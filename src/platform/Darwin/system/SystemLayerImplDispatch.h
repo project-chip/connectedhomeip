@@ -22,15 +22,16 @@
 
 #pragma once
 
+#include "system/SystemClock.h"
 #include "system/SystemConfig.h"
 
 #include <lib/support/ObjectLifeCycle.h>
 #include <system/SystemLayer.h>
 #include <system/SystemTimer.h>
 
+#include <vector>
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 #include <mutex>
-#include <vector>
 #endif
 
 namespace chip {
@@ -55,7 +56,6 @@ public:
 
     // LayerDispatch overrides.
     void SetDispatchQueue(dispatch_queue_t dispatchQueue) override { mDispatchQueue = dispatchQueue; };
-    dispatch_queue_t GetDispatchQueue() override { return mDispatchQueue; };
     void HandleDispatchQueueEvents(Clock::Timeout timeout) override;
     CHIP_ERROR ScheduleWorkWithBlock(dispatch_block_t block) override;
     CHIP_ERROR StartTimerWithBlock(dispatch_block_t block, Clock::Timeout delay) override;
@@ -119,38 +119,57 @@ protected:
     CHIP_ERROR ClearCallback(SocketWatchToken token, SocketEventFlags flag);
 #endif
 
-    TimerPool<TimerList::Node> mTimerPool;
-    TimerList mTimerList;
-    // List of expired timers being processed right now.  Stored in a member so
-    // we can cancel them.
-    TimerList mExpiredTimers;
-    void EnableTimer(const char * source, TimerList::Node *);
-    void DisableTimer(const char * source, TimerList::Node *);
-    CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState, bool shouldCancel);
+    dispatch_queue_t GetDispatchQueue()
+    {
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        //  We create a suspended serial dispatch queue
+        if (!mDispatchQueue)
+        {
+            mDispatchQueue = dispatch_queue_create("com.chip.unit_test_fallback", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+            mHasSuspendedDispatchQueue = true;
+            dispatch_suspend(mDispatchQueue);
+        }
+#endif
+        VerifyOrDie(nullptr != mDispatchQueue);
+        return mDispatchQueue;
+    };
+
+    // Struct to hold some data for every timer (the timer source object, the time that the timer was supposed to fire, the callback
+    // and the state to pass to the callback).
+    struct TimerData
+    {
+        TimerData(dispatch_source_t timerSource, Clock::Timestamp awakenTime, TimerCompleteCallback onComplete, void * appState);
+        ~TimerData();
+
+        dispatch_source_t timerSource;
+        // Sadly, there doesn't seem to be a way to get the remaining or the
+        // awaken time of a timer from its dispatch_source_t. Also, dispatch_time_t
+        // is an opaque value that can't be used for computations or comparisons.
+        // So we store the time here calculated from SystemClock's monotonic timer.
+        Clock::Timestamp awakenTime;
+        TimerCompleteCallback onComplete;
+        void * appState;
+    };
+
+    std::vector<TimerData> mTimers;
     void HandleTimerEvents(Clock::Timeout timeout);
+
+private:
+    static void EnableTimer(const char * source, dispatch_source_t timerSource);
+    static void DisableTimer(const char * source, dispatch_source_t timerSource);
+    static std::vector<TimerData>::const_iterator CancelTimer(std::vector<TimerData> & timers, TimerCompleteCallback onComplete,
+                                                              void * appState);
+
+    CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState, bool shouldCancel);
 
     ObjectLifeCycle mLayerState;
 
     dispatch_queue_t mDispatchQueue = nullptr;
 
-private:
-    inline bool HasTimerSource(TimerList::Node * timer)
-    {
-#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
-        VerifyOrDie(nullptr != timer->mTimerSource);
-#endif
-        return nullptr != timer->mTimerSource;
-    }
-
-    inline bool HasDispatchQueue(dispatch_queue_t queue)
-    {
-#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
-        VerifyOrDie(nullptr != queue);
-#endif
-        return nullptr != queue;
-    }
-
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    std::vector<TimerData> mExpiredTimers;
+    bool mHasSuspendedDispatchQueue = false;
+
     std::mutex mTestQueueMutex;
     std::vector<dispatch_block_t> mTestQueuedBlocks;
 #endif
