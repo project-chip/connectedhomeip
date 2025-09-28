@@ -40,9 +40,15 @@
 #include <platform/ThreadStackManager.h>
 #include <platforms/openthread-system.h>
 
+namespace {
 #if defined(FEATURE_TRUSTZONE_ENABLE) && (FEATURE_TRUSTZONE_ENABLE == 1)
 constexpr size_t kThreadManagerSecureContextSize = 5 * 1024;
+static void AllocateThreadTaskSecureContext()
+{
+    os_alloc_secure_ctx(kThreadManagerSecureContextSize);
+}
 #endif
+} // namespace
 
 #if DLPS_EN
 #ifdef __cplusplus
@@ -158,7 +164,7 @@ CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
 void ThreadStackManagerImpl::ExecuteThreadTask(void)
 {
 #if defined(FEATURE_TRUSTZONE_ENABLE) && (FEATURE_TRUSTZONE_ENABLE == 1)
-    os_alloc_secure_ctx(kThreadManagerSecureContextSize);
+    AllocateThreadTaskSecureContext();
 #endif
 
     while (true)
@@ -202,7 +208,7 @@ CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
 void ThreadStackManagerImpl::ExecuteThreadTask(void)
 {
 #if defined(FEATURE_TRUSTZONE_ENABLE) && (FEATURE_TRUSTZONE_ENABLE == 1)
-    os_alloc_secure_ctx(kThreadManagerSecureContextSize);
+    AllocateThreadTaskSecureContext();
 #endif
     uint32_t notify;
     while (true)
