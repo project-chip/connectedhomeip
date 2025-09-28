@@ -643,10 +643,20 @@ void WifiInterfaceImpl::ProcessEvent(WiseconnectWifiInterface::WifiPlatformEvent
         break;
 
     case WiseconnectWifiInterface::WifiPlatformEvent::kStationStartJoin:
-        ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationStartJoin");
+        {
+            ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationStartJoin");
+            sl_status_t status = InitiateScan();
+            if(SL_STATUS_OK != status)
+            {
+                ChipLogError(DeviceLayer, "InitiateScan failed: 0x%lx", static_cast<uint32_t>(status));
+            }
 
-        InitiateScan();
-        JoinWifiNetwork();
+            status = JoinWifiNetwork();
+            if(SL_STATUS_OK != status)
+            {
+                ChipLogError(DeviceLayer, "JoinWifiNetwork failed: 0x%lx", static_cast<uint32_t>(status));
+            }
+        }
         break;
 
     case WiseconnectWifiInterface::WifiPlatformEvent::kConnectionComplete:
