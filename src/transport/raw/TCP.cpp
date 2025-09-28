@@ -676,7 +676,6 @@ void TCPBase::HandleIncomingConnection(Inet::TCPEndPoint * listenEndPoint, Inet:
     else
     {
         ChipLogError(Inet, "Insufficient connection space to accept new connections.");
-        endPoint->Free();
         listenEndPoint->OnAcceptError(endPoint, CHIP_ERROR_TOO_MANY_CONNECTIONS);
     }
 }
