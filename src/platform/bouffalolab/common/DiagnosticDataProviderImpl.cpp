@@ -246,6 +246,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 #else
 
     struct netif * netif = deviceInterface_getNetif();
+    if (netif == nullptr)
+    {
+        delete ifp;
+        *netifpp = nullptr;
+        return CHIP_ERROR_NOT_FOUND;
+    }
 
     Platform::CopyString(ifp->Name, netif->name);
     ifp->name          = CharSpan::fromCharString(ifp->Name);
