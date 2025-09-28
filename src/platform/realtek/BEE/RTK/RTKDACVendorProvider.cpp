@@ -210,7 +210,7 @@ CHIP_ERROR RTKDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpan & m
 
     ReturnErrorOnFailure(chip::Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey));
     ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(
-        ByteSpan(reinterpret_cast<uint8_t *>(pFactoryData->dac.dac_key.value), pFactoryData->sdac.dac_key.len),
+        ByteSpan(reinterpret_cast<uint8_t *>(pFactoryData->dac.dac_key.value), pFactoryData->dac.dac_key.len),
         ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length())));
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
     err = CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);

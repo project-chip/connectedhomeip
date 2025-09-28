@@ -22,9 +22,6 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/realtek/BEE/FactoryDataProvider.h>
-#if FEATURE_TRUSTZONE_ENABLE
-#include "rtk_nsc_veneer_customize.h"
-#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -33,7 +30,7 @@ class RTKDACVendorProvider : public chip::Credentials::DeviceAttestationCredenti
 {
 public:
     RTKDACVendorProvider() : pFactoryData(GetFactoryData()) {}
-    ~RTKDACVendorProvider() {}
+    ~RTKDACVendorProvider() = default;
 
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & outBuffer) override;
     CHIP_ERROR GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer) override;
@@ -42,8 +39,6 @@ public:
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) override;
 
 private:
-    static constexpr uint8_t kDACPrivateKeyLength = 32;
-    static constexpr uint8_t kDACPublicKeyLength  = 65;
     const FactoryData * pFactoryData;
 };
 
