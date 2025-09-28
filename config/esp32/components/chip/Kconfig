@@ -847,6 +847,15 @@ menu "CHIP Device Layer"
                 then this option gets enabled.
                 Also, please disable ESP_SECURE_CERT_DS_PERIPHERAL from the menuconfig when this option is disabled
 
+        config USE_ESP32_TEE_SECURE_STORAGE
+            bool "Use ESP32 TEE Secure Storage"
+            depends on SEC_CERT_DAC_PROVIDER && SECURE_ENABLE_TEE && !ESP_SECURE_CERT_DS_PERIPHERAL
+            select MBEDTLS_TEE_SEC_STG_ECDSA_SIGN
+            default y
+            help
+                If DAC is being read from secure cert and ESP-TEE is enabled then this option gets enabled.
+                Also, ESP_SECURE_CERT_DS_PERIPHERAL must be disabled in menuconfig for this option to take effect.
+
         config ENABLE_SET_CERT_DECLARATION_API
             depends on ENABLE_ESP32_FACTORY_DATA_PROVIDER || SEC_CERT_DAC_PROVIDER
             bool "Enable Set CD API"
