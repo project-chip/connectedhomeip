@@ -22,6 +22,8 @@
  *
  */
 
+#include <stdlib.h>
+
 #include "CHIPDeviceManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -30,7 +32,6 @@
 #include <core/ErrorStr.h>
 #include <dac_provider/CommonDACProvider.h>
 #include <platform/realtek/BEE/FactoryDataProvider.h>
-#include <stdlib.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 
