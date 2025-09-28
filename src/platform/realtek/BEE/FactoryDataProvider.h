@@ -52,9 +52,8 @@ public:
     CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override;
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
+
+    static const FactoryData * GetFactoryData();
 };
-
-const FactoryData * GetFactoryData();
-
 } // namespace DeviceLayer
 } // namespace chip

@@ -29,7 +29,7 @@ namespace DeviceLayer {
 class RTKDACVendorProvider : public chip::Credentials::DeviceAttestationCredentialsProvider
 {
 public:
-    RTKDACVendorProvider() : pFactoryData(GetFactoryData()) {}
+    RTKDACVendorProvider() : pFactoryData(FactoryDataProvider::GetFactoryData()) {}
     ~RTKDACVendorProvider() = default;
 
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & outBuffer) override;

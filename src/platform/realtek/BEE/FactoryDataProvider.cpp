@@ -97,12 +97,12 @@ void buf_dump(const char * title, uint8_t * buf, uint32_t data_len)
 #endif
 
 namespace {
-FactoryData mFactoryData = { 0 };
+static FactoryData sFactoryData = { 0 };
 } // namespace
 
-const FactoryData * GetFactoryData()
+const FactoryData * FactoryDataProvider::GetFactoryData()
 {
-    return &mFactoryData;
+    return &sFactoryData;
 }
 
 CHIP_ERROR FactoryDataProvider::Init()
@@ -124,21 +124,21 @@ CHIP_ERROR FactoryDataProvider::Init()
             free(buffer);
             return err;
         }
-        err = decoder.DecodeFactoryData(buffer, &mFactoryData, factorydata_len);
+        err = decoder.DecodeFactoryData(buffer, &sFactoryData, factorydata_len);
 #if FACTORY_TEST
-        ChipLogDetail(DeviceLayer, "DecodeFactoryData passcode %d!", mFactoryData.cdata.passcode);
-        ChipLogDetail(DeviceLayer, "DecodeFactoryData discriminator %d!", mFactoryData.cdata.discriminator);
-        ChipLogDetail(DeviceLayer, "DecodeFactoryData vendor_id %d!", mFactoryData.dii.vendor_id);
-        ChipLogDetail(DeviceLayer, "DecodeFactoryData product_id %d!", mFactoryData.dii.product_id);
-        buf_dump("DecodeFactoryData cd", mFactoryData.dac.cd.value, mFactoryData.dac.cd.len);
-        buf_dump("DecodeFactoryData dac_cert", mFactoryData.dac.dac_cert.value, mFactoryData.dac.dac_cert.len);
-        buf_dump("DecodeFactoryData dac_key", mFactoryData.dac.dac_key.value, mFactoryData.dac.dac_key.len);
-        buf_dump("DecodeFactoryData pai_cert", mFactoryData.dac.pai_cert.value, mFactoryData.dac.pai_cert.len);
-        ChipLogDetail(DeviceLayer, "DecodeFactoryData spake2_it %d", mFactoryData.cdata.spake2_it);
-        buf_dump("DecodeFactoryData rd_id_uid", mFactoryData.dii.rd_id_uid.value, mFactoryData.dii.rd_id_uid.len);
-        buf_dump("DecodeFactoryData vendor_name", mFactoryData.dii.vendor_name.value, mFactoryData.dii.vendor_name.len);
-        buf_dump("DecodeFactoryData product_name", mFactoryData.dii.product_name.value, mFactoryData.dii.product_name.len);
-        buf_dump("DecodeFactoryData serial_num", mFactoryData.dii.serial_num.value, mFactoryData.dii.serial_num.len);
+        ChipLogDetail(DeviceLayer, "DecodeFactoryData passcode %d!", sFactoryData.cdata.passcode);
+        ChipLogDetail(DeviceLayer, "DecodeFactoryData discriminator %d!", sFactoryData.cdata.discriminator);
+        ChipLogDetail(DeviceLayer, "DecodeFactoryData vendor_id %d!", sFactoryData.dii.vendor_id);
+        ChipLogDetail(DeviceLayer, "DecodeFactoryData product_id %d!", sFactoryData.dii.product_id);
+        buf_dump("DecodeFactoryData cd", sFactoryData.dac.cd.value, sFactoryData.dac.cd.len);
+        buf_dump("DecodeFactoryData dac_cert", sFactoryData.dac.dac_cert.value, sFactoryData.dac.dac_cert.len);
+        buf_dump("DecodeFactoryData dac_key", sFactoryData.dac.dac_key.value, sFactoryData.dac.dac_key.len);
+        buf_dump("DecodeFactoryData pai_cert", sFactoryData.dac.pai_cert.value, sFactoryData.dac.pai_cert.len);
+        ChipLogDetail(DeviceLayer, "DecodeFactoryData spake2_it %d", sFactoryData.cdata.spake2_it);
+        buf_dump("DecodeFactoryData rd_id_uid", sFactoryData.dii.rd_id_uid.value, sFactoryData.dii.rd_id_uid.len);
+        buf_dump("DecodeFactoryData vendor_name", sFactoryData.dii.vendor_name.value, sFactoryData.dii.vendor_name.len);
+        buf_dump("DecodeFactoryData product_name", sFactoryData.dii.product_name.value, sFactoryData.dii.product_name.len);
+        buf_dump("DecodeFactoryData serial_num", sFactoryData.dii.serial_num.value, sFactoryData.dii.serial_num.len);
 #endif
         if (err != CHIP_NO_ERROR)
         {
@@ -162,7 +162,7 @@ CHIP_ERROR FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscrimina
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
 #if CONFIG_FACTORY_DATA
-    setupDiscriminator = mFactoryData.cdata.discriminator;
+    setupDiscriminator = sFactoryData.cdata.discriminator;
     err                = CHIP_NO_ERROR;
 #else
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
@@ -186,8 +186,8 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pIterationCount(uint32_t & iterationCou
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
 #if CONFIG_FACTORY_DATA
-    VerifyOrReturnError(mFactoryData.cdata.spake2_it != 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    iterationCount = mFactoryData.cdata.spake2_it;
+    VerifyOrReturnError(sFactoryData.cdata.spake2_it != 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    iterationCount = sFactoryData.cdata.spake2_it;
     err            = CHIP_NO_ERROR;
 #else
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT) && CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
@@ -208,9 +208,9 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
     size_t saltB64Len                       = 0;
 
 #if CONFIG_FACTORY_DATA
-    saltB64Len = mFactoryData.cdata.spake2_salt.len;
+    saltB64Len = sFactoryData.cdata.spake2_salt.len;
     VerifyOrReturnError(saltB64Len <= sizeof(saltB64), CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(saltB64, mFactoryData.cdata.spake2_salt.value, saltB64Len);
+    memcpy(saltB64, sFactoryData.cdata.spake2_salt.value, saltB64Len);
     err = CHIP_NO_ERROR;
 #else
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
@@ -241,9 +241,9 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf
     size_t verifierB64Len                                     = 0;
 
 #if CONFIG_FACTORY_DATA
-    verifierB64Len = mFactoryData.cdata.spake2_verifier.len;
+    verifierB64Len = sFactoryData.cdata.spake2_verifier.len;
     VerifyOrReturnError(verifierB64Len <= sizeof(verifierB64), CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(verifierB64, mFactoryData.cdata.spake2_verifier.value, verifierB64Len);
+    memcpy(verifierB64, sFactoryData.cdata.spake2_verifier.value, verifierB64Len);
     err = CHIP_NO_ERROR;
 #else
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
@@ -268,8 +268,8 @@ CHIP_ERROR FactoryDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
 #if CONFIG_FACTORY_DATA
-    VerifyOrReturnError(mFactoryData.cdata.passcode != 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    setupPasscode = mFactoryData.cdata.passcode;
+    VerifyOrReturnError(sFactoryData.cdata.passcode != 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    setupPasscode = sFactoryData.cdata.passcode;
     err           = CHIP_NO_ERROR;
 #else
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
@@ -291,10 +291,10 @@ CHIP_ERROR FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
 #if CONFIG_FACTORY_DATA
-    VerifyOrReturnError(bufSize >= mFactoryData.dii.vendor_name.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(mFactoryData.dii.vendor_name.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    memcpy(buf, mFactoryData.dii.vendor_name.value, mFactoryData.dii.vendor_name.len);
-    buf[mFactoryData.dii.vendor_name.len] = 0;
+    VerifyOrReturnError(bufSize >= sFactoryData.dii.vendor_name.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(sFactoryData.dii.vendor_name.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    memcpy(buf, sFactoryData.dii.vendor_name.value, sFactoryData.dii.vendor_name.len);
+    buf[sFactoryData.dii.vendor_name.len] = 0;
     err                                   = CHIP_NO_ERROR;
 #else
     VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -310,7 +310,7 @@ CHIP_ERROR FactoryDataProvider::GetVendorId(uint16_t & vendorId)
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
 #if CONFIG_FACTORY_DATA
-    vendorId = mFactoryData.dii.vendor_id;
+    vendorId = sFactoryData.dii.vendor_id;
     err      = CHIP_NO_ERROR;
 #else
     vendorId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
@@ -324,10 +324,10 @@ CHIP_ERROR FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
 #if CONFIG_FACTORY_DATA
-    VerifyOrReturnError(bufSize >= mFactoryData.dii.product_name.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(mFactoryData.dii.product_name.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    memcpy(buf, mFactoryData.dii.product_name.value, mFactoryData.dii.product_name.len);
-    buf[mFactoryData.dii.product_name.len] = 0;
+    VerifyOrReturnError(bufSize >= sFactoryData.dii.product_name.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(sFactoryData.dii.product_name.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    memcpy(buf, sFactoryData.dii.product_name.value, sFactoryData.dii.product_name.len);
+    buf[sFactoryData.dii.product_name.len] = 0;
     err                                    = CHIP_NO_ERROR;
 #else
     VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -343,7 +343,7 @@ CHIP_ERROR FactoryDataProvider::GetProductId(uint16_t & productId)
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
 #if CONFIG_FACTORY_DATA
-    productId = mFactoryData.dii.product_id;
+    productId = sFactoryData.dii.product_id;
     err       = CHIP_NO_ERROR;
 #else
     productId           = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
@@ -373,10 +373,10 @@ CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
 #if CONFIG_FACTORY_DATA
-    VerifyOrReturnError(bufSize >= mFactoryData.dii.serial_num.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(mFactoryData.dii.serial_num.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    memcpy(buf, mFactoryData.dii.serial_num.value, mFactoryData.dii.serial_num.len);
-    buf[mFactoryData.dii.serial_num.len] = 0;
+    VerifyOrReturnError(bufSize >= sFactoryData.dii.serial_num.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(sFactoryData.dii.serial_num.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    memcpy(buf, sFactoryData.dii.serial_num.value, sFactoryData.dii.serial_num.len);
+    buf[sFactoryData.dii.serial_num.len] = 0;
     err                                  = CHIP_NO_ERROR;
 #else
     size_t serialNumLen = 0; // without counting null-terminator
@@ -413,23 +413,23 @@ CHIP_ERROR FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & 
     };
     char * parseEnd;
     size_t dateLen;
-    dateLen = mFactoryData.dii.mfg_date.len;
+    dateLen = sFactoryData.dii.mfg_date.len;
     VerifyOrExit(dateLen == kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Cast does not lose information, because we then check that we only parsed
     // 4 digits, so our number can't be bigger than 9999.
-    year = static_cast<uint16_t>(strtoul((char *) mFactoryData.dii.mfg_date.value, &parseEnd, 10));
-    VerifyOrExit(parseEnd == (char *) mFactoryData.dii.mfg_date.value + 4, err = CHIP_ERROR_INVALID_ARGUMENT);
+    year = static_cast<uint16_t>(strtoul((char *) sFactoryData.dii.mfg_date.value, &parseEnd, 10));
+    VerifyOrExit(parseEnd == (char *) sFactoryData.dii.mfg_date.value + 4, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Cast does not lose information, because we then check that we only parsed
     // 2 digits, so our number can't be bigger than 99.
-    month = static_cast<uint8_t>(strtoul((char *) mFactoryData.dii.mfg_date.value + 5, &parseEnd, 10));
-    VerifyOrExit(parseEnd == (char *) mFactoryData.dii.mfg_date.value + 7, err = CHIP_ERROR_INVALID_ARGUMENT);
+    month = static_cast<uint8_t>(strtoul((char *) sFactoryData.dii.mfg_date.value + 5, &parseEnd, 10));
+    VerifyOrExit(parseEnd == (char *) sFactoryData.dii.mfg_date.value + 7, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Cast does not lose information, because we then check that we only parsed
     // 2 digits, so our number can't be bigger than 99.
-    day = static_cast<uint8_t>(strtoul((char *) mFactoryData.dii.mfg_date.value + 8, &parseEnd, 10));
-    VerifyOrExit(parseEnd == (char *) mFactoryData.dii.mfg_date.value + 10, err = CHIP_ERROR_INVALID_ARGUMENT);
+    day = static_cast<uint8_t>(strtoul((char *) sFactoryData.dii.mfg_date.value + 8, &parseEnd, 10));
+    VerifyOrExit(parseEnd == (char *) sFactoryData.dii.mfg_date.value + 10, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     err             = CHIP_NO_ERROR;
 #endif
@@ -440,7 +440,7 @@ CHIP_ERROR FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & 
 exit:
     if (err != CHIP_NO_ERROR && err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND && err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
-        ChipLogError(DeviceLayer, "Invalid manufacturing date: %s", mFactoryData.dii.mfg_date.value);
+        ChipLogError(DeviceLayer, "Invalid manufacturing date: %s", sFactoryData.dii.mfg_date.value);
     }
     return err;
 }
@@ -453,7 +453,7 @@ CHIP_ERROR FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
 #if FACTORY_TEST
     err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #else
-    hardwareVersion = mFactoryData.dii.hw_ver;
+    hardwareVersion = sFactoryData.dii.hw_ver;
     err             = CHIP_NO_ERROR;
 #endif
 #else
@@ -469,10 +469,10 @@ CHIP_ERROR FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufS
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
 #if CONFIG_FACTORY_DATA
-    VerifyOrReturnError(bufSize >= mFactoryData.dii.hw_ver_string.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(mFactoryData.dii.hw_ver_string.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    memcpy(buf, mFactoryData.dii.hw_ver_string.value, mFactoryData.dii.hw_ver_string.len);
-    buf[mFactoryData.dii.hw_ver_string.len] = 0;
+    VerifyOrReturnError(bufSize >= sFactoryData.dii.hw_ver_string.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(sFactoryData.dii.hw_ver_string.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    memcpy(buf, sFactoryData.dii.hw_ver_string.value, sFactoryData.dii.hw_ver_string.len);
+    buf[sFactoryData.dii.hw_ver_string.len] = 0;
     err                                     = CHIP_NO_ERROR;
 #else
     VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -488,9 +488,9 @@ CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & un
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
 #if CONFIG_FACTORY_DATA
-    VerifyOrReturnError(uniqueIdSpan.size() >= mFactoryData.dii.rd_id_uid.len, CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(mFactoryData.dii.rd_id_uid.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    memcpy(uniqueIdSpan.data(), mFactoryData.dii.rd_id_uid.value, mFactoryData.dii.rd_id_uid.len);
+    VerifyOrReturnError(uniqueIdSpan.size() >= sFactoryData.dii.rd_id_uid.len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(sFactoryData.dii.rd_id_uid.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    memcpy(uniqueIdSpan.data(), sFactoryData.dii.rd_id_uid.value, sFactoryData.dii.rd_id_uid.len);
     err = CHIP_NO_ERROR;
 #else
     err = CHIP_ERROR_WRONG_KEY_TYPE;
