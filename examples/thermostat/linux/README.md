@@ -12,7 +12,7 @@ details.
 
 <hr>
 
--   [Matter Linux Thermostat Example](#matter-linux-lighting-example)
+-   [Matter Linux Thermostat Example](#matter-linux-thermostat-example)
     -   [Building](#building)
     -   [Commandline Arguments](#commandline-arguments)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
