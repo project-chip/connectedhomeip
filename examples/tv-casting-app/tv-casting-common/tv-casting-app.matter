@@ -3071,7 +3071,7 @@ endpoint 0 {
     ram      attribute activeLocale default = "en-US";
     callback attribute supportedLocales;
     callback attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster TimeFormatLocalization {
