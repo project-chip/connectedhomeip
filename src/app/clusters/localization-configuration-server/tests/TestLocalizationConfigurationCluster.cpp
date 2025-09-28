@@ -29,6 +29,7 @@
 #include <lib/support/ReadOnlyBuffer.h>
 #include <platform/DeviceInfoProvider.h>
 #include <platform/PlatformManager.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace {
 
@@ -37,6 +38,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::LocalizationConfiguration;
 using namespace chip::app::Clusters::LocalizationConfiguration::Attributes;
+using namespace chip::Protocols::InteractionModel;
 
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
@@ -127,14 +129,15 @@ TEST_F(TestLocalizationConfigurationCluster, TestReadAndWriteActiveLocale)
     CharSpan initialLocale = CharSpan::fromCharString("de-DE");
     LocalizationConfigurationCluster cluster(*mDeviceInfoProvider, initialLocale);
 
-    // ActiveLocale should not be set.
+    // ActiveLocale should be set to the default locale which is the first supported locale in this case.
     CharSpan actualLocale = cluster.GetActiveLocale();
-    EXPECT_EQ(actualLocale.size(), size_t(0));
+    EXPECT_TRUE(actualLocale.data_equal(supportedLocales[0]));
+    EXPECT_EQ(actualLocale.size(), supportedLocales[0].size());
 
     // Test 1: Write a valid supported locale.
-    CharSpan validLocale                       = CharSpan::fromCharString("es-ES");
-    Protocols::InteractionModel::Status status = cluster.SetActiveLocale(validLocale);
-    EXPECT_EQ(status, Protocols::InteractionModel::Status::Success);
+    CharSpan validLocale                 = CharSpan::fromCharString("es-ES");
+    DataModel::ActionReturnStatus status = cluster.SetActiveLocale(validLocale);
+    EXPECT_EQ(status, Status::Success);
 
     // Verify the valid locale was written correctly.
     actualLocale = cluster.GetActiveLocale();
@@ -145,7 +148,7 @@ TEST_F(TestLocalizationConfigurationCluster, TestReadAndWriteActiveLocale)
     CharSpan invalidLocale = CharSpan::fromCharString("de-DE");
 
     status = cluster.SetActiveLocale(invalidLocale);
-    EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(status, Status::ConstraintError);
 }
 
 TEST_F(TestLocalizationConfigurationCluster, TestReadAttributes)

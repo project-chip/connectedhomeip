@@ -18,7 +18,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/localization-configuration-server/localization-configuration-cluster.h>
 #include <app/static-cluster-config/LocalizationConfiguration.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/DeviceInfoProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -40,57 +40,57 @@ namespace {
 
 LazyRegisteredServerCluster<LocalizationConfigurationCluster> gServer;
 
-} // namespace
-
-Status MatterLocalizationConfigurationClusterServerPreAttributeChangedCallback(const ConcreteAttributePath & attributePath,
-                                                                               EmberAfAttributeType attributeType, uint16_t size,
-                                                                               uint8_t * value)
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
-    return Status::Success;
-}
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    {
+        VerifyOrReturn(endpointId == kRootEndpointId);
+        char outBuf[Attributes::ActiveLocale::TypeInfo::MaxLength()];
+        MutableCharSpan activeLocale(outBuf);
+        Status status = ActiveLocale::Get(endpointId, activeLocale);
+        if (status != Status::Success)
+        {
+            ChipLogError(AppServer, "Failed to get active locale on endpoint %u: 0x%02x", endpointId, to_underlying(status));
+        }
+
+        gServer.Create(*DeviceLayer::GetDeviceInfoProvider(), activeLocale);
+        return gServer.Registration();
+    }
+
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override { return &gServer.Cluster(); }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
+};
+
+} // namespace
 
 void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpointId)
 {
-    VerifyOrReturn(endpointId == kRootEndpointId);
-    char outBuf[Attributes::ActiveLocale::TypeInfo::MaxLength()];
-    MutableCharSpan activeLocale(outBuf);
-    ActiveLocale::Get(endpointId, activeLocale);
-
-    gServer.Create(*DeviceLayer::GetDeviceInfoProvider(), activeLocale);
-
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register LocalizationConfiguration on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
-
-    // If the active locale is not supported, set the default supported locale.
-    if (!gServer.Cluster().IsSupportedLocale(activeLocale))
-    {
-        char tempBuf[Attributes::ActiveLocale::TypeInfo::MaxLength()];
-        MutableCharSpan validLocale(tempBuf);
-        if (gServer.Cluster().GetDefaultLocale(validLocale))
+    IntegrationDelegate integrationDelegate;
+    CodegenClusterIntegration::RegisterServer(
         {
-            gServer.Cluster().SetActiveLocale(validLocale);
-        }
-    }
+            .endpointId = kRootEndpointId,
+            .clusterId  = LocalizationConfiguration::Id,
+            .fixedClusterInstanceCount =
+                static_cast<uint16_t>(LocalizationConfiguration::StaticApplicationConfig::kFixedClusterConfig.size()),
+            .maxClusterInstanceCount = 1, // only root-node functionality supported by this implementation
+            .fetchFeatureMap         = false,
+            .fetchOptionalAttributes = false,
+        },
+        integrationDelegate);
 }
 
 void MatterLocalizationConfigurationClusterServerShutdownCallback(EndpointId endpointId)
 {
-    VerifyOrReturn(endpointId == kRootEndpointId);
-
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to unregister LocalizationConfiguration on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
-
-    gServer.Destroy();
+    IntegrationDelegate integrationDelegate;
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId = kRootEndpointId,
+            .clusterId  = LocalizationConfiguration::Id,
+            .fixedClusterInstanceCount =
+                static_cast<uint16_t>(LocalizationConfiguration::StaticApplicationConfig::kFixedClusterConfig.size()),
+            .maxClusterInstanceCount = 1, // only root-node functionality supported by this implementation
+        },
+        integrationDelegate);
 }
-
-void MatterLocalizationConfigurationPluginServerInitCallback() {}
-
-void MatterLocalizationConfigurationPluginServerShutdownCallback() {}
