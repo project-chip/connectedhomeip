@@ -689,7 +689,8 @@ CHIP_ERROR PushAvStreamTransportManager::IsAnyPrivacyModeActive(bool & isActive)
 uint64_t PushAvStreamTransportManager::OnTriggerActivated(uint8_t fabricIdx, uint8_t sessionGroup)
 {
     std::lock_guard<std::mutex> lock(mSessionMapMutex);
-    auto & sessionInfo = mSessionMap[{ fabricIdx, sessionGroup }];
+    auto sessionKey    = CreateSessionKey(fabricIdx, sessionGroup);
+    auto & sessionInfo = mSessionMap[sessionKey];
     auto now           = std::chrono::system_clock::now();
     if (sessionInfo.activeCount == 0)
     {
@@ -712,7 +713,8 @@ uint64_t PushAvStreamTransportManager::OnTriggerActivated(uint8_t fabricIdx, uin
 void PushAvStreamTransportManager::OnTriggerDeactivated(uint8_t fabricIdx, uint8_t sessionGroup)
 {
     std::lock_guard<std::mutex> lock(mSessionMapMutex);
-    auto & sessionInfo = mSessionMap[{ fabricIdx, sessionGroup }];
+    auto sessionKey    = CreateSessionKey(fabricIdx, sessionGroup);
+    auto & sessionInfo = mSessionMap[sessionKey];
     sessionInfo.activeCount--;
 }
 

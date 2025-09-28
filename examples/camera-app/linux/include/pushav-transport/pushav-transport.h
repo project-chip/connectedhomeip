@@ -37,6 +37,16 @@
 #include <thread>
 #include <vector>
 
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace PushAvStreamTransport {
+class PushAvStreamTransportManager; // Forward declaration
+} // namespace PushAvStreamTransport
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
 static constexpr int kInvalidZoneId      = -1;
 static constexpr int kDefaultSensitivity = 5;
 

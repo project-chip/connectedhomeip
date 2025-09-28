@@ -16,13 +16,15 @@
  *    limitations under the License.
  */
 
+#include <push-av-stream-manager.h>
 #include <pushav-transport.h>
 
 using namespace chip::app::Clusters::PushAvStreamTransport;
 
 PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
                                  AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams) :
-    mAudioStreamParams(audioStreamParams), mVideoStreamParams(videoStreamParams)
+    mAudioStreamParams(audioStreamParams),
+    mVideoStreamParams(videoStreamParams)
 {
     ConfigureRecorderSettings(transportOptions, audioStreamParams, videoStreamParams);
     mConnectionID    = connectionID;
@@ -295,7 +297,7 @@ bool PushAVTransport::HandleTriggerDetected()
         mHasAugmented                       = false;
         mRecorder->mClipInfo.activationTime = std::chrono::steady_clock::now();
         mRecorder->mClipInfo.mSessionNumber =
-            mPushAvStreamTransportManager.OnTriggerActivation(mFabricIndex, mClipInfo.mSessionGroup);
+            mPushAvStreamTransportManager->OnTriggerActivated(mFabricIndex, mClipInfo.mSessionGroup);
         mRecorder->SetFabricIndex(mFabricIndex);
         mRecorder->SetPushAvStreamTransportManager(mPushAvStreamTransportManager);
 
@@ -456,7 +458,7 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
             mRecorder->SetConnectionInfo(mConnectionID, mTransportTriggerType,
                                          chip::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum>());
             mRecorder->mClipInfo.mSessionNumber =
-                mPushAvStreamTransportManager.OnTriggerActivation(mFabricIndex, mClipInfo.mSessionGroup);
+                mPushAvStreamTransportManager->OnTriggerActivated(mFabricIndex, mClipInfo.mSessionGroup);
             mRecorder->SetFabricIndex(mFabricIndex);
             mRecorder->SetPushAvStreamTransportManager(mPushAvStreamTransportManager);
             mRecorder->Start();

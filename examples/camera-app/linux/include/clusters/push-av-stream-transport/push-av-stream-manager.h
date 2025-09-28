@@ -37,6 +37,12 @@ namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
 
+// Helper function to combine FabricIndex and sessionGroup into a single key
+inline uint32_t CreateSessionKey(FabricIndex fabricIdx, uint8_t sessionGroup)
+{
+    return (static_cast<uint32_t>(fabricIdx) << 8) | sessionGroup;
+}
+
 struct PushAvStream
 {
     uint16_t id;
@@ -50,15 +56,6 @@ struct SessionInfo
     uint64_t sessionNumber = 1;
     std::chrono::system_clock::time_point sessionStartedTimestamp;
     int activeCount = 0;
-    mutable std::mutex sessionMutex;
-
-    uint64_t GetSessionNumber()
-    {
-        std::lock_guard<std::mutex> lock(sessionMutex);
-        sessionNumber++;
-        sessionStartedTimestamp = std::chrono::system_clock::now();
-        return sessionNumber;
-    }
 };
 
 /**
@@ -148,7 +145,7 @@ private:
     VideoStreamStruct mVideoStreamParams;
     std::unordered_map<uint16_t, std::unique_ptr<PushAVTransport>> mTransportMap; // map for the transport objects
     std::unordered_map<uint16_t, TransportOptionsStruct> mTransportOptionsMap;    // map for the transport options
-    std::unordered_map<std::pair<FabricIndex, uint8_t>, SessionInfo> mSessionMap; // map for the session info
+    std::unordered_map<uint32_t, SessionInfo> mSessionMap;                        // map for the session info
     std::mutex mSessionMapMutex;
     uint32_t mTotalUsedBandwidthbps = 0; // Tracks the total bandwidth used by all active transports
 

@@ -21,6 +21,7 @@
 #include <dirent.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
+#include <push-av-stream-manager.h>
 #include <sys/stat.h>
 
 extern "C" {
@@ -44,7 +45,8 @@ AVDictionary * options = NULL;
 
 PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStruct & aAudioInfo, VideoInfoStruct & aVideoInfo,
                                        PushAVUploader * aUploader) :
-    mClipInfo(aClipInfo), mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
+    mClipInfo(aClipInfo),
+    mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
 {
     mFormatContext        = nullptr;
     mInputFormatContext   = nullptr;
@@ -80,7 +82,7 @@ PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStru
     SetRecorderStatus(false); // Start off as not running
 
     mClipInfo.mRecorderId = std::to_string(mVideoInfo.mVideoStreamIndex) + "-" + std::to_string(mAudioInfo.mAudioStreamIndex);
-    ChipLogProgress(Camera, "PushAVClipRecorder initialized with sessionID: %u Track name: %s, output path: %s",
+    ChipLogProgress(Camera, "PushAVClipRecorder initialized with sessionID: %lu Track name: %s, output path: %s",
                     mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str(), mClipInfo.mOutputPath.c_str());
 }
 
@@ -308,7 +310,7 @@ void PushAVClipRecorder::Start()
 
     SetRecorderStatus(true);
     mWorkerThread = std::thread(&PushAVClipRecorder::StartClipRecording, this);
-    ChipLogProgress(Camera, "Recording started for sessionID: %u Track name: %s", mClipInfo.mSessionNumber,
+    ChipLogProgress(Camera, "Recording started for sessionID: %lu Track name: %s", mClipInfo.mSessionNumber,
                     mClipInfo.mTrackName.c_str());
 }
 
@@ -359,7 +361,7 @@ void PushAVClipRecorder::Stop()
         ChipLogError(Camera, "Error recording is not running");
     }
     mDeinitializeRecorder = true;
-    ChipLogProgress(Camera, "Recording stopped for sessionID: %u Track name: %s", mClipInfo.mSessionNumber,
+    ChipLogProgress(Camera, "Recording stopped for sessionID: %lu Track name: %s", mClipInfo.mSessionNumber,
                     mClipInfo.mTrackName.c_str());
 }
 
@@ -410,7 +412,7 @@ int PushAVClipRecorder::StartClipRecording()
             lock, [this] { return !mVideoQueue.empty() || !mAudioQueue.empty() || !GetRecorderStatus() || mDeinitializeRecorder; });
         if (!GetRecorderStatus() || mDeinitializeRecorder)
         {
-            ChipLogProgress(Camera, "Recorder thread received stop signal for sessionID: %u Track name: %s",
+            ChipLogProgress(Camera, "Recorder thread received stop signal for sessionID: %lu Track name: %s",
                             mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str());
             break; // Exit loop
         }

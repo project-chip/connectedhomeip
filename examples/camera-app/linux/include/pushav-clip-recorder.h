@@ -41,6 +41,16 @@ extern "C" {
 #include <libavutil/timestamp.h>
 }
 
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace PushAvStreamTransport {
+class PushAvStreamTransportManager; // Forward declaration
+} // namespace PushAvStreamTransport
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
 /**
  * @struct BufferData
  * @brief Contains buffer information for custom IO operations
