@@ -4880,14 +4880,6 @@
               "isEnabled": 1
             },
             {
-              "name": "SetActiveScheduleRequest",
-              "code": 5,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
               "name": "SetActivePresetRequest",
               "code": 6,
               "mfgCode": null,
@@ -5218,54 +5210,6 @@
               "reportableChange": 0
             },
             {
-              "name": "NumberOfSchedules",
-              "code": 75,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0",
-              "reportable": 0,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "NumberOfScheduleTransitions",
-              "code": 76,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0",
-              "reportable": 0,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "NumberOfScheduleTransitionPerDay",
-              "code": 77,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 0,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
               "name": "ActivePresetHandle",
               "code": 78,
               "mfgCode": null,
@@ -5282,22 +5226,6 @@
               "reportableChange": 0
             },
             {
-              "name": "ActiveScheduleHandle",
-              "code": 79,
-              "mfgCode": null,
-              "side": "server",
-              "type": "octet_string",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 0,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
               "name": "Presets",
               "code": 80,
               "mfgCode": null,
@@ -5309,22 +5237,6 @@
               "bounded": 0,
               "defaultValue": null,
               "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "Schedules",
-              "code": 81,
-              "mfgCode": null,
-              "side": "server",
-              "type": "array",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
