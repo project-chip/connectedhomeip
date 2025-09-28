@@ -189,39 +189,3 @@
 #ifndef CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION
 #define CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION 0
 #endif
-
-#if defined(CONFIG_ENABLE_RAM_REDUCE) && (CONFIG_ENABLE_RAM_REDUCE == 1)
-#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE (6 * 1024)
-
-#define CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE (4 * 1024)
-
-#define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 8
-
-#define CHIP_LOG_FILTERING 0
-
-#define CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS 1
-
-#define CHIP_CONFIG_MAX_GROUP_DATA_PEERS 7
-
-/**
- * @def CHIP_IM_MAX_NUM_COMMAND_HANDLER
- *
- * @brief Defines the maximum number of CommandHandler, limits the number of active commands transactions on server.
- */
-#define CHIP_IM_MAX_NUM_COMMAND_HANDLER 1
-
-/**
- * @def CHIP_IM_MAX_NUM_WRITE_HANDLER
- *
- * @brief Defines the maximum number of WriteHandler, limits the number of active write transactions on server.
- */
-#define CHIP_IM_MAX_NUM_WRITE_HANDLER 1
-
-#define CHIP_IM_MAX_NUM_WRITE_CLIENT 1
-
-#define CHIP_IM_MAX_REPORTS_IN_FLIGHT 1
-
-#define CHIP_CONFIG_LAMBDA_EVENT_SIZE (16)
-
-#define CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES 2
-#endif

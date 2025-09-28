@@ -199,6 +199,7 @@ CHIP_ERROR RTKDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpan & m
 
 #if CONFIG_FACTORY_DATA
 #if FEATURE_TRUSTZONE_ENABLE
+    ChipLogError(DeviceLayer, "TrustZone build: Device attestation is NOT implemented. Attestation will fail.");
     ReturnErrorOnFailure(CHIP_ERROR_NOT_IMPLEMENTED);
 #else
     VerifyOrReturnError(pFactoryData->dac.dac_cert.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
@@ -209,7 +210,7 @@ CHIP_ERROR RTKDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpan & m
 
     ReturnErrorOnFailure(chip::Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey));
     ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(
-        ByteSpan(reinterpret_cast<uint8_t *>(mFactoryData.dac.dac_key.value), mFactoryData.dac.dac_key.len),
+        ByteSpan(reinterpret_cast<uint8_t *>(pFactoryData->dac.dac_key.value), pFactoryData->dac.dac_key.len),
         ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length())));
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
     err = CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);

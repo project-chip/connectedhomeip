@@ -45,10 +45,6 @@ private:
     static constexpr uint8_t kDACPrivateKeyLength = 32;
     static constexpr uint8_t kDACPublicKeyLength  = 65;
     const FactoryData * pFactoryData;
-
-#if FEATURE_TRUSTZONE_ENABLE
-    rtk_matter_data param;
-#endif
 };
 
 } // namespace DeviceLayer
