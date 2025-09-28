@@ -522,8 +522,8 @@ CHIP_ERROR EventManagement::CopyEvent(const TLVReader & aReader, TLVWriter & aWr
     return CHIP_NO_ERROR;
 }
 
-bool EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOutContext,
-                                        const EventManagement::EventEnvelopeContext & event)
+bool EventManagement::IncludeEventInReport(EventLoadOutContext * eventLoadOutContext,
+                                           const EventManagement::EventEnvelopeContext & event)
 {
     if (eventLoadOutContext->mCurrentEventNumber < eventLoadOutContext->mStartingEventNumber)
     {
@@ -609,7 +609,7 @@ CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDep
     apEventLoadOutContext->mCurrentTime        = event->mCurrentTime;
     apEventLoadOutContext->mCurrentEventNumber = event->mEventNumber;
 
-    encodeEvent = CheckEventContext(apEventLoadOutContext, *event);
+    encodeEvent = IncludeEventInReport(apEventLoadOutContext, *event);
     return err;
 }
 

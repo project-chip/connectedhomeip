@@ -512,7 +512,7 @@ private:
      * The function is used to scan through the event log to find events matching the spec in the supplied context.
      * Particularly, it would check against mStartingEventNumber, and skip fetched event.
      *
-     * If the fetched event log is not going to be filtered, the encodeEvent will be true.
+     * On success, if the event represented by the EventEnvelopeContext should be encoded, encodeEvent will be set to true.
      */
     static CHIP_ERROR EventIterator(const TLV::TLVReader & aReader, size_t aDepth, EventLoadOutContext * apEventLoadOutContext,
                                     EventEnvelopeContext * event, bool & encodeEvent);
@@ -544,10 +544,10 @@ private:
     /**
      * @brief Check whether the event instance represented by the EventEnvelopeContext should be included in the report.
      *
-     * @retval false This path should be excluded in the generated event report.
-     * @retval true This path should be included in the generated event report.
+     * @retval false This event instance should be excluded in the generated event report.
+     * @retval true This event instance should be included in the generated event report.
      */
-    static bool CheckEventContext(EventLoadOutContext * eventLoadOutContext, const EventEnvelopeContext & event);
+    static bool IncludeEventInReport(EventLoadOutContext * eventLoadOutContext, const EventEnvelopeContext & event);
 
     /**
      * @brief copy event from circular buffer to target buffer for report
