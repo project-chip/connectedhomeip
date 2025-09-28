@@ -23,9 +23,11 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/LocalizationConfiguration/ClusterId.h>
 #include <lib/support/Span.h>
+#include <lib/support/TypeTraits.h>
 #include <platform/DeviceInfoProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+using namespace chip::Protocols::InteractionModel;
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -36,7 +38,20 @@ public:
     LocalizationConfigurationCluster(DeviceLayer::DeviceInfoProvider & aDeviceInfoProvider, CharSpan activeLocale) :
         DefaultServerCluster({ kRootEndpointId, LocalizationConfiguration::Id }), mDeviceInfoProvider(aDeviceInfoProvider)
     {
-        SetActiveLocale(activeLocale);
+        DataModel::ActionReturnStatus status = SetActiveLocale(activeLocale);
+        if (status != Status::Success)
+        {
+            char tempBuf[kActiveLocaleMaxLength];
+            MutableCharSpan validLocale(tempBuf);
+            if (GetDefaultLocale(validLocale))
+            {
+                status = SetActiveLocale(validLocale);
+                if (status != Status::Success)
+                {
+                    ChipLogError(AppServer, "Failed to set active locale on endpoint %u", kRootEndpointId);
+                }
+            }
+        }
     }
 
     // Server cluster implementation
@@ -54,10 +69,11 @@ public:
      * @return InteractionModel::Status::Success on success, InteractionModel::Status::ConstraintError if the locale is not valid or
      * supportedLocale.
      */
-    Protocols::InteractionModel::Status SetActiveLocale(CharSpan activeLocale);
+    DataModel::ActionReturnStatus SetActiveLocale(CharSpan activeLocale);
 
     CharSpan GetActiveLocale();
 
+private:
     /*
      * Read the supported locales.
      *
@@ -72,7 +88,7 @@ public:
      * @param newLangTag The locale to check.
      * @return true if the locale is supported, false otherwise.
      */
-    bool IsSupportedLocale(CharSpan newLangTag);
+    bool IsSupportedLocale(CharSpan newLangTag) const;
 
     /**
      * @brief Get the default locale of the device.
@@ -82,7 +98,6 @@ public:
      */
     virtual bool GetDefaultLocale(MutableCharSpan & outLocale);
 
-private:
     Storage::String<kActiveLocaleMaxLength> mActiveLocale;
     DeviceLayer::DeviceInfoProvider & mDeviceInfoProvider;
 };

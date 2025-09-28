@@ -811,6 +811,7 @@
             "FeatureMap"
         ],
         "Unit Localization": ["TemperatureUnit"],
+        "Localization Configuration": ["ClusterRevision", "SupportedLocales"],
         "TLS Certificate Management": [
             "ClusterRevision",
             "MaxRootCertificates",

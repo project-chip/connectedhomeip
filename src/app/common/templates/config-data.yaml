@@ -119,6 +119,7 @@ ClustersWithPreAttributeChangeFunctions:
     - Pump Configuration and Control
     - Thermostat User Interface Configuration
     - Localization Configuration
+    - Time Format Localization
     - Mode Select
     - Fan Control
     - Thermostat
