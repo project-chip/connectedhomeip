@@ -510,11 +510,11 @@ void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callback
     {
         JniUtfString jniInstanceName(env, (jstring) env->GetObjectArrayElement(instanceName, i));
         VerifyOrReturn(strlen(jniInstanceName.c_str()) <= Operational::kInstanceNameMaxLength,
-                       dispatch(CHIP_ERROR_INVALID_ARGUMENT));
+                       { delete[] service; dispatch(CHIP_ERROR_INVALID_ARGUMENT); });
 
         CopyString(service[i].mName, jniInstanceName.c_str());
         VerifyOrReturn(extractProtocol(jniServiceType.c_str(), service[i].mType, service[i].mProtocol) == CHIP_NO_ERROR,
-                       dispatch(CHIP_ERROR_INVALID_ARGUMENT));
+                       { delete[] service; dispatch(CHIP_ERROR_INVALID_ARGUMENT); });
     }
 
     dispatch(CHIP_NO_ERROR, service, size);
