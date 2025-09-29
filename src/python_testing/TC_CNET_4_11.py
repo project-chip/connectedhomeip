@@ -442,12 +442,15 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
 
             # If connection failed and we have more attempts, reset interface
             if attempt < MAX_ATTEMPTS:
+                logger.warning(
+                    f"connect_wifi_linux: Attempt {attempt} failed after {CONNECTION_TIMEOUT}s (last_state: {last_state}), resetting interface")
                 await run_subprocess(["sudo", "ip", "link", "set", interface, "down"])
                 await asyncio.sleep(2)
                 await run_subprocess(["sudo", "ip", "link", "set", interface, "up"])
                 await asyncio.sleep(3)
 
                 # Re-select and reconnect to the network
+                logger.info(f"connect_wifi_linux: Re-selecting network {network_id} for attempt {attempt + 1}")
                 await wpa_command(interface, f"SELECT_NETWORK {network_id}")
                 await wpa_command(interface, "REASSOCIATE")
                 await asyncio.sleep(2)
