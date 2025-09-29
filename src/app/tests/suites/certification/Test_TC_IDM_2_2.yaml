@@ -563,7 +563,7 @@ tests:
         [1720438762.167] [11289:11291] [TOO]   Type: 8
         [1720438762.167] [11289:11291] [EM] <<< [E:62870i S:42139 M:55647198 (Ack:38231779)] (S) Msg TX to 1:0000000000000001 [67EF] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
         [1720438762.168] [11289:11291] [EM] Flushed pending ack for MessageCounter:38231779 on exchange 62870i
-              disabled: true
+    disabled: true
 
     - label:
           "Step 18: TH sends the Read Request Message to the DUT to read an
