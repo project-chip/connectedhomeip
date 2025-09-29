@@ -191,6 +191,38 @@ protected:
     }
 };
 
+/** @brief
+ *  Defines methods for implementing application-specific logic for checking if a certificate
+ *  has no blocking dependencies and can be removed.
+ */
+class CertificateDependencyChecker
+{
+public:
+    CertificateDependencyChecker() = default;
+
+    virtual ~CertificateDependencyChecker() = default;
+
+    /**
+     * @brief Checks whether the root certificate with the given (matterEndpoint, fabric, id) has no dependencies
+     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the certificate is associated with
+     * @param[in] id The id of the root certificate to remove.
+     * @return CHIP_NO_ERROR if the certificate can be removed.
+     */
+    virtual CHIP_ERROR RootCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) = 0;
+
+    /**
+     * @brief Checks whether the client certificate with the given (matterEndpoint, fabric, id) has no dependencies
+     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the certificate is associated with
+     * @param[in] id The id of the client certificate to remove.
+     * @return CHIP_NO_ERROR if the certificate can be removed.
+     */
+    virtual CHIP_ERROR ClientCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id) = 0;
+};
+
 } // namespace Tls
 } // namespace Clusters
 
