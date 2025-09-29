@@ -672,8 +672,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                     ChipLogError(
                         Zcl, "Transport Options verification from command data[ep=%d]: Duplicate Zone ID (=%d) in Motion Zones. ",
                         mEndpointId, zoneID);
-                    handler.AddStatus(commandPath, Status::AlreadyExists);
-                    return std::nullopt;
+                    return Status::AlreadyExists;
                 }
             }
             else
@@ -684,8 +683,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                     ChipLogError(
                         Zcl, "Transport Options verification from command data[ep=%d]: Duplicate Null Zone ID in Motion Zones. ",
                         mEndpointId);
-                    handler.AddStatus(commandPath, Status::AlreadyExists);
-                    return std::nullopt;
+                    return Status::AlreadyExists;
                 }
                 nullFound = true;
             }
