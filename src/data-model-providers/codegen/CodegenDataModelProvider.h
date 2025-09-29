@@ -67,7 +67,8 @@ public:
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
 
-    void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType) override;
+    void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType,
+                                        FabricIndex accessingFabric) override;
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 

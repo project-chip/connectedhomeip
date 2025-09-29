@@ -59,8 +59,7 @@ class MockServerCluster : public DefaultServerCluster
 public:
     MockServerCluster(std::initializer_list<ConcreteClusterPath> paths, DataVersion dataVersion,
                       BitFlags<DataModel::ClusterQualityFlags> flags) :
-        DefaultServerCluster({ 0, 0 }),
-        mPaths(paths), mDataVersion(dataVersion), mFlags(flags),
+        DefaultServerCluster({ 0, 0 }), mPaths(paths), mDataVersion(dataVersion), mFlags(flags),
         mAttributeEntry(1, BitMask<DataModel::AttributeQualityFlags>(), std::nullopt, std::nullopt)
     {}
 
@@ -175,10 +174,12 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType) override
+    void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType,
+                                        FabricIndex accessingFabric) override
     {
         mLastListWriteOpPath = path;
         mLastListWriteOpType = opType;
+        mLastListWriteOpAccessingFabric = accessingFabric;
     }
 
     CHIP_ERROR Startup(ServerClusterContext & context) override
@@ -209,6 +210,7 @@ public:
     DataModel::EventEntry mEventEntry;
     std::optional<ConcreteAttributePath> mLastListWriteOpPath;
     std::optional<DataModel::ListWriteOperation> mLastListWriteOpType;
+    std::optional<FabricIndex> mLastListWriteOpAccessingFabric;
 };
 
 class TestCodeDrivenDataModelProvider : public ::testing::Test
@@ -830,7 +832,7 @@ TEST_F(TestCodeDrivenDataModelProvider, ListAttributeWriteNotification)
     mProvider.AddEndpoint(*mOwnedRegistrations.back());
 
     ConcreteAttributePath path(1, 10, 1);
-    mProvider.ListAttributeWriteNotification(path, DataModel::ListWriteOperation::kListWriteSuccess);
+    mProvider.ListAttributeWriteNotification(path, DataModel::ListWriteOperation::kListWriteSuccess, 1);
     ASSERT_TRUE(testCluster.mLastListWriteOpPath.has_value());
     if (testCluster.mLastListWriteOpPath)
     {
@@ -840,6 +842,11 @@ TEST_F(TestCodeDrivenDataModelProvider, ListAttributeWriteNotification)
     if (testCluster.mLastListWriteOpType)
     {
         EXPECT_EQ(testCluster.mLastListWriteOpType.value(), DataModel::ListWriteOperation::kListWriteSuccess);
+    }
+    ASSERT_TRUE(testCluster.mLastListWriteOpAccessingFabric.has_value());
+    if (testCluster.mLastListWriteOpAccessingFabric)
+    {
+        EXPECT_EQ(testCluster.mLastListWriteOpAccessingFabric.value(), 1);
     }
 }
 
