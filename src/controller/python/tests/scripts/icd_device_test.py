@@ -57,16 +57,6 @@ async def main():
         metavar="<timeout-second>",
     )
     optParser.add_option(
-        "-a",
-        "--address",
-        action="store",
-        dest="deviceAddress",
-        default='',
-        type='str',
-        help="Address of the device",
-        metavar="<device-addr>",
-    )
-    optParser.add_option(
         "--setup-payload",
         action="store",
         dest="setupPayload",
@@ -133,9 +123,9 @@ async def main():
     devCtrl = test.devCtrl
     devCtrl.EnableICDRegistration(devCtrl.GenerateICDRegistrationParameters())
     logger.info("Testing commissioning")
-    FailIfNot(await test.TestCommissioning(ip=options.deviceAddress,
-                                           setuppin=20202021,
-                                           nodeid=options.nodeid),
+    FailIfNot(await test.TestOnNetworkCommissioning(discriminator=options.discriminator,
+                                                    setuppin=options.setupPayload,
+                                                    nodeid=options.nodeid),
               "Failed to finish key exchange")
     logger.info("Commissioning completed")
 

@@ -59,14 +59,22 @@ async def main():
         metavar="<timeout-second>",
     )
     optParser.add_option(
-        "-a",
-        "--address",
+        "-d",
+        "--discriminator",
         action="store",
-        dest="deviceAddress",
+        dest="discriminator",
         default='',
-        type='str',
-        help="Address of the device",
-        metavar="<device-addr>",
+        type='int',
+        help="Discriminator of the device",
+    )
+    optParser.add_option(
+        "-c",
+        "--passcode",
+        action="store",
+        dest="passcode",
+        default='',
+        type='int',
+        help="Passcode of the device",
     )
     optParser.add_option(
         "-p",
@@ -95,9 +103,9 @@ async def main():
               "Failed to finish network commissioning")
 
     logger.info("Testing commissioning")
-    FailIfNot(await test.TestCommissioning(ip=options.deviceAddress,
-                                           setuppin=20202021,
-                                           nodeid=1),
+    FailIfNot(await test.TestOnNetworkCommissioning(discriminator=options.discriminator,
+                                                    setuppin=options.passcode,
+                                                    nodeid=1),
               "Failed to finish key exchange")
 
     FailIfNot(await test.TestFailsafe(nodeid=1), "Failed failsafe test")

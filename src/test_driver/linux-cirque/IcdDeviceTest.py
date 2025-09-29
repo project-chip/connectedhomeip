@@ -41,6 +41,7 @@ TEST_DISCRIMINATOR2 = 3584
 TEST_DISCRIMINATOR3 = 1203
 TEST_DISCRIMINATOR4 = 2145
 TEST_DISCOVERY_TYPE = [0, 1, 2]
+TEST_PASSCODE = 20202021
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 
 TEST_EVENT_KEY_HEX = "00112233445566778899aabbccddeeff"
@@ -105,9 +106,10 @@ class TestCommissioner(CHIPVirtualHome):
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_repl-1.0.0-py3-none-any.whl")))
 
         command = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
-                   "--args python3 {} -t 300 -a {} --paa-trust-store-path {} --test-event-key {}").format(
+                   "--args python3 {} -t 300 --discriminator {} --setup-payload {} --paa-trust-store-path {} --test-event-key {}").format(
             os.path.join(
-                CHIP_REPO, "src/controller/python/tests/scripts/icd_device_test.py"), ethernet_ip,
+                CHIP_REPO, "src/controller/python/tests/scripts/icd_device_test.py"),
+            TEST_DISCRIMINATOR, TEST_PASSCODE,
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS), TEST_EVENT_KEY_HEX)
         ret = self.execute_device_cmd(req_device_id, command)
 
