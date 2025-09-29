@@ -9,9 +9,9 @@ import tempfile
 from typing import Optional
 
 import click
-from zap_download import DownloadReleasedZap
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+from zap_download import DownloadReleasedZap
 
 
 try:
