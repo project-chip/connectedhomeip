@@ -242,8 +242,8 @@ TimeSynchronizationCluster::TimeSynchronizationCluster(
     EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
     TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type supportsDNSResolve, TimeZoneDatabaseEnum timeZoneDatabase,
     TimeSynchronization::TimeSourceEnum timeSource) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mFeatures(features), mSupportsDNSResolve(supportsDNSResolve), mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mFeatures(features), mSupportsDNSResolve(supportsDNSResolve),
+    mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -1152,6 +1152,7 @@ TimeSynchronizationCluster::HandleSetUTCTime(CommandHandler * commandObj, const 
         (currentGranularity == GranularityEnum::kNoTimeGranularity || granularity >= currentGranularity) &&
         CHIP_NO_ERROR == SetUTCTime(commandPath.mEndpointId, utcTime, granularity, TimeSourceEnum::kAdmin))
     {
+        NotifyAttributeChanged(UTCTime::Id);
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -1181,6 +1182,7 @@ TimeSynchronizationCluster::HandleSetTrustedTimeSource(CommandHandler * commandO
     }
 
     SetTrustedTimeSource(tts);
+    NotifyAttributeChanged(TrustedTimeSource::Id);
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -1237,6 +1239,7 @@ TimeSynchronizationCluster::HandleSetTimeZone(CommandHandler * commandObj, const
     }
 
     commandObj->AddResponse(commandPath, response);
+    NotifyAttributeChanged(TimeZone::Id);
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -1267,6 +1270,7 @@ TimeSynchronizationCluster::HandleSetDSTOffset(CommandHandler * commandObj, cons
         emitDSTStatusEvent(commandPath.mEndpointId, TimeState::kActive == UpdateDSTOffsetState(), GetEventsGenerator());
     }
 
+    NotifyAttributeChanged(DSTOffset::Id);
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -1296,6 +1300,8 @@ TimeSynchronizationCluster::HandleSetDefaultNTP(CommandHandler * commandObj, con
     {
         return Protocols::InteractionModel::Status::Failure;
     }
+
+    NotifyAttributeChanged(DefaultNTP::Id);
     return Protocols::InteractionModel::Status::Success;
 }
 

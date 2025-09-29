@@ -35,7 +35,7 @@ constexpr size_t kTimeSynchronizationFixedClusterCount = TimeSynchronization::St
 constexpr size_t kTimeSynchronizationMaxClusterCount =
     kTimeSynchronizationFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-LazyRegisteredServerCluster<TimeSynchronizationCluster> gServers[kTimeSynchronizationMaxClusterCount];
+LazyRegisteredServerCluster<TimeSynchronizationCluster> gServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -54,17 +54,17 @@ public:
         TimeSynchronization::TimeSourceEnum timeSource = TimeSourceEnum::kNone;
         TimeSource::Get(endpointId, &timeSource);
 
-        gServers[clusterInstanceIndex].Create(endpointId, featureMap, supportsDNSResolve, timeZoneDatabase, timeSource);
-        return gServers[clusterInstanceIndex].Registration();
+        gServer.Create(endpointId, featureMap, supportsDNSResolve, timeZoneDatabase, timeSource);
+        return gServer.Registration();
     }
 
     ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
-        VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
-        return &gServers[clusterInstanceIndex].Cluster();
+        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+        return &gServer.Cluster();
     }
 
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
 };
 
 } // namespace
