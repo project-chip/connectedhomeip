@@ -1036,7 +1036,7 @@ def _prepare_write_attributes_data(attributes: List[AttributeWriteRequest], must
 
 def WriteAttributes(future: Future, eventLoop, device,
                     attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: Union[None, int] = None,
-                    interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None, 
+                    interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None,
                     suppressResponse: bool = False, forceLegacyListEncoding: bool = False) -> PyChipError:
     handle = GetLibraryHandle()
 

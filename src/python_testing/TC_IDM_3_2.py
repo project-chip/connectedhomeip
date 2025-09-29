@@ -82,7 +82,8 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                         # Check if this attribute requires timed write using the must_use_timed_write property
                         if hasattr(attr_instance, 'must_use_timed_write') and attr_instance.must_use_timed_write:
                             if await self.attribute_guard(endpoint=endpoint_id, attribute=attr_class):
-                                logging.info(f"Found timed write attribute: {attr_class.__name__} (id={attr_id}) in cluster {cluster_type.__name__}")
+                                logging.info(f"Found timed write attribute: {attr_class.__name__} (id={
+                                             attr_id}) in cluster {cluster_type.__name__}")
                                 return endpoint_id, attr_class
                             else:
                                 logging.info(f"Device does not support timed write attribute: {attr_class.__name__} (id={attr_id})")
@@ -218,7 +219,6 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal(write_status2, Status.UnsupportedAttribute,
                              f"Write to unsupported attribute should return UNSUPPORTED_ATTRIBUTE, got {write_status2}")
 
-        
         # Check if NodeLabel attribute exists for steps 4 through 6 (DataVersion and SuppressResponse tests)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
             self.step(4)
@@ -229,13 +229,13 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
             test_attribute = Clusters.BasicInformation.Attributes.NodeLabel
             test_value = "SuppressResponse-Test"
-            
-            logging.info("Testing SuppressResponse functionality with NodeLabel attribute") 
+
+            logging.info("Testing SuppressResponse functionality with NodeLabel attribute")
             # Use the new suppressResponse parameter in controller's WriteAttribute method
             # This should set the SuppressResponse flag in the WriteRequest message
             # and the device should NOT send a WriteResponse back
 
-            with asserts.assert_raises(ChipStackError) as cm:            
+            with asserts.assert_raises(ChipStackError) as cm:
                 res = await self.default_controller.WriteAttribute(
                     nodeid=self.dut_node_id,
                     attributes=[(self.endpoint, test_attribute(test_value))],
@@ -248,14 +248,14 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
             logging.info("Verifying that the write operation succeeded despite timeout")
             actual_value = await self.read_single_attribute_check_success(
-                endpoint=self.endpoint, 
-                cluster=Clusters.BasicInformation, 
+                endpoint=self.endpoint,
+                cluster=Clusters.BasicInformation,
                 attribute=test_attribute
             )
-            
+
             asserts.assert_equal(actual_value, test_value,
-                                f"Attribute should be written. Expected {test_value}, got {actual_value}")
-                                
+                                 f"Attribute should be written. Expected {test_value}, got {actual_value}")
+
             self.step(5)
             '''
             TH sends a ReadRequest message to the DUT to read any attribute on any cluster.
