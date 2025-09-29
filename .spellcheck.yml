@@ -69,3 +69,5 @@ matrix:
     aspell:
       ignore-case: true
       camel-case: true
+      options:
+        spelling_ignore_acronyms: true
