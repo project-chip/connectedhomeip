@@ -23,7 +23,7 @@ namespace Dnssd {
 class DnssdServer
 {
 public:
-    virtual ~DnssdServer()                   = default;
+    virtual ~DnssdServer() = default;
 
     /**
      * @brief Advertise the operational state of the device.
@@ -41,8 +41,8 @@ public:
      *
      * This method initializes and starts the DNS-SD server, enabling the device
      * to advertise its services and respond to discovery requests on the network.
-    */
-    virtual void StartServer()                = 0;
+     */
+    virtual void StartServer() = 0;
 
     /**
      * @brief Stop the DNS-SD server.
@@ -50,7 +50,7 @@ public:
      * This method stops the DNS-SD server, removing any advertised services
      * and preventing the device from responding to discovery requests.
      */
-    virtual void StopServer()                 = 0;
+    virtual void StopServer() = 0;
 
     /**
      * @brief Check if advertising is enabled.
@@ -58,7 +58,7 @@ public:
      * This method checks whether the DNS-SD server is currently advertising
      * services on the network.
      */
-    virtual bool IsAdvertisingEnabled()       = 0;
+    virtual bool IsAdvertisingEnabled() = 0;
 };
 } // namespace Dnssd
 } // namespace chip
