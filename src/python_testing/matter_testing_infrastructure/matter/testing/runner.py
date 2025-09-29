@@ -69,6 +69,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from matter.testing.matter_test_config import MatterTestConfig
 
+LOGGER = logging.getLogger(__name__)
+
 
 def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib.Path]:
     """Attempt to find a PAA trust store following SDK convention at `root_path`
@@ -124,7 +126,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         Args:
             count: The number of tests in the set.
         """
-        logging.info(f'Starting test set, running {count} tests')
+        LOGGER.info(f'Starting test set, running {count} tests')
 
     def stop(self, duration: int):
         """
@@ -133,7 +135,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         Args:
             duration: The duration of the test set in milliseconds.
         """
-        logging.info(f'Finished test set, ran for {duration}ms')
+        LOGGER.info(f'Finished test set, ran for {duration}ms')
 
     def test_start(
             self,
@@ -150,7 +152,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             count: Number of steps in the test
             steps: List of step descriptions
         """
-        logging.info(f'Starting test from {filename}: {name} - {count} steps')
+        LOGGER.info(f'Starting test from {filename}: {name} - {count} steps')
 
     def test_stop(self, exception: Exception, duration: int):
         """
@@ -160,7 +162,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             exception: Exception raised during test execution, or None if successful
             duration: Test execution duration in milliseconds
         """
-        logging.info(f'Finished test in {duration}ms')
+        LOGGER.info(f'Finished test in {duration}ms')
 
     def step_skipped(self, name: str, expression: str):
         """
@@ -172,7 +174,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         # TODO: Do we really need the expression as a string? We can evaluate
         # this in code very easily
-        logging.info(f'\t\t**** Skipping: {name}')
+        LOGGER.info(f'\t\t**** Skipping: {name}')
 
     def step_start(self, name: str):
         """
@@ -183,7 +185,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         # The way I'm calling this, the name is already includes the step
         # number, but it seems like it might be good to separate these
-        logging.info(f'\t\t***** Test Step {name}')
+        LOGGER.info(f'\t\t***** Test Step {name}')
 
     def step_success(self, logger, logs, duration: int, request):
         """
@@ -208,11 +210,11 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             request: The original test request
             received: The actual response received
         """
-        logging.info('\t\t***** Test Failure : ')
+        LOGGER.info('\t\t***** Test Failure : ')
         if received is not None:
-            logging.info(f'\t\t      Received: {received}')
+            LOGGER.info(f'\t\t      Received: {received}')
         if request is not None:
-            logging.info(f'\t\t      Expected: {request}')
+            LOGGER.info(f'\t\t      Expected: {request}')
 
     def step_unknown(self):
         """
@@ -242,7 +244,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             filename: Source file containing the test
             name: Name of the test
         """
-        logging.info(f"Skipping test from {filename}: {name}")
+        LOGGER.info(f"Skipping test from {filename}: {name}")
 
 
 @dataclass
@@ -483,8 +485,8 @@ def run_tests_no_exit(
             except signals.TestAbortAll:
                 ok = False
             except Exception:
-                logging.exception('Exception when executing %s.',
-                                  test_config.testbed_name)
+                LOGGER.exception('Exception when executing %s.',
+                                 test_config.testbed_name)
                 ok = False
 
     if hooks:
@@ -501,9 +503,9 @@ def run_tests_no_exit(
         event_loop.run_until_complete(shutdown())
 
     if ok:
-        logging.info("Final result: PASS !")
+        LOGGER.info("Final result: PASS !")
     else:
-        logging.error("Final result: FAIL !")
+        LOGGER.error("Final result: FAIL !")
     return ok
 
 
@@ -740,7 +742,7 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     if config.pipe_name is not None and not os.path.exists(config.pipe_name):
         # Named pipes are unique, so we MUST have consistent paths
         # Verify from start the named pipe exists.
-        logging.error("Named pipe %r does NOT exist" % config.pipe_name)
+        LOGGER.error("Named pipe %r does NOT exist" % config.pipe_name)
         raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name)
 
     config.fail_on_skipped_tests = args.fail_on_skipped

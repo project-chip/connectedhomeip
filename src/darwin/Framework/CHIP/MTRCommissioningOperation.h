@@ -21,7 +21,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_AVAILABLE(ios(26.2), macos(26.2), watchos(26.2), tvos(26.2))
 @interface MTRCommissioningOperation : NSObject
 /**
  * Initialized via initWithParameters:setupPayload:delegate:queue:

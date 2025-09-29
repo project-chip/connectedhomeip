@@ -672,6 +672,15 @@ CHIP_ERROR CertificateTableImpl::UpdateClientCertificateEntry(FabricIndex fabric
     ClientCertWithKey certWithKey;
     CertificateId localId(id);
     ReturnErrorOnFailure(mClientCertificates.GetTableEntry(fabric_index, localId, certWithKey, buffer));
+    Crypto::P256PublicKey certPubKey;
+    ReturnErrorOnFailure(Crypto::ExtractPubkeyFromX509Cert(entry.clientCertificate.Value().Value(), certPubKey));
+    Crypto::P256Keypair keyPair;
+    ReturnErrorOnFailure(keyPair.Deserialize(certWithKey.key));
+    auto & storedPubKey = keyPair.Pubkey();
+    if (!ByteSpan(storedPubKey, storedPubKey.Length()).data_equal(ByteSpan(certPubKey, certPubKey.Length())))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     certWithKey.detail       = entry;
     certWithKey.detail.ccdid = id;
 
