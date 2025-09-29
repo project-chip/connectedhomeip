@@ -635,7 +635,7 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, TriesNextRes
 
     ASSERT_EQ(r, CHIP_NO_ERROR);
 
-    System::Clock::Internal::MockClock clock;
+    System::Clock::Internal::RAIIMockClock clock;
 
     AddressResolve::NodeLookupHandle handle;
     auto request = NodeLookupRequest(chip::PeerId(1, 2));
@@ -685,7 +685,7 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, CancellingLo
 
     ASSERT_EQ(r, CHIP_NO_ERROR);
 
-    System::Clock::Internal::MockClock clock;
+    System::Clock::Internal::RAIIMockClock clock;
 
     AddressResolve::NodeLookupHandle handle;
     auto request = NodeLookupRequest(chip::PeerId(1, 2));
