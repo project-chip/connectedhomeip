@@ -145,12 +145,20 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         await self.write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
         await self.announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
 
-        # wait for Download event this means updating has started
+        # event_list = [
+        #     {'timeout': 30, 'report_attr': 'newState', 'expected_value': Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying},
+        #     {'timeout': 30, 'report_attr': 'newState', 'expected_value': Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading},
+        #     {'timeout': 60*6, 'event_handler': basicinformation_handler, 'event': Clusters.BasicInformation.Events.ShutDown}
+        # ]
+        # self.await_event_list(event_list, event_handler=event_state_transition,
+        #                       event=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition)
+
+        # Wait for Download event this means updating has started
         event_report = event_state_transition.wait_for_event_report(
             Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=30)
         logger.info(f"Event report for Querying : {event_report}")
 
-        # wait for Download event this means updating has started
+        # Wait for Download event this means updating has started
         event_report = event_state_transition.wait_for_event_report(
             Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=30)
         logger.info(f"Event report for Downloading : {event_report}")
@@ -159,6 +167,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         shutdown_event = basicinformation_handler.wait_for_event_report(Clusters.BasicInformation.Events.ShutDown, timeout_sec=60*6)
         logger.info(f"Event report for ShutDown : {shutdown_event}")
         # Cancel eventhandlers
+
         event_state_transition.flush_events()
         await event_state_transition.cancel()
 
@@ -263,6 +272,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.step(3)
         expected_software_version = 4
         delayed_apply_action_time = 60
+        spec_wait_time = 120
         self.launch_provider_app(extra_args=['--applyUpdateAction', 'awaitNextAction',
                                              '--delayedApplyActionTimeSec', str(delayed_apply_action_time)], version=expected_software_version)
         await controller.CommissionOnNetwork(
@@ -313,16 +323,28 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         logger.info(f"Event report for DelayedOnApply : {event_report}")
         asserts.assert_equal(event_report.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply)
 
+        # Wait 119 seconds or 1 minute and 59 seconds
+        logger.info(f"Expect {(spec_wait_time/60)} minutes without events from StateTransition")
+        event_state_transition.wait_for_event_expect_no_report(spec_wait_time-1)
+        logger.info(f"Waited {(spec_wait_time/60)} minutes without events")
+
         event_state_transition.flush_events()
         await event_state_transition.cancel()
 
-        # Wait for 119 seconds 1 minute and 59 seconds and check the version in BasicInformationCluster
-        # In the last second verify no update has taken place
-        logger.info("Waitiing 1 minute a 59 seconds (Almost 2 minutes defined in the spec)")
-        await asyncio.sleep(119)
+        # Cluster still in the same software version
         await self.verify_version_applied_basic_information(controller=controller, node_id=requestor_node_id, target_version=current_sw_version)
 
-        # Should be the same version as the start before annouce
+        # Should change to Applying in the next Second
+        event_state_transition = EventSubscriptionHandler(expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+                                                          expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id)
+        await event_state_transition.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60)
+        event_report = event_state_transition.wait_for_event_report(
+            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=1)
+        logger.info(f"Event report for Applying : {event_report}")
+        asserts.assert_equal(event_report.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
+        event_state_transition.flush_events()
+        await event_state_transition.cancel()
+
         self._terminate_provider_process()
         controller.ExpireSessions(nodeid=provider_data['node_id'])
 
@@ -373,9 +395,9 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         event_state_transition.wait_for_event_expect_no_report(delayed_apply_action_time-1)
         logger.info(f"Waited {(delayed_apply_action_time/60)} minutes without events")
 
-        # Inmediatly should change to Applying
+        # Should change to Applying in the next Second
         event_report = event_state_transition.wait_for_event_report(
-            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=3)
+            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=1)
         logger.info(f"Event report for Applying : {event_report}")
         asserts.assert_equal(event_report.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
 
@@ -468,31 +490,3 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
-
-# if __name__ == "__main__":
-#     # Ota image
-#     version = 2
-#     ota_image = ""
-#     if environ.get(f"SU_OTA_REQUESTOR_V{version}") is not None:
-#         ota_image = environ.get(f"SU_OTA_REQUESTOR_V{version}")
-#     else:
-#         ota_image = f"{getcwd()}/chip-ota-requestor-app_v{version}.min.ota"
-
-#     ota_image_path = OtaImagePath(path=ota_image)
-#     ts = '1758662674'
-#     provider_log = f'/tmp/provider_{ts}.log'
-#     logger.info(f"WRITING LOGS AT : {provider_log}")
-#     proc = OTAProviderSubprocess(
-#         'ota_app',
-#         storage_dir='/tmp',
-#         port=5541,
-#         discriminator=321,
-#         passcode=2321,
-#         ota_source=ota_image_path,
-#         extra_args=[],
-#         log_file=provider_log)
-#     lines = proc.read_from_logs(
-#         r"\[OTA-PROVIDER\]\[[0-9]+\.[0-9]+\]\s\[[0-9]+\:[0-9]+\:chip\]\s\[ZCL\].*ApplyUpdateRequest", regex=True)
-#     print(f"LINES 1 {lines}")
-#     lines = proc.read_from_logs('Provider received ApplyUpdateRequest', regex=False)
-#     print(f"LINES 2 {lines}")
