@@ -103,6 +103,11 @@ public:
 
     void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                 const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, uint32_t & outBandwidthbps) override;
+    
+    Protocols::InteractionModel::Status GetVideoStreamIdForStreams(StreamUsageEnum streamUsage, uint16_t & videoStreamId) override;
+
+    Protocols::InteractionModel::Status GetAudioStreamIdForStreams(StreamUsageEnum streamUsage, uint16_t & audioStreamId) override;
+
     void Init();
 
     CameraAVStreamManager()  = default;

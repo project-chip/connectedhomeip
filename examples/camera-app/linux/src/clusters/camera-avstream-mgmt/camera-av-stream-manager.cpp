@@ -261,10 +261,10 @@ void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nul
 CHIP_ERROR CameraAVStreamManager::ValidateVideoStreamID(uint16_t videoStreamId)
 {
     const std::vector<VideoStreamStruct> & allocatedVideoStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
-
+    printf("\n From camera av stream manager validate videostream id  size of allocated vdo stream %lu\n",allocatedVideoStreams.size());
     // Check if the videoStreamId exists in allocated streams
     for (const auto & stream : allocatedVideoStreams)
-    {
+    {printf("\n vdo stream available %d and passed vdo stream is %d\n",(int)stream.videoStreamID,videoStreamId);
         if (stream.videoStreamID == videoStreamId)
         {
             ChipLogProgress(Camera, "Video stream ID %u is valid and allocated", videoStreamId);

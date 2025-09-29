@@ -142,6 +142,11 @@ private:
      */
     void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                 const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, uint32_t & outBandwidthMbps);
+
+    Protocols::InteractionModel::Status GetVideoStreamIdForStreams(StreamUsageEnum streamUsage, uint16_t & videoStreamId);
+
+    Protocols::InteractionModel::Status GetAudioStreamIdForStreams(StreamUsageEnum streamUsage, uint16_t & audioStreamId);
+
 };
 
 } // namespace PushAvStreamTransport

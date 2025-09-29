@@ -270,6 +270,28 @@ void PushAvStreamTransportManager::GetBandwidthForStreams(const Optional<DataMod
     return;
 }
 
+Protocols::InteractionModel::Status PushAvStreamTransportManager::GetVideoStreamIdForStreams(StreamUsageEnum streamUsage,
+                                                                                              uint16_t & videoStreamId)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized for GetVideoStreamIdForStreams");
+        return Status::Failure;
+    }
+    return mCameraDevice->GetCameraAVStreamMgmtDelegate().GetVideoStreamIdForStreams(streamUsage, videoStreamId);
+}
+
+Protocols::InteractionModel::Status PushAvStreamTransportManager::GetAudioStreamIdForStreams(StreamUsageEnum streamUsage,
+                                                                                              uint16_t & audioStreamId)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized for GetAudioStreamIdForStreams");
+        return Status::Failure;
+    }
+    return mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAudioStreamIdForStreams(streamUsage, audioStreamId);
+}
+
 Protocols::InteractionModel::Status
 PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage,
                                                      const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
