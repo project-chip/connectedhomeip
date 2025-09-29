@@ -323,8 +323,6 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         logging.exception(f"'--expected-failures {expected_failures}' used without '--keep-going'")
         sys.exit(2)
 
-    runner = chiptest.runner.Runner()
-
     paths_finder = PathsFinder()
 
     if all_clusters_app is None:
@@ -407,19 +405,24 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
     if sys.platform == 'linux':
         ns = chiptest.linux.IsolatedNetworkNamespace(
+            index=0,
             # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
             setup_app_link_up=not ble_wifi,
             # Change the app link name so the interface will be recognized as WiFi or Ethernet
             # depending on the commissioning method used.
             app_link_name='wlx-app' if ble_wifi else 'eth-app',
             unshared=context.obj.in_unshare)
+            
         if ble_wifi:
             bus = chiptest.linux.DBusTestSystemBus()
             bluetooth = chiptest.linux.BluetoothMock()
             wifi = chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns)
             ble_controller_app = 0   # Bind app to the first BLE controller
             ble_controller_tool = 1  # Bind tool to the second BLE controller
-        paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
+        
+        runner = runner = chiptest.runner.NamespacedRunner(index=0)
+    else:
+        runner = chiptest.runner.Runner()
 
     logging.info("Each test will be executed %d times" % iterations)
 
