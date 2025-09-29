@@ -32,7 +32,7 @@ using TestSessionKeystoreImpl = chip::Crypto::DefaultSessionKeystore;
 
 namespace chip {
 namespace Test {
-    
+
 chip::Credentials::GroupDataProviderImpl sProvider(5, 8);
 chip::SimpleSessionResumptionStorage sessionStorage;
 
@@ -130,5 +130,5 @@ private:
     chip::PersistentStorageOperationalKeystore mOpKeyStore;
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
 };
-}
-}
+} // namespace Test
+} // namespace chip

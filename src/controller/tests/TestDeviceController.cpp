@@ -38,6 +38,7 @@ using TestSessionKeystoreImpl = chip::Crypto::DefaultSessionKeystore;
 
 namespace chip {
 namespace Controller {
+
 chip::TestPersistentStorageDelegate storage;
 
 // Test DeviceControllerFactory Class
