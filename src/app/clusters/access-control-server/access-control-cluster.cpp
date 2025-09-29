@@ -718,7 +718,6 @@ void AccessControlCluster::OnEntryChanged(const chip::Access::SubjectDescriptor 
     }
 
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, 0);
-    return;
 }
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
