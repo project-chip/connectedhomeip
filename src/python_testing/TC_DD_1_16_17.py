@@ -106,7 +106,6 @@ class TC_DD_1_16_17(MatterBaseTest):
         self.step(1)
         asserts.assert_true(self.matter_test_config.qr_code_content,
                             "This test needs to be run with the qr setup code.")
-        print(self.matter_test_config.qr_code_content)
         parsed = SetupPayload().ParseQrCode(self.matter_test_config.qr_code_content[0])
 
         self.step(2)

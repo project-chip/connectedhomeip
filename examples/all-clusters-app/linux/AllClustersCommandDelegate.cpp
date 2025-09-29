@@ -591,7 +591,6 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
         self->OnSoilMoistureChange(endpoint, soilMoistureMeasuredValue);
     }
     else if (name == "UserIntentCommissioningStart") {
-        ChipLogError(Zcl, "user intent commissioning received");
         Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     }
     else
