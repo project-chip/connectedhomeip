@@ -199,22 +199,24 @@ class IsolatedNetworkNamespace:
         Returns a copy of paths with updated command arrays to invoke the
         commands in an appropriate network namespace.
         """
+        tool = 'ip netns exec tool-{}'.format(self.index).split()
+        app = 'ip netns exec app-{}'.format(self.index).split()
         return ApplicationPaths(
-            chip_tool='ip netns exec tool-{}'.format(self.index).split() + paths.chip_tool,
-            all_clusters_app='ip netns exec app-{}'.format(self.index).split() + paths.all_clusters_app,
-            lock_app='ip netns exec app-{}'.format(self.index).split() + paths.lock_app,
-            fabric_bridge_app='ip netns exec app-{}'.format(self.index).split() + paths.fabric_bridge_app,
-            ota_provider_app='ip netns exec app-{}'.format(self.index).split() + paths.ota_provider_app,
-            ota_requestor_app='ip netns exec app-{}'.format(self.index).split() + paths.ota_requestor_app,
-            tv_app='ip netns exec app-{}'.format(self.index).split() + paths.tv_app,
-            lit_icd_app='ip netns exec app-{}'.format(self.index).split() + paths.lit_icd_app,
-            microwave_oven_app='ip netns exec app-{}'.format(self.index).split() + paths.microwave_oven_app,
-            rvc_app='ip netns exec app-{}'.format(self.index).split() + paths.rvc_app,
-            network_manager_app='ip netns exec app-{}'.format(self.index).split() + paths.network_manager_app,
-            energy_gateway_app='ip netns exec app-{}'.format(self.index).split() + paths.energy_gateway_app,
-            energy_management_app='ip netns exec app-{}'.format(self.index).split() + paths.energy_management_app,
-            bridge_app='ip netns exec app-{}'.format(self.index).split() + paths.bridge_app,
-            matter_repl_yaml_tester_cmd='ip netns exec tool-{}'.format(self.index).split() + paths.matter_repl_yaml_tester_cmd,
-            chip_tool_with_python_cmd='ip netns exec tool-{}'.format(self.index).split() + paths.chip_tool_with_python_cmd,
-            closure_app='ip netns exec app-{}'.format(self.index).split() + paths.closure_app,
+            chip_tool=tool + paths.chip_tool,
+            all_clusters_app=app + paths.all_clusters_app,
+            lock_app=app + paths.lock_app,
+            fabric_bridge_app=app + paths.fabric_bridge_app,
+            ota_provider_app=app + paths.ota_provider_app,
+            ota_requestor_app=app + paths.ota_requestor_app,
+            tv_app=app + paths.tv_app,
+            lit_icd_app=app + paths.lit_icd_app,
+            microwave_oven_app=app + paths.microwave_oven_app,
+            rvc_app=app + paths.rvc_app,
+            network_manager_app=app + paths.network_manager_app,
+            energy_gateway_app=app + paths.energy_gateway_app,
+            energy_management_app=app + paths.energy_management_app,
+            bridge_app=app + paths.bridge_app,
+            matter_repl_yaml_tester_cmd=tool + paths.matter_repl_yaml_tester_cmd,
+            chip_tool_with_python_cmd=tool + paths.chip_tool_with_python_cmd,
+            closure_app=app + paths.closure_app,
         )
