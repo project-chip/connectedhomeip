@@ -93,26 +93,19 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    TimeSyncDataProvider & GetDataProvider(void) { return mTimeSyncDataProvider; }
-
-    DataModel::EventsGenerator * GetEventsGenerator() const
-    {
-        return mContext != nullptr ? &mContext->interactionContext.eventsGenerator : nullptr;
-    }
-
     CHIP_ERROR SetTrustedTimeSource(const DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & tts);
     CHIP_ERROR SetDefaultNTP(const DataModel::Nullable<chip::CharSpan> & dntp);
-    void InitTimeZone(void);
+    void InitTimeZone();
     CHIP_ERROR SetTimeZone(const DataModel::DecodableList<TimeSynchronization::Structs::TimeZoneStruct::Type> & tzL);
-    CHIP_ERROR LoadTimeZone(void);
-    CHIP_ERROR ClearTimeZone(void);
-    void InitDSTOffset(void);
+    CHIP_ERROR LoadTimeZone();
+    CHIP_ERROR ClearTimeZone();
+    void InitDSTOffset();
     CHIP_ERROR SetDSTOffset(const DataModel::DecodableList<TimeSynchronization::Structs::DSTOffsetStruct::Type> & dstL);
-    CHIP_ERROR LoadDSTOffset(void);
-    CHIP_ERROR ClearDSTOffset(void);
-    DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & GetTrustedTimeSource(void);
-    Span<TimeSyncDataProvider::TimeZoneStore> & GetTimeZone(void);
-    DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> & GetDSTOffset(void);
+    CHIP_ERROR LoadDSTOffset();
+    CHIP_ERROR ClearDSTOffset();
+    DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & GetTrustedTimeSource();
+    Span<TimeSyncDataProvider::TimeZoneStore> & GetTimeZone();
+    DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> & GetDSTOffset();
     CHIP_ERROR GetDefaultNtp(MutableCharSpan & dntp);
 
     CHIP_ERROR SetUTCTime(chip::EndpointId ep, uint64_t utcTime, TimeSynchronization::GranularityEnum granularity,
@@ -122,9 +115,7 @@ public:
 
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
 
-    TimeSynchronization::TimeState UpdateTimeZoneState();
-    TimeSynchronization::TimeState UpdateDSTOffsetState();
-    TimeSynchronization::TimeSyncEventFlag GetEventFlag(void);
+    TimeSynchronization::TimeSyncEventFlag GetEventFlag();
     void ClearEventFlag(TimeSynchronization::TimeSyncEventFlag flag);
 
     CHIP_ERROR AttemptToGetTimeFromTrustedNode();
@@ -216,6 +207,16 @@ private:
     std::optional<DataModel::ActionReturnStatus>
     HandleSetDefaultNTP(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                         const TimeSynchronization::Commands::SetDefaultNTP::DecodableType & commandData);
+
+    TimeSyncDataProvider & GetDataProvider() { return mTimeSyncDataProvider; }
+
+    DataModel::EventsGenerator * GetEventsGenerator() const
+    {
+        return mContext != nullptr ? &mContext->interactionContext.eventsGenerator : nullptr;
+    }
+
+    TimeSynchronization::TimeState UpdateTimeZoneState();
+    TimeSynchronization::TimeState UpdateDSTOffsetState();
 };
 
 } // namespace chip::app::Clusters
