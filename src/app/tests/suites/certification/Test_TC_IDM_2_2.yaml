@@ -453,8 +453,8 @@ tests:
            ./chip-tool modeselect read supported-modes 1 1
 
           On the TH (chip-tool), verify that the DUT has returned data from the expected attribute path. The output should resemble the following:
-        
-          [1720438689.894] [11260:11262] [DMG]         SuppressResponse = true, 
+
+          [1720438689.894] [11260:11262] [DMG]         SuppressResponse = true,
           [1720438689.894] [11260:11262] [DMG]         InteractionModelRevision = 11
           [1720438689.894] [11260:11262] [DMG] }
           [1720438689.894] [11260:11262] [TOO] Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 1411155267
@@ -531,7 +531,7 @@ tests:
           ./chip-tool windowcovering read  type 1 1
 
           On the TH (chip-tool), verify that the DUT has returned data from the expected attribute path. The output should show the type value, for example:
-        
+
           [1720438762.165] [11289:11291] [EM] Rxd Ack; Removing MessageCounter:55647197 from Retrans Table on exchange 62870i
           [1720438762.165] [11289:11291] [DMG] ReportDataMessage =
           [1720438762.165] [11289:11291] [DMG] {
@@ -548,15 +548,15 @@ tests:
           [1720438762.166] [11289:11291] [DMG]                                         Cluster = 0x102,
           [1720438762.166] [11289:11291] [DMG]                                         Attribute = 0x0000_0000,
           [1720438762.166] [11289:11291] [DMG]                                 }
-          [1720438762.166] [11289:11291] [DMG]                                         
-          [1720438762.166] [11289:11291] [DMG]                                 Data = 8 (unsigned), 
+          [1720438762.166] [11289:11291] [DMG]
+          [1720438762.166] [11289:11291] [DMG]                                 Data = 8 (unsigned),
           [1720438762.166] [11289:11291] [DMG]                         },
-          [1720438762.167] [11289:11291] [DMG]                         
+          [1720438762.167] [11289:11291] [DMG]
           [1720438762.167] [11289:11291] [DMG]                 },
-          [1720438762.167] [11289:11291] [DMG]                 
+          [1720438762.167] [11289:11291] [DMG]
           [1720438762.167] [11289:11291] [DMG]         ],
-          [1720438762.167] [11289:11291] [DMG]         
-          [1720438762.167] [11289:11291] [DMG]         SuppressResponse = true, 
+          [1720438762.167] [11289:11291] [DMG]
+          [1720438762.167] [11289:11291] [DMG]         SuppressResponse = true,
           [1720438762.167] [11289:11291] [DMG]         InteractionModelRevision = 11
           [1720438762.167] [11289:11291] [DMG] }
           [1720438762.167] [11289:11291] [TOO] Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0000 DataVersion: 810489327

@@ -114,9 +114,9 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF  1 0xFFFF
-          
+
           On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
-          
+
           [1686225824.262856][92910:92910] CHIP:SC: Allocated SecureSession (0x5592c114b150) - waiting for Sigma1 msg
           [1686225824.264205][92910:92910] CHIP:EM: >>> [E:34791r S:64883 M:91848948] (S) Msg RX from 1:000000000001B669 [58B9] --- Type 0001:02 (IM:ReadRequest)
           [1686225824.264240][92910:92910] CHIP:EM: Handling via exchange: 34791r, Delegate: 0x5592c0755fc8
@@ -148,7 +148,7 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFD  1 0xFFFF
-          
+
           On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
 
           [1686225928.892595][92910:92910] CHIP:EM: >>> [E:30698r S:64884 M:221692686] (S) Msg RX from 1:000000000001B669 [58B9] --- Type 0001:02 (IM:ReadRequest)
@@ -182,9 +182,9 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0x03 0xFFFFFFFF  1 0xFFFF
-          
+
           On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
-          
+
           [1686226185.511406][92910:92910] CHIP:EM: Handling via exchange: 42616r, Delegate: 0x5592c0755fc8
           [1686226185.511424][92910:92910] CHIP:IM: Received Read request
           [1686226185.511444][92910:92910] CHIP:DMG: ReadRequestMessage =
@@ -217,9 +217,9 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0x03 0x01  1 0xFFFF
-          
+
           On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
-          
+
           [1686226228.381581][92910:92910] CHIP:SC: Allocated SecureSession (0x5592c114a190) - waiting for Sigma1 msg
           [1686226228.383047][92910:92910] CHIP:EM: >>> [E:14054r S:64886 M:240745911] (S) Msg RX from 1:000000000001B669 [58B9] --- Type 0001:02 (IM:ReadRequest)
           [1686226228.383084][92910:92910] CHIP:EM: Handling via exchange: 14054r, Delegate: 0x5592c0755fc8
@@ -253,9 +253,9 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF  1 1
-          
+
           On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
-          
+
           [1686226295.956172][92910:92910] CHIP:SC: Allocated SecureSession (0x5592c1141cd0) - waiting for Sigma1 msg
           [1686226295.957552][92910:92910] CHIP:EM: >>> [E:39621r S:64888 M:136668914] (S) Msg RX from 1:000000000001B669 [58B9] --- Type 0001:02 (IM:ReadRequest)
           [1686226295.957583][92910:92910] CHIP:EM: Handling via exchange: 39621r, Delegate: 0x5592c0755fc8
@@ -289,9 +289,9 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFD  1 0
-          
+
           On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
-          
+
           [1686226336.606276][92910:92910] CHIP:EM: >>> [E:29124r S:64889 M:25401402] (S) Msg RX from 1:000000000001B669 [58B9] --- Type 0001:02 (IM:ReadRequest)
           [1686226336.606300][92910:92910] CHIP:EM: Handling via exchange: 29124r, Delegate: 0x5592c0755fc8
           [1686226336.606318][92910:92910] CHIP:IM: Received Read request
@@ -323,9 +323,9 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool onoff read on-off 1 1
-           
+
           On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
-          
+
           [1686226378.552745][92910:92910] CHIP:EM: Handling via exchange: 15302r, Delegate: 0x5592c0755fc8
           [1686226378.552758][92910:92910] CHIP:IM: Received Read request
           [1686226378.552776][92910:92910] CHIP:DMG: ReadRequestMessage =
@@ -357,9 +357,9 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool modeselect read description  1 1
-          
+
           On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
-          
+
           [1686226406.253784][92910:92910] CHIP:EM: Handling via exchange: 31624r, Delegate: 0x5592c0755fc8
           [1686226406.253789][92910:92910] CHIP:IM: Received Read request
           [1686226406.253796][92910:92910] CHIP:DMG: ReadRequestMessage =
@@ -391,7 +391,7 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0x3 0x1 1 1
-          
+
           On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
 
           [1686226432.788003][92910:92910] CHIP:EM: Handling via exchange: 43574r, Delegate: 0x5592c0755fc8
@@ -425,9 +425,9 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool pressuremeasurement read measured-value 1 1
-          
+
           On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
-          
+
           [1686226460.249020][92910:92910] CHIP:EM: Handling via exchange: 37364r, Delegate: 0x5592c0755fc8
           [1686226460.249037][92910:92910] CHIP:IM: Received Read request
           [1686226460.249056][92910:92910] CHIP:DMG: ReadRequestMessage =
@@ -469,7 +469,7 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool operationalcredentials read trusted-root-certificates 1 0
-          
+
           On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
 
           [1686226515.137562][92910:92910] CHIP:EM: Handling via exchange: 28684r, Delegate: 0x5592c0755fc8
@@ -503,9 +503,9 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool  generalcommissioning read  basic-commissioning-info   1 0
-           
+
           On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
-          
+
           [1686226552.178768][92910:92910] CHIP:EM: Handling via exchange: 24439r, Delegate: 0x5592c0755fc8
           [1686226552.178784][92910:92910] CHIP:IM: Received Read request
           [1686226552.178802][92910:92910] CHIP:DMG: ReadRequestMessage =
@@ -572,9 +572,9 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool  occupancysensing read   occupancy-sensor-type 1 1
-          
+
           On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
-          
+
           [1686226611.149856][92910:92910] CHIP:EM: Handling via exchange: 60503r, Delegate: 0x5592c0755fc8
           [1686226611.149867][92910:92910] CHIP:IM: Received Read request
           [1686226611.149886][92910:92910] CHIP:DMG: ReadRequestMessage =
@@ -606,9 +606,9 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool levelcontrol read options 1 1
-          
+
           On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
-          
+
           02 (IM:ReadRequest)
           [1686226637.039290][92910:92910] CHIP:EM: Handling via exchange: 26755r, Delegate: 0x5592c0755fc8
           [1686226637.039328][92910:92910] CHIP:IM: Received Read request
@@ -640,9 +640,9 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool  occupancysensing read occupancy 1 1
-           
+
           On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
-          
+
           [1686226665.453133][92910:92910] CHIP:EM: Handling via exchange: 16385r, Delegate: 0x5592c0755fc8
           [1686226665.453147][92910:92910] CHIP:IM: Received Read request
           [1686226665.453164][92910:92910] CHIP:DMG: ReadRequestMessage =
@@ -667,9 +667,9 @@ tests:
 
 
            ./chip-tool  occupancysensing read occupancy    1 1
-           
+
           On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
-          
+
           [1686226666.412296][92910:92910] CHIP:EM: Handling via exchange: 46567r, Delegate: 0x5592c0755fc8
           [1686226666.412312][92910:92910] CHIP:IM: Received Read request
           [1686226666.412331][92910:92910] CHIP:DMG: ReadRequestMessage =
@@ -695,9 +695,9 @@ tests:
 
 
            ./chip-tool  occupancysensing read occupancy    1 1
-           
+
           On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
-          
+
           [1686226667.318600][92910:92910] CHIP:EM: Handling via exchange: 25390r, Delegate: 0x5592c0755fc8
           [1686226667.318616][92910:92910] CHIP:IM: Received Read request
           [1686226667.318640][92910:92910] CHIP:DMG: ReadRequestMessage =
@@ -805,9 +805,9 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF --timeout 40
-           
+
           On TH(all-clusters-app), Verify that the TH(all-clusters-app) receives the right Read Request Message.
-          
+
           [1686226782.460404][92910:92910] CHIP:SC: Allocated SecureSession (0x5592c114f040) - waiting for Sigma1 msg
           [1686226782.460986][92910:92910] CHIP:EM: >>> [E:22319r S:64903 M:14178699] (S) Msg RX from 1:000000000001B669 [58B9] --- Type 0001:02 (IM:ReadRequest)
           [1686226782.460999][92910:92910] CHIP:EM: Handling via exchange: 22319r, Delegate: 0x5592c0755fc8
