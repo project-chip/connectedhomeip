@@ -25,6 +25,7 @@
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/tests/DispatchDataModel.h>
+#include <controller/tests/UsefulDefinitions.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
@@ -37,105 +38,7 @@ using TestSessionKeystoreImpl = chip::Crypto::DefaultSessionKeystore;
 
 namespace chip {
 namespace Controller {
-
-chip::Credentials::GroupDataProviderImpl sProvider(5, 8);
 chip::TestPersistentStorageDelegate storage;
-chip::SimpleSessionResumptionStorage sessionStorage;
-
-class Engine_raii
-{
-public:
-    Engine_raii() : engine{ chip::app::InteractionModelEngine::GetInstance() } {}
-
-    ~Engine_raii() { engine->Shutdown(); }
-
-    chip::app::InteractionModelEngine * operator->() { return engine; }
-
-private:
-    chip::app::InteractionModelEngine * engine;
-};
-
-class FactoryInitParamsSetter
-{
-public:
-    FactoryInitParamsSetter()
-    {
-        // Set all the basic requirement to test DeviceControllerFactory
-        EXPECT_EQ(opCertStore.Init(&cerStorage), CHIP_NO_ERROR);
-
-        // Initialize Group Data Provider
-        sProvider.SetStorageDelegate(&sStorageDelegate);
-        sProvider.SetSessionKeystore(&keystore);
-        sProvider.Init();
-        chip::Credentials::SetGroupDataProvider(&sProvider);
-
-        // Set initials params of factoryInitParams
-        factoryInitParams.sessionKeystore          = &keystore;
-        factoryInitParams.groupDataProvider        = &sProvider;
-        factoryInitParams.opCertStore              = &opCertStore;
-        factoryInitParams.listenPort               = 88;
-        factoryInitParams.fabricTable              = nullptr;
-        factoryInitParams.fabricIndependentStorage = &factoryStorage;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        factoryInitParams.wifipaf_layer = &wifipaf;
-#endif
-    };
-    ~FactoryInitParamsSetter()
-    {
-        sProvider.Finish();
-        opCertStore.Finish();
-    };
-    chip::Controller::FactoryInitParams GetFactoryInitParams() { return factoryInitParams; };
-
-protected:
-    chip::TestPersistentStorageDelegate cerStorage;
-    chip::Credentials::PersistentStorageOpCertStore opCertStore;
-    chip::TestPersistentStorageDelegate sStorageDelegate;
-    TestSessionKeystoreImpl keystore;
-    chip::TestPersistentStorageDelegate factoryStorage;
-    chip::Controller::FactoryInitParams factoryInitParams;
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    chip::WiFiPAF::WiFiPAFLayer wifipaf;
-#endif
-};
-
-// Fabric Table Holder Class handle a Factory Table class to test
-class FabricTableHolder
-{
-public:
-    FabricTableHolder() {}
-    ~FabricTableHolder()
-    {
-        mFabricTable.Shutdown();
-        ChipLogProgress(Controller, "Shutting down Keystore");
-        mOpKeyStore.Finish();
-        ChipLogProgress(Controller, "Shutting down CertStore");
-        mOpCertStore.Finish();
-        ChipLogProgress(Controller, "All processes are closed");
-    }
-
-    CHIP_ERROR Init()
-    {
-        ReturnErrorOnFailure(mOpKeyStore.Init(&mStorage));
-        ReturnErrorOnFailure(mOpCertStore.Init(&mStorage));
-
-        chip::FabricTable::InitParams initParams;
-        initParams.storage             = &mStorage;
-        initParams.operationalKeystore = &mOpKeyStore;
-        initParams.opCertStore         = &mOpCertStore;
-
-        return mFabricTable.Init(initParams);
-    }
-
-    chip::FabricTable & GetFabricTable() { return mFabricTable; }
-
-private:
-    chip::FabricTable mFabricTable;
-    chip::TestPersistentStorageDelegate mStorage;
-    chip::PersistentStorageOperationalKeystore mOpKeyStore;
-    chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
-};
 
 // Test DeviceControllerFactory Class
 class TestDeviceControllerFactory : public chip::Test::AppContext
@@ -159,8 +62,8 @@ public:
     }
 
 protected:
-    FactoryInitParamsSetter params;
-    Engine_raii engine;
+    chip::Test::FactoryInitParamsSetter params;
+    chip::Test::Engine_raii engine;
 
 private:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
@@ -203,7 +106,7 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_SetupControll
     chip::Controller::SetupParams deviceParams;
     chip::Controller::DeviceCommissioner commissioner;
     chip::Controller::DeviceController device;
-    FabricTableHolder fHolder;
+    chip::Test::FabricTableHolder fHolder;
     // Initialize the ember side server logic
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
@@ -211,11 +114,11 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_SetupControll
     // Init device controller factory
     factoryInitParams.dataModelProvider = engine->GetDataModelProvider();
 
-    EXPECT_EQ(sessionStorage.Init(&storage), CHIP_NO_ERROR);
+    EXPECT_EQ(chip::Test::sessionStorage.Init(&storage), CHIP_NO_ERROR);
     EXPECT_EQ(fHolder.Init(), CHIP_NO_ERROR);
 
     factoryInitParams.fabricTable              = &fHolder.GetFabricTable();
-    factoryInitParams.sessionResumptionStorage = &sessionStorage;
+    factoryInitParams.sessionResumptionStorage = &chip::Test::sessionStorage;
     factoryInitParams.enableServerInteractions = true;
 
     EXPECT_EQ(DeviceControllerFactory::GetInstance().Init(factoryInitParams), CHIP_NO_ERROR);
@@ -234,7 +137,7 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_RetainAndRele
 {
     chip::Controller::FactoryInitParams factoryInitParams = params.GetFactoryInitParams();
     chip::Controller::SetupParams dparams;
-    FabricTableHolder fHolder;
+    chip::Test::FabricTableHolder fHolder;
     // Initialize the ember side server logic
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
@@ -242,11 +145,11 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_RetainAndRele
     // Init device controller factory
     factoryInitParams.dataModelProvider = engine->GetDataModelProvider();
 
-    EXPECT_EQ(sessionStorage.Init(&storage), CHIP_NO_ERROR);
+    EXPECT_EQ(chip::Test::sessionStorage.Init(&storage), CHIP_NO_ERROR);
     EXPECT_EQ(fHolder.Init(), CHIP_NO_ERROR);
 
     factoryInitParams.fabricTable              = &fHolder.GetFabricTable();
-    factoryInitParams.sessionResumptionStorage = &sessionStorage;
+    factoryInitParams.sessionResumptionStorage = &chip::Test::sessionStorage;
     factoryInitParams.enableServerInteractions = true;
 
     EXPECT_EQ(DeviceControllerFactory::GetInstance().Init(factoryInitParams), CHIP_NO_ERROR);

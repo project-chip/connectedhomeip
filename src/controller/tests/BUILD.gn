@@ -74,6 +74,7 @@ chip_test_suite("tests") {
   sources = [
     "AutoCommissionerTestAccess.h",
     "DispatchDataModel.h",
+    "UsefulDefinitions.h",
   ]
 
   public_deps = [
