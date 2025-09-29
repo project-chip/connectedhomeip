@@ -71,7 +71,7 @@ Git: 1.4-1773-g2b8c413df
   </struct>
 
   <domain name="CHIP"/>
-  <cluster apiMaturity="provisional">
+  <cluster>
     <name>Scenes Management</name>
     <domain>General</domain>
     <description>Attributes and commands for scene configuration and manipulation.</description>

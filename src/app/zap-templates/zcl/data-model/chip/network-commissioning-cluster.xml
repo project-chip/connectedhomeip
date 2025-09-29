@@ -109,9 +109,12 @@ limitations under the License.
             <optionalConform choice="a"/>
             </feature>
             <feature bit="3" code="PDC" name="PerDeviceCredentials" summary="Wi-Fi Per-Device Credentials">
-            <mandatoryConform>
-              <feature name="WI"/>
-            </mandatoryConform>
+              <otherwiseConform>
+                <provisionalConform/>
+                <mandatoryConform>
+                  <feature name="WI"/>
+                </mandatoryConform>
+              </otherwiseConform>
             </feature>
         </features>
 
