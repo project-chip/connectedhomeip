@@ -60,11 +60,8 @@
 #
 # Test runs twice - once with standard flow, once with user-intent flow
 
-import logging
-
 from mobly import asserts
 
-import matter.clusters as Clusters
 import matter.discovery
 from matter.setup_payload import SetupPayload
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
