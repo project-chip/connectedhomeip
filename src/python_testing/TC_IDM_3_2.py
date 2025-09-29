@@ -42,8 +42,8 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClusterObjects
-from matter.interaction_model import InteractionModelError, Status
 from matter.exceptions import ChipStackError
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
