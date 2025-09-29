@@ -666,10 +666,11 @@ void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::Exchang
         WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
         self->mSessionIdMap.erase(args.peerNodeId);
 
+        transport->MoveToState(WebrtcTransport::State::Idle);
+
         // remove from current sessions list
         self->mWebRTCTransportProvider->RemoveSession(sessionId);
         self->mWebrtcTransportMap.erase(sessionId);
-        transport->MoveToState(WebrtcTransport::State::Idle);
         break;
     }
     default:
