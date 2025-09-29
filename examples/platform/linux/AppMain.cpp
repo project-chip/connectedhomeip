@@ -912,7 +912,8 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     initParams.accessRestrictionProvider = exampleAccessRestrictionProvider.get();
 #endif
 
-    if (LinuxDeviceOptions::GetInstance().payload.commissioningFlow == CommissioningFlow::kUserActionRequired) {
+    if (LinuxDeviceOptions::GetInstance().payload.commissioningFlow == CommissioningFlow::kUserActionRequired)
+    {
         initParams.advertiseCommissionable = false;
     }
 

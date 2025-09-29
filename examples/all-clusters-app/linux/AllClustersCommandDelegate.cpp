@@ -590,7 +590,8 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
 
         self->OnSoilMoistureChange(endpoint, soilMoistureMeasuredValue);
     }
-    else if (name == "UserIntentCommissioningStart") {
+    else if (name == "UserIntentCommissioningStart")
+    {
         Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     }
     else
