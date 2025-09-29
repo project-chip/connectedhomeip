@@ -307,9 +307,6 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()), errorStatus = Status::FailsafeRequired);
     VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), errorStatus = Status::ConstraintError);
 
-    // Flush acks before really slow work
-    commandObj->FlushAcksRightAwayOnSlowCommand();
-
     // Prepare NOCSRElements structure
     {
         constexpr size_t csrLength = Crypto::kMIN_CSR_Buffer_Size;
@@ -446,9 +443,6 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
 
     // Internal error that would prevent IPK from being added
     VerifyOrExit(groupDataProvider != nullptr, errorStatus = Status::Failure);
-
-    // Flush acks before really slow work
-    commandObj->FlushAcksRightAwayOnSlowCommand();
 
     // We can't possibly have a matching root based on the fact that we don't have
     // a shared root store. Therefore we would later fail path validation due to
@@ -630,9 +624,6 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * co
     VerifyOrExit(fabricInfo != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INSUFFICIENT_PRIVILEGE));
     fabricIndex = fabricInfo->GetFabricIndex();
 
-    // Flush acks before really slow work
-    commandObj->FlushAcksRightAwayOnSlowCommand();
-
     err = fabricTable.UpdatePendingFabricWithOperationalKeystore(fabricIndex, NOCValue, ICACValue.ValueOr(ByteSpan{}));
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
@@ -750,9 +741,6 @@ HandleAddTrustedRootCertificate(CommandHandler * commandObj, const ConcreteComma
     // be useful in the context.
     VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), finalStatus = Status::ConstraintError);
 
-    // Flush acks before really slow work
-    commandObj->FlushAcksRightAwayOnSlowCommand();
-
     err = ValidateChipRCAC(rootCertificate);
     VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::InvalidCommand);
 
@@ -858,8 +846,6 @@ std::optional<DataModel::ActionReturnStatus> HandleRemoveFabric(CommandHandler *
         return Status::InvalidCommand;
     }
 
-    commandObj->FlushAcksRightAwayOnSlowCommand();
-
     CHIP_ERROR err = fabricTable.Delete(fabricBeingRemoved);
     SuccessOrExit(err);
 
@@ -915,8 +901,6 @@ std::optional<DataModel::ActionReturnStatus> HandleSignVIDVerificationRequest(Co
     {
         return Status::ConstraintError;
     }
-
-    commandObj->FlushAcksRightAwayOnSlowCommand();
 
     FabricTable::SignVIDVerificationResponseData responseData;
     ByteSpan attestationChallenge = GetAttestationChallengeFromCurrentSession(commandObj);
@@ -1015,9 +999,6 @@ HandleAttestationRequest(CommandHandler * commandObj, const ConcreteCommandPath 
     const ByteSpan kEmptyFirmwareInfo;
 
     ChipLogDetail(Zcl, "OpCreds: Received an AttestationRequest command");
-
-    // Flush acks before really slow work
-    commandObj->FlushAcksRightAwayOnSlowCommand();
 
     VerifyOrExit(attestationNonce.size() == Credentials::kExpectedAttestationNonceSize, errorStatus = Status::InvalidCommand);
 
