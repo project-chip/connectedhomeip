@@ -512,9 +512,6 @@ void WebRTCProviderManager::ScheduleOfferSend(uint16_t sessionId)
 
         transport->SetCommandType(WebrtcTransport::CommandType::kOffer);
 
-        // Set current session ID for callback communication
-        mCurrentSessionId = sessionId;
-
         // Attempt to find or establish a CASE session to the target PeerId.
         CASESessionManager * caseSessionMgr = Server::GetInstance().GetCASESessionManager();
         VerifyOrDie(caseSessionMgr != nullptr);
@@ -541,9 +538,6 @@ void WebRTCProviderManager::ScheduleAnswerSend(uint16_t sessionId)
         ChipLogProgress(Camera, "Sending Answer command to node " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
 
         transport->SetCommandType(WebrtcTransport::CommandType::kAnswer);
-
-        // Set current session ID for callback communication
-        mCurrentSessionId = sessionId;
 
         // Attempt to find or establish a CASE session to the target PeerId.
         CASESessionManager * caseSessionMgr = Server::GetInstance().GetCASESessionManager();
@@ -572,9 +566,6 @@ void WebRTCProviderManager::ScheduleEndSend(uint16_t sessionId)
 
         transport->SetCommandType(WebrtcTransport::CommandType::kEnd);
 
-        // Set current session ID for callback communication
-        mCurrentSessionId = sessionId;
-
         // Attempt to find or establish a CASE session to the target PeerId.
         CASESessionManager * caseSessionMgr = Server::GetInstance().GetCASESessionManager();
         VerifyOrDie(caseSessionMgr != nullptr);
@@ -602,9 +593,6 @@ void WebRTCProviderManager::ScheduleICECandidatesSend(uint16_t sessionId)
 
         transport->SetCommandType(WebrtcTransport::CommandType::kICECandidates);
 
-        // Set current session ID for callback communication
-        mCurrentSessionId = sessionId;
-
         // Attempt to find or establish a CASE session to the target PeerId.
         CASESessionManager * caseSessionMgr = Server::GetInstance().GetCASESessionManager();
         VerifyOrDie(caseSessionMgr != nullptr);
@@ -621,7 +609,17 @@ void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::Exchang
     WebRTCProviderManager * self = reinterpret_cast<WebRTCProviderManager *>(context);
     VerifyOrReturn(self != nullptr, ChipLogError(Camera, "OnDeviceConnected:: context is null"));
 
-    uint16_t sessionId          = self->mCurrentSessionId;
+    // Derive sessionId from sessionHandle by looking up the peer node ID
+    NodeId peerNodeId = sessionHandle->GetPeer().GetNodeId();
+    auto sessionIt    = self->mSessionIdMap.find(peerNodeId);
+    if (sessionIt == self->mSessionIdMap.end())
+    {
+        ChipLogError(Camera, "OnDeviceConnected:: no session found for peer node ID: " ChipLogFormatX64,
+                     ChipLogValueX64(peerNodeId));
+        return;
+    }
+
+    uint16_t sessionId          = sessionIt->second;
     WebrtcTransport * transport = self->GetTransport(sessionId);
     if (transport == nullptr)
     {

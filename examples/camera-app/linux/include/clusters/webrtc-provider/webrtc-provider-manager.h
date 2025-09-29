@@ -144,9 +144,6 @@ private:
     CameraDeviceInterface * mCameraDevice = nullptr;
 
     bool mSoftLiveStreamPrivacyEnabled = false;
-
-    // Current session ID for callback communication
-    uint16_t mCurrentSessionId = 0;
 };
 
 } // namespace WebRTCTransportProvider
