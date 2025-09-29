@@ -358,6 +358,8 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
 
         nocsrElementsSpan = MutableByteSpan{ nocsrElements.Get(), nocsrLengthEstimate };
 
+        VerifyOrExit(nocsrElementsSpan.size() >= nocsrLengthEstimate, errorStatus = Status::ConstraintError);
+
         err = Credentials::ConstructNOCSRElements(ByteSpan{ csrSpan.data(), csrSpan.size() }, CSRNonce, kNoVendorReserved,
                                                   kNoVendorReserved, kNoVendorReserved, nocsrElementsSpan);
         VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
