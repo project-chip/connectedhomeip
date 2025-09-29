@@ -31,10 +31,6 @@ using namespace chip::Protocols::InteractionModel;
 
 namespace {
 
-constexpr size_t kTimeSynchronizationFixedClusterCount = TimeSynchronization::StaticApplicationConfig::kFixedClusterConfig.size();
-constexpr size_t kTimeSynchronizationMaxClusterCount =
-    kTimeSynchronizationFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-
 LazyRegisteredServerCluster<TimeSynchronizationCluster> gServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
@@ -78,8 +74,8 @@ void MatterTimeSynchronizationClusterInitCallback(EndpointId endpointId)
         {
             .endpointId                = endpointId,
             .clusterId                 = TimeSynchronization::Id,
-            .fixedClusterInstanceCount = kTimeSynchronizationFixedClusterCount,
-            .maxClusterInstanceCount   = kTimeSynchronizationMaxClusterCount,
+            .fixedClusterInstanceCount = 1,
+            .maxClusterInstanceCount   = 1,
             .fetchFeatureMap           = true,
             .fetchOptionalAttributes   = false,
         },
@@ -95,8 +91,8 @@ void MatterTimeSynchronizationClusterShutdownCallback(EndpointId endpointId)
         {
             .endpointId                = endpointId,
             .clusterId                 = TimeSynchronization::Id,
-            .fixedClusterInstanceCount = kTimeSynchronizationFixedClusterCount,
-            .maxClusterInstanceCount   = kTimeSynchronizationMaxClusterCount,
+            .fixedClusterInstanceCount = 1,
+            .maxClusterInstanceCount   = 1,
         },
         integrationDelegate);
 }
@@ -113,8 +109,8 @@ TimeSynchronizationCluster * FindClusterOnEndpoint(EndpointId endpointId)
         {
             .endpointId                = endpointId,
             .clusterId                 = TimeSynchronization::Id,
-            .fixedClusterInstanceCount = kTimeSynchronizationFixedClusterCount,
-            .maxClusterInstanceCount   = kTimeSynchronizationMaxClusterCount,
+            .fixedClusterInstanceCount = 1,
+            .maxClusterInstanceCount   = 1,
         },
         integrationDelegate);
 
