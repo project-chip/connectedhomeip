@@ -123,9 +123,9 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
 
     if (transport == nullptr)
     {
-        mWebrtcTransportMap[args.sessionId] = std::unique_ptr<WebrtcTransport>(new WebrtcTransport());
-        mSessionIdMap[args.peerNodeId]      = args.sessionId;
-        transport                           = mWebrtcTransportMap[args.sessionId].get();
+        mWebrtcTransportMap[args.sessionId]                            = std::unique_ptr<WebrtcTransport>(new WebrtcTransport());
+        mSessionIdMap[ScopedNodeId(args.peerNodeId, args.fabricIndex)] = args.sessionId;
+        transport                                                      = mWebrtcTransportMap[args.sessionId].get();
         transport->SetCallbacks(
             [this](const std::string & sdp, SDPType type, const uint16_t sessionId) {
                 this->OnLocalDescription(sdp, type, sessionId);
@@ -272,9 +272,9 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     WebrtcTransport * transport = GetTransport(args.sessionId);
     if (transport == nullptr)
     {
-        mWebrtcTransportMap[args.sessionId] = std::unique_ptr<WebrtcTransport>(new WebrtcTransport());
-        mSessionIdMap[args.peerNodeId]      = args.sessionId;
-        transport                           = mWebrtcTransportMap[args.sessionId].get();
+        mWebrtcTransportMap[args.sessionId]                            = std::unique_ptr<WebrtcTransport>(new WebrtcTransport());
+        mSessionIdMap[ScopedNodeId(args.peerNodeId, args.fabricIndex)] = args.sessionId;
+        transport                                                      = mWebrtcTransportMap[args.sessionId].get();
         transport->SetCallbacks(
             [this](const std::string & sdp, SDPType type, const uint16_t sessionId) {
                 this->OnLocalDescription(sdp, type, sessionId);
@@ -405,7 +405,7 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
         mMediaController->UnregisterTransport(transport);
         mWebrtcTransportMap.erase(sessionId);
         WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
-        mSessionIdMap.erase(args.peerNodeId);
+        mSessionIdMap.erase(ScopedNodeId(args.peerNodeId, args.fabricIndex));
     }
 
     if (transport->ClosePeerConnection())
@@ -609,13 +609,13 @@ void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::Exchang
     WebRTCProviderManager * self = reinterpret_cast<WebRTCProviderManager *>(context);
     VerifyOrReturn(self != nullptr, ChipLogError(Camera, "OnDeviceConnected:: context is null"));
 
-    // Derive sessionId from sessionHandle by looking up the peer node ID
-    NodeId peerNodeId = sessionHandle->GetPeer().GetNodeId();
-    auto sessionIt    = self->mSessionIdMap.find(peerNodeId);
+    // Derive sessionId from sessionHandle by looking up the peer ScopedNodeId (NodeId + FabricIndex)
+    ScopedNodeId peerScopedNodeId = sessionHandle->GetPeer();
+    auto sessionIt                = self->mSessionIdMap.find(peerScopedNodeId);
     if (sessionIt == self->mSessionIdMap.end())
     {
-        ChipLogError(Camera, "OnDeviceConnected:: no session found for peer node ID: " ChipLogFormatX64,
-                     ChipLogValueX64(peerNodeId));
+        ChipLogError(Camera, "OnDeviceConnected:: no session found for peer ScopedNodeId: [%d:" ChipLogFormatX64 "]",
+                     peerScopedNodeId.GetFabricIndex(), ChipLogValueX64(peerScopedNodeId.GetNodeId()));
         return;
     }
 
@@ -662,7 +662,7 @@ void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::Exchang
         self->ReleaseAudioVideoStreams(sessionId);
         self->mMediaController->UnregisterTransport(transport);
         WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
-        self->mSessionIdMap.erase(args.peerNodeId);
+        self->mSessionIdMap.erase(ScopedNodeId(args.peerNodeId, args.fabricIndex));
 
         transport->MoveToState(WebrtcTransport::State::Idle);
 
