@@ -10,7 +10,7 @@ import tempfile
 import click
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-from zap_download import DownloadReleasedZap # noqa: E402 isort:skip
+from zap_download import DownloadReleasedZap  # noqa: E402 isort:skip
 
 
 try:
