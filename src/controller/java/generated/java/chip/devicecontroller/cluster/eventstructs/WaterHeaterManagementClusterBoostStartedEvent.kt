@@ -17,16 +17,18 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class WaterHeaterManagementClusterBoostStartedEvent(
-  val boostInfo:
-    chip.devicecontroller.cluster.structs.WaterHeaterManagementClusterWaterHeaterBoostInfoStruct
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class WaterHeaterManagementClusterBoostStartedEvent (
+    val boostInfo: chip.devicecontroller.cluster.structs.WaterHeaterManagementClusterWaterHeaterBoostInfoStruct) {
+  override fun toString(): String  = buildString {
     append("WaterHeaterManagementClusterBoostStartedEvent {\n")
     append("\tboostInfo : $boostInfo\n")
     append("}\n")
@@ -43,12 +45,10 @@ class WaterHeaterManagementClusterBoostStartedEvent(
   companion object {
     private const val TAG_BOOST_INFO = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): WaterHeaterManagementClusterBoostStartedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : WaterHeaterManagementClusterBoostStartedEvent {
       tlvReader.enterStructure(tlvTag)
-      val boostInfo =
-        chip.devicecontroller.cluster.structs.WaterHeaterManagementClusterWaterHeaterBoostInfoStruct
-          .fromTlv(ContextSpecificTag(TAG_BOOST_INFO), tlvReader)
-
+      val boostInfo = chip.devicecontroller.cluster.structs.WaterHeaterManagementClusterWaterHeaterBoostInfoStruct.fromTlv(ContextSpecificTag(TAG_BOOST_INFO), tlvReader)
+      
       tlvReader.exitContainer()
 
       return WaterHeaterManagementClusterBoostStartedEvent(boostInfo)

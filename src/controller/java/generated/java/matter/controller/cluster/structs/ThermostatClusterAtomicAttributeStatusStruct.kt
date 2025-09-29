@@ -16,13 +16,18 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ThermostatClusterAtomicAttributeStatusStruct(val attributeID: UInt, val statusCode: UByte) {
+class ThermostatClusterAtomicAttributeStatusStruct(
+  val attributeID: UInt,
+  val statusCode: UByte
+) {
   override fun toString(): String = buildString {
     append("ThermostatClusterAtomicAttributeStatusStruct {\n")
     append("\tattributeID : $attributeID\n")
@@ -47,7 +52,7 @@ class ThermostatClusterAtomicAttributeStatusStruct(val attributeID: UInt, val st
       tlvReader.enterStructure(tlvTag)
       val attributeID = tlvReader.getUInt(ContextSpecificTag(TAG_ATTRIBUTE_ID))
       val statusCode = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS_CODE))
-
+      
       tlvReader.exitContainer()
 
       return ThermostatClusterAtomicAttributeStatusStruct(attributeID, statusCode)
