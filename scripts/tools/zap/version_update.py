@@ -105,14 +105,6 @@ def version_update(log_level, update, new_version):
                 f"Version '{new_version}' does not seem to parse as a ZAP VERSION")
             sys.exit(1)
 
-        # new CIPD versions use semantic tags only, so they lose the `v` prefix
-        # as well as the `-nightly` suffix. Adjust as a result:
-        #  v1234.56.78-nightly becomes "1234.56.78" and
-        #  v1234.56.78 becomes "1234.56.78"
-        # This is ambiguous in case both official and nightly releases exist, however
-        # for now we accept that.
-        new_version = ".".join(parsed.groups()[:3])
-
         # get the numeric version for zap_execution
         #
         # This makes every group element (date section) to a base 10 integer,
@@ -141,6 +133,7 @@ def version_update(log_level, update, new_version):
 
         # If we update, perform the update
         if new_version:
+            logging.info('Updating content of %s to version %s', name, version)
             search_pos = 0
             need_replace = False
             m = ZAP_VERSION_RE.search(file_data, search_pos)
@@ -155,7 +148,7 @@ def version_update(log_level, update, new_version):
                 need_replace = True
                 # We search a bit past the match to not re-match the same thing again
                 # This is because our version lengths may vary.
-                search_pos = m.start() + 1
+                search_pos = m.start() + len(version)
                 m = ZAP_VERSION_RE.search(file_data, search_pos)
 
             if need_replace:
