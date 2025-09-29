@@ -31,6 +31,14 @@ using namespace chip::Protocols::InteractionModel;
 
 namespace {
 
+static constexpr size_t kTimeSynchronizationFixedClusterCount =
+    TimeSynchronization::StaticApplicationConfig::kFixedClusterConfig.size();
+
+static_assert((kTimeSynchronizationFixedClusterCount == 0) ||
+                  ((kTimeSynchronizationFixedClusterCount == 1) &&
+                   TimeSynchronization::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId),
+              "Time Synchronization cluster MUST be on endpoint 0");
+
 LazyRegisteredServerCluster<TimeSynchronizationCluster> gServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
@@ -67,6 +75,8 @@ public:
 
 void MatterTimeSynchronizationClusterInitCallback(EndpointId endpointId)
 {
+    VerifyOrReturn(endpointId == kRootEndpointId);
+
     IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
@@ -74,8 +84,8 @@ void MatterTimeSynchronizationClusterInitCallback(EndpointId endpointId)
         {
             .endpointId                = endpointId,
             .clusterId                 = TimeSynchronization::Id,
-            .fixedClusterInstanceCount = 1,
-            .maxClusterInstanceCount   = 1,
+            .fixedClusterInstanceCount = kTimeSynchronizationFixedClusterCount,
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
             .fetchFeatureMap           = true,
             .fetchOptionalAttributes   = false,
         },
@@ -84,6 +94,8 @@ void MatterTimeSynchronizationClusterInitCallback(EndpointId endpointId)
 
 void MatterTimeSynchronizationClusterShutdownCallback(EndpointId endpointId)
 {
+    VerifyOrReturn(endpointId == kRootEndpointId);
+
     IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
@@ -91,8 +103,8 @@ void MatterTimeSynchronizationClusterShutdownCallback(EndpointId endpointId)
         {
             .endpointId                = endpointId,
             .clusterId                 = TimeSynchronization::Id,
-            .fixedClusterInstanceCount = 1,
-            .maxClusterInstanceCount   = 1,
+            .fixedClusterInstanceCount = kTimeSynchronizationFixedClusterCount,
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
         integrationDelegate);
 }
@@ -103,14 +115,16 @@ namespace chip::app::Clusters::TimeSynchronization {
 
 TimeSynchronizationCluster * FindClusterOnEndpoint(EndpointId endpointId)
 {
+    VerifyOrReturnValue(endpointId == kRootEndpointId, nullptr);
+
     IntegrationDelegate integrationDelegate;
 
     ServerClusterInterface * timeSynchronization = CodegenClusterIntegration::FindClusterOnEndpoint(
         {
             .endpointId                = endpointId,
             .clusterId                 = TimeSynchronization::Id,
-            .fixedClusterInstanceCount = 1,
-            .maxClusterInstanceCount   = 1,
+            .fixedClusterInstanceCount = kTimeSynchronizationFixedClusterCount,
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
         integrationDelegate);
 

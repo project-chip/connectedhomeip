@@ -242,8 +242,8 @@ TimeSynchronizationCluster::TimeSynchronizationCluster(
     EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
     TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type supportsDNSResolve, TimeZoneDatabaseEnum timeZoneDatabase,
     TimeSynchronization::TimeSourceEnum timeSource) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mFeatures(features), mSupportsDNSResolve(supportsDNSResolve), mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mFeatures(features), mSupportsDNSResolve(supportsDNSResolve),
+    mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -317,8 +317,65 @@ CHIP_ERROR TimeSynchronizationCluster::ReadLocalTime(AttributeValueEncoder & enc
 CHIP_ERROR TimeSynchronizationCluster::Attributes(const ConcreteClusterPath & path,
                                                   ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(TimeSynchronization::Attributes::kMandatoryMetadata), {});
+    AttributeListBuilder attributeListBuilder(builder);
+
+    const DataModel::AttributeEntry optionalAttributes[] = {
+        TrustedTimeSource::kMetadataEntry,    //
+        DefaultNTP::kMetadataEntry,           //
+        TimeZone::kMetadataEntry,             //
+        DSTOffset::kMetadataEntry,            //
+        LocalTime::kMetadataEntry,            //
+        TimeZoneDatabase::kMetadataEntry,     //
+        NTPServerAvailable::kMetadataEntry,   //
+        TimeZoneListMaxSize::kMetadataEntry,  //
+        DSTOffsetListMaxSize::kMetadataEntry, //
+        SupportsDNSResolve::kMetadataEntry    //
+    };
+
+    // Attribute set, real "optional" attributes
+    chip::app::OptionalAttributeSet<TimeSynchronization::Attributes::TimeSource::Id> optAttributesSet;
+
+    // Full attribute set, to combine real "optional" attributes but also
+    // attributes controlled by feature flags.
+    chip::app::OptionalAttributeSet<TimeSynchronization::Attributes::TrustedTimeSource::Id,    //
+                                    TimeSynchronization::Attributes::DefaultNTP::Id,           //
+                                    TimeSynchronization::Attributes::TimeZone::Id,             //
+                                    TimeSynchronization::Attributes::DSTOffset::Id,            //
+                                    TimeSynchronization::Attributes::LocalTime::Id,            //
+                                    TimeSynchronization::Attributes::TimeZoneDatabase::Id,     //
+                                    TimeSynchronization::Attributes::NTPServerAvailable::Id,   //
+                                    TimeSynchronization::Attributes::TimeZoneListMaxSize::Id,  //
+                                    TimeSynchronization::Attributes::DSTOffsetListMaxSize::Id, //
+                                    TimeSynchronization::Attributes::SupportsDNSResolve::Id    //
+                                    >
+        optionalAttributeSet(optAttributesSet);
+
+    if (mFeatures.Has(Feature::kTimeSyncClient))
+    {
+        optionalAttributeSet.Set<TrustedTimeSource::Id>();
+    }
+
+    if (mFeatures.Has(Feature::kNTPClient))
+    {
+        optionalAttributeSet.Set<DefaultNTP::Id>();
+        optionalAttributeSet.Set<SupportsDNSResolve::Id>();
+    }
+
+    if (mFeatures.Has(Feature::kNTPServer))
+    {
+        optionalAttributeSet.Set<NTPServerAvailable::Id>();
+    }
+
+    if (mFeatures.Has(Feature::kTimeZone))
+    {
+        optionalAttributeSet.Set<TimeZone::Id>();
+        optionalAttributeSet.Set<DSTOffset::Id>();
+        optionalAttributeSet.Set<LocalTime::Id>();
+        optionalAttributeSet.Set<TimeZoneDatabase::Id>();
+        optionalAttributeSet.Set<TimeZoneListMaxSize::Id>();
+        optionalAttributeSet.Set<DSTOffsetListMaxSize::Id>();
+    }
+    return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet);
 }
 
 DataModel::ActionReturnStatus TimeSynchronizationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -347,17 +404,29 @@ DataModel::ActionReturnStatus TimeSynchronizationCluster::ReadAttribute(const Da
         return encoder.Encode(timeSynchronization->GetGranularity());
     }
     case TrustedTimeSource::Id:
-        return ReadTrustedTimeSource(encoder);
+        if (mFeatures.Has(Feature::kTimeSyncClient))
+            return ReadTrustedTimeSource(encoder);
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     case DefaultNTP::Id:
-        return ReadDefaultNtp(encoder);
+        if (mFeatures.Has(Feature::kNTPClient))
+            return ReadDefaultNtp(encoder);
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     case TimeZone::Id:
-        return ReadTimeZone(encoder);
+        if (mFeatures.Has(Feature::kTimeZone))
+            return ReadTimeZone(encoder);
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     case DSTOffset::Id:
-        return ReadDSTOffset(encoder);
+        if (mFeatures.Has(Feature::kTimeZone))
+            return ReadDSTOffset(encoder);
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     case TimeZoneListMaxSize::Id:
-        return encoder.Encode<uint8_t>(CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE);
+        if (mFeatures.Has(Feature::kTimeZone))
+            return encoder.Encode<uint8_t>(CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE);
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     case DSTOffsetListMaxSize::Id:
-        return encoder.Encode<uint8_t>(CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE);
+        if (mFeatures.Has(Feature::kTimeZone))
+            return encoder.Encode<uint8_t>(CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE);
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     case LocalTime::Id:
         return ReadLocalTime(encoder);
     case ClusterRevision::Id:
@@ -365,11 +434,17 @@ DataModel::ActionReturnStatus TimeSynchronizationCluster::ReadAttribute(const Da
     case FeatureMap::Id:
         return encoder.Encode(mFeatures);
     case SupportsDNSResolve::Id:
-        return encoder.Encode(mSupportsDNSResolve);
+        if (mFeatures.Has(Feature::kNTPClient))
+            return encoder.Encode(mSupportsDNSResolve);
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     case TimeZoneDatabase::Id:
-        return encoder.Encode(mTimeZoneDatabase);
+        if (mFeatures.Has(Feature::kTimeZone))
+            return encoder.Encode(mTimeZoneDatabase);
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     case TimeSource::Id:
-        return encoder.Encode(mTimeSource);
+        if (mFeatures.Has(Feature::kTimeZone))
+            return encoder.Encode(mTimeSource);
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -1085,24 +1160,40 @@ std::optional<DataModel::ActionReturnStatus> TimeSynchronizationCluster::InvokeC
         return HandleSetUTCTime(handler, request.path, data);
     }
     case Commands::SetTrustedTimeSource::Id: {
-        Commands::SetTrustedTimeSource::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(input_arguments, handler->GetAccessingFabricIndex()));
-        return HandleSetTrustedTimeSource(handler, request.path, data);
+        if (mFeatures.Has(Feature::kTimeSyncClient))
+        {
+            Commands::SetTrustedTimeSource::DecodableType data;
+            ReturnErrorOnFailure(data.Decode(input_arguments, handler->GetAccessingFabricIndex()));
+            return HandleSetTrustedTimeSource(handler, request.path, data);
+        }
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
     case Commands::SetTimeZone::Id: {
-        Commands::SetTimeZone::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(input_arguments));
-        return HandleSetTimeZone(handler, request.path, data);
+        if (mFeatures.Has(Feature::kTimeZone))
+        {
+            Commands::SetTimeZone::DecodableType data;
+            ReturnErrorOnFailure(data.Decode(input_arguments));
+            return HandleSetTimeZone(handler, request.path, data);
+        }
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
     case Commands::SetDSTOffset::Id: {
-        Commands::SetDSTOffset::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(input_arguments));
-        return HandleSetDSTOffset(handler, request.path, data);
+        if (mFeatures.Has(Feature::kTimeZone))
+        {
+            Commands::SetDSTOffset::DecodableType data;
+            ReturnErrorOnFailure(data.Decode(input_arguments));
+            return HandleSetDSTOffset(handler, request.path, data);
+        }
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
     case Commands::SetDefaultNTP::Id: {
-        Commands::SetDefaultNTP::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(input_arguments));
-        return HandleSetDefaultNTP(handler, request.path, data);
+        if (mFeatures.Has(Feature::kNTPClient))
+        {
+            Commands::SetDefaultNTP::DecodableType data;
+            ReturnErrorOnFailure(data.Decode(input_arguments));
+            return HandleSetDefaultNTP(handler, request.path, data);
+        }
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
@@ -1112,10 +1203,72 @@ std::optional<DataModel::ActionReturnStatus> TimeSynchronizationCluster::InvokeC
 CHIP_ERROR TimeSynchronizationCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
+    if (mFeatures.Has(Feature::kTimeSyncClient) && mFeatures.Has(Feature::kTimeZone) && mFeatures.Has(Feature::kNTPClient))
+    {
+        static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
+            Commands::SetUTCTime::kMetadataEntry,           //
+            Commands::SetTrustedTimeSource::kMetadataEntry, //
+            Commands::SetTimeZone::kMetadataEntry,          //
+            Commands::SetDSTOffset::kMetadataEntry,         //
+            Commands::SetDefaultNTP::kMetadataEntry,        //
+        };
+        return builder.ReferenceExisting(kAcceptedCommands);
+    }
+
+    if (mFeatures.Has(Feature::kTimeZone) && mFeatures.Has(Feature::kNTPClient))
+    {
+        static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
+            Commands::SetUTCTime::kMetadataEntry,    //
+            Commands::SetTimeZone::kMetadataEntry,   //
+            Commands::SetDSTOffset::kMetadataEntry,  //
+            Commands::SetDefaultNTP::kMetadataEntry, //
+        };
+        return builder.ReferenceExisting(kAcceptedCommands);
+    }
+
+    if (mFeatures.Has(Feature::kTimeSyncClient) && mFeatures.Has(Feature::kTimeZone))
+    {
+        static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
+            Commands::SetUTCTime::kMetadataEntry,           //
+            Commands::SetTrustedTimeSource::kMetadataEntry, //
+            Commands::SetTimeZone::kMetadataEntry,          //
+            Commands::SetDSTOffset::kMetadataEntry,         //
+        };
+        return builder.ReferenceExisting(kAcceptedCommands);
+    }
+
+    if (mFeatures.Has(Feature::kTimeSyncClient) && mFeatures.Has(Feature::kNTPClient))
+    {
+        static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
+            Commands::SetUTCTime::kMetadataEntry,           //
+            Commands::SetTrustedTimeSource::kMetadataEntry, //
+            Commands::SetDefaultNTP::kMetadataEntry,        //
+        };
+        return builder.ReferenceExisting(kAcceptedCommands);
+    }
+
+    if (mFeatures.Has(Feature::kTimeSyncClient))
+    {
+        static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
+            Commands::SetUTCTime::kMetadataEntry,           //
+            Commands::SetTrustedTimeSource::kMetadataEntry, //
+        };
+        return builder.ReferenceExisting(kAcceptedCommands);
+    }
+
+    if (mFeatures.Has(Feature::kTimeZone))
+    {
+        static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
+            Commands::SetUTCTime::kMetadataEntry,   //
+            Commands::SetTimeZone::kMetadataEntry,  //
+            Commands::SetDSTOffset::kMetadataEntry, //
+        };
+        return builder.ReferenceExisting(kAcceptedCommands);
+    }
+
     static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
-        Commands::SetUTCTime::kMetadataEntry,    Commands::SetTrustedTimeSource::kMetadataEntry,
-        Commands::SetTimeZone::kMetadataEntry,   Commands::SetDSTOffset::kMetadataEntry,
-        Commands::SetDefaultNTP::kMetadataEntry,
+        Commands::SetUTCTime::kMetadataEntry,    //
+        Commands::SetDefaultNTP::kMetadataEntry, //
     };
     return builder.ReferenceExisting(kAcceptedCommands);
 }
@@ -1123,9 +1276,72 @@ CHIP_ERROR TimeSynchronizationCluster::AcceptedCommands(const ConcreteClusterPat
 CHIP_ERROR TimeSynchronizationCluster::GeneratedCommands(const ConcreteClusterPath & path,
                                                          ReadOnlyBufferBuilder<CommandId> & builder)
 {
+    if (mFeatures.Has(Feature::kTimeSyncClient) && mFeatures.Has(Feature::kTimeZone) && mFeatures.Has(Feature::kNTPClient))
+    {
+        static constexpr CommandId kGeneratedCommands[] = {
+            Commands::SetUTCTime::Id,           //
+            Commands::SetTrustedTimeSource::Id, //
+            Commands::SetTimeZone::Id,          //
+            Commands::SetDSTOffset::Id,         //
+            Commands::SetDefaultNTP::Id,        //
+        };
+        return builder.ReferenceExisting(kGeneratedCommands);
+    }
+
+    if (mFeatures.Has(Feature::kTimeZone) && mFeatures.Has(Feature::kNTPClient))
+    {
+        static constexpr CommandId kGeneratedCommands[] = {
+            Commands::SetUTCTime::Id,    //
+            Commands::SetTimeZone::Id,   //
+            Commands::SetDSTOffset::Id,  //
+            Commands::SetDefaultNTP::Id, //
+        };
+        return builder.ReferenceExisting(kGeneratedCommands);
+    }
+
+    if (mFeatures.Has(Feature::kTimeSyncClient) && mFeatures.Has(Feature::kTimeZone))
+    {
+        static constexpr CommandId kGeneratedCommands[] = {
+            Commands::SetUTCTime::Id,           //
+            Commands::SetTrustedTimeSource::Id, //
+            Commands::SetTimeZone::Id,          //
+            Commands::SetDSTOffset::Id,         //
+        };
+        return builder.ReferenceExisting(kGeneratedCommands);
+    }
+
+    if (mFeatures.Has(Feature::kTimeSyncClient) && mFeatures.Has(Feature::kNTPClient))
+    {
+        static constexpr CommandId kGeneratedCommands[] = {
+            Commands::SetUTCTime::Id,           //
+            Commands::SetTrustedTimeSource::Id, //
+            Commands::SetDefaultNTP::Id,        //
+        };
+        return builder.ReferenceExisting(kGeneratedCommands);
+    }
+
+    if (mFeatures.Has(Feature::kTimeSyncClient))
+    {
+        static constexpr CommandId kGeneratedCommands[] = {
+            Commands::SetUTCTime::Id,           //
+            Commands::SetTrustedTimeSource::Id, //
+        };
+        return builder.ReferenceExisting(kGeneratedCommands);
+    }
+
+    if (mFeatures.Has(Feature::kTimeZone))
+    {
+        static constexpr CommandId kGeneratedCommands[] = {
+            Commands::SetUTCTime::Id,   //
+            Commands::SetTimeZone::Id,  //
+            Commands::SetDSTOffset::Id, //
+        };
+        return builder.ReferenceExisting(kGeneratedCommands);
+    }
+
     static constexpr CommandId kGeneratedCommands[] = {
-        Commands::SetUTCTime::Id,   Commands::SetTrustedTimeSource::Id, Commands::SetTimeZone::Id,
-        Commands::SetDSTOffset::Id, Commands::SetDefaultNTP::Id,
+        Commands::SetUTCTime::Id,    //
+        Commands::SetDefaultNTP::Id, //
     };
     return builder.ReferenceExisting(kGeneratedCommands);
 }

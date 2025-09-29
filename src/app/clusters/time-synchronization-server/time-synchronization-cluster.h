@@ -57,13 +57,6 @@ Delegate * GetDelegate();
 void SetDefaultDelegate(Delegate * delegate);
 Delegate * GetDefaultDelegate();
 
-// Event generation functions
-bool emitDSTTableEmptyEvent(EndpointId ep, DataModel::EventsGenerator * eventsGenerator);
-bool emitDSTStatusEvent(EndpointId ep, bool dstOffsetActive, DataModel::EventsGenerator * eventsGenerator);
-bool emitTimeZoneStatusEvent(EndpointId ep, DataModel::EventsGenerator * eventsGenerator);
-bool emitTimeFailureEvent(EndpointId ep, DataModel::EventsGenerator * eventsGenerator);
-bool emitMissingTrustedTimeSourceEvent(EndpointId ep, DataModel::EventsGenerator * eventsGenerator);
-
 } // namespace TimeSynchronization
 
 class TimeSynchronizationCluster : public DefaultServerCluster,
@@ -149,26 +142,6 @@ public:
 
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
-    std::optional<DataModel::ActionReturnStatus>
-    HandleSetUTCTime(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                     const TimeSynchronization::Commands::SetUTCTime::DecodableType & commandData);
-
-    std::optional<DataModel::ActionReturnStatus>
-    HandleSetTrustedTimeSource(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                               const TimeSynchronization::Commands::SetTrustedTimeSource::DecodableType & commandData);
-
-    std::optional<DataModel::ActionReturnStatus>
-    HandleSetTimeZone(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                      const TimeSynchronization::Commands::SetTimeZone::DecodableType & commandData);
-
-    std::optional<DataModel::ActionReturnStatus>
-    HandleSetDSTOffset(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                       const TimeSynchronization::Commands::SetDSTOffset::DecodableType & commandData);
-
-    std::optional<DataModel::ActionReturnStatus>
-    HandleSetDefaultNTP(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                        const TimeSynchronization::Commands::SetDefaultNTP::DecodableType & commandData);
-
 private:
     static constexpr size_t kMaxDefaultNTPSize = 128;
     DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> mTrustedTimeSource;
@@ -223,6 +196,26 @@ private:
     CHIP_ERROR ReadTimeZone(AttributeValueEncoder & encoder);
     CHIP_ERROR ReadDSTOffset(AttributeValueEncoder & encoder);
     CHIP_ERROR ReadLocalTime(AttributeValueEncoder & encoder);
+
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSetUTCTime(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                     const TimeSynchronization::Commands::SetUTCTime::DecodableType & commandData);
+
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSetTrustedTimeSource(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                               const TimeSynchronization::Commands::SetTrustedTimeSource::DecodableType & commandData);
+
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSetTimeZone(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                      const TimeSynchronization::Commands::SetTimeZone::DecodableType & commandData);
+
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSetDSTOffset(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                       const TimeSynchronization::Commands::SetDSTOffset::DecodableType & commandData);
+
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSetDefaultNTP(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                        const TimeSynchronization::Commands::SetDefaultNTP::DecodableType & commandData);
 };
 
 } // namespace chip::app::Clusters
