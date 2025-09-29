@@ -146,7 +146,8 @@ def version_update(log_level, update, new_version):
                 file_data = file_data[:m.start()] + \
                     new_version + file_data[m.end():]
                 need_replace = True
-                # We search a bit past the match to not re-match the same thing again
+
+                # We search a bit past the match to not re-match the same thing again.
                 # This is because our version lengths may vary.
                 search_pos = m.start() + len(version)
                 m = ZAP_VERSION_RE.search(file_data, search_pos)
