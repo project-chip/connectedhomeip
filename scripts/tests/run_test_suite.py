@@ -391,8 +391,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
     if sys.platform == 'linux':
         ns = chiptest.linux.IsolatedNetworkNamespace(
+            index=0,
             unshared=context.obj.in_unshare)
-        paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
+        paths = ns.paths_with_network_namespaces(paths)
 
     logging.info("Each test will be executed %d times" % iterations)
 
