@@ -214,7 +214,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
 {
     ChipLogProgress(Camera, "HandleProvideOffer called");
 
-    // Initialize a new WebRTC session from the SolicitOfferRequestArgs
+    // Initialize a new WebRTC session from the ProvideOfferRequestArgs
     outSession.id             = args.sessionId;
     outSession.peerNodeID     = args.peerNodeId;
     outSession.peerEndpointID = args.originatingEndpointId;
@@ -512,6 +512,9 @@ void WebRTCProviderManager::ScheduleOfferSend(uint16_t sessionId)
 
         transport->SetCommandType(WebrtcTransport::CommandType::kOffer);
 
+        // Set current session ID for callback communication
+        mCurrentSessionId = sessionId;
+
         // Attempt to find or establish a CASE session to the target PeerId.
         CASESessionManager * caseSessionMgr = Server::GetInstance().GetCASESessionManager();
         VerifyOrDie(caseSessionMgr != nullptr);
@@ -538,6 +541,9 @@ void WebRTCProviderManager::ScheduleAnswerSend(uint16_t sessionId)
         ChipLogProgress(Camera, "Sending Answer command to node " ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
 
         transport->SetCommandType(WebrtcTransport::CommandType::kAnswer);
+
+        // Set current session ID for callback communication
+        mCurrentSessionId = sessionId;
 
         // Attempt to find or establish a CASE session to the target PeerId.
         CASESessionManager * caseSessionMgr = Server::GetInstance().GetCASESessionManager();
@@ -566,6 +572,9 @@ void WebRTCProviderManager::ScheduleEndSend(uint16_t sessionId)
 
         transport->SetCommandType(WebrtcTransport::CommandType::kEnd);
 
+        // Set current session ID for callback communication
+        mCurrentSessionId = sessionId;
+
         // Attempt to find or establish a CASE session to the target PeerId.
         CASESessionManager * caseSessionMgr = Server::GetInstance().GetCASESessionManager();
         VerifyOrDie(caseSessionMgr != nullptr);
@@ -593,6 +602,9 @@ void WebRTCProviderManager::ScheduleICECandidatesSend(uint16_t sessionId)
 
         transport->SetCommandType(WebrtcTransport::CommandType::kICECandidates);
 
+        // Set current session ID for callback communication
+        mCurrentSessionId = sessionId;
+
         // Attempt to find or establish a CASE session to the target PeerId.
         CASESessionManager * caseSessionMgr = Server::GetInstance().GetCASESessionManager();
         VerifyOrDie(caseSessionMgr != nullptr);
@@ -609,72 +621,65 @@ void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::Exchang
     WebRTCProviderManager * self = reinterpret_cast<WebRTCProviderManager *>(context);
     VerifyOrReturn(self != nullptr, ChipLogError(Camera, "OnDeviceConnected:: context is null"));
 
-    WebrtcTransport * transport = nullptr;
-    uint16_t sessionId          = 0;
-
-    for (auto it = self->mWebrtcTransportMap.begin(); it != self->mWebrtcTransportMap.end();)
+    uint16_t sessionId          = self->mCurrentSessionId;
+    WebrtcTransport * transport = self->GetTransport(sessionId);
+    if (transport == nullptr)
     {
-        sessionId = it->first;
-        transport = (WebrtcTransport *) it->second.get();
+        ChipLogError(Camera, "OnDeviceConnected:: transport not found for sessionId: %u", sessionId);
+        return;
+    }
 
-        if (transport == nullptr)
+    ChipLogProgress(Camera, "CASE session established, sending command with Command Type: %d, for sessionID: %u",
+                    static_cast<int>(transport->GetCommandType()), sessionId);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    switch (transport->GetCommandType())
+    {
+    case WebrtcTransport::CommandType::kOffer:
+        err = self->SendOfferCommand(exchangeMgr, sessionHandle, sessionId);
+        transport->MoveToState(WebrtcTransport::State::Idle);
+        break;
+
+    case WebrtcTransport::CommandType::kAnswer:
+        err = self->SendAnswerCommand(exchangeMgr, sessionHandle, sessionId);
+        transport->MoveToState(WebrtcTransport::State::Idle);
+        break;
+    case WebrtcTransport::CommandType::kICECandidates:
+        err = self->SendICECandidatesCommand(exchangeMgr, sessionHandle, sessionId);
+        transport->MoveToState(WebrtcTransport::State::Idle);
+        break;
+    case WebrtcTransport::CommandType::kEnd: {
+        // Determine the end reason - check if it's due to privacy mode or resource exhaustion
+        WebRTCEndReasonEnum endReason = WebRTCEndReasonEnum::kOutOfResources;
+
+        if (self->mSoftLiveStreamPrivacyEnabled)
         {
-            ++it;
-            continue;
+            endReason = WebRTCEndReasonEnum::kPrivacyMode;
         }
 
-        ChipLogProgress(Camera, "CASE session established, sending command with Command Type: %d, for sessionID: %u",
-                        static_cast<int>(transport->GetCommandType()), sessionId);
+        err = self->SendEndCommand(exchangeMgr, sessionHandle, sessionId, endReason);
+        // Release the Video and Audio Streams from the CameraAVStreamManagement
+        // cluster and update the reference counts.
+        self->ReleaseAudioVideoStreams(sessionId);
+        self->mMediaController->UnregisterTransport(transport);
+        WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
+        self->mSessionIdMap.erase(args.peerNodeId);
 
-        CHIP_ERROR err = CHIP_NO_ERROR;
+        // remove from current sessions list
+        self->mWebRTCTransportProvider->RemoveSession(sessionId);
+        self->mWebrtcTransportMap.erase(sessionId);
+        transport->MoveToState(WebrtcTransport::State::Idle);
+        break;
+    }
+    default:
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+        break;
+    }
 
-        switch (transport->GetCommandType())
-        {
-        case WebrtcTransport::CommandType::kOffer:
-            err = self->SendOfferCommand(exchangeMgr, sessionHandle, sessionId);
-            transport->MoveToState(WebrtcTransport::State::Idle);
-            break;
-
-        case WebrtcTransport::CommandType::kAnswer:
-            err = self->SendAnswerCommand(exchangeMgr, sessionHandle, sessionId);
-            transport->MoveToState(WebrtcTransport::State::Idle);
-            break;
-        case WebrtcTransport::CommandType::kICECandidates:
-            err = self->SendICECandidatesCommand(exchangeMgr, sessionHandle, sessionId);
-            transport->MoveToState(WebrtcTransport::State::Idle);
-            break;
-        case WebrtcTransport::CommandType::kEnd:
-            if (self->mSoftLiveStreamPrivacyEnabled)
-            {
-                err = self->SendEndCommand(exchangeMgr, sessionHandle, sessionId, WebRTCEndReasonEnum::kPrivacyMode);
-                // Release the Video and Audio Streams from the CameraAVStreamManagement
-                // cluster and update the reference counts.
-                self->ReleaseAudioVideoStreams(sessionId);
-                WebrtcTransport * transport = self->GetTransport(sessionId);
-                if (transport != nullptr)
-                {
-                    self->mMediaController->UnregisterTransport(transport);
-                    WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
-                    self->mSessionIdMap.erase(args.peerNodeId);
-                    // remove from current sessions list
-                    self->mWebRTCTransportProvider->RemoveSession(sessionId);
-                }
-
-                it = self->mWebrtcTransportMap.erase(it);
-                continue;
-            }
-            transport->MoveToState(WebrtcTransport::State::Idle);
-            break;
-        default:
-            err = CHIP_ERROR_INVALID_ARGUMENT;
-            break;
-        }
-
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Camera, "OnDeviceConnected::SendCommand failed: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-        ++it;
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "OnDeviceConnected::SendCommand failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
