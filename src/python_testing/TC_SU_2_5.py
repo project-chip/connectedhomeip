@@ -44,22 +44,17 @@
 
 import asyncio
 import logging
-from os import environ, getcwd, path
-from signal import SIGTERM
 from subprocess import run
 from time import sleep
-from TC_SUBase import SoftwareUpdateBaseTest
 
 from mobly import asserts
-from typing import Union
+from TC_SUBase import SoftwareUpdateBaseTest
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
-from matter.interaction_model import Status
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -453,7 +448,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         ota_file_data = self.get_downloaded_ota_image_info()
         logger.info(f"Downloaded ota image data {str(ota_file_data)}")
         asserts.assert_equal(True, ota_file_data['exists'], f"File is not bein downloaded  at {ota_file_data['path']}")
-        asserts.assert_greater(ota_file_data['size'], 0, f"Downloaded file is still at 0")
+        asserts.assert_greater(ota_file_data['size'], 0, "Downloaded file is still at 0")
 
         # Applying
         event_report = event_state_transition.wait_for_event_report(
@@ -478,7 +473,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         ota_file_data = self.get_downloaded_ota_image_info()
         logger.info(f"Downloaded ota image data {str(ota_file_data)}")
         asserts.assert_equal(ota_file_data['exists'], False, f"Downloaded file is still present {ota_file_data['path']}")
-        asserts.assert_equal(ota_file_data['size'], 0, f"File size is greater than 0")
+        asserts.assert_equal(ota_file_data['size'], 0, "File size is greater than 0")
         update_state_progress = await self.read_single_attribute_check_success(
             Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress, controller, requestor_node_id, 0)
         asserts.assert_equal(update_state_progress, NullValue, "Progress is not Null")
