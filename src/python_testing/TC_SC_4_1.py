@@ -65,14 +65,25 @@ class TC_SC_4_1(MatterBaseTest):
 
     def steps_TC_SC_4_1(self):
         return [TestStep(1, "DUT is commissioned.", is_commissioning=True),
-                TestStep(2, "TH reads ServerList attribute from the Descriptor cluster on EP0. ",
-                         "If the ICD Management cluster ID (70,0x46) is present in the list, set supports_icd to true, otherwise set supports_icd to false."),
-                TestStep(
-                    3, "If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold_ms."),
-                TestStep(4, "DUT is put in Commissioning Mode.",
-                         "DUT starts advertising Commissionable Node Discovery service through DNS-SD."),
-                TestStep(5, "DUT is put in Commissioning Mode.",
-                         "DUT starts advertising Commissionable Node Discovery service through DNS-SD."),
+                TestStep(2, "TH reads ServerList attribute from the Descriptor cluster on EP0. ","""
+                                - If the ICD Management cluster ID (70,0x46) is present in the list, set supports_icd to true, otherwise set supports_icd to false.
+                                - If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold.                         
+                                """),
+                TestStep(3, "DUT is put in Commissioning Mode using Open Basic Commissioning Window command.", """
+                                - DUT starts advertising Commissionable Node Discovery service through DNS-SD
+                                - Verify DUT Commissionable Node Discovery service advertisements
+                                - Close commissioning window
+                                """),
+                TestStep(4, "DUT is put in Commissioning Mode using Open Commissioning Window command.", """
+                                - DUT starts advertising Commissionable Node Discovery service through DNS-SD
+                                - Verify DUT Commissionable Node Discovery service advertisements
+                                - Close commissioning window
+                                """),
+                TestStep(5, "Check if DUT is in Extended Discovery mode.", """
+                                - Check if DUT is advertising Commissionable Node Discovery services through DNS-SD
+                                - If so:
+                                    - Verify DUT Commissionable Node Discovery service advertisements
+                                    """),
                 ]
 
     async def read_attribute(self, attribute: Any) -> Any:
@@ -331,8 +342,10 @@ class TC_SC_4_1(MatterBaseTest):
         self.step(5)
         is_cs_present, commissionable_service = await self.is_commissionable_service_present()
         if is_cs_present:
+            logging.info("DUT is in Extended Discovery mode")
             await self.verify_commissionable_node_dns_sd_advertisements(commissionable_service=commissionable_service, expected_cm="0")
-
+        else:
+            logging.info("DUT isn't in Extended Discovery mode")
 
 if __name__ == "__main__":
     default_matter_test_main()
