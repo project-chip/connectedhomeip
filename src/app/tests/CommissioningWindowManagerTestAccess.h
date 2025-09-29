@@ -30,12 +30,14 @@ class CommissioningWindowManagerTestAccess
 {
 public:
     CommissioningWindowManagerTestAccess() = delete;
-    CommissioningWindowManagerTestAccess(CommissioningWindowManager * cmwinMgr) : mCmwinMgr(cmwinMgr) {}
+    CommissioningWindowManagerTestAccess(CommissioningWindowManager * commissioningWindowManager) :
+        mCommissioningWindowManager(commissioningWindowManager)
+    {}
 
-    SessionHolderWithDelegate & GetPASESession() { return mCmwinMgr->mPASESession; }
+    SessionHolderWithDelegate & GetPASESession() { return mCommissioningWindowManager->mPASESession; }
 
 private:
-    CommissioningWindowManager * mCmwinMgr = nullptr;
+    CommissioningWindowManager * mCommissioningWindowManager = nullptr;
 };
 } // namespace Test
 

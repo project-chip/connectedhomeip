@@ -87,7 +87,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
-        CHIP_ERROR err = mServer->GetDnssdServer()->AdvertiseOperational();
+        CHIP_ERROR err = GetDnssdServer()->AdvertiseOperational();
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Operational advertising failed: %" CHIP_ERROR_FORMAT, err.Format());
