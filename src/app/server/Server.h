@@ -45,7 +45,7 @@
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <inet/InetConfig.h>
 #include <lib/core/CHIPConfig.h>
-#include <lib/dnssd/IDnssdServer.h>
+#include <lib/dnssd/DnssdServer.h>
 #include <lib/support/SafeInt.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -432,7 +432,6 @@ public:
 
     app::reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
-    chip::Dnssd::IDnssdServer * GetDnssdServer() { return mDnssdServer; }
     chip::app::PlatformDnssdServer & GetDefaultDnssdServer() { return mDefaultDnssdServer; }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
@@ -472,10 +471,9 @@ public:
     }
 
     static Server & GetInstance() { return sServer; }
-    void SetDnssdServer(Dnssd::IDnssdServer * dnssdServer) { mDnssdServer = dnssdServer; }
 
 private:
-    Server() : mDnssdServer(&mDefaultDnssdServer) {}
+    Server() {}
 
     static Server sServer;
 
@@ -731,7 +729,6 @@ private:
     app::FailSafeContext mFailSafeContext;
 
     // For dependency injection of DNSSD server implementation
-    Dnssd::IDnssdServer * mDnssdServer;
     app::PlatformDnssdServer mDefaultDnssdServer;
 
     bool mIsDnssdReady = false;
