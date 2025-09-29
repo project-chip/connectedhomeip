@@ -116,15 +116,20 @@ static void StopEventLoop(intptr_t context)
 class MockDnssdServer : public chip::Dnssd::DnssdServer
 {
 public:
-    MockDnssdServer() : mAdvertisingEnabled(false), mIsStopped(false), mAdvertiseOperationalCallCount(0) {}
+    MockDnssdServer() :
+        mAdvertiseOperationalCallCount(0), mLastAdvertiseOperationalResult(CHIP_NO_ERROR), mAdvertisingEnabled(false),
+        mIsStopped(false)
+    {}
     CHIP_ERROR AdvertiseOperational() override
     {
         mAdvertiseOperationalCallCount++;
         if (mIsStopped)
         {
+            mLastAdvertiseOperationalResult = CHIP_ERROR_INCORRECT_STATE;
             return CHIP_ERROR_INCORRECT_STATE;
         }
-        mAdvertisingEnabled = true;
+        mAdvertisingEnabled             = true;
+        mLastAdvertiseOperationalResult = CHIP_NO_ERROR;
         return CHIP_NO_ERROR;
     }
 
@@ -132,8 +137,10 @@ public:
 
     void StopServer() override
     {
-        mAdvertisingEnabled = false;
-        mIsStopped          = true;
+        mAdvertisingEnabled             = false;
+        mIsStopped                      = true;
+        mAdvertiseOperationalCallCount  = 0;
+        mLastAdvertiseOperationalResult = CHIP_NO_ERROR;
     }
 
     bool IsAdvertisingEnabled() override { return !mIsStopped && mAdvertisingEnabled; }
@@ -144,11 +151,12 @@ public:
         mAdvertiseOperationalCallCount = 0;
     }
 
+    int mAdvertiseOperationalCallCount;
+    CHIP_ERROR mLastAdvertiseOperationalResult;
+
 private:
     bool mAdvertisingEnabled;
     bool mIsStopped;
-    int mAdvertiseOperationalCallCount;
-    CHIP_ERROR mLastAdvertiseOperationalResult;
 };
 
 class TestCommissioningWindowManager : public ::testing::Test
@@ -546,6 +554,8 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
     auto event                                 = CreateEvent(chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled);
 
     commissionMgr.OnPlatformEvent(&event);
+    EXPECT_EQ(mMockDnssd.mAdvertiseOperationalCallCount, 1);
+    EXPECT_EQ(mMockDnssd.mLastAdvertiseOperationalResult, CHIP_NO_ERROR);
     EXPECT_TRUE(mMockDnssd.IsAdvertisingEnabled());
 }
 
@@ -553,6 +563,8 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
 TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabledFail)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+
+    mMockDnssd.Reset();
 
     // Stopping DNS-SD server to trigger AdvertiseOperational() failure.
     Server::GetInstance().GetCommissioningWindowManager().GetDnssdServer()->StopServer();
