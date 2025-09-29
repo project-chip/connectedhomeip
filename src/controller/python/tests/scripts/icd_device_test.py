@@ -81,7 +81,6 @@ async def main():
         default=TEST_DISCRIMINATOR,
         type=int,
         help="Discriminator of the device",
-        metavar="<nodeid>"
     )
     optParser.add_option(
         "-p",
