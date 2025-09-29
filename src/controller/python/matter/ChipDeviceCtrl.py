@@ -350,8 +350,8 @@ class DeviceProxyWrapper():
         if that happens.
     '''
     class DeviceProxyType(enum.Enum):
-        OPERATIONAL = enum.auto(),
-        COMMISSIONEE = enum.auto(),
+        OPERATIONAL = enum.auto()
+        COMMISSIONEE = enum.auto()
 
     def __init__(self, deviceProxy: ctypes.c_void_p, proxyType, dmLib=None):
         self._deviceProxy = deviceProxy
