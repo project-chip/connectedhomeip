@@ -86,7 +86,7 @@ class TC_DD_1_16_17(MatterBaseTest):
         commissioning devices into a commissionable mode because this test needs to be run for every device
         with a setup code. This test does NOT verify that user-intent commissioning flow devices do not
         advertise out of box because they cannot be differentiated from custom commissioning flow devices
-        from the manual pairing code. That check is done in TC-DD-1.17
+        from the manual pairing code. That check is done in TC-DD-1.16
     '''
 
     def steps_TC_DD_1_16(self):
@@ -131,13 +131,13 @@ class TC_DD_1_16_17(MatterBaseTest):
                 TestStep(2, "If the VID_PID_PRESENT field is set to 0, this device uses standard flow. Verify that the DUT is advertising as Commissionable",
                          "Device is advertising as commissionable"),
                 TestStep(3, "If the device uses custom flow or user-intent commissioning, ask the tester to place the device into commissionable mode"),
-                TestStep(4, "If the device uses custom flow or user-intent commissioning, verify that the DUT is advertising as commisionable",
+                TestStep(4, "If the device uses custom flow or user-intent commissioning, verify that the DUT is advertising as commissionable",
                          "Device is advertising as commissionable"),
                 ]
 
     async def ensure_advertising(self, filter_type: matter.discovery.FilterType, filter: int):
         responses = await self.default_controller.DiscoverCommissionableNodes(filterType=filter_type, filter=filter, stopOnFirst=True)
-        asserts.assert_greater_equal(len(responses), 1, "Device is not advertising as commissionable")
+        asserts.assert_greater_equal(len(responses), 1, "Device should be advertising as commissionable")
 
     @async_test_body
     async def test_TC_DD_1_17(self):

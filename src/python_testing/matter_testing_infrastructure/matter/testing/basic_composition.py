@@ -156,7 +156,7 @@ class BasicCompositionTests:
         if not setup_codes:
             return None
         asserts.assert_greater_equal(len(setup_codes), 1,
-                                     "Require exactly one of either --qr-code, --manual-code or (--discriminator and --passcode).")
+                                     "Require at least one of either --qr-code, --manual-code or (--discriminator and --passcode).")
         return setup_codes[0]
 
     def dump_wildcard(self, dump_device_composition_path: typing.Optional[str]) -> tuple[str, str]:
