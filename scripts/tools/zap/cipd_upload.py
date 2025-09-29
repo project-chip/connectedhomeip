@@ -76,23 +76,23 @@ def main(log_level: str, version: str, no_temp_clean: bool):
 
             # Release downloaded, create a CIPD definition and upload it
             cipd_def_file = f"cipd_{platform}_{arch}.yaml"
-            with open(os.path.join(tmpdir, cipd_def_file), "wt") as f:
+            with open(os.path.join(download_path, cipd_def_file), "wt") as f:
                 f.write(f"package: experimental/matter/zap/{cipd_dir}\n")
                 f.write(f"description: ZAP release {version} of {platform}-{arch}\n")
                 f.write("install_mode: copy\n")
                 f.write("data:\n")
-                f.write(f"  - dir: {download_dir}\n")
+                f.write("  - dir: .\n")
 
             cmd = [
                 "cipd",
                 "create",
                 f"-pkg-def={cipd_def_file}",
                 "-tag",
-                f"version:{version}",
+                f"version:{version}.2",
             ]
             logging.info("Creating CIPD: %s", shlex.join(cmd))
 
-            subprocess.check_call(cmd, cwd=tmpdir)
+            subprocess.check_call(cmd, cwd=download_path)
 
 
 if __name__ == '__main__':
