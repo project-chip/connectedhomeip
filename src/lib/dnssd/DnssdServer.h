@@ -24,7 +24,7 @@ class DnssdServer
 {
 public:
     virtual ~DnssdServer()                   = default;
-    
+
     /**
      * @brief Advertise the operational state of the device.
      *
