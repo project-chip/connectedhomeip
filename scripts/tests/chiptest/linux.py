@@ -199,6 +199,7 @@ class IsolatedNetworkNamespace:
         for command in self.COMMANDS_TERMINATE:
             self.run(command)
 
+
 class DBusTestSystemBus(subprocess.Popen):
     """Run a dbus-daemon in a subprocess as a test system bus."""
 
