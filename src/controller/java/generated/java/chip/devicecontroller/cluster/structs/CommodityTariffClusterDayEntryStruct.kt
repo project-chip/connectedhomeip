@@ -28,7 +28,7 @@ class CommodityTariffClusterDayEntryStruct(
   val startTime: UInt,
   val duration: Optional<UInt>,
   val randomizationOffset: Optional<Int>,
-  val randomizationType: Optional<UInt>,
+  val randomizationType: Optional<UInt>
 ) {
   override fun toString(): String = buildString {
     append("CommodityTariffClusterDayEntryStruct {\n")
@@ -98,7 +98,7 @@ class CommodityTariffClusterDayEntryStruct(
         startTime,
         duration,
         randomizationOffset,
-        randomizationType,
+        randomizationType
       )
     }
   }

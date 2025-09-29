@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class ServiceAreaClusterLandmarkInfoStruct(
   val landmarkTag: UByte,
-  val relativePositionTag: UByte?,
+  val relativePositionTag: UByte?
 ) {
   override fun toString(): String = buildString {
     append("ServiceAreaClusterLandmarkInfoStruct {\n")

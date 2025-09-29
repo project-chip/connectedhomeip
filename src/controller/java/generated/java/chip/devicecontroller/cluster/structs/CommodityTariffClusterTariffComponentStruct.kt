@@ -32,7 +32,7 @@ class CommodityTariffClusterTariffComponentStruct(
   val powerThreshold: Optional<CommodityTariffClusterPowerThresholdStruct>,
   val threshold: Long?,
   val label: Optional<String>?,
-  val predicted: Optional<Boolean>,
+  val predicted: Optional<Boolean>
 ) {
   override fun toString(): String = buildString {
     append("CommodityTariffClusterTariffComponentStruct {\n")
@@ -117,7 +117,7 @@ class CommodityTariffClusterTariffComponentStruct(
             Optional.of(
               CommodityTariffClusterTariffPriceStruct.fromTlv(
                 ContextSpecificTag(TAG_PRICE),
-                tlvReader,
+                tlvReader
               )
             )
           } else {
@@ -138,7 +138,7 @@ class CommodityTariffClusterTariffComponentStruct(
           Optional.of(
             CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct.fromTlv(
               ContextSpecificTag(TAG_AUXILIARY_LOAD),
-              tlvReader,
+              tlvReader
             )
           )
         } else {
@@ -149,7 +149,7 @@ class CommodityTariffClusterTariffComponentStruct(
           Optional.of(
             CommodityTariffClusterPeakPeriodStruct.fromTlv(
               ContextSpecificTag(TAG_PEAK_PERIOD),
-              tlvReader,
+              tlvReader
             )
           )
         } else {
@@ -160,7 +160,7 @@ class CommodityTariffClusterTariffComponentStruct(
           Optional.of(
             CommodityTariffClusterPowerThresholdStruct.fromTlv(
               ContextSpecificTag(TAG_POWER_THRESHOLD),
-              tlvReader,
+              tlvReader
             )
           )
         } else {
@@ -202,7 +202,7 @@ class CommodityTariffClusterTariffComponentStruct(
         powerThreshold,
         threshold,
         label,
-        predicted,
+        predicted
       )
     }
   }

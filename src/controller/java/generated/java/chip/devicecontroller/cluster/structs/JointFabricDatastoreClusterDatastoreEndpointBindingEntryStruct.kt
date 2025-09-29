@@ -27,7 +27,7 @@ class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(
   val endpointID: UInt,
   val listID: UInt,
   val binding: JointFabricDatastoreClusterDatastoreBindingTargetStruct,
-  val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct,
+  val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct {\n")
@@ -60,7 +60,7 @@ class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
@@ -69,12 +69,12 @@ class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(
       val binding =
         JointFabricDatastoreClusterDatastoreBindingTargetStruct.fromTlv(
           ContextSpecificTag(TAG_BINDING),
-          tlvReader,
+          tlvReader
         )
       val statusEntry =
         JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(
           ContextSpecificTag(TAG_STATUS_ENTRY),
-          tlvReader,
+          tlvReader
         )
 
       tlvReader.exitContainer()
@@ -84,7 +84,7 @@ class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(
         endpointID,
         listID,
         binding,
-        statusEntry,
+        statusEntry
       )
     }
   }

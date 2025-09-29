@@ -41,14 +41,14 @@ import matter.tlv.TlvWriter
 
 class CommissionerControlCluster(
   private val controller: MatterController,
-  private val endpointId: UShort,
+  private val endpointId: UShort
 ) {
   class ReverseOpenCommissioningWindow(
     val commissioningTimeout: UShort,
     val PAKEPasscodeVerifier: ByteArray,
     val discriminator: UShort,
     val iterations: UInt,
-    val salt: ByteArray,
+    val salt: ByteArray
   )
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -86,7 +86,7 @@ class CommissionerControlCluster(
     vendorID: UShort,
     productID: UShort,
     label: String?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 0u
 
@@ -110,7 +110,7 @@ class CommissionerControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -120,7 +120,7 @@ class CommissionerControlCluster(
   suspend fun commissionNode(
     requestID: ULong,
     responseTimeoutSeconds: UShort,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): ReverseOpenCommissioningWindow {
     val commandId: UInt = 1u
 
@@ -138,7 +138,7 @@ class CommissionerControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -214,7 +214,7 @@ class CommissionerControlCluster(
       PAKEPasscodeVerifier_decoded,
       discriminator_decoded,
       iterations_decoded,
-      salt_decoded,
+      salt_decoded
     )
   }
 
@@ -251,7 +251,7 @@ class CommissionerControlCluster(
 
   suspend fun subscribeSupportedDeviceCategoriesAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -264,7 +264,7 @@ class CommissionerControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -341,7 +341,7 @@ class CommissionerControlCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -354,7 +354,7 @@ class CommissionerControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -438,7 +438,7 @@ class CommissionerControlCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -451,7 +451,7 @@ class CommissionerControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -535,7 +535,7 @@ class CommissionerControlCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -548,7 +548,7 @@ class CommissionerControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -623,7 +623,7 @@ class CommissionerControlCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -636,7 +636,7 @@ class CommissionerControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -704,7 +704,7 @@ class CommissionerControlCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -717,7 +717,7 @@ class CommissionerControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

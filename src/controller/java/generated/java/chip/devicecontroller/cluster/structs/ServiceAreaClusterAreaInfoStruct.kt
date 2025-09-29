@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class ServiceAreaClusterAreaInfoStruct(
   val locationInfo: ServiceAreaClusterLocationDescriptorStruct?,
-  val landmarkInfo: ServiceAreaClusterLandmarkInfoStruct?,
+  val landmarkInfo: ServiceAreaClusterLandmarkInfoStruct?
 ) {
   override fun toString(): String = buildString {
     append("ServiceAreaClusterAreaInfoStruct {\n")
@@ -60,7 +60,7 @@ class ServiceAreaClusterAreaInfoStruct(
         if (!tlvReader.isNull()) {
           ServiceAreaClusterLocationDescriptorStruct.fromTlv(
             ContextSpecificTag(TAG_LOCATION_INFO),
-            tlvReader,
+            tlvReader
           )
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_LOCATION_INFO))
@@ -70,7 +70,7 @@ class ServiceAreaClusterAreaInfoStruct(
         if (!tlvReader.isNull()) {
           ServiceAreaClusterLandmarkInfoStruct.fromTlv(
             ContextSpecificTag(TAG_LANDMARK_INFO),
-            tlvReader,
+            tlvReader
           )
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_LANDMARK_INFO))

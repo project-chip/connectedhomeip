@@ -99,7 +99,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
     duration: ULong?,
     messageText: String,
     responses: List<MessagesClusterMessageResponseOptionStruct>?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 0u
 
@@ -138,7 +138,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -147,7 +147,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
 
   suspend fun cancelMessagesRequest(
     messageIDs: List<ByteArray>,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 1u
 
@@ -166,7 +166,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -213,7 +213,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeMessagesAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<MessagesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -226,7 +226,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -308,7 +308,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeActiveMessageIDsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<ActiveMessageIDsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -321,7 +321,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -405,7 +405,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -418,7 +418,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -502,7 +502,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -515,7 +515,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -599,7 +599,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -612,7 +612,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -687,7 +687,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -700,7 +700,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -768,7 +768,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -781,7 +781,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

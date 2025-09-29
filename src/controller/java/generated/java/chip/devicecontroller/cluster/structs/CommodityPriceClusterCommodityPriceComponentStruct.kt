@@ -27,7 +27,7 @@ class CommodityPriceClusterCommodityPriceComponentStruct(
   val price: Long,
   val source: UInt,
   val description: Optional<String>,
-  val tariffComponentID: Optional<ULong>,
+  val tariffComponentID: Optional<ULong>
 ) {
   override fun toString(): String = buildString {
     append("CommodityPriceClusterCommodityPriceComponentStruct {\n")
@@ -63,7 +63,7 @@ class CommodityPriceClusterCommodityPriceComponentStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): CommodityPriceClusterCommodityPriceComponentStruct {
       tlvReader.enterStructure(tlvTag)
       val price = tlvReader.getLong(ContextSpecificTag(TAG_PRICE))
@@ -87,7 +87,7 @@ class CommodityPriceClusterCommodityPriceComponentStruct(
         price,
         source,
         description,
-        tariffComponentID,
+        tariffComponentID
       )
     }
   }

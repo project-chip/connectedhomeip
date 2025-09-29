@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class DeviceEnergyManagementModeClusterModeOptionStruct(
   val label: String,
   val mode: UByte,
-  val modeTags: List<DeviceEnergyManagementModeClusterModeTagStruct>,
+  val modeTags: List<DeviceEnergyManagementModeClusterModeTagStruct>
 ) {
   override fun toString(): String = buildString {
     append("DeviceEnergyManagementModeClusterModeOptionStruct {\n")
@@ -57,7 +57,7 @@ class DeviceEnergyManagementModeClusterModeOptionStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): DeviceEnergyManagementModeClusterModeOptionStruct {
       tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))

@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class CameraAvSettingsUserLevelManagementClusterDPTZStruct(
   val videoStreamID: UInt,
-  val viewport: CameraAvSettingsUserLevelManagementClusterViewportStruct,
+  val viewport: CameraAvSettingsUserLevelManagementClusterViewportStruct
 ) {
   override fun toString(): String = buildString {
     append("CameraAvSettingsUserLevelManagementClusterDPTZStruct {\n")
@@ -48,14 +48,14 @@ class CameraAvSettingsUserLevelManagementClusterDPTZStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): CameraAvSettingsUserLevelManagementClusterDPTZStruct {
       tlvReader.enterStructure(tlvTag)
       val videoStreamID = tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
       val viewport =
         CameraAvSettingsUserLevelManagementClusterViewportStruct.fromTlv(
           ContextSpecificTag(TAG_VIEWPORT),
-          tlvReader,
+          tlvReader
         )
 
       tlvReader.exitContainer()

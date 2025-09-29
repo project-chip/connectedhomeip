@@ -41,12 +41,12 @@ import matter.tlv.TlvWriter
 
 class CommodityTariffCluster(
   private val controller: MatterController,
-  private val endpointId: UShort,
+  private val endpointId: UShort
 ) {
   class GetTariffComponentResponse(
     val label: String?,
     val dayEntryIDs: List<UInt>,
-    val tariffComponent: CommodityTariffClusterTariffComponentStruct,
+    val tariffComponent: CommodityTariffClusterTariffComponentStruct
   )
 
   class GetDayEntryResponse(val dayEntry: CommodityTariffClusterDayEntryStruct)
@@ -293,7 +293,7 @@ class CommodityTariffCluster(
 
   suspend fun getTariffComponent(
     tariffComponentID: UInt,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): GetTariffComponentResponse {
     val commandId: UInt = 0u
 
@@ -308,7 +308,7 @@ class CommodityTariffCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -377,7 +377,7 @@ class CommodityTariffCluster(
 
   suspend fun getDayEntry(
     dayEntryID: UInt,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): GetDayEntryResponse {
     val commandId: UInt = 1u
 
@@ -392,7 +392,7 @@ class CommodityTariffCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -461,7 +461,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeTariffInfoAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<TariffInfoAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -474,7 +474,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -554,7 +554,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeTariffUnitAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<TariffUnitAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -567,7 +567,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -647,7 +647,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeStartDateAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<StartDateAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -660,7 +660,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -746,7 +746,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeDayEntriesAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<DayEntriesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -759,7 +759,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -851,7 +851,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeDayPatternsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<DayPatternsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
@@ -864,7 +864,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -956,7 +956,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeCalendarPeriodsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<CalendarPeriodsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 5u
     val attributePaths =
@@ -969,7 +969,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1063,7 +1063,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeIndividualDaysAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<IndividualDaysAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 6u
     val attributePaths =
@@ -1076,7 +1076,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1164,7 +1164,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeCurrentDayAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<CurrentDayAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 7u
     val attributePaths =
@@ -1177,7 +1177,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1257,7 +1257,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeNextDayAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<NextDayAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 8u
     val attributePaths =
@@ -1270,7 +1270,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1350,7 +1350,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeCurrentDayEntryAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<CurrentDayEntryAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 9u
     val attributePaths =
@@ -1363,7 +1363,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1445,7 +1445,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeCurrentDayEntryDateAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<CurrentDayEntryDateAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 10u
     val attributePaths =
@@ -1458,7 +1458,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1540,7 +1540,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeNextDayEntryAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<NextDayEntryAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 11u
     val attributePaths =
@@ -1553,7 +1553,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1633,7 +1633,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeNextDayEntryDateAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<NextDayEntryDateAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 12u
     val attributePaths =
@@ -1646,7 +1646,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1734,7 +1734,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeTariffComponentsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<TariffComponentsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 13u
     val attributePaths =
@@ -1747,7 +1747,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1841,7 +1841,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeTariffPeriodsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<TariffPeriodsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 14u
     val attributePaths =
@@ -1854,7 +1854,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1946,7 +1946,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeCurrentTariffComponentsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<CurrentTariffComponentsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 15u
     val attributePaths =
@@ -1959,7 +1959,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2053,7 +2053,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeNextTariffComponentsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<NextTariffComponentsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16u
     val attributePaths =
@@ -2066,7 +2066,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2158,7 +2158,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeDefaultRandomizationOffsetAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<DefaultRandomizationOffsetAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 17u
     val attributePaths =
@@ -2171,7 +2171,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2263,7 +2263,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeDefaultRandomizationTypeAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<DefaultRandomizationTypeAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 18u
     val attributePaths =
@@ -2276,7 +2276,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2363,7 +2363,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -2376,7 +2376,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2460,7 +2460,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -2473,7 +2473,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2557,7 +2557,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -2570,7 +2570,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2645,7 +2645,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -2658,7 +2658,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2726,7 +2726,7 @@ class CommodityTariffCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -2739,7 +2739,7 @@ class CommodityTariffCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

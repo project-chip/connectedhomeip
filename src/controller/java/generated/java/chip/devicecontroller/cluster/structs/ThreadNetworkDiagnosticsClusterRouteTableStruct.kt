@@ -32,7 +32,7 @@ class ThreadNetworkDiagnosticsClusterRouteTableStruct(
   val LQIOut: UInt,
   val age: UInt,
   val allocated: Boolean,
-  val linkEstablished: Boolean,
+  val linkEstablished: Boolean
 ) {
   override fun toString(): String = buildString {
     append("ThreadNetworkDiagnosticsClusterRouteTableStruct {\n")
@@ -80,7 +80,7 @@ class ThreadNetworkDiagnosticsClusterRouteTableStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): ThreadNetworkDiagnosticsClusterRouteTableStruct {
       tlvReader.enterStructure(tlvTag)
       val extAddress = tlvReader.getULong(ContextSpecificTag(TAG_EXT_ADDRESS))
@@ -106,7 +106,7 @@ class ThreadNetworkDiagnosticsClusterRouteTableStruct(
         LQIOut,
         age,
         allocated,
-        linkEstablished,
+        linkEstablished
       )
     }
   }

@@ -27,7 +27,7 @@ class ClosureControlClusterOverallCurrentStateStruct(
   val position: Optional<UByte>?,
   val latch: Optional<Boolean>?,
   val speed: Optional<UByte>,
-  val secureState: Boolean?,
+  val secureState: Boolean?
 ) {
   override fun toString(): String = buildString {
     append("ClosureControlClusterOverallCurrentStateStruct {\n")

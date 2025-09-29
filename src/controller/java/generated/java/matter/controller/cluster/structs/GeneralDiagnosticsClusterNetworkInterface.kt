@@ -31,7 +31,7 @@ class GeneralDiagnosticsClusterNetworkInterface(
   val hardwareAddress: ByteArray,
   val IPv4Addresses: List<ByteArray>,
   val IPv6Addresses: List<ByteArray>,
-  val type: UByte,
+  val type: UByte
 ) {
   override fun toString(): String = buildString {
     append("GeneralDiagnosticsClusterNetworkInterface {\n")
@@ -54,7 +54,7 @@ class GeneralDiagnosticsClusterNetworkInterface(
       if (offPremiseServicesReachableIPv4 != null) {
         put(
           ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV4),
-          offPremiseServicesReachableIPv4,
+          offPremiseServicesReachableIPv4
         )
       } else {
         putNull(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV4))
@@ -62,7 +62,7 @@ class GeneralDiagnosticsClusterNetworkInterface(
       if (offPremiseServicesReachableIPv6 != null) {
         put(
           ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV6),
-          offPremiseServicesReachableIPv6,
+          offPremiseServicesReachableIPv6
         )
       } else {
         putNull(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV6))
@@ -140,7 +140,7 @@ class GeneralDiagnosticsClusterNetworkInterface(
         hardwareAddress,
         IPv4Addresses,
         IPv6Addresses,
-        type,
+        type
       )
     }
   }

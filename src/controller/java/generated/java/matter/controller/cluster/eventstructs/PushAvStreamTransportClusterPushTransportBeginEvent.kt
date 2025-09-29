@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class PushAvStreamTransportClusterPushTransportBeginEvent(
   val connectionID: UShort,
   val triggerType: UByte,
-  val activationReason: Optional<UByte>,
+  val activationReason: Optional<UByte>
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterPushTransportBeginEvent {\n")
@@ -56,7 +56,7 @@ class PushAvStreamTransportClusterPushTransportBeginEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): PushAvStreamTransportClusterPushTransportBeginEvent {
       tlvReader.enterStructure(tlvTag)
       val connectionID = tlvReader.getUShort(ContextSpecificTag(TAG_CONNECTION_ID))
@@ -73,7 +73,7 @@ class PushAvStreamTransportClusterPushTransportBeginEvent(
       return PushAvStreamTransportClusterPushTransportBeginEvent(
         connectionID,
         triggerType,
-        activationReason,
+        activationReason
       )
     }
   }

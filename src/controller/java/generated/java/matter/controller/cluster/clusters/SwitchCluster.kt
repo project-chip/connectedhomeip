@@ -99,7 +99,7 @@ class SwitchCluster(private val controller: MatterController, private val endpoi
 
   suspend fun subscribeNumberOfPositionsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -112,7 +112,7 @@ class SwitchCluster(private val controller: MatterController, private val endpoi
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -182,7 +182,7 @@ class SwitchCluster(private val controller: MatterController, private val endpoi
 
   suspend fun subscribeCurrentPositionAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -195,7 +195,7 @@ class SwitchCluster(private val controller: MatterController, private val endpoi
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -270,7 +270,7 @@ class SwitchCluster(private val controller: MatterController, private val endpoi
 
   suspend fun subscribeMultiPressMaxAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -283,7 +283,7 @@ class SwitchCluster(private val controller: MatterController, private val endpoi
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -363,7 +363,7 @@ class SwitchCluster(private val controller: MatterController, private val endpoi
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -376,7 +376,7 @@ class SwitchCluster(private val controller: MatterController, private val endpoi
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -460,7 +460,7 @@ class SwitchCluster(private val controller: MatterController, private val endpoi
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -473,7 +473,7 @@ class SwitchCluster(private val controller: MatterController, private val endpoi
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -557,7 +557,7 @@ class SwitchCluster(private val controller: MatterController, private val endpoi
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -570,7 +570,7 @@ class SwitchCluster(private val controller: MatterController, private val endpoi
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -645,7 +645,7 @@ class SwitchCluster(private val controller: MatterController, private val endpoi
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -658,7 +658,7 @@ class SwitchCluster(private val controller: MatterController, private val endpoi
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -726,7 +726,7 @@ class SwitchCluster(private val controller: MatterController, private val endpoi
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -739,7 +739,7 @@ class SwitchCluster(private val controller: MatterController, private val endpoi
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

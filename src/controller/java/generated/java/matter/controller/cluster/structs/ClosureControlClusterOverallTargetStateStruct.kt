@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class ClosureControlClusterOverallTargetStateStruct(
   val position: Optional<UByte>?,
   val latch: Optional<Boolean>?,
-  val speed: Optional<UByte>,
+  val speed: Optional<UByte>
 ) {
   override fun toString(): String = buildString {
     append("ClosureControlClusterOverallTargetStateStruct {\n")

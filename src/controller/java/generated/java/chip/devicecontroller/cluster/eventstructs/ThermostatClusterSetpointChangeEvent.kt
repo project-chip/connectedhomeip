@@ -27,7 +27,7 @@ class ThermostatClusterSetpointChangeEvent(
   val systemMode: UInt,
   val occupancy: Optional<UInt>,
   val previousSetpoint: Optional<Int>,
-  val currentSetpoint: Int,
+  val currentSetpoint: Int
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterSetpointChangeEvent {\n")
@@ -84,7 +84,7 @@ class ThermostatClusterSetpointChangeEvent(
         systemMode,
         occupancy,
         previousSetpoint,
-        currentSetpoint,
+        currentSetpoint
       )
     }
   }

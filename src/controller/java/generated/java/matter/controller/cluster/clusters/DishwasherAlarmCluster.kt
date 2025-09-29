@@ -41,7 +41,7 @@ import matter.tlv.TlvWriter
 
 class DishwasherAlarmCluster(
   private val controller: MatterController,
-  private val endpointId: UShort,
+  private val endpointId: UShort
 ) {
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
@@ -87,7 +87,7 @@ class DishwasherAlarmCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -108,7 +108,7 @@ class DishwasherAlarmCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -148,7 +148,7 @@ class DishwasherAlarmCluster(
 
   suspend fun subscribeMaskAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -161,7 +161,7 @@ class DishwasherAlarmCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -234,7 +234,7 @@ class DishwasherAlarmCluster(
 
   suspend fun subscribeLatchAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -247,7 +247,7 @@ class DishwasherAlarmCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -320,7 +320,7 @@ class DishwasherAlarmCluster(
 
   suspend fun subscribeStateAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -333,7 +333,7 @@ class DishwasherAlarmCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -401,7 +401,7 @@ class DishwasherAlarmCluster(
 
   suspend fun subscribeSupportedAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -414,7 +414,7 @@ class DishwasherAlarmCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -489,7 +489,7 @@ class DishwasherAlarmCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -502,7 +502,7 @@ class DishwasherAlarmCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -586,7 +586,7 @@ class DishwasherAlarmCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -599,7 +599,7 @@ class DishwasherAlarmCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -683,7 +683,7 @@ class DishwasherAlarmCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -696,7 +696,7 @@ class DishwasherAlarmCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -771,7 +771,7 @@ class DishwasherAlarmCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -784,7 +784,7 @@ class DishwasherAlarmCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -852,7 +852,7 @@ class DishwasherAlarmCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -865,7 +865,7 @@ class DishwasherAlarmCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

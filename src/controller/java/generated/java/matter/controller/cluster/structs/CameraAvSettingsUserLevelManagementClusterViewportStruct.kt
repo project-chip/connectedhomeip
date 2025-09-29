@@ -26,7 +26,7 @@ class CameraAvSettingsUserLevelManagementClusterViewportStruct(
   val x1: UShort,
   val y1: UShort,
   val x2: UShort,
-  val y2: UShort,
+  val y2: UShort
 ) {
   override fun toString(): String = buildString {
     append("CameraAvSettingsUserLevelManagementClusterViewportStruct {\n")
@@ -56,7 +56,7 @@ class CameraAvSettingsUserLevelManagementClusterViewportStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): CameraAvSettingsUserLevelManagementClusterViewportStruct {
       tlvReader.enterStructure(tlvTag)
       val x1 = tlvReader.getUShort(ContextSpecificTag(TAG_X1))

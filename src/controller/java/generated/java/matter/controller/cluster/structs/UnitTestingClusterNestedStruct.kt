@@ -27,7 +27,7 @@ class UnitTestingClusterNestedStruct(
   val a: UByte,
   val b: Boolean,
   val c: UnitTestingClusterSimpleStruct,
-  val d: Optional<UnitTestingClusterTestGlobalStruct>,
+  val d: Optional<UnitTestingClusterTestGlobalStruct>
 ) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterNestedStruct {\n")

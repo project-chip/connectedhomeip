@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class ThermostatClusterActivePresetChangeEvent(
   val previousPresetHandle: Optional<ByteArray>?,
-  val currentPresetHandle: ByteArray?,
+  val currentPresetHandle: ByteArray?
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterActivePresetChangeEvent {\n")

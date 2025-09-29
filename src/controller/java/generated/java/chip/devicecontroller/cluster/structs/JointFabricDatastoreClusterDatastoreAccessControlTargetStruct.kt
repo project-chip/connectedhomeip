@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class JointFabricDatastoreClusterDatastoreAccessControlTargetStruct(
   val cluster: ULong?,
   val endpoint: UInt?,
-  val deviceType: ULong?,
+  val deviceType: ULong?
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreAccessControlTargetStruct {\n")
@@ -64,7 +64,7 @@ class JointFabricDatastoreClusterDatastoreAccessControlTargetStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): JointFabricDatastoreClusterDatastoreAccessControlTargetStruct {
       tlvReader.enterStructure(tlvTag)
       val cluster =
@@ -94,7 +94,7 @@ class JointFabricDatastoreClusterDatastoreAccessControlTargetStruct(
       return JointFabricDatastoreClusterDatastoreAccessControlTargetStruct(
         cluster,
         endpoint,
-        deviceType,
+        deviceType
       )
     }
   }

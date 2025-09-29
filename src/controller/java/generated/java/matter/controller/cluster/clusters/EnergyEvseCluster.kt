@@ -244,7 +244,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -255,7 +255,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
     chargingEnabledUntil: UInt?,
     minimumChargeCurrent: Long,
     maximumChargeCurrent: Long,
-    timedInvokeTimeout: Duration,
+    timedInvokeTimeout: Duration
   ) {
     val commandId: UInt = 2u
 
@@ -278,7 +278,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -288,7 +288,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
   suspend fun enableDischarging(
     dischargingEnabledUntil: UInt?,
     maximumDischargeCurrent: Long,
-    timedInvokeTimeout: Duration,
+    timedInvokeTimeout: Duration
   ) {
     val commandId: UInt = 3u
 
@@ -308,7 +308,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -326,7 +326,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -335,7 +335,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun setTargets(
     chargingTargetSchedules: List<EnergyEvseClusterChargingTargetScheduleStruct>,
-    timedInvokeTimeout: Duration,
+    timedInvokeTimeout: Duration
   ) {
     val commandId: UInt = 5u
 
@@ -354,7 +354,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -372,7 +372,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -420,7 +420,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -466,7 +466,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeStateAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<StateAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -479,7 +479,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -553,7 +553,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeSupplyStateAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -566,7 +566,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -634,7 +634,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeFaultStateAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -647,7 +647,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -721,7 +721,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeChargingEnabledUntilAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<ChargingEnabledUntilAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -734,7 +734,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -820,7 +820,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeDischargingEnabledUntilAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<DischargingEnabledUntilAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
@@ -833,7 +833,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -913,7 +913,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeCircuitCapacityAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<LongSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 5u
     val attributePaths =
@@ -926,7 +926,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -996,7 +996,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeMinimumChargeCurrentAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<LongSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 6u
     val attributePaths =
@@ -1009,7 +1009,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1079,7 +1079,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeMaximumChargeCurrentAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<LongSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 7u
     val attributePaths =
@@ -1092,7 +1092,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1167,7 +1167,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeMaximumDischargeCurrentAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<LongSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 8u
     val attributePaths =
@@ -1180,7 +1180,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1260,7 +1260,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun writeUserMaximumChargeCurrentAttribute(
     value: Long,
-    timedWriteTimeout: Duration? = null,
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 9u
 
@@ -1274,10 +1274,10 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1303,7 +1303,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeUserMaximumChargeCurrentAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<LongSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 9u
     val attributePaths =
@@ -1316,7 +1316,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1396,7 +1396,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun writeRandomizationDelayWindowAttribute(
     value: UInt,
-    timedWriteTimeout: Duration? = null,
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 10u
 
@@ -1410,10 +1410,10 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1439,7 +1439,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeRandomizationDelayWindowAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 10u
     val attributePaths =
@@ -1452,7 +1452,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1537,7 +1537,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeNextChargeStartTimeAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<NextChargeStartTimeAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 35u
     val attributePaths =
@@ -1550,7 +1550,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1640,7 +1640,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeNextChargeTargetTimeAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<NextChargeTargetTimeAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 36u
     val attributePaths =
@@ -1653,7 +1653,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1743,7 +1743,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeNextChargeRequiredEnergyAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<NextChargeRequiredEnergyAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 37u
     val attributePaths =
@@ -1756,7 +1756,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1846,7 +1846,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeNextChargeTargetSoCAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<NextChargeTargetSoCAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 38u
     val attributePaths =
@@ -1859,7 +1859,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1949,7 +1949,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun writeApproximateEVEfficiencyAttribute(
     value: UShort,
-    timedWriteTimeout: Duration? = null,
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 39u
 
@@ -1963,10 +1963,10 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1992,7 +1992,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeApproximateEVEfficiencyAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<ApproximateEVEfficiencyAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 39u
     val attributePaths =
@@ -2005,7 +2005,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2095,7 +2095,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeStateOfChargeAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<StateOfChargeAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 48u
     val attributePaths =
@@ -2108,7 +2108,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2196,7 +2196,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeBatteryCapacityAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<BatteryCapacityAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 49u
     val attributePaths =
@@ -2209,7 +2209,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2299,7 +2299,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeVehicleIDAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<VehicleIDAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 50u
     val attributePaths =
@@ -2312,7 +2312,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2396,7 +2396,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeSessionIDAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<SessionIDAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 64u
     val attributePaths =
@@ -2409,7 +2409,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2489,7 +2489,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeSessionDurationAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<SessionDurationAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65u
     val attributePaths =
@@ -2502,7 +2502,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2584,7 +2584,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeSessionEnergyChargedAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<SessionEnergyChargedAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 66u
     val attributePaths =
@@ -2597,7 +2597,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2683,7 +2683,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeSessionEnergyDischargedAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<SessionEnergyDischargedAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 67u
     val attributePaths =
@@ -2696,7 +2696,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2783,7 +2783,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -2796,7 +2796,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2880,7 +2880,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -2893,7 +2893,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2977,7 +2977,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -2990,7 +2990,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3065,7 +3065,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -3078,7 +3078,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3146,7 +3146,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -3159,7 +3159,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

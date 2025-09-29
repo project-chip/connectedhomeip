@@ -26,7 +26,7 @@ class CameraAvStreamManagementClusterViewportStruct(
   val x1: UInt,
   val y1: UInt,
   val x2: UInt,
-  val y2: UInt,
+  val y2: UInt
 ) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterViewportStruct {\n")

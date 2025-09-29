@@ -26,7 +26,7 @@ class ThermostatClusterThermostatSuggestionStruct(
   val uniqueID: UInt,
   val presetHandle: ByteArray,
   val effectiveTime: ULong,
-  val expirationTime: ULong,
+  val expirationTime: ULong
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterThermostatSuggestionStruct {\n")
@@ -67,7 +67,7 @@ class ThermostatClusterThermostatSuggestionStruct(
         uniqueID,
         presetHandle,
         effectiveTime,
-        expirationTime,
+        expirationTime
       )
     }
   }

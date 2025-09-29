@@ -26,7 +26,7 @@ class ThreadNetworkDirectoryClusterThreadNetworkStruct(
   val extendedPanID: ByteArray,
   val networkName: String,
   val channel: UInt,
-  val activeTimestamp: ULong,
+  val activeTimestamp: ULong
 ) {
   override fun toString(): String = buildString {
     append("ThreadNetworkDirectoryClusterThreadNetworkStruct {\n")
@@ -56,7 +56,7 @@ class ThreadNetworkDirectoryClusterThreadNetworkStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): ThreadNetworkDirectoryClusterThreadNetworkStruct {
       tlvReader.enterStructure(tlvTag)
       val extendedPanID = tlvReader.getByteArray(ContextSpecificTag(TAG_EXTENDED_PAN_ID))
@@ -70,7 +70,7 @@ class ThreadNetworkDirectoryClusterThreadNetworkStruct(
         extendedPanID,
         networkName,
         channel,
-        activeTimestamp,
+        activeTimestamp
       )
     }
   }

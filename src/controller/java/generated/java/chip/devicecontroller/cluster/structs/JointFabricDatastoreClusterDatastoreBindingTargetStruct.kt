@@ -27,7 +27,7 @@ class JointFabricDatastoreClusterDatastoreBindingTargetStruct(
   val node: Optional<ULong>,
   val group: Optional<UInt>,
   val endpoint: Optional<UInt>,
-  val cluster: Optional<ULong>,
+  val cluster: Optional<ULong>
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreBindingTargetStruct {\n")
@@ -69,7 +69,7 @@ class JointFabricDatastoreClusterDatastoreBindingTargetStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): JointFabricDatastoreClusterDatastoreBindingTargetStruct {
       tlvReader.enterStructure(tlvTag)
       val node =

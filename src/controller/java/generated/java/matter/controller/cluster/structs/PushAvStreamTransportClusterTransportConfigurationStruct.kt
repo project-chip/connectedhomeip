@@ -27,7 +27,7 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
   val connectionID: UShort,
   val transportStatus: UByte,
   val transportOptions: Optional<PushAvStreamTransportClusterTransportOptionsStruct>,
-  val fabricIndex: UByte,
+  val fabricIndex: UByte
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportConfigurationStruct {\n")
@@ -60,7 +60,7 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): PushAvStreamTransportClusterTransportConfigurationStruct {
       tlvReader.enterStructure(tlvTag)
       val connectionID = tlvReader.getUShort(ContextSpecificTag(TAG_CONNECTION_ID))
@@ -70,7 +70,7 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
           Optional.of(
             PushAvStreamTransportClusterTransportOptionsStruct.fromTlv(
               ContextSpecificTag(TAG_TRANSPORT_OPTIONS),
-              tlvReader,
+              tlvReader
             )
           )
         } else {
@@ -84,7 +84,7 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
         connectionID,
         transportStatus,
         transportOptions,
-        fabricIndex,
+        fabricIndex
       )
     }
   }

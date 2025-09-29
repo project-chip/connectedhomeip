@@ -41,7 +41,7 @@ import matter.tlv.TlvWriter
 
 class OtaSoftwareUpdateProviderCluster(
   private val controller: MatterController,
-  private val endpointId: UShort,
+  private val endpointId: UShort
 ) {
   class QueryImageResponse(
     val status: UByte,
@@ -51,7 +51,7 @@ class OtaSoftwareUpdateProviderCluster(
     val softwareVersionString: String?,
     val updateToken: ByteArray?,
     val userConsentNeeded: Boolean?,
-    val metadataForRequestor: ByteArray?,
+    val metadataForRequestor: ByteArray?
   )
 
   class ApplyUpdateResponse(val action: UByte, val delayedActionTime: UInt)
@@ -95,7 +95,7 @@ class OtaSoftwareUpdateProviderCluster(
     location: String?,
     requestorCanConsent: Boolean?,
     metadataForProvider: ByteArray?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): QueryImageResponse {
     val commandId: UInt = 0u
 
@@ -141,7 +141,7 @@ class OtaSoftwareUpdateProviderCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -295,14 +295,14 @@ class OtaSoftwareUpdateProviderCluster(
       softwareVersionString_decoded,
       updateToken_decoded,
       userConsentNeeded_decoded,
-      metadataForRequestor_decoded,
+      metadataForRequestor_decoded
     )
   }
 
   suspend fun applyUpdateRequest(
     updateToken: ByteArray,
     newVersion: UInt,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): ApplyUpdateResponse {
     val commandId: UInt = 2u
 
@@ -320,7 +320,7 @@ class OtaSoftwareUpdateProviderCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -364,7 +364,7 @@ class OtaSoftwareUpdateProviderCluster(
   suspend fun notifyUpdateApplied(
     updateToken: ByteArray,
     softwareVersion: UInt,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 4u
 
@@ -382,7 +382,7 @@ class OtaSoftwareUpdateProviderCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -429,7 +429,7 @@ class OtaSoftwareUpdateProviderCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -442,7 +442,7 @@ class OtaSoftwareUpdateProviderCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -526,7 +526,7 @@ class OtaSoftwareUpdateProviderCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -539,7 +539,7 @@ class OtaSoftwareUpdateProviderCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -623,7 +623,7 @@ class OtaSoftwareUpdateProviderCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -636,7 +636,7 @@ class OtaSoftwareUpdateProviderCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -711,7 +711,7 @@ class OtaSoftwareUpdateProviderCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -724,7 +724,7 @@ class OtaSoftwareUpdateProviderCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -792,7 +792,7 @@ class OtaSoftwareUpdateProviderCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -805,7 +805,7 @@ class OtaSoftwareUpdateProviderCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

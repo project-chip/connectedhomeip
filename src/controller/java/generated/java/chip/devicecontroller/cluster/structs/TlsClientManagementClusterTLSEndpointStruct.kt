@@ -29,7 +29,7 @@ class TlsClientManagementClusterTLSEndpointStruct(
   val caid: UInt,
   val ccdid: UInt?,
   val status: UInt,
-  val fabricIndex: UInt,
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("TlsClientManagementClusterTLSEndpointStruct {\n")
@@ -95,7 +95,7 @@ class TlsClientManagementClusterTLSEndpointStruct(
         caid,
         ccdid,
         status,
-        fabricIndex,
+        fabricIndex
       )
     }
   }

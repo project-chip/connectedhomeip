@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class ThermostatClusterActiveScheduleChangeEvent(
   val previousScheduleHandle: Optional<ByteArray>?,
-  val currentScheduleHandle: ByteArray?,
+  val currentScheduleHandle: ByteArray?
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterActiveScheduleChangeEvent {\n")
@@ -83,7 +83,7 @@ class ThermostatClusterActiveScheduleChangeEvent(
 
       return ThermostatClusterActiveScheduleChangeEvent(
         previousScheduleHandle,
-        currentScheduleHandle,
+        currentScheduleHandle
       )
     }
   }

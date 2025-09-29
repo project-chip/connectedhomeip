@@ -49,7 +49,7 @@ class ElectricalGridConditionsClusterCurrentConditionsChangedEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): ElectricalGridConditionsClusterCurrentConditionsChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val currentConditions =

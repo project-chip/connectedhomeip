@@ -46,7 +46,7 @@ import matter.tlv.TlvWriter
 
 class CameraAvStreamManagementCluster(
   private val controller: MatterController,
-  private val endpointId: UShort,
+  private val endpointId: UShort
 ) {
   class AudioStreamAllocateResponse(val audioStreamID: UShort)
 
@@ -57,7 +57,7 @@ class CameraAvStreamManagementCluster(
   class CaptureSnapshotResponse(
     val data: ByteArray,
     val imageCodec: UByte,
-    val resolution: CameraAvStreamManagementClusterVideoResolutionStruct,
+    val resolution: CameraAvStreamManagementClusterVideoResolutionStruct
   )
 
   class VideoSensorParamsAttribute(
@@ -249,7 +249,7 @@ class CameraAvStreamManagementCluster(
     sampleRate: UInt,
     bitRate: UInt,
     bitDepth: UByte,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): AudioStreamAllocateResponse {
     val commandId: UInt = 0u
 
@@ -279,7 +279,7 @@ class CameraAvStreamManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -323,7 +323,7 @@ class CameraAvStreamManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -342,7 +342,7 @@ class CameraAvStreamManagementCluster(
     keyFrameInterval: UShort,
     watermarkEnabled: Boolean?,
     OSDEnabled: Boolean?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): VideoStreamAllocateResponse {
     val commandId: UInt = 3u
 
@@ -389,7 +389,7 @@ class CameraAvStreamManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -423,7 +423,7 @@ class CameraAvStreamManagementCluster(
     videoStreamID: UShort,
     watermarkEnabled: Boolean?,
     OSDEnabled: Boolean?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 5u
 
@@ -446,7 +446,7 @@ class CameraAvStreamManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -467,7 +467,7 @@ class CameraAvStreamManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -482,7 +482,7 @@ class CameraAvStreamManagementCluster(
     quality: UByte,
     watermarkEnabled: Boolean?,
     OSDEnabled: Boolean?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): SnapshotStreamAllocateResponse {
     val commandId: UInt = 7u
 
@@ -517,7 +517,7 @@ class CameraAvStreamManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -551,7 +551,7 @@ class CameraAvStreamManagementCluster(
     snapshotStreamID: UShort,
     watermarkEnabled: Boolean?,
     OSDEnabled: Boolean?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 9u
 
@@ -574,7 +574,7 @@ class CameraAvStreamManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -583,7 +583,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun snapshotStreamDeallocate(
     snapshotStreamID: UShort,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 10u
 
@@ -598,7 +598,7 @@ class CameraAvStreamManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -607,7 +607,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun setStreamPriorities(
     streamPriorities: List<UByte>,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 11u
 
@@ -626,7 +626,7 @@ class CameraAvStreamManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -636,7 +636,7 @@ class CameraAvStreamManagementCluster(
   suspend fun captureSnapshot(
     snapshotStreamID: UShort?,
     requestedResolution: CameraAvStreamManagementClusterVideoResolutionStruct,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): CaptureSnapshotResponse {
     val commandId: UInt = 12u
 
@@ -656,7 +656,7 @@ class CameraAvStreamManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -747,7 +747,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeMaxConcurrentEncodersAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -760,7 +760,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -840,7 +840,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeMaxEncodedPixelRateAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -853,7 +853,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -933,7 +933,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeVideoSensorParamsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<VideoSensorParamsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -946,7 +946,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -976,7 +976,7 @@ class CameraAvStreamManagementCluster(
             if (tlvReader.isNextTag(AnonymousTag)) {
               CameraAvStreamManagementClusterVideoSensorParamsStruct.fromTlv(
                 AnonymousTag,
-                tlvReader,
+                tlvReader
               )
             } else {
               null
@@ -1029,7 +1029,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeNightVisionUsesInfraredAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -1042,7 +1042,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1122,7 +1122,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeMinViewportResolutionAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<MinViewportResolutionAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
@@ -1135,7 +1135,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1211,7 +1211,7 @@ class CameraAvStreamManagementCluster(
             add(
               CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct.fromTlv(
                 AnonymousTag,
-                tlvReader,
+                tlvReader
               )
             )
           }
@@ -1226,7 +1226,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeRateDistortionTradeOffPointsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<RateDistortionTradeOffPointsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 5u
     val attributePaths =
@@ -1239,7 +1239,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1274,7 +1274,7 @@ class CameraAvStreamManagementCluster(
                   add(
                     CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct.fromTlv(
                       AnonymousTag,
-                      tlvReader,
+                      tlvReader
                     )
                   )
                 }
@@ -1328,7 +1328,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeMaxContentBufferSizeAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 6u
     val attributePaths =
@@ -1341,7 +1341,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1416,7 +1416,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeMicrophoneCapabilitiesAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<MicrophoneCapabilitiesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 7u
     val attributePaths =
@@ -1429,7 +1429,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1459,7 +1459,7 @@ class CameraAvStreamManagementCluster(
             if (tlvReader.isNextTag(AnonymousTag)) {
               CameraAvStreamManagementClusterAudioCapabilitiesStruct.fromTlv(
                 AnonymousTag,
-                tlvReader,
+                tlvReader
               )
             } else {
               null
@@ -1512,7 +1512,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeSpeakerCapabilitiesAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<SpeakerCapabilitiesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 8u
     val attributePaths =
@@ -1525,7 +1525,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1555,7 +1555,7 @@ class CameraAvStreamManagementCluster(
             if (tlvReader.isNextTag(AnonymousTag)) {
               CameraAvStreamManagementClusterAudioCapabilitiesStruct.fromTlv(
                 AnonymousTag,
-                tlvReader,
+                tlvReader
               )
             } else {
               null
@@ -1608,7 +1608,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeTwoWayTalkSupportAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 9u
     val attributePaths =
@@ -1621,7 +1621,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1697,7 +1697,7 @@ class CameraAvStreamManagementCluster(
             add(
               CameraAvStreamManagementClusterSnapshotCapabilitiesStruct.fromTlv(
                 AnonymousTag,
-                tlvReader,
+                tlvReader
               )
             )
           }
@@ -1712,7 +1712,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeSnapshotCapabilitiesAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<SnapshotCapabilitiesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 10u
     val attributePaths =
@@ -1725,7 +1725,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1759,7 +1759,7 @@ class CameraAvStreamManagementCluster(
                   add(
                     CameraAvStreamManagementClusterSnapshotCapabilitiesStruct.fromTlv(
                       AnonymousTag,
-                      tlvReader,
+                      tlvReader
                     )
                   )
                 }
@@ -1811,7 +1811,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeMaxNetworkBandwidthAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 11u
     val attributePaths =
@@ -1824,7 +1824,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1899,7 +1899,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeCurrentFrameRateAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 12u
     val attributePaths =
@@ -1912,7 +1912,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2003,10 +2003,10 @@ class CameraAvStreamManagementCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2032,7 +2032,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeHDRModeEnabledAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 13u
     val attributePaths =
@@ -2045,7 +2045,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2127,7 +2127,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeSupportedStreamUsagesAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<SupportedStreamUsagesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 14u
     val attributePaths =
@@ -2140,7 +2140,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2228,7 +2228,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeAllocatedVideoStreamsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AllocatedVideoStreamsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 15u
     val attributePaths =
@@ -2241,7 +2241,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2275,7 +2275,7 @@ class CameraAvStreamManagementCluster(
                   add(
                     CameraAvStreamManagementClusterVideoStreamStruct.fromTlv(
                       AnonymousTag,
-                      tlvReader,
+                      tlvReader
                     )
                   )
                 }
@@ -2338,7 +2338,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeAllocatedAudioStreamsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AllocatedAudioStreamsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16u
     val attributePaths =
@@ -2351,7 +2351,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2385,7 +2385,7 @@ class CameraAvStreamManagementCluster(
                   add(
                     CameraAvStreamManagementClusterAudioStreamStruct.fromTlv(
                       AnonymousTag,
-                      tlvReader,
+                      tlvReader
                     )
                   )
                 }
@@ -2450,7 +2450,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeAllocatedSnapshotStreamsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AllocatedSnapshotStreamsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 17u
     val attributePaths =
@@ -2463,7 +2463,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2497,7 +2497,7 @@ class CameraAvStreamManagementCluster(
                   add(
                     CameraAvStreamManagementClusterSnapshotStreamStruct.fromTlv(
                       AnonymousTag,
-                      tlvReader,
+                      tlvReader
                     )
                   )
                 }
@@ -2556,7 +2556,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeStreamUsagePrioritiesAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<StreamUsagePrioritiesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 18u
     val attributePaths =
@@ -2569,7 +2569,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2653,7 +2653,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun writeSoftRecordingPrivacyModeEnabledAttribute(
     value: Boolean,
-    timedWriteTimeout: Duration? = null,
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 19u
 
@@ -2667,10 +2667,10 @@ class CameraAvStreamManagementCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2696,7 +2696,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeSoftRecordingPrivacyModeEnabledAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 19u
     val attributePaths =
@@ -2709,7 +2709,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2791,7 +2791,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun writeSoftLivestreamPrivacyModeEnabledAttribute(
     value: Boolean,
-    timedWriteTimeout: Duration? = null,
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 20u
 
@@ -2805,10 +2805,10 @@ class CameraAvStreamManagementCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2834,7 +2834,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeSoftLivestreamPrivacyModeEnabledAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 20u
     val attributePaths =
@@ -2847,7 +2847,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2927,7 +2927,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeHardPrivacyModeOnAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 21u
     val attributePaths =
@@ -2940,7 +2940,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3031,10 +3031,10 @@ class CameraAvStreamManagementCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3060,7 +3060,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeNightVisionAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 22u
     val attributePaths =
@@ -3073,7 +3073,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3162,10 +3162,10 @@ class CameraAvStreamManagementCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3191,7 +3191,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeNightVisionIllumAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 23u
     val attributePaths =
@@ -3204,7 +3204,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3284,7 +3284,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun writeViewportAttribute(
     value: CameraAvStreamManagementClusterViewportStruct,
-    timedWriteTimeout: Duration? = null,
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 24u
 
@@ -3298,10 +3298,10 @@ class CameraAvStreamManagementCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3327,7 +3327,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeViewportAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<ViewportAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 24u
     val attributePaths =
@@ -3340,7 +3340,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3429,10 +3429,10 @@ class CameraAvStreamManagementCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3458,7 +3458,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeSpeakerMutedAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 25u
     val attributePaths =
@@ -3471,7 +3471,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3560,10 +3560,10 @@ class CameraAvStreamManagementCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3589,7 +3589,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeSpeakerVolumeLevelAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 26u
     val attributePaths =
@@ -3602,7 +3602,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3682,7 +3682,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeSpeakerMaxLevelAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 27u
     val attributePaths =
@@ -3695,7 +3695,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3775,7 +3775,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeSpeakerMinLevelAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 28u
     val attributePaths =
@@ -3788,7 +3788,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3879,10 +3879,10 @@ class CameraAvStreamManagementCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3908,7 +3908,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeMicrophoneMutedAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 29u
     val attributePaths =
@@ -3921,7 +3921,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4001,7 +4001,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun writeMicrophoneVolumeLevelAttribute(
     value: UByte,
-    timedWriteTimeout: Duration? = null,
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 30u
 
@@ -4015,10 +4015,10 @@ class CameraAvStreamManagementCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4044,7 +4044,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeMicrophoneVolumeLevelAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 30u
     val attributePaths =
@@ -4057,7 +4057,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4137,7 +4137,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeMicrophoneMaxLevelAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 31u
     val attributePaths =
@@ -4150,7 +4150,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4230,7 +4230,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeMicrophoneMinLevelAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 32u
     val attributePaths =
@@ -4243,7 +4243,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4323,7 +4323,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun writeMicrophoneAGCEnabledAttribute(
     value: Boolean,
-    timedWriteTimeout: Duration? = null,
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 33u
 
@@ -4337,10 +4337,10 @@ class CameraAvStreamManagementCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4366,7 +4366,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeMicrophoneAGCEnabledAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 33u
     val attributePaths =
@@ -4379,7 +4379,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4470,10 +4470,10 @@ class CameraAvStreamManagementCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4499,7 +4499,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeImageRotationAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 34u
     val attributePaths =
@@ -4512,7 +4512,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4590,7 +4590,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun writeImageFlipHorizontalAttribute(
     value: Boolean,
-    timedWriteTimeout: Duration? = null,
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 35u
 
@@ -4604,10 +4604,10 @@ class CameraAvStreamManagementCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4633,7 +4633,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeImageFlipHorizontalAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 35u
     val attributePaths =
@@ -4646,7 +4646,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4737,10 +4737,10 @@ class CameraAvStreamManagementCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4766,7 +4766,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeImageFlipVerticalAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 36u
     val attributePaths =
@@ -4779,7 +4779,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4859,7 +4859,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun writeLocalVideoRecordingEnabledAttribute(
     value: Boolean,
-    timedWriteTimeout: Duration? = null,
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 37u
 
@@ -4873,10 +4873,10 @@ class CameraAvStreamManagementCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4902,7 +4902,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeLocalVideoRecordingEnabledAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 37u
     val attributePaths =
@@ -4915,7 +4915,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4997,7 +4997,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun writeLocalSnapshotRecordingEnabledAttribute(
     value: Boolean,
-    timedWriteTimeout: Duration? = null,
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 38u
 
@@ -5011,10 +5011,10 @@ class CameraAvStreamManagementCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5040,7 +5040,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeLocalSnapshotRecordingEnabledAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 38u
     val attributePaths =
@@ -5053,7 +5053,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5133,7 +5133,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun writeStatusLightEnabledAttribute(
     value: Boolean,
-    timedWriteTimeout: Duration? = null,
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 39u
 
@@ -5147,10 +5147,10 @@ class CameraAvStreamManagementCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5176,7 +5176,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeStatusLightEnabledAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 39u
     val attributePaths =
@@ -5189,7 +5189,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5269,7 +5269,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun writeStatusLightBrightnessAttribute(
     value: UByte,
-    timedWriteTimeout: Duration? = null,
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 40u
 
@@ -5283,10 +5283,10 @@ class CameraAvStreamManagementCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5312,7 +5312,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeStatusLightBrightnessAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 40u
     val attributePaths =
@@ -5325,7 +5325,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5407,7 +5407,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -5420,7 +5420,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5504,7 +5504,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -5517,7 +5517,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5601,7 +5601,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -5614,7 +5614,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5689,7 +5689,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -5702,7 +5702,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5770,7 +5770,7 @@ class CameraAvStreamManagementCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -5783,7 +5783,7 @@ class CameraAvStreamManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

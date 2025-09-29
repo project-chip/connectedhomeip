@@ -27,7 +27,7 @@ class ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct(
   val importedResetTimestamp: Optional<ULong>?,
   val exportedResetTimestamp: Optional<ULong>?,
   val importedResetSystime: Optional<ULong>?,
-  val exportedResetSystime: Optional<ULong>?,
+  val exportedResetSystime: Optional<ULong>?
 ) {
   override fun toString(): String = buildString {
     append("ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct {\n")
@@ -85,7 +85,7 @@ class ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct {
       tlvReader.enterStructure(tlvTag)
       val importedResetTimestamp =
@@ -139,7 +139,7 @@ class ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct(
         importedResetTimestamp,
         exportedResetTimestamp,
         importedResetSystime,
-        exportedResetSystime,
+        exportedResetSystime
       )
     }
   }

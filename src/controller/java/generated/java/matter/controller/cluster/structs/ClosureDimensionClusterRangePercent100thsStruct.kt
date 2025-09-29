@@ -45,7 +45,7 @@ class ClosureDimensionClusterRangePercent100thsStruct(val min: UShort, val max: 
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): ClosureDimensionClusterRangePercent100thsStruct {
       tlvReader.enterStructure(tlvTag)
       val min = tlvReader.getUShort(ContextSpecificTag(TAG_MIN))

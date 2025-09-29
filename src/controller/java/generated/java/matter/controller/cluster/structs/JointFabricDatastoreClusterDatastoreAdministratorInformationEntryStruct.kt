@@ -26,7 +26,7 @@ class JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(
   val nodeID: ULong,
   val friendlyName: String,
   val vendorID: UShort,
-  val icac: ByteArray,
+  val icac: ByteArray
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct {\n")
@@ -56,7 +56,7 @@ class JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
@@ -70,7 +70,7 @@ class JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct(
         nodeID,
         friendlyName,
         vendorID,
-        icac,
+        icac
       )
     }
   }

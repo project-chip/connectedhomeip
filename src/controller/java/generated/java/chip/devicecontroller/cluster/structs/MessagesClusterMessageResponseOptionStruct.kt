@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class MessagesClusterMessageResponseOptionStruct(
   val messageResponseID: Optional<ULong>,
-  val label: Optional<String>,
+  val label: Optional<String>
 ) {
   override fun toString(): String = buildString {
     append("MessagesClusterMessageResponseOptionStruct {\n")

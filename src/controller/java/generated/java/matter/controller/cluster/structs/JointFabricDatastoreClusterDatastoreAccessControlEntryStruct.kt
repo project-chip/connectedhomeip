@@ -27,7 +27,7 @@ class JointFabricDatastoreClusterDatastoreAccessControlEntryStruct(
   val privilege: UByte,
   val authMode: UByte,
   val subjects: List<ULong>?,
-  val targets: List<JointFabricDatastoreClusterDatastoreAccessControlTargetStruct>?,
+  val targets: List<JointFabricDatastoreClusterDatastoreAccessControlTargetStruct>?
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreAccessControlEntryStruct {\n")
@@ -73,7 +73,7 @@ class JointFabricDatastoreClusterDatastoreAccessControlEntryStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): JointFabricDatastoreClusterDatastoreAccessControlEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val privilege = tlvReader.getUByte(ContextSpecificTag(TAG_PRIVILEGE))
@@ -99,7 +99,7 @@ class JointFabricDatastoreClusterDatastoreAccessControlEntryStruct(
               add(
                 JointFabricDatastoreClusterDatastoreAccessControlTargetStruct.fromTlv(
                   AnonymousTag,
-                  tlvReader,
+                  tlvReader
                 )
               )
             }
@@ -116,7 +116,7 @@ class JointFabricDatastoreClusterDatastoreAccessControlEntryStruct(
         privilege,
         authMode,
         subjects,
-        targets,
+        targets
       )
     }
   }

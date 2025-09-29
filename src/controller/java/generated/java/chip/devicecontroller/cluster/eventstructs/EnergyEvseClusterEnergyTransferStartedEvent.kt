@@ -27,7 +27,7 @@ class EnergyEvseClusterEnergyTransferStartedEvent(
   val sessionID: ULong,
   val state: UInt,
   val maximumCurrent: Long,
-  val maximumDischargeCurrent: Optional<Long>,
+  val maximumDischargeCurrent: Optional<Long>
 ) {
   override fun toString(): String = buildString {
     append("EnergyEvseClusterEnergyTransferStartedEvent {\n")
@@ -76,7 +76,7 @@ class EnergyEvseClusterEnergyTransferStartedEvent(
         sessionID,
         state,
         maximumCurrent,
-        maximumDischargeCurrent,
+        maximumDischargeCurrent
       )
     }
   }

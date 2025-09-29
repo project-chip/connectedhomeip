@@ -32,7 +32,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
   val triggerOptions: PushAvStreamTransportClusterTransportTriggerOptionsStruct,
   val ingestMethod: UInt,
   val containerOptions: PushAvStreamTransportClusterContainerOptionsStruct,
-  val expiryTime: Optional<ULong>,
+  val expiryTime: Optional<ULong>
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportOptionsStruct {\n")
@@ -94,7 +94,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): PushAvStreamTransportClusterTransportOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val streamUsage = tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_USAGE))
@@ -125,13 +125,13 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
       val triggerOptions =
         PushAvStreamTransportClusterTransportTriggerOptionsStruct.fromTlv(
           ContextSpecificTag(TAG_TRIGGER_OPTIONS),
-          tlvReader,
+          tlvReader
         )
       val ingestMethod = tlvReader.getUInt(ContextSpecificTag(TAG_INGEST_METHOD))
       val containerOptions =
         PushAvStreamTransportClusterContainerOptionsStruct.fromTlv(
           ContextSpecificTag(TAG_CONTAINER_OPTIONS),
-          tlvReader,
+          tlvReader
         )
       val expiryTime =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXPIRY_TIME))) {
@@ -151,7 +151,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
         triggerOptions,
         ingestMethod,
         containerOptions,
-        expiryTime,
+        expiryTime
       )
     }
   }

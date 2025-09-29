@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class WebRTCTransportRequestorClusterICECandidateStruct(
   val candidate: String,
   val SDPMid: String?,
-  val SDPMLineIndex: UShort?,
+  val SDPMLineIndex: UShort?
 ) {
   override fun toString(): String = buildString {
     append("WebRTCTransportRequestorClusterICECandidateStruct {\n")
@@ -60,7 +60,7 @@ class WebRTCTransportRequestorClusterICECandidateStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): WebRTCTransportRequestorClusterICECandidateStruct {
       tlvReader.enterStructure(tlvTag)
       val candidate = tlvReader.getString(ContextSpecificTag(TAG_CANDIDATE))

@@ -31,7 +31,7 @@ class ElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct(
   val percentTypical: Optional<UInt>,
   val fixedMax: Optional<ULong>,
   val fixedMin: Optional<ULong>,
-  val fixedTypical: Optional<ULong>,
+  val fixedTypical: Optional<ULong>
 ) {
   override fun toString(): String = buildString {
     append("ElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct {\n")
@@ -91,7 +91,7 @@ class ElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): ElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct {
       tlvReader.enterStructure(tlvTag)
       val rangeMin = tlvReader.getLong(ContextSpecificTag(TAG_RANGE_MIN))
@@ -143,7 +143,7 @@ class ElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct(
         percentTypical,
         fixedMax,
         fixedMin,
-        fixedTypical,
+        fixedTypical
       )
     }
   }

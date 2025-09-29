@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent(
   val current: List<UByte>,
-  val previous: List<UByte>,
+  val previous: List<UByte>
 ) {
   override fun toString(): String = buildString {
     append("ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent {\n")
@@ -57,7 +57,7 @@ class ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent {
       tlvReader.enterStructure(tlvTag)
       val current =

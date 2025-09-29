@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class SwitchClusterMultiPressOngoingEvent(
   val newPosition: UInt,
-  val currentNumberOfPressesCounted: UInt,
+  val currentNumberOfPressesCounted: UInt
 ) {
   override fun toString(): String = buildString {
     append("SwitchClusterMultiPressOngoingEvent {\n")

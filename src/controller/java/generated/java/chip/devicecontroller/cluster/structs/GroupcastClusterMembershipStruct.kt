@@ -30,7 +30,7 @@ class GroupcastClusterMembershipStruct(
   val keyID: ULong,
   val hasAuxiliaryACL: Boolean,
   val expiringKeyID: Optional<ULong>,
-  val fabricIndex: UInt,
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("GroupcastClusterMembershipStruct {\n")
@@ -100,7 +100,7 @@ class GroupcastClusterMembershipStruct(
         keyID,
         hasAuxiliaryACL,
         expiringKeyID,
-        fabricIndex,
+        fabricIndex
       )
     }
   }

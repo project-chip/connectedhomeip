@@ -31,7 +31,7 @@ class SoilMeasurementClusterMeasurementAccuracyRangeStruct(
   val percentTypical: Optional<UShort>,
   val fixedMax: Optional<ULong>,
   val fixedMin: Optional<ULong>,
-  val fixedTypical: Optional<ULong>,
+  val fixedTypical: Optional<ULong>
 ) {
   override fun toString(): String = buildString {
     append("SoilMeasurementClusterMeasurementAccuracyRangeStruct {\n")
@@ -91,7 +91,7 @@ class SoilMeasurementClusterMeasurementAccuracyRangeStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): SoilMeasurementClusterMeasurementAccuracyRangeStruct {
       tlvReader.enterStructure(tlvTag)
       val rangeMin = tlvReader.getLong(ContextSpecificTag(TAG_RANGE_MIN))
@@ -143,7 +143,7 @@ class SoilMeasurementClusterMeasurementAccuracyRangeStruct(
         percentTypical,
         fixedMax,
         fixedMin,
-        fixedTypical,
+        fixedTypical
       )
     }
   }

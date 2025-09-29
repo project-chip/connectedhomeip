@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct(
   val nodeID: ULong,
   val groupKeySetID: UInt,
-  val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct,
+  val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct {\n")
@@ -52,7 +52,7 @@ class JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
@@ -60,7 +60,7 @@ class JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct(
       val statusEntry =
         JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(
           ContextSpecificTag(TAG_STATUS_ENTRY),
-          tlvReader,
+          tlvReader
         )
 
       tlvReader.exitContainer()
@@ -68,7 +68,7 @@ class JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct(
       return JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct(
         nodeID,
         groupKeySetID,
-        statusEntry,
+        statusEntry
       )
     }
   }

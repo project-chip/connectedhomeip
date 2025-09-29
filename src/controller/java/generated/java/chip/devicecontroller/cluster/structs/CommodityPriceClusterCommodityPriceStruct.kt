@@ -30,7 +30,7 @@ class CommodityPriceClusterCommodityPriceStruct(
   val price: Optional<Long>,
   val priceLevel: Optional<Int>,
   val description: Optional<String>,
-  val components: Optional<List<CommodityPriceClusterCommodityPriceComponentStruct>>,
+  val components: Optional<List<CommodityPriceClusterCommodityPriceComponentStruct>>
 ) {
   override fun toString(): String = buildString {
     append("CommodityPriceClusterCommodityPriceStruct {\n")
@@ -121,7 +121,7 @@ class CommodityPriceClusterCommodityPriceStruct(
                 add(
                   CommodityPriceClusterCommodityPriceComponentStruct.fromTlv(
                     AnonymousTag,
-                    tlvReader,
+                    tlvReader
                   )
                 )
               }
@@ -140,7 +140,7 @@ class CommodityPriceClusterCommodityPriceStruct(
         price,
         priceLevel,
         description,
-        components,
+        components
       )
     }
   }

@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class HepaFilterMonitoringClusterReplacementProductStruct(
   val productIdentifierType: UByte,
-  val productIdentifierValue: String,
+  val productIdentifierValue: String
 ) {
   override fun toString(): String = buildString {
     append("HepaFilterMonitoringClusterReplacementProductStruct {\n")
@@ -48,7 +48,7 @@ class HepaFilterMonitoringClusterReplacementProductStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): HepaFilterMonitoringClusterReplacementProductStruct {
       tlvReader.enterStructure(tlvTag)
       val productIdentifierType =
@@ -60,7 +60,7 @@ class HepaFilterMonitoringClusterReplacementProductStruct(
 
       return HepaFilterMonitoringClusterReplacementProductStruct(
         productIdentifierType,
-        productIdentifierValue,
+        productIdentifierValue
       )
     }
   }

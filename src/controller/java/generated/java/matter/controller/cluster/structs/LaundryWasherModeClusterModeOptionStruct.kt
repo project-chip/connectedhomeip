@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class LaundryWasherModeClusterModeOptionStruct(
   val label: String,
   val mode: UByte,
-  val modeTags: List<LaundryWasherModeClusterModeTagStruct>,
+  val modeTags: List<LaundryWasherModeClusterModeTagStruct>
 ) {
   override fun toString(): String = buildString {
     append("LaundryWasherModeClusterModeOptionStruct {\n")

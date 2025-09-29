@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class JointFabricDatastoreClusterDatastoreStatusEntryStruct(
   val state: UByte,
   val updateTimestamp: UInt,
-  val failureCode: UByte,
+  val failureCode: UByte
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreStatusEntryStruct {\n")
@@ -52,7 +52,7 @@ class JointFabricDatastoreClusterDatastoreStatusEntryStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): JointFabricDatastoreClusterDatastoreStatusEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val state = tlvReader.getUByte(ContextSpecificTag(TAG_STATE))
@@ -64,7 +64,7 @@ class JointFabricDatastoreClusterDatastoreStatusEntryStruct(
       return JointFabricDatastoreClusterDatastoreStatusEntryStruct(
         state,
         updateTimestamp,
-        failureCode,
+        failureCode
       )
     }
   }

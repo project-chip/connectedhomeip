@@ -31,7 +31,7 @@ class JointFabricDatastoreClusterDatastoreGroupKeySetStruct(
   val epochStartTime1: ULong?,
   val epochKey2: ByteArray?,
   val epochStartTime2: ULong?,
-  val groupKeyMulticastPolicy: UInt,
+  val groupKeyMulticastPolicy: UInt
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreGroupKeySetStruct {\n")
@@ -100,7 +100,7 @@ class JointFabricDatastoreClusterDatastoreGroupKeySetStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): JointFabricDatastoreClusterDatastoreGroupKeySetStruct {
       tlvReader.enterStructure(tlvTag)
       val groupKeySetID = tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_KEY_SET_ID))
@@ -162,7 +162,7 @@ class JointFabricDatastoreClusterDatastoreGroupKeySetStruct(
         epochStartTime1,
         epochKey2,
         epochStartTime2,
-        groupKeyMulticastPolicy,
+        groupKeyMulticastPolicy
       )
     }
   }

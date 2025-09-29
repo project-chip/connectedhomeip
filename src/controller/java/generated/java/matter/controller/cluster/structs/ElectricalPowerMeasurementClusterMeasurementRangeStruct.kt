@@ -34,7 +34,7 @@ class ElectricalPowerMeasurementClusterMeasurementRangeStruct(
   val startSystime: Optional<ULong>,
   val endSystime: Optional<ULong>,
   val minSystime: Optional<ULong>,
-  val maxSystime: Optional<ULong>,
+  val maxSystime: Optional<ULong>
 ) {
   override fun toString(): String = buildString {
     append("ElectricalPowerMeasurementClusterMeasurementRangeStruct {\n")
@@ -109,7 +109,7 @@ class ElectricalPowerMeasurementClusterMeasurementRangeStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): ElectricalPowerMeasurementClusterMeasurementRangeStruct {
       tlvReader.enterStructure(tlvTag)
       val measurementType = tlvReader.getUShort(ContextSpecificTag(TAG_MEASUREMENT_TYPE))
@@ -177,7 +177,7 @@ class ElectricalPowerMeasurementClusterMeasurementRangeStruct(
         startSystime,
         endSystime,
         minSystime,
-        maxSystime,
+        maxSystime
       )
     }
   }

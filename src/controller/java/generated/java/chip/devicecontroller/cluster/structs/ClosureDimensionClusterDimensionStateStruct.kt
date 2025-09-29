@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class ClosureDimensionClusterDimensionStateStruct(
   val position: Optional<UInt>?,
   val latch: Optional<Boolean>?,
-  val speed: Optional<UInt>,
+  val speed: Optional<UInt>
 ) {
   override fun toString(): String = buildString {
     append("ClosureDimensionClusterDimensionStateStruct {\n")

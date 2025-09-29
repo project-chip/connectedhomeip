@@ -43,7 +43,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
   class LeaveGroupResponse(
     val groupID: UShort,
     val endpoints: List<UShort>?,
-    val listTooLarge: Boolean?,
+    val listTooLarge: Boolean?
   )
 
   class MembershipAttribute(val value: List<GroupcastClusterMembershipStruct>)
@@ -94,7 +94,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
     keyID: UInt,
     gracePeriod: UInt?,
     useAuxiliaryACL: Boolean?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 0u
 
@@ -130,7 +130,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -140,7 +140,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
   suspend fun leaveGroup(
     groupID: UShort,
     endpoints: List<UShort>?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): LeaveGroupResponse {
     val commandId: UInt = 1u
 
@@ -164,7 +164,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -239,7 +239,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
     key: ByteArray,
     keyID: UInt,
     gracePeriod: UInt?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 3u
 
@@ -263,7 +263,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -284,7 +284,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -294,7 +294,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
   suspend fun configureAuxiliaryACL(
     groupID: UShort,
     useAuxiliaryACL: Boolean,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 5u
 
@@ -312,7 +312,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -359,7 +359,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
 
   suspend fun subscribeMembershipAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<MembershipAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -372,7 +372,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -447,7 +447,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
 
   suspend fun subscribeMaxMembershipCountAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -460,7 +460,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -537,7 +537,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -550,7 +550,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -634,7 +634,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -647,7 +647,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -731,7 +731,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -744,7 +744,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -819,7 +819,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -832,7 +832,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -900,7 +900,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -913,7 +913,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

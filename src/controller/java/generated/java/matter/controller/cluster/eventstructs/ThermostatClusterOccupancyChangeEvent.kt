@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class ThermostatClusterOccupancyChangeEvent(
   val previousOccupancy: Optional<UByte>,
-  val currentOccupancy: UByte,
+  val currentOccupancy: UByte
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterOccupancyChangeEvent {\n")

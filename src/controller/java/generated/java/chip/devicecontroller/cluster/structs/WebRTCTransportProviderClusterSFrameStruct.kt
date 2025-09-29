@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class WebRTCTransportProviderClusterSFrameStruct(
   val cipherSuite: UInt,
   val baseKey: ByteArray,
-  val kid: ByteArray,
+  val kid: ByteArray
 ) {
   override fun toString(): String = buildString {
     append("WebRTCTransportProviderClusterSFrameStruct {\n")

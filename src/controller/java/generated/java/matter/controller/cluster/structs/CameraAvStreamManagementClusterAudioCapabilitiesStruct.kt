@@ -27,7 +27,7 @@ class CameraAvStreamManagementClusterAudioCapabilitiesStruct(
   val maxNumberOfChannels: UByte,
   val supportedCodecs: List<UByte>,
   val supportedSampleRates: List<UInt>,
-  val supportedBitDepths: List<UByte>,
+  val supportedBitDepths: List<UByte>
 ) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterAudioCapabilitiesStruct {\n")
@@ -69,7 +69,7 @@ class CameraAvStreamManagementClusterAudioCapabilitiesStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): CameraAvStreamManagementClusterAudioCapabilitiesStruct {
       tlvReader.enterStructure(tlvTag)
       val maxNumberOfChannels = tlvReader.getUByte(ContextSpecificTag(TAG_MAX_NUMBER_OF_CHANNELS))
@@ -104,7 +104,7 @@ class CameraAvStreamManagementClusterAudioCapabilitiesStruct(
         maxNumberOfChannels,
         supportedCodecs,
         supportedSampleRates,
-        supportedBitDepths,
+        supportedBitDepths
       )
     }
   }

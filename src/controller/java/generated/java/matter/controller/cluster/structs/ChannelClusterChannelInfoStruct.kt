@@ -30,7 +30,7 @@ class ChannelClusterChannelInfoStruct(
   val callSign: Optional<String>,
   val affiliateCallSign: Optional<String>,
   val identifier: Optional<String>,
-  val type: Optional<UByte>,
+  val type: Optional<UByte>
 ) {
   override fun toString(): String = buildString {
     append("ChannelClusterChannelInfoStruct {\n")
@@ -126,7 +126,7 @@ class ChannelClusterChannelInfoStruct(
         callSign,
         affiliateCallSign,
         identifier,
-        type,
+        type
       )
     }
   }

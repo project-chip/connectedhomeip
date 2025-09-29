@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class MeterIdentificationClusterPowerThresholdStruct(
   val powerThreshold: Optional<Long>,
   val apparentPowerThreshold: Optional<Long>,
-  val powerThresholdSource: UInt?,
+  val powerThresholdSource: UInt?
 ) {
   override fun toString(): String = buildString {
     append("MeterIdentificationClusterPowerThresholdStruct {\n")
@@ -88,7 +88,7 @@ class MeterIdentificationClusterPowerThresholdStruct(
       return MeterIdentificationClusterPowerThresholdStruct(
         powerThreshold,
         apparentPowerThreshold,
-        powerThresholdSource,
+        powerThresholdSource
       )
     }
   }

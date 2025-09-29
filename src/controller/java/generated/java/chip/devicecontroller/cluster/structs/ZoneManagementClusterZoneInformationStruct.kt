@@ -27,7 +27,7 @@ class ZoneManagementClusterZoneInformationStruct(
   val zoneID: UInt,
   val zoneType: UInt,
   val zoneSource: UInt,
-  val twoDCartesianZone: Optional<ZoneManagementClusterTwoDCartesianZoneStruct>,
+  val twoDCartesianZone: Optional<ZoneManagementClusterTwoDCartesianZoneStruct>
 ) {
   override fun toString(): String = buildString {
     append("ZoneManagementClusterZoneInformationStruct {\n")
@@ -68,7 +68,7 @@ class ZoneManagementClusterZoneInformationStruct(
           Optional.of(
             ZoneManagementClusterTwoDCartesianZoneStruct.fromTlv(
               ContextSpecificTag(TAG_TWO_D_CARTESIAN_ZONE),
-              tlvReader,
+              tlvReader
             )
           )
         } else {
@@ -81,7 +81,7 @@ class ZoneManagementClusterZoneInformationStruct(
         zoneID,
         zoneType,
         zoneSource,
-        twoDCartesianZone,
+        twoDCartesianZone
       )
     }
   }

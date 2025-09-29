@@ -26,7 +26,7 @@ class PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct(
   val initialDuration: UShort,
   val augmentationDuration: UShort,
   val maxDuration: UInt,
-  val blindDuration: UShort,
+  val blindDuration: UShort
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct {\n")
@@ -56,7 +56,7 @@ class PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct {
       tlvReader.enterStructure(tlvTag)
       val initialDuration = tlvReader.getUShort(ContextSpecificTag(TAG_INITIAL_DURATION))
@@ -70,7 +70,7 @@ class PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct(
         initialDuration,
         augmentationDuration,
         maxDuration,
-        blindDuration,
+        blindDuration
       )
     }
   }

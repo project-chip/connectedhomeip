@@ -42,7 +42,7 @@ class BridgedDeviceBasicInformationClusterActiveChangedEvent(val promisedActiveD
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): BridgedDeviceBasicInformationClusterActiveChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val promisedActiveDuration =

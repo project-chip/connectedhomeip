@@ -29,7 +29,7 @@ class WaterHeaterManagementClusterWaterHeaterBoostInfoStruct(
   val emergencyBoost: Optional<Boolean>,
   val temporarySetpoint: Optional<Short>,
   val targetPercentage: Optional<UByte>,
-  val targetReheat: Optional<UByte>,
+  val targetReheat: Optional<UByte>
 ) {
   override fun toString(): String = buildString {
     append("WaterHeaterManagementClusterWaterHeaterBoostInfoStruct {\n")
@@ -80,7 +80,7 @@ class WaterHeaterManagementClusterWaterHeaterBoostInfoStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): WaterHeaterManagementClusterWaterHeaterBoostInfoStruct {
       tlvReader.enterStructure(tlvTag)
       val duration = tlvReader.getUInt(ContextSpecificTag(TAG_DURATION))
@@ -123,7 +123,7 @@ class WaterHeaterManagementClusterWaterHeaterBoostInfoStruct(
         emergencyBoost,
         temporarySetpoint,
         targetPercentage,
-        targetReheat,
+        targetReheat
       )
     }
   }

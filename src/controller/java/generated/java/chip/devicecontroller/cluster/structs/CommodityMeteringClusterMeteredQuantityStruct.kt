@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class CommodityMeteringClusterMeteredQuantityStruct(
   val tariffComponentIDs: List<ULong>,
-  val quantity: Long,
+  val quantity: Long
 ) {
   override fun toString(): String = buildString {
     append("CommodityMeteringClusterMeteredQuantityStruct {\n")

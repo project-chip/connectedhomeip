@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class PushAvStreamTransportClusterTransportZoneOptionsStruct(
   val zone: UShort?,
-  val sensitivity: Optional<UByte>,
+  val sensitivity: Optional<UByte>
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportZoneOptionsStruct {\n")
@@ -56,7 +56,7 @@ class PushAvStreamTransportClusterTransportZoneOptionsStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): PushAvStreamTransportClusterTransportZoneOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val zone =

@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct(
   val number: UInt,
-  val requiredState: UInt,
+  val requiredState: UInt
 ) {
   override fun toString(): String = buildString {
     append("CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct {\n")
@@ -48,7 +48,7 @@ class CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct {
       tlvReader.enterStructure(tlvTag)
       val number = tlvReader.getUInt(ContextSpecificTag(TAG_NUMBER))

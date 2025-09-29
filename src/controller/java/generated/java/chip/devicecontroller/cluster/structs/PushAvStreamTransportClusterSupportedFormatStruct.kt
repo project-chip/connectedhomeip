@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class PushAvStreamTransportClusterSupportedFormatStruct(
   val containerFormat: UInt,
-  val ingestMethod: UInt,
+  val ingestMethod: UInt
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterSupportedFormatStruct {\n")
@@ -48,7 +48,7 @@ class PushAvStreamTransportClusterSupportedFormatStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): PushAvStreamTransportClusterSupportedFormatStruct {
       tlvReader.enterStructure(tlvTag)
       val containerFormat = tlvReader.getUInt(ContextSpecificTag(TAG_CONTAINER_FORMAT))

@@ -32,7 +32,7 @@ class UnitTestingClusterSimpleStruct(
   val f: UByte,
   val g: Float,
   val h: Double,
-  val i: Optional<UByte>,
+  val i: Optional<UByte>
 ) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterSimpleStruct {\n")

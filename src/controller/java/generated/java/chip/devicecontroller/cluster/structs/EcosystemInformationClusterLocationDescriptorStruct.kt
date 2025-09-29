@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class EcosystemInformationClusterLocationDescriptorStruct(
   val locationName: String,
   val floorNumber: Int?,
-  val areaType: UInt?,
+  val areaType: UInt?
 ) {
   override fun toString(): String = buildString {
     append("EcosystemInformationClusterLocationDescriptorStruct {\n")
@@ -60,7 +60,7 @@ class EcosystemInformationClusterLocationDescriptorStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): EcosystemInformationClusterLocationDescriptorStruct {
       tlvReader.enterStructure(tlvTag)
       val locationName = tlvReader.getString(ContextSpecificTag(TAG_LOCATION_NAME))
@@ -84,7 +84,7 @@ class EcosystemInformationClusterLocationDescriptorStruct(
       return EcosystemInformationClusterLocationDescriptorStruct(
         locationName,
         floorNumber,
-        areaType,
+        areaType
       )
     }
   }

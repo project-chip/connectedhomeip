@@ -30,7 +30,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
   val videoStreamID: UInt?,
   val audioStreamID: UInt?,
   val metadataEnabled: Boolean,
-  val fabricIndex: UInt,
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("WebRTCTransportProviderClusterWebRTCSessionStruct {\n")
@@ -80,7 +80,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): WebRTCTransportProviderClusterWebRTCSessionStruct {
       tlvReader.enterStructure(tlvTag)
       val id = tlvReader.getUInt(ContextSpecificTag(TAG_ID))
@@ -114,7 +114,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
         videoStreamID,
         audioStreamID,
         metadataEnabled,
-        fabricIndex,
+        fabricIndex
       )
     }
   }

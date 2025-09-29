@@ -36,7 +36,7 @@ class CameraAvStreamManagementClusterVideoStreamStruct(
   val keyFrameInterval: UInt,
   val watermarkEnabled: Optional<Boolean>,
   val OSDEnabled: Optional<Boolean>,
-  val referenceCount: UInt,
+  val referenceCount: UInt
 ) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterVideoStreamStruct {\n")
@@ -99,7 +99,7 @@ class CameraAvStreamManagementClusterVideoStreamStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): CameraAvStreamManagementClusterVideoStreamStruct {
       tlvReader.enterStructure(tlvTag)
       val videoStreamID = tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
@@ -110,12 +110,12 @@ class CameraAvStreamManagementClusterVideoStreamStruct(
       val minResolution =
         CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(
           ContextSpecificTag(TAG_MIN_RESOLUTION),
-          tlvReader,
+          tlvReader
         )
       val maxResolution =
         CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(
           ContextSpecificTag(TAG_MAX_RESOLUTION),
-          tlvReader,
+          tlvReader
         )
       val minBitRate = tlvReader.getULong(ContextSpecificTag(TAG_MIN_BIT_RATE))
       val maxBitRate = tlvReader.getULong(ContextSpecificTag(TAG_MAX_BIT_RATE))
@@ -149,7 +149,7 @@ class CameraAvStreamManagementClusterVideoStreamStruct(
         keyFrameInterval,
         watermarkEnabled,
         OSDEnabled,
-        referenceCount,
+        referenceCount
       )
     }
   }

@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class TlsCertificateManagementClusterTLSCertStruct(
   val caid: UShort,
   val certificate: Optional<ByteArray>,
-  val fabricIndex: UByte,
+  val fabricIndex: UByte
 ) {
   override fun toString(): String = buildString {
     append("TlsCertificateManagementClusterTLSCertStruct {\n")

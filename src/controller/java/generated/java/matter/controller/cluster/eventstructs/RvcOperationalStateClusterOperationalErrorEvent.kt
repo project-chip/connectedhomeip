@@ -44,13 +44,13 @@ class RvcOperationalStateClusterOperationalErrorEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): RvcOperationalStateClusterOperationalErrorEvent {
       tlvReader.enterStructure(tlvTag)
       val errorState =
         matter.controller.cluster.structs.RvcOperationalStateClusterErrorStateStruct.fromTlv(
           ContextSpecificTag(TAG_ERROR_STATE),
-          tlvReader,
+          tlvReader
         )
 
       tlvReader.exitContainer()

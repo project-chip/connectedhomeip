@@ -42,7 +42,7 @@ import matter.tlv.TlvWriter
 
 class TlsCertificateManagementCluster(
   private val controller: MatterController,
-  private val endpointId: UShort,
+  private val endpointId: UShort
 ) {
   class ProvisionRootCertificateResponse(val caid: UShort)
 
@@ -122,7 +122,7 @@ class TlsCertificateManagementCluster(
   suspend fun provisionRootCertificate(
     certificate: ByteArray,
     caid: UShort?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): ProvisionRootCertificateResponse {
     val commandId: UInt = 0u
 
@@ -140,7 +140,7 @@ class TlsCertificateManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -172,7 +172,7 @@ class TlsCertificateManagementCluster(
 
   suspend fun findRootCertificate(
     caid: UShort?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): FindRootCertificateResponse {
     val commandId: UInt = 2u
 
@@ -187,7 +187,7 @@ class TlsCertificateManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -226,7 +226,7 @@ class TlsCertificateManagementCluster(
 
   suspend fun lookupRootCertificate(
     fingerprint: ByteArray,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): LookupRootCertificateResponse {
     val commandId: UInt = 4u
 
@@ -241,7 +241,7 @@ class TlsCertificateManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -285,7 +285,7 @@ class TlsCertificateManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -295,7 +295,7 @@ class TlsCertificateManagementCluster(
   suspend fun clientCSR(
     nonce: ByteArray,
     ccdid: UShort?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): ClientCSRResponse {
     val commandId: UInt = 7u
 
@@ -313,7 +313,7 @@ class TlsCertificateManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -369,7 +369,7 @@ class TlsCertificateManagementCluster(
     ccdid: UShort,
     clientCertificate: ByteArray,
     intermediateCertificates: List<ByteArray>,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 9u
 
@@ -394,7 +394,7 @@ class TlsCertificateManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -403,7 +403,7 @@ class TlsCertificateManagementCluster(
 
   suspend fun findClientCertificate(
     ccdid: UShort?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): FindClientCertificateResponse {
     val commandId: UInt = 10u
 
@@ -418,7 +418,7 @@ class TlsCertificateManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -442,7 +442,7 @@ class TlsCertificateManagementCluster(
               add(
                 TlsCertificateManagementClusterTLSClientCertificateDetailStruct.fromTlv(
                   AnonymousTag,
-                  tlvReader,
+                  tlvReader
                 )
               )
             }
@@ -464,7 +464,7 @@ class TlsCertificateManagementCluster(
 
   suspend fun lookupClientCertificate(
     fingerprint: ByteArray,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): LookupClientCertificateResponse {
     val commandId: UInt = 12u
 
@@ -479,7 +479,7 @@ class TlsCertificateManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -523,7 +523,7 @@ class TlsCertificateManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -563,7 +563,7 @@ class TlsCertificateManagementCluster(
 
   suspend fun subscribeMaxRootCertificatesAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -576,7 +576,7 @@ class TlsCertificateManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -653,7 +653,7 @@ class TlsCertificateManagementCluster(
 
   suspend fun subscribeProvisionedRootCertificatesAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<ProvisionedRootCertificatesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -666,7 +666,7 @@ class TlsCertificateManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -743,7 +743,7 @@ class TlsCertificateManagementCluster(
 
   suspend fun subscribeMaxClientCertificatesAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -756,7 +756,7 @@ class TlsCertificateManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -828,7 +828,7 @@ class TlsCertificateManagementCluster(
           add(
             TlsCertificateManagementClusterTLSClientCertificateDetailStruct.fromTlv(
               AnonymousTag,
-              tlvReader,
+              tlvReader
             )
           )
         }
@@ -840,7 +840,7 @@ class TlsCertificateManagementCluster(
 
   suspend fun subscribeProvisionedClientCertificatesAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<ProvisionedClientCertificatesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -853,7 +853,7 @@ class TlsCertificateManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -886,7 +886,7 @@ class TlsCertificateManagementCluster(
                 add(
                   TlsCertificateManagementClusterTLSClientCertificateDetailStruct.fromTlv(
                     AnonymousTag,
-                    tlvReader,
+                    tlvReader
                   )
                 )
               }
@@ -942,7 +942,7 @@ class TlsCertificateManagementCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -955,7 +955,7 @@ class TlsCertificateManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1039,7 +1039,7 @@ class TlsCertificateManagementCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -1052,7 +1052,7 @@ class TlsCertificateManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1136,7 +1136,7 @@ class TlsCertificateManagementCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -1149,7 +1149,7 @@ class TlsCertificateManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1224,7 +1224,7 @@ class TlsCertificateManagementCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -1237,7 +1237,7 @@ class TlsCertificateManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1305,7 +1305,7 @@ class TlsCertificateManagementCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -1318,7 +1318,7 @@ class TlsCertificateManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

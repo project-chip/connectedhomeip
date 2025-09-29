@@ -28,7 +28,7 @@ class JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(
   val groupKeySetID: UInt?,
   val groupCAT: UInt?,
   val groupCATVersion: UInt?,
-  val groupPermission: UInt,
+  val groupPermission: UInt
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct {\n")
@@ -76,7 +76,7 @@ class JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val groupID = tlvReader.getULong(ContextSpecificTag(TAG_GROUP_ID))
@@ -112,7 +112,7 @@ class JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct(
         groupKeySetID,
         groupCAT,
         groupCATVersion,
-        groupPermission,
+        groupPermission
       )
     }
   }

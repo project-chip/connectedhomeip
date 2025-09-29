@@ -28,7 +28,7 @@ class WebRTCTransportRequestorClusterICEServerStruct(
   val URLs: List<String>,
   val username: Optional<String>,
   val credential: Optional<String>,
-  val caid: Optional<UShort>,
+  val caid: Optional<UShort>
 ) {
   override fun toString(): String = buildString {
     append("WebRTCTransportRequestorClusterICEServerStruct {\n")

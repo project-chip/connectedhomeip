@@ -27,7 +27,7 @@ class CommodityTariffClusterTariffInformationStruct(
   val tariffLabel: String?,
   val providerName: String?,
   val currency: Optional<CommodityTariffClusterCurrencyStruct>?,
-  val blockMode: UByte?,
+  val blockMode: UByte?
 ) {
   override fun toString(): String = buildString {
     append("CommodityTariffClusterTariffInformationStruct {\n")
@@ -96,7 +96,7 @@ class CommodityTariffClusterTariffInformationStruct(
             Optional.of(
               CommodityTariffClusterCurrencyStruct.fromTlv(
                 ContextSpecificTag(TAG_CURRENCY),
-                tlvReader,
+                tlvReader
               )
             )
           } else {
@@ -120,7 +120,7 @@ class CommodityTariffClusterTariffInformationStruct(
         tariffLabel,
         providerName,
         currency,
-        blockMode,
+        blockMode
       )
     }
   }

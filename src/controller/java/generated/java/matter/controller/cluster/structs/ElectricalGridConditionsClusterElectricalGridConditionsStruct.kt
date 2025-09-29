@@ -28,7 +28,7 @@ class ElectricalGridConditionsClusterElectricalGridConditionsStruct(
   val gridCarbonIntensity: Short,
   val gridCarbonLevel: UByte,
   val localCarbonIntensity: Short,
-  val localCarbonLevel: UByte,
+  val localCarbonLevel: UByte
 ) {
   override fun toString(): String = buildString {
     append("ElectricalGridConditionsClusterElectricalGridConditionsStruct {\n")
@@ -68,7 +68,7 @@ class ElectricalGridConditionsClusterElectricalGridConditionsStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): ElectricalGridConditionsClusterElectricalGridConditionsStruct {
       tlvReader.enterStructure(tlvTag)
       val periodStart = tlvReader.getUInt(ContextSpecificTag(TAG_PERIOD_START))
@@ -92,7 +92,7 @@ class ElectricalGridConditionsClusterElectricalGridConditionsStruct(
         gridCarbonIntensity,
         gridCarbonLevel,
         localCarbonIntensity,
-        localCarbonLevel,
+        localCarbonLevel
       )
     }
   }

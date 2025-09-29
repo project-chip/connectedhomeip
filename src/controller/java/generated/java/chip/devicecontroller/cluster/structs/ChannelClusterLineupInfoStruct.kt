@@ -27,7 +27,7 @@ class ChannelClusterLineupInfoStruct(
   val operatorName: String,
   val lineupName: Optional<String>,
   val postalCode: Optional<String>,
-  val lineupInfoType: UInt,
+  val lineupInfoType: UInt
 ) {
   override fun toString(): String = buildString {
     append("ChannelClusterLineupInfoStruct {\n")

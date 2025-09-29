@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class CommodityTariffClusterDayStruct(
   val date: ULong,
   val dayType: UInt,
-  val dayEntryIDs: List<ULong>,
+  val dayEntryIDs: List<ULong>
 ) {
   override fun toString(): String = buildString {
     append("CommodityTariffClusterDayStruct {\n")

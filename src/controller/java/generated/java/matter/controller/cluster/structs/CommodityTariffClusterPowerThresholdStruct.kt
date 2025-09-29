@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class CommodityTariffClusterPowerThresholdStruct(
   val powerThreshold: Optional<Long>,
   val apparentPowerThreshold: Optional<Long>,
-  val powerThresholdSource: UByte?,
+  val powerThresholdSource: UByte?
 ) {
   override fun toString(): String = buildString {
     append("CommodityTariffClusterPowerThresholdStruct {\n")
@@ -88,7 +88,7 @@ class CommodityTariffClusterPowerThresholdStruct(
       return CommodityTariffClusterPowerThresholdStruct(
         powerThreshold,
         apparentPowerThreshold,
-        powerThresholdSource,
+        powerThresholdSource
       )
     }
   }

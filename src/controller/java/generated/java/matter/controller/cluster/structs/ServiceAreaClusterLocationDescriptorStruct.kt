@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class ServiceAreaClusterLocationDescriptorStruct(
   val locationName: String,
   val floorNumber: Short?,
-  val areaType: UByte?,
+  val areaType: UByte?
 ) {
   override fun toString(): String = buildString {
     append("ServiceAreaClusterLocationDescriptorStruct {\n")

@@ -41,7 +41,7 @@ import matter.tlv.TlvWriter
 
 class PushAvStreamTransportCluster(
   private val controller: MatterController,
-  private val endpointId: UShort,
+  private val endpointId: UShort
 ) {
   class AllocatePushTransportResponse(
     val transportConfiguration: PushAvStreamTransportClusterTransportConfigurationStruct
@@ -109,7 +109,7 @@ class PushAvStreamTransportCluster(
 
   suspend fun allocatePushTransport(
     transportOptions: PushAvStreamTransportClusterTransportOptionsStruct,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): AllocatePushTransportResponse {
     val commandId: UInt = 0u
 
@@ -124,7 +124,7 @@ class PushAvStreamTransportCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -170,7 +170,7 @@ class PushAvStreamTransportCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -180,7 +180,7 @@ class PushAvStreamTransportCluster(
   suspend fun modifyPushTransport(
     connectionID: UShort,
     transportOptions: PushAvStreamTransportClusterTransportOptionsStruct,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 3u
 
@@ -198,7 +198,7 @@ class PushAvStreamTransportCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -208,7 +208,7 @@ class PushAvStreamTransportCluster(
   suspend fun setTransportStatus(
     connectionID: UShort?,
     transportStatus: UByte,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 4u
 
@@ -226,7 +226,7 @@ class PushAvStreamTransportCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -238,7 +238,7 @@ class PushAvStreamTransportCluster(
     activationReason: UByte,
     timeControl: PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct?,
     userDefined: ByteArray?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 5u
 
@@ -262,7 +262,7 @@ class PushAvStreamTransportCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -271,7 +271,7 @@ class PushAvStreamTransportCluster(
 
   suspend fun findTransport(
     connectionID: UShort?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): FindTransportResponse {
     val commandId: UInt = 6u
 
@@ -286,7 +286,7 @@ class PushAvStreamTransportCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -310,7 +310,7 @@ class PushAvStreamTransportCluster(
               add(
                 PushAvStreamTransportClusterTransportConfigurationStruct.fromTlv(
                   AnonymousTag,
-                  tlvReader,
+                  tlvReader
                 )
               )
             }
@@ -370,7 +370,7 @@ class PushAvStreamTransportCluster(
 
   suspend fun subscribeSupportedFormatsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<SupportedFormatsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -383,7 +383,7 @@ class PushAvStreamTransportCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -462,7 +462,7 @@ class PushAvStreamTransportCluster(
           add(
             PushAvStreamTransportClusterTransportConfigurationStruct.fromTlv(
               AnonymousTag,
-              tlvReader,
+              tlvReader
             )
           )
         }
@@ -474,7 +474,7 @@ class PushAvStreamTransportCluster(
 
   suspend fun subscribeCurrentConnectionsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<CurrentConnectionsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -487,7 +487,7 @@ class PushAvStreamTransportCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -520,7 +520,7 @@ class PushAvStreamTransportCluster(
                 add(
                   PushAvStreamTransportClusterTransportConfigurationStruct.fromTlv(
                     AnonymousTag,
-                    tlvReader,
+                    tlvReader
                   )
                 )
               }
@@ -576,7 +576,7 @@ class PushAvStreamTransportCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -589,7 +589,7 @@ class PushAvStreamTransportCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -673,7 +673,7 @@ class PushAvStreamTransportCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -686,7 +686,7 @@ class PushAvStreamTransportCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -770,7 +770,7 @@ class PushAvStreamTransportCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -783,7 +783,7 @@ class PushAvStreamTransportCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -858,7 +858,7 @@ class PushAvStreamTransportCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -871,7 +871,7 @@ class PushAvStreamTransportCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -939,7 +939,7 @@ class PushAvStreamTransportCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -952,7 +952,7 @@ class PushAvStreamTransportCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

@@ -40,7 +40,7 @@ import matter.tlv.TlvWriter
 
 class ElectricalGridConditionsCluster(
   private val controller: MatterController,
-  private val endpointId: UShort,
+  private val endpointId: UShort
 ) {
   class LocalGenerationAvailableAttribute(val value: Boolean?)
 
@@ -149,7 +149,7 @@ class ElectricalGridConditionsCluster(
 
   suspend fun writeLocalGenerationAvailableAttribute(
     value: Boolean,
-    timedWriteTimeout: Duration? = null,
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 0u
 
@@ -163,10 +163,10 @@ class ElectricalGridConditionsCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
+              tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timedWriteTimeout,
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -192,7 +192,7 @@ class ElectricalGridConditionsCluster(
 
   suspend fun subscribeLocalGenerationAvailableAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<LocalGenerationAvailableAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -205,7 +205,7 @@ class ElectricalGridConditionsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -278,7 +278,7 @@ class ElectricalGridConditionsCluster(
       if (!tlvReader.isNull()) {
         ElectricalGridConditionsClusterElectricalGridConditionsStruct.fromTlv(
           AnonymousTag,
-          tlvReader,
+          tlvReader
         )
       } else {
         tlvReader.getNull(AnonymousTag)
@@ -290,7 +290,7 @@ class ElectricalGridConditionsCluster(
 
   suspend fun subscribeCurrentConditionsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<CurrentConditionsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -303,7 +303,7 @@ class ElectricalGridConditionsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -333,7 +333,7 @@ class ElectricalGridConditionsCluster(
             if (!tlvReader.isNull()) {
               ElectricalGridConditionsClusterElectricalGridConditionsStruct.fromTlv(
                 AnonymousTag,
-                tlvReader,
+                tlvReader
               )
             } else {
               tlvReader.getNull(AnonymousTag)
@@ -383,7 +383,7 @@ class ElectricalGridConditionsCluster(
             add(
               ElectricalGridConditionsClusterElectricalGridConditionsStruct.fromTlv(
                 AnonymousTag,
-                tlvReader,
+                tlvReader
               )
             )
           }
@@ -398,7 +398,7 @@ class ElectricalGridConditionsCluster(
 
   suspend fun subscribeForecastConditionsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<ForecastConditionsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -411,7 +411,7 @@ class ElectricalGridConditionsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -445,7 +445,7 @@ class ElectricalGridConditionsCluster(
                   add(
                     ElectricalGridConditionsClusterElectricalGridConditionsStruct.fromTlv(
                       AnonymousTag,
-                      tlvReader,
+                      tlvReader
                     )
                   )
                 }
@@ -504,7 +504,7 @@ class ElectricalGridConditionsCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -517,7 +517,7 @@ class ElectricalGridConditionsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -601,7 +601,7 @@ class ElectricalGridConditionsCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -614,7 +614,7 @@ class ElectricalGridConditionsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -698,7 +698,7 @@ class ElectricalGridConditionsCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -711,7 +711,7 @@ class ElectricalGridConditionsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -786,7 +786,7 @@ class ElectricalGridConditionsCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -799,7 +799,7 @@ class ElectricalGridConditionsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -867,7 +867,7 @@ class ElectricalGridConditionsCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -880,7 +880,7 @@ class ElectricalGridConditionsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

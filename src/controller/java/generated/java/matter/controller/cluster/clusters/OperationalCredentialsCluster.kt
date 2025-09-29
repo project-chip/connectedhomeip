@@ -42,11 +42,11 @@ import matter.tlv.TlvWriter
 
 class OperationalCredentialsCluster(
   private val controller: MatterController,
-  private val endpointId: UShort,
+  private val endpointId: UShort
 ) {
   class AttestationResponse(
     val attestationElements: ByteArray,
-    val attestationSignature: ByteArray,
+    val attestationSignature: ByteArray
   )
 
   class CertificateChainResponse(val certificate: ByteArray)
@@ -58,7 +58,7 @@ class OperationalCredentialsCluster(
   class SignVIDVerificationResponse(
     val fabricIndex: UByte,
     val fabricBindingVersion: UByte,
-    val signature: ByteArray,
+    val signature: ByteArray
   )
 
   class NOCsAttribute(val value: List<OperationalCredentialsClusterNOCStruct>)
@@ -127,7 +127,7 @@ class OperationalCredentialsCluster(
 
   suspend fun attestationRequest(
     attestationNonce: ByteArray,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): AttestationResponse {
     val commandId: UInt = 0u
 
@@ -142,7 +142,7 @@ class OperationalCredentialsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -185,7 +185,7 @@ class OperationalCredentialsCluster(
 
   suspend fun certificateChainRequest(
     certificateType: UByte,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): CertificateChainResponse {
     val commandId: UInt = 2u
 
@@ -200,7 +200,7 @@ class OperationalCredentialsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -233,7 +233,7 @@ class OperationalCredentialsCluster(
   suspend fun CSRRequest(
     CSRNonce: ByteArray,
     isForUpdateNOC: Boolean?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): CSRResponse {
     val commandId: UInt = 4u
 
@@ -253,7 +253,7 @@ class OperationalCredentialsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -300,7 +300,7 @@ class OperationalCredentialsCluster(
     IPKValue: ByteArray,
     caseAdminSubject: ULong,
     adminVendorId: UShort,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): NOCResponse {
     val commandId: UInt = 6u
 
@@ -327,7 +327,7 @@ class OperationalCredentialsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -394,7 +394,7 @@ class OperationalCredentialsCluster(
   suspend fun updateNOC(
     NOCValue: ByteArray,
     ICACValue: ByteArray?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): NOCResponse {
     val commandId: UInt = 7u
 
@@ -412,7 +412,7 @@ class OperationalCredentialsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -490,7 +490,7 @@ class OperationalCredentialsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -568,7 +568,7 @@ class OperationalCredentialsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -634,7 +634,7 @@ class OperationalCredentialsCluster(
 
   suspend fun addTrustedRootCertificate(
     rootCACertificate: ByteArray,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 11u
 
@@ -649,7 +649,7 @@ class OperationalCredentialsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -660,7 +660,7 @@ class OperationalCredentialsCluster(
     vendorID: UShort?,
     VIDVerificationStatement: ByteArray?,
     vvsc: ByteArray?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 12u
 
@@ -674,7 +674,7 @@ class OperationalCredentialsCluster(
     VIDVerificationStatement?.let {
       tlvWriter.put(
         ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT_REQ),
-        VIDVerificationStatement,
+        VIDVerificationStatement
       )
     }
 
@@ -686,7 +686,7 @@ class OperationalCredentialsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -696,7 +696,7 @@ class OperationalCredentialsCluster(
   suspend fun signVIDVerificationRequest(
     fabricIndex: UByte,
     clientChallenge: ByteArray,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ): SignVIDVerificationResponse {
     val commandId: UInt = 13u
 
@@ -714,7 +714,7 @@ class OperationalCredentialsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -766,7 +766,7 @@ class OperationalCredentialsCluster(
     return SignVIDVerificationResponse(
       fabricIndex_decoded,
       fabricBindingVersion_decoded,
-      signature_decoded,
+      signature_decoded
     )
   }
 
@@ -810,7 +810,7 @@ class OperationalCredentialsCluster(
 
   suspend fun subscribeNOCsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<NOCsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -823,7 +823,7 @@ class OperationalCredentialsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -905,7 +905,7 @@ class OperationalCredentialsCluster(
 
   suspend fun subscribeFabricsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<FabricsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -918,7 +918,7 @@ class OperationalCredentialsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -949,7 +949,7 @@ class OperationalCredentialsCluster(
                 add(
                   OperationalCredentialsClusterFabricDescriptorStruct.fromTlv(
                     AnonymousTag,
-                    tlvReader,
+                    tlvReader
                   )
                 )
               }
@@ -998,7 +998,7 @@ class OperationalCredentialsCluster(
 
   suspend fun subscribeSupportedFabricsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -1011,7 +1011,7 @@ class OperationalCredentialsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1081,7 +1081,7 @@ class OperationalCredentialsCluster(
 
   suspend fun subscribeCommissionedFabricsAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -1094,7 +1094,7 @@ class OperationalCredentialsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1171,7 +1171,7 @@ class OperationalCredentialsCluster(
 
   suspend fun subscribeTrustedRootCertificatesAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<TrustedRootCertificatesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
@@ -1184,7 +1184,7 @@ class OperationalCredentialsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1261,7 +1261,7 @@ class OperationalCredentialsCluster(
 
   suspend fun subscribeCurrentFabricIndexAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 5u
     val attributePaths =
@@ -1274,7 +1274,7 @@ class OperationalCredentialsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1351,7 +1351,7 @@ class OperationalCredentialsCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -1364,7 +1364,7 @@ class OperationalCredentialsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1448,7 +1448,7 @@ class OperationalCredentialsCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -1461,7 +1461,7 @@ class OperationalCredentialsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1545,7 +1545,7 @@ class OperationalCredentialsCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -1558,7 +1558,7 @@ class OperationalCredentialsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1633,7 +1633,7 @@ class OperationalCredentialsCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -1646,7 +1646,7 @@ class OperationalCredentialsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1714,7 +1714,7 @@ class OperationalCredentialsCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -1727,7 +1727,7 @@ class OperationalCredentialsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

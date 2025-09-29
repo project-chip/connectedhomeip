@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class OccupancySensingClusterHoldTimeLimitsStruct(
   val holdTimeMin: UShort,
   val holdTimeMax: UShort,
-  val holdTimeDefault: UShort,
+  val holdTimeDefault: UShort
 ) {
   override fun toString(): String = buildString {
     append("OccupancySensingClusterHoldTimeLimitsStruct {\n")

@@ -31,7 +31,7 @@ class MessagesClusterMessageStruct(
   val startTime: ULong?,
   val duration: ULong?,
   val messageText: String,
-  val responses: Optional<List<MessagesClusterMessageResponseOptionStruct>>,
+  val responses: Optional<List<MessagesClusterMessageResponseOptionStruct>>
 ) {
   override fun toString(): String = buildString {
     append("MessagesClusterMessageStruct {\n")
@@ -127,7 +127,7 @@ class MessagesClusterMessageStruct(
         startTime,
         duration,
         messageText,
-        responses,
+        responses
       )
     }
   }

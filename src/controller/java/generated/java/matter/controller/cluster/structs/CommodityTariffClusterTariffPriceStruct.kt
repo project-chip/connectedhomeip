@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class CommodityTariffClusterTariffPriceStruct(
   val priceType: UByte,
   val price: Optional<Long>,
-  val priceLevel: Optional<Short>,
+  val priceLevel: Optional<Short>
 ) {
   override fun toString(): String = buildString {
     append("CommodityTariffClusterTariffPriceStruct {\n")

@@ -28,7 +28,7 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
   val ccdid: UShort,
   val clientCertificate: Optional<ByteArray>?,
   val intermediateCertificates: Optional<List<ByteArray>>,
-  val fabricIndex: UByte,
+  val fabricIndex: UByte
 ) {
   override fun toString(): String = buildString {
     append("TlsCertificateManagementClusterTLSClientCertificateDetailStruct {\n")
@@ -72,7 +72,7 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): TlsCertificateManagementClusterTLSClientCertificateDetailStruct {
       tlvReader.enterStructure(tlvTag)
       val ccdid = tlvReader.getUShort(ContextSpecificTag(TAG_CCDID))
@@ -109,7 +109,7 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
         ccdid,
         clientCertificate,
         intermediateCertificates,
-        fabricIndex,
+        fabricIndex
       )
     }
   }

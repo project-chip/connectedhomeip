@@ -44,7 +44,7 @@ import matter.tlv.TlvWriter
 
 class JointFabricDatastoreCluster(
   private val controller: MatterController,
-  private val endpointId: UShort,
+  private val endpointId: UShort
 ) {
   class GroupKeySetListAttribute(
     val value: List<JointFabricDatastoreClusterDatastoreGroupKeySetStruct>
@@ -209,7 +209,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun addKeySet(
     groupKeySet: JointFabricDatastoreClusterDatastoreGroupKeySetStruct,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 0u
 
@@ -224,7 +224,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -233,7 +233,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun updateKeySet(
     groupKeySet: JointFabricDatastoreClusterDatastoreGroupKeySetStruct,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 1u
 
@@ -248,7 +248,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -269,7 +269,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -283,7 +283,7 @@ class JointFabricDatastoreCluster(
     groupCAT: UShort?,
     groupCATVersion: UShort?,
     groupPermission: UByte,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 3u
 
@@ -317,7 +317,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -331,7 +331,7 @@ class JointFabricDatastoreCluster(
     groupCAT: UShort?,
     groupCATVersion: UShort?,
     groupPermission: UByte,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 4u
 
@@ -365,7 +365,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -386,7 +386,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -398,7 +398,7 @@ class JointFabricDatastoreCluster(
     friendlyName: String,
     vendorID: UShort,
     icac: ByteArray,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 6u
 
@@ -422,7 +422,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -433,7 +433,7 @@ class JointFabricDatastoreCluster(
     nodeID: ULong?,
     friendlyName: String?,
     icac: ByteArray?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 7u
 
@@ -454,7 +454,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -475,7 +475,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -485,7 +485,7 @@ class JointFabricDatastoreCluster(
   suspend fun addPendingNode(
     nodeID: ULong,
     friendlyName: String,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 9u
 
@@ -503,7 +503,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -524,7 +524,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -534,7 +534,7 @@ class JointFabricDatastoreCluster(
   suspend fun updateNode(
     nodeID: ULong,
     friendlyName: String,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 11u
 
@@ -552,7 +552,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -573,7 +573,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -584,7 +584,7 @@ class JointFabricDatastoreCluster(
     endpointID: UShort,
     nodeID: ULong,
     friendlyName: String,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 13u
 
@@ -605,7 +605,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -616,7 +616,7 @@ class JointFabricDatastoreCluster(
     nodeID: ULong,
     endpointID: UShort,
     groupID: UShort,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 14u
 
@@ -637,7 +637,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -648,7 +648,7 @@ class JointFabricDatastoreCluster(
     nodeID: ULong,
     endpointID: UShort,
     groupID: UShort,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 15u
 
@@ -669,7 +669,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -680,7 +680,7 @@ class JointFabricDatastoreCluster(
     nodeID: ULong,
     endpointID: UShort,
     binding: JointFabricDatastoreClusterDatastoreBindingTargetStruct,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 16u
 
@@ -701,7 +701,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -712,7 +712,7 @@ class JointFabricDatastoreCluster(
     listID: UShort,
     endpointID: UShort,
     nodeID: ULong,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 17u
 
@@ -733,7 +733,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -743,7 +743,7 @@ class JointFabricDatastoreCluster(
   suspend fun addACLToNode(
     nodeID: ULong,
     ACLEntry: JointFabricDatastoreClusterDatastoreAccessControlEntryStruct,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 18u
 
@@ -761,7 +761,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -771,7 +771,7 @@ class JointFabricDatastoreCluster(
   suspend fun removeACLFromNode(
     listID: UShort,
     nodeID: ULong,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 19u
 
@@ -789,7 +789,7 @@ class JointFabricDatastoreCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -829,7 +829,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeAnchorRootCAAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<ByteArraySubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -842,7 +842,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -910,7 +910,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeAnchorNodeIDAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<ULongSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -923,7 +923,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -991,7 +991,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeAnchorVendorIDAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -1004,7 +1004,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1074,7 +1074,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeFriendlyNameAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<StringSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -1087,7 +1087,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1164,7 +1164,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeGroupKeySetListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<GroupKeySetListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
@@ -1177,7 +1177,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1210,7 +1210,7 @@ class JointFabricDatastoreCluster(
                 add(
                   JointFabricDatastoreClusterDatastoreGroupKeySetStruct.fromTlv(
                     AnonymousTag,
-                    tlvReader,
+                    tlvReader
                   )
                 )
               }
@@ -1259,7 +1259,7 @@ class JointFabricDatastoreCluster(
           add(
             JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct.fromTlv(
               AnonymousTag,
-              tlvReader,
+              tlvReader
             )
           )
         }
@@ -1271,7 +1271,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeGroupListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<GroupListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 5u
     val attributePaths =
@@ -1284,7 +1284,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1315,7 +1315,7 @@ class JointFabricDatastoreCluster(
                 add(
                   JointFabricDatastoreClusterDatastoreGroupInformationEntryStruct.fromTlv(
                     AnonymousTag,
-                    tlvReader,
+                    tlvReader
                   )
                 )
               }
@@ -1364,7 +1364,7 @@ class JointFabricDatastoreCluster(
           add(
             JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct.fromTlv(
               AnonymousTag,
-              tlvReader,
+              tlvReader
             )
           )
         }
@@ -1376,7 +1376,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeNodeListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<NodeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 6u
     val attributePaths =
@@ -1389,7 +1389,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1420,7 +1420,7 @@ class JointFabricDatastoreCluster(
                 add(
                   JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct.fromTlv(
                     AnonymousTag,
-                    tlvReader,
+                    tlvReader
                   )
                 )
               }
@@ -1470,7 +1470,7 @@ class JointFabricDatastoreCluster(
           add(
             JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct.fromTlv(
               AnonymousTag,
-              tlvReader,
+              tlvReader
             )
           )
         }
@@ -1482,7 +1482,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeAdminListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AdminListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 7u
     val attributePaths =
@@ -1495,7 +1495,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1527,7 +1527,7 @@ class JointFabricDatastoreCluster(
                 add(
                   JointFabricDatastoreClusterDatastoreAdministratorInformationEntryStruct.fromTlv(
                     AnonymousTag,
-                    tlvReader,
+                    tlvReader
                   )
                 )
               }
@@ -1577,7 +1577,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeStatusAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<StatusAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 8u
     val attributePaths =
@@ -1590,7 +1590,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1659,7 +1659,7 @@ class JointFabricDatastoreCluster(
           add(
             JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct.fromTlv(
               AnonymousTag,
-              tlvReader,
+              tlvReader
             )
           )
         }
@@ -1671,7 +1671,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeEndpointGroupIDListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<EndpointGroupIDListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 9u
     val attributePaths =
@@ -1684,7 +1684,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1717,7 +1717,7 @@ class JointFabricDatastoreCluster(
                 add(
                   JointFabricDatastoreClusterDatastoreEndpointGroupIDEntryStruct.fromTlv(
                     AnonymousTag,
-                    tlvReader,
+                    tlvReader
                   )
                 )
               }
@@ -1766,7 +1766,7 @@ class JointFabricDatastoreCluster(
           add(
             JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct.fromTlv(
               AnonymousTag,
-              tlvReader,
+              tlvReader
             )
           )
         }
@@ -1778,7 +1778,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeEndpointBindingListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<EndpointBindingListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 10u
     val attributePaths =
@@ -1791,7 +1791,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1824,7 +1824,7 @@ class JointFabricDatastoreCluster(
                 add(
                   JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct.fromTlv(
                     AnonymousTag,
-                    tlvReader,
+                    tlvReader
                   )
                 )
               }
@@ -1873,7 +1873,7 @@ class JointFabricDatastoreCluster(
           add(
             JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct.fromTlv(
               AnonymousTag,
-              tlvReader,
+              tlvReader
             )
           )
         }
@@ -1885,7 +1885,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeNodeKeySetListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<NodeKeySetListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 11u
     val attributePaths =
@@ -1898,7 +1898,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1931,7 +1931,7 @@ class JointFabricDatastoreCluster(
                 add(
                   JointFabricDatastoreClusterDatastoreNodeKeySetEntryStruct.fromTlv(
                     AnonymousTag,
-                    tlvReader,
+                    tlvReader
                   )
                 )
               }
@@ -1987,7 +1987,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeNodeACLListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<NodeACLListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 12u
     val attributePaths =
@@ -2000,7 +2000,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2031,7 +2031,7 @@ class JointFabricDatastoreCluster(
                 add(
                   JointFabricDatastoreClusterDatastoreACLEntryStruct.fromTlv(
                     AnonymousTag,
-                    tlvReader,
+                    tlvReader
                   )
                 )
               }
@@ -2089,7 +2089,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeNodeEndpointListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<NodeEndpointListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 13u
     val attributePaths =
@@ -2102,7 +2102,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2135,7 +2135,7 @@ class JointFabricDatastoreCluster(
                 add(
                   JointFabricDatastoreClusterDatastoreEndpointEntryStruct.fromTlv(
                     AnonymousTag,
-                    tlvReader,
+                    tlvReader
                   )
                 )
               }
@@ -2191,7 +2191,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -2204,7 +2204,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2288,7 +2288,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -2301,7 +2301,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2385,7 +2385,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -2398,7 +2398,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2473,7 +2473,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -2486,7 +2486,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2554,7 +2554,7 @@ class JointFabricDatastoreCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -2567,7 +2567,7 @@ class JointFabricDatastoreCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

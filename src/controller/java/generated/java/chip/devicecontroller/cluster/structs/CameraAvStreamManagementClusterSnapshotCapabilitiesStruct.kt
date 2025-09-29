@@ -28,7 +28,7 @@ class CameraAvStreamManagementClusterSnapshotCapabilitiesStruct(
   val maxFrameRate: UInt,
   val imageCodec: UInt,
   val requiresEncodedPixels: Boolean,
-  val requiresHardwareEncoder: Optional<Boolean>,
+  val requiresHardwareEncoder: Optional<Boolean>
 ) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterSnapshotCapabilitiesStruct {\n")
@@ -64,13 +64,13 @@ class CameraAvStreamManagementClusterSnapshotCapabilitiesStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): CameraAvStreamManagementClusterSnapshotCapabilitiesStruct {
       tlvReader.enterStructure(tlvTag)
       val resolution =
         CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(
           ContextSpecificTag(TAG_RESOLUTION),
-          tlvReader,
+          tlvReader
         )
       val maxFrameRate = tlvReader.getUInt(ContextSpecificTag(TAG_MAX_FRAME_RATE))
       val imageCodec = tlvReader.getUInt(ContextSpecificTag(TAG_IMAGE_CODEC))
@@ -90,7 +90,7 @@ class CameraAvStreamManagementClusterSnapshotCapabilitiesStruct(
         maxFrameRate,
         imageCodec,
         requiresEncodedPixels,
-        requiresHardwareEncoder,
+        requiresHardwareEncoder
       )
     }
   }

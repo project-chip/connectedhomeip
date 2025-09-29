@@ -32,7 +32,7 @@ class EcosystemInformationClusterEcosystemDeviceStruct(
   val deviceTypes: List<EcosystemInformationClusterDeviceTypeStruct>,
   val uniqueLocationIDs: List<String>,
   val uniqueLocationIDsLastEdit: ULong,
-  val fabricIndex: UInt,
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("EcosystemInformationClusterEcosystemDeviceStruct {\n")
@@ -88,7 +88,7 @@ class EcosystemInformationClusterEcosystemDeviceStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): EcosystemInformationClusterEcosystemDeviceStruct {
       tlvReader.enterStructure(tlvTag)
       val deviceName =
@@ -135,7 +135,7 @@ class EcosystemInformationClusterEcosystemDeviceStruct(
         deviceTypes,
         uniqueLocationIDs,
         uniqueLocationIDsLastEdit,
-        fabricIndex,
+        fabricIndex
       )
     }
   }

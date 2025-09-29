@@ -52,7 +52,7 @@ class CommodityPriceClusterPriceChangeEvent(
         if (!tlvReader.isNull()) {
           chip.devicecontroller.cluster.structs.CommodityPriceClusterCommodityPriceStruct.fromTlv(
             ContextSpecificTag(TAG_CURRENT_PRICE),
-            tlvReader,
+            tlvReader
           )
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_PRICE))

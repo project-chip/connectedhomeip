@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class CameraAvSettingsUserLevelManagementClusterMPTZStruct(
   val pan: Optional<Int>,
   val tilt: Optional<Int>,
-  val zoom: Optional<UInt>,
+  val zoom: Optional<UInt>
 ) {
   override fun toString(): String = buildString {
     append("CameraAvSettingsUserLevelManagementClusterMPTZStruct {\n")
@@ -62,7 +62,7 @@ class CameraAvSettingsUserLevelManagementClusterMPTZStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): CameraAvSettingsUserLevelManagementClusterMPTZStruct {
       tlvReader.enterStructure(tlvTag)
       val pan =

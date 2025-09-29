@@ -26,7 +26,7 @@ class CommissionerControlClusterCommissioningRequestResultEvent(
   val requestID: ULong,
   val clientNodeID: ULong,
   val statusCode: UInt,
-  val fabricIndex: UInt,
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("CommissionerControlClusterCommissioningRequestResultEvent {\n")
@@ -56,7 +56,7 @@ class CommissionerControlClusterCommissioningRequestResultEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): CommissionerControlClusterCommissioningRequestResultEvent {
       tlvReader.enterStructure(tlvTag)
       val requestID = tlvReader.getULong(ContextSpecificTag(TAG_REQUEST_ID))
@@ -70,7 +70,7 @@ class CommissionerControlClusterCommissioningRequestResultEvent(
         requestID,
         clientNodeID,
         statusCode,
-        fabricIndex,
+        fabricIndex
       )
     }
   }

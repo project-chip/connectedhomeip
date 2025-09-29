@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class ContentLauncherClusterStyleInformationStruct(
   val imageURL: Optional<String>,
   val color: Optional<String>,
-  val size: Optional<ContentLauncherClusterDimensionStruct>,
+  val size: Optional<ContentLauncherClusterDimensionStruct>
 ) {
   override fun toString(): String = buildString {
     append("ContentLauncherClusterStyleInformationStruct {\n")

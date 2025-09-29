@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
   val nodeID: ULong,
   val friendlyName: String,
-  val commissioningStatusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct,
+  val commissioningStatusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct {\n")
@@ -52,7 +52,7 @@ class JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
@@ -60,7 +60,7 @@ class JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
       val commissioningStatusEntry =
         JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(
           ContextSpecificTag(TAG_COMMISSIONING_STATUS_ENTRY),
-          tlvReader,
+          tlvReader
         )
 
       tlvReader.exitContainer()
@@ -68,7 +68,7 @@ class JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
       return JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
         nodeID,
         friendlyName,
-        commissioningStatusEntry,
+        commissioningStatusEntry
       )
     }
   }

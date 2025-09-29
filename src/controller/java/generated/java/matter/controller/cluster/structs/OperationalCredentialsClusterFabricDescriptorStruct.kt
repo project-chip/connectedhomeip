@@ -30,7 +30,7 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
   val nodeID: ULong,
   val label: String,
   val VIDVerificationStatement: Optional<ByteArray>,
-  val fabricIndex: UByte,
+  val fabricIndex: UByte
 ) {
   override fun toString(): String = buildString {
     append("OperationalCredentialsClusterFabricDescriptorStruct {\n")
@@ -72,7 +72,7 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): OperationalCredentialsClusterFabricDescriptorStruct {
       tlvReader.enterStructure(tlvTag)
       val rootPublicKey = tlvReader.getByteArray(ContextSpecificTag(TAG_ROOT_PUBLIC_KEY))
@@ -97,7 +97,7 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
         nodeID,
         label,
         VIDVerificationStatement,
-        fabricIndex,
+        fabricIndex
       )
     }
   }

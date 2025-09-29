@@ -27,7 +27,7 @@ class ServiceAreaClusterProgressStruct(
   val areaID: UInt,
   val status: UByte,
   val totalOperationalTime: Optional<UInt>?,
-  val estimatedTime: Optional<UInt>?,
+  val estimatedTime: Optional<UInt>?
 ) {
   override fun toString(): String = buildString {
     append("ServiceAreaClusterProgressStruct {\n")

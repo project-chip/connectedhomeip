@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class UnitTestingClusterTestGlobalStruct(
   val name: String,
   val myBitmap: UInt?,
-  val myEnum: Optional<UByte>?,
+  val myEnum: Optional<UByte>?
 ) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterTestGlobalStruct {\n")

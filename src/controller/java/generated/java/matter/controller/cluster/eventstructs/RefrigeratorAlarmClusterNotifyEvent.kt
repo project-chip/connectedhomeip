@@ -26,7 +26,7 @@ class RefrigeratorAlarmClusterNotifyEvent(
   val active: UInt,
   val inactive: UInt,
   val state: UInt,
-  val mask: UInt,
+  val mask: UInt
 ) {
   override fun toString(): String = buildString {
     append("RefrigeratorAlarmClusterNotifyEvent {\n")

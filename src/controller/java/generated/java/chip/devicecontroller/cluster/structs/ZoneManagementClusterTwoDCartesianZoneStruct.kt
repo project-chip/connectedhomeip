@@ -28,7 +28,7 @@ class ZoneManagementClusterTwoDCartesianZoneStruct(
   val name: String,
   val use: UInt,
   val vertices: List<ZoneManagementClusterTwoDCartesianVertexStruct>,
-  val color: Optional<String>,
+  val color: Optional<String>
 ) {
   override fun toString(): String = buildString {
     append("ZoneManagementClusterTwoDCartesianZoneStruct {\n")

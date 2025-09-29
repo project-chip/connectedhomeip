@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class ThermostatClusterRunningModeChangeEvent(
   val previousRunningMode: Optional<UByte>,
-  val currentRunningMode: UByte,
+  val currentRunningMode: UByte
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterRunningModeChangeEvent {\n")

@@ -27,7 +27,7 @@ class OperationalCredentialsClusterNOCStruct(
   val noc: ByteArray,
   val icac: ByteArray?,
   val vvsc: Optional<ByteArray>,
-  val fabricIndex: UByte,
+  val fabricIndex: UByte
 ) {
   override fun toString(): String = buildString {
     append("OperationalCredentialsClusterNOCStruct {\n")

@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class WaterHeaterModeClusterModeOptionStruct(
   val label: String,
   val mode: UInt,
-  val modeTags: List<WaterHeaterModeClusterModeTagStruct>,
+  val modeTags: List<WaterHeaterModeClusterModeTagStruct>
 ) {
   override fun toString(): String = buildString {
     append("WaterHeaterModeClusterModeOptionStruct {\n")

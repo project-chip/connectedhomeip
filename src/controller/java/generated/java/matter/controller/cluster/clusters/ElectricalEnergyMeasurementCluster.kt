@@ -36,7 +36,7 @@ import matter.tlv.TlvReader
 
 class ElectricalEnergyMeasurementCluster(
   private val controller: MatterController,
-  private val endpointId: UShort,
+  private val endpointId: UShort
 ) {
   class AccuracyAttribute(val value: ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct)
 
@@ -180,7 +180,7 @@ class ElectricalEnergyMeasurementCluster(
 
   suspend fun subscribeAccuracyAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AccuracyAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -193,7 +193,7 @@ class ElectricalEnergyMeasurementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -220,7 +220,7 @@ class ElectricalEnergyMeasurementCluster(
           val decodedValue: ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct =
             ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct.fromTlv(
               AnonymousTag,
-              tlvReader,
+              tlvReader
             )
 
           emit(AccuracyAttributeSubscriptionState.Success(decodedValue))
@@ -275,7 +275,7 @@ class ElectricalEnergyMeasurementCluster(
 
   suspend fun subscribeCumulativeEnergyImportedAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<CumulativeEnergyImportedAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -288,7 +288,7 @@ class ElectricalEnergyMeasurementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -319,7 +319,7 @@ class ElectricalEnergyMeasurementCluster(
               if (tlvReader.isNextTag(AnonymousTag)) {
                 ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.fromTlv(
                   AnonymousTag,
-                  tlvReader,
+                  tlvReader
                 )
               } else {
                 null
@@ -381,7 +381,7 @@ class ElectricalEnergyMeasurementCluster(
 
   suspend fun subscribeCumulativeEnergyExportedAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<CumulativeEnergyExportedAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -394,7 +394,7 @@ class ElectricalEnergyMeasurementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -425,7 +425,7 @@ class ElectricalEnergyMeasurementCluster(
               if (tlvReader.isNextTag(AnonymousTag)) {
                 ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.fromTlv(
                   AnonymousTag,
-                  tlvReader,
+                  tlvReader
                 )
               } else {
                 null
@@ -487,7 +487,7 @@ class ElectricalEnergyMeasurementCluster(
 
   suspend fun subscribePeriodicEnergyImportedAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<PeriodicEnergyImportedAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -500,7 +500,7 @@ class ElectricalEnergyMeasurementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -531,7 +531,7 @@ class ElectricalEnergyMeasurementCluster(
               if (tlvReader.isNextTag(AnonymousTag)) {
                 ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.fromTlv(
                   AnonymousTag,
-                  tlvReader,
+                  tlvReader
                 )
               } else {
                 null
@@ -593,7 +593,7 @@ class ElectricalEnergyMeasurementCluster(
 
   suspend fun subscribePeriodicEnergyExportedAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<PeriodicEnergyExportedAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
@@ -606,7 +606,7 @@ class ElectricalEnergyMeasurementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -637,7 +637,7 @@ class ElectricalEnergyMeasurementCluster(
               if (tlvReader.isNextTag(AnonymousTag)) {
                 ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.fromTlv(
                   AnonymousTag,
-                  tlvReader,
+                  tlvReader
                 )
               } else {
                 null
@@ -687,7 +687,7 @@ class ElectricalEnergyMeasurementCluster(
         if (tlvReader.isNextTag(AnonymousTag)) {
           ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct.fromTlv(
             AnonymousTag,
-            tlvReader,
+            tlvReader
           )
         } else {
           null
@@ -702,7 +702,7 @@ class ElectricalEnergyMeasurementCluster(
 
   suspend fun subscribeCumulativeEnergyResetAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<CumulativeEnergyResetAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 5u
     val attributePaths =
@@ -715,7 +715,7 @@ class ElectricalEnergyMeasurementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -746,7 +746,7 @@ class ElectricalEnergyMeasurementCluster(
               if (tlvReader.isNextTag(AnonymousTag)) {
                 ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct.fromTlv(
                   AnonymousTag,
-                  tlvReader,
+                  tlvReader
                 )
               } else {
                 null
@@ -805,7 +805,7 @@ class ElectricalEnergyMeasurementCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -818,7 +818,7 @@ class ElectricalEnergyMeasurementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -902,7 +902,7 @@ class ElectricalEnergyMeasurementCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -915,7 +915,7 @@ class ElectricalEnergyMeasurementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -999,7 +999,7 @@ class ElectricalEnergyMeasurementCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -1012,7 +1012,7 @@ class ElectricalEnergyMeasurementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1087,7 +1087,7 @@ class ElectricalEnergyMeasurementCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -1100,7 +1100,7 @@ class ElectricalEnergyMeasurementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1168,7 +1168,7 @@ class ElectricalEnergyMeasurementCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int,
+    maxInterval: Int
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -1181,7 +1181,7 @@ class ElectricalEnergyMeasurementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

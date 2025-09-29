@@ -27,7 +27,7 @@ class NetworkCommissioningClusterNetworkInfoStruct(
   val networkID: ByteArray,
   val connected: Boolean,
   val networkIdentifier: Optional<ByteArray>?,
-  val clientIdentifier: Optional<ByteArray>?,
+  val clientIdentifier: Optional<ByteArray>?
 ) {
   override fun toString(): String = buildString {
     append("NetworkCommissioningClusterNetworkInfoStruct {\n")
@@ -102,7 +102,7 @@ class NetworkCommissioningClusterNetworkInfoStruct(
         networkID,
         connected,
         networkIdentifier,
-        clientIdentifier,
+        clientIdentifier
       )
     }
   }

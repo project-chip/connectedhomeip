@@ -28,7 +28,7 @@ class NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
   val bssid: ByteArray,
   val channel: UInt,
   val wiFiBand: UInt,
-  val rssi: Int,
+  val rssi: Int
 ) {
   override fun toString(): String = buildString {
     append("NetworkCommissioningClusterWiFiInterfaceScanResultStruct {\n")
@@ -64,7 +64,7 @@ class NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): NetworkCommissioningClusterWiFiInterfaceScanResultStruct {
       tlvReader.enterStructure(tlvTag)
       val security = tlvReader.getUInt(ContextSpecificTag(TAG_SECURITY))
@@ -82,7 +82,7 @@ class NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
         bssid,
         channel,
         wiFiBand,
-        rssi,
+        rssi
       )
     }
   }

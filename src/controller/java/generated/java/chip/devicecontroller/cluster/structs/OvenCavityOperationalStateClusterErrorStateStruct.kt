@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class OvenCavityOperationalStateClusterErrorStateStruct(
   val errorStateID: UInt,
   val errorStateLabel: Optional<String>,
-  val errorStateDetails: Optional<String>,
+  val errorStateDetails: Optional<String>
 ) {
   override fun toString(): String = buildString {
     append("OvenCavityOperationalStateClusterErrorStateStruct {\n")
@@ -59,7 +59,7 @@ class OvenCavityOperationalStateClusterErrorStateStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): OvenCavityOperationalStateClusterErrorStateStruct {
       tlvReader.enterStructure(tlvTag)
       val errorStateID = tlvReader.getUInt(ContextSpecificTag(TAG_ERROR_STATE_ID))
@@ -81,7 +81,7 @@ class OvenCavityOperationalStateClusterErrorStateStruct(
       return OvenCavityOperationalStateClusterErrorStateStruct(
         errorStateID,
         errorStateLabel,
-        errorStateDetails,
+        errorStateDetails
       )
     }
   }

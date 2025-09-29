@@ -42,7 +42,7 @@ class BridgedDeviceBasicInformationClusterReachableChangedEvent(val reachableNew
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): BridgedDeviceBasicInformationClusterReachableChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val reachableNewValue = tlvReader.getBoolean(ContextSpecificTag(TAG_REACHABLE_NEW_VALUE))

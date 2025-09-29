@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class ServiceAreaClusterAreaStruct(
   val areaID: UInt,
   val mapID: UInt?,
-  val areaInfo: ServiceAreaClusterAreaInfoStruct,
+  val areaInfo: ServiceAreaClusterAreaInfoStruct
 ) {
   override fun toString(): String = buildString {
     append("ServiceAreaClusterAreaStruct {\n")

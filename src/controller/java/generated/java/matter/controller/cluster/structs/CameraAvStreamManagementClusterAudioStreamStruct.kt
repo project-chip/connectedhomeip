@@ -30,7 +30,7 @@ class CameraAvStreamManagementClusterAudioStreamStruct(
   val sampleRate: UInt,
   val bitRate: UInt,
   val bitDepth: UByte,
-  val referenceCount: UByte,
+  val referenceCount: UByte
 ) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterAudioStreamStruct {\n")
@@ -72,7 +72,7 @@ class CameraAvStreamManagementClusterAudioStreamStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): CameraAvStreamManagementClusterAudioStreamStruct {
       tlvReader.enterStructure(tlvTag)
       val audioStreamID = tlvReader.getUShort(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
@@ -94,7 +94,7 @@ class CameraAvStreamManagementClusterAudioStreamStruct(
         sampleRate,
         bitRate,
         bitDepth,
-        referenceCount,
+        referenceCount
       )
     }
   }

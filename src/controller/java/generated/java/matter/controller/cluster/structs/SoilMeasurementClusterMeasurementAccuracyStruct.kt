@@ -28,7 +28,7 @@ class SoilMeasurementClusterMeasurementAccuracyStruct(
   val measured: Boolean,
   val minMeasuredValue: Long,
   val maxMeasuredValue: Long,
-  val accuracyRanges: List<SoilMeasurementClusterMeasurementAccuracyRangeStruct>,
+  val accuracyRanges: List<SoilMeasurementClusterMeasurementAccuracyRangeStruct>
 ) {
   override fun toString(): String = buildString {
     append("SoilMeasurementClusterMeasurementAccuracyStruct {\n")
@@ -65,7 +65,7 @@ class SoilMeasurementClusterMeasurementAccuracyStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): SoilMeasurementClusterMeasurementAccuracyStruct {
       tlvReader.enterStructure(tlvTag)
       val measurementType = tlvReader.getUShort(ContextSpecificTag(TAG_MEASUREMENT_TYPE))
@@ -90,7 +90,7 @@ class SoilMeasurementClusterMeasurementAccuracyStruct(
         measured,
         minMeasuredValue,
         maxMeasuredValue,
-        accuracyRanges,
+        accuracyRanges
       )
     }
   }
