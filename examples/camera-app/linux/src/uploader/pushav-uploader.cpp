@@ -296,15 +296,6 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     std::string filename = fullPath.substr(fullPath.find_last_of("/\\") + 1);
     std::replace(filename.begin(), filename.end(), '@', '/');
 
-    // Change the 5th character from the back from '0' to '1', if the string is long enough
-    if (filename.length() >= 5)
-    {
-        if (filename[filename.length() - 5] == '0')
-        {
-            filename[filename.length() - 5] = '1';
-        }
-    }
-
     // Construct the URL with just the filename
     std::string baseUrl = data.second;
     if (baseUrl.back() != '/')

@@ -45,7 +45,7 @@ AVDictionary * options = NULL;
 
 PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStruct & aAudioInfo, VideoInfoStruct & aVideoInfo,
                                        PushAVUploader * aUploader) :
-    mClipInfo(aClipInfo),
+    mClipInfo(aClipInfo), 
     mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
 {
     mFormatContext        = nullptr;
@@ -62,8 +62,8 @@ PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStru
     mDeinitializeRecorder = false;
     mUploadedInitSegment  = false;
     mUploadMPD            = false;
-    mAudioFragment        = 1;
-    mVideoFragment        = 1;
+    mAudioFragment        = 10001;
+    mVideoFragment        = 10001;
     mCurrentClipStartPts  = AV_NOPTS_VALUE;
     mFoundFirstIFramePts  = -1;
     currentPts            = AV_NOPTS_VALUE;
@@ -81,7 +81,6 @@ PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStru
     }
     SetRecorderStatus(false); // Start off as not running
 
-    mClipInfo.mRecorderId = std::to_string(mVideoInfo.mVideoStreamIndex) + "-" + std::to_string(mAudioInfo.mAudioStreamIndex);
     ChipLogProgress(Camera, "PushAVClipRecorder initialized with sessionID: %lu Track name: %s, output path: %s",
                     mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str(), mClipInfo.mOutputPath.c_str());
 }
@@ -133,7 +132,7 @@ void PushAVClipRecorder::RemovePreviousRecordingFiles(const std::string & path)
     closedir(dir);
 }
 
-bool PushAVClipRecorder::IsOutputDirectoryValid(const std::string & path)
+bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
 {
     struct stat info;
     if (stat(path.c_str(), &info) != 0)
@@ -142,25 +141,61 @@ bool PushAVClipRecorder::IsOutputDirectoryValid(const std::string & path)
         // 0755 = owner: rwx, group: rx, others: rx
         if (mkdir(path.c_str(), 0755) != 0)
         {
-            ChipLogError(Camera, "Failed to create output directory: %s", path.c_str());
+            ChipLogError(Camera, "Failed to create directory: %s", path.c_str());
             return false;
         }
-        ChipLogProgress(Camera, "Created output directory: %s", path.c_str());
+        ChipLogProgress(Camera, "Created directory: %s", path.c_str());
     }
     else if (!(info.st_mode & S_IFDIR))
     {
-        ChipLogProgress(Camera, "Output path is not a directory %s", path.c_str());
+        ChipLogError(Camera, "Path is not a directory: %s", path.c_str());
         return false;
     }
 
     if (access(path.c_str(), W_OK) != 0)
     {
-        ChipLogError(Camera, "Output path is not writable: %s", path.c_str());
+        ChipLogError(Camera, "Directory is not writable: %s", path.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+bool PushAVClipRecorder::IsOutputDirectoryValid(const std::string & path)
+{
+    std::string sessionDir     = path + "session_" + std::to_string(mClipInfo.mSessionNumber);
+    std::string trackDir       = sessionDir + "/" + mClipInfo.mTrackName;
+    std::string videoStreamDir = trackDir + "/" + "0";
+    std::string audioStreamDir = trackDir + "/" + "1";
+
+    if (!EnsureDirectoryExists(path))
+    {
+        return false;
+    }
+
+    if (!EnsureDirectoryExists(sessionDir))
+    {
+        return false;
+    }
+
+    if (!EnsureDirectoryExists(trackDir))
+    {
+        return false;
+    }
+
+    if (!EnsureDirectoryExists(videoStreamDir))
+    {
+        return false;
+    }
+
+    if (!EnsureDirectoryExists(audioStreamDir))
+    {
         return false;
     }
 
     // Remove files from previous recordings
-    RemovePreviousRecordingFiles(path);
+    RemovePreviousRecordingFiles(videoStreamDir);
+    RemovePreviousRecordingFiles(audioStreamDir);
 
     return true;
 }
@@ -318,7 +353,7 @@ void PushAVClipRecorder::Stop()
 {
     if (GetRecorderStatus())
     {
-        mPushAvStreamTransportManager->OnTriggerDeactivated(mFabricIndex, mClipInfo.mSessionGroup);
+        mPushAvStreamTransportManager->OnTriggerDeactivated(mFabricIndex, mClipInfo.mSessionGroup, mConnectionID);
 
         // Call the cluster server's NotifyTransportStopped method asynchronously to prevent blocking
         if (mPushAvStreamTransportServer != nullptr)
@@ -391,10 +426,6 @@ void PushAVClipRecorder::PushPacket(const uint8_t * data, size_t size, bool isVi
     }
     queue.push(packet);
     mCondition.notify_one();
-    if (mClipInfo.activationTime == std::chrono::steady_clock::time_point())
-    {
-        mClipInfo.activationTime = std::chrono::steady_clock::now();
-    }
 }
 
 int PushAVClipRecorder::StartClipRecording()
@@ -622,15 +653,12 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
         {
             return false;
         }
-<<<<<<< HEAD
-        std::string prefix           = mClipInfo.mRecorderId + "_clip_" + std::to_string(mClipInfo.mClipId);
-        std::string initSegName      = prefix + "_init-stream$RepresentationID$.m4s";
-        std::string mediaSegName     = prefix + "_chunk-stream$RepresentationID$-$Number%05d$.m4s";
-=======
-        std::string prefix           = "session_" + std::to_string(mClipInfo.mSessionNumber) + "@" + mClipInfo.mTrackName;
-        std::string initSegName      = prefix + "@$RepresentationID$.m4s";
-        std::string mediaSegName     = prefix + "@$RepresentationID$@segment_1$Number%04d$.m4s";
->>>>>>> 7388828bdc (Initial changes for session grouping feature)
+
+        std::string segment_name_prefix = mClipInfo.mTrackName;
+        std::string initSegName         = segment_name_prefix + "/$RepresentationID$.m4s";
+        std::string mediaSegName        = segment_name_prefix + "/$RepresentationID$/segment_1$Number%04d$.m4s";
+        std::string mpd_dir_prefix = "session_" + std::to_string(mClipInfo.mSessionNumber) + "/" + mClipInfo.mTrackName;
+
         mInputFormatContext          = avformat_alloc_context();
         int avioCtxBufferSize        = 1048576; // 1MB
         uint8_t * mAvioContextBuffer = static_cast<uint8_t *>(av_malloc(static_cast<size_t>(avioCtxBufferSize)));
@@ -654,7 +682,7 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
             Stop();
             return -1;
         }
-        if (SetupOutput(mClipInfo.mOutputPath + prefix, initSegName, mediaSegName) < 0)
+        if (SetupOutput(mClipInfo.mOutputPath + mpd_dir_prefix, initSegName, mediaSegName) < 0)
         {
             ChipLogError(Camera, "Error: setting up output");
             return -1;
@@ -756,10 +784,11 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
 {
     int64_t clipLengthInPTS = currentPts - mCurrentClipStartPts;
     // Final duration has to be (clipDuration + preRollLen) seconds
-    const int64_t clipDuration = (mClipInfo.mInitialDuration + (mClipInfo.mPreRollLength / 1000)) * AV_TIME_BASE_Q.den;
+    const int64_t clipDuration =
+        (mClipInfo.mInitialDuration - mClipInfo.mElapsedTime + (mClipInfo.mPreRollLength / 1000)) * AV_TIME_BASE_Q.den;
     // Pre-calculate common path components
     const std::string basePath =
-        mClipInfo.mOutputPath + "session_" + std::to_string(mClipInfo.mSessionNumber) + "@" + mClipInfo.mTrackName;
+        mClipInfo.mOutputPath + "session_" + std::to_string(mClipInfo.mSessionNumber) + "/" + mClipInfo.mTrackName;
 
     if (reason || ((clipLengthInPTS >= clipDuration) && (mClipInfo.mTriggerType != 2)))
     {
@@ -781,12 +810,10 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         return std::string(path_buffer);
     };
 
+
     // 1. Handle initialization files
-<<<<<<< HEAD
-    std::string m4s_path = make_path("%s_init-stream0.m4s");
-=======
-    std::string m4s_path = make_path("%s@0.m4s");
->>>>>>> 7388828bdc (Initial changes for session grouping feature)
+    std::string m4s_path = make_path("%s/0.m4s");
+    // ChipLogProgress(Camera, "Recorder: Video initialization file ready [%s]", m4s_path.c_str());
     if (mUploadedInitSegment && FileExists(m4s_path) && !FileExists(m4s_path + ".tmp"))
     {
         mUploadedInitSegment = false;
@@ -794,11 +821,8 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
 
         if (mClipInfo.mHasAudio)
         {
-<<<<<<< HEAD
-            std::string audio_m4s = make_path("%s_init-stream1.m4s");
-=======
-            std::string audio_m4s = make_path("%s@1.m4s");
->>>>>>> 7388828bdc (Initial changes for session grouping feature)
+            std::string audio_m4s = make_path("%s/1.m4s");
+            // ChipLogProgress(Camera, "Recorder: Audio initialization file ready [%s]", audio_m4s.c_str());
             if (FileExists(audio_m4s) && !FileExists(audio_m4s + ".tmp"))
             {
                 CheckAndUploadFile(audio_m4s);
@@ -806,30 +830,31 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         }
     }
 
+
     // 2. Handle video fragments
-    std::string video_m4s = make_path("%s0@Segment_%05d.m4s", mVideoFragment);
+    std::string video_m4s = make_path("%s/0/segment_%05d.m4s", mVideoFragment);
     while (FileExists(video_m4s) && !FileExists(video_m4s + ".tmp"))
     {
-        if (mVideoFragment == 1)
+        if (mVideoFragment == 10001)
         {
             mUploadedInitSegment = true;
         }
         mUploadMPD = true;
         CheckAndUploadFile(video_m4s);
         mVideoFragment++;
-        video_m4s = make_path("%s0@Segment_%05d.m4s", mVideoFragment);
+        video_m4s = make_path("%s/0/segment_%05d.m4s", mVideoFragment);
     }
 
     // 3. Handle audio fragments
     if (mClipInfo.mHasAudio)
     {
-        std::string audio_m4s = make_path("%s1@Segment_%05d.m4s", mAudioFragment);
+        std::string audio_m4s = make_path("%s/1/segment_%05d.m4s", mAudioFragment);
         while (FileExists(audio_m4s) && !FileExists(audio_m4s + ".tmp"))
         {
             mUploadMPD = true;
             CheckAndUploadFile(audio_m4s);
             mAudioFragment++;
-            audio_m4s = make_path("%s1@Segment_%05d.m4s", mAudioFragment);
+            audio_m4s = make_path("%s/1/segment_%05d.m4s", mAudioFragment);
         }
     }
 

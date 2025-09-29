@@ -87,7 +87,7 @@ public:
         uint16_t mSegmentDuration;                            ///< Segment duration in milliseconds
         uint16_t mBlindDuration;                              ///< Duration without recording after motion stop
         uint16_t mPreRollLength;                              ///< Pre-roll length in seconds
-        std::string mRecorderId;                              ///< <deperecate> Unique recorder identifier
+        uint16_t mElapsedTime;                                ///< Elapsed time since recording start in seconds
         std::string mOutputPath;                              ///< Base output directory path
         std::string mTrackName;                               ///< Track name for segmented files
         AVRational mInputTimeBase;                            ///< Input time base
@@ -203,8 +203,8 @@ private:
     std::queue<AVPacket *> mAudioQueue;
     std::queue<AVPacket *> mVideoQueue;
 
-    int mAudioFragment           = 1;
-    int mVideoFragment           = 1;
+    int mAudioFragment;
+    int mVideoFragment;
     int64_t mCurrentClipStartPts = AV_NOPTS_VALUE;
     int64_t mFoundFirstIFramePts = -1;
     int64_t currentPts           = AV_NOPTS_VALUE;
@@ -227,6 +227,13 @@ private:
     bool FileExists(const std::string & path);
 
     bool IsOutputDirectoryValid(const std::string & path);
+
+    /**
+     * @brief Ensures a directory exists, creating it if necessary.
+     * @param path The directory path to check/create.
+     * @return true if the directory exists or was created successfully, false otherwise.
+     */
+    bool EnsureDirectoryExists(const std::string & path);
 
     /**
      * @brief Removes files from previous recordings in the specified directory.

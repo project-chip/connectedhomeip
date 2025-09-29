@@ -37,6 +37,7 @@ PushAvStreamTransportManager::~PushAvStreamTransportManager()
 {
     // Unregister all transports from Media Controller before deleting them. This will ensure that any ongoing streams are
     // stopped.
+    StopSessionMonitor();
     if (mMediaController != nullptr)
     {
         for (auto & kv : mTransportMap)
@@ -51,6 +52,7 @@ PushAvStreamTransportManager::~PushAvStreamTransportManager()
 void PushAvStreamTransportManager::Init()
 {
     ChipLogProgress(Zcl, "Push AV Stream Transport Initialized");
+    StartSessionMonitor();
     return;
 }
 
@@ -617,7 +619,6 @@ void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedCl
     mBufferClientCertKey.assign(keypairDer.data(), keypairDer.data() + keypairDer.size());
 }
 
-<<<<<<< HEAD
 void PushAvStreamTransportManager::RecordingStreamPrivacyModeChanged(bool privacyModeEnabled)
 {
     // To Do:
@@ -681,47 +682,95 @@ CHIP_ERROR PushAvStreamTransportManager::IsAnyPrivacyModeActive(bool & isActive)
     status            = avsmController.IsSoftRecordingPrivacyModeActive(isSoftRecordingPrivacyModeActve);
     status            = avsmController.IsSoftLivestreamPrivacyModeActive(isSoftLivestreamPrivacyModeActive);
 
-<<<<<<< HEAD
     isActive = isHardPrivacyModeActive || isSoftRecordingPrivacyModeActve || isSoftLivestreamPrivacyModeActive;
-=======
-    isActive = isHardPrivacyModeActive || isSoftRecordingPrivacyModeActve;
-=======
-uint64_t PushAvStreamTransportManager::OnTriggerActivated(uint8_t fabricIdx, uint8_t sessionGroup)
+    return CHIP_NO_ERROR;
+}
+
+uint64_t PushAvStreamTransportManager::OnTriggerActivated(uint8_t fabricIdx, uint8_t sessionGroup, uint16_t connectionID)
 {
     std::lock_guard<std::mutex> lock(mSessionMapMutex);
-    auto sessionKey    = CreateSessionKey(fabricIdx, sessionGroup);
+    auto sessionKey = CreateSessionKey(fabricIdx, sessionGroup);
+    if (mSessionMap.find(sessionKey) == mSessionMap.end())
+    {
+        mSessionMap[sessionKey] = SessionInfo();
+    }
     auto & sessionInfo = mSessionMap[sessionKey];
     auto now           = std::chrono::system_clock::now();
-    if (sessionInfo.activeCount == 0)
+    if (sessionInfo.activeConnectionIDs.size() == 0)
     {
+        // This case is a new trigger activation.
         sessionInfo.sessionNumber++;
         sessionInfo.sessionStartedTimestamp = now;
-        sessionInfo.activeCount++;
     }
-    else
-    {
-        auto elapsed = std::chrono::duration_cast<std::chrono::minutes>(now - sessionInfo.sessionStartedTimestamp).count();
-        if (elapsed >= 5)
-        {
-            sessionInfo.sessionNumber++;
-            sessionInfo.sessionStartedTimestamp = now;
-        }
-    }
+    sessionInfo.activeConnectionIDs.insert(connectionID);
     return sessionInfo.sessionNumber;
 }
 
-void PushAvStreamTransportManager::OnTriggerDeactivated(uint8_t fabricIdx, uint8_t sessionGroup)
+void PushAvStreamTransportManager::OnTriggerDeactivated(uint8_t fabricIdx, uint8_t sessionGroup, uint16_t connectionID)
 {
     std::lock_guard<std::mutex> lock(mSessionMapMutex);
     auto sessionKey    = CreateSessionKey(fabricIdx, sessionGroup);
     auto & sessionInfo = mSessionMap[sessionKey];
-    sessionInfo.activeCount--;
+    sessionInfo.activeConnectionIDs.erase(connectionID);
 }
 
 void PushAvStreamTransportManager::SetFabricIndex(FabricIndex peerFabricIndex, uint16_t connectionID)
 {
     mTransportMap[connectionID].get()->SetFabricIndex(peerFabricIndex);
 }
+
+void PushAvStreamTransportManager::StartSessionMonitor()
+{
+    mStopMonitoring       = false;
+    mSessionMonitorThread = std::thread(&PushAvStreamTransportManager::SessionMonitor, this);
+}
+
+void PushAvStreamTransportManager::StopSessionMonitor()
+{
+    mStopMonitoring = true;
+    if (mSessionMonitorThread.joinable())
+    {
+        mSessionMonitorThread.join();
+    }
+}
+
+void PushAvStreamTransportManager::SessionMonitor()
+{
+    while (!mStopMonitoring)
+    {
+        std::vector<std::pair<uint16_t, uint64_t>> sessionsToRestart;
+        {
+            std::lock_guard<std::mutex> lock(mSessionMapMutex);
+            for (auto & session : mSessionMap)
+            {
+                auto & sessionInfo = session.second;
+                auto now = std::chrono::system_clock::now();
+                auto elapsed = std::chrono::duration_cast<std::chrono::minutes>(now - sessionInfo.sessionStartedTimestamp).count();
+                if (!sessionInfo.activeConnectionIDs.empty() && elapsed >= kMaxSessionDuration)
+                {
+                    sessionInfo.sessionNumber++;
+                    sessionInfo.sessionStartedTimestamp = now;
+                    for (auto connectionID : sessionInfo.activeConnectionIDs)
+                    {
+                        sessionsToRestart.push_back({connectionID, sessionInfo.sessionNumber});
+                    }
+                }
+            }
+        }
+
+        for (auto & [connectionID, newSessionNumber] : sessionsToRestart)
+        {
+            auto it = mTransportMap.find(connectionID);
+            if (it != mTransportMap.end())
+            {
+                it->second->StartNewSession(newSessionNumber);
+            }
+        }
+
+        std::this_thread::sleep_for(std::chrono::seconds(kSessionMonitorInterval));
+    }
+}
+
 void PushAvStreamTransportManager::OnAttributeChanged(AttributeId attributeId)
 {
     ChipLogProgress(Zcl, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
@@ -738,8 +787,5 @@ CHIP_ERROR
 PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
 {
     ChipLogProgress(Zcl, "Push AV Stream Transport Persistent attributes loaded");
-
->>>>>>> e437fcb6b4 (Initial changes for session grouping feature)
->>>>>>> c947357afa (Initial changes for session grouping feature)
     return CHIP_NO_ERROR;
 }

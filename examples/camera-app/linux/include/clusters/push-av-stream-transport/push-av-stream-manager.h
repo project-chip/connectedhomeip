@@ -30,12 +30,16 @@
 #include <mutex>
 #include <pushav-transport.h>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
+
+static constexpr int kMaxSessionDuration     = 5; // in minutes
+static constexpr int kSessionMonitorInterval = 1; // in seconds
 
 // Helper function to combine FabricIndex and sessionGroup into a single key
 inline uint32_t CreateSessionKey(FabricIndex fabricIdx, uint8_t sessionGroup)
@@ -53,9 +57,9 @@ struct PushAvStream
 
 struct SessionInfo
 {
-    uint64_t sessionNumber = 1;
+    uint64_t sessionNumber = 0;
     std::chrono::system_clock::time_point sessionStartedTimestamp;
-    int activeCount = 0;
+    std::unordered_set<uint16_t> activeConnectionIDs;
 };
 
 /**
@@ -130,12 +134,12 @@ public:
     void RecordingStreamPrivacyModeChanged(bool privacyModeEnabled);
     void SetFabricIndex(FabricIndex peerFabricIndex, uint16_t connectionID) override;
 
-    uint64_t OnTriggerActivated(uint8_t fabricIdx, uint8_t sessionGroup);
+    uint64_t OnTriggerActivated(uint8_t fabricIdx, uint8_t sessionGroup, uint16_t connectionID);
 
-    void OnTriggerDeactivated(uint8_t fabricIdx, uint8_t sessionGroup);
+    void OnTriggerDeactivated(uint8_t fabricIdx, uint8_t sessionGroup, uint16_t connectionID);
 
 private:
-    std::vector<PushAvStream> pushavStreams;
+    uint32_t mTotalUsedBandwidthbps = 0.0; // Tracks the total bandwidth used by all active transports
 
     MediaController * mMediaController                         = nullptr;
     CameraDeviceInterface * mCameraDevice                      = nullptr;
@@ -143,16 +147,25 @@ private:
 
     AudioStreamStruct mAudioStreamParams;
     VideoStreamStruct mVideoStreamParams;
+
+    std::atomic<bool> mStopMonitoring{ false };
+    std::mutex mSessionMapMutex;
+    std::thread mSessionMonitorThread;
+
     std::unordered_map<uint16_t, std::unique_ptr<PushAVTransport>> mTransportMap; // map for the transport objects
     std::unordered_map<uint16_t, TransportOptionsStruct> mTransportOptionsMap;    // map for the transport options
     std::unordered_map<uint32_t, SessionInfo> mSessionMap;                        // map for the session info
+<<<<<<< HEAD
     std::mutex mSessionMapMutex;
     uint32_t mTotalUsedBandwidthbps = 0; // Tracks the total bandwidth used by all active transports
+=======
+>>>>>>> 4749112d95 (Enhance session management in Push AV stream transport, Added max session duration)
 
     std::vector<uint8_t> mBufferRootCert;
     std::vector<uint8_t> mBufferClientCert;
     std::vector<uint8_t> mBufferClientCertKey;
     std::vector<std::vector<uint8_t>> mBufferIntermediateCerts;
+    std::vector<PushAvStream> pushavStreams;
 
     CHIP_ERROR IsAnyPrivacyModeActive(bool & isActive);
 
@@ -169,6 +182,9 @@ private:
 
     Protocols::InteractionModel::Status GetAudioStreamIdForStreams(StreamUsageEnum streamUsage, uint16_t & audioStreamId);
 
+    void StartSessionMonitor();
+    void StopSessionMonitor();
+    void SessionMonitor();
 };
 
 } // namespace PushAvStreamTransport
