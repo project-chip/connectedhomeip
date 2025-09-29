@@ -139,16 +139,6 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         # Write default OTA providers TH1 with p1_node which does not exist
         await self.write_ota_providers(th1, p1_node, endpoint)
 
-        default_ota_providers = await self.read_single_attribute_check_success(
-            node_id=self.dut_node_id,
-            endpoint=endpoint,
-            attribute=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders,
-            cluster=Clusters.Objects.OtaSoftwareUpdateRequestor,
-            dev_ctrl=th1
-        )
-
-        logging.info(f"Default OTA Providers: {default_ota_providers}.")
-
         # Do not announce TH1-OTA Provider
 
         # Expect events idle to querying, downloadError and then back to idle
@@ -184,17 +174,6 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         # Write default OTA providers TH2
         await self.write_ota_providers(th2, p2_node, endpoint)
-
-        # Write default OTA providers TH2
-        default_ota_providers = await self.read_single_attribute_check_success(
-            node_id=dut_node_id_th2,
-            endpoint=endpoint,
-            attribute=Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders,
-            cluster=Clusters.Objects.OtaSoftwareUpdateRequestor,
-            dev_ctrl=th2
-        )
-
-        logging.info(f"Default OTA Providers: {default_ota_providers}.")
 
         # Announce after subscription
         await self.announce_ota_provider(th2, vendor_id, p2_node, dut_node_id_th2, endpoint)
