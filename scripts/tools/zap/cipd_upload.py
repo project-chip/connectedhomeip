@@ -6,12 +6,11 @@ import shlex
 import subprocess
 import sys
 import tempfile
-from typing import Optional
 
 import click
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-from zap_download import DownloadReleasedZap
+from zap_download import DownloadReleasedZap # noqa: E402 isort:skip
 
 
 try:
