@@ -29,7 +29,7 @@ from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_SU_2_8(MatterBaseTest, SoftwareUpdateBaseTest):
+class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
     """
     This test case verifies that the DUT is able to successfully send a QueryImage command to the OTA-P in multi fabric scenario.
     """
@@ -53,52 +53,6 @@ class TC_SU_2_8(MatterBaseTest, SoftwareUpdateBaseTest):
                      "Subscribe to events for OtaSoftwareUpdateRequestor cluster and verify StateTransition reaches downloading state. Also check if the targetSoftwareVersion is 2."),
         ]
         return steps
-
-    def _make_provider_location(self, controller, provider_node_id: int, endpoint: int):
-        ProviderLoc = Clusters.Objects.OtaSoftwareUpdateRequestor.Structs.ProviderLocation
-        fabric_index = controller.fabricId
-        return ProviderLoc(providerNodeID=provider_node_id, endpoint=endpoint, fabricIndex=fabric_index)
-
-    async def _write_default_providers(self, controller, endpoint, provider_node_id, dut_node_id):
-        """
-        Write default OTA providers.
-        """
-
-        prov = self._make_provider_location(controller, provider_node_id, endpoint)
-
-        logging.info("Writing DefaultOTAProviders.")
-        resp = await controller.WriteAttribute(
-            dut_node_id,
-            [(endpoint, Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders([prov]))]
-        )
-        asserts.assert_equal(resp[0].Status, Status.Success, "Write DefaultOTAProviders failed.")
-        logging.info(f"DefaultOTAProviders = [{prov}].")
-
-    async def _announce(self, controller, vendor_id: int, node_id: int, endpoint: int):
-        """
-        Announce OTA provider.
-        """
-
-        cmd = Clusters.Objects.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
-            providerNodeID=node_id,
-            vendorID=vendor_id,
-            announcementReason=Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable,
-            metadataForNode=None,
-            endpoint=endpoint
-        )
-        resp = await self.send_single_cmd(cmd=cmd, dev_ctrl=controller)
-        logging.info(f"Announce resp: {resp}.")
-
-    async def check_event_status(self, event, previous_state, next_state, software_version):
-        logging.info(f"State Transition: {event}")
-
-        asserts.assert_equal(previous_state, event.previousState,
-                             f"Previous state is {event.previousState} and it should be {previous_state}")
-        asserts.assert_equal(next_state, event.newState,
-                             f"New state is {event.newState} and it should be {next_state}")
-
-        asserts.assert_equal(software_version, event.targetSoftwareVersion,
-                             f"Target version is {event.targetSoftwareVersion} and it should be {software_version}")
 
     @async_test_body
     async def test_TC_SU_2_8(self):
@@ -183,7 +137,7 @@ class TC_SU_2_8(MatterBaseTest, SoftwareUpdateBaseTest):
                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
         # Write default OTA providers TH1 with p1_node which does not exist
-        await self._write_default_providers(th1, endpoint, p1_node, dut_node_id)
+        await self.write_ota_providers(th1, p1_node, endpoint)
 
         default_ota_providers = await self.read_single_attribute_check_success(
             node_id=self.dut_node_id,
@@ -229,7 +183,7 @@ class TC_SU_2_8(MatterBaseTest, SoftwareUpdateBaseTest):
                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
         # Write default OTA providers TH2
-        await self._write_default_providers(th2, endpoint, p2_node, dut_node_id_th2)
+        await self.write_ota_providers(th2, p2_node, endpoint)
 
         # Write default OTA providers TH2
         default_ota_providers = await self.read_single_attribute_check_success(
@@ -243,17 +197,18 @@ class TC_SU_2_8(MatterBaseTest, SoftwareUpdateBaseTest):
         logging.info(f"Default OTA Providers: {default_ota_providers}.")
 
         # Announce after subscription
-        await self._announce(th2, vendor_id, p2_node, endpoint)
+        await self.announce_ota_provider(th2, vendor_id, p2_node, dut_node_id_th2, endpoint)
 
         event_idle_to_querying = event_cb.wait_for_event_report(
             Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
 
-        await self.check_event_status(event=event_idle_to_querying, previous_state=idle, next_state=querying, software_version=NullValue)
+        self.verfy_state_transition_event(event_report=event_idle_to_querying, previous_state=idle, new_state=querying)
 
         event_querying_to_downloading = event_cb.wait_for_event_report(
             Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
 
-        await self.check_event_status(event=event_querying_to_downloading, previous_state=querying, next_state=downloading, software_version=target_version)
+        self.verfy_state_transition_event(event_report=event_querying_to_downloading,
+                                          previous_state=querying, new_state=downloading, target_version=target_version)
 
 
 if __name__ == "__main__":

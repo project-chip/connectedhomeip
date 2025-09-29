@@ -16,16 +16,14 @@
 
 
 import logging
-from datetime import datetime
-from os import environ, getcwd, path
-from typing import Optional, Union
+from os import path
+from typing import Optional
 
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
-from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
 from matter.testing.matter_testing import MatterBaseTest
 
 logger = logging.getLogger(__name__)
@@ -146,10 +144,10 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
     def verfy_state_transition_event(self, event_report: Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, previous_state, new_state, target_version: Optional[int] = None, reason: Optional[int] = None):
         logger.info(f"Verifying the event {event_report}")
-        if target_version is None or reason is None:
-            raise Exception("Missing arguments")
 
         asserts.assert_equal(event_report.previousState, previous_state, f"Previous state was not {previous_state}")
         asserts.assert_equal(event_report.newState,  new_state, f"New state is not {new_state}")
-        asserts.assert_equal(event_report.targetSoftwareVersion,  target_version, f"Target version is not {target_version}")
-        asserts.assert_equal(event_report.reason,  reason, f"Reason is not {reason}")
+        if target_version is not None:
+            asserts.assert_equal(event_report.targetSoftwareVersion,  target_version, f"Target version is not {target_version}")
+        if reason is not None:
+            asserts.assert_equal(event_report.reason,  reason, f"Reason is not {reason}")
