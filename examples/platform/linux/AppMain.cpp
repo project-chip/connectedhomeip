@@ -914,7 +914,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     if (LinuxDeviceOptions::GetInstance().payload.commissioningFlow == CommissioningFlow::kUserActionRequired)
     {
-        initParams.advertiseCommissionable = false;
+        initParams.advertiseCommissionableIfNoFabrics = false;
     }
 
     // Init ZCL Data Model and CHIP App Server

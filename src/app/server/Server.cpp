@@ -362,7 +362,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
 #endif
     }
-    else if (initParams.advertiseCommissionable)
+    else if (initParams.advertiseCommissionableIfNoFabrics)
     {
         SuccessOrExit(err = mCommissioningWindowManager.OpenBasicCommissioningWindow(initParams.discoveryTimeout));
     }
