@@ -526,44 +526,44 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
-        The TH sends a Read Request Message to the DUT to read an attribute of data type enum:
+          The TH sends a Read Request Message to the DUT to read an attribute of data type enum:
 
           ./chip-tool windowcovering read  type 1 1
 
-        On the TH (chip-tool), verify that the DUT has returned data from the expected attribute path. The output should show the type value, for example:
+          On the TH (chip-tool), verify that the DUT has returned data from the expected attribute path. The output should show the type value, for example:
         
-        [1720438762.165] [11289:11291] [EM] Rxd Ack; Removing MessageCounter:55647197 from Retrans Table on exchange 62870i
-        [1720438762.165] [11289:11291] [DMG] ReportDataMessage =
-        [1720438762.165] [11289:11291] [DMG] {
-        [1720438762.165] [11289:11291] [DMG]         AttributeReportIBs =
-        [1720438762.165] [11289:11291] [DMG]         [
-        [1720438762.165] [11289:11291] [DMG]                 AttributeReportIB =
-        [1720438762.165] [11289:11291] [DMG]                 {
-        [1720438762.165] [11289:11291] [DMG]                         AttributeDataIB =
-        [1720438762.165] [11289:11291] [DMG]                         {
-        [1720438762.166] [11289:11291] [DMG]                                 DataVersion = 0x304f15ef,
-        [1720438762.166] [11289:11291] [DMG]                                 AttributePathIB =
-        [1720438762.166] [11289:11291] [DMG]                                 {
-        [1720438762.166] [11289:11291] [DMG]                                         Endpoint = 0x1,
-        [1720438762.166] [11289:11291] [DMG]                                         Cluster = 0x102,
-        [1720438762.166] [11289:11291] [DMG]                                         Attribute = 0x0000_0000,
-        [1720438762.166] [11289:11291] [DMG]                                 }
-        [1720438762.166] [11289:11291] [DMG]                                         
-        [1720438762.166] [11289:11291] [DMG]                                 Data = 8 (unsigned), 
-        [1720438762.166] [11289:11291] [DMG]                         },
-        [1720438762.167] [11289:11291] [DMG]                         
-        [1720438762.167] [11289:11291] [DMG]                 },
-        [1720438762.167] [11289:11291] [DMG]                 
-        [1720438762.167] [11289:11291] [DMG]         ],
-        [1720438762.167] [11289:11291] [DMG]         
-        [1720438762.167] [11289:11291] [DMG]         SuppressResponse = true, 
-        [1720438762.167] [11289:11291] [DMG]         InteractionModelRevision = 11
-        [1720438762.167] [11289:11291] [DMG] }
-        [1720438762.167] [11289:11291] [TOO] Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0000 DataVersion: 810489327
-        [1720438762.167] [11289:11291] [TOO]   Type: 8
-        [1720438762.167] [11289:11291] [EM] <<< [E:62870i S:42139 M:55647198 (Ack:38231779)] (S) Msg TX to 1:0000000000000001 [67EF] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
-        [1720438762.168] [11289:11291] [EM] Flushed pending ack for MessageCounter:38231779 on exchange 62870i
-    disabled: true
+          [1720438762.165] [11289:11291] [EM] Rxd Ack; Removing MessageCounter:55647197 from Retrans Table on exchange 62870i
+          [1720438762.165] [11289:11291] [DMG] ReportDataMessage =
+          [1720438762.165] [11289:11291] [DMG] {
+          [1720438762.165] [11289:11291] [DMG]         AttributeReportIBs =
+          [1720438762.165] [11289:11291] [DMG]         [
+          [1720438762.165] [11289:11291] [DMG]                 AttributeReportIB =
+          [1720438762.165] [11289:11291] [DMG]                 {
+          [1720438762.165] [11289:11291] [DMG]                         AttributeDataIB =
+          [1720438762.165] [11289:11291] [DMG]                         {
+          [1720438762.166] [11289:11291] [DMG]                                 DataVersion = 0x304f15ef,
+          [1720438762.166] [11289:11291] [DMG]                                 AttributePathIB =
+          [1720438762.166] [11289:11291] [DMG]                                 {
+          [1720438762.166] [11289:11291] [DMG]                                         Endpoint = 0x1,
+          [1720438762.166] [11289:11291] [DMG]                                         Cluster = 0x102,
+          [1720438762.166] [11289:11291] [DMG]                                         Attribute = 0x0000_0000,
+          [1720438762.166] [11289:11291] [DMG]                                 }
+          [1720438762.166] [11289:11291] [DMG]                                         
+          [1720438762.166] [11289:11291] [DMG]                                 Data = 8 (unsigned), 
+          [1720438762.166] [11289:11291] [DMG]                         },
+          [1720438762.167] [11289:11291] [DMG]                         
+          [1720438762.167] [11289:11291] [DMG]                 },
+          [1720438762.167] [11289:11291] [DMG]                 
+          [1720438762.167] [11289:11291] [DMG]         ],
+          [1720438762.167] [11289:11291] [DMG]         
+          [1720438762.167] [11289:11291] [DMG]         SuppressResponse = true, 
+          [1720438762.167] [11289:11291] [DMG]         InteractionModelRevision = 11
+          [1720438762.167] [11289:11291] [DMG] }
+          [1720438762.167] [11289:11291] [TOO] Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0000 DataVersion: 810489327
+          [1720438762.167] [11289:11291] [TOO]   Type: 8
+          [1720438762.167] [11289:11291] [EM] <<< [E:62870i S:42139 M:55647198 (Ack:38231779)] (S) Msg TX to 1:0000000000000001 [67EF] [UDP:[fe80::e65f:1ff:fe49:ae1a%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1720438762.168] [11289:11291] [EM] Flushed pending ack for MessageCounter:38231779 on exchange 62870i
+      disabled: true
 
     - label:
           "Step 18: TH sends the Read Request Message to the DUT to read an
