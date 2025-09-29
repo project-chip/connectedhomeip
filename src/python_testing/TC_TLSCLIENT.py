@@ -136,8 +136,10 @@ class TC_TLSCLIENT(MatterBaseTest):
                      "DUT replies with CCDID, CSR and Nonce. Store TLSCCDID in myCcdid[1] and CSR in myCsr[1]."),
             TestStep(12,
                      "Populate myClientCert[] with 2 distinct, valid, self-signed, DER-encoded x509 certificates using each respective public key from myCsr[i]."),
-            TestStep(13, "CR1 sends ProvisionClientCertificate command to the TLSCertificateManagementCluster with CCDID set to myCcdid[0] and ClientCertificateDetails set to myClientCert[0].", test_plan_support.verify_success()),
-            TestStep(14, "CR2 sends ProvisionClientCertificate command to the TLSCertificateManagementCluster with CCDID set to myCcdid[1] and ClientCertificateDetails set to myClientCert[1].", test_plan_support.verify_success()),
+            TestStep(
+                13, "CR1 sends ProvisionClientCertificate command to the TLSCertificateManagementCluster with CCDID set to myCcdid[0] and ClientCertificateDetails set to myClientCert[0].", test_plan_support.verify_success()),
+            TestStep(
+                14, "CR2 sends ProvisionClientCertificate command to the TLSCertificateManagementCluster with CCDID set to myCcdid[1] and ClientCertificateDetails set to myClientCert[1].", test_plan_support.verify_success()),
             TestStep(15, "CR1 sends ProvisionEndpoint command with valid Hostname myHostname, Port myPort[0], CAID myCaid[0], CCDID myCcdid[0] and null EndpointID.",
                      "DUT replies with a TLSEndpointID value. Store the returned value as myEndpoint[0]."),
             TestStep(16, "CR1 reads ProvisionedEndpoints attribute.",
@@ -251,8 +253,10 @@ class TC_TLSCLIENT(MatterBaseTest):
             TestStep(4, "Set myHostname to a valid value."),
             TestStep(5, "Populate myPort[] with myMaxProvisioned + 1 distinct valid values."),
             TestStep(6, "Populate myRootCert[] with 2 distinct, valid, self-signed, DER-encoded x509 certificates"),
-            TestStep(7, "CR1 sends ProvisionRootCertificate command to the TLSCertificateManagementCluster with null CAID and Certificate set to myRootCert[0].", "DUT replies with a TLSCAID value. Store the returned value as myCaid[0]."),
-            TestStep(8, "CR2 sends ProvisionRootCertificate command to the TLSCertificateManagementCluster with null CAID and Certificate set to myRootCert[1].", "DUT replies with a TLSCAID value. Store the returned value as myCaid[1]."),
+            TestStep(
+                7, "CR1 sends ProvisionRootCertificate command to the TLSCertificateManagementCluster with null CAID and Certificate set to myRootCert[0].", "DUT replies with a TLSCAID value. Store the returned value as myCaid[0]."),
+            TestStep(
+                8, "CR2 sends ProvisionRootCertificate command to the TLSCertificateManagementCluster with null CAID and Certificate set to myRootCert[1].", "DUT replies with a TLSCAID value. Store the returned value as myCaid[1]."),
             TestStep(9, "Populate myNonce[] with 2 distinct, random 32-octet values"),
             TestStep(10, "CR1 sends ClientCSR command with Nonce set to myNonce[0]",
                      "DUT replies with CCDID, CSR and Nonce. Store TLSCCDID in myCcdid[0] and CSR in myCsr[0]."),
@@ -260,18 +264,30 @@ class TC_TLSCLIENT(MatterBaseTest):
                      "DUT replies with CCDID, CSR and Nonce. Store TLSCCDID in myCcdid[1] and CSR in myCsr[1]."),
             TestStep(12,
                      "Populate myClientCert[] with 2 distinct, valid, self-signed, DER-encoded x509 certificates using each respective public key from myCsr[i]."),
-            TestStep(13, "CR1 sends ProvisionClientCertificate command to the TLSCertificateManagementCluster with CCDID set to myCcdid[0] and ClientCertificateDetails set to myClientCert[0].", test_plan_support.verify_success()),
-            TestStep(14, "CR2 sends ProvisionClientCertificate command to the TLSCertificateManagementCluster with CCDID set to myCcdid[1] and ClientCertificateDetails set to myClientCert[1].", test_plan_support.verify_success()),
-            TestStep(15, "CR1 sends ProvisionEndpoint command with valid Hostname myHostname, Port myPort[0], CAID myCaid[0], CCDID myCcdid[0] and null EndpointID.", "DUT replies with a TLSEndpointID value. Store the returned value as myEndpoint[0]."),
-            TestStep(16, "CR1 sends ProvisionEndpoint command with valid Hostname myHostname, Port myPort[1], CAID myCaid[0], CCDID myCcdid[0] and null EndpointID.", "DUT replies with a TLSEndpointID value. Store the returned value as myEndpoint[1]."),
-            TestStep(17, "For i in (2..myMaxProvisioned-1), CR2 sends ProvisionEndpoint command with valid Hostname myHostname, Port myPort[i], CAID myCaid[1], CCDID myCcdid[1] and null EndpointID.", "DUT replies with a TLSEndpointID value. Store the returned value as myEndpoint[i]."),
-            TestStep(18, "CR1 reads ProvisionedEndpoints attribute.", "DUT replies with a list of TLSEndpointStruct with 2 entries. The entries should correspond to (myEndpoint[i], myHostname, myPort[i], myCaid[0], myCcdid[0], myStatus) where myStatus is Provisioned (0), and i is [0..1]."),
-            TestStep(19, "CR2 reads ProvisionedEndpoints attribute.", "DUT replies with a list of TLSEndpointStruct with myMaxProvisioned - 2 entries. The entries should correspond to (myEndpoint[i], myHostname, myPort[i], myCaid[1], myCcdid[1], myStatus) where myStatus is Provisioned (0), and i is [2..myMaxProvisioned-1]."),
-            TestStep(20, "CR2 sends ProvisionEndpoint command with valid Hostname myHostname, Port myPort[myMaxProvisioned], CAID myCaid[1], CCDID myCcdid[1] and null EndpointID.", test_plan_support.verify_status(Status.ResourceExhausted)),
-            TestStep(21, "CR1 sends RemoveEndpoint command with EndpointID set to myEndpoint[0].", test_plan_support.verify_success()),
-            TestStep(22, "CR2 sends ProvisionEndpoint command with valid Hostname myHostname, Port myPort[myMaxProvisioned], CAID myCaid[1], CCDID myCcdid[1] and null EndpointID.", "DUT replies with a TLSEndpointID value. Store the returned value as myEndpoint[myMaxProvisioned]."),
-            TestStep(23, "CR1 reads ProvisionedEndpoints attribute.", "DUT replies with a list of TLSEndpointStruct with one entry. The entry should correspond to (myEndpoint[1], myHostname, myPort[1], myCaid[0], myCcdid[0], myStatus) where myStatus is Provisioned (0)."),
-            TestStep(24, "CR2 reads ProvisionedEndpoints attribute.", "DUT replies with a list of TLSEndpointStruct with myMaxProvisioned - 1 entries. The entries should correspond to (myEndpoint[i], myHostname, myPort[i], myCaid[1], myCcdid[1], myStatus) where myStatus is Provisioned (0), and i is [2..myMaxProvisioned]."),
+            TestStep(
+                13, "CR1 sends ProvisionClientCertificate command to the TLSCertificateManagementCluster with CCDID set to myCcdid[0] and ClientCertificateDetails set to myClientCert[0].", test_plan_support.verify_success()),
+            TestStep(
+                14, "CR2 sends ProvisionClientCertificate command to the TLSCertificateManagementCluster with CCDID set to myCcdid[1] and ClientCertificateDetails set to myClientCert[1].", test_plan_support.verify_success()),
+            TestStep(15, "CR1 sends ProvisionEndpoint command with valid Hostname myHostname, Port myPort[0], CAID myCaid[0], CCDID myCcdid[0] and null EndpointID.",
+                     "DUT replies with a TLSEndpointID value. Store the returned value as myEndpoint[0]."),
+            TestStep(16, "CR1 sends ProvisionEndpoint command with valid Hostname myHostname, Port myPort[1], CAID myCaid[0], CCDID myCcdid[0] and null EndpointID.",
+                     "DUT replies with a TLSEndpointID value. Store the returned value as myEndpoint[1]."),
+            TestStep(
+                17, "For i in (2..myMaxProvisioned-1), CR2 sends ProvisionEndpoint command with valid Hostname myHostname, Port myPort[i], CAID myCaid[1], CCDID myCcdid[1] and null EndpointID.", "DUT replies with a TLSEndpointID value. Store the returned value as myEndpoint[i]."),
+            TestStep(18, "CR1 reads ProvisionedEndpoints attribute.",
+                     "DUT replies with a list of TLSEndpointStruct with 2 entries. The entries should correspond to (myEndpoint[i], myHostname, myPort[i], myCaid[0], myCcdid[0], myStatus) where myStatus is Provisioned (0), and i is [0..1]."),
+            TestStep(19, "CR2 reads ProvisionedEndpoints attribute.",
+                     "DUT replies with a list of TLSEndpointStruct with myMaxProvisioned - 2 entries. The entries should correspond to (myEndpoint[i], myHostname, myPort[i], myCaid[1], myCcdid[1], myStatus) where myStatus is Provisioned (0), and i is [2..myMaxProvisioned-1]."),
+            TestStep(20, "CR2 sends ProvisionEndpoint command with valid Hostname myHostname, Port myPort[myMaxProvisioned], CAID myCaid[1], CCDID myCcdid[1] and null EndpointID.", test_plan_support.verify_status(
+                Status.ResourceExhausted)),
+            TestStep(
+                21, "CR1 sends RemoveEndpoint command with EndpointID set to myEndpoint[0].", test_plan_support.verify_success()),
+            TestStep(22, "CR2 sends ProvisionEndpoint command with valid Hostname myHostname, Port myPort[myMaxProvisioned], CAID myCaid[1], CCDID myCcdid[1] and null EndpointID.",
+                     "DUT replies with a TLSEndpointID value. Store the returned value as myEndpoint[myMaxProvisioned]."),
+            TestStep(23, "CR1 reads ProvisionedEndpoints attribute.",
+                     "DUT replies with a list of TLSEndpointStruct with one entry. The entry should correspond to (myEndpoint[1], myHostname, myPort[1], myCaid[0], myCcdid[0], myStatus) where myStatus is Provisioned (0)."),
+            TestStep(24, "CR2 reads ProvisionedEndpoints attribute.",
+                     "DUT replies with a list of TLSEndpointStruct with myMaxProvisioned - 1 entries. The entries should correspond to (myEndpoint[i], myHostname, myPort[i], myCaid[1], myCcdid[1], myStatus) where myStatus is Provisioned (0), and i is [2..myMaxProvisioned]."),
             TestStep(25, test_plan_support.remove_fabric('CR2', 'CR1'), test_plan_support.verify_success()),
         ]
 
