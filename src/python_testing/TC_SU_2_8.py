@@ -19,6 +19,7 @@
 import logging
 
 from mobly import asserts
+from TC_SUBase import SoftwareUpdateBaseTest
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
@@ -28,7 +29,7 @@ from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_SU_2_8(MatterBaseTest):
+class TC_SU_2_8(MatterBaseTest, SoftwareUpdateBaseTest):
     """
     This test case verifies that the DUT is able to successfully send a QueryImage command to the OTA-P in multi fabric scenario.
     """
