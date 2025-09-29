@@ -143,8 +143,9 @@ Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apEx
 
     Status status = ProcessWriteRequest(std::move(aPayload), aIsTimedWrite);
 
-    // Do not send response on Group Write
-    if (status == Status::Success && !apExchangeContext->IsGroupExchangeContext())
+    // Do not send response on Group Write or when SuppressResponse is true
+    if (status == Status::Success && !apExchangeContext->IsGroupExchangeContext() && 
+        !mStateFlags.Has(StateBits::kSuppressResponse))
     {
         CHIP_ERROR err = SendWriteResponse(std::move(messageWriter));
         if (err != CHIP_NO_ERROR)

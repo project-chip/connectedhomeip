@@ -43,6 +43,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.interaction_model import InteractionModelError, Status
+from matter.exceptions import ChipStackError
 from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -81,8 +82,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                         # Check if this attribute requires timed write using the must_use_timed_write property
                         if hasattr(attr_instance, 'must_use_timed_write') and attr_instance.must_use_timed_write:
                             if await self.attribute_guard(endpoint=endpoint_id, attribute=attr_class):
-                                logging.info(f"Found timed write attribute: {attr_class.__name__} (id={
-                                             attr_id}) in cluster {cluster_type.__name__}")
+                                logging.info(f"Found timed write attribute: {attr_class.__name__} (id={attr_id}) in cluster {cluster_type.__name__}")
                                 return endpoint_id, attr_class
                             else:
                                 logging.info(f"Device does not support timed write attribute: {attr_class.__name__} (id={attr_id})")
@@ -218,31 +218,52 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal(write_status2, Status.UnsupportedAttribute,
                              f"Write to unsupported attribute should return UNSUPPORTED_ATTRIBUTE, got {write_status2}")
 
-        self.step(4)
-        '''
-        TH sends the WriteRequestMessage to the DUT to modify the value of one attribute and Set SuppressResponse to True.
-        Currently there is an open issue for the SuppressResponse not being available currently and is mentioned in the yaml file for this test::
-        Issue Link: https://github.com/project-chip/connectedhomeip/issues/8043
-        Out of Scope
-        For now similar to the yaml file version, skipping this test step as the Python API doesn't expose SuppressResponse
-        '''
-        logging.info(
-            "Step 4: SuppressResponse parameter not supported in current WriteAttribute API, please refer to the issue link for more details")
-
-        # Check if NodeLabel attribute exists
+        
+        # Check if NodeLabel attribute exists for steps 4 through 6 (DataVersion and SuppressResponse tests)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
-            # NodeLabel exists - use it
-            test_cluster = Clusters.BasicInformation
-            test_attribute = Clusters.BasicInformation.Attributes.NodeLabel
-            new_value0 = "New-Label-Step5"
-            logging.info("Using NodeLabel for DataVersion test")
+            self.step(4)
+            '''
+            TH sends the WriteRequestMessage to the DUT to modify the value of one attribute and Set SuppressResponse to True.
+            On the TH verify that the DUT does not send a Write Response message with a success back to the TH.
+            '''
 
+            test_attribute = Clusters.BasicInformation.Attributes.NodeLabel
+            test_value = "SuppressResponse-Test"
+            
+            logging.info("Testing SuppressResponse functionality with NodeLabel attribute") 
+            # Use the new suppressResponse parameter in controller's WriteAttribute method
+            # This should set the SuppressResponse flag in the WriteRequest message
+            # and the device should NOT send a WriteResponse back
+
+            with asserts.assert_raises(ChipStackError) as cm:            
+                res = await self.default_controller.WriteAttribute(
+                    nodeid=self.dut_node_id,
+                    attributes=[(self.endpoint, test_attribute(test_value))],
+                    suppressResponse=True
+                )
+                asserts.fail(f"Received WriteResponse when suppressResponse=True: {res}")
+
+            asserts.assert_equal(cm.exception.err, 0x00000032,
+                                 f"WriteAttribute should return Success, got {cm.exception.err}")
+
+            logging.info("Verifying that the write operation succeeded despite timeout")
+            actual_value = await self.read_single_attribute_check_success(
+                endpoint=self.endpoint, 
+                cluster=Clusters.BasicInformation, 
+                attribute=test_attribute
+            )
+            
+            asserts.assert_equal(actual_value, test_value,
+                                f"Attribute should be written. Expected {test_value}, got {actual_value}")
+                                
             self.step(5)
             '''
             TH sends a ReadRequest message to the DUT to read any attribute on any cluster.
             DUT returns with a report data action with the attribute values and the dataversion of the cluster.
             TH sends a WriteRequestMessage to the DUT to modify the value of one attribute with the DataVersion field set to the one received in the prior step.
             '''
+            test_cluster = Clusters.BasicInformation
+            new_value0 = "New-Label-Step5"
 
             # Read an attribute to get the current DataVersion
             read_result = await self.default_controller.ReadAttribute(
@@ -310,6 +331,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             # Created following follow-up task for the event that the node label attribute does not exist
             # TODO: https://github.com/project-chip/matter-test-scripts/issues/693
             logging.info("NodeLabel not found - this may be a non-commissionable device")
+            self.skip_step(4)
             self.skip_step(5)
             self.skip_step(6)
 
