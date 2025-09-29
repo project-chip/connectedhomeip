@@ -28,21 +28,15 @@ __LOG_LEVELS__ = {
     'fatal': logging.FATAL,
 }
 
-
-def _ZapArchitectures():
-    """Iterates through required releases.
-
-    Returns a tuple:
-      - zap zip 'platform'
-      - zap zip 'arch'
-      - CIPD package tuple
-    """
-
-    yield 'linux', 'arm64', 'linux-arm64'
-    yield 'linux', 'x64', 'linux-amd64'
-    yield 'mac', 'arm64', 'mac-arm64'
-    yield 'mac', 'x64', 'mac-amd64'
-    yield 'win', 'x64', 'windows-amd64'
+# A list of things to copy. Tuples of
+#  (zap_platform, zap_architecture, cipd_platform)
+__ZAP_ARCHITECTURES__ = [
+    ('linux', 'arm64', 'linux-arm64'),
+    ('linux', 'x64', 'linux-amd64'),
+    ('mac', 'arm64', 'mac-arm64'),
+    ('mac', 'x64', 'mac-amd64'),
+    ('win', 'x64', 'windows-amd64'),
+]
 
 
 @click.command()
@@ -68,7 +62,7 @@ def main(log_level: str, version: str, no_temp_clean: bool):
     with tempfile.TemporaryDirectory(prefix="zap_", suffix="_cipd", delete=(not no_temp_clean)) as tmpdir:
         logging.info("Temporary Directory: %s", tmpdir)
 
-        for platform, arch, cipd_dir in _ZapArchitectures():
+        for platform, arch, cipd_dir in __ZAP_ARCHITECTURES__:
             download_dir = f"zap-{platform}-{arch}"
             download_path = os.path.join(tmpdir, download_dir)
             logging.info("Downloading %s-%s into %s", platform, arch, download_path)
