@@ -307,4 +307,60 @@ TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer)
     proxyDiagnosticLog.Reset();
 }
 
+TEST_F(TestTransferDiagnosticLog, AccpetsTransferAndReceivesNonNullTerminatedDataCorrectly)
+{
+    auto proxyDiagnosticLog = BDXTransferProxyDiagnosticLog();
+
+    TransferSession initiator;
+    TransferSession::TransferInitData transferInitData;
+    transferInitData.TransferCtlFlags = TransferControlFlags::kSenderDrive;
+    transferInitData.MaxBlockSize     = kMaxBlockSize;
+    transferInitData.StartOffset      = 0;
+    transferInitData.Length           = 1024;
+    char testFileDes[8]               = { 't', 'e', 's', 't', '.', 't', 'x', 't' };
+    transferInitData.FileDesLength    = 8;
+    transferInitData.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
+    uint8_t fakeData[5]               = { 7, 6, 5, 4, 3 };
+    transferInitData.MetadataLength   = 5;
+    transferInitData.Metadata         = reinterpret_cast<uint8_t *>(fakeData);
+
+    /// Init initiator (and sender) transfer session
+    auto r = initiator.StartTransfer(TransferRole::kSender, transferInitData, System::Clock::Seconds16(10));
+
+    EXPECT_EQ(r, CHIP_NO_ERROR);
+
+    TransferSession::OutputEvent initiatorEvent;
+    initiator.PollOutput(initiatorEvent, System::Clock::kZero);
+    EXPECT_EQ(initiatorEvent.EventType, TransferSession::OutputEventType::kMsgToSend);
+
+    /// Init responder (and receiver) transfer session
+    r = mTransferSession.WaitForTransfer(TransferRole::kReceiver, TransferControlFlags::kSenderDrive, kMaxBlockSize,
+                                         System::Clock::Seconds16(20));
+    EXPECT_EQ(r, CHIP_NO_ERROR);
+
+    TransferSession::OutputEvent responderEvent;
+    mTransferSession.PollOutput(responderEvent, System::Clock::kZero);
+    EXPECT_EQ(responderEvent.EventType, TransferSession::OutputEventType::kNone);
+
+    chip::PayloadHeader payloadHeader;
+    payloadHeader.SetMessageType(initiatorEvent.msgTypeData.ProtocolId, initiatorEvent.msgTypeData.MessageType);
+
+    r = mTransferSession.HandleMessageReceived(payloadHeader, std::move(initiatorEvent.MsgData), System::Clock::kZero);
+
+    EXPECT_EQ(r, CHIP_NO_ERROR);
+
+    mTransferSession.PollOutput(responderEvent, System::Clock::kZero);
+
+    EXPECT_EQ(responderEvent.EventType, TransferSession::OutputEventType::kInitReceived);
+
+    /// Proxy fills its file designator data member from transfer session object passed as argument
+    r = proxyDiagnosticLog.Init(&mTransferSession);
+
+    EXPECT_EQ(r, CHIP_NO_ERROR);
+
+    auto fileDesignator = proxyDiagnosticLog.GetFileDesignator();
+
+    EXPECT_TRUE(fileDesignator.data_equal(CharSpan{ testFileDes, 8 }));
+}
+
 } // namespace
