@@ -56,7 +56,8 @@ def run_single_test(software_version: int = 2) -> int:
 
     app_args = '--discriminator 1234 '
 
-    script_args = f' --commissioning-method on-network --passcode 20202021 --discriminator 1234 --int-arg SOFTWAREVERSION:{software_version} --storage-path admin_storage.json '
+    script_args = f' --commissioning-method on-network --passcode 20202021 --discriminator 1234 --int-arg SOFTWAREVERSION:{
+        software_version} --storage-path admin_storage.json '
 
     script = os.path.abspath(os.path.join(
         CHIP_ROOT, 'src/python_testing/test_testing/test_ota_version.py'))
