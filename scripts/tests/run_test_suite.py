@@ -391,7 +391,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
     if sys.platform == 'linux':
         ns = chiptest.linux.IsolatedNetworkNamespace(
-            0,
+            index=0,
             unshared=context.obj.in_unshare)
         paths = ns.paths_with_network_namespaces(paths)
 
