@@ -104,7 +104,7 @@ class TestCommissioner(CHIPVirtualHome):
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_repl-1.0.0-py3-none-any.whl")))
 
         command = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
-                   "--args python3 {} -t 300 --discriminator {} --setup-payload {} --paa-trust-store-path {} --test-event-key {}").format(
+                   "--args python3 {} -t 300 --discriminator {} --passcode {} --paa-trust-store-path {} --test-event-key {}").format(
             os.path.join(
                 CHIP_REPO, "src/controller/python/tests/scripts/icd_device_test.py"),
             TEST_DISCRIMINATOR, TEST_PASSCODE,

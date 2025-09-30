@@ -63,7 +63,6 @@ async def main():
         "--discriminator",
         action="store",
         dest="discriminator",
-        default='',
         type='int',
         help="Discriminator of the device",
     )
@@ -72,7 +71,6 @@ async def main():
         "--passcode",
         action="store",
         dest="passcode",
-        default='',
         type='int',
         help="Passcode of the device",
     )

@@ -57,15 +57,6 @@ async def main():
         metavar="<timeout-second>",
     )
     optParser.add_option(
-        "--setup-payload",
-        action="store",
-        dest="setupPayload",
-        default='',
-        type='str',
-        help="Setup Payload (manual pairing code or QR code content)",
-        metavar="<setup-payload>"
-    )
-    optParser.add_option(
         "--nodeid",
         action="store",
         dest="nodeid",
@@ -81,6 +72,13 @@ async def main():
         default=TEST_DISCRIMINATOR,
         type=int,
         help="Discriminator of the device",
+    )
+    optParser.add_option(
+        "--passcode",
+        action="store",
+        dest="passcode",
+        type=int,
+        help="setup passcdoe",
     )
     optParser.add_option(
         "-p",
@@ -123,7 +121,7 @@ async def main():
     devCtrl.EnableICDRegistration(devCtrl.GenerateICDRegistrationParameters())
     logger.info("Testing commissioning")
     FailIfNot(await test.TestOnNetworkCommissioning(discriminator=options.discriminator,
-                                                    setuppin=options.setupPayload,
+                                                    setuppin=options.passcode,
                                                     nodeid=options.nodeid),
               "Failed to finish key exchange")
     logger.info("Commissioning completed")
