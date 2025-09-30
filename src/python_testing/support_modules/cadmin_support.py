@@ -418,7 +418,6 @@ class CADMINBaseTest(MatterBaseTest):
             expected_discriminator: int,
             max_attempts: int = 5,
             delay_sec: int = 5):
-
         """Wait for the correct CM value and discriminator in DNS-SD with retries."""
         for attempt in range(max_attempts):
             discovery = mdns_discovery.MdnsDiscovery()
