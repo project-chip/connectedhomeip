@@ -220,6 +220,7 @@ static_library("system") {
 
   sources = [
     "PlatformEventSupport.h",
+    "RAIIMockClock.h",
     "SystemAlignSize.h",
     "SystemClock.cpp",
     "SystemClock.h",
