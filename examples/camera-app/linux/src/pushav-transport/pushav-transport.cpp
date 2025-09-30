@@ -22,8 +22,7 @@ using namespace chip::app::Clusters::PushAvStreamTransport;
 
 PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
                                  AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams) :
-    mAudioStreamParams(audioStreamParams),
-    mVideoStreamParams(videoStreamParams)
+    mAudioStreamParams(audioStreamParams), mVideoStreamParams(videoStreamParams)
 {
     ConfigureRecorderSettings(transportOptions, audioStreamParams, videoStreamParams);
     mConnectionID    = connectionID;
@@ -532,23 +531,23 @@ bool PushAVTransport::CanSendPacketsToRecorder()
     return true;
 }
 
-void PushAVTransport::SendVideo(const char * data, size_t size, int64_t timestamp, uint16_t videoStreamID)
+void PushAVTransport::SendVideo(const chip::ByteSpan & data, int64_t timestamp, uint16_t videoStreamID)
 {
     if (CanSendPacketsToRecorder())
     {
-        mRecorder->PushPacket(data, size, 1);
+        mRecorder->PushPacket(data.data(), data.size(), 1);
     }
 }
 
-void PushAVTransport::SendAudio(const char * data, size_t size, int64_t timestamp, uint16_t audioStreamID)
+void PushAVTransport::SendAudio(const chip::ByteSpan & data, int64_t timestamp, uint16_t audioStreamID)
 {
     if (CanSendPacketsToRecorder())
     {
-        mRecorder->PushPacket(data, size, 0);
+        mRecorder->PushPacket(data.data(), data.size(), 0);
     }
 }
 
-void PushAVTransport::SendAudioVideo(const char * data, size_t size, uint16_t videoStreamID, uint16_t audioStreamID) {}
+void PushAVTransport::SendAudioVideo(const chip::ByteSpan & data, uint16_t videoStreamID, uint16_t audioStreamID) {}
 
 // Utility API for Test purpose
 void PushAVTransport::readFromFile(char * filename, uint8_t ** videoBuffer, size_t * videoBufferBytes)
