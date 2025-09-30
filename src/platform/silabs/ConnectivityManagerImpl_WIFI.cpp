@@ -203,10 +203,10 @@ void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 CHIP_ERROR ConnectivityManagerImpl::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
 {
-    // TODO ICD
+    // TODO: This function is not used in the current integration - return no error to avoid having the ICDManager error log.
+    // Revisit this once we complete the ICD integration
     (void) pollingInterval;
-    ChipLogError(DeviceLayer, "Set ICD Fast Polling on Silabs Wifi platform");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_NO_ERROR;
 }
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 
