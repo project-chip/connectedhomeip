@@ -866,6 +866,7 @@ jobs:
                   echo "SU_OTA_PROVIDER_V2: objdir-clone/chip-ota-requestor-app_v2.min.ota" >> /tmp/test_env.yaml
                   echo "SU_OTA_PROVIDER_V3: objdir-clone/chip-ota-requestor-app_v3.min.ota" >> /tmp/test_env.yaml
                   echo "SU_OTA_PROVIDER_V4: objdir-clone/chip-ota-requestor-app_v4.min.ota" >> /tmp/test_env.yaml
+                  echo "SU_OTA_PROVIDER_V5: objdir-clone/chip-ota-requestor-app_v5.min.ota" >> /tmp/test_env.yaml
 
                   # Generic trace setups after applications
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
