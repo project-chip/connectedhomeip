@@ -250,6 +250,16 @@ struct GlobalCertificateData : public PersistentData<kPersistentBufferNextIdByte
         return DoRemoval(storage, table, fabric, id, mRootCertMappingCount, mRootCertMapping.data());
     }
 
+    CHIP_ERROR RemoveAllClientCertificates(PersistentStorageDelegate & storage, FabricIndex fabric)
+    {
+        return DoRemovalAll(storage, fabric, mClientCertMappingCount, mClientCertMapping.data());
+    }
+
+    CHIP_ERROR RemoveAllRootCertificates(PersistentStorageDelegate & storage, FabricIndex fabric)
+    {
+        return DoRemovalAll(storage, fabric, mRootCertMappingCount, mRootCertMapping.data());
+    }
+
 private:
     template <class CertificateTable>
     CHIP_ERROR DoRemoval(PersistentStorageDelegate & storage, CertificateTable & table, FabricIndex fabric, uint16_t id,
@@ -290,6 +300,27 @@ private:
             ReturnErrorOnFailure(this->Save(&storage));
         }
         return removeResult;
+    }
+
+    CHIP_ERROR DoRemovalAll(PersistentStorageDelegate & storage, FabricIndex fabric, size_t count, StoredCertificate * source)
+    {
+        // Find the entry in the global mapping
+        uint16_t foundCount = 0;
+        for (size_t i = 0; i < count; ++i)
+        {
+            auto & entry = source[i];
+            if (entry.fabric == fabric)
+            {
+                entry.fabric = kUndefinedFabricIndex;
+                entry.id.Clear();
+                ++foundCount;
+            }
+        }
+        if (foundCount == 0)
+        {
+            return CHIP_ERROR_NOT_FOUND;
+        }
+        return this->Save(&storage);
     }
 
     CHIP_ERROR GetNextCertificateId(uint16_t & nextId, uint16_t maxId, size_t count, const StoredCertificate * source)
@@ -721,4 +752,24 @@ CHIP_ERROR CertificateTableImpl::RemoveClientCertificate(FabricIndex fabric, TLS
 CHIP_ERROR CertificateTableImpl::GetClientCertificateCount(FabricIndex fabric, uint8_t & outCount)
 {
     return mClientCertificates.GetFabricEntryCount(fabric, outCount);
+}
+
+CHIP_ERROR CertificateTableImpl::RemoveFabric(FabricIndex fabric)
+{
+    CHIP_ERROR result = mClientCertificates.RemoveFabric(fabric);
+    ReturnErrorOnFailure(mRootCertificates.RemoveFabric(fabric));
+
+    GlobalCertificateData globalData(mEndpointId);
+    ReturnErrorOnFailure(globalData.Load(mStorage));
+    if (result != CHIP_NO_ERROR)
+    {
+        result = globalData.RemoveAllClientCertificates(*mStorage, fabric);
+    }
+
+    if (result != CHIP_NO_ERROR)
+    {
+        result = globalData.RemoveAllRootCertificates(*mStorage, fabric);
+    }
+
+    return result;
 }
