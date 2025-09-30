@@ -157,8 +157,6 @@ class TC_SU_2_2(MatterBaseTest):
 
         Returns:
             provider_proc: Process handle of the launched Provider.
-            original_requestor_acls: Original ACLs for the Requestor (before modification).
-            original_provider_acls: Original ACLs for the Provider (before modification).
         """
 
         logger.info(f"""{step_number}: Prerequisite #1.0 - Provider info:
@@ -229,7 +227,7 @@ class TC_SU_2_2(MatterBaseTest):
             original_provider_acls=original_provider_acls,
         )
 
-        return provider_proc, original_requestor_acls, original_provider_acls
+        return provider_proc
 
     async def cleanup_provider(
         self,
@@ -381,27 +379,27 @@ class TC_SU_2_2(MatterBaseTest):
 
         self.step(1)
         # ------------------------------------------------------------------------------------
-        # [STEP_1]: Prerequisites - Setup Provider_S1
+        # [STEP_1]: Prerequisites - Setup Provider
         # ------------------------------------------------------------------------------------
         step_number_s1 = "[STEP_1]"
 
         # Prerequisite #1.0 - Provider_S1 info
-        provider_node_id_s1 = 1
-        provider_discriminator_s1 = 1111
-        provider_setupPinCode_s1 = 20202021
-        provider_port_s1 = 5540
+        provider_node_id = 1
+        provider_discriminator = 1111
+        provider_setupPinCode = 20202021
+        provider_port = 5540
         provider_ota_file_s1 = "firmware_requestor_v2min.ota"
 
         # Setup, Launch, Commisioning and ACLs on Provider
-        provider_proc_s1, original_requestor_acls_s1, original_provider_acls_s1 = await self.setup_provider(
+        provider_proc_s1 = await self.setup_provider(
             step_number=step_number_s1,
             controller=CONTROLLER,
             fabric_id=FABRIC_ID,
             requestor_node_id=REQUESTOR_NODE_ID,
-            provider_node_id=provider_node_id_s1,
-            provider_discriminator=provider_discriminator_s1,
-            provider_setup_pin_code=provider_setupPinCode_s1,
-            provider_port=provider_port_s1,
+            provider_node_id=provider_node_id,
+            provider_discriminator=provider_discriminator,
+            provider_setup_pin_code=provider_setupPinCode,
+            provider_port=provider_port,
             provider_ota_file=provider_ota_file_s1,
             provider_wait_for="Status: Satisfied",
             provider_queue=None,                    # Optional
@@ -411,7 +409,7 @@ class TC_SU_2_2(MatterBaseTest):
 
         # Prerequisite #4.0 - Add OTA Provider to the Requestor
         logger.info(f'{step_number_s1}: Prerequisite #5.0 - Add Provider to Requestor(DUT) DefaultOTAProviders')
-        await self.add_single_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id_s1)
+        await self.add_single_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id)
 
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.1 - Matcher for OTA records logs
@@ -454,7 +452,7 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_1]: Step #1.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s1}: Step #1.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id_s1)
+        resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id)
         logger.info(f'{step_number_s1}: Step #1.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
@@ -597,18 +595,11 @@ class TC_SU_2_2(MatterBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.5 - Close Provider_S1 Process (CLEANUP!)
-        # Restores ACLs, expires sessions, stops provider, and deletes temporary KVS files
         # ------------------------------------------------------------------------------------
-        logger.info(f'{step_number_s1}: Step #1.5 - Clean Close Provider_S1 Process')
+        logger.info(f'{step_number_s1}: Step #1.5 - Close Provider_S1 Process')
 
-        await self.cleanup_provider(
-            controller=CONTROLLER,
-            requestor_node_id=REQUESTOR_NODE_ID,
-            provider_node_id=provider_node_id_s1,
-            provider_proc=provider_proc_s1,
-            original_requestor_acls=original_requestor_acls_s1,
-            original_provider_acls=original_provider_acls_s1
-        )
+        # Kill Provider process
+        provider_proc_s1.terminate()
 
         self.step(2)
         # ------------------------------------------------------------------------------------
@@ -618,28 +609,22 @@ class TC_SU_2_2(MatterBaseTest):
         logger.info(f'{step_number_s2}: Prerequisite #1.0 - Requestor (DUT), NodeID: {REQUESTOR_NODE_ID}, FabricId: {FABRIC_ID}')
 
         # Prerequisite #1.0 - Provider_S2 info
-        provider_node_id_s2 = 3
-        provider_discriminator_s2 = 2222             # Changed in each step
-        provider_setupPinCode_s2 = 20202022          # Changed in each step
-        provider_port_s2 = 5540                      # Previous used on Steps 1
         provider_ota_file_s2 = "firmware_requestor_v3min.ota"
 
-        # Setup, Launch, Commisioning and ACLs on Provider
-        provider_proc_s2, original_requestor_acls_s2, original_provider_acls_s2 = await self.setup_provider(
-            step_number=step_number_s2,
-            controller=CONTROLLER,
-            fabric_id=FABRIC_ID,
-            requestor_node_id=REQUESTOR_NODE_ID,
-            provider_node_id=provider_node_id_s2,
-            provider_discriminator=provider_discriminator_s2,
-            provider_setup_pin_code=provider_setupPinCode_s2,
-            provider_port=provider_port_s2,
-            provider_ota_file=provider_ota_file_s2,
-            provider_wait_for="Status: Satisfied",
-            provider_queue="busy",                  # Optional
-            provider_timeout=60,                    # Optional
-            provider_override_image_uri=None        # Optional
+        provider_proc_s2 = OTAProviderSubprocess(
+            ota_file=provider_ota_file_s2,           # Path to OTA image file
+            discriminator=provider_discriminator,
+            passcode=provider_setupPinCode,
+            secured_device_port=provider_port,
+            queue="busy",
+            timeout=60,
+            override_image_uri=None,
+            log_file_path=self.LOG_FILE_PATH,
+            app_path=self.APP_PATH,
+            kvs_path=self.KVS_PATH,
         )
+        provider_wait_for = "Status: Satisfied"
+        provider_proc_s2.start(expected_output=provider_wait_for, timeout=300)
 
         # ------------------------------------------------------------------------------------
         # [STEP_2]: Step #2.1 - Matcher for OTA records logs
@@ -668,7 +653,7 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_2]: Step #2.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s2}: Step #2.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id_s2)
+        resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id)
         logger.info(f'{step_number_s2}: Step #2.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
@@ -755,19 +740,12 @@ class TC_SU_2_2(MatterBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_2]: Step #2.5 - Close Provider_S2 Process (CLEANUP!)
-        # Restores ACLs, expires sessions, stops provider, and deletes temporary KVS files
         # ------------------------------------------------------------------------------------
         logger.info(
-            f'{step_number_s2}: Step #2.5 - Cleanly closed Provider_S2 process: ACLs restored, sessions expired, process stopped, KVS files deleted.')
+            f'{step_number_s2}: Step #2.5 - Closed Provider_S2 process.')
 
-        await self.cleanup_provider(
-            controller=CONTROLLER,
-            requestor_node_id=REQUESTOR_NODE_ID,
-            provider_node_id=provider_node_id_s2,
-            provider_proc=provider_proc_s2,
-            original_requestor_acls=original_requestor_acls_s2,
-            original_provider_acls=original_provider_acls_s2
-        )
+        # Kill Provider process
+        provider_proc_s2.terminate()
 
         self.step(3)
         # ------------------------------------------------------------------------------------
@@ -777,28 +755,22 @@ class TC_SU_2_2(MatterBaseTest):
         logger.info(f'{step_number_s3}: Prerequisite #1.0 - Requestor (DUT), NodeID: {REQUESTOR_NODE_ID}, FabricId: {FABRIC_ID}')
 
         # Prerequisite #1.0 - Provider_S3 info
-        provider_node_id_s3 = 4
-        provider_discriminator_s3 = 3333             # Changed in each step
-        provider_setupPinCode_s3 = 20202022          # Changed in each step
-        provider_port_s3 = 5540                      # Previous used on Steps 1
         provider_ota_file_s3 = "firmware_requestor_v4.ota"  # OTA updated
 
-        # Setup, Launch, Commisioning and ACLs on Provider
-        provider_proc_s3, original_requestor_acls_s3, original_provider_acls_s3 = await self.setup_provider(
-            step_number=step_number_s3,
-            controller=CONTROLLER,
-            fabric_id=FABRIC_ID,
-            requestor_node_id=REQUESTOR_NODE_ID,
-            provider_node_id=provider_node_id_s3,
-            provider_discriminator=provider_discriminator_s3,
-            provider_setup_pin_code=provider_setupPinCode_s3,
-            provider_port=provider_port_s3,
-            provider_ota_file=provider_ota_file_s3,
-            provider_wait_for="Status: Satisfied",
-            provider_queue="updateNotAvailable",       # Optional
-            provider_timeout=60,                       # Optional
-            provider_override_image_uri=None           # Optional
+        provider_proc_s3 = OTAProviderSubprocess(
+            ota_file=provider_ota_file_s3,           # Path to OTA image file
+            discriminator=provider_discriminator,
+            passcode=provider_setupPinCode,
+            secured_device_port=provider_port,
+            queue="updateNotAvailable",
+            timeout=60,
+            override_image_uri=None,
+            log_file_path=self.LOG_FILE_PATH,
+            app_path=self.APP_PATH,
+            kvs_path=self.KVS_PATH,
         )
+        provider_wait_for = "Status: Satisfied"
+        provider_proc_s3.start(expected_output=provider_wait_for, timeout=300)
 
         # ------------------------------------------------------------------------------------
         # [STEP_3]: Step #3.1 - Matcher for OTA records logs
@@ -825,7 +797,7 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_3]: Step #3.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s3}: Step #3.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id_s3)
+        resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id)
         logger.info(f'{step_number_s3}: Step #3.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
@@ -921,19 +893,12 @@ class TC_SU_2_2(MatterBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_3]: Step #3.5 - Close Provider_S3 Process (CLEANUP!)
-        # Restores ACLs, expires sessions, stops provider, and deletes temporary KVS files
         # ------------------------------------------------------------------------------------
         logger.info(
-            f'{step_number_s3}: Step #3.5 - Cleanly closed Provider_S3 process: ACLs restored, sessions expired, process stopped, KVS files deleted.')
+            f'{step_number_s3}: Step #3.5 - Closed Provider_S3 process.')
 
-        await self.cleanup_provider(
-            controller=CONTROLLER,
-            requestor_node_id=REQUESTOR_NODE_ID,
-            provider_node_id=provider_node_id_s3,
-            provider_proc=provider_proc_s3,
-            original_requestor_acls=original_requestor_acls_s3,
-            original_provider_acls=original_provider_acls_s3
-        )
+        # Kill Provider process
+        provider_proc_s3.terminate()
 
         self.step(4)
         # ------------------------------------------------------------------------------------
@@ -943,28 +908,22 @@ class TC_SU_2_2(MatterBaseTest):
         logger.info(f'{step_number_s4}: Prerequisite #1.0 - Requestor (DUT), NodeID: {REQUESTOR_NODE_ID}, FabricId: {FABRIC_ID}')
 
         # Prerequisite #1.0 - Provider_S4 info
-        provider_node_id_s4 = 5
-        provider_discriminator_s4 = 1114             # Changed in each step
-        provider_setupPinCode_s4 = 20202022          # Changed in each step
-        provider_port_s4 = 5540                      # Previous used on Steps 1
         provider_ota_file_s4 = "firmware_requestor_v5.ota"
 
-        # Setup, Launch, Commisioning and ACLs on Provider
-        provider_proc_s4, original_requestor_acls_s4, original_provider_acls_s4 = await self.setup_provider(
-            step_number=step_number_s4,
-            controller=CONTROLLER,
-            fabric_id=FABRIC_ID,
-            requestor_node_id=REQUESTOR_NODE_ID,
-            provider_node_id=provider_node_id_s4,
-            provider_discriminator=provider_discriminator_s4,
-            provider_setup_pin_code=provider_setupPinCode_s4,
-            provider_port=provider_port_s4,
-            provider_ota_file=provider_ota_file_s4,
-            provider_wait_for="Status: Satisfied",
-            provider_queue="busy",                  # Optional
-            provider_timeout=180,                   # Optional
-            provider_override_image_uri=None        # Optional
+        provider_proc_s4 = OTAProviderSubprocess(
+            ota_file=provider_ota_file_s4,           # Path to OTA image file
+            discriminator=provider_discriminator,
+            passcode=provider_setupPinCode,
+            secured_device_port=provider_port,
+            queue="busy",
+            timeout=180,
+            override_image_uri=None,
+            log_file_path=self.LOG_FILE_PATH,
+            app_path=self.APP_PATH,
+            kvs_path=self.KVS_PATH,
         )
+        provider_wait_for = "Status: Satisfied"
+        provider_proc_s4.start(expected_output=provider_wait_for, timeout=300)
 
         # ------------------------------------------------------------------------------------
         # [STEP_4]: Step #4.1 - Matcher for OTA records logs
@@ -1004,7 +963,7 @@ class TC_SU_2_2(MatterBaseTest):
         logger.info(f'{step_number_s4}: Step #4.0 - FailSafe armed for 900s: {resp}')
 
         logger.info(f'{step_number_s4}: Step #4.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id_s4)
+        resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id)
         logger.info(f'{step_number_s4}: Step #4.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
@@ -1092,19 +1051,12 @@ class TC_SU_2_2(MatterBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_4]: Step #4.5 - Close Provider_S4 Process (CLEANUP!)
-        # Restores ACLs, expires sessions, stops provider, and deletes temporary KVS files
         # ------------------------------------------------------------------------------------
         logger.info(
-            f'{step_number_s4}: Step #4.5 - Cleanly closed Provider_S4 process: ACLs restored, sessions expired, process stopped, KVS files deleted.')
+            f'{step_number_s4}: Step #4.5 - Closed Provider_S4 process.')
 
-        await self.cleanup_provider(
-            controller=CONTROLLER,
-            requestor_node_id=REQUESTOR_NODE_ID,
-            provider_node_id=provider_node_id_s4,
-            provider_proc=provider_proc_s4,
-            original_requestor_acls=original_requestor_acls_s4,
-            original_provider_acls=original_provider_acls_s4
-        )
+        # Kill Provider process
+        provider_proc_s4.terminate()
 
         self.step(5)
         # Step #5 - HTTPS image download
@@ -1118,28 +1070,22 @@ class TC_SU_2_2(MatterBaseTest):
         logger.info(f'{step_number_s6}: Prerequisite #1.0 - Requestor (DUT), NodeID: {REQUESTOR_NODE_ID}, FabricId: {FABRIC_ID}')
 
         # Prerequisite #1.0 - Provider_S6 info
-        provider_node_id_s6 = 6
-        provider_discriminator_s6 = 1116             # Changed in each step
-        provider_setupPinCode_s6 = 20202022          # Changed in each step
-        provider_port_s6 = 5540                      # Previous used on Steps 1
         provider_ota_file_s6 = "firmware_requestor_v3min.ota"
 
-        # Setup, Launch, Commisioning and ACLs on Provider
-        provider_proc_s6, original_requestor_acls_s6, original_provider_acls_s6 = await self.setup_provider(
-            step_number=step_number_s6,
-            controller=CONTROLLER,
-            fabric_id=FABRIC_ID,
-            requestor_node_id=REQUESTOR_NODE_ID,
-            provider_node_id=provider_node_id_s6,
-            provider_discriminator=provider_discriminator_s6,
-            provider_setup_pin_code=provider_setupPinCode_s6,
-            provider_port=provider_port_s6,
-            provider_ota_file=provider_ota_file_s6,
-            provider_wait_for="Status: Satisfied",
-            provider_queue=None,                    # Optional
-            provider_timeout=None,                  # Optional
-            provider_override_image_uri=None        # Optional
+        provider_proc_s6 = OTAProviderSubprocess(
+            ota_file=provider_ota_file_s6,           # Path to OTA image file
+            discriminator=provider_discriminator,
+            passcode=provider_setupPinCode,
+            secured_device_port=provider_port,
+            queue=None,
+            timeout=None,
+            override_image_uri=None,
+            log_file_path=self.LOG_FILE_PATH,
+            app_path=self.APP_PATH,
+            kvs_path=self.KVS_PATH,
         )
+        provider_wait_for = "Status: Satisfied"
+        provider_proc_s6.start(expected_output=provider_wait_for, timeout=300)
 
         # ------------------------------------------------------------------------------------
         # [STEP_6]: Step #6.1 - Matcher for OTA records logs
@@ -1167,7 +1113,7 @@ class TC_SU_2_2(MatterBaseTest):
         # ------------------------------------------------------------------------------------
 
         logger.info(f'{step_number_s6}: Step #6.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id_s6)
+        resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id)
         logger.info(f'{step_number_s6}: Step #6.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
@@ -1248,19 +1194,12 @@ class TC_SU_2_2(MatterBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_6]: Step #6.5 - Close Provider_S6 Process (CLEANUP!)
-        # Restores ACLs, expires sessions, stops provider, and deletes temporary KVS files
         # ------------------------------------------------------------------------------------
         logger.info(
-            f'{step_number_s6}: Step #6.5 - Cleanly closed Provider_S6 process: ACLs restored, sessions expired, process stopped, KVS files deleted.')
+            f'{step_number_s6}: Step #6.5 - Closed Provider_S6.')
 
-        await self.cleanup_provider(
-            controller=CONTROLLER,
-            requestor_node_id=REQUESTOR_NODE_ID,
-            provider_node_id=provider_node_id_s6,
-            provider_proc=provider_proc_s6,
-            original_requestor_acls=original_requestor_acls_s6,
-            original_provider_acls=original_provider_acls_s6
-        )
+        # Kill Provider process
+        provider_proc_s6.terminate()
 
         self.step(7)
         # ------------------------------------------------------------------------------------
@@ -1270,28 +1209,22 @@ class TC_SU_2_2(MatterBaseTest):
         logger.info(f'{step_number_s7}: Prerequisite #1.0 - Requestor (DUT), NodeID: {REQUESTOR_NODE_ID}, FabricId: {FABRIC_ID}')
 
         # Prerequisite #1.0 - Provider_S7 info
-        provider_node_id_s7 = 7
-        provider_discriminator_s7 = 1117             # Changed in each step
-        provider_setupPinCode_s7 = 20202022          # Changed in each step
-        provider_port_s7 = 5540                      # Previous used on Steps 1
         provider_ota_file_s7 = "firmware_requestor_v5.ota"
 
-        # Setup, Launch, Commisioning and ACLs on Provider
-        provider_proc_s7, original_requestor_acls_s7, original_provider_acls_s7 = await self.setup_provider(
-            step_number=step_number_s7,
-            controller=CONTROLLER,
-            fabric_id=FABRIC_ID,
-            requestor_node_id=REQUESTOR_NODE_ID,
-            provider_node_id=provider_node_id_s7,
-            provider_discriminator=provider_discriminator_s7,
-            provider_setup_pin_code=provider_setupPinCode_s7,
-            provider_port=provider_port_s7,
-            provider_ota_file=provider_ota_file_s7,
-            provider_wait_for="Status: Satisfied",
-            provider_queue=None,                                    # Optional
-            provider_timeout=None,                                  # Optional
-            provider_override_image_uri="bdx://000000000000000X"    # Optional - URI Invalid
+        provider_proc_s7 = OTAProviderSubprocess(
+            ota_file=provider_ota_file_s7,           # Path to OTA image file
+            discriminator=provider_discriminator,
+            passcode=provider_setupPinCode,
+            secured_device_port=provider_port,
+            queue=None,
+            timeout=None,
+            override_image_uri="bdx://000000000000000X",
+            log_file_path=self.LOG_FILE_PATH,
+            app_path=self.APP_PATH,
+            kvs_path=self.KVS_PATH,
         )
+        provider_wait_for = "Status: Satisfied"
+        provider_proc_s7.start(expected_output=provider_wait_for, timeout=300)
 
         # ------------------------------------------------------------------------------------
         # [STEP_7]: Step #7.1 - Matcher for OTA records logs
@@ -1318,7 +1251,7 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_7]: Step #7.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s7}: Step #7.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id_s7)
+        resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id)
         logger.info(f'{step_number_s7}: Step #7.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
@@ -1394,20 +1327,16 @@ class TC_SU_2_2(MatterBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_7]: Step #7.5 - Close Provider_S7 Process (CLEANUP!)
-        # Restores ACLs, expires sessions, stops provider, and deletes temporary KVS files
         # ------------------------------------------------------------------------------------
         logger.info(
-            f'{step_number_s7}: Step #7.5 - Cleanly closed Provider_S7 process: ACLs restored, sessions expired, process stopped, KVS files deleted.')
+            f'{step_number_s7}: Step #7.5 - Closed Provider_S7 process.')
 
-        # Kill Provider
-        provider_proc_s7.terminate()
-        await asyncio.sleep(1)
-
-        # Delete KVS files
-        subprocess.run("rm -rf /tmp/chip_kvs /tmp/chip_kvs-shm /tmp/chip_kvs-wal", shell=True)
-        await asyncio.sleep(1)
-        subprocess.run("rm -rf /tmp/chip_kvs_provider*", shell=True)
-        await asyncio.sleep(1)
+        try:
+            provider_proc_s7.terminate()
+        except Exception as e:
+            logger.info(
+                f'{step_number_s7}: Step #7.5 - Provider termination raised an expected exception (likely BDX unsolicited message): {e}'
+            )
 
 
 if __name__ == "__main__":

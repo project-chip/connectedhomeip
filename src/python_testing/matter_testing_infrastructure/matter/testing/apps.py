@@ -54,9 +54,16 @@ class AppServerSubprocess(Subprocess):
     PREFIX = b"[SERVER]"
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: list[str] = []):
+                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: str = None):
         # Create a temporary KVS file and keep the descriptor to avoid leaks.
-        self.kvs_fd, kvs_path = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")
+        # self.kvs_fd, kvs_path = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")
+
+        if kvs_path:
+            self.kvs_fd = None
+            final_kvs_path = kvs_path
+        else:
+            self.kvs_fd, final_kvs_path = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")
+
         try:
             # Build the command list
             command = [app]
@@ -64,7 +71,7 @@ class AppServerSubprocess(Subprocess):
                 command.extend(extra_args)
 
             command.extend([
-                "--KVS", kvs_path,
+                "--KVS", final_kvs_path,
                 '--secured-device-port', str(port),
                 "--discriminator", str(discriminator),
                 "--passcode", str(passcode)
@@ -75,12 +82,13 @@ class AppServerSubprocess(Subprocess):
                              output_cb=lambda line, is_stderr: self.PREFIX + line)
         except Exception:
             # Do not leak KVS file descriptor on failure
-            os.close(self.kvs_fd)
+            if self.kvs_fd is not None:
+                os.close(self.kvs_fd)
             raise
 
     def __del__(self):
         # Do not leak KVS file descriptor.
-        if hasattr(self, "kvs_fd"):
+        if hasattr(self, "kvs_fd") and self.kvs_fd is not None:
             try:
                 os.close(self.kvs_fd)
             except OSError:
@@ -210,6 +218,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
             passcode=passcode,
             port=secured_device_port,
             extra_args=args,
+            kvs_path=kvs_path
         )
 
     def _process_output(self, line: bytes, is_stderr: bool) -> bytes:
