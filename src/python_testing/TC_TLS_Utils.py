@@ -34,6 +34,7 @@ from pyasn1_modules import rfc2986, rfc5480
 import matter.clusters as Clusters
 import matter.testing.matchers as matchers
 from matter import ChipDeviceCtrl
+from matter.clusters.enum import MatterIntEnum
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
@@ -350,7 +351,7 @@ class TLSUtils:
         caid: uint,
         endpoint_id: Union[Nullable, int] = NullValue,
         ccdid: Union[Nullable, uint] = NullValue,
-        expected_status: Status = Status.Success,
+        expected_status: Union[Status, MatterIntEnum] = Status.Success,
     ) -> Union[
         Clusters.TlsClientManagement.Commands.ProvisionEndpointResponse,
         InteractionModelError,
@@ -373,7 +374,12 @@ class TLSUtils:
             )
             return result
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+            if matchers.is_type(expected_status, Status):
+                asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+            else:
+                asserts.assert_equal(e.status, Status.Failure, "Unexpected error returned")
+                asserts.assert_equal(e.clusterStatus, expected_status, "Unexpected error returned")
+
             return e
 
     async def send_remove_tls_endpoint_command(

@@ -95,21 +95,9 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
 {
     VerifyOrReturnError(matterEndpoint == EndpointId(1), ClusterStatusCode(Status::ConstraintError));
 
-    if (mCertificateTable.HasRootCertificateEntry(fabric, provisionReq.caid) != CHIP_NO_ERROR)
-    {
-        return ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kRootCertificateNotFound);
-    }
-    if (!provisionReq.ccdid.IsNull() &&
-        mCertificateTable.HasClientCertificateEntry(fabric, provisionReq.ccdid.Value()) != CHIP_NO_ERROR)
-    {
-        return ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kClientCertificateNotFound);
-    }
-
-    VerifyOrReturnError(!provisionReq.endpointID.IsNull() || mProvisioned.size() < mTlsClientManagementServer->GetMaxProvisioned(),
-                        ClusterStatusCode(Status::ResourceExhausted));
-
     // Find existing value to update & check for port/name collisions
     Provisioned * provisioned = nullptr;
+    uint16_t numInFabric      = 0;
     for (auto & item : mProvisioned)
     {
         const auto & endpointStruct = item.payload;
@@ -118,14 +106,21 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
             provisioned = &item;
             continue;
         }
-        if (endpointStruct.hostname.data_equal(provisionReq.hostname) || (endpointStruct.port == provisionReq.port))
+        if (item.fabric == fabric)
         {
-            return ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kEndpointAlreadyInstalled);
+            numInFabric++;
+            if (endpointStruct.hostname.data_equal(provisionReq.hostname) && (endpointStruct.port == provisionReq.port))
+            {
+                return ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kEndpointAlreadyInstalled);
+            }
         }
     }
 
     if (provisionReq.endpointID.IsNull())
     {
+        VerifyOrReturnError(numInFabric < mTlsClientManagementServer->GetMaxProvisioned(),
+                            ClusterStatusCode(Status::ResourceExhausted));
+
         provisioned           = &mProvisioned.emplace_back();
         auto & endpointStruct = provisioned->payload;
 
@@ -149,10 +144,12 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
     }
 
     auto & endpointStruct = provisioned->payload;
+    provisioned->fabric   = fabric;
     ReturnValueOnFailure(endpointStruct.CopyHostnameFrom(provisionReq.hostname), ClusterStatusCode(Status::ConstraintError));
-    endpointStruct.port  = provisionReq.port;
-    endpointStruct.caid  = provisionReq.caid;
-    endpointStruct.ccdid = provisionReq.ccdid;
+    endpointStruct.port           = provisionReq.port;
+    endpointStruct.caid           = provisionReq.caid;
+    endpointStruct.ccdid          = provisionReq.ccdid;
+    endpointStruct.referenceCount = 0;
     endpointStruct.SetFabricIndex(fabric);
 
     return ClusterStatusCode(Status::Success);
@@ -175,10 +172,10 @@ Status TlsClientManagementCommandDelegate::FindProvisionedEndpointByID(EndpointI
     return Status::NotFound;
 }
 
-ClusterStatusCode TlsClientManagementCommandDelegate::RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                                    uint16_t endpointID)
+Status TlsClientManagementCommandDelegate::RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                         uint16_t endpointID)
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), ClusterStatusCode(Status::ConstraintError));
+    VerifyOrReturnError(matterEndpoint == EndpointId(1), Status::ConstraintError);
 
     auto i = mProvisioned.begin();
     for (; i != mProvisioned.end(); i++)
@@ -188,17 +185,12 @@ ClusterStatusCode TlsClientManagementCommandDelegate::RemoveProvisionedEndpointB
             break;
         }
     }
-    if (i == mProvisioned.end() || i->fabric != fabric)
-    {
-        return ClusterStatusCode(Status::NotFound);
-    }
-    if (i->payload.status == TLSEndpointStatusEnum::kInUse)
-    {
-        return ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kEndpointInUse);
-    }
+    VerifyOrReturnError(i != mProvisioned.end() && i->fabric == fabric, Status::NotFound);
+    VerifyOrReturnError(i->payload.referenceCount == 0, Status::InvalidInState);
+
     mProvisioned.erase(i);
 
-    return ClusterStatusCode(Status::Success);
+    return Status::Success;
 }
 
 CHIP_ERROR TlsClientManagementCommandDelegate::RootCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id)
@@ -226,6 +218,21 @@ CHIP_ERROR TlsClientManagementCommandDelegate::ClientCertCanBeRemoved(EndpointId
         }
     }
     return CHIP_NO_ERROR;
+}
+
+void TlsClientManagementCommandDelegate::RemoveFabric(FabricIndex fabric)
+{
+    for (auto i = mProvisioned.begin(); i != mProvisioned.end();)
+    {
+        if (i->fabric == fabric)
+        {
+            i = mProvisioned.erase(i);
+        }
+        else
+        {
+            ++i;
+        }
+    }
 }
 
 static CertificateTableImpl gCertificateTableInstance;

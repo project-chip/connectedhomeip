@@ -58,11 +58,13 @@ public:
                                                                     uint16_t endpointID,
                                                                     EndpointStructType & endpoint) const override;
 
-    Protocols::InteractionModel::ClusterStatusCode RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                                 uint16_t endpointID) override;
+    Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                      uint16_t endpointID) override;
 
     CHIP_ERROR RootCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) override;
     CHIP_ERROR ClientCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id) override;
+
+    void RemoveFabric(FabricIndex fabric) override;
 
     static inline TlsClientManagementCommandDelegate & GetInstance() { return instance; }
 
