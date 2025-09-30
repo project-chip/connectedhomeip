@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2021-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -94,9 +94,8 @@ CHIP_ERROR IsValidAclEntryList(const DataModel::DecodableList<AclStorage::Decoda
     {
         VerifyOrReturnError(validationIterator.GetValue().GetEntry().IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
     }
-    ReturnErrorOnFailure(validationIterator.GetStatus());
 
-    return CHIP_NO_ERROR;
+    return validationIterator.GetStatus();
 }
 
 CHIP_ERROR WriteAcl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
@@ -740,8 +739,6 @@ void AccessControlCluster::OnFabricRestrictionReviewUpdate(FabricIndex fabricInd
     event.ARLRequestFlowUrl = arlRequestFlowUrl;
 
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
-
-    return;
 }
 #endif
 
