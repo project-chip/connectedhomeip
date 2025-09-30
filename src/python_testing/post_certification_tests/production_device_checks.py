@@ -354,9 +354,9 @@ def get_qr() -> str:
 
 
 class SetupCodeType(Enum):
-    UNKNOWN = auto(),
-    QR = auto(),
-    MANUAL = auto(),
+    UNKNOWN = auto()
+    QR = auto()
+    MANUAL = auto()
 
 
 def get_setup_code() -> (str, bool):

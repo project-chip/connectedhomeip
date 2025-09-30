@@ -261,6 +261,7 @@ void Instance::ResetCurrentAttributes()
     mCurrentDayEntry.SetNull();
     mNextDayEntry.SetNull();
     mCurrentDayEntryDate.SetNull();
+    mNextDayEntryDate.SetNull();
 
     mCurrentTariffComponents_MgmtObj.Cleanup();
     mNextTariffComponents_MgmtObj.Cleanup();
