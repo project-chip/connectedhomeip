@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +27,7 @@ import matter.tlv.TlvWriter
 class CameraAvSettingsUserLevelManagementClusterMPTZStruct(
   val pan: Optional<Short>,
   val tilt: Optional<Short>,
-  val zoom: Optional<UByte>,
+  val zoom: Optional<UByte>
 ) {
   override fun toString(): String = buildString {
     append("CameraAvSettingsUserLevelManagementClusterMPTZStruct {\n")
@@ -60,30 +61,24 @@ class CameraAvSettingsUserLevelManagementClusterMPTZStruct(
     private const val TAG_TILT = 1
     private const val TAG_ZOOM = 2
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): CameraAvSettingsUserLevelManagementClusterMPTZStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CameraAvSettingsUserLevelManagementClusterMPTZStruct {
       tlvReader.enterStructure(tlvTag)
-      val pan =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PAN))) {
-          Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_PAN)))
-        } else {
-          Optional.empty()
-        }
-      val tilt =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TILT))) {
-          Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_TILT)))
-        } else {
-          Optional.empty()
-        }
-      val zoom =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ZOOM))) {
-          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_ZOOM)))
-        } else {
-          Optional.empty()
-        }
-
+      val pan = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PAN))) {
+      Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_PAN)))
+    } else {
+      Optional.empty()
+    }
+      val tilt = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TILT))) {
+      Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_TILT)))
+    } else {
+      Optional.empty()
+    }
+      val zoom = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ZOOM))) {
+      Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_ZOOM)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return CameraAvSettingsUserLevelManagementClusterMPTZStruct(pan, tilt, zoom)

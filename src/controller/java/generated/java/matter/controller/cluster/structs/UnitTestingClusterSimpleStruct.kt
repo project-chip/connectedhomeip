@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -32,7 +33,7 @@ class UnitTestingClusterSimpleStruct(
   val f: UByte,
   val g: Float,
   val h: Double,
-  val i: Optional<UByte>,
+  val i: Optional<UByte>
 ) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterSimpleStruct {\n")
@@ -88,13 +89,12 @@ class UnitTestingClusterSimpleStruct(
       val f = tlvReader.getUByte(ContextSpecificTag(TAG_F))
       val g = tlvReader.getFloat(ContextSpecificTag(TAG_G))
       val h = tlvReader.getDouble(ContextSpecificTag(TAG_H))
-      val i =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_I))) {
-          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_I)))
-        } else {
-          Optional.empty()
-        }
-
+      val i = if (tlvReader.isNextTag(ContextSpecificTag(TAG_I))) {
+      Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_I)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return UnitTestingClusterSimpleStruct(a, b, c, d, e, f, g, h, i)

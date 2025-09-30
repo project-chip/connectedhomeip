@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +28,7 @@ class EnergyEvseClusterFaultEvent(
   val sessionID: UInt?,
   val state: UByte,
   val faultStatePreviousState: UByte,
-  val faultStateCurrentState: UByte,
+  val faultStateCurrentState: UByte
 ) {
   override fun toString(): String = buildString {
     append("EnergyEvseClusterFaultEvent {\n")
@@ -58,29 +60,21 @@ class EnergyEvseClusterFaultEvent(
     private const val TAG_FAULT_STATE_PREVIOUS_STATE = 2
     private const val TAG_FAULT_STATE_CURRENT_STATE = 4
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterFaultEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : EnergyEvseClusterFaultEvent {
       tlvReader.enterStructure(tlvTag)
-      val sessionID =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_ID))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_SESSION_ID))
-          null
-        }
+      val sessionID = if (!tlvReader.isNull()) {
+        tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_ID))
+      } else {
+        tlvReader.getNull(ContextSpecificTag(TAG_SESSION_ID))
+        null
+      }
       val state = tlvReader.getUByte(ContextSpecificTag(TAG_STATE))
-      val faultStatePreviousState =
-        tlvReader.getUByte(ContextSpecificTag(TAG_FAULT_STATE_PREVIOUS_STATE))
-      val faultStateCurrentState =
-        tlvReader.getUByte(ContextSpecificTag(TAG_FAULT_STATE_CURRENT_STATE))
-
+      val faultStatePreviousState = tlvReader.getUByte(ContextSpecificTag(TAG_FAULT_STATE_PREVIOUS_STATE))
+      val faultStateCurrentState = tlvReader.getUByte(ContextSpecificTag(TAG_FAULT_STATE_CURRENT_STATE))
+      
       tlvReader.exitContainer()
 
-      return EnergyEvseClusterFaultEvent(
-        sessionID,
-        state,
-        faultStatePreviousState,
-        faultStateCurrentState,
-      )
+      return EnergyEvseClusterFaultEvent(sessionID, state, faultStatePreviousState, faultStateCurrentState)
     }
   }
 }

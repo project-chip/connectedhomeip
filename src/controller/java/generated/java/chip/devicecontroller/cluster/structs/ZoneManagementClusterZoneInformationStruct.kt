@@ -17,19 +17,21 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ZoneManagementClusterZoneInformationStruct(
-  val zoneID: UInt,
-  val zoneType: UInt,
-  val zoneSource: UInt,
-  val twoDCartesianZone: Optional<ZoneManagementClusterTwoDCartesianZoneStruct>,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ZoneManagementClusterZoneInformationStruct (
+    val zoneID: UInt,
+    val zoneType: UInt,
+    val zoneSource: UInt,
+    val twoDCartesianZone: Optional<ZoneManagementClusterTwoDCartesianZoneStruct>) {
+  override fun toString(): String  = buildString {
     append("ZoneManagementClusterZoneInformationStruct {\n")
     append("\tzoneID : $zoneID\n")
     append("\tzoneType : $zoneType\n")
@@ -45,9 +47,9 @@ class ZoneManagementClusterZoneInformationStruct(
       put(ContextSpecificTag(TAG_ZONE_TYPE), zoneType)
       put(ContextSpecificTag(TAG_ZONE_SOURCE), zoneSource)
       if (twoDCartesianZone.isPresent) {
-        val opttwoDCartesianZone = twoDCartesianZone.get()
-        opttwoDCartesianZone.toTlv(ContextSpecificTag(TAG_TWO_D_CARTESIAN_ZONE), this)
-      }
+      val opttwoDCartesianZone = twoDCartesianZone.get()
+      opttwoDCartesianZone.toTlv(ContextSpecificTag(TAG_TWO_D_CARTESIAN_ZONE), this)
+    }
       endStructure()
     }
   }
@@ -58,31 +60,20 @@ class ZoneManagementClusterZoneInformationStruct(
     private const val TAG_ZONE_SOURCE = 2
     private const val TAG_TWO_D_CARTESIAN_ZONE = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ZoneManagementClusterZoneInformationStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ZoneManagementClusterZoneInformationStruct {
       tlvReader.enterStructure(tlvTag)
       val zoneID = tlvReader.getUInt(ContextSpecificTag(TAG_ZONE_ID))
       val zoneType = tlvReader.getUInt(ContextSpecificTag(TAG_ZONE_TYPE))
       val zoneSource = tlvReader.getUInt(ContextSpecificTag(TAG_ZONE_SOURCE))
-      val twoDCartesianZone =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TWO_D_CARTESIAN_ZONE))) {
-          Optional.of(
-            ZoneManagementClusterTwoDCartesianZoneStruct.fromTlv(
-              ContextSpecificTag(TAG_TWO_D_CARTESIAN_ZONE),
-              tlvReader,
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-
+      val twoDCartesianZone = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TWO_D_CARTESIAN_ZONE))) {
+      Optional.of(ZoneManagementClusterTwoDCartesianZoneStruct.fromTlv(ContextSpecificTag(TAG_TWO_D_CARTESIAN_ZONE), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return ZoneManagementClusterZoneInformationStruct(
-        zoneID,
-        zoneType,
-        zoneSource,
-        twoDCartesianZone,
-      )
+      return ZoneManagementClusterZoneInformationStruct(zoneID, zoneType, zoneSource, twoDCartesianZone)
     }
   }
 }

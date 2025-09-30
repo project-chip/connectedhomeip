@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -25,7 +27,7 @@ import matter.tlv.TlvWriter
 class CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct(
   val codec: UByte,
   val resolution: CameraAvStreamManagementClusterVideoResolutionStruct,
-  val minBitRate: UInt,
+  val minBitRate: UInt
 ) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct {\n")
@@ -50,26 +52,15 @@ class CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct(
     private const val TAG_RESOLUTION = 1
     private const val TAG_MIN_BIT_RATE = 2
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct {
       tlvReader.enterStructure(tlvTag)
       val codec = tlvReader.getUByte(ContextSpecificTag(TAG_CODEC))
-      val resolution =
-        CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(
-          ContextSpecificTag(TAG_RESOLUTION),
-          tlvReader,
-        )
+      val resolution = CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(ContextSpecificTag(TAG_RESOLUTION), tlvReader)
       val minBitRate = tlvReader.getUInt(ContextSpecificTag(TAG_MIN_BIT_RATE))
-
+      
       tlvReader.exitContainer()
 
-      return CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct(
-        codec,
-        resolution,
-        minBitRate,
-      )
+      return CameraAvStreamManagementClusterRateDistortionTradeOffPointsStruct(codec, resolution, minBitRate)
     }
   }
 }
