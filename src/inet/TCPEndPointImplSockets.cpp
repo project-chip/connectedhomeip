@@ -1045,7 +1045,6 @@ void TCPEndPointImplSockets::HandleIncomingConnection()
 #else  // !INET_CONFIG_ENABLE_IPV4
             conEP->mAddrType = IPAddressType::kIPv6;
 #endif // !INET_CONFIG_ENABLE_IPV4
-            conEP->Retain();
 
             // Wait for ability to read on this endpoint.
             auto & conEPLayer = static_cast<System::LayerSockets &>(conEP->GetSystemLayer());
@@ -1070,10 +1069,6 @@ void TCPEndPointImplSockets::HandleIncomingConnection()
     }
     if (conEP != nullptr)
     {
-        if (conEP->mState == State::kConnected)
-        {
-            conEP->Release();
-        }
         conEP->Release();
     }
     if (OnAcceptError != nullptr)

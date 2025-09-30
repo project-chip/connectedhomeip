@@ -371,7 +371,7 @@ TEST_F(TestInetEndPoint, TestInetEndPointInternal)
     EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_IPV4
 
-    testTCPEP1->Free();
+    testTCPEP1->Release();
     EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, 0));
     EXPECT_TRUE(SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, 1));
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT

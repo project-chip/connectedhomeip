@@ -318,15 +318,6 @@ public:
     void Abort();
 
     /**
-     * @brief   Initiate (or continue) TCP full close, ignoring errors.
-     *
-     * @details
-     *  The object is returned to the free pool, and all remaining user
-     *  references are subsequently invalid.
-     */
-    void Free();
-
-    /**
      * @brief   Extract whether TCP connection is established.
      */
     bool IsConnected() const { return IsConnected(mState); }
@@ -526,6 +517,16 @@ public:
 
 protected:
     friend class TCPTest;
+    friend class EndPointDeletor<TCPEndPoint>;
+
+    /**
+     * @brief   Initiate (or continue) TCP full close, ignoring errors.
+     *
+     * @details
+     *  The object is returned to the free pool, and all remaining user
+     *  references are subsequently invalid.
+     */
+    void Free();
 
     TCPEndPoint(EndPointManager<TCPEndPoint> & endPointManager) :
         EndPointBasis(endPointManager), OnConnectComplete(nullptr), OnDataReceived(nullptr), OnDataSent(nullptr),
@@ -602,8 +603,6 @@ protected:
     void StartConnectTimerIfSet();
     void StopConnectTimer();
 
-    friend class TCPEndPointDeletor;
-
     /*
      * Implementation helpers for shared methods.
      */
@@ -623,6 +622,13 @@ struct EndPointProperties<TCPEndPoint>
     static constexpr char kName[]         = "TCP";
     static constexpr size_t kNumEndPoints = INET_CONFIG_NUM_TCP_ENDPOINTS;
     static constexpr int kSystemStatsKey  = System::Stats::kInetLayer_NumTCPEps;
+};
+
+template <>
+class EndPointDeletor<TCPEndPoint>
+{
+public:
+    static void Release(TCPEndPoint * obj) { obj->Free(); }
 };
 
 } // namespace Inet
