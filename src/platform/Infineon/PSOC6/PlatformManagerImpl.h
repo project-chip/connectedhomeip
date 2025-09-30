@@ -48,7 +48,6 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
-    CHIP_ERROR InitLwIPCoreLock(void);
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
 private:
