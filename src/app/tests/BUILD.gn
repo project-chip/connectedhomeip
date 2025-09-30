@@ -282,8 +282,6 @@ chip_test_suite("tests") {
     "TestWriteInteraction.cpp",
   ]
 
-  sources = [ "CommissioningWindowManagerTestAccess.h" ]
-
   cflags = [ "-Wconversion" ]
 
   public_deps = [
