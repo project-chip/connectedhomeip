@@ -62,7 +62,7 @@ class WebRTCTestHelper:
             logging.error(f"Failed to allocate audio stream. {e}")
             return None
 
-    async def allocate_video_stream(self, endpoint):
+    async def allocate_video_stream(self, endpoint, devCtrl=None, node_id=None):
         """Try to allocate a video stream from the camera device. Returns the stream ID if successful, otherwise None."""
         attrs = CameraAvStreamManagement.Attributes
         try:
@@ -78,6 +78,12 @@ class WebRTCTestHelper:
             )
             aMinViewportRes = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewportResolution)
             aVideoSensorParams = await self.read_avstr_attribute_expect_success(endpoint, attrs.VideoSensorParams)
+            dev_ctrl = self.default_controller
+
+            if (node_id is None):
+                node_id = self.dut_node_id
+            if (devCtrl is not None):
+                dev_ctrl = devCtrl
 
             response = await self.send_single_cmd(
                 cmd=CameraAvStreamManagement.Commands.VideoStreamAllocate(
@@ -96,6 +102,8 @@ class WebRTCTestHelper:
                     OSDEnabled=osd,
                 ),
                 endpoint=endpoint,
+                dev_ctrl=dev_ctrl,
+                node_id=node_id
             )
             return response.videoStreamID
 
