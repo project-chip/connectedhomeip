@@ -3,7 +3,7 @@
 
 import asyncio
 import logging
-from typing import List, Optional
+from typing import List
 
 import matter.clusters as Clusters
 from matter.testing.matter_testing import (
