@@ -14,6 +14,10 @@ using namespace ::chip::System::Clock::Literals;
 
 namespace {
 
+constexpr uint16_t kMaxBlockSize         = 512;
+constexpr chip::FabricIndex kFabricIndex = 1;
+constexpr chip::NodeId kNodeId           = 2;
+
 class TestTransferDiagnosticLog : public ::testing::Test
 {
 public:
@@ -29,7 +33,7 @@ TEST_F(TestTransferDiagnosticLog, InitsDiagnosticLog)
 {
     System::Clock::Internal::RAIIMockClock mockClock;
 
-    mTransferSession.WaitForTransfer(TransferRole::kReceiver, TransferControlFlags::kSenderDrive, uint16_t{ 512 }, 1000_ms);
+    mTransferSession.WaitForTransfer(TransferRole::kReceiver, TransferControlFlags::kSenderDrive, kMaxBlockSize, 1000_ms);
 
     auto transferInit = TransferInit();
 
@@ -81,7 +85,7 @@ TEST_F(TestTransferDiagnosticLog, AccpetsTransferActingAsReceiverWhileInititator
     TransferSession initiator;
     TransferSession::TransferInitData transferInitData;
     transferInitData.TransferCtlFlags = TransferControlFlags::kSenderDrive;
-    transferInitData.MaxBlockSize     = 512;
+    transferInitData.MaxBlockSize     = kMaxBlockSize;
     transferInitData.StartOffset      = 0;
     transferInitData.Length           = 1024;
     char testFileDes[9]               = { "test.txt" };
@@ -101,7 +105,7 @@ TEST_F(TestTransferDiagnosticLog, AccpetsTransferActingAsReceiverWhileInititator
     EXPECT_EQ(initiatorEvent.EventType, TransferSession::OutputEventType::kMsgToSend);
 
     /// Init responder (and receiver) transfer session
-    r = mTransferSession.WaitForTransfer(TransferRole::kReceiver, TransferControlFlags::kSenderDrive, 512,
+    r = mTransferSession.WaitForTransfer(TransferRole::kReceiver, TransferControlFlags::kSenderDrive, kMaxBlockSize,
                                          System::Clock::Seconds16(20));
     EXPECT_EQ(r, CHIP_NO_ERROR);
 
@@ -124,8 +128,8 @@ TEST_F(TestTransferDiagnosticLog, AccpetsTransferActingAsReceiverWhileInititator
 
     EXPECT_EQ(r, CHIP_NO_ERROR);
 
-    proxyDiagnosticLog.SetFabricIndex(1);
-    proxyDiagnosticLog.SetPeerNodeId(2);
+    proxyDiagnosticLog.SetFabricIndex(kFabricIndex);
+    proxyDiagnosticLog.SetPeerNodeId(kNodeId);
     r = proxyDiagnosticLog.Accept();
 
     EXPECT_EQ(r, CHIP_NO_ERROR);
@@ -143,7 +147,7 @@ TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer)
     TransferSession initiator;
     TransferSession::TransferInitData transferInitData;
     transferInitData.TransferCtlFlags = TransferControlFlags::kSenderDrive;
-    transferInitData.MaxBlockSize     = 512;
+    transferInitData.MaxBlockSize     = kMaxBlockSize;
     transferInitData.StartOffset      = 0;
     transferInitData.Length           = 1024;
     char testFileDes[9]               = { "test.txt" };
@@ -163,7 +167,7 @@ TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer)
     EXPECT_EQ(initiatorEvent.EventType, TransferSession::OutputEventType::kMsgToSend);
 
     /// Init responder (and receiver) transfer session
-    r = mTransferSession.WaitForTransfer(TransferRole::kReceiver, TransferControlFlags::kSenderDrive, 512,
+    r = mTransferSession.WaitForTransfer(TransferRole::kReceiver, TransferControlFlags::kSenderDrive, kMaxBlockSize,
                                          System::Clock::Seconds16(20));
     EXPECT_EQ(r, CHIP_NO_ERROR);
 
@@ -186,8 +190,8 @@ TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer)
 
     EXPECT_EQ(r, CHIP_NO_ERROR);
 
-    proxyDiagnosticLog.SetFabricIndex(1);
-    proxyDiagnosticLog.SetPeerNodeId(2);
+    proxyDiagnosticLog.SetFabricIndex(kFabricIndex);
+    proxyDiagnosticLog.SetPeerNodeId(kNodeId);
     r = proxyDiagnosticLog.Accept();
 
     EXPECT_EQ(r, CHIP_NO_ERROR);
