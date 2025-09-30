@@ -36,8 +36,6 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/tests/CommissioningWindowManagerTestAccess.h>
-
 using namespace chip::Crypto;
 
 using chip::CommissioningWindowAdvertisement;
