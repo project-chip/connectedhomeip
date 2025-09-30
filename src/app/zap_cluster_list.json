@@ -43,6 +43,7 @@
         "DISHWASHER_MODE_CLUSTER": [],
         "ELECTRICAL_GRID_CONDITIONS_CLUSTER": [],
         "GROUPCAST_CLUSTER": [],
+        "HUMIDISTAT_CLUSTER": [],
         "METER_IDENTIFICATION_CLUSTER": [],
         "MICROWAVE_OVEN_MODE_CLUSTER": [],
         "DOOR_LOCK_CLUSTER": [],
@@ -217,6 +218,7 @@
             "electrical-grid-conditions-server"
         ],
         "GROUPCAST_CLUSTER": [],
+        "HUMIDISTAT_CLUSTER": [],
         "METER_IDENTIFICATION_CLUSTER": ["meter-identification-server"],
         "MICROWAVE_OVEN_MODE_CLUSTER": ["mode-base-server"],
         "DOOR_LOCK_CLUSTER": ["door-lock-server"],
