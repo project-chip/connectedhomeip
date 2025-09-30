@@ -38,12 +38,11 @@ class TlsClientManagementCommandDelegate : public TlsClientManagementDelegate
     };
 
     static TlsClientManagementCommandDelegate instance;
-    Tls::CertificateTable & mCertificateTable;
     std::vector<Provisioned> mProvisioned;
     uint16_t mNextId = 1;
 
 public:
-    TlsClientManagementCommandDelegate(Tls::CertificateTable & certificateTable) : mCertificateTable(certificateTable) {}
+    TlsClientManagementCommandDelegate() {}
     ~TlsClientManagementCommandDelegate() = default;
 
     CHIP_ERROR GetProvisionedEndpointByIndex(EndpointId matterEndpoint, FabricIndex fabric, size_t index,

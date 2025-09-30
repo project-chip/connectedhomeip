@@ -236,7 +236,7 @@ void TlsClientManagementCommandDelegate::RemoveFabric(FabricIndex fabric)
 }
 
 static CertificateTableImpl gCertificateTableInstance;
-TlsClientManagementCommandDelegate TlsClientManagementCommandDelegate::instance(gCertificateTableInstance);
+TlsClientManagementCommandDelegate TlsClientManagementCommandDelegate::instance;
 static TlsClientManagementServer gTlsClientManagementClusterServerInstance = TlsClientManagementServer(
     EndpointId(1), TlsClientManagementCommandDelegate::GetInstance(), gCertificateTableInstance, kMaxProvisioned);
 
