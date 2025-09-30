@@ -501,7 +501,7 @@ DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataMode
     case AccessControl::Attributes::ClusterRevision::Id:
         return encoder.Encode(AccessControl::kRevision);
     default:
-        return CHIP_NO_ERROR;
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
 }
 
