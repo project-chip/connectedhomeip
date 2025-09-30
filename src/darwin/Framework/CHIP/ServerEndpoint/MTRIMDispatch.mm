@@ -26,6 +26,7 @@
 #include <lib/core/TLVReader.h>
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <zap-generated/CodeDrivenCallback.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -75,19 +76,23 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 
 void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
+    if (clusterId == Descriptor::Id) {
+        MatterDescriptorClusterInitCallback(endpoint);
+    }
     assertChipStackLockedByCurrentThread();
 
-    // No-op: Until Descriptor cluster is migrated to be code driven,
-    // this is a no-op. For OTA we don't use the functions in CodegenIntegration
+    // No-op: For OTA we don't use the functions in CodegenIntegration
     // because we use the gOtaProviderServer and the functions defined here.
 }
 
 void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId)
 {
+    if (clusterId == Descriptor::Id) {
+        MatterDescriptorClusterShutdownCallback(endpoint);
+    }
     assertChipStackLockedByCurrentThread();
 
-    // No-op: Until Descriptor cluster is migrated to be code driven,
-    // this is a no-op. For OTA we don't use the functions in CodegenIntegration
+    // No-op: For OTA we don't use the functions in CodegenIntegration
     // because we use the gOtaProviderServer and the functions defined here.
 }
 
