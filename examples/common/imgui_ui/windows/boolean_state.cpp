@@ -33,7 +33,7 @@ namespace Windows {
 
 void BooleanState::UpdateState()
 {
-    auto booleanState = chip::app::Clusters::BooleanState::GetClusterForEndpointIndex(mEndpointId);
+    auto booleanState = chip::app::Clusters::BooleanState::FindClusterOnEndpoint(mEndpointId);
     VerifyOrReturn(booleanState != nullptr);
 
     if (mTargetState.HasValue())
