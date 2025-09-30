@@ -414,7 +414,8 @@ CHIP_ERROR ChipErrorToImErrorMap(CHIP_ERROR err)
     return mappedError;
 }
 
-CHIP_ERROR WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder, ServerClusterContext * context)
+CHIP_ERROR WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder,
+                     ServerClusterContext * context)
 {
     switch (request.path.mAttributeId)
     {
