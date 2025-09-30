@@ -673,7 +673,8 @@ commissioned into the test fabric. They can also be run against a MatterTlvJson
 file with a representation of this information. These files can be generated
 from the TC_DeviceBasicComposition.py tests, as described below.
 
-To run any of the python certification tests, you will first need to
+To run any of the python certification tests, you will first need to set up your
+environment as described in [Setup](#setup).
 
 #### Running conformance tests against an uncommissioned device over PASE
 
@@ -722,8 +723,6 @@ thread operational dataset via the `--thread-dataset-hex` parameter.
 
 If the commissioning method is `ble-wifi`, you will also need to provide the
 wifi SSID and password via the `--wifi-ssid` and `--wifi-passphrase` parameters.
-
-You can change the fabric storage location and the node ID via the
 
 By default, the test stores fabric information in `admin_storage.json` in the
 current directory and uses a node ID of `0x12344321` for the device being
