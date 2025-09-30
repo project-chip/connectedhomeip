@@ -27,6 +27,7 @@ from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
 from matter.testing.matter_testing import MatterBaseTest
+from matter.clusters.Types import NullValue
 
 logger = logging.getLogger(__name__)
 
@@ -37,13 +38,19 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
     current_provider_app_proc: Union[OTAProviderSubprocess, None] = None
     current_requestor_app_proc: Union[OTAProviderSubprocess, None] = None
 
-    def launch_provider_app(self, version: int = 2, extra_args: list = [], log_file: str = "/tmp/provider.log"):
+    def commission_provider(self, **kwargs):
+        self.launch_provider_app(kwargs.version, kwargs.extra_arguments, kwargs.log_file)
+        self.write_ota_providers(kwargs.controller, kwargs.provider_node_id, kwargs.endpoint)
+        self.create_acl_entry(kwargs.controller, kwargs.provider_node_id, kwargs.requestor_node_id)
+
+    def launch_provider_app(self, version: int = 2, extra_args: list = [], log_file: str = "/tmp/provider.log", expected_output: str = "Status: Satisfied"):
         """Launch the provider app using the OTAProviderSubprocess.
 
         Args:
             version (int, optional): Version of the OTA image to load. Defaults to 2.
             extra_args (list, optional): List of arguments for ota provider. Defaults to [].
             log_file (str, optional): Destination of the output app logs. Defaults to "/tmp/provider.log".
+
         """
         logger.info(f"LAUNCHING PROVIDER APP WITH VERSION {version}")
         # Image to launch
@@ -77,7 +84,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             log_file=provider_log,
             err_log_file=provider_log)
         proc.start(
-            expected_output="Server initialization complete",
+            expected_output=expected_output,
             timeout=10)
 
         self.current_provider_app_proc = proc
@@ -201,3 +208,50 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             asserts.assert_equal(event_report.targetSoftwareVersion,  target_version, f"Target version is not {target_version}")
         if reason is not None:
             asserts.assert_equal(event_report.reason,  reason, f"Reason is not {reason}")
+
+    def create_acl_entry(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, provider_node_id: int, requestor_node_id: Optional[int] = None):
+        """Create ACL entries to allow OTA requestors to access the provider.
+
+        Args:
+            dev_ctrl: Device controller for sending commands
+            provider_node_id: Node ID of the OTA provider
+            requestor_node_id: Optional specific requestor node ID for targeted access
+
+        Returns:
+            Result of the ACL write operation
+        """
+        # Standard ACL entry for OTA Provider cluster
+        admin_node_id = dev_ctrl.nodeId if hasattr(dev_ctrl, 'nodeId') else self.DEFAULT_ADMIN_NODE_ID
+        requestor_subjects = [requestor_node_id] if requestor_node_id else NullValue
+
+        # Create ACL entries using proper struct constructors
+        acl_entries = [
+            # Admin entry
+            Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,  # type: ignore
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
+                subjects=[admin_node_id],  # type: ignore
+                targets=NullValue
+            ),
+            # Operate entry
+            Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,  # type: ignore
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
+                subjects=requestor_subjects,  # type: ignore
+                targets=[
+                    Clusters.AccessControl.Structs.AccessControlTargetStruct(  # type: ignore
+                        cluster=Clusters.OtaSoftwareUpdateProvider.id,  # type: ignore
+                        endpoint=NullValue,
+                        deviceType=NullValue
+                    )
+                ],
+            )
+        ]
+
+        # Create the attribute descriptor for the ACL attribute
+        acl_attribute = Clusters.AccessControl.Attributes.Acl(acl_entries)
+
+        return dev_ctrl.WriteAttribute(
+            nodeid=provider_node_id,
+            attributes=[(0, acl_attribute)]
+        )

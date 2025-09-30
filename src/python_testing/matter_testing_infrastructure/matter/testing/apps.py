@@ -58,9 +58,13 @@ class AppServerSubprocess(Subprocess):
     PREFIX = b"[SERVER]"
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: list[str] = [], f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
+                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: str = None, f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
         # Create a temporary KVS file and keep the descriptor to avoid leaks.
-        self.kvs_fd, kvs_path = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")
+
+        if kvs_path is not None:
+            self.kvs_fd, kvs_path = kvs_path
+        else:
+            self.kvs_fd, kvs_path = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")
         try:
             # Build the command list
             command = [app]
@@ -157,27 +161,28 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5541, extra_args: list[str] = [], log_file: Union[str, BinaryIO] = stdout.buffer, err_log_file: Union[str, BinaryIO] = stderr.buffer):
+                 port: int = 5541, extra_args: list[str] = [], kvs_path: str = None, log_file: Union[str, BinaryIO] = stdout.buffer, err_log_file: Union[str, BinaryIO] = stderr.buffer):
         """Initialize the OTA Provider subprocess.
 
         Args:
-            app: Path to the chip-ota-provider-app executable
-            storage_dir: Directory for persistent storage
-            discriminator: Discriminator for commissioning
-            passcode: Passcode for commissioning
-            port: UDP port for secure connections (default: 5541)
-            ota_source: Either OtaImagePath or ImageListPath specifying the OTA image source
-            extra_args: Additional command line arguments
-            log_file: Path to create the BinaryIO logger for stdoutput, if not use the default stdout.buffer.
-            err_log_file: Path to create the BinaryIO logger for stderr, if not use the default stderr.buffer.
+            app(str): Path to the chip-ota-provider-app executable
+            storage_dir(str): Directory for persistent storage
+            discriminator(int): Discriminator for commissioning
+            passcode(int): Passcode for commissioning
+            port(int): UDP port for secure connections (default: 5541)
+            ota_source(OtaImagePath,ImageListPath): Either OtaImagePath or ImageListPath specifying the OTA image source
+            extra_args(list): Additional command line arguments
+            kvs_path(str): Str of the path for the kvs path, if not will use temp file.
+            log_file(str,BinaryIO): Path to create the BinaryIO logger for stdoutput, if not use the default stdout.buffer.
+            err_log_file(str,BinaryIO): Path to create the BinaryIO logger for stderr, if not use the default stderr.buffer.
         """
         # Create the BinaryIO fp allow to use
         if isinstance(log_file, str):
-            f_stdout = open(log_file, 'a+b')
+            f_stdout = open(log_file, 'ab')
             self.log_file = log_file
 
         if isinstance(err_log_file, str):
-            f_stderr = open(err_log_file, 'a+b')
+            f_stderr = open(err_log_file, 'ab')
             self.err_log_file = err_log_file
 
         # Build OTA-specific arguments using the ota_source property
@@ -185,7 +190,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
         # Initialize with the combined arguments
         super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator,
-                         passcode=passcode, port=port, extra_args=combined_extra_args, f_stdout=f_stdout, f_stderr=f_stderr)
+                         passcode=passcode, port=port, extra_args=combined_extra_args, kvs_path=kvs_path, f_stdout=f_stdout, f_stderr=f_stderr)
 
     def kill(self):
         self.p.send_signal(signal.SIGKILL)
@@ -213,7 +218,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
         # read all lines at the moment
         all_lines = None
-        with open(self.log_file, 'r+b') as fp:
+        with open(self.log_file, 'rb') as fp:
             all_lines = fp.readlines()
 
         found_lines = []
@@ -243,6 +248,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
         return found_lines
 
+    # PROPOSE THIS TO REMOVE THIS AND MOVE TO BASE CLASS
     def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int, requestor_node_id: Optional[int] = None):
         """Create ACL entries to allow OTA requestors to access the provider.
 
