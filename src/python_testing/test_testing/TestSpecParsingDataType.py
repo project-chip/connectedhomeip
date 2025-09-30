@@ -981,11 +981,6 @@ class TestSpecParsingDataType(MatterBaseTest):
                     skip_conditions = [
                         ({"MonitoringRegistrationStruct"}, ["Key"], "ICD Management"),
                         ({"ModeOptionStruct"}, ["Mode", "ModeTags", "Label"], None),
-                        ({"EcosystemDeviceStruct"}, ["DeviceName"], "Ecosystem Information"),
-                        ({"HoldTimeLimitsStruct"}, ["HoldTimeMin", "HoldTimeMax"], "Occupancy Sensing"),
-                        ({"ErrorStateStruct"}, ["ErrorStateID"], "Operational State"),
-                        ({"OperationalStateStruct"}, ["OperationalStateID"], "Operational State"),
-                        ({"PowerAdjustCapabilityStruct", "SlotStruct"}, ["MinPower", "MinDuration"], "Device Energy Management"),
                     ]
 
                     should_skip = False
