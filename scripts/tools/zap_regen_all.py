@@ -27,7 +27,6 @@ import sys
 import tempfile
 import time
 import traceback
-from urllib.error import HTTPError
 import urllib.request
 from dataclasses import dataclass
 from enum import Flag, auto
