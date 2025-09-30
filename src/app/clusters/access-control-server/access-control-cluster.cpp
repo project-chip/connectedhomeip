@@ -413,6 +413,22 @@ CHIP_ERROR ChipErrorToImErrorMap(CHIP_ERROR err)
 
     return mappedError;
 }
+
+CHIP_ERROR WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder, ServerClusterContext * context)
+{
+    switch (request.path.mAttributeId)
+    {
+    case Acl::Id:
+        return WriteAcl(request.path, decoder);
+#if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+    case Extension::Id: {
+        return WriteExtension(request.path, decoder, context);
+    }
+#endif
+    default:
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
+    }
+}
 } // namespace
 
 namespace chip {
@@ -456,6 +472,10 @@ void AccessControlCluster::Shutdown()
 DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                   AttributeValueEncoder & encoder)
 {
+    // in many cases attributes are numeric. Do a fallback to handle the general case
+    size_t value                             = 0;
+    const chip::Access::AccessControl & ctrl = chip::Access::GetAccessControl();
+
     switch (request.path.mAttributeId)
     {
     case AccessControl::Attributes::Acl::Id:
@@ -464,64 +484,48 @@ DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataMode
     case AccessControl::Attributes::Extension::Id:
         return ReadExtension(encoder);
 #endif // CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
-    case AccessControl::Attributes::SubjectsPerAccessControlEntry::Id: {
-        size_t value = 0;
-        ReturnErrorOnFailure(chip::Access::GetAccessControl().GetMaxSubjectsPerEntry(value));
-        return encoder.Encode(static_cast<uint16_t>(value));
-    }
-    case AccessControl::Attributes::TargetsPerAccessControlEntry::Id: {
-        size_t value = 0;
-        ReturnErrorOnFailure(chip::Access::GetAccessControl().GetMaxTargetsPerEntry(value));
-        return encoder.Encode(static_cast<uint16_t>(value));
-    }
-    case AccessControl::Attributes::AccessControlEntriesPerFabric::Id: {
-        size_t value = 0;
-        ReturnErrorOnFailure(chip::Access::GetAccessControl().GetMaxEntriesPerFabric(value));
-        return encoder.Encode(static_cast<uint16_t>(value));
-    }
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     case AccessControl::Attributes::CommissioningARL::Id:
         return ReadCommissioningArl(encoder);
     case AccessControl::Attributes::Arl::Id:
         return ReadArl(encoder);
 #endif
+    case AccessControl::Attributes::SubjectsPerAccessControlEntry::Id:
+        ReturnErrorOnFailure(ctrl.GetMaxSubjectsPerEntry(value));
+        break;
+    case AccessControl::Attributes::TargetsPerAccessControlEntry::Id:
+        ReturnErrorOnFailure(ctrl.GetMaxTargetsPerEntry(value));
+        break;
+    case AccessControl::Attributes::AccessControlEntriesPerFabric::Id:
+        ReturnErrorOnFailure(ctrl.GetMaxEntriesPerFabric(value));
+        break;
     case AccessControl::Attributes::FeatureMap::Id: {
-        uint32_t featureMap = 0;
+        value = 0;
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-        featureMap |= to_underlying(Clusters::AccessControl::Feature::kManagedDevice);
+        value |= to_underlying(Clusters::AccessControl::Feature::kManagedDevice);
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
-        featureMap |= to_underlying(Clusters::AccessControl::Feature::kExtension);
+        value |= to_underlying(Clusters::AccessControl::Feature::kExtension);
 #endif // CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
 
-        return encoder.Encode(featureMap);
+        break;
     }
     case AccessControl::Attributes::ClusterRevision::Id:
-        return encoder.Encode(AccessControl::kRevision);
+        value = kRevision;
+        break;
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
+
+    return encoder.Encode(static_cast<uint32_t>(value));
 }
 
 DataModel::ActionReturnStatus AccessControlCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                    AttributeValueDecoder & decoder)
 {
-    switch (request.path.mAttributeId)
-    {
-    case Acl::Id: {
-        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, ChipErrorToImErrorMap(WriteAcl(request.path, decoder)));
-    }
-#if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
-    case Extension::Id: {
-        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId,
-                                               ChipErrorToImErrorMap(WriteExtension(request.path, decoder, mContext)));
-    }
-#endif
-    default:
-        return Protocols::InteractionModel::Status::UnsupportedWrite;
-    }
+    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, ChipErrorToImErrorMap(WriteImpl(request, decoder, mContext)));
 }
 
 std::optional<DataModel::ActionReturnStatus> AccessControlCluster::InvokeCommand(const DataModel::InvokeRequest & request,
@@ -546,25 +550,22 @@ CHIP_ERROR AccessControlCluster::Attributes(const ConcreteClusterPath & path,
                                             ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
+
+#if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS || CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    AttributeListBuilder::OptionalAttributeEntry kOptionalAttributes[] = {
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
-    const bool haveExtensions = true;
-#else
-    const bool haveExtensions    = false;
+        { .enabled = true, .metadata = Attributes::Extension::kMetadataEntry },
 #endif
-
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    const bool haveManagedDevice = true;
-#else
-    const bool haveManagedDevice = false;
+        { .enabled = true, .metadata = Attributes::CommissioningARL::kMetadataEntry },
+        { .enabled = true, .metadata = Attributes::Arl::kMetadataEntry },
 #endif
-
-    AttributeListBuilder::OptionalAttributeEntry optionalEntries[] = {
-        { haveExtensions, Attributes::Extension::kMetadataEntry },
-        { haveManagedDevice, Attributes::CommissioningARL::kMetadataEntry },
-        { haveManagedDevice, Attributes::Arl::kMetadataEntry },
     };
 
-    return listBuilder.Append(Span(AccessControl::Attributes::kMandatoryMetadata), Span(optionalEntries));
+    return listBuilder.Append(Span(AccessControl::Attributes::kMandatoryMetadata), Span(kOptionalAttributes));
+#else
+    return listBuilder.Append(Span(AccessControl::Attributes::kMandatoryMetadata), {});
+#endif
 }
 
 CHIP_ERROR AccessControlCluster::AcceptedCommands(const ConcreteClusterPath & path,
