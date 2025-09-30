@@ -31,7 +31,7 @@ from .storage import PersistentStorage
 LOGGER = logging.getLogger(__name__)
 
 # By default, let's set certificate validity to 10 years.
-CERTIFICATE_VALIDITY_PERIOD_SEC = int(timedelta(days=10*365).total_seconds())
+CERTIFICATE_VALIDITY_PERIOD_SEC = int(timedelta(days=10 * 365).total_seconds())
 
 
 class CertificateAuthority:
