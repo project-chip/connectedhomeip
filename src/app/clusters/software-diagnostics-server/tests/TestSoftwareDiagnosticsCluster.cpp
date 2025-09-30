@@ -73,7 +73,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, CompileTest)
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, SoftwareDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
 }
 
-TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
+TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
 {
     {
         // everything returns empty here ..
@@ -103,6 +103,14 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
         {
         public:
             bool SupportsWatermarks() override { return true; }
+
+            CHIP_ERROR ResetWatermarks() override
+            {
+                resetCalled = true;
+                return CHIP_NO_ERROR;
+            }
+
+            bool resetCalled = false;
         };
 
         ScopedDiagnosticsProvider<WatermarksProvider> watermarksProvider;
@@ -130,6 +138,11 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
                   CHIP_NO_ERROR);
 
         ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+
+        // Call the command, and verify it calls through to the provider
+        ASSERT_FALSE(watermarksProvider.resetCalled);
+        ASSERT_EQ(diag.ResetWatermarks(), CHIP_NO_ERROR);
+        ASSERT_TRUE(watermarksProvider.resetCalled);
     }
 
     {
