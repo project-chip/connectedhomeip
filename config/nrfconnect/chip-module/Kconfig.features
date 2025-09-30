@@ -52,25 +52,17 @@ if CHIP_QSPI_NOR
 config NORDIC_QSPI_NOR_STACK_WRITE_BUFFER_SIZE
 	default 16
 
-endif # CHIP_QSPI_NOR
+endif # NORDIC_QSPI_NOR
 
-config CHIP_SPI_NOR
-	bool "Enable SPI NOR feature set"
-	imply SPI
-	imply SPI_NOR
-	imply MULTITHREADING
-	imply PM_OVERRIDE_EXTERNAL_DRIVER_CHECK
-	imply MCUMGR_GRP_IMG_ALLOW_ERASE_PENDING
-	help
-	  Enables SPI NOR flash with a set of options for configuring pages and
-	  buffer sizes.
-
-if CHIP_SPI_NOR
+if SPI_NOR
 
 config SPI_NOR_FLASH_LAYOUT_PAGE_SIZE
 	default 4096
 
-endif # CHIP_SPI_NOR
+config PM_OVERRIDE_EXTERNAL_DRIVER_CHECK
+	default y
+
+endif # SPI_NOR
 
 config CHIP_MEMORY_PROFILING
 	bool "Enable features for tracking memory usage"
@@ -151,8 +143,6 @@ endif
 
 config CHIP_DFU_OVER_BT_SMP
 	bool "Enable DFU over Bluetooth LE SMP feature set"
-	imply CHIP_QSPI_NOR if BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
-	imply CHIP_SPI_NOR if BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF5340_CPUAPP_NRF7001 || BOARD_NRF54L15DK
 	imply BOOTLOADER_MCUBOOT
 	select MCUMGR
 	select MCUMGR_TRANSPORT_BT

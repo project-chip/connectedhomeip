@@ -229,19 +229,6 @@ config NFC_THREAD_CALLBACK
 config CHIP_OTA_REQUESTOR
     default y
 
-# All boards except nRF7002DK use QSPI NOR external flash
-config CHIP_QSPI_NOR
-    default y if BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
-
-# nRF7002DK uses SPI NOR external flash
-
-if BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF5340_CPUAPP_NRF7001 || BOARD_NRF54L15DK
-
-config CHIP_SPI_NOR
-    default y
-
-endif # BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF5340_CPUAPP_NRF7001 || BOARD_NRF54L15DK
-
 config BOOT_IMAGE_ACCESS_HOOKS
     default y if SOC_SERIES_NRF53X
 
@@ -260,7 +247,7 @@ config NRF_WIFI_FW_PATCH_DFU
 # ==============================================================================
 
 config NET_L2_OPENTHREAD
-    default y if !WIFI_NRF70 && NETWORKING
+    default y if !CHIP_WIFI && NETWORKING
 
 if NET_L2_OPENTHREAD
 
@@ -275,7 +262,7 @@ endif # NET_L2_OPENTHREAD
 # ==============================================================================
 
 config OPENTHREAD
-    default y if !WIFI_NRF70
+    default y if !CHIP_WIFI
 
 if OPENTHREAD
 
@@ -291,7 +278,7 @@ config OPENTHREAD_DEFAULT_TX_POWER
 endif # OPENTHREAD
 
 config CHIP_USE_ZEPHYR_NETWORKING
-    default n if !CHIP_WIFI
+    default n
 
 # ==============================================================================
 # ICD configuration

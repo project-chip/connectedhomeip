@@ -107,7 +107,7 @@ struct InternalFlashFactoryData
 #endif
 };
 
-#if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1 && (defined(CONFIG_CHIP_QSPI_NOR) || defined(CONFIG_CHIP_SPI_NOR))
+#if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1 && (defined(CONFIG_SPI_NOR) || defined(CONFIG_NORDIC_QSPI_NOR))
 struct ExternalFlashFactoryData
 {
     CHIP_ERROR GetFactoryDataPartition(uint8_t *& data, size_t & dataSize)
@@ -130,8 +130,8 @@ struct ExternalFlashFactoryData
     const struct device * mFlashDevice = DEVICE_DT_GET(DT_CHOSEN(nordic_pm_ext_flash));
     uint8_t mFactoryDataBuffer[FACTORY_DATA_SIZE];
 };
-#endif // if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1 && (defined(CONFIG_CHIP_QSPI_NOR) ||
-       // defined(CONFIG_CHIP_SPI_NOR))
+#endif // if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1 && (defined(CONFIG_SPI_NOR) ||
+       // defined(CONFIG_NORDIC_QSPI_NOR))
 
 class FactoryDataProviderBase : public chip::Credentials::DeviceAttestationCredentialsProvider,
                                 public CommissionableDataProvider,
