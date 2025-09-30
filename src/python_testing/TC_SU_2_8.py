@@ -24,6 +24,7 @@ from TC_SUBase import SoftwareUpdateBaseTest
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
+from matter.testing.apps import OTAProviderSubprocess
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
@@ -71,6 +72,21 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         downloading = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
 
         target_version = 2
+
+        # Start OTA Provider
+        provider_ota_file = "firmware_v2.ota"
+        provider_discriminator = 1111
+        provider_setup_pin_code = 20202021
+        provider_port = 5540
+
+        provider = OTAProviderSubprocess(
+            ota_file=provider_ota_file,
+            discriminator=provider_discriminator,
+            passcode=provider_setup_pin_code,
+            secured_device_port=provider_port
+        )
+
+        provider.start()
 
         # Commissioning step
         self.step(0)
