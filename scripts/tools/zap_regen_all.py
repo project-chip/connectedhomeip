@@ -27,6 +27,7 @@ import sys
 import tempfile
 import time
 import traceback
+from urllib.error import HTTPError
 import urllib.request
 from dataclasses import dataclass
 from enum import Flag, auto
@@ -287,15 +288,25 @@ class JinjaCodegenTarget():
             for name in paths:
                 logging.info("    %s" % name)
 
-            VERSION = "0.51"
+            VERSION = "0.58"
             JAR_NAME = f"ktfmt-{VERSION}-jar-with-dependencies.jar"
             jar_url = f"https://repo1.maven.org/maven2/com/facebook/ktfmt/{VERSION}/{JAR_NAME}"
 
             with tempfile.TemporaryDirectory(prefix='ktfmt') as tmpdir:
-                path, http_message = urllib.request.urlretrieve(jar_url, Path(tmpdir).joinpath(JAR_NAME).as_posix())
+                RETRY_COUNT = 4
+                path = None
+                for retry in range(RETRY_COUNT):
+                    try:
+                        path, _ = urllib.request.urlretrieve(jar_url, Path(tmpdir).joinpath(JAR_NAME).as_posix())
+                    except HTTPError as err:
+                        if retry == (RETRY_COUNT - 1) or err.code != 403:
+                            raise
+                        logging.info("GOT HTTP 403 ... sleeping and retrying...")
+                        time.sleep(5)
                 subprocess.check_call(['java', '-jar', path, '--google-style'] + paths)
         except Exception:
             traceback.print_exc()
+            raise
 
     def formatWithClangFormat(self, paths):
         try:
