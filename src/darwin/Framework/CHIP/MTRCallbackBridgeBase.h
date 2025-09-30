@@ -96,8 +96,7 @@ protected:
             return;
         }
 
-        auto * params = [[MTRSessionParameters alloc] init];
-        params.supportsLargePayloads = needsLargePayloadSupport;
+        MTRSessionParameters params = needsLargePayloadSupport ? MTRSessionParametersSupportsLargePayloads : 0;
 
         [controller getSessionForNode:nodeID
                            parameters:params

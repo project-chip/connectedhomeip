@@ -58,7 +58,7 @@ public:
      * Connect must be called on the Matter queue, and will invoke the
      * completionHandler on the Matter queue as well.
      */
-    void Connect(chip::Controller::DeviceController * controller, chip::NodeId deviceID, MTRSessionParameters * parameters);
+    void Connect(chip::Controller::DeviceController * controller, chip::NodeId deviceID, MTRSessionParameters parameters);
 
 private:
     MTRInternalDeviceConnectionCallback mCompletionHandler;

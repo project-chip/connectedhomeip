@@ -1705,10 +1705,10 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
-    [self getSessionForNode:nodeID parameters:[[MTRSessionParameters alloc] init] completion:completion];
+    [self getSessionForNode:nodeID parameters:0 completion:completion];
 }
 
-- (void)getSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters *)parameters completion:(MTRInternalDeviceConnectionCallback)completion
+- (void)getSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters)parameters completion:(MTRInternalDeviceConnectionCallback)completion
 {
     // TODO: Figure out whether the synchronization here makes sense.  What
     // happens if this call happens mid-suspend or mid-resume?
@@ -1740,10 +1740,10 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
-    [self directlyGetSessionForNode:nodeID parameters:[[MTRSessionParameters alloc] init] completion:completion];
+    [self directlyGetSessionForNode:nodeID parameters:0 completion:completion];
 }
 
-- (void)directlyGetSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters *)parameters completion:(MTRInternalDeviceConnectionCallback)completion
+- (void)directlyGetSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters)parameters completion:(MTRInternalDeviceConnectionCallback)completion
 {
     // TODO: Figure out whether the synchronization here makes sense.  What
     // happens if this call happens mid-suspend or mid-resume?

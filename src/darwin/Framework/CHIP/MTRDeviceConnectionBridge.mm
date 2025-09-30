@@ -39,10 +39,10 @@ void MTRDeviceConnectionBridge::OnConnectionFailure(void * context, const chip::
     object->Release();
 }
 
-void MTRDeviceConnectionBridge::Connect(chip::Controller::DeviceController * controller, chip::NodeId deviceID, MTRSessionParameters * parameters)
+void MTRDeviceConnectionBridge::Connect(chip::Controller::DeviceController * controller, chip::NodeId deviceID, MTRSessionParameters parameters)
 {
     chip::TransportPayloadCapability transportPayloadCapability;
-    if (parameters.supportsLargePayloads) {
+    if (parameters & MTRSessionParametersSupportsLargePayloads) {
         transportPayloadCapability = chip::TransportPayloadCapability::kLargePayload;
     } else {
         transportPayloadCapability = chip::TransportPayloadCapability::kMRPPayload;

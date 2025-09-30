@@ -270,7 +270,6 @@
 		51E95DFC2A78443C00A434F0 /* MTRSessionResumptionStorageBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51E95DFA2A78443C00A434F0 /* MTRSessionResumptionStorageBridge.mm */; };
 		51EF279F2A2A3EB100E33F75 /* MTRBackwardsCompatShims.h in Headers */ = {isa = PBXBuildFile; fileRef = 51EF279E2A2A3EB100E33F75 /* MTRBackwardsCompatShims.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		51F12DBA2E8C639300E6B095 /* MTRLargeMessageCommandTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 51F12DB92E8C639300E6B095 /* MTRLargeMessageCommandTests.m */; };
-		51F12DBD2E8C732600E6B095 /* MTRSessionParameters.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51F12DBC2E8C732600E6B095 /* MTRSessionParameters.mm */; };
 		51F12DBE2E8C732600E6B095 /* MTRSessionParameters.h in Headers */ = {isa = PBXBuildFile; fileRef = 51F12DBB2E8C732600E6B095 /* MTRSessionParameters.h */; };
 		51F152812E397829007A7E05 /* MTRDelegateManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 51F152802E397829007A7E05 /* MTRDelegateManagerTests.m */; };
 		51F522682AE70734000C4050 /* MTRDeviceTypeMetadata.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51F522672AE70734000C4050 /* MTRDeviceTypeMetadata.mm */; };
@@ -902,7 +901,6 @@
 		51EF279E2A2A3EB100E33F75 /* MTRBackwardsCompatShims.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRBackwardsCompatShims.h; sourceTree = "<group>"; };
 		51F12DB92E8C639300E6B095 /* MTRLargeMessageCommandTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRLargeMessageCommandTests.m; sourceTree = "<group>"; };
 		51F12DBB2E8C732600E6B095 /* MTRSessionParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRSessionParameters.h; sourceTree = "<group>"; };
-		51F12DBC2E8C732600E6B095 /* MTRSessionParameters.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRSessionParameters.mm; sourceTree = "<group>"; };
 		51F152802E397829007A7E05 /* MTRDelegateManagerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRDelegateManagerTests.m; sourceTree = "<group>"; };
 		51F522662AE7071E000C4050 /* MTRDeviceTypeMetadata-src.zapt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "MTRDeviceTypeMetadata-src.zapt"; sourceTree = "<group>"; };
 		51F522672AE70734000C4050 /* MTRDeviceTypeMetadata.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceTypeMetadata.mm; sourceTree = "<group>"; };
@@ -1917,7 +1915,6 @@
 				B2E0D7AC245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.h */,
 				B2E0D7AE245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.mm */,
 				51F12DBB2E8C732600E6B095 /* MTRSessionParameters.h */,
-				51F12DBC2E8C732600E6B095 /* MTRSessionParameters.mm */,
 				B2E0D7AF245B0B5C003C5B48 /* MTRSetupPayload.h */,
 				9956064326420367000C28DE /* MTRSetupPayload_Internal.h */,
 				B2E0D7B0245B0B5C003C5B48 /* MTRSetupPayload.mm */,
@@ -2773,7 +2770,6 @@
 				514654492A72F9DF00904E61 /* MTRDemuxingStorage.mm in Sources */,
 				1E4D655229C30A8700BC3478 /* MTRCommissionableBrowser.mm in Sources */,
 				88FA798E2B7B257100CD4B6F /* MTRMetricsCollector.mm in Sources */,
-				51F12DBD2E8C732600E6B095 /* MTRSessionParameters.mm in Sources */,
 				3DA1A3562ABAB3B4004F0BB9 /* MTRAsyncWorkQueue.mm in Sources */,
 				51D0B1272B617246006E3511 /* MTRServerEndpoint.mm in Sources */,
 				3DECCB722934AFE200585AEC /* MTRLogging.mm in Sources */,

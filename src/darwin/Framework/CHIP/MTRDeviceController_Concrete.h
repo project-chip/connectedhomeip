@@ -146,7 +146,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Like getSessionForNode:completion: but allows configuring what sort of session we want.
  */
-- (void)getSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters *)parameters completion:(MTRInternalDeviceConnectionCallback)completion;
+- (void)getSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters)parameters completion:(MTRInternalDeviceConnectionCallback)completion;
 
 /**
  * Since getSessionForNode now enqueues by the subscription pool for Thread
@@ -158,7 +158,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Like directlyGetSessionForNode:completion: but allows configuring what sort of session we want.
  */
-- (void)directlyGetSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters *)parameters completion:(MTRInternalDeviceConnectionCallback)completion;
+- (void)directlyGetSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters)parameters completion:(MTRInternalDeviceConnectionCallback)completion;
 
 /**
  * Get a session for the commissionee device with the given device id.  This may

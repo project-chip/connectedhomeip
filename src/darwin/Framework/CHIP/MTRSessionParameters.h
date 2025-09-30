@@ -18,9 +18,6 @@
 
 // Input to getSessionForNode that lets us configure what sort of session we
 // want.
-@interface MTRSessionParameters : NSObject
-// If set to YES, will request a session that supports large payloads.  Defaults
-// to NO.
-@property (nonatomic, readwrite, assign) BOOL supportsLargePayloads;
-
-@end
+typedef NS_OPTIONS(NSUInteger, MTRSessionParameters) {
+    MTRSessionParametersSupportsLargePayloads = 0x1,
+};
