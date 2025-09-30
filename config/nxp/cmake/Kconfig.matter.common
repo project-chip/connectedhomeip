@@ -487,6 +487,12 @@ config CHIP_BUILD_TESTS
 	help
 	  Enables building Matter unit tests.
 
+config BUILD_FOR_HOST_UNIT_TEST
+	bool "build host unit test"
+	default y if CHIP_BUILD_TESTS
+	help
+		Enable matter host unit test
+
 config CHIP_OTA_IMAGE_BUILD
 	bool "Generate OTA image"
 	help

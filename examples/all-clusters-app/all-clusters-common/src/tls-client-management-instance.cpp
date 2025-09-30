@@ -54,6 +54,41 @@ CHIP_ERROR TlsClientManagementCommandDelegate::GetProvisionedEndpointByIndex(End
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
+uint16_t TlsClientManagementCommandDelegate::GetEndpointId(Provisioned * provisioned)
+{
+    uint16_t ret      = 0;
+    uint16_t totalIds = 0;
+    while (totalIds < UINT16_MAX)
+    {
+        bool idInUse = false;
+        for (const auto & item : mProvisioned)
+        {
+            if (item.payload.endpointID == mNextId)
+            {
+                idInUse = true;
+                totalIds++;
+                if (totalIds == UINT16_MAX)
+                {
+                    break;
+                }
+                mNextId++;
+                if (mNextId == 0)
+                {
+                    mNextId = 1;
+                }
+                break;
+            }
+        }
+        if (!idInUse)
+        {
+            break;
+        }
+    }
+    ret = (totalIds == UINT16_MAX) ? 0 : mNextId;
+
+    return ret;
+}
+
 ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
     EndpointId matterEndpoint, FabricIndex fabric,
     const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & provisionReq, uint16_t & endpointID)
@@ -94,13 +129,23 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
         provisioned           = &mProvisioned.emplace_back();
         auto & endpointStruct = provisioned->payload;
 
-        endpointStruct.endpointID = mNextId++;
+        uint16_t nextId = GetEndpointId(provisioned);
+        if (nextId == 0)
+        {
+            return ClusterStatusCode(Status::ResourceExhausted);
+        }
+        endpointStruct.endpointID = nextId;
         provisioned->fabric       = fabric;
+        endpointID                = endpointStruct.endpointID;
     }
     // Updating existing value
     else if (provisioned == nullptr || provisioned->fabric != fabric)
     {
         return ClusterStatusCode(Status::NotFound);
+    }
+    else
+    {
+        endpointID = provisionReq.endpointID.Value();
     }
 
     auto & endpointStruct = provisioned->payload;
@@ -108,6 +153,7 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
     endpointStruct.port  = provisionReq.port;
     endpointStruct.caid  = provisionReq.caid;
     endpointStruct.ccdid = provisionReq.ccdid;
+    endpointStruct.SetFabricIndex(fabric);
 
     return ClusterStatusCode(Status::Success);
 }
@@ -153,6 +199,33 @@ ClusterStatusCode TlsClientManagementCommandDelegate::RemoveProvisionedEndpointB
     mProvisioned.erase(i);
 
     return ClusterStatusCode(Status::Success);
+}
+
+CHIP_ERROR TlsClientManagementCommandDelegate::RootCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id)
+{
+    auto i = mProvisioned.begin();
+    for (; i != mProvisioned.end(); i++)
+    {
+        if (i->payload.caid == id)
+        {
+            return CHIP_ERROR_BAD_REQUEST;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TlsClientManagementCommandDelegate::ClientCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                      Tls::TLSCCDID id)
+{
+    auto i = mProvisioned.begin();
+    for (; i != mProvisioned.end(); i++)
+    {
+        if (i->payload.ccdid == id)
+        {
+            return CHIP_ERROR_BAD_REQUEST;
+        }
+    }
+    return CHIP_NO_ERROR;
 }
 
 static CertificateTableImpl gCertificateTableInstance;

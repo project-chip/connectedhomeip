@@ -23,6 +23,8 @@ from matter.idl.matter_idl_types import Idl
 from .filters import RegisterCommonFilters
 from .storage import GeneratorStorage
 
+LOGGER = logging.getLogger(__name__)
+
 
 class CodeGenerator:
     """
@@ -99,11 +101,11 @@ class CodeGenerator:
           output_file_name - File name that the template is to be generated to.
           vars             - variables used for template generation
         """
-        logging.info("File to be generated: %s" % output_file_name)
+        LOGGER.info("File to be generated: %s" % output_file_name)
         if self.dry_run:
             return
 
-        logging.info(f"Template path: {template_path}, CWD: {os.getcwd()}")
+        LOGGER.info(f"Template path: {template_path}, CWD: {os.getcwd()}")
         rendered = self.jinja_env.get_template(template_path).render(vars)
 
         # Report regardless if it has changed or not. This is because even if
@@ -112,6 +114,6 @@ class CodeGenerator:
         self.storage.report_output_file(output_file_name)
 
         if rendered == self.storage.get_existing_data(output_file_name):
-            logging.info("File content not changed")
+            LOGGER.info("File content not changed")
         else:
             self.storage.write_new_data(output_file_name, rendered)

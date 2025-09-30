@@ -211,6 +211,22 @@ class AVSUMTestBase:
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
+    async def dptzstreamentryvalid(self, endpoint, videoStreamID, viewport):
+        dptz_streams_dut = await self.read_avsum_attribute_expect_success(endpoint, Clusters.Objects.CameraAvSettingsUserLevelManagement.attributes.DPTZStreams)
+        match_found = False
+        if dptz_streams_dut is not None:
+            for streams in dptz_streams_dut:
+                if streams.videoStreamID == videoStreamID:
+                    # verify the viewport matches
+                    if (streams.viewport == viewport):
+                        match_found = True
+                        break
+
+        else:
+            asserts.assert_fail("DPTZStreams is empty, even though a stream has been allocated")
+
+        return match_found
+
     async def video_stream_allocate_command(self, endpoint, expected_status: Status = Status.Success):
         cluster = Clusters.Objects.CameraAvStreamManagement
         attrs = cluster.Attributes
@@ -231,7 +247,7 @@ class AVSUMTestBase:
         # Get the parms from the device (those which are available)
         aStreamUsagePriorities = await self.read_avstr_attribute_expect_success(endpoint, attrs.StreamUsagePriorities)
         aRateDistortionTradeOffPoints = await self.read_avstr_attribute_expect_success(endpoint, attrs.RateDistortionTradeOffPoints)
-        aMinViewport = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewport)
+        aMinViewportRes = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewportResolution)
         aVideoSensorParams = await self.read_avstr_attribute_expect_success(endpoint, attrs.VideoSensorParams)
 
         try:
@@ -240,7 +256,7 @@ class AVSUMTestBase:
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
                 minFrameRate=30,
                 maxFrameRate=aVideoSensorParams.maxFPS,
-                minResolution=aMinViewport,
+                minResolution=aMinViewportRes,
                 maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=aVideoSensorParams.sensorWidth,
                                                                                               height=aVideoSensorParams.sensorHeight),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,

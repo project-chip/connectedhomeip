@@ -139,9 +139,10 @@ _ChipThreadTaskRunnerFunct = CFUNCTYPE(None, py_object)
 
 @_singleton
 class ChipStack(object):
-    def __init__(self, persistentStoragePath: str, enableServerInteractions=True):
+    def __init__(self, persistentStorage: PersistentStorage, enableServerInteractions=True):
         builtins.enableDebugMode = False
 
+        self._persistentStorage = persistentStorage
         self._ChipStackLib: Any = None
         self._chipDLLPath = None
         self.devMgr = None
@@ -157,10 +158,6 @@ class ChipStack(object):
             callback()
 
         self.cbHandleChipThreadRun = HandleChipThreadRun
-
-        # Storage has to be initialized BEFORE initializing the stack, since the latter
-        # requires a PersistentStorageDelegate to be provided to DeviceControllerFactory.
-        self._persistentStorage = PersistentStorage(persistentStoragePath)
 
         # Initialize the chip stack.
         res = self._ChipStackLib.pychip_DeviceController_StackInit(
@@ -201,8 +198,9 @@ class ChipStack(object):
 
         # We only shutdown the persistent storage layer AFTER we've shut down the stack,
         # since there is a possibility of interactions with the storage layer during shutdown.
+        # TODO: The storage object was passed to the stack during initialization,
+        #       maybe it should not be shut down here?
         self._persistentStorage.Shutdown()
-        self._persistentStorage = None
 
         # Stack init happens in native, but shutdown happens here unfortunately.
         # #20437 tracks consolidating these.
