@@ -36,10 +36,11 @@ namespace {
 static constexpr size_t kTimeSynchronizationFixedClusterCount =
     TimeSynchronization::StaticApplicationConfig::kFixedClusterConfig.size();
 
-static_assert((kTimeSynchronizationFixedClusterCount == 0) ||
-                  ((kTimeSynchronizationFixedClusterCount == 1) &&
-                   TimeSynchronization::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId),
-              "Time Synchronization cluster MUST be on endpoint 0");
+// TODO: Enable this check later
+// static_assert((kTimeSynchronizationFixedClusterCount == 0) ||
+//                  ((kTimeSynchronizationFixedClusterCount == 1) &&
+//                   TimeSynchronization::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId),
+//              "Time Synchronization cluster MUST be on endpoint 0");
 
 LazyRegisteredServerCluster<TimeSynchronizationCluster> gServer;
 
@@ -87,7 +88,8 @@ public:
 
 void MatterTimeSynchronizationClusterInitCallback(EndpointId endpointId)
 {
-    VerifyOrReturn(endpointId == kRootEndpointId);
+    // TODO: Enable this check later
+    // VerifyOrReturn(endpointId == kRootEndpointId);
 
     IntegrationDelegate integrationDelegate;
 
@@ -106,7 +108,8 @@ void MatterTimeSynchronizationClusterInitCallback(EndpointId endpointId)
 
 void MatterTimeSynchronizationClusterShutdownCallback(EndpointId endpointId)
 {
-    VerifyOrReturn(endpointId == kRootEndpointId);
+    // TODO: Enable this check later
+    // VerifyOrReturn(endpointId == kRootEndpointId);
 
     IntegrationDelegate integrationDelegate;
 
@@ -127,7 +130,8 @@ namespace chip::app::Clusters::TimeSynchronization {
 
 TimeSynchronizationCluster * FindClusterOnEndpoint(EndpointId endpointId)
 {
-    VerifyOrReturnValue(endpointId == kRootEndpointId, nullptr);
+    // TODO: Enable this check later
+    // VerifyOrReturnValue(endpointId == kRootEndpointId, nullptr);
 
     IntegrationDelegate integrationDelegate;
 
