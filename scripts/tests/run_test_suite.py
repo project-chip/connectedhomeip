@@ -326,78 +326,78 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     paths_finder = PathsFinder()
 
     if all_clusters_app is None:
-        all_clusters_app = paths_finder.get('chip-all-clusters-app')
+        all_clusters_app = Application(kind="app", path=Path(paths_finder.get('chip-all-clusters-app')))
 
     if lock_app is None:
-        lock_app = paths_finder.get('chip-lock-app')
+        lock_app = Application(kind="app", path=Path(paths_finder.get('chip-lock-app')))
 
     if fabric_bridge_app is None:
-        fabric_bridge_app = paths_finder.get('fabric-bridge-app')
+        fabric_bridge_app = Application(kind="app", path=Path(paths_finder.get('fabric-bridge-app')))
 
     if ota_provider_app is None:
-        ota_provider_app = paths_finder.get('chip-ota-provider-app')
+        ota_provider_app = Application(kind="app", path=Path(paths_finder.get('chip-ota-provider-app')))
 
     if ota_requestor_app is None:
-        ota_requestor_app = paths_finder.get('chip-ota-requestor-app')
+        ota_requestor_app = Application(kind="app", path=Path(paths_finder.get('chip-ota-requestor-app')))
 
     if tv_app is None:
-        tv_app = paths_finder.get('chip-tv-app')
+        tv_app = Application(kind="app", path=Path(paths_finder.get('chip-tv-app')))
 
     if bridge_app is None:
-        bridge_app = paths_finder.get('chip-bridge-app')
+        bridge_app = Application(kind="app", path=Path(paths_finder.get('chip-bridge-app')))
 
     if lit_icd_app is None:
-        lit_icd_app = paths_finder.get('lit-icd-app')
+        lit_icd_app = Application(kind="app", path=Path(paths_finder.get('lit-icd-app')))
 
     if microwave_oven_app is None:
-        microwave_oven_app = paths_finder.get('chip-microwave-oven-app')
+        microwave_oven_app = Application(kind="app", path=Path(paths_finder.get('chip-microwave-oven-app')))
 
     if rvc_app is None:
-        rvc_app = paths_finder.get('chip-rvc-app')
+        rvc_app = Application(kind="app", path=Path(paths_finder.get('chip-rvc-app')))
 
     if network_manager_app is None:
-        network_manager_app = paths_finder.get('matter-network-manager-app')
+        network_manager_app = Application(kind="app", path=Path(paths_finder.get('matter-network-manager-app')))
 
     if energy_gateway_app is None:
-        energy_gateway_app = paths_finder.get('chip-energy-gateway-app')
+        energy_gateway_app = Application(kind="app", path=Path(paths_finder.get('chip-energy-gateway-app')))
 
     if energy_management_app is None:
-        energy_management_app = paths_finder.get('chip-energy-management-app')
+        energy_management_app = Application(kind="app", path=Path(paths_finder.get('chip-energy-management-app')))
 
     if closure_app is None:
-        closure_app = paths_finder.get('closure-app')
+        closure_app = Application(kind="app", path=Path(paths_finder.get('closure-app')))
 
     if matter_repl_yaml_tester is None:
-        matter_repl_yaml_tester = paths_finder.get('yamltest_with_matter_repl_tester.py')
+        matter_repl_yaml_tester = Application(kind="tool", path=Path(paths_finder.get('yamltest_with_matter_repl_tester.py')))
 
     if chip_tool_with_python is None:
         if context.obj.runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
-            chip_tool_with_python = paths_finder.get('darwinframeworktool.py')
+            chip_tool_with_python = Application(kind="tool", path=Path("python3"), args=(paths_finder.get('darwinframeworktool.py'),))
         else:
-            chip_tool_with_python = paths_finder.get('chiptool.py')
+            chip_tool_with_python = Application(kind="tool", path=Path("python3"), args=(paths_finder.get('chiptool.py'),))
 
     if ble_wifi and sys.platform != "linux":
         raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
 
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(
-        chip_tool=[context.obj.chip_tool],
-        all_clusters_app=[all_clusters_app],
-        lock_app=[lock_app],
-        fabric_bridge_app=[fabric_bridge_app],
-        ota_provider_app=[ota_provider_app],
-        ota_requestor_app=[ota_requestor_app],
-        tv_app=[tv_app],
-        bridge_app=[bridge_app],
-        lit_icd_app=[lit_icd_app],
-        microwave_oven_app=[microwave_oven_app],
-        rvc_app=[rvc_app],
-        network_manager_app=[network_manager_app],
-        energy_gateway_app=[energy_gateway_app],
-        energy_management_app=[energy_management_app],
-        closure_app=[closure_app],
-        matter_repl_yaml_tester_cmd=['python3'] + [matter_repl_yaml_tester],
-        chip_tool_with_python_cmd=['python3'] + [chip_tool_with_python],
+        chip_tool=context.obj.chip_tool,
+        all_clusters_app=all_clusters_app,
+        lock_app=lock_app,
+        fabric_bridge_app=fabric_bridge_app,
+        ota_provider_app=ota_provider_app,
+        ota_requestor_app=ota_requestor_app,
+        tv_app=tv_app,
+        bridge_app=bridge_app,
+        lit_icd_app=lit_icd_app,
+        microwave_oven_app=microwave_oven_app,
+        rvc_app=rvc_app,
+        network_manager_app=network_manager_app,
+        energy_gateway_app=energy_gateway_app,
+        energy_management_app=energy_management_app,
+        closure_app=closure_app,
+        matter_repl_yaml_tester_cmd=matter_repl_yaml_tester,
+        chip_tool_with_python_cmd=chip_tool_with_python,
     )
 
     ble_controller_app = None
@@ -412,7 +412,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             # depending on the commissioning method used.
             app_link_name='wlx-app' if ble_wifi else 'eth-app',
             unshared=context.obj.in_unshare)
-            
+
         if ble_wifi:
             bus = chiptest.linux.DBusTestSystemBus()
             bluetooth = chiptest.linux.BluetoothMock()
