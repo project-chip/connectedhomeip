@@ -125,23 +125,23 @@ class TC_ACL_2_5(MatterBaseTest):
         asserts.assert_equal(subscription_event, direct_event.Data, "Subscription event should be in direct event")
 
         asserts.assert_equal(subscription_event.changeType,
-                            Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
-                            "Expected Added change type")
+                             Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+                             "Expected Added change type")
 
         asserts.assert_equal(subscription_event.latestValue.data,
-                            D_OK_EMPTY,
-                            "LatestValue.Data should be D_OK_EMPTY")
+                             D_OK_EMPTY,
+                             "LatestValue.Data should be D_OK_EMPTY")
         asserts.assert_in('matter.clusters.Types.Nullable', str(type(subscription_event.adminPasscodeID)),
-                        "AdminPasscodeID should be Null")
+                          "AdminPasscodeID should be Null")
         asserts.assert_equal(subscription_event.adminNodeID,
-                            self.default_controller.nodeId,
-                            "AdminNodeID should be the controller node ID")
+                             self.default_controller.nodeId,
+                             "AdminNodeID should be the controller node ID")
         asserts.assert_equal(subscription_event.latestValue.fabricIndex,
-                            f1,
-                            "LatestValue.FabricIndex should be the current fabric index")
+                             f1,
+                             "LatestValue.FabricIndex should be the current fabric index")
         asserts.assert_equal(subscription_event.fabricIndex,
-                            f1,
-                            "FabricIndex should be the current fabric index")
+                             f1,
+                             "FabricIndex should be the current fabric index")
 
         self.step(6)
         # Create a new extension with different data to replace the existing one
@@ -173,62 +173,62 @@ class TC_ACL_2_5(MatterBaseTest):
         if not force_legacy_encoding:
             # Verify event data
             asserts.assert_equal(event_data1.changeType,
-                                Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
-                                "Expected Changed change type")
+                                 Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged,
+                                 "Expected Changed change type")
             asserts.assert_in('matter.clusters.Types.Nullable', str(type(event_data1.adminPasscodeID)),
-                            "AdminPasscodeID should be Null")
+                              "AdminPasscodeID should be Null")
             asserts.assert_equal(event_data1.adminNodeID,
-                                self.default_controller.nodeId,
-                                "AdminNodeID should be the controller node ID")
+                                 self.default_controller.nodeId,
+                                 "AdminNodeID should be the controller node ID")
             asserts.assert_equal(event_data1.latestValue.data,
-                                D_OK_SINGLE,
-                                "LatestValue.Data should match D_OK_SINGLE")
+                                 D_OK_SINGLE,
+                                 "LatestValue.Data should match D_OK_SINGLE")
             asserts.assert_equal(event_data1.latestValue.fabricIndex,
-                                f1,
-                                "LatestValue.FabricIndex should be the current fabric index")
+                                 f1,
+                                 "LatestValue.FabricIndex should be the current fabric index")
             asserts.assert_equal(event_data1.fabricIndex,
-                                f1,
-                                "FabricIndex should be the current fabric index")
+                                 f1,
+                                 "FabricIndex should be the current fabric index")
 
         if force_legacy_encoding:
             # Verify event data 1 struct
             asserts.assert_equal(event_data1.changeType,
-                                Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
-                                "Expected Removed change type")
+                                 Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
+                                 "Expected Removed change type")
             asserts.assert_in('matter.clusters.Types.Nullable', str(type(event_data1.adminPasscodeID)),
-                            "AdminPasscodeID should be Null")
+                              "AdminPasscodeID should be Null")
             asserts.assert_equal(event_data1.adminNodeID,
-                                self.default_controller.nodeId,
-                                "AdminNodeID should be the controller node ID")
+                                 self.default_controller.nodeId,
+                                 "AdminNodeID should be the controller node ID")
             asserts.assert_equal(event_data1.latestValue.data,
-                                D_OK_EMPTY,
-                                "LatestValue.Data should match D_OK_EMPTY")
+                                 D_OK_EMPTY,
+                                 "LatestValue.Data should match D_OK_EMPTY")
             asserts.assert_equal(event_data1.latestValue.fabricIndex,
-                                f1,
-                                "LatestValue.FabricIndex should be the current fabric index")
+                                 f1,
+                                 "LatestValue.FabricIndex should be the current fabric index")
             asserts.assert_equal(event_data1.fabricIndex,
-                                f1,
-                                "FabricIndex should be the current fabric index")
+                                 f1,
+                                 "FabricIndex should be the current fabric index")
 
             event_data2 = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
             # Verify event data 2 struct
             asserts.assert_equal(event_data2.changeType,
-                                Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
-                                "Expected Added change type")
+                                 Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+                                 "Expected Added change type")
             asserts.assert_in('matter.clusters.Types.Nullable', str(type(event_data2.adminPasscodeID)),
-                            "AdminPasscodeID should be Null")
+                              "AdminPasscodeID should be Null")
             asserts.assert_equal(event_data2.adminNodeID,
-                                self.default_controller.nodeId,
-                                "AdminNodeID should be the controller node ID")
+                                 self.default_controller.nodeId,
+                                 "AdminNodeID should be the controller node ID")
             asserts.assert_equal(event_data2.latestValue.data,
-                                D_OK_SINGLE,
-                                "LatestValue.Data should match D_OK_SINGLE")
+                                 D_OK_SINGLE,
+                                 "LatestValue.Data should match D_OK_SINGLE")
             asserts.assert_equal(event_data2.latestValue.fabricIndex,
-                                f1,
-                                "LatestValue.FabricIndex should be the current fabric index")
+                                 f1,
+                                 "LatestValue.FabricIndex should be the current fabric index")
             asserts.assert_equal(event_data2.fabricIndex,
-                                f1,
-                                "FabricIndex should be the current fabric index")
+                                 f1,
+                                 "FabricIndex should be the current fabric index")
 
         self.step(8)
         # Try to write an extension that exceeds max length (128 bytes)
@@ -250,7 +250,7 @@ class TC_ACL_2_5(MatterBaseTest):
         )
         logging.info(f"Write result {str(a)}")
         asserts.assert_equal(a[0].Status, Status.ConstraintError,
-                            "Write should have failed with CONSTRAINT_ERROR 135")
+                             "Write should have failed with CONSTRAINT_ERROR 135")
 
         self.step(9)
         # Verify no event was generated for the failed write
@@ -276,22 +276,22 @@ class TC_ACL_2_5(MatterBaseTest):
             event_data3 = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
             # Verify event data 1 struct
             asserts.assert_equal(event_data3.changeType,
-                                Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
-                                "Expected Removed change type")
+                                 Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
+                                 "Expected Removed change type")
             asserts.assert_in('matter.clusters.Types.Nullable', str(type(event_data3.adminPasscodeID)),
-                            "AdminPasscodeID should be Null")
+                              "AdminPasscodeID should be Null")
             asserts.assert_equal(event_data3.adminNodeID,
-                                self.default_controller.nodeId,
-                                "AdminNodeID should be the controller node ID")
+                                 self.default_controller.nodeId,
+                                 "AdminNodeID should be the controller node ID")
             asserts.assert_equal(event_data3.latestValue.data,
-                                D_OK_SINGLE,
-                                "LatestValue.Data should match D_OK_SINGLE")
+                                 D_OK_SINGLE,
+                                 "LatestValue.Data should match D_OK_SINGLE")
             asserts.assert_equal(event_data3.latestValue.fabricIndex,
-                                f1,
-                                "LatestValue.FabricIndex should be the current fabric index")
+                                 f1,
+                                 "LatestValue.FabricIndex should be the current fabric index")
             asserts.assert_equal(event_data3.fabricIndex,
-                                f1,
-                                "FabricIndex should be the current fabric index")
+                                 f1,
+                                 "FabricIndex should be the current fabric index")
 
         self.step(10)
         # This should fail with CONSTRAINT_ERROR
@@ -305,7 +305,7 @@ class TC_ACL_2_5(MatterBaseTest):
         )
         logging.info(f"Write result {str(b)}")
         asserts.assert_equal(b[0].Status, Status.ConstraintError,
-                            "Write should have failed with CONSTRAINT_ERROR")
+                             "Write should have failed with CONSTRAINT_ERROR")
 
         self.step(11)
         # Verify no event was generated at all, since the whole extensions list was rejected.
@@ -329,22 +329,22 @@ class TC_ACL_2_5(MatterBaseTest):
             event_data4 = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
             # Verify event data 2 struct
             asserts.assert_equal(event_data4.changeType,
-                                Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
-                                "Expected Added change type")
+                                 Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded,
+                                 "Expected Added change type")
             asserts.assert_in('matter.clusters.Types.Nullable', str(type(event_data4.adminPasscodeID)),
-                            "AdminPasscodeID should be Null")
+                              "AdminPasscodeID should be Null")
             asserts.assert_equal(event_data4.adminNodeID,
-                                self.default_controller.nodeId,
-                                "AdminNodeID should be the controller node ID")
+                                 self.default_controller.nodeId,
+                                 "AdminNodeID should be the controller node ID")
             asserts.assert_equal(event_data4.latestValue.data,
-                                D_OK_EMPTY,
-                                "LatestValue.Data should match D_OK_EMPTY")
+                                 D_OK_EMPTY,
+                                 "LatestValue.Data should match D_OK_EMPTY")
             asserts.assert_equal(event_data4.latestValue.fabricIndex,
-                                f1,
-                                "LatestValue.FabricIndex should be the current fabric index")
+                                 f1,
+                                 "LatestValue.FabricIndex should be the current fabric index")
             asserts.assert_equal(event_data4.fabricIndex,
-                                f1,
-                                "FabricIndex should be the current fabric index")
+                                 f1,
+                                 "FabricIndex should be the current fabric index")
 
         self.step(12)
         # Write an empty list to clear all extensions
@@ -367,33 +367,33 @@ class TC_ACL_2_5(MatterBaseTest):
         if not force_legacy_encoding:
             # Verify event data
             asserts.assert_equal(event_data5.latestValue.data,
-                                D_OK_SINGLE,
-                                "LatestValue.Data should match D_OK_SINGLE")
+                                 D_OK_SINGLE,
+                                 "LatestValue.Data should match D_OK_SINGLE")
 
         if force_legacy_encoding:
             # Verify event data 1 struct
             asserts.assert_equal(event_data5.latestValue.data,
-                                D_OK_EMPTY,
-                                "LatestValue.Data should match D_OK_EMPTY")
+                                 D_OK_EMPTY,
+                                 "LatestValue.Data should match D_OK_EMPTY")
 
         asserts.assert_in('matter.clusters.Types.Nullable', str(type(event_data5.adminPasscodeID)),
-                        "AdminPasscodeID should be Null")
+                          "AdminPasscodeID should be Null")
 
         asserts.assert_equal(event_data5.changeType,
-                            Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
-                            "Expected Removed change type")
+                             Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved,
+                             "Expected Removed change type")
 
         asserts.assert_equal(event_data5.adminNodeID,
-                            self.default_controller.nodeId,
-                            "AdminNodeID should be the controller node ID")
+                             self.default_controller.nodeId,
+                             "AdminNodeID should be the controller node ID")
 
         asserts.assert_equal(event_data5.latestValue.fabricIndex,
-                            f1,
-                            "LatestValue.FabricIndex should be the current fabric index")
+                             f1,
+                             "LatestValue.FabricIndex should be the current fabric index")
 
         asserts.assert_equal(event_data5.fabricIndex,
-                            f1,
-                            "FabricIndex should be the current fabric index")
+                             f1,
+                             "FabricIndex should be the current fabric index")
 
         # Rerunning test using the legacy list writing mechanism
         if not force_legacy_encoding:
