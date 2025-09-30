@@ -105,8 +105,8 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_SetupControll
 {
     chip::Controller::FactoryInitParams factoryInitParams = params.GetFactoryInitParams();
     chip::Controller::SetupParams deviceParams;
-    chip::Controller::DeviceCommissioner commissioner;
-    chip::Controller::DeviceController device;
+    auto commissioner = std::make_unique<chip::Controller::DeviceCommissioner>();
+    auto device = std::make_unique<chip::Controller::DeviceController>();
     chip::Test::FabricTableHolder fHolder;
     // Initialize the ember side server logic
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), chip::app::reporting::GetDefaultReportScheduler()),
@@ -125,10 +125,10 @@ TEST_F(TestDeviceControllerFactory, DeviceControllerFactoryMethods_SetupControll
     EXPECT_EQ(DeviceControllerFactory::GetInstance().Init(factoryInitParams), CHIP_NO_ERROR);
 
     deviceParams.controllerVendorId = chip::VendorId::TestVendor1;
-    EXPECT_EQ(DeviceControllerFactory::GetInstance().SetupController(deviceParams, device), CHIP_NO_ERROR);
+    EXPECT_EQ(DeviceControllerFactory::GetInstance().SetupController(deviceParams, *device.get()), CHIP_NO_ERROR);
     // SetupCommissioner is expected to fail because deviceParams does not have a pairingDelegate,
     // which is required for a commissioner.
-    EXPECT_EQ(DeviceControllerFactory::GetInstance().SetupCommissioner(deviceParams, commissioner), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(DeviceControllerFactory::GetInstance().SetupCommissioner(deviceParams, *commissioner.get()), CHIP_ERROR_INVALID_ARGUMENT);
 
     EXPECT_TRUE(DeviceControllerFactory::GetInstance().ReleaseSystemState());
     DeviceControllerFactory::GetInstance().Shutdown();
