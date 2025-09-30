@@ -20,7 +20,7 @@ namespace System {
 
 using StartTimerHook = std::function<void(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState)>;
 
-class TimerWithMockClock : public Clock::Internal::MockClock, public Layer
+class SystemLayerWithMockClock : public Clock::Internal::MockClock, public Layer
 {
 public:
     // System Layer overrides
@@ -95,8 +95,8 @@ private:
 } // namespace chip
 
 // These are globals because SetUpTestSuite is static which requires static variables
-System::TimerWithMockClock gSystemLayerAndClock = System::TimerWithMockClock();
-System::Clock::ClockBase * gSavedClock          = nullptr;
+System::SystemLayerWithMockClock gSystemLayerAndClock = System::SystemLayerWithMockClock();
+System::Clock::ClockBase * gSavedClock                = nullptr;
 
 class TestTransferFacilitator : public ::testing::Test
 {
@@ -128,12 +128,10 @@ private:
         }
     }
 
-    using BASE = Initiator;
-
 public:
-    void PollForOutput() { BASE::PollForOutput(); }
+    void PollForOutput() { Initiator::PollForOutput(); }
 
-    void ScheduleImmediatePoll() { BASE::ScheduleImmediatePoll(); }
+    void ScheduleImmediatePoll() { Initiator::ScheduleImmediatePoll(); }
 
     std::optional<TransferSessionOutputHandler> mTransferSessionOutputHandler{ std::nullopt };
 };

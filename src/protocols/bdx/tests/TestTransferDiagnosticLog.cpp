@@ -212,8 +212,9 @@ TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer)
 
     /// initiator prepares block to send
     TransferSession::BlockData blockData;
-    blockData.Data         = reinterpret_cast<const uint8_t *>("hi there");
-    blockData.Length       = 8;
+    const uint8_t data[]   = { 1, 2, 3, 4, 5 };
+    blockData.Data         = data;
+    blockData.Length       = 5;
     blockData.IsEof        = false;
     blockData.BlockCounter = 0;
 
