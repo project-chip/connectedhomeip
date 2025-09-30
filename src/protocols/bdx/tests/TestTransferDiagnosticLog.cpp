@@ -14,9 +14,11 @@ using namespace ::chip::System::Clock::Literals;
 
 namespace {
 
-constexpr uint16_t kMaxBlockSize         = 512;
-constexpr chip::FabricIndex kFabricIndex = 1;
-constexpr chip::NodeId kNodeId           = 2;
+constexpr uint16_t kMaxBlockSize             = 512;
+constexpr chip::FabricIndex kFabricIndex     = 1;
+constexpr chip::NodeId kNodeId               = 2;
+constexpr uint8_t kMetaDataLength            = 5;
+constexpr uint8_t kMetaData[kMetaDataLength] = { 7, 6, 5, 4, 3 }; // This is not TLV but this is fine for the flows we test here
 
 class TestTransferDiagnosticLog : public ::testing::Test
 {
@@ -35,7 +37,7 @@ TEST_F(TestTransferDiagnosticLog, InitsDiagnosticLog)
 
     mTransferSession.WaitForTransfer(TransferRole::kReceiver, TransferControlFlags::kSenderDrive, kMaxBlockSize, 1000_ms);
 
-    auto transferInit = TransferInit();
+    TransferInit transferInit{};
 
     transferInit.TransferCtlOptions.ClearAll().Set(TransferControlFlags::kSenderDrive, true);
     transferInit.Version = 1;
@@ -45,13 +47,12 @@ TEST_F(TestTransferDiagnosticLog, InitsDiagnosticLog)
     transferInit.StartOffset  = 42;
     transferInit.MaxBlockSize = 256;
 
-    char testFileDes[9]         = { "test.txt" };
-    transferInit.FileDesLength  = 9;
-    transferInit.FileDesignator = reinterpret_cast<uint8_t *>(testFileDes);
+    const char testFileDes[]    = "test.txt";
+    transferInit.FileDesLength  = 8;
+    transferInit.FileDesignator = reinterpret_cast<const uint8_t *>(testFileDes);
 
-    uint8_t fakeData[5]         = { 7, 6, 5, 4, 3 };
-    transferInit.MetadataLength = 5;
-    transferInit.Metadata       = reinterpret_cast<uint8_t *>(fakeData);
+    transferInit.MetadataLength = kMetaDataLength;
+    transferInit.Metadata       = kMetaData;
 
     size_t msgSize = transferInit.MessageSize();
     Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(msgSize));
@@ -66,11 +67,11 @@ TEST_F(TestTransferDiagnosticLog, InitsDiagnosticLog)
     PayloadHeader payloadHeader;
     payloadHeader.SetMessageType(Protocols::BDX::Id, to_underlying(MessageType::SendInit));
 
-    auto r = mTransferSession.HandleMessageReceived(payloadHeader, std::move(rcvBuf), System::Clock::kZero);
+    CHIP_ERROR r = mTransferSession.HandleMessageReceived(payloadHeader, std::move(rcvBuf), System::Clock::kZero);
 
     EXPECT_EQ(r, CHIP_NO_ERROR);
 
-    auto proxyDiagnosticLog = BDXTransferProxyDiagnosticLog();
+    BDXTransferProxyDiagnosticLog proxyDiagnosticLog{};
 
     r = proxyDiagnosticLog.Init(&mTransferSession);
 
@@ -80,23 +81,22 @@ TEST_F(TestTransferDiagnosticLog, InitsDiagnosticLog)
 TEST_F(TestTransferDiagnosticLog, AccpetsTransferActingAsReceiverWhileInititatorDrivesTransfer)
 {
 
-    auto proxyDiagnosticLog = BDXTransferProxyDiagnosticLog();
+    BDXTransferProxyDiagnosticLog proxyDiagnosticLog{};
 
     TransferSession initiator;
-    TransferSession::TransferInitData transferInitData;
+    TransferSession::TransferInitData transferInitData{};
     transferInitData.TransferCtlFlags = TransferControlFlags::kSenderDrive;
     transferInitData.MaxBlockSize     = kMaxBlockSize;
     transferInitData.StartOffset      = 0;
     transferInitData.Length           = 1024;
-    char testFileDes[9]               = { "test.txt" };
+    const char testFileDes[]          = "test.txt";
     transferInitData.FileDesLength    = 9;
-    transferInitData.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
-    uint8_t fakeData[5]               = { 7, 6, 5, 4, 3 };
-    transferInitData.MetadataLength   = 5;
-    transferInitData.Metadata         = reinterpret_cast<uint8_t *>(fakeData);
+    transferInitData.FileDesignator   = reinterpret_cast<const uint8_t *>(testFileDes);
+    transferInitData.MetadataLength   = kMetaDataLength;
+    transferInitData.Metadata         = kMetaData;
 
     /// Init initiator (and sender) transfer session
-    auto r = initiator.StartTransfer(TransferRole::kSender, transferInitData, System::Clock::Seconds16(10));
+    CHIP_ERROR r = initiator.StartTransfer(TransferRole::kSender, transferInitData, System::Clock::Seconds16(10));
 
     EXPECT_EQ(r, CHIP_NO_ERROR);
 
@@ -142,23 +142,22 @@ TEST_F(TestTransferDiagnosticLog, AccpetsTransferActingAsReceiverWhileInititator
 TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer)
 {
 
-    auto proxyDiagnosticLog = BDXTransferProxyDiagnosticLog();
+    BDXTransferProxyDiagnosticLog proxyDiagnosticLog{};
 
     TransferSession initiator;
-    TransferSession::TransferInitData transferInitData;
+    TransferSession::TransferInitData transferInitData{};
     transferInitData.TransferCtlFlags = TransferControlFlags::kSenderDrive;
     transferInitData.MaxBlockSize     = kMaxBlockSize;
     transferInitData.StartOffset      = 0;
     transferInitData.Length           = 1024;
-    char testFileDes[9]               = { "test.txt" };
-    transferInitData.FileDesLength    = 9;
-    transferInitData.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
-    uint8_t fakeData[5]               = { 7, 6, 5, 4, 3 };
-    transferInitData.MetadataLength   = 5;
-    transferInitData.Metadata         = reinterpret_cast<uint8_t *>(fakeData);
+    const char testFileDes[]          = "test.txt";
+    transferInitData.FileDesLength    = 8;
+    transferInitData.FileDesignator   = reinterpret_cast<const uint8_t *>(testFileDes);
+    transferInitData.MetadataLength   = kMetaDataLength;
+    transferInitData.Metadata         = kMetaData;
 
     /// Init initiator (and sender) transfer session
-    auto r = initiator.StartTransfer(TransferRole::kSender, transferInitData, System::Clock::Seconds16(10));
+    CHIP_ERROR r = initiator.StartTransfer(TransferRole::kSender, transferInitData, System::Clock::Seconds16(10));
 
     EXPECT_EQ(r, CHIP_NO_ERROR);
 
@@ -309,7 +308,7 @@ TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer)
 
 TEST_F(TestTransferDiagnosticLog, AccpetsTransferAndReceivesNonNullTerminatedDataCorrectly)
 {
-    auto proxyDiagnosticLog = BDXTransferProxyDiagnosticLog();
+    BDXTransferProxyDiagnosticLog proxyDiagnosticLog{};
 
     TransferSession initiator;
     TransferSession::TransferInitData transferInitData;
@@ -317,15 +316,14 @@ TEST_F(TestTransferDiagnosticLog, AccpetsTransferAndReceivesNonNullTerminatedDat
     transferInitData.MaxBlockSize     = kMaxBlockSize;
     transferInitData.StartOffset      = 0;
     transferInitData.Length           = 1024;
-    char testFileDes[8]               = { 't', 'e', 's', 't', '.', 't', 'x', 't' };
+    const char testFileDes[8]         = { 't', 'e', 's', 't', '.', 't', 'x', 't' };
     transferInitData.FileDesLength    = 8;
-    transferInitData.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
-    uint8_t fakeData[5]               = { 7, 6, 5, 4, 3 };
-    transferInitData.MetadataLength   = 5;
-    transferInitData.Metadata         = reinterpret_cast<uint8_t *>(fakeData);
+    transferInitData.FileDesignator   = reinterpret_cast<const uint8_t *>(testFileDes);
+    transferInitData.MetadataLength   = kMetaDataLength;
+    transferInitData.Metadata         = kMetaData;
 
     /// Init initiator (and sender) transfer session
-    auto r = initiator.StartTransfer(TransferRole::kSender, transferInitData, System::Clock::Seconds16(10));
+    CHIP_ERROR r = initiator.StartTransfer(TransferRole::kSender, transferInitData, System::Clock::Seconds16(10));
 
     EXPECT_EQ(r, CHIP_NO_ERROR);
 
@@ -358,7 +356,7 @@ TEST_F(TestTransferDiagnosticLog, AccpetsTransferAndReceivesNonNullTerminatedDat
 
     EXPECT_EQ(r, CHIP_NO_ERROR);
 
-    auto fileDesignator = proxyDiagnosticLog.GetFileDesignator();
+    CharSpan fileDesignator = proxyDiagnosticLog.GetFileDesignator();
 
     EXPECT_TRUE(fileDesignator.data_equal(CharSpan{ testFileDes, 8 }));
 }
