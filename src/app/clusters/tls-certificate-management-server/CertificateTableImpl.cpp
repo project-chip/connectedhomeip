@@ -754,21 +754,26 @@ CHIP_ERROR CertificateTableImpl::GetClientCertificateCount(FabricIndex fabric, u
     return mClientCertificates.GetFabricEntryCount(fabric, outCount);
 }
 
+inline CHIP_ERROR SwallowNotFound(CHIP_ERROR err)
+{
+    return (err == CHIP_ERROR_NOT_FOUND) ? CHIP_NO_ERROR : err;
+}
+
 CHIP_ERROR CertificateTableImpl::RemoveFabric(FabricIndex fabric)
 {
-    CHIP_ERROR result = mClientCertificates.RemoveFabric(fabric);
-    ReturnErrorOnFailure(mRootCertificates.RemoveFabric(fabric));
+    CHIP_ERROR result = SwallowNotFound(mClientCertificates.RemoveFabric(fabric));
+    ReturnErrorOnFailure(SwallowNotFound(mRootCertificates.RemoveFabric(fabric)));
 
     GlobalCertificateData globalData(mEndpointId);
     ReturnErrorOnFailure(globalData.Load(mStorage));
     if (result != CHIP_NO_ERROR)
     {
-        result = globalData.RemoveAllClientCertificates(*mStorage, fabric);
+        result = SwallowNotFound(globalData.RemoveAllClientCertificates(*mStorage, fabric));
     }
 
     if (result != CHIP_NO_ERROR)
     {
-        result = globalData.RemoveAllRootCertificates(*mStorage, fabric);
+        result = SwallowNotFound(globalData.RemoveAllRootCertificates(*mStorage, fabric));
     }
 
     return result;
