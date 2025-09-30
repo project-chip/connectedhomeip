@@ -131,6 +131,7 @@ ClustersWithPreAttributeChangeFunctions:
 # The clusters in this list require Init() and/or Shutdown() callbacks, defined
 # in the cluster's respective CodgenIntegration.cpp file.
 CodeDrivenClusters:
+    - Access Control
     - Administrator Commissioning
     - Basic Information
     - Binding
@@ -144,4 +145,3 @@ CodeDrivenClusters:
     - Time Format Localization
     - Wi-Fi Network Diagnostics
     - Diagnostic Logs
-    - Access Control
