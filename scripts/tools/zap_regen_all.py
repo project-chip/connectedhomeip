@@ -289,20 +289,16 @@ class JinjaCodegenTarget():
                 logging.info("    %s" % name)
 
             VERSION = "0.58"
-            JAR_NAME = f"ktfmt-{VERSION}-jar-with-dependencies.jar"
+            JAR_NAME = f"ktfmt-{VERSION}-with-dependencies.jar"
             jar_url = f"https://repo1.maven.org/maven2/com/facebook/ktfmt/{VERSION}/{JAR_NAME}"
 
+            # ensure we have some headers otherwise maven seems to 403 us
+            opener = urllib.request.build_opener()
+            opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+            urllib.request.install_opener(opener)
+
             with tempfile.TemporaryDirectory(prefix='ktfmt') as tmpdir:
-                RETRY_COUNT = 4
-                path = None
-                for retry in range(RETRY_COUNT):
-                    try:
-                        path, _ = urllib.request.urlretrieve(jar_url, Path(tmpdir).joinpath(JAR_NAME).as_posix())
-                    except HTTPError as err:
-                        if retry == (RETRY_COUNT - 1) or err.code != 403:
-                            raise
-                        logging.info("GOT HTTP 403 ... sleeping and retrying...")
-                        time.sleep(5)
+                path, _ = urllib.request.urlretrieve(jar_url, Path(tmpdir).joinpath(JAR_NAME).as_posix())
                 subprocess.check_call(['java', '-jar', path, '--google-style'] + paths)
         except Exception:
             traceback.print_exc()
