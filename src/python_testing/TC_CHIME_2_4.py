@@ -116,7 +116,7 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
         longestChimeDurationChime = await self.read_chime_attribute_expect_success(endpoint, attributes.SelectedChime)
 
         if not self.is_ci:
-            user_response = self.wait_for_user_input(prompt_msg="Plesse enter the ChimeID of the longest duration chime",
+            user_response = self.wait_for_user_input(prompt_msg="Please enter the ChimeID of the longest duration chime",
                                                      prompt_msg_placeholder=str(longestChimeDurationChime),
                                                      default_value=str(longestChimeDurationChime))
 
@@ -137,7 +137,7 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
 
                 longestChimeDurationChime = chosenChimeID
             else:
-                logging.info("CHIME 2_4: No response received for longest chime id user prompt")
+                logging.info("CHIME 2_4: No response received for longest ChimeID user prompt")
 
         await self.write_chime_attribute_expect_success(endpoint, attributes.SelectedChime, longestChimeDurationChime)
 
