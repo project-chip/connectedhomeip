@@ -1914,6 +1914,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
 
 /**
+ *  @def CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE
+ *
+ *  @brief
+ *    Maximum block size recommended by device for bdx log transfers.
+ *
+ */
+#ifndef CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE
+#define CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE 1024
+#endif // CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE
+
+/**
  *  @def CHIP_CONFIG_TEST_GOOGLETEST
  *
  *  @brief

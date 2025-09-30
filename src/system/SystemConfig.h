@@ -441,6 +441,16 @@
 #endif /* CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX */
 
 /**
+ *  @def CHIP_SYSTEM_CONFIG_ALLOW_LARGE_PAYLOAD_ON_UDP
+ *
+ *  @brief
+ *      If 1, payloads larger than the MTU will be allowed for the UDP transport type.
+ */
+#ifndef CHIP_SYSTEM_CONFIG_ALLOW_LARGE_PAYLOAD_ON_UDP
+#define CHIP_SYSTEM_CONFIG_ALLOW_LARGE_PAYLOAD_ON_UDP 0
+#endif /* CHIP_SYSTEM_CONFIG_ALLOW_LARGE_PAYLOAD_ON_UDP */
+
+/**
  *  @def _CHIP_SYSTEM_CONFIG_LWIP_EVENT
  *
  *  @brief
