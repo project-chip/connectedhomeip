@@ -239,11 +239,12 @@ void OnFallbackNTPCompletionWrapper(void * context, bool timeSyncSuccessful)
 }
 
 TimeSynchronizationCluster::TimeSynchronizationCluster(
-    EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
+    EndpointId endpoint, const TimeSynchronizationCluster::OptionalAttributeSet & optionalAttributeSet,
+    const BitFlags<TimeSynchronization::Feature> features,
     TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type supportsDNSResolve, TimeZoneDatabaseEnum timeZoneDatabase,
     TimeSynchronization::TimeSourceEnum timeSource) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mFeatures(features), mSupportsDNSResolve(supportsDNSResolve), mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mOptionalAttributeSet(optionalAttributeSet), mFeatures(features),
+    mSupportsDNSResolve(supportsDNSResolve), mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -329,11 +330,9 @@ CHIP_ERROR TimeSynchronizationCluster::Attributes(const ConcreteClusterPath & pa
         NTPServerAvailable::kMetadataEntry,   //
         TimeZoneListMaxSize::kMetadataEntry,  //
         DSTOffsetListMaxSize::kMetadataEntry, //
-        SupportsDNSResolve::kMetadataEntry    //
+        SupportsDNSResolve::kMetadataEntry,   //
+        TimeSource::kMetadataEntry            //
     };
-
-    // Attribute set, real "optional" attributes
-    chip::app::OptionalAttributeSet<TimeSynchronization::Attributes::TimeSource::Id> optAttributesSet;
 
     // Full attribute set, to combine real "optional" attributes but also
     // attributes controlled by feature flags.
@@ -346,9 +345,10 @@ CHIP_ERROR TimeSynchronizationCluster::Attributes(const ConcreteClusterPath & pa
                                     TimeSynchronization::Attributes::NTPServerAvailable::Id,   //
                                     TimeSynchronization::Attributes::TimeZoneListMaxSize::Id,  //
                                     TimeSynchronization::Attributes::DSTOffsetListMaxSize::Id, //
-                                    TimeSynchronization::Attributes::SupportsDNSResolve::Id    //
+                                    TimeSynchronization::Attributes::SupportsDNSResolve::Id,   //
+                                    TimeSynchronization::Attributes::TimeSource::Id            //
                                     >
-        optionalAttributeSet(optAttributesSet);
+        optionalAttributeSet(mOptionalAttributeSet);
 
     if (mFeatures.Has(Feature::kTimeSyncClient))
     {
@@ -403,48 +403,80 @@ DataModel::ActionReturnStatus TimeSynchronizationCluster::ReadAttribute(const Da
         VerifyOrReturnValue(timeSynchronization != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         return encoder.Encode(timeSynchronization->GetGranularity());
     }
-    case TrustedTimeSource::Id:
+    case TrustedTimeSource::Id: {
         if (mFeatures.Has(Feature::kTimeSyncClient))
+        {
             return ReadTrustedTimeSource(encoder);
+        }
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    case DefaultNTP::Id:
+    }
+    case DefaultNTP::Id: {
         if (mFeatures.Has(Feature::kNTPClient))
+        {
             return ReadDefaultNtp(encoder);
+        }
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    case TimeZone::Id:
+    }
+    case TimeZone::Id: {
         if (mFeatures.Has(Feature::kTimeZone))
+        {
             return ReadTimeZone(encoder);
+        }
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    case DSTOffset::Id:
+    }
+    case DSTOffset::Id: {
         if (mFeatures.Has(Feature::kTimeZone))
+        {
             return ReadDSTOffset(encoder);
+        }
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    case TimeZoneListMaxSize::Id:
+    }
+    case TimeZoneListMaxSize::Id: {
         if (mFeatures.Has(Feature::kTimeZone))
+        {
             return encoder.Encode<uint8_t>(CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE);
+        }
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    case DSTOffsetListMaxSize::Id:
+    }
+    case DSTOffsetListMaxSize::Id: {
         if (mFeatures.Has(Feature::kTimeZone))
+        {
             return encoder.Encode<uint8_t>(CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE);
+        }
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    case LocalTime::Id:
-        return ReadLocalTime(encoder);
+    }
+    case LocalTime::Id: {
+        if (mFeatures.Has(Feature::kTimeZone))
+        {
+            return ReadLocalTime(encoder);
+        }
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    }
     case ClusterRevision::Id:
         return encoder.Encode(TimeSynchronization::kRevision);
     case FeatureMap::Id:
         return encoder.Encode(mFeatures);
-    case SupportsDNSResolve::Id:
+    case SupportsDNSResolve::Id: {
         if (mFeatures.Has(Feature::kNTPClient))
+        {
             return encoder.Encode(mSupportsDNSResolve);
+        }
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    case TimeZoneDatabase::Id:
+    }
+    case TimeZoneDatabase::Id: {
         if (mFeatures.Has(Feature::kTimeZone))
+        {
             return encoder.Encode(mTimeZoneDatabase);
+        }
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    case TimeSource::Id:
-        if (mFeatures.Has(Feature::kTimeZone))
+    }
+    case TimeSource::Id: {
+        if (mOptionalAttributeSet.IsSet(TimeSource::Id))
+        {
             return encoder.Encode(mTimeSource);
+        }
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    }
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }

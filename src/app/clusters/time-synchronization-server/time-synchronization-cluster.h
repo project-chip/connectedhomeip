@@ -19,6 +19,7 @@
 #include "TimeSyncDataProvider.h"
 #include "time-synchronization-delegate.h"
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/TimeSynchronization/Metadata.h>
 #include <platform/DeviceInfoProvider.h>
 
@@ -67,7 +68,12 @@ class TimeSynchronizationCluster : public DefaultServerCluster,
 #endif
 {
 public:
-    TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
+    // NOTE: this set is smaller than the full optional attributes supported by time synchronization
+    //       as other attributes are controlled by feature flags
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<TimeSynchronization::Attributes::TimeSource::Id>;
+
+    TimeSynchronizationCluster(EndpointId endpoint, const OptionalAttributeSet & optionalAttributeSet,
+                               const BitFlags<TimeSynchronization::Feature> features,
                                TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type supportsDNSResolve,
                                TimeSynchronization::TimeZoneDatabaseEnum timeZoneDatabase,
                                TimeSynchronization::TimeSourceEnum timeSource);
@@ -144,6 +150,7 @@ private:
     TimeSyncDataProvider::TimeZoneStore mTz[CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE];
     TimeSynchronization::Structs::DSTOffsetStruct::Type mDst[CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE];
 
+    const OptionalAttributeSet mOptionalAttributeSet;
     const BitFlags<TimeSynchronization::Feature> mFeatures;
 
     TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type mSupportsDNSResolve;

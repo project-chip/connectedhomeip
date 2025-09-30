@@ -18,6 +18,8 @@
 
 #include <app/clusters/time-synchronization-server/CodegenIntegration.h>
 #include <app/clusters/time-synchronization-server/DefaultTimeSyncDelegate.h>
+#include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/TimeSynchronization.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -50,15 +52,25 @@ public:
         const BitFlags<TimeSynchronization::Feature> featureMap(rawFeatureMap);
 
         TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type supportsDNSResolve = false;
-        SupportsDNSResolve::Get(endpointId, &supportsDNSResolve);
+        if (featureMap.Has(Feature::kNTPClient))
+        {
+            SupportsDNSResolve::Get(endpointId, &supportsDNSResolve);
+        }
 
         TimeSynchronization::TimeZoneDatabaseEnum timeZoneDatabase = TimeZoneDatabaseEnum::kNone;
-        TimeZoneDatabase::Get(endpointId, &timeZoneDatabase);
+        if (featureMap.Has(Feature::kTimeZone))
+        {
+            TimeZoneDatabase::Get(endpointId, &timeZoneDatabase);
+        }
 
+        TimeSynchronizationCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         TimeSynchronization::TimeSourceEnum timeSource = TimeSourceEnum::kNone;
-        TimeSource::Get(endpointId, &timeSource);
+        if (optionalAttributeSet.IsSet(TimeSource::Id))
+        {
+            TimeSource::Get(endpointId, &timeSource);
+        }
 
-        gServer.Create(endpointId, featureMap, supportsDNSResolve, timeZoneDatabase, timeSource);
+        gServer.Create(endpointId, optionalAttributeSet, featureMap, supportsDNSResolve, timeZoneDatabase, timeSource);
         return gServer.Registration();
     }
 
@@ -87,7 +99,7 @@ void MatterTimeSynchronizationClusterInitCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kTimeSynchronizationFixedClusterCount,
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
             .fetchFeatureMap           = true,
-            .fetchOptionalAttributes   = false,
+            .fetchOptionalAttributes   = true,
         },
         integrationDelegate);
 }
