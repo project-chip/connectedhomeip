@@ -157,7 +157,6 @@ CHIP_ERROR TCPEndPointImplLwIP::ConnectImpl(const IPAddress & addr, uint16_t por
         if (res == CHIP_NO_ERROR)
         {
             mState = State::kConnecting;
-            Retain();
         }
     }
 
@@ -849,7 +848,6 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
             conEP->mState            = State::kConnected;
             conEP->mTCP              = tpcb;
             conEP->mLwIPEndPointType = LwIPEndPointType::TCP;
-            conEP->Retain();
 
             // Setup LwIP callback functions for the new PCB.
             tcp_arg(tpcb, conEP);
@@ -880,7 +878,6 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
                 conEP->Release(); // for the Ref in ScheduleLambda
                 listenEP->Release();
                 err = CHIP_ERROR_CONNECTION_ABORTED;
-                conEP->Release(); // for the Retain() above
             }
         }
 

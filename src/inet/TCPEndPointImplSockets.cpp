@@ -262,9 +262,6 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
     ReturnErrorOnFailure(static_cast<System::LayerSockets &>(GetSystemLayer())
                              .SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this)));
 
-    // Once Connecting or Connected, bump the reference count.  The corresponding Release() will happen in DoClose().
-    Retain();
-
     if (conRes == 0)
     {
         mState = State::kConnected;
