@@ -348,7 +348,7 @@ public:
      */
     void SetInstance(Instance * aInstance)
     {
-        assert(mInstance == nullptr || aInstance == nullptr || mInstance == aInstance);
+        VerifyOrDie(mInstance == nullptr || aInstance == nullptr || mInstance == aInstance);
         mInstance = aInstance;
     }
 
