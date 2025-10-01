@@ -53,31 +53,31 @@ from TC_SUBase import SoftwareUpdateBaseTest
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
-from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler, AttributeSubscriptionHandler
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main, AttributeMatcher
 
 logger = logging.getLogger(__name__)
 
 
-class TC_SU_2_5(SoftwareUpdateBaseTest):
+class TC_SU_2_4(SoftwareUpdateBaseTest):
     "This test case verifies that the DUT behaves according to the spec when it is applying the software update."
 
-    def desc_TC_SU_2_5(self) -> str:
+    def desc_TC_SU_2_4(self) -> str:
         return "  [TC-SU-2.4] ApplyUpdateRequest Command from DUT to OTA-P"
 
-    def pics_TC_SU_2_5(self):
+    def pics_TC_SU_2_4(self):
         """Return the PICS definitions associated with this test."""
         pics = [
             "MCORE.OTA.Requestor",
         ]
         return pics
 
-    def steps_TC_SU_2_5(self) -> list[TestStep]:
+    def steps_TC_SU_2_4(self) -> list[TestStep]:
         steps = [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, 'DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to "UpdateAvailable". Set ImageURI to the location where the image is located. After the DUT transfers the image, the DUT should send ApplyUpdateRequest to the OTA-P.', 'Verify that the request received on the OTA-P has the following mandatory fields.'
                      'UpdateToken - verify that it is same as the one sent in the QueryImageResponse.'
-                     'NewVersion - verify that this is the same as the software version that was downloaded.'),
+                     'NewVersion - verify that this is the same as the software version that was downloaded.')
         ]
         return steps
 
@@ -95,19 +95,49 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         }
 
         self.step(1)
-        self.commission_provider(
+        expected_software_version = 2
+        await self.commission_provider(
             controller=controller,
+            discriminator=provider_data['discriminator'],
+            setup_pincode=provider_data['setup_pincode'],
             requestor_node_id=requestor_node_id,
             provider_node_id=provider_data['node_id'],
-            version=2,
+            version=expected_software_version,
             endpoint=0,
             log_file='/tmp/provider.log',
-            extra_arguments=['--queryImageStatus updateAvailable']
+            extra_arguments=['--queryImageStatus', 'updateAvailable']
         )
+        update_state_attr_handler = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+        )
+        await update_state_attr_handler.start(dev_ctrl=controller, node_id=requestor_node_id, endpoint=0,
+                                              fabric_filtered=False, min_interval_sec=1, max_interval_sec=5000)
         await self.announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
-        found_lines = self.current_provider_app_proc.read_log('ApplyUpdateRequest', regex=False, before=2, after=6)
+
+        update_state_match = AttributeMatcher.from_callable(
+            "Update state is applying",
+            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
+
+        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60*6)
+        # This value should be obtained from a response but for now is 32
+        expected_token = '32'
+        found_lines = self.current_provider_app_proc.read_from_logs(
+            'Provider received ApplyUpdateRequest', regex=False, before=2, after=6)
         if len(found_lines) == 0:
-            asserts.fail("No found lines while searching for the string 'ApplyUpdateRequest'")
+            asserts.fail("No found lines while searching for the string 'Provider received ApplyUpdateRequest'")
+        update_token_line = found_lines[0]['after'][0]
+        handle_apply_request_line = found_lines[0]['after'][2]
+        logger.info(f"Handle Apply Request {handle_apply_request_line} and token line {update_token_line}")
+        version_string = f"version: {expected_software_version}"
+        token_stirng = f"Update Token: {expected_token}"
+        # Match for the expected strings
+        asserts.assert_true(version_string in handle_apply_request_line, f"{version_string} is not in the expected line")
+        asserts.assert_true(token_stirng in update_token_line, f"{expected_token} is not in the expected line")
+        update_state_attr_handler.reset()
+        await update_state_attr_handler.cancel()
+        self.current_provider_app_proc.terminate()
+        controller.ExpireSessions(nodeid=provider_data['node_id'])
 
 
 if __name__ == "__main__":
