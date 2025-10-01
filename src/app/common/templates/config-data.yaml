@@ -75,6 +75,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Soil Measurement
     - Basic Information
     - Boolean State
+    - User Label
     - Diagnostic Logs
 
 # We need a more configurable way of deciding which clusters have which init functions....
@@ -143,3 +144,4 @@ CodeDrivenClusters:
     - Time Format Localization
     - Wi-Fi Network Diagnostics
     - Diagnostic Logs
+    - User Label
