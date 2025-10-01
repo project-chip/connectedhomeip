@@ -23,6 +23,7 @@
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/zone-management-server/zone-management-server.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/reporting/reporting.h>
 #include <app/util/util.h>
 #include <clusters/ZoneManagement/Metadata.h>
@@ -114,7 +115,7 @@ void ZoneMgmtServer::LoadPersistentAttributes()
     mZones.clear();
     DataModel::DecodableList<chip::app::Clusters::ZoneManagement::Structs::ZoneInformationStruct::DecodableType> decodableZones;
 
-    err = GetSafeAttributePersistenceProvider()->SafeReadValue(ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id), bufferSpan);
+    err = GetAttributePersistenceProvider()->ReadValue(ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id), bufferSpan);
 
     VerifyOrReturn((CHIP_NO_ERROR == err) || (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND), ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load zones from the KVS.", mEndpointId));
 
@@ -372,20 +373,21 @@ void ZoneMgmtServer::PersistZones() {
     TLV::TLVType arrayType;
 
     err = writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogDetail(Zcl,"ZoneManagement[ep=%d] failure saving zone: %s", mEndpointId, "start"));
+    LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving zone: %s", mEndpointId, "start");
 
     for (const auto & zone : mZones)
     {
         err = zone.Encode(writer, chip::TLV::AnonymousTag());
-        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogDetail(Zcl,"ZoneManagement[ep=%d] failure saving zone: %s", mEndpointId, "element"));
+        LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving zone: %s", mEndpointId, "element");
     }
     err = writer.EndContainer(arrayType);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogDetail(Zcl,"ZoneManagement[ep=%d] failure saving zone: %s", mEndpointId, "end"));
+    LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving zone: %s", mEndpointId, "end");
 
     bufferSpan.reduce_size(writer.GetLengthWritten());
 
-    err = GetSafeAttributePersistenceProvider()->SafeWriteValue(ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id), bufferSpan);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogDetail(Zcl,"ZoneManagement[ep=%d] failure saving zone: %s", mEndpointId, "write"));
+    err = GetAttributePersistenceProvider()->WriteValue(ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id), bufferSpan);
+    LogAndReturnOnFailure(err, Zcl,"ZoneManagement[ep=%d] failure saving zone: %s", mEndpointId, "write");
+    ChipLogProgress(Zcl, "ZoneManagement[ep=%d] persisted %zu zones, wrote %d bytes", mEndpointId, mZones.size(), writer.GetLengthWritten());
 }
 
 CHIP_ERROR ZoneMgmtServer::AddZone(const ZoneInformationStorage & zone)
