@@ -197,6 +197,8 @@ void TCPEndPoint::Free()
 
     // Ensure the end point is Closed or Closing.
     Close();
+
+    GetEndPointManager().DeleteEndPoint(this);
 }
 
 #if INET_TCP_IDLE_CHECK_INTERVAL > 0
