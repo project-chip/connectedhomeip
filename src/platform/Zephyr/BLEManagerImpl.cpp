@@ -76,7 +76,7 @@ const bt_uuid_128 UUID128_CHIPoBLEChar_C3 =
 
 bt_uuid_16 UUID16_CHIPoBLEService = BT_UUID_INIT_16(0xFFF6);
 
-#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 2
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 1
 bt_gatt_ccc_managed_user_data CHIPoBLEChar_TX_CCC =
     BT_GATT_CCC_MANAGED_USER_DATA_INIT(nullptr, BLEManagerImpl::HandleTXCCCWrite, nullptr);
 #else
