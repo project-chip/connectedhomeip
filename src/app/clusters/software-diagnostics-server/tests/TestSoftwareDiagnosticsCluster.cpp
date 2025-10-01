@@ -216,8 +216,13 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
         EXPECT_EQ(diag.GetCurrentHighWatermark(value), CHIP_NO_ERROR);
         EXPECT_EQ(value, 456u);
     }
+
+    // Here should be test for ThreadMetrics attribute, but this will be harder to do without a testing
+    // infrastructure for clusters.
 }
 
+// This doesn't really test event generation right now, for it there needs to be a testing infrastructure for clusters.
+// This just tests the global listener functionality.
 TEST_F(TestSoftwareDiagnosticsCluster, SoftwareFaultListenerTest)
 {
     class TestListener : public SoftwareDiagnostics::SoftwareFaultListener
