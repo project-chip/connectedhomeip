@@ -49,16 +49,7 @@ public:
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
 
-    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               chip::TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler) override;
-
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
-
-    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
-
-    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
     CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override;
 
@@ -66,6 +57,15 @@ public:
     std::optional<DataModel::ActionReturnStatus>
     HandleReviewFabricRestrictions(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                    const Clusters::AccessControl::Commands::ReviewFabricRestrictions::DecodableType & commandData);
+
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
+
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override;
 #endif
 
 private:
