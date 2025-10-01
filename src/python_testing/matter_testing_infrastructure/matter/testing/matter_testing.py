@@ -222,7 +222,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             for problem in self.problems:
                 LOGGER.info(str(problem))
             LOGGER.info("###########################################################")
-            
+
             # Attempt to dump device attribute data for debugging when problems are found
             self._dump_device_attributes_on_failure()
         super().teardown_class()
@@ -230,7 +230,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     def _dump_device_attributes_on_failure(self):
         """
         Dump device attribute data when problems are found for debugging purposes.
-        
+
         This method attempts to generate a device attribute dump if the test has
         collected endpoint data. It's designed to be safe and not interfere with
         the original test failure reporting.
@@ -239,7 +239,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             # Check if we have endpoints_tlv data (from BasicCompositionTests or similar)
             if hasattr(self, 'endpoints_tlv') and self.endpoints_tlv:
                 LOGGER.info("MatterBaseTest: Problems detected - generating device attribute dump")
-                
+
                 # Check if we have the dump_wildcard method (from BasicCompositionTests)
                 if hasattr(self, 'dump_wildcard'):
                     LOGGER.info("Device attribute data available - generating dump")

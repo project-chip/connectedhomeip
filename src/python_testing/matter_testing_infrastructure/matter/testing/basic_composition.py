@@ -295,4 +295,3 @@ class BasicCompositionTests:
         self.xml_clusters, self.problems = build_xml_clusters(dm)
         self.xml_device_types, problems = build_xml_device_types(dm)
         self.problems.extend(problems)
-
