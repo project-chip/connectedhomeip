@@ -345,7 +345,11 @@ public:
      * This method is used by the SDK to set the instance pointer. This is done during the instantiation of a Instance object.
      * @param aInstance A pointer to the Instance object related to this delegate object.
      */
-    void SetInstance(Instance * aInstance) { assert(mInstance == nullptr || aInstance == nullptr || mInstance == aInstance); mInstance = aInstance; }
+    void SetInstance(Instance * aInstance)
+    {
+        assert(mInstance == nullptr || aInstance == nullptr || mInstance == aInstance);
+        mInstance = aInstance;
+    }
 
 private:
     Instance * mInstance = nullptr;
