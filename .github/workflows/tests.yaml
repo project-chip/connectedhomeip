@@ -967,9 +967,10 @@ jobs:
                 - os: macos-15
                   arch: arm64   # observed, not configured
                   build_variant: no-ble-no-wifi-tsan-clang
-                - os: macos-26
-                  arch: arm64   # observed, not configured
-                  build_variant: no-ble-no-wifi-tsan-clang
+                # as of 1 oct 2025, macos-26 runners still relatively scarce
+                # - os: macos-26
+                #   arch: arm64   # observed, not configured
+                #   build_variant: no-ble-no-wifi-tsan-clang
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"
