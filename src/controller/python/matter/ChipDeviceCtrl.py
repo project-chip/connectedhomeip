@@ -2722,7 +2722,6 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self.SetThreadOperationalDataset(threadOperationalDataset)
         return await self.ConnectNFC(discriminator, setupPinCode, nodeId, isShortDiscriminator)
 
-
     async def CommissionBleWiFi(self, discriminator, setupPinCode, nodeId, ssid: str, credentials: str, isShortDiscriminator: bool = False) -> int:
         '''
         Commissions a Wi-Fi device over BLE.
