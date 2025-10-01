@@ -2,26 +2,26 @@
 
 <hr>
 
--   [MATTER NXP RT1170 Applications Guide](#matter-nxp-rt1170-applications-guide)
-    -   [Introduction](#introduction)
-        -   [Supported configurations](#supported-configurations)
-        -   [Supported build systems](#supported-build-systems)
-        -   [Hardware requirements for RT1170 + IW612](#hardware-requirements-for-rt1170--iw612)
-            -   [Hardware rework for SPI support on MIMXRT1170-EVK-B](#hardware-rework-for-spi-support-on-mimxrt1170-evk-b)
-            -   [Board settings (Spinel over SPI, I2C, BLE over UART)](#board-settings-spinel-over-spi-i2c-ble-over-uart)
-    -   [Building](#building)
-        -   [CMake Build System](#cmake-build-system)
-        -   [GN Build System](#gn-build-system)
-            -   [Building with Matter over Wifi configuration on RT1170 + IW612](#building-with-matter-over-wifi-configuration-on-rt1170--iw612)
-            -   [Building with Matter over Thread configuration on RT1170 + IW612](#building-with-matter-over-thread-configuration-on-rt1170--iw612)
-            -   [Building with Matter over Wifi + OpenThread Border Router configuration on RT1170 + IW612](#building-with-matter-over-wifi--openthread-border-router-configuration-on-rt1170--iw612)
-        -   [General information](#general-information)
-    -   [Manufacturing data](#manufacturing-data)
-    -   [Flashing and debugging](#flashing-and-debugging)
-    -   [Testing the example](#testing-the-example)
-        -   [UART details](#uart-details)
-    -   [OTA Software Update](#ota-software-update)
-    -   [Thread Border Router overview](#thread-border-router-overview)
+- [MATTER NXP RT1170 Applications Guide](#matter-nxp-rt1170-applications-guide)
+  - [Introduction](#introduction)
+    - [Supported configurations](#supported-configurations)
+    - [Supported build systems](#supported-build-systems)
+    - [Hardware requirements for RT1170 + IW612](#hardware-requirements-for-rt1170--iw612)
+      - [Hardware rework for SPI support on MIMXRT1170-EVK-B](#hardware-rework-for-spi-support-on-mimxrt1170-evk-b)
+      - [Board settings (Spinel over SPI, I2C, BLE over UART)](#board-settings-spinel-over-spi-i2c-ble-over-uart)
+  - [Building](#building)
+    - [CMake Build System](#cmake-build-system)
+    - [GN Build System](#gn-build-system)
+      - [Building with Matter over Wifi configuration on RT1170 + IW612](#building-with-matter-over-wifi-configuration-on-rt1170--iw612)
+      - [Building with Matter over Thread configuration on RT1170 + IW612](#building-with-matter-over-thread-configuration-on-rt1170--iw612)
+      - [Building with Matter over Wifi + OpenThread Border Router configuration on RT1170 + IW612](#building-with-matter-over-wifi--openthread-border-router-configuration-on-rt1170--iw612)
+    - [General information](#general-information)
+  - [Manufacturing data](#manufacturing-data)
+  - [Flashing and debugging](#flashing-and-debugging)
+  - [Testing the example](#testing-the-example)
+    - [UART details](#uart-details)
+  - [OTA Software Update](#ota-software-update)
+  - [Thread Border Router overview](#thread-border-router-overview)
 
 ## Introduction
 
@@ -46,6 +46,8 @@ Here are listed configurations that allow to support Matter over Wi-Fi & Matter
 over Thread on RT1170 :
 
 -   RT1170 + IW612 (Wi-Fi + BLE + 15.4)
+
+> **Note:** For CMake builds, Matter over Wi-Fi is the default configuration when no `prj_<flavour>.conf` file is specified in the build.
 
 ### Supported build systems
 
