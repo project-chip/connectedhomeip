@@ -42,7 +42,8 @@ AVDictionary * options = NULL;
 
 PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStruct & aAudioInfo, VideoInfoStruct & aVideoInfo,
                                        PushAVUploader * aUploader) :
-    mClipInfo(aClipInfo), mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
+    mClipInfo(aClipInfo),
+    mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
 {
     mFormatContext        = nullptr;
     mInputFormatContext   = nullptr;
@@ -411,7 +412,7 @@ int PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
         mVideoStream->codecpar->codec_tag = 0;
         mVideoStream->codecpar->width     = mVideoInfo.mWidth;
         mVideoStream->codecpar->height    = mVideoInfo.mHeight;
-        mVideoStream->avg_frame_rate      = (AVRational) { mVideoInfo.mFrameRate, 1 };
+        mVideoStream->avg_frame_rate      = (AVRational){ mVideoInfo.mFrameRate, 1 };
     }
     else if (type == AVMEDIA_TYPE_AUDIO)
     {
@@ -450,7 +451,7 @@ int PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
 
         mAudioEncoderContext->bit_rate              = mAudioInfo.mBitRate;
         mAudioEncoderContext->sample_fmt            = audioCodec->sample_fmts[0];
-        mAudioEncoderContext->time_base             = (AVRational) { 1, mAudioInfo.mSampleRate };
+        mAudioEncoderContext->time_base             = (AVRational){ 1, mAudioInfo.mSampleRate };
         mAudioEncoderContext->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
         AVDictionary * opts                         = NULL;
         av_dict_set(&opts, "strict", "experimental", 0);
