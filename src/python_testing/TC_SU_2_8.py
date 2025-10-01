@@ -74,6 +74,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         target_version = 2
 
         # Start OTA Provider
+        app_path = "./out/debug/chip-ota-provider-app"
         provider_ota_file = "firmware_v2.ota"
         provider_discriminator = 1111
         provider_setup_pin_code = 20202021
@@ -83,7 +84,8 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
             ota_file=provider_ota_file,
             discriminator=provider_discriminator,
             passcode=provider_setup_pin_code,
-            secured_device_port=provider_port
+            secured_device_port=provider_port,
+            app_path=app_path
         )
 
         provider.start()
@@ -203,6 +205,8 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         self.verfy_state_transition_event(event_report=event_querying_to_downloading,
                                           previous_state=querying, new_state=downloading, target_version=target_version)
+
+        provider.terminate()
 
 
 if __name__ == "__main__":

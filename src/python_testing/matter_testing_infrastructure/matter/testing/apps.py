@@ -16,7 +16,7 @@ import os
 import signal
 import tempfile
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Optional
 
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
