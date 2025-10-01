@@ -588,7 +588,7 @@
 #include <clusters/ZoneManagement/Events.h>
 #include <clusters/ZoneManagement/Structs.h>
 
-#include <app/common/CompatEnumNames.h>
+#include <app-common/zap-generated/cluster-enums.h>
 
 namespace chip {
 namespace app {
@@ -599,3 +599,8 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand);
 
 } // namespace app
 } // namespace chip
+
+// Included at the end, so all our definitions above are available.
+#define CHIP_INCLUDING_FROM_CLUSTER_OBJECTS
+#include <app/common/CompatClusterObjects.h>
+#undef CHIP_INCLUDING_FROM_CLUSTER_OBJECTS
