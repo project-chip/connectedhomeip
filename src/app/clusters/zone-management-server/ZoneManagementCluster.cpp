@@ -23,7 +23,8 @@
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/zone-management-server/ZoneManagementCluster.h>
-#include <app/persistence/AttributePersistenceProviderInstance.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistence.h>
 #include <app/reporting/reporting.h>
 #include <app/util/util.h>
 #include <clusters/ZoneManagement/Metadata.h>
@@ -47,7 +48,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ZoneManagement {
-
 // TODO: find a more reasonable value, enforce / check on save
 constexpr size_t kMaxPersistedValueLengthSupported = 2048;
 
@@ -58,7 +58,8 @@ ZoneManagementCluster::ZoneManagementCluster(EndpointId endpointId, Delegate & a
     mDelegate(aDelegate), mFeatures(aFeatures), mMaxUserDefinedZones(aMaxUserDefinedZones), mMaxZones(aMaxZones),
     mSensitivityMax(aSensitivityMax), mTwoDCartesianMax(aTwoDCartesianMax)
 {
-    mDelegate.SetZoneMgmtServer(reinterpret_cast<ZoneMgmtServer *>(this));
+    mDelegate.SetZoneMgmtServer(this);
+    //reinterpret_cast<ZoneManagementCluster *>(this));
 }
 
 ZoneManagementCluster::~ZoneManagementCluster()
@@ -72,21 +73,31 @@ CHIP_ERROR ZoneManagementCluster::Init()
     if (HasFeature(Feature::kUserDefined))
     {
         VerifyOrReturnError(mMaxUserDefinedZones >= 5, CHIP_ERROR_INVALID_ARGUMENT,
-                            ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxUserDefinedZones configuration error", mEndpointId));
+                            ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxUserDefinedZones configuration error", mPath.mEndpointId));
         VerifyOrReturnError(mMaxZones >= mMaxUserDefinedZones, CHIP_ERROR_INVALID_ARGUMENT,
-                            ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxZones configuration error", mEndpointId));
+                            ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxZones configuration error", mPath.mEndpointId));
     }
     else
     {
         VerifyOrReturnError(mMaxZones >= 1, CHIP_ERROR_INVALID_ARGUMENT,
-                            ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxZones configuration error", mEndpointId));
+                            ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxZones configuration error", mPath.mEndpointId));
     }
 
     VerifyOrReturnError(mSensitivityMax >= 2 && mSensitivityMax <= 10, CHIP_ERROR_INVALID_ARGUMENT,
-                        ChipLogError(Zcl, "ZoneManagement[ep=%d]: SensitivityMax configuration error", mEndpointId));
+                        ChipLogError(Zcl, "ZoneManagement[ep=%d]: SensitivityMax configuration error", mPath.mEndpointId));
 
-    LoadPersistentAttributes();
+    return CHIP_NO_ERROR;
+}
 
+CHIP_ERROR ZoneManagementCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
+    ReturnErrorOnFailure(LoadZones());
+    ReturnErrorOnFailure(LoadTriggers());
+    ReturnErrorOnFailure(LoadSensitivity());
+    // Signal delegate that all persistent configuration attributes have been loaded.
+    mDelegate.PersistentAttributesLoadedCallback();
     return CHIP_NO_ERROR;
 }
 
@@ -95,7 +106,7 @@ bool ZoneManagementCluster::HasFeature(Feature feature) const
     return mFeatures.Has(feature);
 }
 
-void ZoneManagementCluster::LoadPersistentAttributes()
+CHIP_ERROR ZoneManagementCluster::LoadZones()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t buffer[kMaxPersistedValueLengthSupported];
@@ -105,11 +116,10 @@ void ZoneManagementCluster::LoadPersistentAttributes()
     mZones.clear();
     DataModel::DecodableList<chip::app::Clusters::ZoneManagement::Structs::ZoneInformationStruct::DecodableType> decodableZones;
 
-    err = GetAttributePersistenceProvider()->ReadValue(ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id),
+    err = mContext->attributeStorage.ReadValue(ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Zones::Id),
                                                        bufferSpan);
-
-    VerifyOrReturn((CHIP_NO_ERROR == err) || (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND),
-                   ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load zones from the KVS.", mEndpointId));
+    VerifyOrReturnError((CHIP_NO_ERROR == err) || (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND), err,
+                   ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load zones from the KVS.", mPath.mEndpointId));
 
     chip::TLV::TLVReader reader;
     reader.Init(bufferSpan);
@@ -144,33 +154,40 @@ void ZoneManagementCluster::LoadPersistentAttributes()
     }
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
-        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to iterate zones from the KVS.", mEndpointId);
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to iterate zones from the KVS.", mPath.mEndpointId);
     }
+    return CHIP_NO_ERROR;
+}
 
-    // Load Triggers
-    err = mDelegate.LoadTriggers(mTriggers);
+CHIP_ERROR ZoneManagementCluster::LoadTriggers()
+{
+    // TODO: move trigger persistence logic from the delegate into the base
+    CHIP_ERROR err = CHIP_NO_ERROR;
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load triggers from the KVS.", mEndpointId);
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load triggers from the KVS.", mPath.mEndpointId);
     }
+    return CHIP_NO_ERROR;
+}
 
-    // Load Sensitivity
+CHIP_ERROR ZoneManagementCluster::LoadSensitivity()
+{
     uint8_t sensitivity = 0;
-    err                 = GetSafeAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Sensitivity::Id), sensitivity);
-    if (err == CHIP_NO_ERROR)
+    AttributePersistence persistence(mContext->attributeStorage);
+
+    if (persistence.LoadNativeEndianValue<uint8_t>({mPath.mEndpointId, ZoneManagement::Id, Attributes::Sensitivity::Id}, sensitivity, static_cast<uint8_t>(0)))
+
+
     {
         mSensitivity = sensitivity;
-        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Loaded Sensitivity as %u", mEndpointId, mSensitivity);
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Loaded Sensitivity as %u", mPath.mEndpointId, mSensitivity);
     }
     else
     {
-        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load the Sensitivity from the KVS. Defaulting to %u", mEndpointId,
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load the Sensitivity from the KVS. Defaulting to %u", mPath.mEndpointId,
                       mSensitivity);
     }
-
-    // Signal delegate that all persistent configuration attributes have been loaded.
-    mDelegate.PersistentAttributesLoadedCallback();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ZoneManagementCluster::ReadAndEncodeZones(const AttributeValueEncoder::ListEncodeHelper & encoder)
@@ -207,32 +224,10 @@ const Optional<ZoneTriggerControlStruct> ZoneManagementCluster::GetTriggerForZon
     return MakeOptional(*foundTrigger);
 }
 
-CHIP_ERROR ZoneManagementCluster::SetSensitivity(uint8_t aSensitivity)
-{
-    VerifyOrReturnValue(aSensitivity != mSensitivity, CHIP_NO_ERROR);
-
-    if (aSensitivity < 1 || aSensitivity > mSensitivityMax)
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
-
-    // Set the value
-    mSensitivity = aSensitivity;
-
-    // Persist the set value in storage
-    auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Sensitivity::Id);
-    ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mSensitivity));
-
-    mDelegate.OnAttributeChanged(Attributes::Sensitivity::Id);
-    MatterReportingAttributeChangeCallback(path);
-
-    return CHIP_NO_ERROR;
-}
-
 DataModel::ActionReturnStatus ZoneManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & aRequest,
                                                                    AttributeValueEncoder & aEncoder)
 {
-    ChipLogProgress(Zcl, "Zone Management[ep=%d]: Reading", mEndpointId);
+    ChipLogProgress(Zcl, "Zone Management[ep=%d]: Reading", mPath.mEndpointId);
 
     switch (aRequest.path.mAttributeId)
     {
@@ -243,7 +238,7 @@ DataModel::ActionReturnStatus ZoneManagementCluster::ReadAttribute(const DataMod
     case MaxUserDefinedZones::Id:
         VerifyOrReturnError(
             HasFeature(Feature::kUserDefined), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "ZoneManagement[ep=%d]: can not get MaxUserDefinedZones, feature is not supported", mEndpointId));
+            ChipLogError(Zcl, "ZoneManagement[ep=%d]: can not get MaxUserDefinedZones, feature is not supported", mPath.mEndpointId));
         return aEncoder.Encode(mMaxUserDefinedZones);
     case MaxZones::Id:
         return aEncoder.Encode(mMaxZones);
@@ -257,16 +252,16 @@ DataModel::ActionReturnStatus ZoneManagementCluster::ReadAttribute(const DataMod
         VerifyOrReturnError(!HasFeature(Feature::kPerZoneSensitivity), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl,
                                          "ZoneManagement[ep=%d]: cannot read Sensitivity, PerZoneSensitivity feature is supported",
-                                         mEndpointId));
+                                         mPath.mEndpointId));
         return aEncoder.Encode(mSensitivity);
     case TwoDCartesianMax::Id:
         VerifyOrReturnError(
             HasFeature(Feature::kTwoDimensionalCartesianZone), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "ZoneManagement[ep=%d]: cannot read TwoDCartesianMax, feature is not supported", mEndpointId));
+            ChipLogError(Zcl, "ZoneManagement[ep=%d]: cannot read TwoDCartesianMax, feature is not supported", mPath.mEndpointId));
         return aEncoder.Encode(mTwoDCartesianMax);
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
-
-    return DataModel::ActionReturnStatus::Success;
 }
 
 DataModel::ActionReturnStatus ZoneManagementCluster::WriteAttribute(const DataModel::WriteAttributeRequest & aRequest,
@@ -278,10 +273,20 @@ DataModel::ActionReturnStatus ZoneManagementCluster::WriteAttribute(const DataMo
         VerifyOrReturnError(!HasFeature(Feature::kPerZoneSensitivity), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl,
                                          "ZoneManagement[ep=%d]: cannot write Sensitivity, PerZoneSensitivity feature is supported",
-                                         mEndpointId));
+                                         mPath.mEndpointId));
         uint8_t sensitivity;
         ReturnErrorOnFailure(aDecoder.Decode(sensitivity));
-        return SetSensitivity(sensitivity);
+
+        VerifyOrReturnError(sensitivity >= 1 && sensitivity <= mSensitivityMax, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+        AttributePersistence persistence(mContext->attributeStorage);
+
+        mSensitivity = sensitivity;
+
+        ReturnErrorOnFailure(persistence.DecodeAndStoreNativeEndianValue<uint8_t>({mPath.mEndpointId, ZoneManagement::Id, Attributes::Sensitivity::Id}, aDecoder, mSensitivity));
+
+        mDelegate.OnAttributeChanged(Attributes::Sensitivity::Id);
+        return CHIP_NO_ERROR;
     }
 
     default:
@@ -294,59 +299,108 @@ std::optional<DataModel::ActionReturnStatus>
 ZoneManagementCluster::InvokeCommand(const DataModel::InvokeRequest & aRequest, TLV::TLVReader & aInputArgs,
                                      CommandHandler * aHandler)
 {
+    using namespace chip::app::Clusters::ZoneManagement::Commands;
+
     switch (aRequest.path.mCommandId)
     {
-    case Commands::CreateTwoDCartesianZone::Id:
-        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Creating TwoDCartesian Zone", mEndpointId);
+    case CreateTwoDCartesianZone::Id: {
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Creating TwoDCartesian Zone", mPath.mEndpointId);
 
         VerifyOrReturnError(HasFeature(Feature::kTwoDimensionalCartesianZone) && HasFeature(Feature::kUserDefined),
                             Status::UnsupportedCommand);
-
-        return HandleCommand<Commands::CreateTwoDCartesianZone::DecodableType>(
-            aRequest, aInputArgs, aHandler,
-            [this](CommandHandler * handler, const auto & commandData) { HandleCreateTwoDCartesianZone(handler, commandData); });
-
-    case Commands::UpdateTwoDCartesianZone::Id:
-        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Updating TwoDCartesian Zone", mEndpointId);
+        CreateTwoDCartesianZone::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(aInputArgs));
+        HandleCreateTwoDCartesianZone(aHandler, aRequest.path, commandData);
+        return std::nullopt;
+    }
+    case UpdateTwoDCartesianZone::Id: {
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Updating TwoDCartesian Zone", mPath.mEndpointId);
 
         VerifyOrReturnError(HasFeature(Feature::kTwoDimensionalCartesianZone) && HasFeature(Feature::kUserDefined),
                             Status::UnsupportedCommand);
-
-        return HandleCommand<Commands::UpdateTwoDCartesianZone::DecodableType>(
-            aRequest, aInputArgs, aHandler,
-            [this](CommandHandler * handler, const auto & commandData) { HandleUpdateTwoDCartesianZone(handler, commandData); });
-
-    case Commands::RemoveZone::Id:
-        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Removing TwoDCartesian Zone", mEndpointId);
+        UpdateTwoDCartesianZone::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(aInputArgs));
+        HandleUpdateTwoDCartesianZone(aHandler, aRequest.path, commandData);
+        return std::nullopt;
+    }
+    case RemoveZone::Id: {
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Removing TwoDCartesian Zone", mPath.mEndpointId);
 
         VerifyOrReturnError(HasFeature(Feature::kUserDefined), Status::UnsupportedCommand);
-
-        return HandleCommand<Commands::RemoveZone::DecodableType>(
-            aRequest, aInputArgs, aHandler,
-            [this](CommandHandler * handler, const auto & commandData) { HandleRemoveZone(handler, commandData); });
-
-    case Commands::CreateOrUpdateTrigger::Id:
-        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Create or Update Trigger", mEndpointId);
-
-        return HandleCommand<Commands::CreateOrUpdateTrigger::DecodableType>(
-            aRequest, aInputArgs, aHandler,
-            [this](CommandHandler * handler, const auto & commandData) { HandleCreateOrUpdateTrigger(handler, commandData); });
-
-    case Commands::RemoveTrigger::Id:
-        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Removing Trigger", mEndpointId);
-
-        return HandleCommand<Commands::RemoveTrigger::DecodableType>(
-            aRequest, aInputArgs, aHandler,
-            [this](CommandHandler * handler, const auto & commandData) { HandleRemoveTrigger(handler, commandData); });
+        RemoveZone::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(aInputArgs));
+        HandleRemoveZone(aHandler, aRequest.path, commandData);
+        return std::nullopt;
+    }
+    case CreateOrUpdateTrigger::Id: {
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Create or Update Trigger", mPath.mEndpointId);
+        CreateOrUpdateTrigger::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(aInputArgs));
+        HandleCreateOrUpdateTrigger(aHandler, aRequest.path, commandData);
+        return std::nullopt;
+    }
+    case RemoveTrigger::Id: {
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Removing Trigger", mPath.mEndpointId);
+        RemoveTrigger::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(aInputArgs));
+        HandleRemoveTrigger(aHandler, aRequest.path, commandData);
+        return std::nullopt;
+    }
     }
     return std::nullopt;
 }
 
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    MaxZones::kMetadataEntry,
+    Zones::kMetadataEntry,
+    Triggers::kMetadataEntry,
+    SensitivityMax::kMetadataEntry
+};
+
 CHIP_ERROR ZoneManagementCluster::Attributes(const ConcreteClusterPath & path,
                                              ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    using namespace Attributes;
-    // TODO: Add all attributes
+    if (HasFeature(Feature::kUserDefined))
+    {
+        ReturnErrorOnFailure(builder.Append(MaxUserDefinedZones::kMetadataEntry));
+    }
+
+    if (!HasFeature(Feature::kPerZoneSensitivity))
+    {
+        ReturnErrorOnFailure(builder.Append(Sensitivity::kMetadataEntry));
+    }
+
+    if (HasFeature(Feature::kTwoDimensionalCartesianZone))
+    {
+        ReturnErrorOnFailure(builder.Append(TwoDCartesianMax::kMetadataEntry));
+    }
+
+    return builder.AppendElements(kMandatoryAttributes);
+}
+
+CHIP_ERROR ZoneManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                   ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+{
+    using namespace chip::app::Clusters::ZoneManagement::Commands;
+    if (HasFeature(Feature::kTwoDimensionalCartesianZone) && HasFeature(Feature::kUserDefined))
+    {
+        ReturnErrorOnFailure(builder.AppendElements({CreateTwoDCartesianZone::kMetadataEntry, UpdateTwoDCartesianZone::kMetadataEntry}));
+    }
+    if (HasFeature(Feature::kUserDefined))
+    {
+        ReturnErrorOnFailure(builder.Append(RemoveZone::kMetadataEntry));
+    }
+    return builder.AppendElements({CreateOrUpdateTrigger::kMetadataEntry, RemoveTrigger::kMetadataEntry});
+}
+
+CHIP_ERROR ZoneManagementCluster::GeneratedCommands(const ConcreteClusterPath & path,
+                                                    ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    using namespace chip::app::Clusters::ZoneManagement::Commands;
+    if (HasFeature(Feature::kTwoDimensionalCartesianZone))
+    {
+        return builder.Append(CreateTwoDCartesianZoneResponse::Id);
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -361,22 +415,22 @@ void ZoneManagementCluster::PersistZones()
     writer.Init(bufferSpan);
 
     err = writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType);
-    LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving zone: %s", mEndpointId, "start");
+    LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving zone: %s", mPath.mEndpointId, "start");
 
     for (const auto & zone : mZones)
     {
         err = zone.Encode(writer, chip::TLV::AnonymousTag());
-        LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving zone: %s", mEndpointId, "element");
+        LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving zone: %s", mPath.mEndpointId, "element");
     }
     err = writer.EndContainer(arrayType);
-    LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving zone: %s", mEndpointId, "end");
+    LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving zone: %s", mPath.mEndpointId, "end");
 
     bufferSpan.reduce_size(writer.GetLengthWritten());
 
-    err = GetAttributePersistenceProvider()->WriteValue(ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id),
+    err = mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Zones::Id),
                                                         bufferSpan);
-    LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving zone: %s", mEndpointId, "write");
-    ChipLogProgress(Zcl, "ZoneManagement[ep=%d] persisted %zu zones, wrote %d bytes", mEndpointId, mZones.size(),
+    LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving zone: %s", mPath.mEndpointId, "write");
+    ChipLogProgress(Zcl, "ZoneManagement[ep=%d] persisted %zu zones, wrote %d bytes", mPath.mEndpointId, mZones.size(),
                     writer.GetLengthWritten());
 }
 
@@ -384,7 +438,7 @@ CHIP_ERROR ZoneManagementCluster::AddZone(const ZoneInformationStorage & zone)
 {
     mZones.push_back(zone);
     PersistZones();
-    auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
+    auto path = ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
     mDelegate.OnAttributeChanged(Attributes::Zones::Id);
     MatterReportingAttributeChangeCallback(path);
 
@@ -402,7 +456,7 @@ CHIP_ERROR ZoneManagementCluster::UpdateZone(uint16_t zoneId, const ZoneInformat
     {
         *it = zoneInfo; // Replace the found item with the newItem
         PersistZones();
-        auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
+        auto path = ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
         mDelegate.OnAttributeChanged(Attributes::Zones::Id);
         MatterReportingAttributeChangeCallback(path);
 
@@ -423,7 +477,7 @@ CHIP_ERROR ZoneManagementCluster::RemoveZone(uint16_t zoneId)
     {
         mZones.erase(it, mZones.end());
         PersistZones();
-        auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
+        auto path = ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
         mDelegate.OnAttributeChanged(Attributes::Zones::Id);
         MatterReportingAttributeChangeCallback(path);
 
@@ -464,7 +518,7 @@ Status ZoneManagementCluster::AddOrUpdateTrigger(const ZoneTriggerControlStruct 
 
     if (status == Status::Success)
     {
-        auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id);
+        auto path = ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id);
         mDelegate.OnAttributeChanged(Attributes::Triggers::Id);
         MatterReportingAttributeChangeCallback(path);
     }
@@ -480,7 +534,7 @@ Status ZoneManagementCluster::RemoveTrigger(uint16_t zoneId)
         mTriggers.erase(std::remove_if(mTriggers.begin(), mTriggers.end(),
                                        [&](const ZoneTriggerControlStruct & trigger) { return trigger.zoneID == zoneId; }),
                         mTriggers.end());
-        auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id);
+        auto path = ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id);
         mDelegate.OnAttributeChanged(Attributes::Triggers::Id);
         MatterReportingAttributeChangeCallback(path);
     }
@@ -507,7 +561,7 @@ Status ZoneManagementCluster::ValidateTwoDCartesianZone(const TwoDCartesianZoneD
     return Status::Success;
 }
 
-void ZoneManagementCluster::HandleCreateTwoDCartesianZone(CommandHandler * handler,
+void ZoneManagementCluster::HandleCreateTwoDCartesianZone(CommandHandler * handler, const ConcreteCommandPath & commandPath,
                                                           const Commands::CreateTwoDCartesianZone::DecodableType & commandData)
 {
     Commands::CreateTwoDCartesianZoneResponse::Type response;
@@ -517,15 +571,15 @@ void ZoneManagementCluster::HandleCreateTwoDCartesianZone(CommandHandler * handl
     Status status = ValidateTwoDCartesianZone(zoneToCreate);
     if (status != Status::Success)
     {
-        handler->AddStatus(status);
+        handler->AddStatus(commandPath, status, "invalidZone");
         return;
     }
 
-    VerifyOrReturn(mUserDefinedZonesCount < mMaxUserDefinedZones, handler->AddStatus(Status::ResourceExhausted));
+    VerifyOrReturn(mUserDefinedZonesCount < mMaxUserDefinedZones, handler->AddStatus(commandPath, Status::ResourceExhausted, "maxZones"));
 
     if (zoneToCreate.use == ZoneUseEnum::kFocus && !HasFeature(Feature::kFocusZones))
     {
-        handler->AddStatus(Status::ConstraintError);
+        handler->AddStatus(commandPath, Status::ConstraintError, "focusZones");
         return;
     }
 
@@ -537,7 +591,7 @@ void ZoneManagementCluster::HandleCreateTwoDCartesianZone(CommandHandler * handl
         auto vertex = iter.GetValue();
         if (vertex.x > mTwoDCartesianMax.x || vertex.y > mTwoDCartesianMax.y)
         {
-            handler->AddStatus(Status::DynamicConstraintError);
+            handler->AddStatus(commandPath, Status::DynamicConstraintError, "boundingBox");
             return;
         }
         // Store the vertices
@@ -549,20 +603,20 @@ void ZoneManagementCluster::HandleCreateTwoDCartesianZone(CommandHandler * handl
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleCreateTwoDCartesianZone: Vertices list error: %" CHIP_ERROR_FORMAT, err.Format());
-        handler->AddStatus(Status::InvalidCommand);
+        handler->AddStatus(commandPath, Status::InvalidCommand, "vertexList");
         return;
     }
 
     if (ZoneAlreadyExists(zoneToCreate.use, twoDCartVertices, DataModel::NullNullable))
     {
-        handler->AddStatus(Status::AlreadyExists);
+        handler->AddStatus(commandPath, Status::AlreadyExists, "zoneExists");
         return;
     }
 
     if (ZoneGeometry::IsZoneSelfIntersecting(twoDCartVertices))
     {
         ChipLogError(Zcl, "HandleCreateTwoDCartesianZone: Found self-intersecting polygon vertices for zone");
-        handler->AddStatus(Status::DynamicConstraintError);
+        handler->AddStatus(commandPath, Status::DynamicConstraintError, "selfIntersection");
         return;
     }
 
@@ -577,7 +631,7 @@ void ZoneManagementCluster::HandleCreateTwoDCartesianZone(CommandHandler * handl
     status = mDelegate.CreateTwoDCartesianZone(zoneID, twoDCartZoneStorage);
     if (status != Status::Success)
     {
-        handler->AddStatus(status);
+        handler->AddStatus(commandPath, status, "delegate");
         return;
     }
 
@@ -588,10 +642,10 @@ void ZoneManagementCluster::HandleCreateTwoDCartesianZone(CommandHandler * handl
     mUserDefinedZonesCount++;
 
     response.zoneID = zoneID;
-    handler->AddResponse(response);
+    handler->AddResponse(commandPath, response);
 }
 
-void ZoneManagementCluster::HandleUpdateTwoDCartesianZone(CommandHandler * handler,
+void ZoneManagementCluster::HandleUpdateTwoDCartesianZone(CommandHandler * handler, const ConcreteCommandPath & commandPath,
                                                           const Commands::UpdateTwoDCartesianZone::DecodableType & commandData)
 {
     uint16_t zoneID     = commandData.zoneID;
@@ -601,7 +655,7 @@ void ZoneManagementCluster::HandleUpdateTwoDCartesianZone(CommandHandler * handl
 
     if (status != Status::Success)
     {
-        handler->AddStatus(status);
+        handler->AddStatus(commandPath, status, "invalidZone");
         return;
     }
 
@@ -609,20 +663,20 @@ void ZoneManagementCluster::HandleUpdateTwoDCartesianZone(CommandHandler * handl
         std::find_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStruct & z) { return z.zoneID == zoneID; });
     if (foundZone == mZones.end())
     {
-        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: No zone exists by id %d", mEndpointId, zoneID);
-        handler->AddStatus(Status::NotFound);
+        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: No zone exists by id %d", mPath.mEndpointId, zoneID);
+        handler->AddStatus(commandPath, Status::NotFound, "notFound");
         return;
     }
 
     if (foundZone->zoneSource == ZoneSourceEnum::kMfg)
     {
-        handler->AddStatus(Status::ConstraintError);
+        handler->AddStatus(commandPath, Status::ConstraintError, "zoneSource");
         return;
     }
 
     if (foundZone->zoneType != ZoneTypeEnum::kTwoDCARTZone)
     {
-        handler->AddStatus(Status::DynamicConstraintError);
+        handler->AddStatus(commandPath, Status::DynamicConstraintError, "zoneType");
         return;
     }
 
@@ -634,7 +688,7 @@ void ZoneManagementCluster::HandleUpdateTwoDCartesianZone(CommandHandler * handl
         auto vertex = iter.GetValue();
         if (vertex.x > mTwoDCartesianMax.x || vertex.y > mTwoDCartesianMax.y)
         {
-            handler->AddStatus(Status::DynamicConstraintError);
+            handler->AddStatus(commandPath, Status::DynamicConstraintError, "boundingBox");
             return;
         }
         // Store the vertices
@@ -646,20 +700,20 @@ void ZoneManagementCluster::HandleUpdateTwoDCartesianZone(CommandHandler * handl
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleUpdateTwoDCartesianZone: Vertices list error: %" CHIP_ERROR_FORMAT, err.Format());
-        handler->AddStatus(Status::InvalidCommand);
+        handler->AddStatus(commandPath, Status::InvalidCommand, "vertexList");
         return;
     }
 
     if (ZoneAlreadyExists(zoneToUpdate.use, twoDCartVertices, DataModel::MakeNullable(zoneID)))
     {
-        handler->AddStatus(Status::AlreadyExists);
+        handler->AddStatus(commandPath, Status::AlreadyExists, "zoneExists");
         return;
     }
 
     if (ZoneGeometry::IsZoneSelfIntersecting(twoDCartVertices))
     {
         ChipLogError(Zcl, "HandleUpdateTwoDCartesianZone: Found self-intersecting polygon vertices for zone");
-        handler->AddStatus(Status::DynamicConstraintError);
+        handler->AddStatus(commandPath, Status::DynamicConstraintError, "selfIntersection");
         return;
     }
 
@@ -670,7 +724,7 @@ void ZoneManagementCluster::HandleUpdateTwoDCartesianZone(CommandHandler * handl
     status = mDelegate.UpdateTwoDCartesianZone(zoneID, twoDCartZoneStorage);
     if (status != Status::Success)
     {
-        handler->AddStatus(status);
+        handler->AddStatus(commandPath, status, "delegate");
         return;
     }
 
@@ -679,10 +733,10 @@ void ZoneManagementCluster::HandleUpdateTwoDCartesianZone(CommandHandler * handl
 
     UpdateZone(zoneID, zoneInfo);
 
-    handler->AddStatus(Status::Success);
+    handler->AddStatus(commandPath, Status::Success);
 }
 
-void ZoneManagementCluster::HandleRemoveZone(CommandHandler * handler, const Commands::RemoveZone::DecodableType & commandData)
+void ZoneManagementCluster::HandleRemoveZone(CommandHandler * handler, const ConcreteCommandPath & commandPath, const Commands::RemoveZone::DecodableType & commandData)
 {
     uint16_t zoneID = commandData.zoneID;
 
@@ -690,14 +744,14 @@ void ZoneManagementCluster::HandleRemoveZone(CommandHandler * handler, const Com
         std::find_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStruct & z) { return z.zoneID == zoneID; });
     if (foundZone == mZones.end())
     {
-        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: No zone exists by id %d", mEndpointId, zoneID);
-        handler->AddStatus(Status::NotFound);
+        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: No zone exists by id %d", mPath.mEndpointId, zoneID);
+        handler->AddStatus(commandPath, Status::NotFound);
         return;
     }
 
     if (foundZone->zoneSource == ZoneSourceEnum::kMfg)
     {
-        handler->AddStatus(Status::ConstraintError);
+        handler->AddStatus(commandPath, Status::ConstraintError);
         return;
     }
 
@@ -705,8 +759,8 @@ void ZoneManagementCluster::HandleRemoveZone(CommandHandler * handler, const Com
         std::find_if(mTriggers.begin(), mTriggers.end(), [&](const ZoneTriggerControlStruct & t) { return t.zoneID == zoneID; });
     if (foundTrigger != mTriggers.end())
     {
-        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: Zone id %d is referenced in zone triggers", mEndpointId, zoneID);
-        handler->AddStatus(Status::InvalidInState);
+        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: Zone id %d is referenced in zone triggers", mPath.mEndpointId, zoneID);
+        handler->AddStatus(commandPath, Status::InvalidInState);
         return;
     }
 
@@ -719,7 +773,7 @@ void ZoneManagementCluster::HandleRemoveZone(CommandHandler * handler, const Com
         mUserDefinedZonesCount--;
     }
 
-    handler->AddStatus(status);
+    handler->AddStatus(commandPath, status);
 }
 
 Status ZoneManagementCluster::ValidateTrigger(const ZoneTriggerControlStruct & trigger)
@@ -743,7 +797,7 @@ Status ZoneManagementCluster::ValidateTrigger(const ZoneTriggerControlStruct & t
     return Status::Success;
 }
 
-void ZoneManagementCluster::HandleCreateOrUpdateTrigger(CommandHandler * handler,
+void ZoneManagementCluster::HandleCreateOrUpdateTrigger(CommandHandler * handler, const ConcreteCommandPath & commandPath,
                                                         const Commands::CreateOrUpdateTrigger::DecodableType & commandData)
 {
     ZoneTriggerControlStruct trigger = commandData.trigger;
@@ -752,7 +806,7 @@ void ZoneManagementCluster::HandleCreateOrUpdateTrigger(CommandHandler * handler
 
     if (status != Status::Success)
     {
-        handler->AddStatus(status);
+        handler->AddStatus(commandPath, status);
         return;
     }
 
@@ -760,23 +814,23 @@ void ZoneManagementCluster::HandleCreateOrUpdateTrigger(CommandHandler * handler
         std::find_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStorage & z) { return z.zoneID == trigger.zoneID; });
     if (foundZone == mZones.end())
     {
-        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: No zone exists by id %d", mEndpointId, trigger.zoneID);
-        handler->AddStatus(Status::NotFound);
+        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: No zone exists by id %d", mPath.mEndpointId, trigger.zoneID);
+        handler->AddStatus(commandPath, Status::NotFound);
         return;
     }
 
     if (foundZone->twoDCartZoneStorage.HasValue() && foundZone->twoDCartZoneStorage.Value().use != ZoneUseEnum::kMotion)
     {
-        handler->AddStatus(Status::ConstraintError);
+        handler->AddStatus(commandPath, Status::ConstraintError);
         return;
     }
 
     status = AddOrUpdateTrigger(trigger);
 
-    handler->AddStatus(status);
+    handler->AddStatus(commandPath, status);
 }
 
-void ZoneManagementCluster::HandleRemoveTrigger(CommandHandler * handler, const Commands::RemoveTrigger::DecodableType & commandData)
+void ZoneManagementCluster::HandleRemoveTrigger(CommandHandler * handler, const ConcreteCommandPath & commandPath, const Commands::RemoveTrigger::DecodableType & commandData)
 {
     uint16_t zoneID = commandData.zoneID;
 
@@ -784,14 +838,14 @@ void ZoneManagementCluster::HandleRemoveTrigger(CommandHandler * handler, const 
         std::find_if(mTriggers.begin(), mTriggers.end(), [&](const ZoneTriggerControlStruct & t) { return t.zoneID == zoneID; });
     if (foundTrigger == mTriggers.end())
     {
-        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: Trigger for zone id %d does not exist", mEndpointId, zoneID);
-        handler->AddStatus(Status::NotFound);
+        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: Trigger for zone id %d does not exist", mPath.mEndpointId, zoneID);
+        handler->AddStatus(commandPath, Status::NotFound);
         return;
     }
 
     Status status = RemoveTrigger(zoneID);
 
-    handler->AddStatus(status);
+    handler->AddStatus(commandPath, status);
 }
 
 bool ZoneManagementCluster::DoZoneUseAndVerticesMatch(ZoneUseEnum use, const std::vector<TwoDCartesianVertexStruct> & vertices,
@@ -866,11 +920,11 @@ Status ZoneManagementCluster::GenerateZoneTriggeredEvent(uint16_t zoneID, ZoneEv
     event.zone   = zoneID;
     event.reason = triggerReason;
 
-    CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
+    CHIP_ERROR err = LogEvent(event, mPath.mEndpointId, eventNumber);
 
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(AppServer, "Endpoint %d - Unable to generate ZoneTriggered event: %" CHIP_ERROR_FORMAT, mEndpointId,
+        ChipLogError(AppServer, "Endpoint %d - Unable to generate ZoneTriggered event: %" CHIP_ERROR_FORMAT, mPath.mEndpointId,
                      err.Format());
         return Status::Failure;
     }
@@ -885,11 +939,11 @@ Status ZoneManagementCluster::GenerateZoneStoppedEvent(uint16_t zoneID, ZoneEven
     event.zone   = zoneID;
     event.reason = stopReason;
 
-    CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
+    CHIP_ERROR err = LogEvent(event, mPath.mEndpointId, eventNumber);
 
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(AppServer, "Endpoint %d - Unable to generate ZoneTriggered event: %" CHIP_ERROR_FORMAT, mEndpointId,
+        ChipLogError(AppServer, "Endpoint %d - Unable to generate ZoneTriggered event: %" CHIP_ERROR_FORMAT, mPath.mEndpointId,
                      err.Format());
         return Status::Failure;
     }

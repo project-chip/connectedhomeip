@@ -25,26 +25,17 @@ source_set("zone-geometry") {
 
 source_set("zone-management-server-impl") {
   sources = [
-    "CodegenIntegration.cpp",
     "ZoneManagementCluster.cpp",
-    "zone-management-server.cpp",
   ]
 
   deps = [
     ":zone-geometry",
-    "${chip_root}/src/app",
-    "${chip_root}/src/app/reporting",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/zzz_generated/app-common/app-common/zap-generated",
-    "${chip_root}/zzz_generated/app-common/clusters/ZoneManagement",
   ]
 
   public_deps = [
     ":zone-management-server-cluster",
-    "${chip_root}/src/app:app-server",
-    "${chip_root}/src/app/data-model-providers",
-    "${chip_root}/src/app/util",
   ]
 }
 
@@ -53,9 +44,13 @@ source_set("zone-management-server-cluster") {
 
   public_deps = [
     ":zone-geometry",
-    "${chip_root}/src/app:app-server",
-    "${chip_root}/src/app/data-model-providers",
-    "${chip_root}/src/app/util",
+    "${chip_root}/src/app:constants",
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/persistence",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/zzz_generated/app-common/clusters/ZoneManagement",
   ]
 }
 
