@@ -21,7 +21,6 @@
 #include "CommodityTariffConsts.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <cstdint>
 #include <platform/LockTracker.h>
 
 #include <atomic>
@@ -451,14 +450,14 @@ using ExtractNestedType_t = typename ExtractNestedType<U>::type;
  *   * Manages memory allocation/deallocation
  *   * Provides element-wise copy and cleanup
  * - For struct types:
- *   * Uses type-specific CopyData and CleanupStructValue specializations
+ *   * Uses type-specific CopyData and CleanupStruct specializations
  * - For primitive types:
  *   * Simple value storage with atomic update support
  *
  * @section memory_management Memory Management
  * The class handles automatic cleanup for:
  * - List memory (allocated via Platform::MemoryCalloc)
- * - Nested structs (via CleanupStructValue template)
+ * - Nested structs (via CleanupStruct template)
  * - Nullable state transitions
  *
  * @section usage_patterns Usage Patterns
@@ -575,7 +574,7 @@ public:
      * - Others: default initialized
      * - Update state set to kIdle
      */
-    explicit CTC_BaseDataClass(AttributeId aAttrId, void * aMgmtCtx = nullptr) : mMgmtDataCtx(aMgmtCtx), mAttrId(aAttrId)
+    explicit CTC_BaseDataClass(AttributeId aAttrId) : mAttrId(aAttrId)
     {
         if constexpr (TypeIsNullable<ValueType>())
         {
@@ -784,7 +783,7 @@ public:
                 {
                     if constexpr (TypeIsStruct<ListEntryType>())
                     {
-                        if (CHIP_NO_ERROR == (err = CopyListEntry(actualValue[idx], buffer[idx], idx)))
+                        if (CHIP_NO_ERROR == (err = CopyData(actualValue[idx], buffer[idx])))
                         {
                             continue;
                         }
@@ -1024,7 +1023,6 @@ private:
     // Internal implementation methods...
 
     CHIP_ERROR CopyData(const StructType & input, StructType & output);
-    CHIP_ERROR CopyListEntry(const StructType & input, StructType & output, size_t aIdx = 0);
 
     /**
      * @brief Validates the new value using type-specific validation
@@ -1140,7 +1138,7 @@ private:
                 }
                 else if constexpr (TypeIsStruct<DataType>())
                 {
-                    CleanupData(aValue.Value());
+                    CleanupStruct(aValue.Value());
                 }
             }
             aValue.SetNull();
@@ -1161,9 +1159,10 @@ private:
 
         if constexpr (TypeIsStruct<ListEntryType>())
         {
-            for (size_t idx = 0; idx < list.size(); idx++)
+
+            for (auto & item : list)
             {
-                CleanupListEntry(list[idx], idx);
+                CleanupStruct(item);
             }
         }
 
@@ -1178,19 +1177,10 @@ private:
      * @brief Cleans up a struct value
      * @param aValue Struct to clean up
      */
-    void CleanupData(StructType & aValue);
-    void CleanupListEntry(StructType & aValue, size_t aIdx = 0);
+    void CleanupStruct(StructType & aValue);
 
-    //{
-    // CleanupStructValue<StructType>(aValue);
-    //}
-
-    void * mMgmtDataCtx = nullptr;
-    void * mAuxData     = nullptr; ///< Validation context data
-    const AttributeId mAttrId;     ///< Managed attribute ID
-
-protected:
-    void * GetMgmtCtx() const { return mMgmtDataCtx; }
+    void * mAuxData = nullptr; ///< Validation context data
+    const AttributeId mAttrId; ///< Managed attribute ID
 };
 
 } // namespace CommodityTariffAttrsDataMgmt
