@@ -35,7 +35,7 @@ using namespace chip::app::Clusters::WebRTCTransportProvider;
 namespace {
 
 // Constants
-constexpr size_t kMaxConcurrentWebRTCSessions = 5;
+constexpr uint16_t kMaxConcurrentWebRTCSessions = 5;
 
 } // namespace
 
@@ -146,7 +146,7 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     // If we cannot allocate resources, send End command with OutOfResources reason
     if (mWebrtcTransportMap.size() > kMaxConcurrentWebRTCSessions)
     {
-        ChipLogProgress(Camera, "Resource exhaustion detected: maximum WebRTC sessions (%zu)", kMaxConcurrentWebRTCSessions);
+        ChipLogProgress(Camera, "Resource exhaustion detected: maximum WebRTC sessions (%u)", kMaxConcurrentWebRTCSessions);
 
         transport->SetCommandType(WebrtcTransport::CommandType::kEnd);
         transport->MoveToState(WebrtcTransport::State::SendingEnd);
@@ -310,7 +310,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     // If we cannot allocate resources, respond with a response status of RESOURCE_EXHAUSTED
     if (mWebrtcTransportMap.size() > kMaxConcurrentWebRTCSessions)
     {
-        ChipLogProgress(Camera, "Resource exhaustion detected in ProvideOffer: maximum WebRTC sessions (%zu)",
+        ChipLogProgress(Camera, "Resource exhaustion detected in ProvideOffer: maximum WebRTC sessions (%u)",
                         kMaxConcurrentWebRTCSessions);
         return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
     }
