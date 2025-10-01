@@ -91,7 +91,7 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
 void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId)
 {
     assertChipStackLockedByCurrentThread();
-    
+
     // No-op: For OTA we don't use the functions in CodegenIntegration
     // because we use the gOtaProviderServer and the functions defined here.
     switch (clusterId) {
