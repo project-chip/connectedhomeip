@@ -54,7 +54,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import TestStep, AttributeMatcher, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import AttributeMatcher, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -280,7 +280,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # Just want to make sure we did change the update state meaning we applied the update
         asserts.assert_equal(update_state_after, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
                              "UpdateState is not Idle")
-
         await self.verify_version_applied_basic_information(
             controller=controller, node_id=requestor_node_id, target_version=expected_software_version)
 
