@@ -25,7 +25,7 @@
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1
-#       --custom-flow 0
+#       --custom-flow 1
 #       --app-pipe /tmp/tmp_pipe
 #       --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -43,7 +43,7 @@
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1
-#       --custom-flow 1
+#       --custom-flow 0
 #       --app-pipe /tmp/tmp_pipe
 #       --trace-to json:${TRACE_APP}.json
 #     script-args: >
