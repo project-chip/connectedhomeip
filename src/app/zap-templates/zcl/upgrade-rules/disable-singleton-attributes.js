@@ -8,17 +8,17 @@ async function postLoad(api, context)
 {
   let resMsg = "";
   let epts   = await api.endpoints(context);
-  for (let i = 0; i < epts.length; i++) {
-    let clusters = await api.clusters(context, epts[i]);
-    for (let j = 0; j < clusters.length; j++) {
+  for (const ept of epts) {
+    let clusters = await api.clusters(context, ept);
+    for (const cluster of clusters) {
       let attributes = await api.attributes(
           context,
-          epts[i],
-          clusters[j],
+          ept,
+          cluster,
       );
-      for (let k = 0; k < attributes.length; k++) {
+      for (const attribute of attributes) {
         // None of the matter attributes are singleton
-        if (parseInt(attributes[k].isSingleton) == 1 || attributes[k].isSingleton == true) {
+        if (attribute.isSingleton) {
           let params = [
             {
               key : context.updateKey.attributeSingleton,
@@ -27,13 +27,13 @@ async function postLoad(api, context)
           ];
           await api.updateAttribute(
               context,
-              epts[i],
-              clusters[j],
-              attributes[k],
+              ept,
+              cluster,
+              attribute,
               params,
           );
-          resMsg += `${attributes[k].name} attribute of ${clusters[j].name} cluster on endpoint ${
-              epts[i].endpointIdentifier} is no longer a singleton attribute.\n`;
+          resMsg += `${attribute.name} attribute of ${cluster.name} cluster on endpoint ${
+              ept.endpointIdentifier} is no longer a singleton attribute.\n`;
         }
       }
     }

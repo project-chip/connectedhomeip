@@ -74,7 +74,7 @@ Git: 1.4-prerelease-ipr-69-ge15ff5700
     <command source="server" code="0x01" name="ChangeToModeResponse" disableDefaultResponse="true" optional="false">
       <description>This command is sent by the device on receipt of the ChangeToMode command.</description>
       <arg id="0" name="Status" type="enum8"/>
-      <arg id="1" name="StatusText" type="char_string" lenght="64" optional="true" length="64"/>
+      <arg id="1" name="StatusText" type="char_string" optional="true" length="64"/>
       <mandatoryConform/>
     </command>
 
