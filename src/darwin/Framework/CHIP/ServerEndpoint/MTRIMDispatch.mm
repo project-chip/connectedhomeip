@@ -77,8 +77,7 @@ void MatterDescriptorClusterShutdownCallback(EndpointId endpointId);
 
 void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
-    switch (clusterId)
-    {
+    switch (clusterId) {
     case app::Clusters::Descriptor::Id:
         MatterDescriptorClusterInitCallback(endpoint);
         break;
@@ -91,8 +90,7 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
 
 void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId)
 {
-    switch (clusterId)
-    {
+    switch (clusterId) {
     case app::Clusters::Descriptor::Id:
         MatterDescriptorClusterShutdownCallback(endpoint);
         break;
