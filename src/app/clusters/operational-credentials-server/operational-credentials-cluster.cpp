@@ -398,7 +398,7 @@ exit:
 std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                           TLV::TLVReader & input_arguments, FabricTable & fabricTable,
                                                           FailSafeContext & failSafeContext, DnssdServer & dnssdServer,
-                                                          CommissioningWindowManager & commissioningWindowManager)
+                                                          CommissioningWindowManager & commissioningWindowManager, bool & reportChange)
 {
     MATTER_TRACE_SCOPE("AddNOC", "OperationalCredentials");
     Commands::AddNOC::DecodableType commandData;
@@ -412,7 +412,6 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
     auto nocResponse         = NodeOperationalCertStatusEnum::kOk;
     auto errorStatus         = Status::Success;
     bool needRevert          = false;
-    bool shouldReport        = false;
 
     CHIP_ERROR err             = CHIP_NO_ERROR;
     FabricIndex newFabricIndex = kUndefinedFabricIndex;
@@ -536,7 +535,7 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
         ChipLogError(AppServer, "Operational advertising failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    shouldReport = true;
+    reportChange = true;
 
 exit:
     if (needRevert)
@@ -555,7 +554,7 @@ exit:
 
         (void) Access::GetAccessControl().DeleteAllEntriesForFabric(newFabricIndex);
 
-        shouldReport = true;
+        reportChange = true;
     }
 
     // We have an NOC response
@@ -573,12 +572,7 @@ exit:
         {
             ChipLogProgress(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC", static_cast<unsigned>(newFabricIndex));
         }
-
-        if (shouldReport)
-        {
-            // Using Success status to report that a notification is needed.
-            return Status::Success;
-        }
+        
         return std::nullopt;
     }
 
@@ -1215,16 +1209,16 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
     case OperationalCredentials::Commands::CSRRequest::Id:
         return HandleCSRRequest(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDACProvider());
     case OperationalCredentials::Commands::AddNOC::Id: {
+        bool reportChange = false;
         std::optional<DataModel::ActionReturnStatus> returnStatus =
             HandleAddNOC(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDNSSDServer(),
-                         GetCommissioningWindowManager());
-        if (returnStatus == Status::Success)
+                         GetCommissioningWindowManager(), reportChange);
+        if (reportChange)
         {
             // Notify the attributes containing fabric metadata can be read with new data
             NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);
             // Notify we have one more fabric
             NotifyAttributeChanged(OperationalCredentials::Attributes::CommissionedFabrics::Id);
-            return std::nullopt;
         }
         return returnStatus;
     }
@@ -1233,7 +1227,7 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
     case OperationalCredentials::Commands::UpdateFabricLabel::Id: {
         std::optional<DataModel::ActionReturnStatus> returnStatus =
             HandleUpdateFabricLabel(handler, input_arguments, request, GetFabricTable());
-        if (returnStatus == std::nullopt)
+        if (!returnStatus.has_value())
         {
             // Succeeded at updating the label, mark Fabrics table changed.
             NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);
