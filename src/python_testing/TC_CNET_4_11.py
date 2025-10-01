@@ -344,16 +344,6 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
         return ConnectionResult(1, "No WiFi interface found")
 
     try:
-        if isinstance(ssid, bytes):
-            ssid = ssid.decode()
-        if isinstance(password, bytes):
-            password = password.decode()
-
-        interface = await detect_wifi_interface()
-        if not interface:
-            logger.error("connect_wifi_linux: No WiFi interface found")
-            return ConnectionResult(1, "No WiFi interface found")
-
         # Ensure interface is up and reset state first
         await run_subprocess(["sudo", "ip", "link", "set", interface, "up"])
         await asyncio.sleep(1)
