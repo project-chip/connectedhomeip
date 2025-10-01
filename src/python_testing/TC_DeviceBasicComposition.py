@@ -178,7 +178,7 @@ import logging
 from dataclasses import dataclass
 from typing import Any, Callable
 
-from TC_DeviceConformance import get_supersets
+from test_testing.DeviceConformanceTests import get_supersets
 
 import matter.clusters as Clusters
 import matter.clusters.ClusterObjects
@@ -197,6 +197,7 @@ from matter.testing.problem_notices import AttributePathLocation, ClusterPathLoc
 from matter.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
                                                       find_tag_list_problems, find_tree_roots, flat_list_ok,
                                                       get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
+from matter.tlv import uint
 
 
 def get_vendor_id(mei: int) -> int:
@@ -354,13 +355,13 @@ class TC_DeviceBasicComposition(BasicCompositionTests, MatterBaseTest):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=matter.tlv.uint)
+                return ClusterObjectFieldDescriptor(Type=uint)
 
             @ChipUtility.classproperty
             def standard_attribute(cls) -> bool:
                 return False
 
-            value: matter.tlv.uint = 0
+            value: 'uint' = 0
 
         result = await self.default_controller.Read(nodeid=self.dut_node_id, attributes=[(endpoint_id, TempAttribute)])
         try:

@@ -240,7 +240,7 @@ DEVICE_TYPE_NAME_FIXES = {0x010b: 'Dimmable Plug-In Unit', 0x010a: 'On/Off Plug-
 
 # fuzzy match to name because some of the old specs weren't careful here
 def _fuzzy_name(to_fuzz: str):
-    to_fuzz = re.sub("\(.*?\)|\[.*?\]", "", to_fuzz)
+    to_fuzz = re.sub(r"\(.*?\)|\[.*?\]", "", to_fuzz)
     return to_fuzz.lower().strip().replace(' ', '').replace('/', '')
 
 
@@ -1233,11 +1233,13 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
         # The expression (specification_version & uint(0xFFFF00FF)) might be inferred as int by mypy.
         specification_version = typing.cast(uint, specification_version & uint(0xFFFF00FF))
 
-    version_to_dm = {0x01030000: PrebuiltDataModelDirectory.k1_3,
-                     0x01040000: PrebuiltDataModelDirectory.k1_4,
-                     0x01040100: PrebuiltDataModelDirectory.k1_4_1,
-                     0x01040200: PrebuiltDataModelDirectory.k1_4_2,
-                     0x01050000: PrebuiltDataModelDirectory.k1_5, }
+    version_to_dm = {
+        0x01030000: PrebuiltDataModelDirectory.k1_3,
+        0x01040000: PrebuiltDataModelDirectory.k1_4,
+        0x01040100: PrebuiltDataModelDirectory.k1_4_1,
+        0x01040200: PrebuiltDataModelDirectory.k1_4_2,
+        0x01050000: PrebuiltDataModelDirectory.k1_5,
+    }
 
     if specification_version not in version_to_dm.keys():
         raise ConformanceException(f"Unknown specification_version 0x{specification_version:08X}")

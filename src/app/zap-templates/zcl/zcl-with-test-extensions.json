@@ -264,6 +264,7 @@
             "CurrentMode",
             "FeatureMap"
         ],
+        "Diagnostic Logs": ["ClusterRevision", "FeatureMap"],
         "Door Lock": [
             "AliroReaderVerificationKey",
             "AliroReaderGroupIdentifier",
