@@ -94,7 +94,6 @@ ClustersWithInitFunctions:
     - Scenes Management
     - Thermostat
     - Fixed Label
-    - Operational Credentials
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic Information
@@ -115,7 +114,6 @@ ClustersWithShutdownFunctions:
     - Scenes Management
     - Thermostat
     - Fixed Label
-    - Operational Credentials
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock
