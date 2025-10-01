@@ -291,6 +291,7 @@ template("scm1612s_ayla_sources") {
       "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/main/app_main.c",
       "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/main/demo_matter.c",
       "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/main/demo_ota.c",
+      "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/main/sched_conf.c",
       "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/main/bp5758d.c",
       "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/main/app/callback-stub.cpp",
       "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/main/app/cluster-init-callback.cpp",
