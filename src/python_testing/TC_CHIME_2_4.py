@@ -131,7 +131,7 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
                         break
 
                 if not found_id:
-                    asserts.assert_fail("Unknown ChimeID selected")
+                    asserts.assert_fail(f"Unknown ChimeID selected: {chosenChimeID}")
                 else:
                     logging.info(f"CHIME 2_4: selected chime id for longest chime: {chosenChimeID}")
 
