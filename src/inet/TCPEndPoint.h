@@ -515,6 +515,10 @@ public:
      */
     constexpr static size_t kMaxReceiveMessageSize = System::PacketBuffer::kMaxAllocSize;
 
+#if INET_CONFIG_TEST
+    static bool sForceEarlyFailureIncomingConnection;
+#endif
+
 protected:
     friend class TCPTest;
     friend class EndPointDeletor<TCPEndPoint>;

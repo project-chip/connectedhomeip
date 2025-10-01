@@ -1023,6 +1023,13 @@ void TCPEndPointImplSockets::HandleIncomingConnection()
         }
     }
 
+#if INET_CONFIG_TEST
+    if (TCPEndPoint::sForceEarlyFailureIncomingConnection)
+    {
+        err = CHIP_ERROR_INCORRECT_STATE;
+    }
+#endif
+
     // Attempt to allocate an end point object.
     if (err == CHIP_NO_ERROR)
     {

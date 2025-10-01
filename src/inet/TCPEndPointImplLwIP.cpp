@@ -453,7 +453,7 @@ void TCPEndPointImplLwIP::DoCloseImpl(CHIP_ERROR err, State oldState)
     if (mPreAllocatedConnectEP)
     {
         // If the Listen EndPoint has a pre-allocated connect EndPoint, release it for the Retain() in the constructor
-        mPreAllocatedConnectEP->Free();
+        mPreAllocatedConnectEP->Release();
         mPreAllocatedConnectEP = nullptr;
     }
     if (mState == State::kClosed)
@@ -743,7 +743,7 @@ void TCPEndPointImplLwIP::HandleIncomingConnection(TCPEndPoint * conEP)
     // If something failed above, abort and free the connection end point.
     if (err != CHIP_NO_ERROR)
     {
-        conEP->Free();
+        conEP->Release();
     }
 }
 

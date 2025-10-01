@@ -424,7 +424,7 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
     // we assume NO open endpoints
     gTCP.ForEachEndPoint([](TCPEndPoint * ep) {
         ChipLogError(Test, "NOTE: Unexpected TCP endpoint in use. Will free it");
-        ep->Free();
+        ep->Release();
         return Loop::Continue;
     });
 
@@ -483,7 +483,7 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
     {
         if (testTCPEP[i] != nullptr)
         {
-            testTCPEP[i]->Free();
+            testTCPEP[i]->Release();
             --tcpCount;
             EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, tcpCount));
         }

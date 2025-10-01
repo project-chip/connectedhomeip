@@ -475,5 +475,9 @@ void TCPEndPoint::TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void
 
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
+#if INET_CONFIG_TEST
+bool TCPEndPoint::sForceEarlyFailureIncomingConnection = false;
+#endif
+
 } // namespace Inet
 } // namespace chip
