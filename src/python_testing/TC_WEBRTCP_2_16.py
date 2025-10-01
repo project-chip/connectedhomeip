@@ -122,39 +122,39 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
             except ValueError:
                 asserts.fail(f"Invalid input '{user_input}'. Please enter a valid number.")
 
-            provide_offer_cmd = Clusters.WebRTCTransportProvider.Commands.ProvideOffer(
-                webRTCSessionID=NullValue,
-                sdp=(
-                    "v=0\n"
-                    "o=rtc 2281582238 0 IN IP4 127.0.0.1\n"
-                    "s=-\n"
-                    "t=0 0\n"
-                    "a=group:BUNDLE 0\n"
-                    "a=msid-semantic:WMS *\n"
-                    "a=ice-options:ice2,trickle\n"
-                    "a=fingerprint:sha-256 8F:BF:9A:B9:FA:59:EC:F6:08:EA:47:D3:F4:AC:FA:AC:E9:27:FA:28:D3:00:1D:9B:EF:62:3F:B8:C6:09:FB:B9\n"
-                    "m=application 9 UDP/DTLS/SCTP webrtc-datachannel\n"
-                    "c=IN IP4 0.0.0.0\n"
-                    "a=mid:0\n"
-                    "a=sendrecv\n"
-                    "a=sctp-port:5000\n"
-                    "a=max-message-size:262144\n"
-                    "a=setup:actpass\n"
-                    "a=ice-ufrag:ytRw\n"
-                    "a=ice-pwd:blrzPJtaV9Y1BNgbC1bXpi"
-                ),
-                streamUsage=3,
-                originatingEndpointID=endpoint,
-                videoStreamID=videoStreamID,
-                audioStreamID=audioStreamID
-            )
+        provide_offer_cmd = Clusters.WebRTCTransportProvider.Commands.ProvideOffer(
+            webRTCSessionID=NullValue,
+            sdp=(
+                "v=0\n"
+                "o=rtc 2281582238 0 IN IP4 127.0.0.1\n"
+                "s=-\n"
+                "t=0 0\n"
+                "a=group:BUNDLE 0\n"
+                "a=msid-semantic:WMS *\n"
+                "a=ice-options:ice2,trickle\n"
+                "a=fingerprint:sha-256 8F:BF:9A:B9:FA:59:EC:F6:08:EA:47:D3:F4:AC:FA:AC:E9:27:FA:28:D3:00:1D:9B:EF:62:3F:B8:C6:09:FB:B9\n"
+                "m=application 9 UDP/DTLS/SCTP webrtc-datachannel\n"
+                "c=IN IP4 0.0.0.0\n"
+                "a=mid:0\n"
+                "a=sendrecv\n"
+                "a=sctp-port:5000\n"
+                "a=max-message-size:262144\n"
+                "a=setup:actpass\n"
+                "a=ice-ufrag:ytRw\n"
+                "a=ice-pwd:blrzPJtaV9Y1BNgbC1bXpi"
+            ),
+            streamUsage=3,
+            originatingEndpointID=1,
+            videoStreamID=videoStreamID,
+            audioStreamID=audioStreamID
+        )
 
         # Try to allocate multiple sessions to reach the DUT's capacity limit
         for attempt in range(max_attempts):
             logger.info(f"Attempt {attempt + 1}: Sending ProvideOffer command")
             resp = await self.send_single_cmd(
                 cmd=provide_offer_cmd,
-                endpoint=endpoint,
+                endpoint=1,
                 payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD
             )
             asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.ProvideOfferResponse,
