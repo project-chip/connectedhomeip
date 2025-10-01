@@ -26,7 +26,6 @@
 #include <lib/core/TLVReader.h>
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <zap-generated/CodeDrivenCallback.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -73,27 +72,35 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     // No-op: Descriptor and OTA do not need this, and our client-defined
     // clusters dont use it.
 }
+void MatterDescriptorClusterInitCallback(EndpointId endpointId);
+void MatterDescriptorClusterShutdownCallback(EndpointId endpointId);
 
 void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
-    if (clusterId == Descriptor::Id) {
+    switch (clusterId)
+    {
+    case app::Clusters::Descriptor::Id:
         MatterDescriptorClusterInitCallback(endpoint);
+        break;
+    default:
+        // No-op: For OTA we don't use the functions in CodegenIntegration
+        // because we use the gOtaProviderServer and the functions defined here.
+        assertChipStackLockedByCurrentThread();
     }
-    assertChipStackLockedByCurrentThread();
-
-    // No-op: For OTA we don't use the functions in CodegenIntegration
-    // because we use the gOtaProviderServer and the functions defined here.
 }
 
 void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId)
 {
-    if (clusterId == Descriptor::Id) {
+    switch (clusterId)
+    {
+    case app::Clusters::Descriptor::Id:
         MatterDescriptorClusterShutdownCallback(endpoint);
+        break;
+    default:
+        // No-op: For OTA we don't use the functions in CodegenIntegration
+        // because we use the gOtaProviderServer and the functions defined here.
+        assertChipStackLockedByCurrentThread();       
     }
-    assertChipStackLockedByCurrentThread();
-
-    // No-op: For OTA we don't use the functions in CodegenIntegration
-    // because we use the gOtaProviderServer and the functions defined here.
 }
 
 Protocols::InteractionModel::Status emAfWriteAttributeExternal(const ConcreteAttributePath & path,
