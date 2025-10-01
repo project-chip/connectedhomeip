@@ -16,12 +16,8 @@ import os
 import signal
 import tempfile
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any, Pattern, Optional
 
-import matter.clusters as Clusters
-from matter.ChipDeviceCtrl import ChipDeviceController
-from matter.clusters.Types import NullValue
-from matter.interaction_model import Status
 from matter.testing.tasks import Subprocess
 
 
@@ -221,14 +217,15 @@ class OTAProviderSubprocess(AppServerSubprocess):
             kvs_path=kvs_path
         )
 
-    def _process_output(self, line: bytes, is_stderr: bool) -> bytes:
+    def _process_output(self, line: bytes) -> bytes:
         """Write logs only to file, return empty bytes to avoid console output."""
+        assert self.log_file_path is not None, "log_file_path must not be None"
         with open(self.log_file_path, "ab") as f:
             f.write(line)
             f.flush()
         return b""  # must return bytes, not None
 
-    def start(self, expected_output: Optional[str] = None, timeout: Optional[int] = 30):
+    def start(self, expected_output: str | Pattern[Any] | None = None, timeout: float | None = 30):
         """Override start to attach log processing callback."""
         self.output_cb = self._process_output
         super().start(expected_output=expected_output, timeout=timeout)

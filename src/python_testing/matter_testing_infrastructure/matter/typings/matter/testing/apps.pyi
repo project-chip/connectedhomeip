@@ -1,7 +1,7 @@
 # src/python_testing/matter_testing_infrastructure/matter/typings/matter/testing/apps.py
 
 from dataclasses import dataclass
-from typing import Any, List, Optional
+from typing import Any, List, Pattern, Optional
 
 from matter.testing.tasks import Subprocess
 from matter.ChipDeviceCtrl import ChipDeviceController
@@ -63,6 +63,6 @@ class OTAProviderSubprocess(AppServerSubprocess):
     def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int,
                          requestor_node_id: Optional[int] = None) -> Any: ...
 
-    def start(self, expected_output: Optional[str] = None, timeout: Optional[int] = 30) -> None: ...
+    def start(self, expected_output: str | Pattern[Any] | None = None, timeout: float | None = 30) -> None: ...
 
-    def _process_output(self, line: bytes, is_stderr: bool) -> bytes: ...
+    def _process_output(self, line: bytes) -> bytes: ...
