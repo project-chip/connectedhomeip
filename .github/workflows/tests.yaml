@@ -440,16 +440,16 @@ jobs:
             matrix:
                 include:
                     # TODO:  use reflection to pick arch between x64 and arm64
-                    - os: macos-13
-                      arch: x64     # observed, not configured
-                      dry-run: true
-                      build_variant: no-ble-no-shell-asan-clang
-                      chip_tool: ""
-                    - os: macos-13
-                      arch: x64     # observed, not configured
-                      dry-run: true
-                      build_variant: no-ble-no-shell-tsan-clang
-                      chip_tool: ""
+                    # - os: macos-13
+                    #   arch: x64     # observed, not configured
+                    #   dry-run: true
+                    #   build_variant: no-ble-no-shell-asan-clang
+                    #   chip_tool: ""
+                    # - os: macos-13
+                    #   arch: x64     # observed, not configured
+                    #   dry-run: true
+                    #   build_variant: no-ble-no-shell-tsan-clang
+                    #   chip_tool: ""
                     - os: macos-14
                       arch: arm64     # observed, not configured
                       dry-run: true
