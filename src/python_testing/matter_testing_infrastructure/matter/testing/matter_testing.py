@@ -206,7 +206,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.stored_global_wildcard = None
 
     def teardown_class(self):
-        """Final teardown after all tests: log all problems.
+        """Final teardown after all tests: log all problems and dump device attributes if available.
             Test authors may overwrite this method in the derived class to perform teardown that is common for all tests
              This function is called only once per class. To perform teardown after each test, use teardown_test.
              Test authors that implement steps in this function need to be careful of step handling if there is
@@ -222,7 +222,53 @@ class MatterBaseTest(base_test.BaseTestClass):
             for problem in self.problems:
                 LOGGER.info(str(problem))
             LOGGER.info("###########################################################")
+            
+            # Attempt to dump device attribute data for debugging when problems are found
+            self._dump_device_attributes_on_failure()
         super().teardown_class()
+
+    def _dump_device_attributes_on_failure(self):
+        """
+        Dump device attribute data when problems are found for debugging purposes.
+        
+        This method attempts to generate a device attribute dump if the test has
+        collected endpoint data. It's designed to be safe and not interfere with
+        the original test failure reporting.
+        """
+        try:
+            # Check if we have endpoints_tlv data (from BasicCompositionTests or similar)
+            if hasattr(self, 'endpoints_tlv') and self.endpoints_tlv:
+                LOGGER.info("MatterBaseTest: Problems detected - generating device attribute dump")
+                
+                # Check if we have the dump_wildcard method (from BasicCompositionTests)
+                if hasattr(self, 'dump_wildcard'):
+                    LOGGER.info("Device attribute data available - generating dump")
+                    _, txt_str = self.dump_wildcard(None)
+                    # Only dump the text format - it's more readable for debugging
+                    self._log_structured_data('==== FAILURE_DUMP_txt: ', txt_str)
+                else:
+                    LOGGER.info("dump_wildcard method not available - skipping device attribute dump")
+            else:
+                LOGGER.debug("No device attribute data available (endpoints_tlv not populated)")
+        except Exception as e:
+            # Don't let logging errors interfere with the original test failure
+            LOGGER.warning(f"Failed to generate device attribute dump: {e}")
+
+    def _log_structured_data(self, start_tag: str, dump_string: str):
+        """Log structured data with a clear start and end marker.
+
+        This function is used to output device attribute dumps and other structured 
+        data to logs in a format that can be easily extracted for debugging.
+
+        Args:
+            start_tag: A prefix tag to identify the type of data being logged
+            dump_string: The data to be logged
+        """
+        lines = dump_string.splitlines()
+        LOGGER.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
+        for line in lines:
+            LOGGER.info(f'{start_tag}{line}')
+        LOGGER.info(f'{start_tag}END ====')
 
     def setup_test(self):
         """Set up for each individual test execution.

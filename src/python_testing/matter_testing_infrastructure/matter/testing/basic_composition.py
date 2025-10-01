@@ -296,26 +296,3 @@ class BasicCompositionTests:
         self.xml_device_types, problems = build_xml_device_types(dm)
         self.problems.extend(problems)
 
-    def teardown_class(self):
-        """Override teardown_class to dump device attribute data when problems are found.
-
-        This ensures that whenever any test inheriting from BasicCompositionTests has problems,
-        we automatically get the device attribute dump for debugging purposes.
-        """
-        # Check if we have problems and device attributes are available
-        if len(self.problems) > 0:
-            LOGGER.info("BasicCompositionTests: Problems detected - attempting device attribute dump")
-            try:
-                if hasattr(self, 'endpoints_tlv') and self.endpoints_tlv:
-                    LOGGER.info("Device attribute data available - generating dump")
-                    _, txt_str = self.dump_wildcard(None)
-                    # Only dump the text format - it's more readable for debugging
-                    log_structured_data('==== FAILURE_DUMP_txt: ', txt_str)
-                else:
-                    LOGGER.info("No device attribute data available (endpoints_tlv not populated)")
-            except Exception as e:
-                # Don't let logging errors interfere with the original test failure
-                LOGGER.warning(f"Failed to generate device attribute dump: {e}")
-
-        # Call the parent teardown_class method to handle normal teardown and problem logging
-        super().teardown_class()
