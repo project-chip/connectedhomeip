@@ -193,7 +193,7 @@ async def commission_device(
             )
             return PairingStatus()
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            logging.error("Commissioning failed: %s" % e)
+            LOGGER.error("Commissioning failed: %s" % e)
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "nfc-thread":
         try:

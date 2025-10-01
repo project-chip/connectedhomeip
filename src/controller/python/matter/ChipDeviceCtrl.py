@@ -719,7 +719,6 @@ class ChipDeviceControllerBase():
             nodeid (int): Node id of the device.
             isShortDiscriminator (Optional[bool]): Optional short discriminator.
 
-
         Returns:
             int: Effective Node ID of the device (as defined by the assigned NOC).
         '''
