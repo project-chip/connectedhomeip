@@ -151,9 +151,9 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     if chip_tool is None and not runtime == TestRunTime.MATTER_REPL_PYTHON:
         paths_finder = PathsFinder()
         if runtime == TestRunTime.CHIP_TOOL_PYTHON:
-            chip_tool = paths_finder.get('chip-tool')
+            chip_tool = Application(kind="tool", path=Path(paths_finder.get('chip-tool')))
         else:
-            chip_tool = paths_finder.get('darwin-framework-tool')
+            chip_tool = Application(kind="tool", path=Path(paths_finder.get('darwin-framework-tool')))
 
     if include_tags:
         include_tags = set([TestTag.__members__[t] for t in include_tags])
