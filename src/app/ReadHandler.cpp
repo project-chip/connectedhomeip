@@ -413,6 +413,9 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
     case HandlerState::AwaitingReportResponse:
         if (IsType(InteractionType::Subscribe) && !IsPriming())
         {
+            // Delay triggering check-in messages until the ReadHandler is closed, since it remains in the AwaitingReportResponse state,
+            // which blocks check-in messages from being sent.
+            // Additionally, avoid triggering a check-in during subscription setup failures; handling such cases is the client's responsibility.
             ChipLogError(DataManagement, "Trigger check-in message when non-priming subscription report times out");
             mManagementCallback.GetInteractionModelEngine()->ScheduledForceTriggerCheckInMessages();
         }
