@@ -16,7 +16,7 @@ import os
 import signal
 import tempfile
 from dataclasses import dataclass
-from typing import Any, Pattern, Optional
+from typing import Any, Optional, Pattern
 
 from matter.testing.tasks import Subprocess
 

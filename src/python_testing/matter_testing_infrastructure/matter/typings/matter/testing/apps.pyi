@@ -1,7 +1,7 @@
 # src/python_testing/matter_testing_infrastructure/matter/typings/matter/testing/apps.py
 
 from dataclasses import dataclass
-from typing import Any, List, Pattern, Optional
+from typing import Any, List, Optional, Pattern
 
 from matter.testing.tasks import Subprocess
 from matter.ChipDeviceCtrl import ChipDeviceController
