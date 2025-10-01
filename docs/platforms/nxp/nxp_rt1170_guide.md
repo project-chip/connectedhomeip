@@ -47,7 +47,7 @@ over Thread on RT1170 :
 
 -   RT1170 + IW612 (Wi-Fi + BLE + 15.4)
 
-> **Note:** For CMake builds, Matter over Wi-Fi is the default configuration when no `prj_<flavour>.conf` file is specified in the build.
+> **Note:** For CMake builds, Matter over Wi-Fi is the default configuration when no `prj_<flavour>.conf` file is specified in the [build](#cmake-build-system).
 
 ### Supported build systems
 
