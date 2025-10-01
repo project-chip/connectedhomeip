@@ -572,7 +572,7 @@ exit:
         {
             ChipLogProgress(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC", static_cast<unsigned>(newFabricIndex));
         }
-        
+
         return std::nullopt;
     }
 
