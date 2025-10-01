@@ -92,7 +92,7 @@ CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(const Access::Subje
     }
 
     ChipLogProgress(Zcl, "OpCreds: ACL entry created for Fabric index 0x%x CASE Admin Subject 0x" ChipLogFormatX64,
-                  static_cast<unsigned>(fabricIndex), ChipLogValueX64(subject));
+                    static_cast<unsigned>(fabricIndex), ChipLogValueX64(subject));
 
     return CHIP_NO_ERROR;
 }
@@ -398,7 +398,8 @@ exit:
 std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                           TLV::TLVReader & input_arguments, FabricTable & fabricTable,
                                                           FailSafeContext & failSafeContext, DnssdServer & dnssdServer,
-                                                          CommissioningWindowManager & commissioningWindowManager, bool & reportChange)
+                                                          CommissioningWindowManager & commissioningWindowManager,
+                                                          bool & reportChange)
 {
     MATTER_TRACE_SCOPE("AddNOC", "OperationalCredentials");
     Commands::AddNOC::DecodableType commandData;
@@ -570,7 +571,8 @@ exit:
         // Success
         else
         {
-            ChipLogProgress(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC", static_cast<unsigned>(newFabricIndex));
+            ChipLogProgress(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC",
+                            static_cast<unsigned>(newFabricIndex));
         }
 
         return std::nullopt;
@@ -774,7 +776,7 @@ std::optional<DataModel::ActionReturnStatus> HandleSetVIDVerificationStatement(C
     auto finalStatus        = Status::Failure;
 
     ChipLogProgress(Zcl, "OpCreds: Received a SetVIDVerificationStatement Command for FabricIndex 0x%x",
-                  static_cast<unsigned>(fabricIndex));
+                    static_cast<unsigned>(fabricIndex));
 
     if (!commandData.vendorID.HasValue() && !commandData.VIDVerificationStatement.HasValue() && !commandData.vvsc.HasValue())
     {
@@ -834,7 +836,8 @@ std::optional<DataModel::ActionReturnStatus> HandleRemoveFabric(CommandHandler *
 
     auto & fabricBeingRemoved = commandData.fabricIndex;
 
-    ChipLogProgress(Zcl, "OpCreds: Received a RemoveFabric Command for FabricIndex 0x%x", static_cast<unsigned>(fabricBeingRemoved));
+    ChipLogProgress(Zcl, "OpCreds: Received a RemoveFabric Command for FabricIndex 0x%x",
+                    static_cast<unsigned>(fabricBeingRemoved));
 
     if (!IsValidFabricIndex(fabricBeingRemoved))
     {
@@ -890,7 +893,7 @@ std::optional<DataModel::ActionReturnStatus> HandleSignVIDVerificationRequest(Co
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
     ChipLogProgress(Zcl, "OpCreds: Received a SignVIDVerificationRequest Command for FabricIndex 0x%x",
-                  static_cast<unsigned>(commandData.fabricIndex));
+                    static_cast<unsigned>(commandData.fabricIndex));
 
     if (!IsValidFabricIndex(commandData.fabricIndex) ||
         (commandData.clientChallenge.size() != Crypto::kVendorIdVerificationClientChallengeSize))
@@ -1334,8 +1337,8 @@ void OperationalCredentialsCluster::OnFabricCommitted(const FabricTable & fabric
     VerifyOrReturn(fabric != nullptr);
 
     ChipLogProgress(Zcl,
-                  "OpCreds: Fabric index 0x%x was committed to storage. Compressed Fabric Id 0x" ChipLogFormatX64
-                  ", FabricId " ChipLogFormatX64 ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
-                  static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetCompressedFabricId()),
-                  ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
+                    "OpCreds: Fabric index 0x%x was committed to storage. Compressed Fabric Id 0x" ChipLogFormatX64
+                    ", FabricId " ChipLogFormatX64 ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
+                    static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetCompressedFabricId()),
+                    ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
 }
