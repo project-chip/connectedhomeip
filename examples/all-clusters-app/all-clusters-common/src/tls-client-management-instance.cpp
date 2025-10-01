@@ -201,6 +201,33 @@ ClusterStatusCode TlsClientManagementCommandDelegate::RemoveProvisionedEndpointB
     return ClusterStatusCode(Status::Success);
 }
 
+CHIP_ERROR TlsClientManagementCommandDelegate::RootCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id)
+{
+    auto i = mProvisioned.begin();
+    for (; i != mProvisioned.end(); i++)
+    {
+        if (i->payload.caid == id)
+        {
+            return CHIP_ERROR_BAD_REQUEST;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TlsClientManagementCommandDelegate::ClientCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                      Tls::TLSCCDID id)
+{
+    auto i = mProvisioned.begin();
+    for (; i != mProvisioned.end(); i++)
+    {
+        if (i->payload.ccdid == id)
+        {
+            return CHIP_ERROR_BAD_REQUEST;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
 static CertificateTableImpl gCertificateTableInstance;
 TlsClientManagementCommandDelegate TlsClientManagementCommandDelegate::instance(gCertificateTableInstance);
 static TlsClientManagementServer gTlsClientManagementClusterServerInstance = TlsClientManagementServer(

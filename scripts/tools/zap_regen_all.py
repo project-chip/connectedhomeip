@@ -287,15 +287,21 @@ class JinjaCodegenTarget():
             for name in paths:
                 logging.info("    %s" % name)
 
-            VERSION = "0.51"
-            JAR_NAME = f"ktfmt-{VERSION}-jar-with-dependencies.jar"
+            VERSION = "0.58"
+            JAR_NAME = f"ktfmt-{VERSION}-with-dependencies.jar"
             jar_url = f"https://repo1.maven.org/maven2/com/facebook/ktfmt/{VERSION}/{JAR_NAME}"
 
+            # ensure we have some headers otherwise maven seems to 403 us
+            opener = urllib.request.build_opener()
+            opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+            urllib.request.install_opener(opener)
+
             with tempfile.TemporaryDirectory(prefix='ktfmt') as tmpdir:
-                path, http_message = urllib.request.urlretrieve(jar_url, Path(tmpdir).joinpath(JAR_NAME).as_posix())
+                path, _ = urllib.request.urlretrieve(jar_url, Path(tmpdir).joinpath(JAR_NAME).as_posix())
                 subprocess.check_call(['java', '-jar', path, '--google-style'] + paths)
         except Exception:
             traceback.print_exc()
+            raise
 
     def formatWithClangFormat(self, paths):
         try:
