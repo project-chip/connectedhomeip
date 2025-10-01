@@ -35,7 +35,6 @@ echo_bold_white() {
 }
 
 CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
-OUTPUT_ROOT="$CHIP_ROOT/out/python_lib"
 
 declare enable_ble=true
 declare enable_nfc=true
@@ -45,6 +44,7 @@ declare chip_detail_logging=false
 declare chip_mdns=minimal
 declare chip_case_retry_delta
 declare install_virtual_env
+declare output_root="$CHIP_ROOT/out/python_lib"
 declare clean_virtual_env=yes
 declare install_pytest_deps=yes
 declare install_jupyterlab=no
@@ -75,6 +75,7 @@ Input Options:
   -w, --enable_webrtc       <true/false>                    Enable WebRTC support in the controller (default=$enable_webrtc)
   -t --time_between_case_retries MRPActiveRetryInterval     Specify MRPActiveRetryInterval value
                                                             Default is 300 ms
+  -O, --output_root         <path>                          Path for the generated bindings (default=$output_root)
   -i, --install_virtual_env <path>                          Create a virtual environment with the wheels installed
                                                             <path> represents where the virtual environment is to be created.
   -c, --clean_virtual_env  <yes|no>                         When installing a virtual environment, create/clean it first.
@@ -156,6 +157,10 @@ while (($#)); do
             ;;
         --time_between_case_retries | -t)
             chip_case_retry_delta=$2
+            shift
+            ;;
+        --output_root | -O)
+            output_root=$2
             shift
             ;;
         --install_virtual_env | -i)
@@ -307,7 +312,7 @@ fi
 # Append extra arguments provided by the user.
 gn_args+=("${extra_gn_args[@]}")
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="${gn_args[*]}"
+gn --root="$CHIP_ROOT" gen "$output_root" --args="${gn_args[*]}"
 
 # Set up ccache environment for compilation
 if [[ "$enable_ccache" == "yes" ]]; then
@@ -321,20 +326,20 @@ if [[ "$enable_ccache" == "yes" ]]; then
 fi
 
 # Compile Python wheels
-ninja -C "$OUTPUT_ROOT" python_wheels
+ninja -C "$output_root" python_wheels
 
 # Add wheels from matter_python_wheel_action templates.
-WHEEL=("$OUTPUT_ROOT"/controller/python/matter*.whl)
+WHEEL=("$output_root"/controller/python/matter*.whl)
 
 # Add the matter_testing_infrastructure wheel
-WHEEL+=("$OUTPUT_ROOT"/obj/src/python_testing/matter_testing_infrastructure/matter-testing._build_wheel/matter_testing*.whl)
+WHEEL+=("$output_root"/obj/src/python_testing/matter_testing_infrastructure/matter-testing._build_wheel/matter_testing*.whl)
 
 if [ "$install_pytest_deps" = "yes" ]; then
     # Add wheels with YAML testing support.
     WHEEL+=(
         # Add matter-idl as well as matter-yamltests depends on it.
-        "$OUTPUT_ROOT"/python/obj/scripts/py_matter_idl/matter-idl._build_wheel/matter_idl-*.whl
-        "$OUTPUT_ROOT"/python/obj/scripts/py_matter_yamltests/matter-yamltests._build_wheel/matter_yamltests-*.whl
+        "$output_root"/python/obj/scripts/py_matter_idl/matter-idl._build_wheel/matter_idl-*.whl
+        "$output_root"/python/obj/scripts/py_matter_yamltests/matter-yamltests._build_wheel/matter_yamltests-*.whl
     )
 fi
 
@@ -345,7 +350,7 @@ fi
 if [[ "$enable_pw_rpc" == "true" ]]; then
     echo "Installing Pw RPC Python wheels"
     PWRPC_ROOT="$CHIP_ROOT/examples/common/pigweed/rpc_console"
-    PWRPC_OUTPUT_ROOT="$OUTPUT_ROOT/pwrpc"
+    PWRPC_OUTPUT_ROOT="$output_root/pwrpc"
     gn --root="$PWRPC_ROOT" gen "$PWRPC_OUTPUT_ROOT"
     # Compile Python wheels
     ninja -C "$PWRPC_OUTPUT_ROOT" chip_rpc_wheel

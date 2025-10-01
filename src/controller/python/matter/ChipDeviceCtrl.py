@@ -178,7 +178,7 @@ def _IssueNOCChainCallbackPythonCallback(devCtrl, status: PyChipError, noc: c_vo
             ipkBytes = string_at(ipk, ipkLen)[:]
         nocChain = NOCChain(nocBytes, icacBytes, rcacBytes, ipkBytes, adminSubject)
     else:
-        logging.error(f"Failure to generate NOC Chain: {status}. All NOCChain field will be None and commissioning will fail!")
+        LOGGER.error(f"Failure to generate NOC Chain: {status}. All NOCChain field will be None and commissioning will fail!")
     devCtrl.NOCChainCallback(nocChain)
 
 
@@ -350,8 +350,8 @@ class DeviceProxyWrapper():
         if that happens.
     '''
     class DeviceProxyType(enum.Enum):
-        OPERATIONAL = enum.auto(),
-        COMMISSIONEE = enum.auto(),
+        OPERATIONAL = enum.auto()
+        COMMISSIONEE = enum.auto()
 
     def __init__(self, deviceProxy: ctypes.c_void_p, proxyType, dmLib=None):
         self._deviceProxy = deviceProxy

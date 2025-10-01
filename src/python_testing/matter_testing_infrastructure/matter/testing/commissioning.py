@@ -31,8 +31,8 @@ from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
 from matter.setup_payload import SetupPayload
 
-logger = logging.getLogger("matter.python_testing")
-logger.setLevel(logging.INFO)
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.INFO)
 
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
 
@@ -143,7 +143,7 @@ async def commission_device(
     """
 
     if commissioning_info.tc_version_to_simulate is not None and commissioning_info.tc_user_response_to_simulate is not None:
-        logging.debug(
+        LOGGER.debug(
             f"Setting TC Acknowledgements to version {commissioning_info.tc_version_to_simulate} with user response {commissioning_info.tc_user_response_to_simulate}."
         )
         dev_ctrl.SetTCAcknowledgements(commissioning_info.tc_version_to_simulate, commissioning_info.tc_user_response_to_simulate)
@@ -155,7 +155,7 @@ async def commission_device(
             )
             return PairingStatus()
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            logging.error("Commissioning failed: %s" % e)
+            LOGGER.error("Commissioning failed: %s" % e)
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "ble-wifi":
         try:
@@ -175,7 +175,7 @@ async def commission_device(
             )
             return PairingStatus()
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            logging.error("Commissioning failed: %s" % e)
+            LOGGER.error("Commissioning failed: %s" % e)
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "ble-thread":
         try:
@@ -209,7 +209,7 @@ async def commission_device(
             )
             return PairingStatus()
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            logging.error("Commissioning failed: %s" % e)
+            LOGGER.error("Commissioning failed: %s" % e)
             return PairingStatus(exception=e)
     else:
         raise ValueError("Invalid commissioning method %s!" % commissioning_info.commissioning_method)
@@ -237,7 +237,7 @@ async def commission_devices(
     """
     commissioned = []
     for node_id, setup_payload in zip(dut_node_ids, setup_payloads):
-        logging.info(f"Commissioning method: {commissioning_info.commissioning_method}")
+        LOGGER.info(f"Commissioning method: {commissioning_info.commissioning_method}")
         commissioned.append(await commission_device(dev_ctrl, node_id, setup_payload, commissioning_info))
 
     return all(commissioned)
