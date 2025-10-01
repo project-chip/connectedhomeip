@@ -53,7 +53,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
         queue: Optional[str] = None,
         timeout: Optional[int] = None,
         override_image_uri: Optional[str] = None,
-        log_file_path: str = "provider.log",
+        log_file_path: Optional[str] = "provider.log",
         app_path: Optional[str] = None,
         kvs_path: Optional[str] = None
     ) -> None: ...
@@ -61,6 +61,6 @@ class OTAProviderSubprocess(AppServerSubprocess):
     def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int,
                          requestor_node_id: Optional[int] = None) -> Any: ...
 
-    def start(self, expected_output: Optional[str] = None, timeout: int = 30) -> None: ...
+    def start(self, expected_output: Optional[str] = None, timeout: Optional[int] = 30) -> None: ...
 
     def _process_output(self, line: bytes, is_stderr: bool) -> bytes: ...
