@@ -47,6 +47,16 @@ async def main():
         metavar="<timeout-second>",
     )
     optParser.add_option(
+        "-a",
+        "--address",
+        action="store",
+        dest="deviceAddress",
+        default='',
+        type='str',
+        help="Address of the device",
+        metavar="<device-addr>",
+    )
+    optParser.add_option(
         "--nodeid",
         action="store",
         dest="nodeid",
