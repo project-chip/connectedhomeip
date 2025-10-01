@@ -44,10 +44,19 @@ class OTAProviderSubprocess(AppServerSubprocess):
     DEFAULT_ADMIN_NODE_ID: int
     PREFIX: bytes
 
-    def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5541, extra_args: List[str] = ...,
-                 kvs_path: Optional[str] = ..., persist_kvs: bool = ...) -> None: ...
+    def __init__(
+        self,
+        ota_file: str,
+        discriminator: int,
+        passcode: int,
+        secured_device_port: int,
+        queue: str = None,
+        timeout: int = None,
+        override_image_uri: str = None,
+        log_file_path: str = "provider.log",
+        app_path: str = None,
+        kvs_path: str = None,
+    ) -> None: ...
 
     def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int,
                          requestor_node_id: Optional[int] = None) -> Any: ...
