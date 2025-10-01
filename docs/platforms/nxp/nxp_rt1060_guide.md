@@ -2,31 +2,31 @@
 
 <hr>
 
-- [MATTER NXP RT1060 Applications Guide](#matter-nxp-rt1060-applications-guide)
-  - [Introduction](#introduction)
-    - [Supported configurations](#supported-configurations)
-    - [Hardware requirements RT1060 + transceiver](#hardware-requirements-rt1060--transceiver)
-      - [Hardware requirements RT1060+IW416](#hardware-requirements-rt1060iw416)
-      - [Hardware requirements RT1060+88W8801](#hardware-requirements-rt106088w8801)
-      - [Hardware requirements RT1060 + K32W0](#hardware-requirements-rt1060--k32w0)
-      - [Hardware requirements RT1060-EVK-C + IW612 / IW610](#hardware-requirements-rt1060-evk-c--iw612--iw610)
-      - [Hardware requirements RT1060 + 88W8801 + K32W0x1DK6](#hardware-requirements-rt1060--88w8801--k32w0x1dk6)
-  - [Building](#building)
-    - [CMake Build System](#cmake-build-system)
-    - [GN Build System](#gn-build-system)
-      - [Building with Matter over Wifi configuration on RT1060 + transceiver](#building-with-matter-over-wifi-configuration-on-rt1060--transceiver)
-      - [Build with Matter over Thread configuration on RT1060 + transceiver](#build-with-matter-over-thread-configuration-on-rt1060--transceiver)
-        - [Build with Matter over Thread configuration on RT1060 + K32W0](#build-with-matter-over-thread-configuration-on-rt1060--k32w0)
-        - [Build with Matter over Thread configuration on RT1060-EVK-C + IW612](#build-with-matter-over-thread-configuration-on-rt1060-evk-c--iw612)
-        - [Build with Matter over Wi-Fi + OpenThread Border Router configuration on RT1060-EVK-C + IW612](#build-with-matter-over-wi-fi--openthread-border-router-configuration-on-rt1060-evk-c--iw612)
-        - [Build with Matter over Wi-Fi + OpenThread Border Router configuration on RT1060 + 88W8801 + K32W0x1DK6](#build-with-matter-over-wi-fi--openthread-border-router-configuration-on-rt1060--88w8801--k32w0x1dk6)
-      - [General Information](#general-information)
-  - [Manufacturing data](#manufacturing-data)
-  - [Flashing and debugging](#flashing-and-debugging)
-  - [Testing the example](#testing-the-example)
-    - [UART details](#uart-details)
-  - [OTA Software Update](#ota-software-update)
-  - [Thread Border Router overview](#thread-border-router-overview)
+-   [MATTER NXP RT1060 Applications Guide](#matter-nxp-rt1060-applications-guide)
+    -   [Introduction](#introduction)
+        -   [Supported configurations](#supported-configurations)
+        -   [Hardware requirements RT1060 + transceiver](#hardware-requirements-rt1060--transceiver)
+            -   [Hardware requirements RT1060+IW416](#hardware-requirements-rt1060iw416)
+            -   [Hardware requirements RT1060+88W8801](#hardware-requirements-rt106088w8801)
+            -   [Hardware requirements RT1060 + K32W0](#hardware-requirements-rt1060--k32w0)
+            -   [Hardware requirements RT1060-EVK-C + IW612 / IW610](#hardware-requirements-rt1060-evk-c--iw612--iw610)
+            -   [Hardware requirements RT1060 + 88W8801 + K32W0x1DK6](#hardware-requirements-rt1060--88w8801--k32w0x1dk6)
+    -   [Building](#building)
+        -   [CMake Build System](#cmake-build-system)
+        -   [GN Build System](#gn-build-system)
+            -   [Building with Matter over Wifi configuration on RT1060 + transceiver](#building-with-matter-over-wifi-configuration-on-rt1060--transceiver)
+            -   [Build with Matter over Thread configuration on RT1060 + transceiver](#build-with-matter-over-thread-configuration-on-rt1060--transceiver)
+                -   [Build with Matter over Thread configuration on RT1060 + K32W0](#build-with-matter-over-thread-configuration-on-rt1060--k32w0)
+                -   [Build with Matter over Thread configuration on RT1060-EVK-C + IW612](#build-with-matter-over-thread-configuration-on-rt1060-evk-c--iw612)
+                -   [Build with Matter over Wi-Fi + OpenThread Border Router configuration on RT1060-EVK-C + IW612](#build-with-matter-over-wi-fi--openthread-border-router-configuration-on-rt1060-evk-c--iw612)
+                -   [Build with Matter over Wi-Fi + OpenThread Border Router configuration on RT1060 + 88W8801 + K32W0x1DK6](#build-with-matter-over-wi-fi--openthread-border-router-configuration-on-rt1060--88w8801--k32w0x1dk6)
+            -   [General Information](#general-information)
+    -   [Manufacturing data](#manufacturing-data)
+    -   [Flashing and debugging](#flashing-and-debugging)
+    -   [Testing the example](#testing-the-example)
+        -   [UART details](#uart-details)
+    -   [OTA Software Update](#ota-software-update)
+    -   [Thread Border Router overview](#thread-border-router-overview)
 
 <a name="intro"></a>
 
@@ -65,7 +65,9 @@ Matter over Wi-Fi with Openthread Border Router support :
 -   RT1060-EVK-C + IW612 (Wi-Fi + 15.4 + BLE)
 -   RT1060-EVK-C + IW610 (Wi-Fi + 15.4 + BLE)
 
-> **Note:** For CMake builds, Matter over Wi-Fi with `RT1060-EVK-C + IW612` is the default configuration when no `prj_<flavour>.conf` file and no transceiver option is specified in the [build](#cmake-build-system).
+> **Note:** For CMake builds, Matter over Wi-Fi with `RT1060-EVK-C + IW612` is
+> the default configuration when no `prj_<flavour>.conf` file and no transceiver
+> option is specified in the [build](#cmake-build-system).
 
 ### Hardware requirements RT1060 + transceiver
 
