@@ -31,6 +31,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::Controller;
 using namespace chip::Crypto;
+using namespace chip::app::Clusters::JointFabricAdministrator;
 
 constexpr uint8_t kJFAvailableShift = 0;
 constexpr uint8_t kJFAdminShift     = 1;
@@ -216,7 +217,7 @@ void JFAManager::OnConnectionFailure(void * context, const ScopedNodeId & peerId
 
 CHIP_ERROR JFAManager::AnnounceJointFabricAdministrator()
 {
-    JointFabricAdministrator::Commands::AnnounceJointFabricAdministrator::Type request;
+    Commands::AnnounceJointFabricAdministrator::Type request;
 
     if (!mExchangeMgr)
     {
@@ -251,7 +252,7 @@ void JFAManager::OnAnnounceJointFabricAdministratorFailure(void * context, CHIP_
 
 CHIP_ERROR JFAManager::SendICACSRRequest()
 {
-    JointFabricAdministrator::Commands::ICACCSRRequest::Type request;
+    Commands::ICACCSRRequest::Type request;
 
     if (!mExchangeMgr)
     {
@@ -264,8 +265,7 @@ CHIP_ERROR JFAManager::SendICACSRRequest()
     return cluster.InvokeCommand(request, this, OnSendICACSRRequestResponse, OnSendICACSRRequestFailure);
 }
 
-void JFAManager::OnSendICACSRRequestResponse(void * context,
-                                             const JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType & icaccsr)
+void JFAManager::OnSendICACSRRequestResponse(void * context, const Commands::ICACCSRResponse::DecodableType & icaccsr)
 {
     JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
     VerifyOrDie(jfaManagerCore != nullptr);

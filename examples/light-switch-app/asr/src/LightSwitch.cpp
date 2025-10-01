@@ -20,9 +20,9 @@
 #include "AppEvent.h"
 #include "BindingHandler.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/bindings/binding-table.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
-#include <app/util/binding-table.h>
 #include <controller/InvokeInteraction.h>
 
 using namespace chip;

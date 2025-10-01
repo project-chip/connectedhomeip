@@ -53,6 +53,7 @@ if (chip_build_tests) {
       "${chip_root}/src/access/tests",
       "${chip_root}/src/app/clusters/administrator-commissioning-server/tests",
       "${chip_root}/src/app/clusters/basic-information/tests",
+      "${chip_root}/src/app/clusters/bindings/tests",
       "${chip_root}/src/app/clusters/general-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/group-key-mgmt-server/tests",
       "${chip_root}/src/app/clusters/network-commissioning/tests",
@@ -64,7 +65,9 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/zone-management-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/soil-measurement-server/tests",
+      "${chip_root}/src/app/clusters/fixed-label-server/tests",
       "${chip_root}/src/app/clusters/boolean-state-server/tests",
+      "${chip_root}/src/app/clusters/time-format-localization-server/tests",
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/app/data-model/tests",
@@ -88,7 +91,10 @@ if (chip_build_tests) {
       "${chip_root}/src/system/tests",
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/transport/tests",
-      "${chip_root}/src/tracing/esp32_diagnostic_trace/tests",
+      "${chip_root}/src/tracing/esp32_diagnostics/tests",
+      "${chip_root}/src/app/clusters/push-av-stream-transport-server/tests",
+      "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/tests",
+      "${chip_root}/src/app/clusters/zone-management-server/tests",
 
       # TODO(#40932): Fix and re-enable the Commodity Tariff unit tests.
       # "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
@@ -132,6 +138,10 @@ if (chip_build_tests) {
         "${chip_root}/src/data-model-providers/codegen/tests",
         "${chip_root}/examples/common/server-cluster-shim/tests",
       ]
+    }
+
+    if (chip_device_platform != "nrfconnect") {
+      tests += [ "${chip_root}/src/app/clusters/diagnostic-logs-server/tests/" ]
     }
 
     if (chip_device_platform != "efr32") {

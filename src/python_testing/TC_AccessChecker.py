@@ -220,7 +220,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         """
         ota_exception = self.user_params.get('ci_only_linux_skip_ota_cluster_disallowed_for_certification', False)
         if cluster_id == Clusters.OtaSoftwareUpdateRequestor.id and ota_exception:
-            logging.warn('WARNING: Skipping OTA cluster check for CI. THIS IS DISALLOWED FOR CERTIFICATION')
+            logging.warning('WARNING: Skipping OTA cluster check for CI. THIS IS DISALLOWED FOR CERTIFICATION')
             return
 
         logging.info(f'Testing commands on {xml_cluster.name} at privilege {privilege}')

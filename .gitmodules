@@ -251,6 +251,7 @@
 [submodule "third_party/libwebsockets/repo"]
 	path = third_party/libwebsockets/repo
 	url = https://github.com/warmcat/libwebsockets
+	branch = v4.4-stable
 	platforms = linux,darwin,tizen
 [submodule "third_party/imgui/repo"]
 	path = third_party/imgui/repo

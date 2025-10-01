@@ -26,7 +26,7 @@
 #include <media-controller.h>
 #include <webrtc-transport.h>
 
-#include <unordered_map>
+#include <map>
 
 namespace chip {
 namespace app {
@@ -89,6 +89,8 @@ public:
     void LiveStreamPrivacyModeChanged(bool privacyModeEnabled);
 
 private:
+    std::string ExtractMidFromSdp(const std::string & sdp, const std::string & mediaType);
+
     void ScheduleOfferSend(uint16_t sessionId);
 
     void ScheduleICECandidatesSend(uint16_t sessionId);
@@ -130,8 +132,8 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 
     std::unordered_map<uint16_t, std::unique_ptr<WebrtcTransport>> mWebrtcTransportMap;
-    // This is to retrieve the sessionIds for a given NodeId
-    std::unordered_map<NodeId, uint16_t> mSessionIdMap;
+    // This is to retrieve the sessionIds for a given ScopedNodeId (NodeId + FabricIndex)
+    std::map<ScopedNodeId, uint16_t> mSessionIdMap;
 
     MediaController * mMediaController = nullptr;
 

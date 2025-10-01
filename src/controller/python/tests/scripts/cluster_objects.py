@@ -705,7 +705,7 @@ class ClusterObjectTests:
 
         for attributes in attributePathPossibilities():
             for events in eventPathPossibilities():
-                logging.info(
+                logger.info(
                     f"{testCount}: Reading mixed Attributes({attributes[0]}) Events({events[0]})")
                 await cls._TriggerEvent(devCtrl)
                 res = await cls._RetryForContent(request=lambda: devCtrl.Read(

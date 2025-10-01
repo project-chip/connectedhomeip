@@ -43,6 +43,8 @@ _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
 _EXCLUDE_DEVICE_FROM_LINUX_CI = [
     "noip_rootnode_dimmablelight_bCwGYSDpoe",  # Broken.
     "rootnode_genericswitch_2dfff6e516",  # not actively developed,
+    # heatingcoolingunit is not the spec/matter_devices.xml. This leads to failure in the bundle step.
+    "rootnode_heatingcoolingunit_ncdGai1E5a",
     "rootnode_mounteddimmableloadcontrol_a9a1a87f2d",  # not actively developed,
     "rootnode_mountedonoffcontrol_ec30c757a6",  # not actively developed,
     "rootnode_onofflight_samplemei",  # not actively developed,
@@ -91,7 +93,8 @@ def load_config() -> None:
         config["nrfconnect"]["TTY"] = None
         config["esp32"]["IDF_PATH"] = os.environ.get('IDF_PATH')
         config["esp32"]["TTY"] = None
-        config["silabs-thread"]["GECKO_SDK"] = f"{_REPO_BASE_PATH}third_party/efr32_sdk/repo"
+        config["silabs-thread"]["GECKO_SDK"] = f"{
+            _REPO_BASE_PATH}third_party/efr32_sdk/repo"
         config["silabs-thread"]["TTY"] = None
         config["silabs-thread"]["CU"] = None
         config["silabs-thread"]["SILABS_BOARD"] = None
@@ -430,7 +433,8 @@ def main() -> int:
                     f"{device_name} in CICD config but not {_DEVICE_FOLDER}!")
                 exit(1)
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
-            command = f"./chef.py -cbr -d {device_name} -t {options.build_target}"
+            command = f"./chef.py -cbr -d {
+                device_name} -t {options.build_target}"
             flush_print(f"Building {command}", with_border=True)
             shell.run_cmd(command)
             bundle(options.build_target, device_name)
@@ -715,7 +719,8 @@ def main() -> int:
             if len(sw_ver_string) >= 64:
                 truncated_sw_ver_string = f"""{branch[:22]}:{commit_id}"""
                 flush_print(
-                    f"Truncate the software version string from \"{sw_ver_string}\" to "
+                    f"Truncate the software version string from \"{
+                        sw_ver_string}\" to "
                     f"\"{truncated_sw_ver_string}\" due to 64 bytes limitation")
                 sw_ver_string = truncated_sw_ver_string
 
@@ -760,7 +765,8 @@ def main() -> int:
             shell.run_cmd("idf.py build")
             shell.run_cmd("idf.py build flashing_script")
             shell.run_cmd(
-                f"(cd build/ && tar cJvf $(git rev-parse HEAD)-{options.sample_device_type_name}.tar.xz "
+                f"(cd build/ && tar cJvf $(git rev-parse HEAD)-{
+                    options.sample_device_type_name}.tar.xz "
                 f"--files-from=chip-shell.flashbundle.txt)")
             shell.run_cmd(
                 f"cp build/$(git rev-parse HEAD)-{options.sample_device_type_name}.tar.xz {_CHEF_SCRIPT_PATH}")
@@ -846,7 +852,8 @@ def main() -> int:
                 shell.run_cmd(
                     f"cd {config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE")
                 shell.run_cmd("rm -f project_include.mk")
-                cmd = f"{config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE/project_include.mk"
+                cmd = f"{config['ameba']['AMEBA_SDK']
+                         }/project/realtek_amebaz2_v0_example/GCC-RELEASE/project_include.mk"
                 with open(cmd, "w") as f:
                     f.write(textwrap.dedent(f"""\
                         SAMPLE_NAME = {options.sample_device_type_name}
@@ -855,7 +862,7 @@ def main() -> int:
                         CHEF_FLAGS += -DCONFIG_DEVICE_PRODUCT_ID={options.pid}
                         CHEF_FLAGS += -DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"{options.pid}\"
                         """
-                                            ))
+                    ))
                 if options.do_clean:
                     shell.run_cmd("make clean")
                 shell.run_cmd("make chef")
@@ -892,6 +899,7 @@ def main() -> int:
                  f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", '
                  f'"CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}", '
                  f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\\"{str(options.pname)}\\""]'),
+                'chip_app_data_model_target = "//:chef-data-model"',
             ])
 
             uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
@@ -1008,7 +1016,8 @@ def main() -> int:
                 shell.run_cmd(
                     f"cd {config['ameba']['AMEBA_SDK']}/tools/AmebaD/Image_Tool_Linux")
                 shell.run_cmd((
-                    f"{config['ameba']['AMEBA_SDK']}/tools/AmebaD/Image_Tool_Linux/flash.sh "
+                    f"{config['ameba']['AMEBA_SDK']
+                       }/tools/AmebaD/Image_Tool_Linux/flash.sh "
                     f"{config['ameba']['TTY']} {config['ameba']['AMEBA_SDK']}"
                     f"/project/realtek_amebaD_va0_example/GCC-RELEASE/out"
                 ), raise_on_returncode=False)
@@ -1017,7 +1026,8 @@ def main() -> int:
                 shell.run_cmd(
                     f"cd {config['ameba']['AMEBA_SDK']}/tools/AmebaZ2/Image_Tool_Linux")
                 shell.run_cmd((
-                    f"{config['ameba']['AMEBA_SDK']}/tools/AmebaZ2/Image_Tool_Linux/flash.sh "
+                    f"{config['ameba']['AMEBA_SDK']
+                       }/tools/AmebaZ2/Image_Tool_Linux/flash.sh "
                     f"{config['ameba']['TTY']} {config['ameba']['AMEBA_SDK']}"
                     f"/project/realtek_amebaz2_v0_example/GCC-RELEASE/application_is/Debug/bin"
                 ), raise_on_returncode=False)

@@ -1,6 +1,7 @@
 import argparse
 import asyncio
 import datetime
+import ipaddress
 import json
 import logging
 import os.path
@@ -263,17 +264,21 @@ class CAHierarchy:
         self,
         dns: str,
         public_key: CertificatePublicKeyTypes,
-        duration: datetime.timedelta
+        duration: datetime.timedelta,
+        ip_address: Optional[str] = None
     ) -> x509.Certificate:
         """
         Generate and sign a certificate.
         """
+        # Use ip_address for Common Name if provided, otherwise use dns
+        common_name = ip_address if ip_address else dns
+
         # Sign certificate
         subject = x509.Name(
             [
                 x509.NameAttribute(NameOID.ORGANIZATION_NAME, "CSA"),
                 x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, "TC_PAVS"),
-                x509.NameAttribute(NameOID.COMMON_NAME, dns),
+                x509.NameAttribute(NameOID.COMMON_NAME, common_name),
             ]
         )
 
@@ -322,8 +327,11 @@ class CAHierarchy:
         )
 
         if self.kind == 'server':
+            san_names = [x509.DNSName(dns)]
+            if ip_address:
+                san_names.append(x509.IPAddress(ipaddress.ip_address(ip_address)))
             builder.add_extension(
-                x509.SubjectAlternativeName([x509.DNSName(dns)]),
+                x509.SubjectAlternativeName(san_names),
                 critical=False,
             )
 
@@ -357,7 +365,7 @@ class CAHierarchy:
 
         return (key_path, cert_bundle_path, False)
 
-    def gen_keypair(self, dns: str, override=False, duration: datetime.timedelta = datetime.timedelta(hours=1)) -> tuple[Path, Path, bool]:
+    def gen_keypair(self, dns: str, override=False, duration: datetime.timedelta = datetime.timedelta(hours=1), ip_address: Optional[str] = None) -> tuple[Path, Path, bool]:
         """
         Generate a private key as well as the associated certificate signed by this CA
         hierarchy. Returns the path to the key, cert, and whether it was reused or not.
@@ -375,7 +383,7 @@ class CAHierarchy:
         key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
 
         # Sign certificate
-        cert = self._sign_cert(dns, key.public_key(), duration)
+        cert = self._sign_cert(dns, key.public_key(), duration, ip_address=ip_address)
 
         # Save that information to disk
         (key_path, cert_bundle_path) = self._save_cert(dns, cert, key, bundle_root=True)
@@ -650,17 +658,17 @@ class PushAvServer:
 class PushAvContext:
     """Hold the context for a full Push AV Server including temporary disk, CA hierarchies and web server"""
 
-    def __init__(self, host: Optional[str], port: Optional[int], working_directory: Optional[str], dns: Optional[str], strict_mode: bool):
+    def __init__(self, host: Optional[str], port: Optional[int], working_directory: Optional[str], dns: Optional[str], server_ip: Optional[str], strict_mode: bool):
         self.directory = WorkingDirectory(working_directory)
         self.host = host
         self.port = port
-        self.dns = "localhost" if dns is None else f"{dns}._http._tcp_.local."
+        self.dns = "localhost" if dns is None else f"{dns}._http._tcp.local."
         self.strict_mode = strict_mode
 
         # Create CA hierarchies (for webserver and devices)
         self.device_hierarchy = CAHierarchy(self.directory.mkdir("certs", "device"), "device", "client")
         self.server_hierarchy = CAHierarchy(self.directory.mkdir("certs", "server"), "server", "server")
-        (self.server_key_file, self.server_cert_file, _) = self.server_hierarchy.gen_keypair(self.dns, override=True)
+        (self.server_key_file, self.server_cert_file, _) = self.server_hierarchy.gen_keypair(self.dns, override=True, ip_address=server_ip)
 
         # mDNS configuration. Registration only happen if the dns isn't localhost.
         self.zeroconf = Zeroconf()
@@ -682,7 +690,7 @@ class PushAvContext:
         pas = PushAvServer(self.directory, self.device_hierarchy, strict_mode)
         self.app.include_router(pas.router)
 
-    async def start(self, shutdown_trigger: Optional[Callable[..., Awaitable]] = None,):
+    async def start(self, shutdown_trigger: Optional[Callable[..., Awaitable]] = None):
         """
         Start the PUSH AV server. Note that method do not check if a server is already running.
         """
@@ -739,12 +747,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--dns", help="A mDNS record to adversise, or none if left empty."
     )
+    parser.add_argument("--server-ip", help="The IP address of the server to include in the SSL certificate.")
     parser.add_argument("--strict-mode", action='store_true',
                         help="When enabled, upload must happen on the path described by the Matter specification")
 
     args = parser.parse_args()
 
-    ctx = PushAvContext(args.host, args.port, args.working_directory, args.dns, args.strict_mode)
+    ctx = PushAvContext(args.host, args.port, args.working_directory, args.dns, args.server_ip, args.strict_mode)
 
     shutdown_event = asyncio.Event()
 
