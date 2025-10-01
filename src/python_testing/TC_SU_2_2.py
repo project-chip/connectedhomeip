@@ -57,7 +57,7 @@ from matter.interaction_model import Status
 from matter.testing import matter_asserts
 from matter.testing.event_attribute_reporting import AttributeMatcher, AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from matter.testing.apps import OTAProviderSubprocess, ACLHandler
+from matter.testing.apps import OTAProviderSubprocess, ACLHandler, OTAHelper
 
 # Create a logger
 logger = logging.getLogger(__name__)
@@ -68,212 +68,6 @@ class TC_SU_2_2(MatterBaseTest):
     LOG_FILE_PATH = "provider.log"
     APP_PATH = "./out/debug/chip-ota-provider-app"
     KVS_PATH = "/tmp/chip_kvs_provider"
-
-    async def add_single_ota_provider(self, controller, requestor_node_id: int, provider_node_id: int):
-        """
-        Adds a single OTA provider to the Requestor's DefaultOTAProviders attribute
-        only if no provider is currently registered. If a provider already exists,
-        the function does nothing.
-
-        Args:
-            controller: The device controller.
-            requestor_node_id (int): Node ID of the Requestor device.
-            provider_node_id (int): Node ID of the OTA Provider to add.
-
-        Returns:
-            None
-        """
-        # Read existing DefaultOTAProviders on the Requestor
-        current_providers = await self.read_single_attribute_check_success(
-            dev_ctrl=controller,
-            cluster=Clusters.OtaSoftwareUpdateRequestor,
-            attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
-        )
-        logger.info(f'Prerequisite #4.0 - Current DefaultOTAProviders on Requestor: {current_providers}')
-
-        # If there is already a provider, skip adding
-        if current_providers:
-            logger.info(f'Skipping add: Requestor already has a provider registered ({current_providers})')
-            return
-
-        # Create a ProviderLocation for the new provider
-        provider_location = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
-            providerNodeID=provider_node_id,
-            endpoint=0,
-            fabricIndex=controller.fabricId
-        )
-        logger.info(f'Prerequisite #4.0 - ProviderLocation to add: {provider_location}')
-
-        # Combine with existing providers (preserving previous ones)
-        updated_providers = current_providers + [provider_location]
-
-        # Write the updated DefaultOTAProviders list back to the Requestor
-        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=updated_providers)
-        resp = await controller.WriteAttribute(
-            attributes=[(0, attr)],
-            nodeid=requestor_node_id
-        )
-        logger.info(f'Prerequisite #4.0 - Write DefaultOTAProviders response: {resp}')
-        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write DefaultOTAProviders attribute")
-
-    async def setup_provider(
-        self,
-        step_number,
-        controller,
-        fabric_id,
-        requestor_node_id,
-        provider_node_id,
-        provider_discriminator,
-        provider_setup_pin_code,
-        provider_port,
-        provider_ota_file,
-        provider_wait_for,
-        provider_queue,
-        provider_timeout,
-        provider_override_image_uri
-    ):
-        """
-        Set up an OTA Provider Launch,  commissioning, and ACLs.
-
-        Steps:
-            1. Launch the OTA Provider process with given parameters.
-            2. Commission the Provider onto the specified fabric.
-            3. Configure ACLs on both Requestor and Provider to allow OTA cluster interactions.
-
-        Args:
-            step_number: Identifier for the test step (used in logging).
-            controller: Controller instance for commissioning and ACL configuration.
-            fabric_id: Fabric index to associate with the Provider.
-            requestor_node_id: Node ID of the OTA Requestor (DUT).
-            provider_node_id: Node ID of the OTA Provider.
-            provider_discriminator: Discriminator used for Provider discovery.
-            provider_setup_pin_code: Setup PIN code for commissioning.
-            provider_port: Port number for Provider process.
-            provider_ota_file: Path to OTA image file served by Provider.
-            provider_wait_for: Regex to wait for specific Provider log output.
-            provider_queue: Queue used by the Provider.
-            provider_timeout: Timeout for Provider.
-            provider_override_image_uri: ImageURI for the OTA file.
-
-        Returns:
-            provider_proc: Process handle of the launched Provider.
-        """
-
-        logger.info(f"""{step_number}: Prerequisite #1.0 - Provider info:
-            NodeID: {provider_node_id},
-            discriminator: {provider_discriminator},
-            setupPinCode: {provider_setup_pin_code},
-            port: {provider_port},
-            ota_file: {provider_ota_file}""")
-
-        # Prerequisite #2.0- Launch Provider with Queue "updateAvailable"
-        # NOTE: Using OTAProviderSubprocess from matter.testing.apps to avoid code duplication
-        provider_proc = OTAProviderSubprocess(
-            ota_file=provider_ota_file,           # Path to OTA image file
-            discriminator=provider_discriminator,
-            passcode=provider_setup_pin_code,
-            secured_device_port=provider_port,
-            queue=provider_queue,
-            timeout=provider_timeout,
-            override_image_uri=provider_override_image_uri,
-            log_file_path=self.LOG_FILE_PATH,
-            app_path=self.APP_PATH,
-            kvs_path=self.KVS_PATH,
-        )
-        provider_proc.start(expected_output=provider_wait_for, timeout=300)
-
-        # Log the provider PID
-        logger.info(f"{step_number}: Prerequisite #2.0 - Launched Provider PID {provider_proc.p.pid}")
-
-        # Prerequisite #2.1 - Commissioning Provider
-        resp = await controller.CommissionOnNetwork(
-            nodeId=provider_node_id,
-            setupPinCode=provider_setup_pin_code,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=provider_discriminator
-        )
-        logger.info(f'{step_number}: Prerequisite #3 - Provider Commissioning response: {resp}')
-
-        # Prerequisite #3.0 - Setting ACLs
-        logger.info(f'{step_number}: Prerequisite #4.0 - Setting ACLs under FabricIndex {fabric_id}')
-        logger.info(f'{step_number}: Prerequisite #4.0 - Requestor (DUT), NodeID: {requestor_node_id}')
-        logger.info(f'{step_number}: Prerequisite #4.0 - Provider, NodeID: {provider_node_id}')
-
-        # Set ACLs for OTA update:
-        # - On Requestor to allow specified Provider to interact with OTA Requestor cluster
-        # - On Provider to allow Requestor to interact with OTA Provider cluster
-
-        # Read existing ACLs Requestor
-        original_requestor_acls = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-
-        # Read existing ACLs Provider
-        original_provider_acls = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=provider_node_id,
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-
-        await self.acl_handler.set_ota_acls(
-            requestor_node=requestor_node_id,
-            provider_node=provider_node_id,
-            fabric_index=fabric_id,
-            original_requestor_acls=original_requestor_acls,
-            original_provider_acls=original_provider_acls,
-        )
-
-        return provider_proc
-
-    async def cleanup_provider(
-        self,
-        controller,
-        requestor_node_id,
-        provider_node_id,
-        provider_proc,
-        original_requestor_acls,
-        original_provider_acls
-    ):
-        """
-        Cleanly shuts down the Provider process.
-        Restores ACLs, expires sessions, stops the provider process, and deletes temporary KVS files.
-
-        Args:
-            controller: Controller object.
-            requestor_node_id: Node ID of the requestor.
-            provider_node_id: Node ID of the provider.
-            provider_proc: Process handle of the provider to stop.
-            original_requestor_acls: Original ACLs for the requestor.
-            original_provider_acls: Original ACLs for the provider.
-
-        Returns:
-            None
-        """
-        # Clean Provider ACL
-        await self.acl_handler.write_acl(provider_node_id, original_provider_acls)
-        await asyncio.sleep(1)
-
-        # Expire sessions
-        controller.ExpireSessions(provider_node_id)
-        await asyncio.sleep(1)
-
-        # Clean Requestor ACL
-        await self.acl_handler.write_acl(requestor_node_id, original_requestor_acls)
-        await asyncio.sleep(1)
-
-        # Kill Provider process
-        provider_proc.terminate()
-        await asyncio.sleep(1)
-
-        # Delete KVS files
-        subprocess.run("rm -rf /tmp/chip_kvs /tmp/chip_kvs-shm /tmp/chip_kvs-wal", shell=True)
-        await asyncio.sleep(1)
-        subprocess.run("rm -rf /tmp/chip_kvs_provider*", shell=True)
-        await asyncio.sleep(1)
 
     async def send_announce_ota_provider(self, controller, requestor_node_id, provider_node_id, vendor_id=0xFFF1, reason=None, endpoint=0):
         """
@@ -371,8 +165,14 @@ class TC_SU_2_2(MatterBaseTest):
         # Prerequisite #1.0 - Requestor (DUT) info
         CONTROLLER = self.default_controller
         FABRIC_ID = CONTROLLER.fabricId
-        REQUESTOR_NODE_ID = self.dut_node_id  # Assigned on execution time
+        REQUESTOR_NODE_ID = self.dut_node_id
         self.acl_handler = ACLHandler(CONTROLLER)
+        self.ota_helper = OTAHelper(
+            log_file_path=self.LOG_FILE_PATH,
+            app_path=self.APP_PATH,
+            kvs_path=self.KVS_PATH,
+            acl_handler=self.acl_handler
+        )
 
         step_number = "[STEP_0]"
         logger.info(f'{step_number}: Prerequisite #1.0 - Requestor (DUT), NodeID: {REQUESTOR_NODE_ID}, FabricId: {FABRIC_ID}')
@@ -380,6 +180,11 @@ class TC_SU_2_2(MatterBaseTest):
         self.step(1)
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Prerequisites - Setup Provider
+        # Steps:
+        #     1. Launch the OTA Provider process with given parameters.
+        #     2. Commission the Provider onto the specified fabric.
+        #     3. Configure ACLs on both Requestor and Provider to allow OTA cluster interactions.
+        #     4. Add the Provider to the Requestor's DefaultOTAProviders attribute if none exists.
         # ------------------------------------------------------------------------------------
         step_number_s1 = "[STEP_1]"
 
@@ -390,9 +195,8 @@ class TC_SU_2_2(MatterBaseTest):
         provider_port = 5540
         provider_ota_file_s1 = "firmware_requestor_v2min.ota"
 
-        # Setup, Launch, Commisioning and ACLs on Provider
-        provider_proc_s1 = await self.setup_provider(
-            step_number=step_number_s1,
+        # Launch, Commisioning, configure ACLs and add the DefaultOTAProviders
+        provider_proc_s1 = await self.ota_helper.setup_provider(
             controller=CONTROLLER,
             fabric_id=FABRIC_ID,
             requestor_node_id=REQUESTOR_NODE_ID,
@@ -406,10 +210,6 @@ class TC_SU_2_2(MatterBaseTest):
             provider_timeout=None,                  # Optional
             provider_override_image_uri=None        # Optional
         )
-
-        # Prerequisite #4.0 - Add OTA Provider to the Requestor
-        logger.info(f'{step_number_s1}: Prerequisite #5.0 - Add Provider to Requestor(DUT) DefaultOTAProviders')
-        await self.add_single_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id)
 
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.1 - Matcher for OTA records logs

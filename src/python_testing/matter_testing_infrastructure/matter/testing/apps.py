@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,17 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import subprocess
+import logging
 import os
 import signal
 import tempfile
 from dataclasses import dataclass
 from typing import Optional, Union
 
+from mobly import asserts
+
 import matter.clusters as Clusters
-from matter.ChipDeviceCtrl import ChipDeviceController
+from matter.ChipDeviceCtrl import ChipDeviceController, DiscoveryFilterType
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.tasks import Subprocess
+
+# Create a logger
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -233,6 +240,11 @@ class OTAProviderSubprocess(AppServerSubprocess):
         self.output_cb = self._process_output
         super().start(expected_output=expected_output, timeout=timeout)
 
+    def terminate(self):
+        """Override terminate to ensure log file is closed."""
+        super().terminate()
+        # No explicit file close needed since we open/close on each write.
+
 
 class ACLHandler:
     """
@@ -241,7 +253,7 @@ class ACLHandler:
 
     DEFAULT_ADMIN_NODE_ID = 112233
 
-    def __init__(self, controller):
+    def __init__(self, controller: ChipDeviceController):
         """
         Initialize the ACL handler.
 
@@ -412,3 +424,251 @@ class ACLHandler:
         """
         await self.set_acl_for_requestor(requestor_node, provider_node, fabric_index, original_requestor_acls)
         await self.set_acl_for_provider(provider_node, requestor_node, fabric_index, original_provider_acls)
+
+
+class OTAHelper:
+    """Helper to handle OTA Provider setup, commissioning, and ACLs."""
+
+    def __init__(self, log_file_path: str, app_path: str, kvs_path: str, acl_handler: 'ACLHandler'):
+        """
+        Args:
+            log_file_path: Log file path for provider logs.
+            app_path: Path to chip-ota-provider-app binary.
+            kvs_path: Optional KVS path to reuse across steps.
+            acl_handler: Instance of ACLHandler to configure ACLs.
+        """
+        self.log_file_path = log_file_path
+        self.app_path = app_path
+        self.kvs_path = kvs_path
+        self.acl_handler = acl_handler
+
+    async def read_single_attribute(self, controller, node_id, endpoint, attribute, fabric_filtered=False):
+        """
+        Reads a single attribute from a node using the controller directly.
+
+        Args:
+            controller: The controller to use for reading the attribute
+            node_id: Node ID of the device
+            endpoint: Endpoint of the cluster
+            attribute: Attribute to read
+            fabric_filtered: Whether to filter by fabric ID (optional)
+
+        Returns:
+            The value of the attribute read
+        """
+        result = await controller.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
+        data = result[endpoint]
+        return list(data.values())[0][attribute]
+
+    async def read_single_attribute_check_success(self, controller, node_id, endpoint, attribute):
+        """
+        Reads a single attribute and raises an error if it fails.
+
+        Args:
+            controller: The controller to use for reading the attribute
+            node_id: Node ID of the device
+            endpoint: Endpoint of the cluster
+            attribute: Attribute to read
+
+        Returns:
+            The value of the attribute if successful
+        """
+        value = await self.read_single_attribute(controller, node_id, endpoint, attribute)
+        if value is None:
+            raise RuntimeError(f"Attribute read failed: {attribute}")
+        return value
+
+    async def add_single_ota_provider(self, controller, requestor_node_id: int, provider_node_id: int):
+        """
+        Adds a single OTA provider to the Requestor's DefaultOTAProviders attribute
+        only if no provider is currently registered. If a provider already exists,
+        the function does nothing.
+
+        Args:
+            controller: The controller to use for reading and writing attributes.
+            requestor_node_id (int): Node ID of the Requestor device.
+            provider_node_id (int): Node ID of the OTA Provider to add.
+
+        Returns:
+            None
+        """
+        # Read existing DefaultOTAProviders on the Requestor
+        current_providers = await self.read_single_attribute_check_success(
+            controller=controller,
+            node_id=requestor_node_id,
+            endpoint=0,
+            attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
+        )
+        logger.info(f'Prerequisite #5.0 - Current DefaultOTAProviders on Requestor: {current_providers}')
+
+        # If there is already a provider, skip adding
+        if current_providers:
+            logger.info(f'Skipping add: Requestor already has a provider registered ({current_providers})')
+            return
+
+        # Create a ProviderLocation for the new provider
+        provider_location = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
+            providerNodeID=provider_node_id,
+            endpoint=0,
+            fabricIndex=controller.fabricId
+        )
+        logger.info(f'Prerequisite #5.0 - ProviderLocation to add: {provider_location}')
+
+        # Combine with existing providers (preserving previous ones)
+        updated_providers = current_providers + [provider_location]
+
+        # Write the updated DefaultOTAProviders list back to the Requestor
+        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=updated_providers)
+        resp = await controller.WriteAttribute(
+            attributes=[(0, attr)],
+            nodeid=requestor_node_id
+        )
+        logger.info(f'Prerequisite #5.0 - Write DefaultOTAProviders response: {resp}')
+        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write DefaultOTAProviders attribute")
+
+    async def setup_provider(
+        self,
+        controller: ChipDeviceController,
+        fabric_id,
+        requestor_node_id,
+        provider_node_id,
+        provider_discriminator,
+        provider_setup_pin_code,
+        provider_port,
+        provider_ota_file,
+        provider_wait_for,
+        provider_queue,
+        provider_timeout,
+        provider_override_image_uri
+    ):
+        """
+        Set up an OTA Provider Launch,  commissioning, and ACLs.
+
+        Steps:
+            1. Launch the OTA Provider process with given parameters.
+            2. Commission the Provider onto the specified fabric.
+            3. Configure ACLs on both Requestor and Provider to allow OTA cluster interactions.
+            4. Add the Provider to the Requestor's DefaultOTAProviders attribute if none exists.
+
+        Args:
+            controller: Controller instance for commissioning and ACL configuration.
+            fabric_id: Fabric index to associate with the Provider.
+            requestor_node_id: Node ID of the OTA Requestor (DUT).
+            provider_node_id: Node ID of the OTA Provider.
+            provider_discriminator: Discriminator used for Provider discovery.
+            provider_setup_pin_code: Setup PIN code for commissioning.
+            provider_port: Port number for Provider process.
+            provider_ota_file: Path to OTA image file served by Provider.
+            provider_wait_for: Regex to wait for specific Provider log output.
+            provider_queue: Queue used by the Provider.
+            provider_timeout: Timeout for Provider.
+            provider_override_image_uri: ImageURI for the OTA file.
+
+        Returns:
+            provider_proc: Process handle of the launched Provider.
+        """
+
+        logger.info(f"""Prerequisite #1.0 - Provider info:
+            NodeID: {provider_node_id},
+            discriminator: {provider_discriminator},
+            setupPinCode: {provider_setup_pin_code},
+            port: {provider_port},
+            ota_file: {provider_ota_file}""")
+
+        # Step 1: Launch Provider process
+        provider_proc = OTAProviderSubprocess(
+            ota_file=provider_ota_file,
+            discriminator=provider_discriminator,
+            passcode=provider_setup_pin_code,
+            secured_device_port=provider_port,
+            queue=provider_queue,
+            timeout=provider_timeout,
+            override_image_uri=provider_override_image_uri,
+            log_file_path=self.log_file_path,
+            app_path=self.app_path,
+            kvs_path=self.kvs_path,
+        )
+        provider_proc.start(expected_output=provider_wait_for, timeout=300)
+        logger.info(f"Prerequisite #2.0 - Launched Provider PID {provider_proc.p.pid}")
+
+        # Step 2: Commission the Provider
+        resp = await controller.CommissionOnNetwork(
+            nodeId=provider_node_id,
+            setupPinCode=provider_setup_pin_code,
+            filterType=DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=provider_discriminator
+        )
+        logger.info(f'Prerequisite #3 - Provider Commissioning response: {resp}')
+
+        # Step 3: Configure ACLs
+        original_requestor_acls = await self.read_single_attribute(
+            controller=controller,
+            node_id=requestor_node_id,
+            endpoint=0,
+            attribute=Clusters.AccessControl.Attributes.Acl,
+        )
+        original_provider_acls = await self.read_single_attribute(
+            controller=controller,
+            node_id=provider_node_id,
+            endpoint=0,
+            attribute=Clusters.AccessControl.Attributes.Acl,
+        )
+
+        await self.acl_handler.set_ota_acls(
+            requestor_node=requestor_node_id,
+            provider_node=provider_node_id,
+            fabric_index=fabric_id,
+            original_requestor_acls=original_requestor_acls,
+            original_provider_acls=original_provider_acls,
+        )
+        logger.info(f'Prerequisite #4.0 - Configure ACLs on Requestor and Provider')
+
+        # Prerequisite #5.0 - Add OTA Provider to the Requestor
+        await self.add_single_ota_provider(
+            controller=controller,
+            requestor_node_id=requestor_node_id,
+            provider_node_id=provider_node_id,
+        )
+        logger.info(f'Prerequisite #5.0 - Added Provider to Requestor(DUT) DefaultOTAProviders')
+
+        return provider_proc
+
+    async def cleanup_provider(
+        self,
+        controller: ChipDeviceController,
+        requestor_node_id,
+        provider_node_id,
+        provider_proc,
+        original_requestor_acls,
+        original_provider_acls
+    ):
+        """
+        Cleanly shuts down the Provider process.
+        Restores ACLs, expires sessions, stops the provider process, and deletes temporary KVS files.
+
+        Args:
+            controller: Controller object.
+            requestor_node_id: Node ID of the requestor.
+            provider_node_id: Node ID of the provider.
+            provider_proc: Process handle of the provider to stop.
+            original_requestor_acls: Original ACLs for the requestor.
+            original_provider_acls: Original ACLs for the provider.
+
+        Returns:
+            None
+        """
+        # Clean Provider ACL
+        await self.acl_handler.write_acl(provider_node_id, original_provider_acls)
+
+        # Expire sessions
+        controller.ExpireSessions(provider_node_id)
+
+        # Clean Requestor ACL
+        await self.acl_handler.write_acl(requestor_node_id, original_requestor_acls)
+
+        # Kill Provider process
+        provider_proc.terminate()
+
+        # Delete KVS files
+        subprocess.run("rm -rf /tmp/chip_kvs /tmp/chip_kvs-shm /tmp/chip_kvs-wal", shell=True)
+        subprocess.run("rm -rf /tmp/chip_kvs_provider*", shell=True)
