@@ -24,10 +24,10 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
+from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
 from matter.testing.matter_testing import MatterBaseTest
-from matter.clusters.Types import NullValue
 
 logger = logging.getLogger(__name__)
 
@@ -38,12 +38,19 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
     current_provider_app_proc: Union[OTAProviderSubprocess, None] = None
     current_requestor_app_proc: Union[OTAProviderSubprocess, None] = None
 
-    def commission_provider(self, **kwargs):
-        self.launch_provider_app(kwargs.version, kwargs.extra_arguments, kwargs.log_file)
-        self.write_ota_providers(kwargs.controller, kwargs.provider_node_id, kwargs.endpoint)
-        self.create_acl_entry(kwargs.controller, kwargs.provider_node_id, kwargs.requestor_node_id)
+    async def commission_provider(self, **kwargs):
+        self.launch_provider_app(kwargs['version'], kwargs['extra_arguments'], kwargs['log_file'])
+        controller = kwargs['controller']
+        await controller.CommissionOnNetwork(
+            nodeId=kwargs['provider_node_id'],
+            setupPinCode=kwargs['setup_pincode'],
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=kwargs['discriminator']
+        )
+        await self.write_ota_providers(controller, kwargs['provider_node_id'], kwargs['endpoint'])
+        await self.create_acl_entry(controller, kwargs['provider_node_id'], kwargs['requestor_node_id'])
 
-    def launch_provider_app(self, version: int = 2, extra_args: list = [], log_file: str = "/tmp/provider.log", expected_output: str = "Status: Satisfied"):
+    def launch_provider_app(self, version: int = 2, extra_args: list = [], log_file: Optional[str] = None, expected_output: str = "Status: Satisfied"):
         """Launch the provider app using the OTAProviderSubprocess.
 
         Args:
@@ -69,10 +76,13 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         ota_image_path = OtaImagePath(path=ota_image)
         # Ideally we send the logs to a fixed location to avoid conflicts
-        now = datetime.now()
-        ts = int(now.timestamp())
-        provider_log = f'/tmp/provider_{ts}.log'
-        logger.info(f"WRITING LOGS AT : {provider_log}")
+        log_file = "/tmp/provider.log"
+        if log_file is None:
+            now = datetime.now()
+            ts = int(now.timestamp())
+            log_file = f'/tmp/provider_{ts}.log'
+        logger.info(f"Writing provider logs at : {log_file}")
+        # Launch the subprocess
         proc = OTAProviderSubprocess(
             ota_app,
             storage_dir='/tmp',
@@ -81,8 +91,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             passcode=2321,
             ota_source=ota_image_path,
             extra_args=extra_args,
-            log_file=provider_log,
-            err_log_file=provider_log)
+            log_file=log_file,
+            err_log_file=log_file)
         proc.start(
             expected_output=expected_output,
             timeout=10)
@@ -90,7 +100,13 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         self.current_provider_app_proc = proc
         logger.info(f"Provider stareted with  {self.current_provider_app_proc.get_pid()}")
 
-    async def announce_ota_provider(self, controller: ChipDeviceCtrl, provider_node_id: int,  requestor_node_id: int, reason: Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum = Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable):
+    async def announce_ota_provider(self,
+                                    controller: ChipDeviceCtrl,
+                                    provider_node_id: int,
+                                    requestor_node_id: int,
+                                    reason: Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum = Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable,
+                                    vendor_id: int = 0xFFF1,
+                                    endpoint=0):
         """ Announce the OTA provider that a software update is requested.
 
         Args:
@@ -104,17 +120,17 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         """
         cmd_announce_ota_provider = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
             providerNodeID=provider_node_id,
-            vendorID=0xFFF1,
+            vendorID=vendor_id,
             announcementReason=reason,
             metadataForNode=None,
-            endpoint=0
+            endpoint=endpoint
         )
         logger.info("Sending AnnounceOTA Provider Command")
         cmd_resp = await self.send_single_cmd(
             cmd=cmd_announce_ota_provider,
             dev_ctrl=controller,
             node_id=requestor_node_id,
-            endpoint=0,
+            endpoint=endpoint,
         )
         logger.info(f"Announce command sent {cmd_resp}")
         return cmd_resp
@@ -200,7 +216,12 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         return ota_image_info
 
-    def verfy_state_transition_event(self, event_report: Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, previous_state, new_state, target_version: Optional[int] = None, reason: Optional[int] = None):
+    def verfy_state_transition_event(self,
+                                     event_report: Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
+                                     previous_state,
+                                     new_state,
+                                     target_version: Optional[int] = None,
+                                     reason: Optional[int] = None):
         logger.info(f"Verifying the event {event_report}")
         asserts.assert_equal(event_report.previousState, previous_state, f"Previous state was not {previous_state}")
         asserts.assert_equal(event_report.newState,  new_state, f"New state is not {new_state}")
