@@ -39,7 +39,21 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
     current_requestor_app_proc: Union[OTAProviderSubprocess, None] = None
 
     async def commission_provider(self, **kwargs):
-        self.launch_provider_app(kwargs['version'], kwargs['extra_arguments'], kwargs['log_file'])
+        """Launche provider, then comission provider and finally configure the provider and requestor to be ready for announce.
+            Args:
+            controller:
+            requestor_node_id:
+            provider_node_id:
+            endpoint:
+            discriminator:
+            setup_pincode:
+            extra_args:
+            log_file
+        """
+        log_file = None
+        if kwargs.get('log_file') is not None:
+            log_file = kwargs.get('log_file')
+        self.launch_provider_app(kwargs['version'], kwargs['extra_arguments'], log_file)
         controller = kwargs['controller']
         await controller.CommissionOnNetwork(
             nodeId=kwargs['provider_node_id'],
@@ -76,7 +90,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         ota_image_path = OtaImagePath(path=ota_image)
         # Ideally we send the logs to a fixed location to avoid conflicts
-        log_file = "/tmp/provider.log"
+
         if log_file is None:
             now = datetime.now()
             ts = int(now.timestamp())
@@ -222,6 +236,15 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                                      new_state,
                                      target_version: Optional[int] = None,
                                      reason: Optional[int] = None):
+        """Verify the values of the StateTransitionEvent from the EventHandler given the provided arguments.
+
+        Args:
+            event_report (Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition): StateTransition Event report to verify.
+            previous_state (UpdateStateEnum:int): Int or UpdateStateEnum value for the previous state.
+            new_state (UpdateStateEnum:int): Int or UpdateStateEnum value for the new or current state.
+            target_version (Optional[int], optional): Software version to verify if not provided ignore this check.. Defaults to None.
+            reason (Optional[int], optional): UpdateStateEnum reason of the event, if not provided ignore. Defaults to None.
+        """
         logger.info(f"Verifying the event {event_report}")
         asserts.assert_equal(event_report.previousState, previous_state, f"Previous state was not {previous_state}")
         asserts.assert_equal(event_report.newState,  new_state, f"New state is not {new_state}")
