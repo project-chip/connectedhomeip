@@ -21,20 +21,6 @@ class ImageListPath:
     def ota_args(self) -> List[str]: ...
 
 
-@dataclass
-class OtaImagePath:
-    path: str
-    @property
-    def ota_args(self) -> List[str]: ...
-
-
-@dataclass
-class ImageListPath:
-    path: str
-    @property
-    def ota_args(self) -> List[str]: ...
-
-
 class AppServerSubprocess(Subprocess):
     PREFIX: bytes
     def __init__(self, app: str, storage_dir: str, discriminator: int,
