@@ -393,7 +393,7 @@ void TlsCertificateManagementServer::HandleProvisionClientCertificate(HandlerCon
         ReturnOnFailure(Crypto::IsCertificateValidAtCurrentTime(cert),
                         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
     }
-    ReturnOnFailure(srcIter.GetStatus(), ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+    ReturnOnFailure(srcIter.GetStatus(), ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidAction));
 
     auto fabric = ctx.mCommandHandler.GetAccessingFabricIndex();
     DataModel::Nullable<Tls::TLSCCDID> foundId;

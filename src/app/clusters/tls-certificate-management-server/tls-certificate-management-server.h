@@ -36,7 +36,7 @@ class TlsCertificateManagementDelegate;
 
 class TlsCertificateManagementServer : private AttributeAccessInterface,
                                        private CommandHandlerInterface,
-                                       private chip::FabricTable::Delegate
+                                       private FabricTable::Delegate
 {
 public:
     /**
