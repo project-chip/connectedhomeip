@@ -54,7 +54,7 @@ class AppServerSubprocess(Subprocess):
     PREFIX = b"[SERVER]"
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: str = None):
+                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: Optional[str] = None):
         # Create a temporary KVS file and keep the descriptor to avoid leaks.
         # self.kvs_fd, kvs_path = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")
 
@@ -161,12 +161,12 @@ class OTAProviderSubprocess(AppServerSubprocess):
         discriminator: int,
         passcode: int,
         secured_device_port: int,
-        queue: str = None,
-        timeout: int = None,
-        override_image_uri: str = None,
-        log_file_path: str = "provider.log",
-        app_path: str = None,
-        kvs_path: str = None,
+        queue: Optional[str] = None,
+        timeout: Optional[int] = None,
+        override_image_uri: Optional[str] = None,
+        log_file_path: Optional[str] = "provider.log",
+        app_path: Optional[str] = None,
+        kvs_path: Optional[str] = None,
     ):
         """
         Initialize OTA Provider with hardcoded KVS path, log file, and extra args.
@@ -228,7 +228,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
             f.flush()
         return b""  # must return bytes, not None
 
-    def start(self, expected_output: str = None, timeout: int = 30):
+    def start(self, expected_output: Optional[str] = None, timeout: Optional[int] = 30):
         """Override start to attach log processing callback."""
         self.output_cb = self._process_output
         super().start(expected_output=expected_output, timeout=timeout)
