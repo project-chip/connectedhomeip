@@ -24,7 +24,7 @@ class ImageListPath:
 class AppServerSubprocess(Subprocess):
     PREFIX: bytes
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: List[str] = ...) -> None: ...
+                 passcode: int, port: int = 5540, extra_args: List[str] = ..., kvs_path: Optional[str] = None) -> None: ...
 
 
 class IcdAppServerSubprocess(AppServerSubprocess):
@@ -60,3 +60,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
     def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int,
                          requestor_node_id: Optional[int] = None) -> Any: ...
+
+    def start(self, expected_output: Optional[str] = None, timeout: int = 30) -> None: ...
+
+    def _process_output(self, line: bytes, is_stderr: bool) -> bytes: ...
