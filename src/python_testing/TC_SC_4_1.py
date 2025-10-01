@@ -61,6 +61,9 @@ Test Plan
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securechannel.adoc#341-tc-sc-41-commissionable-node-discovery-dut_commissionee
 '''
 
+TCP_PICS_STR = "MCORE.SC.TCP"
+
+
 class TC_SC_4_1(MatterBaseTest):
 
     def steps_TC_SC_4_1(self):
@@ -107,28 +110,74 @@ class TC_SC_4_1(MatterBaseTest):
         )
 
     @staticmethod
-    async def is_commissionable_service_present() -> tuple[bool, Any | None]:
-        # Get DUT's commissionable service
-        commissionable_services = await MdnsDiscovery().get_commissionable_services(log_output=True)
+    async def is_commissionable_service_ptr_present() -> tuple[bool, Any | None]:
+        mdns = MdnsDiscovery()
 
-        # Verify presence of DUT's comissionable service
-        if len(commissionable_services) > 0:
-            return True, commissionable_services[0]
+        # Browse for DUT's commissionable service
+        await mdns.discover(
+            service_types=[MdnsServiceType.COMMISSIONABLE.value],
+            log_output=True
+        )
+
+        # Filter for commissionable service type
+        commissionable_services_ptr = mdns._discovered_services.get(MdnsServiceType.COMMISSIONABLE.value, [])
+
+        # Verify presence of DUT's comissionable service PTR record and return if present
+        if len(commissionable_services_ptr) > 0:
+            return True, commissionable_services_ptr[0]
 
         return False, None
 
-    async def verify_commissionable_node_dns_sd_advertisements(self, commissionable_service: MdnsServiceInfo, expected_cm: str) -> None:
+    async def get_commissionable_node_dns_sd_advertisements_txt(self) -> MdnsServiceInfo:
+        mdns = MdnsDiscovery()
+
+        # Get DUT's commissionable service
+        is_cs_ptr_present, commissionable_service_ptr = await self.is_commissionable_service_ptr_present()
+        asserts.assert_true(is_cs_ptr_present, "DUT's commissionable node services not present")
+
+        # TH performs a query for the SRV record against the commissionable service service name.
+        srv_record = await mdns.get_srv_record(
+            service_name=commissionable_service_ptr.service_name,
+            service_type=MdnsServiceType.COMMISSIONABLE.value,
+            log_output=True
+        )
+
+        # Verify SRV record is returned
+        srv_record_returned = srv_record is not None and srv_record.service_name == commissionable_service_ptr.service_name
+        asserts.assert_true(srv_record_returned, "SRV record was not returned")
+
+        # TH performs a query for the TXT record against the commissionable service service name.
+        # Verify TXT record is returned if required
+        txt_record = await mdns.get_txt_record(
+            service_name=commissionable_service_ptr.service_name,
+            service_type=MdnsServiceType.COMMISSIONABLE.value,
+            log_output=True
+        )
+
+        # Request the TXT record. The device may opt not to return a TXT record if there are no mandatory TXT keys
+        txt_record_returned = txt_record is not None and txt_record.txt is not None and bool(
+            txt_record.txt)
+        txt_record_required = self.supports_icd or self.check_pics(TCP_PICS_STR)
+
+        if txt_record_required:
+            asserts.assert_true(txt_record_returned, "TXT record is required and was not returned or contains no values")
+
+        return txt_record
+
+    async def verify_commissionable_node_dns_sd_advertisements_txt(self, txt_record: MdnsServiceInfo, expected_cm: str) -> None:
         # Verify DUT's commissionable service is a valid DNS-SD instance name
         # (64-bit randomly selected ID expressed as a sixteen-char hex string with capital letters)
-        assert_valid_commissionable_instance_name(commissionable_service.instance_name)
+        assert_valid_commissionable_instance_name(txt_record.instance_name)
 
+        # TODO: Also handle for Thread, .local can be different
+        # TODO: how to check if commissioned by eth, wifi, thread?
         # Verify DUT's commissionable service service type is '_matterc._udp' and service domain '.local.'
-        assert_is_commissionable_type(commissionable_service.service_type)
+        assert_is_commissionable_type(txt_record.service_type)
 
         # Verify target hostname is derived from the 48bit or 64bit MAC address
         # expressed as a twelve or sixteen capital letter hex string. If the MAC
         # is randomized for privacy, the randomized version must be used each time.
-        assert_valid_hostname(commissionable_service.hostname)
+        assert_valid_hostname(txt_record.hostname)
 
         # Get commissionable subtypes
         subtypes = await MdnsDiscovery().get_commissionable_subtypes(log_output=True)
@@ -154,7 +203,6 @@ class TC_SC_4_1(MatterBaseTest):
 
         # If the commissionable devtype subtype is present, validate it's a
         # 32-bit variable length decimal number in ASCII without leading zeros
-        # TODO: Update test plan to inclide "32-bit"
         devtype_subtype = next((s for s in subtypes if s.startswith('_T')), None)
         if devtype_subtype:
             assert_valid_devtype_subtype(devtype_subtype)
@@ -166,37 +214,37 @@ class TC_SC_4_1(MatterBaseTest):
         # Verify D key is present, which represents the discriminator
         # and must be encoded as a variable-length decimal value with up to 4
         # digits omitting any leading zeros
-        d_key = commissionable_service.txt.get('D')
+        d_key = txt_record.txt.get('D')
         asserts.assert_is_not_none(d_key, "D key must be present.")
         assert_valid_d_key(d_key)
 
         # If VP key is present, verify it contain at least Vendor ID
         # and if Product ID is present, values must be separated by a + sign
-        if 'VP' in commissionable_service.txt:
-            vp_key = commissionable_service.txt['VP']
+        if 'VP' in txt_record.txt:
+            vp_key = txt_record.txt['VP']
             if vp_key:
                 assert_valid_vp_key(vp_key)
 
         # If SAI key is present, SII key must be an unsigned integer with
         # units of milliseconds and shall be encoded as a variable length decimal
         # number in ASCII, omitting leading zeros. Shall not exceed 3600000.
-        if 'SII' in commissionable_service.txt:
-            sii_key = commissionable_service.txt['SII']
+        if 'SII' in txt_record.txt:
+            sii_key = txt_record.txt['SII']
             if sii_key:
                 assert_valid_sii_key(sii_key)
 
         # If SAI key is present, SAI key must be an unsigned integer with
         # units of milliseconds and shall be encoded as a variable length decimal
         # number in ASCII, omitting leading zeros. Shall not exceed 3600000.
-        if 'SAI' in commissionable_service.txt:
-            sai_key = commissionable_service.txt['SAI']
+        if 'SAI' in txt_record.txt:
+            sai_key = txt_record.txt['SAI']
             if sai_key:
                 assert_valid_sai_key(sai_key)
 
         # - If the SAT key is present, verify that it is a decimal value with
         #   no leading zeros and is less than or equal to 65535
-        if 'SAT' in commissionable_service.txt:
-            sat_key = commissionable_service.txt['SAT']
+        if 'SAT' in txt_record.txt:
+            sat_key = txt_record.txt['SAT']
             if sat_key:
                 assert_valid_sat_key(sat_key)
 
@@ -208,14 +256,16 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Verify that the SAI key is present if the SAT key is present
         asserts.assert_true(
-            'SAT' not in commissionable_service.txt
-            or 'SAI' in commissionable_service.txt,
+            'SAT' not in txt_record.txt
+            or 'SAI' in txt_record.txt,
             "SAI key must be present if SAT key is present."
         )
 
-        # Verify that the CM key is present and is equal to the expected CM value
-        if 'CM' in commissionable_service.txt:
-            cm_key = commissionable_service.txt['CM']
+        # TODO: update to hanble CM=0 or no CM key when in extended discovery
+        # Verify that the CM key is present and is equal to the expected CM value. During Extended
+        # Discovery if active, the CM key can be present or omitted, both meaning CM=0
+        if 'CM' in txt_record.txt:
+            cm_key = txt_record.txt['CM']
             assert_valid_cm_key(cm_key)
             asserts.assert_true(cm_key == expected_cm, f"CM key must be '{expected_cm}', got '{cm_key}'")
         else:
@@ -224,41 +274,41 @@ class TC_SC_4_1(MatterBaseTest):
         # If the DT key is present, it must contain the device type identifier from
         # Data Model Device Types and must be encoded as a variable length decimal
         # ASCII number without leading zeros
-        if 'DT' in commissionable_service.txt:
-            dt_key = commissionable_service.txt['DT']
+        if 'DT' in txt_record.txt:
+            dt_key = txt_record.txt['DT']
             assert_valid_dt_key(dt_key)
 
         # If the DN key is present, DN key must be a UTF-8 encoded string with a maximum length of 32B
-        if 'DN' in commissionable_service.txt:
-            dn_key = commissionable_service.txt['DN']
+        if 'DN' in txt_record.txt:
+            dn_key = txt_record.txt['DN']
             assert_valid_dn_key(dn_key)
 
         # If the RI key is present, key RI must include the Rotating Device Identifier
         # encoded as an uppercase string with a maximum length of 100 chars (each octet
         # encoded as a 2-digit hex number, max 50 octets)
-        if 'RI' in commissionable_service.txt:
-            ri_key = commissionable_service.txt['RI']
+        if 'RI' in txt_record.txt:
+            ri_key = txt_record.txt['RI']
             assert_valid_ri_key(ri_key)
 
         # If the PH key is present, key PH must be encoded as a variable-length decimal number
         # in ASCII text, omitting any leading zeros. If present value must be different of 0
-        if 'PH' in commissionable_service.txt:
-            ph_key = commissionable_service.txt['PH']
+        if 'PH' in txt_record.txt:
+            ph_key = txt_record.txt['PH']
             assert_valid_ph_key(ph_key)
 
         # TODO: Fix PI key present but null/None ??
         # If the PI key is present, key PI must be encoded as a valid UTF-8 string
         # with a maximum length of 128 bytes
-        # if 'PI' in commissionable_service.txt:
-        #     pi_key = commissionable_service.txt['PI']
+        # if 'PI' in txt_record.txt:
+        #     pi_key = txt_record.txt['PI']
             # assert_valid_pi_key(pi_key)
 
         # TH performs a query for the AAAA record against the target
-        # listed in the Commissionable Service SRV record.
-        hostname = commissionable_service.hostname
+        # hostname listed in the Commissionable Service SRV record.
+        hostname = txt_record.hostname
         quada_records = await MdnsDiscovery().get_quada_records(hostname=hostname, log_output=True)
 
-        # Verify at least 1 AAAA record is returned
+        # Verify that at least 1 AAAA record is returned for each IPv6 a address
         asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{hostname}'")
 
     def desc_TC_TC_SC_4_1(self) -> str:
@@ -269,6 +319,7 @@ class TC_SC_4_1(MatterBaseTest):
         self.endpoint = self.get_endpoint(default=1)
         obcw_cmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
         revoke_cmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
+        mdns = MdnsDiscovery()
 
         # *** STEP 1 ***
         # DUT is Commissioned.
@@ -277,7 +328,7 @@ class TC_SC_4_1(MatterBaseTest):
         # *** STEP 2 ***
         # TH reads from the DUT the ServerList attribute from the Descriptor cluster on EP0.
         #   - If the ICD Management cluster ID (70,0x46) is present in the list, set supports_icd to true, otherwise set supports_icd to false.
-        #   - If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold.
+        #   - If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold_ms.
         self.step(2)
         ep0_servers = await self.get_descriptor_server_list()
 
@@ -297,13 +348,12 @@ class TC_SC_4_1(MatterBaseTest):
         #   - Close commissioning window
         self.step(3)
         await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcw_cmd, timedRequestTimeoutMs=6000)
-        
-        # Get DUT's commissionable service
-        is_cs_present, commissionable_service = await self.is_commissionable_service_present()
-        asserts.assert_true(is_cs_present, "DUT's commissionable node services not present")
+
+        # Get DUT's commissionable DNS-SD advertisements
+        txt_record = await self.get_commissionable_node_dns_sd_advertisements_txt()
 
         # Verify DUT Commissionable Node Discovery service advertisements
-        await self.verify_commissionable_node_dns_sd_advertisements(commissionable_service=commissionable_service, expected_cm="1")
+        await self.verify_commissionable_node_dns_sd_advertisements_txt(txt_record=txt_record, expected_cm="1")
 
         # Close commissioning window
         await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revoke_cmd, timedRequestTimeoutMs=6000)
@@ -322,13 +372,12 @@ class TC_SC_4_1(MatterBaseTest):
             discriminator=3840,
             option=1
         )
-        
-        # Get DUT's commissionable service
-        is_cs_present, commissionable_service = await self.is_commissionable_service_present()
-        asserts.assert_true(is_cs_present, "DUT's commissionable node services not present")
+
+        # Get DUT's commissionable DNS-SD advertisements
+        txt_record = await self.get_commissionable_node_dns_sd_advertisements_txt()
 
         # Verify DUT Commissionable Node Discovery service advertisements
-        await self.verify_commissionable_node_dns_sd_advertisements(commissionable_service=commissionable_service, expected_cm="2")
+        await self.verify_commissionable_node_dns_sd_advertisements_txt(txt_record=txt_record, expected_cm="2")
 
         # Close commissioning window
         await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revoke_cmd, timedRequestTimeoutMs=6000)
@@ -340,12 +389,18 @@ class TC_SC_4_1(MatterBaseTest):
         #   - If so:
         #       - Verify DUT Commissionable Node Discovery service advertisements
         self.step(5)
-        is_cs_present, commissionable_service = await self.is_commissionable_service_present()
-        if is_cs_present:
+        is_cs_ptr_present, _ = await self.is_commissionable_service_ptr_present()
+        if is_cs_ptr_present:
             logging.info("DUT is in Extended Discovery mode")
-            await self.verify_commissionable_node_dns_sd_advertisements(commissionable_service=commissionable_service, expected_cm="0")
+
+            # Get DUT's commissionable DNS-SD advertisements
+            txt_record = await self.get_commissionable_node_dns_sd_advertisements_txt()
+
+            # Verify DUT Commissionable Node Discovery service advertisements
+            await self.verify_commissionable_node_dns_sd_advertisements_txt(txt_record=txt_record, expected_cm="0")
         else:
             logging.info("DUT isn't in Extended Discovery mode")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
