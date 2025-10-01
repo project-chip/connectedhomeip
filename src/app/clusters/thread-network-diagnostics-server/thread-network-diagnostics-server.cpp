@@ -69,8 +69,8 @@ CHIP_ERROR ThreadDiagnosticsAttrAccess::Read(const ConcreteReadAttributePath & a
     {
     case Attributes::ClusterRevision::Id: {
         ReturnErrorOnFailure(aEncoder.Encode(ThreadNetworkDiagnostics::kRevision));
+        break;
     }
-    break;
 
     case ThreadNetworkDiagnostics::Attributes::NeighborTable::Id:
     case ThreadNetworkDiagnostics::Attributes::RouteTable::Id:
