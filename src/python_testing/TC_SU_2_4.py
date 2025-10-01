@@ -42,19 +42,15 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
+
 import logging
-from subprocess import run
-from time import sleep
 
 from mobly import asserts
 from TC_SUBase import SoftwareUpdateBaseTest
 
 import matter.clusters as Clusters
-from matter import ChipDeviceCtrl
-from matter.clusters.Types import NullValue
-from matter.testing.event_attribute_reporting import EventSubscriptionHandler, AttributeSubscriptionHandler
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main, AttributeMatcher
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import AttributeMatcher, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
