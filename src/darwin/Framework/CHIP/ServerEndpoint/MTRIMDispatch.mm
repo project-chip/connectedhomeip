@@ -77,27 +77,27 @@ void MatterDescriptorClusterShutdownCallback(EndpointId endpointId);
 
 void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
+    assertChipStackLockedByCurrentThread();
+
+    // No-op: For OTA we don't use the functions in CodegenIntegration
+    // because we use the gOtaProviderServer and the functions defined here.
     switch (clusterId) {
     case app::Clusters::Descriptor::Id:
         MatterDescriptorClusterInitCallback(endpoint);
         break;
-    default:
-        // No-op: For OTA we don't use the functions in CodegenIntegration
-        // because we use the gOtaProviderServer and the functions defined here.
-        assertChipStackLockedByCurrentThread();
     }
 }
 
 void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId)
 {
+    assertChipStackLockedByCurrentThread();
+    
+    // No-op: For OTA we don't use the functions in CodegenIntegration
+    // because we use the gOtaProviderServer and the functions defined here.
     switch (clusterId) {
     case app::Clusters::Descriptor::Id:
         MatterDescriptorClusterShutdownCallback(endpoint);
         break;
-    default:
-        // No-op: For OTA we don't use the functions in CodegenIntegration
-        // because we use the gOtaProviderServer and the functions defined here.
-        assertChipStackLockedByCurrentThread();
     }
 }
 
