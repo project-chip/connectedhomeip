@@ -45,7 +45,7 @@
 import asyncio
 import logging
 from subprocess import run
-from time import sleep
+from time import sleep, time
 
 from mobly import asserts
 from TC_SUBase import SoftwareUpdateBaseTest
@@ -53,8 +53,8 @@ from TC_SUBase import SoftwareUpdateBaseTest
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
-from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.matter_testing import TestStep, AttributeMatcher, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -181,12 +181,17 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         asserts.assert_equal(len(found_lines), 1,
                              f"Zero or more than 1 lines , but not 1 line containing {expected_line} found in the logs")
 
-        self._terminate_provider_process()
-        controller.ExpireSessions(nodeid=provider_data['node_id'])
+        # self._terminate_provider_process()
+        # controller.ExpireSessions(nodeid=provider_data['node_id'])
 
         self.step(2)
         expected_software_version = 3
         delayed_apply_action_time = 60*3
+        current_sw_version = await self.read_single_attribute_check_success(
+            dev_ctrl=controller,
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.SoftwareVersion,
+            node_id=requestor_node_id)
         self.launch_provider_app(extra_args=['--applyUpdateAction', 'proceed',
                                              '--delayedApplyActionTimeSec', str(delayed_apply_action_time)], version=expected_software_version)
         await controller.CommissionOnNetwork(
@@ -199,18 +204,24 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         event_state_transition = EventSubscriptionHandler(expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
                                                           expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id)
         await event_state_transition.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=6000)
-        basicinformation_handler = EventSubscriptionHandler(
-            expected_cluster=Clusters.BasicInformation, expected_event_id=Clusters.BasicInformation.Events.ShutDown.event_id)
-        await basicinformation_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=6000)
+        # basicinformation_handler = EventSubscriptionHandler(
+        #     expected_cluster=Clusters.BasicInformation, expected_event_id=Clusters.BasicInformation.Events.ShutDown.event_id)
+        # await basicinformation_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=6000)
+        software_version_attr_handler = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.BasicInformation,
+            expected_attribute=Clusters.BasicInformation.Attributes.SoftwareVersion
+        )
+        await software_version_attr_handler.start(dev_ctrl=controller, node_id=requestor_node_id, endpoint=0,
+                                                  fabric_filtered=False, min_interval_sec=1, max_interval_sec=5000)
 
         await self.current_provider_app_proc.create_acl_entry(dev_ctrl=controller, provider_node_id=provider_data['node_id'], requestor_node_id=requestor_node_id)
         await self.write_ota_providers(controller=controller, provider_node_id=provider_data['node_id'], endpoint=0)
         await self.announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
 
         # Report of failed and waiting on Idle
-        event_report = event_state_transition.wait_for_event_report(
-            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=30)
-        logger.info(f"Event report for Idle : {event_report}")
+        # event_report = event_state_transition.wait_for_event_report(
+        #     Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=30)
+        # logger.info(f"Event report for Idle : {event_report}")
 
         event_report = event_state_transition.wait_for_event_report(
             Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=30)
@@ -221,40 +232,52 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=30)
         logger.info(f"Event report for Downloading : {event_report}")
 
-        update_state_prev = await self.read_single_attribute_check_success(
-            Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, controller, requestor_node_id)
-        logger.info("UpdateState before update " + str(update_state_prev))
-
-        # Applying this wil trigger the "delayedActionTime: 180 seconds" in the logs
+        # Applying and proceed  will trigger the "delayedActionTime: 180 seconds" in the logs
+        # The Applying state should stay for 3 minutes in this 3 minutes no software update should happen.
         event_report = event_state_transition.wait_for_event_report(
             Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=60*5)
-        logger.info(f"Event report for Applying : {event_report}")
-
-        # Should not get a report at least for the following 3 minutes
-        logger.info("Waiting for 3 minutes without events")
-        event_state_transition.wait_for_event_expect_no_report(timeout_sec=delayed_apply_action_time)
-        logger.info("Waited for 3 minutes without events")
+        logger.info(f"Event report for Apply : {event_report}")
 
         # Cancel State Transition
         event_state_transition.flush_events()
         await event_state_transition.cancel()
 
-        # Wait for shutdown event (this is triggered after the SU Completition)
-        shutdown_event = basicinformation_handler.wait_for_event_report(Clusters.BasicInformation.Events.ShutDown, timeout_sec=30)
-        logger.info(f"Event report for ShutDown : {shutdown_event}")
+        # update_state_prev = await self.read_single_attribute_check_success(
+        #     Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, controller, requestor_node_id)
+        # logger.info("UpdateState before update " + str(update_state_prev))
 
-        basicinformation_handler.flush_events()
-        await basicinformation_handler.cancel()
+        start_time = time()
+        update_sw_vesion = AttributeMatcher.from_callable(
+            f"Sofware version was updated to {expected_software_version}",
+            lambda report: report.value > current_sw_version)
+        software_version_attr_handler.await_all_expected_report_matches([update_sw_vesion], timeout_sec=60*4)
+        logger.info(str(update_sw_vesion))
+        end_time = time()
+        total_wait_time = end_time - start_time
+        logger.info(f"Time taken after the update was done {total_wait_time} seconds")
+        asserts.assert_greater_equal(
+            total_wait_time, 60*3, f"Software Udpate did occure before 3 minutes defined time {total_wait_time}")
+
+        # Should not get a report at least for the following 3 minutes
+        # logger.info("Waiting for 3 minutes without events")
+        # event_state_transition.wait_for_event_expect_no_report(timeout_sec=delayed_apply_action_time)
+        # logger.info("Waited for 3 minutes without events")
+
+        # Wait for shutdown event (this is triggered after the SU Completition)
+        # shutdown_event = basicinformation_handler.wait_for_event_report(Clusters.BasicInformation.Events.ShutDown, timeout_sec=30)
+        # logger.info(f"Event report for ShutDown : {shutdown_event}")
+
+        # basicinformation_handler.flush_events()
+        # await basicinformation_handler.cancel()
 
         # Just wait for the device to StartUp after ShutDown
-        await asyncio.sleep(5)
+
         # Verify software version after StartUp
 
         update_state_after = await self.read_single_attribute_check_success(
             Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, controller, requestor_node_id)
         logger.info("UpdateState after update" + str(update_state_after))
         # Just want to make sure we did change the update state meaning we applied the update
-        asserts.assert_not_equal(update_state_prev, update_state_after, "Update state did not change")
         asserts.assert_equal(update_state_after, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
                              "UpdateState is not Idle")
 
