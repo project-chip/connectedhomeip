@@ -91,12 +91,6 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
         await self.validate_allocated_audio_stream(audioStreamID)
         await self.validate_allocated_video_stream(videoStreamID)
 
-        # Create WebRTC manager and peer for receiving End commands
-        webrtc_manager = WebRTCManager(event_loop=self.event_loop)
-        webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(
-            node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint
-        )
-
         self.step(2)
         # Send multiple ProvideOffer commands to exhaust the DUT's capacity
         logger.info("Starting to send ProvideOffer commands to exhaust DUT capacity")
@@ -181,8 +175,6 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
             logger.info(f"Correctly received RESOURCE_EXHAUSTED status: {e.status}")
 
         logger.info("Successfully validated ProvideOffer resource exhaustion behavior")
-
-        await webrtc_manager.close_all()
 
 
 if __name__ == "__main__":

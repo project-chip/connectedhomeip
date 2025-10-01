@@ -43,7 +43,6 @@ from TC_WEBRTCPTestBase import WEBRTCPTestBase
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
-from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
