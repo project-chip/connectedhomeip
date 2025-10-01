@@ -3,8 +3,8 @@
 from dataclasses import dataclass
 from typing import Any, List, Optional, Union
 
-from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.testing.tasks import Subprocess
+from matter.ChipDeviceCtrl import ChipDeviceController
 
 
 @dataclass
