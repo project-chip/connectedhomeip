@@ -58,11 +58,12 @@ class AppServerSubprocess(Subprocess):
     PREFIX = b"[SERVER]"
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: str = None, f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
+                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: Optional[str] = None, f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
         # Create a temporary KVS file and keep the descriptor to avoid leaks.
 
         if kvs_path is not None:
-            self.kvs_fd, kvs_path = kvs_path
+            self.kvs_fd = None
+            kvs_path = kvs_path
         else:
             self.kvs_fd, kvs_path = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")
         try:
@@ -83,8 +84,9 @@ class AppServerSubprocess(Subprocess):
                              output_cb=lambda line, is_stderr: self.PREFIX + line, f_stdout=f_stdout, f_stderr=f_stderr)
         except Exception:
             # Do not leak KVS file descriptor on failure
-            os.close(self.kvs_fd)
-            raise
+            if self.kvs_fd is not None:
+                os.close(self.kvs_fd)
+                raise
 
     def __del__(self):
         # Do not leak KVS file descriptor.
@@ -161,7 +163,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5541, extra_args: list[str] = [], kvs_path: str = None, log_file: Union[str, BinaryIO] = stdout.buffer, err_log_file: Union[str, BinaryIO] = stderr.buffer):
+                 port: int = 5541, extra_args: list[str] = [], kvs_path: Optional[str] = None, log_file: Union[str, BinaryIO] = stdout.buffer, err_log_file: Union[str, BinaryIO] = stderr.buffer):
         """Initialize the OTA Provider subprocess.
 
         Args:
