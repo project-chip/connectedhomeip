@@ -2382,7 +2382,7 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
             VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
                                                     Clusters::IcdManagement::Attributes::FeatureMap::Id));
             VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                                Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::Id));
+                                                    Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::Id));
             VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
                                                     Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id));
             VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
