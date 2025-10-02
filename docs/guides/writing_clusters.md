@@ -101,22 +101,23 @@ the default target name is important.
 
 #### `app_config_dependent_sources`
 
-There are two code generation integration support files: one for `gn` and one
-for `cmake`. The way these work is that
+There are two code generation integration support files: one for `GN` and one
+for `CMake`. The way these work is that
 `chip_data_model.gni`/`chip_data_model.cmake` will include these files and
 bundle _ALL_ referenced sources into _ONE SINGLE SOURCE SET_, together with
 ember code-generated settings (e.g. `endpoint_config.h` and similar files that
 are application-specific)
 
-As a result, there will be a difference between `GN` and `cmake`:
+As a result, there will be a difference between `.gni` and `.cmake`:
 
--   `app_config_dependent_sources.gn` will typically just contain
+-   `app_config_dependent_sources.gni` will typically just contain
     `CodegenIntegration.cpp` and any other helper/compatibility layers (e.g.
     `CodegenIntegration.h` if applicable)
 -   `app_config_dependent_sources.cmake` will contain all the files that the
-    `gn` file contains PLUS any dependencies that the `BUILD.gn` would pull in
+    `.gni` file contains PLUS any dependencies that the `BUILD.gn` would pull in
     but cmake would not (i.e. dependencies not in the `libCHIP` builds). These
-    extra files are often the `h/cpp` files that were in the `.gn` source set.
+    extra files are often the `*.h/*.cpp` files that were in the `BUILD.gn`
+    source set.
 
 **EXAMPLE** taken from
 ([src/app/clusters/basic-information](https://github.com/project-chip/connectedhomeip/tree/master/src/app/clusters/basic-information)):
