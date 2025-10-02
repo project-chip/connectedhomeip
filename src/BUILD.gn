@@ -91,7 +91,10 @@ if (chip_build_tests) {
       "${chip_root}/src/system/tests",
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/transport/tests",
-      "${chip_root}/src/tracing/esp32_diagnostic_trace/tests",
+      "${chip_root}/src/tracing/esp32_diagnostics/tests",
+      "${chip_root}/src/app/clusters/push-av-stream-transport-server/tests",
+      "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/tests",
+      "${chip_root}/src/app/clusters/zone-management-server/tests",
       "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
       "${chip_root}/src/srp/tests",
     ]
