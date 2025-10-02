@@ -219,6 +219,9 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal(write_status2, Status.UnsupportedAttribute,
                              f"Write to unsupported attribute should return UNSUPPORTED_ATTRIBUTE, got {write_status2}")
 
+
+        self.skip_step(4)
+        # Please see below notes for why test step 4 is currently being skipped until SuppressResponse handling is implemented on the SDK server side (Please see issue https://github.com/project-chip/connectedhomeip/issues/41227)
         """
         // TODO: SuppressResponse handling not yet implemented in the SDK server side (see Issue #41227).
         // Current behavior: server always responds to WriteAttribute even when suppressResponse=true.
@@ -226,7 +229,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         // Test step 4 is skipped until SDK-level fix is implemented.
         // Reference: https://github.com/project-chip/connectedhomeip/issues/41227
 
-        # Check if NodeLabel attribute exists for steps 4 through 6 (DataVersion and SuppressResponse tests)
+        # Check if NodeLabel attribute exists for step 4 (SuppressResponse tests)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
             self.step(4)
             '''
@@ -263,12 +266,11 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             asserts.assert_equal(actual_value, test_value,
                                  f"Attribute should be written. Expected {test_value}, got {actual_value}")
 
+        else:
+            self.skip_step(4)
         """
         # Check if NodeLabel attribute exists for steps 5 and 6 (DataVersion test steps)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
-            self.skip_step(4)
-            # Please see above notes for why test step 4 is currently being skipped until SuppressResponse handling is implemented on the SDK server side (Please see issue https://github.com/project-chip/connectedhomeip/issues/41227)
-
             self.step(5)
             '''
             TH sends a ReadRequest message to the DUT to read any attribute on any cluster.
@@ -344,7 +346,6 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             # Created following follow-up task for the event that the node label attribute does not exist
             # TODO: https://github.com/project-chip/matter-test-scripts/issues/693
             logging.info("NodeLabel not found - this may be a non-commissionable device")
-            self.skip_step(4)
             self.skip_step(5)
             self.skip_step(6)
 
