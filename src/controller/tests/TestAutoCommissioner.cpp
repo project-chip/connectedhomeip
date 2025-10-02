@@ -340,7 +340,6 @@ TEST_F(AutoCommissionerTest, NextStageConfigureTCAcknowledgments)
     EXPECT_EQ(nextStage, kSendPAICertificateRequest);
 }
 
-
 namespace TestCerts {
 /*
  * Test certificates and keys used for AutoCommissioner tests only.
@@ -510,7 +509,6 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_EmptyNOCReturnsInvalidArgument)
 
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
-
 
 TEST_F(AutoCommissionerTest, TrySecondaryNetwork_confirm_true)
 {
@@ -691,4 +689,3 @@ TEST_F(AutoCommissionerTest, IsSecondaryNetworkSupportedCombinations)
     }
 }
 } // namespace
-
