@@ -2539,8 +2539,8 @@ endpoint 0 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster AccessControl {
@@ -2656,8 +2656,8 @@ endpoint 0 {
   }
 
   server cluster DiagnosticLogs {
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command RetrieveLogsRequest;
     handle command RetrieveLogsResponse;
@@ -2758,7 +2758,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 3;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
@@ -2903,8 +2903,8 @@ endpoint 1 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 2 {
@@ -2936,8 +2936,8 @@ endpoint 2 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 3 {
@@ -2969,8 +2969,8 @@ endpoint 3 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 4 {
@@ -3002,8 +3002,8 @@ endpoint 4 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 5 {
@@ -3035,8 +3035,8 @@ endpoint 5 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 6 {
@@ -3068,8 +3068,8 @@ endpoint 6 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 7 {
@@ -3101,8 +3101,8 @@ endpoint 7 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 8 {
@@ -3134,8 +3134,8 @@ endpoint 8 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 9 {
@@ -3167,8 +3167,8 @@ endpoint 9 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 10 {
@@ -3240,8 +3240,8 @@ endpoint 11 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 12 {
@@ -3273,8 +3273,8 @@ endpoint 12 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 13 {
@@ -3306,8 +3306,8 @@ endpoint 13 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 

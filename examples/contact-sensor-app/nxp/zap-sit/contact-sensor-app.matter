@@ -1976,8 +1976,8 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command RetrieveLogsRequest;
     handle command RetrieveLogsResponse;
@@ -2076,7 +2076,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 3;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
@@ -2186,12 +2186,12 @@ endpoint 1 {
 
   server cluster BooleanState {
     emits event StateChange;
-    ram      attribute stateValue default = 0;
+    callback attribute stateValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 

@@ -45,6 +45,7 @@
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
+        "groupcast-cluster.xml",
         "microwave-oven-mode-cluster.xml",
         "microwave-oven-control-cluster.xml",
         "meter-identification-cluster.xml",
@@ -207,7 +208,9 @@
             "MaxPathsPerInvoke",
             "ConfigurationVersion"
         ],
+        "Boolean State": ["ClusterRevision", "FeatureMap", "StateValue"],
         "Bridged Device Basic Information": ["ProductAppearance"],
+        "Binding": ["FeatureMap", "ClusterRevision"],
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": [
             "CountdownTime",
@@ -261,6 +264,7 @@
             "CurrentMode",
             "FeatureMap"
         ],
+        "Diagnostic Logs": ["ClusterRevision", "FeatureMap"],
         "Door Lock": [
             "AliroReaderVerificationKey",
             "AliroReaderGroupIdentifier",
@@ -468,7 +472,8 @@
             "ChannelPage0Mask",
             "OperationalDatasetComponents",
             "ExtAddress",
-            "Rloc16"
+            "Rloc16",
+            "ClusterRevision"
         ],
         "Wi-Fi Network Diagnostics": [
             "BSSID",
@@ -800,6 +805,7 @@
             "FeatureMap"
         ],
         "Camera AV Settings User Level Management": ["MPTZPosition"],
+        "Fixed Label": ["LabelList", "ClusterRevision", "FeatureMap"],
         "Soil Measurement": [
             "SoilMoistureMeasurementLimits",
             "SoilMoistureMeasuredValue",
@@ -818,6 +824,7 @@
             "CurrentThermostatSuggestion",
             "ThermostatSuggestionNotFollowingReason"
         ],
+        "Time Format Localization": ["ClusterRevision"],
         "Zone Management": [
             "MaxUserDefinedZones",
             "MaxZones",

@@ -47,5 +47,5 @@ cp /path/to/auth/key.txt path/to/connectedhomeip/examples/energy-gateway-app/esp
 
 ### Cluster Control
 
--   More examples using chip-repl are demonstrated in
+-   More examples using matter-repl are demonstrated in
     [Energy Gateway Linux](../linux/README.md)

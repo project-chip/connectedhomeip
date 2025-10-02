@@ -23,7 +23,6 @@
 #include "app/server/Server.h"
 #include "controller/InvokeInteraction.h"
 #include "platform/CHIPDeviceLayer.h"
-#include <app/clusters/bindings/bindings.h>
 #include <lib/support/CodeUtils.h>
 
 #if defined(ENABLE_CHIP_SHELL)

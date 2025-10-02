@@ -36,7 +36,6 @@ else
     PW_PATH="$PW_ENVIRONMENT_ROOT/cipd/packages/pigweed"
 fi
 
-set -x
 env
 USE_WIFI=false
 USE_DOCKER=false
@@ -44,6 +43,7 @@ USE_GIT_SHA_FOR_VERSION=true
 GN_PATH="$PW_PATH/gn"
 USE_BOOTLOADER=false
 DOTFILE=".gn"
+VERBOSE_MODE=false
 
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
 USAGE="./scripts/examples/gn_silabs_example.sh <AppRootFolder> <outputFolder> <silabs_board_name> [<Build options>]"
@@ -159,6 +159,8 @@ if [ "$#" == "0" ]; then
             Generate files with SLC for current board and options Requires an SLC-CLI installation or running in Docker.
         --slc_reuse_files
             Use generated files without running slc again.
+        --verbose
+            Add additional logs.
         --bootloader
             Add bootloader to the generated image.
 
@@ -273,6 +275,11 @@ else
                 optArgs+="slc_reuse_files=true "
                 shift
                 ;;
+            --verbose)
+                optArgs+="sl_verbose_mode=true "
+                VERBOSE_MODE=true
+                shift
+                ;;
             --gn_path)
                 if [ -z "$2" ]; then
                     echo "--gn_path requires a path to GN"
@@ -346,8 +353,17 @@ else
     "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --add-export-compile-commands=* --root="$ROOT" --dotfile="$DOTFILE" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
 
     ninja -C "$BUILD_DIR"/
+
     #print stats
     arm-none-eabi-size -A "$BUILD_DIR"/*.out
+
+    if [ "$VERBOSE_MODE" == true ]; then
+        echo "================= Warning!!!!! ================"
+        echo "Verbose mode is enabled. BAUDRATE FOR UART LOGS IS SET TO 921600"
+        echo "Use Simplicity Studio or commander with the following command to set the baudrate:"
+        echo "commander vcom config --baudrate 921600 --handshake rtscts"
+        echo "==============================================="
+    fi
 
     # add bootloader to generated image
     if [ "$USE_BOOTLOADER" == true ]; then

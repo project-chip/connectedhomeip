@@ -4,7 +4,8 @@ click
 colorama
 coloredlogs
 diskcache
-mypy==1.10.1
+mypy==1.16.0
+types-PyYAML
 tabulate
 
 -e ${PW_PROJECT_ROOT}/scripts/py_matter_idl

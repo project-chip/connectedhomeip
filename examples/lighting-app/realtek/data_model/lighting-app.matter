@@ -2548,7 +2548,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 3;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
@@ -2618,8 +2618,8 @@ endpoint 0 {
 
   server cluster FixedLabel {
     callback attribute labelList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster UserLabel {

@@ -62,12 +62,7 @@ using namespace ::chip::DeviceLayer;
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 5000
 #define RESET_TRIGGER_TIMEOUT 1500
 
-#if CONFIG_DAC_KEY_ENC
-#define APP_TASK_STACK_SIZE (8 * 1024)
-#else
 #define APP_TASK_STACK_SIZE (4 * 1024)
-#endif
-
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 #define LOCK_ENDPOINT_ID (1)
