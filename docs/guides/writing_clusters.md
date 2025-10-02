@@ -93,7 +93,7 @@ items:
 
 #### `BUILD.gn`
 
-Will contain a target that is named `<cluster-directory>`, usually a
+This file will contain a target that is named `<cluster-directory>`, usually a
 `source_set`. This file gets referenced from
 [src/app/chip_data_model.gni](https://github.com/project-chip/connectedhomeip/blob/master/src/app/chip_data_model.gni)
 by adding a dependency as `deps += [ "${_app_root}/clusters/${cluster}" ]`, so
