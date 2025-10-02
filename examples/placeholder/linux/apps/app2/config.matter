@@ -9230,7 +9230,7 @@ endpoint 0 {
     callback attribute ACCoilTemperature;
     callback attribute ACCapacityformat default = 0x00;
     ram      attribute featureMap default = 0x000b;
-    ram      attribute clusterRevision default = 6;
+    callback attribute clusterRevision;
   }
 
   server cluster ThermostatUserInterfaceConfiguration {
