@@ -446,7 +446,7 @@ class TC_SU_2_2(MatterBaseTest):
             fabric_filtered=False,
             min_interval_sec=1,
             max_interval_sec=1,
-            keepSubscriptions=True
+            keepSubscriptions=False
         )
 
         # ------------------------------------------------------------------------------------
@@ -590,7 +590,7 @@ class TC_SU_2_2(MatterBaseTest):
             fabric_filtered=False,
             min_interval_sec=1,
             max_interval_sec=1,
-            keepSubscriptions=True
+            keepSubscriptions=False
         )
 
         # ------------------------------------------------------------------------------------
@@ -646,7 +646,7 @@ class TC_SU_2_2(MatterBaseTest):
             if "first_idle" in observed_states and "second_idle" not in observed_states:
                 # Immediate validation: fail if non-Idle state observed
                 if val != Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle:
-                    logger.info(f'{step_number_s3}: Step #3.4 - OTA UpdateState (updateNotAvailable) observed in 120s interval: {val}')
+                    logger.info(f'{step_number_s3}: Step #3.2 - OTA UpdateState (updateNotAvailable) observed in 120s interval: {val}')
                     raise AssertionError(
                         f"Unexpected non-Idle state {val} observed during 120s interval"
                     )
@@ -745,7 +745,7 @@ class TC_SU_2_2(MatterBaseTest):
             fabric_filtered=False,
             min_interval_sec=1,
             max_interval_sec=1,
-            keepSubscriptions=True
+            keepSubscriptions=False
         )
 
         # ------------------------------------------------------------------------------------
@@ -984,7 +984,7 @@ class TC_SU_2_2(MatterBaseTest):
             logger.info(f'{step_number_s6}: Step #6.3 - StateTransition two events: '
                         '(1) Idle > Querying, (2) Querying > Idle, if UpdateAvailable version is same or lower, '
                         'successfully observed.')
-            subscription_state_no_download.reset()
+            await subscription_state_no_download.cancel()
 
         # ------------------------------------------------------------------------------------
         # [STEP_6]: Step # 6.4 - Verify NO image transfer occurs from TH/OTA-P to DUT if UpdateAvailable version is same or lower
@@ -1118,7 +1118,7 @@ class TC_SU_2_2(MatterBaseTest):
             logger.info(f'{step_number_s7}: Step #7.3 - StateTransition two events: '
                         '(1) Idle > Querying, (2) Querying > Idle, due invalid BDX ImageURI, '
                         'successfully observed.')
-            subscription_state_invalid_uri.reset()
+            await subscription_state_invalid_uri.cancel()
 
         # ------------------------------------------------------------------------------------
         # [STEP_7]: Step # 7.4 - Verify NO image transfer occurs from TH/OTA-P to DUT due invalid BDX ImageURI in UpdateAvailable.
