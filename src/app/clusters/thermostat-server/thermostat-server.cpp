@@ -29,6 +29,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/server/Server.h>
 #include <app/util/endpoint-config-api.h>
+#include <clusters/Thermostat/Metadata.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
@@ -680,6 +681,10 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         ReturnErrorOnFailure(aEncoder.Encode(delegate->GetThermostatSuggestionNotFollowingReason()));
+    }
+    break;
+    case ClusterRevision::Id: {
+        return aEncoder.Encode(Thermostat::kRevision);
     }
     break;
     default: // return CHIP_NO_ERROR and just read from the attribute store in default
