@@ -64,6 +64,10 @@ class TC_WEBRTCP_2_18(MatterBaseTest, WEBRTCPTestBase):
                      "DUT sends Offer command with the allocated WebRTCSessionID and valid SDP offer"),
             TestStep(4, "TH sends the ProvideAnswer command with valid WebRTCSessionID and valid SDP answer",
                      "DUT responds with success status code"),
+            TestStep(5, "TH sends EndSession command to terminate the WebRTC session",
+                     "DUT responds with success status code"),
+            TestStep(6, "TH deallocates the Audio and Video streams via AudioStreamDeallocate and VideoStreamDeallocate commands",
+                     "DUT responds with success status code for both deallocate commands"),
         ]
         return steps
 
@@ -85,12 +89,12 @@ class TC_WEBRTCP_2_18(MatterBaseTest, WEBRTCPTestBase):
 
         self.step(1)
         # Allocate Audio and Video streams
-        audioStreamID = await self.allocate_one_audio_stream()
-        videoStreamID = await self.allocate_one_video_stream()
+        audio_stream_id = await self.allocate_one_audio_stream()
+        video_stream_id = await self.allocate_one_video_stream()
 
         # Validate that the streams were allocated successfully
-        await self.validate_allocated_audio_stream(audioStreamID)
-        await self.validate_allocated_video_stream(videoStreamID)
+        await self.validate_allocated_audio_stream(audio_stream_id)
+        await self.validate_allocated_video_stream(video_stream_id)
 
         # Create WebRTC manager and peer for sending SolicitOffer and receiving Offer
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
@@ -105,8 +109,8 @@ class TC_WEBRTCP_2_18(MatterBaseTest, WEBRTCPTestBase):
         resp: Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse = await webrtc_peer.send_command(
             cmd=Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
                 streamUsage=Clusters.Objects.Globals.Enums.StreamUsageEnum.kLiveView,
-                videoStreamID=videoStreamID,
-                audioStreamID=audioStreamID,
+                videoStreamID=video_stream_id,
+                audioStreamID=audio_stream_id,
                 originatingEndpointID=1,
             ),
             endpoint=endpoint,
@@ -152,6 +156,42 @@ class TC_WEBRTCP_2_18(MatterBaseTest, WEBRTCPTestBase):
         )
 
         logger.info(f"Successfully sent ProvideAnswer command for session {session_id}")
+
+        self.step(5)
+        # Send EndSession command to terminate the WebRTC session
+        logger.info(f"Sending EndSession command for session {session_id}")
+
+        await self.send_single_cmd(
+            cmd=Clusters.WebRTCTransportProvider.Commands.EndSession(
+                webRTCSessionID=session_id,
+                reason=Clusters.Globals.Enums.WebRTCEndReasonEnum.kUserHangup
+            ),
+            endpoint=endpoint,
+        )
+
+        logger.info(f"Successfully ended WebRTC session {session_id}")
+
+        self.step(6)
+        # Deallocate the Audio and Video streams to return DUT to known state
+        logger.info("Deallocating Audio and Video streams")
+
+        # Deallocate audio stream
+        await self.send_single_cmd(
+            cmd=Clusters.CameraAvStreamManagement.Commands.AudioStreamDeallocate(
+                audioStreamID=audio_stream_id
+            ),
+            endpoint=endpoint,
+        )
+        logger.info(f"Successfully deallocated audio stream {audio_stream_id}")
+
+        # Deallocate video stream
+        await self.send_single_cmd(
+            cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamDeallocate(
+                videoStreamID=video_stream_id
+            ),
+            endpoint=endpoint,
+        )
+        logger.info(f"Successfully deallocated video stream {video_stream_id}")
 
         # Clean up
         await webrtc_manager.close_all()
