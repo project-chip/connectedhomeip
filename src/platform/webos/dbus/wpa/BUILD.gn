@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,19 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/build/chip/linux/gdbus_library.gni")
 
-# ESP32 Diagnostic Storage specific tests
-chip_test_suite("tests") {
-  output_name = "libDiagnosticTests"
-
-  test_sources = [ "TestESP32DiagnosticTrace.cpp" ]
-
-  public_deps = [
-    "${chip_root}/src/lib/core:string-builder-adapters",
-    "${chip_root}/src/tracing/esp32_diagnostic_trace:diagnostic_storage",
+gdbus_library("wpa") {
+  sources = [
+    "DBusWpa.xml",
+    "DBusWpaBss.xml",
+    "DBusWpaInterface.xml",
+    "DBusWpaNetwork.xml",
   ]
+
+  c_namespace = "WpaSupplicant"
+  interface_prefix = "fi.w1.wpa_supplicant"
+  c_generate_object_manager = false
+  dbus_out_dir = "platform/Linux/dbus/wpa"
 }
