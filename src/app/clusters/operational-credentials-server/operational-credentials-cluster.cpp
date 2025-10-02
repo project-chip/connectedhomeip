@@ -767,13 +767,12 @@ std::optional<DataModel::ActionReturnStatus> HandleSetVIDVerificationStatement(C
                                                                                TLV::TLVReader & input_arguments,
                                                                                const DataModel::InvokeRequest & request,
                                                                                FabricTable & fabricTable,
-                                                                               FailSafeContext & failSafeContext)
+                                                                               FailSafeContext & failSafeContext, bool & reportChange)
 {
     Commands::SetVIDVerificationStatement::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
 
     FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
-    auto finalStatus        = Status::Failure;
 
     ChipLogProgress(Zcl, "OpCreds: Received a SetVIDVerificationStatement Command for FabricIndex 0x%x",
                     static_cast<unsigned>(fabricIndex));
@@ -788,42 +787,30 @@ std::optional<DataModel::ActionReturnStatus> HandleSetVIDVerificationStatement(C
         return Status::ConstraintError;
     }
 
-    bool fabricChangesOccurred = false;
     CHIP_ERROR err             = fabricTable.SetVIDVerificationStatementElements(
-        fabricIndex, commandData.vendorID, commandData.VIDVerificationStatement, commandData.vvsc, fabricChangesOccurred);
-    if (err == CHIP_ERROR_INVALID_ARGUMENT)
-    {
-        finalStatus = Status::ConstraintError;
-    }
-    else if (err == CHIP_ERROR_INCORRECT_STATE)
-    {
-        finalStatus = Status::InvalidCommand;
-    }
-    else if (err != CHIP_NO_ERROR)
-    {
-        // We have no idea what happened; just report failure.
-        StatusIB status(err);
-        finalStatus = status.mStatus;
-    }
-    else
-    {
-        finalStatus = Status::Success;
-    }
-
-    // Handle dirty-marking if anything changed. Only `Fabrics` attribute is reported since `NOCs`
-    // is not reportable (`C` quality).
-    if (fabricChangesOccurred)
-    {
-        failSafeContext.RecordSetVidVerificationStatementHasBeenInvoked();
-
-        return std::nullopt;
-    }
+        fabricIndex, commandData.vendorID, commandData.VIDVerificationStatement, commandData.vvsc, reportChange);
 
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "SetVIDVerificationStatement failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
-    return finalStatus;
+
+    if (err == CHIP_ERROR_INVALID_ARGUMENT)
+    {
+        return Status::ConstraintError;
+    }
+    else if (err == CHIP_ERROR_INCORRECT_STATE)
+    {
+        return Status::InvalidCommand;
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        // We have no idea what happened; just report failure.
+        return err;
+    }
+
+    // No error during execution, but no response was added so return Success.
+    return Status::Success;
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleRemoveFabric(CommandHandler * commandObj,
@@ -1242,13 +1229,16 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
     case OperationalCredentials::Commands::AddTrustedRootCertificate::Id:
         return HandleAddTrustedRootCertificate(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext());
     case OperationalCredentials::Commands::SetVIDVerificationStatement::Id: {
+        bool reportChange = false;
         std::optional<DataModel::ActionReturnStatus> returnStatus =
-            HandleSetVIDVerificationStatement(handler, input_arguments, request, GetFabricTable(), GetFailSafeContext());
-        if (returnStatus == std::nullopt)
+            HandleSetVIDVerificationStatement(handler, input_arguments, request, GetFabricTable(), GetFailSafeContext(), reportChange);
+        if (reportChange)
         {
+            // Handle dirty-marking if anything changed. Only `Fabrics` attribute is reported since `NOCs`
+            // is not reportable (`C` quality).
+            mOpCredsContext.failSafeContext.RecordSetVidVerificationStatementHasBeenInvoked();
             // Report if Fabric attribute has changed.
             NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);
-            returnStatus = Status::Success;
         }
         return returnStatus;
     }
