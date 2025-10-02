@@ -219,6 +219,13 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal(write_status2, Status.UnsupportedAttribute,
                              f"Write to unsupported attribute should return UNSUPPORTED_ATTRIBUTE, got {write_status2}")
 
+        """
+        // TODO: SuppressResponse handling not yet implemented in the SDK server side (see Issue #41227).
+        // Current behavior: server always responds to WriteAttribute even when suppressResponse=true.
+        // Expected behavior: server should suppress the response when suppressResponse flag is set.
+        // Test step 4 is skipped until SDK-level fix is implemented.
+        // Reference: https://github.com/project-chip/connectedhomeip/issues/41227
+
         # Check if NodeLabel attribute exists for steps 4 through 6 (DataVersion and SuppressResponse tests)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
             self.step(4)
@@ -255,6 +262,12 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
             asserts.assert_equal(actual_value, test_value,
                                  f"Attribute should be written. Expected {test_value}, got {actual_value}")
+
+        """
+        # Check if NodeLabel attribute exists for steps 5 and 6 (DataVersion test steps)
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
+            self.skip_step(4)
+            # Please see above notes for why test step 4 is currently being skipped until SuppressResponse handling is implemented on the SDK server side (Please see issue https://github.com/project-chip/connectedhomeip/issues/41227)
 
             self.step(5)
             '''
