@@ -522,9 +522,27 @@ public:
     virtual AttributeId GetAttrId() const = 0;
 
     // Type-erased methods for generic access
-    virtual CHIP_ERROR GetValueAsVoid(void *& outValue) { return CHIP_NO_ERROR; };
-    virtual CHIP_ERROR GetNewValueAsVoid(void *& outValue) { return CHIP_NO_ERROR; };
-    virtual CHIP_ERROR SetNewValueFromVoid(const void * value) { return CHIP_NO_ERROR; };
+    // Must be overridden in child template classes to provide type-safe access
+    /**
+     * @brief Gets a pointer to the internal current value storage.
+     * @param[out] outValue Set to point to the internal current value object.
+     *                      The pointer remains valid only while this object exists.
+     *                      Cast back to the specific type based on the child class's template specialization.
+     */
+    virtual CHIP_ERROR GetValueAsVoid(void *& outValue) { outValue = nullptr; return CHIP_ERROR_NOT_IMPLEMENTED; };
+    
+    /**
+     * @brief Gets a pointer to the internal pending new value storage during updates.
+     * @param[out] outValue Set to point to the internal pending value object.
+     *                      Cast back to the specific type based on the child class's template specialization.
+     */
+    virtual CHIP_ERROR GetNewValueAsVoid(void *& outValue) { outValue = nullptr; return CHIP_ERROR_NOT_IMPLEMENTED; };
+
+    /**
+     * @brief Copies data from external source to internal pending storage.
+     * @param[in] value Pointer to external source data of the type matching the child class's template specialization.
+     */
+    virtual CHIP_ERROR SetNewValueFromVoid(const void * value) { return CHIP_ERROR_NOT_IMPLEMENTED; };
 };
 
 template <typename T>
@@ -940,18 +958,27 @@ public:
     AttributeId GetAttrId() const override { return mAttrId; }
 
     // Type-erased implementations
+    /**
+     * @brief Returns a pointer to the current typed value
+     */
     CHIP_ERROR GetValueAsVoid(void *& outValue) override
     {
         outValue = static_cast<void *>(&GetValueRef());
         return CHIP_NO_ERROR;
     }
 
+    /**
+     * @brief Returns a pointer to the pending new typed value
+     */
     CHIP_ERROR GetNewValueAsVoid(void *& outValue) override
     {
         outValue = static_cast<void *>(&GetNewValueRef());
         return CHIP_NO_ERROR;
     }
 
+    /**
+     * @brief Sets new value from typed pointer
+     */
     CHIP_ERROR SetNewValueFromVoid(const void * value) override
     {
         if (value == nullptr)
