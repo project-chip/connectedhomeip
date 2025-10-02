@@ -243,9 +243,8 @@ TimeSynchronizationCluster::TimeSynchronizationCluster(
     const BitFlags<TimeSynchronization::Feature> features,
     TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type supportsDNSResolve, TimeZoneDatabaseEnum timeZoneDatabase,
     TimeSynchronization::TimeSourceEnum timeSource) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mOptionalAttributeSet(optionalAttributeSet), mFeatures(features), mSupportsDNSResolve(supportsDNSResolve),
-    mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mOptionalAttributeSet(optionalAttributeSet), mFeatures(features),
+    mSupportsDNSResolve(supportsDNSResolve), mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -324,11 +323,9 @@ DataModel::ActionReturnStatus TimeSynchronizationCluster::ReadAttribute(const Da
     case UTCTime::Id: {
         System::Clock::Microseconds64 utcTimeUnix;
         uint64_t chipEpochTime;
-        auto timeSynchronization = FindClusterOnEndpoint(request.path.mEndpointId);
-        VerifyOrReturnValue(timeSynchronization != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         // This return allows us to simulate no internal time for testing purposes
         // This will be set once we receive a good time either from the delegate or via a command
-        if (timeSynchronization->GetGranularity() == GranularityEnum::kNoTimeGranularity)
+        if (mGranularity == GranularityEnum::kNoTimeGranularity)
         {
             return encoder.EncodeNull();
         }
@@ -336,11 +333,8 @@ DataModel::ActionReturnStatus TimeSynchronizationCluster::ReadAttribute(const Da
         VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTimeUnix.count(), chipEpochTime), encoder.EncodeNull());
         return encoder.Encode(chipEpochTime);
     }
-    case Granularity::Id: {
-        auto timeSynchronization = FindClusterOnEndpoint(request.path.mEndpointId);
-        VerifyOrReturnValue(timeSynchronization != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        return encoder.Encode(timeSynchronization->GetGranularity());
-    }
+    case Granularity::Id:
+        return encoder.Encode(mGranularity);
     case TrustedTimeSource::Id:
         return ReadTrustedTimeSource(encoder);
     case DefaultNTP::Id:
