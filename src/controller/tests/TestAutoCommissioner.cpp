@@ -476,18 +476,14 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_EmptyRCACReturnsInvalidArgument)
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
 
+// On 32-bit systems, NOCChainGenerated cannot fail due to size_t being 32 bits and never exceeding uint32_t,
+// therefore we skip some tests.
+#if SIZE_MAX > UINT32_MAX
+
 // Ensures extra checks are done with RCAC buffer size
 TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedRCACLengthReturnsError)
 {
-    // On 32-bit systems, NOCChainGenerated cannot fail due to size_t being 32 bits and never exceeding uint32_t,
-    // therefore we skip this check .
-
-#if SIZE_MAX <= UINT32_MAX
-    GTEST_SKIP() << "Only meaningful on 64-bit systems";
-#endif
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
-    // Use uint32_t for portability on 32-bit systems
-
     CHIP_ERROR err =
         privateConfigCommissioner.NOCChainGenerated(kValidNOC, kValidICAC, kCoruptedBufferInvalidRCAC, kValidIpk, kValidNodeId);
 
@@ -497,17 +493,13 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedRCACLengthReturnsError)
 // Ensures extra checks are done with NOC buffer size
 TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedNOCLengthReturnsError)
 {
-#if SIZE_MAX <= UINT32_MAX
-    GTEST_SKIP() << "Only meaningful on 64-bit systems";
-#endif
-
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
-
     CHIP_ERROR err =
         privateConfigCommissioner.NOCChainGenerated(kCoruptedBufferInvalidNOC, kValidICAC, kValidRCAC, kValidIpk, kValidNodeId);
 
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
+#endif
 
 // Ensures empty NOC certificates aren't admitted
 TEST_F(AutoCommissionerTest, NOCChainGenerated_EmptyNOCReturnsInvalidArgument)
