@@ -49,6 +49,8 @@ constexpr size_t kWindowCoveringDelegateTableSize =
     MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kWindowCoveringDelegateTableSize <= kEmberInvalidEndpointIndex, "WindowCovering Delegate table size error");
 
+WindowCoverAttrAccess gAttrAccess;
+
 Delegate * gDelegateTable[kWindowCoveringDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
@@ -112,7 +114,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace WindowCovering {
-static WindowCoverAttrAccess gAttrAccess;
 
 CHIP_ERROR WindowCoverAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
