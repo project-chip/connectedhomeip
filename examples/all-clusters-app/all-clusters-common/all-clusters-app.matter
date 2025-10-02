@@ -7716,14 +7716,14 @@ endpoint 0 {
   }
 
   server cluster TimeFormatLocalization {
-    persist  attribute hourFormat default = 0;
-    persist  attribute activeCalendarType default = 0;
+    ram      attribute hourFormat default = 0;
+    ram      attribute activeCalendarType default = 0;
     callback attribute supportedCalendarTypes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster UnitLocalization {
@@ -7810,8 +7810,8 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command RetrieveLogsRequest;
     handle command RetrieveLogsResponse;
@@ -7921,7 +7921,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }

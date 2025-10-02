@@ -263,6 +263,7 @@
             "CurrentMode",
             "FeatureMap"
         ],
+        "Diagnostic Logs": ["ClusterRevision", "FeatureMap"],
         "Door Lock": [
             "AliroReaderVerificationKey",
             "AliroReaderGroupIdentifier",
@@ -470,7 +471,8 @@
             "ChannelPage0Mask",
             "OperationalDatasetComponents",
             "ExtAddress",
-            "Rloc16"
+            "Rloc16",
+            "ClusterRevision"
         ],
         "Wi-Fi Network Diagnostics": [
             "BSSID",
@@ -821,6 +823,7 @@
             "CurrentThermostatSuggestion",
             "ThermostatSuggestionNotFollowingReason"
         ],
+        "Time Format Localization": ["ClusterRevision"],
         "Zone Management": [
             "MaxUserDefinedZones",
             "MaxZones",

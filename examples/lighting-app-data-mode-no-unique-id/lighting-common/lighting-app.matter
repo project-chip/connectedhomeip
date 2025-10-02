@@ -2787,8 +2787,8 @@ endpoint 0 {
   }
 
   server cluster DiagnosticLogs {
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command RetrieveLogsRequest;
   }
@@ -2888,7 +2888,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
