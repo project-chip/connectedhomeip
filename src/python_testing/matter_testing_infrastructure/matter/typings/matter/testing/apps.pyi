@@ -1,10 +1,10 @@
 # src/python_testing/matter_testing_infrastructure/matter/typings/matter/testing/apps.py
 
 from dataclasses import dataclass
-from typing import Any, List, Optional, Pattern
+from typing import Any, List, Optional, Union
 
-from matter.testing.tasks import Subprocess
 from matter.ChipDeviceCtrl import ChipDeviceController
+from matter.testing.tasks import Subprocess
 
 
 @dataclass
@@ -24,9 +24,7 @@ class ImageListPath:
 class AppServerSubprocess(Subprocess):
     PREFIX: bytes
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: List[str] = ..., kvs_path: Optional[str] = None) -> None: ...
-
-    def __del__(self) -> None: ...
+                 passcode: int, port: int = 5540, extra_args: List[str] = ...) -> None: ...
 
 
 class IcdAppServerSubprocess(AppServerSubprocess):
@@ -46,23 +44,10 @@ class OTAProviderSubprocess(AppServerSubprocess):
     DEFAULT_ADMIN_NODE_ID: int
     PREFIX: bytes
 
-    def __init__(
-        self,
-        ota_file: str,
-        discriminator: int,
-        passcode: int,
-        secured_device_port: int,
-        queue: Optional[str] = None,
-        timeout: Optional[int] = None,
-        override_image_uri: Optional[str] = None,
-        log_file_path: Optional[str] = "provider.log",
-        app_path: Optional[str] = None,
-        kvs_path: Optional[str] = None
-    ) -> None: ...
+    def __init__(self, app: str, storage_dir: str, discriminator: int,
+                 passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
+                 port: int = 5541, extra_args: List[str] = ...,
+                 kvs_path: Optional[str] = ..., persist_kvs: bool = ...) -> None: ...
 
     def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int,
                          requestor_node_id: Optional[int] = None) -> Any: ...
-
-    def start(self, expected_output: str | Pattern[Any] | None = None, timeout: float | None = 30) -> None: ...
-
-    def _process_output(self, line: bytes) -> bytes: ...
