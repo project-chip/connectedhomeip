@@ -163,10 +163,10 @@ class TC_SU_2_2(MatterBaseTest):
         # Controller has already commissioned the requestor
 
         # Prerequisite #1.0 - Requestor (DUT) info
-        CONTROLLER = self.default_controller
-        FABRIC_ID = CONTROLLER.fabricId
-        REQUESTOR_NODE_ID = self.dut_node_id
-        self.acl_handler = ACLHandler(CONTROLLER)
+        controller = self.default_controller
+        fabric_id = controller.fabricId
+        requestor_node_id = self.dut_node_id
+        self.acl_handler = ACLHandler(controller)
         self.ota_helper = OTAHelper(
             log_file_path=self.LOG_FILE_PATH,
             app_path=self.APP_PATH,
@@ -175,7 +175,7 @@ class TC_SU_2_2(MatterBaseTest):
         )
 
         step_number = "[STEP_0]"
-        logger.info(f'{step_number}: Prerequisite #1.0 - Requestor (DUT), NodeID: {REQUESTOR_NODE_ID}, FabricId: {FABRIC_ID}')
+        logger.info(f'{step_number}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
 
         self.step(1)
         # ------------------------------------------------------------------------------------
@@ -197,9 +197,9 @@ class TC_SU_2_2(MatterBaseTest):
 
         # Launch, Commisioning, configure ACLs and add the DefaultOTAProviders
         provider_proc_s1 = await self.ota_helper.setup_provider(
-            controller=CONTROLLER,
-            fabric_id=FABRIC_ID,
-            requestor_node_id=REQUESTOR_NODE_ID,
+            controller=controller,
+            fabric_id=fabric_id,
+            requestor_node_id=requestor_node_id,
             provider_node_id=provider_node_id,
             provider_discriminator=provider_discriminator,
             provider_setup_pin_code=provider_setupPinCode,
@@ -229,8 +229,8 @@ class TC_SU_2_2(MatterBaseTest):
         # Start subscriptions for both attributes in parallel
         await asyncio.gather(
             subscription_attr_state.start(
-                dev_ctrl=CONTROLLER,
-                node_id=REQUESTOR_NODE_ID,
+                dev_ctrl=controller,
+                node_id=requestor_node_id,
                 endpoint=0,
                 fabric_filtered=False,
                 min_interval_sec=0.5,
@@ -238,8 +238,8 @@ class TC_SU_2_2(MatterBaseTest):
                 keepSubscriptions=True
             ),
             subscription_attr_progress.start(
-                dev_ctrl=CONTROLLER,
-                node_id=REQUESTOR_NODE_ID,
+                dev_ctrl=controller,
+                node_id=requestor_node_id,
                 endpoint=0,
                 fabric_filtered=False,
                 min_interval_sec=2,
@@ -252,7 +252,7 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_1]: Step #1.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s1}: Step #1.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id)
+        resp_announce = await self.send_announce_ota_provider(controller, requestor_node_id, provider_node_id=provider_node_id)
         logger.info(f'{step_number_s1}: Step #1.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
@@ -406,7 +406,7 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_2]: Prerequisites - Setup Provider_S2
         # ------------------------------------------------------------------------------------
         step_number_s2 = "[STEP_2]"
-        logger.info(f'{step_number_s2}: Prerequisite #1.0 - Requestor (DUT), NodeID: {REQUESTOR_NODE_ID}, FabricId: {FABRIC_ID}')
+        logger.info(f'{step_number_s2}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
 
         # Prerequisite #1.0 - Provider_S2 info
         provider_ota_file_s2 = "firmware_requestor_v3min.ota"
@@ -440,8 +440,8 @@ class TC_SU_2_2(MatterBaseTest):
 
         # Start subscriptions
         await subscription_attr_state_busy.start(
-            dev_ctrl=CONTROLLER,
-            node_id=REQUESTOR_NODE_ID,  # DUT
+            dev_ctrl=controller,
+            node_id=requestor_node_id,  # DUT
             endpoint=0,
             fabric_filtered=False,
             min_interval_sec=1,
@@ -453,7 +453,7 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_2]: Step #2.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s2}: Step #2.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id)
+        resp_announce = await self.send_announce_ota_provider(controller, requestor_node_id, provider_node_id=provider_node_id)
         logger.info(f'{step_number_s2}: Step #2.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
@@ -552,7 +552,7 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_3]: Prerequisites - Setup Provider_S3
         # ------------------------------------------------------------------------------------
         step_number_s3 = "[STEP_3]"
-        logger.info(f'{step_number_s3}: Prerequisite #1.0 - Requestor (DUT), NodeID: {REQUESTOR_NODE_ID}, FabricId: {FABRIC_ID}')
+        logger.info(f'{step_number_s3}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
 
         # Prerequisite #1.0 - Provider_S3 info
         provider_ota_file_s3 = "firmware_requestor_v4.ota"  # OTA updated
@@ -584,8 +584,8 @@ class TC_SU_2_2(MatterBaseTest):
 
         # Start subscriptions
         await subscription_attr_state_updatenotavailable.start(
-            dev_ctrl=CONTROLLER,
-            node_id=REQUESTOR_NODE_ID,  # DUT
+            dev_ctrl=controller,
+            node_id=requestor_node_id,  # DUT
             endpoint=0,
             fabric_filtered=False,
             min_interval_sec=1,
@@ -597,7 +597,7 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_3]: Step #3.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s3}: Step #3.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id)
+        resp_announce = await self.send_announce_ota_provider(controller, requestor_node_id, provider_node_id=provider_node_id)
         logger.info(f'{step_number_s3}: Step #3.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
@@ -705,7 +705,7 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_4]: Prerequisites - Setup Provider_S4
         # ------------------------------------------------------------------------------------
         step_number_s4 = "[STEP_4]"
-        logger.info(f'{step_number_s4}: Prerequisite #1.0 - Requestor (DUT), NodeID: {REQUESTOR_NODE_ID}, FabricId: {FABRIC_ID}')
+        logger.info(f'{step_number_s4}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
 
         # Prerequisite #1.0 - Provider_S4 info
         provider_ota_file_s4 = "firmware_requestor_v5.ota"
@@ -739,8 +739,8 @@ class TC_SU_2_2(MatterBaseTest):
 
         # Start subscriptions
         await subscription_attr_state_busy_180s.start(
-            dev_ctrl=CONTROLLER,
-            node_id=REQUESTOR_NODE_ID,  # DUT
+            dev_ctrl=controller,
+            node_id=requestor_node_id,  # DUT
             endpoint=0,
             fabric_filtered=False,
             min_interval_sec=1,
@@ -756,14 +756,14 @@ class TC_SU_2_2(MatterBaseTest):
             breadcrumb=1
         )
         resp = await self.send_single_cmd(
-            dev_ctrl=CONTROLLER,
-            node_id=REQUESTOR_NODE_ID,
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
             cmd=cmd
         )
         logger.info(f'{step_number_s4}: Step #4.0 - FailSafe armed for 900s: {resp}')
 
         logger.info(f'{step_number_s4}: Step #4.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id)
+        resp_announce = await self.send_announce_ota_provider(controller, requestor_node_id, provider_node_id=provider_node_id)
         logger.info(f'{step_number_s4}: Step #4.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
@@ -867,7 +867,7 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_6]: Prerequisites - Setup Provider_S6
         # ------------------------------------------------------------------------------------
         step_number_s6 = "[STEP_6]"
-        logger.info(f'{step_number_s6}: Prerequisite #1.0 - Requestor (DUT), NodeID: {REQUESTOR_NODE_ID}, FabricId: {FABRIC_ID}')
+        logger.info(f'{step_number_s6}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
 
         # Prerequisite #1.0 - Provider_S6 info
         provider_ota_file_s6 = "firmware_requestor_v3min.ota"
@@ -899,8 +899,8 @@ class TC_SU_2_2(MatterBaseTest):
 
         # Start subscriptions
         await subscription_state_no_download.start(
-            dev_ctrl=CONTROLLER,
-            node_id=REQUESTOR_NODE_ID,  # DUT
+            dev_ctrl=controller,
+            node_id=requestor_node_id,  # DUT
             endpoint=0,
             fabric_filtered=False,
             min_interval_sec=1,
@@ -913,7 +913,7 @@ class TC_SU_2_2(MatterBaseTest):
         # ------------------------------------------------------------------------------------
 
         logger.info(f'{step_number_s6}: Step #6.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id)
+        resp_announce = await self.send_announce_ota_provider(controller, requestor_node_id, provider_node_id=provider_node_id)
         logger.info(f'{step_number_s6}: Step #6.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
@@ -1006,7 +1006,7 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_7]: Prerequisites - Setup Provider_S7
         # ------------------------------------------------------------------------------------
         step_number_s7 = "[STEP_7]"
-        logger.info(f'{step_number_s7}: Prerequisite #1.0 - Requestor (DUT), NodeID: {REQUESTOR_NODE_ID}, FabricId: {FABRIC_ID}')
+        logger.info(f'{step_number_s7}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
 
         # Prerequisite #1.0 - Provider_S7 info
         provider_ota_file_s7 = "firmware_requestor_v5.ota"
@@ -1038,8 +1038,8 @@ class TC_SU_2_2(MatterBaseTest):
 
         # Start subscriptions
         await subscription_state_invalid_uri.start(
-            dev_ctrl=CONTROLLER,
-            node_id=REQUESTOR_NODE_ID,  # DUT
+            dev_ctrl=controller,
+            node_id=requestor_node_id,  # DUT
             endpoint=0,
             fabric_filtered=False,
             min_interval_sec=1,
@@ -1051,7 +1051,7 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_7]: Step #7.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s7}: Step #7.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.send_announce_ota_provider(CONTROLLER, REQUESTOR_NODE_ID, provider_node_id=provider_node_id)
+        resp_announce = await self.send_announce_ota_provider(controller, requestor_node_id, provider_node_id=provider_node_id)
         logger.info(f'{step_number_s7}: Step #7.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
