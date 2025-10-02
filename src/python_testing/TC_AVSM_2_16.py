@@ -80,7 +80,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 4,
-                "TH establishes a WeRTC session via a ProvideOffer/Answer exchange using aVideoStreamID and aAudioStreamID.",
+                "TH ensures all Soft and Hard PrivacyModes are disabled/off and establishes a WeRTC session via a ProvideOffer/Answer exchange using aVideoStreamID and aAudioStreamID.",
                 "Verify the ProvideOfferResponse. Store the SessionID as aSessionID",
             ),
             TestStep(
@@ -177,6 +177,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         aAudioStreamID = aAllocatedAudioStreams[0].audioStreamID
         aAudioRefCount = aAllocatedAudioStreams[0].referenceCount
 
+        self.step(4)
         # Ensure privacy modes are not enabled before issuing WebRTC
         # ProvideOffer command
         self.privacySupport = (aFeatureMap & cluster.Bitmaps.Feature.kPrivacy) > 0
@@ -199,7 +200,22 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
             )
             asserts.assert_false(softRecordingPrivMode, "SoftRecordingPrivacyModeEnabled should be False")
 
-        self.step(4)
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.HardPrivacyModeOn):
+            # For CI: Use app pipe to simulate physical privacy switch being turned on
+            # For manual testing: User should physically turn on the privacy switch
+            if self.is_pics_sdk_ci_only:
+                self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": False})
+            else:
+                input("Please ensure that the physical privacy switch on the device is OFF, then press Enter to continue...")
+
+            # Verify the attribute reflects the privacy switch state
+            hard_privacy_mode = await self.read_single_attribute_check_success(
+                endpoint=endpoint,
+                cluster=Clusters.CameraAvStreamManagement,
+                attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOn
+            )
+            asserts.assert_false(hard_privacy_mode, "HardPrivacyModeOn should be False")
+
         # Establish WebRTC via Provide Offer/Answer
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
         webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(

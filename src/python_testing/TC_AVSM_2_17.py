@@ -81,6 +81,7 @@ class TC_AVSM_2_17(MatterBaseTest, AVSMTestBase):
                 4,
                 "TH writes attribute `SoftLivestreamPrivacyModeEnabled` and `SoftRecordingPrivacyModeEnabled` to false in the CameraAVStreamManagement Cluster on DUT.",
                 "DUT responds with Success",
+                "TH ensures HardPrivacyModeOn is false"
             ),
             TestStep(
                 5,
@@ -232,6 +233,22 @@ class TC_AVSM_2_17(MatterBaseTest, AVSMTestBase):
             endpoint=endpoint, cluster=cluster, attribute=attr.SoftRecordingPrivacyModeEnabled
         )
         asserts.assert_false(softRecordingPrivMode, "SoftRecordingPrivacyModeEnabled should be False")
+
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.HardPrivacyModeOn):
+            # For CI: Use app pipe to simulate physical privacy switch being turned on
+            # For manual testing: User should physically turn on the privacy switch
+            if self.is_pics_sdk_ci_only:
+                self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": False})
+            else:
+                input("Please ensure that the physical privacy switch on the device is OFF, then press Enter to continue...")
+
+            # Verify the attribute reflects the privacy switch state
+            hard_privacy_mode = await self.read_single_attribute_check_success(
+                endpoint=endpoint,
+                cluster=Clusters.CameraAvStreamManagement,
+                attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOn
+            )
+            asserts.assert_false(hard_privacy_mode, "HardPrivacyModeOn should be False")
 
         self.step(5)
         current_sessions = await self.read_single_attribute_check_success(
