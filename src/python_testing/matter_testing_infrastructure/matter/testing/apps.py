@@ -17,7 +17,7 @@ import signal
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Optional, Pattern
+from typing import Any, Optional, Pattern
 
 from matter.testing.tasks import Subprocess
 
