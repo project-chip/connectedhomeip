@@ -688,7 +688,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             if (!localStream.active())
             {
                 ChipLogError(JointFabric, "RPC: Opening GetStream Error");
-                SetCommandExitStatus(CHIP_ERROR_SHUT_DOWN);
+                SetCommandExitStatus(CHIP_ERROR_INTERNAL);
                 return;
             }
             else
