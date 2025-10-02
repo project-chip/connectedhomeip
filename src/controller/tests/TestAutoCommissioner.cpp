@@ -477,7 +477,7 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_EmptyRCACReturnsInvalidArgument)
 }
 
 // On 32-bit systems, NOCChainGenerated cannot fail due to size_t being 32 bits and never exceeding uint32_t,
-// therefore we skip some checks.
+// therefore we skip some tests.
 #if SIZE_MAX > UINT32_MAX
 
 // Ensures extra checks are done with RCAC buffer size
