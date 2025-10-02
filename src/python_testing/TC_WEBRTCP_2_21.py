@@ -57,12 +57,18 @@ class TC_WEBRTCP_2_21(MatterBaseTest, WEBRTCPTestBase):
 
     def steps_TC_WEBRTCP_2_21(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "TH sends the ProvideOffer command with an SDP Offer and null WebRTCSessionID to the DUT",
+            TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
+                     "DUT responds with success and provides stream IDs"),
+            TestStep(2, "TH sends the ProvideOffer command with an SDP Offer and null WebRTCSessionID to the DUT",
                      "DUT responds with ProvideOfferResponse containing allocated WebRTCSessionID. TH saves the WebRTCSessionID to be used in a later step"),
-            TestStep(2, "DUT sends Answer command to the TH",
+            TestStep(3, "DUT sends Answer command to the TH",
                      "Verify that Answer command contains the same WebRTCSessionID saved in step 1 and contain a non-empty SDP string. TH sends the SUCCESS status code to the DUT"),
-            TestStep(3, "TH sends the ProvideICECandidates command with invalid WebRTCSessionID",
+            TestStep(4, "TH sends the ProvideICECandidates command with invalid WebRTCSessionID",
                      "DUT responds with NOT_FOUND status code"),
+            TestStep(5, "TH sends EndSession command to terminate the WebRTC session",
+                     "DUT responds with success status code"),
+            TestStep(6, "TH deallocates the Audio and Video streams via AudioStreamDeallocate and VideoStreamDeallocate commands",
+                     "DUT responds with success status code for both deallocate commands"),
         ]
         return steps
 
@@ -81,16 +87,22 @@ class TC_WEBRTCP_2_21(MatterBaseTest, WEBRTCPTestBase):
 
         endpoint = self.get_endpoint(default=1)
 
-        # Create WebRTC manager and peer
+        self.step(1)
+        # Allocate Audio and Video streams
+        audio_stream_id = await self.allocate_one_audio_stream()
+        video_stream_id = await self.allocate_one_video_stream()
+
+        # Validate that the streams were allocated successfully
+        await self.validate_allocated_audio_stream(audio_stream_id)
+        await self.validate_allocated_video_stream(video_stream_id)
+
+        # Create WebRTC manager and peer for sending SolicitOffer and receiving Offer
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
         webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(
             node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint
         )
 
-        # Allocate video stream if possible (not required by test plan but useful for testing)
-        video_stream_id = await self.allocate_one_video_stream()
-
-        self.step(1)
+        self.step(2)
         # TH sends ProvideOffer command with null WebRTCSessionID
         logger.info("Sending ProvideOffer command with null WebRTCSessionID")
 
@@ -103,6 +115,7 @@ class TC_WEBRTCP_2_21(MatterBaseTest, WEBRTCPTestBase):
                 sdp=offer,
                 streamUsage=Clusters.Globals.Enums.StreamUsageEnum.kLiveView,
                 videoStreamID=video_stream_id,
+                audioStreamID=audio_stream_id,
                 originatingEndpointID=1,
             ),
             endpoint=endpoint,
@@ -115,7 +128,7 @@ class TC_WEBRTCP_2_21(MatterBaseTest, WEBRTCPTestBase):
 
         webrtc_manager.session_id_created(session_id, self.dut_node_id)
 
-        self.step(2)
+        self.step(3)
         # Wait for DUT to send Answer command
         logger.info("Waiting for DUT to send Answer command")
 
@@ -129,7 +142,7 @@ class TC_WEBRTCP_2_21(MatterBaseTest, WEBRTCPTestBase):
         # Set the remote answer to continue the WebRTC handshake
         webrtc_peer.set_remote_answer(answer)
 
-        self.step(3)
+        self.step(4)
         # TH sends ProvideICECandidates command with invalid WebRTCSessionID
         logger.info("Sending ProvideICECandidates command with invalid WebRTCSessionID")
 
@@ -163,6 +176,42 @@ class TC_WEBRTCP_2_21(MatterBaseTest, WEBRTCPTestBase):
             logger.info(f"Correctly received NOT_FOUND status: {e.status}")
 
         logger.info("Successfully validated ProvideICECandidates with invalid session ID behavior")
+
+        self.step(5)
+        # Send EndSession command to terminate the WebRTC session
+        logger.info(f"Sending EndSession command for session {session_id}")
+
+        await self.send_single_cmd(
+            cmd=Clusters.WebRTCTransportProvider.Commands.EndSession(
+                webRTCSessionID=session_id,
+                reason=Clusters.Globals.Enums.WebRTCEndReasonEnum.kUserHangup
+            ),
+            endpoint=endpoint,
+        )
+
+        logger.info(f"Successfully ended WebRTC session {session_id}")
+
+        self.step(6)
+        # Deallocate the Audio and Video streams to return DUT to known state
+        logger.info("Deallocating Audio and Video streams")
+
+        # Deallocate audio stream
+        await self.send_single_cmd(
+            cmd=Clusters.CameraAvStreamManagement.Commands.AudioStreamDeallocate(
+                audioStreamID=audio_stream_id
+            ),
+            endpoint=endpoint,
+        )
+        logger.info(f"Successfully deallocated audio stream {audio_stream_id}")
+
+        # Deallocate video stream
+        await self.send_single_cmd(
+            cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamDeallocate(
+                videoStreamID=video_stream_id
+            ),
+            endpoint=endpoint,
+        )
+        logger.info(f"Successfully deallocated video stream {video_stream_id}")
 
         # Clean up
         await webrtc_manager.close_all()

@@ -57,7 +57,7 @@ class TC_WEBRTCP_2_20(MatterBaseTest, WEBRTCPTestBase):
     def steps_TC_WEBRTCP_2_20(self) -> list[TestStep]:
         steps = [
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
-                     "DUT responds with success and provides stream IDs"),        
+                     "DUT responds with success and provides stream IDs"),
             TestStep(2, "TH sends the ProvideOffer command with an SDP Offer and null WebRTCSessionID to the DUT",
                      "DUT responds with ProvideOfferResponse containing allocated WebRTCSessionID. TH saves the WebRTCSessionID to be used in a later step"),
             TestStep(3, "DUT sends Answer command to the TH",
@@ -114,7 +114,7 @@ class TC_WEBRTCP_2_20(MatterBaseTest, WEBRTCPTestBase):
                 sdp=offer,
                 streamUsage=Clusters.Globals.Enums.StreamUsageEnum.kLiveView,
                 videoStreamID=video_stream_id,
-                audioStreamID=audio_stream_id,                
+                audioStreamID=audio_stream_id,
                 originatingEndpointID=1,
             ),
             endpoint=endpoint,
