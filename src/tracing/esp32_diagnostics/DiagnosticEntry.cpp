@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 #include <lib/support/CHIPMemString.h>
-#include <tracing/esp32_diagnostic_trace/DiagnosticEntry.h>
+#include <tracing/esp32_diagnostics/DiagnosticEntry.h>
 using namespace chip::TLV;
 
 namespace chip {
