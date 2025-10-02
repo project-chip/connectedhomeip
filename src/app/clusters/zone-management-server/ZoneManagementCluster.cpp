@@ -114,7 +114,6 @@ CHIP_ERROR ZoneManagementCluster::LoadZones()
 
     // Load Zones
     mZones.clear();
-    // DataModel::DecodableList<chip::app::Clusters::ZoneManagement::Structs::ZoneInformationStruct::DecodableType> decodableZones;
 
     err = mContext->attributeStorage.ReadValue(ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Zones::Id),
                                                bufferSpan);
