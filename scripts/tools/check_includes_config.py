@@ -187,7 +187,8 @@ ALLOW: Dict[str, Set[str]] = {
     'src/tracing/json/json_tracing.h': {'fstream', 'unordered_map', 'string'},
 
     # esp32 diagnostic tracing
-    'src/tracing/esp32_diagnostic_trace/Counter.h': {'map'},
+    'src/tracing/esp32_diagnostics/Counter.h': {'map'},
+    'src/tracing/esp32_diagnostics/DiagnosticTracing.h': {'unordered_set'},
 
     # esp32 tracing
     'src/tracing/esp32_trace/esp32_tracing.h': {'unordered_map'},

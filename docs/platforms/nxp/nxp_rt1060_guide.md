@@ -65,6 +65,10 @@ Matter over Wi-Fi with Openthread Border Router support :
 -   RT1060-EVK-C + IW612 (Wi-Fi + 15.4 + BLE)
 -   RT1060-EVK-C + IW610 (Wi-Fi + 15.4 + BLE)
 
+> **Note:** For CMake builds, Matter over Wi-Fi with `RT1060-EVK-C + IW612` is
+> the default configuration when no `prj_<flavour>.conf` file and no transceiver
+> option is specified in the [build](#cmake-build-system).
+
 ### Hardware requirements RT1060 + transceiver
 
 #### Hardware requirements RT1060+IW416
