@@ -407,6 +407,9 @@ class TC_ACL_2_5(MatterBaseTest):
         events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
         return max([e.Header.EventNumber for e in events])
 
+    def pics_TC_ACL_2_5(self) -> list[str]:
+        return ['ACL.S.A0001']
+
     def desc_TC_ACL_2_5(self) -> str:
         return "[TC-ACL-2.5]  AccessControlExtensionChanged event"
 
