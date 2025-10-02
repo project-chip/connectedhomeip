@@ -114,11 +114,12 @@ CHIP_ERROR ZoneManagementCluster::LoadZones()
 
     // Load Zones
     mZones.clear();
-    //DataModel::DecodableList<chip::app::Clusters::ZoneManagement::Structs::ZoneInformationStruct::DecodableType> decodableZones;
+    // DataModel::DecodableList<chip::app::Clusters::ZoneManagement::Structs::ZoneInformationStruct::DecodableType> decodableZones;
 
     err = mContext->attributeStorage.ReadValue(ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Zones::Id),
                                                bufferSpan);
-    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) {
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
         ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: No persistent info found. Continuing.", mPath.mEndpointId);
         return CHIP_NO_ERROR;
     }
@@ -162,14 +163,13 @@ CHIP_ERROR ZoneManagementCluster::LoadZones()
     }
     if (err == CHIP_END_OF_TLV)
     {
-            return CHIP_NO_ERROR;
+        return CHIP_NO_ERROR;
     }
     else
     {
         ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to iterate zones from the KVS.", mPath.mEndpointId);
         return err;
     }
-
 }
 
 CHIP_ERROR ZoneManagementCluster::LoadTriggers()
@@ -372,17 +372,17 @@ CHIP_ERROR ZoneManagementCluster::Attributes(const ConcreteClusterPath & path,
 {
     if (HasFeature(Feature::kUserDefined))
     {
-        ReturnErrorOnFailure(builder.AppendElements({MaxUserDefinedZones::kMetadataEntry}));
+        ReturnErrorOnFailure(builder.AppendElements({ MaxUserDefinedZones::kMetadataEntry }));
     }
 
     if (!HasFeature(Feature::kPerZoneSensitivity))
     {
-        ReturnErrorOnFailure(builder.AppendElements({Sensitivity::kMetadataEntry}));
+        ReturnErrorOnFailure(builder.AppendElements({ Sensitivity::kMetadataEntry }));
     }
 
     if (HasFeature(Feature::kTwoDimensionalCartesianZone))
     {
-        ReturnErrorOnFailure(builder.AppendElements({TwoDCartesianMax::kMetadataEntry}));
+        ReturnErrorOnFailure(builder.AppendElements({ TwoDCartesianMax::kMetadataEntry }));
     }
 
     ReturnErrorOnFailure(builder.AppendElements(kMandatoryAttributes));
@@ -400,7 +400,7 @@ CHIP_ERROR ZoneManagementCluster::AcceptedCommands(const ConcreteClusterPath & p
     }
     if (HasFeature(Feature::kUserDefined))
     {
-        ReturnErrorOnFailure(builder.AppendElements({RemoveZone::kMetadataEntry}));
+        ReturnErrorOnFailure(builder.AppendElements({ RemoveZone::kMetadataEntry }));
     }
     return builder.AppendElements({ CreateOrUpdateTrigger::kMetadataEntry, RemoveTrigger::kMetadataEntry });
 }
@@ -410,7 +410,7 @@ CHIP_ERROR ZoneManagementCluster::GeneratedCommands(const ConcreteClusterPath & 
     using namespace chip::app::Clusters::ZoneManagement::Commands;
     if (HasFeature(Feature::kTwoDimensionalCartesianZone))
     {
-        return builder.AppendElements({CreateTwoDCartesianZoneResponse::Id});
+        return builder.AppendElements({ CreateTwoDCartesianZoneResponse::Id });
     }
     return CHIP_NO_ERROR;
 }

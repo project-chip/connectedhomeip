@@ -23,8 +23,8 @@
  *
  */
 
-#include <vector>
 #include <pw_unit_test/framework.h>
+#include <vector>
 
 #include <app/AttributePathParams.h>
 #include <app/AttributeValueDecoder.h>
@@ -40,8 +40,8 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
-#include <app/clusters/zone-management-server/zone-geometry.h>
 #include <app/clusters/zone-management-server/ZoneManagementCluster.h>
+#include <app/clusters/zone-management-server/zone-geometry.h>
 
 #include <lib/support/CodeUtils.h>
 
@@ -62,18 +62,15 @@ using chip::app::AttributeValueDecoder;
 using chip::app::DataModel::AttributeEntry;
 using chip::app::Testing::WriteOperation;
 
-
 class MockZoneManagementDelegate : public chip::app::Clusters::ZoneManagement::Delegate
 {
     chip::Protocols::InteractionModel::Status
-    CreateTwoDCartesianZone(uint16_t zoneID,
-                            const chip::app::Clusters::ZoneManagement::TwoDCartesianZoneStorage & zone) override
+    CreateTwoDCartesianZone(uint16_t zoneID, const chip::app::Clusters::ZoneManagement::TwoDCartesianZoneStorage & zone) override
     {
         return chip::Protocols::InteractionModel::Status::Success;
     }
     chip::Protocols::InteractionModel::Status
-    UpdateTwoDCartesianZone(uint16_t zoneID,
-                            const chip::app::Clusters::ZoneManagement::TwoDCartesianZoneStorage & zone) override
+    UpdateTwoDCartesianZone(uint16_t zoneID, const chip::app::Clusters::ZoneManagement::TwoDCartesianZoneStorage & zone) override
     {
         return chip::Protocols::InteractionModel::Status::Success;
     }
@@ -81,13 +78,13 @@ class MockZoneManagementDelegate : public chip::app::Clusters::ZoneManagement::D
     {
         return chip::Protocols::InteractionModel::Status::Success;
     }
-    chip::Protocols::InteractionModel::Status CreateTrigger(
-        const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override
+    chip::Protocols::InteractionModel::Status
+    CreateTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override
     {
         return chip::Protocols::InteractionModel::Status::Success;
     }
-    chip::Protocols::InteractionModel::Status UpdateTrigger(
-        const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override
+    chip::Protocols::InteractionModel::Status
+    UpdateTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override
     {
         return chip::Protocols::InteractionModel::Status::Success;
     }
@@ -110,20 +107,18 @@ TEST_F(TestZoneManagementCluster, TestAttributes)
 
     MockZoneManagementDelegate delegate;
 
-    BitFlags<Feature, uint32_t> testFeatures1(Feature::kTwoDimensionalCartesianZone,
-                                              Feature::kPerZoneSensitivity,
-                                              Feature::kUserDefined,
-                                              Feature::kFocusZones);
-    uint8_t testUserZones      = 5;
-    uint8_t testMaxZones       = 5;
-    uint8_t testSensitivityMax = 10;
+    BitFlags<Feature, uint32_t> testFeatures1(Feature::kTwoDimensionalCartesianZone, Feature::kPerZoneSensitivity,
+                                              Feature::kUserDefined, Feature::kFocusZones);
+    uint8_t testUserZones                      = 5;
+    uint8_t testMaxZones                       = 5;
+    uint8_t testSensitivityMax                 = 10;
     TwoDCartesianVertexStruct twoDCartesianMax = { .x = 100, .y = 100 };
 
-    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax, twoDCartesianMax);
+    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax,
+                                  twoDCartesianMax);
     chip::Test::TestServerClusterContext context;
     cluster.Init();
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
 
     ReadOnlyBufferBuilder<AttributeEntry> builder;
     ASSERT_EQ(cluster.Attributes({ kRootEndpointId, ZoneManagement::Id }, builder), CHIP_NO_ERROR);
@@ -132,15 +127,15 @@ TEST_F(TestZoneManagementCluster, TestAttributes)
     ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
 
     ASSERT_EQ(expectedBuilder.AppendElements({
-                Attributes::MaxUserDefinedZones::kMetadataEntry,
-                Attributes::MaxZones::kMetadataEntry,
-                Attributes::Zones::kMetadataEntry,
-                Attributes::Triggers::kMetadataEntry,
-                Attributes::SensitivityMax::kMetadataEntry,
-                // testFeatures1 defines PerZoneSensitivity, so there should be no global Sensitivity attribute
-                Attributes::TwoDCartesianMax::kMetadataEntry,
-            }),
-        CHIP_NO_ERROR);
+                  Attributes::MaxUserDefinedZones::kMetadataEntry,
+                  Attributes::MaxZones::kMetadataEntry,
+                  Attributes::Zones::kMetadataEntry,
+                  Attributes::Triggers::kMetadataEntry,
+                  Attributes::SensitivityMax::kMetadataEntry,
+                  // testFeatures1 defines PerZoneSensitivity, so there should be no global Sensitivity attribute
+                  Attributes::TwoDCartesianMax::kMetadataEntry,
+              }),
+              CHIP_NO_ERROR);
     ASSERT_TRUE(::chip::Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 }
 
@@ -149,20 +144,18 @@ TEST_F(TestZoneManagementCluster, TestGeneratedCommands)
 
     MockZoneManagementDelegate delegate;
 
-    BitFlags<Feature, uint32_t> testFeatures1(Feature::kTwoDimensionalCartesianZone,
-                                              Feature::kPerZoneSensitivity,
-                                              Feature::kUserDefined,
-                                              Feature::kFocusZones);
-    uint8_t testUserZones      = 5;
-    uint8_t testMaxZones       = 5;
-    uint8_t testSensitivityMax = 10;
+    BitFlags<Feature, uint32_t> testFeatures1(Feature::kTwoDimensionalCartesianZone, Feature::kPerZoneSensitivity,
+                                              Feature::kUserDefined, Feature::kFocusZones);
+    uint8_t testUserZones                      = 5;
+    uint8_t testMaxZones                       = 5;
+    uint8_t testSensitivityMax                 = 10;
     TwoDCartesianVertexStruct twoDCartesianMax = { .x = 100, .y = 100 };
 
-    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax, twoDCartesianMax);
+    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax,
+                                  twoDCartesianMax);
     chip::Test::TestServerClusterContext context;
     cluster.Init();
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
 
     ReadOnlyBufferBuilder<CommandId> builder;
     ASSERT_EQ(cluster.GeneratedCommands({ kRootEndpointId, ZoneManagement::Id }, builder), CHIP_NO_ERROR);
@@ -170,10 +163,10 @@ TEST_F(TestZoneManagementCluster, TestGeneratedCommands)
     ReadOnlyBufferBuilder<CommandId> expectedBuilder;
 
     ASSERT_EQ(expectedBuilder.AppendElements({
-                Commands::CreateTwoDCartesianZoneResponse::Id,
-            }),
-        CHIP_NO_ERROR);
-    //ASSERT_TRUE(::chip::Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+                  Commands::CreateTwoDCartesianZoneResponse::Id,
+              }),
+              CHIP_NO_ERROR);
+    // ASSERT_TRUE(::chip::Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 }
 
 TEST_F(TestZoneManagementCluster, TestAcceptedCommands)
@@ -181,20 +174,18 @@ TEST_F(TestZoneManagementCluster, TestAcceptedCommands)
 
     MockZoneManagementDelegate delegate;
 
-    BitFlags<Feature, uint32_t> testFeatures1(Feature::kTwoDimensionalCartesianZone,
-                                              Feature::kPerZoneSensitivity,
-                                              Feature::kUserDefined,
-                                              Feature::kFocusZones);
-    uint8_t testUserZones      = 5;
-    uint8_t testMaxZones       = 5;
-    uint8_t testSensitivityMax = 10;
+    BitFlags<Feature, uint32_t> testFeatures1(Feature::kTwoDimensionalCartesianZone, Feature::kPerZoneSensitivity,
+                                              Feature::kUserDefined, Feature::kFocusZones);
+    uint8_t testUserZones                      = 5;
+    uint8_t testMaxZones                       = 5;
+    uint8_t testSensitivityMax                 = 10;
     TwoDCartesianVertexStruct twoDCartesianMax = { .x = 100, .y = 100 };
 
-    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax, twoDCartesianMax);
+    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax,
+                                  twoDCartesianMax);
     chip::Test::TestServerClusterContext context;
     cluster.Init();
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
 
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> builder;
     ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, ZoneManagement::Id }, builder), CHIP_NO_ERROR);
@@ -202,30 +193,29 @@ TEST_F(TestZoneManagementCluster, TestAcceptedCommands)
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expectedBuilder;
 
     ASSERT_EQ(expectedBuilder.AppendElements({
-                Commands::CreateTwoDCartesianZone::kMetadataEntry,
-                Commands::UpdateTwoDCartesianZone::kMetadataEntry,
-                Commands::RemoveZone::kMetadataEntry,
-                Commands::CreateOrUpdateTrigger::kMetadataEntry,
-                Commands::RemoveTrigger::kMetadataEntry,
-            }),
-        CHIP_NO_ERROR);
-    //ASSERT_TRUE(::chip::Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+                  Commands::CreateTwoDCartesianZone::kMetadataEntry,
+                  Commands::UpdateTwoDCartesianZone::kMetadataEntry,
+                  Commands::RemoveZone::kMetadataEntry,
+                  Commands::CreateOrUpdateTrigger::kMetadataEntry,
+                  Commands::RemoveTrigger::kMetadataEntry,
+              }),
+              CHIP_NO_ERROR);
+    // ASSERT_TRUE(::chip::Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 }
 
 TEST_F(TestZoneManagementCluster, TestZonePersistence)
 {
     MockZoneManagementDelegate delegate;
 
-    BitFlags<Feature, uint32_t> testFeatures1(Feature::kTwoDimensionalCartesianZone,
-                                              Feature::kPerZoneSensitivity,
-                                              Feature::kUserDefined,
-                                              Feature::kFocusZones);
-    uint8_t testUserZones      = 5;
-    uint8_t testMaxZones       = 5;
-    uint8_t testSensitivityMax = 10;
+    BitFlags<Feature, uint32_t> testFeatures1(Feature::kTwoDimensionalCartesianZone, Feature::kPerZoneSensitivity,
+                                              Feature::kUserDefined, Feature::kFocusZones);
+    uint8_t testUserZones                      = 5;
+    uint8_t testMaxZones                       = 5;
+    uint8_t testSensitivityMax                 = 10;
     TwoDCartesianVertexStruct twoDCartesianMax = { .x = 100, .y = 100 };
 
-    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax, twoDCartesianMax);
+    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax,
+                                  twoDCartesianMax);
     chip::Test::TestServerClusterContext context;
     cluster.Init();
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -246,7 +236,8 @@ TEST_F(TestZoneManagementCluster, TestZonePersistence)
     EXPECT_EQ(cluster.GetZones().size(), 1u);
 
     // Create a new server instance and check if it loads the persisted zone
-    ZoneManagementCluster newCluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax, twoDCartesianMax);
+    ZoneManagementCluster newCluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax,
+                                     twoDCartesianMax);
     newCluster.Init();
     ASSERT_EQ(newCluster.Startup(context.Get()), CHIP_NO_ERROR);
 
