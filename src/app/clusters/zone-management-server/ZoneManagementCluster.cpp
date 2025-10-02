@@ -114,21 +114,29 @@ CHIP_ERROR ZoneManagementCluster::LoadZones()
 
     // Load Zones
     mZones.clear();
-    DataModel::DecodableList<chip::app::Clusters::ZoneManagement::Structs::ZoneInformationStruct::DecodableType> decodableZones;
+    //DataModel::DecodableList<chip::app::Clusters::ZoneManagement::Structs::ZoneInformationStruct::DecodableType> decodableZones;
 
     err = mContext->attributeStorage.ReadValue(ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Zones::Id),
                                                bufferSpan);
-    VerifyOrReturnError((CHIP_NO_ERROR == err) || (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND), err,
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) {
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: No persistent info found. Continuing.", mPath.mEndpointId);
+        return CHIP_NO_ERROR;
+    }
+    VerifyOrReturnError(CHIP_NO_ERROR == err, err,
                         ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load zones from the KVS.", mPath.mEndpointId));
 
     chip::TLV::TLVReader reader;
+    chip::TLV::TLVType type;
     reader.Init(bufferSpan);
-    decodableZones.Decode(reader);
+    reader.Next();
+    VerifyOrReturnError(reader.GetType() == chip::TLV::kTLVType_Array, CHIP_ERROR_SCHEMA_MISMATCH);
+    reader.EnterContainer(type);
 
-    auto iter = decodableZones.begin();
-    while (iter.Next())
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        auto & decodableZone = iter.GetValue();
+        chip::app::Clusters::ZoneManagement::Structs::ZoneInformationStruct::DecodableType decodableZone;
+        decodableZone.Decode(reader);
+
         ZoneInformationStorage zoneInfo;
 
         Optional<TwoDCartesianZoneStorage> twoDCartZoneStorage;
@@ -152,11 +160,16 @@ CHIP_ERROR ZoneManagementCluster::LoadZones()
         zoneInfo.Set(decodableZone.zoneID, decodableZone.zoneType, decodableZone.zoneSource, twoDCartZoneStorage);
         mZones.push_back(zoneInfo);
     }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
+    if (err == CHIP_END_OF_TLV)
+    {
+            return CHIP_NO_ERROR;
+    }
+    else
     {
         ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to iterate zones from the KVS.", mPath.mEndpointId);
+        return err;
     }
-    return CHIP_NO_ERROR;
+
 }
 
 CHIP_ERROR ZoneManagementCluster::LoadTriggers()
@@ -359,20 +372,21 @@ CHIP_ERROR ZoneManagementCluster::Attributes(const ConcreteClusterPath & path,
 {
     if (HasFeature(Feature::kUserDefined))
     {
-        ReturnErrorOnFailure(builder.Append(MaxUserDefinedZones::kMetadataEntry));
+        ReturnErrorOnFailure(builder.AppendElements({MaxUserDefinedZones::kMetadataEntry}));
     }
 
     if (!HasFeature(Feature::kPerZoneSensitivity))
     {
-        ReturnErrorOnFailure(builder.Append(Sensitivity::kMetadataEntry));
+        ReturnErrorOnFailure(builder.AppendElements({Sensitivity::kMetadataEntry}));
     }
 
     if (HasFeature(Feature::kTwoDimensionalCartesianZone))
     {
-        ReturnErrorOnFailure(builder.Append(TwoDCartesianMax::kMetadataEntry));
+        ReturnErrorOnFailure(builder.AppendElements({TwoDCartesianMax::kMetadataEntry}));
     }
 
-    return builder.AppendElements(kMandatoryAttributes);
+    ReturnErrorOnFailure(builder.AppendElements(kMandatoryAttributes));
+    return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
 }
 
 CHIP_ERROR ZoneManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
@@ -386,7 +400,7 @@ CHIP_ERROR ZoneManagementCluster::AcceptedCommands(const ConcreteClusterPath & p
     }
     if (HasFeature(Feature::kUserDefined))
     {
-        ReturnErrorOnFailure(builder.Append(RemoveZone::kMetadataEntry));
+        ReturnErrorOnFailure(builder.AppendElements({RemoveZone::kMetadataEntry}));
     }
     return builder.AppendElements({ CreateOrUpdateTrigger::kMetadataEntry, RemoveTrigger::kMetadataEntry });
 }
@@ -396,7 +410,7 @@ CHIP_ERROR ZoneManagementCluster::GeneratedCommands(const ConcreteClusterPath & 
     using namespace chip::app::Clusters::ZoneManagement::Commands;
     if (HasFeature(Feature::kTwoDimensionalCartesianZone))
     {
-        return builder.Append(CreateTwoDCartesianZoneResponse::Id);
+        return builder.AppendElements({CreateTwoDCartesianZoneResponse::Id});
     }
     return CHIP_NO_ERROR;
 }
