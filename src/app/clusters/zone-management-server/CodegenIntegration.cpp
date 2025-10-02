@@ -60,12 +60,12 @@ void emberAfZoneManagementClusterServerInitCallback(EndpointId endpointId)
 
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId = endpointId,
-            .clusterId = ZoneManagement::Id,
+            .endpointId                = endpointId,
+            .clusterId                 = ZoneManagement::Id,
             .fixedClusterInstanceCount = kZoneManagementFixedClusterCount,
-            .maxClusterInstanceCount = kZoneManagementMaxClusterCount,
-            .fetchFeatureMap = false,
-            .fetchOptionalAttributes = false,
+            .maxClusterInstanceCount   = kZoneManagementMaxClusterCount,
+            .fetchFeatureMap           = false,
+            .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
 }
@@ -76,10 +76,10 @@ void MatterZoneManagementClusterServerShutdownCallback(EndpointId endpointId)
 
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId = endpointId,
-            .clusterId = ZoneManagement::Id,
+            .endpointId                = endpointId,
+            .clusterId                 = ZoneManagement::Id,
             .fixedClusterInstanceCount = kZoneManagementFixedClusterCount,
-            .maxClusterInstanceCount = kZoneManagementMaxClusterCount,
+            .maxClusterInstanceCount   = kZoneManagementMaxClusterCount,
         },
         integrationDelegate);
 }

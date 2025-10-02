@@ -115,9 +115,11 @@ void ZoneMgmtServer::LoadPersistentAttributes()
     mZones.clear();
     DataModel::DecodableList<chip::app::Clusters::ZoneManagement::Structs::ZoneInformationStruct::DecodableType> decodableZones;
 
-    err = GetAttributePersistenceProvider()->ReadValue(ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id), bufferSpan);
+    err = GetAttributePersistenceProvider()->ReadValue(
+        ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id), bufferSpan);
 
-    VerifyOrReturn((CHIP_NO_ERROR == err) || (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND), ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load zones from the KVS.", mEndpointId));
+    VerifyOrReturn((CHIP_NO_ERROR == err) || (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND),
+                   ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load zones from the KVS.", mEndpointId));
 
     chip::TLV::TLVReader reader;
     reader.Init(bufferSpan);
@@ -365,7 +367,8 @@ void ZoneMgmtServer::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
-void ZoneMgmtServer::PersistZones() {
+void ZoneMgmtServer::PersistZones()
+{
     uint8_t buffer[kMaxPersistedValueLengthSupported];
     MutableByteSpan bufferSpan(buffer);
     chip::TLV::TLVWriter writer;
@@ -385,9 +388,11 @@ void ZoneMgmtServer::PersistZones() {
 
     bufferSpan.reduce_size(writer.GetLengthWritten());
 
-    err = GetAttributePersistenceProvider()->WriteValue(ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id), bufferSpan);
-    LogAndReturnOnFailure(err, Zcl,"ZoneManagement[ep=%d] failure saving zone: %s", mEndpointId, "write");
-    ChipLogProgress(Zcl, "ZoneManagement[ep=%d] persisted %zu zones, wrote %d bytes", mEndpointId, mZones.size(), writer.GetLengthWritten());
+    err = GetAttributePersistenceProvider()->WriteValue(
+        ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id), bufferSpan);
+    LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving zone: %s", mEndpointId, "write");
+    ChipLogProgress(Zcl, "ZoneManagement[ep=%d] persisted %zu zones, wrote %d bytes", mEndpointId, mZones.size(),
+                    writer.GetLengthWritten());
 }
 
 CHIP_ERROR ZoneMgmtServer::AddZone(const ZoneInformationStorage & zone)
@@ -410,7 +415,7 @@ CHIP_ERROR ZoneMgmtServer::UpdateZone(uint16_t zoneId, const ZoneInformationStor
     // If an item with the zoneID was found
     if (it != mZones.end())
     {
-        *it       = zoneInfo; // Replace the found item with the newItem
+        *it = zoneInfo; // Replace the found item with the newItem
         PersistZones();
         auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
         mDelegate.OnAttributeChanged(Attributes::Zones::Id);

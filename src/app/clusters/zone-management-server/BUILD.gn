@@ -24,9 +24,7 @@ source_set("zone-geometry") {
 }
 
 source_set("zone-management-server-impl") {
-  sources = [
-    "ZoneManagementCluster.cpp",
-  ]
+  sources = [ "ZoneManagementCluster.cpp" ]
 
   deps = [
     ":zone-geometry",
@@ -34,9 +32,7 @@ source_set("zone-management-server-impl") {
     "${chip_root}/src/lib/support",
   ]
 
-  public_deps = [
-    ":zone-management-server-cluster",
-  ]
+  public_deps = [ ":zone-management-server-cluster" ]
 }
 
 source_set("zone-management-server-cluster") {
@@ -46,10 +42,10 @@ source_set("zone-management-server-cluster") {
     ":zone-geometry",
     "${chip_root}/src/app:constants",
     "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/persistence",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
-    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/zzz_generated/app-common/clusters/ZoneManagement",
   ]
 }

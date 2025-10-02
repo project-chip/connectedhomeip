@@ -20,7 +20,6 @@
 #include <clusters/ZoneManagement/Attributes.h>
 #include <clusters/ZoneManagement/Commands.h>
 
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -108,7 +107,7 @@ struct ZoneInformationStorage : ZoneInformationStruct
     Optional<TwoDCartesianZoneStorage> twoDCartZoneStorage;
 };
 
-    /** @brief
+/** @brief
  *  Defines interfaces for implementing application-specific logic for various aspects of the ZoneManagement Cluster.
  *  Specifically, it defines interfaces for the command handling and loading of the allocated streams.
  */
@@ -198,7 +197,7 @@ public:
 
 private:
     friend class ZoneManagementCluster;
-    ZoneManagementCluster *mZoneMgmtServer = nullptr;
+    ZoneManagementCluster * mZoneMgmtServer = nullptr;
     /**
      * This method is used by the SDK to ensure the delegate points to the server instance it's associated with.
      * When a server instance is created or destroyed, this method will be called to set and clear, respectively,
@@ -212,9 +211,8 @@ private:
 class ZoneManagementCluster : public DefaultServerCluster
 {
 public:
-    ZoneManagementCluster(EndpointId endpointId, Delegate & delegate, const BitFlags<Feature> features,
-                          uint8_t maxUserDefinedZones, uint8_t maxZones, uint8_t sensitivityMax,
-                          const TwoDCartesianVertexStruct & twoDCartesianMax);
+    ZoneManagementCluster(EndpointId endpointId, Delegate & delegate, const BitFlags<Feature> features, uint8_t maxUserDefinedZones,
+                          uint8_t maxZones, uint8_t sensitivityMax, const TwoDCartesianVertexStruct & twoDCartesianMax);
     ~ZoneManagementCluster() override;
 
     CHIP_ERROR Init();
@@ -305,15 +303,20 @@ private:
     bool ZoneAlreadyExists(ZoneUseEnum zoneUse, const std::vector<TwoDCartesianVertexStruct> & vertices,
                            const DataModel::Nullable<uint16_t> & excludeZoneId);
 
-    void HandleCreateTwoDCartesianZone(CommandHandler * handler, const ConcreteCommandPath & commandPath, const Commands::CreateTwoDCartesianZone::DecodableType & req);
+    void HandleCreateTwoDCartesianZone(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+                                       const Commands::CreateTwoDCartesianZone::DecodableType & req);
 
-    void HandleUpdateTwoDCartesianZone(CommandHandler * handler, const ConcreteCommandPath & commandPath, const Commands::UpdateTwoDCartesianZone::DecodableType & req);
+    void HandleUpdateTwoDCartesianZone(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+                                       const Commands::UpdateTwoDCartesianZone::DecodableType & req);
 
-    void HandleRemoveZone(CommandHandler * handler, const ConcreteCommandPath & commandPath, const Commands::RemoveZone::DecodableType & req);
+    void HandleRemoveZone(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+                          const Commands::RemoveZone::DecodableType & req);
 
-    void HandleCreateOrUpdateTrigger(CommandHandler * handler, const ConcreteCommandPath & commandPath, const Commands::CreateOrUpdateTrigger::DecodableType & req);
+    void HandleCreateOrUpdateTrigger(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+                                     const Commands::CreateOrUpdateTrigger::DecodableType & req);
 
-    void HandleRemoveTrigger(CommandHandler * handler, const ConcreteCommandPath & commandPath, const Commands::RemoveTrigger::DecodableType & req);
+    void HandleRemoveTrigger(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+                             const Commands::RemoveTrigger::DecodableType & req);
 };
 
 } // namespace ZoneManagement
