@@ -80,7 +80,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
-                os: ${{ github.event_name == 'schedule' && fromJSON('["macos-13", "macos-14"]') || fromJSON('["macos-13", "macos-14"]') }}
+                os: ${{ github.event_name == 'schedule' && fromJSON('["macos-13", "macos-14"]') || fromJSON('["macos-14"]') }}
                 options: # We don't need a full matrix
                     - flavor: asan
                       arguments:
