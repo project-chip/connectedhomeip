@@ -288,7 +288,11 @@ private:
         DataModel::Nullable<uint64_t> localTime;
 
         CHIP_ERROR err = GetLocalTime(mPath.mEndpointId, localTime);
-        // ReturnErrorOnFailure(err);
+        if (err == CHIP_ERROR_INVALID_TIME)
+        {
+            return encoder.EncodeNull();
+        }
+        ReturnErrorOnFailure(err);
 
         return encoder.Encode(localTime);
     }
