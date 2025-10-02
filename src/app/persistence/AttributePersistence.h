@@ -51,24 +51,42 @@ public:
 
     /// Performs all the steps of:
     ///   - decode the given raw data
+    ///   - apply optional custom validation
     ///   - write to storage
-    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T>> * = nullptr>
-    CHIP_ERROR DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, T & value)
+    template <typename T, typename Validator = decltype(nullptr), typename std::enable_if_t<std::is_arithmetic_v<T>> * = nullptr>
+    CHIP_ERROR DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, T & value,
+                                               Validator validator = nullptr)
     {
         ReturnErrorOnFailure(decoder.Decode(value));
+
+        // Apply custom validation if provided
+        if constexpr (!std::is_same_v<Validator, std::nullptr_t>)
+        {
+            ReturnErrorOnFailure(validator(value));
+        }
+
         return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
     }
 
     // Specialization for enums
     // - decode the given data
     // - verifies that it is a valid enum value
+    // - applies optional custom validation
     // - writes to storage
-    template <typename T, typename std::enable_if_t<std::is_enum_v<T>> * = nullptr>
-    CHIP_ERROR DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, T & value)
+    template <typename T, typename Validator = decltype(nullptr), typename std::enable_if_t<std::is_enum_v<T>> * = nullptr>
+    CHIP_ERROR DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, T & value,
+                                               Validator validator = nullptr)
     {
         T decodedValue = T::kUnknownEnumValue;
         ReturnErrorOnFailure(decoder.Decode(decodedValue));
         VerifyOrReturnError(decodedValue != T::kUnknownEnumValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+        // Apply custom validation if provided
+        if constexpr (!std::is_same_v<Validator, std::nullptr_t>)
+        {
+            ReturnErrorOnFailure(validator(decodedValue));
+        }
+
         value = decodedValue;
         return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
     }
