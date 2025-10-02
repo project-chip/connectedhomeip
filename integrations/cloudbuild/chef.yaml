@@ -44,8 +44,7 @@ steps:
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
-          - ./examples/chef/chef.py --build_all --build_include linux_x86-icd nrf52840dk-icd
-      allowFailure: true # TODO: Remove this once compilation stability is established.
+          - ./examples/chef/chef.py --build_all --build_include "linux_x86-icd|nrf52840dk-icd"
       id: CompileICD
       waitFor:
           - CompileAll
