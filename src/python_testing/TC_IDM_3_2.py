@@ -82,8 +82,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                         # Check if this attribute requires timed write using the must_use_timed_write property
                         if hasattr(attr_instance, 'must_use_timed_write') and attr_instance.must_use_timed_write:
                             if await self.attribute_guard(endpoint=endpoint_id, attribute=attr_class):
-                                logging.info(f"Found timed write attribute: {attr_class.__name__}(id={
-                                             attr_id}) in cluster {cluster_type.__name__}")
+                                logging.info(f"Found timed write attribute: {attr_class.__name__}(id={attr_id}) in cluster {cluster_type.__name__}")
                                 return endpoint_id, attr_class
                             else:
                                 logging.info(f"Device does not support timed write attribute: {attr_class.__name__} (id={attr_id})")
@@ -219,7 +218,6 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal(write_status2, Status.UnsupportedAttribute,
                              f"Write to unsupported attribute should return UNSUPPORTED_ATTRIBUTE, got {write_status2}")
 
-
         self.skip_step(4)
         """
         // TODO: SuppressResponse handling not yet implemented in the SDK server side (see Issue #41227).
@@ -277,6 +275,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             TH sends a WriteRequestMessage to the DUT to modify the value of one attribute with the DataVersion field set to the one received in the prior step.
             '''
             test_cluster = Clusters.BasicInformation
+            test_attribute = Clusters.BasicInformation.Attributes.NodeLabel
             new_value0 = "New-Label-Step5"
 
             # Read an attribute to get the current DataVersion
