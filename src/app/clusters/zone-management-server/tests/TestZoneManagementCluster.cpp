@@ -247,5 +247,54 @@ TEST_F(TestZoneManagementCluster, TestZonePersistence)
     EXPECT_TRUE(newCluster.GetZones()[0].twoDCartZoneStorage.Value().name.data_equal("TestZone"_span));
 }
 
+TEST_F(TestZoneManagementCluster, TestTriggerPersistence)
+{
+    MockZoneManagementDelegate delegate;
+
+    BitFlags<Feature, uint32_t> testFeatures1(Feature::kTwoDimensionalCartesianZone, Feature::kPerZoneSensitivity,
+                                              Feature::kUserDefined, Feature::kFocusZones);
+    uint8_t testUserZones                      = 5;
+    uint8_t testMaxZones                       = 5;
+    uint8_t testSensitivityMax                 = 10;
+    TwoDCartesianVertexStruct twoDCartesianMax = { .x = 100, .y = 100 };
+
+    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax,
+                                  twoDCartesianMax);
+    chip::Test::TestServerClusterContext context;
+    cluster.Init();
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    // Add a zone
+    {
+        ZoneInformationStorage zone;
+        TwoDCartesianZoneStorage twoDCartZone;
+        std::vector<TwoDCartesianVertexStruct> vertices;
+        vertices.push_back({ .x = 1, .y = 1 });
+        vertices.push_back({ .x = 2, .y = 2 });
+        vertices.push_back({ .x = 3, .y = 3 });
+        twoDCartZone.Set("TestZone"_span, ZoneUseEnum::kMotion, vertices, NullOptional);
+        zone.Set(1, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(twoDCartZone));
+        EXPECT_EQ(cluster.AddZone(zone), CHIP_NO_ERROR);
+    }
+
+    // Add a trigger
+    {
+        ZoneTriggerControlStruct trigger;
+        trigger.zoneID = 1;
+        EXPECT_EQ(cluster.AddOrUpdateTrigger(trigger), Protocols::InteractionModel::Status::Success);
+    }
+
+    // Verify the trigger is there
+    EXPECT_EQ(cluster.GetTriggers().size(), 1u);
+
+    // Create a new server instance and check if it loads the persisted trigger
+    ZoneManagementCluster newCluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax,
+                                     twoDCartesianMax);
+    newCluster.Init();
+    ASSERT_EQ(newCluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(newCluster.GetTriggers().size(), 1u);
+    EXPECT_EQ(newCluster.GetTriggers()[0].zoneID, 1u);
+}
+
 } // namespace app
 } // namespace chip

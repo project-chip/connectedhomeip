@@ -174,13 +174,45 @@ CHIP_ERROR ZoneManagementCluster::LoadZones()
 
 CHIP_ERROR ZoneManagementCluster::LoadTriggers()
 {
-    // TODO: move trigger persistence logic from the delegate into the base
     CHIP_ERROR err = CHIP_NO_ERROR;
-    if (err != CHIP_NO_ERROR)
+    uint8_t buffer[kMaxPersistedValueLengthSupported];
+    MutableByteSpan bufferSpan(buffer);
+
+    // Load Triggers
+    mTriggers.clear();
+
+    err = mContext->attributeStorage.ReadValue(
+        ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id), bufferSpan);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
-        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load triggers from the KVS.", mPath.mEndpointId);
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: No persistent info found. Continuing.", mPath.mEndpointId);
+        return CHIP_NO_ERROR;
     }
-    return CHIP_NO_ERROR;
+    VerifyOrReturnError(CHIP_NO_ERROR == err, err,
+                        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load triggers from the KVS.", mPath.mEndpointId));
+
+    chip::TLV::TLVReader reader;
+    chip::TLV::TLVType type;
+    reader.Init(bufferSpan);
+    reader.Next();
+    VerifyOrReturnError(reader.GetType() == chip::TLV::kTLVType_Array, CHIP_ERROR_SCHEMA_MISMATCH);
+    reader.EnterContainer(type);
+
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        chip::app::Clusters::ZoneManagement::Structs::ZoneTriggerControlStruct::DecodableType decodableTrigger;
+        decodableTrigger.Decode(reader);
+        mTriggers.push_back(decodableTrigger);
+    }
+    if (err == CHIP_END_OF_TLV)
+    {
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to iterate triggers from the KVS.", mPath.mEndpointId);
+        return err;
+    }
 }
 
 CHIP_ERROR ZoneManagementCluster::LoadSensitivity()
@@ -445,6 +477,36 @@ void ZoneManagementCluster::PersistZones()
                     writer.GetLengthWritten());
 }
 
+void ZoneManagementCluster::PersistTriggers()
+{
+    uint8_t buffer[kMaxPersistedValueLengthSupported];
+    MutableByteSpan bufferSpan(buffer);
+    chip::TLV::TLVWriter writer;
+    CHIP_ERROR err;
+    TLV::TLVType arrayType;
+
+    writer.Init(bufferSpan);
+
+    err = writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType);
+    LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving trigger: %s", mPath.mEndpointId, "start");
+
+    for (const auto & trigger : mTriggers)
+    {
+        err = trigger.Encode(writer, chip::TLV::AnonymousTag());
+        LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving trigger: %s", mPath.mEndpointId, "element");
+    }
+    err = writer.EndContainer(arrayType);
+    LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving trigger: %s", mPath.mEndpointId, "end");
+
+    bufferSpan.reduce_size(writer.GetLengthWritten());
+
+    err = mContext->attributeStorage.WriteValue(
+        ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id), bufferSpan);
+    LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving trigger: %s", mPath.mEndpointId, "write");
+    ChipLogProgress(Zcl, "ZoneManagement[ep=%d] persisted %zu triggers, wrote %d bytes", mPath.mEndpointId, mTriggers.size(),
+                    writer.GetLengthWritten());
+}
+
 CHIP_ERROR ZoneManagementCluster::AddZone(const ZoneInformationStorage & zone)
 {
     mZones.push_back(zone);
@@ -529,6 +591,7 @@ Status ZoneManagementCluster::AddOrUpdateTrigger(const ZoneTriggerControlStruct 
 
     if (status == Status::Success)
     {
+        PersistTriggers();
         auto path = ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id);
         mDelegate.OnAttributeChanged(Attributes::Triggers::Id);
         MatterReportingAttributeChangeCallback(path);
@@ -545,6 +608,7 @@ Status ZoneManagementCluster::RemoveTrigger(uint16_t zoneId)
         mTriggers.erase(std::remove_if(mTriggers.begin(), mTriggers.end(),
                                        [&](const ZoneTriggerControlStruct & trigger) { return trigger.zoneID == zoneId; }),
                         mTriggers.end());
+        PersistTriggers();
         auto path = ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id);
         mDelegate.OnAttributeChanged(Attributes::Triggers::Id);
         MatterReportingAttributeChangeCallback(path);

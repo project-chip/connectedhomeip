@@ -284,6 +284,8 @@ private:
     CHIP_ERROR LoadSensitivity();
 
     void PersistZones();
+    void PersistTriggers();
+
 
     CHIP_ERROR ReadAndEncodeZones(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
