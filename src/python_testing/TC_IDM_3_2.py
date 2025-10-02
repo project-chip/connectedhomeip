@@ -221,7 +221,6 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
 
         self.skip_step(4)
-        # Please see below notes for why test step 4 is currently being skipped until SuppressResponse handling is implemented on the SDK server side (Please see issue https://github.com/project-chip/connectedhomeip/issues/41227)
         """
         // TODO: SuppressResponse handling not yet implemented in the SDK server side (see Issue #41227).
         // Current behavior: server always responds to WriteAttribute even when suppressResponse=true.
