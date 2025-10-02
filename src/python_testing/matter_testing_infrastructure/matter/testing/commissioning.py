@@ -144,8 +144,7 @@ async def commission_device(
 
     if commissioning_info.tc_version_to_simulate is not None and commissioning_info.tc_user_response_to_simulate is not None:
         LOGGER.debug(
-            f"Setting TC Acknowledgements to version {commissioning_info.tc_version_to_simulate} with user response {
-                commissioning_info.tc_user_response_to_simulate}."
+            f"Setting TC Acknowledgements to version {commissioning_info.tc_version_to_simulate} with user response {commissioning_info.tc_user_response_to_simulate}."
         )
         dev_ctrl.SetTCAcknowledgements(commissioning_info.tc_version_to_simulate, commissioning_info.tc_user_response_to_simulate)
 
