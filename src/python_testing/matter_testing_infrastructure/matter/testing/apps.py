@@ -92,7 +92,8 @@ class AppServerSubprocess(Subprocess):
         # Do not leak KVS file descriptor.
         if hasattr(self, "kvs_fd"):
             try:
-                os.close(self.kvs_fd)
+                if self.kvs_fd is not None:
+                    os.close(self.kvs_fd)
             except OSError:
                 pass
 
