@@ -36,10 +36,11 @@
 
 from __future__ import annotations
 import logging
-from typing import Any
+from typing import Any, Optional
 
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mdns_discovery.data_classes.mdns_service_info import MdnsServiceInfo
+from mdns_discovery.data_classes.ptr_record import PtrRecord
 from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_valid_cm_key,
                                           assert_valid_commissionable_instance_name, assert_valid_d_key,
                                           assert_valid_devtype_subtype, assert_valid_dn_key, assert_valid_dt_key,
@@ -90,8 +91,9 @@ class TC_SC_4_1(MatterBaseTest):
                 ]
 
     async def read_attribute(self, attribute: Any) -> Any:
+        endpoint = self.get_endpoint(default=1)
         cluster = Clusters.Objects.IcdManagement
-        return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
+        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     async def get_descriptor_server_list(self):
         return await self.read_single_attribute_check_success(
@@ -110,7 +112,7 @@ class TC_SC_4_1(MatterBaseTest):
         )
 
     @staticmethod
-    async def is_commissionable_service_ptr_present() -> tuple[bool, Any | None]:
+    async def get_commissionable_service_ptr_record() -> Optional[PtrRecord]:
         mdns = MdnsDiscovery()
 
         # Browse for DUT's commissionable service
@@ -124,61 +126,48 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Verify presence of DUT's comissionable service PTR record and return if present
         if len(commissionable_services_ptr) > 0:
-            return True, commissionable_services_ptr[0]
+            return commissionable_services_ptr[0]
 
-        return False, None
+        return None
 
-    async def get_commissionable_node_dns_sd_advertisements_txt(self) -> MdnsServiceInfo:
+    async def close_commissioning_window(self) -> None:
+        revoke_cmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
+        await self.default_controller.SendCommand(nodeid=self.dut_node_id,
+                                                  endpoint=0,
+                                                  payload=revoke_cmd,
+                                                  timedRequestTimeoutMs=6000)
+        sleep(1) # Give some time for failsafe cleanup scheduling
+
+    async def verify_commissionable_node_advertisements(self, service_name: str, expected_cm: str) -> None:
         mdns = MdnsDiscovery()
 
-        # Get DUT's commissionable service
-        is_cs_ptr_present, commissionable_service_ptr = await self.is_commissionable_service_ptr_present()
-        asserts.assert_true(is_cs_ptr_present, "DUT's commissionable node services not present")
-
+        # *** SRV RECORD CHECKS ***
+        # *************************
         # TH performs a query for the SRV record against the commissionable service service name.
         srv_record = await mdns.get_srv_record(
-            service_name=commissionable_service_ptr.service_name,
+            service_name=service_name,
             service_type=MdnsServiceType.COMMISSIONABLE.value,
             log_output=True
         )
 
         # Verify SRV record is returned
-        srv_record_returned = srv_record is not None and srv_record.service_name == commissionable_service_ptr.service_name
-        asserts.assert_true(srv_record_returned, "SRV record was not returned")
+        srv_record_returned = srv_record is not None and srv_record.service_name == service_name
+        asserts.assert_true(srv_record_returned, "SRV record was not returned")        
 
-        # TH performs a query for the TXT record against the commissionable service service name.
-        # Verify TXT record is returned if required
-        txt_record = await mdns.get_txt_record(
-            service_name=commissionable_service_ptr.service_name,
-            service_type=MdnsServiceType.COMMISSIONABLE.value,
-            log_output=True
-        )
-
-        # Request the TXT record. The device may opt not to return a TXT record if there are no mandatory TXT keys
-        txt_record_returned = txt_record is not None and txt_record.txt is not None and bool(
-            txt_record.txt)
-        txt_record_required = self.supports_icd or self.check_pics(TCP_PICS_STR)
-
-        if txt_record_required:
-            asserts.assert_true(txt_record_returned, "TXT record is required and was not returned or contains no values")
-
-        return txt_record
-
-    async def verify_commissionable_node_dns_sd_advertisements_txt(self, txt_record: MdnsServiceInfo, expected_cm: str) -> None:
         # Verify DUT's commissionable service is a valid DNS-SD instance name
         # (64-bit randomly selected ID expressed as a sixteen-char hex string with capital letters)
-        assert_valid_commissionable_instance_name(txt_record.instance_name)
+        assert_valid_commissionable_instance_name(srv_record.instance_name)
 
-        # TODO: Also handle for Thread, .local can be different
-        # TODO: how to check if commissioned by eth, wifi, thread?
         # Verify DUT's commissionable service service type is '_matterc._udp' and service domain '.local.'
-        assert_is_commissionable_type(txt_record.service_type)
+        assert_is_commissionable_type(srv_record.service_type)
 
         # Verify target hostname is derived from the 48bit or 64bit MAC address
         # expressed as a twelve or sixteen capital letter hex string. If the MAC
         # is randomized for privacy, the randomized version must be used each time.
-        assert_valid_hostname(txt_record.hostname)
+        assert_valid_hostname(srv_record.hostname)
 
+        # *** COMMISSIONABLE SUBTYPES CHECKS ***
+        # **************************************
         # Get commissionable subtypes
         subtypes = await MdnsDiscovery().get_commissionable_subtypes(log_output=True)
 
@@ -210,6 +199,23 @@ class TC_SC_4_1(MatterBaseTest):
         # Verify presence of the _CM subtype
         cm_subtype = f"_CM._sub.{MdnsServiceType.COMMISSIONABLE.value}"
         asserts.assert_in(cm_subtype, subtypes, f"'{cm_subtype}' subtype must be present.")
+
+        # *** TXT RECORD CHECKS ***
+        # *************************
+        # TH performs a query for the TXT record against the commissionable service service name.
+        txt_record = await mdns.get_txt_record(
+            service_name=service_name,
+            service_type=MdnsServiceType.COMMISSIONABLE.value,
+            log_output=True
+        )
+
+        # The device may omit the TXT record if there are no mandatory TXT keys
+        txt_record_required = self.supports_icd or self.check_pics(TCP_PICS_STR)
+        txt_record_returned = (txt_record is not None) and (len(txt_record.txt) > 0)
+
+        # Verify that the TXT record, when required, is returned and is non-empty
+        if txt_record_required:
+            asserts.assert_true(txt_record_returned, "TXT record is required and was not returned or contains no values")
 
         # Verify D key is present, which represents the discriminator
         # and must be encoded as a variable-length decimal value with up to 4
@@ -261,15 +267,21 @@ class TC_SC_4_1(MatterBaseTest):
             "SAI key must be present if SAT key is present."
         )
 
-        # TODO: update to hanble CM=0 or no CM key when in extended discovery
-        # Verify that the CM key is present and is equal to the expected CM value. During Extended
-        # Discovery if active, the CM key can be present or omitted, both meaning CM=0
+        # Verify that the CM key is present and is equal to the expected
+        # CM value or ommitted if DUT is in Extended Discovery mode
         if 'CM' in txt_record.txt:
             cm_key = txt_record.txt['CM']
             assert_valid_cm_key(cm_key)
             asserts.assert_true(cm_key == expected_cm, f"CM key must be '{expected_cm}', got '{cm_key}'")
         else:
-            asserts.fail("CM key not present")
+            # When the DUT is in Extended Discovery mode and the
+            # CM key is not present, it's equivalent to CM=0
+            extended_discovery_mode = expected_cm == "0"
+
+            # Fail test only when CM key is not present
+            # and DUT is not in Extended Discovery mode
+            if not extended_discovery_mode:
+                asserts.fail(f"CM key not present, was expecting CM='{expected_cm}'")
 
         # If the DT key is present, it must contain the device type identifier from
         # Data Model Device Types and must be encoded as a variable length decimal
@@ -303,23 +315,21 @@ class TC_SC_4_1(MatterBaseTest):
         #     pi_key = txt_record.txt['PI']
             # assert_valid_pi_key(pi_key)
 
+        # *** AAAA RECORD CHECKS ***
+        # **************************
         # TH performs a query for the AAAA record against the target
         # hostname listed in the Commissionable Service SRV record.
-        hostname = txt_record.hostname
-        quada_records = await MdnsDiscovery().get_quada_records(hostname=hostname, log_output=True)
+        quada_records = await MdnsDiscovery().get_quada_records(hostname=srv_record.hostname, log_output=True)
 
         # Verify that at least 1 AAAA record is returned for each IPv6 a address
-        asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{hostname}'")
+        asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{srv_record.hostname}'")            
 
     def desc_TC_TC_SC_4_1(self) -> str:
         return "[TC-SC-4.1] Commissionable Node Discovery with DUT as Commissionee"
 
     @async_test_body
     async def test_TC_SC_4_1(self):
-        self.endpoint = self.get_endpoint(default=1)
         obcw_cmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
-        revoke_cmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        mdns = MdnsDiscovery()
 
         # *** STEP 1 ***
         # DUT is Commissioned.
@@ -343,27 +353,30 @@ class TC_SC_4_1(MatterBaseTest):
 
         # *** STEP 3 ***
         # DUT is put in Commissioning Mode using Open Basic Commissioning Window command
-        #   - DUT starts advertising Commissionable Node Discovery service through DNS-SD
-        #   - Verify DUT Commissionable Node Discovery service advertisements
-        #   - Close commissioning window
+        # and starts advertising Commissionable Node Discovery service through DNS-SD
         self.step(3)
-        await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcw_cmd, timedRequestTimeoutMs=6000)
+        await self.default_controller.SendCommand(
+            nodeid=self.dut_node_id,
+            endpoint=0,
+            payload=obcw_cmd,
+            timedRequestTimeoutMs=6000
+        )
 
-        # Get DUT's commissionable DNS-SD advertisements
-        txt_record = await self.get_commissionable_node_dns_sd_advertisements_txt()
+        # TH performs a browse for the commissionable service PTR record of type '_matterc._udp.local.'
+        commissionable_service_ptr = await self.get_commissionable_service_ptr_record()
+
+        # Verify PTR record is returned
+        asserts.assert_is_not_none(commissionable_service_ptr, "DUT's commissionable service not present")
 
         # Verify DUT Commissionable Node Discovery service advertisements
-        await self.verify_commissionable_node_dns_sd_advertisements_txt(txt_record=txt_record, expected_cm="1")
+        await self.verify_commissionable_node_advertisements(service_name=commissionable_service_ptr.service_name, expected_cm="1")
 
         # Close commissioning window
-        await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revoke_cmd, timedRequestTimeoutMs=6000)
-        sleep(1) # Give some time for failsafe cleanup scheduling
+        await self.close_commissioning_window()
 
         # *** STEP 4 ***
-        # DUT is put in Commissioning Mode using Open Commissioning Window command
-        #   - DUT starts advertising Commissionable Node Discovery service through DNS-SD
-        #   - Verify DUT Commissionable Node Discovery service advertisements
-        #   - Close commissioning window
+        # DUT is put in Commissioning Mode using Open Commissioning Window command and
+        # starts advertising Commissionable Node Discovery service through DNS-SD
         self.step(4)
         await self.default_controller.OpenCommissioningWindow(
             nodeid=self.dut_node_id,
@@ -373,33 +386,31 @@ class TC_SC_4_1(MatterBaseTest):
             option=1
         )
 
-        # Get DUT's commissionable DNS-SD advertisements
-        txt_record = await self.get_commissionable_node_dns_sd_advertisements_txt()
+        # TH performs a browse for the commissionable service PTR record of type '_matterc._udp.local.'
+        commissionable_service_ptr = await self.get_commissionable_service_ptr_record()
+
+        # Verify PTR record is returned
+        asserts.assert_is_not_none(commissionable_service_ptr, "DUT's commissionable node services not present")
 
         # Verify DUT Commissionable Node Discovery service advertisements
-        await self.verify_commissionable_node_dns_sd_advertisements_txt(txt_record=txt_record, expected_cm="2")
+        await self.verify_commissionable_node_advertisements(service_name=commissionable_service_ptr.service_name, expected_cm="2")
 
         # Close commissioning window
-        await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revoke_cmd, timedRequestTimeoutMs=6000)
-        sleep(1) # Give some time for failsafe cleanup scheduling
+        await self.close_commissioning_window()
 
         # *** STEP 5 ***
-        # Check if DUT is in Extended Discovery mode
-        #   - Check if DUT is advertising Commissionable Node Discovery services through DNS-SD
-        #   - If so:
-        #       - Verify DUT Commissionable Node Discovery service advertisements
+        # Check if DUT Extended Discovery mode is active
         self.step(5)
-        is_cs_ptr_present, _ = await self.is_commissionable_service_ptr_present()
-        if is_cs_ptr_present:
-            logging.info("DUT is in Extended Discovery mode")
+        # TH performs a browse for the commissionable service PTR record of type '_matterc._udp.local.'
+        commissionable_service_ptr = await self.get_commissionable_service_ptr_record()
 
-            # Get DUT's commissionable DNS-SD advertisements
-            txt_record = await self.get_commissionable_node_dns_sd_advertisements_txt()
+        # If DUT's commissionable service is present, Extended Discovery mode is active
+        extended_discovery_mode = commissionable_service_ptr is not None
+        logging.info(f"DUT Extended Discovery mode active: {extended_discovery_mode}")
 
+        if extended_discovery_mode:
             # Verify DUT Commissionable Node Discovery service advertisements
-            await self.verify_commissionable_node_dns_sd_advertisements_txt(txt_record=txt_record, expected_cm="0")
-        else:
-            logging.info("DUT isn't in Extended Discovery mode")
+            await self.verify_commissionable_node_advertisements(service_name=commissionable_service_ptr.service_name, expected_cm="0")
 
 
 if __name__ == "__main__":
