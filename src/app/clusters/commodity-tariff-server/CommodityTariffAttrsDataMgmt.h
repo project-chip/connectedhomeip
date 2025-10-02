@@ -529,14 +529,22 @@ public:
      *                      The pointer remains valid only while this object exists.
      *                      Cast back to the specific type based on the child class's template specialization.
      */
-    virtual CHIP_ERROR GetValueAsVoid(void *& outValue) { outValue = nullptr; return CHIP_ERROR_NOT_IMPLEMENTED; };
-    
+    virtual CHIP_ERROR GetValueAsVoid(void *& outValue)
+    {
+        outValue = nullptr;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    };
+
     /**
      * @brief Gets a pointer to the internal pending new value storage during updates.
      * @param[out] outValue Set to point to the internal pending value object.
      *                      Cast back to the specific type based on the child class's template specialization.
      */
-    virtual CHIP_ERROR GetNewValueAsVoid(void *& outValue) { outValue = nullptr; return CHIP_ERROR_NOT_IMPLEMENTED; };
+    virtual CHIP_ERROR GetNewValueAsVoid(void *& outValue)
+    {
+        outValue = nullptr;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    };
 
     /**
      * @brief Copies data from external source to internal pending storage.
