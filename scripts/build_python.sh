@@ -113,7 +113,7 @@ while (($#)); do
         --enable_nfc | -n)
             enable_nfc=$2
             if [[ "$enable_nfc" != "true" && "$enable_nfc" != "false" ]]; then
-                echo "Error: --enable_nfc/-b should have a true/false value, not '$enable_nfc'" >&2
+                echo "Error: --enable_nfc/-n should have a true/false value, not '$enable_nfc'" >&2
                 exit 1
             fi
             shift
