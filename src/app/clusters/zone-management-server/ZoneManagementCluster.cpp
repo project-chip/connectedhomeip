@@ -47,6 +47,7 @@ using namespace Protocols::InteractionModel;
 namespace chip {
 namespace app {
 namespace Clusters {
+// TODO: canonical layout is for the cluster to live in the Clusters namespace, without the additional namespace. Remove the namespace here and fix the pattern in other clusters
 namespace ZoneManagement {
 // TODO: find a more reasonable value, enforce / check on save
 constexpr size_t kMaxPersistedValueLengthSupported = 2048;
