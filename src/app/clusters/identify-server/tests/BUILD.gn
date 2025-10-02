@@ -35,3 +35,28 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/support",
   ]
 }
+
+chip_test_suite("tests-backwards-compatibility") {
+
+  import("${chip_root}/src/app/clusters/identify-server/app_config_dependent_sources.gni")
+  
+  output_name = "TestIdentifyClusterBackwardsCompatibility"
+
+  test_sources = [ "TestIdentifyClusterBackwardsCompatibility.cpp" ]
+
+  # Prefix app_config_dependent_sources with "../" and add to the sources list
+  sources = []
+  foreach(file, app_config_dependent_sources) {
+    sources += [ "../" + file ]
+  }
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/identify-server",
+    "${chip_root}/src/app/clusters/testing",
+    "${chip_root}/src/app/data-model-provider/tests:encode-decode",
+    "${chip_root}/src/app/server-cluster/testing:testing",
+    "${chip_root}/src/lib/support",
+  ]
+}

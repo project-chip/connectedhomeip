@@ -15,9 +15,9 @@
  */
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
+#include "TestIdentifyClusterHelpers.h"
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -52,87 +52,6 @@ void onIdentifyStop(IdentifyCluster * cluster)
 void onEffectIdentifier(IdentifyCluster * cluster)
 {
     onEffectIdentifierCalled = true;
-}
-
-// Helper function to read an attribute and decode its value.
-template <typename T>
-CHIP_ERROR ReadAttribute(IdentifyCluster & cluster, const ConcreteDataAttributePath & path, T & value)
-{
-    chip::app::Testing::ReadOperation readOperation(path);
-    std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
-    ReturnErrorOnFailure(cluster.ReadAttribute(readOperation.GetRequest(), *encoder).GetUnderlyingError());
-    ReturnErrorOnFailure(readOperation.FinishEncoding());
-
-    std::vector<chip::app::Testing::DecodedAttributeData> attributeData;
-    ReturnErrorOnFailure(readOperation.GetEncodedIBs().Decode(attributeData));
-    VerifyOrReturnError(attributeData.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
-
-    return chip::app::DataModel::Decode(attributeData[0].dataReader, value);
-}
-
-// Helper function to write a value to an attribute.
-template <typename T>
-CHIP_ERROR WriteAttribute(IdentifyCluster & cluster, const ConcreteDataAttributePath & path, const T & value)
-{
-    chip::app::Testing::WriteOperation writeOperation(path);
-    AttributeValueDecoder decoder = writeOperation.DecoderFor(value);
-    return cluster.WriteAttribute(writeOperation.GetRequest(), decoder).GetUnderlyingError();
-}
-
-class TestTimerDelegate : public reporting::ReportScheduler::TimerDelegate
-{
-public:
-    using TimerContext = reporting::TimerContext;
-
-    CHIP_ERROR StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) override
-    {
-        mTimerContext = context;
-        mTimerTimeout = mMockSystemTimestamp + aTimeout;
-        return CHIP_NO_ERROR;
-    }
-
-    void CancelTimer(TimerContext * context) override
-    {
-        mTimerContext = nullptr;
-        mTimerTimeout = System::Clock::Milliseconds64(0x7FFFFFFFFFFFFFFF);
-    }
-
-    bool IsTimerActive(TimerContext * context) override { return mTimerContext != nullptr && mTimerTimeout > mMockSystemTimestamp; }
-
-    System::Clock::Timestamp GetCurrentMonotonicTimestamp() override { return mMockSystemTimestamp; }
-
-    void AdvanceClock(System::Clock::Timeout aTimeout)
-    {
-        mMockSystemTimestamp += aTimeout;
-        if (mTimerContext && mMockSystemTimestamp >= mTimerTimeout)
-        {
-            mTimerContext->TimerFired();
-        }
-    }
-
-private:
-    TimerContext * mTimerContext                  = nullptr;
-    System::Clock::Timestamp mTimerTimeout        = System::Clock::Milliseconds64(0x7FFFFFFFFFFFFFFF);
-    System::Clock::Timestamp mMockSystemTimestamp = System::Clock::Milliseconds64(0);
-};
-
-// Helper function to invoke a command and return the result.
-template <typename T>
-std::optional<DataModel::ActionReturnStatus> InvokeCommand(IdentifyCluster & cluster, CommandId commandId, const T & data)
-{
-    constexpr EndpointId kEndpointId       = 1;
-    const DataModel::InvokeRequest request = { .path = { kEndpointId, Identify::Id, commandId } };
-
-    uint8_t buffer[128];
-    TLV::TLVWriter tlvWriter;
-    tlvWriter.Init(buffer);
-    EXPECT_EQ(data.Encode(tlvWriter, TLV::AnonymousTag()), CHIP_NO_ERROR);
-
-    TLV::TLVReader tlvReader;
-    tlvReader.Init(buffer, tlvWriter.GetLengthWritten());
-    EXPECT_EQ(tlvReader.Next(), CHIP_NO_ERROR);
-
-    return cluster.InvokeCommand(request, tlvReader, nullptr);
 }
 
 struct TestIdentifyCluster : public ::testing::Test
