@@ -25,6 +25,7 @@
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <clusters/WindowCovering/Metadata.h>
 #include <lib/support/TypeTraits.h>
 #include <string.h>
 
@@ -111,6 +112,19 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace WindowCovering {
+WindowCoverAttrAccess gAttrAccess;
+
+CHIP_ERROR WindowCoverAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::ClusterRevision::Id:
+        return aEncoder.Encode(WindowCovering::kRevision);
+    default:
+        break;
+    }
+    return CHIP_NO_ERROR;
+}
 
 bool HasFeature(chip::EndpointId endpoint, Feature feature)
 {
@@ -974,5 +988,12 @@ MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAtt
 /**
  * @brief Cluster Plugin Init Callback
  */
-void MatterWindowCoveringPluginServerInitCallback() {}
-void MatterWindowCoveringPluginServerShutdownCallback() {}
+void MatterWindowCoveringPluginServerInitCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+}
+
+void MatterWindowCoveringPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+}
