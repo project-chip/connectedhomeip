@@ -177,6 +177,28 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         aAudioStreamID = aAllocatedAudioStreams[0].audioStreamID
         aAudioRefCount = aAllocatedAudioStreams[0].referenceCount
 
+        # Ensure privacy modes are not enabled before issuing WebRTC
+        # ProvideOffer command
+        self.privacySupport = (aFeatureMap & cluster.Bitmaps.Feature.kPrivacy) > 0
+        if self.privacySupport:
+            result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint)
+            asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
+            logger.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{False}")
+
+            softLivestreamPrivMode = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.SoftLivestreamPrivacyModeEnabled
+            )
+            asserts.assert_false(softLivestreamPrivMode, "SoftLivestreamPrivacyModeOn should be False")
+
+            result = await self.write_single_attribute(attr.SoftRecordingPrivacyModeEnabled(False), endpoint_id=endpoint)
+            asserts.assert_equal(result, Status.Success, "Error when trying to write SoftRecordingPrivacyModeEnabled")
+            logger.info(f"Tx'd : SoftRecordingPrivacyModeEnabled{False}")
+
+            softRecordingPrivMode = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.SoftRecordingPrivacyModeEnabled
+            )
+            asserts.assert_false(softRecordingPrivMode, "SoftRecordingPrivacyModeOn should be False")
+
         self.step(4)
         # Establish WebRTC via Provide Offer/Answer
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)

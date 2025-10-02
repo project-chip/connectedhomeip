@@ -79,7 +79,7 @@ class TC_AVSM_2_17(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 4,
-                "TH writes attribute `SoftLivestreamPrivacyModeEnabled` to false in the CameraAVStreamManagement Cluster on DUT.",
+                "TH writes attribute `SoftLivestreamPrivacyModeEnabled` and `SoftRecordingPrivacyEnabled` to false in the CameraAVStreamManagement Cluster on DUT.",
                 "DUT responds with Success",
             ),
             TestStep(
@@ -218,6 +218,20 @@ class TC_AVSM_2_17(MatterBaseTest, AVSMTestBase):
         result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint)
         asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
         logger.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{False}")
+
+        softLivestreamPrivMode = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.SoftLivestreamPrivacyModeEnabled
+        )
+        asserts.assert_false(softLivestreamPrivMode, "SoftLivestreamPrivacyModeOn should be False")
+
+        result = await self.write_single_attribute(attr.SoftRecordingPrivacyModeEnabled(False), endpoint_id=endpoint)
+        asserts.assert_equal(result, Status.Success, "Error when trying to write SoftRecordingPrivacyModeEnabled")
+        logger.info(f"Tx'd : SoftRecordingPrivacyModeEnabled{False}")
+
+        softRecordingPrivMode = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.SoftRecordingPrivacyModeEnabled
+        )
+        asserts.assert_false(softRecordingPrivMode, "SoftRecordingPrivacyModeOn should be False")
 
         self.step(5)
         current_sessions = await self.read_single_attribute_check_success(
