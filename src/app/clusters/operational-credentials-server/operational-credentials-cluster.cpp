@@ -763,11 +763,10 @@ exit:
     return finalStatus;
 }
 
-std::optional<DataModel::ActionReturnStatus> HandleSetVIDVerificationStatement(CommandHandler * commandObj,
-                                                                               TLV::TLVReader & input_arguments,
-                                                                               const DataModel::InvokeRequest & request,
-                                                                               FabricTable & fabricTable,
-                                                                               FailSafeContext & failSafeContext, bool & reportChange)
+std::optional<DataModel::ActionReturnStatus>
+HandleSetVIDVerificationStatement(CommandHandler * commandObj, TLV::TLVReader & input_arguments,
+                                  const DataModel::InvokeRequest & request, FabricTable & fabricTable,
+                                  FailSafeContext & failSafeContext, bool & reportChange)
 {
     Commands::SetVIDVerificationStatement::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
@@ -787,7 +786,7 @@ std::optional<DataModel::ActionReturnStatus> HandleSetVIDVerificationStatement(C
         return Status::ConstraintError;
     }
 
-    CHIP_ERROR err             = fabricTable.SetVIDVerificationStatementElements(
+    CHIP_ERROR err = fabricTable.SetVIDVerificationStatementElements(
         fabricIndex, commandData.vendorID, commandData.VIDVerificationStatement, commandData.vvsc, reportChange);
 
     if (err != CHIP_NO_ERROR)
@@ -1229,9 +1228,9 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
     case OperationalCredentials::Commands::AddTrustedRootCertificate::Id:
         return HandleAddTrustedRootCertificate(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext());
     case OperationalCredentials::Commands::SetVIDVerificationStatement::Id: {
-        bool reportChange = false;
-        std::optional<DataModel::ActionReturnStatus> returnStatus =
-            HandleSetVIDVerificationStatement(handler, input_arguments, request, GetFabricTable(), GetFailSafeContext(), reportChange);
+        bool reportChange                                         = false;
+        std::optional<DataModel::ActionReturnStatus> returnStatus = HandleSetVIDVerificationStatement(
+            handler, input_arguments, request, GetFabricTable(), GetFailSafeContext(), reportChange);
         if (reportChange)
         {
             // Handle dirty-marking if anything changed. Only `Fabrics` attribute is reported since `NOCs`
