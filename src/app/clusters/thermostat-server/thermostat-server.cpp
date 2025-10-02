@@ -683,10 +683,8 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         ReturnErrorOnFailure(aEncoder.Encode(delegate->GetThermostatSuggestionNotFollowingReason()));
     }
     break;
-    case ClusterRevision::Id: {
+    case ClusterRevision::Id:
         return aEncoder.Encode(Thermostat::kRevision);
-    }
-    break;
     default: // return CHIP_NO_ERROR and just read from the attribute store in default
         break;
     }
