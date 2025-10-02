@@ -396,14 +396,14 @@ config CHIP_MAX_ACTIVE_DEVICES
 	  concurrently connect over CASE and interact with.
 
 config CHIP_SUBSCRIPTION_RESUMPTION_MIN_RETRY_INTERVAL
-	int "Minimum subscrpition resumption interval in seconds"
+	int "Minimum subscription resumption interval in seconds"
 	default 20 if CHIP_PERSISTENT_SUBSCRIPTIONS
 	default 300
 	help
-	  The minimum interval in seconds before resuming a subsciption that timed out.
+	  The minimum interval in seconds before resuming a subscription that timed out.
 
 config CHIP_SUBSCRIPTION_RESUMPTION_RETRY_MULTIPLIER
-	int "The multiplier for suscription resumption retry in seconds"
+	int "The multiplier for subscription resumption retry in seconds"
 	default 40 if CHIP_PERSISTENT_SUBSCRIPTIONS
 	default 300
 	help

@@ -45,7 +45,7 @@
 #define KMU_GROUP_KEYS_SLOT_START                                                                                                  \
     PSA_KEY_HANDLE_FROM_CRACEN_KMU_SLOT(CRACEN_KMU_KEY_USAGE_SCHEME_RAW, (KMU_ICD_SLOT_START + KMU_SLOTS_ICD_MAX_NUMBER))
 
-// Check whether the DAC KMU slot doesn not overlap with the KMU slots dedicated for Matter core.
+// Check whether the DAC KMU slot does not overlap with the KMU slots dedicated for Matter core.
 #if defined(CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU) &&                                                                            \
     (CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU_SLOT_ID >= CONFIG_CHIP_KMU_SLOT_RANGE_START &&                                        \
      CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_KMU_SLOT_ID <= CONFIG_CHIP_KMU_SLOT_RANGE_END)
