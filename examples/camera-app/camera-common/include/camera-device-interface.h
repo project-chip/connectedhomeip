@@ -25,7 +25,7 @@
 #include <app/clusters/chime-server/chime-server.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
-#include <app/clusters/zone-management-server/zone-management-server.h>
+#include <app/clusters/zone-management-server/ZoneManagementCluster.h>
 
 using chip::app::Clusters::CameraAvStreamManagement::AudioCapabilitiesStruct;
 using chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct;

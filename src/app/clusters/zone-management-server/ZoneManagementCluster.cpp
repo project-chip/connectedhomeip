@@ -52,20 +52,25 @@ namespace ZoneManagement {
 // TODO: find a more reasonable value, enforce / check on save
 constexpr size_t kMaxPersistedValueLengthSupported = 2048;
 
+    // TODO: figure out a more sensible set of constructors that works well with codegen integration
+ZoneManagementCluster::ZoneManagementCluster(EndpointId endpointId) :
+    DefaultServerCluster({ endpointId, ZoneManagement::Id }), mFeatures(0), mMaxUserDefinedZones(5), mMaxZones(5), mSensitivityMax(10), mTwoDCartesianMax({.x = 640, .y = 480})
+{
+}
 ZoneManagementCluster::ZoneManagementCluster(EndpointId endpointId, Delegate & aDelegate, const BitFlags<Feature> aFeatures,
                                              uint8_t aMaxUserDefinedZones, uint8_t aMaxZones, uint8_t aSensitivityMax,
                                              const TwoDCartesianVertexStruct & aTwoDCartesianMax) :
     DefaultServerCluster({ endpointId, ZoneManagement::Id }),
-    mDelegate(aDelegate), mFeatures(aFeatures), mMaxUserDefinedZones(aMaxUserDefinedZones), mMaxZones(aMaxZones),
+    mDelegate(&aDelegate), mFeatures(aFeatures), mMaxUserDefinedZones(aMaxUserDefinedZones), mMaxZones(aMaxZones),
     mSensitivityMax(aSensitivityMax), mTwoDCartesianMax(aTwoDCartesianMax)
 {
-    mDelegate.SetZoneMgmtServer(this);
+    mDelegate->SetZoneMgmtServer(this);
     // reinterpret_cast<ZoneManagementCluster *>(this));
 }
 
 ZoneManagementCluster::~ZoneManagementCluster()
 {
-    mDelegate.SetZoneMgmtServer(nullptr);
+    mDelegate->SetZoneMgmtServer(nullptr);
 }
 
 CHIP_ERROR ZoneManagementCluster::Init()
@@ -98,7 +103,7 @@ CHIP_ERROR ZoneManagementCluster::Startup(ServerClusterContext & context)
     ReturnErrorOnFailure(LoadTriggers());
     ReturnErrorOnFailure(LoadSensitivity());
     // Signal delegate that all persistent configuration attributes have been loaded.
-    mDelegate.PersistentAttributesLoadedCallback();
+    mDelegate->PersistentAttributesLoadedCallback();
     return CHIP_NO_ERROR;
 }
 
@@ -331,7 +336,7 @@ DataModel::ActionReturnStatus ZoneManagementCluster::WriteAttribute(const DataMo
         ReturnErrorOnFailure(persistence.DecodeAndStoreNativeEndianValue<uint8_t>(
             { mPath.mEndpointId, ZoneManagement::Id, Attributes::Sensitivity::Id }, aDecoder, mSensitivity));
 
-        mDelegate.OnAttributeChanged(Attributes::Sensitivity::Id);
+        mDelegate->OnAttributeChanged(Attributes::Sensitivity::Id);
         return CHIP_NO_ERROR;
     }
 
@@ -512,7 +517,7 @@ CHIP_ERROR ZoneManagementCluster::AddZone(const ZoneInformationStorage & zone)
     mZones.push_back(zone);
     PersistZones();
     auto path = ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
-    mDelegate.OnAttributeChanged(Attributes::Zones::Id);
+    mDelegate->OnAttributeChanged(Attributes::Zones::Id);
     MatterReportingAttributeChangeCallback(path);
 
     return CHIP_NO_ERROR;
@@ -530,7 +535,7 @@ CHIP_ERROR ZoneManagementCluster::UpdateZone(uint16_t zoneId, const ZoneInformat
         *it = zoneInfo; // Replace the found item with the newItem
         PersistZones();
         auto path = ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
-        mDelegate.OnAttributeChanged(Attributes::Zones::Id);
+        mDelegate->OnAttributeChanged(Attributes::Zones::Id);
         MatterReportingAttributeChangeCallback(path);
 
         return CHIP_NO_ERROR;
@@ -551,7 +556,7 @@ CHIP_ERROR ZoneManagementCluster::RemoveZone(uint16_t zoneId)
         mZones.erase(it, mZones.end());
         PersistZones();
         auto path = ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
-        mDelegate.OnAttributeChanged(Attributes::Zones::Id);
+        mDelegate->OnAttributeChanged(Attributes::Zones::Id);
         MatterReportingAttributeChangeCallback(path);
 
         return CHIP_NO_ERROR;
@@ -574,7 +579,7 @@ Status ZoneManagementCluster::AddOrUpdateTrigger(const ZoneTriggerControlStruct 
     if (foundTrigger == mTriggers.end())
     {
         // Call the delegate
-        status = mDelegate.CreateTrigger(trigger);
+        status = mDelegate->CreateTrigger(trigger);
         if (status == Status::Success)
         {
             mTriggers.push_back(trigger);
@@ -582,7 +587,7 @@ Status ZoneManagementCluster::AddOrUpdateTrigger(const ZoneTriggerControlStruct 
     }
     else
     {
-        status = mDelegate.UpdateTrigger(trigger);
+        status = mDelegate->UpdateTrigger(trigger);
         if (status == Status::Success)
         {
             *foundTrigger = trigger; // Replace the found item with the newItem
@@ -593,7 +598,7 @@ Status ZoneManagementCluster::AddOrUpdateTrigger(const ZoneTriggerControlStruct 
     {
         PersistTriggers();
         auto path = ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id);
-        mDelegate.OnAttributeChanged(Attributes::Triggers::Id);
+        mDelegate->OnAttributeChanged(Attributes::Triggers::Id);
         MatterReportingAttributeChangeCallback(path);
     }
 
@@ -602,7 +607,7 @@ Status ZoneManagementCluster::AddOrUpdateTrigger(const ZoneTriggerControlStruct 
 
 Status ZoneManagementCluster::RemoveTrigger(uint16_t zoneId)
 {
-    Status status = mDelegate.RemoveTrigger(zoneId);
+    Status status = mDelegate->RemoveTrigger(zoneId);
     if (status == Status::Success)
     {
         mTriggers.erase(std::remove_if(mTriggers.begin(), mTriggers.end(),
@@ -610,7 +615,7 @@ Status ZoneManagementCluster::RemoveTrigger(uint16_t zoneId)
                         mTriggers.end());
         PersistTriggers();
         auto path = ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id);
-        mDelegate.OnAttributeChanged(Attributes::Triggers::Id);
+        mDelegate->OnAttributeChanged(Attributes::Triggers::Id);
         MatterReportingAttributeChangeCallback(path);
     }
 
@@ -704,7 +709,7 @@ void ZoneManagementCluster::HandleCreateTwoDCartesianZone(CommandHandler * handl
     zoneID = GetNewZoneId();
 
     // Call the delegate
-    status = mDelegate.CreateTwoDCartesianZone(zoneID, twoDCartZoneStorage);
+    status = mDelegate->CreateTwoDCartesianZone(zoneID, twoDCartZoneStorage);
     if (status != Status::Success)
     {
         handler->AddStatus(commandPath, status, "delegate");
@@ -797,7 +802,7 @@ void ZoneManagementCluster::HandleUpdateTwoDCartesianZone(CommandHandler * handl
     twoDCartZoneStorage.Set(zoneToUpdate.name, zoneToUpdate.use, twoDCartVertices, zoneToUpdate.color);
 
     // Call the delegate
-    status = mDelegate.UpdateTwoDCartesianZone(zoneID, twoDCartZoneStorage);
+    status = mDelegate->UpdateTwoDCartesianZone(zoneID, twoDCartZoneStorage);
     if (status != Status::Success)
     {
         handler->AddStatus(commandPath, status, "delegate");
@@ -842,7 +847,7 @@ void ZoneManagementCluster::HandleRemoveZone(CommandHandler * handler, const Con
     }
 
     // Call the delegate
-    Status status = mDelegate.RemoveZone(zoneID);
+    Status status = mDelegate->RemoveZone(zoneID);
 
     if (status == Status::Success)
     {

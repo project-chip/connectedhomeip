@@ -26,7 +26,7 @@
 #include <vector>
 
 #include <app/clusters/zone-management-server/zone-geometry.h>
-#include <app/clusters/zone-management-server/zone-management-server.h>
+#include <app/clusters/zone-management-server/ZoneManagementCluster.h>
 
 #include <pw_unit_test/framework.h>
 

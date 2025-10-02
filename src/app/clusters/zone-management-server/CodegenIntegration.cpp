@@ -83,3 +83,4 @@ void MatterZoneManagementClusterServerShutdownCallback(EndpointId endpointId)
         },
         integrationDelegate);
 }
+void MatterZoneManagementPluginServerInitCallback() {}

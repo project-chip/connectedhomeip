@@ -19,7 +19,7 @@
 #pragma once
 
 #include "camera-device-interface.h"
-#include <app/clusters/zone-management-server/zone-management-server.h>
+#include <app/clusters/zone-management-server/ZoneManagementCluster.h>
 #include <app/util/config.h>
 #include <vector>
 
@@ -50,10 +50,6 @@ public:
     Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneID) override;
 
     void OnAttributeChanged(AttributeId attributeId) override;
-
-    CHIP_ERROR LoadZones(std::vector<ZoneInformationStorage> & aZones) override;
-
-    CHIP_ERROR LoadTriggers(std::vector<ZoneTriggerControlStruct> & aTriggers) override;
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 

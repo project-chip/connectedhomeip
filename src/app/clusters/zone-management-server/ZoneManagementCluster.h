@@ -193,7 +193,7 @@ public:
      */
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
 
-    ZoneManagementCluster * GetZoneMgmtServer() const { return mZoneMgmtServer; }
+    ZoneManagementCluster * GetZoneManagementCluster() const { return mZoneMgmtServer; }
 
 private:
     friend class ZoneManagementCluster;
@@ -213,6 +213,7 @@ class ZoneManagementCluster : public DefaultServerCluster
 public:
     ZoneManagementCluster(EndpointId endpointId, Delegate & delegate, const BitFlags<Feature> features, uint8_t maxUserDefinedZones,
                           uint8_t maxZones, uint8_t sensitivityMax, const TwoDCartesianVertexStruct & twoDCartesianMax);
+    ZoneManagementCluster(EndpointId endpointId);
     ~ZoneManagementCluster() override;
 
     CHIP_ERROR Init();
@@ -262,7 +263,7 @@ public:
     Protocols::InteractionModel::Status GenerateZoneStoppedEvent(uint16_t zoneID, ZoneEventStoppedReasonEnum stopReason);
 
 private:
-    Delegate & mDelegate;
+    Delegate * mDelegate = nullptr;
     const BitFlags<Feature> mFeatures;
 
     // Attributes
