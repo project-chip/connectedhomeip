@@ -37,9 +37,9 @@ chip_test_suite("tests") {
 }
 
 chip_test_suite("tests-backwards-compatibility") {
+  import(
+      "${chip_root}/src/app/clusters/identify-server/app_config_dependent_sources.gni")
 
-  import("${chip_root}/src/app/clusters/identify-server/app_config_dependent_sources.gni")
-  
   output_name = "TestIdentifyClusterBackwardsCompatibility"
 
   test_sources = [ "TestIdentifyClusterBackwardsCompatibility.cpp" ]
