@@ -483,6 +483,7 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_EmptyRCACReturnsInvalidArgument)
 // Ensures extra checks are done with RCAC buffer size
 TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedRCACLengthReturnsError)
 {
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
     CHIP_ERROR err =
         privateConfigCommissioner.NOCChainGenerated(kValidNOC, kValidICAC, kCoruptedBufferInvalidRCAC, kValidIpk, kValidNodeId);
 
@@ -493,7 +494,6 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedRCACLengthReturnsError)
 TEST_F(AutoCommissionerTest, NOCChainGenerated_CorruptedNOCLengthReturnsError)
 {
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
-
     CHIP_ERROR err =
         privateConfigCommissioner.NOCChainGenerated(kCoruptedBufferInvalidNOC, kValidICAC, kValidRCAC, kValidIpk, kValidNodeId);
 
