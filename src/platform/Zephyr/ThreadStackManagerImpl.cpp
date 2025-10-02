@@ -32,6 +32,10 @@
 
 #include <zephyr/version.h>
 
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#include <ncs_version.h>
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -54,8 +58,13 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 
 void ThreadStackManagerImpl::_LockThreadStack()
 {
-#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 1
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 2
     openthread_mutex_lock();
+// nRF Connect SDK 3.1.0 supports Zephyr 4.1.99 version, so unfortunately it needs a separate check
+#elif CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#if NCS_VERSION_MAJOR >= 3 && NCS_VERSION_MINOR >= 1
+    openthread_mutex_lock();
+#endif
 #else
     openthread_api_mutex_lock(openthread_get_default_context());
 #endif
@@ -63,8 +72,13 @@ void ThreadStackManagerImpl::_LockThreadStack()
 
 bool ThreadStackManagerImpl::_TryLockThreadStack()
 {
-#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 1
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 2
     return openthread_mutex_try_lock() == 0;
+// nRF Connect SDK 3.1.0 supports Zephyr 4.1.99 version, so unfortunately it needs a separate check
+#elif CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#if NCS_VERSION_MAJOR >= 3 && NCS_VERSION_MINOR >= 1
+    return openthread_mutex_try_lock() == 0;
+#endif
 #else
     // There's no openthread_api_mutex_try_lock() in Zephyr, so until it's contributed we must use the low-level API
     return k_mutex_lock(&openthread_get_default_context()->api_lock, K_NO_WAIT) == 0;
@@ -73,8 +87,13 @@ bool ThreadStackManagerImpl::_TryLockThreadStack()
 
 void ThreadStackManagerImpl::_UnlockThreadStack()
 {
-#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 1
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 2
     openthread_mutex_unlock();
+// nRF Connect SDK 3.1.0 supports Zephyr 4.1.99 version, so unfortunately it needs a separate check
+#elif CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#if NCS_VERSION_MAJOR >= 3 && NCS_VERSION_MINOR >= 1
+    openthread_mutex_unlock();
+#endif
 #else
     openthread_api_mutex_unlock(openthread_get_default_context());
 #endif
