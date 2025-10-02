@@ -460,6 +460,7 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_2]: Step #2.2 - Track OTA attributes: UpdateState (Busy sequence)
         # UpdateState (Busy sequence) matcher: DelayedOnQuery > Downloading > Idle
         # ------------------------------------------------------------------------------------
+        # TODO: Cancelling mid-update is not yet implemented (#685), this validation doesn't require a full OTA update.
         logger.info(
             f'{step_number_s2}: Step #2.1 - Started subscription for UpdateState attribute (Busy sequence) '
             'before AnnounceOTAProvider to avoid missing OTA events')
@@ -769,6 +770,7 @@ class TC_SU_2_2(MatterBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_4]: Step #4.2 -  Track OTA attributes: UpdateState (Busy, 180s DelayedActionTime)
         # UpdateState (Busy, 180s DelayedActionTime) matcher: DelayedOnQuery > Downloading after ~180s delay > Idle
+        # TODO: Cancelling mid-update is not yet implemented (#685), this validation doesn't require a full OTA update.
         # ------------------------------------------------------------------------------------
         logger.info(
             f'{step_number_s4}: Step #4.1 - Started subscription for UpdateState attribute '
