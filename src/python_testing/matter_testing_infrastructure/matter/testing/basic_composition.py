@@ -64,6 +64,17 @@ def arls_populated(tlv_data: dict[int, Any]) -> ArlData:
     return ArlData(have_arl=have_arl, have_carl=have_carl)
 
 
+def is_commissioning_without_power(tlv_data: dict[int, Any]) -> bool:
+    ''' Returns true if the TLV data includes the IsCommissioningWithoutPower attribute and the attribute is set to true'''
+
+    # General Commissioning Cluster is always on EP0
+    cluster_id = Clusters.GeneralCommissioning.id
+    attr_id = Clusters.GeneralCommissioning.Attributes.IsCommissioningWithoutPower.attribute_id
+    if 0 not in tlv_data or cluster_id not in tlv_data[0] or attr_id not in tlv_data[0][cluster_id]:
+        return False
+    return tlv_data[0][cluster_id][attr_id]
+
+
 def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
     """Given TLV data for a specific cluster instance, convert to the Matter JSON format."""
 
@@ -236,6 +247,9 @@ class BasicCompositionTests:
             arl_data.have_arl, "ARL cannot be populated for this test - Please follow manufacturer-specific steps to remove the access restrictions and re-run this test")
         asserts.assert_false(
             arl_data.have_carl, "CommissioningARL cannot be populated for this test - Please follow manufacturer-specific steps to remove the access restrictions and re-run this test")
+
+        asserts.assert_false(is_commissioning_without_power(
+            self.endpoints_tlv), "This test cannot be run on devices using an unpowered transport. Commission the device and re-run the test.")
 
     def get_test_name(self) -> str:
         """Return the function name of the caller. Used to create logging entries."""

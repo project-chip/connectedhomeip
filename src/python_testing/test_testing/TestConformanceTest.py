@@ -24,7 +24,7 @@ from fake_device_builder import create_minimal_cluster, create_minimal_dt
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.basic_composition import arls_populated
+from matter.testing.basic_composition import arls_populated, is_commissioning_without_power
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation, ProblemLocation
 from matter.testing.runner import default_matter_test_main
@@ -233,6 +233,34 @@ class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
         arl_data = arls_populated(self.endpoints_tlv)
         asserts.assert_true(arl_data.have_arl, "Did not find expected ARL")
         asserts.assert_true(arl_data.have_carl, "Did not find expected Commissioning ARL")
+
+    def test_is_commissioning_without_power(self):
+        root_node_id = self._get_device_type_id('root node')
+        root = create_minimal_dt(self.xml_clusters, self.xml_device_types, device_type_id=root_node_id)
+
+        on_off_id = self._get_device_type_id('On/Off Light')
+        on_off = create_minimal_dt(self.xml_clusters, self.xml_device_types, device_type_id=on_off_id)
+
+        # no ep0
+        tlv = {1: on_off}
+        asserts.assert_false(is_commissioning_without_power(tlv), "Bad assessment of is_commissioning_without_power")
+
+        # no GeneralCommissioning cluster
+        tlv = {0: on_off}
+        asserts.assert_false(is_commissioning_without_power(tlv), "Bad assessment of is_commissioning_without_power")
+
+        # no attribute present - this is the default
+        tlv = {0: root}
+        asserts.assert_false(is_commissioning_without_power(tlv), "Bad assessment of is_commissioning_without_power")
+
+        # attribute present, but false
+        root[Clusters.GeneralCommissioning.id][Clusters.GeneralCommissioning.Attributes.IsCommissioningWithoutPower.attribute_id] = False
+        tlv = {0: root}
+        asserts.assert_false(is_commissioning_without_power(tlv), "Bad assessment of is_commissioning_without_power")
+
+        root[Clusters.GeneralCommissioning.id][Clusters.GeneralCommissioning.Attributes.IsCommissioningWithoutPower.attribute_id] = True
+        tlv = {0: root}
+        asserts.assert_true(is_commissioning_without_power(tlv), "Bad assessment of is_commissioning_without_power")
 
     def test_error_locations(self):
         root_node_id = self._get_device_type_id('root node')
