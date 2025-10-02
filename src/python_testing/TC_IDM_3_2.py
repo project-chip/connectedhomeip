@@ -82,7 +82,8 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                         # Check if this attribute requires timed write using the must_use_timed_write property
                         if hasattr(attr_instance, 'must_use_timed_write') and attr_instance.must_use_timed_write:
                             if await self.attribute_guard(endpoint=endpoint_id, attribute=attr_class):
-                                logging.info(f"Found timed write attribute: {attr_class.__name__}(id={attr_id}) in cluster {cluster_type.__name__}")
+                                logging.info(f"Found timed write attribute: {attr_class.__name__}(id={
+                                             attr_id}) in cluster {cluster_type.__name__}")
                                 return endpoint_id, attr_class
                             else:
                                 logging.info(f"Device does not support timed write attribute: {attr_class.__name__} (id={attr_id})")
