@@ -87,12 +87,8 @@ CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(const Access::Subje
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "OpCreds: Failed to add administrative node ACL entry: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
-
-    ChipLogDetail(Zcl, "OpCreds: ACL entry created for Fabric index 0x%x CASE Admin Subject 0x" ChipLogFormatX64,
-                  static_cast<unsigned>(fabricIndex), ChipLogValueX64(subject));
 
     return CHIP_NO_ERROR;
 }
@@ -280,7 +276,6 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
     Commands::CSRRequest::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
-    ChipLogDetail(Zcl, "OpCreds: Received a CSRRequest command");
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> nocsrElements;
     MutableByteSpan nocsrElementsSpan;
@@ -336,13 +331,7 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
             err = CHIP_ERROR_INTERNAL;
         }
 
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "OpCreds: AllocatePendingOperationalKey returned %" CHIP_ERROR_FORMAT, err.Format());
-            VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
-        }
-
-        ChipLogDetail(Zcl, "OpCreds: AllocatePendingOperationalKey succeeded");
+        VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
 
         // Encode the NOCSR elements with the CSR and Nonce
         nocsrLengthEstimate = TLV::EstimateStructOverhead(csrSpan.size(),  // CSR buffer
@@ -383,15 +372,12 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
             response.NOCSRElements        = nocsrElementsSpan;
             response.attestationSignature = signatureSpan;
 
-            ChipLogDetail(Zcl, "OpCreds: CSRRequest successful.");
             commandObj->AddResponse(commandPath, response);
             return std::nullopt;
         }
     }
 exit:
     // If failed constraints or internal errors, send a status report instead of the response sent above
-    ChipLogError(Zcl, "OpCreds: Failed CSRRequest request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
-                 to_underlying(errorStatus), err.Format());
     return errorStatus;
 }
 
@@ -426,8 +412,6 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
 
     bool csrWasForUpdateNoc = false; //< Output param of HasPendingOperationalKey
     bool hasPendingKey      = fabricTable.HasPendingOperationalKey(csrWasForUpdateNoc);
-
-    ChipLogDetail(Zcl, "OpCreds: Received an AddNOC command");
 
     VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, errorStatus = Status::InvalidCommand);
     VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength,
@@ -530,11 +514,7 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
     needRevert = false;
 
     // We might have a new operational identity, so we should start advertising it right away.
-    err = dnssdServer.AdvertiseOperational();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Operational advertising failed: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    dnssdServer.AdvertiseOperational();
 
     shouldReport = true;
 
@@ -563,16 +543,6 @@ exit:
     {
         SendNOCResponse(commandObj, commandPath, nocResponse, newFabricIndex, CharSpan());
         // Failed to add NOC
-        if (nocResponse != NodeOperationalCertStatusEnum::kOk)
-        {
-            ChipLogError(Zcl, "OpCreds: Failed AddNOC request (err=%" CHIP_ERROR_FORMAT ") with OperationalCert error %d",
-                         err.Format(), to_underlying(nocResponse));
-        }
-        // Success
-        else
-        {
-            ChipLogDetail(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC", static_cast<unsigned>(newFabricIndex));
-        }
 
         if (shouldReport)
         {
@@ -583,7 +553,6 @@ exit:
     }
 
     // No NOC response - Failed constraints
-    ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02x", to_underlying(errorStatus));
     return errorStatus;
 }
 
@@ -604,7 +573,6 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * co
     CHIP_ERROR err          = CHIP_NO_ERROR;
     FabricIndex fabricIndex = 0;
 
-    ChipLogDetail(Zcl, "OpCreds: Received an UpdateNOC command");
 
     const FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj, fabricTable);
 
@@ -644,16 +612,8 @@ exit:
     {
         SendNOCResponse(commandObj, request.path, nocResponse, fabricIndex, CharSpan());
         // Failed to update NOC
-        if (nocResponse != NodeOperationalCertStatusEnum::kOk)
+        if (nocResponse == NodeOperationalCertStatusEnum::kOk)
         {
-            ChipLogError(Zcl, "OpCreds: Failed UpdateNOC request (err=%" CHIP_ERROR_FORMAT ") with OperationalCert error %d",
-                         err.Format(), to_underlying(nocResponse));
-        }
-        // Success
-        else
-        {
-            ChipLogDetail(Zcl, "OpCreds: UpdateNOC successful.");
-
             // On success, revoke all CASE sessions on the fabric hosting the exchange.
             // From spec:
             //
@@ -668,7 +628,6 @@ exit:
         return std::nullopt;
     }
     // No NOC response - Failed constraints
-    ChipLogError(Zcl, "OpCreds: Failed UpdateNOC request with IM error 0x%02x", to_underlying(errorStatus));
     return errorStatus;
 }
 
@@ -683,13 +642,10 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHand
     auto & label        = commandData.label;
     auto ourFabricIndex = commandObj->GetAccessingFabricIndex();
 
-    ChipLogDetail(Zcl, "OpCreds: Received an UpdateFabricLabel command");
-
     if (label.size() > 32)
     {
         // TODO: This error should probably be a ConstraintError instead of InvalidCommand,
         // need to confirm if current tests are expecting the later.
-        ChipLogError(Zcl, "OpCreds: Failed UpdateFabricLabel due to invalid label size %u", static_cast<unsigned>(label.size()));
         return Status::InvalidCommand;
     }
 
@@ -697,7 +653,6 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateFabricLabel(CommandHand
     {
         if (fabricInfo.GetFabricLabel().data_equal(label) && fabricInfo.GetFabricIndex() != ourFabricIndex)
         {
-            ChipLogError(Zcl, "Fabric label already in use");
             SendNOCResponse(commandObj, request.path, NodeOperationalCertStatusEnum::kLabelConflict, ourFabricIndex, CharSpan());
             return std::nullopt;
         }
@@ -730,8 +685,6 @@ HandleAddTrustedRootCertificate(CommandHandler * commandObj, const ConcreteComma
 
     auto & rootCertificate = commandData.rootCACertificate;
 
-    ChipLogDetail(Zcl, "OpCreds: Received an AddTrustedRootCertificate command");
-
     VerifyOrExit(rootCertificate.size() <= Credentials::kMaxCHIPCertLength, finalStatus = Status::InvalidCommand);
 
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()), finalStatus = Status::FailsafeRequired);
@@ -754,16 +707,10 @@ HandleAddTrustedRootCertificate(CommandHandler * commandObj, const ConcreteComma
     VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
 
     // Got here, so we succeeded, mark AddTrustedRootCert has having been invoked.
-    ChipLogDetail(Zcl, "OpCreds: AddTrustedRootCertificate successful.");
     finalStatus = Status::Success;
     failSafeContext.SetAddTrustedRootCertInvoked();
 
 exit:
-    if (finalStatus != Status::Success)
-    {
-        ChipLogError(Zcl, "OpCreds: Failed AddTrustedRootCertificate request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
-                     to_underlying(finalStatus), err.Format());
-    }
     return finalStatus;
 }
 
@@ -778,9 +725,6 @@ std::optional<DataModel::ActionReturnStatus> HandleSetVIDVerificationStatement(C
 
     FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
     auto finalStatus        = Status::Failure;
-
-    ChipLogDetail(Zcl, "OpCreds: Received a SetVIDVerificationStatement Command for FabricIndex 0x%x",
-                  static_cast<unsigned>(fabricIndex));
 
     if (!commandData.vendorID.HasValue() && !commandData.VIDVerificationStatement.HasValue() && !commandData.vvsc.HasValue())
     {
@@ -823,10 +767,6 @@ std::optional<DataModel::ActionReturnStatus> HandleSetVIDVerificationStatement(C
         return std::nullopt;
     }
 
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "SetVIDVerificationStatement failed: %" CHIP_ERROR_FORMAT, err.Format());
-    }
     return finalStatus;
 }
 
@@ -840,11 +780,8 @@ std::optional<DataModel::ActionReturnStatus> HandleRemoveFabric(CommandHandler *
 
     auto & fabricBeingRemoved = commandData.fabricIndex;
 
-    ChipLogDetail(Zcl, "OpCreds: Received a RemoveFabric Command for FabricIndex 0x%x", static_cast<unsigned>(fabricBeingRemoved));
-
     if (!IsValidFabricIndex(fabricBeingRemoved))
     {
-        ChipLogError(Zcl, "OpCreds: Failed RemoveFabric due to invalid FabricIndex");
         return Status::InvalidCommand;
     }
 
@@ -858,7 +795,6 @@ exit:
     // AddNOC/UpdateNOC specific.
     if (err == CHIP_ERROR_NOT_FOUND)
     {
-        ChipLogError(Zcl, "OpCreds: Failed RemoveFabric due to FabricIndex not found locally");
         SendNOCResponse(commandObj, commandPath, NodeOperationalCertStatusEnum::kInvalidFabricIndex, fabricBeingRemoved,
                         CharSpan());
         return std::nullopt;
@@ -866,11 +802,9 @@ exit:
     else if (err != CHIP_NO_ERROR)
     {
         // We have no idea what happened; just report failure.
-        ChipLogError(Zcl, "OpCreds: Failed RemoveFabric due to internal error (err = %" CHIP_ERROR_FORMAT ")", err.Format());
         return err;
     }
 
-    ChipLogDetail(Zcl, "OpCreds: RemoveFabric successful");
     SendNOCResponse(commandObj, commandPath, NodeOperationalCertStatusEnum::kOk, fabricBeingRemoved, CharSpan());
 
     chip::Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
@@ -894,9 +828,6 @@ std::optional<DataModel::ActionReturnStatus> HandleSignVIDVerificationRequest(Co
 {
     Commands::SignVIDVerificationRequest::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
-
-    ChipLogDetail(Zcl, "OpCreds: Received a SignVIDVerificationRequest Command for FabricIndex 0x%x",
-                  static_cast<unsigned>(commandData.fabricIndex));
 
     if (!IsValidFabricIndex(commandData.fabricIndex) ||
         (commandData.clientChallenge.size() != Crypto::kVendorIdVerificationClientChallengeSize))
@@ -948,17 +879,14 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
 
     if (certificateType == kDACCertificate)
     {
-        ChipLogDetail(Zcl, "OpCreds: Certificate Chain request received for DAC");
         SuccessOrExit(err = dacProvider->GetDeviceAttestationCert(derBufSpan));
     }
     else if (certificateType == kPAICertificate)
     {
-        ChipLogDetail(Zcl, "OpCreds: Certificate Chain request received for PAI");
         SuccessOrExit(err = dacProvider->GetProductAttestationIntermediateCert(derBufSpan));
     }
     else
     {
-        ChipLogError(Zcl, "OpCreds: Certificate Chain request received for unknown type: %d", static_cast<int>(certificateType));
         return Status::InvalidCommand;
     }
 
@@ -967,7 +895,6 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
     return std::nullopt;
 
 exit:
-    ChipLogError(Zcl, "OpCreds: Failed CertificateChainRequest: %" CHIP_ERROR_FORMAT, err.Format());
     return err;
 }
 
@@ -999,8 +926,6 @@ HandleAttestationRequest(CommandHandler * commandObj, const ConcreteCommandPath 
 
     // TODO: in future versions, also retrieve and use firmware Information
     const ByteSpan kEmptyFirmwareInfo;
-
-    ChipLogDetail(Zcl, "OpCreds: Received an AttestationRequest command");
 
     VerifyOrExit(attestationNonce.size() == Credentials::kExpectedAttestationNonceSize, errorStatus = Status::InvalidCommand);
 
@@ -1045,14 +970,11 @@ HandleAttestationRequest(CommandHandler * commandObj, const ConcreteCommandPath 
         response.attestationElements  = attestationElementsSpan;
         response.attestationSignature = signatureSpan;
 
-        ChipLogDetail(Zcl, "OpCreds: AttestationRequest successful.");
         commandObj->AddResponse(commandPath, response);
         return std::nullopt;
     }
 
 exit:
-    ChipLogError(Zcl, "OpCreds: Failed AttestationRequest request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
-                 to_underlying(errorStatus), err.Format());
     return errorStatus;
 }
 
@@ -1060,7 +982,6 @@ void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, in
 {
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
-        ChipLogError(Zcl, "OpCreds: Got FailSafeTimerExpired");
         OperationalCredentialsCluster::FailSafeCleanup(event, reinterpret_cast<OperationalCredentialsCluster *>(arg));
     }
 }
@@ -1070,7 +991,6 @@ void OperationalCredentialsCluster::FailSafeCleanup(const DeviceLayer::ChipDevic
                                                     OperationalCredentialsCluster * cluster)
 {
     VerifyOrDie(cluster != nullptr);
-    ChipLogError(Zcl, "OpCreds: Proceeding to FailSafeCleanup on fail-safe expiry!");
 
     bool nocAddedDuringFailsafe          = event->FailSafeTimerExpired.addNocCommandHasBeenInvoked;
     bool nocUpdatedDuringFailsafe        = event->FailSafeTimerExpired.updateNocCommandHasBeenInvoked;
@@ -1110,11 +1030,7 @@ void OperationalCredentialsCluster::FailSafeCleanup(const DeviceLayer::ChipDevic
     // command.
     if (nocAddedDuringFailsafe)
     {
-        CHIP_ERROR err = cluster->GetFabricTable().Delete(fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "OpCreds: failed to delete fabric at index %u: %" CHIP_ERROR_FORMAT, fabricIndex, err.Format());
-        }
+        cluster->GetFabricTable().Delete(fabricIndex);
     }
 
     if (nocUpdatedDuringFailsafe)
@@ -1284,8 +1200,6 @@ void OperationalCredentialsCluster::FabricWillBeRemoved(const FabricTable & fabr
 
 void OperationalCredentialsCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
-    ChipLogDetail(Zcl, "OpCreds: Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
-
     // We need to withdraw the advertisement for the now-removed fabric, so need
     // to restart advertising altogether.
     GetDNSSDServer().StartServer();
@@ -1338,10 +1252,4 @@ void OperationalCredentialsCluster::OnFabricCommitted(const FabricTable & fabric
     const FabricInfo * fabric = fabricTable.FindFabricWithIndex(fabricIndex);
     // Safety check, but should not happen by the code paths involved
     VerifyOrReturn(fabric != nullptr);
-
-    ChipLogDetail(Zcl,
-                  "OpCreds: Fabric index 0x%x was committed to storage. Compressed Fabric Id 0x" ChipLogFormatX64
-                  ", FabricId " ChipLogFormatX64 ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
-                  static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetCompressedFabricId()),
-                  ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
 }
