@@ -168,8 +168,35 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
                                                                                      TLV::TLVReader & input_arguments,
                                                                                      CommandHandler * handler)
 {
+    const ConcreteClusterPath clusterPath(request.path.mEndpointId, request.path.mClusterId);
+
+    if (auto cached = GetResolvedCommandFor(request.path); cached.has_value())
+    {
+        switch (cached->type)
+        {
+        case ResolvedCommandTarget::HandlerType::kServerCluster:
+            return cached->handler.serverCluster->InvokeCommand(request, input_arguments, handler);
+
+        case ResolvedCommandTarget::HandlerType::kCommandHandlerInterface: {
+            CommandHandlerInterface::HandlerContext context(*handler, request.path, input_arguments);
+            cached->handler.commandHandler->InvokeCommand(context);
+
+            if (context.mCommandHandled)
+            {
+                return std::nullopt;
+            }
+            break;
+        }
+
+        case ResolvedCommandTarget::HandlerType::kGenerated:
+            DispatchSingleClusterCommand(request.path, input_arguments, handler);
+            return std::nullopt;
+        }
+    }
+
     if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
     {
+        RememberResolvedCommand(cluster, clusterPath);
         return cluster->InvokeCommand(request, input_arguments, handler);
     }
 
@@ -178,6 +205,7 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
 
     if (handler_interface)
     {
+        RememberResolvedCommand(handler_interface, clusterPath);
         CommandHandlerInterface::HandlerContext context(*handler, request.path, input_arguments);
         handler_interface->InvokeCommand(context);
 
@@ -188,6 +216,7 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
         }
     }
 
+    RememberGeneratedCommand(clusterPath);
     // Ember always sets the return in the handler
     DispatchSingleClusterCommand(request.path, input_arguments, handler);
     return std::nullopt;
@@ -437,8 +466,12 @@ const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const Concret
 CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path,
                                                       ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
+    bool hasResolvedHandler = false;
+
     if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
     {
+        RememberResolvedCommand(cluster, path);
+        hasResolvedHandler = true;
         return cluster->AcceptedCommands(path, builder);
     }
 
@@ -455,9 +488,19 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
         CHIP_ERROR err = interface->RetrieveAcceptedCommands(path, builder);
         // If retrieving the accepted commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal procesing.
         // Otherwise we finished.
-        VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
+        if (err != CHIP_ERROR_NOT_IMPLEMENTED)
+        {
+            RememberResolvedCommand(interface, path);
+            return err;
+        }
+        RememberResolvedCommand(interface, path);
+        hasResolvedHandler = true;
     }
 
+    if (!hasResolvedHandler)
+    {
+        RememberGeneratedCommand(path);
+    }
     VerifyOrReturnError(serverCluster->acceptedCommandList != nullptr, CHIP_NO_ERROR);
 
     const chip::CommandId * endOfList = serverCluster->acceptedCommandList;
@@ -512,6 +555,48 @@ CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath
     }
     const auto commandCount = static_cast<size_t>(endOfList - serverCluster->generatedCommandList);
     return builder.ReferenceExisting({ serverCluster->generatedCommandList, commandCount });
+}
+
+void CodegenDataModelProvider::RememberResolvedCommand(ServerClusterInterface * cluster, const ConcreteClusterPath & path)
+{
+    if (cluster == nullptr)
+    {
+        return;
+    }
+
+    mLastResolvedCommand = ResolvedCommandTarget(path, cluster);
+}
+
+void CodegenDataModelProvider::RememberResolvedCommand(CommandHandlerInterface * interface, const ConcreteClusterPath & path)
+{
+    if (interface == nullptr)
+    {
+        return;
+    }
+
+    mLastResolvedCommand = ResolvedCommandTarget(path, interface);
+}
+
+void CodegenDataModelProvider::RememberGeneratedCommand(const ConcreteClusterPath & path)
+{
+    mLastResolvedCommand = ResolvedCommandTarget::Generated(path);
+}
+
+std::optional<CodegenDataModelProvider::ResolvedCommandTarget>
+CodegenDataModelProvider::GetResolvedCommandFor(const ConcreteCommandPath & path) const
+{
+    if (!mLastResolvedCommand.has_value())
+    {
+        return std::nullopt;
+    }
+
+    if ((mLastResolvedCommand->cluster.mEndpointId != path.mEndpointId) ||
+        (mLastResolvedCommand->cluster.mClusterId != path.mClusterId))
+    {
+        return std::nullopt;
+    }
+
+    return mLastResolvedCommand;
 }
 
 void CodegenDataModelProvider::InitDataModelForTesting()
