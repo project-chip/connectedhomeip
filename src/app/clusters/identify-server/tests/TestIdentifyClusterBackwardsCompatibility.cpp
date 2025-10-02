@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/identify-server/identify-server.h>
 #include "TestIdentifyClusterHelpers.h"
-#include <gtest/gtest.h>
+#include <app/clusters/identify-server/identify-server.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <gtest/gtest.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -28,8 +28,8 @@ using namespace chip::app::Clusters::Identify::Attributes;
 
 namespace {
 
-bool onIdentifyStartCalled      = false;
-bool onIdentifyStopCalled       = false;
+bool onIdentifyStartCalled    = false;
+bool onIdentifyStopCalled     = false;
 bool onEffectIdentifierCalled = false;
 
 void onIdentifyStart(struct Identify * identify)
@@ -44,7 +44,7 @@ void onIdentifyStop(struct Identify * identify)
 
 void onEffectIdentifier(struct Identify * identify)
 {
-    onEffectIdentifierCalled = true;
+    onEffectIdentifierCalled           = true;
     identify->mCurrentEffectIdentifier = identify->mCluster.Cluster().GetEffectIdentifier();
 }
 
@@ -64,12 +64,13 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestLegacyInstantiattion)
 
 TEST_F(TestIdentifyClusterBackwardsCompatibility, TestLegacyCallbacks)
 {
-    onIdentifyStartCalled = false;
-    onIdentifyStopCalled = false;
+    onIdentifyStartCalled    = false;
+    onIdentifyStopCalled     = false;
     onEffectIdentifierCalled = false;
 
     // Old style struct
-    struct Identify identify(1, onIdentifyStart, onIdentifyStop, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone, onEffectIdentifier, EffectIdentifierEnum::kBlink, EffectVariantEnum::kDefault, &mTestTimerDelegate);
+    struct Identify identify(1, onIdentifyStart, onIdentifyStop, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone,
+                             onEffectIdentifier, EffectIdentifierEnum::kBlink, EffectVariantEnum::kDefault, &mTestTimerDelegate);
     EXPECT_EQ(identify.mCluster.Cluster().Startup(mContext.Get()), CHIP_NO_ERROR);
 
     const auto identifyTimePath = ConcreteDataAttributePath(1, Identify::Id, IdentifyTime::Id);
@@ -86,7 +87,7 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestLegacyCallbacks)
     Commands::TriggerEffect::Type data;
     data.effectIdentifier = EffectIdentifierEnum::kBlink;
     data.effectVariant    = EffectVariantEnum::kDefault;
-    auto result              = InvokeCommand(identify.mCluster.Cluster(), Commands::TriggerEffect::Id, data);
+    auto result           = InvokeCommand(identify.mCluster.Cluster(), Commands::TriggerEffect::Id, data);
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
     EXPECT_TRUE(onEffectIdentifierCalled);
@@ -95,7 +96,8 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestLegacyCallbacks)
 TEST_F(TestIdentifyClusterBackwardsCompatibility, TestCurrentEffectIdentifierUpdate)
 {
     onEffectIdentifierCalled = false;
-    struct Identify identify(1, nullptr, nullptr, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone, onEffectIdentifier, EffectIdentifierEnum::kStopEffect, EffectVariantEnum::kDefault, &mTestTimerDelegate);
+    struct Identify identify(1, nullptr, nullptr, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone, onEffectIdentifier,
+                             EffectIdentifierEnum::kStopEffect, EffectVariantEnum::kDefault, &mTestTimerDelegate);
     EXPECT_EQ(identify.mCluster.Cluster().Startup(mContext.Get()), CHIP_NO_ERROR);
 
     // Check that the effect identifier is the default one
@@ -105,7 +107,7 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestCurrentEffectIdentifierUpd
     Commands::TriggerEffect::Type dataBlink;
     dataBlink.effectIdentifier = EffectIdentifierEnum::kBlink;
     dataBlink.effectVariant    = EffectVariantEnum::kDefault;
-    auto resultBlink              = InvokeCommand(identify.mCluster.Cluster(), Commands::TriggerEffect::Id, dataBlink);
+    auto resultBlink           = InvokeCommand(identify.mCluster.Cluster(), Commands::TriggerEffect::Id, dataBlink);
     ASSERT_TRUE(resultBlink.has_value());
     EXPECT_EQ(resultBlink.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(identify.mCurrentEffectIdentifier, EffectIdentifierEnum::kBlink);
@@ -114,7 +116,7 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestCurrentEffectIdentifierUpd
     Commands::TriggerEffect::Type dataFinish;
     dataFinish.effectIdentifier = EffectIdentifierEnum::kFinishEffect;
     dataFinish.effectVariant    = EffectVariantEnum::kDefault;
-    auto resultFinish              = InvokeCommand(identify.mCluster.Cluster(), Commands::TriggerEffect::Id, dataFinish);
+    auto resultFinish           = InvokeCommand(identify.mCluster.Cluster(), Commands::TriggerEffect::Id, dataFinish);
     ASSERT_TRUE(resultFinish.has_value());
     EXPECT_EQ(resultFinish.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(identify.mCurrentEffectIdentifier, EffectIdentifierEnum::kFinishEffect);

@@ -53,7 +53,7 @@ IdentifyCluster::IdentifyCluster(const Config & config) :
 {}
 
 DataModel::ActionReturnStatus IdentifyCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                 AttributeValueEncoder & encoder)
+                                                             AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -71,7 +71,7 @@ DataModel::ActionReturnStatus IdentifyCluster::ReadAttribute(const DataModel::Re
 }
 
 DataModel::ActionReturnStatus IdentifyCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                  AttributeValueDecoder & decoder)
+                                                              AttributeValueDecoder & decoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -95,8 +95,7 @@ DataModel::ActionReturnStatus IdentifyCluster::WriteAttribute(const DataModel::W
     }
 }
 
-CHIP_ERROR IdentifyCluster::Attributes(const ConcreteClusterPath & path,
-                                           ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR IdentifyCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
     return listBuilder.Append(Span(Identify::Attributes::kMandatoryMetadata), {});
@@ -153,9 +152,8 @@ void IdentifyCluster::IdentifyTimeAttributeChanged(bool isWrittenByClientOrCmd)
     }
 }
 
-std::optional<DataModel::ActionReturnStatus> IdentifyCluster::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                                                TLV::TLVReader & input_arguments,
-                                                                                CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus>
+IdentifyCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
     switch (request.path.mCommandId)
     {
@@ -189,7 +187,7 @@ std::optional<DataModel::ActionReturnStatus> IdentifyCluster::InvokeCommand(cons
         mEffectVariant           = data.effectVariant;
 
         ChipLogProgress(Zcl, "RX identify:trigger effect identifier 0x%X variant 0x%X", to_underlying(mCurrentEffectIdentifier),
-                to_underlying(mEffectVariant));
+                        to_underlying(mEffectVariant));
 
         if (mIdentifyTime > 0)
         {
@@ -226,7 +224,7 @@ std::optional<DataModel::ActionReturnStatus> IdentifyCluster::InvokeCommand(cons
     }
 }
 CHIP_ERROR IdentifyCluster::AcceptedCommands(const ConcreteClusterPath & path,
-                                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+                                             ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     if (mOnEffectIdentifier)
     {

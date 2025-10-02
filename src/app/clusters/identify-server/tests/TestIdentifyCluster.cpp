@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/identify-server/IdentifyCluster.h>
 #include "TestIdentifyClusterHelpers.h"
+#include <app/clusters/identify-server/IdentifyCluster.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/data-model-provider/tests/ReadTesting.h>
@@ -35,8 +35,8 @@ using namespace chip::app::Clusters::Identify::Attributes;
 
 namespace {
 
-bool onIdentifyStartCalled      = false;
-bool onIdentifyStopCalled       = false;
+bool onIdentifyStartCalled    = false;
+bool onIdentifyStopCalled     = false;
 bool onEffectIdentifierCalled = false;
 
 void onIdentifyStart(IdentifyCluster * cluster)
@@ -211,7 +211,7 @@ TEST_F(TestIdentifyCluster, WriteReadOnlyAttributesReturnUnsupportedWriteTest)
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     // Attempt to write to the read-only IdentifyType attribute and verify it fails.
-    EXPECT_EQ(WriteAttribute(cluster, { endpoint, Identify::Id, IdentifyType::Id }, (uint8_t)0),
+    EXPECT_EQ(WriteAttribute(cluster, { endpoint, Identify::Id, IdentifyType::Id }, (uint8_t) 0),
               CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 
     // Attempt to write to the read-only ClusterRevision attribute and verify it fails.
@@ -232,7 +232,7 @@ TEST_F(TestIdentifyCluster, IdentifyTypeCtorInitTest)
 
     uint8_t identifyType;
     EXPECT_EQ(ReadAttribute(cluster, { endpoint, Identify::Id, IdentifyType::Id }, identifyType), CHIP_NO_ERROR);
-    EXPECT_EQ(identifyType, (uint8_t)IdentifyTypeEnum::kVisibleIndicator);
+    EXPECT_EQ(identifyType, (uint8_t) IdentifyTypeEnum::kVisibleIndicator);
 }
 
 TEST_F(TestIdentifyCluster, IdentifyTimeCountdownTest)
@@ -333,8 +333,7 @@ TEST_F(TestIdentifyCluster, OnStopNotCalledIfNotIdentifying)
 TEST_F(TestIdentifyCluster, InvokeIdentifyCommandTest)
 {
     constexpr EndpointId kEndpointId = 1;
-    IdentifyCluster cluster(
-        IdentifyCluster::Config(kEndpointId, IdentifyTypeEnum::kNone).WithTimerDelegate(&mTestTimerDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(kEndpointId, IdentifyTypeEnum::kNone).WithTimerDelegate(&mTestTimerDelegate));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     // Test with a value of 10 for identifyTime.

@@ -17,18 +17,18 @@
 
 #pragma once
 
-#include <gtest/gtest.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
-#include <app/clusters/testing/AttributeTesting.h>
+#include <gtest/gtest.h>
 
 // Helper function to write a value to an attribute.
 template <typename T>
-CHIP_ERROR WriteAttribute(chip::app::Clusters::IdentifyCluster & cluster, const chip::app::ConcreteDataAttributePath & path, const T & value)
+CHIP_ERROR WriteAttribute(chip::app::Clusters::IdentifyCluster & cluster, const chip::app::ConcreteDataAttributePath & path,
+                          const T & value)
 {
     chip::app::Testing::WriteOperation writeOperation(path);
     chip::app::AttributeValueDecoder decoder = writeOperation.DecoderFor(value);
@@ -37,9 +37,10 @@ CHIP_ERROR WriteAttribute(chip::app::Clusters::IdentifyCluster & cluster, const 
 
 // Helper function to invoke a command and return the result.
 template <typename T>
-std::optional<chip::app::DataModel::ActionReturnStatus> InvokeCommand(chip::app::Clusters::IdentifyCluster & cluster, chip::CommandId commandId, const T & data)
+std::optional<chip::app::DataModel::ActionReturnStatus> InvokeCommand(chip::app::Clusters::IdentifyCluster & cluster,
+                                                                      chip::CommandId commandId, const T & data)
 {
-    constexpr chip::EndpointId kEndpointId       = 1;
+    constexpr chip::EndpointId kEndpointId            = 1;
     const chip::app::DataModel::InvokeRequest request = { .path = { kEndpointId, chip::app::Clusters::Identify::Id, commandId } };
 
     uint8_t buffer[128];
@@ -56,7 +57,8 @@ std::optional<chip::app::DataModel::ActionReturnStatus> InvokeCommand(chip::app:
 
 // Helper function to read an attribute and decode its value.
 template <typename T>
-CHIP_ERROR ReadAttribute(chip::app::Clusters::IdentifyCluster & cluster, const chip::app::ConcreteDataAttributePath & path, T & value)
+CHIP_ERROR ReadAttribute(chip::app::Clusters::IdentifyCluster & cluster, const chip::app::ConcreteDataAttributePath & path,
+                         T & value)
 {
     chip::app::Testing::ReadOperation readOperation(path);
     std::unique_ptr<chip::app::AttributeValueEncoder> encoder = readOperation.StartEncoding();
@@ -103,7 +105,7 @@ public:
     }
 
 private:
-    TimerContext * mTimerContext                  = nullptr;
+    TimerContext * mTimerContext                        = nullptr;
     chip::System::Clock::Timestamp mTimerTimeout        = chip::System::Clock::Milliseconds64(0x7FFFFFFFFFFFFFFF);
     chip::System::Clock::Timestamp mMockSystemTimestamp = chip::System::Clock::Milliseconds64(0);
 };

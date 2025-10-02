@@ -53,8 +53,8 @@ static Identify * GetLegacyIdentifyInstance(EndpointId endpoint)
 
 static inline void RegisterLegacyIdentify(Identify * inst)
 {
-    inst->nextIdentify = firstLegacyIdentify;
-    firstLegacyIdentify      = inst;
+    inst->nextIdentify  = firstLegacyIdentify;
+    firstLegacyIdentify = inst;
 }
 
 static inline void UnregisterLegacyIdentify(Identify * inst)
@@ -142,17 +142,17 @@ namespace {
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
-    public:
-        ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
-                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
-        {
-            Identify * identify = GetLegacyIdentifyInstance(endpointId);
-            VerifyOrDie(identify != nullptr);
-            return identify->mCluster.Registration();
-        }
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    {
+        Identify * identify = GetLegacyIdentifyInstance(endpointId);
+        VerifyOrDie(identify != nullptr);
+        return identify->mCluster.Registration();
+    }
 
-        ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override { return nullptr; }
-        void ReleaseRegistration(unsigned clusterInstanceIndex) override {}
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override { return nullptr; }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override {}
 };
 
 } // namespace
@@ -162,9 +162,11 @@ void MatterIdentifyClusterInitCallback(EndpointId endpointId)
     if (GetLegacyIdentifyInstance(endpointId) != nullptr)
     {
         IntegrationDelegate integrationDelegate;
-        CodegenClusterIntegration::RegisterServer(
-            { .endpointId = endpointId, .clusterId = Clusters::Identify::Id, .fixedClusterInstanceCount = 1, .maxClusterInstanceCount = 1 },
-            integrationDelegate);
+        CodegenClusterIntegration::RegisterServer({ .endpointId                = endpointId,
+                                                    .clusterId                 = Clusters::Identify::Id,
+                                                    .fixedClusterInstanceCount = 1,
+                                                    .maxClusterInstanceCount   = 1 },
+                                                  integrationDelegate);
     }
 }
 
@@ -173,8 +175,10 @@ void MatterIdentifyClusterShutdownCallback(EndpointId endpointId)
     if (GetLegacyIdentifyInstance(endpointId) != nullptr)
     {
         IntegrationDelegate integrationDelegate;
-        CodegenClusterIntegration::UnregisterServer(
-            { .endpointId = endpointId, .clusterId = Clusters::Identify::Id, .fixedClusterInstanceCount = 1, .maxClusterInstanceCount = 1 },
-            integrationDelegate);
+        CodegenClusterIntegration::UnregisterServer({ .endpointId                = endpointId,
+                                                      .clusterId                 = Clusters::Identify::Id,
+                                                      .fixedClusterInstanceCount = 1,
+                                                      .maxClusterInstanceCount   = 1 },
+                                                    integrationDelegate);
     }
 }

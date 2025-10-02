@@ -55,13 +55,13 @@ struct Identify
      * @param effectIdentifier if supported by the app, initial identify effect
      * @param effectVariant if supported by the app, initial effect variant
      */
-    Identify(chip::EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIdentifyStopCb onIdentifyStop,
-             chip::app::Clusters::Identify::IdentifyTypeEnum identifyType, onEffectIdentifierCb onEffectIdentifier = nullptr,
-             chip::app::Clusters::Identify::EffectIdentifierEnum effectIdentifier =
-                 chip::app::Clusters::Identify::EffectIdentifierEnum::kBlink,
-             chip::app::Clusters::Identify::EffectVariantEnum effectVariant =
-                 chip::app::Clusters::Identify::EffectVariantEnum::kDefault,
-             chip::app::reporting::ReportScheduler::TimerDelegate * timerDelegate = nullptr);
+    Identify(
+        chip::EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIdentifyStopCb onIdentifyStop,
+        chip::app::Clusters::Identify::IdentifyTypeEnum identifyType, onEffectIdentifierCb onEffectIdentifier = nullptr,
+        chip::app::Clusters::Identify::EffectIdentifierEnum effectIdentifier =
+            chip::app::Clusters::Identify::EffectIdentifierEnum::kBlink,
+        chip::app::Clusters::Identify::EffectVariantEnum effectVariant = chip::app::Clusters::Identify::EffectVariantEnum::kDefault,
+        chip::app::reporting::ReportScheduler::TimerDelegate * timerDelegate = nullptr);
     ~Identify();
 
     onIdentifyStartCb mOnIdentifyStart = nullptr;
