@@ -276,7 +276,6 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
     Commands::CSRRequest::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
-
     chip::Platform::ScopedMemoryBuffer<uint8_t> nocsrElements;
     MutableByteSpan nocsrElementsSpan;
     auto errorStatus = Status::Failure;
@@ -572,7 +571,6 @@ std::optional<DataModel::ActionReturnStatus> HandleUpdateNOC(CommandHandler * co
 
     CHIP_ERROR err          = CHIP_NO_ERROR;
     FabricIndex fabricIndex = 0;
-
 
     const FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj, fabricTable);
 
