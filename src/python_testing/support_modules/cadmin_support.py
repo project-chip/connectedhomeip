@@ -25,7 +25,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import IntEnum
 from time import sleep
-from typing import Any, Optional
+from typing import Optional
 
 from mdns_discovery import mdns_discovery
 from mobly import asserts
