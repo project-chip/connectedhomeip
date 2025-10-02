@@ -85,6 +85,76 @@ cluster is a good example of this pattern.
         interactions. We recommend the term `Driver` to avoid confusion with the
         overloaded term `Delegate`.
 
+### BUILD file layout
+
+The description below will describe build files under
+`src/app/clusters/<cluster-directory>/`. You are expected to have the following
+items:
+
+#### `BUILD.gn`
+
+Will contain a target that is named `<cluster-directory>`, usually a
+`source_set`. This file gets referenced from
+[src/app/chip_data_model.gni](https://github.com/project-chip/connectedhomeip/blob/master/src/app/chip_data_model.gni)
+by adding a dependency as `deps += [ "${_app_root}/clusters/${cluster}" ]`, so
+the default target name is important.
+
+#### `app_config_dependent_sources`
+
+There are two code generation integration support files: one for `gn` and one
+for `cmake`. The way these work is that
+`chip_data_model.gni`/`chip_data_model.cmake` will include these files and
+bundle _ALL_ referenced sources into _ONE SINGLE SOURCE SET_, together with
+ember code-generated settings (e.g. `endpoint_config.h` and similar files that
+are application-specific)
+
+As a result, there will be a difference between `GN` and `cmake`:
+
+-   `app_config_dependent_sources.gn` will typically just contain
+    `CodegenIntegration.cpp` and any other helper/compatibility layers (e.g.
+    `CodegenIntegration.h` if applicable)
+-   `app_config_dependent_sources.cmake` will contain all the files that the
+    `gn` file contains PLUS any dependencies that the `BUILD.gn` would pull in
+    but cmake would not (i.e. dependencies not in the `libCHIP` builds). These
+    extra files are often the `h/cpp` files that were in the `.gn` source set.
+
+**EXAMPLE** taken from
+([src/app/clusters/basic-information](https://github.com/project-chip/connectedhomeip/tree/master/src/app/clusters/basic-information)):
+
+```
+# BUILD.gn
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+source_set("basic-information") {
+   sources = [ ... ]
+   public_deps = [ ... ]
+}
+```
+
+```
+# app_config_dependent_sources.gni
+app_config_dependent_sources = [ "CodegenIntegration.cpp" ]
+```
+
+```
+# app_config_dependent_sources.cmake
+# This block adds the codegen integration sources, similar to app_config_dependent_sources.gni
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+)
+
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/BasicInformationCluster.cpp"
+    "${CLUSTER_DIR}/BasicInformationCluster.h"
+)
+```
+
 ### Implementation Details
 
 #### Attribute and Feature Handling
@@ -111,16 +181,16 @@ attribute's value changes.
         together with a separate `WriteImpl` such that any successful attribute
         write will notify.
 
-            Canonical example code would look like:
+        Canonical example code would look like:
 
-            ```cpp
-            DataModel::ActionReturnStatus SomeCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                      AttributeValueDecoder & decoder)
-            {
+        ```cpp
+        DataModel::ActionReturnStatus SomeCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                          AttributeValueDecoder & decoder)
+        {
                 // Delegate everything to WriteImpl. If write succeeds, notify that the attribute changed.
                 return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
-            }
-            ```
+        }
+        ```
 
     -   For the `NotifyAttributeChangedIfSuccess` ensure that WriteImpl is
         returning
@@ -128,11 +198,11 @@ attribute's value changes.
         when no notification should be sent (e.g. write was a `noop` because
         existing value was already the same).
 
-            Canonical example is:
+        Canonical example is:
 
-            ```cpp
-            VerifyOrReturnValue(mValue != value, ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
-            ```
+        ```cpp
+        VerifyOrReturnValue(mValue != value, ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+        ```
 
 #### Persistent Storage
 
