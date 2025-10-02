@@ -144,7 +144,7 @@ void ZoneManager::OnZoneTriggerTimeout(chip::System::Layer * systemLayer, void *
             ChipLogProgress(Camera, "Generating ZoneStopped event for ZoneId = %u with reason:kActionStopped",
                             trigCtxtIter->triggerCtrl.zoneID);
             zoneManager->GetZoneManagementCluster()->GenerateZoneStoppedEvent(trigCtxtIter->triggerCtrl.zoneID,
-                                                                       ZoneEventStoppedReasonEnum::kActionStopped);
+                                                                              ZoneEventStoppedReasonEnum::kActionStopped);
             // Set the triggerState to BlindDuration
             trigCtxtIter->triggerState = TriggerState::InBlindDuration;
         }
@@ -154,7 +154,7 @@ void ZoneManager::OnZoneTriggerTimeout(chip::System::Layer * systemLayer, void *
             ChipLogProgress(Camera, "Generating ZoneStopped event for ZoneId = %u with reason:kTimeout",
                             trigCtxtIter->triggerCtrl.zoneID);
             zoneManager->GetZoneManagementCluster()->GenerateZoneStoppedEvent(trigCtxtIter->triggerCtrl.zoneID,
-                                                                       ZoneEventStoppedReasonEnum::kTimeout);
+                                                                              ZoneEventStoppedReasonEnum::kTimeout);
             // Set the triggerState to BlindDuration
             trigCtxtIter->triggerState = TriggerState::InBlindDuration;
         }

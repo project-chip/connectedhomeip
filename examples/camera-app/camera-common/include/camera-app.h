@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <app/clusters/zone-management-server/ZoneManagementCluster.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/zone-management-server/ZoneManagementCluster.h>
 
 #include "camera-device-interface.h"
 #include <app/util/config.h>

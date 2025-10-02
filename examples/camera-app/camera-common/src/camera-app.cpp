@@ -192,8 +192,9 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     appTwoDCartesianMax.y                         = sensorParams.sensorHeight - 1;
 
     // Instantiate the ZoneManagementCluster Server
-    mZoneMgmtServerPtr = std::make_unique<ZoneManagementCluster>(mEndpoint, mCameraDevice->GetZoneManagementDelegate(), zoneMgmtFeatures,
-                                                          appMaxUserDefinedZones, appMaxZones, sensitivityMax, appTwoDCartesianMax);
+    mZoneMgmtServerPtr =
+        std::make_unique<ZoneManagementCluster>(mEndpoint, mCameraDevice->GetZoneManagementDelegate(), zoneMgmtFeatures,
+                                                appMaxUserDefinedZones, appMaxZones, sensitivityMax, appTwoDCartesianMax);
 
     //    mZoneMgmtServerPtr->SetSensitivity(mCameraDevice->GetCameraHALInterface().GetDetectionSensitivity());
 }

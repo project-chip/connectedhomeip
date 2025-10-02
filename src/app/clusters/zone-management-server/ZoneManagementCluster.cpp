@@ -47,16 +47,17 @@ using namespace Protocols::InteractionModel;
 namespace chip {
 namespace app {
 namespace Clusters {
-// TODO: canonical layout is for the cluster to live in the Clusters namespace, without the additional namespace. Remove the namespace here and fix the pattern in other clusters
+// TODO: canonical layout is for the cluster to live in the Clusters namespace, without the additional namespace. Remove the
+// namespace here and fix the pattern in other clusters
 namespace ZoneManagement {
 // TODO: find a more reasonable value, enforce / check on save
 constexpr size_t kMaxPersistedValueLengthSupported = 2048;
 
-    // TODO: figure out a more sensible set of constructors that works well with codegen integration
+// TODO: figure out a more sensible set of constructors that works well with codegen integration
 ZoneManagementCluster::ZoneManagementCluster(EndpointId endpointId) :
-    DefaultServerCluster({ endpointId, ZoneManagement::Id }), mFeatures(0), mMaxUserDefinedZones(5), mMaxZones(5), mSensitivityMax(10), mTwoDCartesianMax({.x = 640, .y = 480})
-{
-}
+    DefaultServerCluster({ endpointId, ZoneManagement::Id }), mFeatures(0), mMaxUserDefinedZones(5), mMaxZones(5),
+    mSensitivityMax(10), mTwoDCartesianMax({ .x = 640, .y = 480 })
+{}
 ZoneManagementCluster::ZoneManagementCluster(EndpointId endpointId, Delegate & aDelegate, const BitFlags<Feature> aFeatures,
                                              uint8_t aMaxUserDefinedZones, uint8_t aMaxZones, uint8_t aSensitivityMax,
                                              const TwoDCartesianVertexStruct & aTwoDCartesianMax) :
