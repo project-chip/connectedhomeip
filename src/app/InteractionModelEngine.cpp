@@ -1796,26 +1796,24 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
 
     DataModel::AcceptedCommandEntry acceptedCommandEntry;
 
-    // Execute the ACL Access Granting Algorithm before existence checks, assuming the required_privilege for the element is
-    // Operate, to determine if the subject would have had at least some access against the concrete path. This is done so we don't
-    // leak information if we do fail existence checks.
-    // SPEC-DIVERGENCE: For non-concrete paths (Group Commands), the spec mandates only one ACL check AFTER the existence check.
-    // However, because this code is also used in the group path case, we end up performing an ADDITIONAL ACL check before the
-    // existence check. In practice, this divergence is not observable if all commands require at least Operate privilege.
-    Status status = CheckCommandAccess(request, Access::Privilege::kOperate);
-    VerifyOrReturnValue(status == Status::Success, status);
+    Status existenceStatus = CheckCommandExistence(request.path, acceptedCommandEntry);
 
-    status = CheckCommandExistence(request.path, acceptedCommandEntry);
+    // Default to Operate when the command metadata is unknown so we can fail closed while still avoiding
+    // leaking information about whether the path actually exists. When the metadata lookup succeeds we
+    // enforce the precise privilege declared for the command.
+    Access::Privilege privilegeToCheck = (existenceStatus == Status::Success)
+        ? acceptedCommandEntry.GetInvokePrivilege()
+        : Access::Privilege::kOperate;
 
-    if (status != Status::Success)
+    Status accessStatus = CheckCommandAccess(request, privilegeToCheck);
+    VerifyOrReturnValue(accessStatus == Status::Success, accessStatus);
+
+    if (existenceStatus != Status::Success)
     {
         ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint %u",
                       ChipLogValueMEI(request.path.mCommandId), ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId);
-        return status;
+        return existenceStatus;
     }
-
-    status = CheckCommandAccess(request, acceptedCommandEntry.GetInvokePrivilege());
-    VerifyOrReturnValue(status == Status::Success, status);
 
     return CheckCommandFlags(request, acceptedCommandEntry);
 }
