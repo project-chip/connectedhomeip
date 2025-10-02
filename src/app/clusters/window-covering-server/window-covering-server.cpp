@@ -112,7 +112,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace WindowCovering {
-WindowCoverAttrAccess gAttrAccess;
+static WindowCoverAttrAccess gAttrAccess;
 
 CHIP_ERROR WindowCoverAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
