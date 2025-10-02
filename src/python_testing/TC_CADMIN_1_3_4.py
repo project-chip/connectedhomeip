@@ -194,8 +194,8 @@ class TC_CADMIN(CADMINBaseTest):
                 expected_duration_seconds=180,
                 window_status_accumulator=window_status_accumulator
             )
-            asserts.assert_true(results['window_closed'], "Window should have closed")
-            asserts.assert_true(results['timing_valid'], "Window should have closed within timing constraints")
+            asserts.assert_true(results.window_closed, "Window should have closed")
+            asserts.assert_true(results.timing_valid, "Window should have closed within timing constraints")
 
             self.step(10)
             # TH_CR2 opens a commissioning window on DUT_CE using ECM

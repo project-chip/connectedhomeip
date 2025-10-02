@@ -154,25 +154,25 @@ class CADMINBaseTest(MatterBaseTest):
             logging.error(f"❌ {error_msg}")
             asserts.fail(error_msg)
 
-    def log_timing_results(self, results: dict[str, Any], test_step: str = ""):
+    def log_timing_results(self, results: 'CADMINBaseTest.TimingResults', test_step: str = ""):
         """
         Log timing results prominently for easy visibility in test output.
 
         Args:
-            results: Results dictionary from monitor_commissioning_window_closure_with_subscription
+            results: TimingResults dataclass from monitor_commissioning_window_closure_with_subscription
             test_step: Optional test step identifier
         """
         step_prefix = f"[{test_step}] " if test_step else ""
 
         logging.info(f"{step_prefix}=== COMMISSIONING WINDOW TIMING RESULTS ===")
         logging.info(f"{step_prefix}Window closed: ✅ YES")
-        logging.info(f"{step_prefix}Timing valid: {'✅ YES' if results['timing_valid'] else '❌ NO'}")
+        logging.info(f"{step_prefix}Timing valid: {'✅ YES' if results.timing_valid else '❌ NO'}")
 
-        if results['actual_duration_seconds'] is not None:
-            actual = results['actual_duration_seconds']
-            expected = results['expected_duration_seconds']
-            max_allowed = results['max_allowed_duration_seconds']
-            skew_ms = results['clock_skew_ms']
+        if results.actual_duration_seconds is not None:
+            actual = results.actual_duration_seconds
+            expected = results.expected_duration_seconds
+            max_allowed = results.max_allowed_duration_seconds
+            skew_ms = results.clock_skew_ms
 
             logging.info(f"{step_prefix}⏱️  TIMING BREAKDOWN:")
             logging.info(f"{step_prefix}   Expected duration: {expected}s")
@@ -190,8 +190,8 @@ class CADMINBaseTest(MatterBaseTest):
                 over_by = actual - max_allowed
                 logging.error(f"{step_prefix}   ❌ Window closed TOO LATE by {over_by:.2f}s")
 
-            logging.info(f"{step_prefix}   Start time: {results['start_time']}")
-            logging.info(f"{step_prefix}   End time: {results['end_time']}")
+            logging.info(f"{step_prefix}   Start time: {results.start_time}")
+            logging.info(f"{step_prefix}   End time: {results.end_time}")
             logging.info(f"{step_prefix}   Total monitoring time: {actual:.2f}s")
 
         logging.info(f"{step_prefix}=== END TIMING RESULTS ===")
@@ -204,7 +204,7 @@ class CADMINBaseTest(MatterBaseTest):
         min_interval_sec: int = 0,
         max_interval_sec: int = 30,
         window_status_accumulator: Optional[AttributeSubscriptionHandler] = None
-    ) -> dict[str, Any]:
+    ) -> 'CADMINBaseTest.TimingResults':
         """
         Monitor commissioning window closure using subscription (replaces hardcoded sleep).
 
@@ -216,7 +216,7 @@ class CADMINBaseTest(MatterBaseTest):
             max_interval_sec: Maximum reporting interval for subscription
 
         Returns:
-            Dictionary with monitoring results
+            TimingResults dataclass with monitoring results
         """
         start_time = datetime.now()
         timeout_buffer_sec = 10
@@ -254,16 +254,16 @@ class CADMINBaseTest(MatterBaseTest):
                 logging.error(f"Max allowed: {max_allowed_duration:.2f}s")
                 logging.error(f"Over by: {actual_duration - max_allowed_duration:.2f}s")
 
-            results = {
-                'window_closed': True,  # Always true if we reach this point
-                'expected_duration_seconds': expected_duration_seconds,
-                'actual_duration_seconds': actual_duration,
-                'clock_skew_ms': clock_skew_ms,
-                'max_allowed_duration_seconds': max_allowed_duration,
-                'timing_valid': timing_valid,
-                'start_time': start_time,
-                'end_time': end_time
-            }
+            results = self.TimingResults(
+                window_closed=True,  # Always true if we reach this point
+                expected_duration_seconds=expected_duration_seconds,
+                actual_duration_seconds=actual_duration,
+                clock_skew_ms=clock_skew_ms,
+                max_allowed_duration_seconds=max_allowed_duration,
+                timing_valid=timing_valid,
+                start_time=start_time,
+                end_time=end_time
+            )
 
             # Log results
             self.log_timing_results(results)
@@ -370,6 +370,18 @@ class CADMINBaseTest(MatterBaseTest):
         sleep(1)
 
     @dataclass
+    class TimingResults:
+        """Results from commissioning window timing monitoring."""
+        window_closed: bool
+        expected_duration_seconds: int
+        actual_duration_seconds: Optional[float]
+        clock_skew_ms: int
+        max_allowed_duration_seconds: float
+        timing_valid: bool
+        start_time: datetime
+        end_time: Optional[datetime] = None
+
+    @dataclass
     class ParsedService:
         service: mdns_discovery.MdnsServiceInfo
         cm: Optional[int] = None
@@ -402,15 +414,6 @@ class CADMINBaseTest(MatterBaseTest):
             cm_match = self.cm == expected_cm
             d_match = self.d == expected_d
             return cm_match and d_match
-
-    async def get_all_txt_records(self):
-        discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
-        discovery._service_types = [mdns_discovery.MdnsServiceType.COMMISSIONABLE.value]
-        await discovery._discover(discovery_timeout_sec=240, log_output=False)
-
-        if mdns_discovery.MdnsServiceType.COMMISSIONABLE.value in discovery._discovered_services:
-            return discovery._discovered_services[mdns_discovery.MdnsServiceType.COMMISSIONABLE.value]
-        return []
 
     async def wait_for_correct_cm_value(
             self,
