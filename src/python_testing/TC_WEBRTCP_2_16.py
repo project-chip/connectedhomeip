@@ -83,12 +83,12 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
 
         self.step(1)
         # Allocate Audio and Video streams
-        audioStreamID = await self.allocate_one_audio_stream()
-        videoStreamID = await self.allocate_one_video_stream()
+        audio_stream_id = await self.allocate_one_audio_stream()
+        video_stream_id = await self.allocate_one_video_stream()
 
         # Validate that the streams were allocated successfully
-        await self.validate_allocated_audio_stream(audioStreamID)
-        await self.validate_allocated_video_stream(videoStreamID)
+        await self.validate_allocated_audio_stream(audio_stream_id)
+        await self.validate_allocated_video_stream(video_stream_id)
 
         self.step(2)
         # Send multiple ProvideOffer commands to exhaust the DUT's capacity
@@ -138,8 +138,8 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
             ),
             streamUsage=3,
             originatingEndpointID=1,
-            videoStreamID=videoStreamID,
-            audioStreamID=audioStreamID
+            videoStreamID=video_stream_id,
+            audioStreamID=audio_stream_id
         )
 
         # Try to allocate multiple sessions to reach the DUT's capacity limit

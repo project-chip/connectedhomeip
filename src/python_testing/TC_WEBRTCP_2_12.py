@@ -63,7 +63,7 @@ class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
             TestStep(3, "TH sends an additional SolicitOffer command when DUT capacity is exhausted",
                      "DUT responds with SolicitOfferResponse containing allocated WebRTCSessionID"),
             TestStep(4, "TH waits for DUT to send End command with reason OutOfResources",
-                     "DUT sends End command with reason OutOfResources (value 0x08)"),
+                     "DUT sends End command with reason OutOfResources (value 0x08)")
         ]
         return steps
 
@@ -84,12 +84,12 @@ class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
 
         self.step(1)
         # Allocate Audio and Video streams
-        audioStreamID = await self.allocate_one_audio_stream()
-        videoStreamID = await self.allocate_one_video_stream()
+        audio_stream_id = await self.allocate_one_audio_stream()
+        video_stream_id = await self.allocate_one_video_stream()
 
         # Validate that the streams were allocated successfully
-        await self.validate_allocated_audio_stream(audioStreamID)
-        await self.validate_allocated_video_stream(videoStreamID)
+        await self.validate_allocated_audio_stream(audio_stream_id)
+        await self.validate_allocated_video_stream(video_stream_id)
 
         # Create WebRTC manager and peer for receiving End commands
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
@@ -127,8 +127,8 @@ class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
             resp: Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse = await webrtc_peer.send_command(
                 cmd=Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
                     streamUsage=Clusters.Objects.Globals.Enums.StreamUsageEnum.kLiveView,
-                    videoStreamID=videoStreamID,
-                    audioStreamID=audioStreamID,
+                    videoStreamID=video_stream_id,
+                    audioStreamID=audio_stream_id,
                     originatingEndpointID=1,
                 ),
                 endpoint=endpoint,
@@ -136,10 +136,10 @@ class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
             )
             asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse,
                                  "Incorrect response type")
-            sessionId = resp.webRTCSessionID
-            asserts.assert_true(sessionId >= 0, f"Invalid session ID: {sessionId}")
-            logger.info(f"Created session {sessionId} in attempt {attempt + 1}")
-            webrtc_manager.session_id_created(sessionId, self.dut_node_id)
+            session_id = resp.webRTCSessionID
+            asserts.assert_true(session_id >= 0, f"Invalid session ID: {session_id}")
+            logger.info(f"Created session {session_id} in attempt {attempt + 1}")
+            webrtc_manager.session_id_created(session_id, self.dut_node_id)
 
         self.step(3)
         # Send an additional SolicitOffer command when DUT capacity is exhausted
@@ -150,8 +150,8 @@ class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
         resp: Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse = await webrtc_peer.send_command(
             cmd=Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
                 streamUsage=Clusters.Objects.Globals.Enums.StreamUsageEnum.kLiveView,
-                videoStreamID=videoStreamID,
-                audioStreamID=audioStreamID,
+                videoStreamID=video_stream_id,
+                audioStreamID=audio_stream_id,
                 originatingEndpointID=1,
             ),
             endpoint=endpoint,
@@ -160,10 +160,10 @@ class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
 
         asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse,
                              "Incorrect response type")
-        sessionId = resp.webRTCSessionID
-        asserts.assert_true(sessionId >= 0, f"Invalid session ID: {sessionId}")
-        logger.info(f"DUT allocated session {sessionId} despite resource exhaustion")
-        webrtc_manager.session_id_created(sessionId, self.dut_node_id)
+        session_id = resp.webRTCSessionID
+        asserts.assert_true(session_id >= 0, f"Invalid session ID: {session_id}")
+        logger.info(f"DUT allocated session {session_id} despite resource exhaustion")
+        webrtc_manager.session_id_created(session_id, self.dut_node_id)
 
         self.step(4)
         # Wait for DUT to send End command with reason OutOfResources
