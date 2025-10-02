@@ -16,7 +16,8 @@ import os
 import signal
 import tempfile
 from dataclasses import dataclass
-from typing import Any, Optional, Pattern
+from pathlib import Path
+from typing import Any, Callable, Optional, Pattern
 
 from matter.testing.tasks import Subprocess
 
@@ -201,7 +202,8 @@ class OTAProviderSubprocess(AppServerSubprocess):
             args += [f"--KVS={kvs_path}"]
 
         # Clear the log file before starting
-        open(log_file_path, "w").close()
+        assert self.log_file_path is not None, "log_file_path must not be None"
+        Path(self.log_file_path).write_text("")
 
         # Save args for use in the base constructor
         self._extra_args = args
@@ -217,13 +219,18 @@ class OTAProviderSubprocess(AppServerSubprocess):
             kvs_path=kvs_path
         )
 
-    def _process_output(self, line: bytes) -> bytes:
+    def _process_output(self, line: bytes, is_stderr: bool) -> bytes:
         """Write logs only to file, return empty bytes to avoid console output."""
         assert self.log_file_path is not None, "log_file_path must not be None"
-        with open(self.log_file_path, "ab") as f:
+        fpath = Path(self.log_file_path)
+        fpath.parent.mkdir(parents=True, exist_ok=True)
+        with fpath.open("ab") as f:
             f.write(line)
             f.flush()
         return b""  # must return bytes, not None
+
+    def _output_adapter(self, line: bytes) -> bytes:
+        return self._process_output(line, False)
 
     def start(self, expected_output: str | Pattern[Any] | None = None, timeout: float | None = 30):
         """Override start to attach log processing callback."""
