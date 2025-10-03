@@ -21,6 +21,7 @@
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/SoftwareDiagnostics/Enums.h>
 #include <clusters/SoftwareDiagnostics/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -221,32 +222,12 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
     // infrastructure for clusters.
 }
 
-// This doesn't really test event generation right now, for it there needs to be a testing infrastructure for clusters.
-// This just tests the global listener functionality.
 TEST_F(TestSoftwareDiagnosticsCluster, SoftwareFaultListenerTest)
 {
-    class TestListener : public SoftwareDiagnostics::SoftwareFaultListener
-    {
-    public:
-        void
-        OnSoftwareFaultDetect(const chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault) override
-        {
-            received = softwareFault;
-            called   = true;
-        }
+    SoftwareDiagnosticsServerCluster cluster({});
+    chip::Test::TestServerClusterContext context;
 
-        bool called = false;
-        chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type received;
-    };
-
-    TestListener listener;
-
-    // Initially no listener is set
-    ASSERT_EQ(SoftwareDiagnostics::SoftwareFaultListener::GetGlobalListener(), nullptr);
-
-    // Set the listener
-    SoftwareDiagnostics::SoftwareFaultListener::SetGlobalListener(&listener);
-    ASSERT_EQ(SoftwareDiagnostics::SoftwareFaultListener::GetGlobalListener(), &listener);
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Notify a fault, and verify it is received
     chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type fault;
@@ -256,25 +237,15 @@ TEST_F(TestSoftwareDiagnosticsCluster, SoftwareFaultListenerTest)
     fault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(faultData), sizeof(faultData)));
 
     SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(fault);
+    
+    chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type decodedFault;
+    ASSERT_EQ(context.EventsGenerator().DecodeLastEvent(decodedFault), CHIP_NO_ERROR);
 
-    ASSERT_TRUE(listener.called);
-    ASSERT_EQ(listener.received.id, fault.id);
-    ASSERT_TRUE(listener.received.name.HasValue());
-    ASSERT_EQ(listener.received.name.Value(), fault.name.Value());
-    ASSERT_TRUE(listener.received.faultRecording.HasValue());
-    ASSERT_EQ(listener.received.faultRecording.Value().size(), fault.faultRecording.Value().size());
-    ASSERT_EQ(memcmp(listener.received.faultRecording.Value().data(), fault.faultRecording.Value().data(),
-                     fault.faultRecording.Value().size()),
-              0);
-
-    // Clear the listener
-    SoftwareDiagnostics::SoftwareFaultListener::SetGlobalListener(nullptr);
-    ASSERT_EQ(SoftwareDiagnostics::SoftwareFaultListener::GetGlobalListener(), nullptr);
-
-    // Notify again, and verify nothing is called
-    listener.called = false;
-    SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(fault);
-    ASSERT_FALSE(listener.called);
+    ASSERT_EQ(decodedFault.id, fault.id);
+    ASSERT_TRUE(decodedFault.name.HasValue());
+    ASSERT_EQ(decodedFault.name.Value(), fault.name.Value());
+    ASSERT_TRUE(decodedFault.faultRecording.HasValue());
+    ASSERT_EQ(decodedFault.faultRecording.Value(), fault.faultRecording.Value());
 }
 
 } // namespace
