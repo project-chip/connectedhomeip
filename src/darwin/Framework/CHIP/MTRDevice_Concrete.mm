@@ -3778,7 +3778,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 continue;
             }
 
-            // Other we build unique list of attributes in this cluster that match requested paths
+            // Otherwise, we build unique list of attributes in this cluster that match requested paths
             NSMutableArray<MTRAttributePath *> * existentAttributesPathsInCluster = [[NSMutableArray alloc] init];
             for (MTRAttributeRequestPath * requestPath in attributePaths) {
                 if (requestPath.endpoint != nil && ![requestPath.endpoint isEqual:clusterPath.endpoint]) {
