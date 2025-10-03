@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2021-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -178,7 +178,7 @@ DataModel::ActionReturnStatus GeneralCommissioningCluster::ReadAttribute(const D
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id:
-        return encoder.Encode(mFeatures);
+        return encoder.Encode(kFeatures);
     case ClusterRevision::Id:
         return encoder.Encode(GeneralCommissioning::kRevision);
     case Breadcrumb::Id:
@@ -268,19 +268,14 @@ DataModel::ActionReturnStatus GeneralCommissioningCluster::ReadAttribute(const D
 DataModel::ActionReturnStatus GeneralCommissioningCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                           AttributeValueDecoder & decoder)
 {
-
-    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
-}
-
-DataModel::ActionReturnStatus GeneralCommissioningCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,
-                                                                     AttributeValueDecoder & decoder)
-{
     using namespace GeneralCommissioning::Attributes;
     switch (request.path.mAttributeId)
     {
     case Breadcrumb::Id: {
         uint64_t value;
         ReturnErrorOnFailure(decoder.Decode(value));
+        // SetBreadCrumb handles notification internally, so we don't need WriteImpl
+        // to avoid double-notification.
         SetBreadCrumb(value);
         return CHIP_NO_ERROR;
     }
@@ -325,7 +320,7 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningCluster::Invoke
 CHIP_ERROR GeneralCommissioningCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                          ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (mFeatures.Has(GeneralCommissioning::Feature::kTermsAndConditions))
+    if (kFeatures.Has(GeneralCommissioning::Feature::kTermsAndConditions))
     {
         ReturnErrorOnFailure(builder.AppendElements({ Commands::SetTCAcknowledgements::kMetadataEntry }));
     }
@@ -341,7 +336,7 @@ CHIP_ERROR GeneralCommissioningCluster::GeneratedCommands(const ConcreteClusterP
                                                           ReadOnlyBufferBuilder<CommandId> & builder)
 {
 
-    if (mFeatures.Has(GeneralCommissioning::Feature::kTermsAndConditions))
+    if (kFeatures.Has(GeneralCommissioning::Feature::kTermsAndConditions))
     {
         ReturnErrorOnFailure(builder.AppendElements({ Commands::SetTCAcknowledgementsResponse::Id }));
     }
@@ -357,7 +352,7 @@ CHIP_ERROR GeneralCommissioningCluster::Attributes(const ConcreteClusterPath & p
                                                    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
 
-    if (mFeatures.Has(GeneralCommissioning::Feature::kTermsAndConditions))
+    if (kFeatures.Has(GeneralCommissioning::Feature::kTermsAndConditions))
     {
         ReturnErrorOnFailure(builder.AppendElements({
             TCAcceptedVersion::kMetadataEntry,
@@ -368,7 +363,7 @@ CHIP_ERROR GeneralCommissioningCluster::Attributes(const ConcreteClusterPath & p
         }));
     }
 
-    if (mFeatures.Has(GeneralCommissioning::Feature::kNetworkRecovery))
+    if (kFeatures.Has(GeneralCommissioning::Feature::kNetworkRecovery))
     {
         ReturnErrorOnFailure(builder.AppendElements({
             RecoveryIdentifier::kMetadataEntry,
