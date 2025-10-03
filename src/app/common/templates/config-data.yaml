@@ -154,8 +154,8 @@ CodeDrivenClusters:
     - Ethernet Network Diagnostics
     - General Diagnostics
     - Group Key Management
-    - Operational Credentials
     - OTA Software Update Provider
+    - Operational Credentials
     - Push AV Stream Transport
     - Software Diagnostics
     - Time Format Localization
