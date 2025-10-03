@@ -23,6 +23,10 @@
 
 #include <app/util/basic-types.h>
 
+void MatterAccessControlClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterAccessControlClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterBasicInformationClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBasicInformationClusterShutdownCallback(chip::EndpointId endpointId);
