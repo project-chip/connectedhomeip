@@ -6984,11 +6984,7 @@ provisional cluster TlsClientManagement = 2050 {
     kRootCertificateNotFound = 3;
     kClientCertificateNotFound = 4;
     kEndpointInUse = 5;
-  }
-
-  enum TLSEndpointStatusEnum : enum8 {
-    kProvisioned = 0;
-    kInUse = 1;
+    kInvalidTime = 6;
   }
 
   fabric_scoped struct TLSEndpointStruct {
@@ -6997,7 +6993,7 @@ provisional cluster TlsClientManagement = 2050 {
     int16u port = 2;
     int16u caid = 3;
     nullable int16u ccdid = 4;
-    TLSEndpointStatusEnum status = 5;
+    int8u referenceCount = 5;
     fabric_idx fabricIndex = 254;
   }
 
@@ -7033,7 +7029,7 @@ provisional cluster TlsClientManagement = 2050 {
     int16u endpointID = 0;
   }
 
-  /** This command is used to provision a TLS Endpoint for the provided HostName / Port combination. */
+  /** This command is used to provision a TLS Endpoint for the provided Hostname / Port combination. */
   fabric command access(invoke: administer) ProvisionEndpoint(ProvisionEndpointRequest): ProvisionEndpointResponse = 0;
   /** This command is used to find a TLS Endpoint by its ID. */
   fabric command FindEndpoint(FindEndpointRequest): FindEndpointResponse = 2;
@@ -7716,14 +7712,14 @@ endpoint 0 {
   }
 
   server cluster TimeFormatLocalization {
-    persist  attribute hourFormat default = 0;
-    persist  attribute activeCalendarType default = 0;
+    ram      attribute hourFormat default = 0;
+    ram      attribute activeCalendarType default = 0;
     callback attribute supportedCalendarTypes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster UnitLocalization {
@@ -7810,8 +7806,8 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command RetrieveLogsRequest;
     handle command RetrieveLogsResponse;
@@ -7921,7 +7917,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
@@ -8674,7 +8670,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x17;
-    ram      attribute clusterRevision default = 5;
+    callback attribute clusterRevision;
 
     handle command UpOrOpen;
     handle command DownOrClose;
@@ -8743,7 +8739,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0123;
-    ram      attribute clusterRevision default = 7;
+    callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;
     handle command SetActiveScheduleRequest;
@@ -8931,7 +8927,7 @@ endpoint 1 {
     callback attribute holdTimeLimits;
     callback attribute PIROccupiedToUnoccupiedDelay;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 5;
+    callback attribute clusterRevision;
   }
 
   server cluster CarbonMonoxideConcentrationMeasurement {
@@ -9559,7 +9555,7 @@ endpoint 2 {
     callback attribute holdTimeLimits;
     callback attribute PIROccupiedToUnoccupiedDelay;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 5;
+    callback attribute clusterRevision;
   }
 }
 endpoint 3 {

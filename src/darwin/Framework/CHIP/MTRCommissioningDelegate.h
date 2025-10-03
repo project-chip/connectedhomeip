@@ -24,24 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSInteger, MTRCommissioningStage) {
-    // Possible stages that can be reached during commissioning.  The order of
-    // these stages is not guaranteed to be anything in particular, or to match
-    // the numeric order of this enum.  There are no guarantees that any
-    // particular stage will in fact be reached, unless documented otherwise.
-
-    // The commissionee has received network credentials.  This will never be reached
-    // during on-network commissioning.
-    MTRCommissioningStageProvisionedNetworkCredentials = 1,
-
-    // The commissioning operation is about to ask the commissionee to do a Wi-Fi network scan.
-    MTRCommissioningStageWiFiScanStart = 2,
-
-    // The commissioning operation is about to ask the commissionee to do a Thread network scan.
-    MTRCommissioningStageThreadScanStart = 3,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-MTR_PROVISIONALLY_AVAILABLE
+MTR_AVAILABLE(ios(26.2), macos(26.2), watchos(26.2), tvos(26.2))
 @protocol MTRCommissioningDelegate <NSObject>
 @optional
 /**
@@ -81,9 +64,9 @@ MTR_PROVISIONALLY_AVAILABLE
  * * Both error and networks will be nil if no scan was performed.
  */
 - (void)commissioning:(MTRCommissioningOperation *)commissioning
-    needsWiFiNetworkSelectionWithScanResults:(nullable NSArray<MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct *> *)networks
-                                       error:(nullable NSError *)error
-                                  completion:(void (^)(NSData * ssid, NSData * _Nullable credentials))completion;
+    needsWiFiCredentialsWithScanResults:(nullable NSArray<MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct *> *)networks
+                                  error:(nullable NSError *)error
+                             completion:(void (^)(NSData * ssid, NSData * _Nullable credentials))completion;
 
 /**
  * Callback that gets called for a commissionee that supports Thread if Thread
@@ -99,14 +82,23 @@ MTR_PROVISIONALLY_AVAILABLE
  * * Both error and networks will be nil if no scan was performed.
  */
 - (void)commissioning:(MTRCommissioningOperation *)commissioning
-    needsThreadNetworkSelectionWithScanResults:(nullable NSArray<MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct *> *)networks
-                                         error:(nullable NSError *)error
-                                    completion:(void (^)(NSData * operationalDataset))completion;
+    needsThreadCredentialsWithScanResults:(nullable NSArray<MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct *> *)networks
+                                    error:(nullable NSError *)error
+                               completion:(void (^)(NSData * operationalDataset))completion;
 
 /**
- * Notification that a particular commissioning stage has been reached.
+ * Notification that a network scan is starting.  This will only happen if a
+ * network scan is performed during commissioning.
  */
-- (void)commissioning:(MTRCommissioningOperation *)commissioning reachedCommissioningStage:(MTRCommissioningStage)stage;
+- (void)commissioningStartingNetworkScan:(MTRCommissioningOperation *)commissioning;
+
+/**
+ * Notification that network credentials have been successfully communicated
+ * to the commissionee and it's going to try to join that network.  Note that
+ * for commissionees that are already on-network this notification will not
+ * happen.
+ */
+- (void)commissioningProvisionedNetworkCredentials:(MTRCommissioningOperation *)commissioning;
 
 /**
  * Notification that commissioning has failed.

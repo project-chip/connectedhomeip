@@ -30,8 +30,17 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::Binding::Id:
         MatterBindingClusterInitCallback(endpoint);
         break;
+    case app::Clusters::AccessControl::Id:
+        MatterAccessControlClusterInitCallback(endpoint);
+        break;
     case app::Clusters::BasicInformation::Id:
         MatterBasicInformationClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::TimeFormatLocalization::Id:
+        MatterTimeFormatLocalizationClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::DiagnosticLogs::Id:
+        MatterDiagnosticLogsClusterInitCallback(endpoint);
         break;
     case app::Clusters::GeneralDiagnostics::Id:
         MatterGeneralDiagnosticsClusterInitCallback(endpoint);
@@ -64,8 +73,17 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::Binding::Id:
         MatterBindingClusterShutdownCallback(endpoint);
         break;
+    case app::Clusters::AccessControl::Id:
+        MatterAccessControlClusterShutdownCallback(endpoint);
+        break;
     case app::Clusters::BasicInformation::Id:
         MatterBasicInformationClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::TimeFormatLocalization::Id:
+        MatterTimeFormatLocalizationClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::DiagnosticLogs::Id:
+        MatterDiagnosticLogsClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::GeneralDiagnostics::Id:
         MatterGeneralDiagnosticsClusterShutdownCallback(endpoint);
