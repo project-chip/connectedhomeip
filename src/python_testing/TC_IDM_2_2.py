@@ -39,7 +39,6 @@
 import asyncio
 import copy
 import logging
-import time
 
 from mobly import asserts
 
