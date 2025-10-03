@@ -467,13 +467,15 @@ void TCPBase::CloseConnectionInternal(ActiveTCPConnectionState & connection, CHI
     connection.mPeerAddr.ToString(addrStr);
     ChipLogProgress(Inet, "Closing connection with peer %s.", addrStr);
 
+    Inet::TCPEndPointHandle endpoint = connection.mEndPoint;
+    connection.mEndPoint.Release();
     if (err == CHIP_NO_ERROR)
     {
-        connection.mEndPoint->Close();
+        endpoint->Close();
     }
     else
     {
-        connection.mEndPoint->Abort();
+        endpoint->Abort();
     }
 
     prevState                   = connection.mConnectionState;
@@ -628,9 +630,7 @@ void TCPBase::HandleIncomingConnection(Inet::TCPEndPointHandle & listenEndPoint,
     ActiveTCPConnectionState * activeConnection = tcp->AllocateConnection(endPoint, addr);
     if (activeConnection != nullptr)
     {
-        auto ConnectionDeletor = [](ActiveTCPConnectionState * e) { e->Free(); };
-        std::unique_ptr<ActiveTCPConnectionState, decltype(ConnectionDeletor)> connectionHolder(activeConnection,
-                                                                                                ConnectionDeletor);
+        auto connectionCleanup = ScopeExit([&]() { activeConnection->Free(); });
 
         endPoint->mAppState          = listenEndPoint->mAppState;
         endPoint->OnDataReceived     = HandleTCPEndPointDataReceived;
@@ -653,7 +653,7 @@ void TCPBase::HandleIncomingConnection(Inet::TCPEndPointHandle & listenEndPoint,
         // Call the upper layer handler for incoming connection received.
         tcp->HandleConnectionReceived(*activeConnection);
 
-        connectionHolder.release();
+        connectionCleanup.release();
     }
     else
     {

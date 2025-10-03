@@ -225,7 +225,7 @@
  *
  *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
  */
-#define ReturnAndLogOnFailure(expr, MOD, MSG, ...)                                                                            \
+#define ReturnAndLogOnFailure(expr, MOD, MSG, ...)                                                                                 \
     do                                                                                                                             \
     {                                                                                                                              \
         CHIP_ERROR __err = (expr);                                                                                                 \

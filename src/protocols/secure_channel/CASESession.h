@@ -542,7 +542,7 @@ private:
     void InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricIndex);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override;
+    void HandleConnectionAttemptComplete(const Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override;
     void HandleConnectionClosed(const Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr) override;
 
     // Reference holder to the underlying TCP connection state. Returned by the
