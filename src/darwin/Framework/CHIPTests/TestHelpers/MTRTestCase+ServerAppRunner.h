@@ -56,6 +56,14 @@ NS_ASSUME_NONNULL_BEGIN
                                                      controller:(MTRDeviceController *)controller
                                                         payload:(NSString *)payload
                                                          nodeID:(NSNumber *)nodeID;
+/**
+ * Same thing, but will decide on a commissioning payload itself instead of
+ * making the caller provide one.
+ */
+- (nullable MTRTestCaseServerApp *)startCommissionedAppWithName:(NSString *)name
+                                                      arguments:(NSArray<NSString *> *)arguments
+                                                     controller:(MTRDeviceController *)controller
+                                                         nodeID:(NSNumber *)nodeID;
 
 /**
  * Same thing, but also starts a controller on a test fabric, commissions the
