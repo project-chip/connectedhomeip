@@ -825,6 +825,7 @@
             "ClusterRevision"
         ],
         "Time Format Localization": ["ClusterRevision"],
+        "Window Covering": ["ClusterRevision"],
         "Zone Management": [
             "MaxUserDefinedZones",
             "MaxZones",

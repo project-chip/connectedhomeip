@@ -8905,7 +8905,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TLSEndpointStruct.port", "port", value.isMember("port")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TLSEndpointStruct.caid", "caid", value.isMember("caid")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TLSEndpointStruct.ccdid", "ccdid", value.isMember("ccdid")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TLSEndpointStruct.status", "status", value.isMember("status")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TLSEndpointStruct.referenceCount", "referenceCount",
+                                                                  value.isMember("referenceCount")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpointID");
@@ -8928,9 +8929,9 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.ccdid, value["ccdid"]));
     valueCopy.removeMember("ccdid");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "status");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.status, value["status"]));
-    valueCopy.removeMember("status");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "referenceCount");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.referenceCount, value["referenceCount"]));
+    valueCopy.removeMember("referenceCount");
 
     if (value.isMember("fabricIndex"))
     {
@@ -8949,7 +8950,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::TlsClientManagement::S
     ComplexArgumentParser::Finalize(request.port);
     ComplexArgumentParser::Finalize(request.caid);
     ComplexArgumentParser::Finalize(request.ccdid);
-    ComplexArgumentParser::Finalize(request.status);
+    ComplexArgumentParser::Finalize(request.referenceCount);
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
