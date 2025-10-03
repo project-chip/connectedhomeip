@@ -823,7 +823,8 @@
         "Thermostat": [
             "MaxThermostatSuggestions",
             "CurrentThermostatSuggestion",
-            "ThermostatSuggestionNotFollowingReason"
+            "ThermostatSuggestionNotFollowingReason",
+            "ClusterRevision"
         ],
         "Time Format Localization": ["ClusterRevision"],
         "Zone Management": [

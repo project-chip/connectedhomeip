@@ -19444,14 +19444,14 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
   public Integer port;
   public Integer caid;
   public @Nullable Integer ccdid;
-  public Integer status;
+  public Integer referenceCount;
   public Integer fabricIndex;
   private static final long ENDPOINT_ID_ID = 0L;
   private static final long HOSTNAME_ID = 1L;
   private static final long PORT_ID = 2L;
   private static final long CAID_ID = 3L;
   private static final long CCDID_ID = 4L;
-  private static final long STATUS_ID = 5L;
+  private static final long REFERENCE_COUNT_ID = 5L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public TlsClientManagementClusterTLSEndpointStruct(
@@ -19460,7 +19460,7 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
     Integer port,
     Integer caid,
     @Nullable Integer ccdid,
-    Integer status,
+    Integer referenceCount,
     Integer fabricIndex
   ) {
     this.endpointID = endpointID;
@@ -19468,7 +19468,7 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
     this.port = port;
     this.caid = caid;
     this.ccdid = ccdid;
-    this.status = status;
+    this.referenceCount = referenceCount;
     this.fabricIndex = fabricIndex;
   }
 
@@ -19479,7 +19479,7 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
     values.add(new StructElement(PORT_ID, new UIntType(port)));
     values.add(new StructElement(CAID_ID, new UIntType(caid)));
     values.add(new StructElement(CCDID_ID, ccdid != null ? new UIntType(ccdid) : new NullType()));
-    values.add(new StructElement(STATUS_ID, new UIntType(status)));
+    values.add(new StructElement(REFERENCE_COUNT_ID, new UIntType(referenceCount)));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -19494,7 +19494,7 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
     Integer port = null;
     Integer caid = null;
     @Nullable Integer ccdid = null;
-    Integer status = null;
+    Integer referenceCount = null;
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ENDPOINT_ID_ID) {
@@ -19522,10 +19522,10 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
           UIntType castingValue = element.value(UIntType.class);
           ccdid = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == STATUS_ID) {
+      } else if (element.contextTagNum() == REFERENCE_COUNT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          status = castingValue.value(Integer.class);
+          referenceCount = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -19540,7 +19540,7 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
       port,
       caid,
       ccdid,
-      status,
+      referenceCount,
       fabricIndex
     );
   }
@@ -19564,8 +19564,8 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
     output.append("\tccdid: ");
     output.append(ccdid);
     output.append("\n");
-    output.append("\tstatus: ");
-    output.append(status);
+    output.append("\treferenceCount: ");
+    output.append(referenceCount);
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
