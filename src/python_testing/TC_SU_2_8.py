@@ -19,12 +19,12 @@
 import logging
 
 from mobly import asserts
-from TC_SUBase import SoftwareUpdateBaseTest
+from TC_SUTestBase import SoftwareUpdateBaseTest
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
-from matter.testing.apps import OTAProviderSubprocess
+from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
@@ -75,17 +75,20 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         # Start OTA Provider
         app_path = "./out/debug/chip-ota-provider-app"
-        provider_ota_file = "firmware_v2.ota"
+        provider_ota_file = OtaImagePath(path="firmware_v2.ota")
         provider_discriminator = 1111
         provider_setup_pin_code = 20202021
         provider_port = 5540
 
         provider = OTAProviderSubprocess(
-            ota_file=provider_ota_file,
+            app=app_path,
+            storage_dir='/tmp',
+            port=provider_port,
             discriminator=provider_discriminator,
             passcode=provider_setup_pin_code,
-            secured_device_port=provider_port,
-            app_path=app_path
+            ota_source=provider_ota_file,
+            log_file='/tmp/provider.log',
+            err_log_file='/tmp/provider.log'
         )
 
         provider.start()
@@ -150,7 +153,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         self.step(1)
 
         event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
-        await event_cb.start(dev_ctrl=th2, node_id=dut_node_id_th2, endpoint=endpoint,
+        await event_cb.start(dev_ctrl=th1, node_id=dut_node_id, endpoint=endpoint,
                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
         # Write default OTA providers TH1 with p1_node which does not exist
@@ -193,7 +196,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         await self.write_ota_providers(th2, p2_node, endpoint)
 
         # Announce after subscription
-        await self.announce_ota_provider(th2, vendor_id, p2_node, dut_node_id_th2, endpoint)
+        await self.announce_ota_provider(controller=th2, provider_node_id=p2_node, requestor_node_id=dut_node_id_th2, vendor_id=vendor_id, endpoint=endpoint)
 
         event_idle_to_querying = event_cb.wait_for_event_report(
             Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)

@@ -12,13 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import os
 import re
 import signal
 import tempfile
 from dataclasses import dataclass
-from datetime import datetime
 from sys import stderr, stdout
 from time import sleep
 from typing import BinaryIO, Optional, Union
@@ -298,32 +296,3 @@ class OTAProviderSubprocess(AppServerSubprocess):
             nodeid=provider_node_id,
             attributes=[(0, acl_attribute)]
         )
-
-
-## Basic testing Remove after Complete##
-## Remove libaries only used on this test ##
-if __name__ == "__main__":
-    ota_image_path = OtaImagePath(path='/Users/<>/workspace/github/connectedhomeip/chip-ota-requestor-app_v2.min.ota')
-    now = datetime.now()
-    ts = int(now.timestamp())
-    log_file = f"/tmp/provider_{ts}.log"
-    print("LOGFILE:" + log_file)
-
-    proc = OTAProviderSubprocess(
-        app='/Users/<>/workspace/github/connectedhomeip/out/debug/chip-ota-provider-app',
-        storage_dir='/tmp',
-        port=5541,
-        discriminator=321,
-        passcode=2321,
-        ota_source=ota_image_path,
-        extra_args=[],
-        log_file=log_file,
-    )
-    proc.start(
-        expected_output="Server initialization complete",
-        timeout=10)
-    sleep(2)
-    lines = proc.read_from_logs(pattern="Using WiFi MAC for hostname", regex=False)
-    print(json.dumps(lines))
-
-    proc.terminate()
