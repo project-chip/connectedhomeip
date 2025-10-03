@@ -637,7 +637,7 @@ void GeneralCommissioningCluster::OnFabricRemoved(const FabricTable & fabricTabl
         VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, initialState));
         VerifyOrReturn(CHIP_NO_ERROR == tcProvider->ResetAcceptance());
         VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, updatedState));
-        NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
+        NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState, *this);
     }
 }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -717,7 +717,7 @@ GeneralCommissioningCluster::HandleSetTCAcknowledgements(const DataModel::Invoke
         CheckSuccess(GetTermsAndConditionsAttributeState(tcProvider, initialState), Failure);
         CheckSuccess(tcProvider->SetAcceptance(acceptedTermsAndConditionsPresent), Failure);
         CheckSuccess(GetTermsAndConditionsAttributeState(tcProvider, updatedState), Failure);
-        NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
+        NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState, *this);
 
         // Commit or defer based on fail-safe state
         if (!failSafeContext.IsFailSafeArmed())
