@@ -545,7 +545,6 @@ class OTAHelper:
         )
         logger.info('Cleanup - DefaultOTAProviders cleared')
 
-        # Optional assert to ensure it is cleared
         assert resp[0].Status == Status.Success, "Failed to clear DefaultOTAProviders"
 
     async def setup_provider(
