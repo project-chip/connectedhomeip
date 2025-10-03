@@ -667,14 +667,14 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-void CASESession::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR err)
+void CASESession::HandleConnectionAttemptComplete(const Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR err)
 {
     VerifyOrReturn(conn == mPeerConnState);
 
     char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
     conn->mPeerAddr.ToString(peerAddrBuf);
 
-    auto connectionHolder = ScopeExit([&, this]() {
+    auto connectionCleanup = ScopeExit([&, this]() {
         mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->ReleaseTCPConnection();
         mSecureSessionHolder.Get().Value()->AsSecureSession()->ReleaseTCPConnection();
         AbortPendingEstablish(err);
@@ -697,7 +697,7 @@ void CASESession::HandleConnectionAttemptComplete(Transport::ActiveTCPConnection
     err = SendSigma1();
     ReturnAndLogOnFailure(err, SecureChannel, "Sigma1 failed to peer %s", peerAddrBuf);
 
-    connectionHolder.release();
+    connectionCleanup.release();
 }
 
 void CASESession::HandleConnectionClosed(const Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr)

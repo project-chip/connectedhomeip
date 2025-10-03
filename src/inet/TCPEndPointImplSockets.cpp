@@ -736,6 +736,10 @@ CHIP_ERROR TCPEndPointImplSockets::GetSocket(IPAddressType addrType)
         {
             return CHIP_ERROR_POSIX(errno);
         }
+        auto connectionCleanup = ScopeExit([&]() {
+            close(mSocket);
+            mSocket = kInvalidSocketFd;
+        });
         ReturnErrorOnFailure(static_cast<System::LayerSockets &>(GetSystemLayer()).StartWatchingSocket(mSocket, &mWatch));
         mAddrType = addrType;
 
@@ -761,6 +765,7 @@ CHIP_ERROR TCPEndPointImplSockets::GetSocket(IPAddressType addrType)
             }
         }
 #endif // defined(SO_NOSIGPIPE)
+        connectionCleanup.release();
     }
     else if (mAddrType != addrType)
     {
