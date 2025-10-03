@@ -33,6 +33,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::TimeFormatLocalization::Id:
         MatterTimeFormatLocalizationClusterInitCallback(endpoint);
         break;
+    case app::Clusters::NetworkCommissioning::Id:
+#error                                                                                                                             \
+    "The NetworkCommissioning cluster is part of the CodeDrivenClustersWithoutCodegenIntegration, but an Init() call with this cluster was made."
     case app::Clusters::DiagnosticLogs::Id:
         MatterDiagnosticLogsClusterInitCallback(endpoint);
         break;
@@ -67,6 +70,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::TimeFormatLocalization::Id:
         MatterTimeFormatLocalizationClusterShutdownCallback(endpoint);
         break;
+    case app::Clusters::NetworkCommissioning::Id:
+#error                                                                                                                             \
+    "The NetworkCommissioning cluster is part of the CodeDrivenClustersWithoutCodegenIntegration, but a Shutdown() call with this cluster was made."
     case app::Clusters::DiagnosticLogs::Id:
         MatterDiagnosticLogsClusterShutdownCallback(endpoint);
         break;
