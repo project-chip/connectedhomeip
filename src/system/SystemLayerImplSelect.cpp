@@ -441,6 +441,8 @@ CHIP_ERROR LayerImplSelect::ClearCallbackOnPendingWrite(SocketWatchToken token)
 
 CHIP_ERROR LayerImplSelect::StopWatchingSocket(SocketWatchToken * tokenInOut)
 {
+    VerifyOrReturnError(tokenInOut != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(*tokenInOut);
     *tokenInOut         = InvalidSocketWatchToken();
 
