@@ -73,14 +73,14 @@ struct TestIdentifyCluster : public ::testing::Test
 TEST_F(TestIdentifyCluster, TestCreate)
 {
     constexpr EndpointId endpoint = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone).WithTimerDelegate(&mTestTimerDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone, mTestTimerDelegate));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 }
 
 TEST_F(TestIdentifyCluster, AttributeListTest)
 {
     constexpr EndpointId endpoint = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone).WithTimerDelegate(&mTestTimerDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone, mTestTimerDelegate));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -100,7 +100,7 @@ TEST_F(TestIdentifyCluster, AttributeListTest)
 TEST_F(TestIdentifyCluster, AcceptedCommandsMandatoryOnlyTest)
 {
     constexpr EndpointId endpoint = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone).WithTimerDelegate(&mTestTimerDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone, mTestTimerDelegate));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommands;
@@ -119,8 +119,7 @@ TEST_F(TestIdentifyCluster, AcceptedCommandsWithOptionalTriggerEffectTest)
 {
     constexpr EndpointId endpoint = 1;
     // When passing in onEffectIdentifier callback, we're enabling the TriggerEffect command.
-    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone)
-                                .WithTimerDelegate(&mTestTimerDelegate)
+    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone, mTestTimerDelegate)
                                 .WithOnEffectIdentifier(onEffectIdentifier));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
@@ -140,7 +139,7 @@ TEST_F(TestIdentifyCluster, AcceptedCommandsWithOptionalTriggerEffectTest)
 TEST_F(TestIdentifyCluster, ClusterRevisionTest)
 {
     constexpr EndpointId endpoint = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone).WithTimerDelegate(&mTestTimerDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone, mTestTimerDelegate));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     // Read and verify ClusterRevision
@@ -154,7 +153,7 @@ TEST_F(TestIdentifyCluster, ClusterRevisionTest)
 TEST_F(TestIdentifyCluster, FeatureMapTest)
 {
     constexpr EndpointId endpoint = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone).WithTimerDelegate(&mTestTimerDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone, mTestTimerDelegate));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     // Read and verify FeatureMap
@@ -166,7 +165,7 @@ TEST_F(TestIdentifyCluster, FeatureMapTest)
 TEST_F(TestIdentifyCluster, ReadIdentifyAttributesTest)
 {
     constexpr EndpointId endpoint = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone).WithTimerDelegate(&mTestTimerDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone, mTestTimerDelegate));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     // Read and verify IdentifyTime
@@ -187,7 +186,7 @@ TEST_F(TestIdentifyCluster, ReadIdentifyAttributesTest)
 TEST_F(TestIdentifyCluster, WriteIdentifyTimeTest)
 {
     constexpr EndpointId endpoint = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone).WithTimerDelegate(&mTestTimerDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone, mTestTimerDelegate));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     uint16_t identifyTime;
@@ -204,10 +203,34 @@ TEST_F(TestIdentifyCluster, WriteIdentifyTimeTest)
     EXPECT_EQ(identifyTime, 0u);
 }
 
+TEST_F(TestIdentifyCluster, WriteUnchangedIdentifyTimeDoesNotNotify)
+{
+    constexpr EndpointId endpoint = 1;
+    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone, mTestTimerDelegate));
+    EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
+
+    const auto identifyTimePath = ConcreteDataAttributePath(endpoint, Identify::Id, IdentifyTime::Id);
+    auto & changeListener       = mContext.ChangeListener();
+
+    // Write a value to IdentifyTime and verify it was reported.
+    changeListener.DirtyList().clear();
+    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, 10u), CHIP_NO_ERROR);
+    ASSERT_EQ(changeListener.DirtyList().size(), 1u);
+    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, identifyTimePath.mEndpointId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, identifyTimePath.mClusterId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, identifyTimePath.mAttributeId);
+
+    // Write the same value again and verify that the attribute is not reported as changed.
+    changeListener.DirtyList().clear();
+    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, 10u), CHIP_NO_ERROR);
+    EXPECT_EQ(changeListener.DirtyList().size(), 0u);
+}
+
+
 TEST_F(TestIdentifyCluster, WriteReadOnlyAttributesReturnUnsupportedWriteTest)
 {
     constexpr EndpointId endpoint = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone).WithTimerDelegate(&mTestTimerDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone, mTestTimerDelegate));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     // Attempt to write to the read-only IdentifyType attribute and verify it fails.
@@ -225,8 +248,7 @@ TEST_F(TestIdentifyCluster, WriteReadOnlyAttributesReturnUnsupportedWriteTest)
 TEST_F(TestIdentifyCluster, IdentifyTypeCtorInitTest)
 {
     constexpr EndpointId endpoint = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kVisibleIndicator)
-                                .WithTimerDelegate(&mTestTimerDelegate)
+    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kVisibleIndicator, mTestTimerDelegate)
                                 .WithEffectIdentifier(EffectIdentifierEnum::kBreathe));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
@@ -238,7 +260,7 @@ TEST_F(TestIdentifyCluster, IdentifyTypeCtorInitTest)
 TEST_F(TestIdentifyCluster, IdentifyTimeCountdownTest)
 {
     constexpr EndpointId endpoint = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone).WithTimerDelegate(&mTestTimerDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone, mTestTimerDelegate));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     uint16_t identifyTime;
@@ -262,10 +284,9 @@ TEST_F(TestIdentifyCluster, IdentifyTimeCountdownTest)
 TEST_F(TestIdentifyCluster, OnIdentifyStartStopCallbackTest)
 {
     constexpr EndpointId endpoint = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone)
+    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone, mTestTimerDelegate)
                                 .WithOnIdentifyStart(onIdentifyStart)
-                                .WithOnIdentifyStop(onIdentifyStop)
-                                .WithTimerDelegate(&mTestTimerDelegate));
+                                .WithOnIdentifyStop(onIdentifyStop));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     const auto identifyTimePath = ConcreteDataAttributePath(endpoint, Identify::Id, IdentifyTime::Id);
@@ -292,10 +313,9 @@ TEST_F(TestIdentifyCluster, OnIdentifyStartStopCallbackTest)
 TEST_F(TestIdentifyCluster, OnStartNotCalledMultipleTimes)
 {
     constexpr EndpointId endpoint = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone)
+    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone, mTestTimerDelegate)
                                 .WithOnIdentifyStart(onIdentifyStart)
-                                .WithOnIdentifyStop(onIdentifyStop)
-                                .WithTimerDelegate(&mTestTimerDelegate));
+                                .WithOnIdentifyStop(onIdentifyStop));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
     const auto identifyTimePath = ConcreteDataAttributePath(endpoint, Identify::Id, IdentifyTime::Id);
 
@@ -312,10 +332,9 @@ TEST_F(TestIdentifyCluster, OnStartNotCalledMultipleTimes)
 TEST_F(TestIdentifyCluster, OnStopNotCalledIfNotIdentifying)
 {
     constexpr EndpointId endpoint = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone)
+    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone, mTestTimerDelegate)
                                 .WithOnIdentifyStart(onIdentifyStart)
-                                .WithOnIdentifyStop(onIdentifyStop)
-                                .WithTimerDelegate(&mTestTimerDelegate));
+                                .WithOnIdentifyStop(onIdentifyStop));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
     const auto identifyTimePath = ConcreteDataAttributePath(endpoint, Identify::Id, IdentifyTime::Id);
 
@@ -333,7 +352,7 @@ TEST_F(TestIdentifyCluster, OnStopNotCalledIfNotIdentifying)
 TEST_F(TestIdentifyCluster, InvokeIdentifyCommandTest)
 {
     constexpr EndpointId kEndpointId = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(kEndpointId, IdentifyTypeEnum::kNone).WithTimerDelegate(&mTestTimerDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(kEndpointId, IdentifyTypeEnum::kNone, mTestTimerDelegate));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     // Test with a value of 10 for identifyTime.
@@ -355,8 +374,7 @@ TEST_F(TestIdentifyCluster, InvokeIdentifyCommandTest)
 TEST_F(TestIdentifyCluster, InvokeTriggerEffectCommandTest)
 {
     constexpr EndpointId kEndpointId = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(kEndpointId, IdentifyTypeEnum::kNone)
-                                .WithTimerDelegate(&mTestTimerDelegate)
+    IdentifyCluster cluster(IdentifyCluster::Config(kEndpointId, IdentifyTypeEnum::kNone, mTestTimerDelegate)
                                 .WithOnEffectIdentifier(onEffectIdentifier));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
@@ -377,8 +395,7 @@ TEST_F(TestIdentifyCluster, InvokeTriggerEffectCommandTest)
 TEST_F(TestIdentifyCluster, InvokeTriggerEffectCommandAllEffectsTest)
 {
     constexpr EndpointId kEndpointId = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(kEndpointId, IdentifyTypeEnum::kNone)
-                                .WithTimerDelegate(&mTestTimerDelegate)
+    IdentifyCluster cluster(IdentifyCluster::Config(kEndpointId, IdentifyTypeEnum::kNone, mTestTimerDelegate)
                                 .WithOnEffectIdentifier(onEffectIdentifier));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
@@ -403,8 +420,7 @@ TEST_F(TestIdentifyCluster, InvokeTriggerEffectCommandAllEffectsTest)
 TEST_F(TestIdentifyCluster, InvokeTriggerEffectCommandInvalidVariantTest)
 {
     constexpr EndpointId kEndpointId = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(kEndpointId, IdentifyTypeEnum::kNone)
-                                .WithTimerDelegate(&mTestTimerDelegate)
+    IdentifyCluster cluster(IdentifyCluster::Config(kEndpointId, IdentifyTypeEnum::kNone, mTestTimerDelegate)
                                 .WithOnEffectIdentifier(onEffectIdentifier));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
@@ -423,8 +439,7 @@ TEST_F(TestIdentifyCluster, InvokeTriggerEffectCommandInvalidVariantTest)
 TEST_F(TestIdentifyCluster, TriggerEffectWhileIdentifyingTest)
 {
     constexpr EndpointId kEndpointId = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(kEndpointId, IdentifyTypeEnum::kNone)
-                                .WithTimerDelegate(&mTestTimerDelegate)
+    IdentifyCluster cluster(IdentifyCluster::Config(kEndpointId, IdentifyTypeEnum::kNone, mTestTimerDelegate)
                                 .WithOnEffectIdentifier(onEffectIdentifier));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
@@ -450,8 +465,7 @@ TEST_F(TestIdentifyCluster, TriggerEffectWhileIdentifyingTest)
 TEST_F(TestIdentifyCluster, TriggerEffectFinishEffectTest)
 {
     constexpr EndpointId kEndpointId = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(kEndpointId, IdentifyTypeEnum::kNone)
-                                .WithTimerDelegate(&mTestTimerDelegate)
+    IdentifyCluster cluster(IdentifyCluster::Config(kEndpointId, IdentifyTypeEnum::kNone, mTestTimerDelegate)
                                 .WithOnEffectIdentifier(onEffectIdentifier));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
@@ -475,8 +489,7 @@ TEST_F(TestIdentifyCluster, TriggerEffectFinishEffectTest)
 TEST_F(TestIdentifyCluster, TriggerEffectStopEffectTest)
 {
     constexpr EndpointId kEndpointId = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(kEndpointId, IdentifyTypeEnum::kNone)
-                                .WithTimerDelegate(&mTestTimerDelegate)
+    IdentifyCluster cluster(IdentifyCluster::Config(kEndpointId, IdentifyTypeEnum::kNone, mTestTimerDelegate)
                                 .WithOnEffectIdentifier(onEffectIdentifier));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
@@ -500,7 +513,7 @@ TEST_F(TestIdentifyCluster, TriggerEffectStopEffectTest)
 TEST_F(TestIdentifyCluster, IdentifyTimeAttributeReportingTest)
 {
     constexpr EndpointId endpoint = 1;
-    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone).WithTimerDelegate(&mTestTimerDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone, mTestTimerDelegate));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     auto & changeListener       = mContext.ChangeListener();

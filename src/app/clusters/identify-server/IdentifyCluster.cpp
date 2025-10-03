@@ -31,8 +31,6 @@ using namespace Identify::Attributes;
 using namespace chip::app::Clusters::Identify;
 
 namespace {
-DefaultTimerDelegate sDefaultTimerDelegate;
-
 constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Identify::Commands::Identify::kMetadataEntry,
 };
@@ -45,11 +43,11 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommandsWithTriggerEffect[] =
 } // namespace
 
 IdentifyCluster::IdentifyCluster(const Config & config) :
-    DefaultServerCluster({ config.endpointId, Identify::Id }), mIdentifyTime(0), mPreviousIdentifyTime(0),
+    DefaultServerCluster({ config.endpointId, Identify::Id }), mIdentifyTime(0),
     mIdentifyType(config.identifyType), mOnIdentifyStart(config.onIdentifyStart), mOnIdentifyStop(config.onIdentifyStop),
     mOnEffectIdentifier(config.onEffectIdentifier), mCurrentEffectIdentifier(config.effectIdentifier),
     mEffectVariant(config.effectVariant),
-    mTimerDelegate(config.timerDelegate == nullptr ? &sDefaultTimerDelegate : config.timerDelegate)
+    mTimerDelegate(config.timerDelegate)
 {}
 
 DataModel::ActionReturnStatus IdentifyCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -76,10 +74,10 @@ DataModel::ActionReturnStatus IdentifyCluster::WriteAttribute(const DataModel::W
     switch (request.path.mAttributeId)
     {
     case Attributes::IdentifyTime::Id: {
-        mPreviousIdentifyTime = mIdentifyTime;
-        ReturnErrorOnFailure(decoder.Decode(mIdentifyTime));
-        IdentifyTimeAttributeChanged(/* isWrittenByClientOrCmd */ true);
-        return CHIP_NO_ERROR;
+        uint16_t newIdentifyTime;
+        ReturnErrorOnFailure(decoder.Decode(newIdentifyTime));
+        return NotifyAttributeChangedIfSuccess(
+            request.path.mAttributeId, SetIdentifyTime(IdentifyTimeChangeSource::kClient, newIdentifyTime));
     }
     break;
     // Read-only attributes
@@ -105,9 +103,9 @@ void IdentifyCluster::TimerFired()
 {
     if (mIdentifyTime > 0)
     {
-        mPreviousIdentifyTime = mIdentifyTime;
-        mIdentifyTime--;
-        IdentifyTimeAttributeChanged(false);
+        NotifyAttributeChangedIfSuccess(
+            Attributes::IdentifyTime::Id,
+            SetIdentifyTime(IdentifyTimeChangeSource::kTimer, static_cast<uint16_t>(mIdentifyTime - 1)));
     }
 }
 
@@ -116,40 +114,48 @@ void IdentifyCluster::TimerFired()
 // 1. When it changes from 0 to any other value and vice versa, or
 // 2. When it is written by a client, or
 // 3. When the value is set by an Identify command.
-void IdentifyCluster::IdentifyTimeAttributeChanged(bool isWrittenByClientOrCmd)
+DataModel::ActionReturnStatus IdentifyCluster::SetIdentifyTime(IdentifyTimeChangeSource source, uint16_t newTime)
 {
-    // Start Identify
-    if (mPreviousIdentifyTime == 0 && mIdentifyTime > 0)
+    if (mIdentifyTime == newTime)
     {
-        NotifyAttributeChanged(Attributes::IdentifyTime::Id);
+        return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+    }
+
+    uint16_t previousIdentifyTime = mIdentifyTime;
+    mIdentifyTime                 = newTime;
+
+    if (previousIdentifyTime == 0 && mIdentifyTime > 0)
+    {
         if (mOnIdentifyStart)
         {
             mOnIdentifyStart(this);
         }
     }
-    // Stop Identify
-    else if (mPreviousIdentifyTime > 0 && mIdentifyTime == 0)
+    else if (previousIdentifyTime > 0 && mIdentifyTime == 0)
     {
-        NotifyAttributeChanged(Attributes::IdentifyTime::Id);
         if (mOnIdentifyStop)
         {
             mOnIdentifyStop(this);
         }
     }
-    // Attribute was changed by the client (AttributeWrite or Command), must notify.
-    else if (isWrittenByClientOrCmd)
-    {
-        NotifyAttributeChanged(Attributes::IdentifyTime::Id);
-    }
 
     if (mIdentifyTime > 0)
     {
-        mTimerDelegate->StartTimer(this, System::Clock::Seconds16(1));
+        mTimerDelegate.StartTimer(this, System::Clock::Seconds16(1));
     }
     else
     {
-        mTimerDelegate->CancelTimer(this);
+        mTimerDelegate.CancelTimer(this);
     }
+
+    // Spec, section 5.1: Report on client/command write, or when transitioning to/from 0.
+    if (source == IdentifyTimeChangeSource::kClient || (previousIdentifyTime > 0 && mIdentifyTime == 0) ||
+        (previousIdentifyTime == 0 && mIdentifyTime > 0))
+    {
+        return Protocols::InteractionModel::Status::Success;
+    }
+
+    return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
 }
 
 std::optional<DataModel::ActionReturnStatus>
@@ -159,30 +165,16 @@ IdentifyCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TL
     {
     case Identify::Commands::Identify::Id: {
         Identify::Commands::Identify::DecodableType data;
-        if (data.Decode(input_arguments) != CHIP_NO_ERROR)
-        {
-            return DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand);
-        }
+        ReturnErrorOnFailure(data.Decode(input_arguments));
         MATTER_TRACE_SCOPE("IdentifyCommand", "Identify");
-        mPreviousIdentifyTime = mIdentifyTime;
-        mIdentifyTime         = data.identifyTime;
-        IdentifyTimeAttributeChanged(/* isWrittenByClientOrCmd */ true);
-        return DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::Success);
+        NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
+                                        SetIdentifyTime(IdentifyTimeChangeSource::kClient, data.identifyTime));
+        return Protocols::InteractionModel::Status::Success;
     }
     case Identify::Commands::TriggerEffect::Id: {
-        if (!mOnEffectIdentifier)
-        {
-            return DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::UnsupportedCommand);
-        }
-
         Identify::Commands::TriggerEffect::DecodableType data;
-        if (data.Decode(input_arguments) != CHIP_NO_ERROR)
-        {
-            return DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand);
-        }
-
+        ReturnErrorOnFailure(data.Decode(input_arguments));
         MATTER_TRACE_SCOPE("TriggerEffect", "Identify");
-
         mCurrentEffectIdentifier = data.effectIdentifier;
         mEffectVariant           = data.effectVariant;
 
@@ -193,22 +185,18 @@ IdentifyCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TL
         {
             if (mCurrentEffectIdentifier == Identify::EffectIdentifierEnum::kFinishEffect)
             {
-                mPreviousIdentifyTime = mIdentifyTime;
-                mIdentifyTime         = 1;
-                IdentifyTimeAttributeChanged(true);
+                NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id, SetIdentifyTime(IdentifyTimeChangeSource::kClient, 1));
             }
             else if (mCurrentEffectIdentifier == Identify::EffectIdentifierEnum::kStopEffect)
             {
-                mPreviousIdentifyTime = mIdentifyTime;
-                mIdentifyTime         = 0;
-                IdentifyTimeAttributeChanged(true);
+                NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id, SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0));
             }
             else
             {
                 // Other effects: cancel and trigger new effect.
-                mPreviousIdentifyTime = mIdentifyTime;
-                mIdentifyTime         = 0;
-                IdentifyTimeAttributeChanged(true); // This will call onIdentifyStop.
+                NotifyAttributeChangedIfSuccess(
+                    Attributes::IdentifyTime::Id,
+                    SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0)); // This will call onIdentifyStop.
                 mOnEffectIdentifier(this);
             }
         }
@@ -217,10 +205,10 @@ IdentifyCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TL
             mOnEffectIdentifier(this);
         }
 
-        return DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::Success);
+        return Protocols::InteractionModel::Status::Success;
     }
     default:
-        return DefaultServerCluster::InvokeCommand(request, input_arguments, handler);
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
 }
 CHIP_ERROR IdentifyCluster::AcceptedCommands(const ConcreteClusterPath & path,

@@ -51,7 +51,9 @@ public:
      */
     struct Config
     {
-        Config(EndpointId endpoint, Identify::IdentifyTypeEnum type) : endpointId(endpoint), identifyType(type) {}
+        Config(EndpointId endpoint, Identify::IdentifyTypeEnum type, reporting::ReportScheduler::TimerDelegate & delegate) :
+            endpointId(endpoint), identifyType(type), timerDelegate(delegate)
+        {}
         Config & WithOnIdentifyStart(onIdentifyStartCb cb)
         {
             onIdentifyStart = cb;
@@ -60,11 +62,6 @@ public:
         Config & WithOnIdentifyStop(onIdentifyStopCb cb)
         {
             onIdentifyStop = cb;
-            return *this;
-        }
-        Config & WithTimerDelegate(reporting::ReportScheduler::TimerDelegate * delegate)
-        {
-            timerDelegate = delegate;
             return *this;
         }
         Config & WithOnEffectIdentifier(onEffectIdentifierCb cb)
@@ -85,12 +82,12 @@ public:
 
         EndpointId endpointId;
         Identify::IdentifyTypeEnum identifyType;
-        onIdentifyStartCb onIdentifyStart                         = nullptr;
-        onIdentifyStopCb onIdentifyStop                           = nullptr;
-        reporting::ReportScheduler::TimerDelegate * timerDelegate = nullptr;
-        onEffectIdentifierCb onEffectIdentifier                   = nullptr;
-        Identify::EffectIdentifierEnum effectIdentifier           = Identify::EffectIdentifierEnum::kBlink;
-        Identify::EffectVariantEnum effectVariant                 = Identify::EffectVariantEnum::kDefault;
+        onIdentifyStartCb onIdentifyStart                   = nullptr;
+        onIdentifyStopCb onIdentifyStop                     = nullptr;
+        reporting::ReportScheduler::TimerDelegate & timerDelegate;
+        onEffectIdentifierCb onEffectIdentifier             = nullptr;
+        Identify::EffectIdentifierEnum effectIdentifier     = Identify::EffectIdentifierEnum::kBlink;
+        Identify::EffectVariantEnum effectVariant           = Identify::EffectVariantEnum::kDefault;
     };
 
     /**
@@ -123,16 +120,21 @@ public:
 
 protected:
     uint16_t mIdentifyTime;
-    uint16_t mPreviousIdentifyTime;
     Identify::IdentifyTypeEnum mIdentifyType;
     onIdentifyStartCb mOnIdentifyStart;
     onIdentifyStopCb mOnIdentifyStop;
     onEffectIdentifierCb mOnEffectIdentifier;
     Identify::EffectIdentifierEnum mCurrentEffectIdentifier;
     Identify::EffectVariantEnum mEffectVariant;
-    reporting::ReportScheduler::TimerDelegate * mTimerDelegate;
+    reporting::ReportScheduler::TimerDelegate & mTimerDelegate;
 
 private:
+    enum class IdentifyTimeChangeSource
+    {
+        kClient,
+        kTimer,
+    };
+
     /**
      * @brief Helper method to handle changes to the IdentifyTime attribute.
      *
@@ -140,9 +142,10 @@ private:
      * a command invocation, or a timer countdown. It manages the start/stop of identification
      * callbacks and timer scheduling based on the new IdentifyTime value.
      *
-     * @param isWrittenByClientOrCmd True if the attribute was written by a client or command, false if by timer.
+     * @param source The source of the attribute change.
+     * @param newTime The new value of the IdentifyTime attribute.
      */
-    void IdentifyTimeAttributeChanged(bool isWrittenByClientOrCmd);
+    DataModel::ActionReturnStatus SetIdentifyTime(IdentifyTimeChangeSource source, uint16_t newTime);
 };
 
 } // namespace chip::app::Clusters

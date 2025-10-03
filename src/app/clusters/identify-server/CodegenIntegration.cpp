@@ -26,22 +26,24 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/CodegenProcessingConfig.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <lib/support/CodeUtils.h>
 #include <tracing/macros.h>
+
+namespace {
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Identify;
 using chip::Protocols::InteractionModel::Status;
 
-// Legacy PluginServer callback stubs
-void MatterIdentifyPluginServerInitCallback() {}
-void MatterIdentifyPluginServerShutdownCallback() {}
+Identify * firstLegacyIdentify = nullptr;
+DefaultTimerDelegate sDefaultTimerDelegate;
 
-static Identify * firstLegacyIdentify = nullptr;
 
-static Identify * GetLegacyIdentifyInstance(EndpointId endpoint)
+Identify * GetLegacyIdentifyInstance(EndpointId endpoint)
 {
     Identify * current = firstLegacyIdentify;
     while (current != nullptr && current->mCluster.Cluster().GetPaths()[0].mEndpointId != endpoint)
@@ -51,13 +53,13 @@ static Identify * GetLegacyIdentifyInstance(EndpointId endpoint)
     return current;
 }
 
-static inline void RegisterLegacyIdentify(Identify * inst)
+inline void RegisterLegacyIdentify(Identify * inst)
 {
     inst->nextIdentify  = firstLegacyIdentify;
     firstLegacyIdentify = inst;
 }
 
-static inline void UnregisterLegacyIdentify(Identify * inst)
+inline void UnregisterLegacyIdentify(Identify * inst)
 {
     if (firstLegacyIdentify == inst)
     {
@@ -83,7 +85,7 @@ static inline void UnregisterLegacyIdentify(Identify * inst)
 
 // Legacy Identify callback wrappers that translate new callback types into old callback types
 // They also copy member variable state to maintain backwards compatibility
-static void OnIdentifyStartLegacyWrapper(chip::app::Clusters::IdentifyCluster * cluster)
+void OnIdentifyStartLegacyWrapper(chip::app::Clusters::IdentifyCluster * cluster)
 {
     Identify * identify = GetLegacyIdentifyInstance(cluster->GetPaths()[0].mEndpointId);
     if (identify != nullptr && identify->mOnIdentifyStart)
@@ -92,7 +94,7 @@ static void OnIdentifyStartLegacyWrapper(chip::app::Clusters::IdentifyCluster * 
     }
 }
 
-static void OnIdentifyStopLegacyWrapper(chip::app::Clusters::IdentifyCluster * cluster)
+void OnIdentifyStopLegacyWrapper(chip::app::Clusters::IdentifyCluster * cluster)
 {
     Identify * identify = GetLegacyIdentifyInstance(cluster->GetPaths()[0].mEndpointId);
     if (identify != nullptr && identify->mOnIdentifyStop)
@@ -101,7 +103,7 @@ static void OnIdentifyStopLegacyWrapper(chip::app::Clusters::IdentifyCluster * c
     }
 }
 
-static void OnEffectIdentifierLegacyWrapper(chip::app::Clusters::IdentifyCluster * cluster)
+void OnEffectIdentifierLegacyWrapper(chip::app::Clusters::IdentifyCluster * cluster)
 {
     Identify * identify = GetLegacyIdentifyInstance(cluster->GetPaths()[0].mEndpointId);
     if (identify != nullptr)
@@ -115,6 +117,8 @@ static void OnEffectIdentifierLegacyWrapper(chip::app::Clusters::IdentifyCluster
     }
 }
 
+} // namespace
+
 Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIdentifyStopCb onIdentifyStop,
                    IdentifyTypeEnum identifyType, onEffectIdentifierCb onEffectIdentifier, EffectIdentifierEnum effectIdentifier,
                    EffectVariantEnum effectVariant, reporting::ReportScheduler::TimerDelegate * timerDelegate) :
@@ -122,13 +126,13 @@ Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIde
     mOnIdentifyStart(onIdentifyStart),
     mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType), mOnEffectIdentifier(onEffectIdentifier),
     mCurrentEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant),
-    mCluster(chip::app::Clusters::IdentifyCluster::Config(endpoint, identifyType)
+    mCluster(chip::app::Clusters::IdentifyCluster::Config(endpoint, identifyType,
+                                                          timerDelegate ? *timerDelegate : sDefaultTimerDelegate)
                  .WithOnIdentifyStart(onIdentifyStart ? OnIdentifyStartLegacyWrapper : nullptr)
                  .WithOnIdentifyStop(onIdentifyStop ? OnIdentifyStopLegacyWrapper : nullptr)
                  .WithOnEffectIdentifier(onEffectIdentifier ? OnEffectIdentifierLegacyWrapper : nullptr)
                  .WithEffectIdentifier(effectIdentifier)
-                 .WithEffectVariant(effectVariant)
-                 .WithTimerDelegate(timerDelegate))
+                 .WithEffectVariant(effectVariant))
 {
     RegisterLegacyIdentify(this);
 };
@@ -138,47 +142,40 @@ Identify::~Identify()
     UnregisterLegacyIdentify(this);
 }
 
-namespace {
-
-class IntegrationDelegate : public CodegenClusterIntegration::Delegate
-{
-public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
-                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
-    {
-        Identify * identify = GetLegacyIdentifyInstance(endpointId);
-        VerifyOrDie(identify != nullptr);
-        return identify->mCluster.Registration();
-    }
-
-    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override { return nullptr; }
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override {}
-};
-
-} // namespace
-
 void MatterIdentifyClusterInitCallback(EndpointId endpointId)
 {
-    if (GetLegacyIdentifyInstance(endpointId) != nullptr)
+    Identify * identify = GetLegacyIdentifyInstance(endpointId);
+    if (identify != nullptr)
     {
-        IntegrationDelegate integrationDelegate;
-        CodegenClusterIntegration::RegisterServer({ .endpointId                = endpointId,
-                                                    .clusterId                 = Clusters::Identify::Id,
-                                                    .fixedClusterInstanceCount = 1,
-                                                    .maxClusterInstanceCount   = 1 },
-                                                  integrationDelegate);
+        CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(identify->mCluster.Registration());
+
+        if (err != CHIP_NO_ERROR)
+        {
+#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
+            ChipLogError(AppServer, "Failed to register cluster %u/" ChipLogFormatMEI ":   %" CHIP_ERROR_FORMAT, endpointId,
+                         ChipLogValueMEI(Clusters::Identify::Id), err.Format());
+#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
+        }
     }
 }
 
 void MatterIdentifyClusterShutdownCallback(EndpointId endpointId)
 {
-    if (GetLegacyIdentifyInstance(endpointId) != nullptr)
+    Identify * identify = GetLegacyIdentifyInstance(endpointId);
+    if (identify != nullptr)
     {
-        IntegrationDelegate integrationDelegate;
-        CodegenClusterIntegration::UnregisterServer({ .endpointId                = endpointId,
-                                                      .clusterId                 = Clusters::Identify::Id,
-                                                      .fixedClusterInstanceCount = 1,
-                                                      .maxClusterInstanceCount   = 1 },
-                                                    integrationDelegate);
+        CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&(identify->mCluster.Cluster()));
+
+        if (err != CHIP_NO_ERROR)
+        {
+#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
+            ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT, endpointId,
+                         ChipLogValueMEI(Clusters::Identify::Id), err.Format());
+#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
+        }
     }
 }
+
+// Legacy PluginServer callback stubs
+void MatterIdentifyPluginServerInitCallback() {}
+void MatterIdentifyPluginServerShutdownCallback() {}
