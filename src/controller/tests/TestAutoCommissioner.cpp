@@ -295,8 +295,7 @@ TEST_F(AutoCommissionerTest, NextCommissioningStage)
 
     for (const auto & stagePair : kStagePairs)
     {
-        CommissioningStage nextStage =
-            privateConfigCommissioner.AccessGetNextCommissioningStageInternal(stagePair.currentStage, err);
+        CommissioningStage nextStage = privateConfigCommissioner.GetNextCommissioningStageInternal(stagePair.currentStage, err);
         EXPECT_EQ(nextStage, stagePair.nextStage);
     }
 }
@@ -308,7 +307,7 @@ TEST_F(AutoCommissionerTest, NextStageStopCommissioning)
     mCommissioner.StopCommissioning();
 
     CHIP_ERROR err           = CHIP_ERROR_INTERNAL;
-    CommissioningStage stage = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kSecurePairing, err);
+    CommissioningStage stage = privateConfigCommissioner.GetNextCommissioningStageInternal(kSecurePairing, err);
     EXPECT_EQ(stage, kCleanup);
 }
 
@@ -318,7 +317,7 @@ TEST_F(AutoCommissionerTest, NextCommissioningStageAfterError)
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
 
     CHIP_ERROR err           = CHIP_ERROR_INTERNAL;
-    CommissioningStage stage = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kSecurePairing, err);
+    CommissioningStage stage = privateConfigCommissioner.GetNextCommissioningStageInternal(kSecurePairing, err);
     EXPECT_EQ(stage, kCleanup);
 }
 
@@ -329,7 +328,7 @@ TEST_F(AutoCommissionerTest, NextStageReadCommissioningInfo)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     privateConfigCommissioner.SetBreadcrumb(0);
-    CommissioningStage nextStage = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kReadCommissioningInfo, err);
+    CommissioningStage nextStage = privateConfigCommissioner.GetNextCommissioningStageInternal(kReadCommissioningInfo, err);
 
     EXPECT_EQ(nextStage, kArmFailsafe);
 
@@ -337,8 +336,8 @@ TEST_F(AutoCommissionerTest, NextStageReadCommissioningInfo)
     privateConfigCommissioner.SetBreadcrumb(1);
 
     CommissioningStage nextStageReadCommissioningInfo =
-        privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kReadCommissioningInfo, err);
-    CommissioningStage nextStageSendNOC = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kSendNOC, err);
+        privateConfigCommissioner.GetNextCommissioningStageInternal(kReadCommissioningInfo, err);
+    CommissioningStage nextStageSendNOC = privateConfigCommissioner.GetNextCommissioningStageInternal(kSendNOC, err);
 
     EXPECT_EQ(nextStageReadCommissioningInfo, nextStageSendNOC);
 }
@@ -351,14 +350,13 @@ TEST_F(AutoCommissionerTest, NextStageConfigureTCAcknowledgments)
 
     privateConfigCommissioner.SetUTCRequirements(true);
 
-    CommissioningStage nextStage =
-        privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureTCAcknowledgments, err);
+    CommissioningStage nextStage = privateConfigCommissioner.GetNextCommissioningStageInternal(kConfigureTCAcknowledgments, err);
 
     EXPECT_EQ(nextStage, kConfigureUTCTime);
 
     privateConfigCommissioner.SetUTCRequirements(false);
 
-    nextStage = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureTCAcknowledgments, err);
+    nextStage = privateConfigCommissioner.GetNextCommissioningStageInternal(kConfigureTCAcknowledgments, err);
 
     EXPECT_EQ(nextStage, kSendPAICertificateRequest);
 }
