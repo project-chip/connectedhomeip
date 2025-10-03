@@ -17,13 +17,18 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ClosureControlClusterSecureStateChangedEvent(val secureValue: Boolean) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ClosureControlClusterSecureStateChangedEvent (
+    val secureValue: Boolean) {
+  override fun toString(): String  = buildString {
     append("ClosureControlClusterSecureStateChangedEvent {\n")
     append("\tsecureValue : $secureValue\n")
     append("}\n")
@@ -40,10 +45,10 @@ class ClosureControlClusterSecureStateChangedEvent(val secureValue: Boolean) {
   companion object {
     private const val TAG_SECURE_VALUE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ClosureControlClusterSecureStateChangedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ClosureControlClusterSecureStateChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val secureValue = tlvReader.getBoolean(ContextSpecificTag(TAG_SECURE_VALUE))
-
+      
       tlvReader.exitContainer()
 
       return ClosureControlClusterSecureStateChangedEvent(secureValue)

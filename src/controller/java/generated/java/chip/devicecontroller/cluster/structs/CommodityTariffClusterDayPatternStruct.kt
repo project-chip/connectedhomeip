@@ -20,15 +20,17 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class CommodityTariffClusterDayPatternStruct(
-  val dayPatternID: ULong,
-  val daysOfWeek: UInt,
-  val dayEntryIDs: List<ULong>,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class CommodityTariffClusterDayPatternStruct (
+    val dayPatternID: ULong,
+    val daysOfWeek: UInt,
+    val dayEntryIDs: List<ULong>) {
+  override fun toString(): String  = buildString {
     append("CommodityTariffClusterDayPatternStruct {\n")
     append("\tdayPatternID : $dayPatternID\n")
     append("\tdaysOfWeek : $daysOfWeek\n")
@@ -55,19 +57,18 @@ class CommodityTariffClusterDayPatternStruct(
     private const val TAG_DAYS_OF_WEEK = 1
     private const val TAG_DAY_ENTRY_I_DS = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityTariffClusterDayPatternStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CommodityTariffClusterDayPatternStruct {
       tlvReader.enterStructure(tlvTag)
       val dayPatternID = tlvReader.getULong(ContextSpecificTag(TAG_DAY_PATTERN_ID))
       val daysOfWeek = tlvReader.getUInt(ContextSpecificTag(TAG_DAYS_OF_WEEK))
-      val dayEntryIDs =
-        buildList<ULong> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_DAY_ENTRY_I_DS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getULong(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val dayEntryIDs = buildList<ULong> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_DAY_ENTRY_I_DS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getULong(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return CommodityTariffClusterDayPatternStruct(dayPatternID, daysOfWeek, dayEntryIDs)

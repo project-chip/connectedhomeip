@@ -1454,7 +1454,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;

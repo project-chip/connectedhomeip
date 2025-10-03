@@ -17,13 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ChannelClusterAdditionalInfoStruct(val name: String, val value: String) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ChannelClusterAdditionalInfoStruct (
+    val name: String,
+    val value: String) {
+  override fun toString(): String  = buildString {
     append("ChannelClusterAdditionalInfoStruct {\n")
     append("\tname : $name\n")
     append("\tvalue : $value\n")
@@ -43,11 +49,11 @@ class ChannelClusterAdditionalInfoStruct(val name: String, val value: String) {
     private const val TAG_NAME = 0
     private const val TAG_VALUE = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChannelClusterAdditionalInfoStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ChannelClusterAdditionalInfoStruct {
       tlvReader.enterStructure(tlvTag)
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val value = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
-
+      
       tlvReader.exitContainer()
 
       return ChannelClusterAdditionalInfoStruct(name, value)

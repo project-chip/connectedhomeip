@@ -18,12 +18,16 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class EnergyPreferenceClusterBalanceStruct(val step: UByte, val label: Optional<String>) {
+class EnergyPreferenceClusterBalanceStruct(
+  val step: UByte,
+  val label: Optional<String>
+) {
   override fun toString(): String = buildString {
     append("EnergyPreferenceClusterBalanceStruct {\n")
     append("\tstep : $step\n")
@@ -50,13 +54,12 @@ class EnergyPreferenceClusterBalanceStruct(val step: UByte, val label: Optional<
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyPreferenceClusterBalanceStruct {
       tlvReader.enterStructure(tlvTag)
       val step = tlvReader.getUByte(ContextSpecificTag(TAG_STEP))
-      val label =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
-        } else {
-          Optional.empty()
-        }
-
+      val label = if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return EnergyPreferenceClusterBalanceStruct(step, label)

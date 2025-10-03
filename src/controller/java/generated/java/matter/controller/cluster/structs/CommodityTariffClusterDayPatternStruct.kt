@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -26,7 +27,7 @@ import matter.tlv.TlvWriter
 class CommodityTariffClusterDayPatternStruct(
   val dayPatternID: UInt,
   val daysOfWeek: UByte,
-  val dayEntryIDs: List<UInt>,
+  val dayEntryIDs: List<UInt>
 ) {
   override fun toString(): String = buildString {
     append("CommodityTariffClusterDayPatternStruct {\n")
@@ -59,15 +60,14 @@ class CommodityTariffClusterDayPatternStruct(
       tlvReader.enterStructure(tlvTag)
       val dayPatternID = tlvReader.getUInt(ContextSpecificTag(TAG_DAY_PATTERN_ID))
       val daysOfWeek = tlvReader.getUByte(ContextSpecificTag(TAG_DAYS_OF_WEEK))
-      val dayEntryIDs =
-        buildList<UInt> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_DAY_ENTRY_I_DS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUInt(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val dayEntryIDs = buildList<UInt> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_DAY_ENTRY_I_DS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getUInt(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return CommodityTariffClusterDayPatternStruct(dayPatternID, daysOfWeek, dayEntryIDs)
