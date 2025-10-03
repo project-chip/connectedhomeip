@@ -91,15 +91,6 @@ public:
                                                         const VideoResolutionStruct & resolution,
                                                         ImageSnapshot & outImageSnapshot) override;
 
-    CHIP_ERROR
-    LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams) override;
-
-    CHIP_ERROR
-    LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams) override;
-
-    CHIP_ERROR
-    LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams) override;
-
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
     CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
