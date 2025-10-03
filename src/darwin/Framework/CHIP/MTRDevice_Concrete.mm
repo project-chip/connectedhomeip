@@ -3779,7 +3779,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             }
 
             // Otherwise, we build unique list of attributes in this cluster that match requested paths
-            NSMutableArray<MTRAttributePath *> * existentAttributesPathsInCluster = [[NSMutableArray alloc] init];
+            NSMutableSet<MTRAttributePath *> * existentAttributesPathsInCluster = [[NSMutableSet alloc] init];
             for (MTRAttributeRequestPath * requestPath in attributePaths) {
                 if (requestPath.endpoint != nil && ![requestPath.endpoint isEqual:clusterPath.endpoint]) {
                     continue;
@@ -3791,8 +3791,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     [existentAttributesPathsInCluster addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:requestPath.attribute]];
                 }
             }
-            NSMutableSet<MTRAttributePath *> * existentAttributesPathsSetInCluster = [NSMutableSet setWithArray:existentAttributesPathsInCluster];
-            [existentPaths addObjectsFromArray:[existentAttributesPathsSetInCluster allObjects]];
+            [existentPaths addObjectsFromArray:[existentAttributesPathsInCluster allObjects]];
         }
     }
 
