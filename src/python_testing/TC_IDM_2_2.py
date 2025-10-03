@@ -592,10 +592,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal(filtered_read13, {}, "Expected empty response with matching data version")
 
         self.step(14)
-        # Waiting 1 second after the app-ready-pattern is detected as we need to
-        # wait a tad longer for the app to be ready and stable, otherwise TH2
-        # connection fails later on in test step 14.
-        time.sleep(1)
         read_request14, filtered_read14 = await self._read_data_version_filter(
             endpoint=self.endpoint,
             cluster=Clusters.BasicInformation,
