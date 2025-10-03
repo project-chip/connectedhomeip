@@ -90,12 +90,13 @@ CHIP_ERROR GetTermsAndConditionsAttributeState(TermsAndConditionsProvider * tcPr
 }
 
 void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsState & initialState,
-                                                       const TermsAndConditionsState & updatedState)
+                                                       const TermsAndConditionsState & updatedState,
+                                                       GeneralCommissioningCluster & cluster)
 {
     // Notify on TCAcknowledgementsRequired change
     if (initialState.acknowledgementsRequired != updatedState.acknowledgementsRequired)
     {
-        MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCAcknowledgementsRequired::Id);
+        cluster.InternalNotifyAttributeChanged(TCAcknowledgementsRequired::Id);
     }
 
     // Notify on TCAcceptedVersion change
@@ -103,7 +104,7 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
         (initialState.acceptance.HasValue() &&
          (initialState.acceptance.Value().GetVersion() != updatedState.acceptance.Value().GetVersion())))
     {
-        MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCAcceptedVersion::Id);
+        cluster.InternalNotifyAttributeChanged(TCAcceptedVersion::Id);
     }
 
     // Notify on TCAcknowledgements change
@@ -111,7 +112,7 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
         (initialState.acceptance.HasValue() &&
          (initialState.acceptance.Value().GetValue() != updatedState.acceptance.Value().GetValue())))
     {
-        MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCAcknowledgements::Id);
+        cluster.InternalNotifyAttributeChanged(TCAcknowledgements::Id);
     }
 
     // Notify on TCRequirements change
@@ -120,7 +121,7 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
          (initialState.requirements.Value().GetVersion() != updatedState.requirements.Value().GetVersion() ||
           initialState.requirements.Value().GetValue() != updatedState.requirements.Value().GetValue())))
     {
-        MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCMinRequiredVersion::Id);
+        cluster.InternalNotifyAttributeChanged(TCMinRequiredVersion::Id);
     }
 
     // Notify on TCUpdateDeadline change
@@ -128,7 +129,7 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
         (initialState.updateAcceptanceDeadline.HasValue() &&
          (initialState.updateAcceptanceDeadline.Value() != updatedState.updateAcceptanceDeadline.Value())))
     {
-        MatterReportingAttributeChangeCallback(kRootEndpointId, GeneralCommissioning::Id, TCUpdateDeadline::Id);
+        cluster.InternalNotifyAttributeChanged(TCUpdateDeadline::Id);
     }
 }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -150,7 +151,7 @@ void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t
             VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, initialState));
             VerifyOrReturn(CHIP_NO_ERROR == tcProvider->RevertAcceptance());
             VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, updatedState));
-            NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
+            NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState, GeneralCommissioningCluster::Instance());
         }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     }

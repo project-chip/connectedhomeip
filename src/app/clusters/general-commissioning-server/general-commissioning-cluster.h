@@ -61,6 +61,10 @@ public:
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     // Fabric delegate
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+
+    /// Internal use only for general commissioning code
+    void InternalNotifyAttributeChanged(AttributeId id) { NotifyAttributeChanged(id); }
+
 #endif
 
     // GeneralCommissioning is a singleton cluster that exists only on the root endpoint.
