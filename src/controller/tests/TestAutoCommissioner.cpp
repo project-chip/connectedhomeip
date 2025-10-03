@@ -24,6 +24,7 @@
 #include <credentials/tests/CHIPAttCert_test_vectors.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <cstring>
+#include <lib/core/Optional.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
@@ -910,8 +911,8 @@ TEST_F(AutoCommissionerTest, CleanupCommissioning_ResetsStateAfterTryingSecondar
 
     CommissioningParameters params =
         test_helpers::MakeCommissioningParams(true /* supportsConcurrent */, true /* hasWiFiCreds */, true /* hasThreadDataset */);
-    mParams.SetDAC(TestCerts::sTestCert_DAC_FFF1_8000_0000_Cert);
-    mParams.SetPAI(TestCerts::sTestCert_PAI_FFF1_8000_Cert);
+    mParams.SetDAC(chip::TestCerts::sTestCert_DAC_FFF1_8000_0000_Cert);
+    mParams.SetPAI(chip::TestCerts::sTestCert_PAI_FFF1_8000_Cert);
     EXPECT_EQ(mCommissioner.SetCommissioningParameters(mParams), CHIP_NO_ERROR);
 
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
