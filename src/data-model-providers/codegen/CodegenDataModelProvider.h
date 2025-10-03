@@ -126,10 +126,10 @@ private:
             kGenerated,
         };
 
-        ResolvedCommandTarget(const ConcreteClusterPath & clusterPath, ServerClusterInterface * cluster) :
+        ResolvedCommandTarget(const ConcreteClusterPath & clusterPath, ServerClusterInterface * serverCluster) :
             cluster(clusterPath), type(HandlerType::kServerCluster)
         {
-            handler.serverCluster = cluster;
+            handler.serverCluster = serverCluster;
         }
 
         ResolvedCommandTarget(const ConcreteClusterPath & clusterPath, CommandHandlerInterface * interface) :
