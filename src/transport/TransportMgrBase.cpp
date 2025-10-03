@@ -95,11 +95,6 @@ void TransportMgrBase::HandleConnectionReceived(Transport::ActiveTCPConnectionSt
     {
         mSessionManager->HandleConnectionReceived(conn);
     }
-    else
-    {
-        // Close connection here since no upper layer is interested in the connection.
-        Transport::ActiveTCPConnectionHandle releaseConnection(&conn);
-    }
 }
 
 void TransportMgrBase::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr)
