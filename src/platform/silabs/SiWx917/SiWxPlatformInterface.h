@@ -20,11 +20,9 @@
 #include <app/icd/server/ICDServerConfig.h>
 
 namespace {
-#if defined(ENABLE_CHIP_SHELL) && CHIP_CONFIG_ENABLE_ICD_SERVER
-#ifdef RTE_UULP_GPIO_1_PIN
+#if defined(ENABLE_CHIP_SHELL) && CHIP_CONFIG_ENABLE_ICD_SERVER && defined(RTE_UULP_GPIO_1_PIN)
 bool ps_requirement_added = false;
-#endif // RTE_UULP_GPIO_1_PIN
-#endif // ENABLE_CHIP_SHELL && CHIP_CONFIG_ENABLE_ICD_SERVER
+#endif // defined(ENABLE_CHIP_SHELL) && CHIP_CONFIG_ENABLE_ICD_SERVER && defined(RTE_UULP_GPIO_1_PIN)
 } // namespace
 
 #ifdef __cplusplus
