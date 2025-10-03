@@ -378,7 +378,8 @@
             "PIROccupiedToUnoccupiedDelay",
             "UltrasonicOccupiedToUnoccupiedDelay",
             "PhysicalContactOccupiedToUnoccupiedDelay",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Operational Credentials": [
             "SupportedFabrics",

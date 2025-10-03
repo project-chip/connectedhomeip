@@ -2366,7 +2366,7 @@ endpoint 1 {
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 5;
+    callback attribute clusterRevision;
   }
 }
 
