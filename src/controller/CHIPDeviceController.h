@@ -828,11 +828,7 @@ public:
 
     Credentials::DeviceAttestationVerifier * GetDeviceAttestationVerifier() const { return mDeviceAttestationVerifier; }
 
-    Optional<CommissioningParameters> GetCommissioningParameters()
-    {
-        // TODO: Return a non-optional const & to avoid a copy, mDefaultCommissioner is never null
-        return mDefaultCommissioner == nullptr ? NullOptional : MakeOptional(mDefaultCommissioner->GetCommissioningParameters());
-    }
+    const CommissioningParameters & GetCommissioningParameters() { return mDefaultCommissioner->GetCommissioningParameters(); }
 
     CHIP_ERROR UpdateCommissioningParameters(const CommissioningParameters & newParameters)
     {
@@ -895,6 +891,16 @@ private:
     Internal::WriteCancelFn mWriteCancelFn;
 
     ObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
+
+    // While we have an ongoing PASE attempt (i.e. after calling Pair() on the
+    // PASESession), track which RendezvousParameters we used for that attempt.
+    // This allows us to notify delegates about which thing it was we actually
+    // established PASE with, especially in the context of concatenated QR
+    // codes.
+    //
+    // This member only has a value while we are in the middle of session
+    // establishment.
+    std::optional<RendezvousParameters> mRendezvousParametersForPASEEstablishment;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer * mUdcServer = nullptr;
@@ -1141,7 +1147,7 @@ private:
     SetUpCodePairer mSetUpCodePairer;
     AutoCommissioner mAutoCommissioner;
     CommissioningDelegate * mDefaultCommissioner =
-        nullptr; // Commissioning delegate to call when PairDevice / Commission functions are used
+        &mAutoCommissioner; // Commissioning delegate to call when PairDevice / Commission functions are used
     CommissioningDelegate * mCommissioningDelegate =
         nullptr; // Commissioning delegate that issued the PerformCommissioningStep command
     CompletionStatus mCommissioningCompletionStatus;

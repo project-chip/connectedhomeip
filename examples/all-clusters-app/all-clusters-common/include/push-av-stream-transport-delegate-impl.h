@@ -76,7 +76,7 @@ public:
 
     Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) override;
 
-    bool ValidateMotionZoneSize(uint16_t zoneSize) override;
+    bool ValidateMotionZoneListSize(size_t zoneListSize) override;
 
     PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) override;
 
@@ -91,7 +91,7 @@ public:
     {
         // Handle TLS certificates if needed for implementation
     }
-    void SetPushAvStreamTransportServer(PushAvStreamTransportServerLogic * serverLogic) override
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServer * serverLogic) override
     {
         // Store pointer to server logic if needed for implementation
     }

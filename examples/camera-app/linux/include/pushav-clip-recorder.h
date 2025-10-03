@@ -18,7 +18,7 @@
 #pragma once
 
 #include "pushav-uploader.h"
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-logic.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 
 #include <algorithm>
 #include <atomic>
@@ -144,7 +144,7 @@ public:
     void SetOnStopCallback(std::function<void()> cb) { mOnStopCallback = std::move(cb); }
 
     // Set the cluster server reference for direct API calls
-    void SetPushAvStreamTransportServer(chip::app::Clusters::PushAvStreamTransportServerLogic * server)
+    void SetPushAvStreamTransportServer(chip::app::Clusters::PushAvStreamTransportServer * server)
     {
         mPushAvStreamTransportServer = server;
     }
@@ -198,8 +198,8 @@ private:
     PushAVUploader * mUploader;
 
     // Cluster server reference for direct API calls
-    chip::app::Clusters::PushAvStreamTransportServerLogic * mPushAvStreamTransportServer = nullptr;
-    uint16_t mConnectionID                                                               = 0;
+    chip::app::Clusters::PushAvStreamTransportServer * mPushAvStreamTransportServer = nullptr;
+    uint16_t mConnectionID                                                          = 0;
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTriggerType;
     chip ::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum> mReasonType;
 

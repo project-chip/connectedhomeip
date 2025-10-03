@@ -7810,8 +7810,8 @@ endpoint 0 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster AccessControl {
@@ -7895,7 +7895,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster UnitLocalization {
@@ -7978,8 +7978,8 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command RetrieveLogsRequest;
     handle command RetrieveLogsResponse;
@@ -8089,7 +8089,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
@@ -8231,8 +8231,8 @@ endpoint 0 {
 
   server cluster FixedLabel {
     callback attribute labelList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster UserLabel {
@@ -8375,8 +8375,8 @@ endpoint 1 {
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster Actions {
@@ -8413,8 +8413,8 @@ endpoint 1 {
 
   server cluster FixedLabel {
     callback attribute labelList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster UserLabel {
@@ -9021,7 +9021,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x17;
-    ram      attribute clusterRevision default = 5;
+    callback attribute clusterRevision;
 
     handle command UpOrOpen;
     handle command DownOrClose;
@@ -9090,7 +9090,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0123;
-    ram      attribute clusterRevision default = 7;
+    callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;
     handle command SetActiveScheduleRequest;
@@ -9278,7 +9278,7 @@ endpoint 1 {
     callback attribute holdTimeLimits;
     callback attribute PIROccupiedToUnoccupiedDelay;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 5;
+    callback attribute clusterRevision;
   }
 
   server cluster CarbonMonoxideConcentrationMeasurement {
@@ -9735,7 +9735,7 @@ endpoint 2 {
     callback attribute holdTimeLimits;
     callback attribute PIROccupiedToUnoccupiedDelay;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 5;
+    callback attribute clusterRevision;
   }
 }
 endpoint 3 {

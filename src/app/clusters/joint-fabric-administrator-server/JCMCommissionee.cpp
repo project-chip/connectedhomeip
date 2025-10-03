@@ -208,10 +208,8 @@ TrustVerificationError JCMCommissionee::ReadCommissionerAdminFabricIndex()
     {
         return TrustVerificationError::kAsync;
     }
-    else
-    {
-        return TrustVerificationError::kReadAdminFabricIndexFailed;
-    }
+
+    return TrustVerificationError::kReadAdminFabricIndexFailed;
 }
 
 void JCMCommissionee::FetchAdministratorFabricDescriptor(FabricIndex remoteFabricIndex)
