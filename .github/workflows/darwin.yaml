@@ -22,6 +22,8 @@ on:
     pull_request:
     merge_group:
     workflow_dispatch:
+    schedule:
+        - cron: '0 2 * * *' # Daily at 2 AM UTC, run job on other macOS versions as well
 
 concurrency:
     group:
@@ -37,9 +39,10 @@ jobs:
     framework:
         name: Build framework
         if: github.actor != 'restyled-io[bot]'
-        runs-on: macos-13
+        runs-on: ${{ matrix.os }}
         strategy:
             matrix:
+                os: ${{ github.event_name == 'schedule' && fromJSON('[macos-14", "macos-15", "macos-26"]') || fromJSON('["macos-14"]') }}
                 options: # We don't need a full matrix
                     - flavor: macos-release
                       arguments: -sdk macosx -configuration Release
@@ -74,9 +77,10 @@ jobs:
         name: Run framework tests
         if: github.actor != 'restyled-io[bot]'
         needs: [framework] # serialize to avoid running to many parallel macos runners
-        runs-on: macos-13
+        runs-on: ${{ matrix.os }}
         strategy:
             matrix:
+                os: ${{ github.event_name == 'schedule' && fromJSON('["macos-14", "macos-15", "macos-26"]') || fromJSON('["macos-14"]') }}
                 options: # We don't need a full matrix
                     - flavor: asan
                       arguments:
