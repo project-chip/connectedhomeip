@@ -66,21 +66,6 @@ static constexpr BitFlags<GeneralCommissioning::Feature> kFeatures = BitFlags<Ge
         }                                                                                                                          \
     } while (false)
 
-CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &), AttributeValueEncoder & aEncoder)
-{
-    uint8_t data   = 0;
-    CHIP_ERROR err = (DeviceLayer::ConfigurationMgr().*getter)(data);
-    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-    {
-        data = 0;
-    }
-    else if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
-    return aEncoder.Encode(data);
-}
-
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 typedef struct sTermsAndConditionsState
 {
@@ -429,10 +414,32 @@ DataModel::ActionReturnStatus GeneralCommissioningCluster::ReadAttribute(const D
 
         return encoder.Encode(info);
     }
-    case RegulatoryConfig::Id:
-        return ReadIfSupported(&ConfigurationManager::GetRegulatoryLocation, encoder);
-    case LocationCapability::Id:
-        return ReadIfSupported(&ConfigurationManager::GetLocationCapability, encoder);
+    case RegulatoryConfig::Id: {
+        uint8_t data   = 0;
+        CHIP_ERROR err = DeviceLayer::ConfigurationMgr().GetRegulatoryLocation(data);
+        if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            data = 0;
+        }
+        else if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+        return encoder.Encode(data);
+    }
+    case LocationCapability::Id: {
+        uint8_t data   = 0;
+        CHIP_ERROR err = DeviceLayer::ConfigurationMgr().GetLocationCapability(data);
+        if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            data = 0;
+        }
+        else if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+        return encoder.Encode(data);
+    }
     case SupportsConcurrentConnection::Id:
         return encoder.Encode(CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION != 0);
 
