@@ -163,9 +163,10 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             if not self.is_pics_sdk_ci_only:
                 self.user_verify_snap_shot("Validate the snapshot image", captureSnapshotResponse.data)
         except InteractionModelError as e:
-            # TODO: Fail the test if this is reached, once the test infrastructure supports snapshot capture
-            logger.error(f"Snapshot capture is not supported: {e}")
-            pass
+            if not self.is_pics_sdk_ci_only:
+                asserts.fail(f"Snapshot capture failed: {e}")
+            else:
+                pass
 
         self.step(4)
         try:
@@ -206,9 +207,10 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             if not self.is_pics_sdk_ci_only:
                 self.user_verify_snap_shot("Validate the snapshot image", captureSnapshotResponse.data)
         except InteractionModelError as e:
-            # TODO: Fail the test if this is reached, once the test infrastructure supports snapshot capture
-            logger.error(f"Snapshot capture is not supported: {e}")
-            pass
+            if not self.is_pics_sdk_ci_only:
+                asserts.fail(f"Snapshot capture failed: {e}")
+            else:
+                pass
 
         if self.privacySupport:
             self.step(6)
@@ -231,6 +233,11 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
                     "Unexpected error returned when expecting INVALID_IN_STATE due to SoftPrivacy mode set to On",
                 )
                 pass
+
+            # Cleanup Privacy state after test completion
+            result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint)
+            asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
+            logger.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{False}")
 
         else:
             self.skip_step(6)
