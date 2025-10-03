@@ -152,6 +152,7 @@ ActiveTCPConnectionState * TCPBase::AllocateConnection(Inet::TCPEndPointHandle &
         }
 
         // Out of space; reclaim connections that were never claimed by ProcessSingleMessage
+        // (i.e. that have a ref count of 0)
         for (size_t i = 0; i < mActiveConnectionsSize; i++)
         {
             ActiveTCPConnectionHandle releaseUnclaimed(&mActiveConnections[i]);
