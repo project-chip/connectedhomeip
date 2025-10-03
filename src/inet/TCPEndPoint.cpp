@@ -226,7 +226,7 @@ void TCPEndPoint::HandleIdleTimer(chip::System::Layer * aSystemLayer, void * aAp
     auto & endPointManager = *reinterpret_cast<EndPointManager<TCPEndPoint> *>(aAppState);
     bool lTimerRequired    = IsIdleTimerRunning(endPointManager);
 
-    endPointManager.ForEachEndPoint([](TCPEndPoint * lEndPoint) -> Loop {
+    endPointManager.ForEachEndPoint([](TCPEndPointHandle & lEndPoint) -> Loop {
         if (!lEndPoint->IsConnected())
             return Loop::Continue;
         if (lEndPoint->mIdleTimeout == 0)
@@ -254,7 +254,7 @@ void TCPEndPoint::HandleIdleTimer(chip::System::Layer * aSystemLayer, void * aAp
 bool TCPEndPoint::IsIdleTimerRunning(EndPointManager<TCPEndPoint> & endPointManager)
 {
     // See if there are any TCP connections with the idle timer check in use.
-    return Loop::Break == endPointManager.ForEachEndPoint([](TCPEndPoint * lEndPoint) {
+    return Loop::Break == endPointManager.ForEachEndPoint([](TCPEndPointHandle & lEndPoint) {
         return (lEndPoint->mIdleTimeout == 0) ? Loop::Continue : Loop::Break;
     });
 }
@@ -331,7 +331,8 @@ void TCPEndPoint::DriveReceiving()
         // Acknowledgement is done after handling the buffers to allow the
         // application processing to throttle flow.
         size_t ackLength = mRcvQueue->TotalLength();
-        CHIP_ERROR err   = OnDataReceived(this, std::move(mRcvQueue));
+        TCPEndPointHandle handle(this);
+        CHIP_ERROR err = OnDataReceived(handle, std::move(mRcvQueue));
         if (err != CHIP_NO_ERROR)
         {
             DoClose(err, false);
@@ -365,7 +366,8 @@ void TCPEndPoint::HandleConnectComplete(CHIP_ERROR err)
 
         if (OnConnectComplete != nullptr)
         {
-            OnConnectComplete(this, CHIP_NO_ERROR);
+            TCPEndPointHandle handle(this);
+            OnConnectComplete(handle, CHIP_NO_ERROR);
         }
     }
 
@@ -427,14 +429,15 @@ void TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
             {
                 if (OnConnectComplete != nullptr)
                 {
-                    OnConnectComplete(this, err);
+                    TCPEndPointHandle handle(this);
+                    OnConnectComplete(handle, err);
                 }
             }
             else if ((oldState == State::kConnected || oldState == State::kSendShutdown || oldState == State::kReceiveShutdown ||
                       oldState == State::kClosing) &&
                      OnConnectionClosed != nullptr)
             {
-                OnConnectionClosed(this, err);
+                OnConnectionClosed(*this, err);
             }
         }
     }

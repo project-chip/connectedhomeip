@@ -77,12 +77,12 @@ uint16_t GetRandomPort()
 class MockTransportMgrDelegate : public chip::TransportMgrDelegate
 {
 public:
-    ActiveTCPConnectionHolder refHolder;
-    ActiveTCPConnectionHolder incoming[kMaxIncoming];
-    ActiveTCPConnectionHolder activeTCPConnState;
+    ActiveTCPConnectionHandle refHolder;
+    ActiveTCPConnectionHandle incoming[kMaxIncoming];
+    ActiveTCPConnectionHandle activeTCPConnState;
 
     using MessageReceivedCallback =
-        std::function<CHIP_ERROR(const uint8_t * message, size_t length, int count, ActiveTCPConnectionHolder & conn, void * data)>;
+        std::function<CHIP_ERROR(const uint8_t * message, size_t length, int count, ActiveTCPConnectionHandle & conn, void * data)>;
 
     MockTransportMgrDelegate(IOContext * inContext) : mIOContext(inContext), mCallback(nullptr), mCallbackData(nullptr) {}
     ~MockTransportMgrDelegate() override {}
@@ -100,11 +100,11 @@ public:
 
         EXPECT_EQ(packetHeader.DecodeAndConsume(msgBuf), CHIP_NO_ERROR);
 
-        ActiveTCPConnectionHolder connection;
+        ActiveTCPConnectionHandle connection;
         if (transCtxt)
         {
             // Store a reference to the connection so it's not auto-disconnected
-            ActiveTCPConnectionHolder * available = nullptr;
+            ActiveTCPConnectionHandle * available = nullptr;
             for (size_t i = 0; i < kMaxIncoming; i++)
             {
                 if (incoming[i] == transCtxt->conn)
@@ -132,7 +132,7 @@ public:
         if (transCtxt)
         {
             // Store a reference to the connection so it's not auto-disconnected
-            ActiveTCPConnectionHolder * available = nullptr;
+            ActiveTCPConnectionHandle * available = nullptr;
             for (size_t i = 0; i < kMaxIncoming; i++)
             {
                 if (incoming[i] == transCtxt->conn)
@@ -162,7 +162,7 @@ public:
         mReceiveHandlerCallCount++;
     }
 
-    void HandleConnectionAttemptComplete(ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr) override
+    void HandleConnectionAttemptComplete(ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override
     {
         AppTCPConnectionCallbackCtxt * appConnCbCtxt = nullptr;
         VerifyOrReturn(!conn.IsNull());
@@ -239,16 +239,11 @@ public:
 
     void SingleMessageTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
     {
-        SetCallback([](const uint8_t * message, size_t length, int count, ActiveTCPConnectionHolder & conn, void * data) {
+        SetCallback([](const uint8_t * message, size_t length, int count, ActiveTCPConnectionHandle & conn, void * data) {
             return memcmp(message, PAYLOAD, length) == 0 ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
         });
 
         CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, refHolder);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        // Should be able to send a message to itself by just calling send.
-        chip::System::PacketBufferHandle buffer;
-        err = BufferWithHeader(kMessageCounter, buffer, PAYLOAD);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         // Should be able to send a message to itself by just calling send.
@@ -266,14 +261,14 @@ public:
 
     void MultipleConnectionTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
     {
-        ActiveTCPConnectionHolder firstConnection;
-        ActiveTCPConnectionHolder secondConnection;
+        ActiveTCPConnectionHandle firstConnection;
+        ActiveTCPConnectionHandle secondConnection;
         bool firstMessageReceived   = false;
         bool firstResponseReceived  = false;
         bool secondMessageReceived  = false;
         bool secondResponseReceived = false;
         SetCallback(
-            [&](const uint8_t * message, size_t length, int count, ActiveTCPConnectionHolder & conn, void * data) -> CHIP_ERROR {
+            [&](const uint8_t * message, size_t length, int count, ActiveTCPConnectionHandle & conn, void * data) -> CHIP_ERROR {
                 if (memcmp(message, PAYLOAD, length) == 0)
                 {
                     firstMessageReceived = true;
@@ -412,7 +407,7 @@ public:
     }
 
     CHIP_ERROR TCPConnect(const Transport::PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,
-                          Transport::ActiveTCPConnectionHolder & peerConnState)
+                          Transport::ActiveTCPConnectionHandle & peerConnState)
     {
         return mTransportMgrBase.TCPConnect(peerAddress, appState, peerConnState);
     }
@@ -697,7 +692,7 @@ protected:
 
     // Callback used by CheckProcessReceivedBuffer.
     static CHIP_ERROR TestDataCallbackCheck(const uint8_t * message, size_t length, int count,
-                                            ActiveTCPConnectionHolder & connection, void * data)
+                                            ActiveTCPConnectionHandle & connection, void * data)
     {
         if (data == nullptr)
         {
@@ -870,13 +865,13 @@ TEST_F(TestTCP, CheckTCPEndpointAfterCloseTest)
     Transport::PeerAddress lPeerAddress = Transport::PeerAddress::TCP(addr, port);
     auto state                          = TestAccess::FindActiveConnection(tcp, lPeerAddress);
     ASSERT_TRUE(state);
-    TCPEndPoint * lEndPoint = TestAccess::GetEndpoint(state);
-    ASSERT_NE(lEndPoint, nullptr);
+    TCPEndPointHandle lEndPoint = TestAccess::GetEndpoint(state);
+    ASSERT_TRUE(lEndPoint);
 
     // Call Close and check the TCPEndpoint
     tcp.Close();
     lEndPoint = TestAccess::GetEndpoint(state);
-    ASSERT_EQ(lEndPoint, nullptr);
+    ASSERT_TRUE(lEndPoint.IsNull());
 }
 
 TEST_F(TestTCP, CheckProcessReceivedBuffer)
@@ -897,8 +892,8 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     Transport::PeerAddress lPeerAddress = Transport::PeerAddress::TCP(addr, port);
     auto state                          = TestAccess::FindActiveConnection(tcp, lPeerAddress);
     ASSERT_TRUE(state);
-    TCPEndPoint * lEndPoint = TestAccess::GetEndpoint(state);
-    ASSERT_NE(lEndPoint, nullptr);
+    TCPEndPointHandle lEndPoint = TestAccess::GetEndpoint(state);
+    ASSERT_TRUE(lEndPoint);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestData testData[2];
@@ -962,7 +957,7 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
 
     // The receipt of a message exceeding the allowed size should have
     // closed the connection.
-    EXPECT_EQ(TestAccess::GetEndpoint(state), nullptr);
+    EXPECT_TRUE(TestAccess::GetEndpoint(state).IsNull());
 }
 
 } // namespace

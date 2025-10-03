@@ -682,7 +682,7 @@ void SessionManager::HandleConnectionReceived(Transport::ActiveTCPConnectionStat
     }
 }
 
-void SessionManager::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr)
+void SessionManager::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr)
 {
     VerifyOrReturn(!conn.IsNull());
 
@@ -714,7 +714,7 @@ void SessionManager::HandleConnectionClosed(Transport::ActiveTCPConnectionState 
 }
 
 CHIP_ERROR SessionManager::TCPConnect(const PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,
-                                      Transport::ActiveTCPConnectionHolder & peerConnState)
+                                      Transport::ActiveTCPConnectionHandle & peerConnState)
 {
     char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
     peerAddress.ToString(peerAddrBuf);
@@ -801,7 +801,7 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
     // Associate the unauthenticated session with the connection, if not done already.
     if (peerAddress.GetTransportType() == Transport::Type::kTcp)
     {
-        Transport::ActiveTCPConnectionHolder sessionConn = unsecuredSession->GetTCPConnection();
+        Transport::ActiveTCPConnectionHandle sessionConn = unsecuredSession->GetTCPConnection();
         if (sessionConn.IsNull())
         {
             unsecuredSession->SetTCPConnection(ctxt->conn);

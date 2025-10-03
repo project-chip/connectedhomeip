@@ -47,13 +47,16 @@ public:
 };
 
 /**
- * A reference counted object maintains a count of usages and when the usage
- * count drops to 0, it deletes itself.
+ * Like ReferenceCounted but with protected visibility of Retain/Release
  */
-template <class Subclass, class Deletor = DeleteDeletor<Subclass>, int kInitRefCount = 1, typename CounterType = uint32_t>
-class ReferenceCounted
+template <class Subclass, class Deletor, int kInitRefCount = 1, typename CounterType = uint32_t>
+class ReferenceCountedProtected
 {
 public:
+    /** Get the current reference counter value */
+    CounterType GetReferenceCount() const { return mRefCount; }
+
+protected:
     /** Adds one to the usage count of this class */
     Subclass * Retain()
     {
@@ -75,11 +78,20 @@ public:
         }
     }
 
-    /** Get the current reference counter value */
-    CounterType GetReferenceCount() const { return mRefCount; }
-
 private:
     CounterType mRefCount = kInitRefCount;
+};
+
+/**
+ * A reference counted object maintains a count of usages and when the usage
+ * count drops to 0, it deletes itself.
+ */
+template <class Subclass, class Deletor = DeleteDeletor<Subclass>, int kInitRefCount = 1, typename CounterType = uint32_t>
+class ReferenceCounted : public ReferenceCountedProtected<Subclass, Deletor, kInitRefCount, CounterType>
+{
+public:
+    using ReferenceCountedProtected<Subclass, Deletor, kInitRefCount, CounterType>::Retain;
+    using ReferenceCountedProtected<Subclass, Deletor, kInitRefCount, CounterType>::Release;
 };
 
 } // namespace chip

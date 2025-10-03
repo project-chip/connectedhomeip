@@ -65,20 +65,21 @@ public:
 /**
  *  State for each active TCP connection
  */
-class ActiveTCPConnectionHolder;
+class ActiveTCPConnectionHandle;
 struct ActiveTCPConnectionState
-    : public ReferenceCounted<ActiveTCPConnectionState, ActiveTCPConnectionStateDeleter<ActiveTCPConnectionState>, 0, uint16_t>
+    : public ReferenceCountedProtected<ActiveTCPConnectionState, ActiveTCPConnectionStateDeleter<ActiveTCPConnectionState>, 0,
+                                       uint16_t>
 {
     using ReleaseFnType = std::function<void(ActiveTCPConnectionState & connection)>;
 
-    bool InUse() const { return mEndPoint != nullptr; }
+    bool InUse() const { return !mEndPoint.IsNull(); }
 
-    bool IsConnected() const { return (mEndPoint != nullptr && mConnectionState == TCPState::kConnected); }
+    bool IsConnected() const { return (!mEndPoint.IsNull() && mConnectionState == TCPState::kConnected); }
 
-    bool IsConnecting() const { return (mEndPoint != nullptr && mConnectionState == TCPState::kConnecting); }
+    bool IsConnecting() const { return (!mEndPoint.IsNull() && mConnectionState == TCPState::kConnecting); }
 
-    inline bool operator==(const ActiveTCPConnectionHolder & other) const;
-    inline bool operator!=(const ActiveTCPConnectionHolder & other) const;
+    inline bool operator==(const ActiveTCPConnectionHandle & other) const;
+    inline bool operator!=(const ActiveTCPConnectionHandle & other) const;
 
     // Peer Node Address
     PeerAddress mPeerAddr;
@@ -113,20 +114,18 @@ private:
     friend class TCP;
     friend class TCPBase;
     friend class ActiveTCPConnectionStateDeleter<ActiveTCPConnectionState>;
+    friend class ActiveTCPConnectionHandle;
+    friend class AutoRelease<ActiveTCPConnectionState>;
     // Allow tests to access private members.
     template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
     friend class TCPBaseTestAccess;
 
     // Associated endpoint.
-    Inet::TCPEndPoint * mEndPoint;
+    Inet::TCPEndPointHandle mEndPoint;
     ReleaseFnType mReleaseConnection;
 
-    void Init(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddr, ReleaseFnType releaseConnection)
+    void Init(Inet::TCPEndPointHandle endPoint, const PeerAddress & peerAddr, ReleaseFnType releaseConnection)
     {
-        if (endPoint)
-        {
-            endPoint->Retain();
-        }
         mEndPoint          = endPoint;
         mPeerAddr          = peerAddr;
         mReceived          = nullptr;
@@ -136,10 +135,6 @@ private:
 
     void Free()
     {
-        if (mEndPoint)
-        {
-            mEndPoint->Release();
-        }
         mPeerAddr          = PeerAddress::Uninitialized();
         mEndPoint          = nullptr;
         mReceived          = nullptr;
@@ -151,24 +146,25 @@ private:
 /**
  * A holder for ActiveTCPConnectionState which properly ref-counts on ctor/copy/dtor.
  */
-class ActiveTCPConnectionHolder : private AutoRelease<ActiveTCPConnectionState>
+class ActiveTCPConnectionHandle : private AutoRelease<ActiveTCPConnectionState>
 {
     friend class TCPBase;
     friend struct ActiveTCPConnectionState;
 
 public:
+    using AutoRelease<ActiveTCPConnectionState>::operator bool;
     using AutoRelease<ActiveTCPConnectionState>::operator->;
     using AutoRelease<ActiveTCPConnectionState>::IsNull;
     using AutoRelease<ActiveTCPConnectionState>::Release;
 
-    ActiveTCPConnectionHolder() : AutoRelease<ActiveTCPConnectionState>(nullptr) {}
-    ActiveTCPConnectionHolder(ActiveTCPConnectionState * releasable) :
+    ActiveTCPConnectionHandle() : AutoRelease<ActiveTCPConnectionState>(nullptr) {}
+    ActiveTCPConnectionHandle(ActiveTCPConnectionState * releasable) :
         AutoRelease<ActiveTCPConnectionState>(releasable ? releasable->Retain() : nullptr)
     {}
 
-    ActiveTCPConnectionHolder(const ActiveTCPConnectionHolder & src) : ActiveTCPConnectionHolder(src.mReleasable) {}
+    ActiveTCPConnectionHandle(const ActiveTCPConnectionHandle & src) : ActiveTCPConnectionHandle(src.mReleasable) {}
 
-    inline AutoRelease & operator=(const ActiveTCPConnectionHolder & src)
+    inline AutoRelease & operator=(const ActiveTCPConnectionHandle & src)
     {
         if (mReleasable != src.mReleasable)
         {
@@ -177,8 +173,8 @@ public:
         return *this;
     }
 
-    inline bool operator==(const ActiveTCPConnectionHolder & other) const { return mReleasable == other.mReleasable; }
-    inline bool operator!=(const ActiveTCPConnectionHolder & other) const { return mReleasable != other.mReleasable; }
+    inline bool operator==(const ActiveTCPConnectionHandle & other) const { return mReleasable == other.mReleasable; }
+    inline bool operator!=(const ActiveTCPConnectionHandle & other) const { return mReleasable != other.mReleasable; }
     inline bool operator==(const ActiveTCPConnectionState & other) const { return mReleasable == &other; }
     inline bool operator!=(const ActiveTCPConnectionState & other) const { return mReleasable != &other; }
 
@@ -186,11 +182,11 @@ public:
     inline operator const void *() const { return mReleasable; }
 };
 
-inline bool ActiveTCPConnectionState::operator==(const ActiveTCPConnectionHolder & other) const
+inline bool ActiveTCPConnectionState::operator==(const ActiveTCPConnectionHandle & other) const
 {
     return this == other.mReleasable;
 }
-inline bool ActiveTCPConnectionState::operator!=(const ActiveTCPConnectionHolder & other) const
+inline bool ActiveTCPConnectionState::operator!=(const ActiveTCPConnectionHandle & other) const
 {
     return this != other.mReleasable;
 }
@@ -198,7 +194,7 @@ inline bool ActiveTCPConnectionState::operator!=(const ActiveTCPConnectionHolder
 // Functors for callbacks into higher layers
 using OnTCPConnectionReceivedCallback = void (*)(ActiveTCPConnectionState & conn);
 
-using OnTCPConnectionCompleteCallback = void (*)(ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr);
+using OnTCPConnectionCompleteCallback = void (*)(ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr);
 
 using OnTCPConnectionClosedCallback = void (*)(ActiveTCPConnectionState & conn, CHIP_ERROR conErr);
 

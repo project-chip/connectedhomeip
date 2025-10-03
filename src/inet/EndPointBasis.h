@@ -26,6 +26,7 @@
 
 #include <inet/InetConfig.h>
 #include <lib/core/ReferenceCounted.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/DLLUtil.h>
 
 namespace chip {
@@ -42,11 +43,14 @@ class EndPointManager;
 template <typename EndPointType>
 class EndPointDeletor;
 
+template <class EndPointType>
+class EndPointHandle;
+
 /**
  * Basis of internet transport endpoint classes.
  */
 template <typename EndPointType>
-class DLL_EXPORT EndPointBasis : public ReferenceCounted<EndPointType, EndPointDeletor<EndPointType>>
+class DLL_EXPORT EndPointBasis : public ReferenceCountedProtected<EndPointType, EndPointDeletor<EndPointType>>
 {
 public:
     using EndPoint = EndPointType;
@@ -64,6 +68,10 @@ public:
     chip::System::Layer & GetSystemLayer() const { return mEndPointManager.SystemLayer(); }
 
     void * mAppState;
+
+protected:
+    friend class EndPointHandle<EndPointType>;
+    friend class AutoRelease<EndPointType>;
 
 private:
     EndPointManager<EndPoint> & mEndPointManager; /**< Factory that owns this object. */
