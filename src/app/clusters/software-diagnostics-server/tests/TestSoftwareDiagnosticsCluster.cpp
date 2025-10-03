@@ -55,6 +55,8 @@ public:
     ScopedDiagnosticsProvider(ScopedDiagnosticsProvider &&)                  = delete;
     ScopedDiagnosticsProvider & operator=(ScopedDiagnosticsProvider &&)      = delete;
 
+    T& GetProvider() { return mProvider; }
+
 private:
     DeviceLayer::DiagnosticDataProvider * mOldProvider;
     T mProvider;
@@ -142,9 +144,9 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
         ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 
         // Call the command, and verify it calls through to the provider
-        ASSERT_FALSE(watermarksProvider.resetCalled);
+        ASSERT_FALSE(watermarksProvider.GetProvider().resetCalled);
         ASSERT_EQ(diag.ResetWatermarks(), CHIP_NO_ERROR);
-        ASSERT_TRUE(watermarksProvider.resetCalled);
+        ASSERT_TRUE(watermarksProvider.GetProvider().resetCalled);
     }
 
     {
@@ -238,14 +240,14 @@ TEST_F(TestSoftwareDiagnosticsCluster, SoftwareFaultListenerTest)
 
     SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(fault);
     
-    chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type decodedFault;
+    chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::DecodableType decodedFault;
     ASSERT_EQ(context.EventsGenerator().DecodeLastEvent(decodedFault), CHIP_NO_ERROR);
 
     ASSERT_EQ(decodedFault.id, fault.id);
     ASSERT_TRUE(decodedFault.name.HasValue());
-    ASSERT_EQ(decodedFault.name.Value(), fault.name.Value());
+    ASSERT_TRUE(decodedFault.name.Value().data_equal(fault.name.Value()));
     ASSERT_TRUE(decodedFault.faultRecording.HasValue());
-    ASSERT_EQ(decodedFault.faultRecording.Value(), fault.faultRecording.Value());
+    ASSERT_TRUE(decodedFault.faultRecording.Value().data_equal(fault.faultRecording.Value()));
 }
 
 } // namespace
