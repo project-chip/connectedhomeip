@@ -62,3 +62,7 @@ void MatterAdministratorCommissioningClusterShutdownCallback(chip::EndpointId en
 void MatterGroupKeyManagementClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterGroupKeyManagementClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterFixedLabelClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterFixedLabelClusterShutdownCallback(chip::EndpointId endpointId);
