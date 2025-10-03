@@ -55,7 +55,7 @@ public:
     ScopedDiagnosticsProvider(ScopedDiagnosticsProvider &&)                  = delete;
     ScopedDiagnosticsProvider & operator=(ScopedDiagnosticsProvider &&)      = delete;
 
-    T& GetProvider() { return mProvider; }
+    T & GetProvider() { return mProvider; }
 
 private:
     DeviceLayer::DiagnosticDataProvider * mOldProvider;
