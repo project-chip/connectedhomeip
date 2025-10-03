@@ -12,15 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
+
 import os
 import re
 import signal
 import tempfile
 from dataclasses import dataclass
-from datetime import datetime
 from sys import stderr, stdout
-from time import sleep
 from typing import BinaryIO, Optional, Union
 
 import matter.clusters as Clusters
