@@ -51,7 +51,8 @@ public:
 
     /**
      * @brief
-     *   Called when the underlying TCP connection attempt for the session is complete. Returns true if handled.
+     *   Called when the underlying TCP connection attempt for the session is complete.
+     *   Returns true if the handle was stored (i.e. ref-count incremented beyond lifetime of this method)
      *
      * @param conn          The TCP connection state
      * @param conErr        The connection error code if the connection was unsuccessful
