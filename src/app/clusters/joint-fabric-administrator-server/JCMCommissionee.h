@@ -48,6 +48,7 @@ public:
         mCommandHandle(commandHandle), mOnCompletion(onCompletion)
     {
         mInfo.adminEndpointId = endpointId;
+        mAccessingFabricIndex = mCommandHandle.Get()->GetAccessingFabricIndex();
     }
     ~JCMCommissionee() {}
 
@@ -75,6 +76,7 @@ protected:
 private:
     CommandHandler::Handle & mCommandHandle;
     OnCompletionFunc mOnCompletion;
+    FabricIndex mAccessingFabricIndex;
 
     /// Trust Verification Stages
     // Ecosystem B Administrator SHALL save the value of the EndpointID
@@ -90,6 +92,14 @@ private:
     Credentials::JCM::TrustVerificationError CrossCheckAdministratorIds();
     /// End Trust Verification Stages
     Credentials::JCM::TrustVerificationError ParseCommissionerAdminInfo();
+
+    void FetchAdministratorFabricDescriptor(FabricIndex remoteFabricIndex);
+    Credentials::JCM::TrustVerificationError PopulateLocalAdminFabricInfo(
+        FabricIndex remoteFabricIndex,
+        const app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType & fabricDescriptor);
+    CHIP_ERROR FetchAdministratorOperationalCredentials(FabricIndex remoteFabricIndex);
+    CHIP_ERROR FetchAdministratorNOCs(FabricIndex remoteFabricIndex);
+    FabricIndex mLocalAdminFabricIndex = kUndefinedFabricIndex;
 };
 
 } // namespace JointFabricAdministrator
