@@ -53,6 +53,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
+from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing import matter_asserts
 from matter.testing.event_attribute_reporting import AttributeMatcher, AttributeSubscriptionHandler, EventSubscriptionHandler
@@ -314,7 +315,10 @@ class TC_SU_2_2(MatterBaseTest):
             nonlocal progress_values, progress_seen, final_null_seen, progress_recorded
             val = getattr(report.value, "value", report.value)  # unwrap Nullable if needed
 
-            if str(val).lower() == "null":
+            # DEBUG: loguea el valor y tipo real
+            logger.info(f'DEBUG - Raw value: {val}, Type: {type(val)}')
+
+            if val == NullValue:
                 val = None
 
             # Track progress numbers 1-99
