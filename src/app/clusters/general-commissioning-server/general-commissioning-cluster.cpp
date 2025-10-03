@@ -47,6 +47,15 @@ using chip::Transport::Session;
 
 namespace {
 
+// Feature map constant based on compile-time defines. This ensures feature map
+// is in sync with the actual supported features determined at build time.
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+static constexpr BitFlags<GeneralCommissioning::Feature> kFeatures =
+    BitFlags<GeneralCommissioning::Feature>(GeneralCommissioning::Feature::kTermsAndConditions);
+#else
+static constexpr BitFlags<GeneralCommissioning::Feature> kFeatures = BitFlags<GeneralCommissioning::Feature>(0);
+#endif
+
 #define CheckSuccess(expr, code)                                                                                                   \
     do                                                                                                                             \
     {                                                                                                                              \
@@ -160,6 +169,230 @@ void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t
         }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     }
+}
+
+std::optional<DataModel::ActionReturnStatus>
+HandleArmFailSafe(const DataModel::InvokeRequest & request, CommandHandler * handler,
+                  const GeneralCommissioning::Commands::ArmFailSafe::DecodableType & commandData)
+{
+    MATTER_TRACE_SCOPE("ArmFailSafe", "GeneralCommissioning");
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    Commands::ArmFailSafeResponse::Type response;
+
+    ChipLogProgress(FailSafe, "GeneralCommissioning: Received ArmFailSafe (%us)",
+                    static_cast<unsigned>(commandData.expiryLengthSeconds));
+
+    /*
+     * If the fail-safe timer is not fully disarmed, don't allow arming a new fail-safe.
+     * If the fail-safe timer was not currently armed, then the fail-safe timer SHALL be armed.
+     * If the fail-safe timer was currently armed, and current accessing fabric matches the fail-safe
+     * context’s Fabric Index, then the fail-safe timer SHALL be re-armed.
+     */
+    FabricIndex accessingFabricIndex = request.GetAccessingFabricIndex();
+
+    // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
+    // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
+    if (!failSafeContext.IsFailSafeBusy() &&
+        (!failSafeContext.IsFailSafeArmed() || failSafeContext.MatchesFabricIndex(accessingFabricIndex)))
+    {
+        // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
+        // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
+        if (!failSafeContext.IsFailSafeArmed() &&
+            Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen() &&
+            request.subjectDescriptor->authMode == Access::AuthMode::kCase)
+        {
+            response.errorCode = CommissioningErrorEnum::kBusyWithOtherAdmin;
+        }
+        else if (commandData.expiryLengthSeconds == 0)
+        {
+            // Force the timer to expire immediately.
+            failSafeContext.ForceFailSafeTimerExpiry();
+            // Don't set the breadcrumb, since expiring the failsafe should
+            // reset it anyway.
+            response.errorCode = CommissioningErrorEnum::kOk;
+        }
+        else
+        {
+            CheckSuccess(
+                failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
+                Failure);
+            GeneralCommissioningCluster::Instance().SetBreadCrumb(commandData.breadcrumb);
+            response.errorCode = CommissioningErrorEnum::kOk;
+        }
+    }
+    else
+    {
+        response.errorCode = CommissioningErrorEnum::kBusyWithOtherAdmin;
+    }
+    handler->AddResponse(request.path, response);
+    return std::nullopt;
+}
+
+std::optional<DataModel::ActionReturnStatus>
+HandleCommissioningComplete(const DataModel::InvokeRequest & request, CommandHandler * handler,
+                            const Commands::CommissioningComplete::DecodableType & commandData,
+                            Messaging::ExchangeContext * currentContext)
+{
+    MATTER_TRACE_SCOPE("CommissioningComplete", "GeneralCommissioning");
+
+    DeviceControlServer * devCtrl = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
+    auto & failSafe               = Server::GetInstance().GetFailSafeContext();
+    auto & fabricTable            = Server::GetInstance().GetFabricTable();
+
+    ChipLogProgress(FailSafe, "GeneralCommissioning: Received CommissioningComplete");
+
+    Commands::CommissioningCompleteResponse::Type response;
+    CHIP_ERROR err;
+
+    // Fail-safe must be armed
+    if (!failSafe.IsFailSafeArmed())
+    {
+        response.errorCode = CommissioningErrorEnum::kNoFailSafe;
+        handler->AddResponse(request.path, response);
+        return std::nullopt;
+    }
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
+
+    // Ensure required terms and conditions have been accepted, then attempt to commit
+    if (nullptr != tcProvider)
+    {
+        Optional<TermsAndConditions> requiredTermsAndConditionsMaybe;
+        Optional<TermsAndConditions> acceptedTermsAndConditionsMaybe;
+
+        CheckSuccess(tcProvider->GetRequirements(requiredTermsAndConditionsMaybe), Failure);
+        CheckSuccess(tcProvider->GetAcceptance(acceptedTermsAndConditionsMaybe), Failure);
+
+        if (requiredTermsAndConditionsMaybe.HasValue() && !acceptedTermsAndConditionsMaybe.HasValue())
+        {
+            response.errorCode = CommissioningErrorEnum::kTCAcknowledgementsNotReceived;
+            handler->AddResponse(request.path, response);
+            return std::nullopt;
+        }
+
+        if (requiredTermsAndConditionsMaybe.HasValue() && acceptedTermsAndConditionsMaybe.HasValue())
+        {
+            TermsAndConditions requiredTermsAndConditions = requiredTermsAndConditionsMaybe.Value();
+            TermsAndConditions acceptedTermsAndConditions = acceptedTermsAndConditionsMaybe.Value();
+
+            if (!requiredTermsAndConditions.ValidateVersion(acceptedTermsAndConditions))
+            {
+                response.errorCode = CommissioningErrorEnum::kTCMinVersionNotMet;
+                handler->AddResponse(request.path, response);
+                return std::nullopt;
+            }
+
+            if (!requiredTermsAndConditions.ValidateValue(acceptedTermsAndConditions))
+            {
+                response.errorCode = CommissioningErrorEnum::kRequiredTCNotAccepted;
+                handler->AddResponse(request.path, response);
+                return std::nullopt;
+            }
+        }
+
+        if (failSafe.UpdateTermsAndConditionsHasBeenInvoked())
+        {
+            // Commit terms and conditions acceptance on commissioning complete
+            err = tcProvider->CommitAcceptance();
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit terms and conditions: %" CHIP_ERROR_FORMAT,
+                             err.Format());
+            }
+            else
+            {
+                ChipLogProgress(FailSafe, "GeneralCommissioning: Successfully committed terms and conditions");
+            }
+            CheckSuccess(err, Failure);
+        }
+    }
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+
+    SessionHandle handle = currentContext->GetSessionHandle();
+
+    // Ensure it's a valid CASE session
+    if (handle->GetSessionType() != Session::SessionType::kSecure ||
+        handle->AsSecureSession()->GetSecureSessionType() != SecureSession::Type::kCASE ||
+        !failSafe.MatchesFabricIndex(request.GetAccessingFabricIndex()))
+    {
+        response.errorCode = CommissioningErrorEnum::kInvalidAuthentication;
+        ChipLogError(FailSafe, "GeneralCommissioning: Got commissioning complete in invalid security context");
+        handler->AddResponse(request.path, response);
+        return std::nullopt;
+    }
+
+    // Handle NOC commands
+    if (failSafe.NocCommandHasBeenInvoked())
+    {
+        err = fabricTable.CommitPendingFabricData();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit pending fabric data: %" CHIP_ERROR_FORMAT, err.Format());
+            // CommitPendingFabricData reverts on error, no need to revert explicitly
+        }
+        else
+        {
+            ChipLogProgress(FailSafe, "GeneralCommissioning: Successfully committed pending fabric data");
+        }
+        CheckSuccess(err, Failure);
+    }
+
+    // Disarm the fail-safe and notify the DeviceControlServer
+    failSafe.DisarmFailSafe();
+    err = devCtrl->PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex());
+    CheckSuccess(err, Failure);
+
+    GeneralCommissioningCluster::Instance().SetBreadCrumb(0);
+    response.errorCode = CommissioningErrorEnum::kOk;
+    handler->AddResponse(request.path, response);
+    return std::nullopt;
+}
+
+std::optional<DataModel::ActionReturnStatus>
+HandleSetRegulatoryConfig(const DataModel::InvokeRequest & request, CommandHandler * handler,
+                          const Commands::SetRegulatoryConfig::DecodableType & commandData)
+{
+    MATTER_TRACE_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
+    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
+    Commands::SetRegulatoryConfigResponse::Type response;
+    auto & countryCode = commandData.countryCode;
+
+    if (countryCode.size() != ConfigurationManager::kMaxLocationLength)
+    {
+        ChipLogError(Zcl, "Invalid country code: '%s'", NullTerminated(countryCode).c_str());
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+
+    if (commandData.newRegulatoryConfig > RegulatoryLocationTypeEnum::kIndoorOutdoor)
+    {
+        response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
+        handler->AddResponse(request.path, response);
+        return std::nullopt;
+    }
+
+    uint8_t locationCapability;
+    if (ConfigurationMgr().GetLocationCapability(locationCapability) != CHIP_NO_ERROR)
+    {
+        return Protocols::InteractionModel::Status::Failure;
+    }
+
+    uint8_t location = to_underlying(commandData.newRegulatoryConfig);
+
+    // If the LocationCapability attribute is not Indoor/Outdoor and the NewRegulatoryConfig value received does not match
+    // either the Indoor or Outdoor fixed value in LocationCapability.
+    if ((locationCapability != to_underlying(RegulatoryLocationTypeEnum::kIndoorOutdoor)) && (location != locationCapability))
+    {
+        response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
+        handler->AddResponse(request.path, response);
+        return std::nullopt;
+    }
+
+    CheckSuccess(server->SetRegulatoryConfig(location, countryCode), Failure);
+    GeneralCommissioningCluster::Instance().SetBreadCrumb(commandData.breadcrumb);
+    response.errorCode = CommissioningErrorEnum::kOk;
+    handler->AddResponse(request.path, response);
+    return std::nullopt;
 }
 
 GeneralCommissioningCluster gInstance;
@@ -298,7 +531,8 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningCluster::Invoke
     case Commands::CommissioningComplete::Id: {
         Commands::CommissioningComplete::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments, request.GetAccessingFabricIndex()));
-        return HandleCommissioningComplete(request, handler, request_data);
+        return HandleCommissioningComplete(request, handler, request_data,
+                                           mContext->interactionContext.actionContext.CurrentExchange());
     }
     case Commands::SetRegulatoryConfig::Id: {
         Commands::SetRegulatoryConfig::DecodableType request_data;
@@ -320,7 +554,7 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningCluster::Invoke
 CHIP_ERROR GeneralCommissioningCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                          ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (kFeatures.Has(GeneralCommissioning::Feature::kTermsAndConditions))
+    if constexpr (kFeatures.Has(GeneralCommissioning::Feature::kTermsAndConditions))
     {
         ReturnErrorOnFailure(builder.AppendElements({ Commands::SetTCAcknowledgements::kMetadataEntry }));
     }
@@ -336,7 +570,7 @@ CHIP_ERROR GeneralCommissioningCluster::GeneratedCommands(const ConcreteClusterP
                                                           ReadOnlyBufferBuilder<CommandId> & builder)
 {
 
-    if (kFeatures.Has(GeneralCommissioning::Feature::kTermsAndConditions))
+    if constexpr (kFeatures.Has(GeneralCommissioning::Feature::kTermsAndConditions))
     {
         ReturnErrorOnFailure(builder.AppendElements({ Commands::SetTCAcknowledgementsResponse::Id }));
     }
@@ -352,7 +586,7 @@ CHIP_ERROR GeneralCommissioningCluster::Attributes(const ConcreteClusterPath & p
                                                    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
 
-    if (kFeatures.Has(GeneralCommissioning::Feature::kTermsAndConditions))
+    if constexpr (kFeatures.Has(GeneralCommissioning::Feature::kTermsAndConditions))
     {
         ReturnErrorOnFailure(builder.AppendElements({
             TCAcceptedVersion::kMetadataEntry,
@@ -363,7 +597,7 @@ CHIP_ERROR GeneralCommissioningCluster::Attributes(const ConcreteClusterPath & p
         }));
     }
 
-    if (kFeatures.Has(GeneralCommissioning::Feature::kNetworkRecovery))
+    if constexpr (kFeatures.Has(GeneralCommissioning::Feature::kNetworkRecovery))
     {
         ReturnErrorOnFailure(builder.AppendElements({
             RecoveryIdentifier::kMetadataEntry,
@@ -420,229 +654,6 @@ void GeneralCommissioningCluster::Shutdown()
     PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler, 0);
     Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown();
-}
-
-std::optional<DataModel::ActionReturnStatus>
-GeneralCommissioningCluster::HandleArmFailSafe(const DataModel::InvokeRequest & request, CommandHandler * handler,
-                                               const GeneralCommissioning::Commands::ArmFailSafe::DecodableType & commandData)
-{
-    MATTER_TRACE_SCOPE("ArmFailSafe", "GeneralCommissioning");
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
-    Commands::ArmFailSafeResponse::Type response;
-
-    ChipLogProgress(FailSafe, "GeneralCommissioning: Received ArmFailSafe (%us)",
-                    static_cast<unsigned>(commandData.expiryLengthSeconds));
-
-    /*
-     * If the fail-safe timer is not fully disarmed, don't allow arming a new fail-safe.
-     * If the fail-safe timer was not currently armed, then the fail-safe timer SHALL be armed.
-     * If the fail-safe timer was currently armed, and current accessing fabric matches the fail-safe
-     * context’s Fabric Index, then the fail-safe timer SHALL be re-armed.
-     */
-    FabricIndex accessingFabricIndex = request.GetAccessingFabricIndex();
-
-    // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
-    // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
-    if (!failSafeContext.IsFailSafeBusy() &&
-        (!failSafeContext.IsFailSafeArmed() || failSafeContext.MatchesFabricIndex(accessingFabricIndex)))
-    {
-        // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
-        // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
-        if (!failSafeContext.IsFailSafeArmed() &&
-            Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen() &&
-            request.subjectDescriptor->authMode == Access::AuthMode::kCase)
-        {
-            response.errorCode = CommissioningErrorEnum::kBusyWithOtherAdmin;
-        }
-        else if (commandData.expiryLengthSeconds == 0)
-        {
-            // Force the timer to expire immediately.
-            failSafeContext.ForceFailSafeTimerExpiry();
-            // Don't set the breadcrumb, since expiring the failsafe should
-            // reset it anyway.
-            response.errorCode = CommissioningErrorEnum::kOk;
-        }
-        else
-        {
-            CheckSuccess(
-                failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
-                Failure);
-            SetBreadCrumb(commandData.breadcrumb);
-            response.errorCode = CommissioningErrorEnum::kOk;
-        }
-    }
-    else
-    {
-        response.errorCode = CommissioningErrorEnum::kBusyWithOtherAdmin;
-    }
-    handler->AddResponse(request.path, response);
-    return std::nullopt;
-}
-
-std::optional<DataModel::ActionReturnStatus>
-GeneralCommissioningCluster::HandleCommissioningComplete(const DataModel::InvokeRequest & request, CommandHandler * handler,
-                                                         const Commands::CommissioningComplete::DecodableType & commandData)
-{
-    MATTER_TRACE_SCOPE("CommissioningComplete", "GeneralCommissioning");
-
-    DeviceControlServer * devCtrl = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-    auto & failSafe               = Server::GetInstance().GetFailSafeContext();
-    auto & fabricTable            = Server::GetInstance().GetFabricTable();
-
-    ChipLogProgress(FailSafe, "GeneralCommissioning: Received CommissioningComplete");
-
-    Commands::CommissioningCompleteResponse::Type response;
-    CHIP_ERROR err;
-
-    // Fail-safe must be armed
-    if (!failSafe.IsFailSafeArmed())
-    {
-        response.errorCode = CommissioningErrorEnum::kNoFailSafe;
-        handler->AddResponse(request.path, response);
-        return std::nullopt;
-    }
-
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-    TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
-
-    // Ensure required terms and conditions have been accepted, then attempt to commit
-    if (nullptr != tcProvider)
-    {
-        Optional<TermsAndConditions> requiredTermsAndConditionsMaybe;
-        Optional<TermsAndConditions> acceptedTermsAndConditionsMaybe;
-
-        CheckSuccess(tcProvider->GetRequirements(requiredTermsAndConditionsMaybe), Failure);
-        CheckSuccess(tcProvider->GetAcceptance(acceptedTermsAndConditionsMaybe), Failure);
-
-        if (requiredTermsAndConditionsMaybe.HasValue() && !acceptedTermsAndConditionsMaybe.HasValue())
-        {
-            response.errorCode = CommissioningErrorEnum::kTCAcknowledgementsNotReceived;
-            handler->AddResponse(request.path, response);
-            return std::nullopt;
-        }
-
-        if (requiredTermsAndConditionsMaybe.HasValue() && acceptedTermsAndConditionsMaybe.HasValue())
-        {
-            TermsAndConditions requiredTermsAndConditions = requiredTermsAndConditionsMaybe.Value();
-            TermsAndConditions acceptedTermsAndConditions = acceptedTermsAndConditionsMaybe.Value();
-
-            if (!requiredTermsAndConditions.ValidateVersion(acceptedTermsAndConditions))
-            {
-                response.errorCode = CommissioningErrorEnum::kTCMinVersionNotMet;
-                handler->AddResponse(request.path, response);
-                return std::nullopt;
-            }
-
-            if (!requiredTermsAndConditions.ValidateValue(acceptedTermsAndConditions))
-            {
-                response.errorCode = CommissioningErrorEnum::kRequiredTCNotAccepted;
-                handler->AddResponse(request.path, response);
-                return std::nullopt;
-            }
-        }
-
-        if (failSafe.UpdateTermsAndConditionsHasBeenInvoked())
-        {
-            // Commit terms and conditions acceptance on commissioning complete
-            err = tcProvider->CommitAcceptance();
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit terms and conditions: %" CHIP_ERROR_FORMAT,
-                             err.Format());
-            }
-            else
-            {
-                ChipLogProgress(FailSafe, "GeneralCommissioning: Successfully committed terms and conditions");
-            }
-            CheckSuccess(err, Failure);
-        }
-    }
-#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-
-    SessionHandle handle = mContext->interactionContext.actionContext.CurrentExchange()->GetSessionHandle();
-
-    // Ensure it's a valid CASE session
-    if (handle->GetSessionType() != Session::SessionType::kSecure ||
-        handle->AsSecureSession()->GetSecureSessionType() != SecureSession::Type::kCASE ||
-        !failSafe.MatchesFabricIndex(request.GetAccessingFabricIndex()))
-    {
-        response.errorCode = CommissioningErrorEnum::kInvalidAuthentication;
-        ChipLogError(FailSafe, "GeneralCommissioning: Got commissioning complete in invalid security context");
-        handler->AddResponse(request.path, response);
-        return std::nullopt;
-    }
-
-    // Handle NOC commands
-    if (failSafe.NocCommandHasBeenInvoked())
-    {
-        err = fabricTable.CommitPendingFabricData();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit pending fabric data: %" CHIP_ERROR_FORMAT, err.Format());
-            // CommitPendingFabricData reverts on error, no need to revert explicitly
-        }
-        else
-        {
-            ChipLogProgress(FailSafe, "GeneralCommissioning: Successfully committed pending fabric data");
-        }
-        CheckSuccess(err, Failure);
-    }
-
-    // Disarm the fail-safe and notify the DeviceControlServer
-    failSafe.DisarmFailSafe();
-    err = devCtrl->PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex());
-    CheckSuccess(err, Failure);
-
-    SetBreadCrumb(0);
-    response.errorCode = CommissioningErrorEnum::kOk;
-    handler->AddResponse(request.path, response);
-    return std::nullopt;
-}
-
-std::optional<DataModel::ActionReturnStatus>
-GeneralCommissioningCluster::HandleSetRegulatoryConfig(const DataModel::InvokeRequest & request, CommandHandler * handler,
-                                                       const Commands::SetRegulatoryConfig::DecodableType & commandData)
-{
-    MATTER_TRACE_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
-    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-    Commands::SetRegulatoryConfigResponse::Type response;
-    auto & countryCode = commandData.countryCode;
-
-    if (countryCode.size() != ConfigurationManager::kMaxLocationLength)
-    {
-        ChipLogError(Zcl, "Invalid country code: '%s'", NullTerminated(countryCode).c_str());
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-
-    if (commandData.newRegulatoryConfig > RegulatoryLocationTypeEnum::kIndoorOutdoor)
-    {
-        response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
-        handler->AddResponse(request.path, response);
-        return std::nullopt;
-    }
-
-    uint8_t locationCapability;
-    if (ConfigurationMgr().GetLocationCapability(locationCapability) != CHIP_NO_ERROR)
-    {
-        return Protocols::InteractionModel::Status::Failure;
-    }
-
-    uint8_t location = to_underlying(commandData.newRegulatoryConfig);
-
-    // If the LocationCapability attribute is not Indoor/Outdoor and the NewRegulatoryConfig value received does not match
-    // either the Indoor or Outdoor fixed value in LocationCapability.
-    if ((locationCapability != to_underlying(RegulatoryLocationTypeEnum::kIndoorOutdoor)) && (location != locationCapability))
-    {
-        response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
-        handler->AddResponse(request.path, response);
-        return std::nullopt;
-    }
-
-    CheckSuccess(server->SetRegulatoryConfig(location, countryCode), Failure);
-    SetBreadCrumb(commandData.breadcrumb);
-    response.errorCode = CommissioningErrorEnum::kOk;
-    handler->AddResponse(request.path, response);
-    return std::nullopt;
 }
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED

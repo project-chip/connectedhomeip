@@ -60,28 +60,10 @@ public:
     // GeneralCommissioning is a singleton cluster that exists only on the root endpoint.
     static GeneralCommissioningCluster & Instance();
 
-    // Feature map constant based on compile-time defines. This ensures feature map
-    // is in sync with the actual supported features determined at build time.
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-    static constexpr BitFlags<GeneralCommissioning::Feature> kFeatures =
-        BitFlags<GeneralCommissioning::Feature>(GeneralCommissioning::Feature::kTermsAndConditions);
-#else
-    static constexpr BitFlags<GeneralCommissioning::Feature> kFeatures = BitFlags<GeneralCommissioning::Feature>(0);
-#endif
-
 private:
     OptionalAttributes mOptionalAttributes;
     uint64_t mBreadCrumb = 0;
 
-    std::optional<DataModel::ActionReturnStatus>
-    HandleArmFailSafe(const DataModel::InvokeRequest & request, CommandHandler * handler,
-                      const GeneralCommissioning::Commands::ArmFailSafe::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus>
-    HandleCommissioningComplete(const DataModel::InvokeRequest & request, CommandHandler * handler,
-                                const GeneralCommissioning::Commands::CommissioningComplete::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus>
-    HandleSetRegulatoryConfig(const DataModel::InvokeRequest & request, CommandHandler * handler,
-                              const GeneralCommissioning::Commands::SetRegulatoryConfig::DecodableType & commandData);
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     std::optional<DataModel::ActionReturnStatus>
     HandleSetTCAcknowledgements(const DataModel::InvokeRequest & request, CommandHandler * handler,
