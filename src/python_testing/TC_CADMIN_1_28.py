@@ -123,7 +123,8 @@ class TC_CADMIN_1_28(MatterBaseTest):
 
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork-long 1 {self.jfadmin_fabric_a_passcode} {self.jfadmin_fabric_a_discriminator} --anchor true",
+            message=f"pairing onnetwork-long 1 {self.jfadmin_fabric_a_passcode} {
+                self.jfadmin_fabric_a_discriminator} --anchor true",
             expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
             timeout=30)
 
@@ -202,7 +203,8 @@ class TC_CADMIN_1_28(MatterBaseTest):
 
         # Commission JF-ADMIN app with JF-Controller on Fabric B
         self.fabric_b_ctrl.send(
-            message=f"pairing onnetwork-long 11 {self.jfadmin_fabric_b_passcode} {self.jfadmin_fabric_b_discriminator} --anchor true",
+            message=f"pairing onnetwork-long 11 {self.jfadmin_fabric_b_passcode} {
+                self.jfadmin_fabric_b_discriminator} --anchor true",
             expected_output="[JF] Anchor Administrator (nodeId=11) commissioned with success",
             timeout=30)
 
