@@ -28,7 +28,11 @@
 
 namespace chip::app::Clusters {
 
-class GeneralCommissioningCluster : public DefaultServerCluster, chip::FabricTable::Delegate
+class GeneralCommissioningCluster : public DefaultServerCluster
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    ,
+                                    chip::FabricTable::Delegate
+#endif
 {
 public:
     using OptionalAttributes = OptionalAttributeSet<GeneralCommissioning::Attributes::IsCommissioningWithoutPower::Id>;
@@ -54,8 +58,10 @@ public:
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     // Fabric delegate
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+#endif
 
     // GeneralCommissioning is a singleton cluster that exists only on the root endpoint.
     static GeneralCommissioningCluster & Instance();

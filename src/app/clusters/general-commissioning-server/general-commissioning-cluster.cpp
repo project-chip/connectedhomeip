@@ -620,9 +620,9 @@ CHIP_ERROR GeneralCommissioningCluster::Attributes(const ConcreteClusterPath & p
     return listBuilder.Append(Span(Attributes::kMandatoryMetadata), Span(optionalEntries), mOptionalAttributes);
 }
 
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 void GeneralCommissioningCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     // If the FabricIndex matches the last remaining entry in the Fabrics list, then the device SHALL delete all Matter
     // related data on the node which was created since it was commissioned.
     if (Server::GetInstance().GetFabricTable().FabricCount() == 0)
@@ -638,8 +638,8 @@ void GeneralCommissioningCluster::OnFabricRemoved(const FabricTable & fabricTabl
         VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, updatedState));
         NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
     }
-#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 }
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
 void GeneralCommissioningCluster::SetBreadCrumb(uint64_t value)
 {
@@ -652,14 +652,18 @@ CHIP_ERROR GeneralCommissioningCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, 0);
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
+#endif
     return CHIP_NO_ERROR;
 }
 
 void GeneralCommissioningCluster::Shutdown()
 {
     PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler, 0);
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+#endif
     DefaultServerCluster::Shutdown();
 }
 
