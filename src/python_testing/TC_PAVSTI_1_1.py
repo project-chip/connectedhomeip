@@ -279,6 +279,8 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         audioStreamId = allocatedAudioStream.audioStreamID
 
         self.step(5)
+        trackName = "media"
+        self.server.update_track_name(uploadStreamId, trackName)
         transportOptions = {
             "streamUsage": Globals.Enums.StreamUsageEnum.kRecording,
             "videoStreamID": videoStreamId,
@@ -290,7 +292,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             "containerFormat": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
             "containerOptions": {
                 "containerType": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
-                "CMAFContainerOptions": {"CMAFInterface": 0, "segmentDuration": 4000, "chunkDuration": 2000, "sessionGroup": 1, "trackName": "media"},
+                "CMAFContainerOptions": {"CMAFInterface": 0, "segmentDuration": 4000, "chunkDuration": 2000, "sessionGroup": 1, "trackName": trackName},
             },
         }
         allocatePushTransportResponse = await self.send_single_cmd(
