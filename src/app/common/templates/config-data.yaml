@@ -93,10 +93,6 @@ ClustersWithInitFunctions:
     - Scenes Management
     - Thermostat
     - Fixed Label
-    - Time Format Localization
-    - Wi-Fi Network Diagnostics
-    - HEPA Filter Monitoring
-    - Activated Carbon Filter Monitoring
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic Information
