@@ -7,7 +7,7 @@
 async function postLoad(api, context)
 {
   let resMsg = "";
-  let epts   = await api.endpoints(context);
+  const epts = await api.endpoints(context);
   for (const ept of epts) {
     let clusters = await api.clusters(context, ept);
     for (const cluster of clusters) {
