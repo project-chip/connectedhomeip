@@ -18,7 +18,6 @@ import signal
 import tempfile
 from dataclasses import dataclass
 from sys import stderr, stdout
-from time import sleep
 from typing import BinaryIO, Optional, Union
 
 import matter.clusters as Clusters

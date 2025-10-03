@@ -66,6 +66,11 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         p_pass = 20202021
 
+        provider_port = 5540
+
+        app_path = "./out/debug/chip-ota-provider-app"
+        provider_ota_file = OtaImagePath(path="firmware_v2.ota")
+
         # States
         idle = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
         querying = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
@@ -74,18 +79,12 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         target_version = 2
 
         # Start OTA Provider
-        app_path = "./out/debug/chip-ota-provider-app"
-        provider_ota_file = OtaImagePath(path="firmware_v2.ota")
-        provider_discriminator = 1111
-        provider_setup_pin_code = 20202021
-        provider_port = 5540
-
         provider = OTAProviderSubprocess(
             app=app_path,
             storage_dir='/tmp',
             port=provider_port,
-            discriminator=provider_discriminator,
-            passcode=provider_setup_pin_code,
+            discriminator=p2_disc,
+            passcode=p_pass,
             ota_source=provider_ota_file,
             log_file='/tmp/provider.log',
             err_log_file='/tmp/provider.log'
@@ -98,14 +97,17 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         endpoint = self.get_endpoint(default=0)
         dut_node_id = self.dut_node_id
-        dut_node_id_th2 = self.dut_node_id
+        requestor_node_id = self.dut_node_id
         th1 = self.default_controller
         fabric_id_th2 = th1.fabricId + 1
-        vendor_id = 0xFFF1
+        vendor_id = self.matter_test_config.admin_vendor_id
+        product_id = self.matter_test_config.product_id
 
         logging.info(f"Endpoint: {endpoint}.")
         logging.info(f"DUT Node ID: {dut_node_id}.")
+        logging.info(f"DUT Node ID: {requestor_node_id}.")
         logging.info(f"Vendor ID: {vendor_id}.")
+        logging.info(f"Product ID: {product_id}.")
 
         logging.info(f"TH1 fabric id: {th1.fabricId}.")
         logging.info(f"TH2 fabric id: {fabric_id_th2}.")
@@ -121,7 +123,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         # Commission TH2/DUT (requestor)
         resp = await th2.CommissionOnNetwork(
-            nodeId=dut_node_id_th2,
+            nodeId=requestor_node_id,
             setupPinCode=params.commissioningParameters.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=params.randomDiscriminator
@@ -189,14 +191,14 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         # Subscribe to events
         event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
-        await event_cb.start(dev_ctrl=th2, node_id=dut_node_id_th2, endpoint=endpoint,
+        await event_cb.start(dev_ctrl=th2, node_id=requestor_node_id, endpoint=endpoint,
                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
         # Write default OTA providers TH2
         await self.write_ota_providers(th2, p2_node, endpoint)
 
         # Announce after subscription
-        await self.announce_ota_provider(controller=th2, provider_node_id=p2_node, requestor_node_id=dut_node_id_th2, vendor_id=vendor_id, endpoint=endpoint)
+        await self.announce_ota_provider(controller=th2, provider_node_id=p2_node, requestor_node_id=requestor_node_id, vendor_id=vendor_id, endpoint=endpoint)
 
         event_idle_to_querying = event_cb.wait_for_event_report(
             Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)

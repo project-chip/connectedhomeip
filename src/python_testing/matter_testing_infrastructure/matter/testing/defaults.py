@@ -29,3 +29,4 @@ class TestingDefaults:
     CONTROLLER_NODE_ID: final = 112233
     DUT_NODE_ID: final = 0x12344321
     TRUST_ROOT_INDEX: final = 1
+    PRODUCT_ID: final = 32769
