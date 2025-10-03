@@ -55,24 +55,24 @@ CommandHandlerInterfaceOnlyClusters:
     - Laundry Washer Mode
     - Microwave Oven Control
     - Network Commissioning
-    - Operational State
     - OTA Software Update Provider
+    - Operational State
     - Oven Cavity Operational State
     - Oven Mode
     - Push AV Stream Transport
-    - Refrigerator And Temperature Controlled Cabinet Mode
     - RVC Clean Mode
     - RVC Operational State
     - RVC Run Mode
+    - Refrigerator And Temperature Controlled Cabinet Mode
     - Sample MEI
     - Scenes Management
     - Service Area
     - Software Diagnostics
     - Soil Measurement
-    - Thread Border Router Management
-    - Thread Network Directory
     - TLS Certificate Management
     - TLS Client Management
+    - Thread Border Router Management
+    - Thread Network Directory
     - Water Heater Management
     - Water Heater Mode
     - WebRTC Transport Provider
