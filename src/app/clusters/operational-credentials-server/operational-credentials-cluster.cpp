@@ -798,11 +798,11 @@ HandleSetVIDVerificationStatement(CommandHandler * commandObj, TLV::TLVReader & 
     {
         return Status::ConstraintError;
     }
-    else if (err == CHIP_ERROR_INCORRECT_STATE)
+    if (err == CHIP_ERROR_INCORRECT_STATE)
     {
         return Status::InvalidCommand;
     }
-    else if (err != CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         // We have no idea what happened; just report failure.
         return err;
@@ -846,7 +846,7 @@ exit:
                         CharSpan());
         return std::nullopt;
     }
-    else if (err != CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         // We have no idea what happened; just report failure.
         ChipLogError(Zcl, "OpCreds: Failed RemoveFabric due to internal error (err = %" CHIP_ERROR_FORMAT ")", err.Format());
