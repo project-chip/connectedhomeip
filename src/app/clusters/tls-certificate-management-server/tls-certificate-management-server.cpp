@@ -503,7 +503,7 @@ void TlsCertificateManagementServer::HandleRemoveClientCertificate(HandlerContex
 
 void TlsCertificateManagementServer::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
-    LogAndReturnOnFailure(mCertificateTable.RemoveFabric(fabricIndex), Zcl, "Failed to remove TLS certificate data for fabric 0x%x",
+    ReturnAndLogOnFailure(mCertificateTable.RemoveFabric(fabricIndex), Zcl, "Failed to remove TLS certificate data for fabric 0x%x",
                           fabricIndex);
 }
 
