@@ -3753,13 +3753,24 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // attribute paths we actually have.
     NSMutableArray<MTRAttributePath *> * existentPaths = [[NSMutableArray alloc] init];
     {
+        // Separate paths that ask for wildcard attributes from specific attributes
+        NSMutableArray<MTRAttributeRequestPath *> *wildcardAttributePaths = [[NSMutableArray alloc] init];
+        NSMutableArray<MTRAttributeRequestPath *> *specificAttributePaths = [[NSMutableArray alloc] init];
+        for (MTRAttributeRequestPath * requestPath in attributePaths) {
+            if (requestPath.attribute == nil) {
+                [wildcardAttributePaths addObject:requestPath];
+            } else {
+                [specificAttributePaths addObject:requestPath];
+            }
+        }
+
         std::lock_guard lock(_lock);
         for (MTRClusterPath * clusterPath in [self _knownClusters]) {
             MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
 
             // First pass to check if cluster matches any wildcard
             BOOL clusterMatchesWildcard = NO;
-            for (MTRAttributeRequestPath * requestPath in attributePaths) {
+            for (MTRAttributeRequestPath * requestPath in wildcardAttributePaths) {
                 if (requestPath.endpoint != nil && ![requestPath.endpoint isEqual:clusterPath.endpoint]) {
                     continue;
                 }
@@ -3768,6 +3779,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 }
                 if (requestPath.attribute == nil) {
                     clusterMatchesWildcard = YES;
+                    break;
                 }
             }
             if (clusterMatchesWildcard) {
@@ -3780,7 +3792,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
             // Otherwise, we build unique list of attributes in this cluster that match requested paths
             NSMutableSet<MTRAttributePath *> * existentAttributesPathsInCluster = [[NSMutableSet alloc] init];
-            for (MTRAttributeRequestPath * requestPath in attributePaths) {
+            for (MTRAttributeRequestPath * requestPath in specificAttributePaths) {
                 if (requestPath.endpoint != nil && ![requestPath.endpoint isEqual:clusterPath.endpoint]) {
                     continue;
                 }
