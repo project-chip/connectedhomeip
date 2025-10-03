@@ -91,12 +91,12 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
 
         self.step(1)
         # Allocate both Audio and Video streams
-        audioStreamID = await self.allocate_one_audio_stream()
-        videoStreamID = await self.allocate_one_video_stream()
+        audio_stream_id = await self.allocate_one_audio_stream()
+        video_stream_id = await self.allocate_one_video_stream()
 
         # Validate that the streams were allocated successfully
-        await self.validate_allocated_audio_stream(audioStreamID)
-        await self.validate_allocated_video_stream(videoStreamID)
+        await self.validate_allocated_audio_stream(audio_stream_id)
+        await self.validate_allocated_video_stream(video_stream_id)
 
         self.step(2)
         # For CI: Use app pipe to simulate physical privacy switch being turned on
@@ -140,8 +140,8 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
             sdp=sdp_offer,
             streamUsage=3,
             originatingEndpointID=endpoint,
-            videoStreamID=videoStreamID,
-            audioStreamID=audioStreamID
+            videoStreamID=video_stream_id,
+            audioStreamID=audio_stream_id
         )
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
