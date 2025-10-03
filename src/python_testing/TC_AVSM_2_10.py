@@ -234,11 +234,6 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
                 )
                 pass
 
-            # Cleanup Privacy state after test completion
-            result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint)
-            asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
-            logger.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{False}")
-
         else:
             self.skip_step(6)
             self.skip_step(7)
@@ -270,6 +265,11 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
                 e.status, Status.NotFound, "Unexpected error returned when expecting NOT_FOUND due to 0 allocated snapshot streams"
             )
             pass
+        if self.privacySupport:
+            # Cleanup Privacy state after test completion
+            result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint)
+            asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
+            logger.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{False}")
 
 
 if __name__ == "__main__":
