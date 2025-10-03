@@ -2370,6 +2370,7 @@ void CameraAVStreamMgmtServer::HandleCaptureSnapshot(HandlerContext & ctx,
 
     if (image.data.size() > kMaxSnapshotImageSize)
     {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Snapshot image file size=%ld", mEndpointId, image.data.size());
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
         return;
     }
