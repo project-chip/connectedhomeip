@@ -3754,8 +3754,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     NSMutableArray<MTRAttributePath *> * existentPaths = [[NSMutableArray alloc] init];
     {
         // Separate paths that ask for wildcard attributes from specific attributes
-        NSMutableArray<MTRAttributeRequestPath *> *wildcardAttributePaths = [[NSMutableArray alloc] init];
-        NSMutableArray<MTRAttributeRequestPath *> *specificAttributePaths = [[NSMutableArray alloc] init];
+        NSMutableArray<MTRAttributeRequestPath *> * wildcardAttributePaths = [[NSMutableArray alloc] init];
+        NSMutableArray<MTRAttributeRequestPath *> * specificAttributePaths = [[NSMutableArray alloc] init];
         for (MTRAttributeRequestPath * requestPath in attributePaths) {
             if (requestPath.attribute == nil) {
                 [wildcardAttributePaths addObject:requestPath];
