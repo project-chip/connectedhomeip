@@ -119,8 +119,8 @@ TEST_F(TestIdentifyCluster, AcceptedCommandsWithOptionalTriggerEffectTest)
 {
     constexpr EndpointId endpoint = 1;
     // When passing in onEffectIdentifier callback, we're enabling the TriggerEffect command.
-    IdentifyCluster cluster(IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone, mTestTimerDelegate)
-                                .WithOnEffectIdentifier(onEffectIdentifier));
+    IdentifyCluster cluster(
+        IdentifyCluster::Config(endpoint, IdentifyTypeEnum::kNone, mTestTimerDelegate).WithOnEffectIdentifier(onEffectIdentifier));
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommands;
@@ -225,7 +225,6 @@ TEST_F(TestIdentifyCluster, WriteUnchangedIdentifyTimeDoesNotNotify)
     EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, 10u), CHIP_NO_ERROR);
     EXPECT_EQ(changeListener.DirtyList().size(), 0u);
 }
-
 
 TEST_F(TestIdentifyCluster, WriteReadOnlyAttributesReturnUnsupportedWriteTest)
 {

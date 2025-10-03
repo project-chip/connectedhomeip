@@ -26,9 +26,9 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/CodegenProcessingConfig.h>
-#include <data-model-providers/codegen/ClusterIntegration.h>
 #include <lib/support/CodeUtils.h>
 #include <tracing/macros.h>
 
@@ -41,7 +41,6 @@ using chip::Protocols::InteractionModel::Status;
 
 Identify * firstLegacyIdentify = nullptr;
 DefaultTimerDelegate sDefaultTimerDelegate;
-
 
 Identify * GetLegacyIdentifyInstance(EndpointId endpoint)
 {
@@ -126,13 +125,13 @@ Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIde
     mOnIdentifyStart(onIdentifyStart),
     mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType), mOnEffectIdentifier(onEffectIdentifier),
     mCurrentEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant),
-    mCluster(chip::app::Clusters::IdentifyCluster::Config(endpoint, identifyType,
-                                                          timerDelegate ? *timerDelegate : sDefaultTimerDelegate)
-                 .WithOnIdentifyStart(onIdentifyStart ? OnIdentifyStartLegacyWrapper : nullptr)
-                 .WithOnIdentifyStop(onIdentifyStop ? OnIdentifyStopLegacyWrapper : nullptr)
-                 .WithOnEffectIdentifier(onEffectIdentifier ? OnEffectIdentifierLegacyWrapper : nullptr)
-                 .WithEffectIdentifier(effectIdentifier)
-                 .WithEffectVariant(effectVariant))
+    mCluster(
+        chip::app::Clusters::IdentifyCluster::Config(endpoint, identifyType, timerDelegate ? *timerDelegate : sDefaultTimerDelegate)
+            .WithOnIdentifyStart(onIdentifyStart ? OnIdentifyStartLegacyWrapper : nullptr)
+            .WithOnIdentifyStop(onIdentifyStop ? OnIdentifyStopLegacyWrapper : nullptr)
+            .WithOnEffectIdentifier(onEffectIdentifier ? OnEffectIdentifierLegacyWrapper : nullptr)
+            .WithEffectIdentifier(effectIdentifier)
+            .WithEffectVariant(effectVariant))
 {
     RegisterLegacyIdentify(this);
 };

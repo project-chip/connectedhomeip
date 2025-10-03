@@ -43,11 +43,10 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommandsWithTriggerEffect[] =
 } // namespace
 
 IdentifyCluster::IdentifyCluster(const Config & config) :
-    DefaultServerCluster({ config.endpointId, Identify::Id }), mIdentifyTime(0),
-    mIdentifyType(config.identifyType), mOnIdentifyStart(config.onIdentifyStart), mOnIdentifyStop(config.onIdentifyStop),
+    DefaultServerCluster({ config.endpointId, Identify::Id }), mIdentifyTime(0), mIdentifyType(config.identifyType),
+    mOnIdentifyStart(config.onIdentifyStart), mOnIdentifyStop(config.onIdentifyStop),
     mOnEffectIdentifier(config.onEffectIdentifier), mCurrentEffectIdentifier(config.effectIdentifier),
-    mEffectVariant(config.effectVariant),
-    mTimerDelegate(config.timerDelegate)
+    mEffectVariant(config.effectVariant), mTimerDelegate(config.timerDelegate)
 {}
 
 DataModel::ActionReturnStatus IdentifyCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -76,8 +75,8 @@ DataModel::ActionReturnStatus IdentifyCluster::WriteAttribute(const DataModel::W
     case Attributes::IdentifyTime::Id: {
         uint16_t newIdentifyTime;
         ReturnErrorOnFailure(decoder.Decode(newIdentifyTime));
-        return NotifyAttributeChangedIfSuccess(
-            request.path.mAttributeId, SetIdentifyTime(IdentifyTimeChangeSource::kClient, newIdentifyTime));
+        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId,
+                                               SetIdentifyTime(IdentifyTimeChangeSource::kClient, newIdentifyTime));
     }
     break;
     // Read-only attributes
@@ -185,11 +184,13 @@ IdentifyCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TL
         {
             if (mCurrentEffectIdentifier == Identify::EffectIdentifierEnum::kFinishEffect)
             {
-                NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id, SetIdentifyTime(IdentifyTimeChangeSource::kClient, 1));
+                NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
+                                                SetIdentifyTime(IdentifyTimeChangeSource::kClient, 1));
             }
             else if (mCurrentEffectIdentifier == Identify::EffectIdentifierEnum::kStopEffect)
             {
-                NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id, SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0));
+                NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
+                                                SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0));
             }
             else
             {

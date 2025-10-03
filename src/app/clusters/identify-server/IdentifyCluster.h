@@ -82,12 +82,12 @@ public:
 
         EndpointId endpointId;
         Identify::IdentifyTypeEnum identifyType;
-        onIdentifyStartCb onIdentifyStart                   = nullptr;
-        onIdentifyStopCb onIdentifyStop                     = nullptr;
+        onIdentifyStartCb onIdentifyStart = nullptr;
+        onIdentifyStopCb onIdentifyStop   = nullptr;
         reporting::ReportScheduler::TimerDelegate & timerDelegate;
-        onEffectIdentifierCb onEffectIdentifier             = nullptr;
-        Identify::EffectIdentifierEnum effectIdentifier     = Identify::EffectIdentifierEnum::kBlink;
-        Identify::EffectVariantEnum effectVariant           = Identify::EffectVariantEnum::kDefault;
+        onEffectIdentifierCb onEffectIdentifier         = nullptr;
+        Identify::EffectIdentifierEnum effectIdentifier = Identify::EffectIdentifierEnum::kBlink;
+        Identify::EffectVariantEnum effectVariant       = Identify::EffectVariantEnum::kDefault;
     };
 
     /**
