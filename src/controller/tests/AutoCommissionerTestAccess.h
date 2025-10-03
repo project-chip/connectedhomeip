@@ -40,8 +40,8 @@ public:
     AutoCommissionerTestAccess() = delete;
     AutoCommissionerTestAccess(Controller::AutoCommissioner * commissioner) : mCommissioner(commissioner) {}
 
-    Controller::CommissioningStage AccessGetNextCommissioningStageInternal(Controller::CommissioningStage currentStage,
-                                                                           CHIP_ERROR & lastErr)
+    Controller::CommissioningStage GetNextCommissioningStageInternal(Controller::CommissioningStage currentStage,
+                                                                     CHIP_ERROR & lastErr)
     {
         return mCommissioner->GetNextCommissioningStageInternal(currentStage, lastErr);
     }
