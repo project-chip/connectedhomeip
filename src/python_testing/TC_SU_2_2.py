@@ -1130,6 +1130,12 @@ class TC_SU_2_2(MatterBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_7]: Step #7.5 - Close Provider_S7 Process (CLEANUP!)
         # ------------------------------------------------------------------------------------
+        # Clear DefaultOTAProviders for a clean state
+        await self.ota_helper.clear_ota_providers(
+            controller=controller,
+            requestor_node_id=requestor_node_id
+        )
+
         logger.info(
             f'{step_number_s7}: Step #7.5 - Closed Provider_S7 process.')
 

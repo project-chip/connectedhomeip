@@ -526,6 +526,28 @@ class OTAHelper:
         logger.info(f'Prerequisite #5.0 - Write DefaultOTAProviders response: {resp}')
         asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write DefaultOTAProviders attribute")
 
+    async def clear_ota_providers(self, controller, requestor_node_id: int):
+        """
+        Clears the DefaultOTAProviders attribute on the Requestor, leaving it empty.
+
+        Args:
+            controller: The controller to use for writing attributes.
+            requestor_node_id (int): Node ID of the Requestor device.
+
+        Returns:
+            None
+        """
+        # Set DefaultOTAProviders to empty list
+        attr_clear = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[])
+        resp = await controller.WriteAttribute(
+            attributes=[(0, attr_clear)],
+            nodeid=requestor_node_id
+        )
+        logger.info('Cleanup - DefaultOTAProviders cleared')
+
+        # Optional assert to ensure it is cleared
+        assert resp[0].Status == Status.Success, "Failed to clear DefaultOTAProviders"
+
     async def setup_provider(
         self,
         controller: ChipDeviceController,
