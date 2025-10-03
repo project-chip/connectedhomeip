@@ -72,23 +72,33 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     // No-op: Descriptor and OTA do not need this, and our client-defined
     // clusters dont use it.
 }
+void MatterDescriptorClusterInitCallback(EndpointId endpointId);
+void MatterDescriptorClusterShutdownCallback(EndpointId endpointId);
 
 void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     assertChipStackLockedByCurrentThread();
 
-    // No-op: Until Descriptor cluster is migrated to be code driven,
-    // this is a no-op. For OTA we don't use the functions in CodegenIntegration
+    // No-op: For OTA we don't use the functions in CodegenIntegration
     // because we use the gOtaProviderServer and the functions defined here.
+    switch (clusterId) {
+    case app::Clusters::Descriptor::Id:
+        MatterDescriptorClusterInitCallback(endpoint);
+        break;
+    }
 }
 
 void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId)
 {
     assertChipStackLockedByCurrentThread();
 
-    // No-op: Until Descriptor cluster is migrated to be code driven,
-    // this is a no-op. For OTA we don't use the functions in CodegenIntegration
+    // No-op: For OTA we don't use the functions in CodegenIntegration
     // because we use the gOtaProviderServer and the functions defined here.
+    switch (clusterId) {
+    case app::Clusters::Descriptor::Id:
+        MatterDescriptorClusterShutdownCallback(endpoint);
+        break;
+    }
 }
 
 Protocols::InteractionModel::Status emAfWriteAttributeExternal(const ConcreteAttributePath & path,
@@ -107,6 +117,11 @@ Protocols::InteractionModel::Status emberAfWriteAttribute(const ConcreteAttribut
 
     // All of our attributes are handled via AttributeAccessInterface, so this
     // should be unreached.
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+}
+
+Protocols::InteractionModel::Status emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr, uint16_t readLength)
+{
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
