@@ -1250,7 +1250,8 @@ Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId pe
             (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
         {
             if (transportPayloadCapability == TransportPayloadCapability::kMRPOrTCPCompatiblePayload ||
-                transportPayloadCapability == TransportPayloadCapability::kLargePayload)
+                transportPayloadCapability == TransportPayloadCapability::kLargePayload ||
+                transportPayloadCapability == TransportPayloadCapability::kPreferTCPCompatiblePayload)
             {
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                 // Set up a TCP transport based session as standby
@@ -1275,6 +1276,11 @@ Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId pe
     if (transportPayloadCapability == TransportPayloadCapability::kLargePayload)
     {
         return tcpSession != nullptr ? MakeOptional<SessionHandle>(*tcpSession) : Optional<SessionHandle>::Missing();
+    }
+
+    if (transportPayloadCapability == TransportPayloadCapability::kPreferTCPCompatiblePayload && tcpSession != nullptr)
+    {
+        return MakeOptional<SessionHandle>(*tcpSession);
     }
 
     if (transportPayloadCapability == TransportPayloadCapability::kMRPOrTCPCompatiblePayload)
