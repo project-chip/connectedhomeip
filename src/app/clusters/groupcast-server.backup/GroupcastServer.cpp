@@ -1,7 +1,12 @@
 #include "GroupcastServer.h"
+#include <clusters/Groupcast/AttributeIds.h>
+#include <clusters/Groupcast/ClusterId.h>
+#include <clusters/Groupcast/CommandIds.h>
+#include <clusters/Groupcast/Commands.h>
 
-
-using chip::Protocols::InteractionModel::Status;
+#include <access/examples/GroupcastAccessControlDelegate.h>
+#include <app/server/Server.h>
+#include <credentials/GroupcastDataProvider.h>
 
 namespace chip {
 namespace app {
@@ -15,18 +20,10 @@ GroupcastCluster & GroupcastCluster::Instance()
     return sInstance;
 }
 
-GroupcastCluster::GroupcastCluster() : DefaultServerCluster({ kRootEndpointId, Groupcast::Id })
-{
-}
+GroupcastCluster::GroupcastCluster() : DefaultServerCluster({ kRootEndpointId, Groupcast::Id }) {}
 
-CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-void GroupcastCluster::Shutdown() {}
-
-DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
+DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                              AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -42,7 +39,7 @@ DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::R
 }
 
 DataModel::ActionReturnStatus GroupcastCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                        AttributeValueDecoder & decoder)
+                                                               AttributeValueDecoder & decoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -52,46 +49,45 @@ DataModel::ActionReturnStatus GroupcastCluster::WriteAttribute(const DataModel::
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
-CHIP_ERROR GroupcastCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR GroupcastCluster::Attributes(const ConcreteClusterPath & path,
+                                        ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & arguments, CommandHandler * handler)
+// CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) {}
+
+std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                             chip::TLV::TLVReader & arguments,
+                                                                             CommandHandler * handler)
 {
     VerifyOrReturnValue(nullptr != handler, Protocols::InteractionModel::Status::InvalidAction);
     FabricIndex fabric_index = handler->GetAccessingFabricIndex();
     switch (request.path.mCommandId)
     {
-    case Groupcast::Commands::JoinGroup::Id:
-    {
+    case Groupcast::Commands::JoinGroup::Id: {
         Groupcast::Commands::JoinGroup::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
         return mLogic.JoinGroup(fabric_index, data);
     }
-    case Groupcast::Commands::LeaveGroup::Id:
-    {
+    case Groupcast::Commands::LeaveGroup::Id: {
         Groupcast::Commands::LeaveGroup::DecodableType data;
         Groupcast::Commands::LeaveGroupResponse::Type response;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
         mLogic.LeaveGroup(fabric_index, data, response);
         handler->AddResponse(request.path, response);
-        return Status::Success;
     }
-    case Groupcast::Commands::UpdateGroupKey::Id:
-    {
+    case Groupcast::Commands::UpdateGroupKey::Id: {
         Groupcast::Commands::UpdateGroupKey::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
         return mLogic.UpdateGroupKey(fabric_index, data);
     }
-    case Groupcast::Commands::ExpireGracePeriod::Id:
-    {
+    case Groupcast::Commands::ExpireGracePeriod::Id: {
         Groupcast::Commands::ExpireGracePeriod::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
         return mLogic.ExpireGracePeriod(fabric_index, data);
     }
-    case Groupcast::Commands::ConfigureAuxiliaryACL::Id:
-    {
+    case Groupcast::Commands::ConfigureAuxiliaryACL::Id: {
         Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
         return mLogic.ConfigureAuxiliaryACL(fabric_index, data);
@@ -99,6 +95,11 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
     }
     return Protocols::InteractionModel::Status::UnsupportedCommand;
 }
+
+// CHIP_ERROR GroupcastCluster::AcceptedCommands(const ConcreteClusterPath & path,
+// ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) {} CHIP_ERROR GroupcastCluster::GeneratedCommands(const
+// ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) {} bool GroupcastCluster::PathsContains(const
+// ConcreteClusterPath & path);
 
 } // namespace Clusters
 } // namespace app
