@@ -70,9 +70,10 @@ def is_commissioning_without_power(tlv_data: dict[int, Any]) -> bool:
     # General Commissioning Cluster is always on EP0
     cluster_id = Clusters.GeneralCommissioning.id
     attr_id = Clusters.GeneralCommissioning.Attributes.IsCommissioningWithoutPower.attribute_id
-    if 0 not in tlv_data or cluster_id not in tlv_data[0] or attr_id not in tlv_data[0][cluster_id]:
+    try:
+        return tlv_data[0][cluster_id][attr_id]
+    except KeyError:
         return False
-    return tlv_data[0][cluster_id][attr_id]
 
 
 def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
