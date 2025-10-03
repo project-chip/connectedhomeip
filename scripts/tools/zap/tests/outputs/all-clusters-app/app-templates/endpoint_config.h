@@ -47,16 +47,28 @@
         'B',                                                                                                                       \
         '1',                                                                                                                       \
                                                                                                                                    \
+        /* Endpoint: 0, Cluster: General Commissioning (server), big-endian */                                                     \
+                                                                                                                                   \
+        /* 9 - Breadcrumb, */                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+                                                                                                                                   \
         /* Endpoint: 1, Cluster: Power Source (server), big-endian */                                                              \
                                                                                                                                    \
-        /* 9 - Description, */                                                                                                     \
+        /* 17 - Description, */                                                                                                    \
         2,                                                                                                                         \
         'B',                                                                                                                       \
         '2',                                                                                                                       \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Mode Select (server), big-endian */                                                               \
                                                                                                                                    \
-        /* 12 - Description, */                                                                                                    \
+        /* 20 - Description, */                                                                                                    \
         6,                                                                                                                         \
         'C',                                                                                                                       \
         'o',                                                                                                                       \
@@ -67,7 +79,7 @@
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Valve Configuration and Control (server), big-endian */                                           \
                                                                                                                                    \
-        /* 19 - AutoCloseTime, */                                                                                                  \
+        /* 27 - AutoCloseTime, */                                                                                                  \
         0xFF,                                                                                                                      \
         0xFF,                                                                                                                      \
         0xFF,                                                                                                                      \
@@ -79,7 +91,7 @@
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Unit Testing (server), big-endian */                                                              \
                                                                                                                                    \
-        /* 27 - bitmap64, */                                                                                                       \
+        /* 35 - bitmap64, */                                                                                                       \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -89,23 +101,14 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 35 - int40u, */                                                                                                         \
+        /* 43 - int40u, */                                                                                                         \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 40 - int48u, */                                                                                                         \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-                                                                                                                                   \
-        /* 46 - int56u, */                                                                                                         \
-        0x00,                                                                                                                      \
+        /* 48 - int48u, */                                                                                                         \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -113,8 +116,7 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 53 - int64u, */                                                                                                         \
-        0x00,                                                                                                                      \
+        /* 54 - int56u, */                                                                                                         \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -123,31 +125,7 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 61 - int40s, */                                                                                                         \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-                                                                                                                                   \
-        /* 66 - int48s, */                                                                                                         \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-                                                                                                                                   \
-        /* 72 - int56s, */                                                                                                         \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-                                                                                                                                   \
-        /* 79 - int64s, */                                                                                                         \
+        /* 61 - int64u, */                                                                                                         \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -157,7 +135,31 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 87 - float_double, */                                                                                                   \
+        /* 69 - int40s, */                                                                                                         \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+                                                                                                                                   \
+        /* 74 - int48s, */                                                                                                         \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+                                                                                                                                   \
+        /* 80 - int56s, */                                                                                                         \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+                                                                                                                                   \
+        /* 87 - int64s, */                                                                                                         \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -167,7 +169,7 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 95 - epoch_us, */                                                                                                       \
+        /* 95 - float_double, */                                                                                                   \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -177,7 +179,7 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 103 - nullable_bitmap64, */                                                                                             \
+        /* 103 - epoch_us, */                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -187,31 +189,7 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 111 - nullable_int40u, */                                                                                               \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-                                                                                                                                   \
-        /* 116 - nullable_int48u, */                                                                                               \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-                                                                                                                                   \
-        /* 122 - nullable_int56u, */                                                                                               \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-                                                                                                                                   \
-        /* 129 - nullable_int64u, */                                                                                               \
+        /* 111 - nullable_bitmap64, */                                                                                             \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -221,23 +199,14 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 137 - nullable_int40s, */                                                                                               \
+        /* 119 - nullable_int40u, */                                                                                               \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 142 - nullable_int48s, */                                                                                               \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-                                                                                                                                   \
-        /* 148 - nullable_int56s, */                                                                                               \
-        0x00,                                                                                                                      \
+        /* 124 - nullable_int48u, */                                                                                               \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -245,8 +214,7 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 155 - nullable_int64s, */                                                                                               \
-        0x00,                                                                                                                      \
+        /* 130 - nullable_int56u, */                                                                                               \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -255,7 +223,51 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 163 - nullable_float_double, */                                                                                         \
+        /* 137 - nullable_int64u, */                                                                                               \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+                                                                                                                                   \
+        /* 145 - nullable_int40s, */                                                                                               \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+                                                                                                                                   \
+        /* 150 - nullable_int48s, */                                                                                               \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+                                                                                                                                   \
+        /* 156 - nullable_int56s, */                                                                                               \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+                                                                                                                                   \
+        /* 163 - nullable_int64s, */                                                                                               \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+                                                                                                                                   \
+        /* 171 - nullable_float_double, */                                                                                         \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -267,7 +279,7 @@
                                                                                                                                    \
         /* Endpoint: 2, Cluster: Power Source (server), big-endian */                                                              \
                                                                                                                                    \
-        /* 171 - Description, */                                                                                                   \
+        /* 179 - Description, */                                                                                                   \
         2,                                                                                                                         \
         'B',                                                                                                                       \
         '3',                                                                                                                       \
@@ -295,16 +307,28 @@
         'B',                                                                                                                       \
         '1',                                                                                                                       \
                                                                                                                                    \
+        /* Endpoint: 0, Cluster: General Commissioning (server), little-endian */                                                  \
+                                                                                                                                   \
+        /* 9 - Breadcrumb, */                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+                                                                                                                                   \
         /* Endpoint: 1, Cluster: Power Source (server), little-endian */                                                           \
                                                                                                                                    \
-        /* 9 - Description, */                                                                                                     \
+        /* 17 - Description, */                                                                                                    \
         2,                                                                                                                         \
         'B',                                                                                                                       \
         '2',                                                                                                                       \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Mode Select (server), little-endian */                                                            \
                                                                                                                                    \
-        /* 12 - Description, */                                                                                                    \
+        /* 20 - Description, */                                                                                                    \
         6,                                                                                                                         \
         'C',                                                                                                                       \
         'o',                                                                                                                       \
@@ -315,7 +339,7 @@
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Valve Configuration and Control (server), little-endian */                                        \
                                                                                                                                    \
-        /* 19 - AutoCloseTime, */                                                                                                  \
+        /* 27 - AutoCloseTime, */                                                                                                  \
         0xFF,                                                                                                                      \
         0xFF,                                                                                                                      \
         0xFF,                                                                                                                      \
@@ -327,7 +351,7 @@
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Unit Testing (server), little-endian */                                                           \
                                                                                                                                    \
-        /* 27 - bitmap64, */                                                                                                       \
+        /* 35 - bitmap64, */                                                                                                       \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -337,23 +361,14 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 35 - int40u, */                                                                                                         \
+        /* 43 - int40u, */                                                                                                         \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 40 - int48u, */                                                                                                         \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-                                                                                                                                   \
-        /* 46 - int56u, */                                                                                                         \
-        0x00,                                                                                                                      \
+        /* 48 - int48u, */                                                                                                         \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -361,8 +376,7 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 53 - int64u, */                                                                                                         \
-        0x00,                                                                                                                      \
+        /* 54 - int56u, */                                                                                                         \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -371,31 +385,7 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 61 - int40s, */                                                                                                         \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-                                                                                                                                   \
-        /* 66 - int48s, */                                                                                                         \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-                                                                                                                                   \
-        /* 72 - int56s, */                                                                                                         \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-                                                                                                                                   \
-        /* 79 - int64s, */                                                                                                         \
+        /* 61 - int64u, */                                                                                                         \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -405,7 +395,31 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 87 - float_double, */                                                                                                   \
+        /* 69 - int40s, */                                                                                                         \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+                                                                                                                                   \
+        /* 74 - int48s, */                                                                                                         \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+                                                                                                                                   \
+        /* 80 - int56s, */                                                                                                         \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+                                                                                                                                   \
+        /* 87 - int64s, */                                                                                                         \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -415,7 +429,7 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 95 - epoch_us, */                                                                                                       \
+        /* 95 - float_double, */                                                                                                   \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -425,7 +439,7 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 103 - nullable_bitmap64, */                                                                                             \
+        /* 103 - epoch_us, */                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -435,31 +449,7 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 111 - nullable_int40u, */                                                                                               \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-                                                                                                                                   \
-        /* 116 - nullable_int48u, */                                                                                               \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-                                                                                                                                   \
-        /* 122 - nullable_int56u, */                                                                                               \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-                                                                                                                                   \
-        /* 129 - nullable_int64u, */                                                                                               \
+        /* 111 - nullable_bitmap64, */                                                                                             \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -469,23 +459,14 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 137 - nullable_int40s, */                                                                                               \
+        /* 119 - nullable_int40u, */                                                                                               \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 142 - nullable_int48s, */                                                                                               \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-        0x00,                                                                                                                      \
-                                                                                                                                   \
-        /* 148 - nullable_int56s, */                                                                                               \
-        0x00,                                                                                                                      \
+        /* 124 - nullable_int48u, */                                                                                               \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -493,8 +474,7 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 155 - nullable_int64s, */                                                                                               \
-        0x00,                                                                                                                      \
+        /* 130 - nullable_int56u, */                                                                                               \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -503,7 +483,51 @@
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
                                                                                                                                    \
-        /* 163 - nullable_float_double, */                                                                                         \
+        /* 137 - nullable_int64u, */                                                                                               \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+                                                                                                                                   \
+        /* 145 - nullable_int40s, */                                                                                               \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+                                                                                                                                   \
+        /* 150 - nullable_int48s, */                                                                                               \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+                                                                                                                                   \
+        /* 156 - nullable_int56s, */                                                                                               \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+                                                                                                                                   \
+        /* 163 - nullable_int64s, */                                                                                               \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+        0x00,                                                                                                                      \
+                                                                                                                                   \
+        /* 171 - nullable_float_double, */                                                                                         \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
         0x00,                                                                                                                      \
@@ -515,7 +539,7 @@
                                                                                                                                    \
         /* Endpoint: 2, Cluster: Power Source (server), little-endian */                                                           \
                                                                                                                                    \
-        /* 171 - Description, */                                                                                                   \
+        /* 179 - Description, */                                                                                                   \
         2,                                                                                                                         \
         'B',                                                                                                                       \
         '3',                                                                                                                       \
@@ -524,7 +548,7 @@
 
 #endif // CHIP_CONFIG_BIG_ENDIAN_TARGET
 
-#define GENERATED_DEFAULTS_COUNT (27)
+#define GENERATED_DEFAULTS_COUNT (28)
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
 #define GENERATED_MIN_MAX_DEFAULT_COUNT 46
@@ -773,8 +797,8 @@
         { ZAP_SIMPLE_DEFAULT(2), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) },   /* ClusterRevision */          \
                                                                                                                                    \
         /* Endpoint: 0, Cluster: General Commissioning (server) */                                                                 \
-        { ZAP_EMPTY_DEFAULT(), 0x00000000, 8, ZAP_TYPE(INT64U),                                                                    \
-          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* Breadcrumb */   \
+        { ZAP_LONG_DEFAULTS_INDEX(9), 0x00000000, 8, ZAP_TYPE(INT64U),                                                             \
+          ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* Breadcrumb */                                          \
         { ZAP_EMPTY_DEFAULT(), 0x00000001, 0, ZAP_TYPE(STRUCT),                                                                    \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* BasicCommissioningInfo */                      \
         { ZAP_EMPTY_DEFAULT(), 0x00000002, 1, ZAP_TYPE(ENUM8),                                                                     \
@@ -783,10 +807,8 @@
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* LocationCapability */                          \
         { ZAP_EMPTY_DEFAULT(), 0x00000004, 1, ZAP_TYPE(BOOLEAN),                                                                   \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* SupportsConcurrentConnection */                \
-        { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
-          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */                                  \
-        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
-          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */                             \
+        { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */               \
+        { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) },   /* ClusterRevision */          \
                                                                                                                                    \
         /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                                 \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 1, ZAP_TYPE(INT8U),                                                                     \
@@ -1253,10 +1275,10 @@
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */                             \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Power Source (server) */                                                                          \
-        { ZAP_SIMPLE_DEFAULT(0), 0x00000000, 1, ZAP_TYPE(ENUM8), ZAP_ATTRIBUTE_MASK(READABLE) },             /* Status */          \
-        { ZAP_SIMPLE_DEFAULT(2), 0x00000001, 1, ZAP_TYPE(INT8U), ZAP_ATTRIBUTE_MASK(READABLE) },             /* Order */           \
-        { ZAP_LONG_DEFAULTS_INDEX(9), 0x00000002, 61, ZAP_TYPE(CHAR_STRING), ZAP_ATTRIBUTE_MASK(READABLE) }, /* Description */     \
-        { ZAP_SIMPLE_DEFAULT(0), 0x0000000E, 1, ZAP_TYPE(ENUM8), ZAP_ATTRIBUTE_MASK(READABLE) },             /* BatChargeLevel */  \
+        { ZAP_SIMPLE_DEFAULT(0), 0x00000000, 1, ZAP_TYPE(ENUM8), ZAP_ATTRIBUTE_MASK(READABLE) },              /* Status */         \
+        { ZAP_SIMPLE_DEFAULT(2), 0x00000001, 1, ZAP_TYPE(INT8U), ZAP_ATTRIBUTE_MASK(READABLE) },              /* Order */          \
+        { ZAP_LONG_DEFAULTS_INDEX(17), 0x00000002, 61, ZAP_TYPE(CHAR_STRING), ZAP_ATTRIBUTE_MASK(READABLE) }, /* Description */    \
+        { ZAP_SIMPLE_DEFAULT(0), 0x0000000E, 1, ZAP_TYPE(ENUM8), ZAP_ATTRIBUTE_MASK(READABLE) },              /* BatChargeLevel */ \
         { ZAP_EMPTY_DEFAULT(), 0x0000000F, 1, ZAP_TYPE(BOOLEAN), ZAP_ATTRIBUTE_MASK(READABLE) }, /* BatReplacementNeeded */        \
         { ZAP_EMPTY_DEFAULT(), 0x00000010, 1, ZAP_TYPE(ENUM8), ZAP_ATTRIBUTE_MASK(READABLE) },   /* BatReplaceability */           \
         { ZAP_EMPTY_DEFAULT(), 0x0000001F, 0, ZAP_TYPE(ARRAY),                                                                     \
@@ -1326,7 +1348,7 @@
         { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) },   /* ClusterRevision */          \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Mode Select (server) */                                                                           \
-        { ZAP_LONG_DEFAULTS_INDEX(12), 0x00000000, 65, ZAP_TYPE(CHAR_STRING), ZAP_ATTRIBUTE_MASK(READABLE) }, /* Description */    \
+        { ZAP_LONG_DEFAULTS_INDEX(20), 0x00000000, 65, ZAP_TYPE(CHAR_STRING), ZAP_ATTRIBUTE_MASK(READABLE) }, /* Description */    \
         { ZAP_SIMPLE_DEFAULT(0), 0x00000001, 2, ZAP_TYPE(ENUM16),                                                                  \
           ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) },                           /* StandardNamespace */         \
         { ZAP_SIMPLE_DEFAULT(255), 0xFFF10001, 1, ZAP_TYPE(INT8U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ManufacturerExtension */     \
@@ -1562,7 +1584,7 @@
         { ZAP_SIMPLE_DEFAULT(0xFFFFFFFF), 0x00000001, 4, ZAP_TYPE(ELAPSED_S),                                                      \
           ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) |                             \
               ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* DefaultOpenDuration */                                                            \
-        { ZAP_LONG_DEFAULTS_INDEX(19), 0x00000002, 8, ZAP_TYPE(EPOCH_US),                                                          \
+        { ZAP_LONG_DEFAULTS_INDEX(27), 0x00000002, 8, ZAP_TYPE(EPOCH_US),                                                          \
           ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* AutoCloseTime */                                       \
         { ZAP_EMPTY_DEFAULT(), 0x00000003, 4, ZAP_TYPE(ELAPSED_S),                                                                 \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
@@ -2506,7 +2528,7 @@
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* bitmap16 */                                            \
         { ZAP_SIMPLE_DEFAULT(0), 0x00000003, 4, ZAP_TYPE(BITMAP32),                                                                \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* bitmap32 */                                            \
-        { ZAP_LONG_DEFAULTS_INDEX(27), 0x00000004, 8, ZAP_TYPE(BITMAP64),                                                          \
+        { ZAP_LONG_DEFAULTS_INDEX(35), 0x00000004, 8, ZAP_TYPE(BITMAP64),                                                          \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* bitmap64 */                                            \
         { ZAP_SIMPLE_DEFAULT(0), 0x00000005, 1, ZAP_TYPE(INT8U),                                                                   \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* int8u */                                               \
@@ -2516,13 +2538,13 @@
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* int24u */                                              \
         { ZAP_SIMPLE_DEFAULT(0), 0x00000008, 4, ZAP_TYPE(INT32U),                                                                  \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* int32u */                                              \
-        { ZAP_LONG_DEFAULTS_INDEX(35), 0x00000009, 5, ZAP_TYPE(INT40U),                                                            \
+        { ZAP_LONG_DEFAULTS_INDEX(43), 0x00000009, 5, ZAP_TYPE(INT40U),                                                            \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* int40u */                                              \
-        { ZAP_LONG_DEFAULTS_INDEX(40), 0x0000000A, 6, ZAP_TYPE(INT48U),                                                            \
+        { ZAP_LONG_DEFAULTS_INDEX(48), 0x0000000A, 6, ZAP_TYPE(INT48U),                                                            \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* int48u */                                              \
-        { ZAP_LONG_DEFAULTS_INDEX(46), 0x0000000B, 7, ZAP_TYPE(INT56U),                                                            \
+        { ZAP_LONG_DEFAULTS_INDEX(54), 0x0000000B, 7, ZAP_TYPE(INT56U),                                                            \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* int56u */                                              \
-        { ZAP_LONG_DEFAULTS_INDEX(53), 0x0000000C, 8, ZAP_TYPE(INT64U),                                                            \
+        { ZAP_LONG_DEFAULTS_INDEX(61), 0x0000000C, 8, ZAP_TYPE(INT64U),                                                            \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* int64u */                                              \
         { ZAP_SIMPLE_DEFAULT(0), 0x0000000D, 1, ZAP_TYPE(INT8S),                                                                   \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* int8s */                                               \
@@ -2532,13 +2554,13 @@
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* int24s */                                              \
         { ZAP_SIMPLE_DEFAULT(0), 0x00000010, 4, ZAP_TYPE(INT32S),                                                                  \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* int32s */                                              \
-        { ZAP_LONG_DEFAULTS_INDEX(61), 0x00000011, 5, ZAP_TYPE(INT40S),                                                            \
+        { ZAP_LONG_DEFAULTS_INDEX(69), 0x00000011, 5, ZAP_TYPE(INT40S),                                                            \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* int40s */                                              \
-        { ZAP_LONG_DEFAULTS_INDEX(66), 0x00000012, 6, ZAP_TYPE(INT48S),                                                            \
+        { ZAP_LONG_DEFAULTS_INDEX(74), 0x00000012, 6, ZAP_TYPE(INT48S),                                                            \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* int48s */                                              \
-        { ZAP_LONG_DEFAULTS_INDEX(72), 0x00000013, 7, ZAP_TYPE(INT56S),                                                            \
+        { ZAP_LONG_DEFAULTS_INDEX(80), 0x00000013, 7, ZAP_TYPE(INT56S),                                                            \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* int56s */                                              \
-        { ZAP_LONG_DEFAULTS_INDEX(79), 0x00000014, 8, ZAP_TYPE(INT64S),                                                            \
+        { ZAP_LONG_DEFAULTS_INDEX(87), 0x00000014, 8, ZAP_TYPE(INT64S),                                                            \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* int64s */                                              \
         { ZAP_SIMPLE_DEFAULT(0), 0x00000015, 1, ZAP_TYPE(ENUM8),                                                                   \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* enum8 */                                               \
@@ -2546,7 +2568,7 @@
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* enum16 */                                              \
         { ZAP_SIMPLE_DEFAULT(0), 0x00000017, 4, ZAP_TYPE(SINGLE),                                                                  \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* float_single */                                        \
-        { ZAP_LONG_DEFAULTS_INDEX(87), 0x00000018, 8, ZAP_TYPE(DOUBLE),                                                            \
+        { ZAP_LONG_DEFAULTS_INDEX(95), 0x00000018, 8, ZAP_TYPE(DOUBLE),                                                            \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* float_double */                                        \
         { ZAP_EMPTY_DEFAULT(), 0x00000019, 11, ZAP_TYPE(OCTET_STRING),                                                             \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* octet_string */                                        \
@@ -2564,7 +2586,7 @@
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* char_string */                                         \
         { ZAP_EMPTY_DEFAULT(), 0x0000001F, 1002, ZAP_TYPE(LONG_CHAR_STRING),                                                       \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* long_char_string */                                    \
-        { ZAP_LONG_DEFAULTS_INDEX(95), 0x00000020, 8, ZAP_TYPE(EPOCH_US),                                                          \
+        { ZAP_LONG_DEFAULTS_INDEX(103), 0x00000020, 8, ZAP_TYPE(EPOCH_US),                                                         \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* epoch_us */                                            \
         { ZAP_EMPTY_DEFAULT(), 0x00000021, 4, ZAP_TYPE(EPOCH_S),                                                                   \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* epoch_s */                                             \
@@ -2612,7 +2634,7 @@
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_bitmap16 */    \
         { ZAP_SIMPLE_DEFAULT(0), 0x00004003, 4, ZAP_TYPE(BITMAP32),                                                                \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_bitmap32 */    \
-        { ZAP_LONG_DEFAULTS_INDEX(103), 0x00004004, 8, ZAP_TYPE(BITMAP64),                                                         \
+        { ZAP_LONG_DEFAULTS_INDEX(111), 0x00004004, 8, ZAP_TYPE(BITMAP64),                                                         \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_bitmap64 */    \
         { ZAP_SIMPLE_DEFAULT(0), 0x00004005, 1, ZAP_TYPE(INT8U),                                                                   \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_int8u */       \
@@ -2622,13 +2644,13 @@
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_int24u */      \
         { ZAP_SIMPLE_DEFAULT(0), 0x00004008, 4, ZAP_TYPE(INT32U),                                                                  \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_int32u */      \
-        { ZAP_LONG_DEFAULTS_INDEX(111), 0x00004009, 5, ZAP_TYPE(INT40U),                                                           \
+        { ZAP_LONG_DEFAULTS_INDEX(119), 0x00004009, 5, ZAP_TYPE(INT40U),                                                           \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_int40u */      \
-        { ZAP_LONG_DEFAULTS_INDEX(116), 0x0000400A, 6, ZAP_TYPE(INT48U),                                                           \
+        { ZAP_LONG_DEFAULTS_INDEX(124), 0x0000400A, 6, ZAP_TYPE(INT48U),                                                           \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_int48u */      \
-        { ZAP_LONG_DEFAULTS_INDEX(122), 0x0000400B, 7, ZAP_TYPE(INT56U),                                                           \
+        { ZAP_LONG_DEFAULTS_INDEX(130), 0x0000400B, 7, ZAP_TYPE(INT56U),                                                           \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_int56u */      \
-        { ZAP_LONG_DEFAULTS_INDEX(129), 0x0000400C, 8, ZAP_TYPE(INT64U),                                                           \
+        { ZAP_LONG_DEFAULTS_INDEX(137), 0x0000400C, 8, ZAP_TYPE(INT64U),                                                           \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_int64u */      \
         { ZAP_SIMPLE_DEFAULT(0), 0x0000400D, 1, ZAP_TYPE(INT8S),                                                                   \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_int8s */       \
@@ -2638,13 +2660,13 @@
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_int24s */      \
         { ZAP_SIMPLE_DEFAULT(0), 0x00004010, 4, ZAP_TYPE(INT32S),                                                                  \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_int32s */      \
-        { ZAP_LONG_DEFAULTS_INDEX(137), 0x00004011, 5, ZAP_TYPE(INT40S),                                                           \
+        { ZAP_LONG_DEFAULTS_INDEX(145), 0x00004011, 5, ZAP_TYPE(INT40S),                                                           \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_int40s */      \
-        { ZAP_LONG_DEFAULTS_INDEX(142), 0x00004012, 6, ZAP_TYPE(INT48S),                                                           \
+        { ZAP_LONG_DEFAULTS_INDEX(150), 0x00004012, 6, ZAP_TYPE(INT48S),                                                           \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_int48s */      \
-        { ZAP_LONG_DEFAULTS_INDEX(148), 0x00004013, 7, ZAP_TYPE(INT56S),                                                           \
+        { ZAP_LONG_DEFAULTS_INDEX(156), 0x00004013, 7, ZAP_TYPE(INT56S),                                                           \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_int56s */      \
-        { ZAP_LONG_DEFAULTS_INDEX(155), 0x00004014, 8, ZAP_TYPE(INT64S),                                                           \
+        { ZAP_LONG_DEFAULTS_INDEX(163), 0x00004014, 8, ZAP_TYPE(INT64S),                                                           \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_int64s */      \
         { ZAP_SIMPLE_DEFAULT(0), 0x00004015, 1, ZAP_TYPE(ENUM8),                                                                   \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_enum8 */       \
@@ -2653,7 +2675,7 @@
         { ZAP_SIMPLE_DEFAULT(0), 0x00004017, 4, ZAP_TYPE(SINGLE),                                                                  \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                            \
               ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_float_single */                                                          \
-        { ZAP_LONG_DEFAULTS_INDEX(163), 0x00004018, 8, ZAP_TYPE(DOUBLE),                                                           \
+        { ZAP_LONG_DEFAULTS_INDEX(171), 0x00004018, 8, ZAP_TYPE(DOUBLE),                                                           \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                            \
               ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* nullable_float_double */                                                          \
         { ZAP_EMPTY_DEFAULT(), 0x00004019, 11, ZAP_TYPE(OCTET_STRING),                                                             \
@@ -2729,7 +2751,7 @@
         /* Endpoint: 2, Cluster: Power Source (server) */                                                                          \
         { ZAP_SIMPLE_DEFAULT(0), 0x00000000, 1, ZAP_TYPE(ENUM8), ZAP_ATTRIBUTE_MASK(READABLE) },               /* Status */        \
         { ZAP_SIMPLE_DEFAULT(1), 0x00000001, 1, ZAP_TYPE(INT8U), ZAP_ATTRIBUTE_MASK(READABLE) },               /* Order */         \
-        { ZAP_LONG_DEFAULTS_INDEX(171), 0x00000002, 61, ZAP_TYPE(CHAR_STRING), ZAP_ATTRIBUTE_MASK(READABLE) }, /* Description */   \
+        { ZAP_LONG_DEFAULTS_INDEX(179), 0x00000002, 61, ZAP_TYPE(CHAR_STRING), ZAP_ATTRIBUTE_MASK(READABLE) }, /* Description */   \
         { ZAP_SIMPLE_DEFAULT(0), 0x0000000E, 1, ZAP_TYPE(ENUM8), ZAP_ATTRIBUTE_MASK(READABLE) }, /* BatChargeLevel */              \
         { ZAP_EMPTY_DEFAULT(), 0x0000000F, 1, ZAP_TYPE(BOOLEAN), ZAP_ATTRIBUTE_MASK(READABLE) }, /* BatReplacementNeeded */        \
         { ZAP_EMPTY_DEFAULT(), 0x00000010, 1, ZAP_TYPE(ENUM8), ZAP_ATTRIBUTE_MASK(READABLE) },   /* BatReplaceability */           \
@@ -3662,7 +3684,7 @@
       .clusterId = 0x00000030, \
       .attributes = ZAP_ATTRIBUTE_INDEX(74), \
       .attributeCount = 7, \
-      .clusterSize = 0, \
+      .clusterSize = 14, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 14 ), \
@@ -4940,7 +4962,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 28, 205 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(0), 28, 219 },                                                                                         \
         { ZAP_CLUSTER_INDEX(28), 73, 3440 },                                                                                       \
         { ZAP_CLUSTER_INDEX(101), 7, 114 },                                                                                        \
         { ZAP_CLUSTER_INDEX(108), 2, 0 },                                                                                          \
@@ -4955,7 +4977,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (3759)
+#define ATTRIBUTE_MAX_SIZE (3773)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (4)
