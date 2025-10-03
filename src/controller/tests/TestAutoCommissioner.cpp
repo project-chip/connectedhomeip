@@ -510,4 +510,182 @@ TEST_F(AutoCommissionerTest, NOCChainGenerated_EmptyNOCReturnsInvalidArgument)
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
 
+TEST_F(AutoCommissionerTest, TrySecondaryNetwork_confirm_true)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+    privateConfigCommissioner.TrySecondaryNetwork();
+    EXPECT_EQ(privateConfigCommissioner.TryingSecondaryNetwork(), true);
+}
+
+TEST_F(AutoCommissionerTest, ResetTryingSecondaryNetwork_confirm_false)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+    privateConfigCommissioner.ResetNetworkAttemptType();
+    EXPECT_EQ(privateConfigCommissioner.TryingSecondaryNetwork(), false);
+}
+
+TEST_F(AutoCommissionerTest, IsScanNeededCombinations)
+{
+    struct Case
+    {
+        const char * name;
+        bool attemptWiFi;
+        bool attemptThread;
+        bool scanExpected;
+    };
+
+    const Case cases[] = {
+        {
+            .name          = "WiFiAndThreadSet",
+            .attemptWiFi   = true,
+            .attemptThread = true,
+            .scanExpected  = true,
+        },
+        {
+            .name          = "WiFiAndThreadNotSet",
+            .attemptWiFi   = false,
+            .attemptThread = false,
+            .scanExpected  = false,
+        },
+        {
+            .name          = "WiFiOnlySet",
+            .attemptWiFi   = true,
+            .attemptThread = false,
+            .scanExpected  = true,
+        },
+        {
+            .name          = "ThreadOnlySet",
+            .attemptWiFi   = false,
+            .attemptThread = true,
+            .scanExpected  = true,
+        },
+    };
+
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+
+    for (const auto & c : cases)
+    {
+        CommissioningParameters params{};
+        params.SetAttemptWiFiNetworkScan(c.attemptWiFi);
+        params.SetAttemptThreadNetworkScan(c.attemptThread);
+        EXPECT_EQ(mCommissioner.SetCommissioningParameters(params), CHIP_NO_ERROR);
+
+        ReadCommissioningInfo & commissioningInfo = privateConfigCommissioner.GetDeviceCommissioningInfo();
+        commissioningInfo.network.wifi.endpoint   = c.attemptWiFi ? kRootEndpointId : kInvalidEndpointId;
+        commissioningInfo.network.thread.endpoint = c.attemptThread ? kRootEndpointId : kInvalidEndpointId;
+
+        bool result = privateConfigCommissioner.IsScanNeeded();
+
+        if (result != c.scanExpected)
+        {
+            ChipLogError(Test, "%s failed: result=%d scanExpected=%d, attemptWiFi=%d, attemptThread=%d", c.name, result,
+                         c.scanExpected, c.attemptWiFi, c.attemptThread);
+        }
+        EXPECT_EQ(result, c.scanExpected);
+    }
+}
+TEST_F(AutoCommissionerTest, IsSecondaryNetworkSupportedCombinations)
+{
+    struct Case
+    {
+        const char * name;
+        bool supportsConcurrent;
+        bool hasWiFiCreds;
+        bool hasThreadDataset;
+        EndpointId wifiEndpoint;
+        EndpointId threadEndpoint;
+        bool isSecondaryNetworkSupported;
+    };
+
+    const Case cases[] = {
+        {
+            .name                        = "AllConditionsTrue",
+            .supportsConcurrent          = true,
+            .hasWiFiCreds                = true,
+            .hasThreadDataset            = true,
+            .wifiEndpoint                = kRootEndpointId,
+            .threadEndpoint              = kRootEndpointId,
+            .isSecondaryNetworkSupported = true,
+        },
+        {
+            .name                        = "NoConcurrentConnection",
+            .supportsConcurrent          = false,
+            .hasWiFiCreds                = true,
+            .hasThreadDataset            = true,
+            .wifiEndpoint                = kRootEndpointId,
+            .threadEndpoint              = kRootEndpointId,
+            .isSecondaryNetworkSupported = false,
+        },
+        {
+            .name                        = "NoWiFiCredentials",
+            .supportsConcurrent          = true,
+            .hasWiFiCreds                = false,
+            .hasThreadDataset            = true,
+            .wifiEndpoint                = kRootEndpointId,
+            .threadEndpoint              = kRootEndpointId,
+            .isSecondaryNetworkSupported = false,
+        },
+        {
+            .name                        = "NoThreadDataset",
+            .supportsConcurrent          = true,
+            .hasWiFiCreds                = true,
+            .hasThreadDataset            = false,
+            .wifiEndpoint                = kRootEndpointId,
+            .threadEndpoint              = kRootEndpointId,
+            .isSecondaryNetworkSupported = false,
+        },
+        {
+            .name                        = "InvalidWiFiEndpoint",
+            .supportsConcurrent          = true,
+            .hasWiFiCreds                = true,
+            .hasThreadDataset            = true,
+            .wifiEndpoint                = kInvalidEndpointId,
+            .threadEndpoint              = kRootEndpointId,
+            .isSecondaryNetworkSupported = false,
+        },
+        {
+            .name                        = "InvalidThreadEndpoint",
+            .supportsConcurrent          = true,
+            .hasWiFiCreds                = true,
+            .hasThreadDataset            = true,
+            .wifiEndpoint                = kRootEndpointId,
+            .threadEndpoint              = kInvalidEndpointId,
+            .isSecondaryNetworkSupported = false,
+        },
+    };
+
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+
+    for (const auto & c : cases)
+    {
+        CommissioningParameters params{};
+        params.SetSupportsConcurrentConnection(c.supportsConcurrent);
+
+        if (c.hasWiFiCreds)
+        {
+            params.SetWiFiCredentials(WiFiCredentials(ByteSpan(), ByteSpan()));
+        }
+        if (c.hasThreadDataset)
+        {
+            params.SetThreadOperationalDataset(ByteSpan());
+        }
+
+        EXPECT_EQ(mCommissioner.SetCommissioningParameters(params), CHIP_NO_ERROR);
+
+        ReadCommissioningInfo & commissioningInfo = privateConfigCommissioner.GetDeviceCommissioningInfo();
+        commissioningInfo.network.wifi.endpoint   = c.wifiEndpoint;
+        commissioningInfo.network.thread.endpoint = c.threadEndpoint;
+
+        bool result = privateConfigCommissioner.IsSecondaryNetworkSupported();
+        if (result != c.isSecondaryNetworkSupported)
+        {
+            ChipLogError(Test,
+                         "%s failed: result=%d expected=%d, supportsConcurrent=%d, hasWiFiCreds=%d, hasThreadDataset=%d, "
+                         "wifiEndpoint=0x%03X, threadEndpoint=0x%03X",
+                         c.name, result, c.isSecondaryNetworkSupported, c.supportsConcurrent, c.hasWiFiCreds, c.hasThreadDataset,
+                         c.wifiEndpoint, c.threadEndpoint);
+        }
+        EXPECT_EQ(result, c.isSecondaryNetworkSupported);
+    }
+}
 } // namespace

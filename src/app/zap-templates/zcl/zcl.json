@@ -823,9 +823,11 @@
         "Thermostat": [
             "MaxThermostatSuggestions",
             "CurrentThermostatSuggestion",
-            "ThermostatSuggestionNotFollowingReason"
+            "ThermostatSuggestionNotFollowingReason",
+            "ClusterRevision"
         ],
         "Time Format Localization": ["ClusterRevision"],
+        "Window Covering": ["ClusterRevision"],
         "Zone Management": [
             "MaxUserDefinedZones",
             "MaxZones",
