@@ -6323,7 +6323,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
 
     // read wildcard values
-    NSArray *values = [device readAttributePaths:@[[MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:nil attributeID:nil]]];
+    NSArray * values = [device readAttributePaths:@[ [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:nil attributeID:nil] ]];
 
     XCTAssertNotNil(values);
     // Conservatively assume all-clusters-app has more than 100 attributes ready by MTRDevice by subscription establishment time (last count 1308)
