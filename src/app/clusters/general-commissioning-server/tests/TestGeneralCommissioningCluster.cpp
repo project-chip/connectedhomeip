@@ -19,12 +19,14 @@
 #include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/GeneralCommissioning/Enums.h>
 #include <clusters/GeneralCommissioning/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/Span.h>
 #include <platform/NetworkCommissioning.h>
 
 namespace {
@@ -34,6 +36,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GeneralCommissioning;
 using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
 
+using chip::app::AttributeListBuilder;
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
 
@@ -46,10 +49,14 @@ struct TestGeneralCommissioningCluster : public ::testing::Test
 
 TEST_F(TestGeneralCommissioningCluster, TestAttributes)
 {
+    // test without optional attributes
     {
+        auto & cluster            = GeneralCommissioningCluster::Instance();
+        auto & optionalAttributes = cluster.GetOptionalAttributes();
+        optionalAttributes        = GeneralCommissioningCluster::OptionalAttributes(0);
+
         ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(GeneralCommissioningCluster::Instance().Attributes({ kRootEndpointId, GeneralCommissioning::Id }, builder),
-                  CHIP_NO_ERROR);
+        ASSERT_EQ(cluster.Attributes({ kRootEndpointId, GeneralCommissioning::Id }, builder), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
         ASSERT_EQ(expectedBuilder.AppendElements({
@@ -62,6 +69,8 @@ TEST_F(TestGeneralCommissioningCluster, TestAttributes)
                   CHIP_NO_ERROR);
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        // This is both define AND feature map dependent. The feature map is hardcoded
+        // based on compile-time defines, so we check the define directly.
         ASSERT_EQ(expectedBuilder.AppendElements({
                       TCAcceptedVersion::kMetadataEntry,
                       TCMinRequiredVersion::kMetadataEntry,
@@ -71,8 +80,50 @@ TEST_F(TestGeneralCommissioningCluster, TestAttributes)
                   }),
                   CHIP_NO_ERROR);
 #endif
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
 
+        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
+        ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    }
+
+    // test with optional attributes
+    {
+        auto & cluster            = GeneralCommissioningCluster::Instance();
+        auto & optionalAttributes = cluster.GetOptionalAttributes();
+        optionalAttributes.Set<IsCommissioningWithoutPower::Id>();
+
+        ReadOnlyBufferBuilder<AttributeEntry> builder;
+        ASSERT_EQ(cluster.Attributes({ kRootEndpointId, GeneralCommissioning::Id }, builder), CHIP_NO_ERROR);
+
+        ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
+        ASSERT_EQ(expectedBuilder.AppendElements({
+                      Breadcrumb::kMetadataEntry,
+                      BasicCommissioningInfo::kMetadataEntry,
+                      RegulatoryConfig::kMetadataEntry,
+                      LocationCapability::kMetadataEntry,
+                      SupportsConcurrentConnection::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        // This is both define AND feature map dependent. The feature map is hardcoded
+        // based on compile-time defines, so we check the define directly.
+        ASSERT_EQ(expectedBuilder.AppendElements({
+                      TCAcceptedVersion::kMetadataEntry,
+                      TCMinRequiredVersion::kMetadataEntry,
+                      TCAcknowledgements::kMetadataEntry,
+                      TCAcknowledgementsRequired::kMetadataEntry,
+                      TCUpdateDeadline::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
+#endif
+
+        // Add the optional attribute since it's now enabled
+        ASSERT_EQ(expectedBuilder.AppendElements({
+                      IsCommissioningWithoutPower::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
+
+        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
         ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
     }
 }

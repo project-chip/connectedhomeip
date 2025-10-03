@@ -33,9 +33,7 @@ class GeneralCommissioningCluster : public DefaultServerCluster, chip::FabricTab
 public:
     using OptionalAttributes = OptionalAttributeSet<GeneralCommissioning::Attributes::IsCommissioningWithoutPower::Id>;
 
-    GeneralCommissioningCluster() :
-        DefaultServerCluster({ kRootEndpointId, GeneralCommissioning::Id }), mFeatures(0), mOptionalAttributes(0)
-    {}
+    GeneralCommissioningCluster() : DefaultServerCluster({ kRootEndpointId, GeneralCommissioning::Id }), mOptionalAttributes(0) {}
 
     OptionalAttributes & GetOptionalAttributes() { return mOptionalAttributes; }
 
@@ -62,12 +60,18 @@ public:
     // GeneralCommissioning is a singleton cluster that exists only on the root endpoint.
     static GeneralCommissioningCluster & Instance();
 
+    // Feature map constant based on compile-time defines. This ensures feature map
+    // is in sync with the actual supported features determined at build time.
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    static constexpr BitFlags<GeneralCommissioning::Feature> kFeatures =
+        BitFlags<GeneralCommissioning::Feature>(GeneralCommissioning::Feature::kTermsAndConditions);
+#else
+    static constexpr BitFlags<GeneralCommissioning::Feature> kFeatures = BitFlags<GeneralCommissioning::Feature>(0);
+#endif
+
 private:
-    const BitFlags<GeneralCommissioning::Feature> mFeatures;
     OptionalAttributes mOptionalAttributes;
     uint64_t mBreadCrumb = 0;
-
-    DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
 
     std::optional<DataModel::ActionReturnStatus>
     HandleArmFailSafe(const DataModel::InvokeRequest & request, CommandHandler * handler,
