@@ -46,7 +46,7 @@
 import logging
 
 from mobly import asserts
-from TC_SUBase import SoftwareUpdateBaseTest
+from TC_SUTestBase import SoftwareUpdateBaseTest
 
 import matter.clusters as Clusters
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
@@ -78,6 +78,11 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
         return steps
 
     @async_test_body
+    async def teardown_test(self):
+        self.current_provider_app_proc.terminate()
+        return super().teardown_test()
+
+    @async_test_body
     async def test_TC_SU_2_4(self):
 
         self.step(0)
@@ -92,6 +97,8 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
 
         self.step(1)
         expected_software_version = 2
+        ota_image_path = self.get_ota_image_path(version=expected_software_version)
+        image_path = 'bdx://0000000000000141/' + ota_image_path
         await self.commission_provider(
             controller=controller,
             discriminator=provider_data['discriminator'],
@@ -101,14 +108,14 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
             version=expected_software_version,
             endpoint=0,
             log_file='/tmp/provider.log',
-            extra_arguments=['--queryImageStatus', 'updateAvailable']
+            extra_arguments=['--queryImageStatus', 'updateAvailable', '--imageUri', image_path]
         )
         update_state_attr_handler = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
         await update_state_attr_handler.start(dev_ctrl=controller, node_id=requestor_node_id, endpoint=0,
-                                              fabric_filtered=False, min_interval_sec=1, max_interval_sec=5000)
+                                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
         await self.announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
 
         update_state_match = AttributeMatcher.from_callable(
@@ -132,8 +139,6 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
         asserts.assert_true(token_stirng in update_token_line, f"{expected_token} is not in the expected line")
         update_state_attr_handler.reset()
         await update_state_attr_handler.cancel()
-        self.current_provider_app_proc.terminate()
-        controller.ExpireSessions(nodeid=provider_data['node_id'])
 
 
 if __name__ == "__main__":
