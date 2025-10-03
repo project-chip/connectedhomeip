@@ -62,120 +62,93 @@ class TC_TSTAT_2_2(MatterBaseTest):
             TestStep("1", "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Test Harness Client reads OccupiedCoolingSetpoint from Server DUT",
                      "and verifies that the value is within range MinCoolSetpointLimit to"
-                     "MaxCoolSetpointLimit, writes a value back that is different but valid,"
+                     "MaxCoolSetpointLimit, writes a value back that is different but valid,",
                      "Read value have to to be equal to the written value."),
             TestStep("2b", "Test Harness Client then attempts to write OccupiedCoolingSetpoint",
                      "below the MinCoolSetpointLimit and above the"
-                     "MaxCoolSetpointLimit and confirms that the device"
+                     "MaxCoolSetpointLimit and confirms that the device",
                      "Write command should return the error CONSTRAINT_ERROR (0x87)"),
-            TestStep("2c", "If AUTO ",
-                     "LowerLimit = Max(MinCoolSetpointLimit, (OccupiedHeatingSetpoint + MinSetpointDeadBand)) +"
-                     "else "
-                     "LowerLimit = MinCoolSetpointLimit"
+            TestStep("2c", "If AUTO LowerLimit = Max(MinCoolSetpointLimit, (OccupiedHeatingSetpoint + MinSetpointDeadBand))"
+                     "else LowerLimit = MinCoolSetpointLimit"
                      "Test Harness Client then attempts to write OccupiedCoolingSetpoint to both of the limits of"
-                     "LowerLimit & MaxCoolSetpointLimit and confirms that the device does accept the value."
+                     "LowerLimit & MaxCoolSetpointLimit and confirms that the device does accept the value.",
                      "Write command should succeed without an error"),
             TestStep("3a", "Test Harness Client reads OccupiedHeatingSetpoint from Server DUT",
                      "and verifies that the value is within range MinHeatSetpointLimit"
-                     "to MaxHeatSetpointLimit, writes a value back that is different but valid,"
+                     "to MaxHeatSetpointLimit, writes a value back that is different but valid,",
                      "Read value have to to be equal to the written value."),
             TestStep("3b", "Test Harness Client then attempts to write OccupiedHeatingSetpoint below the MinHeatSetpointLimit",
                      "Write command should return the error CONSTRAINT_ERROR (0x87)"),
-            TestStep("3c", "If AUTO +",
-                     "*UpperLimit* = Min(MaxHeatSetpointLimit, (OccupiedCoolingSetpoint - MinSetpointDeadBand)) +"
-                     "else +"
-                     "*UpperLimit* = MaxHeatSetpointLimit +"
-                     "+"
+            TestStep("3c", "If AUTO UpperLimit = Min(MaxHeatSetpointLimit, (OccupiedCoolingSetpoint - MinSetpointDeadBand))"
+                     "else UpperLimit = MaxHeatSetpointLimit"
                      "Test Harness Client then attempts to write OccupiedHeatingSetpoint to both of the limits of"
-                     "MinHeatSetpointLimit & *UpperLimit* and confirms that the device does accept the value."
-                     "Write command should succeed without an error"
-                     "// UnoccupiedCoolingSetpoint"),
+                     "MinHeatSetpointLimit & UpperLimit and confirms that the device does accept the value.",
+                     "Write command should succeed without an error"),
             TestStep("4a", "Test Harness Client reads UnoccupiedCoolingSetpoint from Server DUT and verifies that the value",
                      "is within range MinCoolSetpointLimit to MaxCoolSetpointLimit,"
-                     "writes a value back that is different but valid,"
+                     "writes a value back that is different but valid,",
                      "Read value have to to be equal to the written value."),
             TestStep("4b", "Test Harness Client then attempts to write UnoccupiedCoolingSetpoint below the MinCoolSetpointLimit",
                      "Write command should return the error CONSTRAINT_ERROR (0x87)"),
-            TestStep("4c", "If AUTO +",
-                     "*LowerLimit* = Max(MinCoolSetpointLimit, (UnoccupiedCoolingSetpoint + MinSetpointDeadBand)) +"
-                     "else +"
-                     "*LowerLimit* = MinCoolSetpointLimit +"
-                     "+"
+            TestStep("4c", "If AUTO LowerLimit = Max(MinCoolSetpointLimit, (UnoccupiedCoolingSetpoint + MinSetpointDeadBand))"
+                     "else LowerLimit = MinCoolSetpointLimit"
                      "Test Harness Client then attempts to write UnoccupiedCoolingSetpoint to both of the limits of"
-                     "*LowerLimit* & MaxCoolSetpointLimit and confirms that the device does accept the value."
-                     "Write command should succeed without an error"
-                     "// UnoccupiedHeatingSetpoint"),
+                     "LowerLimit & MaxCoolSetpointLimit and confirms that the device does accept the value.",
+                     "Write command should succeed without an error"),
             TestStep("5a", "Test Harness Client reads UnoccupiedHeatingSetpoint from Server DUT and verifies that the value",
                      "is within range MinHeatSetpointLimit to MaxHeatSetpointLimit,"
-                     "writes a value back that is different but valid,"
+                     "writes a value back that is different but valid,",
                      "Read value have to to be equal to the written value."),
             TestStep("5b", "Test Harness Client then attempts to write UnoccupiedHeatingSetpoint below the MinHeatSetpointLimit",
                      "Write command should return the error CONSTRAINT_ERROR (0x87)"),
-            TestStep("5c", "If AUTO +",
-                     "*UpperLimit* = Min(MaxHeatSetpointLimit, (UnoccupiedCoolingSetpoint - MinSetpointDeadBand)) +"
-                     "else +"
-                     "*UpperLimit* = MaxHeatSetpointLimit +"
-                     "+"
+            TestStep("5c", "If AUTO UpperLimit = Min(MaxHeatSetpointLimit, (UnoccupiedCoolingSetpoint - MinSetpointDeadBand))"
+                     "else UpperLimit = MaxHeatSetpointLimit"
                      "Test Harness Client then attempts to write UnoccupiedHeatingSetpoint to both of the limits of"
-                     "MinHeatSetpointLimit & *UpperLimit* and confirms that the device does accept the value."
-                     "Write command should succeed without an error"
-                     "// MinHeatSetpointLimit"),
+                     "MinHeatSetpointLimit & UpperLimit and confirms that the device does accept the value.",
+                     "Write command should succeed without an error"),
             TestStep("6a", "Test Harness Client reads MinHeatSetpointLimit from Server DUT and verifies that the value is",
                      "within range AbsMinHeatSetpointLimit to MaxHeatSetpointLimit,"
-                     "writes a value back that is different but valid,"
+                     "writes a value back that is different but valid,",
                      "Read value have to to be equal to the written value."),
             TestStep("6b", "Test Harness Client then attempts to write MinHeatSetpointLimit below the AbsMinHeatSetpointLimit",
                      "Write command should return the error CONSTRAINT_ERROR (0x87)"),
-            TestStep("6c", "If AUTO +",
-                     "*UpperLimit* = Min(MaxHeatSetpointLimit, (MinCoolSetpointLimit - MinSetpointDeadBand)) +"
-                     "else +"
-                     "*UpperLimit* = MaxHeatSetpointLimit +"
-                     "+"
+            TestStep("6c", "If AUTO UpperLimit = Min(MaxHeatSetpointLimit, (MinCoolSetpointLimit - MinSetpointDeadBand))"
+                     "else UpperLimit = MaxHeatSetpointLimit"
                      "Test Harness Client then attempts to write MinHeatSetpointLimit to both of the limits of"
-                     "AbsMinHeatSetpointLimit & *UpperLimit* and confirms that the device does accept the value."
-                     "Write command should succeed without an error"
-                     "// MaxHeatSetpointLimit"),
+                     "AbsMinHeatSetpointLimit & UpperLimit and confirms that the device does accept the value.",
+                     "Write command should succeed without an error"),
             TestStep("7a", "Test Harness Client reads MaxHeatSetpointLimit from Server DUT and verifies that the value is",
                      "within range MinHeatSetpointLimit to AbsMaxHeatSetpointLimit,"
-                     "writes a value back that is different but valid,"
+                     "writes a value back that is different but valid,",
                      "Read value have to to be equal to the written value."),
             TestStep("7b", "Test Harness Client then attempts to write MaxHeatSetpointLimit below the MinHeatSetpointLimit",
                      "Write command should return the error CONSTRAINT_ERROR (0x87)"),
-            TestStep("7c", "If AUTO +",
-                     "*UpperLimit* = Min(AbsMaxHeatSetpointLimit, (MaxCoolSetpointLimit - MinSetpointDeadBand)) +"
-                     "else +"
-                     "*UpperLimit* = AbsMaxHeatSetpointLimit +"
-                     "+"
+            TestStep("7c", "If AUTO UpperLimit = Min(AbsMaxHeatSetpointLimit, (MaxCoolSetpointLimit - MinSetpointDeadBand))"
+                     "else UpperLimit = AbsMaxHeatSetpointLimit"
                      "Test Harness Client then attempts to write MaxHeatSetpointLimit to both of the limits of"
-                     "MinHeatSetpointLimit & *UpperLimit* and confirms that the device does accept the value."
+                     "MinHeatSetpointLimit & UpperLimit and confirms that the device does accept the value.",
                      "Write command should succeed without an error"),
-            TestStep("8a", "Test Harness Client reads MinCoolSetpointLimit from Server DUT and verifies that the value is within",
+            TestStep("8a", "Test Harness Client reads MinCoolSetpointLimit from Server DUT and verifies that the value is within"
                      "range AbsMinCoolSetpointLimit to MaxCoolSetpointLimit,"
-                     "writes a value back that is different but valid,"
+                     "writes a value back that is different but valid,",
                      "Read value have to to be equal to the written value."),
             TestStep("8b", "Test Harness Client then attempts to write MinCoolSetpointLimit below the AbsMinCoolSetpointLimit",
                      "Write command should return the error CONSTRAINT_ERROR (0x87)"),
-            TestStep("8c", "If AUTO +",
-                     "*LowerLimit* = Max(AbsMinCoolSetpointLimit, (MinHeatSetpointLimit + MinSetpointDeadBand)) +"
-                     "else +"
-                     "*LowerLimit* = AbsMinCoolSetpointLimit +"
-                     "+"
+            TestStep("8c", "If AUTO LowerLimit = Max(AbsMinCoolSetpointLimit, (MinHeatSetpointLimit + MinSetpointDeadBand))"
+                     "else LowerLimit = AbsMinCoolSetpointLimit"
                      "Test Harness Client then attempts to write MinCoolSetpointLimit to both of the limits of"
-                     "*LowerLimit* & MaxCoolSetpointLimit and confirms that the device does accept the value."
+                     "LowerLimit & MaxCoolSetpointLimit and confirms that the device does accept the value.",
                      "Write command should succeed without an error"),
-            TestStep("9a", "Test Harness Client reads MaxCoolSetpointLimit from Server DUT and verifies that the value is",
+            TestStep("9a", "Test Harness Client reads MaxCoolSetpointLimit from Server DUT and verifies that the value is"
                      "within range MinCoolSetpointLimit to AbsMaxCoolSetpointLimit,"
-                     "writes a value back that is different but valid,"
+                     "writes a value back that is different but valid,",
                      "Read value have to to be equal to the written value."),
             TestStep("9b", "Test Harness Client then attempts to write MaxCoolSetpointLimit below the MinCoolSetpointLimit",
                      "Write command should return the error CONSTRAINT_ERROR (0x87)"),
-            TestStep("9c", "If AUTO ",
-                     "*LowerLimit* = Max(MinCoolSetpointLimit, (MaxHeatSetpointLimit + MinSetpointDeadBand)) +"
-                     "else +"
-                     "*LowerLimit* = MinCoolSetpointLimit +"
-                     "+"
+            TestStep("9c", "If AUTO LowerLimit = Max(MinCoolSetpointLimit, (MaxHeatSetpointLimit + MinSetpointDeadBand))"
+                     "else LowerLimit = MinCoolSetpointLimit"
                      "Test Harness Client then attempts to write MaxCoolSetpointLimit to both of the limits of"
-                     "*LowerLimit* & AbsMaxCoolSetpointLimit and confirms that the device does accept the value."
+                     "LowerLimit & AbsMaxCoolSetpointLimit and confirms that the device does accept the value.",
                      "Write command should succeed without an error"),
             TestStep("10a", "Set MinHeatSetpointLimit and MaxHeatSetpointLimit back to reasonable values.",
                      "Write command should succeed without an error"),
@@ -185,66 +158,66 @@ class TC_TSTAT_2_2(MatterBaseTest):
                      "Read value have to to be equal to the original value."),
             TestStep("11b", "Test Harness Client then attempts to write MinSetpointDeadBand below 0 and above 127",
                      "Write command should return the error CONSTRAINT_ERROR (0x87)"),
-            TestStep("11c", "Test Harness Client then attempts to write MinSetpointDeadBand to both of the limits of 0 & 127",
-                     "and confirms that the device does accept the value, but does not change the value of the attribute."
+            TestStep("11c", "Test Harness Client then attempts to write MinSetpointDeadBand to both of the limits of 0 & 127"
+                     "and confirms that the device does accept the value, but does not change the value of the attribute.",
                      "Write command should succeed without an error"),
-            TestStep("12", "Valid values for ControlSequenceOfOperation: +",
-                     "COOL: *CoolingOnly* (0), *CoolingWithReheat* (1) +"
-                     "HEAT: *HeatingOnly* (2), *HeatingWithReheat* (3) +"
-                     "COOL & HEAT: *CoolingAndHeating* (4), *CoolingAndHeatingWithReheat*(5)"
-                     "Test Harness Client reads ControlSequenceOfOperation from Server DUT and verifies that the value is valid. +"
-                     "Test Harness sends a Write Attribute command for ControlSequenceOfOperation with a new valid value, +"
+            TestStep("12", "Valid values for ControlSequenceOfOperation:",
+                     "COOL: CoolingOnly (0), CoolingWithReheat (1)"
+                     "HEAT: HeatingOnly (2), HeatingWithReheat (3)"
+                     "COOL & HEAT: CoolingAndHeating (4), CoolingAndHeatingWithReheat(5)"
+                     "Test Harness Client reads ControlSequenceOfOperation from Server DUT and verifies that the value is valid."
+                     "Test Harness sends a Write Attribute command for ControlSequenceOfOperation with a new valid value,",
                      "Read value have to to be equal to the written value."),
-            TestStep("13a", "Test Harness Client sets OccupiedHeatingSetpoint to default value.  +",
-                     "Test Harness sends Server DUT a SetpointRaiseLower command with the mode field set to Heat (0x00), and the amount set to 0xE2 (-30 units = -3 degrees).  +"
+            TestStep("13a", "Test Harness Client sets OccupiedHeatingSetpoint to default value."
+                     "Test Harness sends Server DUT a SetpointRaiseLower command with the mode field set to Heat (0x00), and the amount set to 0xE2 (-30 units = -3 degrees).",
                      "Read value have to to be equal to default value - 3 degrees"),
             TestStep("13b", "Test Harness sends Server DUT a SetpointRaiseLower command with the mode field set to Heat (0x00), and the amount set to 0xE2 (-30 units = -3 degrees).",
                      "SetpointRaiseLower command should return the error INVALID_COMMAND (0x85)"),
-            TestStep("14", "Test Harness Client sets OccupiedHeatingSetpoint to default value.  +",
-                     "Test Harness sends Server DUT a SetpointRaiseLower command with the mode field set to Heat (0x00), and the amount set to 0x1E (+30 units = +3 degrees)."
+            TestStep("14", "Test Harness Client sets OccupiedHeatingSetpoint to default value."
+                     "Test Harness sends Server DUT a SetpointRaiseLower command with the mode field set to Heat (0x00), and the amount set to 0x1E (+30 units = +3 degrees).",
                      "Read value have to to be equal to default value + 3 degrees"),
-            TestStep("15a", "Test Harness Client sets OccupiedCoolingSetpoint to default value.  +",
-                     "Test Harness Client sends Server DUT a SetpointRaiseLower command with the mode field set to Cool (0x01), and the amount set to 0xE2 (-30 units = -3 degrees).  +"
+            TestStep("15a", "Test Harness Client sets OccupiedCoolingSetpoint to default value."
+                     "Test Harness Client sends Server DUT a SetpointRaiseLower command with the mode field set to Cool (0x01), and the amount set to 0xE2 (-30 units = -3 degrees).",
                      "Read value have to to be equal to default value - 3 degrees"),
             TestStep("15b", "Test Harness sends Server DUT a SetpointRaiseLower command with the mode field set to Cool (0x01), and the amount set to 0xE2 (-30 units = -3 degrees).",
                      "SetpointRaiseLower command should return the error INVALID_COMMAND (0x85)"),
-            TestStep("16", "Test Harness Client sets OccupiedCoolingSetpoint to default value.  +",
-                     "Test Harness Client sends Server DUT a SetpointRaiseLower command with the mode field set to Cool (0x01), and the amount set to 0x1E (+30 units = +3 degrees).  +"
+            TestStep("16", "Test Harness Client sets OccupiedCoolingSetpoint to default value."
+                     "Test Harness Client sends Server DUT a SetpointRaiseLower command with the mode field set to Cool (0x01), and the amount set to 0x1E (+30 units = +3 degrees).",
                      "Read value have to to be equal to default value + 3 degrees"),
-            TestStep("17", "Test Harness Client sets OccupiedCoolingSetpoint and OccupiedHeatingSetpoint to default values.  +",
-                     "Test Harness Client sends Server DUT a SetpointRaiseLower command with the mode field set to both (0x02), and the amount set to 0xE2 (-30 units = -3 degrees) .  +"
+            TestStep("17", "Test Harness Client sets OccupiedCoolingSetpoint and OccupiedHeatingSetpoint to default values."
+                     "Test Harness Client sends Server DUT a SetpointRaiseLower command with the mode field set to both (0x02), and the amount set to 0xE2 (-30 units = -3 degrees).",
                      "Both read values have to to be equal to its default value - 3 degrees"),
-            TestStep("18", "Test Harness Client sets OccupiedCoolingSetpoint and OccupiedHeatingSetpoint to default values.  +",
-                     "Test Harness Client sends Server DUT a SetpointRaiseLower command with the mode field set to both (0x02), and the amount set to 0x1E (+30 units = +3 degrees).  +"
+            TestStep("18", "Test Harness Client sets OccupiedCoolingSetpoint and OccupiedHeatingSetpoint to default values."
+                     "Test Harness Client sends Server DUT a SetpointRaiseLower command with the mode field set to both (0x02), and the amount set to 0x1E (+30 units = +3 degrees).",
                      "Both read values have to to be equal to its default value + 3 degrees"),
-            TestStep("19", "Test Harness Client reads ActiveScheduleHandle. +",
-                     "Test Harness Client reads Schedules and chooses a schedule handle different from ActiveScheduleHandle. +"
-                     "Test Harness Client sends Server DUT a SetActiveSchedule command with the ScheduleHandle field set to the chosen handle. +"
+            TestStep("19", "Test Harness Client reads ActiveScheduleHandle."
+                     "Test Harness Client reads Schedules and chooses a schedule handle different from ActiveScheduleHandle."
+                     "Test Harness Client sends Server DUT a SetActiveSchedule command with the ScheduleHandle field set to the chosen handle.",
                      "Read handle has to be equal to the sent handle."),
-            TestStep("20", "Test Harness Client reads Schedules. +",
-                     "Test Harness Client selects a Schedule handle +"
-                     "Test Harness Client starts an atomic write targeting the Schedules attribute. +"
-                     "Test Harness Client writes to Schedules attribute changing the CoolingSetpoint and HeatingSetpoint to different valid temperatures on a ScheduleTransition. +"
+            TestStep("20", "Test Harness Client reads Schedules."
+                     "Test Harness Client selects a Schedule handle"
+                     "Test Harness Client starts an atomic write targeting the Schedules attribute."
+                     "Test Harness Client writes to Schedules attribute changing the CoolingSetpoint and HeatingSetpoint to different valid temperatures on a ScheduleTransition.",
                      "Read ScheduleTransition has to be equal to the sent ScheduleTransition."),
-            TestStep("21", "Test Harness Client reads Schedules. +",
-                     "Test Harness Client selects a Schedule handle +"
-                     "Test Harness Client starts an atomic write targeting the Schedules attribute. +"
-                     "Test Harness Client writes to Schedules attribute changing the CoolingSetpoint and HeatingSetpoint to different valid temperatures on a ScheduleTransition. +"
-                     "Test Harness Client reads Schedules to confirm changed ScheduleTransition. +"
-                     "Test Harness Client rolls back the atomic write targeting the Presets attribute. +"
+            TestStep("21", "Test Harness Client reads Schedules."
+                     "Test Harness Client selects a Schedule handle"
+                     "Test Harness Client starts an atomic write targeting the Schedules attribute."
+                     "Test Harness Client writes to Schedules attribute changing the CoolingSetpoint and HeatingSetpoint to different valid temperatures on a ScheduleTransition."
+                     "Test Harness Client reads Schedules to confirm changed ScheduleTransition."
+                     "Test Harness Client rolls back the atomic write targeting the Presets attribute.",
                      "Read ScheduleTransition has to be equal to the original ScheduleTransition."),
-            TestStep("22a", "Test Harness Client reads Schedules. +",
-                     "Test Harness Client selects a Schedule handle with the BuiltIn field set to false. +"
-                     "Test Harness Client starts an atomic write targeting the Schedules attribute. +"
+            TestStep("22a", "Test Harness Client reads Schedules."
+                     "Test Harness Client selects a Schedule handle with the BuiltIn field set to false."
+                     "Test Harness Client starts an atomic write targeting the Schedules attribute.",
                      "Write should return the error INVALID_COMMAND (0x85)"),
-            TestStep("22b", "Test Harness Client reads Schedules. +",
-                     "Test Harness Client selects a Schedule handle with the BuiltIn field set to true. +"
-                     "Test Harness Client starts an atomic write targeting the Schedules attribute. +"
+            TestStep("22b", "Test Harness Client reads Schedules."
+                     "Test Harness Client selects a Schedule handle with the BuiltIn field set to true."
+                     "Test Harness Client starts an atomic write targeting the Schedules attribute.",
                      "Write should return the error INVALID_COMMAND (0x85)"),
-            TestStep("22c", "Test Harness Client reads Schedules. +",
-                     "Test Harness Client selects a Schedule handle with the BuiltIn field set to true. +"
-                     "Test Harness Client starts an atomic write targeting the Schedules attribute. +"
-                     "Test Harness Client writes to Schedules attribute, removing the selected Schedule. +"
+            TestStep("22c", "Test Harness Client reads Schedules."
+                     "Test Harness Client selects a Schedule handle with the BuiltIn field set to true."
+                     "Test Harness Client starts an atomic write targeting the Schedules attribute."
+                     "Test Harness Client writes to Schedules attribute, removing the selected Schedule.",
                      "Commit should return the error CONSTRAINT_ERROR (0x87)"),
         ]
 
