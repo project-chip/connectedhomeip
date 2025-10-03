@@ -3751,26 +3751,48 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // AttributeList) to determine this set, because we might be in the middle
     // of priming right now and have not gotten those yet.  Just use the set of
     // attribute paths we actually have.
-    NSMutableSet<MTRAttributePath *> * existentPaths = [[NSMutableSet alloc] init];
+    NSMutableArray<MTRAttributePath *> * existentPaths = [[NSMutableArray alloc] init];
     {
         std::lock_guard lock(_lock);
-        for (MTRAttributeRequestPath * requestPath in attributePaths) {
-            for (MTRClusterPath * clusterPath in [self _knownClusters]) {
+        for (MTRClusterPath * clusterPath in [self _knownClusters]) {
+            MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
+
+            // First pass to check if cluster matches any wildcard
+            BOOL clusterMatchesWildcard = NO;
+            for (MTRAttributeRequestPath * requestPath in attributePaths) {
                 if (requestPath.endpoint != nil && ![requestPath.endpoint isEqual:clusterPath.endpoint]) {
                     continue;
                 }
                 if (requestPath.cluster != nil && ![requestPath.cluster isEqual:clusterPath.cluster]) {
                     continue;
                 }
-                MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
                 if (requestPath.attribute == nil) {
-                    for (NSNumber * attributeID in clusterData.attributes) {
-                        [existentPaths addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:attributeID]];
-                    }
-                } else if ([clusterData.attributes objectForKey:requestPath.attribute] != nil) {
-                    [existentPaths addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:requestPath.attribute]];
+                    clusterMatchesWildcard = YES;
                 }
             }
+            if (clusterMatchesWildcard) {
+                // add all attributes - no need to check other paths
+                for (NSNumber * attributeID in clusterData.attributes) {
+                    [existentPaths addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:attributeID]];
+                }
+                continue;
+            }
+
+            // Other we build unique list of attributes in this cluster that match requested paths
+            NSMutableArray<MTRAttributePath *> * existentAttributesPathsInCluster = [[NSMutableArray alloc] init];
+            for (MTRAttributeRequestPath * requestPath in attributePaths) {
+                if (requestPath.endpoint != nil && ![requestPath.endpoint isEqual:clusterPath.endpoint]) {
+                    continue;
+                }
+                if (requestPath.cluster != nil && ![requestPath.cluster isEqual:clusterPath.cluster]) {
+                    continue;
+                }
+                if ([clusterData.attributes objectForKey:requestPath.attribute] != nil) {
+                    [existentAttributesPathsInCluster addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:requestPath.attribute]];
+                }
+            }
+            NSMutableSet<MTRAttributePath *> * existentAttributesPathsSetInCluster = [NSMutableSet setWithArray:existentAttributesPathsInCluster];
+            [existentPaths addObjectsFromArray:[existentAttributesPathsSetInCluster allObjects]];
         }
     }
 
