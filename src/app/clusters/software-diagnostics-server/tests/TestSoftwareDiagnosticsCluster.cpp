@@ -239,7 +239,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, SoftwareFaultListenerTest)
     fault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(faultData), sizeof(faultData)));
 
     SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(fault);
-    
+
     chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::DecodableType decodedFault;
     ASSERT_EQ(context.EventsGenerator().DecodeLastEvent(decodedFault), CHIP_NO_ERROR);
 
