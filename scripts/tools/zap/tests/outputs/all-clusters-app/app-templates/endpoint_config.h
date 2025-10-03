@@ -2959,12 +2959,6 @@
         (EmberAfGenericClusterFunction) emberAfScenesManagementClusterServerInitCallback,                                          \
         (EmberAfGenericClusterFunction) MatterScenesManagementClusterServerShutdownCallback,                                       \
     };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayHepaFilterMonitoringServer[] = {                                              \
-        (EmberAfGenericClusterFunction) emberAfHepaFilterMonitoringClusterServerInitCallback,                                      \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayActivatedCarbonFilterMonitoringServer[] = {                                   \
-        (EmberAfGenericClusterFunction) emberAfActivatedCarbonFilterMonitoringClusterServerInitCallback,                           \
-    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayEnergyPreferenceServer[] = {                                                  \
         (EmberAfGenericClusterFunction) MatterEnergyPreferenceClusterServerPreAttributeChangedCallback,                            \
     };                                                                                                                             \
@@ -3630,8 +3624,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(54), \
       .attributeCount = 5, \
       .clusterSize = 6, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayTimeFormatLocalizationServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = nullptr, \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
@@ -3760,8 +3754,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(178), \
       .attributeCount = 15, \
       .clusterSize = 6, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayWiFiNetworkDiagnosticsServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 48 ), \
       .generatedCommandList = nullptr, \
       .eventList = ZAP_GENERATED_EVENTS_INDEX( 13 ), \
@@ -4306,8 +4300,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(425), \
       .attributeCount = 8, \
       .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayHepaFilterMonitoringServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 188 ), \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
@@ -4319,8 +4313,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(433), \
       .attributeCount = 8, \
       .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayActivatedCarbonFilterMonitoringServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 190 ), \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
