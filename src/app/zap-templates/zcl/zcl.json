@@ -471,7 +471,8 @@
             "ChannelPage0Mask",
             "OperationalDatasetComponents",
             "ExtAddress",
-            "Rloc16"
+            "Rloc16",
+            "ClusterRevision"
         ],
         "Wi-Fi Network Diagnostics": [
             "BSSID",
@@ -820,7 +821,8 @@
         "Thermostat": [
             "MaxThermostatSuggestions",
             "CurrentThermostatSuggestion",
-            "ThermostatSuggestionNotFollowingReason"
+            "ThermostatSuggestionNotFollowingReason",
+            "ClusterRevision"
         ],
         "Time Format Localization": ["ClusterRevision"],
         "Zone Management": [

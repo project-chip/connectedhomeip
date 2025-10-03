@@ -2907,7 +2907,7 @@ endpoint 0 {
     callback attribute extAddress;
     callback attribute rloc16;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 3;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
@@ -3065,7 +3065,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x1A3;
-    ram      attribute clusterRevision default = 9;
+    callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;
     handle command SetActiveScheduleRequest;

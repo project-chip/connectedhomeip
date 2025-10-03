@@ -147,6 +147,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h': {'vector'},
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h': {'vector'},
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h': {'vector'},
+    'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-logic.cpp': {'set'},
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-logic.h': {'vector'},
     'src/app/clusters/zone-management-server/zone-management-server.h': {'vector'},
     'src/app/clusters/zone-management-server/zone-geometry.h': {'vector', 'set'},
@@ -186,7 +187,8 @@ ALLOW: Dict[str, Set[str]] = {
     'src/tracing/json/json_tracing.h': {'fstream', 'unordered_map', 'string'},
 
     # esp32 diagnostic tracing
-    'src/tracing/esp32_diagnostic_trace/Counter.h': {'map'},
+    'src/tracing/esp32_diagnostics/Counter.h': {'map'},
+    'src/tracing/esp32_diagnostics/DiagnosticTracing.h': {'unordered_set'},
 
     # esp32 tracing
     'src/tracing/esp32_trace/esp32_tracing.h': {'unordered_map'},

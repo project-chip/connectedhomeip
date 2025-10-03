@@ -2774,7 +2774,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 3;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
@@ -2957,8 +2957,8 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 419;
-    ram      attribute clusterRevision default = 8;
+    ram      attribute featureMap default = 0x123;
+    callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;
     handle command AddThermostatSuggestionResponse;
@@ -2979,5 +2979,3 @@ endpoint 1 {
     ram      attribute clusterRevision default = 2;
   }
 }
-
-
