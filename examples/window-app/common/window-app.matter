@@ -2847,7 +2847,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x001F;
-    ram      attribute clusterRevision default = 5;
+    callback attribute clusterRevision;
 
     handle command UpOrOpen;
     handle command DownOrClose;
@@ -2933,7 +2933,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0017;
-    ram      attribute clusterRevision default = 5;
+    callback attribute clusterRevision;
 
     handle command UpOrOpen;
     handle command DownOrClose;
