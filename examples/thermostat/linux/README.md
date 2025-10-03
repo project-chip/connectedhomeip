@@ -137,7 +137,7 @@ chip-tool-x86-64 thermostat read presets <nodeID> 1 | grep TOO
 
 ### Write presets
 
-Write the 3-preset value using the atomic-request:
+Write the 3-presets value using the atomic-request:
 ```json
 [
     {
