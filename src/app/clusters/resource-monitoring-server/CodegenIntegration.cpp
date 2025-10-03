@@ -91,7 +91,7 @@ ActiveCluster* removeActiveClusterFromList(ActiveCluster* head, ClusterId cluste
 // HEPA Filter Monitoring Cluster
 //
 
-void emberAfHepaFilterMonitoringClusterServerInitCallback(EndpointId endpointId)
+void MatterHepaFilterMonitoringClusterInitCallback(EndpointId endpointId)
 {
     uint32_t optionalAttributeBits = 0;
 
@@ -115,7 +115,6 @@ void emberAfHepaFilterMonitoringClusterServerInitCallback(EndpointId endpointId)
     };
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(current->registration);
-            
 
     if (err != CHIP_NO_ERROR)
     {
@@ -127,7 +126,7 @@ void emberAfHepaFilterMonitoringClusterServerInitCallback(EndpointId endpointId)
 
 
 
-void emberAfHepaFilterMonitoringClusterShutdownCallback(EndpointId endpointId)
+void MatterHepaFilterMonitoringClusterShutdownCallback(EndpointId endpointId)
 {
     gActiveClusters = removeActiveClusterFromList(gActiveClusters, HepaFilterMonitoring::Id);
 }
@@ -136,7 +135,7 @@ void emberAfHepaFilterMonitoringClusterShutdownCallback(EndpointId endpointId)
 // Activated Carbon Filter Monitoring Cluster
 //
      
-void emberAfActivatedCarbonFilterMonitoringClusterServerInitCallback(EndpointId endpointId )
+void MatterActivatedCarbonFilterMonitoringClusterInitCallback(EndpointId endpointId )
 {
     uint32_t optionalAttributeBits = 0;
 
@@ -169,7 +168,7 @@ void emberAfActivatedCarbonFilterMonitoringClusterServerInitCallback(EndpointId 
     }
 }
 
-void emberAfActivatedCarbonMonitoringClusterShutdownCallback(EndpointId endpointId)
+void MatterActivatedCarbonMonitoringClusterShutdownCallback(EndpointId endpointId)
 {
     gActiveClusters = removeActiveClusterFromList(gActiveClusters, ActivatedCarbonFilterMonitoring::Id);
 }
