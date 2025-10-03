@@ -3,6 +3,7 @@ EnumsNotUsedAsTypeInXML:
     # to this list you prevent incorrectly assuming from code that you are
     # able to use kUnknownEnumValue safely. This happens for derived clusters
     # such as ModeBase where there are CommonTag, DerivedClusterTags, MfgTags.
+    # keep-sorted start
     - "DeviceEnergyManagementMode::ModeTag"
     - "DishwasherMode::ModeTag"
     - "EnergyEvseMode::ModeTag"
@@ -15,12 +16,13 @@ EnumsNotUsedAsTypeInXML:
     - "RvcRunMode::ModeTag"
     - "RvcRunMode::StatusCode"
     - "WaterHeaterMode::ModeTag"
-# Please keep the above list sorted alphabetically, to minimize merge conflicts.
+    # keep-sorted end
 
 CommandHandlerInterfaceOnlyClusters:
     # List of clusters that are implemented entirely with
     # CommandHandlerInterface and hence do not need generated command dispatch.
     # This uses asUpperCamelCase versions of the cluster name.
+    # keep-sorted start
     - Access Control
     - Actions
     - Activated Carbon Filter Monitoring
@@ -53,24 +55,24 @@ CommandHandlerInterfaceOnlyClusters:
     - Laundry Washer Mode
     - Microwave Oven Control
     - Network Commissioning
-    - Operational State
     - OTA Software Update Provider
+    - Operational State
     - Oven Cavity Operational State
     - Oven Mode
     - Push AV Stream Transport
-    - Refrigerator And Temperature Controlled Cabinet Mode
     - RVC Clean Mode
     - RVC Operational State
     - RVC Run Mode
+    - Refrigerator And Temperature Controlled Cabinet Mode
     - Sample MEI
     - Scenes Management
     - Service Area
     - Software Diagnostics
     - Soil Measurement
-    - Thread Border Router Management
-    - Thread Network Directory
     - TLS Certificate Management
     - TLS Client Management
+    - Thread Border Router Management
+    - Thread Network Directory
     - Water Heater Management
     - Water Heater Mode
     - WebRTC Transport Provider
@@ -78,11 +80,12 @@ CommandHandlerInterfaceOnlyClusters:
     - Wi-Fi Network Diagnostics
     - Wi-Fi Network Management
     - Zone Management
-# Please keep the above list sorted alphabetically, to minimize merge conflicts.
+    # keep-sorted end
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369
 ClustersWithInitFunctions:
+    # keep-sorted start
     - Color Control
     - Fixed Label
     - Groups
@@ -96,7 +99,7 @@ ClustersWithInitFunctions:
     - Sample MEI
     - Scenes Management
     - Thermostat
-# Please keep the above list sorted alphabetically, to minimize merge conflicts.
+    # keep-sorted end
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic Information
@@ -121,6 +124,7 @@ ClustersWithShutdownFunctions:
 # Please keep the above list sorted alphabetically, to minimize merge conflicts.
 
 ClustersWithPreAttributeChangeFunctions:
+    # keep-sorted start
     - Door Lock
     - Energy Preference
     - Fan Control
@@ -131,12 +135,13 @@ ClustersWithPreAttributeChangeFunctions:
     - Pump Configuration and Control
     - Thermostat
     - Thermostat User Interface Configuration
-# Please keep the above list sorted alphabetically, to minimize merge conflicts.
+    # keep-sorted end
 
 # Code Driven clusters are clusters that implement the ServerClusterInterface.
 # The clusters in this list require Init() and/or Shutdown() callbacks, defined
 # in the cluster's respective CodgenIntegration.cpp file.
 CodeDrivenClusters:
+    # keep-sorted start
     - Access Control
     - Administrator Commissioning
     - Basic Information
@@ -151,4 +156,4 @@ CodeDrivenClusters:
     - Software Diagnostics
     - Time Format Localization
     - Wi-Fi Network Diagnostics
-# Please keep the above list sorted alphabetically, to minimize merge conflicts.
+    # keep-sorted end
