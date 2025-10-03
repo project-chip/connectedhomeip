@@ -138,6 +138,7 @@ chip-tool-x86-64 thermostat read presets <nodeID> 1 | grep TOO
 ### Write presets
 
 Write the 3-presets value using the atomic-request:
+
 ```json
 [
     {
@@ -165,6 +166,7 @@ Write the 3-presets value using the atomic-request:
 ```
 
 **Atomic-request**
+
 ```shell
 thermostat atomic-request 0 '[80]' <nodeID> 1 --Timeout 3000
 chip-tool-x86-64 thermostat write presets '[ { "presetHandle": "01", "presetScenario": 1, "coolingSetpoint": 2500, "heatingSetpoint": 2100, "builtIn": true }, {"presetHandle": "02", "presetScenario": 2, "coolingSetpoint": 2600, "heatingSetpoint": 2000, "builtIn": true }, {"presetHandle": null, "presetScenario": 3, "coolingSetpoint": 2700, "heatingSetpoint": 2000, "builtIn": false } ]' <nodeID> 1
