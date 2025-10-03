@@ -7,7 +7,7 @@
 #include <app/util/basic-types.h>
 
 {{#all_user_clusters side='server'}}
-{{#if (isInConfigList name "CodeDrivenClusters")}}
+{{#if (isInConfigList name "CodeDrivenClustersWithCodegenIntegration")}}
 
 void Matter{{asUpperCamelCase name}}ClusterInitCallback(chip::EndpointId endpointId);
 

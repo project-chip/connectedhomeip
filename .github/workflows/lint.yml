@@ -441,3 +441,17 @@ jobs:
                     'src/controller/python' \
                     'src/python_testing/matter_testing_infrastructure' \
                     && exit 1 || exit 0
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.
+            - name: Check CodegenIntegration.cpp files contain the required Init() and Shutdown() callbacks
+              if: always()
+              run: |
+                  violating_files=$( ( \
+                      git grep -L 'Matter.*ClusterInitCallback' -- '**/CodegenIntegration.cpp'; \
+                      git grep -L 'Matter.*ClusterShutdownCallback' -- '**/CodegenIntegration.cpp'; \
+                  ) | sort -u )
+                  if [ -n "$violating_files" ]; then
+                      exit 1
+                  fi
+                  exit 0
