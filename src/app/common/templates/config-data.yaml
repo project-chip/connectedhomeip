@@ -92,7 +92,6 @@ ClustersWithInitFunctions:
     - Sample MEI
     - Scenes Management
     - Thermostat
-    - Fixed Label
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic Information
@@ -112,7 +111,6 @@ ClustersWithShutdownFunctions:
     - Sample MEI
     - Scenes Management
     - Thermostat
-    - Fixed Label
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock
@@ -143,3 +141,4 @@ CodeDrivenClusters:
     - Time Format Localization
     - Wi-Fi Network Diagnostics
     - Diagnostic Logs
+    - Fixed Label
