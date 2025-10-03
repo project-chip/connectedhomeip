@@ -265,6 +265,7 @@ sl_status_t SiWxPlatformInit(void)
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #ifdef ENABLE_CHIP_SHELL
+#ifdef RTE_UULP_GPIO_1_PIN
     // While using the matter shell with a Low Power Build, GPIO 1 is used to check the UULP PIN 1 status
     // since UART doesn't act as a wakeup source in the UULP mode.
 
@@ -276,6 +277,7 @@ sl_status_t SiWxPlatformInit(void)
 
     // Enable the REN
     RSI_NPSSGPIO_InputBufferEn(RTE_UULP_GPIO_1_PIN, 1);
+#endif // RTE_UULP_GPIO_1_PIN
 #endif // ENABLE_CHIP_SHELL
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // SLI_SI91X_MCU_INTERFACE

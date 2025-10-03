@@ -21,7 +21,9 @@
 
 namespace {
 #if defined(ENABLE_CHIP_SHELL) && CHIP_CONFIG_ENABLE_ICD_SERVER
+#ifdef RTE_UULP_GPIO_1_PIN
 bool ps_requirement_added = false;
+#endif // RTE_UULP_GPIO_1_PIN
 #endif // ENABLE_CHIP_SHELL && CHIP_CONFIG_ENABLE_ICD_SERVER
 } // namespace
 
@@ -102,6 +104,7 @@ inline void sl_si91x_btn_event_handler()
 void sl_si91x_uart_power_requirement_handler()
 {
 #ifdef ENABLE_CHIP_SHELL
+#ifdef RTE_UULP_GPIO_1_PIN
     // Checking the UULP PIN 1 status to reinit the UART and not allow the device to go to sleep
     if (sl_si91x_gpio_get_uulp_npss_pin(RTE_UULP_GPIO_1_PIN))
     {
@@ -119,6 +122,7 @@ void sl_si91x_uart_power_requirement_handler()
             ps_requirement_added = false;
         }
     }
+#endif // RTE_UULP_GPIO_1_PIN
 #endif // ENABLE_CHIP_SHELL
 }
 
