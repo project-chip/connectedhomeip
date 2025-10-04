@@ -86,6 +86,8 @@ public:
 
     bool HasAllocatedAudioStreams() override;
 
+    CHIP_ERROR ValidateSFrameConfig(uint16_t cipherSuite, size_t baseKeyLength) override;
+
     void LiveStreamPrivacyModeChanged(bool privacyModeEnabled);
 
 private:

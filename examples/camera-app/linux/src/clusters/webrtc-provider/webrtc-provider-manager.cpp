@@ -529,6 +529,45 @@ bool WebRTCProviderManager::HasAllocatedAudioStreams()
     return avsmController.HasAllocatedAudioStreams();
 }
 
+CHIP_ERROR WebRTCProviderManager::ValidateSFrameConfig(uint16_t cipherSuite, size_t baseKeyLength)
+{
+    // Define supported cipher suites and their expected key lengths
+    // Based on SFrame RFC: https://datatracker.ietf.org/doc/html/draft-ietf-sframe-enc
+    // 0x0001: AES-128-GCM-SHA256 (16 byte key)
+    // 0x0002: AES-256-GCM-SHA512 (32 byte key)
+    constexpr uint16_t kCipherSuite_AES_128_GCM = 0x0001;
+    constexpr uint16_t kCipherSuite_AES_256_GCM = 0x0002;
+    constexpr size_t kAES_128_KeyLength         = 16;
+    constexpr size_t kAES_256_KeyLength         = 32;
+
+    size_t expectedKeyLength = 0;
+
+    // Validate cipher suite and determine expected key length
+    if (cipherSuite == kCipherSuite_AES_128_GCM)
+    {
+        expectedKeyLength = kAES_128_KeyLength;
+    }
+    else if (cipherSuite == kCipherSuite_AES_256_GCM)
+    {
+        expectedKeyLength = kAES_256_KeyLength;
+    }
+    else
+    {
+        ChipLogError(Camera, "Unsupported SFrame cipher suite 0x%04X", cipherSuite);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // Validate base key length matches the expected length for the cipher suite
+    if (baseKeyLength != expectedKeyLength)
+    {
+        ChipLogError(Camera, "SFrame base key length mismatch - expected %u bytes for cipher suite 0x%04X, got %u bytes",
+                     static_cast<unsigned int>(expectedKeyLength), cipherSuite, static_cast<unsigned int>(baseKeyLength));
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 void WebRTCProviderManager::ScheduleOfferSend(uint16_t sessionId)
 {
     ChipLogProgress(Camera, "ScheduleOfferSend called.");

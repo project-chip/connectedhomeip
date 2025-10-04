@@ -51,6 +51,7 @@ public:
         StreamUsageEnum streamUsage;
         Optional<DataModel::Nullable<uint16_t>> videoStreamId;
         Optional<DataModel::Nullable<uint16_t>> audioStreamId;
+        Optional<Structs::SFrameStruct::Type> sFrameConfig;
         Optional<std::vector<ICEServerDecodableStruct>> iceServers;
         Optional<std::string> iceTransportPolicy;
         NodeId peerNodeId;
@@ -273,6 +274,20 @@ public:
      * @return false if no audio streams are currently allocated.
      */
     virtual bool HasAllocatedAudioStreams() = 0;
+
+    /**
+     * @brief Validates the SFrame configuration including cipher suite and base key length.
+     *
+     * The implementation SHALL ensure:
+     *  - The cipher suite is a supported value (e.g., AES-128-GCM or AES-256-GCM).
+     *  - The base key length matches the expected length for the specified cipher suite.
+     *
+     * @param[in] cipherSuite    The cipher suite identifier from the SFrame configuration.
+     * @param[in] baseKeyLength  The length of the base key in bytes.
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR if the SFrame configuration is valid; an appropriate error code otherwise.
+     */
+    virtual CHIP_ERROR ValidateSFrameConfig(uint16_t cipherSuite, size_t baseKeyLength) = 0;
 };
 
 class WebRTCTransportProviderServer : public AttributeAccessInterface, public CommandHandlerInterface

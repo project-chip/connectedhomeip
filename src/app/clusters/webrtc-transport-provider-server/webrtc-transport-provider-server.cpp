@@ -397,6 +397,22 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         args.iceTransportPolicy.SetValue(std::string(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size()));
     }
 
+    // Validate SFrameConfig if present
+    if (req.SFrameConfig.HasValue())
+    {
+        const auto & sframeConfig = req.SFrameConfig.Value();
+        err                       = mDelegate.ValidateSFrameConfig(sframeConfig.cipherSuite, sframeConfig.baseKey.size());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleSolicitOffer: SFrame configuration validation failed: %" CHIP_ERROR_FORMAT, err.Format());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+            return;
+        }
+
+        // Validation passed, assign to args
+        args.sFrameConfig.SetValue(std::move(sframeConfig));
+    }
+
     // Delegate processing:
     // The delegate implementation SHALL:
     // - Populate a new WebRTCSessionStruct with the requested values.
@@ -616,6 +632,22 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
     if (req.ICETransportPolicy.HasValue())
     {
         args.iceTransportPolicy.SetValue(std::string(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size()));
+    }
+
+    // Validate SFrameConfig if present
+    if (req.SFrameConfig.HasValue())
+    {
+        const auto & sframeConfig = req.SFrameConfig.Value();
+        CHIP_ERROR err            = mDelegate.ValidateSFrameConfig(sframeConfig.cipherSuite, sframeConfig.baseKey.size());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleSolicitOffer: SFrame configuration validation failed: %" CHIP_ERROR_FORMAT, err.Format());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+            return;
+        }
+
+        // Validation passed, assign to args
+        args.sFrameConfig.SetValue(std::move(sframeConfig));
     }
 
     // Delegate processing: process the SDP offer, create session, increment reference counts.
