@@ -56,6 +56,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Microwave Oven Control
     - Network Commissioning
     - OTA Software Update Provider
+    - Operational Credentials
     - Operational State
     - Oven Cavity Operational State
     - Oven Mode
@@ -102,6 +103,7 @@ ClustersWithInitFunctions:
     # keep-sorted end
 
 ClustersWithAttributeChangedFunctions:
+    # keep-sorted start
     - Bridged Device Basic Information
     - Door Lock
     - Fan Control
@@ -109,9 +111,10 @@ ClustersWithAttributeChangedFunctions:
     - Pump Configuration and Control
     - Thermostat
     - Window Covering
-# Please keep the above list sorted alphabetically, to minimize merge conflicts.
+    # keep-sorted end
 
 ClustersWithShutdownFunctions:
+    # keep-sorted start
     - Barrier Control
     - Color Control
     - Door Lock
@@ -121,7 +124,7 @@ ClustersWithShutdownFunctions:
     - Sample MEI
     - Scenes Management
     - Thermostat
-# Please keep the above list sorted alphabetically, to minimize merge conflicts.
+    # keep-sorted end
 
 ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
@@ -152,6 +155,7 @@ CodeDrivenClusters:
     - General Diagnostics
     - Group Key Management
     - OTA Software Update Provider
+    - Operational Credentials
     - Push AV Stream Transport
     - Software Diagnostics
     - Time Format Localization

@@ -63,6 +63,10 @@ void MatterAdministratorCommissioningClusterInitCallback(chip::EndpointId endpoi
 
 void MatterAdministratorCommissioningClusterShutdownCallback(chip::EndpointId endpointId);
 
+void MatterOperationalCredentialsClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterOperationalCredentialsClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterGroupKeyManagementClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterGroupKeyManagementClusterShutdownCallback(chip::EndpointId endpointId);
