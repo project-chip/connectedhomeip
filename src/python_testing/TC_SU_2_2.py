@@ -52,9 +52,9 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
+from matter.testing.apps import OTAProviderSubprocess, ACLHandler, OTAHelper
 from matter.testing.event_attribute_reporting import AttributeMatcher, AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from matter.testing.apps import OTAProviderSubprocess, ACLHandler, OTAHelper
 
 # Create a logger
 logger = logging.getLogger(__name__)
@@ -703,7 +703,8 @@ class TC_SU_2_2(MatterBaseTest):
             Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
         ]
 
-        msg_notavailable = f"Full OTA UpdateState (updateNotAvailable) observed: {state_sequence_notavailable}, Expected: {expected_flow__notavailable}"
+        msg_notavailable = f"Full OTA UpdateState(updateNotAvailable) observed: {
+            state_sequence_notavailable}, Expected: {expected_flow__notavailable}"
         asserts.assert_equal(state_sequence_notavailable, expected_flow__notavailable, msg=msg_notavailable)
 
         # Assert no unexpected states observed during the ~120s interval
@@ -1158,7 +1159,7 @@ class TC_SU_2_2(MatterBaseTest):
             provider_proc_s7.terminate()
         except Exception as e:
             logger.info(
-                f'{step_number_s7}: Step #7.5 - Provider termination raised an expected exception (likely BDX unsolicited message): {e}'
+                f'{step_number_s7}: Step #7.5 - Provider termination raised an expected exception (BDX unsolicited msg): {e}'
             )
 
 
