@@ -18,7 +18,7 @@ import os
 import signal
 import tempfile
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Optional
 
 from mobly import asserts
 
@@ -642,7 +642,7 @@ class OTAHelper:
             original_requestor_acls=original_requestor_acls,
             original_provider_acls=original_provider_acls,
         )
-        logger.info(f'Prerequisite #4.0 - Configure ACLs on Requestor and Provider')
+        logger.info("Prerequisite #4.0 - Configure ACLs on Requestor and Provider")
 
         # Prerequisite #5.0 - Add OTA Provider to the Requestor
         await self.add_single_ota_provider(
@@ -650,7 +650,7 @@ class OTAHelper:
             requestor_node_id=requestor_node_id,
             provider_node_id=provider_node_id,
         )
-        logger.info(f'Prerequisite #5.0 - Added Provider to Requestor(DUT) DefaultOTAProviders')
+        logger.info("Prerequisite #5.0 - Added Provider to Requestor(DUT) DefaultOTAProviders")
 
         return provider_proc
 

@@ -45,17 +45,13 @@
 import asyncio
 import logging
 import queue
-import subprocess
 import threading
 import time
 
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
-from matter.interaction_model import Status
-from matter.testing import matter_asserts
 from matter.testing.event_attribute_reporting import AttributeMatcher, AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.testing.apps import OTAProviderSubprocess, ACLHandler, OTAHelper
@@ -965,8 +961,8 @@ class TC_SU_2_2(MatterBaseTest):
             nonlocal state_sequence_notavailable
             val = report.Data.newState
             prev_state = report.Data.previousState
-            event_reason = report.Data.reason
-            event_target_sw = report.Data.targetSoftwareVersion
+            # event_reason = report.Data.reason
+            # event_target_sw = report.Data.targetSoftwareVersion
 
             if val is None:
                 return False
@@ -1096,8 +1092,8 @@ class TC_SU_2_2(MatterBaseTest):
             nonlocal state_sequence_notavailable
             val = report.Data.newState
             prev_state = report.Data.previousState
-            event_reason = report.Data.reason
-            event_target_sw = report.Data.targetSoftwareVersion
+            # event_reason = report.Data.reason
+            # event_target_sw = report.Data.targetSoftwareVersion
 
             if val is None:
                 return False
