@@ -263,10 +263,6 @@ template("siwx917_sdk") {
       "SLI_SI91X_LWIP_HOSTED_NETWORK_STACK=1",
       "__FREERTOS_OS_WISECONNECT=1",
       "SL_SI91X_SOC_MODE=1",
-
-      # TODO: This is a workaround for the init issue with the SiWx917
-      "SL_WLAN_EVENT_THREAD_PRIORITY=osPriorityRealtime6",
-      "SL_WLAN_COMMAND_ENGINE_THREAD_PRIORITY=osPriorityRealtime5",
     ]
 
     # Defines for Si917Y MCU

@@ -38,12 +38,11 @@ class TlsClientManagementCommandDelegate : public TlsClientManagementDelegate
     };
 
     static TlsClientManagementCommandDelegate instance;
-    Tls::CertificateTable & mCertificateTable;
     std::vector<Provisioned> mProvisioned;
     uint16_t mNextId = 1;
 
 public:
-    TlsClientManagementCommandDelegate(Tls::CertificateTable & certificateTable) : mCertificateTable(certificateTable) {}
+    TlsClientManagementCommandDelegate() {}
     ~TlsClientManagementCommandDelegate() = default;
 
     CHIP_ERROR GetProvisionedEndpointByIndex(EndpointId matterEndpoint, FabricIndex fabric, size_t index,
@@ -58,11 +57,13 @@ public:
                                                                     uint16_t endpointID,
                                                                     EndpointStructType & endpoint) const override;
 
-    Protocols::InteractionModel::ClusterStatusCode RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                                 uint16_t endpointID) override;
+    Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                      uint16_t endpointID) override;
 
     CHIP_ERROR RootCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) override;
     CHIP_ERROR ClientCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id) override;
+
+    void RemoveFabric(FabricIndex fabric) override;
 
     static inline TlsClientManagementCommandDelegate & GetInstance() { return instance; }
 
