@@ -87,7 +87,6 @@ CommandHandlerInterfaceOnlyClusters:
 ClustersWithInitFunctions:
     # keep-sorted start
     - Color Control
-    - Fixed Label
     - Groups
     - Identify
     - Level Control
@@ -115,7 +114,6 @@ ClustersWithShutdownFunctions:
     - Barrier Control
     - Color Control
     - Door Lock
-    - Fixed Label
     - Level Control
     - On/Off
     - Sample MEI
