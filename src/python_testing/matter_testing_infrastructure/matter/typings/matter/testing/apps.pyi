@@ -6,6 +6,7 @@ from typing import Any, List, Optional, Union
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.testing.tasks import Subprocess
 
+
 @dataclass
 class OtaImagePath:
     path: str
