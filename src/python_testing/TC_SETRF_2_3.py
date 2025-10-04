@@ -290,6 +290,8 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
         await self.check_next_day_entry_date_attribute(endpoint, self.nextDayEntryDateValue)
         asserts.assert_not_equal(self.nextDayEntryDateValue, nextDayEntryDateValue_previous,
                                  "NextDayEntryDate must change after TestEventTrigger for Change Time Test Event.")
+        asserts.assert_not_equal(self.nextDayEntryDateValue, self.currentDayEntryDateValue,
+                                 "NextDayEntryDate must not be equal to CurrentDayEntryDate after TestEventTrigger for Change Time Test Event.")
 
         self.step("16")
         # TH reads NextDay attribute, expects a DayStruct. Checks that NextDay did not change after TestEventTrigger Change Time Test Event.
