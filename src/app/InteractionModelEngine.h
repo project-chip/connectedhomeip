@@ -429,6 +429,11 @@ public:
     // Returns the old data model provider value.
     DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP
+    void ScheduledForceTriggerCheckInMessages();
+    void TriggerCheckInMessages(bool aForceSend);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_SERVER
+
 private:
     /* DataModel::ActionContext implementation */
     Messaging::ExchangeContext * CurrentExchange() override { return mCurrentExchange; }
@@ -632,6 +637,13 @@ private:
     Status CheckCommandExistence(const ConcreteCommandPath & aCommandPath, DataModel::AcceptedCommandEntry & entry);
     Status CheckCommandAccess(const DataModel::InvokeRequest & aRequest, const Access::Privilege aRequiredPrivilege);
     Status CheckCommandFlags(const DataModel::InvokeRequest & aRequest, const DataModel::AcceptedCommandEntry & entry);
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    bool ShouldCheckInMsgsBeSent(FabricIndex aFabricIndex, NodeId subjectID);
+    static void ForceTriggerCheckInMessages(System::Layer * aSystemLayer, void * apAppState);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     /**
      * Find the AttributeEntry that corresponds to the given attribute, if there is one.
