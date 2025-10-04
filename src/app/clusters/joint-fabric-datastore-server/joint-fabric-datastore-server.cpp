@@ -24,6 +24,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -298,8 +299,7 @@ bool emberAfJointFabricDatastoreClusterAddKeySetCallback(
     app::JointFabricDatastore & jointFabricDatastore = Server::GetInstance().GetJointFabricDatastore();
 
     VerifyOrExit(jointFabricDatastore.IsGroupKeySetEntryPresent(groupKeySet.groupKeySetID) == false,
-                 // TODO: make sure this maps to Protocols::InteractionModel::ClusterStatusCode::ConstraintError
-                 err = CHIP_ERROR_INVALID_ARGUMENT);
+                 err = CHIP_IM_GLOBAL_STATUS(ConstraintError));
     SuccessOrExit(err = jointFabricDatastore.AddGroupKeySetEntry(groupKeySet));
 
 exit:
@@ -550,7 +550,10 @@ bool emberAfJointFabricDatastoreClusterRefreshNodeCallback(
 
     app::JointFabricDatastore & jointFabricDatastore = Server::GetInstance().GetJointFabricDatastore();
 
-    SuccessOrExit(err = jointFabricDatastore.RefreshNode(nodeId));
+    ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpointsList;
+    // TODO: Get Endpoints List from connected device with <nodeId>
+
+    SuccessOrExit(err = jointFabricDatastore.RefreshNode(nodeId, endpointsList.TakeBuffer()));
 
 exit:
     if (err == CHIP_NO_ERROR)
