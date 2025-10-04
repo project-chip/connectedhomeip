@@ -53,6 +53,10 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId) : Instance(aDel
 
 Instance::~Instance()
 {
+    if (mDelegate)
+    {
+        mDelegate->SetInstance(nullptr);
+    }
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
