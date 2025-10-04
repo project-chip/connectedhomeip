@@ -128,23 +128,37 @@ void MatterTimeSynchronizationPluginServerInitCallback() {}
 
 namespace chip::app::Clusters::TimeSynchronization {
 
-TimeSynchronizationCluster * FindClusterOnEndpoint(EndpointId endpointId)
+TimeSynchronizationCluster * GetClusterInstance()
 {
     // TODO: Enable this check later
     // VerifyOrReturnValue(endpointId == kRootEndpointId, nullptr);
 
-    IntegrationDelegate integrationDelegate;
+    return static_cast<TimeSynchronizationCluster *>(&gServer.Cluster());
+}
 
-    ServerClusterInterface * timeSynchronization = CodegenClusterIntegration::FindClusterOnEndpoint(
-        {
-            .endpointId                = endpointId,
-            .clusterId                 = TimeSynchronization::Id,
-            .fixedClusterInstanceCount = kTimeSynchronizationFixedClusterCount,
-            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
-        },
-        integrationDelegate);
+// -----------------------------------------------------------------------------
+// Delegate Implementation
 
-    return static_cast<TimeSynchronizationCluster *>(timeSynchronization);
+Delegate * gDelegate = nullptr;
+
+Delegate * GetDelegate()
+{
+    if (gDelegate == nullptr)
+    {
+        static DefaultTimeSyncDelegate dg;
+        gDelegate = &dg;
+    }
+    return gDelegate;
+}
+
+void SetDefaultDelegate(Delegate * delegate)
+{
+    gDelegate = delegate;
+}
+
+Delegate * GetDefaultDelegate()
+{
+    return GetDelegate();
 }
 
 } // namespace chip::app::Clusters::TimeSynchronization

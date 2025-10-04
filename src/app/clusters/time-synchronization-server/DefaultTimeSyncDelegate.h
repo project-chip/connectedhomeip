@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "time-synchronization-delegate.h"
+#include <app/clusters/time-synchronization-server/time-synchronization-delegate.h>
 
 namespace chip::app::Clusters::TimeSynchronization {
 
@@ -26,7 +26,7 @@ class DefaultTimeSyncDelegate : public Delegate
 {
 
 public:
-    DefaultTimeSyncDelegate() : Delegate(){};
+    DefaultTimeSyncDelegate() : Delegate() {};
     bool IsNTPAddressValid(CharSpan ntp) override;
     bool IsNTPAddressDomain(CharSpan ntp) override;
     CHIP_ERROR UpdateTimeFromPlatformSource(chip::Callback::Callback<OnTimeSyncCompletion> * callback) override;

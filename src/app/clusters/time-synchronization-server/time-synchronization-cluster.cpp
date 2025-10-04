@@ -14,10 +14,9 @@
  *    limitations under the License.
  */
 
-#include "DefaultTimeSyncDelegate.h"
-#include "time-synchronization-delegate.h"
 #include <app/clusters/time-synchronization-server/CodegenIntegration.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
+#include <app/clusters/time-synchronization-server/time-synchronization-delegate.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 
 #include <platform/RuntimeOptionsProvider.h>
@@ -59,31 +58,6 @@ CHIP_ERROR UpdateUTCTime(uint64_t UTCTimeInChipEpochUs)
 namespace chip::app::Clusters {
 
 namespace TimeSynchronization {
-
-// -----------------------------------------------------------------------------
-// Delegate Implementation
-
-Delegate * gDelegate = nullptr;
-
-Delegate * GetDelegate()
-{
-    if (gDelegate == nullptr)
-    {
-        static DefaultTimeSyncDelegate dg;
-        gDelegate = &dg;
-    }
-    return gDelegate;
-}
-
-void SetDefaultDelegate(Delegate * delegate)
-{
-    gDelegate = delegate;
-}
-
-Delegate * GetDefaultDelegate()
-{
-    return GetDelegate();
-}
 
 // -----------------------------------------------------------------------------
 // Event generation functions
@@ -131,7 +105,7 @@ bool emitDSTStatusEvent(EndpointId ep, bool dstOffsetActive, DataModel::EventsGe
 
 bool emitTimeZoneStatusEvent(EndpointId ep, DataModel::EventsGenerator * eventsGenerator)
 {
-    auto timeSynchronization = FindClusterOnEndpoint(ep);
+    auto timeSynchronization = GetClusterInstance();
     VerifyOrReturnValue(timeSynchronization != nullptr, false);
 
     const auto & tzList = timeSynchronization->GetTimeZone();
@@ -243,9 +217,8 @@ TimeSynchronizationCluster::TimeSynchronizationCluster(
     const BitFlags<TimeSynchronization::Feature> features,
     TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type supportsDNSResolve, TimeZoneDatabaseEnum timeZoneDatabase,
     TimeSynchronization::TimeSourceEnum timeSource) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mOptionalAttributeSet(optionalAttributeSet), mFeatures(features), mSupportsDNSResolve(supportsDNSResolve),
-    mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mOptionalAttributeSet(optionalAttributeSet), mFeatures(features),
+    mSupportsDNSResolve(supportsDNSResolve), mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),

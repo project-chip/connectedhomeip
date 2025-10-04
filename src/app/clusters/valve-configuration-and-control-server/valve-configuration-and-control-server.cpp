@@ -314,7 +314,7 @@ CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, Data
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kTimeSync))
     {
 #ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
-        auto timeSynchronization = TimeSynchronization::FindClusterOnEndpoint(ep);
+        auto timeSynchronization = TimeSynchronization::GetClusterInstance();
         VerifyOrReturnValue(timeSynchronization != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
         if (!openDuration.IsNull() &&

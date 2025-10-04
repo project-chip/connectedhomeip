@@ -19,9 +19,15 @@
 #pragma once
 
 #include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
+#include <app/clusters/time-synchronization-server/time-synchronization-delegate.h>
 
 namespace chip::app::Clusters::TimeSynchronization {
 
-TimeSynchronizationCluster * FindClusterOnEndpoint(EndpointId endpointId);
+TimeSynchronizationCluster * GetClusterInstance();
+
+// Delegate functions
+Delegate * GetDelegate();
+void SetDefaultDelegate(Delegate * delegate);
+Delegate * GetDefaultDelegate();
 
 } // namespace chip::app::Clusters::TimeSynchronization

@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include "TimeSyncDataProvider.h"
-#include "time-synchronization-delegate.h"
+#include <app/clusters/time-synchronization-server/TimeSyncDataProvider.h>
+#include <app/clusters/time-synchronization-server/time-synchronization-delegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/TimeSynchronization/Metadata.h>
@@ -52,11 +52,6 @@ enum class TimeSyncEventFlag : uint8_t
     kTimeFailure     = 8,
     kMissingTTSource = 16,
 };
-
-// Delegate functions
-Delegate * GetDelegate();
-void SetDefaultDelegate(Delegate * delegate);
-Delegate * GetDefaultDelegate();
 
 } // namespace TimeSynchronization
 
