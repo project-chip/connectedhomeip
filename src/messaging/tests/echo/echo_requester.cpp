@@ -67,9 +67,9 @@ constexpr size_t kMaxTCPConnectAttempts = 3;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
 
 chip::Transport::AppTCPConnectionCallbackCtxt gAppTCPConnCbCtxt;
-chip::Transport::ActiveTCPConnectionHolder gActiveTCPConnState;
+chip::Transport::ActiveTCPConnectionHandle gActiveTCPConnState;
 
-static void HandleConnectionAttemptComplete(chip::Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr);
+static void HandleConnectionAttemptComplete(chip::Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr);
 static void HandleConnectionClosed(chip::Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr);
 
 // True, if client is still connecting to the server, false otherwise.
@@ -228,7 +228,7 @@ void CloseConnection()
     gClientConInProgress  = false;
 }
 
-void HandleConnectionAttemptComplete(chip::Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR err)
+void HandleConnectionAttemptComplete(chip::Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR err)
 {
     chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 

@@ -47,6 +47,7 @@ public:
     inline const Releasable & operator*() const { return *mReleasable; }
     inline Releasable & operator*() { return *mReleasable; }
 
+    inline operator bool() { return mReleasable != nullptr; }
     inline bool IsNull() const { return mReleasable == nullptr; }
 
     void Release()

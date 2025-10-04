@@ -23,6 +23,7 @@
 #pragma once
 
 #include <inet/InetError.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ObjectLifeCycle.h>
 #include <lib/support/Pool.h>
@@ -35,6 +36,9 @@
 namespace chip {
 namespace Inet {
 
+template <typename EndPointType>
+class EndPointDeletor;
+
 /**
  * Template providing traits for EndPoint types used by EndPointManager.
  *
@@ -45,6 +49,55 @@ namespace Inet {
 template <class EndPointType>
 struct EndPointProperties;
 
+template <class EndPointType>
+class EndPointHandle : private AutoRelease<EndPointType>
+{
+public:
+    using AutoRelease<EndPointType>::operator bool;
+    using AutoRelease<EndPointType>::operator->;
+    using AutoRelease<EndPointType>::operator*;
+    using AutoRelease<EndPointType>::IsNull;
+    using AutoRelease<EndPointType>::Release;
+
+    EndPointHandle() : AutoRelease<EndPointType>(nullptr) {}
+    EndPointHandle(EndPointType * releasable) : AutoRelease<EndPointType>(releasable ? releasable->Retain() : nullptr) {}
+
+    EndPointHandle(const EndPointHandle & src) : EndPointHandle(src.mReleasable) {}
+
+    inline EndPointHandle & operator=(const EndPointHandle & src)
+    {
+        if (this->mReleasable != src.mReleasable)
+        {
+            this->Set(src.IsNull() ? nullptr : src.mReleasable->Retain());
+        }
+        return *this;
+    }
+
+    inline bool operator==(const EndPointHandle & other) const { return this->mReleasable == other.mReleasable; }
+    inline bool operator!=(const EndPointHandle & other) const { return this->mReleasable != other.mReleasable; }
+    inline bool operator==(const EndPointType & other) const { return this->mReleasable == &other; }
+    inline bool operator!=(const EndPointType & other) const { return this->mReleasable != &other; }
+
+    // For printing
+    inline operator const void *() const { return this->mReleasable; }
+
+    // This is bad and should not normally be done; we are explicitly closing the connection
+    // instead of gracefully releasing our reference, which will cause anyone holding a reference to have issues
+    inline void ForceDisconnect()
+    {
+        EndPointType * releasable = this->mReleasable;
+        if ((releasable != nullptr) && releasable->GetReferenceCount() > 1)
+        {
+            Release();
+            EndPointDeletor<EndPointType>::Release(releasable);
+        }
+        else
+        {
+            Release();
+        }
+    }
+};
+
 /**
  * Manage creating, deletion, and iteration of Inet::EndPoint types.
  */
@@ -52,8 +105,9 @@ template <class EndPointType>
 class EndPointManager
 {
 public:
-    using EndPoint        = EndPointType;
-    using EndPointVisitor = Loop (*)(EndPoint *);
+    using EndPoint            = EndPointType;
+    using TypedEndPointHandle = EndPointHandle<EndPoint>;
+    using EndPointVisitor     = Loop (*)(TypedEndPointHandle &);
 
     EndPointManager() {}
     virtual ~EndPointManager() { VerifyOrDie(mLayerState.Destroy()); }
@@ -77,13 +131,13 @@ public:
 
     System::Layer & SystemLayer() const { return *mSystemLayer; }
 
-    CHIP_ERROR NewEndPoint(EndPoint ** retEndPoint)
+    CHIP_ERROR NewEndPoint(TypedEndPointHandle & retEndPoint)
     {
         assertChipStackLockedByCurrentThread();
         VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-        *retEndPoint = CreateEndPoint();
-        if (*retEndPoint == nullptr)
+        retEndPoint = CreateEndPoint();
+        if (retEndPoint.IsNull())
         {
             ChipLogError(Inet, "%s endpoint pool FULL", EndPointProperties<EndPointType>::kName);
             return CHIP_ERROR_ENDPOINT_POOL_FULL;
@@ -93,15 +147,21 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    virtual TypedEndPointHandle CreateEndPoint()                = 0;
+    virtual Loop ForEachEndPoint(const EndPointVisitor visitor) = 0;
+
+protected:
+    friend class EndPointDeletor<EndPointType>;
+    friend class EndPointHandle<EndPointType>;
+    friend EndPointType;
+
+    virtual void ReleaseEndPoint(EndPoint * endPoint) = 0;
+
     void DeleteEndPoint(EndPoint * endPoint)
     {
         SYSTEM_STATS_DECREMENT(EndPointProperties<EndPointType>::kSystemStatsKey);
         ReleaseEndPoint(endPoint);
     }
-
-    virtual EndPoint * CreateEndPoint()                         = 0;
-    virtual void ReleaseEndPoint(EndPoint * endPoint)           = 0;
-    virtual Loop ForEachEndPoint(const EndPointVisitor visitor) = 0;
 
 private:
     ObjectLifeCycle mLayerState;
@@ -112,20 +172,25 @@ template <typename EndPointImpl>
 class EndPointManagerImplPool : public EndPointManager<typename EndPointImpl::EndPoint>
 {
 public:
-    using Manager  = EndPointManager<typename EndPointImpl::EndPoint>;
-    using EndPoint = typename EndPointImpl::EndPoint;
+    using Manager             = EndPointManager<typename EndPointImpl::EndPoint>;
+    using EndPoint            = typename EndPointImpl::EndPoint;
+    using TypedEndPointHandle = typename Manager::TypedEndPointHandle;
 
     EndPointManagerImplPool()           = default;
     ~EndPointManagerImplPool() override = default;
 
-    EndPoint * CreateEndPoint() override { return sEndPointPool.CreateObject(*this); }
-    void ReleaseEndPoint(EndPoint * endPoint) override { sEndPointPool.ReleaseObject(static_cast<EndPointImpl *>(endPoint)); }
+    TypedEndPointHandle CreateEndPoint() override { return sEndPointPool.CreateObject(*this); }
     Loop ForEachEndPoint(const typename Manager::EndPointVisitor visitor) override
     {
-        return sEndPointPool.ForEachActiveObject([&](EndPoint * endPoint) -> Loop { return visitor(endPoint); });
+        return sEndPointPool.ForEachActiveObject([&](EndPoint * endPoint) -> Loop {
+            TypedEndPointHandle handle(endPoint);
+            return visitor(handle);
+        });
     }
 
 private:
+    void ReleaseEndPoint(EndPoint * endPoint) override { sEndPointPool.ReleaseObject(static_cast<EndPointImpl *>(endPoint)); }
+
     ObjectPool<EndPointImpl, EndPointProperties<EndPoint>::kNumEndPoints> sEndPointPool;
 };
 
