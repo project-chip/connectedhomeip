@@ -189,7 +189,7 @@ from matter.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterOb
 from matter.clusters.Types import Nullable
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.basic_composition import BasicCompositionTests, log_structured_data
 from matter.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds,
                                                  attribute_id_type, cluster_id_type, command_id_type)
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -272,7 +272,7 @@ def check_no_duplicates(obj: Any) -> None:
         raise ValueError(f"Value {str(obj)} contains duplicate values")
 
 
-class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
+class TC_DeviceBasicComposition(BasicCompositionTests, MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
@@ -604,12 +604,14 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                                                      attribute_id=manufacturer_value)
                     if suffix > attribute_standard_range_max and suffix < global_range_min:
                         self.record_error(self.get_test_name(), location=location,
-                                          problem=f"Manufacturer attribute in undefined range {manufacturer_value} in cluster {cluster_id}",
+                                          problem=f"Manufacturer attribute in undefined range {
+                                              manufacturer_value} in cluster {cluster_id}",
                                           spec_location=f"Cluster {cluster_id}")
                         success = False
                     elif suffix >= global_range_min:
                         self.record_error(self.get_test_name(), location=location,
-                                          problem=f"Manufacturer attribute in global range {manufacturer_value} in cluster {cluster_id}",
+                                          problem=f"Manufacturer attribute in global range {
+                                              manufacturer_value} in cluster {cluster_id}",
                                           spec_location=f"Cluster {cluster_id}")
                         success = False
 
@@ -930,7 +932,8 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             for ep, problem in problems.items():
                 location = AttributePathLocation(endpoint_id=ep, cluster_id=Clusters.Descriptor.id,
                                                  attribute_id=Clusters.Descriptor.Attributes.TagList.attribute_id)
-                msg = f'problem on ep {ep}: missing feature = {problem.missing_feature}, missing attribute = {problem.missing_attribute}, duplicates = {problem.duplicates}, same_tags = {problem.same_tag}'
+                msg = f'problem on ep {ep}: missing feature = {problem.missing_feature}, missing attribute = {
+                    problem.missing_attribute}, duplicates = {problem.duplicates}, same_tags = {problem.same_tag}'
                 self.record_error(self.get_test_name(), location=location, problem=msg, spec_location="Descriptor TagList")
 
         record_problems(problems)
@@ -966,13 +969,6 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         json_str, txt_str = self.dump_wildcard(dump_device_composition_path)
 
         # Structured dump so we can pull these back out of the logs
-        def log_structured_data(start_tag: str, dump_string):
-            lines = dump_string.splitlines()
-            logging.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
-            for line in lines:
-                logging.info(f'{start_tag}{line}')
-            logging.info(f'{start_tag}END ====')
-
         log_structured_data('==== json: ', json_str)
         log_structured_data('==== txt: ', txt_str)
 
@@ -1216,7 +1212,8 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                         self.record_error(
                             self.get_test_name(),
                             location=location,
-                            problem=f"EndpointUniqueId attribute length is {len(value)} bytes which exceeds the maximum allowed 32 bytes",
+                            problem=f"EndpointUniqueId attribute length is {
+                                len(value)} bytes which exceeds the maximum allowed 32 bytes",
                             spec_location="EndpointUniqueId attribute"
                         )
                         self.fail_current_test(
