@@ -19,6 +19,7 @@
 #pragma once
 
 #include <functional>
+#include <lib/support/Span.h>
 #include <memory>
 #include <string>
 #include <vector>
@@ -52,10 +53,10 @@ class WebRTCTrack
 public:
     virtual ~WebRTCTrack() = default;
 
-    virtual void SendData(const char * data, size_t size)                     = 0;
-    virtual void SendFrame(const char * data, size_t size, int64_t timestamp) = 0;
-    virtual bool IsReady()                                                    = 0;
-    virtual std::string GetType()                                             = 0; // "video" or "audio"
+    virtual void SendData(const chip::ByteSpan & data)                     = 0;
+    virtual void SendFrame(const chip::ByteSpan & data, int64_t timestamp) = 0;
+    virtual bool IsReady()                                                 = 0;
+    virtual std::string GetType()                                          = 0; // "video" or "audio"
 };
 
 // Abstract peer connection interface

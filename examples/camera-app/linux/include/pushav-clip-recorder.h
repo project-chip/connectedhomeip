@@ -139,7 +139,7 @@ public:
      * @param size Data size in bytes
      * @param isVideo True for video data, false for audio
      */
-    void PushPacket(const char * data, size_t size, bool isVideo);
+    void PushPacket(const uint8_t * data, size_t size, bool isVideo);
 
     void SetOnStopCallback(std::function<void()> cb) { mOnStopCallback = std::move(cb); }
 

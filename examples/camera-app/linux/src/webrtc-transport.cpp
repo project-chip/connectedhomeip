@@ -67,25 +67,25 @@ WebrtcTransport::RequestArgs & WebrtcTransport::GetRequestArgs()
     return mRequestArgs;
 }
 
-void WebrtcTransport::SendVideo(const char * data, size_t size, int64_t timestamp, uint16_t videoStreamID)
+void WebrtcTransport::SendVideo(const chip::ByteSpan & data, int64_t timestamp, uint16_t videoStreamID)
 {
     if (mLocalVideoTrack)
     {
-        mLocalVideoTrack->SendFrame(data, size, timestamp);
+        mLocalVideoTrack->SendFrame(data, timestamp);
     }
 }
 
 // Implementation of SendAudio method
-void WebrtcTransport::SendAudio(const char * data, size_t size, int64_t timestamp, uint16_t audioStreamID)
+void WebrtcTransport::SendAudio(const chip::ByteSpan & data, int64_t timestamp, uint16_t audioStreamID)
 {
     if (mLocalAudioTrack)
     {
-        mLocalAudioTrack->SendFrame(data, size, timestamp);
+        mLocalAudioTrack->SendFrame(data, timestamp);
     }
 }
 
 // Implementation of SendAudioVideo method
-void WebrtcTransport::SendAudioVideo(const char * data, size_t size, uint16_t videoStreamID, uint16_t audioStreamID)
+void WebrtcTransport::SendAudioVideo(const chip::ByteSpan & data, uint16_t videoStreamID, uint16_t audioStreamID)
 {
     // Placeholder for actual WebRTC implementation to send synchronized audio/video data
 }
