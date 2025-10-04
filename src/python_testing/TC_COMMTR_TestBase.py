@@ -52,9 +52,10 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
         """
 
         matter_asserts.assert_list(struct.tariffComponentIDs,
-                                   "TariffComponentIDs field of MeteredQuantityStruct must return a list", max_length=128)
-        matter_asserts.assert_list_element_type(
-            struct.tariffComponentIDs, int, "TariffComponentIDs field of MeteredQuantityStruct must contain int elements")
+                                   "TariffComponentIDs field of MeteredQuantityStruct must return a list with max length 128.", max_length=128)
+        for tariffComponentID in struct.tariffComponentIDs:
+            matter_asserts.assert_valid_uint32(
+                tariffComponentID, 'TariffComponentID field of MeteredQuantityStruct must have uint32 type.')
         matter_asserts.assert_valid_int64(struct.quantity, 'Quantity field of MeteredQuantityStruct must be int64')
 
     async def check_maximum_metered_quantities_attribute(self, endpoint: int, attribute_value: Optional[int] = None) -> None:
