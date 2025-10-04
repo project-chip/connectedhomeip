@@ -315,9 +315,6 @@ class TC_SU_2_2(MatterBaseTest):
             nonlocal progress_values, progress_seen, final_null_seen, progress_recorded
             val = getattr(report.value, "value", report.value)  # unwrap Nullable if needed
 
-            # DEBUG: loguea el valor y tipo real
-            logger.info(f'DEBUG - Raw value: {val}, Type: {type(val)}')
-
             if val == NullValue:
                 val = None
 
@@ -607,8 +604,8 @@ class TC_SU_2_2(MatterBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_3]: Step #3.2 - Track OTA attributes: UpdateState (updateNotAvailable sequence)
-        # UpdateState (updateNotAvailable sequence) matcher: Idle > Idle after ≥120s
-        # Tracks all observed states to verify that no non-Idle state occurs during the 120s interval.
+        # UpdateState (updateNotAvailable sequence) matcher: Idle > Querying > Idle after ≥120s
+        # Tracks all observed states to verify that no non-Idle/Querying state occurs during the 120s interval.
         # ------------------------------------------------------------------------------------
         logger.info(
             f'{step_number_s3}: Step #3.1 - Started subscription for UpdateState attribute '
@@ -617,17 +614,18 @@ class TC_SU_2_2(MatterBaseTest):
 
         observed_states = set()
         state_sequence_notavailable = []  # Full OTA state flow
-        t_first_idle = None
+        observed_states_during_120s = set()
+        t_querying = None  # Time when QueryingImage is triggered
         MIN_QUERY_IMAGE_INTERVAL = 120 + 1  # Buffer time
 
         def matcher_not_available_state(report):
             """
             Step #3.2 matcher function to track OTA UpdateState (updateNotAvailable sequence).
-            Tracks state transitions: Idle > Idle after ≥120s.
+            Tracks state transitions: Idle > Querying > Idle after ≥120s.
             Records each observed state only once and validates when Idle is reached.
-            Tracks all observed states to verify that no non-Idle state occurs during the 120s interval.
+            Tracks all observed states to verify that no non-Idle/Querying state occurs during the 120s interval.
             """
-            nonlocal observed_states, t_first_idle
+            nonlocal observed_states, t_querying
             val = report.value  # UpdateStateEnum
 
             if val is None:
@@ -638,35 +636,38 @@ class TC_SU_2_2(MatterBaseTest):
             # First Idle observed
             if val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle and "first_idle" not in observed_states:
                 observed_states.add("first_idle")
-                t_first_idle = current_time
                 state_sequence_notavailable.append(val)
                 logger.info(
-                    f'{step_number_s3}: Step #3.2 - UpdateState (updateNotAvailable sequence) recorded: {val}')
-                logger.info(
-                    f'{step_number_s3}: Step #3.2 - First Idle recorded at {time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t_first_idle))}'
-                )
+                    f'{step_number_s3}: Step #3.2 - UpdateState (updateNotAvailable sequence) First Idle ecorded: {val}')
                 return False  # Keep waiting for 120s
 
-            # Track all states after first Idle
-            if "first_idle" in observed_states and "second_idle" not in observed_states:
-                # Immediate validation: fail if non-Idle state observed
-                if val != Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle:
-                    logger.info(f'{step_number_s3}: Step #3.2 - OTA UpdateState (updateNotAvailable) observed in 120s interval: {val}')
-                    raise AssertionError(
-                        f"Unexpected non-Idle state {val} observed during 120s interval"
-                    )
-
-            # Check if >=120s passed since first Idle
-            if "first_idle" in observed_states and "second_idle" not in observed_states and current_time - t_first_idle >= MIN_QUERY_IMAGE_INTERVAL and val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle:
-                observed_states.add("second_idle")
+            # Querying observed after first Idle
+            if val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying \
+                    and "first_idle" in observed_states \
+                    and "querying_seen" not in observed_states:
+                observed_states.add("querying_seen")
+                t_querying = current_time
                 state_sequence_notavailable.append(val)
                 logger.info(
-                    f'{step_number_s3}: Step #3.2 - OTA UpdateState sequence transitioned to Idle after updateNotAvailable (expect ~120s).')
-                logger.info(
-                    f'{step_number_s3}: Step #3.2 - Idle state after 120s interval at {time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(current_time))}, no Query_Image was sent')
-                logger.info(
-                    f'{step_number_s3}: Step #3.2 - And, no non-Idle states observed during the 120s interval.')
-                return True
+                    f'{step_number_s3}: Step #3.2 - UpdateState (updateNotAvailable sequence) First Querying recorded: {val}')
+
+            # Track all states during the 120s interval after Querying
+            if "querying_seen" in observed_states and "second_idle" not in observed_states:
+                if val not in [
+                    Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
+                    Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
+                ]:
+                    observed_states_during_120s.add(val)
+                    logger.info(f'{step_number_s3}: Step #3.2 - Unexpected state during 120s interval: {val}')
+
+                # Check if >=120s passed since Querying and Idle observed
+                if val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle and current_time - t_querying >= MIN_QUERY_IMAGE_INTERVAL:
+                    observed_states.add("second_idle")
+                    state_sequence_notavailable.append(val)
+                    logger.info(
+                        f'{step_number_s3}: Step #3.2 - Second Idle after 120s interval recorded: {val}'
+                    )
+                    return True  # Matcher considers sequence complete
 
             return False
 
@@ -683,18 +684,38 @@ class TC_SU_2_2(MatterBaseTest):
         try:
             # Wait until the final state (Idle) is reached or timeout (10 min)
             await subscription_attr_state_updatenotavailable.await_all_expected_report_matches([matcher_not_available_state_obj], timeout_sec=600.0)
-            logger.info(f'{step_number_s3}: Step #3.3 - UpdateState (updateNotAvailable sequence) matcher has completed.')
         except Exception as e:
-            logger.warning(f"OTA update encountered an error or timeout: {e}")
+            logger.warning(f"OTA update encountered an error or timeout, test continues: {e}")
         finally:
             # Cancel subscriptions and task
+            logger.info(f'{step_number_s3}: Step #3.3 - UpdateState (updateNotAvailable sequence) matcher has completed.')
             await subscription_attr_state_updatenotavailable.cancel()
 
         # ------------------------------------------------------------------------------------
         # [STEP_3]: Step #3.4 - Verify image transfer from TH/OTA-P to DUT is Busy
         # ------------------------------------------------------------------------------------
-        logger.info(f'{step_number_s3}: Step #3.4 - Full OTA UpdateState (updateNotAvailable) observed: {state_sequence_notavailable}')
-        logger.info(f'{step_number_s3}: Step #3.4 - NotAvailable Idle sequence verification completed successfully.')
+        # Log the full sequence
+        logger.info(
+            f'{step_number_s3}: Step #3.4 - Full OTA UpdateState (updateNotAvailable) observed: {state_sequence_notavailable}')
+        logger.info(
+            f'{step_number_s3}: Step #3.4 - 120s interval OTA UpdateState (updateNotAvailable) observed: {list(observed_states_during_120s)} ')
+
+        # Assert Full OTA UpdateState (updateNotAvailable) observed by the matcher (Idle → Idle) - Expected OTA flow
+        expected_flow__notavailable = [
+            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
+            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
+            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
+        ]
+
+        msg_notavailable = f"Full OTA UpdateState (updateNotAvailable) observed: {state_sequence_notavailable}, Expected: {expected_flow__notavailable}"
+        asserts.assert_equal(state_sequence_notavailable, expected_flow__notavailable, msg=msg_notavailable)
+
+        # Assert no unexpected states observed during the ~120s interval
+        msg_unexpected = (
+            f"Unexpected OTA states during 120s interval: {observed_states_during_120s}, "
+            f"Expected: []"
+        )
+        asserts.assert_equal(list(observed_states_during_120s), [], msg=msg_unexpected)
 
         # ------------------------------------------------------------------------------------
         # [STEP_3]: Step #3.5 - Close Provider_S3 Process (CLEANUP!)
@@ -953,9 +974,6 @@ class TC_SU_2_2(MatterBaseTest):
             transition = (prev_state, val)
             state_sequence_notavailable.append(transition)
 
-            # logger.info(f'{step_number_s6}: [DEBUG] {report.Data}')
-            # logger.info(f'{step_number_s6}: [DEBUG] StateTransition observed, new_state {val}, previous state {prev_state}')
-
             expected = [
                 (Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
                  Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying),
@@ -1086,9 +1104,6 @@ class TC_SU_2_2(MatterBaseTest):
 
             transition = (prev_state, val)
             state_sequence_notavailable.append(transition)
-
-            # logger.info(f'{step_number_s7}: [DEBUG] {report.Data}')
-            # logger.info(f'{step_number_s7}: [DEBUG] StateTransition observed, new_state {val}, previous state {prev_state}')
 
             expected = [
                 (Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
