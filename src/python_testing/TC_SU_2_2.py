@@ -428,8 +428,6 @@ class TC_SU_2_2(MatterBaseTest):
         # Start AttributeSubscriptionHandler first to avoid missing any rapid OTA events (race condition)
         # Atrributes: UpdateState (Busy sequence)
         # ------------------------------------------------------------------------------------
-        t_start_query = time.time()
-
         subscription_attr_state_busy = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
@@ -463,47 +461,59 @@ class TC_SU_2_2(MatterBaseTest):
             'before AnnounceOTAProvider to avoid missing OTA events')
 
         observed_states = set()
-        state_sequence = []  # Full OTA state flow
-        final_downloading_seen = False
-        final_idle_seen = False
+        state_sequence_busy = []
+        observed_states_during_delay = set()
+        t_delayedonquery = None
+        t_start_downloading = None
+        MIN_DELAY_INTERVAL = 120 + 1  # Buffer time
 
         def matcher_busy_state(report):
             """
             Step #2.2 matcher function to track OTA UpdateState (Busy sequence).
             Tracks state transitions: DelayedOnQuery > Downloading > Idle.
             Records each observed state only once and captures the timestamp when Downloading starts (~120s after DelayedOnQuery).
+            During the interval (120s): only DelayedOnQuery (3) or Querying (2) are allowed.
             """
-            nonlocal observed_states, final_downloading_seen, final_idle_seen, state_sequence
-            global t_start_downloading
+            nonlocal observed_states, t_delayedonquery, t_start_downloading
             val = report.value
 
             if val is None:
                 return False
 
-            # Only track kQuerying (2) once
-            if val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery:  #
-                if val not in observed_states:
-                    observed_states.add(val)
-                    state_sequence.append(val)
-                    logger.info(f'{step_number_s2}: Step #2.2 - UpdateState (Busy sequence) recorded: {val}')
+            current_time = time.time()
 
-            elif val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading:   # 4
-                if not final_downloading_seen:  # log only once
-                    final_downloading_seen = True
-                    state_sequence.append(val)
-                    t_start_downloading = time.time()
-                    logger.info(f'{step_number_s2}: Step #2.2 - UpdateState (Busy sequence) recorded: {val}')
-                    logger.info(
-                        f'{step_number_s2}: Step #2.2 - OTA UpdateState (Busy sequence) transitioned to Downloading after Busy (expect ~120s).')
+            # First DelayedOnQuery
+            if val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery and "delayedonquery_seen" not in observed_states:
+                observed_states.add("delayedonquery_seen")
+                t_delayedonquery = current_time
+                state_sequence_busy.append(val)
+                logger.info(f'{step_number_s2}: Step #2.2 - First DelayedOnQuery recorded: {val}')
+                return False  # Keep waiting for Downloading
 
-            elif val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle:  # 1
-                if not final_idle_seen:  # log only once
-                    final_idle_seen = True
-                    state_sequence.append(val)
-                    logger.info(f'{step_number_s2}: Step #2.2 - UpdateState (Busy sequence) recorded: {val}')
-                    logger.info(f'{step_number_s2}: Step #2.2 - OTA UpdateState (Busy sequence) complete, final state is Idle')
-            # Return True only when Idle is reached
-            return final_idle_seen
+            # Track all states during 120s interval after DelayedOnQuery
+            if "delayedonquery_seen" in observed_states and "downloading_seen" not in observed_states:
+                if val not in [
+                    Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery,
+                    Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,
+                    Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
+                ]:
+                    observed_states_during_delay.add(val)
+                    logger.info(f'{step_number_s2}: Step #2.2 - Unexpected state during 120s interval: {val}')
+
+                # First Downloading after delay
+                if val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading and current_time - t_delayedonquery >= MIN_DELAY_INTERVAL:
+                    observed_states.add("downloading_seen")
+                    t_start_downloading = current_time
+                    state_sequence_busy.append(val)
+                    logger.info(f'{step_number_s2}: Step #2.2 - Downloading after delay recorded: {val}')
+
+            # Final Idle after Downloading
+            if val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle and "downloading_seen" in observed_states:
+                state_sequence_busy.append(val)
+                logger.info(f'{step_number_s2}: Step #2.2 - Final Idle recorded: {val}')
+                return True  # sequence complete
+
+            return False
 
         # Create matcher object for UpdateState
         matcher_busy_state_obj = AttributeMatcher.from_callable(
@@ -518,20 +528,38 @@ class TC_SU_2_2(MatterBaseTest):
         try:
             # Wait until the final state (Idle) is reached or timeout (10 min)
             await subscription_attr_state_busy.await_all_expected_report_matches([matcher_busy_state_obj], timeout_sec=600.0)
-            logger.info(f'{step_number_s2}: Step #2.3 - UpdateState (Busy sequence) matcher has completed.')
         except Exception as e:
             logger.warning(f"OTA update encountered an error or timeout: {e}")
         finally:
             # Cancel subscriptions and task
+            logger.info(f'{step_number_s2}: Step #2.3 - UpdateState (Busy sequence) matcher has completed.')
             await subscription_attr_state_busy.cancel()
 
         # ------------------------------------------------------------------------------------
         # [STEP_2]: Step #2.4 - Verify image transfer from TH/OTA-P to DUT is Busy
         # ------------------------------------------------------------------------------------
-        logger.info(f'{step_number_s2}: Step #2.4 - Full OTA UpdateState (Busy sequence) observed: {state_sequence}')
-        logger.info(f'{step_number_s2}: Step #2.4 - Time Start as Busy: {t_start_query}, Time Ends as Busy {t_start_downloading}')
-        delayed_action_time = t_start_downloading - t_start_query
-        logger.info(f'{step_number_s2}: Step #2.4 - Delay between Querying and Downloading: {delayed_action_time:.2f} s.')
+        logger.info(f'{step_number_s2}: Step #2.4 - Full OTA UpdateState (Busy sequence) observed: {state_sequence_busy}')
+        logger.info(
+            f'{step_number_s2}: Step #2.4 - Time Start as Busy (DelayedOnQuery): {t_delayedonquery}, Time Starts Downloading: {t_start_downloading}')
+
+        # Assert full Busy sequence
+        expected_flow_busy = [
+            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery,
+            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,
+            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
+        ]
+        msg_sequence = f"Full OTA UpdateState (Busy sequence) observed: {state_sequence_busy}, Expected: {expected_flow_busy}"
+        asserts.assert_equal(state_sequence_busy, expected_flow_busy, msg=msg_sequence)
+
+        # Assert no unexpected states during 120s interval
+        msg_unexpected = (
+            f"Unexpected OTA states during 120s interval: {observed_states_during_delay}, "
+            f"Expected: []"
+        )
+        asserts.assert_equal(list(observed_states_during_delay), [], msg=msg_unexpected)
+
+        delayed_action_time = t_start_downloading - t_delayedonquery
+        logger.info(f'{step_number_s2}: Step #2.4 - Delay between DelayedOnQuery and Downloading: {delayed_action_time:.2f} s.')
 
         asserts.assert_true(delayed_action_time >= 120,
                             f"Expected delay >= 120 seconds, but got {delayed_action_time:.2f} seconds")
@@ -703,8 +731,7 @@ class TC_SU_2_2(MatterBaseTest):
             Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
         ]
 
-        msg_notavailable = f"Full OTA UpdateState(updateNotAvailable) observed: {
-            state_sequence_notavailable}, Expected: {expected_flow__notavailable}"
+        msg_notavailable = f"Full OTA UpdateState(updateNotAvailable) observed: {state_sequence_notavailable}, Expected: {expected_flow__notavailable}"
         asserts.assert_equal(state_sequence_notavailable, expected_flow__notavailable, msg=msg_notavailable)
 
         # Assert no unexpected states observed during the ~120s interval
