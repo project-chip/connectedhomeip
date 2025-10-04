@@ -73,6 +73,7 @@ CommandHandlerInterfaceOnlyClusters:
     - TLS Client Management
     - Thread Border Router Management
     - Thread Network Directory
+    - Time Synchronization
     - Water Heater Management
     - Water Heater Mode
     - WebRTC Transport Provider
@@ -155,5 +156,6 @@ CodeDrivenClusters:
     - Push AV Stream Transport
     - Software Diagnostics
     - Time Format Localization
+    - Time Synchronization
     - Wi-Fi Network Diagnostics
     # keep-sorted end
