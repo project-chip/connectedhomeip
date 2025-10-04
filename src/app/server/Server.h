@@ -207,6 +207,8 @@ struct ServerInitParams
     // data model it wants to use. Backwards-compatibility can use `CodegenDataModelProviderInstance`
     // for ember/zap-generated models.
     chip::app::DataModel::Provider * dataModelProvider = nullptr;
+
+    bool advertiseCommissionableIfNoFabrics = CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART;
 };
 
 /**

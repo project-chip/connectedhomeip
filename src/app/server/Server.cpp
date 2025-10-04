@@ -362,11 +362,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
 #endif
     }
-    else
+    else if (initParams.advertiseCommissionableIfNoFabrics)
     {
-#if CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
         SuccessOrExit(err = mCommissioningWindowManager.OpenBasicCommissioningWindow(initParams.discoveryTimeout));
-#endif
     }
 
     // TODO @bzbarsky-apple @cecille Move to examples
