@@ -5423,7 +5423,7 @@ static id _Nullable DecodeAttributeValueForOvenCavityOperationalStateCluster(Att
                 auto & entry_0 = iter_0.GetValue();
                 MTROvenCavityOperationalStateClusterOperationalStateStruct * newElement_0;
                 newElement_0 = [MTROvenCavityOperationalStateClusterOperationalStateStruct new];
-                newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:entry_0.operationalStateID];
+                newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.operationalStateID)];
                 if (entry_0.operationalStateLabel.HasValue()) {
                     newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel.Value());
                     if (newElement_0.operationalStateLabel == nil) {
@@ -5465,7 +5465,7 @@ static id _Nullable DecodeAttributeValueForOvenCavityOperationalStateCluster(Att
         }
         MTROvenCavityOperationalStateClusterErrorStateStruct * _Nonnull value;
         value = [MTROvenCavityOperationalStateClusterErrorStateStruct new];
-        value.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorStateID];
+        value.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.errorStateID)];
         if (cppValue.errorStateLabel.HasValue()) {
             value.errorStateLabel = AsString(cppValue.errorStateLabel.Value());
             if (value.errorStateLabel == nil) {
@@ -6929,7 +6929,7 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(AttributeId a
                 auto & entry_0 = iter_0.GetValue();
                 MTROperationalStateClusterOperationalStateStruct * newElement_0;
                 newElement_0 = [MTROperationalStateClusterOperationalStateStruct new];
-                newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:entry_0.operationalStateID];
+                newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.operationalStateID)];
                 if (entry_0.operationalStateLabel.HasValue()) {
                     newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel.Value());
                     if (newElement_0.operationalStateLabel == nil) {
@@ -6971,7 +6971,7 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(AttributeId a
         }
         MTROperationalStateClusterErrorStateStruct * _Nonnull value;
         value = [MTROperationalStateClusterErrorStateStruct new];
-        value.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorStateID];
+        value.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.errorStateID)];
         if (cppValue.errorStateLabel.HasValue()) {
             value.errorStateLabel = AsString(cppValue.errorStateLabel.Value());
             if (value.errorStateLabel == nil) {
@@ -7087,7 +7087,7 @@ static id _Nullable DecodeAttributeValueForRVCOperationalStateCluster(AttributeI
                 auto & entry_0 = iter_0.GetValue();
                 MTRRVCOperationalStateClusterOperationalStateStruct * newElement_0;
                 newElement_0 = [MTRRVCOperationalStateClusterOperationalStateStruct new];
-                newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:entry_0.operationalStateID];
+                newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.operationalStateID)];
                 if (entry_0.operationalStateLabel.HasValue()) {
                     newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel.Value());
                     if (newElement_0.operationalStateLabel == nil) {
@@ -7117,7 +7117,7 @@ static id _Nullable DecodeAttributeValueForRVCOperationalStateCluster(AttributeI
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     case Attributes::OperationalError::Id: {
@@ -7129,7 +7129,7 @@ static id _Nullable DecodeAttributeValueForRVCOperationalStateCluster(AttributeI
         }
         MTRRVCOperationalStateClusterErrorStateStruct * _Nonnull value;
         value = [MTRRVCOperationalStateClusterErrorStateStruct new];
-        value.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorStateID];
+        value.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.errorStateID)];
         if (cppValue.errorStateLabel.HasValue()) {
             value.errorStateLabel = AsString(cppValue.errorStateLabel.Value());
             if (value.errorStateLabel == nil) {

@@ -194,31 +194,6 @@ public:
 using DecodableType = Type;
 
 } // namespace ApplicationStruct
-namespace ErrorStateStruct {
-enum class Fields : uint8_t
-{
-    kErrorStateID      = 0,
-    kErrorStateLabel   = 1,
-    kErrorStateDetails = 2,
-};
-
-struct Type
-{
-public:
-    uint8_t errorStateID = static_cast<uint8_t>(0);
-    Optional<chip::CharSpan> errorStateLabel;
-    Optional<chip::CharSpan> errorStateDetails;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace ErrorStateStruct
 namespace LabelStruct {
 enum class Fields : uint8_t
 {
@@ -242,29 +217,6 @@ public:
 using DecodableType = Type;
 
 } // namespace LabelStruct
-namespace OperationalStateStruct {
-enum class Fields : uint8_t
-{
-    kOperationalStateID    = 0,
-    kOperationalStateLabel = 1,
-};
-
-struct Type
-{
-public:
-    uint8_t operationalStateID = static_cast<uint8_t>(0);
-    Optional<chip::CharSpan> operationalStateLabel;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace OperationalStateStruct
 } // namespace Structs
 } // namespace detail
 

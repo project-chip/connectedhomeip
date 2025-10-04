@@ -96,9 +96,9 @@ struct TypeInfo
 namespace OperationalState {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::RvcOperationalState::OperationalStateEnum;
+    using DecodableType    = chip::app::Clusters::RvcOperationalState::OperationalStateEnum;
+    using DecodableArgType = chip::app::Clusters::RvcOperationalState::OperationalStateEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RvcOperationalState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationalState::Id; }
@@ -160,7 +160,8 @@ struct TypeInfo
         Attributes::CurrentPhase::TypeInfo::DecodableType currentPhase;
         Attributes::CountdownTime::TypeInfo::DecodableType countdownTime;
         Attributes::OperationalStateList::TypeInfo::DecodableType operationalStateList;
-        Attributes::OperationalState::TypeInfo::DecodableType operationalState = static_cast<uint8_t>(0);
+        Attributes::OperationalState::TypeInfo::DecodableType operationalState =
+            static_cast<chip::app::Clusters::RvcOperationalState::OperationalStateEnum>(0);
         Attributes::OperationalError::TypeInfo::DecodableType operationalError;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;

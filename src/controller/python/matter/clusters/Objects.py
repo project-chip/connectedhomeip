@@ -15027,12 +15027,12 @@ class OvenCavityOperationalState(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="errorStateID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="errorStateID", Tag=0, Type=OvenCavityOperationalState.Enums.ErrorStateEnum),
                         ClusterObjectFieldDescriptor(Label="errorStateLabel", Tag=1, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="errorStateDetails", Tag=2, Type=typing.Optional[str]),
                     ])
 
-            errorStateID: 'uint' = 0
+            errorStateID: 'OvenCavityOperationalState.Enums.ErrorStateEnum' = 0
             errorStateLabel: 'typing.Optional[str]' = None
             errorStateDetails: 'typing.Optional[str]' = None
 
@@ -15042,11 +15042,11 @@ class OvenCavityOperationalState(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="operationalStateID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="operationalStateID", Tag=0, Type=OvenCavityOperationalState.Enums.OperationalStateEnum),
                         ClusterObjectFieldDescriptor(Label="operationalStateLabel", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            operationalStateID: 'uint' = 0
+            operationalStateID: 'OvenCavityOperationalState.Enums.OperationalStateEnum' = 0
             operationalStateLabel: 'typing.Optional[str]' = None
 
     class Commands:
@@ -19292,12 +19292,12 @@ class OperationalState(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="errorStateID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="errorStateID", Tag=0, Type=OperationalState.Enums.ErrorStateEnum),
                         ClusterObjectFieldDescriptor(Label="errorStateLabel", Tag=1, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="errorStateDetails", Tag=2, Type=typing.Optional[str]),
                     ])
 
-            errorStateID: 'uint' = 0
+            errorStateID: 'OperationalState.Enums.ErrorStateEnum' = 0
             errorStateLabel: 'typing.Optional[str]' = None
             errorStateDetails: 'typing.Optional[str]' = None
 
@@ -19307,11 +19307,11 @@ class OperationalState(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="operationalStateID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="operationalStateID", Tag=0, Type=OperationalState.Enums.OperationalStateEnum),
                         ClusterObjectFieldDescriptor(Label="operationalStateLabel", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            operationalStateID: 'uint' = 0
+            operationalStateID: 'OperationalState.Enums.OperationalStateEnum' = 0
             operationalStateLabel: 'typing.Optional[str]' = None
 
     class Commands:
@@ -19616,7 +19616,7 @@ class RvcOperationalState(Cluster):
                 ClusterObjectFieldDescriptor(Label="currentPhase", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="countdownTime", Tag=0x00000002, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="operationalStateList", Tag=0x00000003, Type=typing.List[RvcOperationalState.Structs.OperationalStateStruct]),
-                ClusterObjectFieldDescriptor(Label="operationalState", Tag=0x00000004, Type=uint),
+                ClusterObjectFieldDescriptor(Label="operationalState", Tag=0x00000004, Type=RvcOperationalState.Enums.OperationalStateEnum),
                 ClusterObjectFieldDescriptor(Label="operationalError", Tag=0x00000005, Type=RvcOperationalState.Structs.ErrorStateStruct),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -19629,7 +19629,7 @@ class RvcOperationalState(Cluster):
     currentPhase: typing.Union[Nullable, uint] = NullValue
     countdownTime: typing.Union[None, Nullable, uint] = None
     operationalStateList: typing.List[RvcOperationalState.Structs.OperationalStateStruct] = field(default_factory=lambda: [])
-    operationalState: uint = 0
+    operationalState: RvcOperationalState.Enums.OperationalStateEnum = 0
     operationalError: RvcOperationalState.Structs.ErrorStateStruct = field(default_factory=lambda: RvcOperationalState.Structs.ErrorStateStruct())
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -19689,12 +19689,12 @@ class RvcOperationalState(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="errorStateID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="errorStateID", Tag=0, Type=RvcOperationalState.Enums.ErrorStateEnum),
                         ClusterObjectFieldDescriptor(Label="errorStateLabel", Tag=1, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="errorStateDetails", Tag=2, Type=typing.Optional[str]),
                     ])
 
-            errorStateID: 'uint' = 0
+            errorStateID: 'RvcOperationalState.Enums.ErrorStateEnum' = 0
             errorStateLabel: 'typing.Optional[str]' = None
             errorStateDetails: 'typing.Optional[str]' = None
 
@@ -19704,11 +19704,11 @@ class RvcOperationalState(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="operationalStateID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="operationalStateID", Tag=0, Type=RvcOperationalState.Enums.OperationalStateEnum),
                         ClusterObjectFieldDescriptor(Label="operationalStateLabel", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            operationalStateID: 'uint' = 0
+            operationalStateID: 'RvcOperationalState.Enums.OperationalStateEnum' = 0
             operationalStateLabel: 'typing.Optional[str]' = None
 
     class Commands:
@@ -19844,9 +19844,9 @@ class RvcOperationalState(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=RvcOperationalState.Enums.OperationalStateEnum)
 
-            value: uint = 0
+            value: RvcOperationalState.Enums.OperationalStateEnum = 0
 
         @dataclass
         class OperationalError(ClusterAttributeDescriptor):
