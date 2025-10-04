@@ -225,6 +225,10 @@ CHIP_ERROR JFAManager::AnnounceJointFabricAdministrator()
     }
 
     ChipLogProgress(JointFabric, "AnnounceJointFabricAdministrator: invoke cluster command.");
+    // TODO: This admin's endpoint ID should be made into a constant and used where applicable, like
+    // JFAManager::HandleCommissioningCompleteEvent.
+    request.endpointID = 1;
+
     Controller::ClusterBase cluster(*mExchangeMgr, mSessionHolder.Get().Value(), peerAdminJFAdminClusterEndpointId);
     return cluster.InvokeCommand(request, this, OnAnnounceJointFabricAdministratorResponse,
                                  OnAnnounceJointFabricAdministratorFailure);
