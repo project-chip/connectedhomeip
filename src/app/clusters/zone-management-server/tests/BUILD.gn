@@ -21,7 +21,10 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "TestZoneManagement"
 
-  test_sources = [ "TestZonePolygon.cpp" ]
+  test_sources = [
+    "TestZoneManagementCluster.cpp",
+    "TestZonePolygon.cpp",
+  ]
 
   sources = []
 
@@ -29,7 +32,11 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/app/clusters/testing",
+    "${chip_root}/src/app/clusters/testing",
     "${chip_root}/src/app/clusters/zone-management-server",
+    "${chip_root}/src/app/data-model-provider/tests:encode-decode",
+    "${chip_root}/src/app/server-cluster/testing:testing",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
   ]
 }

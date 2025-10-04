@@ -16,7 +16,13 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/zone-management-server.cpp"
-    "${CLUSTER_DIR}/zone-management-server.h"
+  "${CLUSTER_DIR}/CodegenIntegration.cpp"
+)
+
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/ZoneManagementCluster.cpp"
+    "${CLUSTER_DIR}/ZoneManagementCluster.h"
     "${CLUSTER_DIR}/zone-geometry.h"
 )
