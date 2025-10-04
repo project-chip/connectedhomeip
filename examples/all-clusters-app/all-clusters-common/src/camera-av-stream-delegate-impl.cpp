@@ -304,14 +304,11 @@ CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamI
     return CHIP_NO_ERROR;
 }
 
-const std::vector<VideoStreamStruct> & CameraAVStreamManager::GetAllocatedVideoStreams() const
+void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                                   const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
+                                                   uint32_t & outBandwidthbps)
 {
-    return videoStreamStructs;
-}
-
-const std::vector<AudioStreamStruct> & CameraAVStreamManager::GetAllocatedAudioStreams() const
-{
-    return audioStreamStructs;
+    ChipLogDetail(Zcl, "Get bandwidth for streams called");
 }
 
 void CameraAVStreamManager::InitializeAvailableVideoStreams()
@@ -398,7 +395,7 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
     AudioCapabilitiesStruct spkrCapabilities{};
     TwoWayTalkSupportTypeEnum twowayTalkSupport                  = TwoWayTalkSupportTypeEnum::kNotSupported;
     std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = {};
-    uint32_t maxNetworkBandwidth                                 = 64;
+    uint32_t maxNetworkBandwidth                                 = 64 * 1000 * 1000; // 64 Mbps
     std::vector<StreamUsageEnum> supportedStreamUsages           = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
     std::vector<StreamUsageEnum> streamUsagePriorities           = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 
