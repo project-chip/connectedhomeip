@@ -30,6 +30,8 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemClock.h>
 
+#include <lib/dnssd/DnssdServer.h>
+
 namespace chip {
 
 enum class CommissioningWindowAdvertisement
@@ -47,7 +49,6 @@ class CommissioningWindowManager : public Messaging::UnsolicitedMessageHandler,
 {
 public:
     CommissioningWindowManager() : mPASESession(*this) {}
-
     CHIP_ERROR Init(Server * server)
     {
         if (server == nullptr)
@@ -129,6 +130,10 @@ public:
     // For tests only, allow overriding the spec-defined minimum value of the
     // commissioning window timeout.
     void OverrideMinCommissioningTimeout(System::Clock::Seconds32 timeout) { mMinCommissioningTimeoutOverride.SetValue(timeout); }
+
+    // Sets a custom DNS-SD Server instance, allowing for dependency injection to support testing or alternative implementations.
+    void SetDnssdServer(Dnssd::DnssdServer * dnssdServer) { mDnssdServer = dnssdServer; }
+    Dnssd::DnssdServer * GetDnssdServer() const { return mDnssdServer; };
 
 private:
     //////////// SessionDelegate Implementation ///////////////
@@ -228,6 +233,9 @@ private:
 
     // The PASE session we are using, so we can handle CloseSession properly.
     SessionHolderWithDelegate mPASESession;
+
+    // Enables the use of a custom DNS-SD Server implementation for testing or alternative configurations.
+    Dnssd::DnssdServer * mDnssdServer = nullptr;
 
     // Information about who opened the commissioning window.  These will only
     // be non-null if the window was opened via the operational credentials
