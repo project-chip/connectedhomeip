@@ -46,6 +46,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeSelect;
 using namespace chip::Protocols;
+using namespace chip::Tracing;
 using chip::Protocols::InteractionModel::Status;
 
 using BootReasonType = GeneralDiagnostics::BootReasonEnum;
@@ -115,7 +116,7 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 
 Status ChangeToMode(EndpointId endpointId, uint8_t newMode)
 {
-    MATTER_TRACE_SCOPE("ChangeToMode", "ModeSelect");
+    MATTER_TRACE_SCOPE(kChangeToMode, kModeSelect);
     ChipLogProgress(Zcl, "ModeSelect: Entering emberAfModeSelectClusterChangeToModeCallback");
 
     // Check that the newMode matches one of the supported options
