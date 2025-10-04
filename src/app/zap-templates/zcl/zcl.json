@@ -377,12 +377,15 @@
             "PIROccupiedToUnoccupiedDelay",
             "UltrasonicOccupiedToUnoccupiedDelay",
             "PhysicalContactOccupiedToUnoccupiedDelay",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Operational Credentials": [
             "SupportedFabrics",
             "CommissionedFabrics",
-            "CurrentFabricIndex"
+            "CurrentFabricIndex",
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Software Diagnostics": [
             "ClusterRevision",
@@ -825,6 +828,7 @@
             "ClusterRevision"
         ],
         "Time Format Localization": ["ClusterRevision"],
+        "Window Covering": ["ClusterRevision"],
         "Zone Management": [
             "MaxUserDefinedZones",
             "MaxZones",
