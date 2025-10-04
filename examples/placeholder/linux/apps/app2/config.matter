@@ -9141,7 +9141,7 @@ endpoint 0 {
     persist  attribute mode default = 0x00;
     ram      attribute safetyStatus default = 0x00;
     ram      attribute featureMap default = 0x17;
-    ram      attribute clusterRevision default = 5;
+    callback attribute clusterRevision;
 
     handle command UpOrOpen;
     handle command DownOrClose;
@@ -9635,7 +9635,7 @@ endpoint 1 {
     ram      attribute physicalContactUnoccupiedToOccupiedDelay default = 0x00;
     ram      attribute physicalContactUnoccupiedToOccupiedThreshold default = 1;
     callback attribute featureMap;
-    callback attribute clusterRevision default = 5;
+    callback attribute clusterRevision;
   }
 }
 

@@ -43,6 +43,7 @@
 #import "lib/core/CHIPError.h"
 #import "lib/core/DataModelTypes.h"
 
+#import <app-common/zap-generated/cluster-objects.h>
 #import <app/AttributePathParams.h>
 #import <app/BufferedReadCallback.h>
 #import <app/ClusterStateCache.h>
@@ -1534,7 +1535,7 @@ exit:
             commandSender.release();
             return CHIP_NO_ERROR;
         });
-    std::move(*bridge).DispatchAction(self);
+    std::move(*bridge).DispatchAction(self, CommandHasLargePayload(static_cast<ClusterId>(clusterID.unsignedLongLongValue), static_cast<CommandId>(commandID.unsignedLongLongValue)));
 }
 
 - (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
