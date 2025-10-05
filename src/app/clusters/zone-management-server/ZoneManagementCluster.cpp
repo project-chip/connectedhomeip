@@ -479,7 +479,7 @@ void ZoneManagementCluster::PersistZones()
     err = mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Zones::Id),
                                                 bufferSpan);
     LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving zone: %s", mPath.mEndpointId, "write");
-    ChipLogProgress(Zcl, "ZoneManagement[ep=%d] persisted %zu zones, wrote %d bytes", mPath.mEndpointId, mZones.size(),
+    ChipLogProgress(Zcl, "ZoneManagement[ep=%d] persisted %u zones, wrote %d bytes", mPath.mEndpointId, static_cast<uint8_t>(mZones.size()),
                     writer.GetLengthWritten());
 }
 
@@ -509,7 +509,7 @@ void ZoneManagementCluster::PersistTriggers()
     err = mContext->attributeStorage.WriteValue(
         ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id), bufferSpan);
     LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving trigger: %s", mPath.mEndpointId, "write");
-    ChipLogProgress(Zcl, "ZoneManagement[ep=%d] persisted %zu triggers, wrote %d bytes", mPath.mEndpointId, mTriggers.size(),
+    ChipLogProgress(Zcl, "ZoneManagement[ep=%d] persisted %u triggers, wrote %d bytes", mPath.mEndpointId, static_cast<uint8_t>(mTriggers.size()),
                     writer.GetLengthWritten());
 }
 
