@@ -384,34 +384,80 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                                  "Incorrect error response for reading non-global attribute on all clusters at endpoint, should have returned GENERAL_ERROR + INVALID_ACTION")
             return None
 
-    async def _read_limited_access(self, endpoint, cluster_id, subject_id):
-        read_request = await self.default_controller.Read(
+    async def _read_limited_access(self, endpoint, cluster_id):
+        """Test reading all attributes from all clusters at an endpoint with limited access.
+        
+        Creates a second controller (TH2) with limited access to only one cluster, then reads
+        all attributes from all clusters at the endpoint. Verifies that only the allowed cluster
+        is returned and no errors are sent for clusters without access.
+        
+        Args:
+            endpoint: The endpoint to test
+            cluster_id: The cluster ID to grant access to
+        """
+        # Creates a second controller (TH2)
+        fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
+        TH2_nodeid = self.matter_test_config.controller_node_id + 1
+        TH2 = fabric_admin.NewController(nodeId=TH2_nodeid)
+        logging.info(f"Created second controller TH2 with node ID {TH2_nodeid}")
+        
+        # Read and save the original ACL using the default (admin) controller
+        read_acl = await self.default_controller.Read(
             self.dut_node_id,
-            [(endpoint, Clusters.AccessControl.Attributes.Acl)])
-        dut_acl_original = read_request.attributes[endpoint][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
+            [(self.endpoint, Clusters.AccessControl.Attributes.Acl)])
+        dut_acl_original = read_acl.attributes[self.endpoint][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
+        
+        # Create an ACE that grants View access to TH2 for only ONE specific cluster
         ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=cluster_id)],
-            subjects=[subject_id])
+            subjects=[TH2_nodeid])
         dut_acl = copy.deepcopy(dut_acl_original)
         dut_acl.append(ace)
+        
+        # Write the modified ACL to grant TH2 limited access
         await self.default_controller.WriteAttribute(
             self.dut_node_id,
             [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl))])
-        read_request = await self.default_controller.Read(
+        logging.info(f"Granted TH2 View access to only cluster {cluster_id}")
+        
+        # Use TH2 to read ALL attributes from ALL clusters at the endpoint
+        read_request = await TH2.Read(
             self.dut_node_id,
-            [(endpoint, Clusters.AccessControl.Attributes.Acl)])
-        asserts.assert_equal(len(read_request.attributes[endpoint]
-                             [Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]), 2)
+            [(endpoint)])  # Read everything at this endpoint with limited access
+        
+        # Verify the endpoint is in the response
+        asserts.assert_in(endpoint, read_request.attributes, 
+                         f"Endpoint {endpoint} not found in response - may not exist or have no accessible clusters")
+        
+        # Verify only the allowed cluster is returned
+        returned_clusters = list(read_request.attributes[endpoint].keys())
+        logging.info(f"Clusters returned with limited access (TH2): {[c.id for c in returned_clusters]}")
+        
+        # The allowed cluster should be present
+        allowed_cluster_obj = None
+        for cluster_obj in returned_clusters:
+            if cluster_obj.id == cluster_id:
+                allowed_cluster_obj = cluster_obj
+                break
+        asserts.assert_is_not_none(allowed_cluster_obj, 
+                                   f"Expected cluster {cluster_id} (allowed) to be present in response")
+        
+        # Verify NO OTHER clusters are returned 
+        for cluster_obj in returned_clusters:
+            if cluster_obj.id != cluster_id:
+                asserts.fail(f"Unexpected cluster {cluster_obj.id} returned - should only get allowed cluster {cluster_id}")
+        
+        # Restore original ACL
         await self.default_controller.WriteAttribute(
             self.dut_node_id,
-            [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl_original))])
-        read_request = await self.default_controller.Read(
-            self.dut_node_id,
-            [(endpoint, Clusters.AccessControl.Attributes.Acl)])
-        asserts.assert_equal(len(read_request.attributes[endpoint]
-                             [Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]), 1)
+            [(self.endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl_original))])
+        logging.info("Restored original ACL")
+
+        # Removes TH2 controller
+        TH2.Shutdown()
+        
         return dut_acl_original, read_request
 
     async def _read_all_events_attributes(self):
@@ -687,13 +733,12 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         self.step(20)
         original_acl21, read_request21 = await self._read_limited_access(
             endpoint=self.endpoint,
-            cluster_id=Clusters.BasicInformation.id,
-            subject_id=self.matter_test_config.controller_node_id + 1)
-        asserts.assert_true(self.endpoint in read_request21.attributes, f"Endpoint {self.endpoint} missing in response")
-        asserts.assert_true(Clusters.AccessControl in read_request21.attributes[self.endpoint],
-                            "Clusters.AccessControl not in response")
-        asserts.assert_true(Clusters.AccessControl.Attributes.Acl in read_request21.attributes[self.endpoint][Clusters.AccessControl],
-                            "ACL attribute not in response")
+            cluster_id=Clusters.BasicInformation.id)
+
+        # Verify only the granted cluster is returned
+        returned_clusters = list(read_request21.attributes[self.endpoint].keys())
+        asserts.assert_equal(len(returned_clusters), 1, 
+                           f"Expected only 1 cluster (the granted one), but got {len(returned_clusters)}: {[c.id for c in returned_clusters]}")
 
         self.step(21)
         read_request22 = await self._read_all_events_attributes()
