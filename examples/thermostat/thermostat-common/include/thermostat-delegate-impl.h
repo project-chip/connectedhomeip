@@ -163,6 +163,13 @@ private:
     bool mIsExpirationTimerRunning = false;
 
     uint8_t mMaxSchedules;
+
+    /**
+     * @brief Initializes the schedules types array with example schedule types.
+     */
+    void InitializeScheduleTypes();
+
+    Structs::ScheduleTypeStruct::Type mScheduleTypes[kMaxNumberOfScheduleTypes];
 };
 
 } // namespace Thermostat

@@ -46,6 +46,8 @@ ThermostatDelegate::ThermostatDelegate()
 
     InitializePresets();
 
+    InitializeScheduleTypes();
+
     memset(mActivePresetHandleData, 0, sizeof(mActivePresetHandleData));
     mActivePresetHandleDataSize = 0;
 }
@@ -485,19 +487,22 @@ size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime
     return minEffectiveTimeSuggestionIndex;
 }
 
+void ThermostatDelegate::InitializeScheduleTypes()
+{
+    mScheduleTypes[0] = { .systemMode           = SystemModeEnum::kHeat,
+                          .numberOfSchedules    = mMaxSchedules,
+                          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) };
+
+    mScheduleTypes[1] = { .systemMode           = SystemModeEnum::kCool,
+                          .numberOfSchedules    = mMaxSchedules,
+                          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) };
+}
+
 CHIP_ERROR ThermostatDelegate::GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType)
 {
-    static ScheduleTypeStruct::Type scheduleTypes[] = {
-        { .systemMode           = SystemModeEnum::kHeat,
-          .numberOfSchedules    = mMaxSchedules,
-          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) },
-        { .systemMode           = SystemModeEnum::kCool,
-          .numberOfSchedules    = mMaxSchedules,
-          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) }
-    };
-    if (index < MATTER_ARRAY_SIZE(scheduleTypes))
+    if (index < MATTER_ARRAY_SIZE(mScheduleTypes))
     {
-        scheduleType = scheduleTypes[index];
+        scheduleType = mScheduleTypes[index];
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
