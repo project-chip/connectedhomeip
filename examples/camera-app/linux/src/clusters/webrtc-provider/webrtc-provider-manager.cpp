@@ -142,6 +142,13 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
 
     transport->SetRequestArgs(requestArgs);
 
+    // Store SFrameConfig in Transport base class if provided for later use in frame encryption
+    if (args.sFrameConfig.HasValue())
+    {
+        transport->sFrameConfig = args.sFrameConfig;
+        ChipLogProgress(Camera, "SFrame encryption enabled for session %u", args.sessionId);
+    }
+
     // Check resource availability before proceeding
     // If we cannot allocate resources, send End command with OutOfResources reason
     if (mWebrtcTransportMap.size() > kMaxConcurrentWebRTCSessions)
@@ -316,6 +323,14 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     }
 
     transport->SetRequestArgs(requestArgs);
+
+    // Store SFrameConfig in Transport base class if provided for later use in frame encryption
+    if (args.sFrameConfig.HasValue())
+    {
+        transport->sFrameConfig = args.sFrameConfig;
+        ChipLogProgress(Camera, "SFrame encryption enabled for session %u", args.sessionId);
+    }
+
     transport->Start();
     auto peerConnection  = transport->GetPeerConnection();
     std::string audioMid = ExtractMidFromSdp(args.sdp, "audio");

@@ -48,4 +48,8 @@ public:
     virtual void DistributeVideo(const char * data, size_t size, uint16_t videoStreamID) = 0;
     virtual void DistributeAudio(const char * data, size_t size, uint16_t audioStreamID) = 0;
     virtual void SetPreRollLength(Transport * transport, uint16_t PreRollBufferLength)   = 0;
+
+    // Get transport registered for a specific stream ID
+    virtual Transport * GetTransportForVideoStream(uint16_t videoStreamID) = 0;
+    virtual Transport * GetTransportForAudioStream(uint16_t audioStreamID) = 0;
 };
