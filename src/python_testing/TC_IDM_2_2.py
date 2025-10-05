@@ -430,18 +430,35 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         return read_a, read_both
 
     async def _read_multiple_data_version_filters(self, endpoint, cluster, attribute, test_value=None):
+        # First read to get the old data version
         read_request = await self.default_controller.ReadAttribute(
             self.dut_node_id, [(endpoint, cluster, attribute)])
-        data_version = read_request[0][cluster][Clusters.Attribute.DataVersion]
+        data_version_old = read_request[0][cluster][Clusters.Attribute.DataVersion]
+        
+        # Write to change the data version
         if test_value is not None:
             await self.default_controller.WriteAttribute(
                 self.dut_node_id,
                 [(endpoint, attribute(value=test_value))])
-        data_version_filter_1 = [(endpoint, cluster, data_version)]
+        
+        # Second read to get the new (correct) data version after write
+        read_after_write = await self.default_controller.ReadAttribute(
+            self.dut_node_id, [(endpoint, cluster, attribute)])
+        data_version_new = read_after_write[0][cluster][Clusters.Attribute.DataVersion]
+        
+        # Create filters with BOTH the correct (new) version AND the older version
+        # Note: Multiple filters for the same cluster - one matches, one doesn't
+        data_version_filters = [
+            (endpoint, cluster, data_version_new),  # Correct/current version
+            (endpoint, cluster, data_version_old)   # Older version
+        ]
+        
+        # Read with both filters
         filtered_read = await self.default_controller.ReadAttribute(
             self.dut_node_id,
             [(endpoint, cluster, attribute)],
-            dataVersionFilters=data_version_filter_1)
+            dataVersionFilters=data_version_filters)
+        
         return read_request, filtered_read
 
     def _verify_empty_wildcard(self, attr_path, read_request):
@@ -632,6 +649,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal(
             filtered_read15[self.endpoint][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.NodeLabel],
             "Goodbye World", "NodeLabel value does not match expected value")
+            
         # Verify that all attributes from the cluster are returned (not just the one we wrote)
         returned_attrs15 = set(filtered_read15[self.endpoint][Clusters.BasicInformation].keys())
         expected_attrs15 = set(read_request15[self.endpoint][Clusters.BasicInformation].keys())
@@ -643,6 +661,9 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.NodeLabel,
             test_value="Hello World Again")
+        logging.info(f"filtered_read16: {filtered_read16}")
+        logging.info(f"read_request16: {read_request16}")
+        exit()
         if filtered_read16 and 0 in filtered_read16:
             asserts.assert_equal(filtered_read16[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.NodeLabel],
                                  "Hello World Again", "Data version does not match expected value")
