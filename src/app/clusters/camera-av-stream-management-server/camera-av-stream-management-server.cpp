@@ -27,6 +27,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -221,6 +222,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeSupportedStreamUsages(const At
 
 CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedVideoStreams(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_ClearInMemoryAllocatedVideoStreams, mAllocatedVideoStreams.clear(););
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_LoadPersistentCameraAVSMAttributes, LoadPersistentAttributes(););
+
     for (const auto & videoStream : mAllocatedVideoStreams)
     {
         ReturnErrorOnFailure(encoder.Encode(videoStream));
@@ -231,6 +235,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedVideoStreams(const At
 
 CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedAudioStreams(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_ClearInMemoryAllocatedAudioStreams, mAllocatedAudioStreams.clear(););
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_LoadPersistentCameraAVSMAttributes, LoadPersistentAttributes(););
+
     for (const auto & audioStream : mAllocatedAudioStreams)
     {
         ReturnErrorOnFailure(encoder.Encode(audioStream));
@@ -241,6 +248,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedAudioStreams(const At
 
 CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedSnapshotStreams(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_ClearInMemoryAllocatedSnapshotStreams, mAllocatedSnapshotStreams.clear(););
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_LoadPersistentCameraAVSMAttributes, LoadPersistentAttributes(););
+
     for (const auto & snapshotStream : mAllocatedSnapshotStreams)
     {
         ReturnErrorOnFailure(encoder.Encode(snapshotStream));
