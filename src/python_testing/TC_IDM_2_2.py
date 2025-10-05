@@ -386,11 +386,11 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
     async def _read_limited_access(self, endpoint, cluster_id):
         """Test reading all attributes from all clusters at an endpoint with limited access.
-        
+
         Creates a second controller (TH2) with limited access to only one cluster, then reads
         all attributes from all clusters at the endpoint. Verifies that only the allowed cluster
         is returned and no errors are sent for clusters without access.
-        
+
         Args:
             endpoint: The endpoint to test
             cluster_id: The cluster ID to grant access to
@@ -399,14 +399,13 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
         TH2_nodeid = self.matter_test_config.controller_node_id + 1
         TH2 = fabric_admin.NewController(nodeId=TH2_nodeid)
-        logging.info(f"Created second controller TH2 with node ID {TH2_nodeid}")
-        
+
         # Read and save the original ACL using the default (admin) controller
         read_acl = await self.default_controller.Read(
             self.dut_node_id,
             [(self.endpoint, Clusters.AccessControl.Attributes.Acl)])
         dut_acl_original = read_acl.attributes[self.endpoint][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
-        
+
         # Create an ACE that grants View access to TH2 for only ONE specific cluster
         ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
@@ -415,40 +414,40 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             subjects=[TH2_nodeid])
         dut_acl = copy.deepcopy(dut_acl_original)
         dut_acl.append(ace)
-        
+
         # Write the modified ACL to grant TH2 limited access
         await self.default_controller.WriteAttribute(
             self.dut_node_id,
             [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl))])
         logging.info(f"Granted TH2 View access to only cluster {cluster_id}")
-        
+
         # Use TH2 to read ALL attributes from ALL clusters at the endpoint
         read_request = await TH2.Read(
             self.dut_node_id,
             [(endpoint)])  # Read everything at this endpoint with limited access
-        
+
         # Verify the endpoint is in the response
-        asserts.assert_in(endpoint, read_request.attributes, 
-                         f"Endpoint {endpoint} not found in response - may not exist or have no accessible clusters")
-        
+        asserts.assert_in(endpoint, read_request.attributes,
+                          f"Endpoint {endpoint} not found in response - may not exist or have no accessible clusters")
+
         # Verify only the allowed cluster is returned
         returned_clusters = list(read_request.attributes[endpoint].keys())
         logging.info(f"Clusters returned with limited access (TH2): {[c.id for c in returned_clusters]}")
-        
+
         # The allowed cluster should be present
         allowed_cluster_obj = None
         for cluster_obj in returned_clusters:
             if cluster_obj.id == cluster_id:
                 allowed_cluster_obj = cluster_obj
                 break
-        asserts.assert_is_not_none(allowed_cluster_obj, 
+        asserts.assert_is_not_none(allowed_cluster_obj,
                                    f"Expected cluster {cluster_id} (allowed) to be present in response")
-        
-        # Verify NO OTHER clusters are returned 
+
+        # Verify NO OTHER clusters are returned
         for cluster_obj in returned_clusters:
             if cluster_obj.id != cluster_id:
                 asserts.fail(f"Unexpected cluster {cluster_obj.id} returned - should only get allowed cluster {cluster_id}")
-        
+
         # Restore original ACL
         await self.default_controller.WriteAttribute(
             self.dut_node_id,
@@ -457,7 +456,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         # Removes TH2 controller
         TH2.Shutdown()
-        
+
         return dut_acl_original, read_request
 
     async def _read_all_events_attributes(self):
@@ -480,30 +479,30 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         read_request = await self.default_controller.ReadAttribute(
             self.dut_node_id, [(endpoint, cluster, attribute)])
         data_version_old = read_request[0][cluster][Clusters.Attribute.DataVersion]
-        
+
         # Write to change the data version
         if test_value is not None:
             await self.default_controller.WriteAttribute(
                 self.dut_node_id,
                 [(endpoint, attribute(value=test_value))])
-        
+
         # Second read to get the new (correct) data version after write
         read_after_write = await self.default_controller.ReadAttribute(
             self.dut_node_id, [(endpoint, cluster, attribute)])
         data_version_new = read_after_write[0][cluster][Clusters.Attribute.DataVersion]
-        
+
         # Create filters with BOTH the correct (new) version AND the older version
         data_version_filters = [
             (endpoint, cluster, data_version_new),  # Correct/current version
             (endpoint, cluster, data_version_old)   # Older version
         ]
-        
+
         # Read with both filters
         filtered_read = await self.default_controller.ReadAttribute(
             self.dut_node_id,
             [(endpoint, cluster, attribute)],
             dataVersionFilters=data_version_filters)
-        
+
         return read_request, filtered_read
 
     def _verify_empty_wildcard(self, attr_path, read_request):
@@ -673,19 +672,19 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         read_request15 = await self.default_controller.ReadAttribute(
             self.dut_node_id, [(self.endpoint, Clusters.BasicInformation)])
         data_version15_before = read_request15[self.endpoint][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
-        
+
         # Write to any attribute to change the data version
         await self.default_controller.WriteAttribute(
             self.dut_node_id,
             [(self.endpoint, Clusters.BasicInformation.Attributes.NodeLabel("Goodbye World"))])
-        
+
         # Read all attributes again with old data version filter - should return all attributes since version changed
         data_version_filter15 = [(self.endpoint, Clusters.BasicInformation, data_version15_before)]
         filtered_read15 = await self.default_controller.ReadAttribute(
             self.dut_node_id,
             [(self.endpoint, Clusters.BasicInformation)],
             dataVersionFilters=data_version_filter15)
-        
+
         # Verify we got all attributes back because data version changed
         asserts.assert_in(self.endpoint, filtered_read15, "Endpoint missing in response")
         asserts.assert_in(Clusters.BasicInformation, filtered_read15[self.endpoint], "BasicInformation cluster missing")
@@ -694,11 +693,12 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal(
             filtered_read15[self.endpoint][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.NodeLabel],
             "Goodbye World", "NodeLabel value does not match expected value")
-            
+
         # Verify that all attributes from the cluster are returned (not just the one we wrote)
         returned_attrs15 = set(filtered_read15[self.endpoint][Clusters.BasicInformation].keys())
         expected_attrs15 = set(read_request15[self.endpoint][Clusters.BasicInformation].keys())
-        asserts.assert_equal(returned_attrs15, expected_attrs15, "All cluster attributes should be returned when data version changed")
+        asserts.assert_equal(returned_attrs15, expected_attrs15,
+                             "All cluster attributes should be returned when data version changed")
 
         self.step(16)
         read_request16, filtered_read16 = await self._read_multiple_data_version_filters(
