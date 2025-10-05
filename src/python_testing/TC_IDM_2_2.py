@@ -447,7 +447,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         data_version_new = read_after_write[0][cluster][Clusters.Attribute.DataVersion]
         
         # Create filters with BOTH the correct (new) version AND the older version
-        # Note: Multiple filters for the same cluster - one matches, one doesn't
         data_version_filters = [
             (endpoint, cluster, data_version_new),  # Correct/current version
             (endpoint, cluster, data_version_old)   # Older version
@@ -661,9 +660,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.NodeLabel,
             test_value="Hello World Again")
-        logging.info(f"filtered_read16: {filtered_read16}")
-        logging.info(f"read_request16: {read_request16}")
-        exit()
         if filtered_read16 and 0 in filtered_read16:
             asserts.assert_equal(filtered_read16[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.NodeLabel],
                                  "Hello World Again", "Data version does not match expected value")
