@@ -607,17 +607,35 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                                  "DataVersion was not incremented")
 
         self.step(15)
-        read_request15, filtered_read15 = await self._read_data_version_filter(
-            endpoint=self.endpoint,
-            cluster=Clusters.BasicInformation,
-            attribute=Clusters.BasicInformation.Attributes.NodeLabel,
-            test_value="Goodbye World")
-        if filtered_read15 and 0 in filtered_read15:
-            data_version15 = filtered_read15[0][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
-            asserts.assert_equal(filtered_read15[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.NodeLabel],
-                                 "Goodbye World", "Data version does not match expected value")
-            asserts.assert_equal((read_request15[0][Clusters.BasicInformation][Clusters.Attribute.DataVersion] + 1), data_version15,
-                                 "DataVersion was not incremented")
+        # Read all attributes on BasicInformation cluster (no attribute filter)
+        read_request15 = await self.default_controller.ReadAttribute(
+            self.dut_node_id, [(self.endpoint, Clusters.BasicInformation)])
+        data_version15_before = read_request15[self.endpoint][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
+        
+        # Write to any attribute to change the data version
+        await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(self.endpoint, Clusters.BasicInformation.Attributes.NodeLabel("Goodbye World"))])
+        
+        # Read all attributes again with old data version filter - should return all attributes since version changed
+        data_version_filter15 = [(self.endpoint, Clusters.BasicInformation, data_version15_before)]
+        filtered_read15 = await self.default_controller.ReadAttribute(
+            self.dut_node_id,
+            [(self.endpoint, Clusters.BasicInformation)],
+            dataVersionFilters=data_version_filter15)
+        
+        # Verify we got all attributes back because data version changed
+        asserts.assert_in(self.endpoint, filtered_read15, "Endpoint missing in response")
+        asserts.assert_in(Clusters.BasicInformation, filtered_read15[self.endpoint], "BasicInformation cluster missing")
+        data_version15_after = filtered_read15[self.endpoint][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
+        asserts.assert_not_equal(data_version15_before, data_version15_after, "DataVersion should have changed after write")
+        asserts.assert_equal(
+            filtered_read15[self.endpoint][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.NodeLabel],
+            "Goodbye World", "NodeLabel value does not match expected value")
+        # Verify that all attributes from the cluster are returned (not just the one we wrote)
+        returned_attrs15 = set(filtered_read15[self.endpoint][Clusters.BasicInformation].keys())
+        expected_attrs15 = set(read_request15[self.endpoint][Clusters.BasicInformation].keys())
+        asserts.assert_equal(returned_attrs15, expected_attrs15, "All cluster attributes should be returned when data version changed")
 
         self.step(16)
         read_request16, filtered_read16 = await self._read_multiple_data_version_filters(
