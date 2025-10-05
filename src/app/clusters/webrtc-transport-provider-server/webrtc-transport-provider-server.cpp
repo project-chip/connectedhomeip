@@ -410,7 +410,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         }
 
         // Validation passed, assign to args
-        args.sFrameConfig.SetValue(std::move(sframeConfig));
+        args.sFrameConfig.SetValue(sframeConfig);
     }
 
     // Delegate processing:
@@ -647,7 +647,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         }
 
         // Validation passed, assign to args
-        args.sFrameConfig.SetValue(std::move(sframeConfig));
+        args.sFrameConfig.SetValue(sframeConfig);
     }
 
     // Delegate processing: process the SDP offer, create session, increment reference counts.

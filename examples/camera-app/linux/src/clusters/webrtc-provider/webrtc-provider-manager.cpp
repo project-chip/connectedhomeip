@@ -558,16 +558,15 @@ CHIP_ERROR WebRTCProviderManager::ValidateSFrameConfig(uint16_t cipherSuite, siz
     size_t expectedKeyLength = 0;
 
     // Validate cipher suite and determine expected key length
-    if (cipherSuite == kCipherSuite_AES_128_GCM)
+    switch (cipherSuite)
     {
+    case kCipherSuite_AES_128_GCM:
         expectedKeyLength = kAES_128_KeyLength;
-    }
-    else if (cipherSuite == kCipherSuite_AES_256_GCM)
-    {
+        break;
+    case kCipherSuite_AES_256_GCM:
         expectedKeyLength = kAES_256_KeyLength;
-    }
-    else
-    {
+        break;
+    default:
         ChipLogError(Camera, "Unsupported SFrame cipher suite 0x%04X", cipherSuite);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }

@@ -144,12 +144,12 @@ class TC_WEBRTCP_2_25(MatterBaseTest, WEBRTCPTestBase):
             asserts.assert_equal(e.status, Status.DynamicConstraintError, "Expected DYNAMIC_CONSTRAINT_ERROR")
 
         self.step(3)
-        # Test: ProvideOffer with incorrect key length for AES-256-GCM (should be 32 bytes)
-        logger.info("Testing ProvideOffer with incorrect key length for AES-256-GCM")
+        # Test: ProvideOffer with incorrect key length for AES-128-GCM (should be 16 bytes)
+        logger.info("Testing ProvideOffer with incorrect key length for AES-128-GCM")
 
         wrong_length_sframe_config = Clusters.WebRTCTransportProvider.Structs.SFrameStruct(
-            cipherSuite=CIPHER_SUITE_AES_256_GCM,
-            baseKey=b'\x00' * 16,  # Wrong: 16 bytes instead of 32
+            cipherSuite=CIPHER_SUITE_AES_128_GCM,
+            baseKey=b'\x00' * 32,  # Wrong: 32 bytes instead of 16
             kid=b'\x01'
         )
 
