@@ -369,6 +369,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     args.fabricIndex           = ctx.mCommandHandler.GetAccessingFabricIndex();
     args.originatingEndpointId = req.originatingEndpointID;
 
+    // ICEServers field SHALL be a list of ICEServerStruct containing ICE servers and credentials.
     if (req.ICEServers.HasValue())
     {
         std::vector<ICEServerDecodableStruct> localIceServers;
@@ -376,15 +377,26 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         auto iter = req.ICEServers.Value().begin();
         while (iter.Next())
         {
+            const auto & iceServer = iter.GetValue();
+
+            // Validate that URLs list is not empty
+            auto urlIter = iceServer.URLs.begin();
+            if (!urlIter.Next())
+            {
+                ChipLogError(Zcl, "HandleSolicitOffer: ICEServer URLs list cannot be empty");
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+                return;
+            }
+
             // Just move the decodable struct as-is, only valid during this method call
             localIceServers.push_back(std::move(iter.GetValue()));
         }
 
-        // Check the validity of the list.
+        // Check the validity of the list structure.
         CHIP_ERROR listErr = iter.GetStatus();
         if (listErr != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "HandleSolicitOffer: ICECandidates list error: %" CHIP_ERROR_FORMAT, listErr.Format());
+            ChipLogError(Zcl, "HandleSolicitOffer: ICEServers list error: %" CHIP_ERROR_FORMAT, listErr.Format());
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
             return;
         }
@@ -392,12 +404,24 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         args.iceServers.SetValue(std::move(localIceServers));
     }
 
+    // ICETransportPolicy field SHALL contain either 'all' or 'relay' per W3C RTCIceTransportPolicy enum.
     if (req.ICETransportPolicy.HasValue())
     {
-        args.iceTransportPolicy.SetValue(std::string(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size()));
+        std::string policy(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size());
+
+        // Validate the policy is either 'all' or 'relay'
+        if (policy != "all" && policy != "relay")
+        {
+            ChipLogError(Zcl, "HandleSolicitOffer: ICETransportPolicy must be 'all' or 'relay', got '%s'", policy.c_str());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            return;
+        }
+
+        args.iceTransportPolicy.SetValue(policy);
     }
 
-    // Validate SFrameConfig if present
+    // Validate SFrameConfig if present.
+    // Constraint enforcement is delegated to the app-side implementation via ValidateSFrameConfig().
     if (req.SFrameConfig.HasValue())
     {
         const auto & sframeConfig = req.SFrameConfig.Value();
@@ -606,7 +630,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
     args.sdp                   = std::string(req.sdp.data(), req.sdp.size());
     args.originatingEndpointId = req.originatingEndpointID;
 
-    // Convert ICE servers list from DecodableList to vector.
+    // ICEServers field SHALL be a list of ICEServerStruct containing ICE servers and credentials.
     if (req.ICEServers.HasValue())
     {
         std::vector<ICEServerDecodableStruct> localIceServers;
@@ -614,6 +638,17 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         auto iter = req.ICEServers.Value().begin();
         while (iter.Next())
         {
+            const auto & iceServer = iter.GetValue();
+
+            // Validate that URLs list is not empty
+            auto urlIter = iceServer.URLs.begin();
+            if (!urlIter.Next())
+            {
+                ChipLogError(Zcl, "HandleProvideOffer: ICEServer URLs list cannot be empty");
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+                return;
+            }
+
             localIceServers.push_back(std::move(iter.GetValue()));
         }
 
@@ -628,13 +663,24 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         args.iceServers.SetValue(std::move(localIceServers));
     }
 
-    // Convert ICETransportPolicy from CharSpan to std::string.
+    // ICETransportPolicy field SHALL contain either 'all' or 'relay' per W3C RTCIceTransportPolicy enum.
     if (req.ICETransportPolicy.HasValue())
     {
-        args.iceTransportPolicy.SetValue(std::string(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size()));
+        std::string policy(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size());
+
+        // Validate the policy is either 'all' or 'relay'
+        if (policy != "all" && policy != "relay")
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: ICETransportPolicy must be 'all' or 'relay', got '%s'", policy.c_str());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            return;
+        }
+
+        args.iceTransportPolicy.SetValue(policy);
     }
 
-    // Validate SFrameConfig if present
+    // Validate SFrameConfig if present.
+    // Constraint enforcement is delegated to the app-side implementation via ValidateSFrameConfig().
     if (req.SFrameConfig.HasValue())
     {
         const auto & sframeConfig = req.SFrameConfig.Value();
