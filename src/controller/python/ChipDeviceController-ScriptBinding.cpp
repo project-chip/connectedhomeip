@@ -454,7 +454,7 @@ PyChipError pychip_DeviceController_ConnectNFC(chip::Controller::DeviceCommissio
 
     return ToPyChipError(devCtrl->PairDevice(nodeid,
                                              chip::RendezvousParameters()
-                                                 .SetPeerAddress(Transport::PeerAddress(Transport::Type::kNfc))
+                                                 .SetPeerAddress(Transport::PeerAddress::NFC(setupDiscriminator))
                                                  .SetSetupPINCode(setupPINCode)
                                                  .SetSetupDiscriminator(setupDiscriminator),
                                              sCommissioningParameters));
