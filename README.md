@@ -1,8 +1,8 @@
 # Documentation links
 
--   [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/project-chip/connectedhomeip)
--   [Matter SDK documentation page](https://project-chip.github.io/connectedhomeip-doc/index.html)
--   [Matter SDK Coverage Report](https://matter-build-automation.ue.r.appspot.com/)
+- [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/project-chip/connectedhomeip)
+- [Matter SDK documentation page](https://project-chip.github.io/connectedhomeip-doc/index.html)
+- [Matter SDK Coverage Report](https://matter-build-automation.ue.r.appspot.com/)
 
 # Matter
 
@@ -23,7 +23,6 @@
 [![i.MX Linux](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20i.MX%20Linux/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-linux-imx.yaml)
 [![K32W with SE051](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20K32W%20with%20SE051/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-k32w.yaml)
 [![Linux ARM](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20Linux%20ARM/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-linux-arm.yaml)
-[![Linux Standalone](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20Linux%20Standalone/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-linux-standalone.yaml)
 [![Linux Standalone](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20Linux%20Standalone/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-linux-standalone.yaml)
 [![nRF Connect SDK](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20nRF%20Connect%20SDK/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-nrfconnect.yaml)
 [![QPG](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20QPG/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-qpg.yaml)
