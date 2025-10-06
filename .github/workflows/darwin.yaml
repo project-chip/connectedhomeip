@@ -39,10 +39,10 @@ jobs:
     framework:
         name: Build framework
         if: github.actor != 'restyled-io[bot]'
-        runs-on: ${{ matrix.os }}
+        
         strategy:
             matrix:
-                os: ${{ github.event_name == 'schedule' && fromJSON('["macos-14", "macos-15", "macos-26"]') || fromJSON('["macos-14"]') }}
+                os: macos-14
                 options: # We don't need a full matrix
                     - flavor: macos-release
                       arguments: -sdk macosx -configuration Release
@@ -52,6 +52,7 @@ jobs:
                       arguments: -sdk appletvos -configuration Debug
                     - flavor: watchos-debug
                       arguments: -sdk watchos -configuration Debug
+        runs-on: ${{ matrix.os }}
         steps:
             - name: Checkout
               uses: actions/checkout@v5
@@ -80,7 +81,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
-                os: ${{ github.event_name == 'schedule' && fromJSON('["macos-14", "macos-15", "macos-26"]') || fromJSON('["macos-14"]') }}
+                os: macos-14
                 options: # We don't need a full matrix
                     - flavor: asan
                       arguments:
