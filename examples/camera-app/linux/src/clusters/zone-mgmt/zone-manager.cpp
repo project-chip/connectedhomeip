@@ -271,16 +271,9 @@ void ZoneManager::OnZoneTriggeredEvent(uint16_t zoneId,
         }
     }
 
-<<<<<<< HEAD
     if (mCameraDevice)
     {
         mCameraDevice->HandlePushAvZoneTrigger(zoneId);
-=======
-    // Notify PushAVTransportManager after the ZoneManager has handled the event.
-    if (mCameraDevice)
-    {
-        mCameraDevice->GetPushAVTransportDelegate().OnZoneTriggeredEvent(zoneId);
->>>>>>> c3cead7288 (Refactor Camera AV stream management, zone event handling and update bandwidth calculation logic.)
     }
 }
 

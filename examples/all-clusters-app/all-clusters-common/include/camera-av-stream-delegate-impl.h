@@ -97,17 +97,12 @@ public:
 
     CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
 
-<<<<<<< HEAD
     const std::vector<chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct> & GetAllocatedVideoStreams() const override;
 
     const std::vector<chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct> & GetAllocatedAudioStreams() const override;
 
     void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                 const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, uint32_t & outBandwidthbps) override;
-=======
-    void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, double & outBandwidthMbps);
->>>>>>> c3cead7288 (Refactor Camera AV stream management, zone event handling and update bandwidth calculation logic.)
     void Init();
 
     CameraAVStreamManager()  = default;
