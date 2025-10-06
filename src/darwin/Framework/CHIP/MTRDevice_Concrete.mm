@@ -3796,7 +3796,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             // Use a reasonable maximum as a starting size to avoid re-hashing of the temporary set
             //  (vast majority of clusters in spec have fewer than 32 attributes as of 2025-10-04)
             NSUInteger reasonableClusterSize = MTR_DEVICE_READATTRIBUTEPATHS_REASONABLE_CLUSTER_SIZE_MAX;
-            reasonableClusterSize = std::min({reasonableClusterSize, specificAttributePaths.count, clusterData.attributes.count});
+            reasonableClusterSize = std::min({ reasonableClusterSize, specificAttributePaths.count, clusterData.attributes.count });
             NSMutableSet<MTRAttributePath *> * requestedAttributesInCluster = [[NSMutableSet alloc] initWithCapacity:reasonableClusterSize];
             for (MTRAttributeRequestPath * requestPath in specificAttributePaths) {
                 if (requestPath.cluster != nil && ![requestPath.cluster isEqual:clusterPath.cluster]) {
