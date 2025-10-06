@@ -434,7 +434,7 @@ PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissio
                                              chip::RendezvousParameters()
                                                  .SetPeerAddress(Transport::PeerAddress(Transport::Type::kBle))
                                                  .SetSetupPINCode(setupPINCode)
-                                                 .SetSetupDiscriminator(setupDiscriminator),
+                                                 .SetSetupDiscriminator(discriminator),
                                              sCommissioningParameters));
 }
 
