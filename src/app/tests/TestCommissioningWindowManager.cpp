@@ -141,7 +141,7 @@ public:
         mLastAdvertiseOperationalResult = CHIP_NO_ERROR;
     }
 
-    bool IsAdvertisingEnabled() override { return !mIsStopped && mAdvertisingEnabled; }
+    bool IsAdvertisingEnabled() { return !mIsStopped && mAdvertisingEnabled; }
 
     void Reset()
     {
@@ -534,8 +534,8 @@ TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnab
 
     commissionMgr.OnPlatformEvent(&event);
     // This should attempt to start operational advertising, which will fail.
-    EXPECT_EQ(mMockDnssd.AdvertiseOperational(), CHIP_ERROR_INCORRECT_STATE);
-
+    EXPECT_EQ(mMockDnssd.mAdvertiseOperationalCallCount, 1);
+    EXPECT_EQ(mMockDnssd.mLastAdvertiseOperationalResult, CHIP_ERROR_INCORRECT_STATE);
     Server::GetInstance().GetCommissioningWindowManager().GetDnssdServer()->StartServer();
 }
 
