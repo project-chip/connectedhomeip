@@ -11,4 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-app_config_dependent_sources = []
+
+# This is the equivalent to app_config_dependent_sources.gni
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+)
+
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/GroupcastCluster.cpp"
+    "${CLUSTER_DIR}/GroupcastCluster.h"
+    "${CLUSTER_DIR}/GroupcastLogic.cpp"
+    "${CLUSTER_DIR}/GroupcastLogic.h"
+)

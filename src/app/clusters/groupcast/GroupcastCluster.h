@@ -17,34 +17,30 @@
 #pragma once
 
 #include "GroupcastLogic.h"
+#include <app/server-cluster/DefaultServerCluster.h>
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <app/server-cluster/DefaultServerCluster.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
 /**
- * @brief Provides coe-driven implementation for the Groupcast cluster server.
-          The `Instance()` method returns a reference to the global instance.
+ * @brief Provides code-driven implementation for the Groupcast cluster server.
  */
 class GroupcastCluster : public DefaultServerCluster
 {
 public:
-    static GroupcastCluster & Instance();
-
     GroupcastCluster();
-
-    CHIP_ERROR Startup(ServerClusterContext & context) override;
-    void Shutdown() override;
+    virtual ~GroupcastCluster() {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                            AttributeValueEncoder & encoder) override;
-    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                AttributeValueDecoder & decoder) override;
+                                                AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
-    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & arguments, CommandHandler * handler) override;
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
 private:
     GroupcastLogic mLogic;
