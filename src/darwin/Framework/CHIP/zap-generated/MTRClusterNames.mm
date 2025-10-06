@@ -8032,6 +8032,18 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"BlockUnrated";
             break;
 
+        case MTRAttributeIDTypeClusterContentControlAttributeBlockChannelListID:
+            result = @"BlockChannelList";
+            break;
+
+        case MTRAttributeIDTypeClusterContentControlAttributeBlockApplicationListID:
+            result = @"BlockApplicationList";
+            break;
+
+        case MTRAttributeIDTypeClusterContentControlAttributeBlockContentTimeWindowID:
+            result = @"BlockContentTimeWindow";
+            break;
+
         case MTRAttributeIDTypeClusterContentControlAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -11779,6 +11791,30 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterContentControlCommandSetScheduledContentRatingThresholdID:
             result = @"SetScheduledContentRatingThreshold";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandAddBlockChannelsID:
+            result = @"AddBlockChannels";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandRemoveBlockChannelsID:
+            result = @"RemoveBlockChannels";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandAddBlockApplicationsID:
+            result = @"AddBlockApplications";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandRemoveBlockApplicationsID:
+            result = @"RemoveBlockApplications";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandSetBlockContentTimeWindowID:
+            result = @"SetBlockContentTimeWindow";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandRemoveBlockContentTimeWindowID:
+            result = @"RemoveBlockContentTimeWindow";
             break;
 
         default:
@@ -15991,6 +16027,10 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
             // Cluster ContentControl events
         case MTREventIDTypeClusterContentControlEventRemainingScreenTimeExpiredID:
             result = @"RemainingScreenTimeExpired";
+            break;
+
+        case MTREventIDTypeClusterContentControlEventEnteringBlockContentTimeWindowID:
+            result = @"EnteringBlockContentTimeWindow";
             break;
 
         default:

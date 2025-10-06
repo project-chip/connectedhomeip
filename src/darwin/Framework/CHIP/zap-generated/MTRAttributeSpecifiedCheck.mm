@@ -5823,6 +5823,15 @@ static BOOL AttributeIsSpecifiedInContentControlCluster(AttributeId aAttributeId
     case Attributes::BlockUnrated::Id: {
         return YES;
     }
+    case Attributes::BlockChannelList::Id: {
+        return YES;
+    }
+    case Attributes::BlockApplicationList::Id: {
+        return YES;
+    }
+    case Attributes::BlockContentTimeWindow::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
