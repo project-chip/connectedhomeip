@@ -1,5 +1,5 @@
 <!--
-IMPORTANT: This file should be kept in sync with the copilot instructions file. Any changes made here should be reflected there, and vice-versa, to maintain consistent review instructions for both AI tools.
+IMPORTANT: This file should be kept in sync with the Gemini instructions file. Any changes made here should be reflected there, and vice-versa, to maintain consistent review instructions for both AI tools.
 -->
 # Code Review Instructions
 
