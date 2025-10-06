@@ -26,25 +26,25 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
- 
+
 namespace {
- 
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
 using namespace chip::app::Clusters::IcdManagement::Attributes;
- 
+
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
- 
+
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestIcdManagementCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
- 
+
 TEST_F(TestIcdManagementCluster, TestAttributes)
 {
     // Create test instances
@@ -52,13 +52,13 @@ TEST_F(TestIcdManagementCluster, TestAttributes)
     chip::Crypto::DefaultSessionKeystore keystore;
     FabricTable fabricTable;
     ICDConfigurationData &icdConfig = ICDConfigurationData::GetInstance();
-    
+
     BitMask<IcdManagement::OptionalCommands> optionalCommands = BitMask<IcdManagement::OptionalCommands>(IcdManagement::OptionalCommands::kStayActive);
     BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint(0);
-    
+
     ICDManagementCluster cluster(kRootEndpointId, storage, keystore, fabricTable, icdConfig,
         OptionalAttributeSet(), optionalCommands, userActiveModeTriggerHint, CharSpan());
-    
+
     // Test attribute list
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
     ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, IcdManagement::Id), attributesBuilder), CHIP_NO_ERROR);
@@ -72,18 +72,17 @@ TEST_F(TestIcdManagementCluster, TestAttributes)
               CHIP_NO_ERROR);
 
     ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
-    
+
     // Test accepted commands list
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsBuilder;
     ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, IcdManagement::Id), acceptedCommandsBuilder), CHIP_NO_ERROR);
-    
+
     ASSERT_TRUE(acceptedCommandsBuilder.Size() == 1);
-    
+
     // Test generated commands list
     ReadOnlyBufferBuilder<CommandId> generatedCommandsBuilder;
     ASSERT_EQ(cluster.GeneratedCommands(ConcreteClusterPath(kRootEndpointId, IcdManagement::Id), generatedCommandsBuilder), CHIP_NO_ERROR);
     ASSERT_TRUE(generatedCommandsBuilder.Size() == 1);
 }
- 
+
 } // namespace
- 
