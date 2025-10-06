@@ -978,10 +978,10 @@
               "side": "server",
               "type": "int64u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x0000000000000000",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -1058,10 +1058,10 @@
               "side": "server",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -1077,7 +1077,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x0001",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -2207,12 +2207,31 @@
     {
       "id": 2,
       "name": "Anonymous Endpoint Type",
-      "deviceTypes": [],
-      "deviceVersions": [],
-      "deviceIdentifiers": [],
-      "deviceTypeName": "",
-      "deviceTypeCode": "",
-      "deviceTypeProfileId": "",
+      "deviceTypeRef": {
+        "code": 768,
+        "profileId": 259,
+        "label": "MA-heatcool",
+        "name": "MA-heatcool",
+        "deviceTypeOrder": 0
+      },
+      "deviceTypes": [
+        {
+          "code": 768,
+          "profileId": 259,
+          "label": "MA-heatcool",
+          "name": "MA-heatcool",
+          "deviceTypeOrder": 0
+        }
+      ],
+      "deviceVersions": [
+        1
+      ],
+      "deviceIdentifiers": [
+        768
+      ],
+      "deviceTypeName": "MA-heatcool",
+      "deviceTypeCode": 768,
+      "deviceTypeProfileId": 259,
       "clusters": [
         {
           "name": "Identify",
