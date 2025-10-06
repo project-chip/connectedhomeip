@@ -16,6 +16,7 @@
 #
 
 
+import asyncio
 import logging
 import re
 
@@ -30,13 +31,23 @@ from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 ANSI_RE = re.compile(r"\x1B\[[0-?]*[-/]*[@-~]]")
+HEX_OR_DEC = re.compile(r"(0x[0-9a-fA-F]+|\d+)")
 VENDOR_RE = re.compile(r"VendorID:\s*(0x[0-9a-fA-F]+|\d+)")
 PRODUCT_RE = re.compile(r"ProductID:\s*(0x[0-9a-fA-F]+|\d+)")
 SWVER_RE = re.compile(r"SoftwareVersion:\s*(0x[0-9a-fA-F]+|\d+)")
-PROTO_RE = re.compile(r"ProtocolsSupported:\s*(0x[0-9a-fA-F]+|\d+)")
+PROTO_RE = re.compile(r"ProtocolsSupported:\s*\[(.*?)\]", re.DOTALL)
 HWVER_RE = re.compile(r"HardwareVersion:\s*(0x[0-9a-fA-F]+|\d+)")
 LOC_RE = re.compile(r"Location:\s*([A-Za-z0.9]+)")
 RCC_RE = re.compile(r"RequestorCanConsent:\s*(0x[0-9a-fA-F]+|\d+)")
+
+FIELDS = {
+    "vendor_id": VENDOR_RE,
+    "product_id": PRODUCT_RE,
+    "software_version": SWVER_RE,
+    "hardware_version": HWVER_RE,
+    "location": LOC_RE,
+    "requestor_can_consent": RCC_RE
+}
 
 
 class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
@@ -64,24 +75,12 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         ]
         return steps
 
-    def deansi(self, s: str) -> str:
-        return ANSI_RE.sub("", s)
-
     def pase_query_block(self, block: dict) -> dict:
-        text = '\n'.join(block.get("after", []))
-        text = self.deansi(text)
+        text = ANSI_RE.sub("", '\n'.join(block.get("after", [])))
 
         out = {}
 
-        for name, rx in {
-            "vendor_id": VENDOR_RE,
-            "product_id": PRODUCT_RE,
-            "software_version": SWVER_RE,
-            "protocols_supported": PROTO_RE,
-            "hardware_version": HWVER_RE,
-            "location": LOC_RE,
-            "requestor_can_consent": RCC_RE
-        }.items():
+        for name, rx in FIELDS.items():
             m = rx.search(text)
             if m:
                 val = m.group(1) if m.lastindex else m.group(0)
@@ -89,6 +88,11 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
                     out[name] = val
                 else:
                     out[name] = int(val, 0)
+
+            m = PROTO_RE.search(text)
+            out["protocols_supported"] = (
+                [int(n, 0) for n in HEX_OR_DEC.findall(m.group(1))] if m else []
+            )
 
         return out
 
@@ -192,7 +196,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         # Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P.
         self.step(1)
 
-        blocks = provider.read_from_logs(f"QueryImage", regex=True, before=0, after=15)
+        blocks = provider.read_from_logs("QueryImage", regex=True, before=0, after=15)
 
         parsed = {}
         for b in blocks:
@@ -243,24 +247,28 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
                              parsed['software_version'], f"Software Version is {parsed['software_version']} and it should be {software_version_basic_information}")
 
         # Check ProtocolsSupported protocols_supported
-        # asserts.assert_true(Clusters.OtaSoftwareUpdateProvider.Enums.DownloadProtocolEnum.kBDXSynchronous in parsed['protocols_supported'],
-        #                     f"kBDXSynchronous: {Clusters.OtaSoftwareUpdateProvider.Enums.DownloadProtocolEnum.kBDXSynchronous} is not part of {parsed['protocols_supported']}")
+        asserts.assert_true(Clusters.OtaSoftwareUpdateProvider.Enums.DownloadProtocolEnum.kBDXSynchronous in parsed['protocols_supported'],
+                            f"kBDXSynchronous: {Clusters.OtaSoftwareUpdateProvider.Enums.DownloadProtocolEnum.kBDXSynchronous} is not part of ProtocolsSupporter: {parsed['protocols_supported']}")
 
         # Check MCORE.OTA.HTTPS
+        if self.check_pics("MCORE.OTA.HTTPS"):
+            asserts.assert_true(Clusters.OtaSoftwareUpdateProvider.Enums.DownloadProtocolEnum.kHttps in parsed['protocols_supported'],
+                                f"kHttps: {Clusters.OtaSoftwareUpdateProvider.Enums.DownloadProtocolEnum.kHttps} is not part of ProtocolsSupporter: {parsed['protocols_supported']}")
 
         # Check RequestorCanConsent
         asserts.assert_equal(parsed['requestor_can_consent'], 0,
                              f"Requestor Can Consent is {parsed['requestor_can_consent']} instead of 0")
 
         # Check Location
-        location_basic_information = await self.read_single_attribute_check_success(
-            dev_ctrl=th1,
-            cluster=Clusters.BasicInformation,
-            attribute=Clusters.BasicInformation.Attributes.Location
-        )
+        if parsed['location']:
+            location_basic_information = await self.read_single_attribute_check_success(
+                dev_ctrl=th1,
+                cluster=Clusters.BasicInformation,
+                attribute=Clusters.BasicInformation.Attributes.Location
+            )
 
-        asserts.assert_equal(location_basic_information,
-                             parsed['location'], f"Location is {parsed['location']} and it should be {location_basic_information}")
+            asserts.assert_equal(location_basic_information,
+                                 parsed['location'], f"Location is {parsed['location']} and it should be {location_basic_information}")
 
         # Event Handler
         event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
@@ -320,7 +328,11 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         self.verfy_state_transition_event(event_report=event_querying_to_downloading,
                                           previous_state=querying, new_state=downloading, target_version=target_version)
 
-        provider.terminate()
+        await asyncio.sleep(5)
+        try:
+            provider.terminate()
+        except Exception as e:
+            logging.warning(f"Provider termination raised: {e}")
 
 
 if __name__ == "__main__":
