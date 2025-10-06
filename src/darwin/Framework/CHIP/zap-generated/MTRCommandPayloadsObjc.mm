@@ -15592,9 +15592,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _endpoints = [NSArray array];
 
-        _key = [NSData data];
-
         _keyID = @(0);
+
+        _key = nil;
 
         _gracePeriod = nil;
 
@@ -15611,8 +15611,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.groupID = self.groupID;
     other.endpoints = self.endpoints;
-    other.key = self.key;
     other.keyID = self.keyID;
+    other.key = self.key;
     other.gracePeriod = self.gracePeriod;
     other.useAuxiliaryACL = self.useAuxiliaryACL;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -15623,7 +15623,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; key:%@; keyID:%@; gracePeriod:%@; useAuxiliaryACL:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, [_key base64EncodedStringWithOptions:0], _keyID, _gracePeriod, _useAuxiliaryACL];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keyID:%@; key:%@; gracePeriod:%@; useAuxiliaryACL:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keyID, [_key base64EncodedStringWithOptions:0], _gracePeriod, _useAuxiliaryACL];
     return descriptionString;
 }
 
@@ -15664,10 +15664,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         }
     }
     {
-        encodableStruct.key = AsByteSpan(self.key);
+        encodableStruct.keyID = self.keyID.unsignedIntValue;
     }
     {
-        encodableStruct.keyID = self.keyID.unsignedIntValue;
+        if (self.key != nil) {
+            auto & definedValue_0 = encodableStruct.key.Emplace();
+            definedValue_0 = AsByteSpan(self.key);
+        }
     }
     {
         if (self.gracePeriod != nil) {
@@ -15960,9 +15963,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _groupID = @(0);
 
-        _key = [NSData data];
-
         _keyID = @(0);
+
+        _key = nil;
 
         _gracePeriod = nil;
         _timedInvokeTimeoutMs = nil;
@@ -15976,8 +15979,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     auto other = [[MTRGroupcastClusterUpdateGroupKeyParams alloc] init];
 
     other.groupID = self.groupID;
-    other.key = self.key;
     other.keyID = self.keyID;
+    other.key = self.key;
     other.gracePeriod = self.gracePeriod;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -15987,7 +15990,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; key:%@; keyID:%@; gracePeriod:%@; >", NSStringFromClass([self class]), _groupID, [_key base64EncodedStringWithOptions:0], _keyID, _gracePeriod];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; keyID:%@; key:%@; gracePeriod:%@; >", NSStringFromClass([self class]), _groupID, _keyID, [_key base64EncodedStringWithOptions:0], _gracePeriod];
     return descriptionString;
 }
 
@@ -16003,10 +16006,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.groupID = self.groupID.unsignedShortValue;
     }
     {
-        encodableStruct.key = AsByteSpan(self.key);
+        encodableStruct.keyID = self.keyID.unsignedIntValue;
     }
     {
-        encodableStruct.keyID = self.keyID.unsignedIntValue;
+        if (self.key != nil) {
+            auto & definedValue_0 = encodableStruct.key.Emplace();
+            definedValue_0 = AsByteSpan(self.key);
+        }
     }
     {
         if (self.gracePeriod != nil) {
