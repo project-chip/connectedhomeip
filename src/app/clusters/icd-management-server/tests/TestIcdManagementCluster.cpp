@@ -51,13 +51,14 @@ TEST_F(TestIcdManagementCluster, TestAttributes)
     TestPersistentStorageDelegate storage;
     chip::Crypto::DefaultSessionKeystore keystore;
     FabricTable fabricTable;
-    ICDConfigurationData &icdConfig = ICDConfigurationData::GetInstance();
+    ICDConfigurationData & icdConfig = ICDConfigurationData::GetInstance();
 
-    BitMask<IcdManagement::OptionalCommands> optionalCommands = BitMask<IcdManagement::OptionalCommands>(IcdManagement::OptionalCommands::kStayActive);
+    BitMask<IcdManagement::OptionalCommands> optionalCommands =
+        BitMask<IcdManagement::OptionalCommands>(IcdManagement::OptionalCommands::kStayActive);
     BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint(0);
 
-    ICDManagementCluster cluster(kRootEndpointId, storage, keystore, fabricTable, icdConfig,
-        OptionalAttributeSet(), optionalCommands, userActiveModeTriggerHint, CharSpan());
+    ICDManagementCluster cluster(kRootEndpointId, storage, keystore, fabricTable, icdConfig, OptionalAttributeSet(),
+                                 optionalCommands, userActiveModeTriggerHint, CharSpan());
 
     // Test attribute list
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
@@ -65,23 +66,24 @@ TEST_F(TestIcdManagementCluster, TestAttributes)
 
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
     ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-    ASSERT_EQ(expectedBuilder.AppendElements({
-        IcdManagement::Attributes::IdleModeDuration::kMetadataEntry,
-        IcdManagement::Attributes::ActiveModeDuration::kMetadataEntry,
-        IcdManagement::Attributes::ActiveModeThreshold::kMetadataEntry}),
+    ASSERT_EQ(expectedBuilder.AppendElements({ IcdManagement::Attributes::IdleModeDuration::kMetadataEntry,
+                                               IcdManagement::Attributes::ActiveModeDuration::kMetadataEntry,
+                                               IcdManagement::Attributes::ActiveModeThreshold::kMetadataEntry }),
               CHIP_NO_ERROR);
 
     ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 
     // Test accepted commands list
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsBuilder;
-    ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, IcdManagement::Id), acceptedCommandsBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, IcdManagement::Id), acceptedCommandsBuilder),
+              CHIP_NO_ERROR);
 
     ASSERT_TRUE(acceptedCommandsBuilder.Size() == 1);
 
     // Test generated commands list
     ReadOnlyBufferBuilder<CommandId> generatedCommandsBuilder;
-    ASSERT_EQ(cluster.GeneratedCommands(ConcreteClusterPath(kRootEndpointId, IcdManagement::Id), generatedCommandsBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.GeneratedCommands(ConcreteClusterPath(kRootEndpointId, IcdManagement::Id), generatedCommandsBuilder),
+              CHIP_NO_ERROR);
     ASSERT_TRUE(generatedCommandsBuilder.Size() == 1);
 }
 
