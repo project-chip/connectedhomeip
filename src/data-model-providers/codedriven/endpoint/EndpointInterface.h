@@ -47,6 +47,11 @@ public:
 
     virtual CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const = 0;
 
+/**
+ * An implementation of the EndpointInterface MUST ensure that the underlying
+ * data returned here remains valid for the lifetime of the implementation instance.
+ * This is a non-owning view of the unique endpoint ID data.
+ */
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     virtual CharSpan EndpointUniqueID() const = 0;
 #endif
