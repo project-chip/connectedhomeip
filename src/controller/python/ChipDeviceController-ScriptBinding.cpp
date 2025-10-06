@@ -434,7 +434,7 @@ PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissio
                                              chip::RendezvousParameters()
                                                  .SetPeerAddress(Transport::PeerAddress(Transport::Type::kBle))
                                                  .SetSetupPINCode(setupPINCode)
-                                                 .SetSetupDiscriminator(discriminator),
+                                                 .SetSetupDiscriminator(setupDiscriminator),
                                              sCommissioningParameters));
 }
 
@@ -454,7 +454,7 @@ PyChipError pychip_DeviceController_ConnectNFC(chip::Controller::DeviceCommissio
 
     return ToPyChipError(devCtrl->PairDevice(nodeid,
                                              chip::RendezvousParameters()
-                                                 .SetPeerAddress(Transport::PeerAddress::NFC(setupDiscriminator))
+                                                 .SetPeerAddress(Transport::PeerAddress::NFC(discriminator))
                                                  .SetSetupPINCode(setupPINCode)
                                                  .SetSetupDiscriminator(setupDiscriminator),
                                              sCommissioningParameters));
