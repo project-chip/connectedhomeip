@@ -2430,9 +2430,6 @@ endpoint 0 {
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
     callback attribute configurationVersion;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -2452,8 +2449,11 @@ endpoint 0 {
   }
 
   server cluster LocalizationConfiguration {
-    ram      attribute activeLocale default = "en-US";
+    ram      attribute activeLocale;
     callback attribute supportedLocales;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
