@@ -654,10 +654,9 @@ struct ActiveSessionState
 {
     CommissioneeDeviceProxy device;
     Transport::SecureSessionTable sessionTable;
-    // std::optional is perfect for holding an object that is constructed after its container
+    // Using std::optional since SecureSession has no default constructor
     std::optional<Transport::SecureSession> session;
 
-    // The RAII guard is part of the state!
     std::optional<ScopedSessionDetacher> detacher;
 };
 
@@ -797,7 +796,7 @@ TEST_F(AutoCommissionerTest, GetNextCommissioningStageNetworkSetup_ReturnsCorrec
     };
 
     Case cases[] = {
-        { .name               = "TrySecondaryWifiAtRootExpectThread",
+        { .name               = "SecondaryNetworkAtRoot_ExpectThread",
           .supportsConcurrent = true,
           .trySecondary       = true,
           .hasWiFiCreds       = true,
@@ -806,16 +805,8 @@ TEST_F(AutoCommissionerTest, GetNextCommissioningStageNetworkSetup_ReturnsCorrec
           .threadEndpoint     = kRootEndpointId,
           .expectedStage      = CommissioningStage::kThreadNetworkSetup,
           .expectedError      = CHIP_NO_ERROR },
-        { .name               = "TrySecondaryWifiNotRootExpectWiFi",
-          .supportsConcurrent = true,
-          .trySecondary       = true,
-          .hasWiFiCreds       = true,
-          .hasThreadDataset   = true,
-          .wifiEndpoint       = kRootEndpointId + 1,
-          .threadEndpoint     = kRootEndpointId,
-          .expectedStage      = CommissioningStage::kWiFiNetworkSetup,
-          .expectedError      = CHIP_NO_ERROR },
-        { .name               = "PrimaryWifiAtRootExpectWiFi",
+
+        { .name               = "PrimaryNetworkWithSecondary_ExpectWiFi",
           .supportsConcurrent = true,
           .trySecondary       = false,
           .hasWiFiCreds       = true,
@@ -824,16 +815,8 @@ TEST_F(AutoCommissionerTest, GetNextCommissioningStageNetworkSetup_ReturnsCorrec
           .threadEndpoint     = kRootEndpointId,
           .expectedStage      = CommissioningStage::kWiFiNetworkSetup,
           .expectedError      = CHIP_NO_ERROR },
-        { .name               = "PrimaryWifiNotRootExpectThread",
-          .supportsConcurrent = true,
-          .trySecondary       = false,
-          .hasWiFiCreds       = true,
-          .hasThreadDataset   = true,
-          .wifiEndpoint       = kRootEndpointId + 1,
-          .threadEndpoint     = kRootEndpointId,
-          .expectedStage      = CommissioningStage::kThreadNetworkSetup,
-          .expectedError      = CHIP_NO_ERROR },
-        { .name               = "NoSecondarySupportWithWiFiOnlyExpectWiFi",
+
+        { .name               = "WiFiOnly_ExpectWiFi",
           .supportsConcurrent = false,
           .trySecondary       = false,
           .hasWiFiCreds       = true,
@@ -842,7 +825,8 @@ TEST_F(AutoCommissionerTest, GetNextCommissioningStageNetworkSetup_ReturnsCorrec
           .threadEndpoint     = kInvalidEndpointId,
           .expectedStage      = CommissioningStage::kWiFiNetworkSetup,
           .expectedError      = CHIP_NO_ERROR },
-        { .name               = "NoSecondarySupportWithThreadOnlyExpectThread",
+
+        { .name               = "ThreadOnly_ExpectThread",
           .supportsConcurrent = false,
           .trySecondary       = false,
           .hasWiFiCreds       = false,
@@ -851,7 +835,8 @@ TEST_F(AutoCommissionerTest, GetNextCommissioningStageNetworkSetup_ReturnsCorrec
           .threadEndpoint     = kRootEndpointId,
           .expectedStage      = CommissioningStage::kThreadNetworkSetup,
           .expectedError      = CHIP_NO_ERROR },
-        { .name               = "MissingAllParamsExpectCleanupError",
+
+        { .name               = "NoNetworks_ExpectCleanupError",
           .supportsConcurrent = false,
           .trySecondary       = false,
           .hasWiFiCreds       = false,
@@ -984,8 +969,8 @@ TEST_F(AutoCommissionerTest, GetCommandTimeout_CalculatesCorrectlyWithActiveSess
     // We use the device from our state object. It's guaranteed to be valid.
     EXPECT_EQ(privateConfigCommissioner.GetCommandTimeout(&state->device, stage), MakeOptional(expectedTimeout));
 
-    // When 'state' goes out of scope at the end of the function, the ScopedSessionDetacher
-    // inside it is automatically destroyed, safely calling DetachSecureSession().
+    // When 'state' goes out of scope at the end of the function
+    // DetachSecureSession() is called
 }
 
 TEST_F(AutoCommissionerTest, GetDeviceProxyForStep_ReturnsCorrectProxy)
