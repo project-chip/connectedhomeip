@@ -40,7 +40,7 @@ namespace Internal {
 #endif
 
 /**
- * This implements a function to return an NULL-terminated descriptive C string, associated with the specified, mapped
+ * This implements a function to return a NULL-terminated descriptive C string, associated with the specified, mapped
  * Platform error.
  *
  *  @param[in] aError  The mapped Platform-specific error to describe.

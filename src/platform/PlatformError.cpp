@@ -63,8 +63,11 @@ const char * DescribePlatformError(CHIP_ERROR aError)
 void RegisterPlatformErrorFormatter()
 {
     static ErrorFormatter sPlatformErrorFormatter = { FormatPlatformError, nullptr };
-
+    static bool sRegistered = false;
+    if (sRegistered)
+        return;
     RegisterErrorFormatter(&sPlatformErrorFormatter);
+    sRegistered = true;
 }
 
 bool FormatPlatformError(char * buf, uint16_t bufSize, CHIP_ERROR err)
