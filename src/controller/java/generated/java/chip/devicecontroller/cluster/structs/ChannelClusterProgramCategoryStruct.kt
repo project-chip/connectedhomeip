@@ -17,19 +17,14 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ChannelClusterProgramCategoryStruct (
-    val category: String,
-    val subCategory: Optional<String>) {
-  override fun toString(): String  = buildString {
+class ChannelClusterProgramCategoryStruct(val category: String, val subCategory: Optional<String>) {
+  override fun toString(): String = buildString {
     append("ChannelClusterProgramCategoryStruct {\n")
     append("\tcategory : $category\n")
     append("\tsubCategory : $subCategory\n")
@@ -41,9 +36,9 @@ class ChannelClusterProgramCategoryStruct (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CATEGORY), category)
       if (subCategory.isPresent) {
-      val optsubCategory = subCategory.get()
-      put(ContextSpecificTag(TAG_SUB_CATEGORY), optsubCategory)
-    }
+        val optsubCategory = subCategory.get()
+        put(ContextSpecificTag(TAG_SUB_CATEGORY), optsubCategory)
+      }
       endStructure()
     }
   }
@@ -52,15 +47,16 @@ class ChannelClusterProgramCategoryStruct (
     private const val TAG_CATEGORY = 0
     private const val TAG_SUB_CATEGORY = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ChannelClusterProgramCategoryStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChannelClusterProgramCategoryStruct {
       tlvReader.enterStructure(tlvTag)
       val category = tlvReader.getString(ContextSpecificTag(TAG_CATEGORY))
-      val subCategory = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SUB_CATEGORY))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_SUB_CATEGORY)))
-    } else {
-      Optional.empty()
-    }
-      
+      val subCategory =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SUB_CATEGORY))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_SUB_CATEGORY)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return ChannelClusterProgramCategoryStruct(category, subCategory)

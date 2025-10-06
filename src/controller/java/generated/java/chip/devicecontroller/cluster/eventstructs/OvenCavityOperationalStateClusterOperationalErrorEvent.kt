@@ -17,18 +17,16 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class OvenCavityOperationalStateClusterOperationalErrorEvent (
-    val errorState: chip.devicecontroller.cluster.structs.OvenCavityOperationalStateClusterErrorStateStruct) {
-  override fun toString(): String  = buildString {
+class OvenCavityOperationalStateClusterOperationalErrorEvent(
+  val errorState:
+    chip.devicecontroller.cluster.structs.OvenCavityOperationalStateClusterErrorStateStruct
+) {
+  override fun toString(): String = buildString {
     append("OvenCavityOperationalStateClusterOperationalErrorEvent {\n")
     append("\terrorState : $errorState\n")
     append("}\n")
@@ -45,10 +43,15 @@ class OvenCavityOperationalStateClusterOperationalErrorEvent (
   companion object {
     private const val TAG_ERROR_STATE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : OvenCavityOperationalStateClusterOperationalErrorEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): OvenCavityOperationalStateClusterOperationalErrorEvent {
       tlvReader.enterStructure(tlvTag)
-      val errorState = chip.devicecontroller.cluster.structs.OvenCavityOperationalStateClusterErrorStateStruct.fromTlv(ContextSpecificTag(TAG_ERROR_STATE), tlvReader)
-      
+      val errorState =
+        chip.devicecontroller.cluster.structs.OvenCavityOperationalStateClusterErrorStateStruct
+          .fromTlv(ContextSpecificTag(TAG_ERROR_STATE), tlvReader)
+
       tlvReader.exitContainer()
 
       return OvenCavityOperationalStateClusterOperationalErrorEvent(errorState)

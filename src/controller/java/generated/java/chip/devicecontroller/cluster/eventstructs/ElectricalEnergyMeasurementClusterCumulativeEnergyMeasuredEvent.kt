@@ -17,19 +17,23 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent (
-    val energyImported: Optional<chip.devicecontroller.cluster.structs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct>,
-    val energyExported: Optional<chip.devicecontroller.cluster.structs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct>) {
-  override fun toString(): String  = buildString {
+class ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent(
+  val energyImported:
+    Optional<
+      chip.devicecontroller.cluster.structs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct
+    >,
+  val energyExported:
+    Optional<
+      chip.devicecontroller.cluster.structs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct
+    >,
+) {
+  override fun toString(): String = buildString {
     append("ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent {\n")
     append("\tenergyImported : $energyImported\n")
     append("\tenergyExported : $energyExported\n")
@@ -40,13 +44,13 @@ class ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent (
     tlvWriter.apply {
       startStructure(tlvTag)
       if (energyImported.isPresent) {
-      val optenergyImported = energyImported.get()
-      optenergyImported.toTlv(ContextSpecificTag(TAG_ENERGY_IMPORTED), this)
-    }
+        val optenergyImported = energyImported.get()
+        optenergyImported.toTlv(ContextSpecificTag(TAG_ENERGY_IMPORTED), this)
+      }
       if (energyExported.isPresent) {
-      val optenergyExported = energyExported.get()
-      optenergyExported.toTlv(ContextSpecificTag(TAG_ENERGY_EXPORTED), this)
-    }
+        val optenergyExported = energyExported.get()
+        optenergyExported.toTlv(ContextSpecificTag(TAG_ENERGY_EXPORTED), this)
+      }
       endStructure()
     }
   }
@@ -55,22 +59,38 @@ class ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent (
     private const val TAG_ENERGY_IMPORTED = 0
     private const val TAG_ENERGY_EXPORTED = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent {
       tlvReader.enterStructure(tlvTag)
-      val energyImported = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENERGY_IMPORTED))) {
-      Optional.of(chip.devicecontroller.cluster.structs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.fromTlv(ContextSpecificTag(TAG_ENERGY_IMPORTED), tlvReader))
-    } else {
-      Optional.empty()
-    }
-      val energyExported = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENERGY_EXPORTED))) {
-      Optional.of(chip.devicecontroller.cluster.structs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.fromTlv(ContextSpecificTag(TAG_ENERGY_EXPORTED), tlvReader))
-    } else {
-      Optional.empty()
-    }
-      
+      val energyImported =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENERGY_IMPORTED))) {
+          Optional.of(
+            chip.devicecontroller.cluster.structs
+              .ElectricalEnergyMeasurementClusterEnergyMeasurementStruct
+              .fromTlv(ContextSpecificTag(TAG_ENERGY_IMPORTED), tlvReader)
+          )
+        } else {
+          Optional.empty()
+        }
+      val energyExported =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENERGY_EXPORTED))) {
+          Optional.of(
+            chip.devicecontroller.cluster.structs
+              .ElectricalEnergyMeasurementClusterEnergyMeasurementStruct
+              .fromTlv(ContextSpecificTag(TAG_ENERGY_EXPORTED), tlvReader)
+          )
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent(energyImported, energyExported)
+      return ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent(
+        energyImported,
+        energyExported,
+      )
     }
   }
 }

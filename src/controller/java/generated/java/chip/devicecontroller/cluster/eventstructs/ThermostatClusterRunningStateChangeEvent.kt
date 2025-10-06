@@ -17,19 +17,17 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ThermostatClusterRunningStateChangeEvent (
-    val previousRunningState: Optional<UInt>,
-    val currentRunningState: UInt) {
-  override fun toString(): String  = buildString {
+class ThermostatClusterRunningStateChangeEvent(
+  val previousRunningState: Optional<UInt>,
+  val currentRunningState: UInt,
+) {
+  override fun toString(): String = buildString {
     append("ThermostatClusterRunningStateChangeEvent {\n")
     append("\tpreviousRunningState : $previousRunningState\n")
     append("\tcurrentRunningState : $currentRunningState\n")
@@ -40,9 +38,9 @@ class ThermostatClusterRunningStateChangeEvent (
     tlvWriter.apply {
       startStructure(tlvTag)
       if (previousRunningState.isPresent) {
-      val optpreviousRunningState = previousRunningState.get()
-      put(ContextSpecificTag(TAG_PREVIOUS_RUNNING_STATE), optpreviousRunningState)
-    }
+        val optpreviousRunningState = previousRunningState.get()
+        put(ContextSpecificTag(TAG_PREVIOUS_RUNNING_STATE), optpreviousRunningState)
+      }
       put(ContextSpecificTag(TAG_CURRENT_RUNNING_STATE), currentRunningState)
       endStructure()
     }
@@ -52,15 +50,16 @@ class ThermostatClusterRunningStateChangeEvent (
     private const val TAG_PREVIOUS_RUNNING_STATE = 0
     private const val TAG_CURRENT_RUNNING_STATE = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ThermostatClusterRunningStateChangeEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterRunningStateChangeEvent {
       tlvReader.enterStructure(tlvTag)
-      val previousRunningState = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_RUNNING_STATE))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_PREVIOUS_RUNNING_STATE)))
-    } else {
-      Optional.empty()
-    }
+      val previousRunningState =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_RUNNING_STATE))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_PREVIOUS_RUNNING_STATE)))
+        } else {
+          Optional.empty()
+        }
       val currentRunningState = tlvReader.getUInt(ContextSpecificTag(TAG_CURRENT_RUNNING_STATE))
-      
+
       tlvReader.exitContainer()
 
       return ThermostatClusterRunningStateChangeEvent(previousRunningState, currentRunningState)

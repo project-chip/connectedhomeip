@@ -17,25 +17,22 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class WebRTCTransportRequestorClusterWebRTCSessionStruct (
-    val id: UInt,
-    val peerNodeID: ULong,
-    val peerEndpointID: UInt,
-    val streamUsage: UInt,
-    val videoStreamID: UInt?,
-    val audioStreamID: UInt?,
-    val metadataEnabled: Boolean,
-    val fabricIndex: UInt) {
-  override fun toString(): String  = buildString {
+class WebRTCTransportRequestorClusterWebRTCSessionStruct(
+  val id: UInt,
+  val peerNodeID: ULong,
+  val peerEndpointID: UInt,
+  val streamUsage: UInt,
+  val videoStreamID: UInt?,
+  val audioStreamID: UInt?,
+  val metadataEnabled: Boolean,
+  val fabricIndex: UInt,
+) {
+  override fun toString(): String = buildString {
     append("WebRTCTransportRequestorClusterWebRTCSessionStruct {\n")
     append("\tid : $id\n")
     append("\tpeerNodeID : $peerNodeID\n")
@@ -56,15 +53,15 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct (
       put(ContextSpecificTag(TAG_PEER_ENDPOINT_ID), peerEndpointID)
       put(ContextSpecificTag(TAG_STREAM_USAGE), streamUsage)
       if (videoStreamID != null) {
-      put(ContextSpecificTag(TAG_VIDEO_STREAM_ID), videoStreamID)
-    } else {
-      putNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
-    }
+        put(ContextSpecificTag(TAG_VIDEO_STREAM_ID), videoStreamID)
+      } else {
+        putNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
+      }
       if (audioStreamID != null) {
-      put(ContextSpecificTag(TAG_AUDIO_STREAM_ID), audioStreamID)
-    } else {
-      putNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
-    }
+        put(ContextSpecificTag(TAG_AUDIO_STREAM_ID), audioStreamID)
+      } else {
+        putNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
+      }
       put(ContextSpecificTag(TAG_METADATA_ENABLED), metadataEnabled)
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
@@ -81,30 +78,44 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct (
     private const val TAG_METADATA_ENABLED = 6
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : WebRTCTransportRequestorClusterWebRTCSessionStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): WebRTCTransportRequestorClusterWebRTCSessionStruct {
       tlvReader.enterStructure(tlvTag)
       val id = tlvReader.getUInt(ContextSpecificTag(TAG_ID))
       val peerNodeID = tlvReader.getULong(ContextSpecificTag(TAG_PEER_NODE_ID))
       val peerEndpointID = tlvReader.getUInt(ContextSpecificTag(TAG_PEER_ENDPOINT_ID))
       val streamUsage = tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_USAGE))
-      val videoStreamID = if (!tlvReader.isNull()) {
-      tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
-      null
-    }
-      val audioStreamID = if (!tlvReader.isNull()) {
-      tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
-      null
-    }
+      val videoStreamID =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
+          null
+        }
+      val audioStreamID =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
+          null
+        }
       val metadataEnabled = tlvReader.getBoolean(ContextSpecificTag(TAG_METADATA_ENABLED))
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return WebRTCTransportRequestorClusterWebRTCSessionStruct(id, peerNodeID, peerEndpointID, streamUsage, videoStreamID, audioStreamID, metadataEnabled, fabricIndex)
+      return WebRTCTransportRequestorClusterWebRTCSessionStruct(
+        id,
+        peerNodeID,
+        peerEndpointID,
+        streamUsage,
+        videoStreamID,
+        audioStreamID,
+        metadataEnabled,
+        fabricIndex,
+      )
     }
   }
 }

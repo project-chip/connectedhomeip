@@ -17,19 +17,17 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ThermostatClusterActiveScheduleChangeEvent (
-    val previousScheduleHandle: Optional<ByteArray>?,
-    val currentScheduleHandle: ByteArray?) {
-  override fun toString(): String  = buildString {
+class ThermostatClusterActiveScheduleChangeEvent(
+  val previousScheduleHandle: Optional<ByteArray>?,
+  val currentScheduleHandle: ByteArray?,
+) {
+  override fun toString(): String = buildString {
     append("ThermostatClusterActiveScheduleChangeEvent {\n")
     append("\tpreviousScheduleHandle : $previousScheduleHandle\n")
     append("\tcurrentScheduleHandle : $currentScheduleHandle\n")
@@ -40,18 +38,18 @@ class ThermostatClusterActiveScheduleChangeEvent (
     tlvWriter.apply {
       startStructure(tlvTag)
       if (previousScheduleHandle != null) {
-      if (previousScheduleHandle.isPresent) {
-      val optpreviousScheduleHandle = previousScheduleHandle.get()
-      put(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE), optpreviousScheduleHandle)
-    }
-    } else {
-      putNull(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE))
-    }
+        if (previousScheduleHandle.isPresent) {
+          val optpreviousScheduleHandle = previousScheduleHandle.get()
+          put(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE), optpreviousScheduleHandle)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE))
+      }
       if (currentScheduleHandle != null) {
-      put(ContextSpecificTag(TAG_CURRENT_SCHEDULE_HANDLE), currentScheduleHandle)
-    } else {
-      putNull(ContextSpecificTag(TAG_CURRENT_SCHEDULE_HANDLE))
-    }
+        put(ContextSpecificTag(TAG_CURRENT_SCHEDULE_HANDLE), currentScheduleHandle)
+      } else {
+        putNull(ContextSpecificTag(TAG_CURRENT_SCHEDULE_HANDLE))
+      }
       endStructure()
     }
   }
@@ -60,28 +58,33 @@ class ThermostatClusterActiveScheduleChangeEvent (
     private const val TAG_PREVIOUS_SCHEDULE_HANDLE = 0
     private const val TAG_CURRENT_SCHEDULE_HANDLE = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ThermostatClusterActiveScheduleChangeEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterActiveScheduleChangeEvent {
       tlvReader.enterStructure(tlvTag)
-      val previousScheduleHandle = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE))) {
-      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE)))
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE))
-      null
-    }
-      val currentScheduleHandle = if (!tlvReader.isNull()) {
-      tlvReader.getByteArray(ContextSpecificTag(TAG_CURRENT_SCHEDULE_HANDLE))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_SCHEDULE_HANDLE))
-      null
-    }
-      
+      val previousScheduleHandle =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE))) {
+            Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE)))
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_PREVIOUS_SCHEDULE_HANDLE))
+          null
+        }
+      val currentScheduleHandle =
+        if (!tlvReader.isNull()) {
+          tlvReader.getByteArray(ContextSpecificTag(TAG_CURRENT_SCHEDULE_HANDLE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_SCHEDULE_HANDLE))
+          null
+        }
+
       tlvReader.exitContainer()
 
-      return ThermostatClusterActiveScheduleChangeEvent(previousScheduleHandle, currentScheduleHandle)
+      return ThermostatClusterActiveScheduleChangeEvent(
+        previousScheduleHandle,
+        currentScheduleHandle,
+      )
     }
   }
 }

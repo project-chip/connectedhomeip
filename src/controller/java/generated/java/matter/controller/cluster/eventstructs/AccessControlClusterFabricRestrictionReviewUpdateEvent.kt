@@ -18,7 +18,6 @@ package matter.controller.cluster.eventstructs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -28,7 +27,7 @@ class AccessControlClusterFabricRestrictionReviewUpdateEvent(
   val token: ULong,
   val instruction: Optional<String>,
   val ARLRequestFlowUrl: Optional<String>,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("AccessControlClusterFabricRestrictionReviewUpdateEvent {\n")
@@ -62,24 +61,34 @@ class AccessControlClusterFabricRestrictionReviewUpdateEvent(
     private const val TAG_ARL_REQUEST_FLOW_URL = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AccessControlClusterFabricRestrictionReviewUpdateEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): AccessControlClusterFabricRestrictionReviewUpdateEvent {
       tlvReader.enterStructure(tlvTag)
       val token = tlvReader.getULong(ContextSpecificTag(TAG_TOKEN))
-      val instruction = if (tlvReader.isNextTag(ContextSpecificTag(TAG_INSTRUCTION))) {
-        Optional.of(tlvReader.getString(ContextSpecificTag(TAG_INSTRUCTION)))
-      } else {
-        Optional.empty()
-      }
-      val ARLRequestFlowUrl = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ARL_REQUEST_FLOW_URL))) {
-        Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ARL_REQUEST_FLOW_URL)))
-      } else {
-        Optional.empty()
-      }
+      val instruction =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_INSTRUCTION))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_INSTRUCTION)))
+        } else {
+          Optional.empty()
+        }
+      val ARLRequestFlowUrl =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ARL_REQUEST_FLOW_URL))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ARL_REQUEST_FLOW_URL)))
+        } else {
+          Optional.empty()
+        }
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return AccessControlClusterFabricRestrictionReviewUpdateEvent(token, instruction, ARLRequestFlowUrl, fabricIndex)
+      return AccessControlClusterFabricRestrictionReviewUpdateEvent(
+        token,
+        instruction,
+        ARLRequestFlowUrl,
+        fabricIndex,
+      )
     }
   }
 }

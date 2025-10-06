@@ -17,18 +17,13 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ThermostatClusterLocalTemperatureChangeEvent (
-    val currentLocalTemperature: Int?) {
-  override fun toString(): String  = buildString {
+class ThermostatClusterLocalTemperatureChangeEvent(val currentLocalTemperature: Int?) {
+  override fun toString(): String = buildString {
     append("ThermostatClusterLocalTemperatureChangeEvent {\n")
     append("\tcurrentLocalTemperature : $currentLocalTemperature\n")
     append("}\n")
@@ -38,10 +33,10 @@ class ThermostatClusterLocalTemperatureChangeEvent (
     tlvWriter.apply {
       startStructure(tlvTag)
       if (currentLocalTemperature != null) {
-      put(ContextSpecificTag(TAG_CURRENT_LOCAL_TEMPERATURE), currentLocalTemperature)
-    } else {
-      putNull(ContextSpecificTag(TAG_CURRENT_LOCAL_TEMPERATURE))
-    }
+        put(ContextSpecificTag(TAG_CURRENT_LOCAL_TEMPERATURE), currentLocalTemperature)
+      } else {
+        putNull(ContextSpecificTag(TAG_CURRENT_LOCAL_TEMPERATURE))
+      }
       endStructure()
     }
   }
@@ -49,15 +44,16 @@ class ThermostatClusterLocalTemperatureChangeEvent (
   companion object {
     private const val TAG_CURRENT_LOCAL_TEMPERATURE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ThermostatClusterLocalTemperatureChangeEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterLocalTemperatureChangeEvent {
       tlvReader.enterStructure(tlvTag)
-      val currentLocalTemperature = if (!tlvReader.isNull()) {
-      tlvReader.getInt(ContextSpecificTag(TAG_CURRENT_LOCAL_TEMPERATURE))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_LOCAL_TEMPERATURE))
-      null
-    }
-      
+      val currentLocalTemperature =
+        if (!tlvReader.isNull()) {
+          tlvReader.getInt(ContextSpecificTag(TAG_CURRENT_LOCAL_TEMPERATURE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_LOCAL_TEMPERATURE))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return ThermostatClusterLocalTemperatureChangeEvent(currentLocalTemperature)

@@ -16,7 +16,6 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -27,7 +26,7 @@ import matter.tlv.TlvWriter
 class AccessControlClusterCommissioningAccessRestrictionEntryStruct(
   val endpoint: UShort,
   val cluster: UInt,
-  val restrictions: List<AccessControlClusterAccessRestrictionStruct>
+  val restrictions: List<AccessControlClusterAccessRestrictionStruct>,
 ) {
   override fun toString(): String = buildString {
     append("AccessControlClusterCommissioningAccessRestrictionEntryStruct {\n")
@@ -56,21 +55,29 @@ class AccessControlClusterCommissioningAccessRestrictionEntryStruct(
     private const val TAG_CLUSTER = 1
     private const val TAG_RESTRICTIONS = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AccessControlClusterCommissioningAccessRestrictionEntryStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): AccessControlClusterCommissioningAccessRestrictionEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val endpoint = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT))
       val cluster = tlvReader.getUInt(ContextSpecificTag(TAG_CLUSTER))
-      val restrictions = buildList<AccessControlClusterAccessRestrictionStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_RESTRICTIONS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(AccessControlClusterAccessRestrictionStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val restrictions =
+        buildList<AccessControlClusterAccessRestrictionStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_RESTRICTIONS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(AccessControlClusterAccessRestrictionStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
-      return AccessControlClusterCommissioningAccessRestrictionEntryStruct(endpoint, cluster, restrictions)
+      return AccessControlClusterCommissioningAccessRestrictionEntryStruct(
+        endpoint,
+        cluster,
+        restrictions,
+      )
     }
   }
 }

@@ -30,7 +30,7 @@ class GroupcastClusterMembershipStruct(
   val keyID: UInt,
   val hasAuxiliaryACL: Boolean,
   val expiringKeyID: Optional<UInt>,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("GroupcastClusterMembershipStruct {\n")
@@ -74,25 +74,34 @@ class GroupcastClusterMembershipStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GroupcastClusterMembershipStruct {
       tlvReader.enterStructure(tlvTag)
       val groupID = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_ID))
-      val endpoints = buildList<UShort> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_ENDPOINTS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getUShort(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
+      val endpoints =
+        buildList<UShort> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_ENDPOINTS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUShort(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
       val keyID = tlvReader.getUInt(ContextSpecificTag(TAG_KEY_ID))
       val hasAuxiliaryACL = tlvReader.getBoolean(ContextSpecificTag(TAG_HAS_AUXILIARY_ACL))
-      val expiringKeyID = if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXPIRING_KEY_ID))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_EXPIRING_KEY_ID)))
-    } else {
-      Optional.empty()
-    }
+      val expiringKeyID =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXPIRING_KEY_ID))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_EXPIRING_KEY_ID)))
+        } else {
+          Optional.empty()
+        }
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return GroupcastClusterMembershipStruct(groupID, endpoints, keyID, hasAuxiliaryACL, expiringKeyID, fabricIndex)
+      return GroupcastClusterMembershipStruct(
+        groupID,
+        endpoints,
+        keyID,
+        hasAuxiliaryACL,
+        expiringKeyID,
+        fabricIndex,
+      )
     }
   }
 }

@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +26,7 @@ import matter.tlv.TlvWriter
 class UnitTestingClusterTestGlobalStruct(
   val name: String,
   val myBitmap: UInt?,
-  val myEnum: Optional<UByte>?
+  val myEnum: Optional<UByte>?,
 ) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterTestGlobalStruct {\n")
@@ -48,9 +47,9 @@ class UnitTestingClusterTestGlobalStruct(
       }
       if (myEnum != null) {
         if (myEnum.isPresent) {
-        val optmyEnum = myEnum.get()
-        put(ContextSpecificTag(TAG_MY_ENUM), optmyEnum)
-      }
+          val optmyEnum = myEnum.get()
+          put(ContextSpecificTag(TAG_MY_ENUM), optmyEnum)
+        }
       } else {
         putNull(ContextSpecificTag(TAG_MY_ENUM))
       }
@@ -66,23 +65,25 @@ class UnitTestingClusterTestGlobalStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterTestGlobalStruct {
       tlvReader.enterStructure(tlvTag)
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-      val myBitmap = if (!tlvReader.isNull()) {
-      tlvReader.getUInt(ContextSpecificTag(TAG_MY_BITMAP))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_MY_BITMAP))
-      null
-    }
-      val myEnum = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_MY_ENUM))) {
-      Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_MY_ENUM)))
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_MY_ENUM))
-      null
-    }
-      
+      val myBitmap =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_MY_BITMAP))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_MY_BITMAP))
+          null
+        }
+      val myEnum =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_MY_ENUM))) {
+            Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_MY_ENUM)))
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_MY_ENUM))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return UnitTestingClusterTestGlobalStruct(name, myBitmap, myEnum)

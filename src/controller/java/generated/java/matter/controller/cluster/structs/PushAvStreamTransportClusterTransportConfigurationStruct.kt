@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -28,7 +27,7 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
   val connectionID: UShort,
   val transportStatus: UByte,
   val transportOptions: Optional<PushAvStreamTransportClusterTransportOptionsStruct>,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportConfigurationStruct {\n")
@@ -59,20 +58,34 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
     private const val TAG_TRANSPORT_OPTIONS = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PushAvStreamTransportClusterTransportConfigurationStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): PushAvStreamTransportClusterTransportConfigurationStruct {
       tlvReader.enterStructure(tlvTag)
       val connectionID = tlvReader.getUShort(ContextSpecificTag(TAG_CONNECTION_ID))
       val transportStatus = tlvReader.getUByte(ContextSpecificTag(TAG_TRANSPORT_STATUS))
-      val transportOptions = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TRANSPORT_OPTIONS))) {
-      Optional.of(PushAvStreamTransportClusterTransportOptionsStruct.fromTlv(ContextSpecificTag(TAG_TRANSPORT_OPTIONS), tlvReader))
-    } else {
-      Optional.empty()
-    }
+      val transportOptions =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TRANSPORT_OPTIONS))) {
+          Optional.of(
+            PushAvStreamTransportClusterTransportOptionsStruct.fromTlv(
+              ContextSpecificTag(TAG_TRANSPORT_OPTIONS),
+              tlvReader,
+            )
+          )
+        } else {
+          Optional.empty()
+        }
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return PushAvStreamTransportClusterTransportConfigurationStruct(connectionID, transportStatus, transportOptions, fabricIndex)
+      return PushAvStreamTransportClusterTransportConfigurationStruct(
+        connectionID,
+        transportStatus,
+        transportOptions,
+        fabricIndex,
+      )
     }
   }
 }
