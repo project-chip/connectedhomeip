@@ -193,11 +193,12 @@ TEST_F(TestIdentifyCluster, WriteReadOnlyAttributesReturnUnsupportedWriteTest)
               CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 
     // Attempt to write to the read-only ClusterRevision attribute and verify it fails.
-    EXPECT_EQ(WriteAttribute(cluster, { kTestEndpointId, Identify::Id, Globals::Attributes::ClusterRevision::Id }, 0u),
-              CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+    EXPECT_EQ(
+        WriteAttribute(cluster, { kTestEndpointId, Identify::Id, Globals::Attributes::ClusterRevision::Id }, static_cast<uint16_t>(0)),
+        CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 
     // Attempt to write to the read-only FeatureMap attribute and verify it fails.
-    EXPECT_EQ(WriteAttribute(cluster, { kTestEndpointId, Identify::Id, FeatureMap::Id }, 0u),
+    EXPECT_EQ(WriteAttribute(cluster, { kTestEndpointId, Identify::Id, FeatureMap::Id }, static_cast<uint32_t>(0)),
               CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 }
 
