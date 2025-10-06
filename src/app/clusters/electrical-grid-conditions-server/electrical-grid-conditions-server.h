@@ -24,6 +24,29 @@
 #include <app/ConcreteAttributePath.h>
 #include <lib/core/CHIPError.h>
 
+// Add equality operator for ElectricalGridConditionsStruct
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ElectricalGridConditions {
+namespace Structs {
+namespace ElectricalGridConditionsStruct {
+inline bool operator==(const Type & lhs, const Type & rhs)
+{
+    return (lhs.periodStart == rhs.periodStart && 
+            lhs.periodEnd == rhs.periodEnd &&
+            lhs.gridCarbonIntensity == rhs.gridCarbonIntensity && 
+            lhs.gridCarbonLevel == rhs.gridCarbonLevel &&
+            lhs.localCarbonIntensity == rhs.localCarbonIntensity && 
+            lhs.localCarbonLevel == rhs.localCarbonLevel);
+}
+} // namespace ElectricalGridConditionsStruct
+} // namespace Structs
+} // namespace ElectricalGridConditions
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
 namespace chip {
 namespace app {
 namespace Clusters {

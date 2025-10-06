@@ -153,14 +153,9 @@ CHIP_ERROR Instance::SetCurrentConditions(DataModel::Nullable<Structs::Electrica
     else if (!mCurrentConditions.IsNull() && !newValue.IsNull())
     {
         const auto & current = mCurrentConditions.Value();
-        const auto & newVal  = newValue.Value();
-
-        if (current.periodStart != newVal.periodStart || current.periodEnd != newVal.periodEnd ||
-            current.gridCarbonIntensity != newVal.gridCarbonIntensity || current.gridCarbonLevel != newVal.gridCarbonLevel ||
-            current.localCarbonIntensity != newVal.localCarbonIntensity || current.localCarbonLevel != newVal.localCarbonLevel)
-        {
-            hasChanged = true;
-        }
+        const auto & newVal = newValue.Value();
+        
+        hasChanged = !(current == newVal);
     }
 
     if (hasChanged)
