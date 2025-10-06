@@ -147,6 +147,8 @@ enum
 #endif
 #if ENABLE_CAMERA_SERVER
     kDeviceOption_Camera_DeferredOffer,
+    kDeviceOption_Camera_TestVideosrc,
+    kDeviceOption_Camera_TestAudiosrc,
     kDeviceOption_Camera_VideoDevice,
 #endif
     kDeviceOption_VendorName,
@@ -247,6 +249,8 @@ OptionDef sDeviceOptionDefs[] = {
 #endif
 #if ENABLE_CAMERA_SERVER
     { "camera-deferred-offer", kNoArgument, kDeviceOption_Camera_DeferredOffer },
+    { "camera-test-videosrc", kNoArgument, kDeviceOption_Camera_TestVideosrc },
+    { "camera-test-audiosrc", kNoArgument, kDeviceOption_Camera_TestAudiosrc },
     { "camera-video-device", kArgumentRequired, kDeviceOption_Camera_VideoDevice },
 #endif
     {}
@@ -457,6 +461,13 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --camera-video-device <path>\n"
     "       Path to a V4L2 video capture device (default: /dev/video0).\n"
+    "\n"
+    "  --camera-test-videosrc\n"
+    "       Use gstreamer test video source for streaming. Overrides --camera-video-device.\n"
+    "\n"
+    "  --camera-test-audiosrc\n"
+    "       Use gstreamer test audio source for streaming. Overrides --camera-video-device.\n"
+    "\n"
 #endif
     "\n";
 
@@ -906,6 +917,14 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 #if ENABLE_CAMERA_SERVER
     case kDeviceOption_Camera_DeferredOffer: {
         LinuxDeviceOptions::GetInstance().cameraDeferredOffer = true;
+        break;
+    }
+    case kDeviceOption_Camera_TestVideosrc: {
+        LinuxDeviceOptions::GetInstance().cameraTestVideosrc = true;
+        break;
+    }
+    case kDeviceOption_Camera_TestAudiosrc: {
+        LinuxDeviceOptions::GetInstance().cameraTestAudiosrc = true;
         break;
     }
     case kDeviceOption_Camera_VideoDevice: {

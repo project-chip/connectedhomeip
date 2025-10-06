@@ -206,7 +206,7 @@ To make provisioning possible and to control the Matter device with Python
 application, you can build and run the Python CHIP controller.
 
 To build and install the Python Device Controller application check the guide
-[Python Device Controller guide](../../development_controllers/chip-repl/python_chip_controller_building.md).
+[Python Device Controller guide](../../development_controllers/matter-repl/python_chip_controller_building.md).
 
 ### Device commissioning for Python Device Controller
 

@@ -74,15 +74,6 @@ CHIP_ERROR FactoryDataProvider::SetSetupDiscriminator(uint16_t setupDiscriminato
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-// TODO: This should be moved to a method of P256Keypair
-CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key,
-        Crypto::P256Keypair &keypair) {
-    Crypto::P256SerializedKeypair serialized_keypair;
-    ReturnErrorOnFailure(serialized_keypair.SetLength(private_key.size() + public_key.size()));
-    memcpy(serialized_keypair.Bytes(), public_key.data(), public_key.size());
-    memcpy(serialized_keypair.Bytes() + public_key.size(), private_key.data(), private_key.size());
-    return keypair.Deserialize(serialized_keypair);
-}
 
 CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan &messageToSign,
         MutableByteSpan &outSignBuffer) {
@@ -113,7 +104,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan &mes
     // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
     // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
 #if (CONFIG_STM32_FACTORY_DATA_ENABLE == 0)
-    ReturnErrorOnFailure(LoadKeypairFromRaw(DevelopmentCerts::kDacPrivateKey, DevelopmentCerts::kDacPublicKey, keypair));
+    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(DevelopmentCerts::kDacPrivateKey, DevelopmentCerts::kDacPublicKey));
 
 #else
     uint8_t Privatekeybuffer[PRIVATE_KEY_LEN];
@@ -127,7 +118,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan &mes
     err = FACTORYDATA_GetValue(TAG_ID_DEVICE_ATTESTATION_PUBLIC_KEY, Publickeybuffer, PUBLIC_KEY_LEN, &tlvDataLength);
     VerifyOrReturnError(DATAFACTORY_OK == err, MapSTM32WBError(err));
 
-    ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan(Privatekeybuffer), ByteSpan(Publickeybuffer), keypair));
+    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(Privatekeybuffer), ByteSpan(Publickeybuffer)));
 #endif
 
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));

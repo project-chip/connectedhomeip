@@ -1,0 +1,5 @@
+repos:
+  - repo: https://github.com/google/keep-sorted
+    rev: v0.7.1
+    hooks:
+      - id: keep-sorted

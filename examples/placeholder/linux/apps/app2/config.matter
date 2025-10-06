@@ -5193,6 +5193,7 @@ cluster Thermostat = 513 {
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
     kEvents = 0x200;
+    kThermostatSuggestions = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -5264,6 +5265,7 @@ cluster Thermostat = 513 {
     kVacationMode = 0x10;
     kTimeOfUseCostSavings = 0x20;
     kPreCoolingOrPreHeating = 0x40;
+    kConflictingSuggestions = 0x80;
   }
 
   struct ScheduleTransitionStruct {
@@ -5626,6 +5628,7 @@ cluster Thermostat = 513 {
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
     kEvents = 0x200;
+    kThermostatSuggestions = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -5697,6 +5700,7 @@ cluster Thermostat = 513 {
     kVacationMode = 0x10;
     kTimeOfUseCostSavings = 0x20;
     kPreCoolingOrPreHeating = 0x40;
+    kConflictingSuggestions = 0x80;
   }
 
   struct ScheduleTransitionStruct {
@@ -8756,7 +8760,7 @@ endpoint 0 {
   }
 
   server cluster GeneralCommissioning {
-    ram      attribute breadcrumb default = 0x0000000000000000;
+    callback attribute breadcrumb;
     callback attribute basicCommissioningInfo;
     callback attribute regulatoryConfig;
     callback attribute locationCapability;
@@ -8764,8 +8768,8 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
@@ -8895,7 +8899,7 @@ endpoint 0 {
     callback attribute channelPage0Mask;
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
@@ -8999,8 +9003,8 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AttestationRequest;
     handle command AttestationResponse;
@@ -9045,9 +9049,9 @@ endpoint 0 {
   }
 
   server cluster BooleanState {
-    ram      attribute stateValue default = 0;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute stateValue;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster ModeSelect {
@@ -9137,7 +9141,7 @@ endpoint 0 {
     persist  attribute mode default = 0x00;
     ram      attribute safetyStatus default = 0x00;
     ram      attribute featureMap default = 0x17;
-    ram      attribute clusterRevision default = 5;
+    callback attribute clusterRevision;
 
     handle command UpOrOpen;
     handle command DownOrClose;
@@ -9226,7 +9230,7 @@ endpoint 0 {
     callback attribute ACCoilTemperature;
     callback attribute ACCapacityformat default = 0x00;
     ram      attribute featureMap default = 0x000b;
-    ram      attribute clusterRevision default = 6;
+    callback attribute clusterRevision;
   }
 
   server cluster ThermostatUserInterfaceConfiguration {
@@ -9631,7 +9635,7 @@ endpoint 1 {
     ram      attribute physicalContactUnoccupiedToOccupiedDelay default = 0x00;
     ram      attribute physicalContactUnoccupiedToOccupiedThreshold default = 1;
     callback attribute featureMap;
-    callback attribute clusterRevision default = 5;
+    callback attribute clusterRevision;
   }
 }
 
