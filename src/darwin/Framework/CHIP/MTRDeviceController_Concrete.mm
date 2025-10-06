@@ -145,7 +145,7 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
 
     // Keep track of dns-sd resolution objects for shutdown-time cleanup.
     os_unfair_lock _deviceConnectivityMonitorLock;
-    NSHashTable<MTRDeviceConnectivityMonitor *> *_weakSetOfDeviceConnectivityMonitors;
+    NSHashTable<MTRDeviceConnectivityMonitor *> * _weakSetOfDeviceConnectivityMonitors;
 }
 
 // TODO: Figure out whether the work queue storage lives here or in the superclass
@@ -487,7 +487,7 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
     // the monitor object, allowing the monitor object to dealloc and clean up.
     {
         std::lock_guard lock(_deviceConnectivityMonitorLock);
-        for (MTRDeviceConnectivityMonitor *deviceConnectivityMonitor in _weakSetOfDeviceConnectivityMonitors) {
+        for (MTRDeviceConnectivityMonitor * deviceConnectivityMonitor in _weakSetOfDeviceConnectivityMonitors) {
             [deviceConnectivityMonitor stopMonitoring];
         }
         [_weakSetOfDeviceConnectivityMonitors removeAllObjects];
@@ -1763,7 +1763,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         // The monitor would call the handler when resolve returns a usable address. The monitor
         // handler block retains the monitor object itself, forming a retain cycle. The cycle is
         // broken when stopMonitoring is called.
-        MTRDeviceConnectivityMonitor *deviceConnectivityMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithCompressedFabricID:self.compressedFabricID nodeID:@(nodeID)];
+        MTRDeviceConnectivityMonitor * deviceConnectivityMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithCompressedFabricID:self.compressedFabricID nodeID:@(nodeID)];
         BOOL monitorStarted = [deviceConnectivityMonitor startMonitoringWithHandler:^{
             // Ensure the work item is queued only once, since this handler could be called multiple times in a row
             if (workItem) {

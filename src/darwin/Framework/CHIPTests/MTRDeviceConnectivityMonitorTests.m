@@ -50,41 +50,75 @@ static DNSServiceRef sSharedConnection;
 static char kLocalDot[] = "local.";
 static char kOperationalType[] = "_matter._tcp";
 
-static NSString * DNSServiceErrorTypeToString(DNSServiceErrorType error) {
+static NSString * DNSServiceErrorTypeToString(DNSServiceErrorType error)
+{
     switch (error) {
-        case kDNSServiceErr_NoError: return @"NoError";
-        case kDNSServiceErr_Unknown: return @"Unknown";
-        case kDNSServiceErr_NoSuchName: return @"NoSuchName";
-        case kDNSServiceErr_NoMemory: return @"NoMemory";
-        case kDNSServiceErr_BadParam: return @"BadParam";
-        case kDNSServiceErr_BadReference: return @"BadReference";
-        case kDNSServiceErr_BadState: return @"BadState";
-        case kDNSServiceErr_BadFlags: return @"BadFlags";
-        case kDNSServiceErr_Unsupported: return @"Unsupported";
-        case kDNSServiceErr_NotInitialized: return @"NotInitialized";
-        case kDNSServiceErr_AlreadyRegistered: return @"AlreadyRegistered";
-        case kDNSServiceErr_NameConflict: return @"NameConflict";
-        case kDNSServiceErr_Invalid: return @"Invalid";
-        case kDNSServiceErr_Firewall: return @"Firewall";
-        case kDNSServiceErr_Incompatible: return @"Incompatible";
-        case kDNSServiceErr_BadInterfaceIndex: return @"BadInterfaceIndex";
-        case kDNSServiceErr_Refused: return @"Refused";
-        case kDNSServiceErr_NoSuchRecord: return @"NoSuchRecord";
-        case kDNSServiceErr_NoAuth: return @"NoAuth";
-        case kDNSServiceErr_NoSuchKey: return @"NoSuchKey";
-        case kDNSServiceErr_NATTraversal: return @"NATTraversal";
-        case kDNSServiceErr_DoubleNAT: return @"DoubleNAT";
-        case kDNSServiceErr_BadTime: return @"BadTime";
-        case kDNSServiceErr_BadSig: return @"BadSig";
-        case kDNSServiceErr_BadKey: return @"BadKey";
-        case kDNSServiceErr_Transient: return @"Transient";
-        case kDNSServiceErr_ServiceNotRunning: return @"ServiceNotRunning";
-        case kDNSServiceErr_NATPortMappingUnsupported: return @"NATPortMappingUnsupported";
-        case kDNSServiceErr_NATPortMappingDisabled: return @"NATPortMappingDisabled";
-        case kDNSServiceErr_NoRouter: return @"NoRouter";
-        case kDNSServiceErr_PollingMode: return @"PollingMode";
-        case kDNSServiceErr_Timeout: return @"Timeout";
-        default: return [NSString stringWithFormat:@"Unknown(%d)", error];
+    case kDNSServiceErr_NoError:
+        return @"NoError";
+    case kDNSServiceErr_Unknown:
+        return @"Unknown";
+    case kDNSServiceErr_NoSuchName:
+        return @"NoSuchName";
+    case kDNSServiceErr_NoMemory:
+        return @"NoMemory";
+    case kDNSServiceErr_BadParam:
+        return @"BadParam";
+    case kDNSServiceErr_BadReference:
+        return @"BadReference";
+    case kDNSServiceErr_BadState:
+        return @"BadState";
+    case kDNSServiceErr_BadFlags:
+        return @"BadFlags";
+    case kDNSServiceErr_Unsupported:
+        return @"Unsupported";
+    case kDNSServiceErr_NotInitialized:
+        return @"NotInitialized";
+    case kDNSServiceErr_AlreadyRegistered:
+        return @"AlreadyRegistered";
+    case kDNSServiceErr_NameConflict:
+        return @"NameConflict";
+    case kDNSServiceErr_Invalid:
+        return @"Invalid";
+    case kDNSServiceErr_Firewall:
+        return @"Firewall";
+    case kDNSServiceErr_Incompatible:
+        return @"Incompatible";
+    case kDNSServiceErr_BadInterfaceIndex:
+        return @"BadInterfaceIndex";
+    case kDNSServiceErr_Refused:
+        return @"Refused";
+    case kDNSServiceErr_NoSuchRecord:
+        return @"NoSuchRecord";
+    case kDNSServiceErr_NoAuth:
+        return @"NoAuth";
+    case kDNSServiceErr_NoSuchKey:
+        return @"NoSuchKey";
+    case kDNSServiceErr_NATTraversal:
+        return @"NATTraversal";
+    case kDNSServiceErr_DoubleNAT:
+        return @"DoubleNAT";
+    case kDNSServiceErr_BadTime:
+        return @"BadTime";
+    case kDNSServiceErr_BadSig:
+        return @"BadSig";
+    case kDNSServiceErr_BadKey:
+        return @"BadKey";
+    case kDNSServiceErr_Transient:
+        return @"Transient";
+    case kDNSServiceErr_ServiceNotRunning:
+        return @"ServiceNotRunning";
+    case kDNSServiceErr_NATPortMappingUnsupported:
+        return @"NATPortMappingUnsupported";
+    case kDNSServiceErr_NATPortMappingDisabled:
+        return @"NATPortMappingDisabled";
+    case kDNSServiceErr_NoRouter:
+        return @"NoRouter";
+    case kDNSServiceErr_PollingMode:
+        return @"PollingMode";
+    case kDNSServiceErr_Timeout:
+        return @"Timeout";
+    default:
+        return [NSString stringWithFormat:@"Unknown(%d)", error];
     }
 }
 
@@ -98,16 +132,16 @@ static void test001_MonitorTest_RegisterCallback(
     void * context)
 {
     if (errorCode != kDNSServiceErr_NoError) {
-        NSLog(@"JEFFTEST: register callback ERROR: %@ for service %s.%s%s",
-              DNSServiceErrorTypeToString(errorCode),
-              name ? name : "(null)",
-              regtype ? regtype : "(null)",
-              domain ? domain : "(null)");
+        NSLog(@"register callback ERROR: %@ for service %s.%s%s",
+            DNSServiceErrorTypeToString(errorCode),
+            name ? name : "(null)",
+            regtype ? regtype : "(null)",
+            domain ? domain : "(null)");
     } else {
-        NSLog(@"JEFFTEST: register callback SUCCESS for service %s.%s%s",
-              name ? name : "(null)",
-              regtype ? regtype : "(null)",
-              domain ? domain : "(null)");
+        NSLog(@"register callback SUCCESS for service %s.%s%s",
+            name ? name : "(null)",
+            regtype ? regtype : "(null)",
+            domain ? domain : "(null)");
     }
 }
 
@@ -162,7 +196,7 @@ static void test001_MonitorTest_RegisterCallback(
         }
     } queue:testQueue];
 
-    [self waitForExpectations:@[firstCallbackExpectation] timeout:5.0];
+    [self waitForExpectations:@[ firstCallbackExpectation ] timeout:5.0];
     XCTAssertTrue(firstCallbackReceived, @"First monitoring session should receive callback");
 
     // Stop monitoring
@@ -178,7 +212,7 @@ static void test001_MonitorTest_RegisterCallback(
         }
     } queue:testQueue];
 
-    [self waitForExpectations:@[secondCallbackExpectation] timeout:5.0];
+    [self waitForExpectations:@[ secondCallbackExpectation ] timeout:5.0];
     XCTAssertTrue(secondCallbackReceived, @"Restarted monitoring should receive callback");
 
     [monitor stopMonitoring];
@@ -188,22 +222,22 @@ static void test001_MonitorTest_RegisterCallback(
 - (void)test003_MultipleMonitorsUniqueIDs
 {
     const NSUInteger kNumMonitors = 12;
-    NSMutableArray<MTRDeviceConnectivityMonitor *> *monitors = [NSMutableArray array];
-    NSMutableSet<NSNumber *> *monitorIDs = [NSMutableSet set];
+    NSMutableArray<MTRDeviceConnectivityMonitor *> * monitors = [NSMutableArray array];
+    NSMutableSet<NSNumber *> * monitorIDs = [NSMutableSet set];
 
     // Create multiple monitors and verify they all get unique IDs
     for (NSUInteger i = 0; i < kNumMonitors; i++) {
-        NSString *instanceName = [NSString stringWithFormat:@"test-monitor-%lu", (unsigned long)i];
-        MTRDeviceConnectivityMonitor *monitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:instanceName];
+        NSString * instanceName = [NSString stringWithFormat:@"test-monitor-%lu", (unsigned long) i];
+        MTRDeviceConnectivityMonitor * monitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:instanceName];
         [monitors addObject:monitor];
 
         NSUInteger monitorID = [monitor monitorID];
-        XCTAssertFalse([monitorIDs containsObject:@(monitorID)], @"Monitor ID %lu is not unique", (unsigned long)monitorID);
+        XCTAssertFalse([monitorIDs containsObject:@(monitorID)], @"Monitor ID %lu is not unique", (unsigned long) monitorID);
         [monitorIDs addObject:@(monitorID)];
     }
 
     // Verify we have the expected number of unique IDs
-    XCTAssertEqual(monitorIDs.count, kNumMonitors, @"Should have %lu unique monitor IDs", (unsigned long)kNumMonitors);
+    XCTAssertEqual(monitorIDs.count, kNumMonitors, @"Should have %lu unique monitor IDs", (unsigned long) kNumMonitors);
 
     // Clean up - monitors will be deallocated when array is released
     [monitors removeAllObjects];
@@ -222,13 +256,13 @@ static void test001_MonitorTest_RegisterCallback(
     XCTAssertEqual(dnsError, kDNSServiceErr_NoError);
 
     @autoreleasepool {
-        MTRDeviceConnectivityMonitor *monitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:@(testInstanceName)];
+        MTRDeviceConnectivityMonitor * monitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:@(testInstanceName)];
         NSUInteger monitorID = [monitor monitorID];
 
         // Start monitoring but don't wait for callback
         [monitor startMonitoringWithHandler:^{
             // This callback might fire after monitor is deallocated
-            NSLog(@"Callback fired for monitor ID %lu (should be safe)", (unsigned long)monitorID);
+            NSLog(@"Callback fired for monitor ID %lu (should be safe)", (unsigned long) monitorID);
         } queue:testQueue];
 
         // Monitor will be deallocated when this autoreleasepool drains
@@ -236,11 +270,11 @@ static void test001_MonitorTest_RegisterCallback(
     }
 
     // Give some time for potential callbacks to fire (they should be safely ignored)
-    XCTestExpectation *waitExpectation = [self expectationWithDescription:@"Wait for potential callbacks"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    XCTestExpectation * waitExpectation = [self expectationWithDescription:@"Wait for potential callbacks"];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [waitExpectation fulfill];
     });
-    [self waitForExpectations:@[waitExpectation] timeout:2.0];
+    [self waitForExpectations:@[ waitExpectation ] timeout:2.0];
 
     DNSServiceRefDeallocate(testAdvertiser);
 }
@@ -248,16 +282,16 @@ static void test001_MonitorTest_RegisterCallback(
 - (void)test005_RapidCreationDestruction
 {
     const NSUInteger kNumCycles = 20;
-    NSMutableSet<NSNumber *> *usedIDs = [NSMutableSet set];
+    NSMutableSet<NSNumber *> * usedIDs = [NSMutableSet set];
 
     // Rapidly create and destroy monitors to test map cleanup
     for (NSUInteger cycle = 0; cycle < kNumCycles; cycle++) {
         @autoreleasepool {
-            NSString *instanceName = [NSString stringWithFormat:@"rapid-test-%lu", (unsigned long)cycle];
-            MTRDeviceConnectivityMonitor *monitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:instanceName];
+            NSString * instanceName = [NSString stringWithFormat:@"rapid-test-%lu", (unsigned long) cycle];
+            MTRDeviceConnectivityMonitor * monitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:instanceName];
 
             NSUInteger monitorID = [monitor monitorID];
-            XCTAssertFalse([usedIDs containsObject:@(monitorID)], @"Monitor ID %lu was reused too quickly", (unsigned long)monitorID);
+            XCTAssertFalse([usedIDs containsObject:@(monitorID)], @"Monitor ID %lu was reused too quickly", (unsigned long) monitorID);
             [usedIDs addObject:@(monitorID)];
 
             // Monitor deallocated when autoreleasepool drains
@@ -266,7 +300,7 @@ static void test001_MonitorTest_RegisterCallback(
 
     // All monitors should be deallocated and map entries cleaned up
     // Create one more monitor to verify IDs are still being assigned properly
-    MTRDeviceConnectivityMonitor *finalMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:@"final-test"];
+    MTRDeviceConnectivityMonitor * finalMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:@"final-test"];
     NSUInteger finalID = [finalMonitor monitorID];
     XCTAssertNotEqual(finalID, 0, @"Final monitor should have valid ID");
 
@@ -278,14 +312,14 @@ static void test001_MonitorTest_RegisterCallback(
 {
     dispatch_queue_t testQueue = dispatch_queue_create("connectivity-monitor-test-queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     const NSUInteger kNumMonitors = 5;
-    NSMutableArray<NSValue *> *advertisers = [NSMutableArray array];
+    NSMutableArray<NSValue *> * advertisers = [NSMutableArray array];
 
     // Create multiple DNS services
     for (NSUInteger i = 0; i < kNumMonitors; i++) {
         DNSServiceRef testAdvertiser;
         DNSServiceFlags flags = kDNSServiceFlagsNoAutoRename;
         char testInstanceName[64];
-        snprintf(testInstanceName, sizeof(testInstanceName), "callback-safety-test-%lu", (unsigned long)i);
+        snprintf(testInstanceName, sizeof(testInstanceName), "callback-safety-test-%lu", (unsigned long) i);
         char testHostName[] = "localhost";
         uint16_t testPort = htons(15002 + i);
 
@@ -295,13 +329,13 @@ static void test001_MonitorTest_RegisterCallback(
     }
 
     __block NSUInteger callbackCount = 0;
-    NSMutableArray<NSNumber *> *monitorIDs = [NSMutableArray array];
+    NSMutableArray<NSNumber *> * monitorIDs = [NSMutableArray array];
 
     @autoreleasepool {
         // Create monitors and start monitoring
         for (NSUInteger i = 0; i < kNumMonitors; i++) {
-            NSString *instanceName = [NSString stringWithFormat:@"callback-safety-test-%lu", (unsigned long)i];
-            MTRDeviceConnectivityMonitor *monitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:instanceName];
+            NSString * instanceName = [NSString stringWithFormat:@"callback-safety-test-%lu", (unsigned long) i];
+            MTRDeviceConnectivityMonitor * monitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:instanceName];
             NSUInteger monitorID = [monitor monitorID];
             [monitorIDs addObject:@(monitorID)];
 
@@ -310,7 +344,7 @@ static void test001_MonitorTest_RegisterCallback(
                 @synchronized(self) {
                     callbackCount++;
                 }
-                NSLog(@"Safe callback fired for monitor ID %lu", (unsigned long)monitorID);
+                NSLog(@"Safe callback fired for monitor ID %lu", (unsigned long) monitorID);
             } queue:testQueue];
         }
 
@@ -319,16 +353,16 @@ static void test001_MonitorTest_RegisterCallback(
     }
 
     // Wait for potential callbacks to fire
-    XCTestExpectation *waitExpectation = [self expectationWithDescription:@"Wait for potential callbacks"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    XCTestExpectation * waitExpectation = [self expectationWithDescription:@"Wait for potential callbacks"];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [waitExpectation fulfill];
     });
-    [self waitForExpectations:@[waitExpectation] timeout:3.0];
+    [self waitForExpectations:@[ waitExpectation ] timeout:3.0];
 
-    NSLog(@"Callback safety test completed - %lu callbacks fired safely", (unsigned long)callbackCount);
+    NSLog(@"Callback safety test completed - %lu callbacks fired safely", (unsigned long) callbackCount);
 
     // Clean up DNS services
-    for (NSValue *advertiserValue in advertisers) {
+    for (NSValue * advertiserValue in advertisers) {
         DNSServiceRef advertiser = (DNSServiceRef)[advertiserValue pointerValue];
         DNSServiceRefDeallocate(advertiser);
     }
@@ -358,28 +392,28 @@ static void test001_MonitorTest_RegisterCallback(
         }
     } queue:testQueue];
 
-    [self waitForExpectations:@[callbackExpectation] timeout:5.0];
+    [self waitForExpectations:@[ callbackExpectation ] timeout:5.0];
 
     // Stop monitoring - this should trigger the linger timer (10 seconds)
     [monitor stopMonitoring];
 
     // Shared connection should still exist within linger window
     XCTestExpectation * withinLingerExpectation = [self expectationWithDescription:@"Check within linger window"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         XCTAssertTrue([MTRDeviceConnectivityMonitor unitTestHasActiveSharedConnection],
-                     @"Shared connection should still exist within linger window");
+            @"Shared connection should still exist within linger window");
         [withinLingerExpectation fulfill];
     });
-    [self waitForExpectations:@[withinLingerExpectation] timeout:2.0];
+    [self waitForExpectations:@[ withinLingerExpectation ] timeout:2.0];
 
     // After linger interval (10 sec) + buffer, shared connection should be cleaned up
     XCTestExpectation * afterLingerExpectation = [self expectationWithDescription:@"Check after linger interval"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(11.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (11.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         XCTAssertFalse([MTRDeviceConnectivityMonitor unitTestHasActiveSharedConnection],
-                      @"Shared connection should be cleaned up after linger interval");
+            @"Shared connection should be cleaned up after linger interval");
         [afterLingerExpectation fulfill];
     });
-    [self waitForExpectations:@[afterLingerExpectation] timeout:13.0];
+    [self waitForExpectations:@[ afterLingerExpectation ] timeout:13.0];
 
     DNSServiceRefDeallocate(testAdvertiser);
 #else

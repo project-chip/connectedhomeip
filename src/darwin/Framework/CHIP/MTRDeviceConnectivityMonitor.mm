@@ -30,7 +30,7 @@
     NSString * _instanceName;
     std::vector<DNSServiceRef> _resolvers;
     NSMutableDictionary<NSString *, nw_connection_t> * _connectionsByHostname;
-    NSUInteger _monitorID;  // Unique ID for safe DNS-SD callback lookup
+    NSUInteger _monitorID; // Unique ID for safe DNS-SD callback lookup
 
     MTRDeviceConnectivityMonitorHandler _monitorHandler;
     dispatch_queue_t _handlerQueue;
@@ -60,7 +60,7 @@ static dispatch_queue_t sSharedResolverQueue;
 // map table. If the object has been deallocated, the weak reference becomes nil and the
 // callback is safely ignored. This completely eliminates race conditions between object
 // deallocation and asynchronous DNS-SD callbacks.
-static NSMapTable<NSNumber *, MTRDeviceConnectivityMonitor *> *sMonitorMap;
+static NSMapTable<NSNumber *, MTRDeviceConnectivityMonitor *> * sMonitorMap;
 static NSUInteger sNextMonitorID = 1;
 
 - (instancetype)initWithInstanceName:(NSString *)instanceName
@@ -246,7 +246,7 @@ static void ResolveCallback(
     NSUInteger monitorID = reinterpret_cast<NSUInteger>(context);
 
     std::lock_guard lock(sConnectivityMonitorLock);
-    MTRDeviceConnectivityMonitor *monitor = [sMonitorMap objectForKey:@(monitorID)];
+    MTRDeviceConnectivityMonitor * monitor = [sMonitorMap objectForKey:@(monitorID)];
 
     // If monitor is nil, object was deallocated - callback safely ignored
     if (!monitor) {
@@ -302,7 +302,7 @@ static void ResolveCallback(
                 kOperationalType,
                 domain,
                 ResolveCallback,
-                reinterpret_cast<void *>(_monitorID));  // Pass ID as context, not object pointer
+                reinterpret_cast<void *>(_monitorID)); // Pass ID as context, not object pointer
             if (dnsError == kDNSServiceErr_NoError) {
                 _resolvers.emplace_back(std::move(resolver));
             } else {
@@ -326,7 +326,7 @@ static void ResolveCallback(
     return result;
 }
 
-- (void)_clearRsolvers:(std::vector<DNSServiceRef>)resolversToCleanUp
+- (void)_clearResolvers:(std::vector<DNSServiceRef>)resolversToCleanUp
 {
     if (resolversToCleanUp.empty()) {
         return;
@@ -369,7 +369,7 @@ static void ResolveCallback(
         sConnectivityMonitorCount--;
         auto resolversToCleanUp = std::move(_resolvers);
         _resolvers.clear(); // Now empty immediately
-        [self _clearRsolvers:resolversToCleanUp]; // Async DNS cleanup
+        [self _clearResolvers:resolversToCleanUp]; // Async DNS cleanup
     }
 }
 
