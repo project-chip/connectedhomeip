@@ -87,12 +87,12 @@ class ICDManagementCluster : public DefaultServerCluster
 public:
     using OptionalAttributeSet = chip::app::OptionalAttributeSet<IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id>;
 
-    ICDManagementCluster(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore & symmetricKeystore,
+    ICDManagementCluster(EndpointId endpointId, PersistentStorageDelegate & storage, Crypto::SymmetricKeystore & symmetricKeystore,
                          FabricTable & fabricTable, ICDConfigurationData & icdConfigurationData,
                          OptionalAttributeSet optionalAttributeSet, BitMask<IcdManagement::OptionalCommands> aEnabledCommands,
                          BitMask<IcdManagement::UserActiveModeTriggerBitmap> aUserActiveModeTriggerBitmap,
                          CharSpan aUserActiveModeTriggerInstruction) :
-        DefaultServerCluster({ kRootEndpointId, IcdManagement::Id })
+        DefaultServerCluster({ endpointId, IcdManagement::Id })
 #if CHIP_CONFIG_ENABLE_ICD_CIP
         ,
         mStorage(storage), mSymmetricKeystore(symmetricKeystore), mFabricTable(fabricTable)

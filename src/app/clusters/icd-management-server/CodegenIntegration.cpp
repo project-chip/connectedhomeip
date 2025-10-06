@@ -79,7 +79,7 @@ public:
             userActiveModeTriggerInstruction = CharSpan(instructionSpan.data(), instructionSpan.size());
         }
 
-        gServer.Create(Server::GetInstance().GetPersistentStorage(), *Server::GetInstance().GetSessionKeystore(),
+        gServer.Create(endpointId, Server::GetInstance().GetPersistentStorage(), *Server::GetInstance().GetSessionKeystore(),
                        Server::GetInstance().GetFabricTable(), ICDConfigurationData::GetInstance().GetInstance(),
                        optionalAttributeSet, enabledCommands, userActiveModeTriggerHint, userActiveModeTriggerInstruction);
         return gServer.Registration();
@@ -90,12 +90,12 @@ public:
 };
 } // namespace
 
-void MatterIcdManagementPluginServerInitCallback()
+void MatterIcdManagementClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                = kRootEndpointId,
+            .endpointId                = endpointId,
             .clusterId                 = IcdManagement::Id,
             .fixedClusterInstanceCount = static_cast<uint16_t>(IcdManagement::StaticApplicationConfig::kFixedClusterConfig.size()),
             .maxClusterInstanceCount   = 1, // only root-node functionality supported by this implementation
@@ -115,7 +115,7 @@ void MatterIcdManagementPluginServerInitCallback()
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 }
 
-void MatterIcdManagementPluginServerShutdownCallback()
+void MatterIcdManagementClusterShutdownCallback(EndpointId endpointId)
 {
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     FabricTable & fabricTable = Server::GetInstance().GetFabricTable();
@@ -125,7 +125,7 @@ void MatterIcdManagementPluginServerShutdownCallback()
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                = kRootEndpointId,
+            .endpointId                = endpointId,
             .clusterId                 = IcdManagement::Id,
             .fixedClusterInstanceCount = static_cast<uint16_t>(IcdManagement::StaticApplicationConfig::kFixedClusterConfig.size()),
             .maxClusterInstanceCount   = 1, // only root-node functionality supported by this implementation
