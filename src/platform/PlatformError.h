@@ -38,7 +38,6 @@ namespace Internal {
 #else
 ::chip::ChipError MapPlatformError(int code);
 #endif
-} // namespace Internal
 
 /**
  * This implements a function to return an NULL-terminated descriptive C string, associated with the specified, mapped
@@ -51,7 +50,16 @@ namespace Internal {
 const char * DescribePlatformError(CHIP_ERROR code);
 
 /**
- * Register a text error formatter for Platform errors.
+ * @brief Registers the platform-specific error formatter.
+ *
+ * This function initializes and registers an error formatter that is responsible
+ * for formatting platform-specific error codes. It ensures that errors originating
+ * from the platform layer are properly formatted and reported by the error handling
+ * system.
+ *
+ * This function is called during the initialization of the respective
+ * platform layer implementation to ensure that platform-specific errors are
+ * correctly handled and reported.
  */
 void RegisterPlatformErrorFormatter();
 
@@ -69,5 +77,6 @@ void RegisterPlatformErrorFormatter();
  */
 bool FormatPlatformError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
+} // namespace Internal
 } // namespace Platform
 } // namespace chip

@@ -85,7 +85,16 @@ DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError)
 DLL_EXPORT const char * DescribeErrorPOSIX(CHIP_ERROR aError)
 {
     const int lError = static_cast<int>(aError.GetValue());
-    return strerror(lError);
+#if CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
+    static thread_local char errBuf[128];
+#else
+    static char errBuf[128];
+#endif // CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
+    if (strerror_r(lError, errBuf, sizeof(errBuf)) == 0)
+    {
+        return errBuf;
+    }
+    return "Unknown platform error";
 }
 
 /**

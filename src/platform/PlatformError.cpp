@@ -15,12 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file contains free functions for mapping Platform
- *      specific errors into CHIP errors
- */
-
 #include <lib/core/CHIPConfig.h>
 #include <platform/PlatformError.h>
 
@@ -54,7 +48,16 @@ namespace Internal {
 const char * DescribePlatformError(CHIP_ERROR aError)
 {
     const int lError = static_cast<int>(aError.GetValue());
-    return strerror(lError);
+#if CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
+    static thread_local char errBuf[128];
+#else
+    static char errBuf[128];
+#endif // CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
+    if (strerror_r(lError, errBuf, sizeof(errBuf)) == 0)
+    {
+        return errBuf;
+    }
+    return "Unknown platform error";
 }
 
 void RegisterPlatformErrorFormatter()
