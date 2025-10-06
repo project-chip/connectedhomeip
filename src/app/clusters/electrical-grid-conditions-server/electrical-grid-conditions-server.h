@@ -33,11 +33,11 @@ namespace Structs {
 namespace ElectricalGridConditionsStruct {
 inline bool operator==(const Type & lhs, const Type & rhs)
 {
-    return (lhs.periodStart == rhs.periodStart && 
+    return (lhs.periodStart == rhs.periodStart &&
             lhs.periodEnd == rhs.periodEnd &&
-            lhs.gridCarbonIntensity == rhs.gridCarbonIntensity && 
+            lhs.gridCarbonIntensity == rhs.gridCarbonIntensity &&
             lhs.gridCarbonLevel == rhs.gridCarbonLevel &&
-            lhs.localCarbonIntensity == rhs.localCarbonIntensity && 
+            lhs.localCarbonIntensity == rhs.localCarbonIntensity &&
             lhs.localCarbonLevel == rhs.localCarbonLevel);
 }
 } // namespace ElectricalGridConditionsStruct
