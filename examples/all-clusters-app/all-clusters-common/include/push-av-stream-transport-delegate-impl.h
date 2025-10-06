@@ -82,11 +82,6 @@ public:
 
     void OnAttributeChanged(AttributeId attributeId) override;
 
-    void OnZoneTriggeredEvent(uint16_t zoneId) override
-    {
-        // Handle triggered event if needed for implementation
-    }
-
     CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStorage> & currentConnections) override;
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;

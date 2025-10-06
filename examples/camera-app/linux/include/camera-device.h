@@ -93,6 +93,8 @@ public:
 
     MediaController & GetMediaController() override;
 
+    void HandlePushAvZoneTrigger(uint16_t zoneId) override;
+
     CameraDevice();
     ~CameraDevice();
 

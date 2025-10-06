@@ -280,7 +280,7 @@ public:
     virtual CHIP_ERROR IsPrivacyModeActive(bool & isActive) = 0;
 
     /**
-     * @brief Sets the PushAvStreamTransportServerLogic instance for the delegate.
+     * @brief Sets the PushAvStreamTransportServer instance for the delegate.
      *
      * This method is called by the PushAvStreamTransportServer to provide
      * the delegate with a pointer to the server instance. This allows the

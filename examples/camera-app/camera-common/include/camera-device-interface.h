@@ -146,6 +146,8 @@ public:
     // Getter for PushAVStreamTransport Delegate
     virtual chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() = 0;
 
+    virtual void HandlePushAvZoneTrigger(uint16_t zoneId) = 0;
+
     // Class defining the Camera HAL interface
     class CameraHALInterface
     {

@@ -273,7 +273,7 @@ void ZoneManager::OnZoneTriggeredEvent(uint16_t zoneId,
 
     if (mCameraDevice)
     {
-        mCameraDevice->GetPushAVTransportDelegate().OnZoneTriggeredEvent(zoneId);
+        mCameraDevice->HandlePushAvZoneTrigger(zoneId);
     }
 }
 

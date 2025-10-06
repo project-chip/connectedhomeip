@@ -1604,6 +1604,11 @@ MediaController & CameraDevice::GetMediaController()
     return mMediaController;
 }
 
+void CameraDevice::HandlePushAvZoneTrigger(uint16_t zoneId)
+{
+    mPushAVTransportManager.HandleZoneTrigger(zoneId);
+}
+
 size_t CameraDevice::GetPreRollBufferSize()
 {
     return kMaxContentBufferSizeBytes;

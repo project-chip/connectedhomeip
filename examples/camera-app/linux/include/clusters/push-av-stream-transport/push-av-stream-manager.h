@@ -108,7 +108,7 @@ public:
 
     CHIP_ERROR IsPrivacyModeActive(bool & isActive) override;
 
-    void OnZoneTriggeredEvent(uint16_t zoneId);
+    void HandleZoneTrigger(uint16_t zoneId);
 
     void RecordingStreamPrivacyModeChanged(bool privacyModeEnabled);
 

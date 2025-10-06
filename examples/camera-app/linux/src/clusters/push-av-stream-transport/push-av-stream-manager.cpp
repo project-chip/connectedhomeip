@@ -540,7 +540,7 @@ PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
     return CHIP_NO_ERROR;
 }
 
-void PushAvStreamTransportManager::OnZoneTriggeredEvent(uint16_t zoneId)
+void PushAvStreamTransportManager::HandleZoneTrigger(uint16_t zoneId)
 {
     for (auto & pavst : mTransportMap)
     {
