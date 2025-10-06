@@ -508,7 +508,7 @@ static bool HandleDataReceived(const PacketBufferHandle & aBuffer, bool aCheckBu
 // TCP Endpoint Callbacks
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-void HandleTCPConnectionComplete(TCPEndPointHandle & aEndPoint, CHIP_ERROR aError)
+void HandleTCPConnectionComplete(const TCPEndPointHandle & aEndPoint, CHIP_ERROR aError)
 {
     CHIP_ERROR lStatus;
 
@@ -539,8 +539,6 @@ void HandleTCPConnectionComplete(TCPEndPointHandle & aEndPoint, CHIP_ERROR aErro
     {
         printf("TCP connection FAILED: %s\n", ErrorStr(aError));
 
-        aEndPoint.Release();
-
         gSendIntervalExpired = false;
         gSystemLayer.CancelTimer(Common::HandleSendTimerComplete, nullptr);
         gSystemLayer.StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
@@ -568,9 +566,9 @@ static void HandleTCPConnectionClosed(TCPEndPoint & aEndPoint, CHIP_ERROR aError
     }
 }
 
-static void HandleTCPDataSent(TCPEndPointHandle & aEndPoint, size_t len) {}
+static void HandleTCPDataSent(const TCPEndPointHandle & aEndPoint, size_t len) {}
 
-static CHIP_ERROR HandleTCPDataReceived(TCPEndPointHandle & aEndPoint, PacketBufferHandle && aBuffer)
+static CHIP_ERROR HandleTCPDataReceived(const TCPEndPointHandle & aEndPoint, PacketBufferHandle && aBuffer)
 {
     const uint32_t lFirstValueReceived = sTestState.mStats.mReceive.mActual;
     const uint8_t lFirstValue          = uint8_t(lFirstValueReceived);
@@ -616,14 +614,14 @@ exit:
     return lStatus;
 }
 
-static void HandleTCPAcceptError(TCPEndPointHandle & aEndPoint, CHIP_ERROR aError)
+static void HandleTCPAcceptError(const TCPEndPointHandle & aEndPoint, CHIP_ERROR aError)
 {
     printf("TCP accept error: %s\n", ErrorStr(aError));
 
     SetStatusFailed(sTestState.mStatus);
 }
 
-static void HandleTCPConnectionReceived(TCPEndPointHandle & aListenEndPoint, TCPEndPointHandle & aConnectEndPoint,
+static void HandleTCPConnectionReceived(const TCPEndPointHandle & aListenEndPoint, const TCPEndPointHandle & aConnectEndPoint,
                                         const IPAddress & aPeerAddress, uint16_t aPeerPort)
 {
     char lPeerAddressBuffer[INET6_ADDRSTRLEN];

@@ -26,8 +26,8 @@
 
 #include <inet/InetConfig.h>
 #include <lib/core/ReferenceCounted.h>
-#include <lib/support/AutoRelease.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/ReferenceCountedPtr.h>
 
 namespace chip {
 
@@ -47,10 +47,10 @@ template <class EndPointType>
 class EndPointHandle;
 
 /**
- * Basis of internet transport endpoint classes.
+ * Basis of internet transport endpoint classes. Guarded by EndPointManager::CreateEndPoint to guarantee proper ref-counting.
  */
 template <typename EndPointType>
-class DLL_EXPORT EndPointBasis : public ReferenceCountedProtected<EndPointType, EndPointDeletor<EndPointType>>
+class DLL_EXPORT EndPointBasis : public ReferenceCountedProtected<EndPointType, EndPointDeletor<EndPointType>, 0>
 {
 public:
     using EndPoint = EndPointType;
@@ -71,7 +71,9 @@ public:
 
 protected:
     friend class EndPointHandle<EndPointType>;
-    friend class AutoRelease<EndPointType>;
+    friend class ReferenceCountedPtr<EndPointType>;
+
+    inline void Delete() { GetEndPointManager().DeleteEndPoint(static_cast<EndPointType *>(this)); }
 
 private:
     EndPointManager<EndPoint> & mEndPointManager; /**< Factory that owns this object. */
@@ -81,7 +83,7 @@ template <typename EndPointType>
 class EndPointDeletor
 {
 public:
-    static void Release(EndPointType * obj) { obj->GetEndPointManager().DeleteEndPoint(obj); }
+    static void Release(EndPointType * obj) { obj->Free(); }
 };
 
 } // namespace Inet

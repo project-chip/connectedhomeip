@@ -22,14 +22,17 @@
 
 #pragma once
 
+#include <lib/core/ReferenceCounted.h>
 #include <lib/support/CodeUtils.h>
 #include <stddef.h>
+#include <type_traits>
 
 namespace chip {
 
 /// RAII class for iterators that guarantees that Release() will be called
 /// on the underlying type.  This is effectively a simple unique_ptr, except
 /// calling Release instead of delete
+/// See also ReferenceCountedPtr<T>, which automatically retains a ReferenceCounted
 template <typename Releasable>
 class AutoRelease
 {
@@ -59,8 +62,11 @@ public:
 
     void Set(Releasable * releasable)
     {
-        Release();
-        mReleasable = releasable;
+        if (mReleasable != releasable)
+        {
+            Release();
+            mReleasable = releasable;
+        }
     }
 
 protected:

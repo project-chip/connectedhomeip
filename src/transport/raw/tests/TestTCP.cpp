@@ -129,34 +129,6 @@ public:
                       CHIP_NO_ERROR);
         }
 
-        if (transCtxt)
-        {
-            // Store a reference to the connection so it's not auto-disconnected
-            ActiveTCPConnectionHandle * available = nullptr;
-            for (size_t i = 0; i < kMaxIncoming; i++)
-            {
-                if (incoming[i] == transCtxt->conn)
-                {
-                    available = &incoming[i];
-                    break;
-                }
-                if (incoming[i].IsNull())
-                {
-                    available = &incoming[i];
-                }
-            }
-            ASSERT_NE(available, nullptr);
-
-            *available = transCtxt->conn;
-            connection = *available;
-        }
-
-        if (mCallback)
-        {
-            EXPECT_EQ(mCallback(msgBuf->Start(), msgBuf->DataLength(), mReceiveHandlerCallCount, connection, mCallbackData),
-                      CHIP_NO_ERROR);
-        }
-
         ChipLogProgress(Inet, "Message Receive Handler called");
 
         mReceiveHandlerCallCount++;

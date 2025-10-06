@@ -72,12 +72,6 @@ public:
         {}
 #endif
 
-        ~EndpointInfo()
-        {
-            // TODO(marcos): Remove, for-test only
-            mListenUdp.Release();
-        }
-
         const chip::Inet::InterfaceId mInterfaceId;
         const chip::Inet::IPAddressType mAddressType;
         chip::Inet::UDPEndPointHandle mListenUdp;

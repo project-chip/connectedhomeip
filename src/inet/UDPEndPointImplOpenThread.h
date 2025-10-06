@@ -44,7 +44,6 @@ public:
     // UDPEndPoint overrides.
     InterfaceId GetBoundInterface() const override;
     uint16_t GetBoundPort() const override;
-    void Free() override;
     void HandleDataReceived(System::PacketBufferHandle && msg);
     void SetNativeParams(void * params);
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;

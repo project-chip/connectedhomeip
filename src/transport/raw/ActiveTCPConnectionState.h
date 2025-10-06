@@ -29,7 +29,7 @@
 #include <inet/TCPEndPoint.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ReferenceCounted.h>
-#include <lib/support/AutoRelease.h>
+#include <lib/support/ReferenceCountedPtr.h>
 #include <transport/raw/PeerAddress.h>
 #include <transport/raw/TCPConfig.h>
 
@@ -115,7 +115,7 @@ private:
     friend class TCPBase;
     friend class ActiveTCPConnectionStateDeleter<ActiveTCPConnectionState>;
     friend class ActiveTCPConnectionHandle;
-    friend class AutoRelease<ActiveTCPConnectionState>;
+    friend class ReferenceCountedPtr<ActiveTCPConnectionState>;
     // Allow tests to access private members.
     template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
     friend class TCPBaseTestAccess;
@@ -146,49 +146,25 @@ private:
 /**
  * A holder for ActiveTCPConnectionState which properly ref-counts on ctor/copy/dtor.
  */
-class ActiveTCPConnectionHandle : private AutoRelease<ActiveTCPConnectionState>
+class ActiveTCPConnectionHandle : public ReferenceCountedPtr<ActiveTCPConnectionState>
 {
     friend class TCPBase;
     friend struct ActiveTCPConnectionState;
 
 public:
-    using AutoRelease<ActiveTCPConnectionState>::operator bool;
-    using AutoRelease<ActiveTCPConnectionState>::operator->;
-    using AutoRelease<ActiveTCPConnectionState>::IsNull;
-    using AutoRelease<ActiveTCPConnectionState>::Release;
-
-    ActiveTCPConnectionHandle() : AutoRelease<ActiveTCPConnectionState>(nullptr) {}
-    ActiveTCPConnectionHandle(ActiveTCPConnectionState * releasable) :
-        AutoRelease<ActiveTCPConnectionState>(releasable ? releasable->Retain() : nullptr)
-    {}
-
-    ActiveTCPConnectionHandle(const ActiveTCPConnectionHandle & src) : ActiveTCPConnectionHandle(src.mReleasable) {}
-
-    inline AutoRelease & operator=(const ActiveTCPConnectionHandle & src)
-    {
-        if (mReleasable != src.mReleasable)
-        {
-            Set(src.IsNull() ? nullptr : src.mReleasable->Retain());
-        }
-        return *this;
-    }
-
-    inline bool operator==(const ActiveTCPConnectionHandle & other) const { return mReleasable == other.mReleasable; }
-    inline bool operator!=(const ActiveTCPConnectionHandle & other) const { return mReleasable != other.mReleasable; }
-    inline bool operator==(const ActiveTCPConnectionState & other) const { return mReleasable == &other; }
-    inline bool operator!=(const ActiveTCPConnectionState & other) const { return mReleasable != &other; }
+    using ReferenceCountedPtr<ActiveTCPConnectionState>::ReferenceCountedPtr;
 
     // For printing
-    inline operator const void *() const { return mReleasable; }
+    inline operator const void *() const { return mRefCounted; }
 };
 
 inline bool ActiveTCPConnectionState::operator==(const ActiveTCPConnectionHandle & other) const
 {
-    return this == other.mReleasable;
+    return this == other.mRefCounted;
 }
 inline bool ActiveTCPConnectionState::operator!=(const ActiveTCPConnectionHandle & other) const
 {
-    return this != other.mReleasable;
+    return this != other.mRefCounted;
 }
 
 // Functors for callbacks into higher layers

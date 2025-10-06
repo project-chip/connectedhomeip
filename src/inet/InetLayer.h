@@ -22,11 +22,12 @@
 
 #pragma once
 
+#include <inet/EndPointBasis.h>
 #include <inet/InetError.h>
-#include <lib/support/AutoRelease.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ObjectLifeCycle.h>
 #include <lib/support/Pool.h>
+#include <lib/support/ReferenceCountedPtr.h>
 #include <platform/LockTracker.h>
 #include <system/SystemLayer.h>
 #include <system/SystemStats.h>
@@ -50,50 +51,27 @@ template <class EndPointType>
 struct EndPointProperties;
 
 template <class EndPointType>
-class EndPointHandle : private AutoRelease<EndPointType>
+class EndPointHandle : public ReferenceCountedPtr<EndPointType>
 {
 public:
-    using AutoRelease<EndPointType>::operator bool;
-    using AutoRelease<EndPointType>::operator->;
-    using AutoRelease<EndPointType>::operator*;
-    using AutoRelease<EndPointType>::IsNull;
-    using AutoRelease<EndPointType>::Release;
-
-    EndPointHandle() : AutoRelease<EndPointType>(nullptr) {}
-    EndPointHandle(EndPointType * releasable) : AutoRelease<EndPointType>(releasable ? releasable->Retain() : nullptr) {}
-
-    EndPointHandle(const EndPointHandle & src) : EndPointHandle(src.mReleasable) {}
-
-    inline EndPointHandle & operator=(const EndPointHandle & src)
-    {
-        if (this->mReleasable != src.mReleasable)
-        {
-            this->Set(src.IsNull() ? nullptr : src.mReleasable->Retain());
-        }
-        return *this;
-    }
-
-    inline bool operator==(const EndPointHandle & other) const { return this->mReleasable == other.mReleasable; }
-    inline bool operator!=(const EndPointHandle & other) const { return this->mReleasable != other.mReleasable; }
-    inline bool operator==(const EndPointType & other) const { return this->mReleasable == &other; }
-    inline bool operator!=(const EndPointType & other) const { return this->mReleasable != &other; }
+    using ReferenceCountedPtr<EndPointType>::ReferenceCountedPtr;
 
     // For printing
-    inline operator const void *() const { return this->mReleasable; }
+    inline operator const void *() const { return this->mRefCounted; }
 
     // This is bad and should not normally be done; we are explicitly closing the connection
     // instead of gracefully releasing our reference, which will cause anyone holding a reference to have issues
     inline void ForceDisconnect()
     {
-        EndPointType * releasable = this->mReleasable;
-        if ((releasable != nullptr) && releasable->GetReferenceCount() > 1)
+        EndPointType * endpoint = this->mRefCounted;
+        if ((endpoint != nullptr) && endpoint->GetReferenceCount() > 1)
         {
-            Release();
-            EndPointDeletor<EndPointType>::Release(releasable);
+            this->Release();
+            endpoint->Free();
         }
         else
         {
-            Release();
+            this->Release();
         }
     }
 };
@@ -147,13 +125,15 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    virtual TypedEndPointHandle CreateEndPoint()                = 0;
     virtual Loop ForEachEndPoint(const EndPointVisitor visitor) = 0;
 
 protected:
     friend class EndPointDeletor<EndPointType>;
     friend class EndPointHandle<EndPointType>;
+    friend class EndPointBasis<EndPointType>;
     friend EndPointType;
+
+    virtual TypedEndPointHandle CreateEndPoint() = 0;
 
     virtual void ReleaseEndPoint(EndPoint * endPoint) = 0;
 

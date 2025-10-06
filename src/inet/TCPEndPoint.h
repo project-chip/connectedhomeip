@@ -392,7 +392,7 @@ public:
      *  member to process connection establishment events on \c endPoint. The
      *  \c err argument distinguishes successful connections from failures.
      */
-    typedef void (*OnConnectCompleteFunct)(TCPEndPointHandle & endPoint, CHIP_ERROR err);
+    typedef void (*OnConnectCompleteFunct)(const TCPEndPointHandle & endPoint, CHIP_ERROR err);
 
     /**
      * The endpoint's connection establishment event handling function
@@ -417,7 +417,7 @@ public:
      *  If this function returns an error, the connection will be closed, since higher layers
      *  are not able to process the data for a better response.
      */
-    typedef CHIP_ERROR (*OnDataReceivedFunct)(TCPEndPointHandle & endPoint, chip::System::PacketBufferHandle && data);
+    typedef CHIP_ERROR (*OnDataReceivedFunct)(const TCPEndPointHandle & endPoint, chip::System::PacketBufferHandle && data);
 
     /**
      * The endpoint's message text reception event handling function delegate.
@@ -436,7 +436,7 @@ public:
      *  is the length of the message text added to the TCP transmit window,
      *  which are eligible for sending by the underlying network stack.
      */
-    typedef void (*OnDataSentFunct)(TCPEndPointHandle & endPoint, size_t len);
+    typedef void (*OnDataSentFunct)(const TCPEndPointHandle & endPoint, size_t len);
 
     /**
      * The endpoint's message text transmission event handling function
@@ -488,7 +488,7 @@ public:
      *  The newly received endpoint \c conEndPoint is located at IP address
      *  \c peerAddr and TCP port \c peerPort.
      */
-    typedef void (*OnConnectionReceivedFunct)(TCPEndPointHandle & listeningEndPoint, TCPEndPointHandle & conEndPoint,
+    typedef void (*OnConnectionReceivedFunct)(const TCPEndPointHandle & listeningEndPoint, const TCPEndPointHandle & conEndPoint,
                                               const IPAddress & peerAddr, uint16_t peerPort);
 
     /** The endpoint's connection receive event handling function delegate. */
@@ -505,7 +505,7 @@ public:
      *  member to process connection acceptance error events on \c endPoint. The
      *  \c err argument provides specific detail about the type of the error.
      */
-    typedef void (*OnAcceptErrorFunct)(TCPEndPointHandle & endPoint, CHIP_ERROR err);
+    typedef void (*OnAcceptErrorFunct)(const TCPEndPointHandle & endPoint, CHIP_ERROR err);
 
     /**
      * The endpoint's connection acceptance event handling function delegate.
@@ -527,6 +527,7 @@ public:
 protected:
     friend class TCPTest;
     friend class EndPointDeletor<TCPEndPoint>;
+    friend class EndPointHandle<TCPEndPoint>;
 
     TCPEndPoint(EndPointManager<TCPEndPoint> & endPointManager) :
         EndPointBasis(endPointManager), OnConnectComplete(nullptr), OnDataReceived(nullptr), OnDataSent(nullptr),
@@ -631,13 +632,6 @@ struct EndPointProperties<TCPEndPoint>
     static constexpr char kName[]         = "TCP";
     static constexpr size_t kNumEndPoints = INET_CONFIG_NUM_TCP_ENDPOINTS;
     static constexpr int kSystemStatsKey  = System::Stats::kInetLayer_NumTCPEps;
-};
-
-template <>
-class EndPointDeletor<TCPEndPoint>
-{
-public:
-    static void Release(TCPEndPoint * obj) { obj->Free(); }
 };
 
 } // namespace Inet

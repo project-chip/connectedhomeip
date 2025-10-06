@@ -42,6 +42,9 @@ struct otInstance;
 namespace chip {
 namespace Inet {
 
+class UDPEndPoint;
+using UDPEndPointHandle = EndPointHandle<UDPEndPoint>;
+
 /**
  * @brief   Objects of this class represent UDP transport endpoints.
  *
@@ -244,7 +247,13 @@ public:
      */
     virtual inline void SetNativeParams(void * params) { (void) params; }
 
+    inline bool operator==(const UDPEndPointHandle & other) const { return other == *this; }
+    inline bool operator!=(const UDPEndPointHandle & other) const { return other != *this; }
+
 protected:
+    friend class EndPointDeletor<UDPEndPoint>;
+    friend class EndPointHandle<UDPEndPoint>;
+
     UDPEndPoint(EndPointManager<UDPEndPoint> & endPointManager) :
         EndPointBasis(endPointManager), mState(State::kReady), OnMessageReceived(nullptr), OnReceiveError(nullptr)
     {}
@@ -290,14 +299,13 @@ protected:
     /**
      * Close the endpoint and recycle its memory.
      *
-     *  Invokes the \c Close method, then invokes the <tt>EndPointBasis::Release</tt> method to return the object to its
+     *  Invokes the \c Close method, then invokes the <tt>EndPointBasis::Free</tt> method to return the object to its
      *  memory pool.
      *
      *  On LwIP systems, this method must not be called with the LwIP stack lock already acquired.
      */
-    virtual void Free() = 0;
+    virtual void Free();
 };
-using UDPEndPointHandle = EndPointHandle<UDPEndPoint>;
 
 template <>
 struct EndPointProperties<UDPEndPoint>

@@ -47,7 +47,8 @@ public:
 };
 
 /**
- * Like ReferenceCounted but with protected visibility of Retain/Release
+ * Like ReferenceCounted but with protected visibility of Retain/Release.
+ * Use ReferenceCountedPtr<T> to automatically increment/decrement the ref count.
  */
 template <class Subclass, class Deletor, int kInitRefCount = 1, typename CounterType = uint32_t>
 class ReferenceCountedProtected
@@ -58,7 +59,7 @@ public:
 
 protected:
     /** Adds one to the usage count of this class */
-    Subclass * Retain()
+    Subclass * Ref()
     {
         VerifyOrDie(!kInitRefCount || mRefCount > 0);
         VerifyOrDie(mRefCount < std::numeric_limits<CounterType>::max());
@@ -67,8 +68,9 @@ protected:
         return static_cast<Subclass *>(this);
     }
 
-    /** Release usage of this class */
-    void Release()
+    /** Decrements the reference count by 1;
+    Not called "Release" to avoid confusion with Pool::Release */
+    void Unref()
     {
         VerifyOrDie(mRefCount != 0);
 
@@ -90,8 +92,11 @@ template <class Subclass, class Deletor = DeleteDeletor<Subclass>, int kInitRefC
 class ReferenceCounted : public ReferenceCountedProtected<Subclass, Deletor, kInitRefCount, CounterType>
 {
 public:
-    using ReferenceCountedProtected<Subclass, Deletor, kInitRefCount, CounterType>::Retain;
-    using ReferenceCountedProtected<Subclass, Deletor, kInitRefCount, CounterType>::Release;
+    /** Backwards compatibility; consider using ReferenceCountedProtected instead. */
+    Subclass * Retain() { return this->Ref(); }
+
+    /** Backwards compatibility; consider using ReferenceCountedProtected instead. */
+    void Release() { this->Unref(); }
 };
 
 } // namespace chip

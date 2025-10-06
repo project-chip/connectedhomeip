@@ -40,7 +40,6 @@ public:
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
     InterfaceId GetBoundInterface() const override;
     uint16_t GetBoundPort() const override;
-    void Free() override;
 
 private:
     // UDPEndPoint overrides.

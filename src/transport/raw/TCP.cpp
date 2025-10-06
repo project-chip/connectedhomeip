@@ -132,7 +132,7 @@ void TCPBase::Close()
     mState = TCPState::kNotReady;
 }
 
-ActiveTCPConnectionState * TCPBase::AllocateConnection(Inet::TCPEndPointHandle & endpoint, const PeerAddress & address)
+ActiveTCPConnectionState * TCPBase::AllocateConnection(const Inet::TCPEndPointHandle & endpoint, const PeerAddress & address)
 {
     // If a peer initiates a connection through HandleIncomingConnection but the connection is never claimed
     // in ProcessSingleMessage, we'll be left with a dangling ActiveTCPConnectionState which can be
@@ -273,7 +273,7 @@ CHIP_ERROR TCPBase::SendMessage(const ActiveTCPConnectionHandle & connection, Sy
 
     if (connection->IsConnected())
     {
-        return const_cast<Inet::TCPEndPointHandle &>(connection->mEndPoint)->Send(std::move(msgBuf));
+        return connection->mEndPoint->Send(std::move(msgBuf));
     }
 
     return SendAfterConnect(connection, std::move(msgBuf));
@@ -368,7 +368,7 @@ CHIP_ERROR TCPBase::SendAfterConnect(const ActiveTCPConnectionHandle & existing,
 #endif
 }
 
-CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPointHandle & endPoint, const PeerAddress & peerAddress,
+CHIP_ERROR TCPBase::ProcessReceivedBuffer(const Inet::TCPEndPointHandle & endPoint, const PeerAddress & peerAddress,
                                           System::PacketBufferHandle && buffer)
 {
     ActiveTCPConnectionState * state = FindActiveConnection(endPoint);
@@ -500,7 +500,7 @@ void TCPBase::CloseConnectionInternal(ActiveTCPConnectionState & connection, CHI
     mUsedEndPointCount--;
 }
 
-CHIP_ERROR TCPBase::HandleTCPEndPointDataReceived(Inet::TCPEndPointHandle & endPoint, System::PacketBufferHandle && buffer)
+CHIP_ERROR TCPBase::HandleTCPEndPointDataReceived(const Inet::TCPEndPointHandle & endPoint, System::PacketBufferHandle && buffer)
 {
     PeerAddress peerAddress;
     ReturnErrorOnFailure(GetPeerAddress(*endPoint, peerAddress));
@@ -517,7 +517,7 @@ CHIP_ERROR TCPBase::HandleTCPEndPointDataReceived(Inet::TCPEndPointHandle & endP
     return CHIP_NO_ERROR;
 }
 
-void TCPBase::HandleTCPEndPointConnectComplete(Inet::TCPEndPointHandle & endPoint, CHIP_ERROR conErr)
+void TCPBase::HandleTCPEndPointConnectComplete(const Inet::TCPEndPointHandle & endPoint, CHIP_ERROR conErr)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     bool foundPendingPacket = false;
@@ -619,7 +619,7 @@ void TCPBase::HandleTCPEndPointConnectionClosed(Inet::TCPEndPoint & endPoint, CH
 }
 
 // Handler for incoming connection requests from peer nodes
-void TCPBase::HandleIncomingConnection(Inet::TCPEndPointHandle & listenEndPoint, Inet::TCPEndPointHandle & endPoint,
+void TCPBase::HandleIncomingConnection(const Inet::TCPEndPointHandle & listenEndPoint, const Inet::TCPEndPointHandle & endPoint,
                                        const Inet::IPAddress & peerAddress, uint16_t peerPort)
 {
     TCPBase * tcp = reinterpret_cast<TCPBase *>(listenEndPoint->mAppState);
@@ -662,7 +662,7 @@ void TCPBase::HandleIncomingConnection(Inet::TCPEndPointHandle & listenEndPoint,
     }
 }
 
-void TCPBase::HandleAcceptError(Inet::TCPEndPointHandle & endPoint, CHIP_ERROR err)
+void TCPBase::HandleAcceptError(const Inet::TCPEndPointHandle & endPoint, CHIP_ERROR err)
 {
     // We don't own endPoint & so we don't free it;
     // It's either mListenSocket, which is owned by this & we want to keep open & will close in Close(),
@@ -728,7 +728,7 @@ bool TCPBase::HasActiveConnections() const
     return false;
 }
 
-void TCPBase::InitEndpoint(Inet::TCPEndPointHandle & endpoint)
+void TCPBase::InitEndpoint(const Inet::TCPEndPointHandle & endpoint)
 {
     endpoint->mAppState         = reinterpret_cast<void *>(this);
     endpoint->OnConnectComplete = HandleTCPEndPointConnectComplete;

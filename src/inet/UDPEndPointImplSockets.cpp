@@ -436,12 +436,6 @@ void UDPEndPointImplSockets::CloseImpl()
     }
 }
 
-void UDPEndPointImplSockets::Free()
-{
-    Close();
-    Release();
-}
-
 CHIP_ERROR UDPEndPointImplSockets::GetSocket(IPAddressType addressType)
 {
     if (mSocket == kInvalidSocketFd)

@@ -121,6 +121,12 @@ CHIP_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
     return CHIP_NO_ERROR;
 }
 
+void UDPEndPoint::Free()
+{
+    Close();
+    Delete();
+}
+
 void UDPEndPoint::Close()
 {
     if (mState != State::kClosed)

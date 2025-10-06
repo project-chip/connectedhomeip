@@ -210,7 +210,7 @@ private:
     /**
      * Allocate and initialize a connection from the pool.
      */
-    ActiveTCPConnectionState * AllocateConnection(Inet::TCPEndPointHandle & endpoint, const PeerAddress & address);
+    ActiveTCPConnectionState * AllocateConnection(const Inet::TCPEndPointHandle & endpoint, const PeerAddress & address);
     /**
      * Find an active connection to the given peer or return nullptr if
      * no active connection exists.
@@ -244,7 +244,7 @@ private:
      * Ownership of buffer is taken over and will be freed (or re-enqueued to the endPoint receive queue)
      * as needed during processing.
      */
-    CHIP_ERROR ProcessReceivedBuffer(Inet::TCPEndPointHandle & endPoint, const PeerAddress & peerAddress,
+    CHIP_ERROR ProcessReceivedBuffer(const Inet::TCPEndPointHandle & endPoint, const PeerAddress & peerAddress,
                                      System::PacketBufferHandle && buffer);
 
     /**
@@ -282,11 +282,11 @@ private:
 
     // Callback handler for TCPEndPoint. TCP message receive handler.
     // @see TCPEndpoint::OnDataReceivedFunct
-    static CHIP_ERROR HandleTCPEndPointDataReceived(Inet::TCPEndPointHandle & endPoint, System::PacketBufferHandle && buffer);
+    static CHIP_ERROR HandleTCPEndPointDataReceived(const Inet::TCPEndPointHandle & endPoint, System::PacketBufferHandle && buffer);
 
     // Callback handler for TCPEndPoint. Called when a connection has been completed.
     // @see TCPEndpoint::OnConnectCompleteFunct
-    static void HandleTCPEndPointConnectComplete(Inet::TCPEndPointHandle & endPoint, CHIP_ERROR err);
+    static void HandleTCPEndPointConnectComplete(const Inet::TCPEndPointHandle & endPoint, CHIP_ERROR err);
 
     // Callback handler for TCPEndPoint. Called when a connection has been closed.
     // @see TCPEndpoint::OnConnectionClosedFunct
@@ -294,14 +294,14 @@ private:
 
     // Callback handler for TCPEndPoint. Called when a connection is received on the listening port.
     // @see TCPEndpoint::OnConnectionReceivedFunct
-    static void HandleIncomingConnection(Inet::TCPEndPointHandle & listenEndPoint, Inet::TCPEndPointHandle & endPoint,
+    static void HandleIncomingConnection(const Inet::TCPEndPointHandle & listenEndPoint, const Inet::TCPEndPointHandle & endPoint,
                                          const Inet::IPAddress & peerAddress, uint16_t peerPort);
 
     // Callback handler for handling accept error
     // @see TCPEndpoint::OnAcceptErrorFunct
-    static void HandleAcceptError(Inet::TCPEndPointHandle & endPoint, CHIP_ERROR err);
+    static void HandleAcceptError(const Inet::TCPEndPointHandle & endPoint, CHIP_ERROR err);
 
-    void InitEndpoint(Inet::TCPEndPointHandle & endpoint);
+    void InitEndpoint(const Inet::TCPEndPointHandle & endpoint);
     CHIP_ERROR TryResetConnection(ActiveTCPConnectionState & connection);
     CHIP_ERROR PrepareBuffer(System::PacketBufferHandle & msgBuf);
 
