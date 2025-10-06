@@ -50,7 +50,7 @@ CHIP_ERROR Instance::Init()
 void Instance::Shutdown()
 {
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
-    
+
     // Free the forecast conditions storage if allocated
     if (mForecastConditionsStorage.Get() != nullptr)
     {
@@ -145,7 +145,7 @@ CHIP_ERROR Instance::SetCurrentConditions(DataModel::Nullable<Structs::Electrica
 
     // Deep check - compare new value with current value to avoid unnecessary updates
     bool hasChanged = false;
-    
+
     if (mCurrentConditions.IsNull() != newValue.IsNull())
     {
         hasChanged = true;
@@ -154,7 +154,7 @@ CHIP_ERROR Instance::SetCurrentConditions(DataModel::Nullable<Structs::Electrica
     {
         const auto & current = mCurrentConditions.Value();
         const auto & newVal = newValue.Value();
-        
+
         if (current.periodStart != newVal.periodStart ||
             current.periodEnd != newVal.periodEnd ||
             current.gridCarbonIntensity != newVal.gridCarbonIntensity ||
@@ -165,7 +165,7 @@ CHIP_ERROR Instance::SetCurrentConditions(DataModel::Nullable<Structs::Electrica
             hasChanged = true;
         }
     }
-    
+
     if (hasChanged)
     {
         mCurrentConditions = newValue;
@@ -201,7 +201,7 @@ CHIP_ERROR Instance::SetForecastConditions(const DataModel::List<const Structs::
     // Validate input constraints
     if (newValue.size() > kMaxForecastEntries)
     {
-        ChipLogError(AppServer, "Endpoint %d - ForecastConditions list size %u exceeds maximum %d", 
+        ChipLogError(AppServer, "Endpoint %d - ForecastConditions list size %u exceeds maximum %d",
                      mEndpointId, static_cast<unsigned int>(newValue.size()), kMaxForecastEntries);
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -210,7 +210,7 @@ CHIP_ERROR Instance::SetForecastConditions(const DataModel::List<const Structs::
     for (size_t i = 0; i < newValue.size(); i++)
     {
         const auto & condition = newValue[i];
-        
+
         if (EnsureKnownEnumValue(condition.gridCarbonLevel) == ThreeLevelEnum::kUnknownEnumValue)
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
@@ -235,34 +235,34 @@ CHIP_ERROR Instance::SetForecastConditions(const DataModel::List<const Structs::
         for (size_t i = 0; i < newValue.size(); i++)
         {
             const auto & condition = newValue[i];
-            
+
             // All entries except the last one SHALL have a non-null PeriodEnd
             if (i < newValue.size() - 1)  // Not the last entry
             {
                 if (condition.periodEnd.IsNull())
                 {
-                    ChipLogError(AppServer, "Endpoint %d - Entry %u: All entries except the last SHALL have a non-null PeriodEnd", 
+                    ChipLogError(AppServer, "Endpoint %d - Entry %u: All entries except the last SHALL have a non-null PeriodEnd",
                                  mEndpointId, static_cast<unsigned int>(i));
                     return CHIP_IM_GLOBAL_STATUS(ConstraintError);
                 }
             }
-            
+
             // For all entries except the first one, PeriodStart SHALL be greater than the previous entry's PeriodEnd
             if (i > 0)  // Not the first entry
             {
                 const auto & previousCondition = newValue[i - 1];
-                
+
                 if (previousCondition.periodEnd.IsNull())
                 {
-                    ChipLogError(AppServer, "Endpoint %d - Entry %u: Previous entry's PeriodEnd is null but current entry exists", 
+                    ChipLogError(AppServer, "Endpoint %d - Entry %u: Previous entry's PeriodEnd is null but current entry exists",
                                  mEndpointId, static_cast<unsigned int>(i));
                     return CHIP_IM_GLOBAL_STATUS(ConstraintError);
                 }
-                
+
                 if (condition.periodStart <= previousCondition.periodEnd.Value())
                 {
-                    ChipLogError(AppServer, "Endpoint %d - Entry %u: PeriodStart (%u) SHALL be greater than previous PeriodEnd (%u)", 
-                                 mEndpointId, static_cast<unsigned int>(i), static_cast<unsigned int>(condition.periodStart), 
+                    ChipLogError(AppServer, "Endpoint %d - Entry %u: PeriodStart (%u) SHALL be greater than previous PeriodEnd (%u)",
+                                 mEndpointId, static_cast<unsigned int>(i), static_cast<unsigned int>(condition.periodStart),
                                  static_cast<unsigned int>(previousCondition.periodEnd.Value()));
                     return CHIP_IM_GLOBAL_STATUS(ConstraintError);
                 }
@@ -273,7 +273,7 @@ CHIP_ERROR Instance::SetForecastConditions(const DataModel::List<const Structs::
     // Do a deep copy of the newValue into mForecastConditions
     ReturnErrorOnFailure(CopyForecastConditions(newValue));
 
-    ChipLogDetail(AppServer, "Endpoint %d - mForecastConditions updated with %u entries", 
+    ChipLogDetail(AppServer, "Endpoint %d - mForecastConditions updated with %u entries",
                   mEndpointId, static_cast<unsigned int>(mForecastConditionsStorageCount));
 
     MatterReportingAttributeChangeCallback(mEndpointId, ElectricalGridConditions::Id, ForecastConditions::Id);
@@ -311,9 +311,9 @@ CHIP_ERROR Instance::CopyForecastConditions(const DataModel::List<const Structs:
         mForecastConditionsStorage[count] = condition;
         count++;
     }
-    
+
     mForecastConditionsStorageCount = count;
-    
+
     // Update the list to point to our copied data
     mForecastConditions = DataModel::List<const Structs::ElectricalGridConditionsStruct::Type>(
         mForecastConditionsStorage.Get(), mForecastConditionsStorageCount);

@@ -92,7 +92,7 @@ private:
     DataModel::Nullable<bool> mLocalGenerationAvailable;
     DataModel::Nullable<Structs::ElectricalGridConditionsStruct::Type> mCurrentConditions;
     DataModel::List<const Structs::ElectricalGridConditionsStruct::Type> mForecastConditions;
-    
+
     // Storage for forecast conditions to ensure proper memory lifetime
     Platform::ScopedMemoryBuffer<Structs::ElectricalGridConditionsStruct::Type> mForecastConditionsStorage;
     size_t mForecastConditionsStorageCount = 0;
