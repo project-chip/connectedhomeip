@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  ot_br_posix_root = "//third_party/ot-br-posix"
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "libTestOperationalCredentialsCluster"
+
+  test_sources = [ "TestOperationalCredentials.cpp" ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/operational-credentials-server",
+    "${chip_root}/src/app/clusters/testing",
+    "${chip_root}/src/lib/support",
+  ]
 }

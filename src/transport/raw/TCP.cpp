@@ -65,7 +65,7 @@ CHIP_ERROR GetPeerAddress(Inet::TCPEndPoint & endPoint, PeerAddress & outAddr)
 
 struct EndPointDeletor
 {
-    inline void operator()(Inet::TCPEndPoint * e) const { e->Free(); }
+    inline void operator()(Inet::TCPEndPoint * e) const { e->Release(); }
 };
 
 } // namespace
@@ -124,7 +124,7 @@ exit:
         ChipLogError(Inet, "Failed to initialize TCP transport: %" CHIP_ERROR_FORMAT, err.Format());
         if (mListenSocket)
         {
-            mListenSocket->Free();
+            mListenSocket->Release();
             mListenSocket = nullptr;
         }
     }
@@ -136,7 +136,7 @@ void TCPBase::Close()
 {
     if (mListenSocket)
     {
-        mListenSocket->Free();
+        mListenSocket->Release();
         mListenSocket = nullptr;
     }
 
@@ -336,7 +336,6 @@ CHIP_ERROR TCPBase::StartConnect(const PeerAddress & addr, Transport::AppTCPConn
 
     mUsedEndPointCount++;
 
-    endPointHolder.release();
     connectionHolder.release();
 
     // Set the return value of the peer connection state to the allocated
@@ -615,7 +614,7 @@ void TCPBase::HandleTCPEndPointConnectComplete(Inet::TCPEndPoint * endPoint, CHI
         }
         else
         {
-            endPoint->Free();
+            endPoint->Release();
         }
         ChipLogError(Inet, "Connection establishment with %s encountered an error: %" CHIP_ERROR_FORMAT, addrStr, failure.Format());
     }
@@ -628,7 +627,7 @@ void TCPBase::HandleTCPEndPointConnectionClosed(Inet::TCPEndPoint * endPoint, CH
 
     if (activeConnection.IsNull())
     {
-        endPoint->Free();
+        endPoint->Release();
         return;
     }
 
@@ -644,6 +643,7 @@ void TCPBase::HandleTCPEndPointConnectionClosed(Inet::TCPEndPoint * endPoint, CH
 void TCPBase::HandleIncomingConnection(Inet::TCPEndPoint * listenEndPoint, Inet::TCPEndPoint * endPoint,
                                        const Inet::IPAddress & peerAddress, uint16_t peerPort)
 {
+    std::unique_ptr<Inet::TCPEndPoint, EndPointDeletor> endPointHolder(endPoint, EndPointDeletor());
     TCPBase * tcp = reinterpret_cast<TCPBase *>(listenEndPoint->mAppState);
 
     PeerAddress addr;
@@ -652,6 +652,10 @@ void TCPBase::HandleIncomingConnection(Inet::TCPEndPoint * listenEndPoint, Inet:
     ActiveTCPConnectionState * activeConnection = tcp->AllocateConnection(endPoint, addr);
     if (activeConnection != nullptr)
     {
+        auto ConnectionDeletor = [](ActiveTCPConnectionState * e) { e->Free(); };
+        std::unique_ptr<ActiveTCPConnectionState, decltype(ConnectionDeletor)> connectionHolder(activeConnection,
+                                                                                                ConnectionDeletor);
+
         endPoint->mAppState          = listenEndPoint->mAppState;
         endPoint->OnDataReceived     = HandleTCPEndPointDataReceived;
         endPoint->OnDataSent         = nullptr;
@@ -672,18 +676,22 @@ void TCPBase::HandleIncomingConnection(Inet::TCPEndPoint * listenEndPoint, Inet:
 
         // Call the upper layer handler for incoming connection received.
         tcp->HandleConnectionReceived(*activeConnection);
+
+        connectionHolder.release();
     }
     else
     {
         ChipLogError(Inet, "Insufficient connection space to accept new connections.");
-        endPoint->Free();
         listenEndPoint->OnAcceptError(endPoint, CHIP_ERROR_TOO_MANY_CONNECTIONS);
     }
 }
 
 void TCPBase::HandleAcceptError(Inet::TCPEndPoint * endPoint, CHIP_ERROR err)
 {
-    endPoint->Free();
+    // We don't own endPoint & so we don't free it;
+    // It's either mListenSocket, which is owned by this & we want to keep open & will close in Close(),
+    // Or it's a new incoming connection which failed in e.g. HandleIncomingConnection,
+    // and that method owns the connection & will release it
     ChipLogError(Inet, "Accept error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
@@ -755,7 +763,7 @@ CHIP_ERROR TCPBase::TryResetConnection(ActiveTCPConnectionState & connection)
     ReturnErrorOnFailure(endpoint->Connect(addr.GetIPAddress(), addr.GetPort(), addr.GetInterface()));
     endPointHolder.release();
     connection.mConnectionState = TCPState::kConnecting;
-    connection.mEndPoint->Free();
+    connection.mEndPoint->Release();
     connection.mEndPoint = endpoint;
     return CHIP_NO_ERROR;
 }

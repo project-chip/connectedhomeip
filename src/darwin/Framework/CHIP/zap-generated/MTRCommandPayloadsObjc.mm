@@ -43994,7 +43994,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         } else {
             self.endpoint.ccdid = [NSNumber numberWithUnsignedShort:decodableStruct.endpoint.ccdid.Value()];
         }
-        self.endpoint.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.endpoint.status)];
+        self.endpoint.referenceCount = [NSNumber numberWithUnsignedChar:decodableStruct.endpoint.referenceCount];
         self.endpoint.fabricIndex = [NSNumber numberWithUnsignedChar:decodableStruct.endpoint.fabricIndex];
     }
     return CHIP_NO_ERROR;
