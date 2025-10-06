@@ -312,7 +312,6 @@ void CameraAppInit(CameraDeviceInterface * cameraDevice)
     ChipLogDetail(Camera, "CameraAppInit: Initialized Camera clusters");
 }
 
-
 void CameraAppShutdown()
 {
     ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera app");

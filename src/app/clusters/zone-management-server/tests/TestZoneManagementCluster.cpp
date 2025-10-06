@@ -115,8 +115,8 @@ TEST_F(TestZoneManagementCluster, TestAttributes)
     uint8_t testSensitivity                    = 8;
     TwoDCartesianVertexStruct twoDCartesianMax = { .x = 100, .y = 100 };
 
-    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax, testSensitivity,
-                                  twoDCartesianMax);
+    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax,
+                                  testSensitivity, twoDCartesianMax);
     chip::Test::TestServerClusterContext context;
     cluster.Init();
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -153,8 +153,8 @@ TEST_F(TestZoneManagementCluster, TestGeneratedCommands)
     uint8_t testSensitivity                    = 8;
     TwoDCartesianVertexStruct twoDCartesianMax = { .x = 100, .y = 100 };
 
-    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax, testSensitivity,
-                                  twoDCartesianMax);
+    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax,
+                                  testSensitivity, twoDCartesianMax);
     chip::Test::TestServerClusterContext context;
     cluster.Init();
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -184,8 +184,8 @@ TEST_F(TestZoneManagementCluster, TestAcceptedCommands)
     uint8_t testSensitivity                    = 8;
     TwoDCartesianVertexStruct twoDCartesianMax = { .x = 100, .y = 100 };
 
-    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax, testSensitivity,
-                                  twoDCartesianMax);
+    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax,
+                                  testSensitivity, twoDCartesianMax);
     chip::Test::TestServerClusterContext context;
     cluster.Init();
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -218,8 +218,8 @@ TEST_F(TestZoneManagementCluster, TestZonePersistence)
     uint8_t testSensitivity                    = 8;
     TwoDCartesianVertexStruct twoDCartesianMax = { .x = 100, .y = 100 };
 
-    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax, testSensitivity,
-                                  twoDCartesianMax);
+    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax,
+                                  testSensitivity, twoDCartesianMax);
     chip::Test::TestServerClusterContext context;
     cluster.Init();
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -240,8 +240,8 @@ TEST_F(TestZoneManagementCluster, TestZonePersistence)
     EXPECT_EQ(cluster.GetZones().size(), 1u);
 
     // Create a new server instance and check if it loads the persisted zone
-    ZoneManagementCluster newCluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax, testSensitivity,
-                                     twoDCartesianMax);
+    ZoneManagementCluster newCluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax,
+                                     testSensitivity, twoDCartesianMax);
     newCluster.Init();
     ASSERT_EQ(newCluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -263,8 +263,8 @@ TEST_F(TestZoneManagementCluster, TestTriggerPersistence)
     uint8_t testSensitivity                    = 8;
     TwoDCartesianVertexStruct twoDCartesianMax = { .x = 100, .y = 100 };
 
-    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax, testSensitivity,
-                                  twoDCartesianMax);
+    ZoneManagementCluster cluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax,
+                                  testSensitivity, twoDCartesianMax);
     chip::Test::TestServerClusterContext context;
     cluster.Init();
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -292,8 +292,8 @@ TEST_F(TestZoneManagementCluster, TestTriggerPersistence)
     EXPECT_EQ(cluster.GetTriggers().size(), 1u);
 
     // Create a new server instance and check if it loads the persisted trigger
-    ZoneManagementCluster newCluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax, testSensitivity,
-                                     twoDCartesianMax);
+    ZoneManagementCluster newCluster(kRootEndpointId, delegate, testFeatures1, testUserZones, testMaxZones, testSensitivityMax,
+                                     testSensitivity, twoDCartesianMax);
     newCluster.Init();
     ASSERT_EQ(newCluster.Startup(context.Get()), CHIP_NO_ERROR);
 

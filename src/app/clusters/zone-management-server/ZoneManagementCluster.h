@@ -212,7 +212,8 @@ class ZoneManagementCluster : public DefaultServerCluster
 {
 public:
     ZoneManagementCluster(EndpointId endpointId, Delegate & delegate, const BitFlags<Feature> features, uint8_t maxUserDefinedZones,
-                          uint8_t maxZones, uint8_t sensitivityMax, uint8_t sensitivity, const TwoDCartesianVertexStruct & twoDCartesianMax);
+                          uint8_t maxZones, uint8_t sensitivityMax, uint8_t sensitivity,
+                          const TwoDCartesianVertexStruct & twoDCartesianMax);
     ~ZoneManagementCluster() override;
 
     CHIP_ERROR Init();
