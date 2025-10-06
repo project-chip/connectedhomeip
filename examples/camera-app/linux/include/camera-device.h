@@ -66,8 +66,9 @@ static constexpr uint8_t kMaxZones                   = 10;  // Spec has min 1
 static constexpr uint8_t kMaxUserDefinedZones        = 10;  // Spec has min 5
 static constexpr uint8_t kSensitivityMax             = 10;  // Spec has 2 to 10
 
-// StreamIDs typically start from 0 and monotonically increase.
-static constexpr uint16_t kInvalidStreamID = 0xFFFF;
+// StreamIDs typically start from 0 and monotonically increase. Setting
+// Invalid value to a large and practically unused value.
+static constexpr uint16_t kInvalidStreamID = 65500;
 #define INVALID_SPKR_LEVEL (0)
 
 namespace Camera {
