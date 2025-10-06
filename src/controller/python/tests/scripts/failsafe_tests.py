@@ -91,7 +91,7 @@ async def main():
     timeoutTicker.start()
 
     test = BaseTestHelper(
-        nodeid=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=False)
+        nodeId=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=False)
 
     logger.info("Testing discovery")
     FailIfNot(await test.TestDiscovery(discriminator=TEST_DISCRIMINATOR),
@@ -103,10 +103,10 @@ async def main():
     logger.info("Testing commissioning")
     FailIfNot(await test.TestOnNetworkCommissioning(discriminator=options.discriminator,
                                                     setuppin=options.passcode,
-                                                    nodeid=1),
+                                                    nodeId=1),
               "Failed to finish key exchange")
 
-    FailIfNot(await test.TestFailsafe(nodeid=1), "Failed failsafe test")
+    FailIfNot(await test.TestFailsafe(nodeId=1), "Failed failsafe test")
 
     timeoutTicker.stop()
 
