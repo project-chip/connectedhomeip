@@ -244,7 +244,8 @@ class TC_DA_1_9(MatterBaseTest):
                 asserts.assert_equal(
                     commissioning_success,
                     test_case['expects_commissioning_success'],
-                    f"Commissioning {'succeeded' if commissioning_success else 'failed'} when it should have {'succeeded' if test_case['expects_commissioning_success'] else 'failed'}"
+                    f"Commissioning {'succeeded' if commissioning_success else 'failed'} when it should "
+                    f"have {'succeeded' if test_case['expects_commissioning_success'] else 'failed'}"
                 )
 
 

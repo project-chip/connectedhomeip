@@ -445,7 +445,7 @@ class TC_ACL_2_5(MatterBaseTest):
         ]
         return steps
 
-    @ async_test_body
+    @async_test_body
     async def test_TC_ACL_2_5(self):
         await self.internal_test_TC_ACL_2_5(force_legacy_encoding=False)
         self.current_step_index = 0

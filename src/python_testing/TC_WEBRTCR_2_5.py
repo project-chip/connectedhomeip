@@ -240,7 +240,8 @@ class TC_WebRTCRequestor_2_5(MatterBaseTest):
         asserts.assert_equal(
             session_read_success,
             True,
-            f"CurrentSessions attribute read {'succeeded with session info' if session_read_success else 'failed or returned incorrect data'}"
+            "CurrentSessions attribute read succeeded with session info" if session_read_success
+            else "CurrentSessions attribute read failed or returned incorrect data"
         )
 
         # Ensure we have a valid session ID before proceeding
@@ -292,7 +293,8 @@ class TC_WebRTCRequestor_2_5(MatterBaseTest):
         asserts.assert_equal(
             final_read_success,
             True,
-            f"Final CurrentSessions attribute read {'succeeded with empty list' if final_read_success else 'failed or returned non-empty list'}"
+            "Final CurrentSessions attribute read succeeded with empty list" if final_read_success
+            else "Final CurrentSessions attribute read failed or returned non-empty list"
         )
 
 
