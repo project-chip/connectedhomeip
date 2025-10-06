@@ -3760,30 +3760,6 @@ endpoint 1 {
     handle command SetDefaultNTP;
   }
 
-  server cluster ZoneManagement {
-    emits event ZoneTriggered;
-    emits event ZoneStopped;
-    callback attribute maxUserDefinedZones;
-    callback attribute maxZones;
-    callback attribute zones;
-    callback attribute triggers;
-    callback attribute sensitivityMax;
-    callback attribute sensitivity;
-    callback attribute twoDCartesianMax;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    callback attribute featureMap;
-    callback attribute clusterRevision;
-
-    handle command CreateTwoDCartesianZone;
-    handle command CreateTwoDCartesianZoneResponse;
-    handle command UpdateTwoDCartesianZone;
-    handle command RemoveZone;
-    handle command CreateOrUpdateTrigger;
-    handle command RemoveTrigger;
-  }
-
   server cluster CameraAvStreamManagement {
     callback attribute maxConcurrentEncoders;
     callback attribute maxEncodedPixelRate;
