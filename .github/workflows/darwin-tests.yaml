@@ -44,11 +44,6 @@ jobs:
           dry-run: true
           build_variant: no-ble-no-shell-asan-clang
           chip_tool: ""
-        - os: macos-15
-          arch: arm64     # observed, not configured
-          dry-run: true
-          build_variant: no-ble-no-shell-asan-clang
-          chip_tool: ""
     env:
       BUILD_VARIANT: ${{matrix.build_variant}}
 
