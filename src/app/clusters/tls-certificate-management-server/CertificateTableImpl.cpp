@@ -250,6 +250,16 @@ struct GlobalCertificateData : public PersistentData<kPersistentBufferNextIdByte
         return DoRemoval(storage, table, fabric, id, mRootCertMappingCount, mRootCertMapping.data());
     }
 
+    CHIP_ERROR RemoveAllClientCertificates(PersistentStorageDelegate & storage, FabricIndex fabric)
+    {
+        return DoRemovalAll(storage, fabric, mClientCertMappingCount, mClientCertMapping.data());
+    }
+
+    CHIP_ERROR RemoveAllRootCertificates(PersistentStorageDelegate & storage, FabricIndex fabric)
+    {
+        return DoRemovalAll(storage, fabric, mRootCertMappingCount, mRootCertMapping.data());
+    }
+
 private:
     template <class CertificateTable>
     CHIP_ERROR DoRemoval(PersistentStorageDelegate & storage, CertificateTable & table, FabricIndex fabric, uint16_t id,
@@ -290,6 +300,27 @@ private:
             ReturnErrorOnFailure(this->Save(&storage));
         }
         return removeResult;
+    }
+
+    CHIP_ERROR DoRemovalAll(PersistentStorageDelegate & storage, FabricIndex fabric, size_t count, StoredCertificate * source)
+    {
+        // Find the entry in the global mapping
+        uint16_t foundCount = 0;
+        for (size_t i = 0; i < count; ++i)
+        {
+            auto & entry = source[i];
+            if (entry.fabric == fabric)
+            {
+                entry.fabric = kUndefinedFabricIndex;
+                entry.id.Clear();
+                ++foundCount;
+            }
+        }
+        if (foundCount == 0)
+        {
+            return CHIP_ERROR_NOT_FOUND;
+        }
+        return this->Save(&storage);
     }
 
     CHIP_ERROR GetNextCertificateId(uint16_t & nextId, uint16_t maxId, size_t count, const StoredCertificate * source)
@@ -721,4 +752,35 @@ CHIP_ERROR CertificateTableImpl::RemoveClientCertificate(FabricIndex fabric, TLS
 CHIP_ERROR CertificateTableImpl::GetClientCertificateCount(FabricIndex fabric, uint8_t & outCount)
 {
     return mClientCertificates.GetFabricEntryCount(fabric, outCount);
+}
+
+inline CHIP_ERROR SwallowNotFound(CHIP_ERROR err)
+{
+    return (err == CHIP_ERROR_NOT_FOUND) ? CHIP_NO_ERROR : err;
+}
+
+CHIP_ERROR CertificateTableImpl::RemoveFabric(FabricIndex fabric)
+{
+    // We want to release as many resources as possible; if anything fails,
+    // hold on to the error until we've had a chance to try to free other resources
+    CHIP_ERROR clientResult = SwallowNotFound(mClientCertificates.RemoveFabric(fabric));
+    CHIP_ERROR rootResult   = SwallowNotFound(mRootCertificates.RemoveFabric(fabric));
+
+    GlobalCertificateData globalData(mEndpointId);
+    CHIP_ERROR globalDataResult = globalData.Load(mStorage);
+    if (globalDataResult == CHIP_ERROR_NOT_FOUND)
+    {
+        ReturnErrorOnFailure(clientResult);
+        return rootResult;
+    }
+    ReturnErrorOnFailure(globalDataResult);
+
+    if (rootResult == CHIP_NO_ERROR)
+    {
+        rootResult = SwallowNotFound(globalData.RemoveAllRootCertificates(*mStorage, fabric));
+    }
+
+    ReturnErrorOnFailure(SwallowNotFound(globalData.RemoveAllClientCertificates(*mStorage, fabric)));
+    ReturnErrorOnFailure(clientResult);
+    return rootResult;
 }

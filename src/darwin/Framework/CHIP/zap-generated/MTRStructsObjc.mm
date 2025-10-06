@@ -11680,7 +11680,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _ccdid = nil;
 
-        _status = @(0);
+        _referenceCount = @(0);
 
         _fabricIndex = @(0);
     }
@@ -11696,7 +11696,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.port = self.port;
     other.caid = self.caid;
     other.ccdid = self.ccdid;
-    other.status = self.status;
+    other.referenceCount = self.referenceCount;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -11704,7 +11704,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpointID:%@; hostname:%@; port:%@; caid:%@; ccdid:%@; status:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _endpointID, [_hostname base64EncodedStringWithOptions:0], _port, _caid, _ccdid, _status, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpointID:%@; hostname:%@; port:%@; caid:%@; ccdid:%@; referenceCount:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _endpointID, [_hostname base64EncodedStringWithOptions:0], _port, _caid, _ccdid, _referenceCount, _fabricIndex];
     return descriptionString;
 }
 

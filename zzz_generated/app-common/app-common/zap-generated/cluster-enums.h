@@ -165,4 +165,6 @@
 #include <clusters/ZoneManagement/Enums.h>
 
 // Included at the end, so all our definitions above are available.
+#define CHIP_INCLUDING_FROM_CLUSTER_ENUMS
 #include <app/common/CompatEnumNames.h>
+#undef CHIP_INCLUDING_FROM_CLUSTER_ENUMS
