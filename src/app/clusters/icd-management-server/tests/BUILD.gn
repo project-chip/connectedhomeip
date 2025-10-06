@@ -27,10 +27,10 @@ chip_test_suite("tests") {
   public_deps = [
     "${chip_root}/src/app/clusters/icd-management-server",
     "${chip_root}/src/app/clusters/testing",
+    "${chip_root}/src/app/icd/server:configuration-data",
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/crypto",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/crypto",
-    "${chip_root}/src/credentials",
-    "${chip_root}/src/app/icd/server:configuration-data",
   ]
 }
