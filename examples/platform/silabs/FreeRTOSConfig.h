@@ -153,9 +153,11 @@ extern uint32_t SystemCoreClock;
 #define configUSE_TICKLESS_IDLE 0
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
 
+// Set the FreeRTOS tick rate depending on the MCU interface.
 #ifdef SLI_SI91X_MCU_INTERFACE
+// For Si91x SoCs, a 1000Hz tick rate provides an exact 1ms systick period
 #define configTICK_RATE_HZ (1000)
-#else // For EFR32
+#else // EFR32 platforms
 #define configTICK_RATE_HZ (1024)
 #endif // SLI_SI91X_MCU_INTERFACE
 
