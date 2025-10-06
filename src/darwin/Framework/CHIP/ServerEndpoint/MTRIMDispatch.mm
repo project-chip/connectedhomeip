@@ -122,7 +122,7 @@ Protocols::InteractionModel::Status emberAfWriteAttribute(const ConcreteAttribut
 
 Protocols::InteractionModel::Status emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr, uint16_t readLength)
 {
-    // Only here so linking succeeds; should never be called, because all our cluster implementations 
+    // Only here so linking succeeds; should never be called, because all our cluster implementations
     // are done via AttributeAccessInterface or ServerClusterInterface.
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
