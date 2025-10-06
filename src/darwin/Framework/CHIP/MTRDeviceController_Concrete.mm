@@ -1705,6 +1705,11 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
+    [self getSessionForNode:nodeID parameters:0 completion:completion];
+}
+
+- (void)getSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters)parameters completion:(MTRInternalDeviceConnectionCallback)completion
+{
     // TODO: Figure out whether the synchronization here makes sense.  What
     // happens if this call happens mid-suspend or mid-resume?
     if (self.suspended) {
@@ -1724,16 +1729,21 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                 completion(exchangeManager, session, error, retryDelay);
                 workItemCompletion(MTRAsyncWorkComplete);
             };
-            [self directlyGetSessionForNode:nodeID completion:completionWrapper];
+            [self directlyGetSessionForNode:nodeID parameters:parameters completion:completionWrapper];
         }];
 
         [_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX", nodeID];
     } else {
-        [self directlyGetSessionForNode:nodeID completion:completion];
+        [self directlyGetSessionForNode:nodeID parameters:parameters completion:completion];
     }
 }
 
 - (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
+{
+    [self directlyGetSessionForNode:nodeID parameters:0 completion:completion];
+}
+
+- (void)directlyGetSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters)parameters completion:(MTRInternalDeviceConnectionCallback)completion
 {
     // TODO: Figure out whether the synchronization here makes sense.  What
     // happens if this call happens mid-suspend or mid-resume?
@@ -1748,9 +1758,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         asyncGetCommissionerOnMatterQueue:^(chip::Controller::DeviceCommissioner * commissioner) {
             auto connectionBridge = new MTRDeviceConnectionBridge(completion);
 
-            // MTRDeviceConnectionBridge always delivers errors async via
-            // completion.
-            connectionBridge->connect(commissioner, nodeID);
+            // MTRDeviceConnectionBridge always delivers errors via completion.
+            connectionBridge->Connect(commissioner, nodeID, parameters);
         }
         errorHandler:^(NSError * error) {
             completion(nullptr, chip::NullOptional, error, nil);

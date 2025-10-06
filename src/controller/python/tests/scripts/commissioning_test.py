@@ -60,16 +60,6 @@ async def main():
         metavar="<timeout-second>",
     )
     optParser.add_option(
-        "-a",
-        "--address",
-        action="store",
-        dest="deviceAddress",
-        default='',
-        type='str',
-        help="Address of the device",
-        metavar="<device-addr>",
-    )
-    optParser.add_option(
         "--setup-payload",
         action="store",
         dest="setupPayload",
@@ -131,20 +121,14 @@ async def main():
     FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
               "Failed to finish network commissioning")
 
-    if options.deviceAddress:
-        logger.info("Testing commissioning (IP)")
-        FailIfNot(await test.TestCommissioning(ip=options.deviceAddress,
-                                               setuppin=20202021,
-                                               nodeid=options.nodeid),
-                  "Failed to finish commissioning")
-    elif options.setupPayload:
+    if options.setupPayload:
         logger.info("Testing commissioning (w/ Setup Payload)")
         FailIfNot(await test.TestCommissioningWithSetupPayload(setupPayload=options.setupPayload,
                                                                nodeid=options.nodeid,
                                                                discoveryType=options.discoveryType),
                   "Failed to finish commissioning")
     else:
-        TestFail("Must provide device address or setup payload to commissioning the device")
+        TestFail("Must provide device setup payload to commissioning the device")
 
     logger.info("Testing on off cluster")
     FailIfNot(await test.TestOnOffCluster(nodeid=options.nodeid,
