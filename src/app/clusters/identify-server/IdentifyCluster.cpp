@@ -44,8 +44,7 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommandsWithTriggerEffect[] =
 
 IdentifyCluster::IdentifyCluster(const Config & config) :
     DefaultServerCluster({ config.endpointId, Identify::Id }), mIdentifyTime(0), mIdentifyType(config.identifyType),
-    mOnIdentifyStart(config.onIdentifyStart), mOnIdentifyStop(config.onIdentifyStop),
-    mOnEffectIdentifier(config.onEffectIdentifier), mCurrentEffectIdentifier(config.effectIdentifier),
+    mIdentifyDelegate(config.identifyDelegate), mEffectIdentifier(config.effectIdentifier),
     mEffectVariant(config.effectVariant), mTimerDelegate(config.timerDelegate)
 {}
 
@@ -123,18 +122,15 @@ DataModel::ActionReturnStatus IdentifyCluster::SetIdentifyTime(IdentifyTimeChang
     uint16_t previousIdentifyTime = mIdentifyTime;
     mIdentifyTime                 = newTime;
 
-    if (previousIdentifyTime == 0 && mIdentifyTime > 0)
+    if (mIdentifyDelegate)
     {
-        if (mOnIdentifyStart)
+        if (previousIdentifyTime == 0 && mIdentifyTime > 0)
         {
-            mOnIdentifyStart(this);
+            mIdentifyDelegate->OnIdentifyStart(*this);
         }
-    }
-    else if (previousIdentifyTime > 0 && mIdentifyTime == 0)
-    {
-        if (mOnIdentifyStop)
+        else if (previousIdentifyTime > 0 && mIdentifyTime == 0)
         {
-            mOnIdentifyStop(this);
+            mIdentifyDelegate->OnIdentifyStop(*this);
         }
     }
 
@@ -174,36 +170,39 @@ IdentifyCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TL
         Identify::Commands::TriggerEffect::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments));
         MATTER_TRACE_SCOPE("TriggerEffect", "Identify");
-        mCurrentEffectIdentifier = data.effectIdentifier;
+        mEffectIdentifier = data.effectIdentifier;
         mEffectVariant           = data.effectVariant;
 
-        ChipLogProgress(Zcl, "RX identify:trigger effect identifier 0x%X variant 0x%X", to_underlying(mCurrentEffectIdentifier),
+        ChipLogProgress(Zcl, "RX identify:trigger effect identifier 0x%X variant 0x%X", to_underlying(mEffectIdentifier),
                         to_underlying(mEffectVariant));
 
-        if (mIdentifyTime > 0)
+        if (mIdentifyDelegate)
         {
-            if (mCurrentEffectIdentifier == Identify::EffectIdentifierEnum::kFinishEffect)
+            if (mIdentifyTime > 0)
             {
-                NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
-                                                SetIdentifyTime(IdentifyTimeChangeSource::kClient, 1));
-            }
-            else if (mCurrentEffectIdentifier == Identify::EffectIdentifierEnum::kStopEffect)
-            {
-                NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
-                                                SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0));
+                if (mEffectIdentifier == Identify::EffectIdentifierEnum::kFinishEffect)
+                {
+                    NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
+                                                    SetIdentifyTime(IdentifyTimeChangeSource::kClient, 1));
+                }
+                else if (mEffectIdentifier == Identify::EffectIdentifierEnum::kStopEffect)
+                {
+                    NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
+                                                    SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0));
+                }
+                else
+                {
+                    // Other effects: cancel and trigger new effect.
+                    NotifyAttributeChangedIfSuccess(
+                        Attributes::IdentifyTime::Id,
+                        SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0)); // This will call onIdentifyStop.
+                    mIdentifyDelegate->OnTriggerEffect(*this);
+                }
             }
             else
             {
-                // Other effects: cancel and trigger new effect.
-                NotifyAttributeChangedIfSuccess(
-                    Attributes::IdentifyTime::Id,
-                    SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0)); // This will call onIdentifyStop.
-                mOnEffectIdentifier(this);
+                mIdentifyDelegate->OnTriggerEffect(*this);
             }
-        }
-        else
-        {
-            mOnEffectIdentifier(this);
         }
 
         return Protocols::InteractionModel::Status::Success;
@@ -215,7 +214,7 @@ IdentifyCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TL
 CHIP_ERROR IdentifyCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (mOnEffectIdentifier)
+    if (mIdentifyDelegate && mIdentifyDelegate->IsTriggerEffectEnabled())
     {
         return builder.ReferenceExisting(kAcceptedCommandsWithTriggerEffect);
     }

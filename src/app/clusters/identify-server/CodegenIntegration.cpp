@@ -17,6 +17,8 @@
 
 #include "identify-server.h"
 
+#include <app/clusters/identify-server/IdentifyCluster.h>
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -37,7 +39,11 @@ namespace {
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Identify;
+
+using chip::app::Clusters::IdentifyCluster;
+using chip::app::Clusters::IdentifyDelegate;
 using chip::Protocols::InteractionModel::Status;
+
 
 Identify * firstLegacyIdentify = nullptr;
 DefaultTimerDelegate sDefaultTimerDelegate;
@@ -52,6 +58,43 @@ Identify * GetLegacyIdentifyInstance(EndpointId endpoint)
     return current;
 }
 
+class IdentifyLegacyDelegate : public IdentifyDelegate
+{
+public:
+    void OnIdentifyStart(IdentifyCluster & cluster) override
+    {
+        Identify * identify = GetLegacyIdentifyInstance(cluster.GetPaths()[0].mEndpointId);
+        if (identify != nullptr && identify->mOnIdentifyStart)
+        {
+            identify->mOnIdentifyStart(identify);
+        }
+    }
+    void OnIdentifyStop(IdentifyCluster & cluster) override
+    {
+        Identify * identify = GetLegacyIdentifyInstance(cluster.GetPaths()[0].mEndpointId);
+        if (identify != nullptr && identify->mOnIdentifyStop)
+        {
+            identify->mOnIdentifyStop(identify);
+        }
+    }
+    void OnTriggerEffect(IdentifyCluster & cluster) override
+    {
+        Identify * identify = GetLegacyIdentifyInstance(cluster.GetPaths()[0].mEndpointId);
+        if (identify != nullptr)
+        {
+            identify->mCurrentEffectIdentifier = cluster.GetEffectIdentifier();
+            identify->mEffectVariant           = cluster.GetEffectVariant();
+            if (identify->mOnEffectIdentifier)
+            {
+                identify->mOnEffectIdentifier(identify);
+            }
+        }
+    }
+    bool IsTriggerEffectEnabled() override { return true; }
+};
+
+IdentifyLegacyDelegate gLegacyDelegate;
+
 inline void RegisterLegacyIdentify(Identify * inst)
 {
     inst->nextIdentify  = firstLegacyIdentify;
@@ -64,7 +107,7 @@ inline void UnregisterLegacyIdentify(Identify * inst)
     {
         firstLegacyIdentify = firstLegacyIdentify->nextIdentify;
     }
-    else
+    else if (firstLegacyIdentify != nullptr)
     {
         Identify * previous = firstLegacyIdentify;
         Identify * current  = firstLegacyIdentify->nextIdentify;
@@ -82,40 +125,6 @@ inline void UnregisterLegacyIdentify(Identify * inst)
     }
 }
 
-// Legacy Identify callback wrappers that translate new callback types into old callback types
-// They also copy member variable state to maintain backwards compatibility
-void OnIdentifyStartLegacyWrapper(chip::app::Clusters::IdentifyCluster * cluster)
-{
-    Identify * identify = GetLegacyIdentifyInstance(cluster->GetPaths()[0].mEndpointId);
-    if (identify != nullptr && identify->mOnIdentifyStart)
-    {
-        identify->mOnIdentifyStart(identify);
-    }
-}
-
-void OnIdentifyStopLegacyWrapper(chip::app::Clusters::IdentifyCluster * cluster)
-{
-    Identify * identify = GetLegacyIdentifyInstance(cluster->GetPaths()[0].mEndpointId);
-    if (identify != nullptr && identify->mOnIdentifyStop)
-    {
-        identify->mOnIdentifyStop(identify);
-    }
-}
-
-void OnEffectIdentifierLegacyWrapper(chip::app::Clusters::IdentifyCluster * cluster)
-{
-    Identify * identify = GetLegacyIdentifyInstance(cluster->GetPaths()[0].mEndpointId);
-    if (identify != nullptr)
-    {
-        identify->mCurrentEffectIdentifier = cluster->GetEffectIdentifier();
-        identify->mEffectVariant           = cluster->GetEffectVariant();
-        if (identify->mOnEffectIdentifier)
-        {
-            identify->mOnEffectIdentifier(identify);
-        }
-    }
-}
-
 } // namespace
 
 Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIdentifyStopCb onIdentifyStop,
@@ -126,10 +135,9 @@ Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIde
     mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType), mOnEffectIdentifier(onEffectIdentifier),
     mCurrentEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant),
     mCluster(
-        chip::app::Clusters::IdentifyCluster::Config(endpoint, identifyType, timerDelegate ? *timerDelegate : sDefaultTimerDelegate)
-            .WithOnIdentifyStart(onIdentifyStart ? OnIdentifyStartLegacyWrapper : nullptr)
-            .WithOnIdentifyStop(onIdentifyStop ? OnIdentifyStopLegacyWrapper : nullptr)
-            .WithOnEffectIdentifier(onEffectIdentifier ? OnEffectIdentifierLegacyWrapper : nullptr)
+        chip::app::Clusters::IdentifyCluster::Config(endpoint, timerDelegate ? *timerDelegate : sDefaultTimerDelegate)
+            .WithIdentifyType(identifyType)
+            .WithDelegate(&gLegacyDelegate)
             .WithEffectIdentifier(effectIdentifier)
             .WithEffectVariant(effectVariant))
 {

@@ -23,17 +23,41 @@
 
 namespace chip::app::Clusters {
 
+class IdentifyCluster;
+
+class IdentifyDelegate
+{
+public:
+    virtual ~IdentifyDelegate() = default;
+
+    /**
+     * @brief Called when identification starts.
+     * @param cluster The IdentifyCluster instance.
+     */
+    virtual void OnIdentifyStart(IdentifyCluster & cluster) = 0;
+
+    /**
+     * @brief Called when identification stops.
+     * @param cluster The IdentifyCluster instance.
+     */
+    virtual void OnIdentifyStop(IdentifyCluster & cluster) = 0;
+
+    /**
+     * @brief Called to trigger an effect.
+     * @param cluster The IdentifyCluster instance from which to get effect information.
+     */
+    virtual void OnTriggerEffect(IdentifyCluster & cluster) = 0;
+
+    /**
+     * @brief Checks if the TriggerEffect command is enabled.
+     * @return True if the TriggerEffect command is enabled, false otherwise.
+     */
+    virtual bool IsTriggerEffectEnabled() = 0;
+};
+
 class IdentifyCluster : public DefaultServerCluster, public reporting::TimerContext
 {
 public:
-    /**
-     * Callbacks are not thread safe. To access the identify struct please
-     * consider using the LockChipStack / UnlockChipStack functions of the PlatformMgr.
-     */
-    using onIdentifyStartCb    = void (*)(IdentifyCluster *);
-    using onIdentifyStopCb     = onIdentifyStartCb;
-    using onEffectIdentifierCb = onIdentifyStartCb;
-
     /**
      * @brief Configuration struct for IdentifyCluster.
      *
@@ -43,30 +67,26 @@ public:
      * Example:
      * @code
      * IdentifyCluster cluster(
-     *     IdentifyCluster::Config(kEndpointId, Identify::IdentifyTypeEnum::kNone)
-     *         .WithOnIdentifyStart(onIdentifyStartCallback)
-     *         .WithTimerDelegate(&myTimerDelegate)
+     *     IdentifyCluster::Config(kEndpointId, myTimerDelegate)
+     *         .WithDelegate(&myIdentifyDelegate)
      * );
+     *
+     * Use `DefaultTimerDelegate` if you don't need a custom timer delegate implementation.
      * @endcode
      */
     struct Config
     {
-        Config(EndpointId endpoint, Identify::IdentifyTypeEnum type, reporting::ReportScheduler::TimerDelegate & delegate) :
-            endpointId(endpoint), identifyType(type), timerDelegate(delegate)
+        Config(EndpointId endpoint, reporting::ReportScheduler::TimerDelegate & delegate) :
+            endpointId(endpoint), timerDelegate(delegate)
         {}
-        Config & WithOnIdentifyStart(onIdentifyStartCb cb)
+        Config & WithIdentifyType(Identify::IdentifyTypeEnum type)
         {
-            onIdentifyStart = cb;
+            identifyType = type;
             return *this;
         }
-        Config & WithOnIdentifyStop(onIdentifyStopCb cb)
+        Config & WithDelegate(IdentifyDelegate * delegate)
         {
-            onIdentifyStop = cb;
-            return *this;
-        }
-        Config & WithOnEffectIdentifier(onEffectIdentifierCb cb)
-        {
-            onEffectIdentifier = cb;
+            identifyDelegate = delegate;
             return *this;
         }
         Config & WithEffectIdentifier(Identify::EffectIdentifierEnum effect)
@@ -81,11 +101,9 @@ public:
         }
 
         EndpointId endpointId;
-        Identify::IdentifyTypeEnum identifyType;
-        onIdentifyStartCb onIdentifyStart = nullptr;
-        onIdentifyStopCb onIdentifyStop   = nullptr;
+        Identify::IdentifyTypeEnum identifyType         = Identify::IdentifyTypeEnum::kNone;
         reporting::ReportScheduler::TimerDelegate & timerDelegate;
-        onEffectIdentifierCb onEffectIdentifier         = nullptr;
+        IdentifyDelegate * identifyDelegate             = nullptr;
         Identify::EffectIdentifierEnum effectIdentifier = Identify::EffectIdentifierEnum::kBlink;
         Identify::EffectVariantEnum effectVariant       = Identify::EffectVariantEnum::kDefault;
     };
@@ -115,16 +133,15 @@ public:
      */
     void TimerFired() override;
 
-    Identify::EffectIdentifierEnum GetEffectIdentifier() const { return mCurrentEffectIdentifier; }
+    Identify::EffectIdentifierEnum GetEffectIdentifier() const { return mEffectIdentifier; }
     Identify::EffectVariantEnum GetEffectVariant() const { return mEffectVariant; }
+    Identify::IdentifyTypeEnum GetIdentifyType() const { return mIdentifyType; }
 
 protected:
     uint16_t mIdentifyTime;
     Identify::IdentifyTypeEnum mIdentifyType;
-    onIdentifyStartCb mOnIdentifyStart;
-    onIdentifyStopCb mOnIdentifyStop;
-    onEffectIdentifierCb mOnEffectIdentifier;
-    Identify::EffectIdentifierEnum mCurrentEffectIdentifier;
+    IdentifyDelegate * mIdentifyDelegate;
+    Identify::EffectIdentifierEnum mEffectIdentifier;
     Identify::EffectVariantEnum mEffectVariant;
     reporting::ReportScheduler::TimerDelegate & mTimerDelegate;
 
