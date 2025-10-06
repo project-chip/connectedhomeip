@@ -86,7 +86,8 @@ CHIP_ERROR ReadDeviceAttribute(DataModel::Provider & provider, EndpointId endpoi
     CHIP_ERROR err = aEncoder.EncodeList([&deviceTypes](const auto & encoder) -> CHIP_ERROR {
         for (const auto & type : deviceTypes)
         {
-            Descriptor::Structs::DeviceTypeStruct::Type deviceStruct{ .deviceType = type.deviceTypeId, .revision = type.deviceTypeRevision };
+            Descriptor::Structs::DeviceTypeStruct::Type deviceStruct{ .deviceType = type.deviceTypeId,
+                                                                      .revision   = type.deviceTypeRevision };
             ReturnErrorOnFailure(encoder.Encode(deviceStruct));
         }
 
@@ -167,9 +168,10 @@ CHIP_ERROR ReadPartsAttribute(DataModel::Provider & provider, EndpointId endpoin
     return CHIP_NO_ERROR;
 }
 
-bool HasSemanticTags(const EndpointId endpointId, ServerClusterContext * context) {
+bool HasSemanticTags(const EndpointId endpointId, ServerClusterContext * context)
+{
     ReadOnlyBufferBuilder<DataModel::Provider::SemanticTag> semanticTagsList;
-    CHIP_ERROR err     = context->provider.SemanticTags(endpointId, semanticTagsList);
+    CHIP_ERROR err = context->provider.SemanticTags(endpointId, semanticTagsList);
     return err == CHIP_NO_ERROR && !semanticTagsList.IsEmpty();
 }
 
