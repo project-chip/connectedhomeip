@@ -39,21 +39,23 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
     current_requestor_app_proc: Union[OTAProviderSubprocess, None] = None
 
     async def commission_provider(self, **kwargs):
-        """Launche provider, then comission provider and finally configure the provider and requestor to be ready for announce.
+        """Launch provider, then comission provider and finally configure the provider and requestor to be ready for announce.
             Args:
-            controller:
-            requestor_node_id:
-            provider_node_id:
-            endpoint:
-            discriminator:
-            setup_pincode:
-            extra_args:
-            log_file
+            controller (required)
+            version: Defaults 2
+            setup_pincode: Defaults 202021
+            discriminator : Defaults 1234
+            port : Defaults 5541
+            storage_dir : Defaults /tmp
+            requestor_node_id: Required
+            provider_node_id: Required
+            endpoint: Defaults to 0
+            extra_args: Optional defaults to []
+            log_file : Defaults to /tmp/requrestor.log
         """
-        log_file = None
-        if kwargs.get('log_file') is not None:
-            log_file = kwargs.get('log_file')
-        self.launch_provider_app(kwargs['version'], kwargs['extra_arguments'], log_file)
+        provider_args_list = ['version', 'setup_pincode', 'discriminator', 'port', 'storage_dir', 'extra_args', 'log_file']
+        provider_args: dict = {k: v for k, v in kwargs.items() if k in provider_args_list}
+        self.launch_provider_app(**provider_args)
         controller = kwargs['controller']
         await controller.CommissionOnNetwork(
             nodeId=kwargs['provider_node_id'],
@@ -64,7 +66,14 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         await self.write_ota_providers(controller, kwargs['provider_node_id'], kwargs['endpoint'])
         await self.create_acl_entry(controller, kwargs['provider_node_id'], kwargs['requestor_node_id'])
 
-    def launch_provider_app(self, version: int = 2, extra_args: list = [], log_file: Optional[str] = None, expected_output: str = "Status: Satisfied"):
+    def launch_provider_app(self,
+                            version: int = 2,
+                            setup_pincode=20202021,
+                            discriminator=1234,
+                            port=5541,
+                            storage_dir='/tmp',
+                            extra_args: list = [],
+                            log_file: Optional[str] = None, expected_output: str = "Status: Satisfied"):
         """Launch the provider app using the OTAProviderSubprocess.
 
         Args:
@@ -82,13 +91,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             ota_app = f"{getcwd()}/out/debug/chip-ota-provider-app"
 
         # Ota image
-        ota_image = ""
-        if environ.get(f"SU_OTA_REQUESTOR_V{version}") is not None:
-            ota_image = environ.get(f"SU_OTA_REQUESTOR_V{version}")
-        else:
-            ota_image = f"{getcwd()}/chip-ota-requestor-app_v{version}.min.ota"
-
-        ota_image_path = OtaImagePath(path=ota_image)
+        ota_image_path = OtaImagePath(path=self.get_ota_image_path(version=version))
         # Ideally we send the logs to a fixed location to avoid conflicts
 
         if log_file is None:
@@ -99,10 +102,10 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         # Launch the subprocess
         proc = OTAProviderSubprocess(
             ota_app,
-            storage_dir='/tmp',
-            port=5541,
-            discriminator=321,
-            passcode=2321,
+            storage_dir=storage_dir,
+            port=port,
+            discriminator=discriminator,
+            passcode=setup_pincode,
             ota_source=ota_image_path,
             extra_args=extra_args,
             log_file=log_file,
@@ -113,6 +116,16 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         self.current_provider_app_proc = proc
         logger.info(f"Provider stareted with  {self.current_provider_app_proc.get_pid()}")
+
+    def get_ota_image_path(self, version=2) -> str:
+        # Ota image
+        ota_image = ""
+        if environ.get(f"SU_OTA_REQUESTOR_V{version}") is not None:
+            ota_image = environ.get(f"SU_OTA_REQUESTOR_V{version}")
+        else:
+            ota_image = f"{getcwd()}/chip-ota-requestor-app_v{version}.min.ota"
+
+        return ota_image
 
     async def announce_ota_provider(self,
                                     controller: ChipDeviceCtrl,
