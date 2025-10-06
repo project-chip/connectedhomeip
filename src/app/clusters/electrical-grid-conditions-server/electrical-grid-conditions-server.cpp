@@ -153,7 +153,7 @@ CHIP_ERROR Instance::SetCurrentConditions(DataModel::Nullable<Structs::Electrica
     else if (!mCurrentConditions.IsNull() && !newValue.IsNull())
     {
         const auto & current = mCurrentConditions.Value();
-        const auto & newVal = newValue.Value();
+        const auto & newVal  = newValue.Value();
 
         hasChanged = !(current == newVal);
     }
