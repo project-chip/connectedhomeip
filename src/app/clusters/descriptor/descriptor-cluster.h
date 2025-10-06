@@ -32,12 +32,12 @@ namespace chip::app::Clusters {
 class DescriptorCluster : public DefaultServerCluster
 {
 public:
-    using OptionalAttributesSet = chip::app::OptionalAttributeSet<
-        Descriptor::Attributes::TagList::Id,
-        Descriptor::Attributes::EndpointUniqueID::Id
-        >;
+    using OptionalAttributesSet =
+        chip::app::OptionalAttributeSet<Descriptor::Attributes::TagList::Id, Descriptor::Attributes::EndpointUniqueID::Id>;
 
-    DescriptorCluster(EndpointId endpointId, OptionalAttributesSet optionalAttributeSet) : DefaultServerCluster({ endpointId, Descriptor::Id }), mEnabledOptionalAttributes(optionalAttributeSet) {}
+    DescriptorCluster(EndpointId endpointId, OptionalAttributesSet optionalAttributeSet) :
+        DefaultServerCluster({ endpointId, Descriptor::Id }), mEnabledOptionalAttributes(optionalAttributeSet)
+    {}
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,

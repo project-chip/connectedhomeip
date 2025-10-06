@@ -187,11 +187,13 @@ CHIP_ERROR DescriptorCluster::Attributes(const ConcreteClusterPath & path,
         TagList::kMetadataEntry,
         EndpointUniqueID::kMetadataEntry,
     };
-    if(HasSemanticTags(path.mEndpointId, mContext)) {
+    if (HasSemanticTags(path.mEndpointId, mContext))
+    {
         mEnabledOptionalAttributes.Set<TagList::Id>();
     }
 
-    return listBuilder.Append(Span(Descriptor::Attributes::kMandatoryMetadata), Span(optionalAttributes), mEnabledOptionalAttributes);
+    return listBuilder.Append(Span(Descriptor::Attributes::kMandatoryMetadata), Span(optionalAttributes),
+                              mEnabledOptionalAttributes);
 }
 
 DataModel::ActionReturnStatus DescriptorCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
