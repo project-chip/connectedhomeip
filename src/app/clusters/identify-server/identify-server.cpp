@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <clusters/Identify/Metadata.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <tracing/macros.h>
@@ -272,5 +273,35 @@ Identify::~Identify()
     unreg(this);
 }
 
-void MatterIdentifyPluginServerInitCallback() {}
-void MatterIdentifyPluginServerShutdownCallback() {}
+namespace {
+IdentifyAttrAccess gAttrAccess;
+} // namespace
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Identify {
+CHIP_ERROR IdentifyAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::ClusterRevision::Id:
+        return aEncoder.Encode(Identify::kRevision);
+    default:
+        break;
+    }
+    return CHIP_NO_ERROR;
+}
+} // namespace Identify
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+void MatterIdentifyPluginServerInitCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+}
+void MatterIdentifyPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+}
