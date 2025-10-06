@@ -30,8 +30,6 @@ namespace chip::app::Clusters {
 class DescriptorCluster : public DefaultServerCluster
 {
 public:
-    using DeviceType = Descriptor::Structs::DeviceTypeStruct::Type;
-
     DescriptorCluster(EndpointId endpointId) : DefaultServerCluster({ endpointId, Descriptor::Id }) {}
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;

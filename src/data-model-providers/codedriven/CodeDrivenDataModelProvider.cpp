@@ -243,7 +243,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::EventInfo(const ConcreteEventPath & path
 }
 
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-CHIP_ERROR CodeDrivenDataModelProvider::EndpointUniqueID(EndpointId endpointId, MutableCharSpan & EndpointUniqueId) override
+CHIP_ERROR CodeDrivenDataModelProvider::EndpointUniqueID(EndpointId endpointId, MutableCharSpan & EndpointUniqueId) 
 {
     EndpointInterface * endpoint = GetEndpointInterface(endpointId);
     VerifyOrReturnError(endpoint != nullptr, CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));

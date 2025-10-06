@@ -79,7 +79,7 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     assertChipStackLockedByCurrentThread();
 
-    // No-op: For OTA we don't use the functions in CodegenIntegration
+    // For OTA we don't use the functions in CodegenIntegration
     // because we use the gOtaProviderServer and the functions defined here.
     switch (clusterId) {
     case app::Clusters::Descriptor::Id:
@@ -92,7 +92,7 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
 {
     assertChipStackLockedByCurrentThread();
 
-    // No-op: For OTA we don't use the functions in CodegenIntegration
+    // For OTA we don't use the functions in CodegenIntegration
     // because we use the gOtaProviderServer and the functions defined here.
     switch (clusterId) {
     case app::Clusters::Descriptor::Id:
@@ -122,6 +122,8 @@ Protocols::InteractionModel::Status emberAfWriteAttribute(const ConcreteAttribut
 
 Protocols::InteractionModel::Status emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr, uint16_t readLength)
 {
+    // Only here so linking succeeds; should never be called, because all our cluster implementations 
+    // are done via AttributeAccessInterface or ServerClusterInterface.
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
