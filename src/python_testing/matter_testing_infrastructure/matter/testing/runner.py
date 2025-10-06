@@ -741,9 +741,6 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.restart_flag_file = args.restart_flag_file
 
-    config.admin_vendor_id = args.admin_vendor_id
-    config.product_id = args.product_id
-
     # Map CLI arg to the current config field name used by tests
     config.pipe_name = args.app_pipe
     if config.pipe_name is not None and not os.path.exists(config.pipe_name):
@@ -854,9 +851,6 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
     commission_group.add_argument('--admin-vendor-id', action="store", type=int_decimal_or_hex, default=TestingDefaults.ADMIN_VENDOR_ID,
                                   metavar="VENDOR_ID",
                                   help="VendorID to use during commissioning (default 0x%04X)" % TestingDefaults.ADMIN_VENDOR_ID)
-    commission_group.add_argument('--product-id', action="store", type=int_decimal_or_hex, default=TestingDefaults.PRODUCT_ID,
-                                  metavar="PRODUCT_ID",
-                                  help="ProductID to use during commissioning (default 0x%04X)" % TestingDefaults.PRODUCT_ID)
     commission_group.add_argument('--case-admin-subject', action="store", type=int_decimal_or_hex,
                                   metavar="CASE_ADMIN_SUBJECT",
                                   help="Set the CASE admin subject to an explicit value (default to commissioner Node ID)")

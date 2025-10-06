@@ -17,6 +17,7 @@
 
 
 import logging
+import re
 
 from mobly import asserts
 from TC_SUTestBase import SoftwareUpdateBaseTest
@@ -27,6 +28,15 @@ from matter.interaction_model import Status
 from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+
+ANSI_RE = re.compile(r"\x1B\[[0-?]*[-/]*[@-~]]")
+VENDOR_RE = re.compile(r"VendorID:\s*(0x[0-9a-fA-F]+|\d+)")
+PRODUCT_RE = re.compile(r"ProductID:\s*(0x[0-9a-fA-F]+|\d+)")
+SWVER_RE = re.compile(r"SoftwareVersion:\s*(0x[0-9a-fA-F]+|\d+)")
+PROTO_RE = re.compile(r"ProtocolsSupported:\s*(0x[0-9a-fA-F]+|\d+)")
+HWVER_RE = re.compile(r"HardwareVersion:\s*(0x[0-9a-fA-F]+|\d+)")
+LOC_RE = re.compile(r"Location:\s*([A-Za-z0.9]+)")
+RCC_RE = re.compile(r"RequestorCanConsent:\s*(0x[0-9a-fA-F]+|\d+)")
 
 
 class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
@@ -53,6 +63,34 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
                      "Subscribe to events for OtaSoftwareUpdateRequestor cluster and verify StateTransition reaches downloading state. Also check if the targetSoftwareVersion is 2."),
         ]
         return steps
+
+    def deansi(self, s: str) -> str:
+        return ANSI_RE.sub("", s)
+
+    def pase_query_block(self, block: dict) -> dict:
+        text = '\n'.join(block.get("after", []))
+        text = self.deansi(text)
+
+        out = {}
+
+        for name, rx in {
+            "vendor_id": VENDOR_RE,
+            "product_id": PRODUCT_RE,
+            "software_version": SWVER_RE,
+            "protocols_supported": PROTO_RE,
+            "hardware_version": HWVER_RE,
+            "location": LOC_RE,
+            "requestor_can_consent": RCC_RE
+        }.items():
+            m = rx.search(text)
+            if m:
+                val = m.group(1) if m.lastindex else m.group(0)
+                if name == "location":
+                    out[name] = val
+                else:
+                    out[name] = int(val, 0)
+
+        return out
 
     @async_test_body
     async def test_TC_SU_2_8(self):
@@ -101,11 +139,11 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         th1 = self.default_controller
         fabric_id_th2 = th1.fabricId + 1
         vendor_id = self.matter_test_config.admin_vendor_id
-        product_id = self.matter_test_config.product_id
+        product_id = 32769
 
         logging.info(f"Endpoint: {endpoint}.")
         logging.info(f"DUT Node ID: {dut_node_id}.")
-        logging.info(f"DUT Node ID: {requestor_node_id}.")
+        logging.info(f"Requestor Node ID: {requestor_node_id}.")
         logging.info(f"Vendor ID: {vendor_id}.")
         logging.info(f"Product ID: {product_id}.")
 
@@ -131,7 +169,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         logging.info(f"TH2 commissioned: {resp}.")
 
-        # Do not commissioning Provider-TH1
+        # Do not commission Provider-TH1
 
         # Commissioning Provider-TH2
 
@@ -154,6 +192,77 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         # Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P.
         self.step(1)
 
+        blocks = provider.read_from_logs(f"QueryImage", regex=True, before=0, after=15)
+
+        parsed = {}
+        for b in blocks:
+            info = self.pase_query_block(b)
+            for k, v in info.items():
+                parsed.setdefault(k, v)
+
+        logging.info(f"Parsed fields: {parsed}")
+
+        # Check VendorID
+        vendor_id_basic_information = await self.read_single_attribute_check_success(
+            dev_ctrl=th1,
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.VendorID
+        )
+
+        asserts.assert_equal(vendor_id_basic_information,
+                             parsed['vendor_id'], f"Vendor ID is {parsed['vendor_id']} and it should be {vendor_id_basic_information}")
+
+        # Check ProductID
+        product_id_basic_information = await self.read_single_attribute_check_success(
+            dev_ctrl=th1,
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.ProductID
+        )
+
+        asserts.assert_equal(product_id_basic_information,
+                             parsed['product_id'], f"Product ID is {parsed['product_id']} and it should be {product_id_basic_information}")
+
+        # Check HardwareVersion
+        hardware_version_basic_information = await self.read_single_attribute_check_success(
+            dev_ctrl=th1,
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.HardwareVersion
+        )
+
+        asserts.assert_equal(hardware_version_basic_information,
+                             parsed['hardware_version'], f"Hardware Version is {parsed['hardware_version']} and it should be {hardware_version_basic_information}")
+
+        # Check SoftwareVersion
+        software_version_basic_information = await self.read_single_attribute_check_success(
+            dev_ctrl=th1,
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.SoftwareVersion
+        )
+
+        asserts.assert_equal(software_version_basic_information,
+                             parsed['software_version'], f"Software Version is {parsed['software_version']} and it should be {software_version_basic_information}")
+
+        # Check ProtocolsSupported protocols_supported
+        # asserts.assert_true(Clusters.OtaSoftwareUpdateProvider.Enums.DownloadProtocolEnum.kBDXSynchronous in parsed['protocols_supported'],
+        #                     f"kBDXSynchronous: {Clusters.OtaSoftwareUpdateProvider.Enums.DownloadProtocolEnum.kBDXSynchronous} is not part of {parsed['protocols_supported']}")
+
+        # Check MCORE.OTA.HTTPS
+
+        # Check RequestorCanConsent
+        asserts.assert_equal(parsed['requestor_can_consent'], 0,
+                             f"Requestor Can Consent is {parsed['requestor_can_consent']} instead of 0")
+
+        # Check Location
+        location_basic_information = await self.read_single_attribute_check_success(
+            dev_ctrl=th1,
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.Location
+        )
+
+        asserts.assert_equal(location_basic_information,
+                             parsed['location'], f"Location is {parsed['location']} and it should be {location_basic_information}")
+
+        # Event Handler
         event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
         await event_cb.start(dev_ctrl=th1, node_id=dut_node_id, endpoint=endpoint,
                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
