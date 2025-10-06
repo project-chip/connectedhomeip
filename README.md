@@ -1,8 +1,8 @@
 # Documentation links
 
-- [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/project-chip/connectedhomeip)
-- [Matter SDK documentation page](https://project-chip.github.io/connectedhomeip-doc/index.html)
-- [Matter SDK Coverage Report](https://matter-build-automation.ue.r.appspot.com/)
+-   [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/project-chip/connectedhomeip)
+-   [Matter SDK documentation page](https://project-chip.github.io/connectedhomeip-doc/index.html)
+-   [Matter SDK Coverage Report](https://matter-build-automation.ue.r.appspot.com/)
 
 # Matter
 
