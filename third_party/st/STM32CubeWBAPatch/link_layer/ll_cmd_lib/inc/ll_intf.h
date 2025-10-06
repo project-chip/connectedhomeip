@@ -82,17 +82,17 @@ typedef void * 		cs_step_data_t;
 #define RX_DATA_OFFSET				0
 
 /**
- *  This defined value is used on Link Status custom command as 
+ *  This defined value is used on Link Status custom command as
  * 	the maximum number of states as follows:
  * 		8 (max num of state machines)
- *  
+ *
  *  in addition to:
- *  	2 (Broadcaster and Observer) 
+ *  	2 (Broadcaster and Observer)
  */
 #define LINK_STATUS_SIZE				(MAX_NUM_CNCRT_STAT_MCHNS+2)
 /**
- *  This defined value is used on Link Status custom command to indicate 
- * 	that the given state machine on a state other that a connection state 
+ *  This defined value is used on Link Status custom command to indicate
+ * 	that the given state machine on a state other that a connection state
  */
 #define LINK_STATUS_DEFAULT_HANDLE		0xFFFF
 
@@ -2173,7 +2173,7 @@ typedef struct _ble_intf_cis_host_param_test{
  * @brief ble_intf_set_cig_params_comman_cmd_st structure is a container to CIS(es)/CIG parameters passed from the host
  */
 typedef struct _ble_intf_set_cig_params_common_cmd_st {
-	
+
 	ble_intf_cis_host_param_st* cis_host_params;
 	ble_intf_cis_host_param_test_st* cis_host_params_test;
 	ble_intf_cig_host_param_st cig_host_params;
@@ -4197,7 +4197,7 @@ uint8_t ll_intf_select_tx_power_table(uint8_t tx_power_table_id);
  * @param  group_id            : [in] contain the identifier of the CIG or BIG.
  * @param  enable_sync 	       : [in] enable or disable generation of sync event.
  * @param  enable_clbr_trigger : [in] enable or disable generation of calibration signal
- * @param  trigger_source      : [in] identify trigger source (CIG or BIG) 
+ * @param  trigger_source      : [in] identify trigger source (CIG or BIG)
  */
 ble_stat_t ll_intf_le_enable_sync_evnt(uint8_t group_id ,uint8_t enable_sync,
 		uint8_t enable_clbr_trigger,uint8_t trigger_source);
@@ -4867,7 +4867,7 @@ void ll_intf_set_temperature_sensor_state(void);
 uint32_t  ll_intf_set_temperature_value(uint32_t temperature);
 /**
  * @brief This function returns the number of packets sent in Direct Test Mode.
- * @param[out] packet_number	: number of packets 
+ * @param[out] packet_number	: number of packets
  * @retval ble_stat_t	: Command status.
  * @note the value will not be cleared until the next Direct TX test starts.
  */
@@ -4875,7 +4875,7 @@ ble_stat_t ll_intf_le_tx_test_packet_number(uint32_t* packet_number);
 
 /**
  * @brief This function returns the value of rssi.
- * @param[out] rssi    	: rssi value 
+ * @param[out] rssi    	: rssi value
  * @retval ble_stat_t	: Command status.
  */
 ble_stat_t ll_intf_read_raw_rssi(int32_t* rssi);
@@ -4899,9 +4899,9 @@ ble_stat_t ll_intf_set_tx_free_carrier(uint8_t enable, uint8_t channel_idx);
 #if(END_OF_RADIO_ACTIVITY_REPORTING)
 /**
  * @brief This function sets the bitmask associated to END_OF_RADIO_ACTIVITY_EVENT.
- * 		Only the radio activities enabled in the mask will be reported to application by 
+ * 		Only the radio activities enabled in the mask will be reported to application by
  * 		END_OF_RADIO_ACTIVITY_EVENT.
- * 		 
+ *
  * @param[in] mask    	: bitmask of the events, the mask can take one of the following
  * 					 	values (or a bitwise OR of them in case of a mask for multiple events)
  * 			(0x0001) idle
@@ -4917,7 +4917,7 @@ ble_stat_t ll_intf_set_tx_free_carrier(uint8_t enable, uint8_t channel_idx);
  * 			(0x4000) central in isochronous connection state event
  * 		note that the following values are reserved and will be ignored upon recepient
  * 			(0x0010, 0x0040, 0x0080, 0x0100, 0x8000)
- * 
+ *
  * @retval ble_stat_t	     : Command status.
  */
 ble_stat_t ll_intf_set_end_of_activity_mask(uint16_t mask);
@@ -4940,11 +4940,11 @@ ble_stat_t ll_intf_get_link_status(uint8_t *sm_status, uint8_t *link_conn_handle
  * 										0 : disable
  * 										1 : enable
  * 					min_spacing 	:min spacing value (min time between
- * 									2 consecutive LL_CHANNEL_STATUS 
+ * 									2 consecutive LL_CHANNEL_STATUS
  * 									"unit of 200 ms")
  * 										5 (1 sec) <= min_spacing <= 150 (30 sec)
  * 					max_delay 		:max delay value (max time between
- * 									channel classification change and 
+ * 									channel classification change and
  * 									LL_CHANNEL_STATUS sending "unit of 200 ms")
  * 										5 (1 sec) <= max_delay <= 150 (30 sec)
  * @retval status.
@@ -5403,7 +5403,7 @@ void ll_intf_set_custom_event_mask(uint8_t cstm_evnt_mask);
  * 			the cbk reports the current cig id, number of accumulated missed
  * 			events and the anchor point of the next scheduled cig event
  *
- * @param  cbk : [in] pointer to the callback function to be registered 
+ * @param  cbk : [in] pointer to the callback function to be registered
  *
  * @retval None
  */
@@ -5417,7 +5417,7 @@ void ll_intf_rgstr_missed_cig_evnts_cbk(hst_cig_missed_evnt_cbk cbk);
 * 			the cbk reports the current big handle, number of accumulated missed
  * 			events and the anchor point of the next scheduled big event
  *
- * @param  cbk : [in] pointer to the callback function to be registered 
+ * @param  cbk : [in] pointer to the callback function to be registered
  *
  * @retval None
  */
@@ -5432,21 +5432,21 @@ void ll_intf_rgstr_missed_big_evnts_cbk(hst_big_missed_evnt_cbk cbk);
 #if (SUPPORT_AOA_AOD)
 
 /**
- * @brief	Set the number of antennas to be used by the controller, number of 
+ * @brief	Set the number of antennas to be used by the controller, number of
  * 			antennas is used as an upper limit for antenna_id set by the host
- * 
+ *
  * @param	num_of_antennas: [in] number of antennas
- * 
+ *
  * @retval status  : [out] 0:SUCCESS, 0xXX:ERROR_CODE.
  */
 ble_stat_t ll_intf_set_num_of_antennas(uint8_t num_of_antennas);
 
 /**
  * @brief 	Get the number of antennas configured to the controller
- * 
+ *
  * @param	ptr_num_of_antennas: [out] pointer to a variable hold
  *  			number of antennas retrived
- * 
+ *
  * @retval status  : [out] 0:SUCCESS, 0xXX:ERROR_CODE.
  */
 ble_stat_t ll_intf_get_num_of_antennas(uint8_t *ptr_num_of_antennas);
@@ -5458,7 +5458,7 @@ ble_stat_t ll_intf_get_num_of_antennas(uint8_t *ptr_num_of_antennas);
  *
  * @param	pckt_count: [in] number of packets to be transmitter
  *
- * @note   for non-zero values of pckt_count, DTM start on TX mode will trigger sending packets with the specified 
+ * @note   for non-zero values of pckt_count, DTM start on TX mode will trigger sending packets with the specified
  * 		number (pckt_count), if the value of pckt_count is Zero, DTM start on TX mode will trigger sending
  *  		indefinite number of packets untill subsequent DTM stop is called or HCI reset is sent.
  *
@@ -5509,7 +5509,7 @@ ble_stat_t ll_intf_ctrl_rx_dtp(uint8_t rx_pckt_count, uint8_t rx_pckt_len);
  * @param  region_0x09_val: absolute gain fix for region 0x09 in dbm.
  * @param  r_msur_percent: percentage of the measured resistor value that will be used
  * 				to select the update values in pre-emphasis sequence (range: 0 to 99).
- * 
+ *
  * @retval None.
  */
 void ll_intf_gain_fix_init(

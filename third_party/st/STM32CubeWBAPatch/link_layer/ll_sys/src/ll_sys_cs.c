@@ -39,7 +39,7 @@ void ll_sys_disable_irq(void) {
 }
 
 /**
-  * @brief  Set the Current Interrupt Priority Mask. 
+  * @brief  Set the Current Interrupt Priority Mask.
   *         All interrupts with low priority level will be masked.
   * @param  None
   * @retval None

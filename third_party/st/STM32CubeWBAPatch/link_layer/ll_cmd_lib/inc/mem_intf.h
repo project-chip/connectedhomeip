@@ -116,4 +116,3 @@ void ble_memcpy_n_bytes(uint8_t *destination,
  * @}
  */
 #endif /* MEM_INTF_H */
-

@@ -180,7 +180,7 @@ typedef enum _HW_ERROR_CODES
 #endif /* #error */
 
 #if ((SUPPORT_CHANNEL_CLASSIFICATION) && (!SUPPORT_MASTER_CONNECTION && !SUPPORT_SLAVE_CONNECTION))
-#error Channel Classification feature shall be enabled only when the master role or slave role is enabled 
+#error Channel Classification feature shall be enabled only when the master role or slave role is enabled
 #endif /* #error */
 
 #if (SUPPORT_LE_ENHANCED_CONN_UPDATE) && (!SUPPORT_MASTER_CONNECTION && !SUPPORT_SLAVE_CONNECTION)

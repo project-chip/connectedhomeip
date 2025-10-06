@@ -253,4 +253,3 @@ pta_error pta_set_mac_coex_priority(
 */
 #endif /* SUPPORT_PTA */
 #endif /* PTA_H_ */
-

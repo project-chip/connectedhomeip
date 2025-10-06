@@ -318,8 +318,8 @@ typedef enum ant_intrv_type_enum {
  * @brief structure that hold antenna diversity parameters information.
  */
 typedef struct _antenna_diversity_st{
-	ant_intrv_type_enum_t ant_intrv_type;                /* antenna interval type: FIXED_TIME(us) or PACKETS_NUMBER(n) */ 
-	uint32_t ant_intrv_value;                            /* antenna interval value based on type; us for FIXED_TIME, n for PACKETS_NUMBER */ 
+	ant_intrv_type_enum_t ant_intrv_type;                /* antenna interval type: FIXED_TIME(us) or PACKETS_NUMBER(n) */
+	uint32_t ant_intrv_value;                            /* antenna interval value based on type; us for FIXED_TIME, n for PACKETS_NUMBER */
 	uint16_t wntd_coord_shrt_addr;	                     /* wanted coordinator/router short address */
 	uint8_t wntd_coord_ext_addr[EXT_ADDRESS_LENGTH];	 /* wanted coordinator/router extended address */
 	uint8_t max_rx_ack_retries;                          /* max number of retries to receive ack in case of ack error reception*/
@@ -400,7 +400,7 @@ typedef enum {
 	HCI_ACL_DATA_PCKT = 0x02,
 	HCI_EVNT_PCKT = 0x04,
 	HCI_ISO_DATA_PCKT = 0x05,
-	
+
 
 #if (SUPPORT_MAC && SUPPORT_MAC_HCI_UART)
 	HCI_MAC_REQ = 0x0A,

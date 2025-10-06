@@ -21,7 +21,7 @@
 
 #include "ll_intf.h"
 #include "hci.h"
-#include "cmsis_compiler.h" 
+#include "cmsis_compiler.h"
 #include <stdint.h>
 
 #define LL_DP_SLP_NO_WAKEUP                 ((uint32_t) ~(0) )
@@ -55,7 +55,7 @@ typedef enum
 typedef enum
 {
   LL_SYS_DP_SLP_DISABLED = 0x00,
-  LL_SYS_DP_SLP_ENABLED, 
+  LL_SYS_DP_SLP_ENABLED,
 } ll_sys_dp_slp_state_t;
 
 /* Link Layer system interface general module functions  ************************************************/
@@ -102,7 +102,7 @@ void ll_sys_dp_slp_wakeup_evt_clbk(void const *ptr_arg);
 /**
   * @brief  Get the number of concurrent state machines for the Link Layer
   * @param  None
-  * @retval Supported number of concurrent state machines 
+  * @retval Supported number of concurrent state machines
   */
 uint8_t ll_sys_get_concurrent_state_machines_num(void);
 
@@ -112,7 +112,7 @@ uint8_t ll_sys_get_concurrent_state_machines_num(void);
   * @param  drift_time[in]: number of Link Layer sleep timer cycles (1 cycle = 31us) for the DRIFT TIME timing.
   * @param  exec_time[in]: number of Link Layer sleep timer cycles (1 cycle = 31us)  for the EXEC TIME timing.
   * @note   This interface needs to be called after system initialization
-  *         and before starting any radio activity.  
+  *         and before starting any radio activity.
   * @retval None
   */
 void ll_sys_config_BLE_schldr_timings(uint8_t drift_time, uint8_t exec_time);

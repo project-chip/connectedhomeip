@@ -454,7 +454,7 @@ uint32_t platform_crypto(uint8_t *ptr_pckt, const uint8_t *ptr_key,
 
 /**
  *
- * @brief radio function that will be called to run periodic calibration if tempature has changed 
+ * @brief radio function that will be called to run periodic calibration if tempature has changed
  *
  * @retval Nonr
  */
@@ -547,7 +547,7 @@ otError radio_set_ant_div_rssi_threshold(otInstance *aInstance, int8_t rssi_thre
  * @param[in]  region_0x09_val: absolute gain fix for region 0x09 in dbm.
  * @param[in]  r_msur_percent: percentage of the measured resistor value that will be used
  * 				to select the update values in pre-emphasis sequence (range: 0 to 99).
- * 
+ *
  * @retval NONE
  */
 void radio_gain_fix_init(

@@ -51,15 +51,15 @@ extern void LINKLAYER_PLAT_Assert(uint8_t condition);
 extern void LINKLAYER_PLAT_AclkCtrl(uint8_t enable);
 
 /**
-  * @brief  Notify the Link Layer platform layer the system will enter in WFI 
-  *         and AHB5 clock may be turned of regarding the 2.4Ghz radio state. 
+  * @brief  Notify the Link Layer platform layer the system will enter in WFI
+  *         and AHB5 clock may be turned of regarding the 2.4Ghz radio state.
   * @param  None
   * @retval None
   */
 extern void LINKLAYER_PLAT_NotifyWFIEnter(void);
 
 /**
-  * @brief  Notify the Link Layer platform layer the system exited WFI and AHB5 
+  * @brief  Notify the Link Layer platform layer the system exited WFI and AHB5
   *         clock may be resynchronized as is may have been turned of during
   *         low power mode entry.
   * @param  None
@@ -124,7 +124,7 @@ extern void LINKLAYER_PLAT_DisableIRQ(void);
   *         This parameter can be one of the following:
   *         @arg LL_HIGH_ISR_ONLY: enable link layer high priority ISR.
   *         @arg LL_LOW_ISR_ONLY: enable link layer SW low priority ISR.
-  *         @arg SYS_LOW_ISR: unmask interrupts for all the other system ISR with 
+  *         @arg SYS_LOW_ISR: unmask interrupts for all the other system ISR with
   *              lower priority that link layer SW low interrupt.
   * @retval None
   */
@@ -136,7 +136,7 @@ extern void LINKLAYER_PLAT_EnableSpecificIRQ(uint8_t isr_type);
   *         This parameter can be one of the following:
   *         @arg LL_HIGH_ISR_ONLY: disable link layer high priority ISR.
   *         @arg LL_LOW_ISR_ONLY: disable link layer SW low priority ISR.
-  *         @arg SYS_LOW_ISR: mask interrupts for all the other system ISR with 
+  *         @arg SYS_LOW_ISR: mask interrupts for all the other system ISR with
   *              lower priority that link layer SW low interrupt.
   * @retval None
   */

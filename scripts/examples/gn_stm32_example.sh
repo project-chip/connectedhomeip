@@ -176,7 +176,7 @@ else
 
     BUILD_DIR=$OUTDIR/$STM32_BOARD
     example_dir=$MATTER_ROOT/examples/$example_name/stm32/$STM32_BOARD
-    
+
     echo BUILD_DIR="$BUILD_DIR"
     echo example_dir="$example_dir"
     if [ "$USE_WIFI" == true ]; then
