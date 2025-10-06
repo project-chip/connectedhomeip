@@ -130,7 +130,7 @@ class TC_WebRTCProvider_2_8(MatterBaseTest, WEBRTCPTestBase):
                                  "Expected INVALID_IN_STATE when SoftRecordingPrivacyModeEnabled is True")
 
         self.step(5)
-        # Send SolicitOffer with StreamUsage = kLiveView (should succeed)
+        # Send SolicitOffer with StreamUsage = kLiveView (should fail)
         solicit_offer_request_liveview = Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
             streamUsage=Clusters.Globals.Enums.StreamUsageEnum.kLiveView,
             originatingEndpointID=endpoint,

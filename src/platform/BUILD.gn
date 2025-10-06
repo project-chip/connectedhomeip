@@ -12,23 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
 
-import("${build_root}/config/linux/pkg_config.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/system/system.gni")
 
 import("device.gni")
-
-if (chip_enable_openthread) {
-  import("//build_overrides/openthread.gni")
-
-  if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
-    import("//build_overrides/ot_br_posix.gni")
-  }
-}
 
 if (chip_device_platform != "none" && chip_device_platform != "external") {
   declare_args() {
