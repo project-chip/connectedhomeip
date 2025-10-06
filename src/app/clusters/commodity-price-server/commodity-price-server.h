@@ -126,7 +126,7 @@ private:
                                           bool isCommand);
 
     // Attribute storage
-    Globals::TariffUnitEnum mTariffUnit;
+    Globals::TariffUnitEnum mTariffUnit = Globals::TariffUnitEnum::kKWh; // Default value
     Globals::Structs::CurrencyStruct::Type mCurrency;
 
     // NOTE the CurrentPrice and PriceForecast are stored here with description and components

@@ -95,7 +95,7 @@ private:
     
     // Storage for forecast conditions to ensure proper memory lifetime
     Platform::ScopedMemoryBuffer<Structs::ElectricalGridConditionsStruct::Type> mForecastConditionsStorage;
-    size_t mForecastConditionsStorageCount;
+    size_t mForecastConditionsStorageCount = 0;
 };
 
 } // namespace ElectricalGridConditions
