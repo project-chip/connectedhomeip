@@ -558,4 +558,91 @@
     os_unfair_lock_unlock(&counterLock);
 }
 
+- (void)testBatchingWithConcurrentWidth
+{
+    // This test exposes a bug at MTRAsyncWorkQueue.mm:407 where [_items removeObjectAtIndex:1]
+    // is hardcoded instead of using firstNonRunningItemIndex.
+    //
+    // Bug scenario:
+    // - Queue has width=2, allowing 2 concurrent items
+    // - Item A is already running
+    // - Item B starts (index 1) and tries to batch Item C (index 2)
+    // - Bug: removes index 1 (B itself!) instead of index 2 (C)
+    // - Result: B is removed from queue but still tries to execute, causing assertion failure
+
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:@"test" width:2];
+
+    dispatch_semaphore_t firstItemStarted = dispatch_semaphore_create(0);
+    dispatch_semaphore_t firstItemCanFinish = dispatch_semaphore_create(0);
+
+    // First work item: blocks to ensure second item starts while first is still running
+    XCTestExpectation * blockingItemExecuted = [self expectationWithDescription:@"Blocking item executed"];
+    MTRAsyncWorkItem * blockingItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    blockingItem.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        dispatch_semaphore_signal(firstItemStarted);
+        dispatch_semaphore_wait(firstItemCanFinish, DISPATCH_TIME_FOREVER);
+        completion(MTRAsyncWorkComplete);
+        [blockingItemExecuted fulfill];
+    };
+    [workQueue enqueueWorkItem:blockingItem description:@"blocking item"];
+
+    // Wait for first item to start running
+    dispatch_semaphore_wait(firstItemStarted, DISPATCH_TIME_FOREVER);
+
+    // Now enqueue batchable items. The second one should start and batch the third.
+    // Array state: [blockingItem_running, batchingItem_pending, batchableItem_pending]
+
+    XCTestExpectation * batchingItemExecuted = [self expectationWithDescription:@"Batching item executed"];
+    XCTestExpectation * batchedItemShouldNotExecute = [self expectationWithDescription:@"Batched item should not execute"];
+    batchedItemShouldNotExecute.inverted = YES;
+
+    NSMutableArray * mergedData = [NSMutableArray arrayWithObject:@"B"];
+
+    MTRAsyncWorkItem * batchingItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    batchingItem.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        // Should execute with merged data from both B and C
+        XCTAssertEqual(mergedData.count, 2, @"Item C should have been batched into item B");
+        XCTAssertEqualObjects(mergedData[0], @"B");
+        XCTAssertEqualObjects(mergedData[1], @"C");
+        completion(MTRAsyncWorkComplete);
+        [batchingItemExecuted fulfill];
+    };
+    [batchingItem setBatchingID:100
+                           data:mergedData
+                        handler:^(id first, id second) {
+                            // Merge second into first
+                            NSMutableArray * firstArray = (NSMutableArray *) first;
+                            NSArray * secondArray = (NSArray *) second;
+                            [firstArray addObjectsFromArray:secondArray];
+                            return MTRBatchedFully;
+                        }];
+    [workQueue enqueueWorkItem:batchingItem description:@"batching item B"];
+
+    MTRAsyncWorkItem * batchedItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    batchedItem.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        // Should NOT execute - should be batched into item B
+        completion(MTRAsyncWorkComplete);
+        [batchedItemShouldNotExecute fulfill];
+    };
+    [batchedItem setBatchingID:100
+                          data:@[ @"C" ]
+                       handler:^(id first, id second) {
+                           return MTRNotBatched;
+                       }];
+    [workQueue enqueueWorkItem:batchedItem description:@"batchable item C"];
+
+    // Give time for batching logic to execute
+    usleep(100000); // 100ms
+
+    // Let first item finish
+    dispatch_semaphore_signal(firstItemCanFinish);
+
+    // With the bug, this will trigger an assertion "work item to post-process is not running"
+    // because batchingItem was incorrectly removed from the array during batching
+    [self waitForExpectations:@[ blockingItemExecuted, batchingItemExecuted, batchedItemShouldNotExecute ] timeout:3];
+
+    // Verify queue is properly drained
+    XCTAssertEqual([workQueue itemCount], 0, @"Queue should be empty after all items complete");
+}
+
 @end
