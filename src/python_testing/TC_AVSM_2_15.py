@@ -153,15 +153,6 @@ class TC_AVSM_2_15(MatterBaseTest):
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
 
         self.step(6)
-        snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
-            imageCodec=aSnapshotCapabilities[0].imageCodec,
-            maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
-            minResolution=aSnapshotCapabilities[0].resolution,
-            maxResolution=aSnapshotCapabilities[0].resolution,
-            quality=90,
-            watermarkEnabled=watermark,
-            OSDEnabled=osd
-        )
         snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
         logger.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
         asserts.assert_is_not_none(
