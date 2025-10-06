@@ -86,7 +86,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
     def pics_TC_SU_2_8(self):
         """Return the PICS definitions associated with this test."""
         pics = [
-            "MCORE.OTA",
+            "MCORE.OTA.Requestor",
         ]
         return pics
 
@@ -94,6 +94,15 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         steps = [
             TestStep(0, "Commissioning, already done.", is_commissioning=True),
             TestStep(1, "Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P.",
+                     "Verify the QueryImage command received on the server has the following mandatory fields."
+                     "VendorId - Should match the value reported by the Basic Information Cluster VendorID attribute of the DUT."
+                     "ProductId - Should match the value reported by the Basic Information Cluster ProductID attribute of the DUT."
+                     "HardwareVersion - If present, verify that it matches the value reported by the Basic Information Cluster HardwareVersion attribute of the DUT."
+                     "SoftwareVersion - Should match the value reported by the Basic Information Cluster SoftwareVersion attribute of the DUT."
+                     "Verify the field ProtocolsSupported lists the BDX Synchronous protocol."
+                     "If (MCORE.OTA.HTTPS_Supported) HTTPS protocol should be listed."
+                     "Verify the default value of RequestorCanConsent is set to False unless DUT sets it to True."
+                     "If the Location field is present, verify that the value is same as Basic Information Cluster Location Attribute of the DUT."
                      "TH1/OTA-P does not respond with QueryImage response command. StateTransition goes from idle to querying, then a download error happens and finally it goes back to idle."),
             TestStep(2, "DUT sends QueryImage command to TH2/OTA-P.",
                      "Subscribe to events for OtaSoftwareUpdateRequestor cluster and verify StateTransition reaches downloading state. Also check if the targetSoftwareVersion is 2."),
