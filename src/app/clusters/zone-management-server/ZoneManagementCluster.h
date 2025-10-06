@@ -212,7 +212,7 @@ class ZoneManagementCluster : public DefaultServerCluster
 {
 public:
     ZoneManagementCluster(EndpointId endpointId, Delegate & delegate, const BitFlags<Feature> features, uint8_t maxUserDefinedZones,
-                          uint8_t maxZones, uint8_t sensitivityMax, const TwoDCartesianVertexStruct & twoDCartesianMax);
+                          uint8_t maxZones, uint8_t sensitivityMax, uint8_t sensitivity, const TwoDCartesianVertexStruct & twoDCartesianMax);
     ~ZoneManagementCluster() override;
 
     CHIP_ERROR Init();
@@ -269,12 +269,12 @@ private:
     const uint8_t mMaxUserDefinedZones;
     const uint8_t mMaxZones;
     const uint8_t mSensitivityMax;
+    uint8_t mSensitivity;
     const TwoDCartesianVertexStruct mTwoDCartesianMax;
     uint8_t mUserDefinedZonesCount = 0;
 
     std::vector<ZoneInformationStorage> mZones;
     std::vector<ZoneTriggerControlStruct> mTriggers;
-    uint8_t mSensitivity = 0;
 
     /**
      * Helper function that loads all the persistent attributes from the KVS.

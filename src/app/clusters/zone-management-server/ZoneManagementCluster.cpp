@@ -54,14 +54,13 @@ namespace ZoneManagement {
 constexpr size_t kMaxPersistedValueLengthSupported = 2048;
 
 ZoneManagementCluster::ZoneManagementCluster(EndpointId endpointId, Delegate & aDelegate, const BitFlags<Feature> aFeatures,
-                                             uint8_t aMaxUserDefinedZones, uint8_t aMaxZones, uint8_t aSensitivityMax,
+                                             uint8_t aMaxUserDefinedZones, uint8_t aMaxZones, uint8_t aSensitivityMax, uint8_t aSensitivity, 
                                              const TwoDCartesianVertexStruct & aTwoDCartesianMax) :
     DefaultServerCluster({ endpointId, ZoneManagement::Id }),
     mDelegate(aDelegate), mFeatures(aFeatures), mMaxUserDefinedZones(aMaxUserDefinedZones), mMaxZones(aMaxZones),
-    mSensitivityMax(aSensitivityMax), mTwoDCartesianMax(aTwoDCartesianMax)
+    mSensitivityMax(aSensitivityMax), mSensitivity(aSensitivity), mTwoDCartesianMax(aTwoDCartesianMax)
 {
     mDelegate.SetZoneMgmtServer(this);
-    // reinterpret_cast<ZoneManagementCluster *>(this));
 }
 
 ZoneManagementCluster::~ZoneManagementCluster()
@@ -329,8 +328,8 @@ DataModel::ActionReturnStatus ZoneManagementCluster::WriteAttribute(const DataMo
 
         mSensitivity = sensitivity;
 
-        ReturnErrorOnFailure(persistence.DecodeAndStoreNativeEndianValue<uint8_t>(
-            { mPath.mEndpointId, ZoneManagement::Id, Attributes::Sensitivity::Id }, aDecoder, mSensitivity));
+        ReturnErrorOnFailure(mContext->attributeStorage.WriteValue(
+            { mPath.mEndpointId, ZoneManagement::Id, Attributes::Sensitivity::Id }, { reinterpret_cast<const uint8_t *>(&mSensitivity), sizeof(mSensitivity) }));
 
         mDelegate.OnAttributeChanged(Attributes::Sensitivity::Id);
         return CHIP_NO_ERROR;
