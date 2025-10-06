@@ -28,8 +28,7 @@ bool EqualAcceptedCommandSets(Span<const app::DataModel::AcceptedCommandEntry> a
                               Span<const app::DataModel::AcceptedCommandEntry> b);
 
 // Compare two lists of generated command Ids as sets and ensure the content is identical
-bool EqualGeneratedCommandSets(Span<const CommandId> a,
-                               Span<const CommandId> b);
+bool EqualGeneratedCommandSets(Span<const CommandId> a, Span<const CommandId> b);
 
 } // namespace Testing
 } // namespace chip
