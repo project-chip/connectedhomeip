@@ -26188,11 +26188,11 @@ public class ClusterInfoMapping {
     CommandParameterInfo groupcastjoinGroupendpointsCommandParameterInfo = new CommandParameterInfo("endpoints", ArrayList.class, ArrayList.class);
     groupcastjoinGroupCommandParams.put("endpoints",groupcastjoinGroupendpointsCommandParameterInfo);
 
-    CommandParameterInfo groupcastjoinGroupkeyCommandParameterInfo = new CommandParameterInfo("key", byte[].class, byte[].class);
-    groupcastjoinGroupCommandParams.put("key",groupcastjoinGroupkeyCommandParameterInfo);
-
     CommandParameterInfo groupcastjoinGroupkeyIDCommandParameterInfo = new CommandParameterInfo("keyID", Long.class, Long.class);
     groupcastjoinGroupCommandParams.put("keyID",groupcastjoinGroupkeyIDCommandParameterInfo);
+
+    CommandParameterInfo groupcastjoinGroupkeyCommandParameterInfo = new CommandParameterInfo("key", Optional.class, byte[].class);
+    groupcastjoinGroupCommandParams.put("key",groupcastjoinGroupkeyCommandParameterInfo);
 
     CommandParameterInfo groupcastjoinGroupgracePeriodCommandParameterInfo = new CommandParameterInfo("gracePeriod", Optional.class, Long.class);
     groupcastjoinGroupCommandParams.put("gracePeriod",groupcastjoinGroupgracePeriodCommandParameterInfo);
@@ -26207,10 +26207,10 @@ public class ClusterInfoMapping {
         commandArguments.get("groupID")
         , (ArrayList<Integer>)
         commandArguments.get("endpoints")
-        , (byte[])
-        commandArguments.get("key")
         , (Long)
         commandArguments.get("keyID")
+        , (Optional<byte[]>)
+        commandArguments.get("key")
         , (Optional<Long>)
         commandArguments.get("gracePeriod")
         , (Optional<Boolean>)
@@ -26251,11 +26251,11 @@ public class ClusterInfoMapping {
     CommandParameterInfo groupcastupdateGroupKeygroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
     groupcastupdateGroupKeyCommandParams.put("groupID",groupcastupdateGroupKeygroupIDCommandParameterInfo);
 
-    CommandParameterInfo groupcastupdateGroupKeykeyCommandParameterInfo = new CommandParameterInfo("key", byte[].class, byte[].class);
-    groupcastupdateGroupKeyCommandParams.put("key",groupcastupdateGroupKeykeyCommandParameterInfo);
-
     CommandParameterInfo groupcastupdateGroupKeykeyIDCommandParameterInfo = new CommandParameterInfo("keyID", Long.class, Long.class);
     groupcastupdateGroupKeyCommandParams.put("keyID",groupcastupdateGroupKeykeyIDCommandParameterInfo);
+
+    CommandParameterInfo groupcastupdateGroupKeykeyCommandParameterInfo = new CommandParameterInfo("key", Optional.class, byte[].class);
+    groupcastupdateGroupKeyCommandParams.put("key",groupcastupdateGroupKeykeyCommandParameterInfo);
 
     CommandParameterInfo groupcastupdateGroupKeygracePeriodCommandParameterInfo = new CommandParameterInfo("gracePeriod", Optional.class, Long.class);
     groupcastupdateGroupKeyCommandParams.put("gracePeriod",groupcastupdateGroupKeygracePeriodCommandParameterInfo);
@@ -26265,10 +26265,10 @@ public class ClusterInfoMapping {
         .updateGroupKey((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("groupID")
-        , (byte[])
-        commandArguments.get("key")
         , (Long)
         commandArguments.get("keyID")
+        , (Optional<byte[]>)
+        commandArguments.get("key")
         , (Optional<Long>)
         commandArguments.get("gracePeriod")
         );
