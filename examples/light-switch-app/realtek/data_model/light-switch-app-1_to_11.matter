@@ -350,7 +350,7 @@ fabric_scoped struct WebRTCSessionStruct {
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
-  revision 5;
+  revision 6;
 
   enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
@@ -399,7 +399,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
-  revision 5;
+  revision 6;
 
   enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
@@ -2884,7 +2884,7 @@ endpoint 1 {
     ram      attribute identifyType default = 0x0;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2918,7 +2918,7 @@ endpoint 2 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2951,7 +2951,7 @@ endpoint 3 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2984,7 +2984,7 @@ endpoint 4 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3017,7 +3017,7 @@ endpoint 5 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3050,7 +3050,7 @@ endpoint 6 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3083,7 +3083,7 @@ endpoint 7 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3116,7 +3116,7 @@ endpoint 8 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3149,7 +3149,7 @@ endpoint 9 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3182,7 +3182,7 @@ endpoint 10 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3222,7 +3222,7 @@ endpoint 11 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3255,7 +3255,7 @@ endpoint 12 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3288,7 +3288,7 @@ endpoint 13 {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
     handle command TriggerEffect;
