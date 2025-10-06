@@ -5,9 +5,9 @@
 Matter code relies on code generation for cluster-specific data types and
 callbacks. Generally this is split into:
 
-- Data serialization for structures/lists/commands. This applies to both
+-   Data serialization for structures/lists/commands. This applies to both
     client-side and server-side structures and objects
-- Callback setup using the Ember-based framework. This generally applies to
+-   Callback setup using the Ember-based framework. This generally applies to
     server-side processing and the code generation defines what processing needs
     to be done when a specific command is received or an attribute is read and
     what memory should be allocated for storing cluster attributes
@@ -29,8 +29,8 @@ Beyond basic zap file selection, there are also `.json` zap settings that define
 additional cluster info: source XML files, sdk-access methods and data types.
 There are only two such files currently in use:
 
-- `src/app/zap-templates/zcl/zcl.json` is the **default** one
-- `src/app/zap-templates/zcl/zcl-with-test-extensions.json` is used by
+-   `src/app/zap-templates/zcl/zcl.json` is the **default** one
+-   `src/app/zap-templates/zcl/zcl-with-test-extensions.json` is used by
     `all-clusters-app` to show how a cluster extension may be configured with
     minimal changes from `zcl.json` (but it is different)
 
@@ -44,15 +44,15 @@ When matter scripts need to invoke `zap-cli` (for code generation) or `zap` (to
 start the UI tool), they make use of the following environment variables to
 figure out where the zap tool is located (in order of precedence):
 
-- if `$ZAP_DEVELOPMENT_PATH` is set, code assumes you are running zap from
+-   if `$ZAP_DEVELOPMENT_PATH` is set, code assumes you are running zap from
     source. Use this if you develop zap. Zap has to be bootstrapped (generally
     `npm ci` but check zap documentation for this. Some scripts have a
     `--run-bootstrap` command line argument to do this for you)
 
-- if `$ZAP_INSTALL_PATH` is set, code assumes that `zap` or `zap-cli` is
+-   if `$ZAP_INSTALL_PATH` is set, code assumes that `zap` or `zap-cli` is
     available in the given path. This is generally an unpacked release.
 
-- otherwise, scripts will assume `zap`/`zap-cli` is in `$PATH` (this is the
+-   otherwise, scripts will assume `zap`/`zap-cli` is in `$PATH` (this is the
     case when running in a bootstrapped environment)
 
 ### Using a UI to edit `.zap` files
@@ -77,10 +77,10 @@ result, the Matter SDK also keeps an equivalent `*.matter` file along side
 `.zap` files that contain the same data as `.zap` files, targeted specifically
 for matter:
 
-- They are designed to be human readable, looking like a IDL (think protobuf
+-   They are designed to be human readable, looking like a IDL (think protobuf
     or android `aidl`, thrift idl etc.)
 
-- We strive to make them contain only Matter-specific data (`.zap` files
+-   We strive to make them contain only Matter-specific data (`.zap` files
     contain more generic data and is designed to be ZigBee backwards compatible)
 
 Currently `.matter` files are generated from `.zap` files during the application
@@ -100,51 +100,51 @@ file.
 The split between `.zap` and `.matter` currently exists as an experiment of code
 generation technologies. Currently `.matter`-based Python code generation:
 
-- has fewer third party dependencies than `zap`, which installs a significant
+-   has fewer third party dependencies than `zap`, which installs a significant
     number of `npm` packages.
-- runs significantly faster than zap
-- offers more flexible code generation (can generate multiple files per
+-   runs significantly faster than zap
+-   offers more flexible code generation (can generate multiple files per
     cluster for example, without which some compiles would run out of RAM on
     large compilations)
-- has a more flexible templating language
-- has human readable (and potentially editable) input
-- is more easily provable deterministic (`zap` uses an underlying sqlite
+-   has a more flexible templating language
+-   has human readable (and potentially editable) input
+-   is more easily provable deterministic (`zap` uses an underlying sqlite
     database and some legacy assumptions from zigbee have historically caused
     non-determinism)
-- uses a synchronous processing model which is potentially easier to develop
+-   uses a synchronous processing model which is potentially easier to develop
     for
-- has lower complexity, is unit tested and uses typing extensively
+-   has lower complexity, is unit tested and uses typing extensively
 
 Ideally, the project would be to have a single code generation method in the
 long term that has all the benefits and none of the drawbacks. We are not there
 yet, however we likely want:
 
-- Flexible codegen (we will need to split output by clusters or other rules)
-- Human-readable inputs that enable code reviews and audits
-- Rules that a script can validate based on CSA data model (ensure mandatory
+-   Flexible codegen (we will need to split output by clusters or other rules)
+-   Human-readable inputs that enable code reviews and audits
+-   Rules that a script can validate based on CSA data model (ensure mandatory
     attribute settings are followed, ensure proper device type adherence, ensure
     correct cluster and data type definitions)
-- Easy to maintain and develop for chosen languages/templates/codegen in
+-   Easy to maintain and develop for chosen languages/templates/codegen in
     general
 
 ## Code generation outputs and templates
 
 Code that is generated:
 
-- **Application-specific**:
+-   **Application-specific**:
 
-  - ZAP generation is based on `.zap` files in `examples/` and generates
+    -   ZAP generation is based on `.zap` files in `examples/` and generates
         server-side processing data: what cluster callbacks to set up, what RAM
         to reserve for attribute storage etc.
 
-  - `Codegen.py` will also generate a subset of application-specific files
+    -   `Codegen.py` will also generate a subset of application-specific files
 
-- **Automated tests**: embedded client-side tools (`chip-tool` and
+-   **Automated tests**: embedded client-side tools (`chip-tool` and
     `darwin-framework-tool`) generate test-definition data. Each use their own
     `examples/${TOOL}/templates/tests/templates.json` to drive what gets
     generated.
 
-- **Controller clusters** target: the file
+-   **Controller clusters** target: the file
     `src/controller/data_model/controller-clusters.zap` contains a set of
     cluster selections to which all applications would potentially have access.
     These are generally used as `all clusters selection` and the intent is to
@@ -210,18 +210,18 @@ time or can use pre-generated output (based on gn/cmake arguments)
 Rules for how `generate.py`/`codegen.py` is invoked at compile time are defined
 at:
 
-- `src/app/chip_data_model.cmake`
-- `src/app/chip_data_model.gni`
+-   `src/app/chip_data_model.cmake`
+-   `src/app/chip_data_model.gni`
 
 ## Pre-generation
 
 Code pre-generation can be used:
 
-- when compile-time code generation is not desirable. This may be for
+-   when compile-time code generation is not desirable. This may be for
     importing into build systems that do not have the pre-requisites to run code
     generation at build time or to save the code generation time at the expense
     of running code generation for every possible zap/generation type
-- To check changes in generated code across versions, beyond the comparisons
+-   To check changes in generated code across versions, beyond the comparisons
     of golden image tests in `scripts/py_matter_idl/matter/idl/tests`
 
 The script to trigger code pre-generation is `scripts/codepregen.py` and
@@ -271,7 +271,7 @@ NOTE: `$PATH_TO_SOURCE_ROOT` should be a top-level directory containing
 zap/matter files as the code pre-generation will generate files based on the
 path inside the root:
 
-- if files are `$PATH_TO_SOURCE_ROOT/some/path/foo.zap` this will generate
+-   if files are `$PATH_TO_SOURCE_ROOT/some/path/foo.zap` this will generate
     files into `$OUTPUT_DIRECTORY/some/path/foo/...`
 
 ### Using pre-generated code
@@ -280,20 +280,20 @@ Instead of generating code at compile time, the chip build system accepts usage
 of a pre-generated folder. It assumes the structure that `codepregen.py`
 creates. To invoke use:
 
-- `build_examples.py` builds accept `--pregen-dir` as an argument, such as:
+-   `build_examples.py` builds accept `--pregen-dir` as an argument, such as:
 
     ```shell
     ./scripts/build/build_examples.py --target $TARGET --pregen-dir $PREGEN_DIR build
     ```
 
-- `gn` builds allow setting `chip_code_pre_generated_directory` as an
+-   `gn` builds allow setting `chip_code_pre_generated_directory` as an
     argument, such as:
 
     ```shell
     gn gen --check --fail-on-unused-args --args='chip_code_pre_generated_directory="/some/pregen/dir"'
     ```
 
-- `cmake` builds allow setting `CHIP_CODEGEN_PREGEN_DIR` variable (which will
+-   `cmake` builds allow setting `CHIP_CODEGEN_PREGEN_DIR` variable (which will
     get propagated to the underlying `gn` builds as needed), such as:
 
     ```shell
