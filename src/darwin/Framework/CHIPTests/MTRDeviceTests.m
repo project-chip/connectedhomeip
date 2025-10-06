@@ -6305,6 +6305,31 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }
 }
 
+- (void)test050_readAttributePaths_withWildCardPath
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    // read wildcard values
+    NSArray * values = [device readAttributePaths:@[ [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:nil attributeID:nil] ]];
+
+    XCTAssertNotNil(values);
+    // Conservatively assume all-clusters-app has more than 100 attributes ready by MTRDevice by subscription establishment time (last count 1308)
+    XCTAssertGreaterThan(values.count, 100);
+}
+
 @end
 
 @interface MTRDeviceEncoderTests : XCTestCase
