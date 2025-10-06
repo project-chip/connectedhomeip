@@ -168,8 +168,7 @@ TEST_F(TestZoneManagementCluster, TestGeneratedCommands)
                   Commands::CreateTwoDCartesianZoneResponse::Id,
               }),
               CHIP_NO_ERROR);
-    // TODO: expand chip::Testing macros to allow for comparisons of not only attribute sets but also of command sets
-    // ASSERT_TRUE(::chip::Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    ASSERT_TRUE(::chip::Testing::EqualGeneratedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 }
 
 TEST_F(TestZoneManagementCluster, TestAcceptedCommands)
