@@ -15,6 +15,31 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${OTA_REQUESTOR_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --passcode 20202021
+#       --secured-device-port 5541
+#       --KVS /tmp/chip_kvs_requestor
+#       --autoApplyImage
+#       --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 0
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
 
 import asyncio
 import logging
@@ -143,7 +168,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         th1 = self.default_controller
         fabric_id_th2 = th1.fabricId + 1
         vendor_id = self.matter_test_config.admin_vendor_id
-        product_id = 32769
+        product_id = 32769  # Default value
 
         logging.info(f"Endpoint: {endpoint}.")
         logging.info(f"DUT Node ID: {dut_node_id}.")
