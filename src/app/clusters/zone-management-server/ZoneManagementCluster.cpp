@@ -448,66 +448,56 @@ CHIP_ERROR ZoneManagementCluster::GeneratedCommands(const ConcreteClusterPath & 
     return CHIP_NO_ERROR;
 }
 
-void ZoneManagementCluster::PersistZones()
+CHIP_ERROR ZoneManagementCluster::PersistZones()
 {
     uint8_t buffer[kMaxPersistedValueLengthSupported];
     MutableByteSpan bufferSpan(buffer);
     chip::TLV::TLVWriter writer;
-    CHIP_ERROR err;
     TLV::TLVType arrayType;
 
     writer.Init(bufferSpan);
 
-    err = writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType);
-    LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving zone: %s", mPath.mEndpointId, "start");
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
 
     for (const auto & zone : mZones)
     {
-        err = zone.Encode(writer, chip::TLV::AnonymousTag());
-        LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving zone: %s", mPath.mEndpointId, "element");
+        ReturnErrorOnFailure(zone.Encode(writer, chip::TLV::AnonymousTag()));
     }
-    err = writer.EndContainer(arrayType);
-    LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving zone: %s", mPath.mEndpointId, "end");
+    ReturnErrorOnFailure(writer.EndContainer(arrayType));
 
     bufferSpan.reduce_size(writer.GetLengthWritten());
 
-    err = mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Zones::Id),
-                                                bufferSpan);
-    LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving zone: %s", mPath.mEndpointId, "write");
+    return mContext->attributeStorage.WriteValue(
+        ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Zones::Id), bufferSpan);
 }
 
-void ZoneManagementCluster::PersistTriggers()
+CHIP_ERROR ZoneManagementCluster::PersistTriggers()
 {
     uint8_t buffer[kMaxPersistedValueLengthSupported];
     MutableByteSpan bufferSpan(buffer);
     chip::TLV::TLVWriter writer;
-    CHIP_ERROR err;
     TLV::TLVType arrayType;
 
     writer.Init(bufferSpan);
 
-    err = writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType);
-    LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving trigger: %s", mPath.mEndpointId, "start");
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
 
     for (const auto & trigger : mTriggers)
     {
-        err = trigger.Encode(writer, chip::TLV::AnonymousTag());
-        LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving trigger: %s", mPath.mEndpointId, "element");
+        ReturnErrorOnFailure(trigger.Encode(writer, chip::TLV::AnonymousTag()));
     }
-    err = writer.EndContainer(arrayType);
-    LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving trigger: %s", mPath.mEndpointId, "end");
+    ReturnErrorOnFailure(writer.EndContainer(arrayType));
 
     bufferSpan.reduce_size(writer.GetLengthWritten());
 
-    err = mContext->attributeStorage.WriteValue(
+    return mContext->attributeStorage.WriteValue(
         ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id), bufferSpan);
-    LogAndReturnOnFailure(err, Zcl, "ZoneManagement[ep=%d] failure saving trigger: %s", mPath.mEndpointId, "write");
 }
 
 CHIP_ERROR ZoneManagementCluster::AddZone(const ZoneInformationStorage & zone)
 {
     mZones.push_back(zone);
-    PersistZones();
+    ReturnErrorOnFailure(PersistZones());
     auto path = ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
     mDelegate.OnAttributeChanged(Attributes::Zones::Id);
     MatterReportingAttributeChangeCallback(path);
@@ -525,7 +515,7 @@ CHIP_ERROR ZoneManagementCluster::UpdateZone(uint16_t zoneId, const ZoneInformat
     if (it != mZones.end())
     {
         *it = zoneInfo; // Replace the found item with the newItem
-        PersistZones();
+        ReturnErrorOnFailure(PersistZones());
         auto path = ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
         mDelegate.OnAttributeChanged(Attributes::Zones::Id);
         MatterReportingAttributeChangeCallback(path);
@@ -546,7 +536,7 @@ CHIP_ERROR ZoneManagementCluster::RemoveZone(uint16_t zoneId)
     if (it != mZones.end())
     {
         mZones.erase(it, mZones.end());
-        PersistZones();
+        ReturnErrorOnFailure(PersistZones());
         auto path = ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
         mDelegate.OnAttributeChanged(Attributes::Zones::Id);
         MatterReportingAttributeChangeCallback(path);
@@ -588,7 +578,10 @@ Status ZoneManagementCluster::AddOrUpdateTrigger(const ZoneTriggerControlStruct 
 
     if (status == Status::Success)
     {
-        PersistTriggers();
+        if (PersistTriggers() != CHIP_NO_ERROR)
+        {
+            return Status::Failure;
+        }
         auto path = ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id);
         mDelegate.OnAttributeChanged(Attributes::Triggers::Id);
         MatterReportingAttributeChangeCallback(path);
@@ -605,7 +598,10 @@ Status ZoneManagementCluster::RemoveTrigger(uint16_t zoneId)
         mTriggers.erase(std::remove_if(mTriggers.begin(), mTriggers.end(),
                                        [&](const ZoneTriggerControlStruct & trigger) { return trigger.zoneID == zoneId; }),
                         mTriggers.end());
-        PersistTriggers();
+        if (PersistTriggers() != CHIP_NO_ERROR)
+        {
+            return Status::Failure;
+        }
         auto path = ConcreteAttributePath(mPath.mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id);
         mDelegate.OnAttributeChanged(Attributes::Triggers::Id);
         MatterReportingAttributeChangeCallback(path);
