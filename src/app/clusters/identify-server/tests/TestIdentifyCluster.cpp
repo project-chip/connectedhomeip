@@ -46,10 +46,7 @@ class TestIdentifyDelegate : public IdentifyDelegate
 public:
     void OnIdentifyStart(IdentifyCluster & cluster) override { onIdentifyStartCalled = true; }
     void OnIdentifyStop(IdentifyCluster & cluster) override { onIdentifyStopCalled = true; }
-    void OnTriggerEffect(IdentifyCluster & cluster) override
-    {
-        onEffectIdentifierCalled = true;
-    }
+    void OnTriggerEffect(IdentifyCluster & cluster) override { onEffectIdentifierCalled = true; }
     bool IsTriggerEffectEnabled() override { return true; }
 };
 
@@ -118,8 +115,7 @@ TEST_F(TestIdentifyCluster, AcceptedCommandsMandatoryOnlyTest)
 TEST_F(TestIdentifyCluster, AcceptedCommandsWithOptionalTriggerEffectTest)
 {
     // When passing in onEffectIdentifier callback, we're enabling the TriggerEffect command.
-    IdentifyCluster cluster(
-        IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
     chip::Test::TestServerClusterContext context;
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -201,7 +197,8 @@ TEST_F(TestIdentifyCluster, WriteReadOnlyAttributesReturnUnsupportedWriteTest)
               CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 
     // Attempt to write to the read-only FeatureMap attribute and verify it fails.
-    EXPECT_EQ(WriteAttribute(cluster, { kTestEndpointId, Identify::Id, FeatureMap::Id }, 0u), CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+    EXPECT_EQ(WriteAttribute(cluster, { kTestEndpointId, Identify::Id, FeatureMap::Id }, 0u),
+              CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 }
 
 TEST_F(TestIdentifyCluster, IdentifyTimeCountdownTest)
@@ -231,8 +228,7 @@ TEST_F(TestIdentifyCluster, IdentifyTimeCountdownTest)
 TEST_F(TestIdentifyCluster, OnIdentifyStartStopCallbackTest)
 {
     chip::Test::TestServerClusterContext context;
-    IdentifyCluster cluster(
-        IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     const auto identifyTimePath = ConcreteDataAttributePath(kTestEndpointId, Identify::Id, IdentifyTime::Id);
@@ -259,8 +255,7 @@ TEST_F(TestIdentifyCluster, OnIdentifyStartStopCallbackTest)
 TEST_F(TestIdentifyCluster, OnStartNotCalledMultipleTimes)
 {
     chip::Test::TestServerClusterContext context;
-    IdentifyCluster cluster(
-        IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     const auto identifyTimePath = ConcreteDataAttributePath(kTestEndpointId, Identify::Id, IdentifyTime::Id);
 
@@ -277,8 +272,7 @@ TEST_F(TestIdentifyCluster, OnStartNotCalledMultipleTimes)
 TEST_F(TestIdentifyCluster, OnStopNotCalledIfNotIdentifying)
 {
     chip::Test::TestServerClusterContext context;
-    IdentifyCluster cluster(
-        IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     const auto identifyTimePath = ConcreteDataAttributePath(kTestEndpointId, Identify::Id, IdentifyTime::Id);
 
@@ -318,8 +312,7 @@ TEST_F(TestIdentifyCluster, InvokeIdentifyCommandTest)
 TEST_F(TestIdentifyCluster, InvokeTriggerEffectCommandTest)
 {
     chip::Test::TestServerClusterContext context;
-    IdentifyCluster cluster(
-        IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Test with a specific effectIdentifier and effectVariant.
@@ -339,8 +332,7 @@ TEST_F(TestIdentifyCluster, InvokeTriggerEffectCommandTest)
 TEST_F(TestIdentifyCluster, InvokeTriggerEffectCommandAllEffectsTest)
 {
     chip::Test::TestServerClusterContext context;
-    IdentifyCluster cluster(
-        IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Test all effect identifiers.
@@ -364,8 +356,7 @@ TEST_F(TestIdentifyCluster, InvokeTriggerEffectCommandAllEffectsTest)
 TEST_F(TestIdentifyCluster, InvokeTriggerEffectCommandInvalidVariantTest)
 {
     chip::Test::TestServerClusterContext context;
-    IdentifyCluster cluster(
-        IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Test with an invalid effect variant.
@@ -383,8 +374,7 @@ TEST_F(TestIdentifyCluster, InvokeTriggerEffectCommandInvalidVariantTest)
 TEST_F(TestIdentifyCluster, TriggerEffectWhileIdentifyingTest)
 {
     chip::Test::TestServerClusterContext context;
-    IdentifyCluster cluster(
-        IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Start identifying.
@@ -409,8 +399,7 @@ TEST_F(TestIdentifyCluster, TriggerEffectWhileIdentifyingTest)
 TEST_F(TestIdentifyCluster, TriggerEffectFinishEffectTest)
 {
     chip::Test::TestServerClusterContext context;
-    IdentifyCluster cluster(
-        IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Start identifying.
@@ -433,8 +422,7 @@ TEST_F(TestIdentifyCluster, TriggerEffectFinishEffectTest)
 TEST_F(TestIdentifyCluster, TriggerEffectStopEffectTest)
 {
     chip::Test::TestServerClusterContext context;
-    IdentifyCluster cluster(
-        IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
+    IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Start identifying.

@@ -44,8 +44,8 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommandsWithTriggerEffect[] =
 
 IdentifyCluster::IdentifyCluster(const Config & config) :
     DefaultServerCluster({ config.endpointId, Identify::Id }), mIdentifyTime(0), mIdentifyType(config.identifyType),
-    mIdentifyDelegate(config.identifyDelegate), mEffectIdentifier(config.effectIdentifier),
-    mEffectVariant(config.effectVariant), mTimerDelegate(config.timerDelegate)
+    mIdentifyDelegate(config.identifyDelegate), mEffectIdentifier(config.effectIdentifier), mEffectVariant(config.effectVariant),
+    mTimerDelegate(config.timerDelegate)
 {}
 
 DataModel::ActionReturnStatus IdentifyCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -171,7 +171,7 @@ IdentifyCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TL
         ReturnErrorOnFailure(data.Decode(input_arguments));
         MATTER_TRACE_SCOPE("TriggerEffect", "Identify");
         mEffectIdentifier = data.effectIdentifier;
-        mEffectVariant           = data.effectVariant;
+        mEffectVariant    = data.effectVariant;
 
         ChipLogProgress(Zcl, "RX identify:trigger effect identifier 0x%X variant 0x%X", to_underlying(mEffectIdentifier),
                         to_underlying(mEffectVariant));

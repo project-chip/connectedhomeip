@@ -101,7 +101,7 @@ public:
         }
 
         EndpointId endpointId;
-        Identify::IdentifyTypeEnum identifyType         = Identify::IdentifyTypeEnum::kNone;
+        Identify::IdentifyTypeEnum identifyType = Identify::IdentifyTypeEnum::kNone;
         reporting::ReportScheduler::TimerDelegate & timerDelegate;
         IdentifyDelegate * identifyDelegate             = nullptr;
         Identify::EffectIdentifierEnum effectIdentifier = Identify::EffectIdentifierEnum::kBlink;

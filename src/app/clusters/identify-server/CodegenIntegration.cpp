@@ -44,7 +44,6 @@ using chip::app::Clusters::IdentifyCluster;
 using chip::app::Clusters::IdentifyDelegate;
 using chip::Protocols::InteractionModel::Status;
 
-
 Identify * firstLegacyIdentify = nullptr;
 DefaultTimerDelegate sDefaultTimerDelegate;
 
@@ -134,12 +133,11 @@ Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIde
     mOnIdentifyStart(onIdentifyStart),
     mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType), mOnEffectIdentifier(onEffectIdentifier),
     mCurrentEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant),
-    mCluster(
-        chip::app::Clusters::IdentifyCluster::Config(endpoint, timerDelegate ? *timerDelegate : sDefaultTimerDelegate)
-            .WithIdentifyType(identifyType)
-            .WithDelegate(&gLegacyDelegate)
-            .WithEffectIdentifier(effectIdentifier)
-            .WithEffectVariant(effectVariant))
+    mCluster(chip::app::Clusters::IdentifyCluster::Config(endpoint, timerDelegate ? *timerDelegate : sDefaultTimerDelegate)
+                 .WithIdentifyType(identifyType)
+                 .WithDelegate(&gLegacyDelegate)
+                 .WithEffectIdentifier(effectIdentifier)
+                 .WithEffectVariant(effectVariant))
 {
     RegisterLegacyIdentify(this);
 };
