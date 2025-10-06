@@ -429,7 +429,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         TH2 = TH2_fabric_admin_real.NewController(nodeId=TH2_nodeid)
         newNodeId = self.dut_node_id + 1
 
-        resp = await TH2.FindOrEstablishPASESession(setupCode=setup_qr_code, nodeid=newNodeId)
+        resp = await TH2.FindOrEstablishPASESession(setupCode=setup_qr_code, nodeId=newNodeId)
         logger.info('Step #15 - TH2 successfully establish PASE session completed')
 
         self.step(16)
@@ -497,7 +497,7 @@ class TC_CGEN_2_2(MatterBaseTest):
 
         self.step(22)
         logger.info("Step #22 - TH1 Waiting for PASE session to stabilize...")
-        resp = await TH2.FindOrEstablishPASESession(setupCode=setup_qr_code, nodeid=newNodeId)
+        resp = await TH2.FindOrEstablishPASESession(setupCode=setup_qr_code, nodeId=newNodeId)
         logger.info('Step #22 - TH2 successfully establish PASE session completed')
 
         # This is expected to fail because the device is not fully commissioned.

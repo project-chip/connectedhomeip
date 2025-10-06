@@ -150,7 +150,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
     async def get_dut_acl(self, ctrl, ep=ROOT_NODE_ENDPOINT_ID):
         sub = await ctrl.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[(ep, Clusters.AccessControl.Attributes.Acl)],
             keepSubscriptions=False,
             fabricFiltered=True
@@ -247,7 +247,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Subscribe to attribute
         sub_cr1_step1 = await CR1.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=node_label_attr_path,
             reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False
@@ -290,7 +290,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Subscribe to attribute
         sub_cr1_step2 = await CR1.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=node_label_attr_path,
             reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False
@@ -342,7 +342,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         with asserts.assert_raises(ChipStackError) as cm:
             await CR2.ReadAttribute(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 # Attribute from a cluster controller 2 has no access to
                 attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
                 keepSubscriptions=False,
@@ -375,7 +375,7 @@ class TC_IDM_4_2(MatterBaseTest):
         # "INVALID_ACTION" status response expected
         with asserts.assert_raises(ChipStackError) as cm:
             await CR2.ReadAttribute(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 # Cluster controller 2 has no access to
                 attributes=[(0, Clusters.BasicInformation)],
                 keepSubscriptions=False,
@@ -416,7 +416,7 @@ class TC_IDM_4_2(MatterBaseTest):
         # "INVALID_ACTION" status response expected
         with asserts.assert_raises(ChipStackError) as cm:
             await CR2.ReadAttribute(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 # Endpoint controller 2 has no access to
                 attributes=[(0)],
                 keepSubscriptions=False,
@@ -444,7 +444,7 @@ class TC_IDM_4_2(MatterBaseTest):
         with asserts.assert_raises(ChipStackError) as cm:
             await CR2.ReadAttribute(
                 # Node controller 2 has no access to
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 attributes=[],
                 keepSubscriptions=False,
                 reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
@@ -464,7 +464,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Subscribe to attribute with empty dataVersionFilters
         sub_cr1_empty_dvf = await CR1.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=node_label_attr_path,
             keepSubscriptions=False
         )
@@ -482,7 +482,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Subscribe to attribute with provided DataVersion
         sub_cr1_step7 = await CR1.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=node_label_attr_path,
             reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False,
@@ -504,7 +504,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Subscribe to attribute
         sub_cr1_update_value = await CR1.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=node_label_attr_path,
             reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False
@@ -561,7 +561,7 @@ class TC_IDM_4_2(MatterBaseTest):
         sub_cr1_invalid_intervals = None
         with asserts.assert_raises(ChipStackError, "Expected exception wasn't thrown."):
             sub_cr1_invalid_intervals = await CR1.ReadAttribute(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 attributes=node_label_attr_path,
                 reportInterval=(20, 10),
                 keepSubscriptions=False
@@ -584,7 +584,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Subscribe to global attribute
         sub_cr1_step11 = await CR1.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=cluster_rev_attr_path,
             reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False
@@ -621,7 +621,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Subscribe to global attribute
         sub_cr1_step12 = await CR1.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=cluster_rev_attr_path,
             reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False
@@ -659,7 +659,7 @@ class TC_IDM_4_2(MatterBaseTest):
         sub_cr1_step13 = None
         with asserts.assert_raises(ChipStackError) as cm:
             sub_cr1_step13 = await CR1.Read(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 attributes=[],
                 events=[],
                 reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),

@@ -226,7 +226,7 @@ class TC_DA_1_9(MatterBaseTest):
                         self.default_controller.SetDACRevocationSetPath(revocation_set)
                         await self.default_controller.CommissionWithCode(
                             setupPayload=test_case['manual_pairing_code'],
-                            nodeid=1,
+                            nodeId=1,
                             discoveryType=ChipDeviceCtrl.DiscoveryType.DISCOVERY_NETWORK_ONLY,
                         )
                         resp = 'Y'

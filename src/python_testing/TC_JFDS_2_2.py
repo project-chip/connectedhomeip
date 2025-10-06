@@ -185,7 +185,7 @@ class TC_JFDS_2_2(MatterBaseTest):
 
         self.step("1")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
+            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
             returnClusterObject=True)
         _groupKetSetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
         step1_groupKeySetListLength = len(_groupKetSetList)
@@ -213,7 +213,7 @@ class TC_JFDS_2_2(MatterBaseTest):
 
         self.step("3")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
+            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
             returnClusterObject=True)
         _groupKetSetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
         asserts.assert_greater_equal(len(_groupKetSetList), step1_groupKeySetListLength,
@@ -241,7 +241,7 @@ class TC_JFDS_2_2(MatterBaseTest):
 
         # self.step("5")
         # response = await devCtrlEcoA.ReadAttribute(
-        #     nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
+        #     nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
         #     returnClusterObject=True)
         # _groupKetSetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
 
@@ -258,7 +258,7 @@ class TC_JFDS_2_2(MatterBaseTest):
 
         self.step("7")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
+            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
             returnClusterObject=True)
         _groupKetSetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
         for _item in _groupKetSetList:

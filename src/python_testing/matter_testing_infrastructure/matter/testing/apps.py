@@ -213,6 +213,6 @@ class OTAProviderSubprocess(AppServerSubprocess):
         acl_attribute = Clusters.AccessControl.Attributes.Acl(acl_entries)
 
         return dev_ctrl.WriteAttribute(
-            nodeid=provider_node_id,
+            nodeId=provider_node_id,
             attributes=[(0, acl_attribute)]
         )

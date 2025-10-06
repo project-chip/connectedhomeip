@@ -363,7 +363,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
             value: 'uint' = 0
 
-        result = await self.default_controller.Read(nodeid=self.dut_node_id, attributes=[(endpoint_id, TempAttribute)])
+        result = await self.default_controller.Read(nodeId=self.dut_node_id, attributes=[(endpoint_id, TempAttribute)])
         try:
             attr_ret = result.tlvAttributes[endpoint_id][cluster_id][attribute_id]
         except KeyError:
@@ -689,7 +689,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         test_failure = None
         try:
-            subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id,
+            subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id,
                                                                    events=[('*')],
                                                                    fabricFiltered=False,
                                                                    reportInterval=(100, 1000))

@@ -126,7 +126,7 @@ class TC_WebRTCRequestor_2_1(MatterBaseTest):
 
         self.step(2)
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.th_server_local_nodeid, timeout=3*60, iteration=10000, discriminator=self.discriminator, option=1)
+            nodeId=self.th_server_local_nodeid, timeout=3*60, iteration=10000, discriminator=self.discriminator, option=1)
         passcode = params.setupPinCode
         sleep(1)
 
@@ -174,7 +174,7 @@ class TC_WebRTCRequestor_2_1(MatterBaseTest):
             takeMutex=False,
         )
         await self.default_controller.SendCommand(
-            nodeid=self.th_server_local_nodeid,
+            nodeId=self.th_server_local_nodeid,
             endpoint=0,  # Fault‑Injection cluster lives on EP0
             payload=command,
         )
