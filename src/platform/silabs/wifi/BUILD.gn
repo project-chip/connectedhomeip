@@ -43,8 +43,7 @@ if (chip_enable_wifi && !wifi_soc && !sl_build_unit_tests) {
 
   if (use_SiWx917) {
     import("${silabs_platform_dir}/wifi/SiWx/ncp/rs9117.gni")
-  }
-  else if (use_wf200) {
+  } else if (use_wf200) {
     import("${silabs_platform_dir}/wifi/wf200/wf200.gni")
   }
 }
@@ -120,7 +119,7 @@ source_set("wifi-platform") {
     "${chip_root}/src/platform:platform_base",
     "${silabs_platform_dir}/wifi/icd:power-save-interface",
   ]
-  
+
   if (use_SiWx917) {
     sources += rs911x_src_plat
 

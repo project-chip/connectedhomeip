@@ -94,9 +94,7 @@ if (wifi_soc) {
 
     if (chip_enable_ble_rs911x) {
       # TODO efr32_sdk should not need a header from this location
-      include_dirs += [
-        "${chip_root}/src/platform/silabs/efr32/rs911x",
-      ]
+      include_dirs += [ "${chip_root}/src/platform/silabs/efr32/rs911x" ]
     }
 
     defines = []
