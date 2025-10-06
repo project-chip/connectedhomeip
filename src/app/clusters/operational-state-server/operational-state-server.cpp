@@ -401,9 +401,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(aEncoder.Encode(mDelegate->GetCountdownTime()));
         break;
     }
-    case OperationalState::Attributes::ClusterRevision::Id: {
+    case OperationalState::Attributes::ClusterRevision::Id:
         return aEncoder.Encode(OperationalState::kRevision);
-    }
     }
     return CHIP_NO_ERROR;
 }
