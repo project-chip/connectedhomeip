@@ -35,6 +35,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::Descriptor::Id:
         MatterDescriptorClusterInitCallback(endpoint);
         break;
+    case app::Clusters::AccessControl::Id:
+        MatterAccessControlClusterInitCallback(endpoint);
+        break;
     case app::Clusters::BasicInformation::Id:
         MatterBasicInformationClusterInitCallback(endpoint);
         break;
@@ -84,13 +87,19 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
 {
     switch (clusterId)
     {
+<<<<<<< HEAD
     case app::Clusters::Identify::Id:
         MatterIdentifyClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::AccessControl::Id:
         MatterAccessControlClusterShutdownCallback(endpoint);
+=======
+>>>>>>> a5ad6918cd (Fix Codegen after rebase)
     case app::Clusters::Descriptor::Id:
         MatterDescriptorClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::AccessControl::Id:
+        MatterAccessControlClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::BasicInformation::Id:
         MatterBasicInformationClusterShutdownCallback(endpoint);
