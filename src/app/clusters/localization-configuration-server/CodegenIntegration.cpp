@@ -64,7 +64,7 @@ public:
 
 } // namespace
 
-void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpointId)
+void MatterLocalizationConfigurationClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::RegisterServer(
@@ -80,7 +80,7 @@ void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoi
         integrationDelegate);
 }
 
-void MatterLocalizationConfigurationClusterServerShutdownCallback(EndpointId endpointId)
+void MatterLocalizationConfigurationClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::UnregisterServer(

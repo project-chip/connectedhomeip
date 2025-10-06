@@ -100,25 +100,18 @@ DataModel::ActionReturnStatus LocalizationConfigurationCluster::SetActiveLocale(
         return Status::ConstraintError;
     }
 
-    if (mActiveLocale.SetContent(activeLocale))
+    VerifyOrReturnError(mActiveLocale.SetContent(activeLocale), Status::Failure);
+    if (mContext != nullptr)
     {
-        if (mContext != nullptr)
+        Storage::String<kActiveLocaleMaxLength> shortString;
+        VerifyOrReturnError(shortString.SetContent(activeLocale), Status::Failure);
+        AttributePersistence persistence(mContext->attributeStorage);
+        if (persistence.StoreString({ mPath.mEndpointId, LocalizationConfiguration::Id, Attributes::ActiveLocale::Id },
+                                    shortString) != CHIP_NO_ERROR)
         {
-            Storage::String<kActiveLocaleMaxLength> shortString;
-            if (shortString.SetContent(activeLocale))
-            {
-                AttributePersistence persistence(mContext->attributeStorage);
-                if (persistence.StoreString({ mPath.mEndpointId, LocalizationConfiguration::Id, Attributes::ActiveLocale::Id },
-                                            shortString) != CHIP_NO_ERROR)
-                {
-                    ChipLogError(AppServer, "Failed to store active locale in persistence");
-                }
-            }
+            ChipLogError(AppServer, "Failed to store active locale in persistence");
+            return Status::Failure;
         }
-    }
-    else
-    {
-        ChipLogError(AppServer, "Failed to set active locale");
     }
 
     return Status::Success;

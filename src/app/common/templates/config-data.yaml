@@ -91,7 +91,6 @@ ClustersWithInitFunctions:
     - Groups
     - Identify
     - Level Control
-    - Localization Configuration
     - Mode Select
     - Occupancy Sensing
     - On/Off
@@ -155,6 +154,7 @@ CodeDrivenClusters:
     - General Commissioning
     - General Diagnostics
     - Group Key Management
+    - Localization Configuration
     - OTA Software Update Provider
     - Operational Credentials
     - Push AV Stream Transport
