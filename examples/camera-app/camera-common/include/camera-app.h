@@ -18,13 +18,13 @@
 
 #pragma once
 
+#include "camera-device-interface.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/zone-management-server/ZoneManagementCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include "camera-device-interface.h"
 #include <app/util/config.h>
 #include <cstring>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <utility>
 
@@ -52,8 +52,7 @@ private:
     std::unique_ptr<chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtServer> mAVStreamMgmtServerPtr;
     std::unique_ptr<chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelMgmtServer>
         mAVSettingsUserLevelMgmtServerPtr;
-    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::ZoneManagement::ZoneManagementCluster>
-    mZoneManagementCluster;
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::ZoneManagement::ZoneManagementCluster> mZoneManagementCluster;
     std::unique_ptr<::chip::app::Clusters::ZoneManagement::ZoneManagementCluster> mZoneMgmtServerPtr;
 
     // Helper to set attribute defaults for CameraAVStreamMgmt

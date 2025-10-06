@@ -192,14 +192,13 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     appTwoDCartesianMax.y                         = sensorParams.sensorHeight - 1;
 
     // Instantiate the ZoneManagementCluster Server
-    mZoneManagementCluster.Create(mEndpoint, mCameraDevice->GetZoneManagementDelegate(), zoneMgmtFeatures,
-                                  appMaxUserDefinedZones, appMaxZones, sensitivityMax, appTwoDCartesianMax);
+    mZoneManagementCluster.Create(mEndpoint, mCameraDevice->GetZoneManagementDelegate(), zoneMgmtFeatures, appMaxUserDefinedZones,
+                                  appMaxZones, sensitivityMax, appTwoDCartesianMax);
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mZoneManagementCluster.Registration());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Camera, "Failed to register ZoneManagement on endpoint %u: %" CHIP_ERROR_FORMAT,
-                     mEndpoint, err.Format());
+        ChipLogError(Camera, "Failed to register ZoneManagement on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpoint, err.Format());
     }
     //    mZoneMgmtServerPtr->SetSensitivity(mCameraDevice->GetCameraHALInterface().GetDetectionSensitivity());
 }
