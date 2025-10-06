@@ -43,7 +43,7 @@ from test_plan_support import commission_if_required
 from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import CameraAvStreamManagement, Objects, WebRTCTransportRequestor
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from matter.webrtc import PeerConnection, WebRTCManager
+from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 
 class TC_WEBRTC_1_5(MatterBaseTest):
@@ -85,10 +85,10 @@ class TC_WEBRTC_1_5(MatterBaseTest):
         return steps
 
     def desc_TC_WEBRTC_1_5(self) -> str:
-        return "[TC-WEBRTC-1.3] Validate Deferred Offer Flow for Battery-Powered Camera in Standby Mode."
+        return "[TC-WEBRTC-1.5] Validate Deferred Offer Flow for Battery-Powered Camera in Standby Mode."
 
     def pics_TC_WEBRTC_1_5(self) -> list[str]:
-        return ["WEBRTCR", "WEBRTCP"]
+        return ["WEBRTCR.S", "WEBRTCP.C"]
 
     @property
     def default_timeout(self) -> int:
@@ -99,7 +99,7 @@ class TC_WEBRTC_1_5(MatterBaseTest):
         self.step("precondition-1")
         endpoint = self.get_endpoint(default=1)
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
-        webrtc_peer: PeerConnection = webrtc_manager.create_peer(
+        webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(
             node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint
         )
 
@@ -163,7 +163,7 @@ class TC_WEBRTC_1_5(MatterBaseTest):
             payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
         )
 
-        webrtc_manager.close_all()
+        await webrtc_manager.close_all()
 
     async def read_avstr_attribute_expect_success(self, endpoint, attribute):
         return await self.read_single_attribute_check_success(

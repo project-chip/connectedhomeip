@@ -3,8 +3,23 @@
 from dataclasses import dataclass
 from typing import Any, List, Optional, Union
 
+from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.testing.tasks import Subprocess
 from matter.ChipDeviceCtrl import ChipDeviceController
+
+
+@dataclass
+class OtaImagePath:
+    path: str
+    @property
+    def ota_args(self) -> List[str]: ...
+
+
+@dataclass
+class ImageListPath:
+    path: str
+    @property
+    def ota_args(self) -> List[str]: ...
 
 
 @dataclass

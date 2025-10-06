@@ -4744,6 +4744,48 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRGroupcastClusterMembershipStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupID = @(0);
+
+        _endpoints = [NSArray array];
+
+        _keyID = @(0);
+
+        _hasAuxiliaryACL = @(0);
+
+        _expiringKeyID = nil;
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRGroupcastClusterMembershipStruct alloc] init];
+
+    other.groupID = self.groupID;
+    other.endpoints = self.endpoints;
+    other.keyID = self.keyID;
+    other.hasAuxiliaryACL = self.hasAuxiliaryACL;
+    other.expiringKeyID = self.expiringKeyID;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keyID:%@; hasAuxiliaryACL:%@; expiringKeyID:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keyID, _hasAuxiliaryACL, _expiringKeyID, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRHEPAFilterMonitoringClusterReplacementProductStruct
 - (instancetype)init
 {
@@ -11638,7 +11680,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _ccdid = nil;
 
-        _status = @(0);
+        _referenceCount = @(0);
 
         _fabricIndex = @(0);
     }
@@ -11654,7 +11696,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.port = self.port;
     other.caid = self.caid;
     other.ccdid = self.ccdid;
-    other.status = self.status;
+    other.referenceCount = self.referenceCount;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -11662,7 +11704,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpointID:%@; hostname:%@; port:%@; caid:%@; ccdid:%@; status:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _endpointID, [_hostname base64EncodedStringWithOptions:0], _port, _caid, _ccdid, _status, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpointID:%@; hostname:%@; port:%@; caid:%@; ccdid:%@; referenceCount:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _endpointID, [_hostname base64EncodedStringWithOptions:0], _port, _caid, _ccdid, _referenceCount, _fabricIndex];
     return descriptionString;
 }
 

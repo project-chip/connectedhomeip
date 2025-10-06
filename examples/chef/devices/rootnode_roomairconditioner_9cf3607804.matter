@@ -1649,6 +1649,7 @@ cluster Thermostat = 513 {
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
     kEvents = 0x200;
+    kThermostatSuggestions = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -1720,6 +1721,7 @@ cluster Thermostat = 513 {
     kVacationMode = 0x10;
     kTimeOfUseCostSavings = 0x20;
     kPreCoolingOrPreHeating = 0x40;
+    kConflictingSuggestions = 0x80;
   }
 
   struct ScheduleTransitionStruct {
@@ -2161,13 +2163,13 @@ endpoint 0 {
   }
 
   server cluster GeneralCommissioning {
-    ram      attribute breadcrumb default = 0x0000000000000000;
+    callback attribute breadcrumb;
     callback attribute basicCommissioningInfo;
     callback attribute regulatoryConfig;
     callback attribute locationCapability;
     callback attribute supportsConcurrentConnection;
-    ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 0x0001;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
@@ -2201,8 +2203,8 @@ endpoint 0 {
   }
 
   server cluster DiagnosticLogs {
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command RetrieveLogsRequest;
   }
@@ -2242,8 +2244,8 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0001;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AttestationRequest;
     handle command AttestationResponse;
@@ -2359,7 +2361,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 7;
+    callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;
   }

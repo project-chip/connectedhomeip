@@ -48,8 +48,7 @@ public:
 
     // Called when a CHIP device was found
 #ifdef CONFIG_BT_NIMBLE_ENABLED
-    virtual void OnDeviceScanned(const struct ble_hs_adv_fields & fields, const ble_addr_t & addr,
-                                 const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
+    virtual void OnDeviceScanned(const ble_addr_t & addr, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
 #else
     virtual void OnDeviceScanned(esp_ble_addr_type_t & addr_type, esp_bd_addr_t & addr,
                                  const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
@@ -91,7 +90,7 @@ public:
 
     bool mIsScanning = false;
 #ifdef CONFIG_BT_NIMBLE_ENABLED
-    void ReportDevice(const struct ble_hs_adv_fields & fields, const ble_addr_t & addr);
+    void ReportDevice(const uint8_t * adv_data, size_t adv_data_len, const ble_addr_t & addr);
 #else
     void ReportDevice(esp_ble_gap_cb_param_t & fields, esp_bd_addr_t & addr);
 #endif

@@ -22,6 +22,7 @@
 #include <stdlib.h>
 
 using namespace chip;
+using namespace chip::app::DataModel;
 using namespace chip::app::Storage;
 using namespace chip::app::Storage::Data;
 using namespace chip::app::Clusters::Tls;
@@ -249,6 +250,16 @@ struct GlobalCertificateData : public PersistentData<kPersistentBufferNextIdByte
         return DoRemoval(storage, table, fabric, id, mRootCertMappingCount, mRootCertMapping.data());
     }
 
+    CHIP_ERROR RemoveAllClientCertificates(PersistentStorageDelegate & storage, FabricIndex fabric)
+    {
+        return DoRemovalAll(storage, fabric, mClientCertMappingCount, mClientCertMapping.data());
+    }
+
+    CHIP_ERROR RemoveAllRootCertificates(PersistentStorageDelegate & storage, FabricIndex fabric)
+    {
+        return DoRemovalAll(storage, fabric, mRootCertMappingCount, mRootCertMapping.data());
+    }
+
 private:
     template <class CertificateTable>
     CHIP_ERROR DoRemoval(PersistentStorageDelegate & storage, CertificateTable & table, FabricIndex fabric, uint16_t id,
@@ -289,6 +300,27 @@ private:
             ReturnErrorOnFailure(this->Save(&storage));
         }
         return removeResult;
+    }
+
+    CHIP_ERROR DoRemovalAll(PersistentStorageDelegate & storage, FabricIndex fabric, size_t count, StoredCertificate * source)
+    {
+        // Find the entry in the global mapping
+        uint16_t foundCount = 0;
+        for (size_t i = 0; i < count; ++i)
+        {
+            auto & entry = source[i];
+            if (entry.fabric == fabric)
+            {
+                entry.fabric = kUndefinedFabricIndex;
+                entry.id.Clear();
+                ++foundCount;
+            }
+        }
+        if (foundCount == 0)
+        {
+            return CHIP_ERROR_NOT_FOUND;
+        }
+        return this->Save(&storage);
     }
 
     CHIP_ERROR GetNextCertificateId(uint16_t & nextId, uint16_t maxId, size_t count, const StoredCertificate * source)
@@ -612,8 +644,8 @@ CHIP_ERROR CertificateTableImpl::GetRootCertificateCount(FabricIndex fabric, uin
 }
 
 CHIP_ERROR CertificateTableImpl::PrepareClientCertificate(FabricIndex fabric, const ByteSpan & nonce, ClientBuffer & buffer,
-                                                          MutableByteSpan & nocsrElementsBuffer, TLSCCDID & id,
-                                                          MutableByteSpan & csr, MutableByteSpan & nonceSignature)
+                                                          Optional<TLSCCDID> & id, MutableByteSpan & csr,
+                                                          MutableByteSpan & nonceSignature)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
@@ -621,24 +653,30 @@ CHIP_ERROR CertificateTableImpl::PrepareClientCertificate(FabricIndex fabric, co
 
     Crypto::P256Keypair keyPair;
 
-    ReturnErrorOnFailure(keyPair.Initialize(Crypto::ECPKeyTarget::ECDSA));
+    if (id.HasValue())
+    {
+        ClientCertWithKey certWithKey;
+        CertificateId localId(id.Value());
+        ReturnErrorOnFailure(mClientCertificates.GetTableEntry(fabric, localId, certWithKey, buffer));
+        ReturnErrorOnFailure(keyPair.Deserialize(certWithKey.key));
+    }
+    else
+    {
+        ReturnErrorOnFailure(keyPair.Initialize(Crypto::ECPKeyTarget::ECDSA));
+    }
 
     size_t csrLen = csr.size();
     ReturnErrorOnFailure(keyPair.NewCertificateSigningRequest(csr.data(), csrLen));
     csr.reduce_size(csrLen);
 
-    // Build nocsr_elements_message per spec
-    TLV::TLVWriter writer;
-    writer.Init(nocsrElementsBuffer);
-    TLV::TLVType container;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(NocsrElements::kCsr), csr));
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(NocsrElements::kCsrNonce), nonce));
-    ReturnErrorOnFailure(writer.EndContainer(container));
-
     Crypto::P256ECDSASignature signatureBuffer;
-    ReturnErrorOnFailure(keyPair.ECDSA_sign_msg(nocsrElementsBuffer.data(), writer.GetLengthWritten(), signatureBuffer));
+    ReturnErrorOnFailure(keyPair.ECDSA_sign_msg(nonce.data(), nonce.size(), signatureBuffer));
     ReturnErrorOnFailure(CopySpanToMutableSpan(signatureBuffer.Span(), nonceSignature));
+
+    if (id.HasValue())
+    {
+        return CHIP_NO_ERROR;
+    }
 
     // Find a usable ID
     GlobalCertificateData globalData(mEndpointId);
@@ -648,11 +686,13 @@ CHIP_ERROR CertificateTableImpl::PrepareClientCertificate(FabricIndex fabric, co
     TLSCCDID localId = 0;
     ReturnErrorOnFailure(globalData.GetNextClientCertificateId(fabric, localId));
     ReturnErrorOnFailure(globalData.Save(mStorage));
-    id = localId;
+    id.SetValue(localId);
 
     ClientCertWithKey certWithKey;
     certWithKey.detail.ccdid = localId;
-    keyPair.Serialize(certWithKey.key);
+    certWithKey.detail.clientCertificate.SetValue(Nullable<ByteSpan>());
+
+    ReturnErrorOnFailure(keyPair.Serialize(certWithKey.key));
     CertificateId certId(localId);
     return mClientCertificates.SetTableEntry(fabric, certId, certWithKey, buffer);
 }
@@ -663,6 +703,15 @@ CHIP_ERROR CertificateTableImpl::UpdateClientCertificateEntry(FabricIndex fabric
     ClientCertWithKey certWithKey;
     CertificateId localId(id);
     ReturnErrorOnFailure(mClientCertificates.GetTableEntry(fabric_index, localId, certWithKey, buffer));
+    Crypto::P256PublicKey certPubKey;
+    ReturnErrorOnFailure(Crypto::ExtractPubkeyFromX509Cert(entry.clientCertificate.Value().Value(), certPubKey));
+    Crypto::P256Keypair keyPair;
+    ReturnErrorOnFailure(keyPair.Deserialize(certWithKey.key));
+    auto & storedPubKey = keyPair.Pubkey();
+    if (!ByteSpan(storedPubKey, storedPubKey.Length()).data_equal(ByteSpan(certPubKey, certPubKey.Length())))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     certWithKey.detail       = entry;
     certWithKey.detail.ccdid = id;
 
@@ -703,4 +752,35 @@ CHIP_ERROR CertificateTableImpl::RemoveClientCertificate(FabricIndex fabric, TLS
 CHIP_ERROR CertificateTableImpl::GetClientCertificateCount(FabricIndex fabric, uint8_t & outCount)
 {
     return mClientCertificates.GetFabricEntryCount(fabric, outCount);
+}
+
+inline CHIP_ERROR SwallowNotFound(CHIP_ERROR err)
+{
+    return (err == CHIP_ERROR_NOT_FOUND) ? CHIP_NO_ERROR : err;
+}
+
+CHIP_ERROR CertificateTableImpl::RemoveFabric(FabricIndex fabric)
+{
+    // We want to release as many resources as possible; if anything fails,
+    // hold on to the error until we've had a chance to try to free other resources
+    CHIP_ERROR clientResult = SwallowNotFound(mClientCertificates.RemoveFabric(fabric));
+    CHIP_ERROR rootResult   = SwallowNotFound(mRootCertificates.RemoveFabric(fabric));
+
+    GlobalCertificateData globalData(mEndpointId);
+    CHIP_ERROR globalDataResult = globalData.Load(mStorage);
+    if (globalDataResult == CHIP_ERROR_NOT_FOUND)
+    {
+        ReturnErrorOnFailure(clientResult);
+        return rootResult;
+    }
+    ReturnErrorOnFailure(globalDataResult);
+
+    if (rootResult == CHIP_NO_ERROR)
+    {
+        rootResult = SwallowNotFound(globalData.RemoveAllRootCertificates(*mStorage, fabric));
+    }
+
+    ReturnErrorOnFailure(SwallowNotFound(globalData.RemoveAllClientCertificates(*mStorage, fabric)));
+    ReturnErrorOnFailure(clientResult);
+    return rootResult;
 }
