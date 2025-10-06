@@ -158,6 +158,10 @@ enum class StreamType
     kSnapshot
 };
 
+// Forward declaration for the StreamTraits helper struct.
+template <AttributeId TAttributeId>
+struct StreamTraits;
+
 class CameraAVStreamMgmtServer;
 
 // ImageSnapshot response data for a CaptureSnapshot command.
@@ -666,6 +670,9 @@ public:
     bool IsResourceAvailableForStreamAllocation(uint32_t candidateEncodedPixelRate, bool encoderRequired);
 
 private:
+    template <AttributeId TAttributeId>
+    friend struct StreamTraits;
+
     CameraAVStreamMgmtDelegate & mDelegate;
     EndpointId mEndpointId;
     const BitFlags<Feature> mFeatures;
@@ -846,11 +853,18 @@ private:
     CHIP_ERROR StoreStreamUsagePriorities();
     CHIP_ERROR LoadStreamUsagePriorities();
 
-    template <typename T, size_t N>
-    CHIP_ERROR StoreAllocatedStreams(const std::vector<T> & streams, AttributeId attributeId, StreamType streamType);
+    template <AttributeId attributeId>
+    CHIP_ERROR StoreAllocatedStreams();
 
-    template <typename T, size_t N>
-    CHIP_ERROR LoadAllocatedStreams(std::vector<T> & streams, AttributeId attributeId, StreamType streamType);
+    /**
+     * @brief
+     *  A templatized function that loads the allocated streams of a certain type from persistent storage.
+     *
+     * @tparam attributeId The attribute Id of the allocated stream list.
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, otherwise another CHIP_ERROR.
+     */
+    template <AttributeId attributeId>
+    CHIP_ERROR LoadAllocatedStreams();
 
     void ModifyVideoStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled, const Optional<bool> osdEnabled);
 

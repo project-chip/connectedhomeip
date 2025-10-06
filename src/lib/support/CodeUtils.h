@@ -239,7 +239,7 @@
  *  @def LogAndReturnErrorOnFailure(expr)
  *
  *  @brief
- *    If expr returns something than CHIP_NO_ERROR, lg a chip message for the specified module
+ *    If expr returns something than CHIP_NO_ERROR, log a chip message for the specified module
  *    in the 'Error' category and return the error.
  *
  *  Example usage:

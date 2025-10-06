@@ -99,7 +99,7 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
             TestStep(
                 10,
                 "TH sets StreamUsage from aStreamUsagePriorities. TH sets VideoCodec, MinResolution, MaxResolution, MinBitRate, MaxBitRate conforming with aRateDistortionTradeOffPoints. TH sets MinFrameRate, MaxFrameRate conforming with aVideoSensorParams. TH sets the KeyFrameInterval = 4000. TH sets WatermarkEnabled to aWatermark, TH also sets OSDEnabled to aOSD. TH sends the VideoStreamAllocate command with these arguments.",
-                "DUT responds with VideoStreamAllocateResponse command with a valid VideoStreamID. Store this as myStreamID",
+                "DUT responds with VideoStreamAllocateResponse command with a valid VideoStreamID.",
             ),
             TestStep(
                 11,
@@ -190,7 +190,6 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
         osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
 
         self.step(10)
-        myStreamID = 0
         try:
             asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
             asserts.assert_greater(len(aRateDistortionTradeOffPoints), 0, "RateDistortionTradeOffPoints is empty")
@@ -214,7 +213,6 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
             asserts.assert_is_not_none(
                 videoStreamAllocateResponse.videoStreamID, "VideoStreamAllocateResponse does not contain StreamID"
             )
-            myStreamID = videoStreamAllocateResponse.videoStreamID
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
@@ -249,7 +247,6 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
             endpoint=0,  # Fault‑Injection cluster lives on EP0
             payload=command,
         )
-        #sleep(1)
 
         self.step(13)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
@@ -257,7 +254,6 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
         )
         logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         asserts.assert_equal(len(aAllocatedVideoStreams), 0, "Allocated video streams is not empty")
-
 
         self.step(14)
         logging.info("Injecting kFault_LoadPersistentCameraAVSMAttributes on DUT")
@@ -281,7 +277,6 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
             endpoint=0,  # Fault‑Injection cluster lives on EP0
             payload=command,
         )
-        #sleep(1)
 
         self.step(15)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
@@ -292,14 +287,19 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
 
         ##### Validate fields in Video Stream that was stored #####
         asserts.assert_equal(aAllocatedVideoStreams[0].streamUsage, aStreamUsagePriorities[0], "Stream Usage does not match")
-        asserts.assert_equal(aAllocatedVideoStreams[0].videoCodec, aRateDistortionTradeOffPoints[0].codec, "Video codec does not match")
+        asserts.assert_equal(aAllocatedVideoStreams[0].videoCodec,
+                             aRateDistortionTradeOffPoints[0].codec, "Video codec does not match")
         asserts.assert_equal(aAllocatedVideoStreams[0].minFrameRate, 30, "MinFrameRate does not match")
         asserts.assert_equal(aAllocatedVideoStreams[0].maxFrameRate, aVideoSensorParams.maxFPS, "MaxFrameRate does not match")
         asserts.assert_equal(aAllocatedVideoStreams[0].minResolution, aMinViewportRes, "MinResolution does not match")
-        asserts.assert_equal(aAllocatedVideoStreams[0].maxResolution.width, aVideoSensorParams.sensorWidth, "MaxResolution does not match")
-        asserts.assert_equal(aAllocatedVideoStreams[0].maxResolution.height, aVideoSensorParams.sensorHeight, "MaxResolution does not match")
-        asserts.assert_equal(aAllocatedVideoStreams[0].minBitRate, aRateDistortionTradeOffPoints[0].minBitRate, "MinBitRate does not match")
-        asserts.assert_equal(aAllocatedVideoStreams[0].maxBitRate, aRateDistortionTradeOffPoints[0].minBitRate, "MaxBitRate does not match")
+        asserts.assert_equal(aAllocatedVideoStreams[0].maxResolution.width,
+                             aVideoSensorParams.sensorWidth, "MaxResolution does not match")
+        asserts.assert_equal(aAllocatedVideoStreams[0].maxResolution.height,
+                             aVideoSensorParams.sensorHeight, "MaxResolution does not match")
+        asserts.assert_equal(aAllocatedVideoStreams[0].minBitRate,
+                             aRateDistortionTradeOffPoints[0].minBitRate, "MinBitRate does not match")
+        asserts.assert_equal(aAllocatedVideoStreams[0].maxBitRate,
+                             aRateDistortionTradeOffPoints[0].minBitRate, "MaxBitRate does not match")
         asserts.assert_equal(aAllocatedVideoStreams[0].keyFrameInterval, 4000, "KeyFrameInterval does not match")
 
         # Clear all allocated streams

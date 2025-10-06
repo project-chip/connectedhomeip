@@ -324,9 +324,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::AddVideoStream(const VideoStreamStruct & vi
 {
     mAllocatedVideoStreams.push_back(videoStream);
 
-    LogAndReturnErrorOnFailure((StoreAllocatedStreams<VideoStreamStruct, kMaxAllocatedVideoStreamsSerializedSize>(
-                                   mAllocatedVideoStreams, Attributes::AllocatedVideoStreams::Id, StreamType::kVideo)),
-                               Zcl, "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated video streams", mEndpointId);
+    LogAndReturnErrorOnFailure(StoreAllocatedStreams<Attributes::AllocatedVideoStreams::Id>(), Zcl,
+                               "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated video streams", mEndpointId);
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
     mDelegate.OnAttributeChanged(Attributes::AllocatedVideoStreams::Id);
@@ -369,9 +368,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::UpdateVideoStreamRangeParams(VideoStreamStr
 
     if (wasModified)
     {
-        LogAndReturnErrorOnFailure((StoreAllocatedStreams<VideoStreamStruct, kMaxAllocatedVideoStreamsSerializedSize>(
-                                       mAllocatedVideoStreams, Attributes::AllocatedVideoStreams::Id, StreamType::kVideo)),
-                                   Zcl, "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated video streams", mEndpointId);
+        LogAndReturnErrorOnFailure(StoreAllocatedStreams<Attributes::AllocatedVideoStreams::Id>(), Zcl,
+                                   "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated video streams", mEndpointId);
         auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
         mDelegate.OnAttributeChanged(Attributes::AllocatedVideoStreams::Id);
         MatterReportingAttributeChangeCallback(path);
@@ -387,9 +385,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveVideoStream(uint16_t videoStreamId)
                        [&](const VideoStreamStruct & vStream) { return vStream.videoStreamID == videoStreamId; }),
         mAllocatedVideoStreams.end());
 
-    LogAndReturnErrorOnFailure((StoreAllocatedStreams<VideoStreamStruct, kMaxAllocatedVideoStreamsSerializedSize>(
-                                   mAllocatedVideoStreams, Attributes::AllocatedVideoStreams::Id, StreamType::kVideo)),
-                               Zcl, "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated video streams", mEndpointId);
+    LogAndReturnErrorOnFailure(StoreAllocatedStreams<Attributes::AllocatedVideoStreams::Id>(), Zcl,
+                               "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated video streams", mEndpointId);
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
     mDelegate.OnAttributeChanged(Attributes::AllocatedVideoStreams::Id);
@@ -400,11 +397,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveVideoStream(uint16_t videoStreamId)
 
 CHIP_ERROR CameraAVStreamMgmtServer::AddAudioStream(const AudioStreamStruct & audioStream)
 {
-    mAllocatedAudioStreams.push_back(audioStream);
-
-    LogAndReturnErrorOnFailure((StoreAllocatedStreams<AudioStreamStruct, kMaxAllocatedAudioStreamsSerializedSize>(
-                                   mAllocatedAudioStreams, Attributes::AllocatedAudioStreams::Id, StreamType::kAudio)),
-                               Zcl, "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated audio streams", mEndpointId);
+    LogAndReturnErrorOnFailure(StoreAllocatedStreams<Attributes::AllocatedAudioStreams::Id>(), Zcl,
+                               "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated audio streams", mEndpointId);
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedAudioStreams::Id);
     mDelegate.OnAttributeChanged(Attributes::AllocatedAudioStreams::Id);
@@ -420,9 +414,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveAudioStream(uint16_t audioStreamId)
                        [&](const AudioStreamStruct & aStream) { return aStream.audioStreamID == audioStreamId; }),
         mAllocatedAudioStreams.end());
 
-    LogAndReturnErrorOnFailure((StoreAllocatedStreams<AudioStreamStruct, kMaxAllocatedAudioStreamsSerializedSize>(
-                                   mAllocatedAudioStreams, Attributes::AllocatedAudioStreams::Id, StreamType::kAudio)),
-                               Zcl, "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated audio streams", mEndpointId);
+    LogAndReturnErrorOnFailure(StoreAllocatedStreams<Attributes::AllocatedAudioStreams::Id>(), Zcl,
+                               "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated audio streams", mEndpointId);
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedAudioStreams::Id);
     mDelegate.OnAttributeChanged(Attributes::AllocatedAudioStreams::Id);
@@ -466,11 +459,8 @@ bool CameraAVStreamMgmtServer::IsAllocatedSnapshotStreamReusable(
 
 CHIP_ERROR CameraAVStreamMgmtServer::AddSnapshotStream(const SnapshotStreamStruct & snapshotStream)
 {
-    mAllocatedSnapshotStreams.push_back(snapshotStream);
-
-    LogAndReturnErrorOnFailure((StoreAllocatedStreams<SnapshotStreamStruct, kMaxAllocatedSnapshotStreamsSerializedSize>(
-                                   mAllocatedSnapshotStreams, Attributes::AllocatedSnapshotStreams::Id, StreamType::kSnapshot)),
-                               Zcl, "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated snapshot streams", mEndpointId);
+    LogAndReturnErrorOnFailure(StoreAllocatedStreams<Attributes::AllocatedSnapshotStreams::Id>(), Zcl,
+                               "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated snapshot streams", mEndpointId);
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedSnapshotStreams::Id);
     mDelegate.OnAttributeChanged(Attributes::AllocatedSnapshotStreams::Id);
@@ -507,9 +497,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::UpdateSnapshotStreamRangeParams(
 
     if (wasModified)
     {
-        LogAndReturnErrorOnFailure((StoreAllocatedStreams<SnapshotStreamStruct, kMaxAllocatedSnapshotStreamsSerializedSize>(
-                                       mAllocatedSnapshotStreams, Attributes::AllocatedSnapshotStreams::Id, StreamType::kSnapshot)),
-                                   Zcl, "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated snapshot streams", mEndpointId);
+        LogAndReturnErrorOnFailure(StoreAllocatedStreams<Attributes::AllocatedSnapshotStreams::Id>(), Zcl,
+                                   "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated snapshot streams", mEndpointId);
 
         auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedSnapshotStreams::Id);
         mDelegate.OnAttributeChanged(Attributes::AllocatedSnapshotStreams::Id);
@@ -526,9 +515,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveSnapshotStream(uint16_t snapshotStrea
                        [&](const SnapshotStreamStruct & sStream) { return sStream.snapshotStreamID == snapshotStreamId; }),
         mAllocatedSnapshotStreams.end());
 
-    LogAndReturnErrorOnFailure((StoreAllocatedStreams<SnapshotStreamStruct, kMaxAllocatedSnapshotStreamsSerializedSize>(
-                                   mAllocatedSnapshotStreams, Attributes::AllocatedSnapshotStreams::Id, StreamType::kSnapshot)),
-                               Zcl, "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated snapshot streams", mEndpointId);
+    LogAndReturnErrorOnFailure(StoreAllocatedStreams<Attributes::AllocatedSnapshotStreams::Id>(), Zcl,
+                               "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated snapshot streams", mEndpointId);
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedSnapshotStreams::Id);
     mDelegate.OnAttributeChanged(Attributes::AllocatedSnapshotStreams::Id);
@@ -1323,23 +1311,20 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     }
 
     // Load AllocatedVideoStreams
-    err = LoadAllocatedStreams<VideoStreamStruct, kMaxAllocatedVideoStreamsSerializedSize>(
-        mAllocatedVideoStreams, Attributes::AllocatedVideoStreams::Id, StreamType::kVideo);
+    err = LoadAllocatedStreams<Attributes::AllocatedVideoStreams::Id>();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load allocated video streams from the KVS.", mEndpointId);
     }
     // Load AllocatedAudioStreams
-    err = LoadAllocatedStreams<AudioStreamStruct, kMaxAllocatedAudioStreamsSerializedSize>(
-        mAllocatedAudioStreams, Attributes::AllocatedAudioStreams::Id, StreamType::kAudio);
+    err = LoadAllocatedStreams<Attributes::AllocatedAudioStreams::Id>();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load allocated audio streams from the KVS.", mEndpointId);
     }
 
     // Load AllocatedSnapshotStreams
-    err = LoadAllocatedStreams<SnapshotStreamStruct, kMaxAllocatedSnapshotStreamsSerializedSize>(
-        mAllocatedSnapshotStreams, Attributes::AllocatedSnapshotStreams::Id, StreamType::kSnapshot);
+    err = LoadAllocatedStreams<Attributes::AllocatedSnapshotStreams::Id>();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load allocated snapshot streams from the KVS.", mEndpointId);
@@ -1711,57 +1696,89 @@ CHIP_ERROR CameraAVStreamMgmtServer::LoadStreamUsagePriorities()
     return reader.VerifyEndOfContainer();
 }
 
-template <typename T, size_t N>
-CHIP_ERROR CameraAVStreamMgmtServer::StoreAllocatedStreams(const std::vector<T> & streams, AttributeId attributeId,
-                                                           StreamType streamType)
+template <AttributeId TAttributeId>
+struct StreamTraits;
+
+template <>
+struct StreamTraits<Attributes::AllocatedVideoStreams::Id>
 {
-    uint8_t buffer[N];
-    chip::TLV::TLVWriter writer;
-    writer.Init(buffer, sizeof(buffer));
+    using StreamStructType                     = VideoStreamStruct;
+    static constexpr size_t kMaxSerializedSize = kMaxAllocatedVideoStreamsSerializedSize;
+    static constexpr StreamType kStreamType    = StreamType::kVideo;
+    static constexpr auto kStreamVectorMember  = &CameraAVStreamMgmtServer::mAllocatedVideoStreams;
+};
+
+template <>
+struct StreamTraits<Attributes::AllocatedAudioStreams::Id>
+{
+    using StreamStructType                     = AudioStreamStruct;
+    static constexpr size_t kMaxSerializedSize = kMaxAllocatedAudioStreamsSerializedSize;
+    static constexpr StreamType kStreamType    = StreamType::kAudio;
+    static constexpr auto kStreamVectorMember  = &CameraAVStreamMgmtServer::mAllocatedAudioStreams;
+};
+
+template <>
+struct StreamTraits<Attributes::AllocatedSnapshotStreams::Id>
+{
+    using StreamStructType                     = SnapshotStreamStruct;
+    static constexpr size_t kMaxSerializedSize = kMaxAllocatedSnapshotStreamsSerializedSize;
+    static constexpr StreamType kStreamType    = StreamType::kSnapshot;
+    static constexpr auto kStreamVectorMember  = &CameraAVStreamMgmtServer::mAllocatedSnapshotStreams;
+};
+
+} // namespace CameraAvStreamManagement
+
+template <AttributeId attributeId>
+CHIP_ERROR CameraAVStreamMgmtServer::StoreAllocatedStreams()
+{
+    using Traits = StreamTraits<attributeId>;
+
+    uint8_t buffer[Traits::kMaxSerializedSize];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
 
     TLV::TLVType arrayType;
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
 
+    const auto & streams = (*this).*Traits::kStreamVectorMember;
     for (const auto & stream : streams)
     {
-        ReturnErrorOnFailure(DataModel::Encode(writer, chip::TLV::AnonymousTag(), stream));
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::AnonymousTag(), stream));
     }
 
     ReturnErrorOnFailure(writer.EndContainer(arrayType));
 
     size_t len = writer.GetLengthWritten();
-    if (len == 0 && !streams.empty())
-    {
-        ChipLogError(Zcl, "TLV encoding produced 0 length for non-empty %s streams", StreamTypeToString(streamType));
-        return CHIP_ERROR_INTERNAL;
-    }
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, attributeId);
     ReturnErrorOnFailure(GetAttributePersistenceProvider()->WriteValue(path, ByteSpan(buffer, len)));
 
-    ChipLogProgress(Zcl, "Saved %u %s streams", static_cast<unsigned int>(streams.size()), StreamTypeToString(streamType));
+    ChipLogProgress(Zcl, "Saved %u %s streams", static_cast<unsigned int>(streams.size()), StreamTypeToString(Traits::kStreamType));
     return CHIP_NO_ERROR;
 }
 
-template <typename T, size_t N>
-CHIP_ERROR CameraAVStreamMgmtServer::LoadAllocatedStreams(std::vector<T> & streams, AttributeId attributeId, StreamType streamType)
+template <AttributeId attributeId>
+CHIP_ERROR CameraAVStreamMgmtServer::LoadAllocatedStreams()
 {
-    uint8_t buffer[N];
+    using Traits = StreamTraits<attributeId>;
+
+    uint8_t buffer[Traits::kMaxSerializedSize];
     MutableByteSpan span(buffer);
 
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, attributeId);
+    auto path      = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, attributeId);
+    auto & streams = (*this).*Traits::kStreamVectorMember;
 
     CHIP_ERROR err = GetAttributePersistenceProvider()->ReadValue(path, span);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         streams.clear();
-        ChipLogProgress(Zcl, "No persisted %s streams found.", StreamTypeToString(streamType));
+        ChipLogProgress(Zcl, "No persisted %s streams found.", StreamTypeToString(Traits::kStreamType));
         return CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
 
-    chip::TLV::TLVReader reader;
-    reader.Init(span.data(), span.size());
+    TLV::TLVReader reader;
+    reader.Init(span);
 
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
     TLV::TLVType arrayType;
@@ -1770,7 +1787,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::LoadAllocatedStreams(std::vector<T> & strea
     streams.clear();
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        T stream;
+        typename Traits::StreamStructType stream;
         ReturnErrorOnFailure(DataModel::Decode(reader, stream));
         streams.push_back(stream);
     }
@@ -1779,7 +1796,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::LoadAllocatedStreams(std::vector<T> & strea
 
     ReturnErrorOnFailure(reader.ExitContainer(arrayType));
 
-    ChipLogProgress(Zcl, "Loaded %u %s streams", static_cast<unsigned int>(streams.size()), StreamTypeToString(streamType));
+    ChipLogProgress(Zcl, "Loaded %u %s streams", static_cast<unsigned int>(streams.size()),
+                    StreamTypeToString(Traits::kStreamType));
 
     return reader.VerifyEndOfContainer();
 }
@@ -2614,7 +2632,6 @@ bool CameraAVStreamMgmtServer::IsResourceAvailableForStreamAllocation(uint32_t c
     return true;
 }
 
-} // namespace CameraAvStreamManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip
