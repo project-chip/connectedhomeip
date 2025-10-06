@@ -80,7 +80,7 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
                      - DUT replies a uint16 value or null;
                      - Value is saved as MaxMeteredQuantitiesValue."""),
             TestStep("4", "TH reads MeteredQuantity attribute.", """
-                     - DUT replies a list of MeteredQuantityStruct entries with length less or equal MaximumMeteredQuantitiesValue from step 2, or null;
+                     - DUT replies a list of MeteredQuantityStruct entries with length less or equal MaximumMeteredQuantitiesValue from step 3, or null;
                      - For each entry:
                         - TariffComponentIDs field has a list of uint32 value with length less or equal 128;
                         - Quantity field has an int64 value;
