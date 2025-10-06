@@ -146,7 +146,7 @@ PyChipError pychip_DeviceController_GetNodeId(chip::Controller::DeviceCommission
 PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
                                                bool isShortDiscriminator, uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectNFC(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
-                                               bool isShortDiscriminator, uint32_t setupPINCode, chip::NodeId nodeid);
+                                               uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                               uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl, const char * onboardingPayload,
@@ -439,18 +439,12 @@ PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissio
 }
 
 PyChipError pychip_DeviceController_ConnectNFC(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
-                                               bool isShortDiscriminator, uint32_t setupPINCode, chip::NodeId nodeid)
+                                               uint32_t setupPINCode, chip::NodeId nodeid)
 {
     SetupDiscriminator setupDiscriminator;
 
-    if (isShortDiscriminator)
-    {
-        setupDiscriminator.SetShortValue(discriminator & 0xFu);
-    }
-    else
-    {
-        setupDiscriminator.SetLongValue(discriminator);
-    }
+    // With NFC, only a long discriminator can be used
+    setupDiscriminator.SetLongValue(discriminator);
 
     return ToPyChipError(devCtrl->PairDevice(nodeid,
                                              chip::RendezvousParameters()
