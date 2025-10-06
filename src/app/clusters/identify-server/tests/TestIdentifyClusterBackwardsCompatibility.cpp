@@ -137,4 +137,24 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestIdentifyTypeInitialization
     EXPECT_EQ(identifyAudibleBeep.mIdentifyType, chip::app::Clusters::Identify::IdentifyTypeEnum::kAudibleBeep);
 }
 
+TEST_F(TestIdentifyClusterBackwardsCompatibility, TestMActive)
+{
+    struct Identify identify(1, nullptr, nullptr, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone, nullptr,
+                             EffectIdentifierEnum::kBlink, EffectVariantEnum::kDefault, &mTestTimerDelegate);
+    EXPECT_EQ(identify.mCluster.Cluster().Startup(mContext.Get()), CHIP_NO_ERROR);
+
+    const auto identifyTimePath = ConcreteDataAttributePath(1, Identify::Id, IdentifyTime::Id);
+
+    // Test that mActive is false initially.
+    EXPECT_FALSE(identify.mActive);
+
+    // Test that mActive is true after writing a non-zero value to IdentifyTime.
+    EXPECT_EQ(WriteAttribute(identify.mCluster.Cluster(), identifyTimePath, 10u), CHIP_NO_ERROR);
+    EXPECT_TRUE(identify.mActive);
+
+    // Test that mActive is false after writing 0 to IdentifyTime.
+    EXPECT_EQ(WriteAttribute(identify.mCluster.Cluster(), identifyTimePath, 0u), CHIP_NO_ERROR);
+    EXPECT_FALSE(identify.mActive);
+}
+
 } // namespace

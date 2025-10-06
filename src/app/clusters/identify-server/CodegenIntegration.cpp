@@ -63,17 +63,25 @@ public:
     void OnIdentifyStart(IdentifyCluster & cluster) override
     {
         Identify * identify = GetLegacyIdentifyInstance(cluster.GetPaths()[0].mEndpointId);
-        if (identify != nullptr && identify->mOnIdentifyStart)
+        if (identify != nullptr)
         {
-            identify->mOnIdentifyStart(identify);
+            identify->mActive = true;
+            if (identify->mOnIdentifyStart)
+            {
+                identify->mOnIdentifyStart(identify);
+            }
         }
     }
     void OnIdentifyStop(IdentifyCluster & cluster) override
     {
         Identify * identify = GetLegacyIdentifyInstance(cluster.GetPaths()[0].mEndpointId);
-        if (identify != nullptr && identify->mOnIdentifyStop)
+        if (identify != nullptr)
         {
-            identify->mOnIdentifyStop(identify);
+            identify->mActive = false;
+            if (identify->mOnIdentifyStop)
+            {
+                identify->mOnIdentifyStop(identify);
+            }
         }
     }
     void OnTriggerEffect(IdentifyCluster & cluster) override

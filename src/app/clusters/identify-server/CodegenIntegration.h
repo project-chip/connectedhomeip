@@ -66,6 +66,7 @@ struct Identify
 
     onIdentifyStartCb mOnIdentifyStart = nullptr;
     onIdentifyStopCb mOnIdentifyStop   = nullptr;
+    bool mActive                       = false;
     chip::app::Clusters::Identify::IdentifyTypeEnum mIdentifyType;
     onEffectIdentifierCb mOnEffectIdentifier;
     chip::app::Clusters::Identify::EffectIdentifierEnum mCurrentEffectIdentifier;
