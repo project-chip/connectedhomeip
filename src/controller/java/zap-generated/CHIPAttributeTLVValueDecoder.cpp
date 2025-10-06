@@ -50795,13 +50795,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                newElement_0_ccdidCtorSignature.c_str(),
                                                                                jninewElement_0_ccdid, newElement_0_ccdid);
                 }
-                jobject newElement_0_status;
-                std::string newElement_0_statusClassName     = "java/lang/Integer";
-                std::string newElement_0_statusCtorSignature = "(I)V";
-                jint jninewElement_0_status                  = static_cast<jint>(entry_0.status);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_statusClassName.c_str(),
-                                                                           newElement_0_statusCtorSignature.c_str(),
-                                                                           jninewElement_0_status, newElement_0_status);
+                jobject newElement_0_referenceCount;
+                std::string newElement_0_referenceCountClassName     = "java/lang/Integer";
+                std::string newElement_0_referenceCountCtorSignature = "(I)V";
+                jint jninewElement_0_referenceCount                  = static_cast<jint>(entry_0.referenceCount);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_referenceCountClassName.c_str(), newElement_0_referenceCountCtorSignature.c_str(),
+                    jninewElement_0_referenceCount, newElement_0_referenceCount);
                 jobject newElement_0_fabricIndex;
                 std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
                 std::string newElement_0_fabricIndexCtorSignature = "(I)V";
@@ -50836,7 +50836,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     newElement_0 =
                         env->NewObject(TLSEndpointStructStructClass_1, TLSEndpointStructStructCtor_1, newElement_0_endpointID,
                                        newElement_0_hostname, newElement_0_port, newElement_0_caid, newElement_0_ccdid,
-                                       newElement_0_status, newElement_0_fabricIndex);
+                                       newElement_0_referenceCount, newElement_0_fabricIndex);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
