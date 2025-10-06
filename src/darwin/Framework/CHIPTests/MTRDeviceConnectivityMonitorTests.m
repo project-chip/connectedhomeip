@@ -231,7 +231,7 @@ static void test001_MonitorTest_RegisterCallback(
         MTRDeviceConnectivityMonitor * monitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:instanceName];
         [monitors addObject:monitor];
 
-        NSUInteger monitorID = [monitor monitorID];
+        uintptr_t monitorID = [monitor monitorID];
         XCTAssertFalse([monitorIDs containsObject:@(monitorID)], @"Monitor ID %lu is not unique", (unsigned long) monitorID);
         [monitorIDs addObject:@(monitorID)];
     }
@@ -257,7 +257,7 @@ static void test001_MonitorTest_RegisterCallback(
 
     @autoreleasepool {
         MTRDeviceConnectivityMonitor * monitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:@(testInstanceName)];
-        NSUInteger monitorID = [monitor monitorID];
+        uintptr_t monitorID = [monitor monitorID];
 
         // Start monitoring but don't wait for callback
         [monitor startMonitoringWithHandler:^{
@@ -290,7 +290,7 @@ static void test001_MonitorTest_RegisterCallback(
             NSString * instanceName = [NSString stringWithFormat:@"rapid-test-%lu", (unsigned long) cycle];
             MTRDeviceConnectivityMonitor * monitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:instanceName];
 
-            NSUInteger monitorID = [monitor monitorID];
+            uintptr_t monitorID = [monitor monitorID];
             XCTAssertFalse([usedIDs containsObject:@(monitorID)], @"Monitor ID %lu was reused too quickly", (unsigned long) monitorID);
             [usedIDs addObject:@(monitorID)];
 
@@ -301,7 +301,7 @@ static void test001_MonitorTest_RegisterCallback(
     // All monitors should be deallocated and map entries cleaned up
     // Create one more monitor to verify IDs are still being assigned properly
     MTRDeviceConnectivityMonitor * finalMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:@"final-test"];
-    NSUInteger finalID = [finalMonitor monitorID];
+    uintptr_t finalID = [finalMonitor monitorID];
     XCTAssertNotEqual(finalID, 0, @"Final monitor should have valid ID");
 
     // Clean up
@@ -336,7 +336,7 @@ static void test001_MonitorTest_RegisterCallback(
         for (NSUInteger i = 0; i < kNumMonitors; i++) {
             NSString * instanceName = [NSString stringWithFormat:@"callback-safety-test-%lu", (unsigned long) i];
             MTRDeviceConnectivityMonitor * monitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:instanceName];
-            NSUInteger monitorID = [monitor monitorID];
+            uintptr_t monitorID = [monitor monitorID];
             [monitorIDs addObject:@(monitorID)];
 
             [monitor startMonitoringWithHandler:^{

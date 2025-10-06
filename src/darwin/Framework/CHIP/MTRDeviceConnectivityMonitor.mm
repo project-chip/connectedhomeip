@@ -30,7 +30,7 @@
     NSString * _instanceName;
     std::vector<DNSServiceRef> _resolvers;
     NSMutableDictionary<NSString *, nw_connection_t> * _connectionsByHostname;
-    NSUInteger _monitorID; // Unique ID for safe DNS-SD callback lookup
+    uintptr_t _monitorID; // Unique ID for safe DNS-SD callback lookup
 
     MTRDeviceConnectivityMonitorHandler _monitorHandler;
     dispatch_queue_t _handlerQueue;
@@ -61,7 +61,7 @@ static dispatch_queue_t sSharedResolverQueue;
 // callback is safely ignored. This completely eliminates race conditions between object
 // deallocation and asynchronous DNS-SD callbacks.
 static NSMapTable<NSNumber *, MTRDeviceConnectivityMonitor *> * sMonitorMap;
-static NSUInteger sNextMonitorID = 1;
+static uintptr_t sNextMonitorID = 1;
 
 - (instancetype)initWithInstanceName:(NSString *)instanceName
 {
@@ -78,20 +78,26 @@ static NSUInteger sNextMonitorID = 1;
         // Assign unique ID and register in map
         std::lock_guard lock(sConnectivityMonitorLock);
 
+        // Mask to ensure monitor IDs fit within pointer size.
+        // Casting UINTPTR_MAX through void* naturally truncates to pointer width.
+        // If uintptr_t were somehow larger than void*, this mask ensures IDs
+        // stay within the representable range when cast to void*.
+        uintptr_t pointerSizeMask = (uintptr_t) (void *) (~(uintptr_t) 0);
+
         // Find an unused ID with bounded search to handle potential wrap-around
-        NSUInteger candidateID = sNextMonitorID;
-        NSUInteger attempts = 0;
+        uintptr_t candidateID = sNextMonitorID;
+        uintptr_t attempts = 0;
 
         while ([sMonitorMap objectForKey:@(candidateID)] != nil) {
             attempts++;
-            NSAssert(attempts < NSUIntegerMax, @"Exhausted all monitor IDs - this should never happen");
+            // Check against max pointer values, not UINTPTR_MAX
+            NSAssert(attempts < pointerSizeMask, @"Exhausted all monitor IDs - this should never happen");
 
-            candidateID++;
-            // Handle wrap-around naturally (0 is fine)
+            candidateID = (candidateID + 1) & pointerSizeMask; // Wrap within pointer size
         }
 
         _monitorID = candidateID;
-        sNextMonitorID = candidateID + 1; // Update for next allocation
+        sNextMonitorID = (candidateID + 1) & pointerSizeMask; // Ensure next ID also fits
         [sMonitorMap setObject:self forKey:@(_monitorID)];
     }
     return self;
@@ -243,7 +249,7 @@ static void ResolveCallback(
     void * context)
 {
     // Context contains monitor ID, to look up the monitor object
-    NSUInteger monitorID = reinterpret_cast<NSUInteger>(context);
+    uintptr_t monitorID = reinterpret_cast<uintptr_t>(context);
 
     std::lock_guard lock(sConnectivityMonitorLock);
     MTRDeviceConnectivityMonitor * monitor = [sMonitorMap objectForKey:@(monitorID)];
@@ -368,7 +374,6 @@ static void ResolveCallback(
     if (_resolvers.size() != 0) {
         sConnectivityMonitorCount--;
         auto resolversToCleanUp = std::move(_resolvers);
-        _resolvers.clear(); // Now empty immediately
         [self _clearResolvers:resolversToCleanUp]; // Async DNS cleanup
     }
 }
@@ -382,7 +387,7 @@ static void ResolveCallback(
 
 #pragma mark - Testing Support
 
-- (NSUInteger)monitorID
+- (uintptr_t)monitorID
 {
     return _monitorID;
 }
