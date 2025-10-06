@@ -240,8 +240,8 @@ TEST_F(TestIdentifyCluster, OnIdentifyStartStopCallbackTest)
 
     // Test onIdentifyStop callback.
     onIdentifyStopCalled = false;
-            EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(0)), CHIP_NO_ERROR);
-            EXPECT_TRUE(onIdentifyStopCalled);
+    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(0)), CHIP_NO_ERROR);
+    EXPECT_TRUE(onIdentifyStopCalled);
     // Test onIdentifyStop callback with timer.
     EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(2)), CHIP_NO_ERROR);
     onIdentifyStopCalled = false;
@@ -480,7 +480,8 @@ TEST_F(TestIdentifyCluster, IdentifyTimeAttributeReportingTest)
     EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, identifyTimePath.mAttributeId);
 
     // 4. Test client write from non-zero to 0
-    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(5)), CHIP_NO_ERROR); // Start again to have a non-zero value.
+    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(5)),
+              CHIP_NO_ERROR); // Start again to have a non-zero value.
     changeListener.DirtyList().clear();
     EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(0)), CHIP_NO_ERROR);
     EXPECT_EQ(changeListener.DirtyList().size(), 1u);
