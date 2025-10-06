@@ -213,7 +213,6 @@ class ZoneManagementCluster : public DefaultServerCluster
 public:
     ZoneManagementCluster(EndpointId endpointId, Delegate & delegate, const BitFlags<Feature> features, uint8_t maxUserDefinedZones,
                           uint8_t maxZones, uint8_t sensitivityMax, const TwoDCartesianVertexStruct & twoDCartesianMax);
-    ZoneManagementCluster(EndpointId endpointId);
     ~ZoneManagementCluster() override;
 
     CHIP_ERROR Init();
@@ -263,7 +262,7 @@ public:
     Protocols::InteractionModel::Status GenerateZoneStoppedEvent(uint16_t zoneID, ZoneEventStoppedReasonEnum stopReason);
 
 private:
-    Delegate * mDelegate = nullptr;
+    Delegate & mDelegate;
     const BitFlags<Feature> mFeatures;
 
     // Attributes
