@@ -432,9 +432,11 @@ typedef enum {
 #define BLE_BUFF_HDR_NULL_PCKT		(1<<3)
 /*
  * BLE_BUFF_HDR_ISO_DATA_PCKT_BIT1  : BLE_BUFF_HDR_ISO_DATA_PCKT_BIT0   = Mode
- * 1								: 1									= Unframed CIS Data PDU; end fragment of an SDU or a complete SDU. LLID (0b00)
- * 0								: 1									= Unframed CIS Data PDU; start or continuation fragment of an SDU.
- * 1								: 0									= Framed CIS Data PDU; one or more segments of an SDU.
+ * 1                                : 1                                    = Unframed CIS Data PDU; end fragment
+ * of an SDU or a complete SDU. LLID (0b00) 0                                : 1 = Unframed CIS Data PDU;
+ * start or continuation fragment of an SDU.
+ * 1                                : 0                                    = Framed CIS Data PDU; one or
+ * more segments of an SDU.
  * */
 #define BLE_BUFF_HDR_ISO_DATA_PCKT_BIT0		(1<<5)
 #define BLE_BUFF_HDR_ISO_DATA_PCKT_BIT1		(1<<6)
