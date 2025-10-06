@@ -137,7 +137,7 @@ public:
     Identify::EffectVariantEnum GetEffectVariant() const { return mEffectVariant; }
     Identify::IdentifyTypeEnum GetIdentifyType() const { return mIdentifyType; }
 
-protected:
+private:
     uint16_t mIdentifyTime;
     Identify::IdentifyTypeEnum mIdentifyType;
     IdentifyDelegate * mIdentifyDelegate;
@@ -145,7 +145,6 @@ protected:
     Identify::EffectVariantEnum mEffectVariant;
     reporting::ReportScheduler::TimerDelegate & mTimerDelegate;
 
-private:
     enum class IdentifyTimeChangeSource
     {
         kClient,

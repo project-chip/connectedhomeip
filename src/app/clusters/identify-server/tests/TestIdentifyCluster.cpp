@@ -362,7 +362,7 @@ TEST_F(TestIdentifyCluster, InvokeTriggerEffectCommandInvalidVariantTest)
     // Test with an invalid effect variant.
     Commands::TriggerEffect::Type data;
     data.effectIdentifier = EffectIdentifierEnum::kBlink;
-    data.effectVariant    = EffectVariantEnum::kInvalid;
+    data.effectVariant    = static_cast<EffectVariantEnum>(0xFF); // Invalid variant.
 
     onEffectIdentifierCalled = false;
     auto result              = InvokeCommand(cluster, Commands::TriggerEffect::Id, data);
