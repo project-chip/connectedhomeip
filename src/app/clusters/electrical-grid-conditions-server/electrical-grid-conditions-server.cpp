@@ -289,7 +289,7 @@ CHIP_ERROR Instance::CopyForecastConditions(const DataModel::List<const Structs:
     mForecastConditionsStorageCount = 0;
 
     // Handle empty list case
-    if (src.size() == 0)
+    if (src.empty())
     {
         mForecastConditions = DataModel::List<const Structs::ElectricalGridConditionsStruct::Type>();
         return CHIP_NO_ERROR;
