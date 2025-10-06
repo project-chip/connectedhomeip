@@ -227,7 +227,7 @@ CHIP_ERROR Instance::SetForecastConditions(const DataModel::List<const Structs::
 
     // Validate time order constraints per spec:
     // The list entries SHALL be in time order
-    if (newValue.size() > 0)
+    if (!newValue.empty())
     {
         for (size_t i = 0; i < newValue.size(); i++)
         {
