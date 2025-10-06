@@ -23,6 +23,7 @@
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
+#include <lib/support/ScopedBuffer.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -49,6 +50,13 @@ CHIP_ERROR Instance::Init()
 void Instance::Shutdown()
 {
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+    
+    // Free the forecast conditions storage if allocated
+    if (mForecastConditionsStorage.Get() != nullptr)
+    {
+        mForecastConditionsStorage.Free();
+    }
+    mForecastConditionsStorageCount = 0;
 }
 
 bool Instance::HasFeature(Feature aFeature) const
@@ -135,12 +143,38 @@ CHIP_ERROR Instance::SetCurrentConditions(DataModel::Nullable<Structs::Electrica
         }
     }
 
-    mCurrentConditions = newValue;
-    ChipLogDetail(AppServer, "Endpoint %d - mCurrentConditions updated", mEndpointId);
-    MatterReportingAttributeChangeCallback(mEndpointId, ElectricalGridConditions::Id, CurrentConditions::Id);
+    // Deep check - compare new value with current value to avoid unnecessary updates
+    bool hasChanged = false;
+    
+    if (mCurrentConditions.IsNull() != newValue.IsNull())
+    {
+        hasChanged = true;
+    }
+    else if (!mCurrentConditions.IsNull() && !newValue.IsNull())
+    {
+        const auto & current = mCurrentConditions.Value();
+        const auto & newVal = newValue.Value();
+        
+        if (current.periodStart != newVal.periodStart ||
+            current.periodEnd != newVal.periodEnd ||
+            current.gridCarbonIntensity != newVal.gridCarbonIntensity ||
+            current.gridCarbonLevel != newVal.gridCarbonLevel ||
+            current.localCarbonIntensity != newVal.localCarbonIntensity ||
+            current.localCarbonLevel != newVal.localCarbonLevel)
+        {
+            hasChanged = true;
+        }
+    }
+    
+    if (hasChanged)
+    {
+        mCurrentConditions = newValue;
+        ChipLogDetail(AppServer, "Endpoint %d - mCurrentConditions updated", mEndpointId);
+        MatterReportingAttributeChangeCallback(mEndpointId, ElectricalGridConditions::Id, CurrentConditions::Id);
 
-    // generate a CurrentConditionsChanged Event
-    GenerateCurrentConditionsChangedEvent();
+        // generate a CurrentConditionsChanged Event
+        GenerateCurrentConditionsChangedEvent();
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -164,11 +198,125 @@ Status Instance::GenerateCurrentConditionsChangedEvent()
 
 CHIP_ERROR Instance::SetForecastConditions(const DataModel::List<const Structs::ElectricalGridConditionsStruct::Type> & newValue)
 {
-    mForecastConditions = newValue;
+    // Validate input constraints
+    if (newValue.size() > kMaxForecastEntries)
+    {
+        ChipLogError(AppServer, "Endpoint %d - ForecastConditions list size %u exceeds maximum %d", 
+                     mEndpointId, static_cast<unsigned int>(newValue.size()), kMaxForecastEntries);
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
 
-    ChipLogDetail(AppServer, "Endpoint %d - mForecastConditions updated", mEndpointId);
+    // Validate each entry individually
+    for (size_t i = 0; i < newValue.size(); i++)
+    {
+        const auto & condition = newValue[i];
+        
+        if (EnsureKnownEnumValue(condition.gridCarbonLevel) == ThreeLevelEnum::kUnknownEnumValue)
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+
+        if (EnsureKnownEnumValue(condition.localCarbonLevel) == ThreeLevelEnum::kUnknownEnumValue)
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+
+        // Check PeriodStart < PeriodEnd (if not null)
+        if (!condition.periodEnd.IsNull() && (condition.periodStart > condition.periodEnd.Value()))
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+    }
+
+    // Validate time order constraints per spec:
+    // The list entries SHALL be in time order
+    if (newValue.size() > 0)
+    {
+        for (size_t i = 0; i < newValue.size(); i++)
+        {
+            const auto & condition = newValue[i];
+            
+            // All entries except the last one SHALL have a non-null PeriodEnd
+            if (i < newValue.size() - 1)  // Not the last entry
+            {
+                if (condition.periodEnd.IsNull())
+                {
+                    ChipLogError(AppServer, "Endpoint %d - Entry %u: All entries except the last SHALL have a non-null PeriodEnd", 
+                                 mEndpointId, static_cast<unsigned int>(i));
+                    return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+                }
+            }
+            
+            // For all entries except the first one, PeriodStart SHALL be greater than the previous entry's PeriodEnd
+            if (i > 0)  // Not the first entry
+            {
+                const auto & previousCondition = newValue[i - 1];
+                
+                if (previousCondition.periodEnd.IsNull())
+                {
+                    ChipLogError(AppServer, "Endpoint %d - Entry %u: Previous entry's PeriodEnd is null but current entry exists", 
+                                 mEndpointId, static_cast<unsigned int>(i));
+                    return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+                }
+                
+                if (condition.periodStart <= previousCondition.periodEnd.Value())
+                {
+                    ChipLogError(AppServer, "Endpoint %d - Entry %u: PeriodStart (%u) SHALL be greater than previous PeriodEnd (%u)", 
+                                 mEndpointId, static_cast<unsigned int>(i), static_cast<unsigned int>(condition.periodStart), 
+                                 static_cast<unsigned int>(previousCondition.periodEnd.Value()));
+                    return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+                }
+            }
+        }
+    }
+
+    // Do a deep copy of the newValue into mForecastConditions
+    ReturnErrorOnFailure(CopyForecastConditions(newValue));
+
+    ChipLogDetail(AppServer, "Endpoint %d - mForecastConditions updated with %u entries", 
+                  mEndpointId, static_cast<unsigned int>(mForecastConditionsStorageCount));
 
     MatterReportingAttributeChangeCallback(mEndpointId, ElectricalGridConditions::Id, ForecastConditions::Id);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Instance::CopyForecastConditions(const DataModel::List<const Structs::ElectricalGridConditionsStruct::Type> & src)
+{
+    // Free the existing forecast conditions storage if allocated
+    if (mForecastConditionsStorage.Get() != nullptr)
+    {
+        mForecastConditionsStorage.Free();
+    }
+    mForecastConditionsStorageCount = 0;
+
+    // Handle empty list case
+    if (src.size() == 0)
+    {
+        mForecastConditions = DataModel::List<const Structs::ElectricalGridConditionsStruct::Type>();
+        return CHIP_NO_ERROR;
+    }
+
+    // Allocate memory for storing forecast conditions using Calloc
+    if (!mForecastConditionsStorage.Calloc(src.size()))
+    {
+        ChipLogError(AppServer, "Endpoint %d - Memory allocation failed for forecast conditions storage", mEndpointId);
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    // Copy each condition to our managed memory
+    size_t count = 0;
+    for (const auto & condition : src)
+    {
+        mForecastConditionsStorage[count] = condition;
+        count++;
+    }
+    
+    mForecastConditionsStorageCount = count;
+    
+    // Update the list to point to our copied data
+    mForecastConditions = DataModel::List<const Structs::ElectricalGridConditionsStruct::Type>(
+        mForecastConditionsStorage.Get(), mForecastConditionsStorageCount);
 
     return CHIP_NO_ERROR;
 }

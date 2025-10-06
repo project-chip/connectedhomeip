@@ -74,6 +74,8 @@ public:
     Protocols::InteractionModel::Status GenerateCurrentConditionsChangedEvent();
 
 private:
+    // Internal copy function for forecast conditions memory management
+    CHIP_ERROR CopyForecastConditions(const DataModel::List<const Structs::ElectricalGridConditionsStruct::Type> & src);
     Delegate & mDelegate;
     BitMask<Feature> mFeatures;
 
@@ -90,6 +92,10 @@ private:
     DataModel::Nullable<bool> mLocalGenerationAvailable;
     DataModel::Nullable<Structs::ElectricalGridConditionsStruct::Type> mCurrentConditions;
     DataModel::List<const Structs::ElectricalGridConditionsStruct::Type> mForecastConditions;
+    
+    // Storage for forecast conditions to ensure proper memory lifetime
+    Platform::ScopedMemoryBuffer<Structs::ElectricalGridConditionsStruct::Type> mForecastConditionsStorage;
+    size_t mForecastConditionsStorageCount;
 };
 
 } // namespace ElectricalGridConditions
