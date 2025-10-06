@@ -404,11 +404,9 @@ template("efr32_sdk") {
     }
 
     if (chip_enable_ble_rs911x) {
-      if  {
         _include_dirs += [
           "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
         ]
-      }
     }
 
     if (use_system_view) {

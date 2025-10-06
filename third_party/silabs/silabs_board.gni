@@ -43,7 +43,6 @@ declare_args() {
 
   # WIFI rcp boards options for wifi apps.
   use_wf200 = false
-  use_rs9116 = false
   use_SiWx917 = false
 
   wifi_soc = false
@@ -70,12 +69,12 @@ declare_args() {
   # Enables LCD Qr Code on supported devices
   show_qr_code = !disable_lcd
 
-  # Enabling BLE on 9116/917 NCP by default
-  chip_enable_ble_rs911x = use_rs9116 || use_SiWx917
+  # Enabling BLE on 917 NCP by default
+  chip_enable_ble_rs911x = use_SiWx917
 }
 
 # TODO - This needs to be removed once multiplexing issues resolved
-if (use_SiWx917 || use_rs9116) {
+if (use_SiWx917) {
   disable_lcd = true
   show_qr_code = false
   use_external_flash = false
