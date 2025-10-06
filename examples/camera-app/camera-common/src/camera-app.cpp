@@ -193,10 +193,10 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     appTwoDCartesianMax.y                         = sensorParams.sensorHeight - 1;
 
     // Instantiate the ZoneManagementCluster Server
-    mZoneManagementCluster.Create(mEndpoint, mCameraDevice->GetZoneManagementDelegate(), zoneMgmtFeatures, appMaxUserDefinedZones,
-                                  appMaxZones, sensitivityMax, sensitivity, appTwoDCartesianMax);
+    mZoneManagementServer.Create(mEndpoint, mCameraDevice->GetZoneManagementDelegate(), zoneMgmtFeatures, appMaxUserDefinedZones,
+                                 appMaxZones, sensitivityMax, sensitivity, appTwoDCartesianMax);
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mZoneManagementCluster.Registration());
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mZoneManagementServer.Registration());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to register ZoneManagement on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpoint, err.Format());
@@ -283,7 +283,7 @@ void CameraApp::InitCameraDeviceClusters()
 
     InitializeCameraAVStreamMgmt();
 
-    mZoneManagementCluster.Cluster().Init();
+    mZoneManagementServer.Cluster().Init();
 }
 
 void CameraApp::ShutdownCameraDeviceClusters()
@@ -291,13 +291,13 @@ void CameraApp::ShutdownCameraDeviceClusters()
     ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera device clusters");
     mAVSettingsUserLevelMgmtServerPtr->Shutdown();
     mWebRTCTransportProviderPtr->Shutdown();
-    mZoneManagementCluster.Cluster().Shutdown();
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mZoneManagementCluster.Cluster());
+    mZoneManagementServer.Cluster().Shutdown();
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mZoneManagementServer.Cluster());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "ZoneManagement unregister error: %" CHIP_ERROR_FORMAT, err.Format());
     }
-    mZoneManagementCluster.Destroy();
+    mZoneManagementServer.Destroy();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;
