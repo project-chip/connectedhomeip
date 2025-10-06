@@ -74,8 +74,8 @@ class PendingDiscovery:
     """Accumulator for ongoing discovery."""
     result: AggregatedDiscoveryResults
     callback: Callable[[AggregatedDiscoveryResults], None]
-    expireTime: int
-    firstResultTime: int
+    expireTime: float
+    firstResultTime: float
 
 
 @dataclass
@@ -199,7 +199,7 @@ class _PendingDiscoveries:
 # define firstResultTime
 
 
-# All pending discovery operations awayting callback results
+# All pending discovery operations awaiting callback results
 _gPendingDiscoveries = _PendingDiscoveries()
 
 
