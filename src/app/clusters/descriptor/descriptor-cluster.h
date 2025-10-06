@@ -18,6 +18,8 @@
 #pragma once
 
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
+#include <clusters/Descriptor/AttributeIds.h>
 #include <clusters/Descriptor/ClusterId.h>
 #include <clusters/Descriptor/Structs.h>
 
@@ -30,11 +32,19 @@ namespace chip::app::Clusters {
 class DescriptorCluster : public DefaultServerCluster
 {
 public:
-    DescriptorCluster(EndpointId endpointId) : DefaultServerCluster({ endpointId, Descriptor::Id }) {}
+    using OptionalAttributesSet = chip::app::OptionalAttributeSet<
+        Descriptor::Attributes::TagList::Id,
+        Descriptor::Attributes::EndpointUniqueID::Id
+        >;
+
+    DescriptorCluster(EndpointId endpointId, OptionalAttributesSet optionalAttributeSet) : DefaultServerCluster({ endpointId, Descriptor::Id }), mEnabledOptionalAttributes(optionalAttributeSet) {}
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
+
+private:
+    OptionalAttributesSet mEnabledOptionalAttributes;
 };
 
 } // namespace chip::app::Clusters
