@@ -25,7 +25,8 @@ assert(current_os == "freertos")
 stm32_project_dir = "${chip_root}/examples/lighting-app/stm32/STM32WB5MM-DK"
 examples_plat_dir = "${chip_root}/examples/platform/stm32"
 stm32_board_src = "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK"
-app_data_model = "${chip_root}/examples/lighting-app/stm32/data_model:stm32-lighting"
+app_data_model =
+    "${chip_root}/examples/lighting-app/stm32/data_model:stm32-lighting"
 
 declare_args() {
   # Dump memory usage at link time.
@@ -55,17 +56,17 @@ stm32_sdk("sdk") {
     "${chip_root}/src/lib",
   ]
 
-    sources = [
-      "${examples_plat_dir}/config_files/STM32WB5/FreeRTOSConfig.h",
-      "${examples_plat_dir}/config_files/STM32WB5/matter_config.h",
-      "${stm32_project_dir}/include/STM32WB5/CHIPProjectConfig.h",
-    ]
+  sources = [
+    "${examples_plat_dir}/config_files/STM32WB5/FreeRTOSConfig.h",
+    "${examples_plat_dir}/config_files/STM32WB5/matter_config.h",
+    "${stm32_project_dir}/include/STM32WB5/CHIPProjectConfig.h",
+  ]
 
-    include_dirs += [
-      "${stm32_project_dir}/include/STM32WB5",
-      "${chip_root}/src/include",
-    ]
-  
+  include_dirs += [
+    "${stm32_project_dir}/include/STM32WB5",
+    "${chip_root}/src/include",
+  ]
+
   defines = [
     "BOARD_ID=${stm32_board}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
@@ -78,41 +79,40 @@ stm32_sdk("sdk") {
 stm32_executable("lighting_app") {
   deps = []
 
-    output_name = "${stm32_board}-lighting.elf"
-    include_dirs = [
-      "${chip_root}/examples/platform/stm32/config_files/STM32WB5/",
-      "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK/Inc",
-      "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK/STM32_WPAN/Target",
-      "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK/STM32_WPAN/App",
-      "${chip_root}/src/include/",
-    ]
-    defines = []
+  output_name = "${stm32_board}-lighting.elf"
+  include_dirs = [
+    "${chip_root}/examples/platform/stm32/config_files/STM32WB5/",
+    "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK/Inc",
+    "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK/STM32_WPAN/Target",
+    "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK/STM32_WPAN/App",
+    "${chip_root}/src/include/",
+  ]
+  defines = []
 
-    sources = [
-      "${stm32_board_src}/STM32_WPAN/App/app_ble.c",
-      "${stm32_board_src}/STM32_WPAN/App/app_matter.c",
-      "${stm32_board_src}/STM32_WPAN/App/app_thread.c",
-      "${stm32_board_src}/STM32_WPAN/App/custom_stm.c",
+  sources = [
+    "${stm32_board_src}/STM32_WPAN/App/app_ble.c",
+    "${stm32_board_src}/STM32_WPAN/App/app_matter.c",
+    "${stm32_board_src}/STM32_WPAN/App/app_thread.c",
+    "${stm32_board_src}/STM32_WPAN/App/custom_stm.c",
 
-      #"${stm32_board_src}/STM32_WPAN/Target/hw_ipcc.c",
-      "${stm32_board_src}/Src/app_entry.cpp",
-      "${stm32_board_src}/Src/main.cpp",
-      "${stm32_board_src}/Src/ota.cpp",
-      "src/STM32WB5/AppTask.cpp",
-      "src/STM32WB5/IdentifierEffect.cpp",
-      "src/STM32WB5/LightingManager.cpp",
-      "src/STM32WB5/ZclCallbacks.cpp",
-    ]
+    #"${stm32_board_src}/STM32_WPAN/Target/hw_ipcc.c",
+    "${stm32_board_src}/Src/app_entry.cpp",
+    "${stm32_board_src}/Src/main.cpp",
+    "${stm32_board_src}/Src/ota.cpp",
+    "src/STM32WB5/AppTask.cpp",
+    "src/STM32WB5/IdentifierEffect.cpp",
+    "src/STM32WB5/LightingManager.cpp",
+    "src/STM32WB5/ZclCallbacks.cpp",
+  ]
 
-    deps = [
-      ":sdk",
-      "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
-      "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
-      "${chip_root}/src/lib",
-      "${chip_root}/src/setup_payload",
-       app_data_model,
-    ]
-
+  deps = [
+    ":sdk",
+    "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+    app_data_model,
+  ]
 
   # Add the startup file to the target
   sources += [ "${examples_plat_dir}/startup_files/startup_${stm32_mcu}.s" ]

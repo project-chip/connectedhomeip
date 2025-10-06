@@ -32,42 +32,42 @@ static_library("stm32wb") {
   friend = [ ":lighting_app" ]
   deps = [ "${chip_root}/src/setup_payload" ]
 
-    sources = [
-      "../../FreeRTOS/SystemTimeSupport.cpp",
-      "../../SingletonConfigurationManager.cpp",
-      "BLEManagerImpl.cpp",
-      "BLEManagerImpl.h",
-      "BlePlatformConfig.h",
-      "CHIPDevicePlatformConfig.h",
-      "CHIPDevicePlatformEvent.h",
-      "CHIPMem-Platform.cpp",
-      "CHIPPlatformConfig.h",
-      "ConfigurationManagerImpl.cpp",
-      "ConfigurationManagerImpl.h",
-      "DeviceInfoProviderImpl.cpp",
-      "DeviceInfoProviderImpl.h",
-      "DiagnosticDataProviderImpl.cpp",
-      "DiagnosticDataProviderImpl.h",
-      "FactoryDataProvider.cpp",
-      "FactoryDataProvider.h",
-      "InetPlatformConfig.h",
-      "KeyValueStoreManagerImpl.cpp",
-      "KeyValueStoreManagerImpl.h",
-      "OTAImageProcessorImpl.cpp",
-      "OTAImageProcessorImpl.h",
-      "PlatformManagerImpl.cpp",
-      "PlatformManagerImpl.h",
-      "STM32Config.cpp",
-      "STM32Config.h",
-      "STM32FreeRtosHooks.cpp",
-      "STM32FreeRtosHooks.h",
-      "SystemPlatformConfig.h",
-    ]
+  sources = [
+    "../../FreeRTOS/SystemTimeSupport.cpp",
+    "../../SingletonConfigurationManager.cpp",
+    "BLEManagerImpl.cpp",
+    "BLEManagerImpl.h",
+    "BlePlatformConfig.h",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "CHIPMem-Platform.cpp",
+    "CHIPPlatformConfig.h",
+    "ConfigurationManagerImpl.cpp",
+    "ConfigurationManagerImpl.h",
+    "DeviceInfoProviderImpl.cpp",
+    "DeviceInfoProviderImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
+    "FactoryDataProvider.cpp",
+    "FactoryDataProvider.h",
+    "InetPlatformConfig.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
+    "OTAImageProcessorImpl.cpp",
+    "OTAImageProcessorImpl.h",
+    "PlatformManagerImpl.cpp",
+    "PlatformManagerImpl.h",
+    "STM32Config.cpp",
+    "STM32Config.h",
+    "STM32FreeRtosHooks.cpp",
+    "STM32FreeRtosHooks.h",
+    "SystemPlatformConfig.h",
+  ]
 
-  deps += [ 
-       "${chip_root}/src/platform/logging:stdio",
-       "${chip_root}/src/app/common:ids", 
-       ]
+  deps += [
+    "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/platform/logging:stdio",
+  ]
   public = [
     "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
     "${chip_root}/src/credentials/examples/ExampleDACs.h",
@@ -78,20 +78,20 @@ static_library("stm32wb") {
   ]
 
   if (chip_enable_openthread) {
-      sources += [
-        "../../OpenThread/DnssdImpl.cpp",
-        "../../OpenThread/OpenThreadDnssdImpl.cpp",
-        "../../OpenThread/OpenThreadUtils.cpp",
-        "ConnectivityManagerImpl.cpp",
-        "ConnectivityManagerImpl.h",
-        "ThreadStackManagerImpl.cpp",
-        "ThreadStackManagerImpl.h",
-      ]
+    sources += [
+      "../../OpenThread/DnssdImpl.cpp",
+      "../../OpenThread/OpenThreadDnssdImpl.cpp",
+      "../../OpenThread/OpenThreadUtils.cpp",
+      "ConnectivityManagerImpl.cpp",
+      "ConnectivityManagerImpl.h",
+      "ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
+    ]
     import("//build_overrides/stm32_sdk.gni")
     import("${stm32_sdk_build_root}/stm32_sdk.gni")
     public_deps += [ "${stm32_sdk_build_root}:stm32_sdk" ]
 
-     deps += [
+    deps += [
       "${chip_root}/src/app:app_config",
       "${chip_root}/src/lib/dnssd:platform_header",
     ]

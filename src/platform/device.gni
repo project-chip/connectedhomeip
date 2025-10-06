@@ -290,6 +290,6 @@ assert(
         chip_device_platform == "bl616" || chip_device_platform == "bl702" ||
         chip_device_platform == "bl702l" || chip_device_platform == "mt793x" ||
         chip_device_platform == "SiWx917" || chip_device_platform == "asr" ||
-        chip_device_platform == "stm32wb" || chip_device_platform == "stm32wba" ||
-        chip_device_platform == "nuttx",
+        chip_device_platform == "stm32wb" ||
+        chip_device_platform == "stm32wba" || chip_device_platform == "nuttx",
     "Please select a valid value for chip_device_platform")

@@ -25,7 +25,8 @@ assert(current_os == "freertos")
 stm32_project_dir = "${chip_root}/examples/lighting-app/stm32/STM32WBA65I-DK1"
 examples_plat_dir = "${chip_root}/examples/platform/stm32"
 stm32_board_src = "${chip_root}/examples/platform/stm32/common"
-app_data_model = "${chip_root}/examples/lighting-app/stm32/data_model:stm32-lighting"
+app_data_model =
+    "${chip_root}/examples/lighting-app/stm32/data_model:stm32-lighting"
 
 declare_args() {
   # Dump memory usage at link time.
@@ -55,17 +56,17 @@ stm32_sdk("sdk") {
     "${chip_root}/src/lib",
   ]
 
-    sources = [
-      "${examples_plat_dir}/config_files/STM32WBA6/FreeRTOSConfig.h",
-      "${examples_plat_dir}/config_files/STM32WBA6/matter_config.h",
-      "${stm32_project_dir}/include/STM32WBA6/CHIPProjectConfig.h",
-    ]
+  sources = [
+    "${examples_plat_dir}/config_files/STM32WBA6/FreeRTOSConfig.h",
+    "${examples_plat_dir}/config_files/STM32WBA6/matter_config.h",
+    "${stm32_project_dir}/include/STM32WBA6/CHIPProjectConfig.h",
+  ]
 
-    include_dirs += [
-      "${stm32_project_dir}/include/STM32WBA6",
-      "${chip_root}/src/include",
-    ]
-  
+  include_dirs += [
+    "${stm32_project_dir}/include/STM32WBA6",
+    "${chip_root}/src/include",
+  ]
+
   defines = [
     "BOARD_ID=${stm32_board}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
@@ -78,53 +79,51 @@ stm32_sdk("sdk") {
 stm32_executable("lighting_app") {
   deps = []
 
-    output_name = "${stm32_board}-lighting.elf"
-    include_dirs = [
-      "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/",
-      "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Inc",
-      "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/STM32_WPAN/Target",
-      "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/STM32_WPAN/App",
-      "${chip_root}/src/include/",
-    ]
-    defines = []
+  output_name = "${stm32_board}-lighting.elf"
+  include_dirs = [
+    "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/",
+    "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Inc",
+    "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/STM32_WPAN/Target",
+    "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/STM32_WPAN/App",
+    "${chip_root}/src/include/",
+  ]
+  defines = []
 
-    sources = [
-      "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/app_ble.c",
-      "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/app_matter.c",
-      "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/app_thread.c",
-      "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/custom_stm.c",
-      "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/threadplat_pka.c",
-      "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/crypto_platform.cpp",
-      "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/flash.c",
-      
-      "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/bleplat.c",
-      "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/bpka.c",
-      "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/host_stack_if.c",
-      "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/linklayer_plat.c",
-      "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/ll_sys_if.c",
-      "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/power_table.c",
+  sources = [
+    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/app_ble.c",
+    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/app_matter.c",
+    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/app_thread.c",
+    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/crypto_platform.cpp",
+    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/custom_stm.c",
+    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/flash.c",
+    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/threadplat_pka.c",
+    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/bleplat.c",
+    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/bpka.c",
+    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/host_stack_if.c",
+    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/linklayer_plat.c",
+    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/ll_sys_if.c",
+    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/power_table.c",
+    "${stm32_board_src}/STM32WBA65I-DK1/Src/app_entry.cpp",
+    "${stm32_board_src}/STM32WBA65I-DK1/Src/main.cpp",
+    "src/STM32WBA6/AppTask.cpp",
+    "src/STM32WBA6/IdentifierEffect.cpp",
+    "src/STM32WBA6/LightingManager.cpp",
+    "src/STM32WBA6/ZclCallbacks.cpp",
+  ]
 
-      "${stm32_board_src}/STM32WBA65I-DK1/Src/app_entry.cpp",
-      "${stm32_board_src}/STM32WBA65I-DK1/Src/main.cpp",
-      "src/STM32WBA6/AppTask.cpp",
-      "src/STM32WBA6/IdentifierEffect.cpp",
-      "src/STM32WBA6/LightingManager.cpp",
-      "src/STM32WBA6/ZclCallbacks.cpp",
-    ]
-
-    deps = [
-      ":sdk",
-      "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
-      "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
-      "${chip_root}/src/lib",
-      "${chip_root}/src/setup_payload",
-       app_data_model,
-    ]
-
+  deps = [
+    ":sdk",
+    "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+    app_data_model,
+  ]
 
   # Add the startup file to the target
   sources += [ "${examples_plat_dir}/startup_files/startup_STM32WBA65I-DK1.s" ]
-  sources += [ "${examples_plat_dir}/startup_files/stm32wbaxx_ResetHandler_GCC.s" ]
+  sources +=
+      [ "${examples_plat_dir}/startup_files/stm32wbaxx_ResetHandler_GCC.s" ]
   defines += [
     "DEBUG",
     "USE_HAL_DRIVER",
