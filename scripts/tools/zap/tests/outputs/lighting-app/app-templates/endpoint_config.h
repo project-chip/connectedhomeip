@@ -1309,7 +1309,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 21, 103 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(0), 21, 89 },                                                                                          \
         { ZAP_CLUSTER_INDEX(21), 8, 107 },                                                                                         \
     }
 
@@ -1322,7 +1322,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (210)
+#define ATTRIBUTE_MAX_SIZE (196)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)
