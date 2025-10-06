@@ -1014,7 +1014,7 @@ class ChipDeviceControllerBase():
         '''
         return self._dmLib.pychip_TestPaseConnection(nodeId)
 
-    def ResolveNode(self, nodeId):
+    def ResolveNode(self, nodeId: int):
         '''
         Resolve node ID.
 
@@ -1025,7 +1025,7 @@ class ChipDeviceControllerBase():
 
         self.GetConnectedDeviceSync(nodeId, allowPASE=False)
 
-    def GetAddressAndPort(self, nodeId):
+    def GetAddressAndPort(self, nodeId: int):
         '''
         Get the address and port.
 
