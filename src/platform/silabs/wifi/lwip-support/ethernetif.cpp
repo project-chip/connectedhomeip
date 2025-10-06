@@ -294,7 +294,6 @@ void sl_wfx_host_received_frame_callback(sl_wfx_received_ind_t * rx_buffer)
     }
 }
 
-
 #elif (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 /*****************************************************************************
  *  @fn  void sl_si91x_host_process_data_frame(uint8_t *buf, int len)
@@ -324,7 +323,7 @@ sl_status_t sl_si91x_host_process_data_frame(sl_wifi_interface_t interface, sl_w
     }
     return SL_STATUS_OK;
 }
-#endif  //WF200_WIFI
+#endif // WF200_WIFI
 
 /*****************************************************************************
  *  @fn  err_t sta_ethernetif_init(struct netif *netif)
