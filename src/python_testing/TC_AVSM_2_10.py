@@ -165,8 +165,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         except InteractionModelError as e:
             if not self.is_pics_sdk_ci_only:
                 asserts.fail(f"Snapshot capture failed: {e}")
-            else:
-                pass
+            pass
 
         self.step(4)
         try:
@@ -209,8 +208,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         except InteractionModelError as e:
             if not self.is_pics_sdk_ci_only:
                 asserts.fail(f"Snapshot capture failed: {e}")
-            else:
-                pass
+            pass
 
         if self.privacySupport:
             self.step(6)
