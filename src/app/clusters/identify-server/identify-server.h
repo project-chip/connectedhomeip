@@ -18,9 +18,6 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandler.h>
 #include <app/util/basic-types.h>
 
 struct Identify
@@ -72,24 +69,3 @@ struct Identify
 
     void setNext(Identify * inst) { this->nextIdentify = inst; }
 };
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace Identify {
-
-/**
- * @brief  Identify Attribute Access Interface.
- */
-class IdentifyAttrAccess : public AttributeAccessInterface
-{
-public:
-    // Register for the Identify cluster on all endpoints.
-    IdentifyAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Identify::Id) {}
-
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-};
-} // namespace Identify
-} // namespace Clusters
-} // namespace app
-} // namespace chip
