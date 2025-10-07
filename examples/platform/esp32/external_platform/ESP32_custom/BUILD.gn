@@ -94,11 +94,9 @@ static_library("ESP32_custom") {
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
-    "LwIPCoreLock.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
-    "SystemTimeSupport.h",
   ]
 
   deps = [

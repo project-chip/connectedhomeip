@@ -200,6 +200,10 @@ if [ -n "$BASH" ]; then
     . "$_CHIP_ROOT/scripts/helpers/bash-completion.sh"
 fi
 
+if [ -n "$ZSH_VERSION" ]; then
+    . "$_CHIP_ROOT/scripts/helpers/zsh-completion.zsh"
+fi
+
 unset -f _bootstrap_or_activate
 unset -f _install_additional_pip_requirements
 

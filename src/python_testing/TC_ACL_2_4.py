@@ -34,11 +34,12 @@
 import logging
 import random
 
-import chip.clusters as Clusters
-from chip.clusters.Types import Nullable, NullValue
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import Nullable, NullValue
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_ACL_2_4(MatterBaseTest):

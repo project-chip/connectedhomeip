@@ -15,10 +15,23 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 
+import("${chip_root}/build/chip/buildconfig_header.gni")
+
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/system/system.gni")
 
 assert(chip_device_platform == "darwin")
+
+declare_args() {
+  dnssd_verbose_context_print = false
+}
+
+buildconfig_header("dnssd_buildconfig") {
+  header = "dnssd_config.h"
+  header_dir = "dnssd"
+
+  defines = [ "DNSSD_VERBOSE_CONTEXT_PRINT=${dnssd_verbose_context_print}" ]
+}
 
 config("darwin_config") {
   frameworks = [
@@ -57,14 +70,7 @@ static_library("Darwin") {
     "ConnectivityManagerImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
-    "DnssdContexts.cpp",
-    "DnssdHostNameRegistrar.mm",
-    "DnssdImpl.cpp",
-    "DnssdImpl.h",
-    "DnssdType.cpp",
     "InetPlatformConfig.h",
-    "MdnsError.cpp",
-    "MdnsError.h",
     "NetworkCommissioningDriver.h",
     "PlatformManagerImpl.h",
     "PlatformManagerImpl.mm",
@@ -75,6 +81,13 @@ static_library("Darwin") {
     "SystemTimeSupport.cpp",
     "UserDefaults.h",
     "UserDefaults.mm",
+    "dnssd/DnssdContexts.cpp",
+    "dnssd/DnssdError.cpp",
+    "dnssd/DnssdError.h",
+    "dnssd/DnssdHostNameRegistrar.mm",
+    "dnssd/DnssdImpl.cpp",
+    "dnssd/DnssdImpl.h",
+    "dnssd/DnssdType.cpp",
     "inet/NetworkMonitor.h",
     "inet/NetworkMonitor.mm",
     "system/SystemLayerImplDispatch.h",
@@ -104,10 +117,12 @@ static_library("Darwin") {
   }
 
   deps = [
+    ":dnssd_buildconfig",
     ":logging",
     ":tracing",
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/common:metadata",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
@@ -140,6 +155,15 @@ static_library("Darwin") {
       "BleUtils.h",
       "BleUtils.mm",
     ]
+  }
+
+  if (chip_enable_nfc_based_commissioning) {
+    sources += [
+      "NFCCommissioningManagerImpl.cpp",
+      "NFCCommissioningManagerImpl.h",
+    ]
+
+    deps += [ "${chip_root}/src/transport/raw:nfc-application-delegate" ]
   }
 }
 

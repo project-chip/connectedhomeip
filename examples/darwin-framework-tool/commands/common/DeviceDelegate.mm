@@ -33,6 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
         _maxIntervalForSubscription = nil;
         _threadEnabled = NO;
+        _onDeviceCachePrimed = nil;
     }
     return self;
 }
@@ -51,6 +52,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)deviceCachePrimed:(MTRDevice *)device
 {
+    if (self.onDeviceCachePrimed != nil) {
+        self.onDeviceCachePrimed();
+    }
 }
 
 - (void)deviceConfigurationChanged:(MTRDevice *)device

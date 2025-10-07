@@ -43,7 +43,6 @@ static_library("ASR") {
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "LwIPCoreLock.cpp",
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningWiFiDriver.cpp",
     "PlatformManagerImpl.cpp",
@@ -73,6 +72,7 @@ static_library("ASR") {
   deps = [
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/common:metadata",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",

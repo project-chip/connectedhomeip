@@ -28,24 +28,18 @@ choice CHIP_NXP_PLATFORM_SELECTION
 		depends on MCUX_HW_DEVICE_RW612 || MCUX_HW_DEVICE_RW610
 		help
 			NXP RW61x platform.
-		    
+
 	config CHIP_NXP_PLATFORM_RT1170
 		bool "RT1170 platform"
 		depends on MCUX_HW_DEVICE_MIMXRT1171 || MCUX_HW_DEVICE_MIMXRT1172 || MCUX_HW_DEVICE_MIMXRT1173 || MCUX_HW_DEVICE_MIMXRT1175 || MCUX_HW_DEVICE_MIMXRT1176
 		help
 			NXP RT1170 platform.
-		
+
 	config CHIP_NXP_PLATFORM_RT1060
 		bool "RT1060 platform"
 		depends on MCUX_HW_DEVICE_MIMXRT1061 || MCUX_HW_DEVICE_MIMXRT1062
 		help
 			NXP RT1060 platform.
-
-	config CHIP_NXP_PLATFORM_K32W1
-		bool "k32w1 platform"
-		depends on MCUX_HW_DEVICE_K32W1480
-		help
-			NXP k32w1 platform.
 
 	config CHIP_NXP_PLATFORM_MCXW71
 		bool "mcxw71 platform"
@@ -66,7 +60,7 @@ config CHIP_NXP_PLATFORM_FOLDER_NAME
 	default "rt/rw61x" if CHIP_NXP_PLATFORM_RW61X
 	default "rt/rt1170" if CHIP_NXP_PLATFORM_RT1170
 	default "rt/rt1060" if CHIP_NXP_PLATFORM_RT1060
-	default "mcxw71_k32w1" if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71
+	default "mcxw71" if CHIP_NXP_PLATFORM_MCXW71
 	default "mcxw72" if CHIP_NXP_PLATFORM_MCXW72
 	default "not specified"
 	help
@@ -74,19 +68,26 @@ config CHIP_NXP_PLATFORM_FOLDER_NAME
 
 config CHIP_NXP_DEVICE_LAYER
 	string "NXP device layer"
-	default "nxp/mcxw71_k32w1" if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71
+	default "nxp/mcxw71" if CHIP_NXP_PLATFORM_MCXW71
 	default "nxp/common"
 
 # Invisible symbol to get the platform family name
 config CHIP_NXP_PLATFORM_FAMILY
 	string
-	default "mcxw71_k32w1" if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	default "mcxw71" if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
 	default "rt" if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1060 || CHIP_NXP_PLATFORM_RT1170
+
+config CHIP_NXP_CRYPTO_IMPL
+	string "NXP Crypto Implementation chosen"
+	default "se05x" if CHIP_SE05X
+	default ""
+	help
+		Defines crypto implementation to be used
 
 choice CHIP_NVM_COMPONENT
 	prompt "NVM component selection"
 	default CHIP_NVM_COMPONENT_NVS
-	
+
 	config CHIP_NVM_COMPONENT_NVS
 		bool "NVS"
 		help
@@ -96,7 +97,7 @@ choice CHIP_NVM_COMPONENT
 		bool "LittleFS"
 		help
 			Use LittleFS component to store CHIP data.
-		
+
 	config CHIP_NVM_COMPONENT_KEYSTORAGE
 		bool "Key Storage"
 		help
@@ -106,19 +107,19 @@ choice CHIP_NVM_COMPONENT
 		bool "NVM Framework"
 		help
 			Use the NVM Framework component to store CHIP data.
-endchoice	
+endchoice
 
 choice CHIP_CRYPTO
 	prompt "CHIP Crypto selection"
+	default CHIP_CRYPTO_PLATFORM if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72 || CHIP_SE05X
 	default CHIP_CRYPTO_MBEDTLS if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
-	default CHIP_CRYPTO_PLATFORM if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
-	
+
 	config CHIP_CRYPTO_MBEDTLS
 		bool "CHIP MbedTLS crypto"
 		help
 			Enables the implementation of the Matter cryptographic operations that is
 			based on the mbedTLS crypto API.
-	
+
 	config CHIP_CRYPTO_PLATFORM
 		bool "CHIP platform crypto"
 		help
@@ -131,6 +132,13 @@ choice CHIP_CRYPTO
 			Enables the implementation of the Matter cryptographic operations that is
 			based on the PSA crypto API.
 endchoice
+
+config CHIP_TASK_STACK_SIZE
+	int "CHIP task stack size"
+	default 13000 if CHIP_SE05X  # Increase is do to the additional middle-ware APDU buffers
+	default 10240
+	help
+		Set the stack size for the CHIP task.
 
 config CHIP_USE_GENERATED_CONFIG
 	bool "Use generated config"
@@ -200,6 +208,65 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 		a random jitter interval is added to it to avoid periodicity. The random jitter is selected
 		within range [-JITTER; +JITTER].
 
+# Secure Element Configurations
+
+config CHIP_SE05X
+	bool "Enable Secure Element support"
+	select SE05X_LIB
+	help
+		Enable SE05x Secure element for offloading crypto operations.
+
+if CHIP_SE05X
+
+config CHIP_SE05X_SPAKE_VERIFIER
+	bool "Enable SE05x Secure element for offloading spake verifier"
+	help
+		Enable SE05x Secure element for offloading spake verifier.
+
+config CHIP_SE05X_SPAKE_PROVER
+	bool "Enable SE05x Secure element for offloading spake prover"
+	help
+		Enable SE05x Secure element for offloading spake prover.
+
+config CHIP_SE05X_RND_GEN
+	bool "Enable SE05x Secure element for offloading random number generation"
+	help
+		Enable SE05x Secure element for offloading random number generation.
+
+config CHIP_SE05X_GENERATE_EC_KEY
+	bool "Enable SE05x Secure element for EC key Generate"
+	default y
+	help
+		Enable SE05x Secure element for EC key Generate.
+
+config CHIP_SE05X_ECDSA_VERIFY
+	bool "Enable SE05x Secure element for ECDSA Verify"
+	default y
+	help
+		Enable SE05x Secure element for ECDSA Verify.
+
+config CHIP_SE05X_PBKDF2_SHA256
+	bool "Enable SE05x Secure element for PBKDF2_SHA256"
+	help
+		Enable SE05x Secure element for PBKDF2_SHA256.
+
+config CHIP_SE05X_HKDF_SHA256
+	bool "Enable SE05x Secure element for HKDF_SHA256"
+	help
+		Enable SE05x Secure element for HKDF_SHA256.
+
+config CHIP_SE05X_HMAC_SHA256
+	bool "Enable SE05x Secure element for HMAC_SHA256"
+	help
+		Enable SE05x Secure element for HMAC_SHA256.
+
+config CHIP_SE05X_DEVICE_ATTESTATION
+	bool "Enable SE05x Secure element for offloading Device attestation Sign"
+	help
+		Enable SE05x Secure element for offloading Device attestation Sign.
+
+endif # CHIP_SE05X
+
 # Thread network features
 
 if NET_L2_OPENTHREAD
@@ -208,7 +275,7 @@ endif # NET_L2_OPENTHREAD
 
 config CHIP_IPV4
 	bool "IPv4 support for Matter"
-	default n if CHIP_NET_L2_OPENTHREAD && !CHIP_WIFI
+	default n if NET_L2_OPENTHREAD && !CHIP_WIFI
 	default y
 	help
 		If disabled, it allows to build NXP SDK application
@@ -225,7 +292,8 @@ config NETWORK_LAYER_BLE
 
 config OPERATIONAL_KEYSTORE
 	bool "Use custom implementation of operational keystore"
-	default y if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72 || CHIP_NXP_PLATFORM_RW61X
+	default y if CHIP_SE05X
 	help
 		"Use custom implementation of operational keystore"
 
@@ -280,7 +348,7 @@ if CHIP_OTA_REQUESTOR
 config CHIP_OTA_ENCRYPTION
 	bool "OTA with encryption"
 	help
-		When enabled, the OTA image processor expects the image to be encrypted with AES, 
+		When enabled, the OTA image processor expects the image to be encrypted with AES,
 		so it will attempt to decrypt each block before storing it in flash.
 
 config CHIP_OTA_ENCRYPTION_KEY
@@ -288,9 +356,18 @@ config CHIP_OTA_ENCRYPTION_KEY
 	depends on CHIP_OTA_ENCRYPTION
 	default "1234567890ABCDEFA1B2C3D4E5F6F1B4"
 	help
-		Defines the key used for encrypting the OTA image. 
+		Defines the key used for encrypting the OTA image.
 		This key is reused to perform an AES decryption of the OTA image.
 
 endif # CHIP_OTA_REQUESTOR
+
+if CHIP_BUILD_TESTS
+
+config NXP_CUSTOM_UNIT_TESTS_DIR
+	string "Path to custom NXP test directory"
+	help
+	Provide a path to the location of NXP custom Matter tests
+
+endif # CHIP_BUILD_TESTS
 
 endif # CHIP

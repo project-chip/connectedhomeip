@@ -22,12 +22,12 @@ jobs:
 
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: matter
           fetch-depth: 0
       - name: Install Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: 3.12
           cache-dependency-path: matter/docs/requirements.txt
@@ -37,6 +37,7 @@ jobs:
         run: |
           python3 -m venv venv
           venv/bin/pip3 install -r docs/requirements.txt
+      # --- Build HTML ---
       - name: Build documentation
         working-directory: matter/docs
         run: |

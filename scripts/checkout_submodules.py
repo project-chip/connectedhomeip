@@ -39,7 +39,6 @@ ALL_PLATFORMS = set([
     'nxp',
     'rw61x',
     'linux',
-    'mbed',
     'nrfconnect',
     'nuttx',
     'qpg',
@@ -49,7 +48,6 @@ ALL_PLATFORMS = set([
     'tizen',
     'webos',
     'genio',
-    'openiotsdk',
     'silabs_docker',
     'unit_tests'
 ])

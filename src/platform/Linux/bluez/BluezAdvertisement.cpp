@@ -96,7 +96,7 @@ gboolean BluezAdvertisement::BluezLEAdvertisement1Release(BluezLEAdvertisement1 
     mIsAdvertising = false;
     bluez_leadvertisement1_complete_release(aAdv, aInvocation);
     BLEManagerImpl::NotifyBLEPeripheralAdvReleased();
-    return TRUE;
+    return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
 
 CHIP_ERROR BluezAdvertisement::InitImpl()

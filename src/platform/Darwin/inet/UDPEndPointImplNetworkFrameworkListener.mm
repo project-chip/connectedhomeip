@@ -94,6 +94,11 @@ namespace Inet {
 
         CHIP_ERROR UDPEndPointImplNetworkFrameworkListener::ListenLoopback()
         {
+#if INET_CONFIG_ENABLE_IPV4
+            if (IsIPv4()) {
+                return ListenAddress(IPAddress::Loopback(IPAddressType::kIPv4));
+            }
+#endif
             return ListenAddress(IPAddress::Loopback(IPAddressType::kIPv6));
         }
 
@@ -159,7 +164,9 @@ namespace Inet {
 
             CHIP_ERROR err = StartMonitorInterfaces(^(InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6Interfaces) {
                 StopListeners();
+#if INET_CONFIG_ENABLE_IPV4
                 ListenInterfaces(inetInterfaces);
+#endif
                 ListenInterfaces(inet6Interfaces);
                 dispatch_semaphore_signal(semaphore);
             });

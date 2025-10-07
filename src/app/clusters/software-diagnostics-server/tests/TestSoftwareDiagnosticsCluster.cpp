@@ -13,12 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include <cmath>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
+#include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/SoftwareDiagnostics/Enums.h>
@@ -28,7 +27,7 @@
 #include <lib/support/ReadOnlyBuffer.h>
 #include <platform/DiagnosticDataProvider.h>
 
-#include <map>
+#include <cmath>
 
 namespace {
 
@@ -36,77 +35,29 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
+using namespace chip::app::Clusters::SoftwareDiagnostics::Attributes;
 
-// Comparse two attribute entries as "sets of attributes" and ensures that the content is identical
-bool EqualAttributeSets(Span<const AttributeEntry> a, Span<const AttributeEntry> b)
+template <class T>
+class ScopedDiagnosticsProvider
 {
-
-    std::map<AttributeId, const AttributeEntry *> entriesA;
-    std::map<AttributeId, const AttributeEntry *> entriesB;
-
-    for (const AttributeEntry & entry : a)
+public:
+    ScopedDiagnosticsProvider()
     {
-        if (!entriesA.emplace(entry.attributeId, &entry).second)
-        {
-            ChipLogError(Test, "Duplicate attribute ID in span A: 0x%08X", static_cast<int>(entry.attributeId));
-            return false;
-        }
+        mOldProvider = &DeviceLayer::GetDiagnosticDataProvider();
+        DeviceLayer::SetDiagnosticDataProvider(&mProvider);
     }
+    ~ScopedDiagnosticsProvider() { DeviceLayer::SetDiagnosticDataProvider(mOldProvider); }
 
-    for (const AttributeEntry & entry : b)
-    {
-        if (!entriesB.emplace(entry.attributeId, &entry).second)
-        {
-            ChipLogError(Test, "Duplicate attribute ID in span B: 0x%08X", static_cast<int>(entry.attributeId));
-            return false;
-        }
-    }
+    ScopedDiagnosticsProvider(const ScopedDiagnosticsProvider &)             = delete;
+    ScopedDiagnosticsProvider & operator=(const ScopedDiagnosticsProvider &) = delete;
+    ScopedDiagnosticsProvider(ScopedDiagnosticsProvider &&)                  = delete;
+    ScopedDiagnosticsProvider & operator=(ScopedDiagnosticsProvider &&)      = delete;
 
-    if (entriesA.size() != entriesB.size())
-    {
-        ChipLogError(Test, "Sets of different sizes.");
+private:
+    DeviceLayer::DiagnosticDataProvider * mOldProvider;
+    T mProvider;
+};
 
-        for (const auto it : entriesA)
-        {
-            if (entriesB.find(it.first) == entriesB.end())
-            {
-                ChipLogError(Test, "Attribute 0x%08X missing in B", static_cast<int>(it.first));
-            }
-        }
-
-        for (const auto it : entriesB)
-        {
-            if (entriesA.find(it.first) == entriesA.end())
-            {
-                ChipLogError(Test, "Attribute 0x%08X missing in A", static_cast<int>(it.first));
-            }
-        }
-
-        return false;
-    }
-
-    for (const auto it : entriesA)
-    {
-        const auto other = entriesB.find(it.first);
-        if (other == entriesB.end())
-        {
-
-            ChipLogError(Test, "Missing entry: 0x%08X", static_cast<int>(it.first));
-            return false;
-        }
-
-        if (*it.second != *other->second)
-        {
-
-            ChipLogError(Test, "Different content (different flags?): 0x%08X", static_cast<int>(it.first));
-            return false;
-        }
-    }
-    // set sizes are the same and all entreisA have a corresponding entriesB, so sets should match
-    return true;
-}
-
-// initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestSoftwareDiagnosticsCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -115,15 +66,8 @@ struct TestSoftwareDiagnosticsCluster : public ::testing::Test
 
 TEST_F(TestSoftwareDiagnosticsCluster, CompileTest)
 {
-    const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
-        .enableThreadMetrics     = false,
-        .enableCurrentHeapFree   = false,
-        .enableCurrentHeapUsed   = false,
-        .enableCurrentWatermarks = false,
-    };
-
     // The cluster should compile for any logic
-    SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic> cluster(enabledAttributes);
+    SoftwareDiagnosticsServerCluster cluster({});
 
     // Essentially say "code executes"
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, SoftwareDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
@@ -136,14 +80,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
         class NullProvider : public DeviceLayer::DiagnosticDataProvider
         {
         };
-        const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
-            .enableThreadMetrics     = false,
-            .enableCurrentHeapFree   = false,
-            .enableCurrentHeapUsed   = false,
-            .enableCurrentWatermarks = false,
-        };
-        NullProvider nullProvider;
-        InjectedDiagnosticsSoftwareDiagnosticsLogic diag(nullProvider, enabledAttributes);
+        ScopedDiagnosticsProvider<NullProvider> nullProvider;
+        SoftwareDiagnosticsLogic diag({});
 
         // without watermarks, no commands are accepted
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
@@ -157,7 +95,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
         ASSERT_EQ(diag.Attributes(attributesBuilder), CHIP_NO_ERROR);
 
-        ASSERT_TRUE(EqualAttributeSets(attributesBuilder.TakeBuffer(), DefaultServerCluster::GlobalAttributes()));
+        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), DefaultServerCluster::GlobalAttributes()));
     }
 
     {
@@ -167,15 +105,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
             bool SupportsWatermarks() override { return true; }
         };
 
-        const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
-            .enableThreadMetrics     = false,
-            .enableCurrentHeapFree   = false,
-            .enableCurrentHeapUsed   = false,
-            .enableCurrentWatermarks = true,
-        };
-
-        WatermarksProvider watermarksProvider;
-        InjectedDiagnosticsSoftwareDiagnosticsLogic diag(watermarksProvider, enabledAttributes);
+        ScopedDiagnosticsProvider<WatermarksProvider> watermarksProvider;
+        SoftwareDiagnosticsLogic diag(SoftwareDiagnosticsLogic::OptionalAttributeSet().Set<CurrentHeapHighWatermark::Id>());
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
         ASSERT_EQ(diag.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);
@@ -198,7 +129,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
         ASSERT_EQ(expectedBuilder.AppendElements({ SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::kMetadataEntry }),
                   CHIP_NO_ERROR);
 
-        ASSERT_TRUE(EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
     }
 
     {
@@ -224,15 +155,12 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
             }
         };
 
-        const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
-            .enableThreadMetrics     = true,
-            .enableCurrentHeapFree   = true,
-            .enableCurrentHeapUsed   = true,
-            .enableCurrentWatermarks = true,
-        };
-
-        AllProvider allProvider;
-        InjectedDiagnosticsSoftwareDiagnosticsLogic diag(allProvider, enabledAttributes);
+        ScopedDiagnosticsProvider<AllProvider> allProvider;
+        SoftwareDiagnosticsLogic diag(SoftwareDiagnosticsLogic::OptionalAttributeSet()
+                                          .Set<ThreadMetrics::Id>()
+                                          .Set<CurrentHeapFree::Id>()
+                                          .Set<CurrentHeapUsed::Id>()
+                                          .Set<CurrentHeapHighWatermark::Id>());
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
         ASSERT_EQ(diag.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);
@@ -260,7 +188,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
                   }),
                   CHIP_NO_ERROR);
 
-        ASSERT_TRUE(EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 
         // assert values are read correctly
         uint64_t value = 0;

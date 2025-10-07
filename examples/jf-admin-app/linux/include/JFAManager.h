@@ -19,6 +19,7 @@
 #pragma once
 
 #include <AppMain.h>
+#include <app/server/JointFabricAdministrator.h>
 #include <app/server/Server.h>
 
 #include <functional>
@@ -27,22 +28,38 @@
 
 #include <lib/core/CHIPError.h>
 
+#include "JFARpc.h"
+
 namespace chip {
 
-class JFAManager
+class JFAManager : public app::JointFabricAdministrator::Delegate
 {
 public:
     JFAManager() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
 
     CHIP_ERROR Init(Server & server);
     void HandleCommissioningCompleteEvent();
-    CHIP_ERROR FinalizeCommissioning(NodeId nodeId);
+    CHIP_ERROR FinalizeCommissioning(NodeId nodeId, bool isJCM, chip::Crypto::P256PublicKey & trustedIcacPublicKeyB,
+                                     uint16_t peerAdminJFAdminClusterEndpointId);
+
+    void SetJFARpc(JFARpc & aJFARpc);
+    JFARpc * GetJFARpc();
+
+    /* app::JointFabricAdministrator::Delegate */
+    CHIP_ERROR GetIcacCsr(MutableByteSpan & icacCsr) override;
+
+    CHIP_ERROR GetJointFabricMode(uint8_t & jointFabricMode);
+
+    bool IsDeviceCommissioned() { return jfFabricIndex != kUndefinedFabricId; }
+    bool IsDeviceJFAdmin();
+    bool IsDeviceJFAnchor();
 
 private:
     // Various actions to take when OnConnected callback is called
     enum OnConnectedAction
     {
         kStandardCommissioningComplete = 0,
+        kJCMCommissioning              = 1,
     };
 
     friend JFAManager & JFAMgr(void);
@@ -54,17 +71,30 @@ private:
     Server * mServer                          = nullptr;
     CASESessionManager * mCASESessionManager  = nullptr;
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
+    JFARpc * mJFARpc                          = nullptr;
     SessionHolder mSessionHolder;
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
-    OnConnectedAction mOnConnectedAction = kStandardCommissioningComplete;
-    FabricId jfFabricIndex               = kUndefinedFabricId;
+    OnConnectedAction mOnConnectedAction         = kStandardCommissioningComplete;
+    FabricId jfFabricIndex                       = kUndefinedFabricId;
+    EndpointId peerAdminJFAdminClusterEndpointId = kInvalidEndpointId;
+    Crypto::P256PublicKey peerAdminICACPubKey;
 
     void ConnectToNode(ScopedNodeId scopedNodeId, OnConnectedAction onConnectedAction);
     CHIP_ERROR SendCommissioningComplete();
+    CHIP_ERROR AnnounceJointFabricAdministrator();
+    CHIP_ERROR SendICACSRRequest();
+
     static void OnCommissioningCompleteResponse(
         void * context, const app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
     static void OnCommissioningCompleteFailure(void * context, CHIP_ERROR error);
+    static void OnAnnounceJointFabricAdministratorResponse(void * context, const chip::app::DataModel::NullObjectType &);
+    static void OnAnnounceJointFabricAdministratorFailure(void * context, CHIP_ERROR error);
+    static void
+    OnSendICACSRRequestResponse(void * context,
+                                const app::Clusters::JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType & icaccsr);
+    static void OnSendICACSRRequestFailure(void * context, CHIP_ERROR error);
+
     void ReleaseSession();
 };
 

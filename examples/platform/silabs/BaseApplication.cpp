@@ -64,9 +64,8 @@
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #ifdef SL_WIFI
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
-#include <platform/silabs/wifi/WifiInterface.h>
+#include <platform/silabs/wifi/WifiInterface.h> // nogncheck
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
@@ -121,11 +120,6 @@ osMessageQueueId_t sAppEventQueue;
 #if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)))
 LEDWidget sStatusLED;
 #endif // ENABLE_WSTK_LEDS
-
-#ifdef SL_WIFI
-app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
-#endif /* SL_WIFI */
 
 bool sIsEnabled  = false;
 bool sIsAttached = false;
@@ -303,12 +297,6 @@ CHIP_ERROR BaseApplication::BaseInit()
         osDelay(pdMS_TO_TICKS(10));
     }
     ChipLogProgress(AppServer, "APP: Done WiFi Init");
-    /* We will init server when we get IP */
-
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    sWiFiNetworkCommissioningInstance.Init();
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
 #endif
 
     // Create cmsis os sw timer for Function Selection.
@@ -882,10 +870,16 @@ void BaseApplication::ScheduleFactoryReset()
 void BaseApplication::DoProvisioningReset()
 {
     PlatformMgr().ScheduleWork([](intptr_t) {
+        // Force the KeyMap update to make sure nvm3 is updated before anything happens.
+        // If the device reboots before the timer update happens, "shadow" keys are left in nvm3 causing a reduction of the
+        // overall available nvm3 - similar to a memory leak.
+        // FactoryResetThreadStack forces a reboot which was causing a memory loss.
+        chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().ForceKeyMapSave();
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         ConfigurationManagerImpl::GetDefaultInstance().ClearThreadStack();
         ThreadStackMgrImpl().FactoryResetThreadStack();
-        ThreadStackMgr().InitThreadStack();
+        // Triggers a reboot - nothing gets executed after this
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION

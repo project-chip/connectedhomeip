@@ -18,6 +18,14 @@ rsource "../../zephyr/Kconfig"
 
 if CHIP
 
+config CHIP_TELINK_PLATFORM
+	bool
+	default y
+	help
+	  States that the configuration uses Matter Telink platform,
+	  what can be used to conditionally deviate from Zephyr generic configuration
+	  for Telink platform related purposes.
+
 # See config/zephyr/Kconfig for full definition
 config CHIP_DEVICE_VENDOR_NAME
 	default "Telink Semiconductor"
@@ -94,7 +102,7 @@ config TELINK_OTA_PARTITION_ADDR
 
 config CHIP_ROTATING_DEVICE_ID
 	bool "Generate rotating device ID"
-	default y
+	default n
 	help
 	  Enables the rotating device identifier that provides a non-trackable
 	  identifier. The identifier is unique per device and rotates at pre-defined
@@ -238,9 +246,9 @@ config CHIP_ENABLE_POWER_ON_FACTORY_RESET
 
 config CHIP_TASK_STACK_SIZE
 	int
-	default 6192 if SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
-	default 5352 if PM
-	default 8192
+	default 6192 if SOC_RISCV_TELINK_TL321X
+	default 5480 if PM
+	default 8448
 
 config CHIP_USE_MARS_SENSOR
 	bool "Use Mars board sensor"

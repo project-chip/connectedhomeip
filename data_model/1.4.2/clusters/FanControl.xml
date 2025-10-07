@@ -192,7 +192,7 @@ Davis, CA 95616, USA
     </bitmap>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="FanMode" type="FanModeEnum" default="0">
+    <attribute id="0x0000" name="FanMode" type="FanModeEnum">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
@@ -200,12 +200,12 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0001" name="FanModeSequence" type="FanModeSequenceEnum" default="MS">
+    <attribute id="0x0001" name="FanModeSequence" type="FanModeSequenceEnum">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0002" name="PercentSetting" type="percent" default="0">
+    <attribute id="0x0002" name="PercentSetting" type="percent">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality nullable="true"/>
       <mandatoryConform/>
@@ -213,14 +213,14 @@ Davis, CA 95616, USA
         <max value="100"/>
       </constraint>
     </attribute>
-    <attribute id="0x0003" name="PercentCurrent" type="percent" default="desc">
+    <attribute id="0x0003" name="PercentCurrent" type="percent">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint>
         <max value="100"/>
       </constraint>
     </attribute>
-    <attribute id="0x0004" name="SpeedMax" type="uint8" default="MS">
+    <attribute id="0x0004" name="SpeedMax" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
@@ -233,7 +233,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0005" name="SpeedSetting" type="uint8" default="0">
+    <attribute id="0x0005" name="SpeedSetting" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality nullable="true"/>
       <mandatoryConform>
@@ -245,7 +245,7 @@ Davis, CA 95616, USA
         </max>
       </constraint>
     </attribute>
-    <attribute id="0x0006" name="SpeedCurrent" type="uint8" default="desc">
+    <attribute id="0x0006" name="SpeedCurrent" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality reportable="true"/>
       <mandatoryConform>
@@ -257,7 +257,7 @@ Davis, CA 95616, USA
         </max>
       </constraint>
     </attribute>
-    <attribute id="0x0007" name="RockSupport" type="RockBitmap" default="0">
+    <attribute id="0x0007" name="RockSupport" type="RockBitmap">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
@@ -267,7 +267,7 @@ Davis, CA 95616, USA
         <min value="1"/>
       </constraint>
     </attribute>
-    <attribute id="0x0008" name="RockSetting" type="RockBitmap" default="0">
+    <attribute id="0x0008" name="RockSetting" type="RockBitmap">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality reportable="true"/>
       <mandatoryConform>
@@ -277,7 +277,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0009" name="WindSupport" type="WindBitmap" default="0">
+    <attribute id="0x0009" name="WindSupport" type="WindBitmap">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
@@ -287,7 +287,7 @@ Davis, CA 95616, USA
         <min value="1"/>
       </constraint>
     </attribute>
-    <attribute id="0x000A" name="WindSetting" type="WindBitmap" default="0">
+    <attribute id="0x000A" name="WindSetting" type="WindBitmap">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality reportable="true"/>
       <mandatoryConform>
@@ -297,7 +297,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x000B" name="AirflowDirection" type="AirflowDirectionEnum" default="0">
+    <attribute id="0x000B" name="AirflowDirection" type="AirflowDirectionEnum">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality reportable="true"/>
       <mandatoryConform>
@@ -312,9 +312,6 @@ Davis, CA 95616, USA
         <feature name="STEP"/>
       </mandatoryConform>
       <field id="0" name="Direction" type="StepDirectionEnum">
-        <default>
-          <enum default="Increase"/>
-        </default>
         <mandatoryConform/>
       </field>
       <field id="1" name="Wrap" type="bool" default="false">

@@ -23,7 +23,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BitMask.h>
@@ -129,19 +129,27 @@ public:
 namespace CMAFContainerOptionsStruct {
 enum class Fields : uint8_t
 {
-    kChunkDuration   = 0,
-    kCENCKey         = 1,
-    kMetadataEnabled = 2,
-    kCENCKeyID       = 3,
+    kCMAFInterface   = 0,
+    kSegmentDuration = 1,
+    kChunkDuration   = 2,
+    kSessionGroup    = 3,
+    kTrackName       = 4,
+    kCENCKey         = 5,
+    kCENCKeyID       = 6,
+    kMetadataEnabled = 7,
 };
 
 struct Type
 {
 public:
-    uint16_t chunkDuration = static_cast<uint16_t>(0);
+    CMAFInterfaceEnum CMAFInterface = static_cast<CMAFInterfaceEnum>(0);
+    uint16_t segmentDuration        = static_cast<uint16_t>(0);
+    uint16_t chunkDuration          = static_cast<uint16_t>(0);
+    uint8_t sessionGroup            = static_cast<uint8_t>(0);
+    chip::CharSpan trackName;
     Optional<chip::ByteSpan> CENCKey;
-    Optional<bool> metadataEnabled;
     Optional<chip::ByteSpan> CENCKeyID;
+    Optional<bool> metadataEnabled;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

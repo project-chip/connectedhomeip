@@ -69,7 +69,13 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "WiFi network SSID not retrieved from persisted storage: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
+        if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            return err;
+        }
+        /* AP ssid has not been set. It's possible after factory-reset.
+        Do not return an error as it will cancel the cluster registration */
+        return CHIP_NO_ERROR;
     }
 
     err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, mSavedNetwork.credentials,
@@ -221,8 +227,7 @@ void NXPWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
     CHIP_ERROR err          = CHIP_NO_ERROR;
     Status networkingStatus = Status::kSuccess;
 
-    ChipLogProgress(NetworkProvisioning, "Connecting to WiFi network: SSID: %.*s", static_cast<int>(networkId.size()),
-                    networkId.data());
+    ChipLogProgress(NetworkProvisioning, "Connecting to WiFi network: SSID: %s", NullTerminated(networkId).c_str());
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
@@ -474,7 +479,10 @@ bool NXPWiFiDriver::WiFiNetworkIterator::Next(Network & item)
         if (connectedNetwork.networkIDLen == item.networkIDLen &&
             memcmp(connectedNetwork.networkID, item.networkID, item.networkIDLen) == 0)
         {
-            item.connected = true;
+            if (ConnectivityMgr().IsWiFiStationConnected())
+            {
+                item.connected = true;
+            }
         }
     }
 
