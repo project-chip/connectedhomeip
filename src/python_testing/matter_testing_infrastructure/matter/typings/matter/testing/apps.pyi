@@ -4,8 +4,8 @@ from dataclasses import dataclass
 from sys import stderr, stdout
 from typing import Any, BinaryIO, List, Optional, Union
 
-from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.testing.tasks import Subprocess
+
 
 @dataclass
 class OtaImagePath:
