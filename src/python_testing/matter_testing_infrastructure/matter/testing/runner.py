@@ -624,6 +624,11 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     # chip-tool that fabricID == commissioner_name == root of trust index
     config.fabric_id = args.fabric_id if args.fabric_id is not None else config.root_of_trust_index
 
+    if "nfc" in args.commissioning_method:
+        from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
+        nfc_tag_data = connect_read_nfc_tag_data()
+        args.qr_code.append(nfc_tag_data)
+
     if args.chip_tool_credentials_path is not None and not args.chip_tool_credentials_path.exists():
         print("error: chip-tool credentials path %s doesn't exist!" % args.chip_tool_credentials_path)
         return False
@@ -642,6 +647,30 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     config.manual_code.extend(args.manual_code)
     config.discriminators.extend(args.discriminators)
     config.setup_passcodes.extend(args.passcodes)
+
+    if config.commissioning_method == "ble-wifi" or config.in_test_commissioning_method == "ble-wifi":
+        if args.wifi_ssid is None:
+            print("error: missing --wifi-ssid <SSID> for --commissioning-method ble-wifi!")
+            return False
+
+        if args.wifi_passphrase is None:
+            print("error: missing --wifi-passphrase <passphrasse> for --commissioning-method ble-wifi!")
+            return False
+
+        config.wifi_ssid = args.wifi_ssid
+        config.wifi_passphrase = args.wifi_passphrase
+    elif (config.commissioning_method in ["ble-thread", "nfc-thread"]
+          or config.in_test_commissioning_method in ["ble-thread", "nfc-thread"]):
+        if args.thread_dataset_hex is None:
+            print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method ble-thread or nfc-thread!")
+            return False
+        config.thread_operational_dataset = args.thread_dataset_hex
+    elif config.commissioning_method == "on-network-ip":
+        if args.ip_addr is None:
+            print("error: missing --ip-addr <IP_ADDRESS> for --commissioning-method on-network-ip")
+            return False
+        config.commissionee_ip_address_just_for_testing = args.ip_addr
+
 
     if args.qr_code != [] and args.manual_code != []:
         print("error: Cannot have both --qr-code and --manual-code present!")
