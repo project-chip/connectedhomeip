@@ -654,6 +654,8 @@ private:
     template <AttributeId TAttributeId>
     CHIP_ERROR PersistAndNotify();
 
+    // Declared friend so that it can access the private stream vector members
+    // from CameraAVStreamMgmtServer.
     template <AttributeId TAttributeId>
     friend struct StreamTraits;
 

@@ -1649,6 +1649,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::LoadStreamUsagePriorities()
     return reader.VerifyEndOfContainer();
 }
 
+// Stream helper template struct containing necessary items for the
+// StoreAllocatedStreams and LoadAllocatedStream functions to work on
+// all the 3 stream types.
 template <AttributeId TAttributeId>
 struct StreamTraits;
 
