@@ -58,6 +58,42 @@ NodeId GetNodeIdFromCtx(const CommandHandler & commandHandler)
     return descriptor.subject;
 }
 
+/**
+ * @brief Validates spec-level SFrame constraints (data model constraints).
+ *
+ * Checks that SFrameConfig meets the data model requirements:
+ * - CipherSuite >= 1
+ * - BaseKey length <= 128 bytes
+ * - KID length 2-8 bytes
+ *
+ * @param[in] sframeConfig The SFrame configuration to validate
+ *
+ * @return true if all spec constraints are satisfied, false otherwise.
+ */
+bool ValidateSFrameSpecConstraints(
+    const chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::DecodableType & sframeConfig)
+{
+    // Spec constraint: CipherSuite >= 1
+    if (sframeConfig.cipherSuite < 1)
+    {
+        return false;
+    }
+
+    // Spec constraint: BaseKey length <= 128
+    if (sframeConfig.baseKey.size() > 128)
+    {
+        return false;
+    }
+
+    // Spec constraint: KID length must be 2-8
+    if (sframeConfig.kid.size() < 2 || sframeConfig.kid.size() > 8)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 } // anonymous namespace
 
 namespace chip {
@@ -254,6 +290,16 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     auto videoStreamID = req.videoStreamID;
     auto audioStreamID = req.audioStreamID;
 
+    if (req.SFrameConfig.HasValue())
+    {
+        if (!ValidateSFrameSpecConstraints(req.SFrameConfig.Value()))
+        {
+            ChipLogError(Zcl, "HandleSolicitOffer: SFrame spec constraint validation failed");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            return;
+        }
+    }
+
     // Validate the streamUsage field against the allowed enum values.
     if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
     {
@@ -420,8 +466,6 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         args.iceTransportPolicy.SetValue(policy);
     }
 
-    // Validate SFrameConfig if present.
-    // Constraint enforcement is delegated to the app-side implementation via ValidateSFrameConfig().
     if (req.SFrameConfig.HasValue())
     {
         const auto & sframeConfig = req.SFrameConfig.Value();
@@ -497,6 +541,16 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
 
     // Prepare delegate arguments for the session
     Delegate::ProvideOfferRequestArgs args;
+
+    if (req.SFrameConfig.HasValue())
+    {
+        if (!ValidateSFrameSpecConstraints(req.SFrameConfig.Value()))
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: SFrame spec constraint validation failed");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            return;
+        }
+    }
 
     // Validate the streamUsage field against the allowed enum values.
     if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
@@ -679,8 +733,6 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         args.iceTransportPolicy.SetValue(policy);
     }
 
-    // Validate SFrameConfig if present.
-    // Constraint enforcement is delegated to the app-side implementation via ValidateSFrameConfig().
     if (req.SFrameConfig.HasValue())
     {
         const auto & sframeConfig = req.SFrameConfig.Value();
