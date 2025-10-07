@@ -582,7 +582,7 @@
     XCTestExpectation * batchedItemShouldNotExecute = [self expectationWithDescription:@"Batched item should not execute"];
     batchedItemShouldNotExecute.inverted = YES;
 
-    NSArray<XCTestExpectation *> * blockingStartedExpectations = @[blockingItem0Started, blockingItem1Started, blockingItem2Started];
+    NSArray<XCTestExpectation *> * blockingStartedExpectations = @[ blockingItem0Started, blockingItem1Started, blockingItem2Started ];
     dispatch_semaphore_t blockingItemsCanFinish = dispatch_semaphore_create(0);
 
     // Enqueue 3 blocking items to fill the width=3 capacity
@@ -612,8 +612,8 @@
     [batchingItem setBatchingID:100
                            data:mergedData
                         handler:^(id first, id second) {
-                            NSMutableArray * firstArray = (NSMutableArray *)first;
-                            NSArray * secondArray = (NSArray *)second;
+                            NSMutableArray * firstArray = (NSMutableArray *) first;
+                            NSArray * secondArray = (NSArray *) second;
                             [firstArray addObjectsFromArray:secondArray];
                             return MTRBatchedFully;
                         }];
@@ -626,14 +626,14 @@
         [batchedItemShouldNotExecute fulfill];
     };
     [batchedItem setBatchingID:100
-                          data:@[@"E"]
+                          data:@[ @"E" ]
                        handler:^(id first, id second) {
                            return MTRNotBatched;
                        }];
     [workQueue enqueueWorkItem:batchedItem description:@"batchable item E"];
 
     // Wait for all blocking items to start
-    [self waitForExpectations:@[blockingItem0Started, blockingItem1Started, blockingItem2Started] timeout:2];
+    [self waitForExpectations:@[ blockingItem0Started, blockingItem1Started, blockingItem2Started ] timeout:2];
 
     // Release ONE blocking item to trigger batching
     // When it completes, item D will start and should batch item E
@@ -642,7 +642,7 @@
     dispatch_semaphore_signal(blockingItemsCanFinish);
 
     // Wait for batching to complete
-    [self waitForExpectations:@[batchingItemExecuted, batchedItemShouldNotExecute] timeout:2];
+    [self waitForExpectations:@[ batchingItemExecuted, batchedItemShouldNotExecute ] timeout:2];
 
     // Release remaining blocking items
     dispatch_semaphore_signal(blockingItemsCanFinish);
@@ -656,7 +656,7 @@
     XCTestExpectation * finalItem0 = [self expectationWithDescription:@"Final item 0"];
     XCTestExpectation * finalItem1 = [self expectationWithDescription:@"Final item 1"];
     XCTestExpectation * finalItem2 = [self expectationWithDescription:@"Final item 2"];
-    NSArray<XCTestExpectation *> * finalExpectations = @[finalItem0, finalItem1, finalItem2];
+    NSArray<XCTestExpectation *> * finalExpectations = @[ finalItem0, finalItem1, finalItem2 ];
 
     for (int i = 0; i < 3; i++) {
         XCTestExpectation * expectation = finalExpectations[i];
