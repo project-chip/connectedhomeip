@@ -181,7 +181,7 @@ static void TestRegisterCallback(
     char testInstanceName[] = "stop-restart-test";
     char testHostName[] = "localhost";
     uint16_t testPort = htons(15000);
-    DNSServiceErrorType dnsError = DNSServiceRegister(&testAdvertiser, flags, 0, testInstanceName, kOperationalType, kLocalDot, testHostName, testPort, 0, NULL, test001_MonitorTest_RegisterCallback, NULL);
+    DNSServiceErrorType dnsError = DNSServiceRegister(&testAdvertiser, flags, 0, testInstanceName, kOperationalType, kLocalDot, testHostName, testPort, 0, NULL, TestRegisterCallback, NULL);
     XCTAssertEqual(dnsError, kDNSServiceErr_NoError);
 
     MTRDeviceConnectivityMonitor * monitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:@(testInstanceName)];
@@ -252,7 +252,7 @@ static void TestRegisterCallback(
     char testHostName[] = "localhost";
     uint16_t testPort = htons(15001);
 
-    DNSServiceErrorType dnsError = DNSServiceRegister(&testAdvertiser, flags, 0, testInstanceName, kOperationalType, kLocalDot, testHostName, testPort, 0, NULL, test001_MonitorTest_RegisterCallback, NULL);
+    DNSServiceErrorType dnsError = DNSServiceRegister(&testAdvertiser, flags, 0, testInstanceName, kOperationalType, kLocalDot, testHostName, testPort, 0, NULL, TestRegisterCallback, NULL);
     XCTAssertEqual(dnsError, kDNSServiceErr_NoError);
 
     @autoreleasepool {
@@ -323,7 +323,7 @@ static void TestRegisterCallback(
         char testHostName[] = "localhost";
         uint16_t testPort = htons(15002 + i);
 
-        DNSServiceErrorType dnsError = DNSServiceRegister(&testAdvertiser, flags, 0, testInstanceName, kOperationalType, kLocalDot, testHostName, testPort, 0, NULL, test001_MonitorTest_RegisterCallback, NULL);
+        DNSServiceErrorType dnsError = DNSServiceRegister(&testAdvertiser, flags, 0, testInstanceName, kOperationalType, kLocalDot, testHostName, testPort, 0, NULL, TestRegisterCallback, NULL);
         XCTAssertEqual(dnsError, kDNSServiceErr_NoError);
         [advertisers addObject:[NSValue valueWithPointer:testAdvertiser]];
     }
@@ -378,7 +378,7 @@ static void TestRegisterCallback(
     char testHostName[] = "localhost";
     uint16_t testPort = htons(15010);
 
-    DNSServiceErrorType dnsError = DNSServiceRegister(&testAdvertiser, flags, 0, testInstanceName, kOperationalType, kLocalDot, testHostName, testPort, 0, NULL, test001_MonitorTest_RegisterCallback, NULL);
+    DNSServiceErrorType dnsError = DNSServiceRegister(&testAdvertiser, flags, 0, testInstanceName, kOperationalType, kLocalDot, testHostName, testPort, 0, NULL, TestRegisterCallback, NULL);
     XCTAssertEqual(dnsError, kDNSServiceErr_NoError);
 
     MTRDeviceConnectivityMonitor * monitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:@(testInstanceName)];
