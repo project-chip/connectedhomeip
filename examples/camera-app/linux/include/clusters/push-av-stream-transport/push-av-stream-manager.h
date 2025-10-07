@@ -170,13 +170,13 @@ private:
     CHIP_ERROR IsAnyPrivacyModeActive(bool & isActive);
 
     /**
-     * @brief Calculates the total bandwidth in Mbps for the given video and audio stream IDs.
+     * @brief Calculates the total bandwidth in bps for the given video and audio stream IDs.
      * @param videoStreamId Optional nullable video stream ID.
      * @param audioStreamId Optional nullable audio stream ID.
-     * @param outBandwidthMbps Output parameter for the calculated bandwidth in Mbps.
+     * @param outBandwidthbps Output parameter for the calculated bandwidth in bps.
      */
     void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, uint32_t & outBandwidthMbps);
+                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, uint32_t & outBandwidthbps);
 
     Protocols::InteractionModel::Status GetVideoStreamIdForStreams(StreamUsageEnum streamUsage, uint16_t & videoStreamId);
 

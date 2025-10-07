@@ -291,9 +291,10 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     struct curl_slist * headers = nullptr;
     headers                     = curl_slist_append(headers, "Content-Type: application/*");
 
-    // Extract just the filename from the full path
+    // Extract the filename from the full path
     std::string fullPath = data.first;
-    std::string filename = fullPath.substr(fullPath.find_first_of("/\\", fullPath.find_first_of("/\\") + 1) + 1);
+    size_t lastSlashPos  = fullPath.find_last_of("/\\");
+    std::string filename = (lastSlashPos == std::string::npos) ? fullPath : fullPath.substr(lastSlashPos + 1);
     // Construct the URL with just the filename
     std::string baseUrl = data.second;
     if (baseUrl.back() != '/')
