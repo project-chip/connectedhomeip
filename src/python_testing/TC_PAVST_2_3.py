@@ -118,7 +118,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             TestStep(20, "TH sends the AllocatePushTransport command with a AudioStreamID not present in aAllocatedAudioStreams.",
                      "DUT responds with Status Code InvalidStream."),
             TestStep(21, "TH sends the AllocatePushTransport command with both VideoStreamID and AudioStreamID absent.",
-                     "DUT responds with Status Code InvalidArgument."),
+                     "DUT responds with Status Code InvalidCommand."),
             TestStep(22, "TH sends the AllocatePushTransport command with both VideoStreamID and AudioStreamID set to None..",
                      "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID."),
             TestStep(23, "If the zone management cluster is present on this endpoint, TH sends the AllocatePushTransport command with the TriggerType = Motion and size of the MotionZones list to be greater than aMaxZones.",
