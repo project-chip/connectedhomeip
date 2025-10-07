@@ -366,7 +366,7 @@ bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDurat
         ChipLogError(Camera, "Segment validation requested with no provided stream")
         return false;
     }
-    else 
+    else
     {
         if (videoStreamId.Value().IsNull())
         {

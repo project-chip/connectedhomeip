@@ -799,7 +799,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     }
 
     bool isValidSegmentDuration =
-        mDelegate->ValidateSegmentDuration(transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration, 
+        mDelegate->ValidateSegmentDuration(transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration,
                                            transportOptionsPtr->videoStreamID);
     if (isValidSegmentDuration == false)
     {

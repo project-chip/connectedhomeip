@@ -153,7 +153,7 @@ public:
      * @param videoStreamId   The video stream to eb validated against
      * @return true if Segment Duration is multiple of KeyFrameInterval for the provided videoStreamId, false otherwise
      */
-    virtual bool ValidateSegmentDuration(uint16_t segmentDuration, 
+    virtual bool ValidateSegmentDuration(uint16_t segmentDuration,
                                          const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) = 0;
 
     /**
