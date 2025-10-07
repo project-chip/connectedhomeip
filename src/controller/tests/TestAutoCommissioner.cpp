@@ -622,12 +622,8 @@ inline CommissioningParameters MakeCommissioningParams(bool supportsConcurrent =
     }
     if (hasThreadDataset)
     {
-        static uint8_t ThreadDataset[] = {
-            0x00, 0x11, 0x22, 0x33,
-            0x44, 0x55, 0x66, 0x77,
-            0x88, 0x99, 0xAA, 0xBB,
-            0xCC, 0xDD, 0xEE, 0xFF
-        };
+        static uint8_t ThreadDataset[] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                           0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF };
         params.SetThreadOperationalDataset(ByteSpan(ThreadDataset));
     }
     return params;
@@ -918,16 +914,15 @@ TEST_F(AutoCommissionerTest, CleanupCommissioning_ResetsStateAfterTryingSecondar
 
     Transport::SecureSessionTable sessionTable;
     sessionTable.Init();
-    Transport::SecureSession testSession(
-    sessionTable,
-    Transport::SecureSession::Type::kPASE, // Session type
-    1234,          // localSessionId
-    0x1111,        // localNodeId
-    0x2222,        // peerNodeId
-    CATValues(),   // peerCATs
-    5678,          // peerSessionId
-    1,             // fabric index
-    GetDefaultMRPConfig() // MRP config
+    Transport::SecureSession testSession(sessionTable,
+                                         Transport::SecureSession::Type::kPASE, // Session type
+                                         1234,                                  // localSessionId
+                                         0x1111,                                // localNodeId
+                                         0x2222,                                // peerNodeId
+                                         CATValues(),                           // peerCATs
+                                         5678,                                  // peerSessionId
+                                         1,                                     // fabric index
+                                         GetDefaultMRPConfig()                  // MRP config
     );
     SessionHandle sessionHandle(testSession);
     OperationalDeviceProxy operationalProxy(&exchangeMgr, sessionHandle);
