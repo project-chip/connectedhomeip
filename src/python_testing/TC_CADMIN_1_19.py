@@ -118,9 +118,10 @@ class TC_CADMIN_1_19(CADMINBaseTest):
 
             self.step("5b")
             # Use a unique fabric ID that won't conflict with existing fabrics
-            fids_ca = self.certificate_authority_manager.NewCertificateAuthority(caIndex=fid + initial_number_of_fabrics + 1)
-            fids_fa = fids_ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=fid + initial_number_of_fabrics + 1)
-            fids = fids_fa.NewController(nodeId=fid + initial_number_of_fabrics + 1)
+            new_fabric_idx = fid + initial_number_of_fabrics + 1
+            fids_ca = self.certificate_authority_manager.NewCertificateAuthority(caIndex=new_fabric_idx)
+            fids_fa = fids_ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=new_fabric_idx)
+            fids = fids_fa.NewController(nodeId=new_fabric_idx)
 
             await fids.CommissionOnNetwork(
                 nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
