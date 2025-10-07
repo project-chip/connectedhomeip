@@ -980,7 +980,7 @@ cluster UnitLocalization = 45 {
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 cluster PowerSource = 47 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 3;
 
   enum BatApprovedChemistryEnum : enum16 {
     kUnspecified = 0;
@@ -2211,7 +2211,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
@@ -3996,7 +3996,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
   }
 
   server cluster ScenesManagement {

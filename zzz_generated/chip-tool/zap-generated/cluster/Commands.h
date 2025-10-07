@@ -6277,8 +6277,8 @@ public:
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("Endpoints", &mComplex_Endpoints);
-        AddArgument("Key", &mRequest.key);
         AddArgument("KeyID", 0, UINT32_MAX, &mRequest.keyID);
+        AddArgument("Key", &mRequest.key);
         AddArgument("GracePeriod", 0, UINT32_MAX, &mRequest.gracePeriod);
         AddArgument("UseAuxiliaryACL", 0, 1, &mRequest.useAuxiliaryACL);
         ClusterCommand::AddArguments();
@@ -6359,8 +6359,8 @@ public:
     GroupcastUpdateGroupKey(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("update-group-key", credsIssuerConfig)
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
-        AddArgument("Key", &mRequest.key);
         AddArgument("KeyID", 0, UINT32_MAX, &mRequest.keyID);
+        AddArgument("Key", &mRequest.key);
         AddArgument("GracePeriod", 0, UINT32_MAX, &mRequest.gracePeriod);
         ClusterCommand::AddArguments();
     }
