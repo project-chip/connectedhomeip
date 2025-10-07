@@ -388,7 +388,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             # (General error + 0x80). Asserting 0x580 here to match the actual returned error.
             # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/data_model/Interaction-Model.adoc#101-status-code-table
             asserts.assert_equal(e.err, 0x580,
-                "Incorrect error response for reading non-global attribute on all clusters at endpoint, should have returned GENERAL_ERROR + INVALID_ACTION")
+                                 "Incorrect error response for reading non-global attribute on all clusters at endpoint, should have returned GENERAL_ERROR + INVALID_ACTION")
             return None
 
     async def _read_limited_access(self, endpoint, cluster_id):
