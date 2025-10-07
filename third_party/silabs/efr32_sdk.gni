@@ -26,8 +26,6 @@ declare_args() {
   # Location of the efr32 SDK.
   efr32_sdk_root = "${chip_root}/third_party/silabs/simplicity_sdk"
   matter_support_root = "${chip_root}/third_party/silabs/matter_support"
-  wiseconnect_sdk_root =
-      "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
   wifi_sdk_root = "${chip_root}/third_party/silabs/wifi_sdk"
 
   # Build openthread with prebuilt silabs lib

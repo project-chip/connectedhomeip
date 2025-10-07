@@ -251,7 +251,6 @@ else
                 ;;
             --docker)
                 optArgs+="efr32_sdk_root=\"$GSDK_ROOT\" "
-                optArgs+="wiseconnect_sdk_root=\"$WISECONNECT_SDK_ROOT\" "
                 optArgs+="wifi_sdk_root=\"$WIFI_SDK_ROOT\" "
                 USE_DOCKER=true
                 shift
