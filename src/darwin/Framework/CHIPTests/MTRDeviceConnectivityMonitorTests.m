@@ -122,7 +122,7 @@ static NSString * DNSServiceErrorTypeToString(DNSServiceErrorType error)
     }
 }
 
-static void test001_MonitorTest_RegisterCallback(
+static void TestRegisterCallback(
     DNSServiceRef sdRef,
     DNSServiceFlags flags,
     DNSServiceErrorType errorCode,
@@ -153,7 +153,7 @@ static void test001_MonitorTest_RegisterCallback(
     char testInstanceName[] = "testinstance-name";
     char testHostName[] = "localhost";
     uint16_t testPort = htons(15000);
-    DNSServiceErrorType dnsError = DNSServiceRegister(&testAdvertiser, flags, 0, testInstanceName, kOperationalType, kLocalDot, testHostName, testPort, 0, NULL, test001_MonitorTest_RegisterCallback, NULL);
+    DNSServiceErrorType dnsError = DNSServiceRegister(&testAdvertiser, flags, 0, testInstanceName, kOperationalType, kLocalDot, testHostName, testPort, 0, NULL, TestRegisterCallback, NULL);
     XCTAssertEqual(dnsError, kDNSServiceErr_NoError);
 
     XCTestExpectation * connectivityMonitorCallbackExpectation = [self expectationWithDescription:@"Got connectivity monitor callback"];
