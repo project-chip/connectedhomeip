@@ -236,7 +236,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, SoftwareFaultListenerTest)
     fault.id = 1234;
     fault.name.SetValue(CharSpan::fromCharString("test"));
     const char faultData[] = "faultdata";
-    fault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(faultData), sizeof(faultData)));
+    fault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(faultData), strlen(faultData)));
 
     SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(fault);
 
