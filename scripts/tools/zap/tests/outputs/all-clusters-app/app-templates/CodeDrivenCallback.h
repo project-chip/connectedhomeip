@@ -39,6 +39,10 @@ void MatterTimeFormatLocalizationClusterInitCallback(chip::EndpointId endpointId
 
 void MatterTimeFormatLocalizationClusterShutdownCallback(chip::EndpointId endpointId);
 
+void MatterGeneralCommissioningClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterGeneralCommissioningClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterDiagnosticLogsClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterDiagnosticLogsClusterShutdownCallback(chip::EndpointId endpointId);
@@ -62,6 +66,10 @@ void MatterEthernetNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId en
 void MatterAdministratorCommissioningClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterAdministratorCommissioningClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterOperationalCredentialsClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterOperationalCredentialsClusterShutdownCallback(chip::EndpointId endpointId);
 
 void MatterGroupKeyManagementClusterInitCallback(chip::EndpointId endpointId);
 
