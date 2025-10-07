@@ -6896,18 +6896,6 @@ void emberAfSampleMeiClusterServerTickCallback(chip::EndpointId endpoint);
 // Cluster Commands Callback
 
 /**
- * @brief Identify Cluster Identify Command callback (from client)
- */
-bool emberAfIdentifyClusterIdentifyCallback(chip::app::CommandHandler * commandObj,
-                                            const chip::app::ConcreteCommandPath & commandPath,
-                                            const chip::app::Clusters::Identify::Commands::Identify::DecodableType & commandData);
-/**
- * @brief Identify Cluster TriggerEffect Command callback (from client)
- */
-bool emberAfIdentifyClusterTriggerEffectCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Identify::Commands::TriggerEffect::DecodableType & commandData);
-/**
  * @brief Groups Cluster AddGroup Command callback (from client)
  */
 bool emberAfGroupsClusterAddGroupCallback(chip::app::CommandHandler * commandObj,
