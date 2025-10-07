@@ -55,6 +55,7 @@ struct Identify
         chip::app::reporting::ReportScheduler::TimerDelegate * timerDelegate = nullptr);
     ~Identify();
 
+
     onIdentifyStartCb mOnIdentifyStart = nullptr;
     onIdentifyStopCb mOnIdentifyStop   = nullptr;
     bool mActive                       = false;
@@ -69,3 +70,5 @@ struct Identify
     // CodeDriven cluster instance
     chip::app::RegisteredServerCluster<chip::app::Clusters::IdentifyCluster> mCluster;
 };
+
+chip::app::Clusters::IdentifyCluster * FindIdentifyClusterOnEndpoint(chip::EndpointId endpoint);

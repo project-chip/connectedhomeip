@@ -16,9 +16,7 @@
  */
 
 #include "identify-server.h"
-
 #include <app/clusters/identify-server/IdentifyCluster.h>
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -133,6 +131,16 @@ inline void UnregisterLegacyIdentify(Identify * inst)
 }
 
 } // namespace
+
+IdentifyCluster * FindIdentifyClusterOnEndpoint(EndpointId endpointId)
+{
+    Identify * legacyInstance = GetLegacyIdentifyInstance(endpointId);
+    if (legacyInstance != nullptr)
+    {
+        return &legacyInstance->mCluster.Cluster();
+    }
+    return nullptr;
+}
 
 Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIdentifyStopCb onIdentifyStop,
                    IdentifyTypeEnum identifyType, onEffectIdentifierCb onEffectIdentifier, EffectIdentifierEnum effectIdentifier,

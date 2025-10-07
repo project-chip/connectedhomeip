@@ -136,6 +136,7 @@ public:
     Identify::EffectIdentifierEnum GetEffectIdentifier() const { return mEffectIdentifier; }
     Identify::EffectVariantEnum GetEffectVariant() const { return mEffectVariant; }
     Identify::IdentifyTypeEnum GetIdentifyType() const { return mIdentifyType; }
+    uint16_t GetIdentifyTime() const { return mIdentifyTime; }
 
 private:
     uint16_t mIdentifyTime;
