@@ -1737,7 +1737,7 @@ class ChipDeviceControllerBase():
         attributes: A list of tuples of type (endpoint, cluster-object):
         interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
-        suppressResponse: if True, the device will not send a WriteResponse message back. Useful for groupcast writes or when response is not needed.
+        suppressResponse: if True, the controller will set the suppressResponse flag on the write request. Note that handling for suppressResponse is not currently implemented in the SDK thus this flag will have no effect, but should not cause problems on the device. ```
         E.g
             (1, Clusters.UnitTesting.Attributes.XYZAttribute('hello')) -- Write 'hello'
             to the XYZ attribute on the test cluster to endpoint 1
