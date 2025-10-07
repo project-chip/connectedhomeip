@@ -54,9 +54,10 @@ public:
     ///   - validate that the decoded value is different to the current one
     ///   - write to storage
     template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T>> * = nullptr>
-    DataModel::ActionReturnStatus DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, T & value)
+    DataModel::ActionReturnStatus DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path,
+                                                                  AttributeValueDecoder & decoder, T & value)
     {
-        T decodedValue {};
+        T decodedValue{};
         ReturnErrorOnFailure(decoder.Decode(decodedValue));
         VerifyOrReturnValue(decodedValue != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         value = decodedValue;
@@ -69,7 +70,8 @@ public:
     // - validate that the decoded value is different to the current one
     // - writes to storage
     template <typename T, typename std::enable_if_t<std::is_enum_v<T>> * = nullptr>
-    DataModel::ActionReturnStatus DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder, T & value)
+    DataModel::ActionReturnStatus DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path,
+                                                                  AttributeValueDecoder & decoder, T & value)
     {
         T decodedValue = T::kUnknownEnumValue;
         ReturnErrorOnFailure(decoder.Decode(decodedValue));

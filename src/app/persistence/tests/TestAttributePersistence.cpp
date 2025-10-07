@@ -267,7 +267,7 @@ TEST(TestAttributePersistence, TestNoOpOnSameValueArithmetic)
     // Attempt to store the same value - should return kWriteSuccessNoOp
     {
         WriteOperation writeOp(path);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(kInitialValue);
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(kInitialValue);
         DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
         EXPECT_TRUE(status.IsSuccess());
         EXPECT_TRUE(status.IsNoOpSuccess());
@@ -307,7 +307,7 @@ TEST(TestAttributePersistence, TestNoOpOnSameValueEnum)
     // Attempt to store the same enum value - should return kWriteSuccessNoOp
     {
         WriteOperation writeOp(path);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(CalendarTypeEnum::kGregorian);
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(CalendarTypeEnum::kGregorian);
         DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
         EXPECT_TRUE(status.IsSuccess());
         EXPECT_TRUE(status.IsNoOpSuccess());
@@ -347,7 +347,7 @@ TEST(TestAttributePersistence, TestWriteOnDifferentValueEnum)
     // Store a different enum value - should perform actual write
     {
         WriteOperation writeOp(path);
-        AttributeValueDecoder decoder = writeOp.DecoderFor(CalendarTypeEnum::kBuddhist);
+        AttributeValueDecoder decoder        = writeOp.DecoderFor(CalendarTypeEnum::kBuddhist);
         DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(path, decoder, currentValue);
         EXPECT_TRUE(status.IsSuccess());
         EXPECT_FALSE(status.IsNoOpSuccess());
