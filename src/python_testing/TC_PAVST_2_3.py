@@ -513,18 +513,18 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             "CMAFContainerOptions": {"CMAFInterface": pvcluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 6000,
                                      "sessionGroup": 3, "trackName": " "},
         }
-        status = await self.allocate_one_pushav_transport(endpoint, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidOptions, 
-                                                          stream_Usage=Clusters.Globals.Enums.StreamUsageEnum.kRecording, tlsEndPoint=tlsEndpointId, 
+        status = await self.allocate_one_pushav_transport(endpoint, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidOptions,
+                                                          stream_Usage=Clusters.Globals.Enums.StreamUsageEnum.kRecording, tlsEndPoint=tlsEndpointId,
                                                           container_Options=containerOptions, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidOptions,
-                            "DUT must responds with Status Code InvalidOptions.")
+                             "DUT must responds with Status Code InvalidOptions.")
 
         self.step(34)
-        status = await self.allocate_one_pushav_transport(endpoint, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidStreamUsage, 
+        status = await self.allocate_one_pushav_transport(endpoint, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidStreamUsage,
                                                           stream_Usage=Clusters.Globals.Enums.StreamUsageEnum.kInternal,
                                                           tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
         asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidStreamUsage,
-                             "DUT must  responds with Status code InvalidStreamUsage")        
+                             "DUT must  responds with Status code InvalidStreamUsage")
 
 
 if __name__ == "__main__":
