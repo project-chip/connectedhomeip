@@ -375,8 +375,6 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsInvalidTimeSer
     // SPEC REQUIREMENTS:
     // 1. Section 5.2.2: "PeriodEnd SHALL be greater than PeriodStart" (individual entry validation)
     // 2. Section 6.3: "PeriodStart SHALL be greater than the previous entry's PeriodEnd" (time series validation)
-    //
-    // Current implementation bug: allows periodStart == periodEnd (violates requirement 1)
 
     struct InvalidForecastTest
     {
