@@ -654,72 +654,81 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_true(Clusters.Descriptor in read_request13[0], "Cluster missing in first read")
         asserts.assert_equal(filtered_read13, {}, "Expected empty response with matching data version")
 
-        self.step(14)
-        read_request14, filtered_read14 = await self._read_data_version_filter(
-            endpoint=self.endpoint,
-            cluster=Clusters.BasicInformation,
-            attribute=Clusters.BasicInformation.Attributes.NodeLabel,
-            test_value="Hello World")
-        if filtered_read14 and 0 in filtered_read14:
-            data_version14 = filtered_read14[0][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
-            asserts.assert_equal(filtered_read14[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.NodeLabel],
-                                 "Hello World", "Data version does not match expected value")
-            asserts.assert_equal((read_request14[0][Clusters.BasicInformation][Clusters.Attribute.DataVersion] + 1), data_version14,
-                                 "DataVersion was not incremented")
+        # Check if BasicInformation cluster exists before running steps 14-17
+        # If it doesn't exist (e.g., non-commissionable node), skip these steps
+        if Clusters.BasicInformation not in self.endpoints[self.endpoint]:
+            logging.info("BasicInformation cluster not found on endpoint - skipping steps 14-17")
+            self.skip_step(14)
+            self.skip_step(15)
+            self.skip_step(16)
+            self.skip_step(17)
+        else:
+            self.step(14)
+            read_request14, filtered_read14 = await self._read_data_version_filter(
+                endpoint=self.endpoint,
+                cluster=Clusters.BasicInformation,
+                attribute=Clusters.BasicInformation.Attributes.NodeLabel,
+                test_value="Hello World")
+            if filtered_read14 and 0 in filtered_read14:
+                data_version14 = filtered_read14[0][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
+                asserts.assert_equal(filtered_read14[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.NodeLabel],
+                                     "Hello World", "Data version does not match expected value")
+                asserts.assert_equal((read_request14[0][Clusters.BasicInformation][Clusters.Attribute.DataVersion] + 1), data_version14,
+                                     "DataVersion was not incremented")
 
-        self.step(15)
-        # Read all attributes on BasicInformation cluster (no attribute filter)
-        read_request15 = await self.default_controller.ReadAttribute(
-            self.dut_node_id, [(self.endpoint, Clusters.BasicInformation)])
-        data_version15_before = read_request15[self.endpoint][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
+            self.step(15)
+            # Read all attributes on BasicInformation cluster (no attribute filter)
+            read_request15 = await self.default_controller.ReadAttribute(
+                self.dut_node_id, [(self.endpoint, Clusters.BasicInformation)])
+            data_version15_before = read_request15[self.endpoint][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
 
-        # Write to any attribute to change the data version
-        await self.default_controller.WriteAttribute(
-            self.dut_node_id,
-            [(self.endpoint, Clusters.BasicInformation.Attributes.NodeLabel("Goodbye World"))])
+            # Write to any attribute to change the data version
+            await self.default_controller.WriteAttribute(
+                self.dut_node_id,
+                [(self.endpoint, Clusters.BasicInformation.Attributes.NodeLabel("Goodbye World"))])
 
-        # Read all attributes again with old data version filter - should return all attributes since version changed
-        data_version_filter15 = [(self.endpoint, Clusters.BasicInformation, data_version15_before)]
-        filtered_read15 = await self.default_controller.ReadAttribute(
-            self.dut_node_id,
-            [(self.endpoint, Clusters.BasicInformation)],
-            dataVersionFilters=data_version_filter15)
+            # Read all attributes again with old data version filter - should return all attributes since version changed
+            data_version_filter15 = [(self.endpoint, Clusters.BasicInformation, data_version15_before)]
+            filtered_read15 = await self.default_controller.ReadAttribute(
+                self.dut_node_id,
+                [(self.endpoint, Clusters.BasicInformation)],
+                dataVersionFilters=data_version_filter15)
 
-        # Verify we got all attributes back because data version changed
-        asserts.assert_in(self.endpoint, filtered_read15, "Endpoint missing in response")
-        asserts.assert_in(Clusters.BasicInformation, filtered_read15[self.endpoint], "BasicInformation cluster missing")
-        data_version15_after = filtered_read15[self.endpoint][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
-        asserts.assert_not_equal(data_version15_before, data_version15_after, "DataVersion should have changed after write")
-        asserts.assert_equal(
-            filtered_read15[self.endpoint][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.NodeLabel],
-            "Goodbye World", "NodeLabel value does not match expected value")
+            # Verify we got all attributes back because data version changed
+            asserts.assert_in(self.endpoint, filtered_read15, "Endpoint missing in response")
+            asserts.assert_in(Clusters.BasicInformation, filtered_read15[self.endpoint], "BasicInformation cluster missing")
+            data_version15_after = filtered_read15[self.endpoint][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
+            asserts.assert_not_equal(data_version15_before, data_version15_after, "DataVersion should have changed after write")
+            asserts.assert_equal(
+                filtered_read15[self.endpoint][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.NodeLabel],
+                "Goodbye World", "NodeLabel value does not match expected value")
 
-        # Verify that all attributes from the cluster are returned (not just the one we wrote)
-        returned_attrs15 = set(filtered_read15[self.endpoint][Clusters.BasicInformation].keys())
-        expected_attrs15 = set(read_request15[self.endpoint][Clusters.BasicInformation].keys())
-        asserts.assert_equal(returned_attrs15, expected_attrs15,
-                             "All cluster attributes should be returned when data version changed")
+            # Verify that all attributes from the cluster are returned (not just the one we wrote)
+            returned_attrs15 = set(filtered_read15[self.endpoint][Clusters.BasicInformation].keys())
+            expected_attrs15 = set(read_request15[self.endpoint][Clusters.BasicInformation].keys())
+            asserts.assert_equal(returned_attrs15, expected_attrs15,
+                                 "All cluster attributes should be returned when data version changed")
 
-        self.step(16)
-        read_request16, filtered_read16 = await self._read_multiple_data_version_filters(
-            endpoint=self.endpoint,
-            cluster=Clusters.BasicInformation,
-            attribute=Clusters.BasicInformation.Attributes.NodeLabel,
-            test_value="Hello World Again")
-        if filtered_read16 and 0 in filtered_read16:
-            asserts.assert_equal(filtered_read16[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.NodeLabel],
-                                 "Hello World Again", "Data version does not match expected value")
+            self.step(16)
+            read_request16, filtered_read16 = await self._read_multiple_data_version_filters(
+                endpoint=self.endpoint,
+                cluster=Clusters.BasicInformation,
+                attribute=Clusters.BasicInformation.Attributes.NodeLabel,
+                test_value="Hello World Again")
+            if filtered_read16 and 0 in filtered_read16:
+                asserts.assert_equal(filtered_read16[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.NodeLabel],
+                                     "Hello World Again", "Data version does not match expected value")
 
-        self.step(17)
-        read_a17, read_both17 = await self._read_data_version_filter_multiple_clusters(
-            endpoint=self.endpoint,
-            cluster=Clusters.Descriptor,
-            attribute=Clusters.Descriptor.Attributes.ServerList,
-            other_cluster=Clusters.BasicInformation,
-            other_attribute=Clusters.BasicInformation.Attributes.NodeLabel)
-        asserts.assert_in(0, read_both17, "Endpoint 0 missing in response for step 17")
-        asserts.assert_not_in(Clusters.Descriptor, read_both17[0], "Cluster A (Descriptor) should have been filtered out")
-        asserts.assert_in(Clusters.BasicInformation, read_both17[0], "Cluster B (BasicInformation) should be present")
+            self.step(17)
+            read_a17, read_both17 = await self._read_data_version_filter_multiple_clusters(
+                endpoint=self.endpoint,
+                cluster=Clusters.Descriptor,
+                attribute=Clusters.Descriptor.Attributes.ServerList,
+                other_cluster=Clusters.BasicInformation,
+                other_attribute=Clusters.BasicInformation.Attributes.NodeLabel)
+            asserts.assert_in(0, read_both17, "Endpoint 0 missing in response for step 17")
+            asserts.assert_not_in(Clusters.Descriptor, read_both17[0], "Cluster A (Descriptor) should have been filtered out")
+            asserts.assert_in(Clusters.BasicInformation, read_both17[0], "Cluster B (BasicInformation) should be present")
 
         self.step(18)
         await self._read_non_global_attribute_across_all_clusters(
@@ -730,18 +739,24 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         await self._read_non_global_attribute_across_all_clusters(
             attribute=Clusters.Descriptor.Attributes.ServerList)
 
-        self.step(20)
-        original_acl21, read_request21 = await self._read_limited_access(
-            endpoint=self.endpoint,
-            cluster_id=Clusters.BasicInformation.id)
+        # Check if BasicInformation cluster exists before running step 20
+        # If it doesn't exist (e.g., non-commissionable node), skip this step
+        if Clusters.BasicInformation not in self.endpoints[self.endpoint]:
+            logging.info("BasicInformation cluster not found on endpoint - skipping step 20")
+            self.skip_step(20)
+        else:
+            self.step(20)
+            original_acl21, read_request21 = await self._read_limited_access(
+                endpoint=self.endpoint,
+                cluster_id=Clusters.BasicInformation.id)
 
-        # Verify only BasicInformation cluster is returned (the one we granted access to)
-        asserts.assert_true(Clusters.BasicInformation in read_request21.attributes[self.endpoint],
-                            "BasicInformation cluster should be present (granted View access)")
+            # Verify only BasicInformation cluster is returned (the one we granted access to)
+            asserts.assert_true(Clusters.BasicInformation in read_request21.attributes[self.endpoint],
+                                "BasicInformation cluster should be present (granted View access)")
 
-        # Verify we got attributes from BasicInformation
-        asserts.assert_true(len(read_request21.attributes[self.endpoint][Clusters.BasicInformation]) > 0,
-                            "Should have received attributes from BasicInformation cluster")
+            # Verify we got attributes from BasicInformation
+            asserts.assert_true(len(read_request21.attributes[self.endpoint][Clusters.BasicInformation]) > 0,
+                                "Should have received attributes from BasicInformation cluster")
 
         self.step(21)
         read_request22 = await self._read_all_events_attributes()
