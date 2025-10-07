@@ -95,8 +95,8 @@ public:
      * @param triggerType The type of trigger that started the transport
      * @return Status::Success if event was generated successfully, failure otherwise
      */
-    Protocols::InteractionModel::Status
-    NotifyTransportStopped(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType)
+    Protocols::InteractionModel::Status NotifyTransportStopped(uint16_t connectionID,
+                                                               PushAvStreamTransport::TransportTriggerTypeEnum triggerType)
     {
         return mLogic.NotifyTransportStopped(connectionID, triggerType);
     }

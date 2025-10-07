@@ -1205,7 +1205,7 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uin
     Events::PushTransportEnd::Type event;
     EventNumber eventNumber;
 
-    event.connectionID     = connectionID;
+    event.connectionID = connectionID;
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)

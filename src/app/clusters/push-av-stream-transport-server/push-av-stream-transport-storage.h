@@ -267,7 +267,7 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         streamUsage   = aTransportOptionsStorage.streamUsage;
         videoStreamID = aTransportOptionsStorage.videoStreamID;
         audioStreamID = aTransportOptionsStorage.audioStreamID;
-        TLSEndpointID    = aTransportOptionsStorage.TLSEndpointID;
+        TLSEndpointID = aTransportOptionsStorage.TLSEndpointID;
 
         // Deep copy the URL buffer
         std::memcpy(mUrlBuffer, aTransportOptionsStorage.mUrlBuffer, kMaxUrlLength);
