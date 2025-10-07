@@ -697,9 +697,9 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
 
         config.wifi_ssid = args.wifi_ssid
         config.wifi_passphrase = args.wifi_passphrase
-    elif config.commissioning_method == "ble-thread":
+    elif config.commissioning_method in ["ble-thread", "nfc-thread"]:
         if args.thread_dataset_hex is None:
-            print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method ble-thread!")
+            print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method ble-thread or nfc-thread!")
             return False
         config.thread_operational_dataset = args.thread_dataset_hex
     elif config.commissioning_method == "on-network-ip":
@@ -820,11 +820,11 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
 
     commission_group.add_argument('-m', '--commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread"],
                                   help='Name of commissioning method to use')
     commission_group.add_argument('--in-test-commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread"],
                                   help='Name of commissioning method to use, for commissioning tests')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
                                   metavar='LONG_DISCRIMINATOR',
