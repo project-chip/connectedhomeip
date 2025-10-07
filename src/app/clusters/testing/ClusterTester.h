@@ -175,6 +175,12 @@ public:
 
         result.status = mCluster.InvokeCommand(invokeRequest, reader, &mHandler);
 
+        // If InvokeCommand returned nullopt but there's a response, treat it as success
+        if (!result.status.has_value() && mHandler.HasResponse())
+        {
+            result.status = app::DataModel::ActionReturnStatus(CHIP_NO_ERROR);
+        }
+
         // If command was successful and there's a response, decode it (skip for NullObjectType)
         if constexpr (!std::is_same_v<ResponseType, app::DataModel::NullObjectType>)
         {
