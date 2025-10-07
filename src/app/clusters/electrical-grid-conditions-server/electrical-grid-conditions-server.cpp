@@ -133,8 +133,8 @@ CHIP_ERROR Instance::SetCurrentConditions(DataModel::Nullable<Structs::Electrica
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
 
-        // Check PeriodStart  < PeriodEnd (if not null)
-        if (!newValue.Value().periodEnd.IsNull() && (newValue.Value().periodStart > newValue.Value().periodEnd.Value()))
+        // PeriodEnd SHALL be greater than PeriodStart (if not null)
+        if (!newValue.Value().periodEnd.IsNull() && !(newValue.Value().periodEnd.Value() > newValue.Value().periodStart))
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
@@ -196,8 +196,8 @@ CHIP_ERROR Instance::SetForecastConditions(const DataModel::List<const Structs::
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
 
-        // Check PeriodStart < PeriodEnd (if not null)
-        if (!condition.periodEnd.IsNull() && (condition.periodStart > condition.periodEnd.Value()))
+        // PeriodEnd SHALL be greater than PeriodStart (if not null)
+        if (!condition.periodEnd.IsNull() && !(condition.periodEnd.Value() > condition.periodStart))
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
