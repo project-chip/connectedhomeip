@@ -3719,6 +3719,33 @@ endpoint 0 {
     handle command ResetCounts;
   }
 
+  server cluster TimeSynchronization {
+    callback attribute UTCTime;
+    callback attribute granularity;
+    ram      attribute timeSource default = 0x00;
+    callback attribute trustedTimeSource;
+    callback attribute defaultNTP;
+    callback attribute timeZone;
+    callback attribute DSTOffset;
+    callback attribute localTime;
+    ram      attribute timeZoneDatabase default = 2;
+    callback attribute timeZoneListMaxSize;
+    callback attribute DSTOffsetListMaxSize;
+    ram      attribute supportsDNSResolve;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 2;
+
+    handle command SetUTCTime;
+    handle command SetTrustedTimeSource;
+    handle command SetTimeZone;
+    handle command SetTimeZoneResponse;
+    handle command SetDSTOffset;
+    handle command SetDefaultNTP;
+  }
+
   server cluster AdministratorCommissioning {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
@@ -3850,33 +3877,6 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision;
-  }
-
-  server cluster TimeSynchronization {
-    callback attribute UTCTime;
-    callback attribute granularity;
-    ram      attribute timeSource default = 0x00;
-    callback attribute trustedTimeSource;
-    callback attribute defaultNTP;
-    callback attribute timeZone;
-    callback attribute DSTOffset;
-    callback attribute localTime;
-    ram      attribute timeZoneDatabase default = 2;
-    callback attribute timeZoneListMaxSize;
-    callback attribute DSTOffsetListMaxSize;
-    ram      attribute supportsDNSResolve;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
-
-    handle command SetUTCTime;
-    handle command SetTrustedTimeSource;
-    handle command SetTimeZone;
-    handle command SetTimeZoneResponse;
-    handle command SetDSTOffset;
-    handle command SetDefaultNTP;
   }
 
   server cluster ZoneManagement {
