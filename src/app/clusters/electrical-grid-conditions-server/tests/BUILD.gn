@@ -12,19 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
 
-source_set("electrical-grid-conditions-server") {
-  sources = [
-    "electrical-grid-conditions-server.cpp",
-    "electrical-grid-conditions-server.h",
-  ]
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "libTestElectricalGridConditionsCluster"
+
+  # Your main test file
+  test_sources = [ "TestElectricalGridConditionsCluster.cpp" ]
+
+  cflags = [ "-Wconversion" ]
+
+  # Allow your mock to replace the one in reporting.cpp
+  # (without triggering linker errors)
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
 
   public_deps = [
-    "${chip_root}/src/app/data-model-provider",
-    "${chip_root}/src/app/server",
-    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app/clusters/electrical-grid-conditions-server",
     "${chip_root}/src/lib/support",
-    "${chip_root}/zzz_generated/app-common/clusters/ElectricalGridConditions",
+    "${chip_root}/src/protocols",
   ]
 }
