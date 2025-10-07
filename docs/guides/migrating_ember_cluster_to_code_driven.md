@@ -23,11 +23,6 @@ type-safe accessors in
 In a code-driven implementation, this data must be moved into member variables
 within your new cluster class.
 
-In some cases the cluster directory may not exist. In that case, create a new
-directory and add the mapping in
-[src/app/zap_cluster_list.json](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap_cluster_list.json)
-under the `ServerDirectories` key.
-
 ### `AttributeAccessInterface` (`AAI`) and `CommandHandlerInterface` (`CHI`)
 
 When more complex logic is needed, Ember clusters use these interfaces.
@@ -105,31 +100,8 @@ new code-driven class structure.
 
 #### Command Handling
 
--   Translate `CommandHandlerInterface` calls or `emberAf...Callback` functions
-    into logic inside your `InvokeCommand` method:
-
-    -   ember calls of the form `emberAf<CLUSTER>Cluster<COMMAND>Callback` will
-        be converted to a switch `case <CLUSTER>::Commands::<COMMAND>::Id: ...`
-        implementation
-
-        Example:
-
-        ```cpp
-        // This
-        emberAfAccessControlClusterReviewFabricRestrictionsCallback(...);
-
-        // Becomes this in the `InvokeCommand` implementation:
-        switch (request.path.mCommandId) {
-          // ...
-          case AccessControl::Commands::ReviewFabricRestrictions::Id:
-             // ...
-        }
-        ```
-
-    -   Command Handler Interface logic translates directly: `CHI` has a switch
-        on command ID inside its `InvokeCommand` call. You should have the same
-        logic inside the `ServerClusterInterface` processing logic.
-
+-   Translate `emberAf...Callback` functions into logic inside your
+    `InvokeCommand` method.
 -   The `InvokeCommand` method can return an `ActionReturnStatus` optional. For
     better readability, prefer returning a status code directly (e.g.,
     `return Status::Success;`) rather than using the command handler to set the
@@ -185,11 +157,6 @@ data.
    `zcl-with-test-extensions.json`, add all of your cluster's non-list
    attributes to the `attributeAccessInterfaceAttributes` list. This tells ZAP
    not to allocate RAM for these attributes, as your class now manages them.
-3. Re-run ZAP regeneration, like
-
-    ```bash
-    ./scripts/run_in_build_env.sh 'scripts/tools/zap_regen_all.py'
-    ```
 
 ---
 

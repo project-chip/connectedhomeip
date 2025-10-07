@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "CodegenIntegration.cpp",
-  "CodegenIntegration.h",
+  "BDXDiagnosticLogsProvider.cpp",
+  "BDXDiagnosticLogsProvider.h",
+  "DiagnosticLogsProviderDelegate.h",
+  "diagnostic-logs-server.cpp",
   "diagnostic-logs-server.h",
 ]

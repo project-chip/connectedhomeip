@@ -169,7 +169,7 @@ class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
             # Send SolicitOffer with stream usage that isn't supported. Valid audio stream ID, valid video stream ID
             self.step(9)
             notSupportedStreamUsage = next((e for e in Globals.Enums.StreamUsageEnum if e not in aStreamUsagePriorities),
-                                           Globals.Enums.StreamUsageEnum.kUnknownEnumValue)
+                                           Globals.Enums.StreamUsageEnum.kUnknownEnumValue,)
 
             cmd = cluster.Commands.SolicitOffer(
                 streamUsage=notSupportedStreamUsage, originatingEndpointID=endpoint, videoStreamID=videoStreamID, audioStreamID=audioStreamID)

@@ -115,7 +115,7 @@ class BrowserWebRTCClient:
     def parse_messsage(self, message: dict[str, Any]) -> WebSocketMessage:
         if not self.validate_message(message):
             # return a dummy WebSocketMessage to set exception
-            raise RuntimeError(f"Invalid message received from server {message=}")
+            raise RuntimeError(f"Invalid message received from server {message =}")
         return WebSocketMessage(**message)
 
     def validate_message(self, message: dict[str, Any]) -> bool:

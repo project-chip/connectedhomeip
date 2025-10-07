@@ -391,40 +391,28 @@ class TestTlsClientManagementDelegate : public TlsClientManagementDelegate
 
 public:
     CHIP_ERROR GetProvisionedEndpointByIndex(EndpointId matterEndpoint, FabricIndex fabric, size_t index,
-                                             EndpointStructType & endpoint) const override
+                                             EndpointStructType & endpoint) const
     {
         return CHIP_NO_ERROR;
     }
 
     Protocols::InteractionModel::ClusterStatusCode
     ProvisionEndpoint(EndpointId matterEndpoint, FabricIndex fabric,
-                      const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & provisionReq,
-                      uint16_t & endpointID) override
+                      const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & provisionReq, uint16_t & endpointID)
     {
         return ClusterStatusCode(Status::Success);
     }
 
     Protocols::InteractionModel::Status FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                    uint16_t endpointID,
-                                                                    EndpointStructType & endpoint) const override
+                                                                    uint16_t endpointID, EndpointStructType & endpoint) const
     {
         return Status::Success;
     }
 
     Protocols::InteractionModel::ClusterStatusCode RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                                 uint16_t endpointID) override
+                                                                                 uint16_t endpointID)
     {
         return ClusterStatusCode(Status::Success);
-    }
-
-    CHIP_ERROR RootCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) override
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR ClientCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id) override
-    {
-        return CHIP_NO_ERROR;
     }
 };
 

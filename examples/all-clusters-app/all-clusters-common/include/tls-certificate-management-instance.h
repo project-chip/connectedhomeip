@@ -36,9 +36,9 @@ public:
     TlsCertificateManagementCommandDelegate(Tls::CertificateTable & certificateTable) : mCertificateTable(certificateTable) {}
     ~TlsCertificateManagementCommandDelegate() = default;
 
-    Protocols::InteractionModel::Status ProvisionRootCert(EndpointId matterEndpoint, FabricIndex fabric,
-                                                          const ProvisionRootCertificateType & provisionReq,
-                                                          Tls::TLSCAID & outCaid) override;
+    Protocols::InteractionModel::ClusterStatusCode ProvisionRootCert(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                     const ProvisionRootCertificateType & provisionReq,
+                                                                     Tls::TLSCAID & outCaid) override;
 
     CHIP_ERROR LoadedRootCerts(EndpointId matterEndpoint, FabricIndex fabric,
                                LoadedRootCertificateCallback loadedCallback) const override;
@@ -56,8 +56,9 @@ public:
     Protocols::InteractionModel::Status GenerateClientCsr(EndpointId matterEndpoint, FabricIndex fabric,
                                                           const ClientCsrType & request,
                                                           GeneratedCsrCallback loadedCallback) const override;
-    Protocols::InteractionModel::Status ProvisionClientCert(EndpointId matterEndpoint, FabricIndex fabric,
-                                                            const ProvisionClientCertificateType & provisionReq) override;
+    Protocols::InteractionModel::ClusterStatusCode
+    ProvisionClientCert(EndpointId matterEndpoint, FabricIndex fabric,
+                        const ProvisionClientCertificateType & provisionReq) override;
 
     CHIP_ERROR LoadedClientCerts(EndpointId matterEndpoint, FabricIndex fabric,
                                  LoadedClientCertificateCallback loadedCallback) const override;
@@ -72,7 +73,7 @@ public:
                                 LoadedClientCertificateCallback loadedCallback) const override;
     Protocols::InteractionModel::Status RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id) override;
 
-    static inline TlsCertificateManagementCommandDelegate & GetInstance() { return instance; }
+    static inline TlsCertificateManagementCommandDelegate & getInstance() { return instance; }
 };
 
 } // namespace Clusters

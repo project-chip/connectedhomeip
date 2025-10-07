@@ -690,7 +690,7 @@ class PushAvContext:
         pas = PushAvServer(self.directory, self.device_hierarchy, strict_mode)
         self.app.include_router(pas.router)
 
-    async def start(self, shutdown_trigger: Optional[Callable[..., Awaitable]] = None):
+    async def start(self, shutdown_trigger: Optional[Callable[..., Awaitable]] = None,):
         """
         Start the PUSH AV server. Note that method do not check if a server is already running.
         """

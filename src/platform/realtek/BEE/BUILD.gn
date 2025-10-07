@@ -80,11 +80,6 @@ static_library("BEE") {
       deps += [ "//src/lib/dnssd:platform_header" ]
     }
   }
-
-  sources += [
-    "RTK/RTKDACVendorProvider.cpp",
-    "RTK/RTKDACVendorProvider.h",
-  ]
 }
 
 source_set("logging") {

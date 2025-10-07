@@ -29,7 +29,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --endpoint 0
+#       --endpoint 1
 # === END CI TEST ARGUMENTS ===
 
 
@@ -101,8 +101,6 @@ class TC_ACL_2_10(MatterBaseTest):
         self.step(1)
         self.th1 = self.default_controller
         self.discriminator = random.randint(0, 4095)
-        self.endpoint = self.get_endpoint()
-        extension_attr = Clusters.AccessControl.Attributes.Extension
 
         self.step(2)
         # Read CurrentFabricIndex for TH1
@@ -193,35 +191,34 @@ class TC_ACL_2_10(MatterBaseTest):
             result[0].Status, Status.Success, "Write should have succeeded")
 
         self.step(7)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=extension_attr):
-            # TH1 writes Extension attribute with D_OK_EMPTY
-            extension1 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
-                data=D_OK_EMPTY)
-            logging.info(f"Writing extension with data {D_OK_EMPTY.hex()}")
-            extensions_list1 = [extension1]
-            result = await self.th1.WriteAttribute(
-                self.dut_node_id,
-                [(0, extension_attr(value=extensions_list1))]
-            )
-            logging.info("TH1 write result: %s", str(result))
-            asserts.assert_equal(
-                result[0].Status, Status.Success, "Write should have succeeded")
+        # TH1 writes Extension attribute with D_OK_EMPTY
+        extension1 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
+            data=D_OK_EMPTY)
+        logging.info(f"Writing extension with data {D_OK_EMPTY.hex()}")
+        extension_attr = Clusters.AccessControl.Attributes.Extension
+        extensions_list1 = [extension1]
+        result = await self.th1.WriteAttribute(
+            self.dut_node_id,
+            [(0, extension_attr(value=extensions_list1))]
+        )
+        logging.info("TH1 write result: %s", str(result))
+        asserts.assert_equal(
+            result[0].Status, Status.Success, "Write should have succeeded")
 
         self.step(8)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=extension_attr):
-            # TH2 writes Extension attribute with D_OK_SINGLE
-            extension2 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
-                data=D_OK_SINGLE)
-            logging.info(f"Writing extension with data {D_OK_SINGLE.hex()}")
-            extensions_list2 = [extension2]
+        # TH2 writes Extension attribute with D_OK_SINGLE
+        extension2 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
+            data=D_OK_SINGLE)
+        logging.info(f"Writing extension with data {D_OK_SINGLE.hex()}")
+        extensions_list2 = [extension2]
 
-            result = await self.th2.WriteAttribute(
-                self.dut_node_id,
-                [(0, extension_attr(value=extensions_list2))]
-            )
-            logging.info("TH2 write result: %s", str(result))
-            asserts.assert_equal(
-                result[0].Status, Status.Success, "Write should have succeeded")
+        result = await self.th2.WriteAttribute(
+            self.dut_node_id,
+            [(0, extension_attr(value=extensions_list2))]
+        )
+        logging.info("TH2 write result: %s", str(result))
+        asserts.assert_equal(
+            result[0].Status, Status.Success, "Write should have succeeded")
 
         self.step(9)
         # Reboot DUT
@@ -277,15 +274,15 @@ class TC_ACL_2_10(MatterBaseTest):
         # Result is SUCCESS, value is list of AccessControlExtensionStruct
         # containing 1 element; MUST NOT contain an element with FabricIndex `F2`
         # or Data `D_OK_SINGLE`
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=extension_attr):
-            th1_extension_attr = await self.read_single_attribute_check_success(dev_ctrl=self.th1, endpoint=0, cluster=acl_cluster, attribute=extension_attr)
-            logging.info("TH1 read extension result: %s", str(th1_extension_attr))
-            asserts.assert_equal(len(th1_extension_attr), 1, "Expected exactly one extension attribute")
+        extension_attr = Clusters.AccessControl.Attributes.Extension
+        th1_extension_attr = await self.read_single_attribute_check_success(dev_ctrl=self.th1, endpoint=0, cluster=acl_cluster, attribute=extension_attr)
+        logging.info("TH1 read extension result: %s", str(th1_extension_attr))
+        asserts.assert_equal(len(th1_extension_attr), 1, "Expected exactly one extension attribute")
 
-            # Verify the actual values
-            entry = th1_extension_attr[0]
-            asserts.assert_equal(entry.data, D_OK_EMPTY, "Data should be D_OK_EMPTY")
-            asserts.assert_equal(entry.fabricIndex, f1, "FabricIndex should be F1")
+        # Verify the actual values
+        entry = th1_extension_attr[0]
+        asserts.assert_equal(entry.data, D_OK_EMPTY, "Data should be D_OK_EMPTY")
+        asserts.assert_equal(entry.fabricIndex, f1, "FabricIndex should be F1")
 
         self.step(12)
         # TH2 reads DUT Endpoint 0 AccessControl cluster ACL attribute
@@ -304,15 +301,14 @@ class TC_ACL_2_10(MatterBaseTest):
         # Result is SUCCESS, value is list of AccessControlExtensionStruct
         # containing 1 element; MUST NOT contain an element with FabricIndex `F1`
         # or Data `D_OK_EMPTY`
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=extension_attr):
-            th2_extension_attr = await self.read_single_attribute_check_success(dev_ctrl=self.th2, endpoint=0, cluster=acl_cluster, attribute=extension_attr)
-            logging.info("TH2 read extension result: %s", str(th2_extension_attr))
-            asserts.assert_equal(len(th2_extension_attr), 1, "Expected exactly one extension attribute")
+        th2_extension_attr = await self.read_single_attribute_check_success(dev_ctrl=self.th2, endpoint=0, cluster=acl_cluster, attribute=extension_attr)
+        logging.info("TH2 read extension result: %s", str(th2_extension_attr))
+        asserts.assert_equal(len(th2_extension_attr), 1, "Expected exactly one extension attribute")
 
-            # Verify the actual values
-            entry2 = th2_extension_attr[0]
-            asserts.assert_equal(entry2.data, D_OK_SINGLE, "Data should be D_OK_SINGLE")
-            asserts.assert_equal(entry2.fabricIndex, f2, "FabricIndex should be F2")
+        # Verify the actual values
+        entry2 = th2_extension_attr[0]
+        asserts.assert_equal(entry2.data, D_OK_SINGLE, "Data should be D_OK_SINGLE")
+        asserts.assert_equal(entry2.fabricIndex, f2, "FabricIndex should be F2")
 
         self.step(14)
         # TH1 removes fabric `F2` from DUT
@@ -334,19 +330,18 @@ class TC_ACL_2_10(MatterBaseTest):
                 entry.fabricIndex, f2, "Should not contain entry with FabricIndex F2")
 
         self.step(16)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=extension_attr):
-            # TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute
-            # Result is SUCCESS, value is list of AccessControlExtensionStruct
-            # containing 1 element; MUST NOT contain an element with FabricIndex `F2`
-            # or Data `D_OK_SINGLE`
-            th1_extension_attr2 = await self.read_single_attribute_check_success(dev_ctrl=self.th1, endpoint=0, cluster=acl_cluster, attribute=extension_attr)
-            logging.info("TH1 read extension result: %s", str(th1_extension_attr2))
-            asserts.assert_equal(len(th1_extension_attr2), 1, "Expected exactly one extension attribute")
+        # TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute
+        # Result is SUCCESS, value is list of AccessControlExtensionStruct
+        # containing 1 element; MUST NOT contain an element with FabricIndex `F2`
+        # or Data `D_OK_SINGLE`
+        th1_extension_attr2 = await self.read_single_attribute_check_success(dev_ctrl=self.th1, endpoint=0, cluster=acl_cluster, attribute=extension_attr)
+        logging.info("TH1 read extension result: %s", str(th1_extension_attr2))
+        asserts.assert_equal(len(th1_extension_attr2), 1, "Expected exactly one extension attribute")
 
-            # Verify the attribute, should not contain an entry with FabricIndex F2 or Data D_OK_SINGLE
-            entry3 = th1_extension_attr2[0]
-            asserts.assert_equal(entry3.data, D_OK_EMPTY, "Data should be D_OK_EMPTY")
-            asserts.assert_equal(entry3.fabricIndex, f1, "FabricIndex should be F1")
+        # Verify the attribute, should not contain an entry with FabricIndex F2 or Data D_OK_SINGLE
+        entry3 = th1_extension_attr2[0]
+        asserts.assert_equal(entry3.data, D_OK_EMPTY, "Data should be D_OK_EMPTY")
+        asserts.assert_equal(entry3.fabricIndex, f1, "FabricIndex should be F1")
 
         # Step 17: Write minimum required ACL (admin only)
         self.step(17)

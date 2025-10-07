@@ -275,15 +275,13 @@
  *  @endcode
  *
  *  @param[in]  expr        An expression to be tested.
- *  @param[in]  ...         Statements to execute before returning. Optional.
  */
-#define ReturnOnFailure(expr, ...)                                                                                                 \
+#define ReturnOnFailure(expr)                                                                                                      \
     do                                                                                                                             \
     {                                                                                                                              \
         auto __err = (expr);                                                                                                       \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
-            __VA_ARGS__;                                                                                                           \
             return;                                                                                                                \
         }                                                                                                                          \
     } while (false)
@@ -311,7 +309,6 @@
         auto __err = (expr);                                                                                                       \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
-            __VA_ARGS__;                                                                                                           \
             return value;                                                                                                          \
         }                                                                                                                          \
     } while (false)

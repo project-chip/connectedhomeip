@@ -42,15 +42,14 @@ public:
      * and called by the interaction model at the appropriate times.
      * @param endpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param delegate A reference to the delegate to be used by this server.
-     * @param dependencyChecker A reference to a CertificateDependencyChecker which checks for transitive dependencies
      * @param certificateTable A reference to the certificate table for looking up certificates
      * @param maxRootCertificates The maximum number of root certificates which can be provisioned
      * @param maxClientCertificates The maximum number of client certificates which can be provisioned
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
     TlsCertificateManagementServer(EndpointId endpointId, TlsCertificateManagementDelegate & delegate,
-                                   Tls::CertificateDependencyChecker & dependencyChecker, Tls::CertificateTable & certificateTable,
-                                   uint8_t maxRootCertificates, uint8_t maxClientCertificates);
+                                   Tls::CertificateTable & certificateTable, uint8_t maxRootCertificates,
+                                   uint8_t maxClientCertificates);
     ~TlsCertificateManagementServer();
 
     /**
@@ -86,7 +85,6 @@ public:
 
 private:
     TlsCertificateManagementDelegate & mDelegate;
-    Tls::CertificateDependencyChecker & mDependencyChecker;
     Tls::CertificateTable & mCertificateTable;
 
     // Attribute local storage
@@ -164,11 +162,12 @@ public:
      * @param[in] provisionReq The request data specifying the root certificate to be provisioned
      * @param[out] outCaid a reference to the TLSCAID variable that is to contain the ID of the provisioned root cert.
      *
-     * @return Success if the certificate was provisioned successfully, or a failure status otherwise.
+     * @return CHIP_NO_ERROR if the certificate was appended to the list successfully.
+     * @return CHIP_ERROR if there was an error adding the certificate.
      */
-    virtual Protocols::InteractionModel::Status ProvisionRootCert(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                  const ProvisionRootCertificateType & provisionReq,
-                                                                  Tls::TLSCAID & outCaid) = 0;
+    virtual Protocols::InteractionModel::ClusterStatusCode ProvisionRootCert(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                             const ProvisionRootCertificateType & provisionReq,
+                                                                             Tls::TLSCAID & outCaid) = 0;
 
     /**
      * @brief Executes loadedCallback for each root certificate with matching (matterEndpoint, fabric). The certificate passed to
@@ -244,7 +243,7 @@ public:
      * @param[in] fingerprint The fingerprint of the root certificate to find.
      * @param[in] loadedCallback The lambda to execute with the generated client CSR. This lambda will be called before this method
      * returns.
-     * @return Success if the CSR was generated successfully, or a failure status otherwise
+     * @return NotFound if no mapping is found.
      */
     virtual Protocols::InteractionModel::Status GenerateClientCsr(EndpointId matterEndpoint, FabricIndex fabric,
                                                                   const ClientCsrType & request,
@@ -258,10 +257,11 @@ public:
      * @param[in] fabric The fabric the endpoint is associated with
      * @param[in] provisionReq The request data specifying the client certificate to be provisioned
      *
-     * @return Success if the certificate was provisioned successfully, or a failure status otherwise
+     * @return CHIP_NO_ERROR if the certificate was appended to the list successfully.
+     * @return CHIP_ERROR if there was an error adding the certificate.
      */
-    virtual Protocols::InteractionModel::Status ProvisionClientCert(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                    const ProvisionClientCertificateType & provisionReq) = 0;
+    virtual Protocols::InteractionModel::ClusterStatusCode
+    ProvisionClientCert(EndpointId matterEndpoint, FabricIndex fabric, const ProvisionClientCertificateType & provisionReq) = 0;
 
     /**
      * @brief Executes loadedCallback for each client certificate matching (matterEndpoint, fabric).  The certificate passed to
@@ -331,7 +331,7 @@ public:
      * InvalidInState if the certificate is attached/in-use
      */
     virtual Protocols::InteractionModel::Status RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                 Tls::TLSCCDID id) = 0;
+                                                                 Tls::TLSCAID id) = 0;
 
     Tls::CertificateTable & GetCertificateTable() { return mTlsCertificateManagementServer->GetCertificateTable(); }
 

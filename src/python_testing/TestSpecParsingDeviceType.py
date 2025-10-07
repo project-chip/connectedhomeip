@@ -17,10 +17,10 @@
 import re
 import xml.etree.ElementTree as ElementTree
 
-from DeviceConformanceTests import DeviceConformanceTests, get_supersets
 from fake_device_builder import create_minimal_dt
 from jinja2 import Template
 from mobly import asserts
+from TC_DeviceConformance import DeviceConformanceTests, get_supersets
 
 import matter.clusters as Clusters
 from matter.testing.conformance import conformance_allowed

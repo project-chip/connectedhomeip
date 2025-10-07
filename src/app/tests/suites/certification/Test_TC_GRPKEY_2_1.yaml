@@ -22,6 +22,9 @@ config:
     cluster: "Group Key Management"
     endpoint: 0
 
+    # Users should set endpoint value on the command line to PIXIT.G.ENDPOINT
+    Groups.Endpoint: 1
+
 tests:
     - label:
           "Step 0: Commission DUT to TH (can be skipped if done in a preceding
@@ -36,6 +39,7 @@ tests:
     - label:
           "Step 1: TH reads GroupKeyMap attribute from DUT using a
           fabric-filtered read."
+      PICS: GRPKEY.S.A0000
       command: "readAttribute"
       attribute: "GroupKeyMap"
       fabricFiltered: true
@@ -48,6 +52,7 @@ tests:
           GroupKeyMap attribute list on GroupKeyManagement cluster by writing
           the GroupKeyMap attribute with one entry as follows: List item
           1:,GroupId: 0x0103,GroupKeySetId: 0x01a3"
+      PICS: GRPKEY.S.A0000
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
@@ -56,6 +61,7 @@ tests:
     - label:
           "Step 3: TH reads GroupKeyMap Attribute from the GroupKeyManagement
           cluster from DUT using a fabric-filtered read."
+      PICS: GRPKEY.S.A0000
       command: "readAttribute"
       attribute: "GroupKeyMap"
       response:
@@ -64,6 +70,7 @@ tests:
     - label:
           "Step 4: TH reads GroupTable attribute from GroupKeyManagement cluster
           on DUT."
+      PICS: GRPKEY.S.A0001
       command: "readAttribute"
       attribute: "GroupTable"
       response:
@@ -72,6 +79,7 @@ tests:
     - label:
           "Step 5: TH reads MaxGroupsPerFabric attribute from GroupKeyManagement
           cluster on DUT using a fabric-filtered read."
+      PICS: GRPKEY.S.A0002
       command: "readAttribute"
       attribute: "MaxGroupsPerFabric"
       fabricFiltered: true
@@ -85,6 +93,7 @@ tests:
     - label:
           "Step 6: TH reads MaxGroupKeysPerFabric attribute from
           GroupKeyManagement cluster on DUT using a fabric-filtered read."
+      PICS: GRPKEY.S.A0003
       command: "readAttribute"
       attribute: "MaxGroupKeysPerFabric"
       fabricFiltered: true

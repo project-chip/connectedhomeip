@@ -24,7 +24,6 @@
 #import "MTRDeviceDataValidation.h"
 #import "MTREndpointInfo_Internal.h"
 #import "MTRLogging_Internal.h"
-#import "MTRNetworkInterfaceInfo_Internal.h"
 #import "MTRProductIdentity.h"
 #import "MTRUtilities.h"
 
@@ -38,8 +37,6 @@ MTR_DIRECT_MEMBERS
 
 - (instancetype)initWithCommissioningInfo:(const chip::Controller::ReadCommissioningInfo &)info commissioningParameters:(MTRCommissioningParameters *)commissioningParameters
 {
-    using namespace chip::app;
-
     self = [super init];
     _productIdentity = [[MTRProductIdentity alloc] initWithVendorID:@(info.basic.vendorId) productID:@(info.basic.productId)];
 
@@ -50,15 +47,13 @@ MTR_DIRECT_MEMBERS
         }
     }
 
-    NSMutableArray<MTRNetworkInterfaceInfo *> * networkInterfaces = [[NSMutableArray alloc] init];
-
     if (info.attributes != nullptr) {
         NSMutableDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> * attributes = [[NSMutableDictionary alloc] init];
 
         // Only expose attributes that match pathFilters, so that API consumers
         // don't start relying on undocumented internal details of which paths
         // we read from the device in which circumstances.
-        std::vector<AttributePathParams> pathFilters;
+        std::vector<chip::app::AttributePathParams> pathFilters;
         if (commissioningParameters.extraAttributesToRead != nil) {
             for (MTRAttributeRequestPath * requestPath in commissioningParameters.extraAttributesToRead) {
                 [requestPath convertToAttributePathParams:pathFilters.emplace_back()];
@@ -69,7 +64,7 @@ MTR_DIRECT_MEMBERS
         // attributes, using a wildcard-endpoint path.
         pathFilters.emplace_back(MTRClusterIDTypeNetworkCommissioningID, MTRAttributeIDTypeGlobalAttributeFeatureMapID);
 
-        info.attributes->ForEachAttribute([&](const ConcreteAttributePath & path) -> CHIP_ERROR {
+        info.attributes->ForEachAttribute([&](const chip::app::ConcreteAttributePath & path) -> CHIP_ERROR {
             // Only grab paths that are included in extraAttributesToRead so that
             // API consumers don't develop dependencies on implementation details
             // (like which other attributes we happen to read).
@@ -116,34 +111,7 @@ MTR_DIRECT_MEMBERS
         });
 
         _attributes = attributes;
-
-        // Now grab the Network Commissioning information in a nicer form.
-        info.attributes->ForEachAttribute(MTRClusterIDTypeNetworkCommissioningID, [&](const ConcreteAttributePath & path) -> CHIP_ERROR {
-            if (path.mAttributeId != MTRAttributeIDTypeGlobalAttributeFeatureMapID) {
-                return CHIP_NO_ERROR;
-            }
-
-            uint32_t value;
-            CHIP_ERROR err = info.attributes->Get<Clusters::NetworkCommissioning::Attributes::FeatureMap::TypeInfo>(path, value);
-            if (err != CHIP_NO_ERROR) {
-                // Keep iterating no matter what.
-                return CHIP_NO_ERROR;
-            }
-
-            MTRNetworkInterfaceInfo * _Nullable interfaceInfo = [[MTRNetworkInterfaceInfo alloc] initWithEndpointID:@(path.mEndpointId) featureMap:@(value)];
-            if (!interfaceInfo) {
-                // Invalid feature map.  Just keep looking for other ones.
-                return CHIP_NO_ERROR;
-            }
-
-            [networkInterfaces addObject:interfaceInfo];
-            return CHIP_NO_ERROR;
-        });
     }
-
-    auto * endpointDescriptor = [[NSSortDescriptor alloc] initWithKey:@"endpointID" ascending:YES];
-    [networkInterfaces sortUsingDescriptors:@[ endpointDescriptor ]];
-    _networkInterfaces = networkInterfaces;
 
     return self;
 }
@@ -151,7 +119,6 @@ MTR_DIRECT_MEMBERS
 static NSString * const sProductIdentityCodingKey = @"pi";
 static NSString * const sEndpointsCodingKey = @"ep";
 static NSString * const sAttributesCodingKey = @"at";
-static NSString * const sNetworkInterfacesCodingKey = @"ni";
 
 - (nullable instancetype)initWithCoder:(NSCoder *)coder
 {
@@ -189,15 +156,6 @@ static NSString * const sNetworkInterfacesCodingKey = @"ni";
         }
     }
 
-    // Decode network interface array (may be nil if decoding something encoded
-    // before we added these properties).
-    _networkInterfaces = [coder decodeArrayOfObjectsOfClass:MTRNetworkInterfaceInfo.class forKey:sNetworkInterfacesCodingKey];
-
-    // Provide empty array for backward compatibility if not present in encoded data
-    if (_networkInterfaces == nil) {
-        _networkInterfaces = @[];
-    }
-
     return self;
 }
 
@@ -206,7 +164,6 @@ static NSString * const sNetworkInterfacesCodingKey = @"ni";
     [coder encodeObject:_productIdentity forKey:sProductIdentityCodingKey];
     [coder encodeObject:_endpointsById forKey:sEndpointsCodingKey];
     [coder encodeObject:_attributes forKey:sAttributesCodingKey];
-    [coder encodeObject:_networkInterfaces forKey:sNetworkInterfacesCodingKey];
 }
 
 + (BOOL)supportsSecureCoding
@@ -226,7 +183,6 @@ static NSString * const sNetworkInterfacesCodingKey = @"ni";
     VerifyOrReturnValue(MTREqualObjects(_productIdentity, other->_productIdentity), NO);
     VerifyOrReturnValue(MTREqualObjects(_endpointsById, other->_endpointsById), NO);
     VerifyOrReturnValue(MTREqualObjects(_attributes, other->_attributes), NO);
-    VerifyOrReturnValue(MTREqualObjects(_networkInterfaces, other->_networkInterfaces), NO);
 
     return YES;
 }

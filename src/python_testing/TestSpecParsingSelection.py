@@ -14,10 +14,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
-
-from DeviceConformanceTests import DeviceConformanceTests
 from mobly import asserts, signals
+from TC_DeviceConformance import DeviceConformanceTests
 
 import matter.clusters as Clusters
 from matter.testing.conformance import ConformanceDecision, ConformanceException

@@ -678,7 +678,7 @@ class TestMatterTestingSupport(MatterBaseTest):
 
     def test_xml_pics(self):
         script_dir = os.path.dirname(os.path.realpath(__file__))
-        with open(f'{script_dir}/example_pics_xml_basic_info.xml') as f:
+        with open(f'{script_dir}/test_testing/example_pics_xml_basic_info.xml') as f:
             pics = parse_pics_xml(f.read())
         print(pics)
         # force the parsed pics here to be in the config so we can check the check_pics function

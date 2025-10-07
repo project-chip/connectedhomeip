@@ -181,7 +181,6 @@ list(
     ${chip_dir}/examples/all-clusters-app/realtek/bee/main/Globals.cpp 
     ${chip_dir}/examples/platform/realtek/util/LEDWidget.cpp
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
-    ${chip_dir}/examples/platform/realtek/dac_provider/CommonDACProvider.cpp
 )
 
 add_library(

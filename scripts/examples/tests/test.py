@@ -40,7 +40,7 @@ def build_actual_output(root: str, out: str) -> List[str]:
     subprocess.run([
         binary,
         project,
-    ], stdout=subprocess.PIPE, check=True, encoding='UTF-8')
+    ], stdout=subprocess.PIPE, check=True, encoding='UTF-8', )
 
     with open(cmake, 'rt') as f:
         for line in f.readlines():

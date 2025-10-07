@@ -347,7 +347,7 @@ class TestXmlParser(unittest.TestCase):
                          Idl(clusters=[
                              Cluster(name='TestFeatures',
                                      code=20, bitmaps=[bitmap])
-                         ]))
+                         ])),
 
     def testGlobalStruct(self):
         idl = XmlToIdl('''<?xml version="1.0"?>
@@ -447,7 +447,7 @@ class TestXmlParser(unittest.TestCase):
                                              ),
                                              qualities=AttributeQuality.READABLE,
                                              readacl=AccessPrivilege.VIEW,
-                                             writeacl=AccessPrivilege.OPERATE)])]))
+                                             writeacl=AccessPrivilege.OPERATE)]), ]))
 
     def testSkipsNotProcessedFields(self):
         # Zap has extra fields that are generally not processed
@@ -497,7 +497,7 @@ Some copyright here... testing that we skip over comments
                                              ),
                                              qualities=AttributeQuality.READABLE,
                                              readacl=AccessPrivilege.VIEW,
-                                             writeacl=AccessPrivilege.OPERATE)])]))
+                                             writeacl=AccessPrivilege.OPERATE)]), ]))
 
 
 if __name__ == '__main__':

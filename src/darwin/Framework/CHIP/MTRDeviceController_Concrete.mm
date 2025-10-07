@@ -1139,7 +1139,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         }
         if (commissioningParams.threadOperationalDataset) {
             params.SetThreadOperationalDataset(AsByteSpan(commissioningParams.threadOperationalDataset));
-        } else if (!commissioningParams.preventNetworkScans && commissioningParams.forceThreadScan) {
+        } else if (!commissioningParams.preventNetworkScans) {
             params.SetAttemptThreadNetworkScan(true);
         }
         if (commissioningParams.acceptedTermsAndConditions && commissioningParams.acceptedTermsAndConditionsVersion) {
@@ -1174,7 +1174,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             }
             chip::Controller::WiFiCredentials wifiCreds(ssid, credentials);
             params.SetWiFiCredentials(wifiCreds);
-        } else if (!commissioningParams.preventNetworkScans && commissioningParams.forceWiFiScan) {
+        } else if (!commissioningParams.preventNetworkScans) {
             params.SetAttemptWiFiNetworkScan(true);
         }
 
@@ -2104,9 +2104,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 }
 
 // We never trigger network scans for commissioning that comes through the old
-// APIs, and in general don't really support not providing credentials as part
-// of MTRCommissioningParameters, so don't need
-// needsWiFiCredentialsWithScanResults/needsThreadCredentialsWithScanResults bits.
+// APIs, so don't need scannedWiFiNetworks:/scannedThreadNetworks: bits.
 
 - (void)commissioning:(MTRCommissioningOperation *)commissioning
     succeededForNodeID:(NSNumber *)nodeID

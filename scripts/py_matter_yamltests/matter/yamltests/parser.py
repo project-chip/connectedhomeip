@@ -87,8 +87,8 @@ class TestStepEventKeyError(UnknownPathQualifierError):
 
 class PostProcessCheckStatus(Enum):
     '''Indicates the post processing check step status.'''
-    SUCCESS = 'success'
-    WARNING = 'warning'
+    SUCCESS = 'success',
+    WARNING = 'warning',
     ERROR = 'error'
 
 

@@ -137,10 +137,6 @@ if (chip_build_tests) {
       ]
     }
 
-    if (chip_device_platform != "nrfconnect") {
-      tests += [ "${chip_root}/src/app/clusters/diagnostic-logs-server/tests/" ]
-    }
-
     if (chip_device_platform != "efr32") {
       tests += [
         "${chip_root}/src/app/tests",

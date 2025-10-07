@@ -98,7 +98,7 @@ private:
 /** @brief
  *  Defines methods for implementing application-specific logic for the TLSClientManagement Cluster.
  */
-class TlsClientManagementDelegate : public Tls::CertificateDependencyChecker
+class TlsClientManagementDelegate
 {
 public:
     struct EndpointStructType : TlsClientManagement::Structs::TLSEndpointStruct::DecodableType

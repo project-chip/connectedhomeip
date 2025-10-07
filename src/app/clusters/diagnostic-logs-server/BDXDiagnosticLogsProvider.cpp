@@ -20,6 +20,7 @@
 
 #if CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
 #include "BDXDiagnosticLogsProvider.h"
+#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 

@@ -39,8 +39,8 @@ list(
     ${chip_dir}/examples/window-app/realtek/bee/main/WindowCovering.cpp
     ${chip_dir}/examples/window-app/realtek/bee/main/AppTask.cpp
     ${chip_dir}/examples/platform/realtek/util/LEDWidget.cpp
+
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
-    ${chip_dir}/examples/platform/realtek/dac_provider/CommonDACProvider.cpp
 )
 
 add_library(

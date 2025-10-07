@@ -349,8 +349,8 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     dispatch_async(_delegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(commissioning:provisionedNetworkCredentialsForDeviceID:)]) {
             [strongDelegate commissioning:self provisionedNetworkCredentialsForDeviceID:nodeID];
-        } else if ([strongDelegate respondsToSelector:@selector(commissioningProvisionedNetworkCredentials:)]) {
-            [strongDelegate commissioningProvisionedNetworkCredentials:self];
+        } else if ([strongDelegate respondsToSelector:@selector(commissioning:reachedCommissioningStage:)]) {
+            [strongDelegate commissioning:self reachedCommissioningStage:MTRCommissioningStageProvisionedNetworkCredentials];
         }
     });
 }
@@ -358,13 +358,13 @@ static inline void emitMetricForSetupPayload(NSString * payload)
 #pragma mark - MTRDeviceControllerDelegate_Internal implementatation
 
 - (void)controller:(MTRDeviceController *)controller
-    needsWiFiCredentialsWithScanResults:(nullable NSArray<MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct *> *)networks
-                                  error:(nullable NSError *)error
+    scannedWiFiNetworks:(nullable NSArray<MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct *> *)networks
+                  error:(nullable NSError *)error
 {
     id<MTRCommissioningDelegate> strongDelegate = _delegate;
     dispatch_async(_delegateQueue, ^{
         mtr_weakify(self);
-        [strongDelegate commissioning:self needsWiFiCredentialsWithScanResults:networks error:error completion:^(NSData * ssid, NSData * _Nullable credentials) {
+        [strongDelegate commissioning:self needsWiFiNetworkSelectionWithScanResults:networks error:error completion:^(NSData * ssid, NSData * _Nullable credentials) {
             mtr_strongify(self);
 
             if (!self) {
@@ -396,13 +396,13 @@ static inline void emitMetricForSetupPayload(NSString * payload)
 }
 
 - (void)controller:(MTRDeviceController *)controller
-    needsThreadCredentialsWithScanResults:(nullable NSArray<MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct *> *)networks
-                                    error:(nullable NSError *)error
+    scannedThreadNetworks:(nullable NSArray<MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct *> *)networks
+                    error:(nullable NSError *)error
 {
     id<MTRCommissioningDelegate> strongDelegate = _delegate;
     dispatch_async(_delegateQueue, ^{
         mtr_weakify(self);
-        [strongDelegate commissioning:self needsThreadCredentialsWithScanResults:networks error:error completion:^(NSData * operationalDataset) {
+        [strongDelegate commissioning:self needsThreadNetworkSelectionWithScanResults:networks error:error completion:^(NSData * operationalDataset) {
             mtr_strongify(self);
 
             if (!self) {
@@ -430,12 +430,13 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     });
 }
 
-- (void)controllerStartingNetworkScan:(MTRDeviceController *)controller
+- (void)controller:(MTRDeviceController *)controller
+    reachedCommissioningStage:(MTRCommissioningStage)stage
 {
-    id<MTRCommissioningDelegate> strongDelegate = _delegate;
-    if ([strongDelegate respondsToSelector:@selector(commissioningStartingNetworkScan:)]) {
+    id<MTRCommissioningDelegate> strongDelegate = [self _internalDelegate];
+    if ([strongDelegate respondsToSelector:@selector(commissioning:reachedCommissioningStage:)]) {
         dispatch_async(_delegateQueue, ^{
-            [strongDelegate commissioningStartingNetworkScan:self];
+            [strongDelegate commissioning:self reachedCommissioningStage:stage];
         });
     }
 }

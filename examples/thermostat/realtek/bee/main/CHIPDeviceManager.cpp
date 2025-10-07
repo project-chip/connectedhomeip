@@ -27,7 +27,6 @@
 #include "CHIPDeviceManager.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <core/ErrorStr.h>
-#include <dac_provider/CommonDACProvider.h>
 #include <platform/realtek/BEE/FactoryDataProvider.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
@@ -78,7 +77,7 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     err = mFactoryDataProvider.Init();
     SuccessOrExit(err);
     SetCommissionableDataProvider(&mFactoryDataProvider);
-    SetDeviceAttestationCredentialsProvider(GetDACProvider());
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
     SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
 
 #if CONFIG_NETWORK_LAYER_BLE

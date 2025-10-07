@@ -53,9 +53,6 @@ public:
     OnScanNetworksSuccess(const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse) override;
     void OnScanNetworksFailure(CHIP_ERROR error) override;
 
-    CHIP_ERROR WiFiCredentialsNeeded(chip::EndpointId endpoint) override;
-    CHIP_ERROR ThreadCredentialsNeeded(chip::EndpointId endpoint) override;
-
     // Other helper methods
     void SetDeviceNodeID(chip::NodeId deviceNodeId);
 
