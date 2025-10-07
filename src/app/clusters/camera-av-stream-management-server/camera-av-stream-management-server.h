@@ -652,6 +652,9 @@ public:
 
 private:
     template <AttributeId TAttributeId>
+    CHIP_ERROR PersistAndNotify();
+
+    template <AttributeId TAttributeId>
     friend struct StreamTraits;
 
     CameraAVStreamMgmtDelegate & mDelegate;

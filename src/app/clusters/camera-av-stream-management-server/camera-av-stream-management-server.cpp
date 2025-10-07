@@ -324,14 +324,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::AddVideoStream(const VideoStreamStruct & vi
 {
     mAllocatedVideoStreams.push_back(videoStream);
 
-    LogAndReturnErrorOnFailure(StoreAllocatedStreams<Attributes::AllocatedVideoStreams::Id>(), Zcl,
-                               "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated video streams", mEndpointId);
-
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedVideoStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
-
-    return CHIP_NO_ERROR;
+    return PersistAndNotify<Attributes::AllocatedVideoStreams::Id>();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::UpdateVideoStreamRangeParams(VideoStreamStruct & videoStreamToUpdate,
@@ -368,11 +361,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::UpdateVideoStreamRangeParams(VideoStreamStr
 
     if (wasModified)
     {
-        LogAndReturnErrorOnFailure(StoreAllocatedStreams<Attributes::AllocatedVideoStreams::Id>(), Zcl,
-                                   "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated video streams", mEndpointId);
-        auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
-        mDelegate.OnAttributeChanged(Attributes::AllocatedVideoStreams::Id);
-        MatterReportingAttributeChangeCallback(path);
+        ReturnErrorOnFailure(PersistAndNotify<Attributes::AllocatedVideoStreams::Id>());
     }
 
     return CHIP_NO_ERROR;
@@ -385,28 +374,14 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveVideoStream(uint16_t videoStreamId)
                        [&](const VideoStreamStruct & vStream) { return vStream.videoStreamID == videoStreamId; }),
         mAllocatedVideoStreams.end());
 
-    LogAndReturnErrorOnFailure(StoreAllocatedStreams<Attributes::AllocatedVideoStreams::Id>(), Zcl,
-                               "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated video streams", mEndpointId);
-
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedVideoStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
-
-    return CHIP_NO_ERROR;
+    return PersistAndNotify<Attributes::AllocatedVideoStreams::Id>();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::AddAudioStream(const AudioStreamStruct & audioStream)
 {
     mAllocatedAudioStreams.push_back(audioStream);
 
-    LogAndReturnErrorOnFailure(StoreAllocatedStreams<Attributes::AllocatedAudioStreams::Id>(), Zcl,
-                               "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated audio streams", mEndpointId);
-
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedAudioStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedAudioStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
-
-    return CHIP_NO_ERROR;
+    return PersistAndNotify<Attributes::AllocatedAudioStreams::Id>();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::RemoveAudioStream(uint16_t audioStreamId)
@@ -416,14 +391,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveAudioStream(uint16_t audioStreamId)
                        [&](const AudioStreamStruct & aStream) { return aStream.audioStreamID == audioStreamId; }),
         mAllocatedAudioStreams.end());
 
-    LogAndReturnErrorOnFailure(StoreAllocatedStreams<Attributes::AllocatedAudioStreams::Id>(), Zcl,
-                               "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated audio streams", mEndpointId);
-
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedAudioStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedAudioStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
-
-    return CHIP_NO_ERROR;
+    return PersistAndNotify<Attributes::AllocatedAudioStreams::Id>();
 }
 
 bool CameraAVStreamMgmtServer::IsAllocatedSnapshotStreamReusable(
@@ -463,14 +431,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::AddSnapshotStream(const SnapshotStreamStruc
 {
     mAllocatedSnapshotStreams.push_back(snapshotStream);
 
-    LogAndReturnErrorOnFailure(StoreAllocatedStreams<Attributes::AllocatedSnapshotStreams::Id>(), Zcl,
-                               "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated snapshot streams", mEndpointId);
-
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedSnapshotStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedSnapshotStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
-
-    return CHIP_NO_ERROR;
+    return PersistAndNotify<Attributes::AllocatedSnapshotStreams::Id>();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::UpdateSnapshotStreamRangeParams(
@@ -501,12 +462,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::UpdateSnapshotStreamRangeParams(
 
     if (wasModified)
     {
-        LogAndReturnErrorOnFailure(StoreAllocatedStreams<Attributes::AllocatedSnapshotStreams::Id>(), Zcl,
-                                   "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated snapshot streams", mEndpointId);
-
-        auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedSnapshotStreams::Id);
-        mDelegate.OnAttributeChanged(Attributes::AllocatedSnapshotStreams::Id);
-        MatterReportingAttributeChangeCallback(path);
+        ReturnErrorOnFailure(PersistAndNotify<Attributes::AllocatedSnapshotStreams::Id>());
     }
 
     return CHIP_NO_ERROR;
@@ -519,14 +475,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveSnapshotStream(uint16_t snapshotStrea
                        [&](const SnapshotStreamStruct & sStream) { return sStream.snapshotStreamID == snapshotStreamId; }),
         mAllocatedSnapshotStreams.end());
 
-    LogAndReturnErrorOnFailure(StoreAllocatedStreams<Attributes::AllocatedSnapshotStreams::Id>(), Zcl,
-                               "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated snapshot streams", mEndpointId);
-
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedSnapshotStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedSnapshotStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
-
-    return CHIP_NO_ERROR;
+    return PersistAndNotify<Attributes::AllocatedSnapshotStreams::Id>();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::UpdateVideoStreamRefCount(uint16_t videoStreamId, bool shouldIncrement)
@@ -1731,6 +1680,19 @@ struct StreamTraits<Attributes::AllocatedSnapshotStreams::Id>
 };
 
 } // namespace CameraAvStreamManagement
+
+template <AttributeId TAttributeId>
+CHIP_ERROR CameraAVStreamMgmtServer::PersistAndNotify()
+{
+    LogAndReturnErrorOnFailure(StoreAllocatedStreams<TAttributeId>(), Zcl,
+                               "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated streams", mEndpointId);
+
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, TAttributeId);
+    mDelegate.OnAttributeChanged(TAttributeId);
+    MatterReportingAttributeChangeCallback(path);
+
+    return CHIP_NO_ERROR;
+}
 
 template <AttributeId attributeId>
 CHIP_ERROR CameraAVStreamMgmtServer::StoreAllocatedStreams()
