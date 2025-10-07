@@ -247,12 +247,6 @@ class CADMINBaseTest(MatterBaseTest):
 
             # Verify timing
             timing_valid = actual_duration <= max_allowed_duration
-            if not timing_valid:
-                logging.error("❌ WINDOW CLOSED TOO LATE")
-                logging.error(f"Expected: {expected_duration_seconds}s")
-                logging.error(f"Actual: {actual_duration:.2f}s")
-                logging.error(f"Max allowed: {max_allowed_duration:.2f}s")
-                logging.error(f"Over by: {actual_duration - max_allowed_duration:.2f}s")
 
             results = self.TimingResults(
                 window_closed=True,  # Always true if we reach this point
