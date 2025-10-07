@@ -1440,7 +1440,7 @@ cluster PowerSourceConfiguration = 46 {
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 cluster PowerSource = 47 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 3;
 
   enum BatApprovedChemistryEnum : enum16 {
     kUnspecified = 0;
@@ -7750,7 +7750,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
   }
 
   server cluster GeneralCommissioning {
@@ -8228,7 +8228,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
   }
 
   server cluster Switch {
@@ -9518,7 +9518,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
   }
 
   server cluster ScenesManagement {

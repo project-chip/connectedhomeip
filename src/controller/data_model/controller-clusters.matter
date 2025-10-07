@@ -1380,7 +1380,7 @@ cluster PowerSourceConfiguration = 46 {
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 cluster PowerSource = 47 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 3;
 
   enum BatApprovedChemistryEnum : enum16 {
     kUnspecified = 0;

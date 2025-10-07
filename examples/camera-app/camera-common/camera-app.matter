@@ -917,7 +917,7 @@ cluster LocalizationConfiguration = 43 {
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 cluster PowerSource = 47 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 3;
 
   enum BatApprovedChemistryEnum : enum16 {
     kUnspecified = 0;
@@ -3719,6 +3719,33 @@ endpoint 0 {
     handle command ResetCounts;
   }
 
+  server cluster TimeSynchronization {
+    callback attribute UTCTime;
+    callback attribute granularity;
+    ram      attribute timeSource default = 0x00;
+    callback attribute trustedTimeSource;
+    callback attribute defaultNTP;
+    callback attribute timeZone;
+    callback attribute DSTOffset;
+    callback attribute localTime;
+    ram      attribute timeZoneDatabase default = 2;
+    callback attribute timeZoneListMaxSize;
+    callback attribute DSTOffsetListMaxSize;
+    ram      attribute supportsDNSResolve;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 2;
+
+    handle command SetUTCTime;
+    handle command SetTrustedTimeSource;
+    handle command SetTimeZone;
+    handle command SetTimeZoneResponse;
+    handle command SetDSTOffset;
+    handle command SetDefaultNTP;
+  }
+
   server cluster AdministratorCommissioning {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
@@ -3849,34 +3876,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster TimeSynchronization {
-    callback attribute UTCTime;
-    callback attribute granularity;
-    ram      attribute timeSource default = 0x00;
-    callback attribute trustedTimeSource;
-    callback attribute defaultNTP;
-    callback attribute timeZone;
-    callback attribute DSTOffset;
-    callback attribute localTime;
-    ram      attribute timeZoneDatabase default = 2;
-    callback attribute timeZoneListMaxSize;
-    callback attribute DSTOffsetListMaxSize;
-    ram      attribute supportsDNSResolve;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
-
-    handle command SetUTCTime;
-    handle command SetTrustedTimeSource;
-    handle command SetTimeZone;
-    handle command SetTimeZoneResponse;
-    handle command SetDSTOffset;
-    handle command SetDefaultNTP;
+    callback attribute clusterRevision;
   }
 
   server cluster ZoneManagement {
