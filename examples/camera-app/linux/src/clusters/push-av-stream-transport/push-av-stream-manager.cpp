@@ -363,15 +363,13 @@ bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDurat
     // If the video stream ID is missing or null, error log and return false
     if (!videoStreamId.HasValue())
     {
-        ChipLogError(Camera, "Segment validation requested with no provided stream")
-        return false;
+        ChipLogError(Camera, "Segment validation requested with no provided stream") return false;
     }
     else
     {
         if (videoStreamId.Value().IsNull())
         {
-            ChipLogError(Camera, "Segment validation requested against a Null stream")
-            return false;
+            ChipLogError(Camera, "Segment validation requested against a Null stream") return false;
         }
     }
 
