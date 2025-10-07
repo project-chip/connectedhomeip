@@ -621,6 +621,133 @@ for the CI). These arguments can be passed as sets of key/value pairs using the
 --int-arg PIXIT.ACE.APPENDPOINT:1 --int-arg PIXIT.ACE.APPDEVTYPEID:0x0100 --string-arg PIXIT.ACE.APPCLUSTER:OnOff --string-arg PIXIT.ACE.APPATTRIBUTE:OnOff
 ```
 
+## IDM Conformance tests
+
+The conformance tests are whole-node tests that ensure the device under test
+meets some of the basic interaction model, data model, and system model
+requirements in the specification. These tests are some of the most commonly
+failed tests as they often turn up real bugs on devices. The recommendation from
+the certification testing team is to run these tests before any other
+application-specific tests as failures on these tests normally result in device
+configuration changes that would necessitate re-test in other areas.
+
+The tests in
+[https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_DeviceBasicComposition.py](TC_DeviceBasicComposition.py)
+cover the following checks:
+
+-   Root node checks for commissionable devices
+-   Base device checks for all endpoints
+-   Base cluster checks for all clusters (checking global attribute conformance)
+-   Basic utf-8 string format verification for string type attributes
+-   Tag list conformance for sibling endpoints
+-   Endpoint list verification for power source clusters
+-   Various Descriptor cluster checks
+-   "test" to create device description files in MatterTlvJson and text
+
+The tests in
+[https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_DeviceConformance.py](TC_DeviceConformance.py)
+cover the following checks:
+
+-   Cluster conformance for every cluster is correct with respect to implemented
+    features, attributes and commands
+-   Cluster revisions are correct for the stated specification revision
+-   Device types implement all the required cluster and element overrides
+-   Device type revisions are correct for the stated specification revision
+-   Devices types respect superset rules
+
+The tests in
+[https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_DefaultWarnings.py](TC_DefaultWarnings.py)
+cover the following checks:
+
+-   Checks for common unintentional default values in clusters that may have
+    been missed when implementing devices from the SDK
+
+### Running Conformance Tests
+
+There are a number of options for running conformance tests. Conformance tests
+can be run on devices that have been commissioned into the test framework
+fabric, similar to other certification tests. Because conformance tests operate
+entirely on a single wildcard read of the device attributes, they can be run
+over PASE on an uncommissioned device, or run against a device that has been
+commissioned into the test fabric. They can also be run against a MatterTlvJson
+file with a representation of this information. These files can be generated
+from the TC_DeviceBasicComposition.py tests, as described below.
+
+To run any of the python certification tests, you will first need to set up your
+environment as described in [Setup](#setup).
+
+#### Running conformance tests against an uncommissioned device over PASE
+
+First ensure the device is in commissioning mode. Then run the test against the
+device by supplying either the QR code, the manual pairing code or the
+discriminator / password pair.
+
+```
+python3 TC_DeviceConformance.py --qr-code MT:-24J0AFN00KA0648G00
+```
+
+```
+python3 TC_DeviceConformance.py --manual-code 34970112332
+```
+
+```
+python3 TC_DeviceConformance.py --discriminator 3840 --passcode 20202021
+```
+
+#### Running conformance tests against a commissioned device over CASE
+
+If the device has already been commissioned into the python testing fabric, you
+can run the test directly
+
+```
+python3 TC_DeviceConformance.py
+```
+
+This uses the default fabric storage and node ID. These can also be specified
+when running the tests.
+
+You can commission the device into the test fabric before running the test by
+using the `--commissioning-method` flag and the `--qr-code`, `--manual-code` or
+`--discriminator` and `--passcode` flags.
+
+For example:
+
+```
+python3 TC_DeviceConformance.py --discriminator 3840 --passcode 20202021 --commissioning-method on-network
+```
+
+You may also need to provide parameters for the commissioning method.
+
+If the commissioning-method is `ble-thread`, you will also need to provide the
+thread operational dataset via the `--thread-dataset-hex` parameter.
+
+If the commissioning method is `ble-wifi`, you will also need to provide the
+wifi SSID and password via the `--wifi-ssid` and `--wifi-passphrase` parameters.
+
+By default, the test stores fabric information in `admin_storage.json` in the
+current directory and uses a node ID of `0x12344321` for the device being
+tested. You can supply these directly by using the `--storage-path` and
+`--dut-node-id` flags.
+
+#### Running conformance tests against MatterTlvJson files
+
+Because the conformance tests are run against the attribute wildcard read from
+the device, they can also be run against a MatterTlvJson machine readable file
+without requiring the device to be physically present. To run against a
+previously generated MatterTlvJson device dump file:
+
+```
+python3 TC_DeviceConformance.py --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json
+```
+
+You can generate a MatterTlvJson file for a device by leveraging the
+certification test that generates these (TC-IDM-12.1, implemented in
+TC_DeviceBasicComposition.py).
+
+```
+python3 TC_DeviceBasicComposition.py --qr-code MT:-24J0AFN00KA0648G00 --tests test_TC_IDM_12_1
+```
+
 ## Local host app testing
 
 `./scripts/tests/run_python_test.py` is a convenient script that starts an

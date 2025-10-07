@@ -90,8 +90,8 @@ class GroupcastCluster(private val controller: MatterController, private val end
   suspend fun joinGroup(
     groupID: UShort,
     endpoints: List<UShort>,
-    key: ByteArray,
     keyID: UInt,
+    key: ByteArray?,
     gracePeriod: UInt?,
     useAuxiliaryACL: Boolean?,
     timedInvokeTimeout: Duration? = null,
@@ -111,11 +111,11 @@ class GroupcastCluster(private val controller: MatterController, private val end
     }
     tlvWriter.endArray()
 
-    val TAG_KEY_REQ: Int = 2
-    tlvWriter.put(ContextSpecificTag(TAG_KEY_REQ), key)
-
-    val TAG_KEY_ID_REQ: Int = 3
+    val TAG_KEY_ID_REQ: Int = 2
     tlvWriter.put(ContextSpecificTag(TAG_KEY_ID_REQ), keyID)
+
+    val TAG_KEY_REQ: Int = 3
+    key?.let { tlvWriter.put(ContextSpecificTag(TAG_KEY_REQ), key) }
 
     val TAG_GRACE_PERIOD_REQ: Int = 4
     gracePeriod?.let { tlvWriter.put(ContextSpecificTag(TAG_GRACE_PERIOD_REQ), gracePeriod) }
@@ -236,8 +236,8 @@ class GroupcastCluster(private val controller: MatterController, private val end
 
   suspend fun updateGroupKey(
     groupID: UShort,
-    key: ByteArray,
     keyID: UInt,
+    key: ByteArray?,
     gracePeriod: UInt?,
     timedInvokeTimeout: Duration? = null,
   ) {
@@ -249,11 +249,11 @@ class GroupcastCluster(private val controller: MatterController, private val end
     val TAG_GROUP_ID_REQ: Int = 0
     tlvWriter.put(ContextSpecificTag(TAG_GROUP_ID_REQ), groupID)
 
-    val TAG_KEY_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_KEY_REQ), key)
-
-    val TAG_KEY_ID_REQ: Int = 2
+    val TAG_KEY_ID_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_KEY_ID_REQ), keyID)
+
+    val TAG_KEY_REQ: Int = 2
+    key?.let { tlvWriter.put(ContextSpecificTag(TAG_KEY_REQ), key) }
 
     val TAG_GRACE_PERIOD_REQ: Int = 3
     gracePeriod?.let { tlvWriter.put(ContextSpecificTag(TAG_GRACE_PERIOD_REQ), gracePeriod) }
