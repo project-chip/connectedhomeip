@@ -615,11 +615,20 @@ inline CommissioningParameters MakeCommissioningParams(bool supportsConcurrent =
     params.SetSupportsConcurrentConnection(supportsConcurrent);
     if (hasWiFiCreds)
     {
-        params.SetWiFiCredentials(WiFiCredentials(ByteSpan(), ByteSpan()));
+        static uint8_t ssid[] = { 'T', 'e', 's', 't', 'W', 'i', 'F', 'i' };
+        static uint8_t cred[] = { 'p', 'a', 's', 's', '1', '2', '3', '4' };
+
+        params.SetWiFiCredentials(WiFiCredentials(ByteSpan(ssid), ByteSpan(cred)));
     }
     if (hasThreadDataset)
     {
-        params.SetThreadOperationalDataset(ByteSpan());
+        static uint8_t ThreadDataset[] = {
+            0x00, 0x11, 0x22, 0x33,
+            0x44, 0x55, 0x66, 0x77,
+            0x88, 0x99, 0xAA, 0xBB,
+            0xCC, 0xDD, 0xEE, 0xFF
+        };
+        params.SetThreadOperationalDataset(ByteSpan(ThreadDataset));
     }
     return params;
 }
@@ -643,7 +652,7 @@ inline void ExpectReadCommissioningInfoEq(const ReadCommissioningInfo & actual,
 }
 
 inline void ExpectOperationalDeviceProxyEq(const chip::OperationalDeviceProxy & actual,
-                                           const chip::OperationalDeviceProxy & expected)
+                                           const chip::OperationalDeviceProxy & expected = OperationalDeviceProxy())
 {
     EXPECT_EQ(actual.GetDeviceId(), expected.GetDeviceId());
     EXPECT_EQ(actual.GetExchangeManager(), expected.GetExchangeManager());
@@ -664,7 +673,7 @@ auto CreateAndConnectTestDevice(AutoCommissionerTestAccess & accessor)
 {
     auto state = std::make_unique<ActiveSessionState>();
 
-    state->device.Init(ControllerDeviceInitParams(), 0x00, Transport::Type::kUdp);
+    state->device.Init(ControllerDeviceInitParams(), kValidNodeId, Transport::Type::kUdp);
     accessor.SetDeviceCommissioneeProxy(&state->device);
 
     state->sessionTable.Init();
@@ -902,18 +911,27 @@ TEST_F(AutoCommissionerTest, CleanupCommissioning_ResetsStateAfterTryingSecondar
 
     CommissioneeDeviceProxy device;
     ControllerDeviceInitParams initParams; // Use the one from the test fixture if available
-    device.Init(initParams, 0x00, Transport::Type::kUdp);
+    device.Init(initParams, kValidNodeId, Transport::Type::kUdp);
     privateConfigCommissioner.SetDeviceCommissioneeProxy(&device);
 
     Messaging::ExchangeManager exchangeMgr;
 
     Transport::SecureSessionTable sessionTable;
     sessionTable.Init();
-    Transport::SecureSession testSession(sessionTable, Transport::SecureSession::Type::kPASE, 1234, 0x1111, 0x2222, CATValues(),
-                                         5678, 1, GetDefaultMRPConfig());
+    Transport::SecureSession testSession(
+    sessionTable,
+    Transport::SecureSession::Type::kPASE, // Session type
+    1234,          // localSessionId
+    0x1111,        // localNodeId
+    0x2222,        // peerNodeId
+    CATValues(),   // peerCATs
+    5678,          // peerSessionId
+    1,             // fabric index
+    GetDefaultMRPConfig() // MRP config
+    );
     SessionHandle sessionHandle(testSession);
     OperationalDeviceProxy operationalProxy(&exchangeMgr, sessionHandle);
-    // Use std::move because the test accessor's setter is designed to move.
+
     privateConfigCommissioner.SetOperationalDeviceProxy(operationalProxy);
 
     chip::Controller::ReadCommissioningInfo & commissioningInfo = privateConfigCommissioner.GetDeviceCommissioningInfo();
@@ -922,20 +940,21 @@ TEST_F(AutoCommissionerTest, CleanupCommissioning_ResetsStateAfterTryingSecondar
     commissioningInfo.maxTimeZoneSize                           = 128;
     commissioningInfo.remoteNodeId                              = 0xDEADBEEF;
     commissioningInfo.supportsConcurrentConnection              = false;
-    commissioningInfo.network.wifi.endpoint                     = 0x000;
-    commissioningInfo.network.thread.endpoint                   = 0x000;
+    commissioningInfo.network.wifi.endpoint                     = kRootEndpointId;
+    commissioningInfo.network.thread.endpoint                   = kRootEndpointId;
 
     privateConfigCommissioner.SetNeedsDST();
     privateConfigCommissioner.TrySecondaryNetwork();
 
     privateConfigCommissioner.CleanupCommissioning();
-
+    // Default parameters are expected since CleanupCommissioning resets everything,
+    // including internal structs such as OperationalDeviceProxy and DeviceCommissioningInfo.
     EXPECT_EQ(privateConfigCommissioner.TryingSecondaryNetwork(), false);
     EXPECT_TRUE(privateConfigCommissioner.GetPAI().empty());
     EXPECT_TRUE(privateConfigCommissioner.GetDAC().empty());
     EXPECT_EQ(privateConfigCommissioner.GetCommissioneeDeviceProxy(), nullptr);
-    test_helpers::ExpectOperationalDeviceProxyEq(privateConfigCommissioner.GetOperationalDeviceProxy(), OperationalDeviceProxy());
-    test_helpers::ExpectReadCommissioningInfoEq(privateConfigCommissioner.GetDeviceCommissioningInfo(), ReadCommissioningInfo());
+    test_helpers::ExpectOperationalDeviceProxyEq(privateConfigCommissioner.GetOperationalDeviceProxy());
+    test_helpers::ExpectReadCommissioningInfoEq(privateConfigCommissioner.GetDeviceCommissioningInfo());
     EXPECT_EQ(privateConfigCommissioner.GetNeedsDST(), false);
 }
 
