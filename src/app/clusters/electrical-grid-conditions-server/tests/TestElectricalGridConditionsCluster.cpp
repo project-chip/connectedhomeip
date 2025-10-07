@@ -26,7 +26,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ElectricalGridConditions;
 using namespace chip::app::Clusters::ElectricalGridConditions::Structs;
 
-// Global variable for mock testing - must be outside anonymous namespace for linkage
 bool gMatterReportingCalled = false;
 
 // This replaces the implementation in src/app/reporting/reporting.cpp
@@ -49,7 +48,6 @@ public:
     static bool WasCalled() { return gMatterReportingCalled; }
 };
 
-// Helper function to create test conditions
 namespace TestHelpers {
 ElectricalGridConditionsStruct::Type CreateTestCondition(uint32_t periodStart, Optional<uint32_t> periodEnd = Optional<uint32_t>(),
                                                          Optional<int16_t> gridCarbonIntensity     = Optional<int16_t>(),
@@ -92,7 +90,6 @@ public:
 protected:
     void SetUp() override
     {
-        // Reset mock for each test
         MockMatterReporting::Reset();
 
         mDelegate = std::make_unique<TestDelegate>();
@@ -212,7 +209,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestCurrentConditionsNoOpBehavior)
 
 TEST_F(TestElectricalGridConditionsCluster, TestCurrentConditionsDeepComparisonDetectsDifferences)
 {
-    // Test that our deep comparison correctly identifies different conditions
+    // Test deep comparison correctly identifies different conditions
     // and that different values properly trigger MatterReporting
 
     // Create base condition
