@@ -51,7 +51,7 @@ jobs:
                       arguments: -sdk appletvos -configuration Debug
                     - flavor: watchos-debug
                       arguments: -sdk watchos -configuration Debug
-        runs-on: macos-14
+        runs-on: macos-13
         steps:
             - name: Checkout
               uses: actions/checkout@v5
@@ -77,7 +77,7 @@ jobs:
         name: Run framework tests
         if: github.actor != 'restyled-io[bot]'
         needs: [framework] # serialize to avoid running to many parallel macos runners
-        runs-on: macos-14
+        runs-on: macos-13
         strategy:
             matrix:
                 options: # We don't need a full matrix
