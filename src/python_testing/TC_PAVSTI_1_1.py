@@ -285,9 +285,11 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         # Verify event received
         event_data = event_callback.wait_for_event_report(pushavCluster.Events.PushTransportBegin, timeout_sec=5)
         logger.info(f"Event data {event_data}")
-        asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned") 
-        asserts.assert_equal(event_data.triggerType, pushavCluster.Enums.TransportTriggerTypeEnum.kCommand, "Unexpected value for TriggerType returned") 
-        asserts.assert_equal(event_data.activationReason, pushavCluster.Enums.TriggerActivationReasonEnum.kUserInitiated, "Unexpected value for ActivationReason returned")      
+        asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
+        asserts.assert_equal(event_data.triggerType, pushavCluster.Enums.TransportTriggerTypeEnum.kCommand,
+                             "Unexpected value for TriggerType returned")
+        asserts.assert_equal(event_data.activationReason, pushavCluster.Enums.TriggerActivationReasonEnum.kUserInitiated,
+                             "Unexpected value for ActivationReason returned")
 
         self.step(10)
         if not self.check_pics("PICS_SDK_CI_ONLY"):
@@ -323,12 +325,12 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                     default_value="y",
                 )
                 asserts.assert_equal(user_response.lower(), "y")
-    
+
         self.step(13)
         # Verify event received
         event_data = event_callback.wait_for_event_report(pushavCluster.Events.PushTransportEnd, timeout_sec=5)
         logger.info(f"Event data {event_data}")
-        asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")   
+        asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
 
 
 if __name__ == "__main__":
