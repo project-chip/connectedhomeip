@@ -1822,7 +1822,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
@@ -2449,7 +2449,7 @@ cluster LowPower = 1288 {
 
 /** This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT. */
 cluster KeypadInput = 1289 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum CECKeyCodeEnum : enum8 {
     kSelect = 0;
@@ -2566,7 +2566,7 @@ cluster KeypadInput = 1289 {
     StatusEnum status = 0;
   }
 
-  /** Upon receipt, this SHALL process a keycode as input to the media device. */
+  /** Upon receipt, this SHALL process a keycode as input to the media endpoint. */
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
 }
 
