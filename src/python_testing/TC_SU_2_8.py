@@ -208,11 +208,16 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         # DUT sends a QueryImage commands to TH1/OTA-P
         self.step(1)
 
+        # Define ACL entry
+        await self.create_acl_entry(dev_ctrl=th1, provider_node_id=p1_node, requestor_node_id=requestor_node_id)
+
         # Write default OTA providers
         await self.write_ota_providers(th1, p1_node, endpoint)
 
         # Announce after subscription
         await self.announce_ota_provider(controller=th1, provider_node_id=p1_node, requestor_node_id=requestor_node_id, vendor_id=vendor_id, endpoint=endpoint)
+
+        await asyncio.sleep(5)
 
         blocks = provider_1.read_from_logs("QueryImage", regex=True, before=0, after=15)
 
@@ -289,13 +294,15 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
                                  parsed['location'], f"Location is {parsed['location']} and it should be {location_basic_information}")
 
         # Stop provider
-        await asyncio.sleep(5)
+        await asyncio.sleep(120)
         try:
             provider_1.terminate()
         except Exception as e:
             logging.warning(f"Provider termination raised: {e}")
-        run("rm -rf /tmp/chip_ksv_provider*", shell=True)
+        run("rm -rf /tmp/chip_kvs", shell=True)
         await asyncio.sleep(2)
+
+        th1.ExpireSessions(nodeid=p1_node)
 
         # Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P. DUT sends QueryImage command to TH2/OTA-P
         self.step(2)
@@ -333,7 +340,17 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         logging.info(f"TH2 commissioned: {resp}.")
 
-        # Do not commission Provider-TH1
+        # Commissioning Provider-TH1
+        # logging.info("Commissioning OTA Provider to TH1")
+#
+        # resp = await th1.CommissionOnNetwork(
+        #     nodeId=p1_node,
+        #     setupPinCode=p_pass,
+        #     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+        #     filter=p1_disc
+        # )
+#
+        # logging.info(f"Commissioning response: {resp}.")
 
         # Commissioning Provider-TH2
         logging.info("Commissioning OTA Provider to TH2")
@@ -354,7 +371,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         # Event Handler
         event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
-        await event_cb.start(dev_ctrl=th1, node_id=dut_node_id, endpoint=endpoint,
+        await event_cb.start(dev_ctrl=th1, node_id=requestor_node_id, endpoint=endpoint,
                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
         # Write default OTA providers TH1 with p1_node which does not exist
@@ -399,13 +416,13 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         event_idle_to_querying = event_cb.wait_for_event_report(
             Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
 
-        self.verfy_state_transition_event(event_report=event_idle_to_querying, previous_state=idle, new_state=querying)
+        self.verfiy_state_transition_event(event_report=event_idle_to_querying, previous_state=idle, new_state=querying)
 
         event_querying_to_downloading = event_cb.wait_for_event_report(
             Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
 
-        self.verfy_state_transition_event(event_report=event_querying_to_downloading,
-                                          previous_state=querying, new_state=downloading, target_version=target_version)
+        self.verfiy_state_transition_event(event_report=event_querying_to_downloading,
+                                           previous_state=querying, new_state=downloading, target_version=target_version)
 
         await asyncio.sleep(5)
         try:

@@ -243,12 +243,12 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         return ota_image_info
 
-    def verfy_state_transition_event(self,
-                                     event_report: Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
-                                     previous_state,
-                                     new_state,
-                                     target_version: Optional[int] = None,
-                                     reason: Optional[int] = None):
+    def verfiy_state_transition_event(self,
+                                      event_report: Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
+                                      previous_state,
+                                      new_state,
+                                      target_version: Optional[int] = None,
+                                      reason: Optional[int] = None):
         """Verify the values of the StateTransitionEvent from the EventHandler given the provided arguments.
 
         Args:
