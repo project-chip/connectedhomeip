@@ -51,12 +51,9 @@ void Instance::Shutdown()
 {
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 
-    // Free the forecast conditions storage if allocated
-    if (mForecastConditionsStorage.Get() != nullptr)
-    {
-        mForecastConditionsStorage.Free();
-    }
-    mForecastConditionsStorageCount = 0;
+    // Reset forecast conditions to not point to mForecastConditionsStorage after freeing
+    mForecastConditions = DataModel::List<const Structs::ElectricalGridConditionsStruct::Type>();
+    mForecastConditionsStorage.Free();
 }
 
 bool Instance::HasFeature(Feature aFeature) const
@@ -143,22 +140,8 @@ CHIP_ERROR Instance::SetCurrentConditions(DataModel::Nullable<Structs::Electrica
         }
     }
 
-    // Deep check - compare new value with current value to avoid unnecessary updates
-    bool hasChanged = false;
-
-    if (mCurrentConditions.IsNull() != newValue.IsNull())
-    {
-        hasChanged = true;
-    }
-    else if (!mCurrentConditions.IsNull() && !newValue.IsNull())
-    {
-        const auto & current = mCurrentConditions.Value();
-        const auto & newVal  = newValue.Value();
-
-        hasChanged = !(current == newVal);
-    }
-
-    if (hasChanged)
+    // Use simple comparison - operator!= handles deep comparison including null states
+    if (mCurrentConditions != newValue)
     {
         mCurrentConditions = newValue;
         ChipLogDetail(AppServer, "Endpoint %d - mCurrentConditions updated", mEndpointId);
@@ -244,13 +227,6 @@ CHIP_ERROR Instance::SetForecastConditions(const DataModel::List<const Structs::
             {
                 const auto & previousCondition = newValue[i - 1];
 
-                if (previousCondition.periodEnd.IsNull())
-                {
-                    ChipLogError(AppServer, "Endpoint %d - Entry %u: Previous entry's PeriodEnd is null but current entry exists",
-                                 mEndpointId, static_cast<unsigned int>(i));
-                    return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-                }
-
                 if (condition.periodStart <= previousCondition.periodEnd.Value())
                 {
                     ChipLogError(AppServer,
@@ -267,7 +243,7 @@ CHIP_ERROR Instance::SetForecastConditions(const DataModel::List<const Structs::
     ReturnErrorOnFailure(CopyForecastConditions(newValue));
 
     ChipLogDetail(AppServer, "Endpoint %d - mForecastConditions updated with %u entries", mEndpointId,
-                  static_cast<unsigned int>(mForecastConditionsStorageCount));
+                  static_cast<unsigned int>(mForecastConditionsStorage.AllocatedSize()));
 
     MatterReportingAttributeChangeCallback(mEndpointId, ElectricalGridConditions::Id, ForecastConditions::Id);
 
@@ -276,40 +252,23 @@ CHIP_ERROR Instance::SetForecastConditions(const DataModel::List<const Structs::
 
 CHIP_ERROR Instance::CopyForecastConditions(const DataModel::List<const Structs::ElectricalGridConditionsStruct::Type> & src)
 {
-    // Free the existing forecast conditions storage if allocated
-    if (mForecastConditionsStorage.Get() != nullptr)
-    {
-        mForecastConditionsStorage.Free();
-    }
-    mForecastConditionsStorageCount = 0;
+    // Convert DataModel::List to Span for CopyFromSpan
+    chip::Span<const Structs::ElectricalGridConditionsStruct::Type> srcSpan(src.data(), src.size());
 
-    // Handle empty list case
-    if (src.empty())
-    {
-        mForecastConditions = DataModel::List<const Structs::ElectricalGridConditionsStruct::Type>();
-        return CHIP_NO_ERROR;
-    }
+    // CopyFromSpan handles allocation, copying, and size tracking automatically
+    mForecastConditionsStorage.CopyFromSpan(srcSpan);
 
-    // Allocate memory for storing forecast conditions using Calloc
-    if (!mForecastConditionsStorage.Calloc(src.size()))
+    // Check if allocation succeeded (CopyFromSpan will have size 0 if allocation failed)
+    if (src.size() > 0 && mForecastConditionsStorage.AllocatedSize() == 0)
     {
         ChipLogError(AppServer, "Endpoint %d - Memory allocation failed for forecast conditions storage", mEndpointId);
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    // Copy each condition to our managed memory
-    size_t count = 0;
-    for (const auto & condition : src)
-    {
-        mForecastConditionsStorage[count] = condition;
-        count++;
-    }
-
-    mForecastConditionsStorageCount = count;
-
-    // Update the list to point to our copied data
-    mForecastConditions = DataModel::List<const Structs::ElectricalGridConditionsStruct::Type>(mForecastConditionsStorage.Get(),
-                                                                                               mForecastConditionsStorageCount);
+    // Update the list to point to our managed storage (or empty if srcSpan was empty)
+    auto storageSpan = mForecastConditionsStorage.Span();
+    mForecastConditions =
+        DataModel::List<const Structs::ElectricalGridConditionsStruct::Type>(storageSpan.data(), storageSpan.size());
 
     return CHIP_NO_ERROR;
 }

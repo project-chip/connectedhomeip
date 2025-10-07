@@ -33,9 +33,41 @@ namespace Structs {
 namespace ElectricalGridConditionsStruct {
 inline bool operator==(const Type & lhs, const Type & rhs)
 {
+    // TODO: see #41307 issue for better codegen support for struct comparison
+    // This operator is dangerous because it needs manual updates when struct fields are added
+    /* uint32_t periodStart = static_cast<uint32_t>(0);
+       DataModel::Nullable<uint32_t> periodEnd;
+       int16_t gridCarbonIntensity     = static_cast<int16_t>(0);
+       ThreeLevelEnum gridCarbonLevel  = static_cast<ThreeLevelEnum>(0);
+       int16_t localCarbonIntensity    = static_cast<int16_t>(0);
+       ThreeLevelEnum localCarbonLevel = static_cast<ThreeLevelEnum>(0);
+    */
+
+    // Validate that all expected fields exist with correct types and names
+    // This will fail compilation if fields are removed, renamed, or change type
+    static_assert(std::is_same<decltype(Type{}.periodStart), uint32_t>::value,
+                  "ElectricalGridConditionsStruct::Type::periodStart missing or type changed - update operator==");
+    static_assert(std::is_same<decltype(Type{}.periodEnd), DataModel::Nullable<uint32_t>>::value,
+                  "ElectricalGridConditionsStruct::Type::periodEnd missing or type changed - update operator==");
+    static_assert(std::is_same<decltype(Type{}.gridCarbonIntensity), int16_t>::value,
+                  "ElectricalGridConditionsStruct::Type::gridCarbonIntensity missing or type changed - update operator==");
+    static_assert(std::is_same<decltype(Type{}.gridCarbonLevel), ThreeLevelEnum>::value,
+                  "ElectricalGridConditionsStruct::Type::gridCarbonLevel missing or type changed - update operator==");
+    static_assert(std::is_same<decltype(Type{}.localCarbonIntensity), int16_t>::value,
+                  "ElectricalGridConditionsStruct::Type::localCarbonIntensity missing or type changed - update operator==");
+    static_assert(std::is_same<decltype(Type{}.localCarbonLevel), ThreeLevelEnum>::value,
+                  "ElectricalGridConditionsStruct::Type::localCarbonLevel missing or type changed - update operator==");
+
+    // Note: Cannot reliably detect new fields being added due to C++ limitations
+
     return (lhs.periodStart == rhs.periodStart && lhs.periodEnd == rhs.periodEnd &&
             lhs.gridCarbonIntensity == rhs.gridCarbonIntensity && lhs.gridCarbonLevel == rhs.gridCarbonLevel &&
             lhs.localCarbonIntensity == rhs.localCarbonIntensity && lhs.localCarbonLevel == rhs.localCarbonLevel);
+}
+
+inline bool operator!=(const Type & lhs, const Type & rhs)
+{
+    return !(lhs == rhs);
 }
 } // namespace ElectricalGridConditionsStruct
 } // namespace Structs
@@ -113,9 +145,10 @@ private:
     DataModel::Nullable<Structs::ElectricalGridConditionsStruct::Type> mCurrentConditions;
     DataModel::List<const Structs::ElectricalGridConditionsStruct::Type> mForecastConditions;
 
-    // Storage for forecast conditions to ensure proper memory lifetime
-    Platform::ScopedMemoryBuffer<Structs::ElectricalGridConditionsStruct::Type> mForecastConditionsStorage;
-    size_t mForecastConditionsStorageCount = 0;
+    // Memory storage for forecast conditions - manages ownership and lifetime
+    // of the forecast data to ensure it remains valid during cluster operation.
+    // The Instance owns this memory and is responsible for its allocation/deallocation.
+    Platform::ScopedMemoryBufferWithSize<Structs::ElectricalGridConditionsStruct::Type> mForecastConditionsStorage;
 };
 
 } // namespace ElectricalGridConditions
