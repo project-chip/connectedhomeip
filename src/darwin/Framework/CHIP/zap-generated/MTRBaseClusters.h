@@ -6281,7 +6281,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command UpdateGroupKey
  *
- * This command SHALL allow a fabric maintainer to update the group operational key for an existing group ID that the server is a member of.
+ * This command SHALL allow a fabric maintainer to update the OperationalGroupKey for an existing group ID that the server is a member of.
  */
 - (void)updateGroupKeyWithParams:(MTRGroupcastClusterUpdateGroupKeyParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -13747,7 +13747,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command SendKey
  *
- * Upon receipt, this SHALL process a keycode as input to the media device.
+ * Upon receipt, this SHALL process a keycode as input to the media endpoint.
  */
 - (void)sendKeyWithParams:(MTRKeypadInputClusterSendKeyParams *)params completion:(void (^)(MTRKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 

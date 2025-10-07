@@ -313,6 +313,9 @@
             "ClusterRevision"
         ],
         "General Commissioning": [
+            "FeatureMap",
+            "ClusterRevision",
+            "Breadcrumb",
             "RegulatoryConfig",
             "LocationCapability",
             "BasicCommissioningInfo",
