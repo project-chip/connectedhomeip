@@ -87,7 +87,9 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kConnectionID = 0,
+    kConnectionID     = 0,
+    kTriggerType      = 1,
+    kActivationReason = 2,
 };
 
 struct Type
@@ -98,7 +100,9 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    uint16_t connectionID = static_cast<uint16_t>(0);
+    uint16_t connectionID                = static_cast<uint16_t>(0);
+    TransportTriggerTypeEnum triggerType = static_cast<TransportTriggerTypeEnum>(0);
+    Optional<TriggerActivationReasonEnum> activationReason;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -110,7 +114,9 @@ public:
     static constexpr EventId GetEventId() { return Events::PushTransportEnd::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
 
-    uint16_t connectionID = static_cast<uint16_t>(0);
+    uint16_t connectionID                = static_cast<uint16_t>(0);
+    TransportTriggerTypeEnum triggerType = static_cast<TransportTriggerTypeEnum>(0);
+    Optional<TriggerActivationReasonEnum> activationReason;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
