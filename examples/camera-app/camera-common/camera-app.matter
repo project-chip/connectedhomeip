@@ -211,6 +211,13 @@ enum RelativePositionTag : enum8 {
   kBehind = 6;
 }
 
+enum SoftwareVersionCertificationStatusEnum : enum8 {
+  kDevTest = 0;
+  kProvisional = 1;
+  kCertified = 2;
+  kRevoked = 3;
+}
+
 enum StreamUsageEnum : enum8 {
   kInternal = 0;
   kRecording = 1;
@@ -2391,6 +2398,11 @@ cluster UserLabel = 65 {
 provisional cluster ZoneManagement = 1360 {
   revision 1;
 
+  enum StatusCodeEnum : enum8 {
+    kZoneNotFound = 2;
+    kZoneInUse = 3;
+  }
+
   enum ZoneEventStoppedReasonEnum : enum8 {
     kActionStopped = 0;
     kTimeout = 1;
@@ -2428,7 +2440,7 @@ provisional cluster ZoneManagement = 1360 {
   }
 
   struct TwoDCartesianZoneStruct {
-    char_string<32> name = 0;
+    char_string<16> name = 0;
     ZoneUseEnum use = 1;
     TwoDCartesianVertexStruct vertices[] = 2;
     optional char_string<9> color = 3;
@@ -2502,11 +2514,11 @@ provisional cluster ZoneManagement = 1360 {
   command access(invoke: manage) CreateTwoDCartesianZone(CreateTwoDCartesianZoneRequest): CreateTwoDCartesianZoneResponse = 0;
   /** The UpdateTwoDCartesianZone SHALL update a stored TwoD Cartesian Zone. */
   command access(invoke: manage) UpdateTwoDCartesianZone(UpdateTwoDCartesianZoneRequest): DefaultSuccess = 2;
-  /** This command SHALL remove the Zone mapped to the passed in ZoneID. */
+  /** This command SHALL remove the user-defined Zone indicated by ZoneID. */
   command access(invoke: manage) RemoveZone(RemoveZoneRequest): DefaultSuccess = 3;
   /** This command is used to create or update a Trigger for the specified motion Zone. */
   command access(invoke: manage) CreateOrUpdateTrigger(CreateOrUpdateTriggerRequest): DefaultSuccess = 4;
-  /** This command SHALL remove the Trigger mapped to the provided ZoneID. */
+  /** This command SHALL remove the Trigger for the provided ZoneID. */
   command access(invoke: manage) RemoveTrigger(RemoveTriggerRequest): DefaultSuccess = 5;
 }
 
@@ -3042,6 +3054,7 @@ provisional cluster PushAvStreamTransport = 1365 {
     kInvalidTransportStatus = 8;
     kInvalidOptions = 9;
     kInvalidStreamUsage = 10;
+    kInvalidTime = 11;
   }
 
   enum TransportStatusEnum : enum8 {
@@ -3106,7 +3119,7 @@ provisional cluster PushAvStreamTransport = 1365 {
     StreamUsageEnum streamUsage = 0;
     optional nullable int16u videoStreamID = 1;
     optional nullable int16u audioStreamID = 2;
-    int16u endpointID = 3;
+    int16u TLSEndpointID = 3;
     long_char_string<2000> url = 4;
     TransportTriggerOptionsStruct triggerOptions = 5;
     IngestMethodsEnum ingestMethod = 6;
@@ -3134,8 +3147,6 @@ provisional cluster PushAvStreamTransport = 1365 {
 
   info event PushTransportEnd = 1 {
     int16u connectionID = 0;
-    TransportTriggerTypeEnum triggerType = 1;
-    optional TriggerActivationReasonEnum activationReason = 2;
   }
 
   readonly attribute SupportedFormatStruct supportedFormats[] = 0;

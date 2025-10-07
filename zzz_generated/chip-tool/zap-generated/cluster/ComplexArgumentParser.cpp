@@ -7356,8 +7356,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TransportOptionsStruct.streamUsage", "streamUsage",
                                                                   value.isMember("streamUsage")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("TransportOptionsStruct.endpointID", "endpointID", value.isMember("endpointID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TransportOptionsStruct.TLSEndpointID", "TLSEndpointID",
+                                                                  value.isMember("TLSEndpointID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TransportOptionsStruct.url", "url", value.isMember("url")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TransportOptionsStruct.triggerOptions", "triggerOptions",
                                                                   value.isMember("triggerOptions")));
@@ -7385,9 +7385,9 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("audioStreamID");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpointID");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpointID, value["endpointID"]));
-    valueCopy.removeMember("endpointID");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "TLSEndpointID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.TLSEndpointID, value["TLSEndpointID"]));
+    valueCopy.removeMember("TLSEndpointID");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "url");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.url, value["url"]));
@@ -7420,7 +7420,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::PushAvStreamTransport:
     ComplexArgumentParser::Finalize(request.streamUsage);
     ComplexArgumentParser::Finalize(request.videoStreamID);
     ComplexArgumentParser::Finalize(request.audioStreamID);
-    ComplexArgumentParser::Finalize(request.endpointID);
+    ComplexArgumentParser::Finalize(request.TLSEndpointID);
     ComplexArgumentParser::Finalize(request.url);
     ComplexArgumentParser::Finalize(request.triggerOptions);
     ComplexArgumentParser::Finalize(request.ingestMethod);

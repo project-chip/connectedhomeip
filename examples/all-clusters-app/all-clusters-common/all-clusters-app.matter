@@ -211,6 +211,13 @@ enum RelativePositionTag : enum8 {
   kBehind = 6;
 }
 
+enum SoftwareVersionCertificationStatusEnum : enum8 {
+  kDevTest = 0;
+  kProvisional = 1;
+  kCertified = 2;
+  kRevoked = 3;
+}
+
 enum StreamUsageEnum : enum8 {
   kInternal = 0;
   kRecording = 1;
@@ -6685,6 +6692,7 @@ provisional cluster PushAvStreamTransport = 1365 {
     kInvalidTransportStatus = 8;
     kInvalidOptions = 9;
     kInvalidStreamUsage = 10;
+    kInvalidTime = 11;
   }
 
   enum TransportStatusEnum : enum8 {
@@ -6749,7 +6757,7 @@ provisional cluster PushAvStreamTransport = 1365 {
     StreamUsageEnum streamUsage = 0;
     optional nullable int16u videoStreamID = 1;
     optional nullable int16u audioStreamID = 2;
-    int16u endpointID = 3;
+    int16u TLSEndpointID = 3;
     long_char_string<2000> url = 4;
     TransportTriggerOptionsStruct triggerOptions = 5;
     IngestMethodsEnum ingestMethod = 6;
@@ -6777,8 +6785,6 @@ provisional cluster PushAvStreamTransport = 1365 {
 
   info event PushTransportEnd = 1 {
     int16u connectionID = 0;
-    TransportTriggerTypeEnum triggerType = 1;
-    optional TriggerActivationReasonEnum activationReason = 2;
   }
 
   readonly attribute SupportedFormatStruct supportedFormats[] = 0;
