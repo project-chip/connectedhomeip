@@ -68,34 +68,28 @@ class TC_WEBRTC_1_7(MatterBaseTest, WebRTCTestHelper):
             TestStep(3, description="TH1 sends the SUCCESS status code to the DUT."),
             TestStep(
                 4,
-                description="TH1 sends the ProvideICECandidates command with a its ICE candidates to the DUT.",
-                expectation="DUT responds with SUCCESS status code.",
+                description="Either or both TH1 and DUT exchange ICE candidates if ICE candidates are not shared in  the SDP Offer / Answer.",
             ),
             TestStep(
-                5,
-                description="DUT sends ICECandidates command to the TH1/WEBRTCR.",
-                expectation="Verify that ICECandidates command contains the same WebRTCSessionID saved in step 1 and contain a non-empty ICE candidates.",
+                5, description="TH1 waits for 5 seconds.", expectation="Verify the WebRTC session has been successfully established."
             ),
             TestStep(
-                6, description="TH1 waits for 5 seconds.", expectation="Verify the WebRTC session has been successfully established."
-            ),
-            TestStep(
-                7,
+                6,
                 description="TH1 sends the EndSession command with the WebRTCSessionID saved in step 1 to the DUT.",
                 expectation="DUT responds with SUCCESS status code.",
             ),
             TestStep(
-                8,
+                7,
                 description="Commission DUT from TH2.",
                 expectation="Verify that camera is commissioned successfully.",
             ),
             TestStep(
-                9,
-                description="Repeat Step 1 to Step 6 with TH2.",
+                8,
+                description="Repeat Step 1 to Step 5 with TH2.",
                 expectation="Verify that WebRTC session is established successfully.",
             ),
             TestStep(
-                10,
+                9,
                 description="TH2 sends the EndSession command with the WebRTCSessionID saved in step 9 to the DUT.",
                 expectation="DUT responds with SUCCESS status code.",
             ),
@@ -170,27 +164,27 @@ class TC_WEBRTC_1_7(MatterBaseTest, WebRTCTestHelper):
         local_candidates_struct_list = [
             Objects.Globals.Structs.ICECandidateStruct(candidate=cand.candidate) for cand in local_candidates
         ]
-        await self.send_single_cmd(
-            cmd=WebRTCTransportProvider.Commands.ProvideICECandidates(
-                webRTCSessionID=answer_sessionId, ICECandidates=local_candidates_struct_list
-            ),
-            endpoint=endpoint,
-            payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
-        )
+        if (len(local_candidates_struct_list) > 0):
+            await self.send_single_cmd(
+                cmd=WebRTCTransportProvider.Commands.ProvideICECandidates(
+                    webRTCSessionID=answer_sessionId, ICECandidates=local_candidates_struct_list
+                ),
+                endpoint=endpoint,
+                payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
+            )
+        else:
+            ice_session_id, remote_candidates = await webrtc_peer.get_remote_ice_candidates()
+            asserts.assert_equal(session_id, ice_session_id, "ProvideIceCandidates invoked with wrong session id")
+            asserts.assert_true(len(remote_candidates) > 0, "Invalid remote ice candidates received")
+
+            webrtc_peer.set_remote_ice_candidates(remote_candidates)
 
         self.step(5)
-        ice_session_id, remote_candidates = await webrtc_peer.get_remote_ice_candidates()
-        asserts.assert_equal(session_id, ice_session_id, "ProvideIceCandidates invoked with wrong session id")
-        asserts.assert_true(len(remote_candidates) > 0, "Invalid remote ice candidates received")
-
-        webrtc_peer.set_remote_ice_candidates(remote_candidates)
-
-        self.step(6)
         if not await webrtc_peer.check_for_session_establishment():
             logging.error("Failed to establish webrtc session")
             raise Exception("Failed to establish webrtc session")
 
-        self.step(7)
+        self.step(6)
         await self.send_single_cmd(
             cmd=WebRTCTransportProvider.Commands.EndSession(
                 webRTCSessionID=session_id, reason=Objects.Globals.Enums.WebRTCEndReasonEnum.kUserHangup
@@ -199,10 +193,10 @@ class TC_WEBRTC_1_7(MatterBaseTest, WebRTCTestHelper):
             payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
         )
 
-        self.step(8)
+        self.step(7)
         th2 = await webrtc_create_test_harness_controller(self)
 
-        self.step(9)
+        self.step(8)
         webrtc_peer2: LibdatachannelPeerConnection = webrtc_manager.create_peer(
             node_id=self.dut_node_id + 1,
             fabric_index=th2.GetFabricIndexInternal(),
@@ -235,24 +229,26 @@ class TC_WEBRTC_1_7(MatterBaseTest, WebRTCTestHelper):
             Objects.Globals.Structs.ICECandidateStruct(candidate=cand.candidate) for cand in local_candidates
         ]
 
-        await self.send_single_cmd(
-            cmd=WebRTCTransportProvider.Commands.ProvideICECandidates(
-                webRTCSessionID=answer_sessionId, ICECandidates=local_candidates_struct_list
-            ),
-            endpoint=endpoint,
-            payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
-            dev_ctrl=dev_ctrl,
-            node_id=map_nodeId
-        )
-
-        ice_session_id, remote_candidates = await webrtc_peer2.get_remote_ice_candidates()
-        webrtc_peer2.set_remote_ice_candidates(remote_candidates)
+        if (len(local_candidates_struct_list) > 0):
+            await self.send_single_cmd(
+                cmd=WebRTCTransportProvider.Commands.ProvideICECandidates(
+                    webRTCSessionID=answer_sessionId, ICECandidates=local_candidates_struct_list
+                ),
+                endpoint=endpoint,
+                payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
+                dev_ctrl=dev_ctrl,
+                node_id=map_nodeId
+            )
+        else:
+            ice_session_id, remote_candidates = await webrtc_peer2.get_remote_ice_candidates()
+            webrtc_peer2.set_remote_ice_candidates(remote_candidates)
+            asserts.assert_true(len(remote_candidates) > 0, "Invalid remote ice candidates received")
 
         if not await webrtc_peer2.check_for_session_establishment():
             logging.error("Failed to establish webrtc session for controller 2")
             raise Exception("Failed to establish webrtc session for controller 2")
 
-        self.step(10)
+        self.step(9)
         await self.send_single_cmd(
             cmd=WebRTCTransportProvider.Commands.EndSession(
                 webRTCSessionID=session_id, reason=Objects.Globals.Enums.WebRTCEndReasonEnum.kUserHangup
