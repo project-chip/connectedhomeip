@@ -69,11 +69,13 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         super().__init__(*args, **kwargs)
         self.endpoint = 0
 
-    # This test can take a long time to run especially if run in highly congested lab environments since it gathers all attributes/clusters/endpoints from DUT in order to run this.
+    # This test can take a long time to run especially if run in highly
+    # congested lab environments since it gathers all
+    # attributes/clusters/endpoints from DUT in order to run this.
     @property
     def default_timeout(self) -> int:
         return 600
-        
+
     # === Attribute Reading and Verification ===
     async def verify_attribute_read(self, attribute_path: list) -> dict:
         """Read and verify attributes from the device.
@@ -386,7 +388,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             # (General error + 0x80). Asserting 0x580 here to match the actual returned error.
             # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/data_model/Interaction-Model.adoc#101-status-code-table
             asserts.assert_equal(e.err, 0x580,
-                                 "Incorrect error response for reading non-global attribute on all clusters at endpoint, should have returned GENERAL_ERROR + INVALID_ACTION")
+                "Incorrect error response for reading non-global attribute on all clusters at endpoint, should have returned GENERAL_ERROR + INVALID_ACTION")
             return None
 
     async def _read_limited_access(self, endpoint, cluster_id):
@@ -678,8 +680,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 data_version14 = filtered_read14[0][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
                 asserts.assert_equal(filtered_read14[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.NodeLabel],
                                      "Hello World", "Data version does not match expected value")
-                asserts.assert_equal((read_request14[0][Clusters.BasicInformation][Clusters.Attribute.DataVersion] + 1), data_version14,
-                                     "DataVersion was not incremented")
+                asserts.assert_equal((read_request14[0][Clusters.BasicInformation]
+                                     [Clusters.Attribute.DataVersion] + 1), data_version14, "DataVersion was not incremented")
 
             self.step(15)
             # Read all attributes on BasicInformation cluster (no attribute filter)
@@ -773,4 +775,3 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
 if __name__ == "__main__":
     default_matter_test_main()
-
