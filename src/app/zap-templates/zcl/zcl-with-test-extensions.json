@@ -314,6 +314,9 @@
             "ClusterRevision"
         ],
         "General Commissioning": [
+            "FeatureMap",
+            "ClusterRevision",
+            "Breadcrumb",
             "RegulatoryConfig",
             "LocationCapability",
             "BasicCommissioningInfo",
@@ -378,12 +381,15 @@
             "PIROccupiedToUnoccupiedDelay",
             "UltrasonicOccupiedToUnoccupiedDelay",
             "PhysicalContactOccupiedToUnoccupiedDelay",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Operational Credentials": [
             "SupportedFabrics",
             "CommissionedFabrics",
-            "CurrentFabricIndex"
+            "CurrentFabricIndex",
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Software Diagnostics": [
             "ClusterRevision",
@@ -747,6 +753,7 @@
             "FeatureMap"
         ],
         "Power Topology": ["FeatureMap"],
+        "Power Source": ["ClusterRevision"],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"],
         "Water Heater Management": [
@@ -822,9 +829,11 @@
         "Thermostat": [
             "MaxThermostatSuggestions",
             "CurrentThermostatSuggestion",
-            "ThermostatSuggestionNotFollowingReason"
+            "ThermostatSuggestionNotFollowingReason",
+            "ClusterRevision"
         ],
         "Time Format Localization": ["ClusterRevision"],
+        "Window Covering": ["ClusterRevision"],
         "Zone Management": [
             "MaxUserDefinedZones",
             "MaxZones",
@@ -846,5 +855,6 @@
     },
     "uiOptions": {
         "showProfileId": false
-    }
+    },
+    "upgradeRules": "./upgrade-rules-matter.json"
 }
