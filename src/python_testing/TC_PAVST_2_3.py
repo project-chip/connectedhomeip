@@ -371,7 +371,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             containerOptions = {
                 "containerType": pvcluster.Enums.ContainerFormatEnum.kCmaf,
                 "CMAFContainerOptions": {"CMAFInterface": pvcluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 1000, "segmentDuration": 4000,
-                                         "sessionGroup": 3, "trackName": ""},
+                                         "sessionGroup": 3, "trackName": "media"},
             }
             status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": streamUsage,

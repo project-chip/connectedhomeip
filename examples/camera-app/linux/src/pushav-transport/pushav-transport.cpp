@@ -155,8 +155,7 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
     }
 
     mTransportTriggerType = transportOptions.triggerOptions.triggerType;
-    mClipInfo.mOutputPath =
-        "./clips/"; // CAUTION: If path is not accessible to executable, the program may fail to write and crash.
+    mClipInfo.mOutputPath = "/tmp/"; // CAUTION: If path is not accessible to executable, the program may fail to write and crash.
     mClipInfo.mInputTimeBase = { 1, 1000000 };
 
     uint8_t audioCodec = static_cast<uint8_t>(audioStreamParams.audioCodec);

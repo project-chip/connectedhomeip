@@ -45,7 +45,7 @@ AVDictionary * options = NULL;
 
 PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStruct & aAudioInfo, VideoInfoStruct & aVideoInfo,
                                        PushAVUploader * aUploader) :
-    mClipInfo(aClipInfo), 
+    mClipInfo(aClipInfo),
     mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
 {
     mFormatContext        = nullptr;
@@ -117,7 +117,7 @@ void PushAVClipRecorder::RemovePreviousRecordingFiles(const std::string & path)
         if (filename.length() > 4 &&
             (filename.substr(filename.length() - 4) == ".mpd" || filename.substr(filename.length() - 4) == ".m4s"))
         {
-            std::string filepath = path + filename;
+            std::string filepath = path + "/" + filename;
             if (unlink(filepath.c_str()) == 0)
             {
                 ChipLogDetail(Camera, "Removed previous recording file: %s", filepath.c_str());
@@ -194,6 +194,8 @@ bool PushAVClipRecorder::IsOutputDirectoryValid(const std::string & path)
     }
 
     // Remove files from previous recordings
+    RemovePreviousRecordingFiles(sessionDir);
+    RemovePreviousRecordingFiles(trackDir);
     RemovePreviousRecordingFiles(videoStreamDir);
     RemovePreviousRecordingFiles(audioStreamDir);
 
@@ -657,7 +659,7 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
         std::string segment_name_prefix = mClipInfo.mTrackName;
         std::string initSegName         = segment_name_prefix + "/$RepresentationID$.m4s";
         std::string mediaSegName        = segment_name_prefix + "/$RepresentationID$/segment_1$Number%04d$.m4s";
-        std::string mpd_dir_prefix = "session_" + std::to_string(mClipInfo.mSessionNumber) + "/" + mClipInfo.mTrackName;
+        std::string mpdPrefix      = "session_" + std::to_string(mClipInfo.mSessionNumber) + "/" + mClipInfo.mTrackName;
 
         mInputFormatContext          = avformat_alloc_context();
         int avioCtxBufferSize        = 1048576; // 1MB
@@ -682,7 +684,7 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
             Stop();
             return -1;
         }
-        if (SetupOutput(mClipInfo.mOutputPath + mpd_dir_prefix, initSegName, mediaSegName) < 0)
+        if (SetupOutput(mClipInfo.mOutputPath + mpdPrefix, initSegName, mediaSegName) < 0)
         {
             ChipLogError(Camera, "Error: setting up output");
             return -1;
@@ -810,7 +812,6 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         return std::string(path_buffer);
     };
 
-
     // 1. Handle initialization files
     std::string m4s_path = make_path("%s/0.m4s");
     // ChipLogProgress(Camera, "Recorder: Video initialization file ready [%s]", m4s_path.c_str());
@@ -829,7 +830,6 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
             }
         }
     }
-
 
     // 2. Handle video fragments
     std::string video_m4s = make_path("%s/0/segment_%05d.m4s", mVideoFragment);

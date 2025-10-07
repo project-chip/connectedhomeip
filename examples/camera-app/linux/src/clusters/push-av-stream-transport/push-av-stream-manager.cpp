@@ -274,7 +274,7 @@ void PushAvStreamTransportManager::GetBandwidthForStreams(const Optional<DataMod
 }
 
 Protocols::InteractionModel::Status PushAvStreamTransportManager::GetVideoStreamIdForStreams(StreamUsageEnum streamUsage,
-                                                                                              uint16_t & videoStreamId)
+                                                                                             uint16_t & videoStreamId)
 {
     if (mCameraDevice == nullptr)
     {
@@ -285,7 +285,7 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::GetVideoStream
 }
 
 Protocols::InteractionModel::Status PushAvStreamTransportManager::GetAudioStreamIdForStreams(StreamUsageEnum streamUsage,
-                                                                                              uint16_t & audioStreamId)
+                                                                                             uint16_t & audioStreamId)
 {
     if (mCameraDevice == nullptr)
     {
@@ -744,7 +744,7 @@ void PushAvStreamTransportManager::SessionMonitor()
             for (auto & session : mSessionMap)
             {
                 auto & sessionInfo = session.second;
-                auto now = std::chrono::system_clock::now();
+                auto now           = std::chrono::system_clock::now();
                 auto elapsed = std::chrono::duration_cast<std::chrono::minutes>(now - sessionInfo.sessionStartedTimestamp).count();
                 if (!sessionInfo.activeConnectionIDs.empty() && elapsed >= kMaxSessionDuration)
                 {
@@ -752,7 +752,7 @@ void PushAvStreamTransportManager::SessionMonitor()
                     sessionInfo.sessionStartedTimestamp = now;
                     for (auto connectionID : sessionInfo.activeConnectionIDs)
                     {
-                        sessionsToRestart.push_back({connectionID, sessionInfo.sessionNumber});
+                        sessionsToRestart.push_back({ connectionID, sessionInfo.sessionNumber });
                     }
                 }
             }
