@@ -7,7 +7,6 @@ from typing import Any, BinaryIO, List, Optional, Union
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.testing.tasks import Subprocess
 
-
 @dataclass
 class OtaImagePath:
     path: str
@@ -57,6 +56,3 @@ class OTAProviderSubprocess(AppServerSubprocess):
     def get_pid(self) -> int: ...
 
     def read_from_logs(self, pattern: str, regex: bool = True, before: int = 4, after: int = 4) -> list[dict]: ...
-
-    def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int,
-                         requestor_node_id: Optional[int] = None) -> Any: ...
