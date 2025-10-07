@@ -28,6 +28,10 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32wbaxx_hal.h"
+#include "stm32wba65i_discovery_bus.h"
+#include "stm32wba65i_discovery_errno.h"
+#include "stm32wba65i_discovery_eeprom.h"
+
 
 /* Usage of STM32WBA65I_DK1 board */
 #define USE_STM32WBA65I_DK1                  1U
@@ -38,6 +42,21 @@ extern "C" {
 
 /* Joystick Debounce Delay in ms */
 #define BSP_JOY_DEBOUNCE_DELAY              200
+
+#define SERIAL_COM_INIT BSP_SPI3_Init
+#define SERIAL_COM_DEINIT BSP_SPI3_DeInit
+#define SERIAL_COM_RECV BSP_SPI3_Recv
+#define SERIAL_COM_SEND BSP_SPI3_Send
+#define SERIAL_COM_SENDRECV BSP_SPI3_SendRecv
+
+#define M95P32_EEPROM_SPI_CS_PORT GPIOH
+#define M95P32_EEPROM_SPI_CS_PIN GPIO_PIN_3
+#define M95P32_EEPROM_SPI_CS_RCC __HAL_RCC_GPIOH_CLK_ENABLE
+
+#define EEPROM_DELAY HAL_Delay
+#define EEPROM_MAX_TRIALS 3000U
+#define USE_SPI
+#define SPI_INSTANCE hspi3
 
 #ifdef __cplusplus
 }

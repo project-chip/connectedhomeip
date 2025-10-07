@@ -31,8 +31,10 @@ SOURCES = [
   "${stm32_wb_bsp}/STM32WBA65I-DK1/stm32wba65i_discovery_bus.c",
   "${stm32_wb_bsp}/STM32WBA65I-DK1/stm32wba65i_discovery_lcd.c",
   "${stm32_wb_bsp}/STM32WBA65I-DK1/stm32wba65i_discovery.c",
+  "${stm32_wb_bsp}/STM32WBA65I-DK1/stm32wba65i_discovery_eeprom.c",
   "${stm32_wb_bsp}/Components/ssd1315/ssd1315.c",
   "${stm32_wb_bsp}/Components/ssd1315/ssd1315_reg.c",
+  "${stm32_wb_bsp}/Components/m95p32/m95p32.c",
   
   # BOARD UTILITIES
   "${stm32_util}/trace/adv_trace/stm32_adv_trace.c",
@@ -57,6 +59,7 @@ INCLUDE_DIRS = [
   "${stm32_util}/LCD",
   "${stm32_wb_bsp}/STM32WBA65I-DK1",
   "${stm32_wb_bsp}/Components/ssd1315",
+  "${stm32_wb_bsp}/Components/m95p32",
   "${stm32_wb_bsp}/Components/Common",
   ]
 

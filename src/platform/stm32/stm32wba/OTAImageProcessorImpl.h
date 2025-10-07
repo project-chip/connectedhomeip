@@ -46,7 +46,10 @@ private:
     static void HandleFinalize(intptr_t context);
     static void HandleAbort(intptr_t context);
     static void HandleProcessBlock(intptr_t context);
-
+    static bool WriteMagicValue(uint32_t dest);
+    static bool WriteFlashChunk(uint32_t dest, uint8_t* pSrc, uint32_t size, OTAImageProcessorImpl* imageProcessor);
+    static bool DeleteImages(OTAImageProcessorImpl* imageProcessor);
+    
     /**
      * Called to allocate memory for mBlock if necessary and set it to block
      */

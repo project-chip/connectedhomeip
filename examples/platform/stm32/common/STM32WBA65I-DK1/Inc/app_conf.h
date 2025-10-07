@@ -605,8 +605,8 @@ typedef enum
 /******************************************************************************
  * OTA support
  ******************************************************************************/
-#define OTA_SUPPORT                (0)
-#define OTA_EXTERNAL_FLASH_ENABLE  (0)
+#define OTA_SUPPORT                (1)
+#define OTA_EXTERNAL_FLASH_ENABLE  (1)
 
 /* USER CODE END Defines_2 */
 

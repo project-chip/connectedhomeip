@@ -105,10 +105,14 @@ stm32_executable("lighting_app") {
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/power_table.c",
     "${stm32_board_src}/STM32WBA65I-DK1/Src/app_entry.cpp",
     "${stm32_board_src}/STM32WBA65I-DK1/Src/main.cpp",
+    "${stm32_board_src}/STM32WBA65I-DK1/Src/stm_ota_spi_flash.c",
+    "${stm32_board_src}/STM32WBA65I-DK1/Src/low_level_spi_flash.c",
+    "${stm32_board_src}/STM32WBA65I-DK1/Src/low_level_spi_device.c",
     "src/STM32WBA6/AppTask.cpp",
     "src/STM32WBA6/IdentifierEffect.cpp",
     "src/STM32WBA6/LightingManager.cpp",
     "src/STM32WBA6/ZclCallbacks.cpp",
+    "src/STM32WBA6/ota.cpp",
   ]
 
   deps = [
@@ -119,7 +123,10 @@ stm32_executable("lighting_app") {
     "${chip_root}/src/setup_payload",
     app_data_model,
   ]
-
+ 
+  public = ["${chip_root}/src/platform/stm32/stm32wba/OTAImageProcessorImpl.h",
+     "${chip_root}/src/platform/stm32/stm32wba/FactoryDataProvider.h"
+   ]
   # Add the startup file to the target
   sources += [ "${examples_plat_dir}/startup_files/startup_STM32WBA65I-DK1.s" ]
   sources +=

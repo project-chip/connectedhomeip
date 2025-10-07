@@ -70,9 +70,7 @@ extern void xPortSysTickHandler (void);
 #include "psa/crypto.h"
 #if (OTA_SUPPORT == 1)
 #if (OTA_EXTERNAL_FLASH_ENABLE == 1)
-#error "external flash not supported yet"
-#else
-#include "stm_ota_flash.h"
+#include "stm_ota_spi_flash.h"
 #endif /* (OTA_EXTERNAL_FLASH_ENABLE == 1) */
 #endif /* (OTA_SUPPORT == 1) */
 
@@ -470,9 +468,7 @@ uint32_t MX_APPE_Init(void *p_param)
 
 #if (OTA_SUPPORT == 1)
 #if (OTA_EXTERNAL_FLASH_ENABLE == 1)
-  /* external flash init not implemented yet */
-#else
-  STM_OTA_FLASH_Init();
+    STM_OTA_SPI_FLASH_Init();
 #endif /* (OTA_EXTERNAL_FLASH_ENABLE == 1) */
 #endif /* (OTA_SUPPORT == 1) */
 
