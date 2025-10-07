@@ -248,6 +248,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, SoftwareFaultListenerTest)
     ASSERT_TRUE(decodedFault.name.Value().data_equal(fault.name.Value()));
     ASSERT_TRUE(decodedFault.faultRecording.HasValue());
     ASSERT_TRUE(decodedFault.faultRecording.Value().data_equal(fault.faultRecording.Value()));
+
+    cluster.Shutdown();
 }
 
 } // namespace
