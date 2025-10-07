@@ -558,4 +558,105 @@
     os_unfair_lock_unlock(&counterLock);
 }
 
+- (void)testBatchingWithConcurrentWidth
+{
+    // This test exposes a bug at MTRAsyncWorkQueue.mm:410 (was 407 before fix) where [_items removeObjectAtIndex:1]
+    // is hardcoded instead of using firstNonRunningItemIndex.
+    //
+    // Bug scenario with width=3:
+    // - Items A, B, C fill capacity (all running at indices 0, 1, 2)
+    // - Items D, E are queued (at indices 3, 4)
+    // - Item A completes and is removed
+    // - Items array becomes: [B_running, C_running, D, E] (indices 0, 1, 2, 3)
+    // - Start D at index 2: _runningWorkItemCount becomes 3
+    // - Try to batch E at index 3 into D
+    // - Bug: removes index 1 (C!) instead of index 3 (E)
+    // - Result: C is removed but still running, causing assertion failure when it completes
+
+    MTRAsyncWorkQueue * workQueue = [[MTRAsyncWorkQueue alloc] initWithContext:@"test" width:3];
+
+    dispatch_semaphore_t blockingItemsCanFinish = dispatch_semaphore_create(0);
+    __block int blockingItemsCompleted = 0;
+
+    XCTestExpectation * batchingItemExecuted = [self expectationWithDescription:@"Batching item executed"];
+    XCTestExpectation * batchedItemShouldNotExecute = [self expectationWithDescription:@"Batched item should not execute"];
+    batchedItemShouldNotExecute.inverted = YES;
+
+    // Setup item runs first and enqueues all test items while holding the queue busy
+    MTRAsyncWorkItem * setupItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    setupItem.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        // Enqueue 3 blocking items to fill the width=3 capacity
+        for (int i = 0; i < 3; i++) {
+            MTRAsyncWorkItem * blockingItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+            blockingItem.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+                // All blocking items wait on semaphore
+                dispatch_semaphore_wait(blockingItemsCanFinish, DISPATCH_TIME_FOREVER);
+                blockingItemsCompleted++;
+                completion(MTRAsyncWorkComplete);
+            };
+            [workQueue enqueueWorkItem:blockingItem descriptionWithFormat:@"blocking item %d", i];
+        }
+
+        // Enqueue 2 batchable items - these will be queued because capacity is full
+        NSMutableArray * mergedData = [NSMutableArray arrayWithObject:@"D"];
+
+        MTRAsyncWorkItem * batchingItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+        batchingItem.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+            // Should execute with merged data from both D and E
+            XCTAssertEqual(mergedData.count, 2, @"Item E should have been batched into item D");
+            XCTAssertEqualObjects(mergedData[0], @"D");
+            XCTAssertEqualObjects(mergedData[1], @"E");
+            completion(MTRAsyncWorkComplete);
+            [batchingItemExecuted fulfill];
+        };
+        [batchingItem setBatchingID:100
+                               data:mergedData
+                            handler:^(id first, id second) {
+                                NSMutableArray * firstArray = (NSMutableArray *)first;
+                                NSArray * secondArray = (NSArray *)second;
+                                [firstArray addObjectsFromArray:secondArray];
+                                return MTRBatchedFully;
+                            }];
+        [workQueue enqueueWorkItem:batchingItem description:@"batching item D"];
+
+        MTRAsyncWorkItem * batchedItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+        batchedItem.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+            // Should NOT execute - should be batched into item D
+            completion(MTRAsyncWorkComplete);
+            [batchedItemShouldNotExecute fulfill];
+        };
+        [batchedItem setBatchingID:100
+                              data:@[@"E"]
+                           handler:^(id first, id second) {
+                               return MTRNotBatched;
+                           }];
+        [workQueue enqueueWorkItem:batchedItem description:@"batchable item E"];
+
+        completion(MTRAsyncWorkComplete);
+    };
+    [workQueue enqueueWorkItem:setupItem description:@"setup item"];
+
+    // Give time for all items to be enqueued and blocking items to start
+    usleep(100000); // 100ms
+
+    // Release ONE blocking item to trigger batching
+    // When it completes, item D will start and should batch item E
+    // At this point: [blockingB_running, blockingC_running, D, E]
+    // D starts at index 2, E is at index 3, but bug removes index 1!
+    dispatch_semaphore_signal(blockingItemsCanFinish);
+
+    [self waitForExpectations:@[batchingItemExecuted, batchedItemShouldNotExecute] timeout:3];
+
+    // Release remaining blocking items
+    dispatch_semaphore_signal(blockingItemsCanFinish);
+    dispatch_semaphore_signal(blockingItemsCanFinish);
+
+    // Wait a bit for cleanup
+    sleep(1);
+
+    // Verify queue is properly drained
+    XCTAssertEqual([workQueue itemCount], 0, @"Queue should be empty after all items complete");
+    XCTAssertEqual(blockingItemsCompleted, 3, @"All blocking items should have completed");
+}
+
 @end

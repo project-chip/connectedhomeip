@@ -404,7 +404,7 @@ struct ContextSnapshot {
             case MTRBatchedFully:
                 MTR_LOG("MTRAsyncWorkQueue<%@> fully merged work item [%llu] into %llu",
                     context.description, nextWorkItem.uniqueID, workItem.uniqueID);
-                [_items removeObjectAtIndex:1];
+                [_items removeObjectAtIndex:firstNonRunningItemIndex];
                 continue; // try to batch the next item (if any)
             }
         }
