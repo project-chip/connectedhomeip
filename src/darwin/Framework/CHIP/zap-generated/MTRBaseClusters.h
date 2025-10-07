@@ -6282,7 +6282,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command UpdateGroupKey
  *
- * This command SHALL allow a fabric maintainer to update the group operational key for an existing group ID that the server is a member of.
+ * This command SHALL allow a fabric maintainer to update the OperationalGroupKey for an existing group ID that the server is a member of.
  */
 - (void)updateGroupKeyWithParams:(MTRGroupcastClusterUpdateGroupKeyParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**

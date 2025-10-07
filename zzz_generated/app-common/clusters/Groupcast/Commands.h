@@ -85,8 +85,8 @@ enum class Fields : uint8_t
 {
     kGroupID         = 0,
     kEndpoints       = 1,
-    kKey             = 2,
-    kKeyID           = 3,
+    kKeyID           = 2,
+    kKey             = 3,
     kGracePeriod     = 4,
     kUseAuxiliaryACL = 5,
 };
@@ -100,8 +100,8 @@ public:
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     DataModel::List<const chip::EndpointId> endpoints;
-    chip::ByteSpan key;
     uint32_t keyID = static_cast<uint32_t>(0);
+    Optional<chip::ByteSpan> key;
     Optional<uint32_t> gracePeriod;
     Optional<bool> useAuxiliaryACL;
 
@@ -121,8 +121,8 @@ public:
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     DataModel::DecodableList<chip::EndpointId> endpoints;
-    chip::ByteSpan key;
     uint32_t keyID = static_cast<uint32_t>(0);
+    Optional<chip::ByteSpan> key;
     Optional<uint32_t> gracePeriod;
     Optional<bool> useAuxiliaryACL;
 
@@ -209,8 +209,8 @@ namespace UpdateGroupKey {
 enum class Fields : uint8_t
 {
     kGroupID     = 0,
-    kKey         = 1,
-    kKeyID       = 2,
+    kKeyID       = 1,
+    kKey         = 2,
     kGracePeriod = 3,
 };
 
@@ -222,8 +222,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Groupcast::Id; }
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
-    chip::ByteSpan key;
-    uint32_t keyID = static_cast<uint32_t>(0);
+    uint32_t keyID        = static_cast<uint32_t>(0);
+    Optional<chip::ByteSpan> key;
     Optional<uint32_t> gracePeriod;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -241,8 +241,8 @@ public:
     static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
-    chip::ByteSpan key;
-    uint32_t keyID = static_cast<uint32_t>(0);
+    uint32_t keyID        = static_cast<uint32_t>(0);
+    Optional<chip::ByteSpan> key;
     Optional<uint32_t> gracePeriod;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);

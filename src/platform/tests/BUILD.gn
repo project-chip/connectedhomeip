@@ -91,7 +91,7 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
     }
 
     if (current_os == "zephyr" || current_os == "android" ||
-        current_os == "mbed" || current_os == "cmsis-rtos") {
+        current_os == "cmsis-rtos") {
       test_sources += [ "TestKeyValueStoreMgr.cpp" ]
     }
 

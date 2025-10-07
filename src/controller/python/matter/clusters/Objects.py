@@ -20563,16 +20563,16 @@ class Groupcast(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="endpoints", Tag=1, Type=typing.List[uint]),
-                        ClusterObjectFieldDescriptor(Label="key", Tag=2, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="keyID", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="keyID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="key", Tag=3, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="gracePeriod", Tag=4, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="useAuxiliaryACL", Tag=5, Type=typing.Optional[bool]),
                     ])
 
             groupID: uint = 0
             endpoints: typing.List[uint] = field(default_factory=lambda: [])
-            key: bytes = b""
             keyID: uint = 0
+            key: typing.Optional[bytes] = None
             gracePeriod: typing.Optional[uint] = None
             useAuxiliaryACL: typing.Optional[bool] = None
 
@@ -20626,14 +20626,14 @@ class Groupcast(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="key", Tag=1, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="keyID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="keyID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="key", Tag=2, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="gracePeriod", Tag=3, Type=typing.Optional[uint]),
                     ])
 
             groupID: uint = 0
-            key: bytes = b""
             keyID: uint = 0
+            key: typing.Optional[bytes] = None
             gracePeriod: typing.Optional[uint] = None
 
         @dataclass
