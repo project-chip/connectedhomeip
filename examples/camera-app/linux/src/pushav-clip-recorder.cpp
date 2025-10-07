@@ -656,9 +656,9 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
             return false;
         }
 
-        std::string initSegName         = mClipInfo.mTrackName + "/$RepresentationID$.m4s";
-        std::string mediaSegName        = mClipInfo.mTrackName + "/$RepresentationID$/segment_1$Number%04d$.m4s";
-        std::string mpdPrefix      = "session_" + std::to_string(mClipInfo.mSessionNumber) + "/" + mClipInfo.mTrackName;
+        std::string initSegName  = mClipInfo.mTrackName + "/$RepresentationID$.m4s";
+        std::string mediaSegName = mClipInfo.mTrackName + "/$RepresentationID$/segment_1$Number%04d$.m4s";
+        std::string mpdPrefix    = "session_" + std::to_string(mClipInfo.mSessionNumber) + "/" + mClipInfo.mTrackName;
 
         mInputFormatContext          = avformat_alloc_context();
         int avioCtxBufferSize        = 1048576; // 1MB
