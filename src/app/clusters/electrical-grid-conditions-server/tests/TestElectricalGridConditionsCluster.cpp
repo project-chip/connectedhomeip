@@ -18,7 +18,6 @@
 #include <memory>
 #include <platform/CHIPDeviceLayer.h>
 #include <pw_unit_test/framework.h>
-#include <vector>
 
 using namespace chip;
 using namespace chip::app;
@@ -254,7 +253,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestCurrentConditionsValidPeriodStar
         const char * description;
     };
 
-    std::vector<ValidConditionTest> validTests = {
+    static const ValidConditionTest validTests[] = {
         // Valid: periodEnd is null (allowed per spec)
         { 1000, Optional<uint32_t>(), "periodEnd is null" },
 
@@ -292,7 +291,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestCurrentConditionsInvalidPeriodSt
         const char * description;
     };
 
-    std::vector<InvalidConditionTest> invalidTests = {
+    static const InvalidConditionTest invalidTests[] = {
         // Invalid: periodStart >= periodEnd (spec requires periodEnd > periodStart)
         { 1000, 1000, "periodStart == periodEnd (1000 == 1000) - violates spec" },
         { 2000, 1000, "periodStart > periodEnd (2000 > 1000)" },
@@ -321,50 +320,75 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsValidTimeSerie
 {
     // Test valid forecast conditions that meet spec requirements for time ordering
 
-    std::vector<std::vector<std::pair<uint32_t, Optional<uint32_t>>>> validForecastTests = {
-        // Single entry with null periodEnd (last entry can have null periodEnd)
-        { { 1000, Optional<uint32_t>() } },
-
-        // Single entry with valid periodStart < periodEnd
-        { { 1000, Optional<uint32_t>(2000) } },
-
-        // Two entries: properly ordered with gaps allowed
-        {
-            { 1000, Optional<uint32_t>(2000) }, // First entry: must have non-null periodEnd
-            { 2001, Optional<uint32_t>() }      // Last entry: can have null periodEnd, periodStart > previous periodEnd
-        },
-
-        // Three entries: properly ordered
-        {
-            { 1000, Optional<uint32_t>(1500) }, // First: non-null periodEnd
-            { 1501, Optional<uint32_t>(2000) }, // Middle: non-null periodEnd, periodStart > previous periodEnd
-            { 2001, Optional<uint32_t>() }      // Last: null periodEnd allowed, periodStart > previous periodEnd
-        },
-
-        // Multiple entries with exact boundaries (periodStart = previous periodEnd + 1)
-        { { 1000, Optional<uint32_t>(1999) },
-          { 2000, Optional<uint32_t>(2999) },
-          { 3000, Optional<uint32_t>(3999) },
-          { 4000, Optional<uint32_t>() } }
-    };
-
-    for (size_t testIndex = 0; testIndex < validForecastTests.size(); testIndex++)
+    // Test case 1: Single entry with null periodEnd (last entry can have null periodEnd)
     {
         MockMatterReporting::Reset();
-
-        // Build forecast conditions list
-        std::vector<ElectricalGridConditionsStruct::Type> forecastList;
-        for (const auto & entry : validForecastTests[testIndex])
-        {
-            forecastList.push_back(TestHelpers::CreateTestCondition(entry.first, entry.second));
-        }
-
-        DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList.data(), forecastList.size());
-
+        ElectricalGridConditionsStruct::Type forecastList[1];
+        forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>());
+        
+        DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 1);
         EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_NO_ERROR)
-            << "Failed for valid forecast test case " << testIndex;
+            << "Failed for valid forecast test case: single entry with null periodEnd";
         EXPECT_TRUE(MockMatterReporting::WasCalled())
-            << "MatterReporting should be called for valid forecast test case " << testIndex;
+            << "MatterReporting should be called for valid forecast test case: single entry with null periodEnd";
+    }
+
+    // Test case 2: Single entry with valid periodStart < periodEnd
+    {
+        MockMatterReporting::Reset();
+        ElectricalGridConditionsStruct::Type forecastList[1];
+        forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(2000));
+        
+        DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 1);
+        EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_NO_ERROR)
+            << "Failed for valid forecast test case: single entry with valid periodStart < periodEnd";
+        EXPECT_TRUE(MockMatterReporting::WasCalled())
+            << "MatterReporting should be called for valid forecast test case: single entry with valid periodStart < periodEnd";
+    }
+
+    // Test case 3: Two entries properly ordered with gaps allowed
+    {
+        MockMatterReporting::Reset();
+        ElectricalGridConditionsStruct::Type forecastList[2];
+        forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(2000)); // First entry: must have non-null periodEnd
+        forecastList[1] = TestHelpers::CreateTestCondition(2001, Optional<uint32_t>());     // Last entry: can have null periodEnd, periodStart > previous periodEnd
+        
+        DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 2);
+        EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_NO_ERROR)
+            << "Failed for valid forecast test case: two entries properly ordered";
+        EXPECT_TRUE(MockMatterReporting::WasCalled())
+            << "MatterReporting should be called for valid forecast test case: two entries properly ordered";
+    }
+
+    // Test case 4: Three entries properly ordered
+    {
+        MockMatterReporting::Reset();
+        ElectricalGridConditionsStruct::Type forecastList[3];
+        forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(1500)); // First: non-null periodEnd
+        forecastList[1] = TestHelpers::CreateTestCondition(1501, Optional<uint32_t>(2000)); // Middle: non-null periodEnd, periodStart > previous periodEnd  
+        forecastList[2] = TestHelpers::CreateTestCondition(2001, Optional<uint32_t>());     // Last: null periodEnd allowed, periodStart > previous periodEnd
+        
+        DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 3);
+        EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_NO_ERROR)
+            << "Failed for valid forecast test case: three entries properly ordered";
+        EXPECT_TRUE(MockMatterReporting::WasCalled())
+            << "MatterReporting should be called for valid forecast test case: three entries properly ordered";
+    }
+
+    // Test case 5: Multiple entries with exact boundaries (periodStart = previous periodEnd + 1)
+    {
+        MockMatterReporting::Reset();
+        ElectricalGridConditionsStruct::Type forecastList[4];
+        forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(1999));
+        forecastList[1] = TestHelpers::CreateTestCondition(2000, Optional<uint32_t>(2999));
+        forecastList[2] = TestHelpers::CreateTestCondition(3000, Optional<uint32_t>(3999));
+        forecastList[3] = TestHelpers::CreateTestCondition(4000, Optional<uint32_t>());
+        
+        DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 4);
+        EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_NO_ERROR)
+            << "Failed for valid forecast test case: multiple entries with exact boundaries";
+        EXPECT_TRUE(MockMatterReporting::WasCalled())
+            << "MatterReporting should be called for valid forecast test case: multiple entries with exact boundaries";
     }
 }
 
@@ -376,70 +400,102 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsInvalidTimeSer
     // 1. Section 5.2.2: "PeriodEnd SHALL be greater than PeriodStart" (individual entry validation)
     // 2. Section 6.3: "PeriodStart SHALL be greater than the previous entry's PeriodEnd" (time series validation)
 
-    struct InvalidForecastTest
+    // Invalid case 1: Single entry with periodStart == periodEnd (violates spec 5.2.2)
     {
-        std::vector<std::pair<uint32_t, Optional<uint32_t>>> entries;
-        const char * description;
-    };
-
-    std::vector<InvalidForecastTest> invalidTests = {
-        // Invalid: Individual entry validation - periodStart >= periodEnd (spec violation)
-        { { { 2000, Optional<uint32_t>(2000) } }, "Single entry: periodStart == periodEnd - violates spec 5.2.2" },
-        { { { 2000, Optional<uint32_t>(1000) } }, "Single entry: periodStart > periodEnd - violates spec 5.2.2" },
-
-        // Invalid: Time series validation - non-last entry has null periodEnd (violates spec 6.3)
-        { {
-              { 1000, Optional<uint32_t>() }, // First entry with null periodEnd (violates spec 6.3)
-              { 2000, Optional<uint32_t>() }  // Last entry with null periodEnd (valid)
-          },
-          "Non-last entry has null periodEnd - violates spec 6.3" },
-
-        // Invalid: Time series validation - periodStart <= previous periodEnd (violates spec 6.3)
-        { {
-              { 1000, Optional<uint32_t>(2000) },
-              { 2000, Optional<uint32_t>() } // periodStart == previous periodEnd (violates spec 6.3: must be >)
-          },
-          "periodStart == previous periodEnd - violates spec 6.3" },
-        { {
-              { 1000, Optional<uint32_t>(2000) },
-              { 1999, Optional<uint32_t>() } // periodStart < previous periodEnd (violates spec 6.3)
-          },
-          "periodStart < previous periodEnd - violates spec 6.3" },
-
-        // Invalid: Multiple violations
-        { { { 1000, Optional<uint32_t>(1500) },
-            { 1400, Optional<uint32_t>(2000) }, // periodStart < previous periodEnd (violates spec 6.3)
-            { 2001, Optional<uint32_t>() } },
-          "Multiple entries with time ordering violation - violates spec 6.3" },
-
-        // Invalid: Time series validation - middle entry has null periodEnd (violates spec 6.3)
-        { {
-              { 1000, Optional<uint32_t>(1500) },
-              { 1501, Optional<uint32_t>() }, // Middle entry with null periodEnd (violates spec 6.3)
-              { 2000, Optional<uint32_t>() }  // Last entry
-          },
-          "Middle entry has null periodEnd - violates spec 6.3" }
-    };
-
-    for (size_t testIndex = 0; testIndex < invalidTests.size(); testIndex++)
-    {
-        const auto & test = invalidTests[testIndex];
         MockMatterReporting::Reset();
-
-        // Build forecast conditions list
-        std::vector<ElectricalGridConditionsStruct::Type> forecastList;
-        for (const auto & entry : test.entries)
-        {
-            forecastList.push_back(TestHelpers::CreateTestCondition(entry.first, entry.second));
-        }
-
-        DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList.data(), forecastList.size());
-
-        // Should return ConstraintError per spec validation
+        ElectricalGridConditionsStruct::Type forecastList[1];
+        forecastList[0] = TestHelpers::CreateTestCondition(2000, Optional<uint32_t>(2000));
+        
+        DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 1);
         EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
-            << "Should reject invalid case: " << test.description;
+            << "Should reject invalid case: Single entry periodStart == periodEnd - violates spec 5.2.2";
         EXPECT_FALSE(MockMatterReporting::WasCalled())
-            << "MatterReporting should NOT be called for invalid case: " << test.description;
+            << "MatterReporting should NOT be called for invalid case: Single entry periodStart == periodEnd";
+    }
+
+    // Invalid case 2: Single entry with periodStart > periodEnd (violates spec 5.2.2)
+    {
+        MockMatterReporting::Reset();
+        ElectricalGridConditionsStruct::Type forecastList[1];
+        forecastList[0] = TestHelpers::CreateTestCondition(2000, Optional<uint32_t>(1000));
+        
+        DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 1);
+        EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
+            << "Should reject invalid case: Single entry periodStart > periodEnd - violates spec 5.2.2";
+        EXPECT_FALSE(MockMatterReporting::WasCalled())
+            << "MatterReporting should NOT be called for invalid case: Single entry periodStart > periodEnd";
+    }
+
+    // Invalid case 3: Non-last entry has null periodEnd (violates spec 6.3)
+    {
+        MockMatterReporting::Reset();
+        ElectricalGridConditionsStruct::Type forecastList[2];
+        forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>());     // First entry with null periodEnd (violates spec 6.3)
+        forecastList[1] = TestHelpers::CreateTestCondition(2000, Optional<uint32_t>());     // Last entry with null periodEnd (valid)
+        
+        DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 2);
+        EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
+            << "Should reject invalid case: Non-last entry has null periodEnd - violates spec 6.3";
+        EXPECT_FALSE(MockMatterReporting::WasCalled())
+            << "MatterReporting should NOT be called for invalid case: Non-last entry has null periodEnd";
+    }
+
+    // Invalid case 4: periodStart == previous periodEnd (violates spec 6.3)
+    {
+        MockMatterReporting::Reset();
+        ElectricalGridConditionsStruct::Type forecastList[2];
+        forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(2000));
+        forecastList[1] = TestHelpers::CreateTestCondition(2000, Optional<uint32_t>());     // periodStart == previous periodEnd (violates spec 6.3: must be >)
+        
+        DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 2);
+        EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
+            << "Should reject invalid case: periodStart == previous periodEnd - violates spec 6.3";
+        EXPECT_FALSE(MockMatterReporting::WasCalled())
+            << "MatterReporting should NOT be called for invalid case: periodStart == previous periodEnd";
+    }
+
+    // Invalid case 5: periodStart < previous periodEnd (violates spec 6.3)
+    {
+        MockMatterReporting::Reset();
+        ElectricalGridConditionsStruct::Type forecastList[2];
+        forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(2000));
+        forecastList[1] = TestHelpers::CreateTestCondition(1999, Optional<uint32_t>());     // periodStart < previous periodEnd (violates spec 6.3)
+        
+        DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 2);
+        EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
+            << "Should reject invalid case: periodStart < previous periodEnd - violates spec 6.3";
+        EXPECT_FALSE(MockMatterReporting::WasCalled())
+            << "MatterReporting should NOT be called for invalid case: periodStart < previous periodEnd";
+    }
+
+    // Invalid case 6: Multiple entries with time ordering violation (violates spec 6.3)
+    {
+        MockMatterReporting::Reset();
+        ElectricalGridConditionsStruct::Type forecastList[3];
+        forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(1500));
+        forecastList[1] = TestHelpers::CreateTestCondition(1400, Optional<uint32_t>(2000)); // periodStart < previous periodEnd (violates spec 6.3)
+        forecastList[2] = TestHelpers::CreateTestCondition(2001, Optional<uint32_t>());
+        
+        DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 3);
+        EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
+            << "Should reject invalid case: Multiple entries with time ordering violation - violates spec 6.3";
+        EXPECT_FALSE(MockMatterReporting::WasCalled())
+            << "MatterReporting should NOT be called for invalid case: Multiple entries with time ordering violation";
+    }
+
+    // Invalid case 7: Middle entry has null periodEnd (violates spec 6.3)
+    {
+        MockMatterReporting::Reset();
+        ElectricalGridConditionsStruct::Type forecastList[3];
+        forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(1500));
+        forecastList[1] = TestHelpers::CreateTestCondition(1501, Optional<uint32_t>());     // Middle entry with null periodEnd (violates spec 6.3)
+        forecastList[2] = TestHelpers::CreateTestCondition(2000, Optional<uint32_t>());     // Last entry
+        
+        DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 3);
+        EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
+            << "Should reject invalid case: Middle entry has null periodEnd - violates spec 6.3";
+        EXPECT_FALSE(MockMatterReporting::WasCalled())
+            << "MatterReporting should NOT be called for invalid case: Middle entry has null periodEnd";
     }
 }
 
