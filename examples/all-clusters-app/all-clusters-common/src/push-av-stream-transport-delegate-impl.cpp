@@ -105,7 +105,8 @@ bool PushAvStreamTransportManager::ValidateStreamUsage(StreamUsageEnum streamUsa
     return true;
 }
 
-bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDuration)
+bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDuration,
+                                                           const Optional<DataModel::Nullable<uint16_t>> & videoStreamId)
 {
     return true;
 }
