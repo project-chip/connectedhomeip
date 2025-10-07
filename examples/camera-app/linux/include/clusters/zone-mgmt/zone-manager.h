@@ -19,7 +19,7 @@
 #pragma once
 
 #include "camera-device-interface.h"
-#include <app/clusters/zone-management-server/zone-management-server.h>
+#include <app/clusters/zone-management-server/ZoneManagementCluster.h>
 #include <app/util/config.h>
 #include <vector>
 
@@ -31,20 +31,13 @@ namespace app {
 namespace Clusters {
 namespace ZoneManagement {
 
-struct TwoDCartZone
-{
-    uint16_t zoneId;
-    TwoDCartesianZoneStorage zone;
-};
-
 /**
  * The application delegate to define the options & implement commands.
  */
 class ZoneManager : public Delegate, public CameraDeviceInterface::CameraHALInterface::ZoneEventCallback
 {
 public:
-    Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneStorage & zone,
-                                                                uint16_t & outZoneID) override;
+    Protocols::InteractionModel::Status CreateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStorage & zone) override;
 
     Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStorage & zone) override;
 
@@ -57,10 +50,6 @@ public:
     Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneID) override;
 
     void OnAttributeChanged(AttributeId attributeId) override;
-
-    CHIP_ERROR LoadZones(std::vector<ZoneInformationStorage> & aZones) override;
-
-    CHIP_ERROR LoadTriggers(std::vector<ZoneTriggerControlStruct> & aTriggers) override;
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
@@ -94,34 +83,9 @@ private:
     };
 
     CameraDeviceInterface * mCameraDevice = nullptr;
-    // Activity zones;
-    std::vector<TwoDCartZone> mTwoDCartZones;
     std::vector<ZoneTriggerContext> mTriggerContexts;
 
     static void OnZoneTriggerTimeout(chip::System::Layer * systemLayer, void * appState);
-
-    uint16_t GetNewZoneId()
-    {
-        // TODO: Replace with a better algo; Maybe use a std::set
-        uint16_t newId = 1;
-        while (true)
-        {
-            bool idExists = false;
-            for (const auto & zone : mTwoDCartZones)
-            {
-                if (zone.zoneId == newId)
-                {
-                    idExists = true;
-                    break;
-                }
-            }
-            if (!idExists)
-            {
-                return newId;
-            }
-            newId++;
-        }
-    }
 };
 
 } // namespace ZoneManagement

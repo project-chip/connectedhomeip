@@ -189,15 +189,20 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     uint8_t appMaxZones                           = mCameraDevice->GetCameraHALInterface().GetMaxZones();
     uint8_t appMaxUserDefinedZones                = mCameraDevice->GetCameraHALInterface().GetMaxUserDefinedZones();
     uint8_t sensitivityMax                        = mCameraDevice->GetCameraHALInterface().GetSensitivityMax();
+    uint8_t sensitivity                           = mCameraDevice->GetCameraHALInterface().GetDetectionSensitivity();
     TwoDCartesianVertexStruct appTwoDCartesianMax = {};
     appTwoDCartesianMax.x                         = sensorParams.sensorWidth - 1;
     appTwoDCartesianMax.y                         = sensorParams.sensorHeight - 1;
 
-    // Instantiate the ZoneManagement Server
-    mZoneMgmtServerPtr = std::make_unique<ZoneMgmtServer>(mCameraDevice->GetZoneManagementDelegate(), mEndpoint, zoneMgmtFeatures,
-                                                          appMaxUserDefinedZones, appMaxZones, sensitivityMax, appTwoDCartesianMax);
+    // Instantiate the ZoneManagementCluster Server
+    mZoneManagementServer.Create(mEndpoint, mCameraDevice->GetZoneManagementDelegate(), zoneMgmtFeatures, appMaxUserDefinedZones,
+                                 appMaxZones, sensitivityMax, sensitivity, appTwoDCartesianMax);
 
-    mZoneMgmtServerPtr->SetSensitivity(mCameraDevice->GetCameraHALInterface().GetDetectionSensitivity());
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mZoneManagementServer.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to register ZoneManagement on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpoint, err.Format());
+    }
 }
 
 void CameraApp::InitializeCameraAVStreamMgmt()
@@ -280,7 +285,7 @@ void CameraApp::InitCameraDeviceClusters()
 
     InitializeCameraAVStreamMgmt();
 
-    mZoneMgmtServerPtr->Init();
+    mZoneManagementServer.Cluster().Init();
 }
 
 void CameraApp::ShutdownCameraDeviceClusters()
@@ -288,6 +293,13 @@ void CameraApp::ShutdownCameraDeviceClusters()
     ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera device clusters");
     mAVSettingsUserLevelMgmtServerPtr->Shutdown();
     mWebRTCTransportProviderPtr->Shutdown();
+    mZoneManagementServer.Cluster().Shutdown();
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mZoneManagementServer.Cluster());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "ZoneManagement unregister error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    mZoneManagementServer.Destroy();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;

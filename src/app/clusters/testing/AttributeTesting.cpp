@@ -18,6 +18,7 @@
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <map>
+#include <set>
 
 namespace chip {
 namespace Testing {
@@ -159,5 +160,55 @@ bool EqualAcceptedCommandSets(Span<const app::DataModel::AcceptedCommandEntry> a
     return true;
 }
 
+bool EqualGeneratedCommandSets(Span<const CommandId> a, Span<const CommandId> b)
+{
+
+    std::set<CommandId> entriesA;
+    std::set<CommandId> entriesB;
+
+    for (const CommandId & entry : a)
+    {
+        if (!entriesA.emplace(entry).second)
+        {
+            ChipLogError(Test, "Duplicate command ID in span A: 0x%08X", static_cast<int>(entry));
+            return false;
+        }
+    }
+
+    for (const CommandId & entry : b)
+    {
+        if (!entriesB.emplace(entry).second)
+        {
+            ChipLogError(Test, "Duplicate command ID in span B: 0x%08X", static_cast<int>(entry));
+            return false;
+        }
+    }
+
+    if (entriesA.size() != entriesB.size())
+    {
+        ChipLogError(Test, "Sets of different sizes.");
+
+        for (const auto it : entriesA)
+        {
+            if (entriesB.find(it) == entriesB.end())
+            {
+                ChipLogError(Test, "Command 0x%08X missing in B", static_cast<int>(it));
+            }
+        }
+
+        for (const auto it : entriesB)
+        {
+            if (entriesA.find(it) == entriesA.end())
+            {
+                ChipLogError(Test, "Command 0x%08X missing in A", static_cast<int>(it));
+            }
+        }
+
+        return false;
+    }
+
+    // set sizes are the same and all entriesA have a corresponding entriesB, so sets should match
+    return true;
+}
 } // namespace Testing
 } // namespace chip
