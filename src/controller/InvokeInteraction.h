@@ -56,7 +56,7 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
                      const Optional<uint16_t> & timedInvokeTimeoutMs,
                      const Optional<System::Clock::Timeout> & responseTimeout = NullOptional,
-                     Internal::InvokeCancelFn * outCancelFn                   = nullptr)
+                     Internal::InvokeCancelFn * outCancelFn = nullptr, bool aAllowLargePayload = false)
 {
     // InvokeCommandRequest expects responses, so cannot happen over a group session.
     VerifyOrReturnError(!sessionHandle->IsGroupSession(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -81,8 +81,8 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
 
     decoder->SetOnDoneCallback(onDone);
 
-    auto commandSender =
-        chip::Platform::MakeUnique<app::CommandSender>(decoder.get(), aExchangeMgr, timedInvokeTimeoutMs.HasValue());
+    auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(
+        decoder.get(), aExchangeMgr, timedInvokeTimeoutMs.HasValue(), /* SuppressResponse = */ false, aAllowLargePayload);
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestCommandData, timedInvokeTimeoutMs));

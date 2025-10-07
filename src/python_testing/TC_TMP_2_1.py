@@ -105,11 +105,10 @@ class TC_TMP_2_1(MatterBaseTest):
                 measured_value, max_bound, "Measured value is greater than max bound")
 
         self.step(7)
-        if await self.attribute_guard(self.get_endpoint(), attr.Tolerance):
+        if self.pics_guard("TMP.S.A0003"):
             tolerance = await self.read_single_attribute_check_success(cluster=cluster, attribute=attr.Tolerance)
             asserts.assert_greater_equal(tolerance, 0, "Tolerance is less than 0")
-            asserts.assert_less_equal(
-                tolerance, 2048, "Tolerance is greater than 2048")
+            asserts.assert_less_equal(tolerance, 2048, "Tolerance is greater than 2048")
 
 
 if __name__ == "__main__":

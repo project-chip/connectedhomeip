@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:162
+            image: ghcr.io/project-chip/chip-build:169
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -153,7 +153,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:162
+            image: ghcr.io/project-chip/chip-build:169
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -234,7 +234,7 @@ jobs:
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/sanitizers"
             - name: Find changed files
               id: changed-files
-              uses: tj-actions/changed-files@v46
+              uses: tj-actions/changed-files@v47
               with:
                 # Exclude all files under "third_party/"
                 files-ignore: |
@@ -331,7 +331,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:162
+            image: ghcr.io/project-chip/chip-build:169
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -365,9 +365,7 @@ jobs:
                   scripts/run_in_build_env.sh 'virtualenv pyenv'
                   source pyenv/bin/activate
                   python -m ensurepip --upgrade
-                  python -m pip install ./out/controller/python/matter_core-1.0.0-cp37-abi3-linux_x86_64.whl
-                  python -m pip install ./out/controller/python/matter_clusters-1.0.0-py3-none-any.whl
-                  python -m pip install ./out/controller/python/matter_repl-1.0.0-py3-none-any.whl
+                  python -m pip install out/controller/python/matter*.whl
 
             - name: Run Python tests
               shell: bash
@@ -396,7 +394,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:162
+            image: ghcr.io/project-chip/chip-build:169
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -473,7 +471,7 @@ jobs:
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/default"
             - name: Find changed files
               id: changed-files
-              uses: tj-actions/changed-files@v46
+              uses: tj-actions/changed-files@v47
             - name: Clang-tidy validation
               # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
               #       See https://github.com/llvm/llvm-project/issues/97426
@@ -520,7 +518,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:162
+            image: ghcr.io/project-chip/chip-build:169
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -535,7 +533,12 @@ jobs:
 
             - name: Run Build Coverage
               run: ./scripts/build_coverage.sh --yaml --xml
-
+            # This is a workaround to unblock CI: failure is due to missing gpg which got triggered when codecov-action@v5 made a new release
+            # TODO: install gpg in chip-build image directly
+            - name: Install gpg
+              run: |
+                apt-get update
+                apt-get install -y --no-install-recommends gnupg
             - name: Upload coverage reports to Codecov with GitHub Action
               uses: codecov/codecov-action@v5
               env:

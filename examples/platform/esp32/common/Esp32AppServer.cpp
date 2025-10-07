@@ -57,6 +57,9 @@
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER
 #include <app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h>
 #endif
+#if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_TARIFF_TRIGGER
+#include <app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h>
+#endif
 
 #ifdef CONFIG_ENABLE_CHIP_SHELL
 #include <lib/shell/commands/WiFi.h>
@@ -206,6 +209,10 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER
     static CommodityMeteringTestEventTriggerHandler sCommodityMeteringTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sCommodityMeteringTestEventTriggerHandler);
+#endif
+#if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_TARIFF_TRIGGER
+    static CommodityTariffTestEventTriggerHandler sCommodityTariffTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sCommodityTariffTestEventTriggerHandler);
 #endif
 
 #if CONFIG_ENABLE_OTA_REQUESTOR

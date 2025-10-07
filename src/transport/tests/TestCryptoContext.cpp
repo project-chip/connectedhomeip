@@ -30,14 +30,11 @@ using namespace chip;
 
 namespace {
 
-constexpr size_t MIC_LENGTH   = chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
-constexpr size_t NONCE_LENGTH = CryptoContext::kAESCCMNonceLen;
-
 struct PrivacyNonceTestEntry
 {
     uint16_t sessionId;
-    uint8_t mic[MIC_LENGTH];
-    uint8_t privacyNonce[NONCE_LENGTH];
+    uint8_t mic[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
+    uint8_t privacyNonce[Crypto::CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES];
 };
 
 struct PrivacyNonceTestEntry thePrivacyNonceTestVector[] = {
@@ -61,14 +58,14 @@ TEST_F(TestGroupCryptoContext, TestBuildPrivacyNonce)
     {
         MessageAuthenticationCode mic;
         uint16_t sessionId = testVector.sessionId;
-        const ByteSpan expectedPrivacyNonce(testVector.privacyNonce, NONCE_LENGTH);
+        const ByteSpan expectedPrivacyNonce{ testVector.privacyNonce };
         CryptoContext::NonceStorage privacyNonce;
         CryptoContext::ConstNonceView privacyNonceView(privacyNonce);
 
-        mic.SetTag(nullptr, testVector.mic, MIC_LENGTH);
+        mic.SetTag(testVector.mic, Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
         EXPECT_EQ(CHIP_NO_ERROR, chip::CryptoContext::BuildPrivacyNonce(privacyNonce, sessionId, mic));
-        EXPECT_EQ(0, memcmp(privacyNonceView.data(), expectedPrivacyNonce.data(), NONCE_LENGTH));
+        EXPECT_EQ(0, memcmp(privacyNonceView.data(), expectedPrivacyNonce.data(), Crypto::CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES));
     }
 }
 

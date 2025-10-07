@@ -56,11 +56,16 @@ class cc32xxBuilder(GnBuilder):
         self.app = app
 
     def GnBuildArgs(self):
-        args = [
-            'ti_sysconfig_root="%s"' % os.environ['TI_SYSCONFIG_ROOT'],
-        ]
+        try:
+            sysconfig_root = os.environ['TI_SYSCONFIG_ROOT_CC32XX']
+        except KeyError:
+            raise Exception(
+                'TI_SYSCONFIG_ROOT_CC32XX environment variable must be set for CC32XX builds. Please point it to the TI SysConfig installation directory.'
+            )
 
-        return args
+        return [
+            'ti_sysconfig_root="%s"' % sysconfig_root,
+        ]
 
     def build_outputs(self):
         if (self.app == cc32xxApp.LOCK):

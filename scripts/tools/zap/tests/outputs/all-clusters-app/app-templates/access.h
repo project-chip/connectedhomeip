@@ -29,7 +29,6 @@
 
 // Parallel array data (*cluster*, attribute, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
-    /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
@@ -62,7 +61,6 @@
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
-    /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
@@ -95,7 +93,6 @@
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
-    /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
@@ -343,7 +340,7 @@
     0x00000201, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
     0x00000801, /* Cluster: TLS Certificate Management, Command: ProvisionRootCertificate, Privilege: administer */ \
     0x00000801, /* Cluster: TLS Certificate Management, Command: RemoveRootCertificate, Privilege: administer */ \
-    0x00000801, /* Cluster: TLS Certificate Management, Command: TLSClientCSR, Privilege: administer */ \
+    0x00000801, /* Cluster: TLS Certificate Management, Command: ClientCSR, Privilege: administer */ \
     0x00000801, /* Cluster: TLS Certificate Management, Command: ProvisionClientCertificate, Privilege: administer */ \
     0x00000801, /* Cluster: TLS Certificate Management, Command: RemoveClientCertificate, Privilege: administer */ \
     0x00000802, /* Cluster: TLS Client Management, Command: ProvisionEndpoint, Privilege: administer */ \
@@ -403,7 +400,7 @@
     0x000000FE, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
     0x00000000, /* Cluster: TLS Certificate Management, Command: ProvisionRootCertificate, Privilege: administer */ \
     0x00000006, /* Cluster: TLS Certificate Management, Command: RemoveRootCertificate, Privilege: administer */ \
-    0x00000007, /* Cluster: TLS Certificate Management, Command: TLSClientCSR, Privilege: administer */ \
+    0x00000007, /* Cluster: TLS Certificate Management, Command: ClientCSR, Privilege: administer */ \
     0x00000009, /* Cluster: TLS Certificate Management, Command: ProvisionClientCertificate, Privilege: administer */ \
     0x0000000E, /* Cluster: TLS Certificate Management, Command: RemoveClientCertificate, Privilege: administer */ \
     0x00000000, /* Cluster: TLS Client Management, Command: ProvisionEndpoint, Privilege: administer */ \
@@ -463,7 +460,7 @@
     chip::Access::Privilege::kManage, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
     chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: ProvisionRootCertificate, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: RemoveRootCertificate, Privilege: administer */ \
-    chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: TLSClientCSR, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: ClientCSR, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: ProvisionClientCertificate, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: RemoveClientCertificate, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: TLS Client Management, Command: ProvisionEndpoint, Privilege: administer */ \

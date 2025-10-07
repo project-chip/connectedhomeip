@@ -5684,6 +5684,127 @@ public static class ScenesManagementClusterSceneInfoStruct {
     return output.toString();
   }
 }
+public static class GroupcastClusterMembershipStruct {
+  public Integer groupID;
+  public ArrayList<Integer> endpoints;
+  public Long keyID;
+  public Boolean hasAuxiliaryACL;
+  public Optional<Long> expiringKeyID;
+  public Integer fabricIndex;
+  private static final long GROUP_ID_ID = 0L;
+  private static final long ENDPOINTS_ID = 1L;
+  private static final long KEY_ID_ID = 2L;
+  private static final long HAS_AUXILIARY_ACL_ID = 3L;
+  private static final long EXPIRING_KEY_ID_ID = 4L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public GroupcastClusterMembershipStruct(
+    Integer groupID,
+    ArrayList<Integer> endpoints,
+    Long keyID,
+    Boolean hasAuxiliaryACL,
+    Optional<Long> expiringKeyID,
+    Integer fabricIndex
+  ) {
+    this.groupID = groupID;
+    this.endpoints = endpoints;
+    this.keyID = keyID;
+    this.hasAuxiliaryACL = hasAuxiliaryACL;
+    this.expiringKeyID = expiringKeyID;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(GROUP_ID_ID, new UIntType(groupID)));
+    values.add(new StructElement(ENDPOINTS_ID, ArrayType.generateArrayType(endpoints, (elementendpoints) -> new UIntType(elementendpoints))));
+    values.add(new StructElement(KEY_ID_ID, new UIntType(keyID)));
+    values.add(new StructElement(HAS_AUXILIARY_ACL_ID, new BooleanType(hasAuxiliaryACL)));
+    values.add(new StructElement(EXPIRING_KEY_ID_ID, expiringKeyID.<BaseTLVType>map((nonOptionalexpiringKeyID) -> new UIntType(nonOptionalexpiringKeyID)).orElse(new EmptyType())));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static GroupcastClusterMembershipStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer groupID = null;
+    ArrayList<Integer> endpoints = null;
+    Long keyID = null;
+    Boolean hasAuxiliaryACL = null;
+    Optional<Long> expiringKeyID = Optional.empty();
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == GROUP_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          groupID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ENDPOINTS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          endpoints = castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == KEY_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          keyID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == HAS_AUXILIARY_ACL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          hasAuxiliaryACL = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == EXPIRING_KEY_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          expiringKeyID = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new GroupcastClusterMembershipStruct(
+      groupID,
+      endpoints,
+      keyID,
+      hasAuxiliaryACL,
+      expiringKeyID,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("GroupcastClusterMembershipStruct {\n");
+    output.append("\tgroupID: ");
+    output.append(groupID);
+    output.append("\n");
+    output.append("\tendpoints: ");
+    output.append(endpoints);
+    output.append("\n");
+    output.append("\tkeyID: ");
+    output.append(keyID);
+    output.append("\n");
+    output.append("\thasAuxiliaryACL: ");
+    output.append(hasAuxiliaryACL);
+    output.append("\n");
+    output.append("\texpiringKeyID: ");
+    output.append(expiringKeyID);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class HepaFilterMonitoringClusterReplacementProductStruct {
   public Integer productIdentifierType;
   public String productIdentifierValue;
@@ -14980,6 +15101,82 @@ public static class CameraAvSettingsUserLevelManagementClusterViewportStruct {
     return output.toString();
   }
 }
+public static class WebRTCTransportProviderClusterSFrameStruct {
+  public Integer cipherSuite;
+  public byte[] baseKey;
+  public byte[] kid;
+  private static final long CIPHER_SUITE_ID = 0L;
+  private static final long BASE_KEY_ID = 1L;
+  private static final long KID_ID = 2L;
+
+  public WebRTCTransportProviderClusterSFrameStruct(
+    Integer cipherSuite,
+    byte[] baseKey,
+    byte[] kid
+  ) {
+    this.cipherSuite = cipherSuite;
+    this.baseKey = baseKey;
+    this.kid = kid;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CIPHER_SUITE_ID, new UIntType(cipherSuite)));
+    values.add(new StructElement(BASE_KEY_ID, new ByteArrayType(baseKey)));
+    values.add(new StructElement(KID_ID, new ByteArrayType(kid)));
+
+    return new StructType(values);
+  }
+
+  public static WebRTCTransportProviderClusterSFrameStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer cipherSuite = null;
+    byte[] baseKey = null;
+    byte[] kid = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CIPHER_SUITE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          cipherSuite = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == BASE_KEY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          baseKey = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == KID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          kid = castingValue.value(byte[].class);
+        }
+      }
+    }
+    return new WebRTCTransportProviderClusterSFrameStruct(
+      cipherSuite,
+      baseKey,
+      kid
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WebRTCTransportProviderClusterSFrameStruct {\n");
+    output.append("\tcipherSuite: ");
+    output.append(cipherSuite);
+    output.append("\n");
+    output.append("\tbaseKey: ");
+    output.append(Arrays.toString(baseKey));
+    output.append("\n");
+    output.append("\tkid: ");
+    output.append(Arrays.toString(kid));
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class WebRTCTransportProviderClusterICECandidateStruct {
   public String candidate;
   public @Nullable String SDPMid;
@@ -19152,7 +19349,7 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
 }
 public static class TlsCertificateManagementClusterTLSClientCertificateDetailStruct {
   public Integer ccdid;
-  public Optional<byte[]> clientCertificate;
+  public @Nullable Optional<byte[]> clientCertificate;
   public Optional<ArrayList<byte[]>> intermediateCertificates;
   public Integer fabricIndex;
   private static final long CCDID_ID = 0L;
@@ -19162,7 +19359,7 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
 
   public TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
     Integer ccdid,
-    Optional<byte[]> clientCertificate,
+    @Nullable Optional<byte[]> clientCertificate,
     Optional<ArrayList<byte[]>> intermediateCertificates,
     Integer fabricIndex
   ) {
@@ -19175,7 +19372,7 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CCDID_ID, new UIntType(ccdid)));
-    values.add(new StructElement(CLIENT_CERTIFICATE_ID, clientCertificate.<BaseTLVType>map((nonOptionalclientCertificate) -> new ByteArrayType(nonOptionalclientCertificate)).orElse(new EmptyType())));
+    values.add(new StructElement(CLIENT_CERTIFICATE_ID, clientCertificate != null ? clientCertificate.<BaseTLVType>map((nonOptionalclientCertificate) -> new ByteArrayType(nonOptionalclientCertificate)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(INTERMEDIATE_CERTIFICATES_ID, intermediateCertificates.<BaseTLVType>map((nonOptionalintermediateCertificates) -> ArrayType.generateArrayType(nonOptionalintermediateCertificates, (elementnonOptionalintermediateCertificates) -> new ByteArrayType(elementnonOptionalintermediateCertificates))).orElse(new EmptyType())));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
@@ -19187,7 +19384,7 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
       return null;
     }
     Integer ccdid = null;
-    Optional<byte[]> clientCertificate = Optional.empty();
+    @Nullable Optional<byte[]> clientCertificate = null;
     Optional<ArrayList<byte[]>> intermediateCertificates = Optional.empty();
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
@@ -19247,14 +19444,14 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
   public Integer port;
   public Integer caid;
   public @Nullable Integer ccdid;
-  public Integer status;
+  public Integer referenceCount;
   public Integer fabricIndex;
   private static final long ENDPOINT_ID_ID = 0L;
   private static final long HOSTNAME_ID = 1L;
   private static final long PORT_ID = 2L;
   private static final long CAID_ID = 3L;
   private static final long CCDID_ID = 4L;
-  private static final long STATUS_ID = 5L;
+  private static final long REFERENCE_COUNT_ID = 5L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public TlsClientManagementClusterTLSEndpointStruct(
@@ -19263,7 +19460,7 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
     Integer port,
     Integer caid,
     @Nullable Integer ccdid,
-    Integer status,
+    Integer referenceCount,
     Integer fabricIndex
   ) {
     this.endpointID = endpointID;
@@ -19271,7 +19468,7 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
     this.port = port;
     this.caid = caid;
     this.ccdid = ccdid;
-    this.status = status;
+    this.referenceCount = referenceCount;
     this.fabricIndex = fabricIndex;
   }
 
@@ -19282,7 +19479,7 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
     values.add(new StructElement(PORT_ID, new UIntType(port)));
     values.add(new StructElement(CAID_ID, new UIntType(caid)));
     values.add(new StructElement(CCDID_ID, ccdid != null ? new UIntType(ccdid) : new NullType()));
-    values.add(new StructElement(STATUS_ID, new UIntType(status)));
+    values.add(new StructElement(REFERENCE_COUNT_ID, new UIntType(referenceCount)));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -19297,7 +19494,7 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
     Integer port = null;
     Integer caid = null;
     @Nullable Integer ccdid = null;
-    Integer status = null;
+    Integer referenceCount = null;
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ENDPOINT_ID_ID) {
@@ -19325,10 +19522,10 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
           UIntType castingValue = element.value(UIntType.class);
           ccdid = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == STATUS_ID) {
+      } else if (element.contextTagNum() == REFERENCE_COUNT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          status = castingValue.value(Integer.class);
+          referenceCount = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -19343,7 +19540,7 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
       port,
       caid,
       ccdid,
-      status,
+      referenceCount,
       fabricIndex
     );
   }
@@ -19367,8 +19564,8 @@ public static class TlsClientManagementClusterTLSEndpointStruct {
     output.append("\tccdid: ");
     output.append(ccdid);
     output.append("\n");
-    output.append("\tstatus: ");
-    output.append(status);
+    output.append("\treferenceCount: ");
+    output.append(referenceCount);
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
