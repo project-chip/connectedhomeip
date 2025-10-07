@@ -418,11 +418,11 @@ public:
             ChipLogDetail(SoftwareUpdate, "Scheduling BdxOtaSender to ABORT TRANSFER");
 
             gOtaProvider.GetBdxOtaSender()->AbortTransfer();
+
+            chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
         });
 
         chip::Server::GetInstance().GenerateShutDownEvent();
-
-        chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); });
     }
 };
 } // namespace
