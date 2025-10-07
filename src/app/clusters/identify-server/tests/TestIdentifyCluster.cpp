@@ -263,6 +263,7 @@ TEST_F(TestIdentifyCluster, OnStartNotCalledMultipleTimes)
     EXPECT_TRUE(onIdentifyStartCalled);
 
     // Reset the flag and write a non-zero value again.
+    onIdentifyStartCalled = false;
     EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(5)), CHIP_NO_ERROR);
     EXPECT_FALSE(onIdentifyStartCalled);
 }
