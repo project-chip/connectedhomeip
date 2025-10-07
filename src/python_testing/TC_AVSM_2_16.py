@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CAMERA_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/avsm_2_16_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -31,6 +31,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
+#       --app-pipe /tmp/avsm_2_16_fifo
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -46,7 +47,7 @@ from matter.clusters import Objects, WebRTCTransportProvider
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
-from matter.webrtc import PeerConnection, WebRTCManager
+from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +81,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 4,
-                "TH establishes a WeRTC session via a ProvideOffer/Answer exchange using aVideoStreamID and aAudioStreamID.",
+                "TH ensures all Soft and Hard PrivacyModes are disabled/off and establishes a WeRTC session via a ProvideOffer/Answer exchange using aVideoStreamID and aAudioStreamID.",
                 "Verify the ProvideOfferResponse. Store the SessionID as aSessionID",
             ),
             TestStep(
@@ -178,9 +179,47 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         aAudioRefCount = aAllocatedAudioStreams[0].referenceCount
 
         self.step(4)
+        # Ensure privacy modes are not enabled before issuing WebRTC
+        # ProvideOffer command
+        self.privacySupport = (aFeatureMap & cluster.Bitmaps.Feature.kPrivacy) > 0
+        if self.privacySupport:
+            result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint)
+            asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
+            logger.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{False}")
+
+            softLivestreamPrivMode = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.SoftLivestreamPrivacyModeEnabled
+            )
+            asserts.assert_false(softLivestreamPrivMode, "SoftLivestreamPrivacyModeEnabled should be False")
+
+            result = await self.write_single_attribute(attr.SoftRecordingPrivacyModeEnabled(False), endpoint_id=endpoint)
+            asserts.assert_equal(result, Status.Success, "Error when trying to write SoftRecordingPrivacyModeEnabled")
+            logger.info(f"Tx'd : SoftRecordingPrivacyModeEnabled{False}")
+
+            softRecordingPrivMode = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.SoftRecordingPrivacyModeEnabled
+            )
+            asserts.assert_false(softRecordingPrivMode, "SoftRecordingPrivacyModeEnabled should be False")
+
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.HardPrivacyModeOn):
+            # For CI: Use app pipe to simulate physical privacy switch being turned on
+            # For manual testing: User should physically turn on the privacy switch
+            if self.is_pics_sdk_ci_only:
+                self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": False})
+            else:
+                input("Please ensure that the physical privacy switch on the device is OFF, then press Enter to continue...")
+
+            # Verify the attribute reflects the privacy switch state
+            hard_privacy_mode = await self.read_single_attribute_check_success(
+                endpoint=endpoint,
+                cluster=Clusters.CameraAvStreamManagement,
+                attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOn
+            )
+            asserts.assert_false(hard_privacy_mode, "HardPrivacyModeOn should be False")
+
         # Establish WebRTC via Provide Offer/Answer
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
-        webrtc_peer: PeerConnection = webrtc_manager.create_peer(
+        webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(
             node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint)
 
         webrtc_peer.create_offer()
@@ -297,7 +336,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
         asserts.assert_equal(len(aAllocatedAudioStreams), 0, "The number of allocated audio streams in the list is not 0")
 
-        webrtc_manager.close_all()
+        await webrtc_manager.close_all()
 
 
 if __name__ == "__main__":

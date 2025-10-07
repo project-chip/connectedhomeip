@@ -183,6 +183,19 @@ public:
      */
     virtual Protocols::InteractionModel::Status AudioStreamDeallocate(const uint16_t streamID) = 0;
 
+    struct SnapshotStreamAllocateArgs
+    {
+        ImageCodecEnum imageCodec;
+        uint16_t maxFrameRate;
+        Structs::VideoResolutionStruct::Type minResolution;
+        Structs::VideoResolutionStruct::Type maxResolution;
+        uint8_t quality;
+        bool encodedPixels;
+        bool hardwareEncoder;
+        Optional<bool> watermarkEnabled;
+        Optional<bool> OSDEnabled;
+    };
+
     /**
      *   @brief Handle Command Delegate for Snapshot stream allocation.
      *
@@ -197,7 +210,7 @@ public:
      *   produced; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
+    virtual Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
                                                                        uint16_t & outStreamID) = 0;
 
     /**
@@ -285,6 +298,26 @@ public:
      *
      */
     virtual CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) = 0;
+
+    /**
+     * @brief Provides read-only access to the list of currently allocated video streams.
+     * This allows other components (like PushAVStreamTransportManager) to query
+     * allocated stream parameters (e.g., for bandwidth calculation) without directly
+     * accessing the CameraAVStreamMgmtServer instance.
+     *
+     * @return A const reference to the vector of allocated video stream structures.
+     */
+    virtual const std::vector<VideoStreamStruct> & GetAllocatedVideoStreams() const = 0;
+
+    /**
+     * @brief Provides read-only access to the list of currently allocated audio streams.
+     * This allows other components (like PushAVStreamTransportManager) to query
+     * allocated stream parameters (e.g., for bandwidth calculation) without directly
+     * accessing the CameraAVStreamMgmtServer instance.
+     *
+     * @return A const reference to the vector of allocated audio stream structures.
+     */
+    virtual const std::vector<AudioStreamStruct> & GetAllocatedAudioStreams() const = 0;
 
 private:
     friend class CameraAVStreamMgmtServer;
@@ -528,6 +561,8 @@ public:
 
     CHIP_ERROR SetStreamUsagePriorities(const std::vector<Globals::StreamUsageEnum> & newPriorities);
 
+    bool IsAllocatedVideoStreamReusable(const VideoStreamStruct & allocatedStream, const VideoStreamStruct & requestedArgs);
+
     CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
 
     CHIP_ERROR UpdateVideoStreamRangeParams(VideoStreamStruct & videoStreamToUpdate, const VideoStreamStruct & videoStream,
@@ -539,10 +574,13 @@ public:
 
     CHIP_ERROR RemoveAudioStream(uint16_t audioStreamId);
 
+    bool IsAllocatedSnapshotStreamReusable(const SnapshotStreamStruct & allocatedStream,
+                                           const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs);
+
     CHIP_ERROR AddSnapshotStream(const SnapshotStreamStruct & snapshotStream);
 
     CHIP_ERROR UpdateSnapshotStreamRangeParams(SnapshotStreamStruct & snapshotStreamToUpdate,
-                                               const SnapshotStreamStruct & snapshotStream);
+                                               const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & snapshotStream);
 
     CHIP_ERROR RemoveSnapshotStream(uint16_t snapshotStreamId);
 
@@ -566,6 +604,8 @@ public:
             return "Unknown";
         }
     };
+
+    bool IsResourceAvailableForStreamAllocation(uint32_t candidateEncodedPixelRate, bool encoderRequired);
 
 private:
     CameraAVStreamMgmtDelegate & mDelegate;
@@ -679,18 +719,30 @@ private:
         {
             if (!isDeallocate)
             {
-                auto sn_capab_it =
+                auto snCapabIt =
                     std::find_if(mSnapshotCapabilitiesList.begin(), mSnapshotCapabilitiesList.end(), [&](const auto & capability) {
-                        return capability.imageCodec == it->imageCodec && capability.maxFrameRate > it->frameRate;
+                        return capability.imageCodec == it->imageCodec && capability.maxFrameRate >= it->frameRate &&
+                            capability.resolution.width >= it->minResolution.width &&
+                            capability.resolution.height >= it->minResolution.height &&
+                            capability.resolution.width <= it->maxResolution.width &&
+                            capability.resolution.height <= it->maxResolution.height;
                     });
-                if (sn_capab_it != mSnapshotCapabilitiesList.end() && sn_capab_it->requiresHardwareEncoder.HasValue() &&
-                    !sn_capab_it->requiresHardwareEncoder.Value())
+                if (snCapabIt != mSnapshotCapabilitiesList.end())
                 {
-                    ChipLogError(Zcl,
-                                 "CameraAVStreamMgmt[ep=%d]: Snapshot stream with ID: %u based off an underlying video stream and "
-                                 "not modifiable",
-                                 mEndpointId, streamID);
-                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::DynamicConstraintError);
+                    if (snCapabIt->requiresHardwareEncoder.HasValue() && !snCapabIt->requiresHardwareEncoder.Value())
+                    {
+                        ChipLogError(
+                            Zcl,
+                            "CameraAVStreamMgmt[ep=%d]: Snapshot stream with ID: %u based off an underlying video stream and "
+                            "not modifiable",
+                            mEndpointId, streamID);
+                        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
+                        return false;
+                    }
+                }
+                else
+                {
+                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
                     return false;
                 }
             }

@@ -39,10 +39,6 @@ extern "C" {
 }
 #endif /* __cplusplus */
 
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-#include "els_pkc_mbedtls.h"
-#endif /* defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) */
-
 namespace chip {
 
 using namespace chip::Crypto;
@@ -54,14 +50,6 @@ static constexpr size_t kPrivateKeyBlobLength = Crypto::kP256_PrivateKey_Length 
 #define CHIP_CRYPTO_PAL_PRIVATE(x) MBEDTLS_PRIVATE(x)
 #else
 #define CHIP_CRYPTO_PAL_PRIVATE(x) x
-#endif
-
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-#define ELS_MUTEX_UNLOCK() (void) mcux_els_mutex_unlock()
-#define ELS_MUTEX_LOCK() (void) mcux_els_mutex_lock()
-#else
-#define ELS_MUTEX_UNLOCK()
-#define ELS_MUTEX_LOCK()
 #endif
 
 static inline const mbedtls_ecp_keypair * to_const_keypair(const P256KeypairContext * context)
@@ -88,7 +76,6 @@ CHIP_ERROR P256KeypairNXP::ExportBlob(P256SerializedKeypairNXP & output) const
     PLOG_DEBUG_BUFFER("plain private key", privkey, kP256_PrivateKey_Length);
     els_enable();
 
-    ELS_MUTEX_LOCK();
     /* Import plain DAC key into S50 */
     status = import_plain_key_into_els(privkey, kP256_PrivateKey_Length, plain_key_properties, &key_index);
     STATUS_SUCCESS_OR_EXIT_MSG("import_plain_key_into_els failed: 0x%08x", status);
@@ -99,11 +86,9 @@ CHIP_ERROR P256KeypairNXP::ExportBlob(P256SerializedKeypairNXP & output) const
 
     status = els_delete_key(key_index);
 
-    ELS_MUTEX_UNLOCK();
     return CHIP_NO_ERROR;
 exit:
     status = els_delete_key(key_index);
-    ELS_MUTEX_UNLOCK();
     return CHIP_ERROR_INTERNAL;
 }
 
@@ -164,7 +149,6 @@ CHIP_ERROR PersistentStorageOpKeystoreS50::SignWithOpKeypair(FabricIndex fabricI
     }
     PLOG_DEBUG_BUFFER("HASH", digest, kSHA256_Hash_Length);
 
-    ELS_MUTEX_LOCK();
     /* Import blob DAC key into SE50 (reserved key slot) */
     status = import_die_int_wrapped_key_into_els(els_key_blob, els_key_blob_size, plain_key_properties, &key_index);
     STATUS_SUCCESS_OR_EXIT_MSG("import_die_int_wrapped_key_into_els failed: 0x%08x", status);
@@ -187,14 +171,12 @@ CHIP_ERROR PersistentStorageOpKeystoreS50::SignWithOpKeypair(FabricIndex fabricI
     els_delete_key(key_index);
 
     /* Generate MutableByteSpan with ECC signature and ECC signature size */
-    ELS_MUTEX_UNLOCK();
     outSignature.SetLength(MCUXCLELS_ECC_SIGNATURE_SIZE);
     memcpy(outSignature.Bytes(), ecc_signature, outSignature.Length());
     PLOG_DEBUG_BUFFER("ECDSA signature", ecc_signature, MCUXCLELS_ECC_SIGNATURE_SIZE);
     return CHIP_NO_ERROR;
 exit:
     els_delete_key(key_index);
-    ELS_MUTEX_UNLOCK();
     return CHIP_ERROR_INVALID_SIGNATURE;
 }
 

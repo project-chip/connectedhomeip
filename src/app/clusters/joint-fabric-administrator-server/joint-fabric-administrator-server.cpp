@@ -151,8 +151,10 @@ void JointFabricAdministratorGlobalInstance::HandleOJCW(HandlerContext & ctx,
     auto & iterations         = commandData.iterations;
     auto & salt               = commandData.salt;
 
-    Optional<JointFabricAdministrator::StatusCodeEnum> status = Optional<JointFabricAdministrator::StatusCodeEnum>::Missing();
-    Status globalStatus                                       = Status::Success;
+    using namespace chip::app::Clusters::JointFabricAdministrator;
+
+    Optional<StatusCodeEnum> status = Optional<StatusCodeEnum>::Missing();
+    Status globalStatus             = Status::Success;
     Spake2pVerifier verifier;
 
     ChipLogProgress(Zcl, "Received command to open joint commissioning window");
@@ -162,28 +164,23 @@ void JointFabricAdministratorGlobalInstance::HandleOJCW(HandlerContext & ctx,
     auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
     auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
 
-    VerifyOrExit(fabricInfo != nullptr, status.Emplace(JointFabricAdministrator::StatusCodeEnum::kPAKEParameterError));
-    VerifyOrExit(failSafeContext.IsFailSafeFullyDisarmed(), status.Emplace(JointFabricAdministrator::StatusCodeEnum::kBusy));
+    VerifyOrExit(fabricInfo != nullptr, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(failSafeContext.IsFailSafeFullyDisarmed(), status.Emplace(StatusCodeEnum::kBusy));
 
-    VerifyOrExit(!commissionMgr.IsCommissioningWindowOpen(), status.Emplace(JointFabricAdministrator::StatusCodeEnum::kBusy));
-    VerifyOrExit(iterations >= kSpake2p_Min_PBKDF_Iterations,
-                 status.Emplace(JointFabricAdministrator::StatusCodeEnum::kPAKEParameterError));
-    VerifyOrExit(iterations <= kSpake2p_Max_PBKDF_Iterations,
-                 status.Emplace(JointFabricAdministrator::StatusCodeEnum::kPAKEParameterError));
-    VerifyOrExit(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length,
-                 status.Emplace(JointFabricAdministrator::StatusCodeEnum::kPAKEParameterError));
-    VerifyOrExit(salt.size() <= kSpake2p_Max_PBKDF_Salt_Length,
-                 status.Emplace(JointFabricAdministrator::StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(!commissionMgr.IsCommissioningWindowOpen(), status.Emplace(StatusCodeEnum::kBusy));
+    VerifyOrExit(iterations >= kSpake2p_Min_PBKDF_Iterations, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(iterations <= kSpake2p_Max_PBKDF_Iterations, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(salt.size() <= kSpake2p_Max_PBKDF_Salt_Length, status.Emplace(StatusCodeEnum::kPAKEParameterError));
 
     VerifyOrExit(commissioningTimeout <= commissionMgr.MaxCommissioningTimeout(), globalStatus = Status::InvalidCommand);
     VerifyOrExit(commissioningTimeout >= commissionMgr.MinCommissioningTimeout(), globalStatus = Status::InvalidCommand);
     VerifyOrExit(discriminator <= kMaxDiscriminatorValue, globalStatus = Status::InvalidCommand);
 
-    VerifyOrExit(verifier.Deserialize(pakeVerifier) == CHIP_NO_ERROR,
-                 status.Emplace(JointFabricAdministrator::StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(verifier.Deserialize(pakeVerifier) == CHIP_NO_ERROR, status.Emplace(StatusCodeEnum::kPAKEParameterError));
     VerifyOrExit(commissionMgr.OpenJointCommissioningWindow(commissioningTimeout, discriminator, verifier, iterations, salt,
                                                             fabricIndex, fabricInfo->GetVendorId()) == CHIP_NO_ERROR,
-                 status.Emplace(JointFabricAdministrator::StatusCodeEnum::kPAKEParameterError));
+                 status.Emplace(StatusCodeEnum::kPAKEParameterError));
     ChipLogProgress(Zcl, "Commissioning window is now open");
 
 exit:

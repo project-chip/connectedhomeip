@@ -40,6 +40,11 @@ void ApplicationInit()
     if (LinuxDeviceOptions::GetInstance().cameraVideoDevice.HasValue())
     {
         std::string videoDevicePath = LinuxDeviceOptions::GetInstance().cameraVideoDevice.Value();
+        // If the path does not start with '/', assume it's a device name and prepend /dev/
+        if (!videoDevicePath.empty() && videoDevicePath[0] != '/')
+        {
+            videoDevicePath = "/dev/" + videoDevicePath;
+        }
         ChipLogDetail(Camera, "Using video device path from options: %s", videoDevicePath.c_str());
         gCameraDevice.SetVideoDevicePath(videoDevicePath);
     }

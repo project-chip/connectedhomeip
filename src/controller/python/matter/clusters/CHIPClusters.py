@@ -5494,6 +5494,101 @@ class ChipClusters:
             },
         },
     }
+    _GROUPCAST_CLUSTER_INFO = {
+        "clusterName": "Groupcast",
+        "clusterId": 0x00000065,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "JoinGroup",
+                "args": {
+                    "groupID": "int",
+                    "endpoints": "int",
+                    "keyID": "int",
+                    "key": "bytes",
+                    "gracePeriod": "int",
+                    "useAuxiliaryACL": "bool",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "LeaveGroup",
+                "args": {
+                    "groupID": "int",
+                    "endpoints": "int",
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "UpdateGroupKey",
+                "args": {
+                    "groupID": "int",
+                    "keyID": "int",
+                    "key": "bytes",
+                    "gracePeriod": "int",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "ExpireGracePeriod",
+                "args": {
+                    "groupID": "int",
+                },
+            },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "ConfigureAuxiliaryACL",
+                "args": {
+                    "groupID": "int",
+                    "useAuxiliaryACL": "bool",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "Membership",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "MaxMembershipCount",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _HEPA_FILTER_MONITORING_CLUSTER_INFO = {
         "clusterName": "HepaFilterMonitoring",
         "clusterId": 0x00000071,
@@ -14299,9 +14394,10 @@ class ChipClusters:
             },
             0x00000007: {
                 "commandId": 0x00000007,
-                "commandName": "TLSClientCSR",
+                "commandName": "ClientCSR",
                 "args": {
                     "nonce": "bytes",
+                    "ccdid": "int",
                 },
             },
             0x00000009: {
@@ -14309,7 +14405,8 @@ class ChipClusters:
                 "commandName": "ProvisionClientCertificate",
                 "args": {
                     "ccdid": "int",
-                    "clientCertificateDetails": "TLSClientCertificateDetailStruct",
+                    "clientCertificate": "bytes",
+                    "intermediateCertificates": "bytes",
                 },
             },
             0x0000000A: {
@@ -15657,6 +15754,7 @@ class ChipClusters:
         0x00000060: _OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000061: _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000062: _SCENES_MANAGEMENT_CLUSTER_INFO,
+        0x00000065: _GROUPCAST_CLUSTER_INFO,
         0x00000071: _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         0x00000072: _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
         0x00000080: _BOOLEAN_STATE_CONFIGURATION_CLUSTER_INFO,
@@ -15800,6 +15898,7 @@ class ChipClusters:
         "OperationalState": _OPERATIONAL_STATE_CLUSTER_INFO,
         "RvcOperationalState": _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
         "ScenesManagement": _SCENES_MANAGEMENT_CLUSTER_INFO,
+        "Groupcast": _GROUPCAST_CLUSTER_INFO,
         "HepaFilterMonitoring": _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         "ActivatedCarbonFilterMonitoring": _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
         "BooleanStateConfiguration": _BOOLEAN_STATE_CONFIGURATION_CLUSTER_INFO,

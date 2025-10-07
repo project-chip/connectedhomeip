@@ -27,7 +27,7 @@
 #include <lib/dnssd/Advertiser.h>
 #include <messaging/ExchangeDelegate.h>
 #include <platform/CHIPDeviceConfig.h>
-#include <protocols/secure_channel/RendezvousParameters.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -92,6 +92,9 @@ public:
     CHIP_ERROR OpenJointCommissioningWindow(System::Clock::Seconds32 commissioningTimeout, uint16_t discriminator,
                                             Crypto::Spake2pVerifier & verifier, uint32_t iterations, ByteSpan salt,
                                             FabricIndex fabricIndex, VendorId vendorId);
+
+    // Tracks whether joint commissioning mode is ongoing
+    bool IsJCM() const;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     void CloseCommissioningWindow();

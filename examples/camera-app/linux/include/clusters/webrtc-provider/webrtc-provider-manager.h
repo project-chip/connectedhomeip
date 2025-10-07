@@ -26,7 +26,7 @@
 #include <media-controller.h>
 #include <webrtc-transport.h>
 
-#include <unordered_map>
+#include <map>
 
 namespace chip {
 namespace app {
@@ -39,7 +39,7 @@ using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandi
 using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
 using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
-class WebRTCProviderManager : public Delegate
+class WebRTCProviderManager : public Delegate, public WebRTCTransportProviderController
 {
 public:
     WebRTCProviderManager() :
@@ -53,6 +53,8 @@ public:
     void CloseConnection();
 
     void SetMediaController(MediaController * mediaController);
+
+    void SetWebRTCTransportProvider(std::unique_ptr<WebRTCTransportProviderServer> webRTCTransportProvider) override;
 
     CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                   bool & outDeferredOffer) override;
@@ -84,12 +86,18 @@ public:
 
     bool HasAllocatedAudioStreams() override;
 
+    void LiveStreamPrivacyModeChanged(bool privacyModeEnabled);
+
 private:
+    std::string ExtractMidFromSdp(const std::string & sdp, const std::string & mediaType);
+
     void ScheduleOfferSend(uint16_t sessionId);
 
     void ScheduleICECandidatesSend(uint16_t sessionId);
 
     void ScheduleAnswerSend(uint16_t sessionId);
+
+    void ScheduleEndSend(uint16_t sessionId);
 
     void RegisterWebrtcTransport(uint16_t sessionId);
 
@@ -101,6 +109,9 @@ private:
 
     CHIP_ERROR SendICECandidatesCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
                                         uint16_t sessionId);
+
+    CHIP_ERROR SendEndCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
+                              uint16_t sessionId, WebRTCEndReasonEnum endReason);
 
     CHIP_ERROR AcquireAudioVideoStreams(uint16_t sessionId);
 
@@ -121,14 +132,18 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 
     std::unordered_map<uint16_t, std::unique_ptr<WebrtcTransport>> mWebrtcTransportMap;
-    // This is to retrieve the sessionIds for a given NodeId
-    std::unordered_map<NodeId, uint16_t> mSessionIdMap;
+    // This is to retrieve the sessionIds for a given ScopedNodeId (NodeId + FabricIndex)
+    std::map<ScopedNodeId, uint16_t> mSessionIdMap;
 
     MediaController * mMediaController = nullptr;
+
+    std::unique_ptr<WebRTCTransportProviderServer> mWebRTCTransportProvider = nullptr;
 
     // Handle to the Camera Device interface. For accessing other
     // clusters, if required.
     CameraDeviceInterface * mCameraDevice = nullptr;
+
+    bool mSoftLiveStreamPrivacyEnabled = false;
 };
 
 } // namespace WebRTCTransportProvider

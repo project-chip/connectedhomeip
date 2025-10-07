@@ -42,6 +42,8 @@ public:
 
     virtual CHIP_ERROR IsPrivacyModeActive(bool & isActive) = 0;
 
+    virtual CHIP_ERROR SetHardPrivacyModeOn(bool hardPrivacyMode) = 0;
+
     virtual bool HasAllocatedVideoStreams() = 0;
 
     virtual bool HasAllocatedAudioStreams() = 0;

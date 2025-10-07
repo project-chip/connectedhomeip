@@ -143,6 +143,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "RvcOperationalState";
     case chip::app::Clusters::ScenesManagement::Id:
         return "ScenesManagement";
+    case chip::app::Clusters::Groupcast::Id:
+        return "Groupcast";
     case chip::app::Clusters::HepaFilterMonitoring::Id:
         return "HepaFilterMonitoring";
     case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id:
@@ -2064,6 +2066,27 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ScenesManagement::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ScenesManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::Groupcast::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Groupcast::Attributes::Membership::Id:
+            return "Membership";
+        case chip::app::Clusters::Groupcast::Attributes::MaxMembershipCount::Id:
+            return "MaxMembershipCount";
+        case chip::app::Clusters::Groupcast::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::Groupcast::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::Groupcast::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::Groupcast::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::Groupcast::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -5542,6 +5565,23 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::Groupcast::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Groupcast::Commands::JoinGroup::Id:
+            return "JoinGroup";
+        case chip::app::Clusters::Groupcast::Commands::LeaveGroup::Id:
+            return "LeaveGroup";
+        case chip::app::Clusters::Groupcast::Commands::UpdateGroupKey::Id:
+            return "UpdateGroupKey";
+        case chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::Id:
+            return "ExpireGracePeriod";
+        case chip::app::Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Id:
+            return "ConfigureAuxiliaryACL";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::HepaFilterMonitoring::Id: {
         switch (id)
         {
@@ -6311,8 +6351,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "LookupRootCertificate";
         case chip::app::Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id:
             return "RemoveRootCertificate";
-        case chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id:
-            return "TLSClientCSR";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ClientCSR::Id:
+            return "ClientCSR";
         case chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id:
             return "ProvisionClientCertificate";
         case chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Id:
@@ -6667,6 +6707,15 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "Unknown";
         }
     }
+    case chip::app::Clusters::Groupcast::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Groupcast::Commands::LeaveGroupResponse::Id:
+            return "LeaveGroupResponse";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::CommodityPrice::Id: {
         switch (id)
         {
@@ -6955,8 +7004,8 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "FindRootCertificateResponse";
         case chip::app::Clusters::TlsCertificateManagement::Commands::LookupRootCertificateResponse::Id:
             return "LookupRootCertificateResponse";
-        case chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSRResponse::Id:
-            return "TLSClientCSRResponse";
+        case chip::app::Clusters::TlsCertificateManagement::Commands::ClientCSRResponse::Id:
+            return "ClientCSRResponse";
         case chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::Id:
             return "FindClientCertificateResponse";
         case chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificateResponse::Id:
@@ -7163,6 +7212,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Chime";
     case 0x00000147:
         return "Camera Controller";
+    case 0x00000148:
+        return "Doorbell";
     case 0x00000202:
         return "Window Covering";
     case 0x00000203:
