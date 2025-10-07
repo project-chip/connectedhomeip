@@ -31,35 +31,93 @@ using namespace chip::app::Clusters::Descriptor::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
 namespace {
-/// Figures out if `childId` is a descendant of `parentId` given some specific endpoint entries
-bool IsDescendantOf(const DataModel::EndpointEntry * __restrict__ childEndpoint, const EndpointId parentId,
-                    Span<const DataModel::EndpointEntry> allEndpoints)
+
+class EndpointFilter
 {
-    // NOTE: this is not very efficient as we loop through all endpoints for each parent search
-    //       however endpoint depth should not be as large.
-    while (true)
+public:
+    virtual ~EndpointFilter()                                         = default;
+    virtual bool Accept(const DataModel::EndpointEntry & entry) const = 0;
+};
+
+// A filter that accepts endpoints for the given parent id
+class ParentEndpointFilter : public EndpointFilter
+{
+public:
+    ParentEndpointFilter(EndpointId parentId) : mParentId(parentId) {}
+    ~ParentEndpointFilter() override = default;
+
+    bool Accept(const DataModel::EndpointEntry & entry) const override { return entry.parentId == mParentId; }
+
+private:
+    EndpointId mParentId;
+};
+
+// A filter that accepts endpoints for the given parent id
+class NonRootEndpointFilter : public EndpointFilter
+{
+public:
+    ~NonRootEndpointFilter() override = default;
+
+    bool Accept(const DataModel::EndpointEntry & entry) const override { return entry.parentId != 0; }
+};
+
+class DescendentEndpointFilter : public EndpointFilter
+{
+public:
+    DescendentEndpointFilter(EndpointId parentId, Span<const DataModel::EndpointEntry> all) :
+        mParentId(parentId), mAllEndpoints(all)
+    {}
+    ~DescendentEndpointFilter() override = default;
+
+    bool Accept(const DataModel::EndpointEntry & entry) const override
     {
-        VerifyOrReturnValue(childEndpoint != nullptr, false);
-        VerifyOrReturnValue(childEndpoint->parentId != parentId, true);
+        const DataModel::EndpointEntry * childEndpoint = &entry;
 
-        // Parent endpoint id 0 is never here: EndpointEntry::parentId uses
-        // kInvalidEndpointId to reference no explicit endpoint. See `EndpointEntry`
-        // comments.
-        VerifyOrReturnValue(childEndpoint->parentId != kInvalidEndpointId, false);
-
-        const auto lookupId = childEndpoint->parentId;
-        childEndpoint       = nullptr; // we will look it up again
-
-        // find the requested value in the array to get its parent
-        for (const auto & ep : allEndpoints)
+        // NOTE: this is not very efficient as we loop through all endpoints for each parent search
+        //       however endpoint depth should not be as large.
+        while (true)
         {
-            if (ep.id == lookupId)
+            VerifyOrReturnValue(childEndpoint != nullptr, false);
+            VerifyOrReturnValue(childEndpoint->parentId != mParentId, true);
+
+            // Parent endpoint id 0 is never here: EndpointEntry::parentId uses
+            // kInvalidEndpointId to reference no explicit endpoint. See `EndpointEntry`
+            // comments.
+            VerifyOrReturnValue(childEndpoint->parentId != kInvalidEndpointId, false);
+
+            const auto lookupId = childEndpoint->parentId;
+            childEndpoint       = nullptr; // we will look it up again
+
+            // find the requested value in the array to get its parent
+            for (const auto & ep : mAllEndpoints)
             {
-                childEndpoint = &ep;
-                break;
+                if (ep.id == lookupId)
+                {
+                    childEndpoint = &ep;
+                    break;
+                }
             }
         }
     }
+
+private:
+    const EndpointId mParentId;
+    Span<const DataModel::EndpointEntry> mAllEndpoints;
+};
+
+CHIP_ERROR EncodeFilteredEndpoints(AttributeValueEncoder & aEncoder, Span<const DataModel::EndpointEntry> allEndpoints,
+                                   const EndpointFilter & filter)
+{
+    return aEncoder.EncodeList([&allEndpoints, &filter](const auto & encoder) -> CHIP_ERROR {
+        for (const auto & ep : allEndpoints)
+        {
+            if (filter.Accept(ep))
+            {
+                ReturnErrorOnFailure(encoder.Encode(ep.id));
+            }
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 CHIP_ERROR ReadTagListAttribute(DataModel::Provider & provider, EndpointId endpoint, AttributeValueEncoder & aEncoder)
@@ -104,17 +162,7 @@ CHIP_ERROR ReadPartsAttribute(DataModel::Provider & provider, EndpointId endpoin
     auto endpoints = endpointsList.TakeBuffer();
     if (endpoint == kRootEndpointId)
     {
-        return aEncoder.EncodeList([&endpoints](const auto & encoder) -> CHIP_ERROR {
-            for (const auto & ep : endpoints)
-            {
-                if (ep.id == 0)
-                {
-                    continue;
-                }
-                ReturnErrorOnFailure(encoder.Encode(ep.id));
-            }
-            return CHIP_NO_ERROR;
-        });
+        return EncodeFilteredEndpoints(aEncoder, endpoints, NonRootEndpointFilter());
     }
 
     // find the given endpoint
@@ -139,29 +187,9 @@ CHIP_ERROR ReadPartsAttribute(DataModel::Provider & provider, EndpointId endpoin
     {
     case DataModel::EndpointCompositionPattern::kFullFamily:
         // encodes ALL endpoints that have the specified endpoint as a descendant.
-        return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
-            for (const auto & ep : endpoints)
-            {
-                if (IsDescendantOf(&ep, endpoint, endpoints))
-                {
-                    ReturnErrorOnFailure(encoder.Encode(ep.id));
-                }
-            }
-            return CHIP_NO_ERROR;
-        });
-
+        return EncodeFilteredEndpoints(aEncoder, endpoints, DescendentEndpointFilter(endpoint, endpoints));
     case DataModel::EndpointCompositionPattern::kTree:
-        return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
-            for (const auto & ep : endpoints)
-            {
-                if (ep.parentId != endpoint)
-                {
-                    continue;
-                }
-                ReturnErrorOnFailure(encoder.Encode(ep.id));
-            }
-            return CHIP_NO_ERROR;
-        });
+        return EncodeFilteredEndpoints(aEncoder, endpoints, ParentEndpointFilter(endpoint));
     }
     // not actually reachable and compiler will validate we
     // handle all switch cases above
