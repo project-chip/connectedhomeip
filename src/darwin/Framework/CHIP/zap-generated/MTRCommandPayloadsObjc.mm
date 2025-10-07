@@ -37554,7 +37554,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 nonNullValue_2 = self.transportOptions.audioStreamID.unsignedShortValue;
             }
         }
-        encodableStruct.transportOptions.TLSEndpointID = self.transportOptions.tlsEndpointID.unsignedShortValue;
+        encodableStruct.transportOptions.endpointID = self.transportOptions.endpointID.unsignedShortValue;
         encodableStruct.transportOptions.url = AsCharSpan(self.transportOptions.url);
         encodableStruct.transportOptions.triggerOptions.triggerType = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.triggerOptions.triggerType)>>(self.transportOptions.triggerOptions.triggerType.unsignedCharValue);
         if (self.transportOptions.triggerOptions.motionZones != nil) {
@@ -37789,7 +37789,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             } else {
                 self.transportConfiguration.transportOptions.audioStreamID = nil;
             }
-            self.transportConfiguration.transportOptions.tlsEndpointID = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().TLSEndpointID];
+            self.transportConfiguration.transportOptions.endpointID = [NSNumber numberWithUnsignedShort:decodableStruct.transportConfiguration.transportOptions.Value().endpointID];
             self.transportConfiguration.transportOptions.url = AsString(decodableStruct.transportConfiguration.transportOptions.Value().url);
             if (self.transportConfiguration.transportOptions.url == nil) {
                 CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
@@ -38042,7 +38042,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 nonNullValue_2 = self.transportOptions.audioStreamID.unsignedShortValue;
             }
         }
-        encodableStruct.transportOptions.TLSEndpointID = self.transportOptions.tlsEndpointID.unsignedShortValue;
+        encodableStruct.transportOptions.endpointID = self.transportOptions.endpointID.unsignedShortValue;
         encodableStruct.transportOptions.url = AsCharSpan(self.transportOptions.url);
         encodableStruct.transportOptions.triggerOptions.triggerType = static_cast<std::remove_reference_t<decltype(encodableStruct.transportOptions.triggerOptions.triggerType)>>(self.transportOptions.triggerOptions.triggerType.unsignedCharValue);
         if (self.transportOptions.triggerOptions.motionZones != nil) {
@@ -38563,7 +38563,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     } else {
                         newElement_0.transportOptions.audioStreamID = nil;
                     }
-                    newElement_0.transportOptions.tlsEndpointID = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().TLSEndpointID];
+                    newElement_0.transportOptions.endpointID = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().endpointID];
                     newElement_0.transportOptions.url = AsString(entry_0.transportOptions.Value().url);
                     if (newElement_0.transportOptions.url == nil) {
                         CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;

@@ -5204,6 +5204,20 @@ static id _Nullable DecodeEventPayloadForPushAVStreamTransportCluster(EventId aE
             memberValue = [NSNumber numberWithUnsignedShort:cppValue.connectionID];
             value.connectionID = memberValue;
         } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.triggerType)];
+            value.triggerType = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.activationReason.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.activationReason.Value())];
+            } else {
+                memberValue = nil;
+            }
+            value.activationReason = memberValue;
+        } while (0);
 
         return value;
     }
