@@ -180,6 +180,13 @@ public:
     virtual CHIP_ERROR RemoveClientCertificate(FabricIndex fabric, TLSCCDID id)          = 0;
     virtual CHIP_ERROR GetClientCertificateCount(FabricIndex fabric, uint8_t & outCount) = 0;
 
+    /**
+     * @brief Removes all data and certificates associated with the specified fabric.
+     *
+     * @param[in] fabric The fabric to remove.
+     */
+    virtual CHIP_ERROR RemoveFabric(FabricIndex fabric) = 0;
+
 protected:
     static inline PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> & GetBuffer(BufferedRootCert & bufferedCert)
     {

@@ -411,10 +411,10 @@ public:
         return Status::Success;
     }
 
-    Protocols::InteractionModel::ClusterStatusCode RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                                 uint16_t endpointID) override
+    Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                      uint16_t endpointID) override
     {
-        return ClusterStatusCode(Status::Success);
+        return Status::Success;
     }
 
     CHIP_ERROR RootCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) override
@@ -426,6 +426,8 @@ public:
     {
         return CHIP_NO_ERROR;
     }
+
+    void RemoveFabric(FabricIndex fabric) override {}
 };
 
 class TestPushAVStreamTransportServerLogic : public ::testing::Test
