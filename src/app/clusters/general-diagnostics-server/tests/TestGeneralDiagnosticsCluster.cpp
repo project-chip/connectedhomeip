@@ -31,7 +31,6 @@
 #include <platform/DiagnosticDataProvider.h>
 
 #include <cmath>
-#include <vector>
 
 namespace {
 
@@ -65,32 +64,6 @@ private:
 // Mock DiagnosticDataProvider for testing
 class NullProvider : public DeviceLayer::DiagnosticDataProvider
 {
-};
-
-struct TestGeneralDiagnosticsCluster : public ::testing::Test
-{
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
-
-    // Small buffer size sufficient for encoding an empty TLV structure
-    static constexpr size_t kEmptyCommandTLVBufferSize = 32;
-
-    // Helper method to setup a TLV reader with an empty structure for TimeSnapshot command
-    static void SetupEmptyCommandTLV(uint8_t (&buffer)[kEmptyCommandTLVBufferSize], TLV::TLVReader & reader)
-    {
-        // Create a TLV writer and initialize it with the buffer
-        TLV::TLVWriter writer;
-        writer.Init(buffer);
-        TLV::TLVType outerContainer;
-
-        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainer), CHIP_NO_ERROR);
-        ASSERT_EQ(writer.EndContainer(outerContainer), CHIP_NO_ERROR);
-        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
-
-        // Initialize the reader with the buffer and the length of the written data
-        reader.Init(buffer, writer.GetLengthWritten());
-        ASSERT_EQ(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()), CHIP_NO_ERROR);
-    }
 };
 
 // Mock CommandHandler for testing command invocations
@@ -169,6 +142,54 @@ public:
 private:
     CommandId mResponseCommandId = 0;
     chip::System::PacketBufferHandle mEncodedData;
+};
+
+struct TestGeneralDiagnosticsCluster : public ::testing::Test
+{
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
+    // Small buffer size sufficient for encoding an empty TLV structure
+    static constexpr size_t kEmptyCommandTLVBufferSize = 32;
+
+    // Helper method to setup a TLV reader with an empty structure for TimeSnapshot command
+    static void SetupEmptyCommandTLV(uint8_t (&buffer)[kEmptyCommandTLVBufferSize], TLV::TLVReader & reader)
+    {
+        // Create a TLV writer and initialize it with the buffer
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType outerContainer;
+
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainer), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(outerContainer), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        // Initialize the reader with the buffer and the length of the written data
+        reader.Init(buffer, writer.GetLengthWritten());
+        ASSERT_EQ(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    }
+
+    // Helper method to invoke TimeSnapshot command and decode response
+    template <typename ClusterType>
+    static void InvokeTimeSnapshotAndGetResponse(ClusterType & cluster,
+                                                 GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType & response)
+    {
+        MockCommandHandler handler;
+        ConcreteCommandPath commandPath(kRootEndpointId, GeneralDiagnostics::Id, GeneralDiagnostics::Commands::TimeSnapshot::Id);
+        DataModel::InvokeRequest invokeRequest;
+        invokeRequest.path = commandPath;
+
+        uint8_t tlvBuffer[kEmptyCommandTLVBufferSize];
+        TLV::TLVReader reader;
+        SetupEmptyCommandTLV(tlvBuffer, reader);
+
+        auto result = cluster.InvokeCommand(invokeRequest, reader, &handler);
+        EXPECT_FALSE(result.has_value());
+        EXPECT_TRUE(handler.HasResponse());
+        EXPECT_EQ(handler.GetResponseCommandId(), GeneralDiagnostics::Commands::TimeSnapshotResponse::Id);
+
+        ASSERT_EQ(handler.DecodeTimeSnapshotResponse(response), CHIP_NO_ERROR);
+    }
 };
 
 TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
@@ -359,29 +380,9 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandTest)
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
     GeneralDiagnosticsCluster cluster(optionalAttributeSet);
 
-    // Prepare command invocation infrastructure
-    MockCommandHandler handler;
-    ConcreteCommandPath commandPath(kRootEndpointId, GeneralDiagnostics::Id, GeneralDiagnostics::Commands::TimeSnapshot::Id);
-    DataModel::InvokeRequest invokeRequest;
-    invokeRequest.path = commandPath;
-
-    uint8_t tlvBuffer[kEmptyCommandTLVBufferSize];
-    TLV::TLVReader reader;
-    SetupEmptyCommandTLV(tlvBuffer, reader);
-
-    // Invoke TimeSnapshot command
-    auto result = cluster.InvokeCommand(invokeRequest, reader, &handler);
-
-    // Verify that the command was handled successfully (returns nullopt on success)
-    EXPECT_FALSE(result.has_value());
-
-    // Verify that a response was generated
-    EXPECT_TRUE(handler.HasResponse());
-    EXPECT_EQ(handler.GetResponseCommandId(), GeneralDiagnostics::Commands::TimeSnapshotResponse::Id);
-
-    // Decode and verify the response
+    // Invoke TimeSnapshot command and get response
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType response;
-    ASSERT_EQ(handler.DecodeTimeSnapshotResponse(response), CHIP_NO_ERROR);
+    InvokeTimeSnapshotAndGetResponse(cluster, response);
 
     // Verify that systemTimeMs is present
     EXPECT_GE(response.systemTimeMs, 0u);
@@ -401,29 +402,9 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandWithPosixTimeTest)
     };
     GeneralDiagnosticsClusterFullConfigurable cluster(optionalAttributeSet, functionsConfig);
 
-    // Prepare command invocation infrastructure
-    MockCommandHandler handler;
-    ConcreteCommandPath commandPath(kRootEndpointId, GeneralDiagnostics::Id, GeneralDiagnostics::Commands::TimeSnapshot::Id);
-    DataModel::InvokeRequest invokeRequest;
-    invokeRequest.path = commandPath;
-
-    uint8_t tlvBuffer[kEmptyCommandTLVBufferSize];
-    TLV::TLVReader reader;
-    SetupEmptyCommandTLV(tlvBuffer, reader);
-
-    // Invoke TimeSnapshot command
-    auto result = cluster.InvokeCommand(invokeRequest, reader, &handler);
-
-    // Verify that the command was handled successfully
-    EXPECT_FALSE(result.has_value());
-
-    // Verify that a response was generated
-    EXPECT_TRUE(handler.HasResponse());
-    EXPECT_EQ(handler.GetResponseCommandId(), GeneralDiagnostics::Commands::TimeSnapshotResponse::Id);
-
-    // Decode and verify the response
+    // Invoke TimeSnapshot command and get response
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType response;
-    ASSERT_EQ(handler.DecodeTimeSnapshotResponse(response), CHIP_NO_ERROR);
+    InvokeTimeSnapshotAndGetResponse(cluster, response);
 
     // Verify that systemTimeMs is present
     EXPECT_GE(response.systemTimeMs, 0u);
@@ -442,40 +423,16 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotResponseValues)
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
     GeneralDiagnosticsCluster cluster(optionalAttributeSet);
 
-    // Prepare command invocation infrastructure
-    ConcreteCommandPath commandPath(kRootEndpointId, GeneralDiagnostics::Id, GeneralDiagnostics::Commands::TimeSnapshot::Id);
-
-    DataModel::InvokeRequest invokeRequest;
-    invokeRequest.path = commandPath;
-
     // First invocation. Capture initial timestamp
-    MockCommandHandler firstHandler;
-    uint8_t firstTlvBuffer[kEmptyCommandTLVBufferSize];
-    TLV::TLVReader firstReader;
-    SetupEmptyCommandTLV(firstTlvBuffer, firstReader);
-    auto firstResult = cluster.InvokeCommand(invokeRequest, firstReader, &firstHandler);
-    EXPECT_FALSE(firstResult.has_value());
-    EXPECT_TRUE(firstHandler.HasResponse());
-
-    // Decode first response
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType firstResponse;
-    ASSERT_EQ(firstHandler.DecodeTimeSnapshotResponse(firstResponse), CHIP_NO_ERROR);
+    InvokeTimeSnapshotAndGetResponse(cluster, firstResponse);
 
     // Verify first response is valid
     EXPECT_GE(firstResponse.systemTimeMs, 0u);
 
     // Second invocation. Capture subsequent timestamp
-    MockCommandHandler secondHandler;
-    uint8_t secondTlvBuffer[kEmptyCommandTLVBufferSize];
-    TLV::TLVReader secondReader;
-    SetupEmptyCommandTLV(secondTlvBuffer, secondReader);
-    auto secondResult = cluster.InvokeCommand(invokeRequest, secondReader, &secondHandler);
-    EXPECT_FALSE(secondResult.has_value());
-    EXPECT_TRUE(secondHandler.HasResponse());
-
-    // Decode second response
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType secondResponse;
-    ASSERT_EQ(secondHandler.DecodeTimeSnapshotResponse(secondResponse), CHIP_NO_ERROR);
+    InvokeTimeSnapshotAndGetResponse(cluster, secondResponse);
 
     // Verify second response is also valid and greater than first
     EXPECT_GE(secondResponse.systemTimeMs, firstResponse.systemTimeMs);
