@@ -52,7 +52,7 @@ public:
      * @brief Checks if the TriggerEffect command is enabled.
      * @return True if the TriggerEffect command is enabled, false otherwise.
      */
-    virtual bool IsTriggerEffectEnabled() = 0;
+    virtual bool IsTriggerEffectEnabled() const = 0;
 };
 
 class IdentifyCluster : public DefaultServerCluster, public reporting::TimerContext

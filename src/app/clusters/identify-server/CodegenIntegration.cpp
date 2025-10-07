@@ -97,7 +97,7 @@ public:
             }
         }
     }
-    bool IsTriggerEffectEnabled() override { return true; }
+    bool IsTriggerEffectEnabled() const override { return true; }
 };
 
 IdentifyLegacyDelegate gLegacyDelegate;

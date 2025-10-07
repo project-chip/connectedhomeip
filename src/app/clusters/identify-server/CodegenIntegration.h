@@ -15,15 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- * @file
- *   Legacy API for the Identify cluster.
- *
- *   This file provides backward compatibility for existing codegen-based implementations
- *   by redirecting to the new code-driven implementation located in IdentifyCluster.h/.cpp.
- *   New implementations should use IdentifyCluster.h/.cpp directly.
- */
-
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
@@ -33,16 +24,16 @@
 
 struct Identify
 {
-    /**
-     * Callbacks are not thread safe. To access the identify struct please
-     * consider using the LockChipStack / UnlockChipStack functions of the PlatformMgr.
-     */
     using onIdentifyStartCb    = void (*)(Identify *);
     using onIdentifyStopCb     = onIdentifyStartCb;
     using onEffectIdentifierCb = onIdentifyStartCb;
 
     /**
      * @brief Construct a new Identify object
+     *
+     * This provides backward compatibility for existing codegen-based implementations
+     * by redirecting to the new code-driven implementation located in IdentifyCluster.h/.cpp.
+     * New implementations should use IdentifyCluster.h/.cpp directly.
      *
      * Please note: The app should create a instance of this object to handle
      * the identify.

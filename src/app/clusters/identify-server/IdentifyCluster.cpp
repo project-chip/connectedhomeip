@@ -77,14 +77,6 @@ DataModel::ActionReturnStatus IdentifyCluster::WriteAttribute(const DataModel::W
         return NotifyAttributeChangedIfSuccess(request.path.mAttributeId,
                                                SetIdentifyTime(IdentifyTimeChangeSource::kClient, newIdentifyTime));
     }
-    // Read-only attributes
-    case Attributes::IdentifyType::Id:
-        return Protocols::InteractionModel::Status::UnsupportedWrite;
-    case Attributes::ClusterRevision::Id:
-        return Protocols::InteractionModel::Status::UnsupportedWrite;
-    case Attributes::FeatureMap::Id:
-        return Protocols::InteractionModel::Status::UnsupportedWrite;
-    // Invalid attributes
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }

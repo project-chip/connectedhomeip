@@ -47,7 +47,7 @@ public:
     void OnIdentifyStart(IdentifyCluster & cluster) override { onIdentifyStartCalled = true; }
     void OnIdentifyStop(IdentifyCluster & cluster) override { onIdentifyStopCalled = true; }
     void OnTriggerEffect(IdentifyCluster & cluster) override { onEffectIdentifierCalled = true; }
-    bool IsTriggerEffectEnabled() override { return true; }
+    bool IsTriggerEffectEnabled() const override { return true; }
 };
 
 TestIdentifyDelegate gTestIdentifyDelegate;
@@ -190,16 +190,16 @@ TEST_F(TestIdentifyCluster, WriteReadOnlyAttributesReturnUnsupportedWriteTest)
 
     // Attempt to write to the read-only IdentifyType attribute and verify it fails.
     EXPECT_EQ(WriteAttribute(cluster, { kTestEndpointId, Identify::Id, IdentifyType::Id }, (uint8_t) 0),
-              CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+              CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 
     // Attempt to write to the read-only ClusterRevision attribute and verify it fails.
     EXPECT_EQ(WriteAttribute(cluster, { kTestEndpointId, Identify::Id, Globals::Attributes::ClusterRevision::Id },
                              static_cast<uint16_t>(0)),
-              CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+              CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 
     // Attempt to write to the read-only FeatureMap attribute and verify it fails.
     EXPECT_EQ(WriteAttribute(cluster, { kTestEndpointId, Identify::Id, FeatureMap::Id }, static_cast<uint32_t>(0)),
-              CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+              CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 }
 
 TEST_F(TestIdentifyCluster, IdentifyTimeCountdownTest)
