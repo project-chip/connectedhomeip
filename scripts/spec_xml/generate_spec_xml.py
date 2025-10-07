@@ -54,7 +54,6 @@ CURRENT_IN_PROGRESS_DEFINES = [
     "metering",
     "nfcCommissioning",
     "q-phase-2",
-    "q-phase-3",
     "rvc-direct-mode",
     "rvc-go-home",
     "soil-sensor",
