@@ -13684,7 +13684,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command Sleep
  *
- * This command shall put the device into low power mode.
+ * This command SHALL put the device into low power mode.
  */
 - (void)sleepWithParams:(MTRLowPowerClusterSleepParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)sleepWithCompletion:(MTRStatusCompletion)completion
