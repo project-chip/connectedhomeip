@@ -107,7 +107,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             ),
             TestStep(
                 6,
-                "TH establisheds a subscription to all of the Events from the Cluster",
+                "TH establishes a subscription to all of the Events from the Cluster",
             ),
             TestStep(
                 7,
