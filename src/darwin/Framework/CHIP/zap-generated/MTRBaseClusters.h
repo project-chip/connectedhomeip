@@ -14495,7 +14495,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command RemoveZone
  *
- * This command SHALL remove the Zone mapped to the passed in ZoneID.
+ * This command SHALL remove the user-defined Zone indicated by ZoneID.
  */
 - (void)removeZoneWithParams:(MTRZoneManagementClusterRemoveZoneParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -14507,7 +14507,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command RemoveTrigger
  *
- * This command SHALL remove the Trigger mapped to the provided ZoneID.
+ * This command SHALL remove the Trigger for the provided ZoneID.
  */
 - (void)removeTriggerWithParams:(MTRZoneManagementClusterRemoveTriggerParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
@@ -17900,11 +17900,36 @@ typedef NS_ENUM(uint8_t, MTRDataTypeRelativePositionTag) {
     MTRDataTypeRelativePositionTagBehind MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x06,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
+typedef NS_ENUM(uint8_t, MTRDataTypeServerAttributionContextInformation) {
+    MTRDataTypeServerAttributionContextInformationServerAutomationRule MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeServerAttributionContextInformationServerSchedule MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+    MTRDataTypeServerAttributionContextInformationServerTimer MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRDataTypeServerAttributionContextInformationSecurity MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRDataTypeServerAttributionContextInformationDemandResponseEventOrSimilarServiceProviderSignalling MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRDataTypeServerAttributionContextInformationPhysicalInteractionOnDevice MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRDataTypeServerAttributionContextInformationInteractionViaAProtocolNotDefinedInThisSpecification MTR_PROVISIONALLY_AVAILABLE = 0x11,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeSoftwareVersionCertificationStatusEnum) {
+    MTRDataTypeSoftwareVersionCertificationStatusEnumDevTest MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeSoftwareVersionCertificationStatusEnumProvisional MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeSoftwareVersionCertificationStatusEnumCertified MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeSoftwareVersionCertificationStatusEnumRevoked MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDataTypeStreamUsageEnum) {
     MTRDataTypeStreamUsageEnumInternal MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRDataTypeStreamUsageEnumRecording MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRDataTypeStreamUsageEnumAnalysis MTR_PROVISIONALLY_AVAILABLE = 0x02,
     MTRDataTypeStreamUsageEnumLiveView MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeSuppliedAttributionContextInformation) {
+    MTRDataTypeSuppliedAttributionContextInformationDefaultClientAction MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeSuppliedAttributionContextInformationUserInteraction MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeSuppliedAttributionContextInformationClientAutomationRule MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeSuppliedAttributionContextInformationClientSchedule MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeSuppliedAttributionContextInformationClientTimer MTR_PROVISIONALLY_AVAILABLE = 0x04,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeTariffPriceTypeEnum) {
@@ -21852,6 +21877,11 @@ typedef NS_ENUM(uint8_t, MTRContentAppObserverStatus) {
     MTRContentAppObserverStatusUnexpectedData MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x01,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
+typedef NS_ENUM(uint8_t, MTRZoneManagementStatusCode) {
+    MTRZoneManagementStatusCodeZoneNotFound MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRZoneManagementStatusCodeZoneInUse MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRZoneManagementZoneEventStoppedReason) {
     MTRZoneManagementZoneEventStoppedReasonActionStopped MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRZoneManagementZoneEventStoppedReasonTimeout MTR_PROVISIONALLY_AVAILABLE = 0x01,
@@ -21966,6 +21996,7 @@ typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportStatusCode) {
     MTRPushAVStreamTransportStatusCodeInvalidTransportStatus MTR_PROVISIONALLY_AVAILABLE = 0x08,
     MTRPushAVStreamTransportStatusCodeInvalidOptions MTR_PROVISIONALLY_AVAILABLE = 0x09,
     MTRPushAVStreamTransportStatusCodeInvalidStreamUsage MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRPushAVStreamTransportStatusCodeInvalidTime MTR_PROVISIONALLY_AVAILABLE = 0x0B,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportTransportStatus) {

@@ -230,7 +230,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                         "streamUsage": 0,
                         "videoStreamID": 1,
                         "audioStreamID": 1,
-                        "endpointID": 5,
+                        "TLSEndpointID": 5,
                         "url": f"https://{host_ip}:1234/streams/1",
                         "triggerOptions": {"triggerType": 2},
                         "ingestMethod": 0,
@@ -345,7 +345,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             }
             status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": streamUsage,
-                 "endpointID": endpoint,
+                 "TLSEndpointID": endpoint,
                  "url": "https://{host_ip}:1234/streams/1",
                  "triggerOptions": {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kContinuous},
                  "ingestMethod": pvcluster.Enums.IngestMethodsEnum.kCMAFIngest,

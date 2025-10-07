@@ -196,6 +196,51 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDataTypeAttributionData
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _contextInformation = @(0);
+
+        _sourceContext = nil;
+
+        _nodeID = nil;
+
+        _groupID = nil;
+
+        _systemTimeStamp = nil;
+
+        _epochTimeStamp = nil;
+
+        _fabricIndex = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeAttributionData alloc] init];
+
+    other.contextInformation = self.contextInformation;
+    other.sourceContext = self.sourceContext;
+    other.nodeID = self.nodeID;
+    other.groupID = self.groupID;
+    other.systemTimeStamp = self.systemTimeStamp;
+    other.epochTimeStamp = self.epochTimeStamp;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contextInformation:%@; sourceContext:%@; nodeID:%@; groupID:%@; systemTimeStamp:%@; epochTimeStamp:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _contextInformation, _sourceContext, _nodeID, _groupID, _systemTimeStamp, _epochTimeStamp, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDataTypeICECandidateStruct
 - (instancetype)init
 {
@@ -326,6 +371,39 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: powerThreshold:%@; apparentPowerThreshold:%@; powerThresholdSource:%@; >", NSStringFromClass([self class]), _powerThreshold, _apparentPowerThreshold, _powerThresholdSource];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDataTypeSuppliedAttributionData
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _contextInformation = @(0);
+
+        _sourceContext = nil;
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeSuppliedAttributionData alloc] init];
+
+    other.contextInformation = self.contextInformation;
+    other.sourceContext = self.sourceContext;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contextInformation:%@; sourceContext:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _contextInformation, _sourceContext, _fabricIndex];
     return descriptionString;
 }
 
@@ -10416,7 +10494,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _audioStreamID = nil;
 
-        _endpointID = @(0);
+        _tlsEndpointID = @(0);
 
         _url = @"";
 
@@ -10438,7 +10516,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.streamUsage = self.streamUsage;
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
-    other.endpointID = self.endpointID;
+    other.tlsEndpointID = self.tlsEndpointID;
     other.url = self.url;
     other.triggerOptions = self.triggerOptions;
     other.ingestMethod = self.ingestMethod;
@@ -10450,7 +10528,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; endpointID:%@; url:%@; triggerOptions:%@; ingestMethod:%@; containerOptions:%@; expiryTime:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _endpointID, _url, _triggerOptions, _ingestMethod, _containerOptions, _expiryTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; tlsEndpointID:%@; url:%@; triggerOptions:%@; ingestMethod:%@; containerOptions:%@; expiryTime:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _tlsEndpointID, _url, _triggerOptions, _ingestMethod, _containerOptions, _expiryTime];
     return descriptionString;
 }
 
@@ -10561,10 +10639,6 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _connectionID = @(0);
-
-        _triggerType = @(0);
-
-        _activationReason = nil;
     }
     return self;
 }
@@ -10574,15 +10648,13 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRPushAVStreamTransportClusterPushTransportEndEvent alloc] init];
 
     other.connectionID = self.connectionID;
-    other.triggerType = self.triggerType;
-    other.activationReason = self.activationReason;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; triggerType:%@; activationReason:%@; >", NSStringFromClass([self class]), _connectionID, _triggerType, _activationReason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; >", NSStringFromClass([self class]), _connectionID];
     return descriptionString;
 }
 

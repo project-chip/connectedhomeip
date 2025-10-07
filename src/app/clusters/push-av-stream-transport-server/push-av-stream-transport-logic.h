@@ -59,9 +59,7 @@ public:
                                Optional<PushAvStreamTransport::TriggerActivationReasonEnum>());
 
     Protocols::InteractionModel::Status
-    NotifyTransportStopped(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
-                           Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason =
-                               Optional<PushAvStreamTransport::TriggerActivationReasonEnum>());
+    NotifyTransportStopped(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType);
 
     enum class UpsertResultEnum : uint8_t
     {
@@ -123,8 +121,7 @@ public:
     GeneratePushTransportBeginEvent(const uint16_t connectionID, const PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
                                     const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason);
     Protocols::InteractionModel::Status
-    GeneratePushTransportEndEvent(const uint16_t connectionID, const PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
-                                  const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason);
+    GeneratePushTransportEndEvent(const uint16_t connectionID);
 
 private:
     PushAvStreamTransportDelegate * mDelegate                            = nullptr;

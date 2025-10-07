@@ -18793,7 +18793,7 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
                     } else {
                         newElement_0.transportOptions.audioStreamID = nil;
                     }
-                    newElement_0.transportOptions.endpointID = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().endpointID];
+                    newElement_0.transportOptions.tlsEndpointID = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().TLSEndpointID];
                     newElement_0.transportOptions.url = AsString(entry_0.transportOptions.Value().url);
                     if (newElement_0.transportOptions.url == nil) {
                         CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;

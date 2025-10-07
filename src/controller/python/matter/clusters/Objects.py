@@ -426,6 +426,31 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7
 
+        class ServerAttributionContextInformation(MatterIntEnum):
+            kServerAutomationRule = 0x0B
+            kServerSchedule = 0x0C
+            kServerTimer = 0x0D
+            kSecurity = 0x0E
+            kDemandResponseEventOrSimilarServiceProviderSignalling = 0x0F
+            kPhysicalInteractionOnDevice = 0x10
+            kInteractionViaAProtocolNotDefinedInThisSpecification = 0x11
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 0
+
+        class SoftwareVersionCertificationStatusEnum(MatterIntEnum):
+            kDevTest = 0x00
+            kProvisional = 0x01
+            kCertified = 0x02
+            kRevoked = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
+
         class StreamUsageEnum(MatterIntEnum):
             kInternal = 0x00
             kRecording = 0x01
@@ -436,6 +461,18 @@ class Globals:
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4
+
+        class SuppliedAttributionContextInformation(MatterIntEnum):
+            kDefaultClientAction = 0x00
+            kUserInteraction = 0x01
+            kClientAutomationRule = 0x02
+            kClientSchedule = 0x03
+            kClientTimer = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 5
 
         class TariffPriceTypeEnum(MatterIntEnum):
             kStandard = 0x00
@@ -589,6 +626,29 @@ class Globals:
             statusCode: 'uint' = 0
 
         @dataclass
+        class AttributionData(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="contextInformation", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sourceContext", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="nodeID", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="systemTimeStamp", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="epochTimeStamp", Tag=5, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=6, Type=typing.Union[Nullable, uint]),
+                    ])
+
+            contextInformation: 'uint' = 0
+            sourceContext: 'typing.Optional[uint]' = None
+            nodeID: 'typing.Optional[uint]' = None
+            groupID: 'typing.Optional[uint]' = None
+            systemTimeStamp: 'typing.Optional[uint]' = None
+            epochTimeStamp: 'typing.Optional[uint]' = None
+            fabricIndex: 'typing.Union[Nullable, uint]' = NullValue
+
+        @dataclass
         class ICECandidateStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -649,6 +709,21 @@ class Globals:
             powerThreshold: 'typing.Optional[int]' = None
             apparentPowerThreshold: 'typing.Optional[int]' = None
             powerThresholdSource: 'typing.Union[Nullable, Globals.Enums.PowerThresholdSourceEnum]' = NullValue
+
+        @dataclass
+        class SuppliedAttributionData(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="contextInformation", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sourceContext", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
+                    ])
+
+            contextInformation: 'uint' = 0
+            sourceContext: 'typing.Optional[uint]' = None
+            fabricIndex: 'uint' = 0
 
         @dataclass
         class TestGlobalStruct(ClusterObject):
@@ -46296,6 +46371,15 @@ class ZoneManagement(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
+        class StatusCodeEnum(MatterIntEnum):
+            kZoneNotFound = 0x02
+            kZoneInUse = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 0
+
         class ZoneEventStoppedReasonEnum(MatterIntEnum):
             kActionStopped = 0x00
             kTimeout = 0x01
@@ -49148,6 +49232,7 @@ class PushAvStreamTransport(Cluster):
             kInvalidTransportStatus = 0x08
             kInvalidOptions = 0x09
             kInvalidStreamUsage = 0x0A
+            kInvalidTime = 0x0B
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
@@ -49285,7 +49370,7 @@ class PushAvStreamTransport(Cluster):
                         ClusterObjectFieldDescriptor(Label="streamUsage", Tag=0, Type=Globals.Enums.StreamUsageEnum),
                         ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=1, Type=typing.Union[None, Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=2, Type=typing.Union[None, Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="endpointID", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="TLSEndpointID", Tag=3, Type=uint),
                         ClusterObjectFieldDescriptor(Label="url", Tag=4, Type=str),
                         ClusterObjectFieldDescriptor(Label="triggerOptions", Tag=5, Type=PushAvStreamTransport.Structs.TransportTriggerOptionsStruct),
                         ClusterObjectFieldDescriptor(Label="ingestMethod", Tag=6, Type=PushAvStreamTransport.Enums.IngestMethodsEnum),
@@ -49296,7 +49381,7 @@ class PushAvStreamTransport(Cluster):
             streamUsage: 'Globals.Enums.StreamUsageEnum' = 0
             videoStreamID: 'typing.Union[None, Nullable, uint]' = None
             audioStreamID: 'typing.Union[None, Nullable, uint]' = None
-            endpointID: 'uint' = 0
+            TLSEndpointID: 'uint' = 0
             url: 'str' = ""
             triggerOptions: 'PushAvStreamTransport.Structs.TransportTriggerOptionsStruct' = field(default_factory=lambda: PushAvStreamTransport.Structs.TransportTriggerOptionsStruct())
             ingestMethod: 'PushAvStreamTransport.Enums.IngestMethodsEnum' = 0
@@ -49624,13 +49709,9 @@ class PushAvStreamTransport(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="triggerType", Tag=1, Type=PushAvStreamTransport.Enums.TransportTriggerTypeEnum),
-                        ClusterObjectFieldDescriptor(Label="activationReason", Tag=2, Type=typing.Optional[PushAvStreamTransport.Enums.TriggerActivationReasonEnum]),
                     ])
 
             connectionID: uint = 0
-            triggerType: PushAvStreamTransport.Enums.TransportTriggerTypeEnum = 0
-            activationReason: typing.Optional[PushAvStreamTransport.Enums.TriggerActivationReasonEnum] = None
 
 
 @dataclass

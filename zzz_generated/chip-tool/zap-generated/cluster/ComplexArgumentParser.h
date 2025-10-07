@@ -47,6 +47,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Struct
 
 static void Finalize(chip::app::Clusters::Globals::Structs::AtomicAttributeStatusStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::AttributionData::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Globals::Structs::AttributionData::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type & request,
                         Json::Value & value);
 
@@ -66,6 +71,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Struct
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::SuppliedAttributionData::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Globals::Structs::SuppliedAttributionData::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::TestGlobalStruct::Type & request,
                         Json::Value & value);
