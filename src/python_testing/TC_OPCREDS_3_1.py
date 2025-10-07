@@ -49,7 +49,7 @@ from matter.tlv import TLVReader, TLVWriter
 
 
 class TC_OPCREDS_3_1(MatterBaseTest):
-    async def FindAndEstablishPase(self, longDiscriminator: int, setupPinCode: int, nodeid: int, dev_ctrl: ChipDeviceCtrl = None):
+    async def FindAndEstablishPase(self, longDiscriminator: int, setupPinCode: int, nodeId: int, dev_ctrl: ChipDeviceCtrl = None):
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
 
@@ -61,13 +61,13 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         for a in device.addresses:
             try:
                 await dev_ctrl.EstablishPASESessionIP(ipaddr=a, setupPinCode=setupPinCode,
-                                                      nodeId=nodeid, port=device.port)
+                                                      nodeId=nodeId, port=device.port)
                 break
             except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Expected fullback behavior when trying multiple IPs, failures are tolerated to continue with next address
                 # assert_raises is not applicable since failure is not fatal here
                 continue
         try:
-            dev_ctrl.GetConnectedDeviceSync(nodeId=nodeid, allowPASE=True, timeoutMs=1000)
+            dev_ctrl.GetConnectedDeviceSync(nodeId=nodeId, allowPASE=True, timeoutMs=1000)
         except TimeoutError:
             asserts.fail("Unable to establish a PASE session to the device")
 

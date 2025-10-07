@@ -2701,7 +2701,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self.SetThreadOperationalDataset(threadOperationalDataset)
         return await self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
 
-async def CommissionNfcThread(self, discriminator, setupPinCode, nodeId: int, threadOperationalDataset: bytes) -> int:
+    async def CommissionNfcThread(self, discriminator, setupPinCode, nodeId: int, threadOperationalDataset: bytes) -> int:
         '''
         Commissions a Thread device over NFC.
 
