@@ -21,12 +21,12 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libTestElectricalGridConditionsCluster"
 
-  # Your main test file
+  # Main test file
   test_sources = [ "TestElectricalGridConditionsCluster.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
-  # Allow your mock to replace the one in reporting.cpp
+  # Allows mock to replace MatterReportingAttributeChangeCallback in reporting.cpp
   # (without triggering linker errors)
   ldflags = [ "-Wl,--allow-multiple-definition" ]
 
