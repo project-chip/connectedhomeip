@@ -397,6 +397,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveVideoStream(uint16_t videoStreamId)
 
 CHIP_ERROR CameraAVStreamMgmtServer::AddAudioStream(const AudioStreamStruct & audioStream)
 {
+    mAllocatedAudioStreams.push_back(audioStream);
+
     LogAndReturnErrorOnFailure(StoreAllocatedStreams<Attributes::AllocatedAudioStreams::Id>(), Zcl,
                                "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated audio streams", mEndpointId);
 
@@ -459,6 +461,8 @@ bool CameraAVStreamMgmtServer::IsAllocatedSnapshotStreamReusable(
 
 CHIP_ERROR CameraAVStreamMgmtServer::AddSnapshotStream(const SnapshotStreamStruct & snapshotStream)
 {
+    mAllocatedSnapshotStreams.push_back(snapshotStream);
+
     LogAndReturnErrorOnFailure(StoreAllocatedStreams<Attributes::AllocatedSnapshotStreams::Id>(), Zcl,
                                "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated snapshot streams", mEndpointId);
 
