@@ -64,6 +64,25 @@ ElectricalGridConditionsStruct::Type CreateTestCondition(uint32_t periodStart, O
     condition.localCarbonLevel     = localCarbonLevel.HasValue() ? localCarbonLevel.Value() : static_cast<ThreeLevelEnum>(0);
     return condition;
 }
+
+// Helper function to test forecast conditions with a specific number of entries
+CHIP_ERROR TestForecastWithEntryCount(Instance * instance, size_t entryCount)
+{
+    // Create array large enough for the maximum test case (57 entries)
+    constexpr size_t kMaxTestSize = 57;
+    static ElectricalGridConditionsStruct::Type forecastList[kMaxTestSize];
+    
+    // Fill with valid entries up to entryCount
+    for (size_t i = 0; i < entryCount && i < kMaxTestSize; i++)
+    {
+        uint32_t startTime = static_cast<uint32_t>(1000 + (i * 1000));
+        Optional<uint32_t> endTime = (i == entryCount - 1) ? Optional<uint32_t>() : Optional<uint32_t>(startTime + 999);
+        forecastList[i] = CreateTestCondition(startTime, endTime);
+    }
+    
+    DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, entryCount);
+    return instance->SetForecastConditions(forecastConditions);
+}
 } // namespace TestHelpers
 
 class TestElectricalGridConditionsCluster : public ::testing::Test
@@ -494,6 +513,94 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsInvalidTimeSer
         EXPECT_FALSE(MockMatterReporting::WasCalled())
             << "MatterReporting should NOT be called for invalid case: Middle entry has null periodEnd";
     }
+}
+
+TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsInvalidEnums)
+{
+    // Test invalid gridCarbonLevel enum
+    {
+        MockMatterReporting::Reset();
+        ElectricalGridConditionsStruct::Type forecastList[1];
+        forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(2000));
+        // Set invalid enum value (4 is not a valid ThreeLevelEnum value)
+        forecastList[0].gridCarbonLevel = static_cast<ThreeLevelEnum>(4);
+        
+        DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 1);
+        EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
+            << "Should reject invalid gridCarbonLevel enum value";
+        EXPECT_FALSE(MockMatterReporting::WasCalled())
+            << "MatterReporting should NOT be called for invalid gridCarbonLevel enum";
+    }
+
+    // Test invalid localCarbonLevel enum
+    {
+        MockMatterReporting::Reset();
+        ElectricalGridConditionsStruct::Type forecastList[1];
+        forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(2000));
+        // Set invalid enum value (255 is not a valid ThreeLevelEnum value)
+        forecastList[0].localCarbonLevel = static_cast<ThreeLevelEnum>(255);
+        
+        DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 1);
+        EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
+            << "Should reject invalid localCarbonLevel enum value";
+        EXPECT_FALSE(MockMatterReporting::WasCalled())
+            << "MatterReporting should NOT be called for invalid localCarbonLevel enum";
+    }
+
+    // Test both invalid enums in same entry
+    {
+        MockMatterReporting::Reset();
+        ElectricalGridConditionsStruct::Type forecastList[1];
+        forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(2000));
+        // Set both to invalid enum values
+        forecastList[0].gridCarbonLevel = static_cast<ThreeLevelEnum>(99);
+        forecastList[0].localCarbonLevel = static_cast<ThreeLevelEnum>(100);
+        
+        DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 1);
+        EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
+            << "Should reject both invalid enum values";
+        EXPECT_FALSE(MockMatterReporting::WasCalled())
+            << "MatterReporting should NOT be called for invalid enum values";
+    }
+
+    // Test valid enum values for comparison (should succeed)
+    {
+        MockMatterReporting::Reset();
+        ElectricalGridConditionsStruct::Type forecastList[1];
+        forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(2000), 
+                                                           Optional<int16_t>(100), Optional<ThreeLevelEnum>(ThreeLevelEnum::kHigh),
+                                                           Optional<int16_t>(50), Optional<ThreeLevelEnum>(ThreeLevelEnum::kLow));
+        
+        DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 1);
+        EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_NO_ERROR)
+            << "Should accept valid enum values";
+        EXPECT_TRUE(MockMatterReporting::WasCalled())
+            << "MatterReporting should be called for valid forecast";
+    }
+}
+
+TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsTooManyEntries)
+{
+    MockMatterReporting::Reset();
+    
+    // Test with 57 entries (one more than kMaxForecastEntries which is 56)
+    constexpr size_t kTestSize = 57;
+    EXPECT_EQ(TestHelpers::TestForecastWithEntryCount(mInstance.get(), kTestSize), CHIP_IM_GLOBAL_STATUS(ConstraintError))
+        << "Should reject forecast with more than kMaxForecastEntries (" << static_cast<int>(kMaxForecastEntries) << ") entries";
+    EXPECT_FALSE(MockMatterReporting::WasCalled())
+        << "MatterReporting should NOT be called when too many forecast entries provided";
+}
+
+TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsExactlyMaxEntries)
+{
+    MockMatterReporting::Reset();
+    
+    // Test with exactly kMaxForecastEntries (56) - should succeed
+    constexpr size_t kTestSize = kMaxForecastEntries;
+    EXPECT_EQ(TestHelpers::TestForecastWithEntryCount(mInstance.get(), kTestSize), CHIP_NO_ERROR)
+        << "Should accept forecast with exactly kMaxForecastEntries (" << static_cast<int>(kMaxForecastEntries) << ") entries";
+    EXPECT_TRUE(MockMatterReporting::WasCalled())
+        << "MatterReporting should be called for valid forecast at maximum size";
 }
 
 } // namespace
