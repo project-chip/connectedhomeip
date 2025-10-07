@@ -14,15 +14,6 @@
  *    limitations under the License.
  */
 
-/**
- * @file
- *   Legacy API for the Identify cluster.
- *
- *   This file provides backward compatibility for existing codegen-based implementations
- *   by redirecting to the new code-driven implementation located in IdentifyCluster.h/.cpp.
- *   New implementations should use IdentifyCluster.h/.cpp directly.
- */
-
 #pragma once
 
 #include <app/clusters/identify-server/CodegenIntegration.h>
