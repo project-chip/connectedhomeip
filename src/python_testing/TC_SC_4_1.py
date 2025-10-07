@@ -34,20 +34,18 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-from __future__ import annotations
 import logging
 from typing import Any, Optional
 
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
-from mdns_discovery.data_classes.mdns_service_info import MdnsServiceInfo
 from mdns_discovery.data_classes.ptr_record import PtrRecord
 from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_valid_cm_key,
                                           assert_valid_commissionable_instance_name, assert_valid_d_key,
                                           assert_valid_devtype_subtype, assert_valid_dn_key, assert_valid_dt_key,
                                           assert_valid_hostname, assert_valid_long_discriminator_subtype, assert_valid_ph_key,
                                           assert_valid_pi_key, assert_valid_ri_key, assert_valid_sai_key, assert_valid_sat_key,
-                                          assert_valid_short_discriminator_subtype, assert_valid_sii_key,
-                                          assert_valid_vendor_subtype, assert_valid_vp_key)
+                                          assert_valid_short_discriminator_subtype, assert_valid_sii_key, assert_valid_t_key,
+                                          assert_valid_vendor_subtype, assert_valid_vp_key, assert_valid_icd_key)
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -63,7 +61,7 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securecha
 '''
 
 TCP_PICS_STR = "MCORE.SC.TCP"
-
+ROOT_NODE_ENDPOINT_ID = 0
 
 class TC_SC_4_1(MatterBaseTest):
 
@@ -91,13 +89,12 @@ class TC_SC_4_1(MatterBaseTest):
                 ]
 
     async def read_attribute(self, attribute: Any) -> Any:
-        endpoint = self.get_endpoint(default=1)
         cluster = Clusters.Objects.IcdManagement
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
+        return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
     async def get_descriptor_server_list(self):
         return await self.read_single_attribute_check_success(
-            endpoint=0,
+            endpoint=ROOT_NODE_ENDPOINT_ID,
             dev_ctrl=self.default_controller,
             cluster=Clusters.Descriptor,
             attribute=Clusters.Descriptor.Attributes.ServerList
@@ -105,10 +102,18 @@ class TC_SC_4_1(MatterBaseTest):
 
     async def get_active_mode_threshhold_ms(self):
         return await self.read_single_attribute_check_success(
-            endpoint=0,
+            endpoint=ROOT_NODE_ENDPOINT_ID,
             dev_ctrl=self.default_controller,
             cluster=Clusters.IcdManagement,
             attribute=Clusters.IcdManagement.Attributes.ActiveModeThreshold
+        )
+
+    async def get_icd_feature_map(self):
+        return await self.read_single_attribute_check_success(
+            endpoint=ROOT_NODE_ENDPOINT_ID,
+            dev_ctrl=self.default_controller,
+            cluster=Clusters.IcdManagement,
+            attribute=Clusters.IcdManagement.Attributes.FeatureMap
         )
 
     @staticmethod
@@ -137,6 +142,41 @@ class TC_SC_4_1(MatterBaseTest):
                                                   payload=revoke_cmd,
                                                   timedRequestTimeoutMs=6000)
         sleep(1) # Give some time for failsafe cleanup scheduling
+
+    def verify_t_value(self, record):
+        has_t = record and record.txt and 'T' in record.txt
+        if not has_t:
+            asserts.assert_false(self.check_pics(TCP_PICS_STR),
+                                 f"T key must be included if TCP is supported - returned TXT record: {record}")
+            return True, 'T is not provided or required'
+
+        t_value = record.txt['T']
+        logging.info("T key is present in TXT record, verify if that it is a decimal value with no leading zeros and is less than or equal to 6. Convert the value to a bitmap and verify bit 0 is clear.")
+        # Verify t_value is a decimal number without leading zeros and less than or equal to 6
+        try:
+            assert_valid_t_key(t_value, enforce_provisional=False)
+
+            # Convert to bitmap and verify bit 0 is clear
+            T_int = int(t_value)
+            if T_int & 1 == 0:
+                return True, f"T value ({t_value}) is valid and bit 0 is clear."
+            else:
+                return False, f"Bit 0 is not clear. T value ({t_value})"
+
+            # Check that the value can be either 2, 4 or 6 depending on whether
+            # DUT is a TCPClient, TCPServer or both.
+            if self.check_pics(TCP_PICS_STR):
+                if (T_int & 0x04 != 0):
+                    return True, f"T value ({t_value}) represents valid TCP support info."
+                else:
+                    return False, f"T value ({t_value}) does not have TCP bits set even though the MCORE.SC.TCP PICS indicates it is required."
+            else:
+                if (T_int & 0x04 != 0):
+                    return False, f"T value ({t_value}) has the TCP bits set even though the MCORE.SC.TCP PICS is not set."
+                else:
+                    return True, f"T value ({t_value}) is valid."
+        except ValueError:
+            return False, f"T value ({t_value}) is not a valid integer"
 
     async def verify_commissionable_node_advertisements(self, service_name: str, expected_cm: str) -> None:
         mdns = MdnsDiscovery()
@@ -214,106 +254,158 @@ class TC_SC_4_1(MatterBaseTest):
         txt_record_returned = (txt_record is not None) and (len(txt_record.txt) > 0)
 
         # Verify that the TXT record, when required, is returned and is non-empty
-        if txt_record_required:
-            asserts.assert_true(txt_record_returned, "TXT record is required and was not returned or contains no values")
+        asserts.assert_true((not txt_record_required) or txt_record_returned, "TXT record is required and was not returned or contains no values")
 
-        # Verify D key is present, which represents the discriminator
-        # and must be encoded as a variable-length decimal value with up to 4
-        # digits omitting any leading zeros
-        d_key = txt_record.txt.get('D')
-        asserts.assert_is_not_none(d_key, "D key must be present.")
-        assert_valid_d_key(d_key)
+        if txt_record_returned:
 
-        # If VP key is present, verify it contain at least Vendor ID
-        # and if Product ID is present, values must be separated by a + sign
-        if 'VP' in txt_record.txt:
-            vp_key = txt_record.txt['VP']
-            if vp_key:
-                assert_valid_vp_key(vp_key)
+            # *** ICD KEY ***
+            icd_key: str | None = None
+            if self.supports_lit:
+                # Verify that TXT key 'ICD' exists
+                asserts.assert_true('ICD' in txt_record.txt, "TXT key 'ICD' must be present.")
 
-        # If SAI key is present, SII key must be an unsigned integer with
-        # units of milliseconds and shall be encoded as a variable length decimal
-        # number in ASCII, omitting leading zeros. Shall not exceed 3600000.
-        if 'SII' in txt_record.txt:
-            sii_key = txt_record.txt['SII']
-            if sii_key:
+                # Get the value
+                icd_key = txt_record.txt.get('ICD')
+
+                # Verify it’s not empty
+                asserts.assert_true(icd_key, "TXT key 'ICD' is present but has no value.")
+
+                # Verify it has the value of 0 or 1 (ASCII)
+                assert_valid_icd_key(icd_key)
+            else:
+                asserts.assert_not_in('ICD', txt_record.txt, "TXT key 'ICD' must NOT be present.")
+
+            # Set sit_mode = True when:
+            #   - supports_icd is True and supports_lit is False.
+            #   - supports_icd is True and supports_lit is True and ICD == '0'.
+            # Set sit_mode = False when:
+            #   - supports_icd is False.
+            #   - supports_icd is True and supports_lit is True and ICD == '1'.
+            sit_mode = self.supports_icd and (not self.supports_lit or icd_key == '0')
+            logging.info(f"\n\n\t** sit_mode: {sit_mode}\n")
+
+            # *** SII KEY ***
+            if sit_mode:
+                # Verify that TXT key 'SII' exists if Session Idle Timeout mode is True
+                asserts.assert_true('SII' in txt_record.txt, "TXT key 'SII' must be present.")
+
+                # Get the value
+                sii_key = txt_record.txt['SII']
+
+                # Verify it’s not empty
+                asserts.assert_true(sii_key, "TXT key 'SII' is present but has no value.")
+
+                # Verify SII key is an unsigned integer with units of milliseconds
+                # and shall be encoded as a variable length decimal number in ASCII,
+                # omitting leading zeros. Shall not exceed 3600000.
                 assert_valid_sii_key(sii_key)
 
-        # If SAI key is present, SAI key must be an unsigned integer with
-        # units of milliseconds and shall be encoded as a variable length decimal
-        # number in ASCII, omitting leading zeros. Shall not exceed 3600000.
-        if 'SAI' in txt_record.txt:
-            sai_key = txt_record.txt['SAI']
-            if sai_key:
+            # *** SAI KEY ***
+            if self.supports_icd:
+                # Verify that TXT key 'SAI' exists if 'supports_icd' is True
+                asserts.assert_true('SAI' in txt_record.txt, "TXT key 'SAI' must be present.")
+
+                # Get the value
+                sai_key = txt_record.txt['SAI']
+
+                # Verify it’s not empty
+                asserts.assert_true(sai_key, "TXT key 'SAI' is present but has no value.")
+
+                # Verify SAI key is an unsigned integer with units of milliseconds
+                # and shall be encoded as a variable length decimal number in ASCII,
+                # omitting leading zeros. Shall not exceed 3600000.
                 assert_valid_sai_key(sai_key)
 
-        # - If the SAT key is present, verify that it is a decimal value with
-        #   no leading zeros and is less than or equal to 65535
-        if 'SAT' in txt_record.txt:
-            sat_key = txt_record.txt['SAT']
-            if sat_key:
-                assert_valid_sat_key(sat_key)
+            # *** SAT KEY ***
+            # - If the SAT key is present, verify that it is a decimal value with
+            #   no leading zeros and is less than or equal to 65535
+            if 'SAT' in txt_record.txt:
+                sat_key = txt_record.txt['SAT']
+                if sat_key:
+                    assert_valid_sat_key(sat_key)
 
-            # - If the SAT key is present and supports_icd is true, verify that
-            #   the value is equal to active_mode_threshold
-            if self.supports_icd:
-                logging.info("supports_icd is True, verify the SAT value is equal to active_mode_threshold.")
-                asserts.assert_equal(int(sat_key), self.active_mode_threshold_ms)
+                # - If the SAT key is present and supports_icd is true, verify that
+                #   the value is equal to active_mode_threshold
+                if self.supports_icd:
+                    logging.info("supports_icd is True, verify the SAT value is equal to active_mode_threshold.")
+                    asserts.assert_equal(int(sat_key), self.active_mode_threshold_ms)
 
-        # Verify that the SAI key is present if the SAT key is present
-        asserts.assert_true(
-            'SAT' not in txt_record.txt
-            or 'SAI' in txt_record.txt,
-            "SAI key must be present if SAT key is present."
-        )
+            # Verify that the SAI key is present if the SAT key is present
+            asserts.assert_true(
+                'SAT' not in txt_record.txt
+                or 'SAI' in txt_record.txt,
+                "SAI key must be present if SAT key is present."
+            )
 
-        # Verify that the CM key is present and is equal to the expected
-        # CM value or ommitted if DUT is in Extended Discovery mode
-        if 'CM' in txt_record.txt:
-            cm_key = txt_record.txt['CM']
-            assert_valid_cm_key(cm_key)
-            asserts.assert_true(cm_key == expected_cm, f"CM key must be '{expected_cm}', got '{cm_key}'")
+            # *** D KEY ***
+            # Verify D key is present, which represents the discriminator
+            # and must be encoded as a variable-length decimal value with up to 4
+            # digits omitting any leading zeros
+            d_key = txt_record.txt.get('D')
+            asserts.assert_is_not_none(d_key, "D key must be present.")
+            assert_valid_d_key(d_key)
+
+            # *** VP KEY ***
+            # If VP key is present, verify it contain at least Vendor ID
+            # and if Product ID is present, values must be separated by a + sign
+            if 'VP' in txt_record.txt:
+                vp_key = txt_record.txt['VP']
+                if vp_key:
+                    assert_valid_vp_key(vp_key)
+
+            # *** T KEY ***
+            result, message = self.verify_t_value(txt_record)
+            asserts.assert_true(result, message)
+
+            # Verify that the CM key is present and is equal to the expected
+            # CM value or ommitted if DUT is in Extended Discovery mode
+            if 'CM' in txt_record.txt:
+                cm_key = txt_record.txt['CM']
+                assert_valid_cm_key(cm_key)
+                asserts.assert_true(cm_key == expected_cm, f"CM key must be '{expected_cm}', got '{cm_key}'")
+            else:
+                # When the DUT is in Extended Discovery mode and the
+                # CM key is not present, it's equivalent to CM=0
+                extended_discovery_mode = expected_cm == "0"
+
+                # Fail test only when CM key is not present
+                # and DUT is not in Extended Discovery mode
+                if not extended_discovery_mode:
+                    asserts.fail(f"CM key not present, was expecting CM='{expected_cm}'")
+
+            # If the DT key is present, it must contain the device type identifier from
+            # Data Model Device Types and must be encoded as a variable length decimal
+            # ASCII number without leading zeros
+            if 'DT' in txt_record.txt:
+                dt_key = txt_record.txt['DT']
+                assert_valid_dt_key(dt_key)
+
+            # If the DN key is present, DN key must be a UTF-8 encoded string with a maximum length of 32B
+            if 'DN' in txt_record.txt:
+                dn_key = txt_record.txt['DN']
+                assert_valid_dn_key(dn_key)
+
+            # If the RI key is present, key RI must include the Rotating Device Identifier
+            # encoded as an uppercase string with a maximum length of 100 chars (each octet
+            # encoded as a 2-digit hex number, max 50 octets)
+            if 'RI' in txt_record.txt:
+                ri_key = txt_record.txt['RI']
+                assert_valid_ri_key(ri_key)
+
+            # If the PH key is present, key PH must be encoded as a variable-length decimal number
+            # in ASCII text, omitting any leading zeros. If present value must be different of 0
+            if 'PH' in txt_record.txt:
+                ph_key = txt_record.txt['PH']
+                assert_valid_ph_key(ph_key)
+
+            # TODO: Fix PI key present but null/None ??
+            # If the PI key is present, key PI must be encoded as a valid UTF-8 string
+            # with a maximum length of 128 bytes
+            # if 'PI' in txt_record.txt:
+            #     pi_key = txt_record.txt['PI']
+                # assert_valid_pi_key(pi_key)
         else:
-            # When the DUT is in Extended Discovery mode and the
-            # CM key is not present, it's equivalent to CM=0
-            extended_discovery_mode = expected_cm == "0"
-
-            # Fail test only when CM key is not present
-            # and DUT is not in Extended Discovery mode
-            if not extended_discovery_mode:
-                asserts.fail(f"CM key not present, was expecting CM='{expected_cm}'")
-
-        # If the DT key is present, it must contain the device type identifier from
-        # Data Model Device Types and must be encoded as a variable length decimal
-        # ASCII number without leading zeros
-        if 'DT' in txt_record.txt:
-            dt_key = txt_record.txt['DT']
-            assert_valid_dt_key(dt_key)
-
-        # If the DN key is present, DN key must be a UTF-8 encoded string with a maximum length of 32B
-        if 'DN' in txt_record.txt:
-            dn_key = txt_record.txt['DN']
-            assert_valid_dn_key(dn_key)
-
-        # If the RI key is present, key RI must include the Rotating Device Identifier
-        # encoded as an uppercase string with a maximum length of 100 chars (each octet
-        # encoded as a 2-digit hex number, max 50 octets)
-        if 'RI' in txt_record.txt:
-            ri_key = txt_record.txt['RI']
-            assert_valid_ri_key(ri_key)
-
-        # If the PH key is present, key PH must be encoded as a variable-length decimal number
-        # in ASCII text, omitting any leading zeros. If present value must be different of 0
-        if 'PH' in txt_record.txt:
-            ph_key = txt_record.txt['PH']
-            assert_valid_ph_key(ph_key)
-
-        # TODO: Fix PI key present but null/None ??
-        # If the PI key is present, key PI must be encoded as a valid UTF-8 string
-        # with a maximum length of 128 bytes
-        # if 'PI' in txt_record.txt:
-        #     pi_key = txt_record.txt['PI']
-            # assert_valid_pi_key(pi_key)
+            logging.info("TXT record NOT required.")
 
         # *** AAAA RECORD CHECKS ***
         # **************************
@@ -329,11 +421,20 @@ class TC_SC_4_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_SC_4_1(self):
+        self.endpoint = self.get_endpoint(default=1)
+        self.supports_icd = False
+        self.supports_lit = False
         obcw_cmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
 
         # *** STEP 1 ***
         # DUT is Commissioned.
         self.step(1)
+
+        # Check if DUT supports Open Basic Commissioning Window
+        supports_obcw = await self.feature_guard(
+            endpoint=ROOT_NODE_ENDPOINT_ID,
+            cluster=Clusters.AdministratorCommissioning,
+            feature_int=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic)
 
         # *** STEP 2 ***
         # TH reads from the DUT the ServerList attribute from the Descriptor cluster on EP0.
@@ -344,35 +445,50 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Check if ep0_servers contain the ICD Management cluster ID (0x0046)
         self.supports_icd = Clusters.IcdManagement.id in ep0_servers
-        logging.info(f"** ICD Management cluster present: {self.supports_icd}")
+        logging.info(f"\n\n\t** supports_icd: {self.supports_icd}\n")
 
         # Read the ActiveModeThreshold attribute if ICD is supported
         if self.supports_icd:
             self.active_mode_threshold_ms = await self.get_active_mode_threshhold_ms()
-            logging.info(f"** ActiveModeThreshold (ms): {self.active_mode_threshold_ms}")
+            logging.info(f"\n\n\t** active_mode_threshold_ms: {self.active_mode_threshold_ms}\n")
+
+        # *** STEP 4 ***
+        # If supports_icd is true, TH reads FeatureMap from the ICD Management cluster on EP0. If the LITS feature
+        # is set, set supports_lit to true. Otherwise set supports_lit to false.
+        # self.step(4)
+        if self.supports_icd:
+            feature_map = await self.get_icd_feature_map()
+            LITS = Clusters.IcdManagement.Bitmaps.Feature.kLongIdleTimeSupport
+            self.supports_lit = bool(feature_map & LITS == LITS)
+            logging.info(f"\n\n\t** supports_lit: {self.supports_lit}\n")
 
         # *** STEP 3 ***
-        # DUT is put in Commissioning Mode using Open Basic Commissioning Window command
-        # and starts advertising Commissionable Node Discovery service through DNS-SD
+        # If DUT supports Open Basic Commissioning Window, put it in Commissioning Mode using
+        # Open Basic Commissioning Window command.
+        #   - DUT starts advertising Commissionable Node Discovery service through DNS-SD.
         self.step(3)
-        await self.default_controller.SendCommand(
-            nodeid=self.dut_node_id,
-            endpoint=0,
-            payload=obcw_cmd,
-            timedRequestTimeoutMs=6000
-        )
+        if supports_obcw:
+            logging.info(f"\n\n\t ** Open Basic Commissioning Window supported\n")
+            await self.default_controller.SendCommand(
+                nodeid=self.dut_node_id,
+                endpoint=0,
+                payload=obcw_cmd,
+                timedRequestTimeoutMs=6000
+            )
 
-        # TH performs a browse for the commissionable service PTR record of type '_matterc._udp.local.'
-        commissionable_service_ptr = await self.get_commissionable_service_ptr_record()
+            # TH performs a browse for the commissionable service PTR record of type '_matterc._udp.local.'
+            commissionable_service_ptr = await self.get_commissionable_service_ptr_record()
 
-        # Verify PTR record is returned
-        asserts.assert_is_not_none(commissionable_service_ptr, "DUT's commissionable service not present")
+            # Verify PTR record is returned
+            asserts.assert_is_not_none(commissionable_service_ptr, "DUT's commissionable service not present")
 
-        # Verify DUT Commissionable Node Discovery service advertisements
-        await self.verify_commissionable_node_advertisements(service_name=commissionable_service_ptr.service_name, expected_cm="1")
+            # Verify DUT Commissionable Node Discovery service advertisements
+            await self.verify_commissionable_node_advertisements(service_name=commissionable_service_ptr.service_name, expected_cm="1")
 
-        # Close commissioning window
-        await self.close_commissioning_window()
+            # Close commissioning window
+            await self.close_commissioning_window()
+        else:
+            logging.info(f"\n\n\t ** Open Basic Commissioning Window unsupported, skipping step.\n")
 
         # *** STEP 4 ***
         # DUT is put in Commissioning Mode using Open Commissioning Window command and
