@@ -973,11 +973,14 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
     it->audioContext = audioPipeline;
 
     // Start the audio playback pipeline
-    CameraError playbackError = StartAudioPlaybackStream();
-    if (playbackError != CameraError::SUCCESS)
+    if (LinuxDeviceOptions::GetInstance().cameraAudioPlayback)
     {
-        ChipLogError(Camera, "Failed to start audio playback pipeline for stream ID: %u. Error: %d", streamID,
-                     static_cast<int>(playbackError));
+        CameraError playbackError = StartAudioPlaybackStream();
+        if (playbackError != CameraError::SUCCESS)
+        {
+            ChipLogError(Camera, "Failed to start audio playback pipeline for stream ID: %u. Error: %d", streamID,
+                         static_cast<int>(playbackError));
+        }
     }
 
     return CameraError::SUCCESS;
@@ -1007,11 +1010,14 @@ CameraError CameraDevice::StopAudioStream(uint16_t streamID)
     }
 
     // Stop the audio playback pipeline
-    CameraError playbackError = StopAudioPlaybackStream();
-    if (playbackError != CameraError::SUCCESS)
+    if (LinuxDeviceOptions::GetInstance().cameraAudioPlayback)
     {
-        ChipLogError(Camera, "Failed to stop audio playback pipeline for stream ID: %u. Error: %d", streamID,
-                     static_cast<int>(playbackError));
+        CameraError playbackError = StopAudioPlaybackStream();
+        if (playbackError != CameraError::SUCCESS)
+        {
+            ChipLogError(Camera, "Failed to stop audio playback pipeline for stream ID: %u. Error: %d", streamID,
+                         static_cast<int>(playbackError));
+        }
     }
 
     return CameraError::SUCCESS;

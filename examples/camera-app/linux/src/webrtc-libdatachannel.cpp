@@ -17,6 +17,7 @@
  */
 
 #include "webrtc-abstract.h"
+#include <Options.h>
 #include <arpa/inet.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <rtc/rtc.hpp>
@@ -148,8 +149,12 @@ public:
         mOpusPacketizer = std::make_shared<rtc::OpusRtpPacketizer>(mRtpCfgAudio);
         mOpusSr         = std::make_shared<rtc::RtcpSrReporter>(mRtpCfgAudio);
         mOpusNack       = std::make_shared<rtc::RtcpNackResponder>();
-        // Receiving Session to recv audio from remote peer
-        mOpusPacketizer->addToChain(std::make_shared<rtc::RtcpReceivingSession>());
+
+        if (LinuxDeviceOptions::GetInstance().cameraAudioPlayback)
+        {
+            // Receiving Session to recv audio from remote peer
+            mOpusPacketizer->addToChain(std::make_shared<rtc::RtcpReceivingSession>());
+        }
 
         mOpusPacketizer->addToChain(mOpusSr);
         mOpusPacketizer->addToChain(mOpusNack);
@@ -157,22 +162,25 @@ public:
         mTrack->setMediaHandler(mOpusPacketizer);
 
         // UDP socket to push audio data
-        mAudioRTPSocket = socket(AF_INET, SOCK_DGRAM, 0);
-        if (mAudioRTPSocket == -1)
+        if (LinuxDeviceOptions::GetInstance().cameraAudioPlayback)
         {
-            ChipLogError(Camera, "Failed to create RTP Audio socket, Cannot play remote audio: %s", strerror(errno));
-            return;
+            mAudioRTPSocket = socket(AF_INET, SOCK_DGRAM, 0);
+            if (mAudioRTPSocket == -1)
+            {
+                ChipLogError(Camera, "Failed to create RTP Audio socket, Cannot play remote audio: %s", strerror(errno));
+                return;
+            }
+            sockaddr_in audioAddr     = {};
+            audioAddr.sin_family      = AF_INET;
+            audioAddr.sin_addr.s_addr = inet_addr(kAudioPlaybackDestAddress);
+            audioAddr.sin_port        = htons(kAudioPlaybackDestPort);
+            mTrack->onMessage(
+                [this, audioAddr](const rtc::binary data) {
+                    sendto(mAudioRTPSocket, reinterpret_cast<const char *>(data.data()), static_cast<size_t>(data.size()), 0,
+                           reinterpret_cast<const struct sockaddr *>(&audioAddr), sizeof(audioAddr));
+                },
+                nullptr);
         }
-        sockaddr_in audioAddr     = {};
-        audioAddr.sin_family      = AF_INET;
-        audioAddr.sin_addr.s_addr = inet_addr(kAudioPlaybackDestAddress);
-        audioAddr.sin_port        = htons(kAudioPlaybackDestPort);
-        mTrack->onMessage(
-            [this, audioAddr](const rtc::binary data) {
-                sendto(mAudioRTPSocket, reinterpret_cast<const char *>(data.data()), static_cast<size_t>(data.size()), 0,
-                       reinterpret_cast<const struct sockaddr *>(&audioAddr), sizeof(audioAddr));
-            },
-            nullptr);
     }
 
     void SendData(const char * data, size_t size) override
