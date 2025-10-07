@@ -30,6 +30,7 @@ namespace CommodityTariffContainers {
 template<typename T>
 class CTC_ContainerClassBase
 {
+    static_assert(std::is_trivially_destructible<T>::value, "T must be trivially destructible");
 protected:
     CTC_ContainerClassBase(size_t aCapacity, size_t aMaxLimit = 0) : mMaxLimit(aMaxLimit), mCapacity(aCapacity)
     {
@@ -53,12 +54,12 @@ public:
         kGenericFail,
         kNotFound,
         kDuplicate,
-    };   
+    }; 
 
     virtual bool insert(const T& item) = 0;
     virtual void remove(const T& item) = 0;
     virtual void clear()    { mCount = 0; };
-    virtual void sort() = 0;    
+    virtual void sort() = 0;
     virtual bool contains(const T& item) const = 0;
     virtual T* find(const T& item) = 0;
     virtual const T* find(const T& item) const = 0;
@@ -67,20 +68,9 @@ public:
     size_t capacity() const { return mCapacity; }
     bool empty() const { return (mCount == 0); }
 
-    // Safe accessors without exceptions
-    T* at(size_t index) 
-    { 
-        return (index < mCount) ? &mBuffer[index] : nullptr;
-    }
-    
-    const T* at(size_t index) const 
-    { 
-        return (index < mCount) ? &mBuffer[index] : nullptr;
-    }
-
     // Array-style access
-    T& operator[](size_t index) { return mBuffer[index]; }
-    const T& operator[](size_t index) const { return mBuffer[index]; }
+    T& operator[](size_t index) { VerifyOrDie( index < mCount ); return mBuffer[index]; }
+    const T& operator[](size_t index) const { VerifyOrDie( index < mCount ); return mBuffer[index]; }
 
     // Iterator support
     T* begin() { return mBuffer.Get(); }
@@ -111,21 +101,21 @@ protected:
         if (newCapacity == mCapacity) {
             return RetCode::kSuccess;
         }
-        
+      
         if (newCapacity < mCount) {
             return RetCode::kInUse;
         }
-        
+      
         chip::Platform::ScopedMemoryBuffer<T> newBuffer;
         if (!newBuffer.Calloc(newCapacity)) {
             return RetCode::kNoMem;
         }
-        
+      
         // Use std::move for efficient transfer
         if (mBuffer.Get() && mCount > 0) {
             std::move(mBuffer.Get(), mBuffer.Get() + mCount, newBuffer.Get());
         }
-        
+      
         mBuffer = std::move(newBuffer);
         mCapacity = newCapacity;
         return RetCode::kSuccess;
@@ -141,42 +131,22 @@ protected:
         {
             return RetCode::kSuccess;
         }
-        
-        size_t newCapacity = std::max(requiredCapacity, mCapacity * 2);
+  
+        size_t newCapacity = std::min(std::max(requiredCapacity, mCapacity * 2), mMaxLimit);
         return resize(newCapacity);
     }
 
-    RetCode insertAt(size_t index, const T& item) {
-        if (index > mMaxLimit-1 ) {
-            return RetCode::kGenericFail;
-        }
-        
+    RetCode insertAtEnd(const T& item) {
+        // Check if we need to resize
         RetCode ret = ensureCapacity(mCount + 1);
         if (ret != RetCode::kSuccess) {
             return ret;
         }
         
-        // Shift items using std::move_backward
-        if (index < mCount) {
-            std::move_backward(mBuffer.Get() + index, mBuffer.Get() + mCount, 
-                              mBuffer.Get() + mCount + 1);
-        }
-        
-        mBuffer[index] = item;
+        // Append to the end
+        mBuffer[mCount] = item;
         ++mCount;
         return RetCode::kSuccess;
-    }
-
-    void removeAt(size_t index) {
-        if (index >= mCount) return;
-        
-        // Shift items using std::move
-        if (index < mCount - 1) {
-            std::move(mBuffer.Get() + index + 1, mBuffer.Get() + mCount, 
-                     mBuffer.Get() + index);
-        }
-        
-        --mCount;
     }
 };
 
@@ -189,44 +159,47 @@ public:
 
     CTC_UnorderedSet(size_t aCapacity) : Base(aCapacity) {}
 
-    bool insert(const ItemType& key) override {
+    bool insert(const ItemType& item) override {
         // Check for duplicate using std::find
-        if (this->find(key) != nullptr) {
-            return false;
+        if (this->find(item) != nullptr) {
+            return false; //Duplicate
         }
-        
+  
         // Append to the end (unordered)
-        return (this->insertAt(this->mCount, key) == Base::RetCode::kSuccess);
+        return (this->insertAtEnd( item) == Base::RetCode::kSuccess);
     }
 
-    void remove(const ItemType& key) override {
-        auto* found = this->find(key);
+    void remove(const ItemType& item) override {
+        auto* found = this->find(item);
         if (found) {
-            size_t index = static_cast<size_t>(found - this->mBuffer.Get());
-            this->removeAt(index);
+            // Swap with the last element for O(1) removal (after finding).
+            auto* last = &this->mBuffer[this->mCount - 1];
+            if (found != last) {
+                *found = std::move(*last);
+            }
+            --this->mCount;
         }
     }
 
     void sort() override {
-        // Sort the entire buffer
-        if (this->mCount > 0) {
+        if (this->mCount > 1) {
             std::sort(this->mBuffer.Get(), this->mBuffer.Get() + this->mCount);
         }
     }
 
-    bool contains(const ItemType& key) const override {
-        return this->find(key) != nullptr;
+    bool contains(const ItemType& item) const override {
+        return this->find(item) != nullptr;
     }
 
-    ItemType* find(const ItemType& key) override {
+    ItemType* find(const ItemType& item) override {
         // Linear search using std::find
-        auto it = std::find(this->begin(), this->end(), key);
+        auto it = std::find(this->begin(), this->end(), item);
         return (it != this->end()) ? it : nullptr;
     }
 
-    const ItemType* find(const ItemType& key) const override {
+    const ItemType* find(const ItemType& item) const override {
         // Const version of linear search
-        auto it = std::find(this->begin(), this->end(), key);
+        auto it = std::find(this->begin(), this->end(), item);
         return (it != this->end()) ? it : nullptr;
     }
 };
@@ -270,6 +243,12 @@ private:
             return (it != this->end()) ? it : nullptr;
         }
 
+        void removeByKey(const KeyType& key) {
+            if (auto* pair = findByKey(key)) {
+                this->remove(*pair);
+            }
+        }
+
         // Override contains to only check key
         bool contains(const PairType& pair) const override {
             return containsKey(pair.first);
@@ -296,10 +275,7 @@ public:
     }
 
     void remove(const KeyType& key) {
-        // We need to find the actual pair to remove
-        if (auto* pair = mPairStorage.findByKey(key)) {
-            mPairStorage.remove(*pair);
-        }
+        mPairStorage.removeByKey(key);
     }
 
     ValueType* getValue(const KeyType& key) {
@@ -314,9 +290,10 @@ public:
 
     ValueType& operator[](const KeyType& key) {
         auto* pair = mPairStorage.findByKey(key);
-        if (!pair) {
-            insert(key, ValueType{});
-            pair = mPairStorage.findByKey(key);
+        if (pair == nullptr) {
+            VerifyOrDie(insert(key, ValueType{}));
+            pair = &mPairStorage[mPairStorage.size() - 1];
+            VerifyOrDie(pair != nullptr);
         }
         return pair->second;
     }
@@ -328,15 +305,6 @@ public:
     size_t size() const { return mPairStorage.size(); }
     size_t capacity() const { return mPairStorage.capacity(); }
     bool empty() const { return mPairStorage.empty(); }
-
-    // Direct access to pairs
-    PairType* find(const KeyType& key) {
-        return mPairStorage.findByKey(key);
-    }
-
-    const PairType* find(const KeyType& key) const {
-        return mPairStorage.findByKey(key);
-    }
 
     // Iterator support
     auto begin() { return mPairStorage.begin(); }

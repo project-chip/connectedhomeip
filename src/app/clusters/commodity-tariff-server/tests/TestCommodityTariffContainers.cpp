@@ -18,8 +18,7 @@
 
 /**
  *    @file
- *      This file implements a unit test suite for testing different zone
- *      polygons for self-intersection.
+ *      This file implements a unit test suite for the CommodityTariffContainers helper classes.  
  *
  */
 
@@ -147,8 +146,55 @@ TEST_F(TestCommodityTariffContainers, UnorderedSet_DuplicatePrevention) {
     EXPECT_FALSE(set.insert(100));
     EXPECT_FALSE(set.insert(200));
     EXPECT_FALSE(set.insert(300));
+
+}
+
+TEST_F(TestCommodityTariffContainers, UnorderedSet_RemoveEntry) {
+    CTC_UnorderedSet<int> set(10);
     
+    EXPECT_TRUE(set.insert(100));
+    EXPECT_TRUE(set.insert(200));
+    EXPECT_TRUE(set.insert(300));
+    
+    EXPECT_EQ(set[0], 100);
+    EXPECT_EQ(set[1], 200);
+    EXPECT_EQ(set[2], 300);
+
     EXPECT_EQ(set.size(), 3u);
+
+    set.remove(200);
+
+    EXPECT_EQ(set.size(), 2u);   
+
+    EXPECT_EQ(set[0], 100);
+    EXPECT_EQ(set[1], 300);
+
+    EXPECT_TRUE(set.insert(200));
+
+    EXPECT_EQ(set[2], 200);
+
+    EXPECT_EQ(set.size(), 3u);
+}
+
+TEST_F(TestCommodityTariffContainers, UnorderedSet_SortEntries) {
+    CTC_UnorderedSet<uint32_t> set(10);
+    
+    EXPECT_TRUE(set.insert(0xAA550004));
+    EXPECT_TRUE(set.insert(0x55AA0002));
+    EXPECT_TRUE(set.insert(0x55AA0001));
+    EXPECT_TRUE(set.insert(0xAA550003));
+    
+    EXPECT_EQ(set[0], 0xAA550004u);
+    EXPECT_EQ(set[1], 0x55AA0002u);
+    EXPECT_EQ(set[2], 0x55AA0001u);
+    EXPECT_EQ(set[3], 0xAA550003u);
+
+    set.sort();
+
+    EXPECT_EQ(set[0], 0x55AA0001u);
+    EXPECT_EQ(set[1], 0x55AA0002u);
+    EXPECT_EQ(set[2], 0xAA550003u);
+    EXPECT_EQ(set[3], 0xAA550004u);
 }
 
 TEST_F(TestCommodityTariffContainers, UnorderedSet_Iteration) {
@@ -195,10 +241,25 @@ TEST_F(TestCommodityTariffContainers, UnorderedMap_BasicOperations) {
     EXPECT_EQ(map.size(), 3u);
     EXPECT_TRUE(map.contains(1));
     EXPECT_TRUE(map.contains(2));
+    EXPECT_TRUE(map.contains(3));
     EXPECT_FALSE(map.contains(4));
-    
-    EXPECT_FALSE(map.insert(1, 100)); // Duplicate key
+
+    EXPECT_EQ(map[1], 0x11u);
+    EXPECT_EQ(map[2], 0x12u);
+    EXPECT_EQ(map[3], 0x13u);
+
+    map.remove(2);
+
+    EXPECT_FALSE(map.contains(2));
+    EXPECT_EQ(map[1], 0x11u);
+    EXPECT_EQ(map[3], 0x13u);   
+    EXPECT_EQ(map.size(), 2u);
+
+    EXPECT_EQ(map[2], 0u);
+    EXPECT_TRUE(map.contains(2));
     EXPECT_EQ(map.size(), 3u);
+
+    EXPECT_FALSE(map.insert(1, 100)); // Duplicate key
 }
 
 } // namespace app
