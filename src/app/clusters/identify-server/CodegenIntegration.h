@@ -55,7 +55,6 @@ struct Identify
         chip::app::reporting::ReportScheduler::TimerDelegate * timerDelegate = nullptr);
     ~Identify();
 
-
     onIdentifyStartCb mOnIdentifyStart = nullptr;
     onIdentifyStopCb mOnIdentifyStop   = nullptr;
     bool mActive                       = false;

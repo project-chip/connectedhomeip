@@ -20,8 +20,8 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/identify-server/CodegenIntegration.h>
 #include <app/CommandHandler.h>
+#include <app/clusters/identify-server/CodegenIntegration.h>
 #include <app/reporting/reporting.h>
 #include <app/util/config.h>
 #include <credentials/GroupDataProvider.h>

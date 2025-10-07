@@ -16,7 +16,6 @@
  */
 
 #include "identify-server.h"
-#include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -25,6 +24,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
