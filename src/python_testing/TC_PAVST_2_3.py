@@ -490,11 +490,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
                           "maxPreRollLen": 4000,
                           "motionZones": zoneList,
-<<<<<<< HEAD
                           "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}}
-=======
-                          "motionTimeControl": {"initialDuration": 10, "augmentationDuration": 1, "maxDuration": 15, "blindDuration": 1}}
->>>>>>> 2bdaaa66a3 (update init segment file extension from .fmp4 to .cmfv and related testcases)
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(status, Status.Success,
                              "DUT must  responds with Status Code Success.")
