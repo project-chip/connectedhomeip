@@ -71,7 +71,7 @@ CHIP_ERROR TestForecastWithEntryCount(Instance * instance, size_t entryCount)
     // Create array large enough for the maximum test case (57 entries)
     constexpr size_t kMaxTestSize = 57;
     static ElectricalGridConditionsStruct::Type forecastList[kMaxTestSize];
-    
+
     // Fill with valid entries up to entryCount
     for (size_t i = 0; i < entryCount && i < kMaxTestSize; i++)
     {
@@ -79,7 +79,7 @@ CHIP_ERROR TestForecastWithEntryCount(Instance * instance, size_t entryCount)
         Optional<uint32_t> endTime = (i == entryCount - 1) ? Optional<uint32_t>() : Optional<uint32_t>(startTime + 999);
         forecastList[i] = CreateTestCondition(startTime, endTime);
     }
-    
+
     DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, entryCount);
     return instance->SetForecastConditions(forecastConditions);
 }
@@ -341,7 +341,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsValidTimeSerie
         MockMatterReporting::Reset();
         ElectricalGridConditionsStruct::Type forecastList[1];
         forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>());
-        
+
         DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 1);
         EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_NO_ERROR)
             << "Failed for valid forecast test case: single entry with null periodEnd";
@@ -354,7 +354,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsValidTimeSerie
         MockMatterReporting::Reset();
         ElectricalGridConditionsStruct::Type forecastList[1];
         forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(2000));
-        
+
         DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 1);
         EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_NO_ERROR)
             << "Failed for valid forecast test case: single entry with valid periodStart < periodEnd";
@@ -368,7 +368,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsValidTimeSerie
         ElectricalGridConditionsStruct::Type forecastList[2];
         forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(2000)); // First entry: must have non-null periodEnd
         forecastList[1] = TestHelpers::CreateTestCondition(2001, Optional<uint32_t>());     // Last entry: can have null periodEnd, periodStart > previous periodEnd
-        
+
         DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 2);
         EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_NO_ERROR)
             << "Failed for valid forecast test case: two entries properly ordered";
@@ -381,9 +381,9 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsValidTimeSerie
         MockMatterReporting::Reset();
         ElectricalGridConditionsStruct::Type forecastList[3];
         forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(1500)); // First: non-null periodEnd
-        forecastList[1] = TestHelpers::CreateTestCondition(1501, Optional<uint32_t>(2000)); // Middle: non-null periodEnd, periodStart > previous periodEnd  
+        forecastList[1] = TestHelpers::CreateTestCondition(1501, Optional<uint32_t>(2000)); // Middle: non-null periodEnd, periodStart > previous periodEnd
         forecastList[2] = TestHelpers::CreateTestCondition(2001, Optional<uint32_t>());     // Last: null periodEnd allowed, periodStart > previous periodEnd
-        
+
         DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 3);
         EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_NO_ERROR)
             << "Failed for valid forecast test case: three entries properly ordered";
@@ -399,7 +399,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsValidTimeSerie
         forecastList[1] = TestHelpers::CreateTestCondition(2000, Optional<uint32_t>(2999));
         forecastList[2] = TestHelpers::CreateTestCondition(3000, Optional<uint32_t>(3999));
         forecastList[3] = TestHelpers::CreateTestCondition(4000, Optional<uint32_t>());
-        
+
         DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 4);
         EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_NO_ERROR)
             << "Failed for valid forecast test case: multiple entries with exact boundaries";
@@ -421,7 +421,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsInvalidTimeSer
         MockMatterReporting::Reset();
         ElectricalGridConditionsStruct::Type forecastList[1];
         forecastList[0] = TestHelpers::CreateTestCondition(2000, Optional<uint32_t>(2000));
-        
+
         DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 1);
         EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
             << "Should reject invalid case: Single entry periodStart == periodEnd - violates spec 5.2.2";
@@ -434,7 +434,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsInvalidTimeSer
         MockMatterReporting::Reset();
         ElectricalGridConditionsStruct::Type forecastList[1];
         forecastList[0] = TestHelpers::CreateTestCondition(2000, Optional<uint32_t>(1000));
-        
+
         DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 1);
         EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
             << "Should reject invalid case: Single entry periodStart > periodEnd - violates spec 5.2.2";
@@ -448,7 +448,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsInvalidTimeSer
         ElectricalGridConditionsStruct::Type forecastList[2];
         forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>());     // First entry with null periodEnd (violates spec 6.3)
         forecastList[1] = TestHelpers::CreateTestCondition(2000, Optional<uint32_t>());     // Last entry with null periodEnd (valid)
-        
+
         DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 2);
         EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
             << "Should reject invalid case: Non-last entry has null periodEnd - violates spec 6.3";
@@ -462,7 +462,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsInvalidTimeSer
         ElectricalGridConditionsStruct::Type forecastList[2];
         forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(2000));
         forecastList[1] = TestHelpers::CreateTestCondition(2000, Optional<uint32_t>());     // periodStart == previous periodEnd (violates spec 6.3: must be >)
-        
+
         DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 2);
         EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
             << "Should reject invalid case: periodStart == previous periodEnd - violates spec 6.3";
@@ -476,7 +476,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsInvalidTimeSer
         ElectricalGridConditionsStruct::Type forecastList[2];
         forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(2000));
         forecastList[1] = TestHelpers::CreateTestCondition(1999, Optional<uint32_t>());     // periodStart < previous periodEnd (violates spec 6.3)
-        
+
         DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 2);
         EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
             << "Should reject invalid case: periodStart < previous periodEnd - violates spec 6.3";
@@ -491,7 +491,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsInvalidTimeSer
         forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(1500));
         forecastList[1] = TestHelpers::CreateTestCondition(1400, Optional<uint32_t>(2000)); // periodStart < previous periodEnd (violates spec 6.3)
         forecastList[2] = TestHelpers::CreateTestCondition(2001, Optional<uint32_t>());
-        
+
         DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 3);
         EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
             << "Should reject invalid case: Multiple entries with time ordering violation - violates spec 6.3";
@@ -506,7 +506,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsInvalidTimeSer
         forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(1500));
         forecastList[1] = TestHelpers::CreateTestCondition(1501, Optional<uint32_t>());     // Middle entry with null periodEnd (violates spec 6.3)
         forecastList[2] = TestHelpers::CreateTestCondition(2000, Optional<uint32_t>());     // Last entry
-        
+
         DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 3);
         EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
             << "Should reject invalid case: Middle entry has null periodEnd - violates spec 6.3";
@@ -524,7 +524,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsInvalidEnums)
         forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(2000));
         // Set invalid enum value (4 is not a valid ThreeLevelEnum value)
         forecastList[0].gridCarbonLevel = static_cast<ThreeLevelEnum>(4);
-        
+
         DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 1);
         EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
             << "Should reject invalid gridCarbonLevel enum value";
@@ -539,7 +539,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsInvalidEnums)
         forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(2000));
         // Set invalid enum value (255 is not a valid ThreeLevelEnum value)
         forecastList[0].localCarbonLevel = static_cast<ThreeLevelEnum>(255);
-        
+
         DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 1);
         EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
             << "Should reject invalid localCarbonLevel enum value";
@@ -555,7 +555,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsInvalidEnums)
         // Set both to invalid enum values
         forecastList[0].gridCarbonLevel = static_cast<ThreeLevelEnum>(99);
         forecastList[0].localCarbonLevel = static_cast<ThreeLevelEnum>(100);
-        
+
         DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 1);
         EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_IM_GLOBAL_STATUS(ConstraintError))
             << "Should reject both invalid enum values";
@@ -567,10 +567,10 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsInvalidEnums)
     {
         MockMatterReporting::Reset();
         ElectricalGridConditionsStruct::Type forecastList[1];
-        forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(2000), 
+        forecastList[0] = TestHelpers::CreateTestCondition(1000, Optional<uint32_t>(2000),
                                                            Optional<int16_t>(100), Optional<ThreeLevelEnum>(ThreeLevelEnum::kHigh),
                                                            Optional<int16_t>(50), Optional<ThreeLevelEnum>(ThreeLevelEnum::kLow));
-        
+
         DataModel::List<const ElectricalGridConditionsStruct::Type> forecastConditions(forecastList, 1);
         EXPECT_EQ(mInstance->SetForecastConditions(forecastConditions), CHIP_NO_ERROR)
             << "Should accept valid enum values";
@@ -582,7 +582,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsInvalidEnums)
 TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsTooManyEntries)
 {
     MockMatterReporting::Reset();
-    
+
     // Test with 57 entries (one more than kMaxForecastEntries which is 56)
     constexpr size_t kTestSize = 57;
     EXPECT_EQ(TestHelpers::TestForecastWithEntryCount(mInstance.get(), kTestSize), CHIP_IM_GLOBAL_STATUS(ConstraintError))
@@ -594,7 +594,7 @@ TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsTooManyEntries
 TEST_F(TestElectricalGridConditionsCluster, TestForecastConditionsExactlyMaxEntries)
 {
     MockMatterReporting::Reset();
-    
+
     // Test with exactly kMaxForecastEntries (56) - should succeed
     constexpr size_t kTestSize = kMaxForecastEntries;
     EXPECT_EQ(TestHelpers::TestForecastWithEntryCount(mInstance.get(), kTestSize), CHIP_NO_ERROR)
