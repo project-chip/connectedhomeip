@@ -124,10 +124,10 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
                 else:
                     out[name] = int(val, 0)
 
-            m = PROTO_RE.search(text)
-            out["protocols_supported"] = (
-                [int(n, 0) for n in HEX_OR_DEC.findall(m.group(1))] if m else []
-            )
+        m = PROTO_RE.search(text)
+        out["protocols_supported"] = (
+            [int(n, 0) for n in HEX_OR_DEC.findall(m.group(1))] if m else []
+        )
 
         return out
 
