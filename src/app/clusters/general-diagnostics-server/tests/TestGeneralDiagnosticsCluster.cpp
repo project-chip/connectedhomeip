@@ -30,8 +30,6 @@
 #include <messaging/ExchangeContext.h>
 #include <platform/DiagnosticDataProvider.h>
 
-#include <cmath>
-
 namespace {
 
 using namespace chip;
