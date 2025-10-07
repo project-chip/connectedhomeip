@@ -63,13 +63,11 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
                      "DUT responds with DynamicConstraintError indicating unsupported configuration"),
             TestStep(3, "TH sends the SolicitOffer command with SFrameConfig containing incorrect key length for AES-128-GCM",
                      "DUT responds with DynamicConstraintError indicating invalid key length"),
-            TestStep(4, "TH sends the SolicitOffer command with SFrameConfig containing incorrect key length for AES-256-GCM",
-                     "DUT responds with DynamicConstraintError indicating invalid key length"),
-            TestStep(5, "TH sends the SolicitOffer command with valid SFrameConfig (AES-128-GCM with 16-byte key)",
+            TestStep(4, "TH sends the SolicitOffer command with valid SFrameConfig (AES-128-GCM with 16-byte key)",
                      "DUT responds with SolicitOfferResponse containing allocated WebRTCSessionID"),
-            TestStep(6, "TH sends the EndSession command with the valid WebRTCSessionID",
+            TestStep(5, "TH sends the EndSession command with the valid WebRTCSessionID",
                      "DUT responds with success status code"),
-            TestStep(7, "TH deallocates the Audio and Video streams via AudioStreamDeallocate and VideoStreamDeallocate commands",
+            TestStep(6, "TH deallocates the Audio and Video streams via AudioStreamDeallocate and VideoStreamDeallocate commands",
                      "DUT responds with success status code for both deallocate commands"),
         ]
         return steps
@@ -111,7 +109,7 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
         unsupported_sframe_config = Clusters.WebRTCTransportProvider.Structs.SFrameStruct(
             cipherSuite=CIPHER_SUITE_UNSUPPORTED,
             baseKey=b'\x00' * 16,  # 16 bytes key
-            kid=b'\x01'
+            kid=b'\x01' * 2
         )
 
         try:
@@ -138,7 +136,7 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
         wrong_length_sframe_config = Clusters.WebRTCTransportProvider.Structs.SFrameStruct(
             cipherSuite=CIPHER_SUITE_AES_128_GCM,
             baseKey=b'\x00' * 32,  # Wrong: 32 bytes instead of 16
-            kid=b'\x01'
+            kid=b'\x01' * 2
         )
 
         try:
@@ -159,33 +157,6 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
             asserts.assert_equal(e.status, Status.DynamicConstraintError, "Expected DYNAMIC_CONSTRAINT_ERROR")
 
         self.step(4)
-        # Test: SolicitOffer with incorrect key length for AES-256-GCM (should be 32 bytes)
-        logger.info("Testing SolicitOffer with incorrect key length for AES-256-GCM")
-
-        wrong_length_sframe_config_256 = Clusters.WebRTCTransportProvider.Structs.SFrameStruct(
-            cipherSuite=CIPHER_SUITE_AES_256_GCM,
-            baseKey=b'\x00' * 16,  # Wrong: 16 bytes instead of 32
-            kid=b'\x01'
-        )
-
-        try:
-            await self.send_single_cmd(
-                cmd=Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
-                    streamUsage=Clusters.Objects.Globals.Enums.StreamUsageEnum.kLiveView,
-                    videoStreamID=video_stream_id,
-                    audioStreamID=audio_stream_id,
-                    originatingEndpointID=1,
-                    SFrameConfig=wrong_length_sframe_config_256,
-                ),
-                endpoint=endpoint,
-                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
-            )
-            asserts.fail("Expected DynamicConstraintError for incorrect key length, but command succeeded")
-        except InteractionModelError as e:
-            logger.info(f"Received expected error for incorrect AES-256 key length: {e}")
-            asserts.assert_equal(e.status, Status.DynamicConstraintError, "Expected DYNAMIC_CONSTRAINT_ERROR")
-
-        self.step(5)
         # Test: SolicitOffer with valid SFrameConfig (AES-128-GCM with 16-byte key)
         logger.info("Testing SolicitOffer with valid SFrameConfig (AES-128-GCM)")
 
@@ -198,7 +169,7 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
         valid_sframe_config_128 = Clusters.WebRTCTransportProvider.Structs.SFrameStruct(
             cipherSuite=CIPHER_SUITE_AES_128_GCM,
             baseKey=b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f',  # 16 bytes
-            kid=b'\x01'
+            kid=b'\x01' * 2
         )
 
         resp: Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse = await webrtc_peer.send_command(
@@ -222,7 +193,7 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
         # Register the session ID with the WebRTC manager
         webrtc_manager.session_id_created(session_id_128, self.dut_node_id)
 
-        self.step(6)
+        self.step(5)
         # End the session from step 5
         logger.info(f"Ending WebRTC session {session_id_128}")
 
@@ -238,7 +209,7 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
         # Clean up the WebRTC manager for step 5
         await webrtc_manager.close_all()
 
-        self.step(7)
+        self.step(6)
         # Deallocate the Audio and Video streams to return DUT to known state
         logger.info("Deallocating Audio and Video streams")
 

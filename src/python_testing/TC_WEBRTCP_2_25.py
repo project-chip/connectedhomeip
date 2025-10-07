@@ -62,7 +62,7 @@ class TC_WEBRTCP_2_25(MatterBaseTest, WEBRTCPTestBase):
                      "DUT responds with success and provides stream IDs"),
             TestStep(2, "TH sends the ProvideOffer command with SFrameConfig containing unsupported cipher suite",
                      "DUT responds with DynamicConstraintError indicating unsupported configuration"),
-            TestStep(3, "TH sends the ProvideOffer command with SFrameConfig containing incorrect key length for AES-256-GCM",
+            TestStep(3, "TH sends the ProvideOffer command with SFrameConfig containing incorrect key length for AES-128-GCM",
                      "DUT responds with DynamicConstraintError indicating invalid key length"),
             TestStep(4, "TH sends the ProvideOffer command with valid SFrameConfig (AES-256-GCM with 32-byte key)",
                      "DUT responds with ProvideOfferResponse containing allocated WebRTCSessionID"),
@@ -121,7 +121,7 @@ class TC_WEBRTCP_2_25(MatterBaseTest, WEBRTCPTestBase):
         unsupported_sframe_config = Clusters.WebRTCTransportProvider.Structs.SFrameStruct(
             cipherSuite=CIPHER_SUITE_UNSUPPORTED,
             baseKey=b'\x00' * 16,  # 16 bytes key
-            kid=b'\x01'
+            kid=b'\x01' * 2
         )
 
         try:
@@ -150,7 +150,7 @@ class TC_WEBRTCP_2_25(MatterBaseTest, WEBRTCPTestBase):
         wrong_length_sframe_config = Clusters.WebRTCTransportProvider.Structs.SFrameStruct(
             cipherSuite=CIPHER_SUITE_AES_128_GCM,
             baseKey=b'\x00' * 32,  # Wrong: 32 bytes instead of 16
-            kid=b'\x01'
+            kid=b'\x01' * 2
         )
 
         try:
@@ -180,7 +180,7 @@ class TC_WEBRTCP_2_25(MatterBaseTest, WEBRTCPTestBase):
             cipherSuite=CIPHER_SUITE_AES_256_GCM,
             baseKey=b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f' +
                     b'\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f',  # 32 bytes
-            kid=b'\x02'
+            kid=b'\x02' * 2
         )
 
         resp_offer: Clusters.WebRTCTransportProvider.Commands.ProvideOfferResponse = await self.send_single_cmd(
