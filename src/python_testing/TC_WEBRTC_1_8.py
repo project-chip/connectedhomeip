@@ -286,6 +286,7 @@ class TC_WEBRTC_1_8(MatterBaseTest, WebRTCTestHelper):
 
         await webrtc_manager.close_all()
 
+
 async def webrtc_create_test_harness_controller(self):
     self.th1 = self.default_controller
     self.discriminator = random.randint(0, 4095)
