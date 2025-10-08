@@ -831,12 +831,6 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
             }
 
             transportOptionsPtr->videoStreamID.SetValue(videoStreamID);
-            auto dStatus = Protocols::InteractionModel::ClusterStatusCode(
-                mDelegate->ValidateVideoStream(transportOptionsPtr->videoStreamID.Value().Value()));
-            if (!dStatus.IsSuccess())
-            {
-                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Validate Video stream failed", mEndpointId);
-            }
         }
         else
         {
@@ -869,12 +863,6 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
             }
 
             transportOptionsPtr->audioStreamID.SetValue(audioStreamID);
-            auto dStatus = Protocols::InteractionModel::ClusterStatusCode(
-                mDelegate->ValidateAudioStream(transportOptionsPtr->audioStreamID.Value().Value()));
-            if (!dStatus.IsSuccess())
-            {
-                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Validate Audio stream failed", mEndpointId);
-            }
         }
         else
         {
