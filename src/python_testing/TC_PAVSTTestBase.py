@@ -250,7 +250,7 @@ class PAVSTTestBase:
                         "streamUsage": streamUsage,
                         "videoStreamID": videoStreamID,
                         "audioStreamID": audioStreamID,
-                        "TLSEndpointID": tlsEndPoint,
+                        "endpointID": tlsEndPoint,
                         "url": url,
                         "triggerOptions": triggerOptions,
                         "ingestMethod": ingestMethod,
