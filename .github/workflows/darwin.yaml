@@ -42,6 +42,7 @@ jobs:
         
         strategy:
             matrix:
+                os: [ macos-13, macos-14, macos-15-intel ]
                 options: # We don't need a full matrix
                     - flavor: macos-release
                       arguments: -sdk macosx -configuration Release
@@ -51,7 +52,7 @@ jobs:
                       arguments: -sdk appletvos -configuration Debug
                     - flavor: watchos-debug
                       arguments: -sdk watchos -configuration Debug
-        runs-on: macos-13
+        runs-on: ${{ matrix.os }}
         steps:
             - name: Checkout
               uses: actions/checkout@v5
@@ -77,9 +78,10 @@ jobs:
         name: Run framework tests
         if: github.actor != 'restyled-io[bot]'
         needs: [framework] # serialize to avoid running to many parallel macos runners
-        runs-on: macos-13
+        runs-on: ${{ matrix.os }}
         strategy:
             matrix:
+                os: [ macos-13, macos-14, macos-15-intel ]
                 options: # We don't need a full matrix
                     - flavor: asan
                       arguments:
