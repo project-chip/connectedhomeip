@@ -64,6 +64,7 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securecha
 TCP_PICS_STR = "MCORE.SC.TCP"
 ROOT_NODE_ENDPOINT_ID = 0
 
+
 class TC_SC_4_1(MatterBaseTest):
 
     def steps_TC_SC_4_1(self):
