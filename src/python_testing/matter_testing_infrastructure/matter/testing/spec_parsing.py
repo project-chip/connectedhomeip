@@ -1014,30 +1014,30 @@ def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDir
 def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: dict[uint, XmlCluster]) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     problems: list[ProblemNotice] = []
     device_types: dict[int, XmlDeviceType] = {}
-    device = root.iter('deviceType')
-    for d in device:
-        name = d.attrib['name']
+    d = root
+    if d.tag == 'deviceType':
+        device_name = d.attrib['name']
         location = DeviceTypePathLocation(device_type_id=0)
 
         str_id = d.attrib.get('id', "")
         if not str_id:
-            if name == "Base Device Type":
+            if device_name == "Base Device Type":
                 # Base is special device type, we're going to call it -1 so we can combine and remove it later.
                 str_id = '-1'
             else:
                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
-                                severity=ProblemSeverity.WARNING, problem=f"Device type {name} does not have an ID listed"))
-                break
+                                severity=ProblemSeverity.WARNING, problem=f"Device type {device_name} does not have an ID listed"))
+                return
         try:
             id = int(str_id, 0)
             revision = int(d.attrib['revision'], 0)
         except ValueError:
             problems.append(ProblemNotice("Parse Device Type XML", location=location,
                             severity=ProblemSeverity.WARNING,
-                            problem=f"Device type {name} does not a valid ID or revision. ID: {str_id} revision: {d.get('revision', 'UNKNOWN')}"))
-            break
+                            problem=f"Device type {device_name} does not a valid ID or revision. ID: {str_id} revision: {d.get('revision', 'UNKNOWN')}"))
+            return
         if id in DEVICE_TYPE_NAME_FIXES:
-            name = DEVICE_TYPE_NAME_FIXES[id]
+            device_name = DEVICE_TYPE_NAME_FIXES[id]
 
         location = DeviceTypePathLocation(device_type_id=id)
 
@@ -1056,10 +1056,15 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                 location = DeviceTypePathLocation(device_type_id=id)
                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                 severity=ProblemSeverity.WARNING, problem="Unable to find classification data for device type"))
-                break
-        device_types[id] = XmlDeviceType(name=name, revision=revision, server_clusters={}, client_clusters={},
+                return
+        device_types[id] = XmlDeviceType(name=device_name, revision=revision, server_clusters={}, client_clusters={},
                                          classification_class=device_class, classification_scope=scope, superset_of_device_type_name=superset_of_device_type_name)
-        clusters = d.iter('cluster')
+        try:
+            main_endpoint_clusters = next(d.iter('clusters'))
+            clusters = main_endpoint_clusters.findall('cluster')
+        except StopIteration:
+            # no clusters in this device type - children device types only
+            clusters = []
         for c in clusters:
             try:
                 try:
@@ -1083,10 +1088,10 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                 conformance = parse_callable_from_xml(conformance_xml, cluster_conformance_params)
                 side_dict = {'server': ClusterSide.SERVER, 'client': ClusterSide.CLIENT}
                 side = side_dict[c.attrib['side']]
-                name = c.attrib['name']
+                cluster_name = c.attrib['name']
                 if cid in CLUSTER_NAME_FIXES:
-                    name = CLUSTER_NAME_FIXES[cid]
-                cluster = XmlDeviceTypeClusterRequirements(name=name, side=side, conformance=conformance)
+                    cluster_name = CLUSTER_NAME_FIXES[cid]
+                cluster = XmlDeviceTypeClusterRequirements(name=cluster_name, side=side, conformance=conformance)
 
                 def append_overrides(override_element_type: str):
                     if override_element_type == 'feature':
@@ -1113,16 +1118,16 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                     elements = container.iter(override_element_type)
                     for e in elements:
                         try:
-                            name = e.attrib['name']
+                            element_name = e.attrib['name']
                         except KeyError:
                             if override_element_type == 'feature':
                                 try:
-                                    name = e.attrib['code']
+                                    element_name = e.attrib['code']
                                 except KeyError:
-                                    name = None
+                                    element_namename = None
                             else:
-                                name = None
-                        if name is None:
+                                element_name = None
+                        if element_name is None:
                             problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                             severity=ProblemSeverity.WARNING, problem=f"Missing {override_element_type} name for override in cluster 0x{cid:04X}, e={str(e.attrib)}"))
                             continue
@@ -1134,22 +1139,23 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                                 continue
                             conformance_override = parse_callable_from_xml(conformance_xml, cluster_conformance_params)
 
-                            map_id = [name_to_id_map[n] for n in name_to_id_map.keys() if _fuzzy_name(n) == _fuzzy_name(name)]
+                            map_id = [name_to_id_map[n] for n in name_to_id_map.keys() if _fuzzy_name(n) ==
+                                      _fuzzy_name(element_name)]
                             if len(map_id) == 0:
                                 # The thermostat in particular explicitly disallows some zigbee things that don't appear in the spec due to
                                 # ifdefs. We can ignore problems if the device type spec disallows things that don't exist.
                                 if is_disallowed(conformance_override):
                                     LOGGER.info(
-                                        f"Ignoring unknown {override_element_type} {name} in cluster {cid} because the conformance is disallowed")
+                                        f"Ignoring unknown {override_element_type} {element_name} in cluster {cid} because the conformance is disallowed")
                                     continue
                                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
-                                                severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {name} in cluster 0x{cid:04X} - map = {map_id}"))
+                                                severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {element_name} in cluster 0x{cid:04X} - map = {map_id}"))
                             else:
                                 override[map_id[0]] = conformance_override
 
                         except ConformanceException as ex:
                             problems.append(ProblemNotice("Parse Device Type XML", location=location,
-                                            severity=ProblemSeverity.WARNING, problem=f"Unable to parse {override_element_type} conformance for {name} in cluster 0x{cid:04X} - {ex}"))
+                                            severity=ProblemSeverity.WARNING, problem=f"Unable to parse {override_element_type} conformance for {element_name} in cluster 0x{cid:04X} - {ex}"))
 
                 append_overrides('feature')
                 append_overrides('attribute')
