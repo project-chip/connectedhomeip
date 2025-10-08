@@ -27,7 +27,7 @@ from matter.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType
                                                  device_type_id_type, is_valid_device_type_id)
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                             ProblemNotice, ProblemSeverity)
-from matter.testing.spec_parsing import CommandType, XmlDeviceType, XmlDeviceTypeClusterRequirements
+from matter.testing.spec_parsing import build_xml_device_types, CommandType, PrebuiltDataModelDirectory, XmlDeviceType, XmlDeviceTypeClusterRequirements
 from matter.tlv import uint
 
 
@@ -481,4 +481,37 @@ class DeviceConformanceTests(BasicCompositionTests):
                 if cluster in root_node_restricted_clusters:
                     problems.append(ProblemNotice("TC-IDM-14.1", location=ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster.id),
                                                   severity=ProblemSeverity.ERROR, problem=f"Root-node-restricted cluster {cluster} appears on non-root-node endpoint"))
+        return problems
+
+    def check_closure_restricted_clusters(self) -> list[ProblemNotice]:
+        # This is a test that is SPECIFIC to the 1.5 spec, and thus we need the 1.5 spec information specifically
+        # to assess the revisions.
+        one_five_device_types, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
+        # TODO: change this once https://github.com/project-chip/matter-test-scripts/issues/689 is implemented
+
+        def get_device_type_id(name: str) -> uint:
+            return [id for id, xml in one_five_device_types.items() if xml.name.lower() == name.lower()][0]
+
+        window_covering_id = get_device_type_id('Window Covering')
+        closure_id = get_device_type_id('Closure')
+        closure_panel_id = get_device_type_id('Closure Panel')
+        restricted_device_type_ids = [window_covering_id, closure_id, closure_panel_id]
+
+        problems = []
+        for endpoint_id, endpoint in self.endpoints.items():
+            device_types = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
+            have_restricted_device_type = False
+            for dt in device_types:
+                if dt.deviceType in restricted_device_type_ids and dt.revision <= one_five_device_types[dt.deviceType].revision:
+                    have_restricted_device_type = True
+                    device_type_id = dt.deviceType
+            if not have_restricted_device_type:
+                continue
+
+            have_closure = Clusters.ClosureControl in endpoint.keys() or Clusters.ClosureDimension in endpoint.keys()
+            have_window_covering = Clusters.WindowCovering in endpoint.keys()
+
+            if have_closure and have_window_covering:
+                problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
+                                              problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has both window covering and closure clusters"))
         return problems
