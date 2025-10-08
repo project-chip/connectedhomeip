@@ -124,16 +124,16 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
       val url = tlvReader.getString(ContextSpecificTag(TAG_URL))
       val triggerOptions =
         PushAvStreamTransportClusterTransportTriggerOptionsStruct.fromTlv(
-          ContextSpecificTag(TAG_TRIGGER_OPTIONS), 
+          ContextSpecificTag(TAG_TRIGGER_OPTIONS),
           tlvReader
         )
       val ingestMethod = tlvReader.getUInt(ContextSpecificTag(TAG_INGEST_METHOD))
-      val containerOptions = 
+      val containerOptions =
         PushAvStreamTransportClusterContainerOptionsStruct.fromTlv(
-          ContextSpecificTag(TAG_CONTAINER_OPTIONS), 
+          ContextSpecificTag(TAG_CONTAINER_OPTIONS),
           tlvReader
         )
-      val expiryTime = 
+      val expiryTime =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXPIRY_TIME))) {
           Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_EXPIRY_TIME)))
         } else {
