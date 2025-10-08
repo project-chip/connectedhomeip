@@ -469,6 +469,7 @@ class TC_SU_2_7(MatterBaseTest):
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
         await state_transition_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*6)
         # This step we need to Kill the provider PID before the announcement
+        logger.info("Killing the provider process")
         self._kill_provider_process()
         sleep(1)
         await self._announce_ota_provider(controller, provider_data['node_id'], requestor_node_id)
