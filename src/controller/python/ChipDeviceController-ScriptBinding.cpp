@@ -145,6 +145,8 @@ PyChipError pychip_DeviceController_GetNodeId(chip::Controller::DeviceCommission
 // Rendezvous
 PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
                                                bool isShortDiscriminator, uint32_t setupPINCode, chip::NodeId nodeid);
+PyChipError pychip_DeviceController_ConnectNFC(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
+                                               uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                               uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl, const char * onboardingPayload,
@@ -431,6 +433,22 @@ PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissio
     return ToPyChipError(devCtrl->PairDevice(nodeid,
                                              chip::RendezvousParameters()
                                                  .SetPeerAddress(Transport::PeerAddress(Transport::Type::kBle))
+                                                 .SetSetupPINCode(setupPINCode)
+                                                 .SetSetupDiscriminator(setupDiscriminator),
+                                             sCommissioningParameters));
+}
+
+PyChipError pychip_DeviceController_ConnectNFC(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
+                                               uint32_t setupPINCode, chip::NodeId nodeid)
+{
+    SetupDiscriminator setupDiscriminator;
+
+    // With NFC, only a long discriminator can be used
+    setupDiscriminator.SetLongValue(discriminator);
+
+    return ToPyChipError(devCtrl->PairDevice(nodeid,
+                                             chip::RendezvousParameters()
+                                                 .SetPeerAddress(Transport::PeerAddress::NFC(discriminator))
                                                  .SetSetupPINCode(setupPINCode)
                                                  .SetSetupDiscriminator(setupDiscriminator),
                                              sCommissioningParameters));

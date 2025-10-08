@@ -85,7 +85,6 @@ jobs:
                      --skip-dir platform/FreeRTOS \
                      --skip-dir platform/Infineon \
                      --skip-dir platform/Linux \
-                     --skip-dir platform/mbed \
                      --skip-dir platform/mt793x \
                      --skip-dir platform/nxp \
                      --skip-dir platform/OpenThread \

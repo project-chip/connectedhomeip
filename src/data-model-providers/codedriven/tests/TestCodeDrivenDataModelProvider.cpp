@@ -39,7 +39,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Testing;
-using SemanticTag = chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type;
+using SemanticTag = chip::app::Clusters::Globals::Structs::SemanticTagStruct::Type;
 
 class TestProviderChangeListener : public DataModel::ProviderChangeListener
 {
