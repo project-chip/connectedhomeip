@@ -234,7 +234,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         return ota_image_info
 
-    def verfy_state_transition_event(self,
+    def verify_state_transition_event(self,
                                      event_report: Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
                                      previous_state,
                                      new_state,
