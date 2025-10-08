@@ -171,7 +171,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
 
         self.step("1")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricAdministrator.Attributes.AdministratorFabricIndex)],
+            nodeId=1, attributes=[(1, Clusters.JointFabricAdministrator.Attributes.AdministratorFabricIndex)],
             returnClusterObject=True)
         attributeAdminFabricIndex = response[1][Clusters.JointFabricAdministrator].administratorFabricIndex
         asserts.assert_greater_equal(attributeAdminFabricIndex, 1,
@@ -181,7 +181,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
 
         self.step("2")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
+            nodeId=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
             returnClusterObject=True)
         asserts.assert_equal(attributeAdminFabricIndex,
                              response[0][Clusters.OperationalCredentials].fabrics[0].fabricIndex, "AdministratorFabricIndex != fabricIndex")

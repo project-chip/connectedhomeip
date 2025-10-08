@@ -277,7 +277,7 @@ class TC_OPCREDS_3_4(MatterBaseTest):
         resp = await self.open_commissioning_window()
 
         self.step(23)
-        await self.default_controller.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeid=self.dut_node_id)
+        await self.default_controller.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeId=self.dut_node_id)
 
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(900)
         resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)

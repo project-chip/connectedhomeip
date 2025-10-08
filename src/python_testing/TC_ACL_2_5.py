@@ -404,7 +404,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
     async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlExtensionChanged) -> int:
         event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
-        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
         return max([e.Header.EventNumber for e in events])
 
     def pics_TC_ACL_2_5(self) -> list[str]:

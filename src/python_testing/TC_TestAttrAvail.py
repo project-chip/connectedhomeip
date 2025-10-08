@@ -93,7 +93,7 @@ class TC_TestAttrAvail(MatterBaseTest):
             pase_future = dev_ctrl.EstablishPASESession(setup_code, self.dut_node_id)
             task_list.append(asyncio.create_task(pase_future))
 
-        case_future = dev_ctrl.GetConnectedDevice(nodeid=node_id, allowPASE=False)
+        case_future = dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
         task_list.append(asyncio.create_task(case_future))
 
         for task in task_list:

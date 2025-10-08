@@ -270,7 +270,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         discriminator = random.randint(0, 4095)
         # Open commissioning window on TH_SERVER_NO_UID.
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=th_server_th_node_id,
+            nodeId=th_server_th_node_id,
             option=self.default_controller.CommissioningWindowPasscode.kTokenWithRandomPin,
             discriminator=discriminator,
             iteration=10000,
@@ -322,7 +322,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         discriminator = random.randint(0, 4095)
         # Open commissioning window on TH_FSA_BRIDGE.
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=th_fsa_bridge_th_node_id,
+            nodeId=th_fsa_bridge_th_node_id,
             option=self.default_controller.CommissioningWindowPasscode.kTokenWithRandomPin,
             discriminator=discriminator,
             iteration=10000,

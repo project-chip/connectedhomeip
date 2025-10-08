@@ -61,7 +61,7 @@ class TestTestTimeSyncTrustedTimeSource(MatterBaseTest):
                                                                 cluster=Clusters.TimeSynchronization.id)]
                                                             )
         acl.append(new_acl_entry)
-        await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(0, ac.Attributes.Acl(acl))])
+        await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(0, ac.Attributes.Acl(acl))])
 
     async def ReadFromTrustedTimeSource(self):
         # Give the node a couple of seconds to reach out and set itself up

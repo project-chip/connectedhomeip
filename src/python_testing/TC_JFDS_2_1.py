@@ -175,25 +175,25 @@ class TC_JFDS_2_1(MatterBaseTest):
 
         self.step("1")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorRootCA)],
+            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorRootCA)],
             returnClusterObject=True)
         asserts.assert_greater_equal(len(response[1][Clusters.JointFabricDatastore].anchorRootCA), 0)
 
         self.step("2")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorNodeID)],
+            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorNodeID)],
             returnClusterObject=True)
         asserts.assert_greater_equal(response[1][Clusters.JointFabricDatastore].anchorNodeID, 0)
 
         self.step("3")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorVendorID)],
+            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorVendorID)],
             returnClusterObject=True)
         asserts.assert_greater_equal(response[1][Clusters.JointFabricDatastore].anchorVendorID, 0)
 
         self.step("4")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.FriendlyName)],
+            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.FriendlyName)],
             returnClusterObject=True)
         asserts.assert_is_instance(response[1][Clusters.JointFabricDatastore].friendlyName, str)
 

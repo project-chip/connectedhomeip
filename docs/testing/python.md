@@ -325,7 +325,7 @@ Example for setting callbacks:
 cb = EventSubscriptionHandler(cluster, cluster_id, event_id)
 
 urgent = 1
-subscription = await dev_ctrl.ReadEvent(nodeid=1, events=[(1, event, urgent)], reportInterval=[1, 3])
+subscription = await dev_ctrl.ReadEvent(nodeId=1, events=[(1, event, urgent)], reportInterval=[1, 3])
 subscription.SetEventUpdateCallback(callback=cb)
 
 try:
@@ -346,7 +346,7 @@ PyChipError
 Example:
 
 ```
-res = await devCtrl.WriteAttribute(nodeid=0, attributes=[(0,Clusters.BasicInformation.Attributes.NodeLabel("Test"))])
+res = await devCtrl.WriteAttribute(nodeId=0, attributes=[(0,Clusters.BasicInformation.Attributes.NodeLabel("Test"))])
 asserts.assert_equal(ret[0].status, Status.Success, “write failed”)
 ```
 

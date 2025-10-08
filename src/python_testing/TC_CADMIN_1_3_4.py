@@ -87,7 +87,7 @@ class TC_CADMIN(CADMINBaseTest):
         self.step("3a")
         if commission_type == "ECM":
             params = await self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 timeout=self.max_window_duration,
                 iteration=1000,
                 discriminator=1234,
@@ -96,7 +96,7 @@ class TC_CADMIN(CADMINBaseTest):
 
         elif commission_type == "BCM":
             obcCmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
 
         else:
             asserts.fail(f"Unknown commissioning type: {commission_type}")
@@ -180,7 +180,7 @@ class TC_CADMIN(CADMINBaseTest):
 
             self.step(9)
             # TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM
-            await self.th2.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=180, iteration=1000, discriminator=0, option=1)
+            await self.th2.OpenCommissioningWindow(nodeId=self.dut_node_id, timeout=180, iteration=1000, discriminator=0, option=1)
 
             self.step(10)
             sleep(181)
@@ -190,9 +190,9 @@ class TC_CADMIN(CADMINBaseTest):
             # TODO: Issue noticed when initially attempting to check window status, issue is detailed here: https://github.com/project-chip/connectedhomeip/issues/35983
             # Workaround in place until above issue resolved
             try:
-                window_status = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.AdministratorCommissioning.Attributes.WindowStatus)])
+                window_status = await self.th2.ReadAttribute(nodeId=self.dut_node_id, attributes=[(0, Clusters.AdministratorCommissioning.Attributes.WindowStatus)])
             except asyncio.CancelledError:
-                window_status = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.AdministratorCommissioning.Attributes.WindowStatus)])
+                window_status = await self.th2.ReadAttribute(nodeId=self.dut_node_id, attributes=[(0, Clusters.AdministratorCommissioning.Attributes.WindowStatus)])
 
             window_status = window_status[0]
             outer_key = list(window_status.keys())[0]
@@ -204,7 +204,7 @@ class TC_CADMIN(CADMINBaseTest):
             # TH_CR2 opens a commissioning window on DUT_CE using ECM
             self.discriminator = random.randint(0, 4095)
             # params2 = await self.openCommissioningWindow(dev_ctrl=self.th2, node_id=self.dut_node_id)
-            params2 = await self.th2.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=1000, discriminator=1234, option=1)
+            params2 = await self.th2.OpenCommissioningWindow(nodeId=self.dut_node_id, timeout=self.max_window_duration, iteration=1000, discriminator=1234, option=1)
 
             self.step(13)
             # TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 12
@@ -223,7 +223,7 @@ class TC_CADMIN(CADMINBaseTest):
 
             self.step(14)
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
             # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
             sleep(1)
 
@@ -234,12 +234,12 @@ class TC_CADMIN(CADMINBaseTest):
             self.step(7)
 
         # TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx
-        th2_idx = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
+        th2_idx = await self.th2.ReadAttribute(nodeId=self.dut_node_id, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
         outer_key = list(th2_idx.keys())[0]
         inner_key = list(th2_idx[outer_key].keys())[0]
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
     def pics_TC_CADMIN_1_3(self) -> list[str]:
         return ["CADMIN.S"]

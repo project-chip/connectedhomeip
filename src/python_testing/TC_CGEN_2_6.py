@@ -75,7 +75,7 @@ class TC_CGEN_2_6(MatterBaseTest):
         # Step 2: Send CommissioningComplete and verify error response
         self.step(2)
         response: Clusters.GeneralCommissioning.Commands.CommissioningCompleteResponse = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.CommissioningComplete(),
         )

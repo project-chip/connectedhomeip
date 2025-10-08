@@ -49,7 +49,7 @@ from matter.tlv import TLVReader, TLVWriter
 
 
 class TC_OPCREDS_3_1(MatterBaseTest):
-    async def FindAndEstablishPase(self, longDiscriminator: int, setupPinCode: int, nodeid: int, dev_ctrl: ChipDeviceCtrl = None):
+    async def FindAndEstablishPase(self, longDiscriminator: int, setupPinCode: int, nodeId: int, dev_ctrl: ChipDeviceCtrl = None):
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
 
@@ -61,13 +61,13 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         for a in device.addresses:
             try:
                 await dev_ctrl.EstablishPASESessionIP(ipaddr=a, setupPinCode=setupPinCode,
-                                                      nodeid=nodeid, port=device.port)
+                                                      nodeId=nodeId, port=device.port)
                 break
             except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Expected fullback behavior when trying multiple IPs, failures are tolerated to continue with next address
                 # assert_raises is not applicable since failure is not fatal here
                 continue
         try:
-            dev_ctrl.GetConnectedDeviceSync(nodeid=nodeid, allowPASE=True, timeoutMs=1000)
+            dev_ctrl.GetConnectedDeviceSync(nodeId=nodeId, allowPASE=True, timeoutMs=1000)
         except TimeoutError:
             asserts.fail("Unable to establish a PASE session to the device")
 
@@ -76,7 +76,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         longDiscriminator = random.randint(0, 4095)
         try:
             params = await dev_ctrl.OpenCommissioningWindow(
-                nodeid=node_id, timeout=600, iteration=10000, discriminator=longDiscriminator, option=ChipDeviceCtrl.ChipDeviceControllerBase.CommissioningWindowPasscode.kTokenWithRandomPin)
+                nodeId=node_id, timeout=600, iteration=10000, discriminator=longDiscriminator, option=ChipDeviceCtrl.ChipDeviceControllerBase.CommissioningWindowPasscode.kTokenWithRandomPin)
         except Exception as e:
             logging.exception('Error running OpenCommissioningWindow %s', e)
             asserts.assert_true(False, 'Failed to open commissioning window')
@@ -115,7 +115,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         self.print_step(3, "TH1 opens a PASE connection to the DUT")
         newNodeId = self.dut_node_id + 1
         await self.FindAndEstablishPase(dev_ctrl=TH1, longDiscriminator=longDiscriminator,
-                                        setupPinCode=params.setupPinCode, nodeid=newNodeId)
+                                        setupPinCode=params.setupPinCode, nodeId=newNodeId)
 
         self.print_step(4, "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds field set to failsafe_max")
         resp = await self.send_single_cmd(dev_ctrl=TH1, node_id=newNodeId, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(failsafe_max))
@@ -238,7 +238,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
             20, "TH1 appends `Root_CA_Certificate_TH1_2` to `TrustedRootsList` and writes the TrustedRootCertificates attribute with that value,  Verify UNSUPPORTED_WRITE")
         trusted_root_list.append(TH1_certs_fake.rcacBytes)
         attr = opcreds.Attributes.TrustedRootCertificates(trusted_root_list)
-        err = await TH1.WriteAttribute(nodeid=newNodeId, attributes=[(0, attr)])
+        err = await TH1.WriteAttribute(nodeId=newNodeId, attributes=[(0, attr)])
         asserts.assert_equal(err[0].Status, Status.UnsupportedWrite,
                              "Unexpected error trying to write TrustedRootCertificate attribute")
 
@@ -308,7 +308,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         noc_list[0].noc = TH1_certs_fake.nocBytes
         noc_list[0].icac = TH1_certs_fake.icacBytes
         attr = opcreds.Attributes.NOCs(noc_list)
-        resp = await TH1.WriteAttribute(nodeid=newNodeId, attributes=[(0, attr)])
+        resp = await TH1.WriteAttribute(nodeId=newNodeId, attributes=[(0, attr)])
         asserts.assert_equal(resp[0].Status, Status.UnsupportedWrite, "Write to NOC attribute did not fail with UnsupportedWrite")
 
         self.print_step(
@@ -363,7 +363,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         self.print_step(33, "TH1 reconnects to the DUT over PASE")
         TH1.ExpireSessions(newNodeId)
         await self.FindAndEstablishPase(dev_ctrl=TH1, longDiscriminator=longDiscriminator,
-                                        setupPinCode=params.setupPinCode, nodeid=newNodeId)
+                                        setupPinCode=params.setupPinCode, nodeId=newNodeId)
 
         self.print_step(34, "TH1 reads the TrustedRootCertificates list from DUT and verifies the TH1 root is not present")
         trusted_root_list = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.TrustedRootCertificates)
