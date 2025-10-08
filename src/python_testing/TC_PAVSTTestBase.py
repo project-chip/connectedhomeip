@@ -305,6 +305,10 @@ class PAVSTTestBase:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, dev_ctrl=dev_ctrl)
             return Status.Success
         except InteractionModelError as e:
+            if (e.status == Status.Busy):
+                asserts.assert_true(
+                    e.status == Status.NotFound, "Busy Status,Transport is currently uploading data" 
+                )
             asserts.assert_true(
                 e.status == Status.NotFound, "Unexpected error returned"
             )
@@ -320,6 +324,10 @@ class PAVSTTestBase:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, dev_ctrl=dev_ctrl)
             return Status.Success
         except InteractionModelError as e:
+            if (e.status == Status.Busy):
+                asserts.assert_true(
+                    e.status == Status.NotFound, "Busy Status,Transport is currently uploading data" 
+                )
             asserts.assert_true(
                 e.status == Status.NotFound, "Unexpected error returned"
             )
@@ -359,7 +367,7 @@ class PAVSTTestBase:
             return e.status
         pass
 
-    async def psvt_manually_trigger_transport(self, cmd, expected_cluster_status=None, devCtrl=None):
+    async def psvt_manually_trigger_transport(self, cmd, expected_cluster_status=None, devCtrl=None, expected_status=None):
         endpoint = self.get_endpoint(default=1)
         dev_ctrl = self.default_controller
         if (devCtrl is not None):
@@ -373,10 +381,17 @@ class PAVSTTestBase:
                     e.clusterStatus == expected_cluster_status, "Unexpected error returned"
                 )
                 return e.clusterStatus
-            else:
+            elif (e.status == Status.Busy):
                 asserts.assert_true(
-                    e.status == Status.NotFound, "Unexpected error returned"
+                    e.status == Status.NotFound, "Busy Status,Transport is currently uploading data"
                 )
+            else:
+                if (expected_status is not None):
+                    asserts.assert_true(e.status == expected_status, "TUnexpected error returned")
+                else:
+                    asserts.assert_true(
+                        e.status == Status.NotFound, "Unexpected error returned"
+                    )
                 return e.status
         pass
 
