@@ -260,6 +260,11 @@ TEST_F(TestCommodityTariffContainers, UnorderedMap_BasicOperations) {
     EXPECT_TRUE(map.contains(2));
     EXPECT_EQ(map.size(), 3u);
 
+    map[4]=0x14;
+    EXPECT_EQ(map[4], 0x14u);
+
+    EXPECT_EQ(map.size(), 4u);
+
     EXPECT_FALSE(map.insert(1, 100)); // Duplicate key
 }
 

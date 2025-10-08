@@ -211,6 +211,8 @@ class CTC_UnorderedMap
 public:
     using PairType = std::pair<KeyType, ValueType>;
 
+    static_assert(std::is_trivially_destructible<PairType>::value, "KeyType and ValueType must be trivially destructible");
+
 private:
     // Custom set that only compares keys for uniqueness
     class PairSet : public CTC_UnorderedSet<PairType>
@@ -219,8 +221,11 @@ private:
         using Base = CTC_UnorderedSet<PairType>;
         using Base::Base;
 
-        bool insertUnchecked(const PairType& pair) {
-            return (this->insertAtEnd(pair) == Base::RetCode::kSuccess);
+        PairType* insertUnchecked(const PairType& pair) {
+            if (this->insertAtEnd(pair) == Base::RetCode::kSuccess) {
+                return &this->mBuffer[this->mCount - 1];
+            }
+            return nullptr;
         }
 
         // Override find to only compare keys
@@ -301,8 +306,7 @@ public:
         auto* pair = mPairStorage.findByKey(key);
         if (pair == nullptr) {
             // Use insertUnchecked since we already know the key is not present.
-            VerifyOrDie(mPairStorage.insertUnchecked(std::make_pair(key, ValueType{})));
-            pair = mPairStorage.findByKey(key);
+            pair = mPairStorage.insertUnchecked(std::make_pair(key, ValueType{}));
             VerifyOrDie(pair != nullptr);
         }
         return pair->second;
