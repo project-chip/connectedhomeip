@@ -25,6 +25,7 @@
 #include "pw_unit_test/framework.h"
 #include <app/clusters/commodity-tariff-server/CommodityTariffContainers.h>
 
+#include <array>
 #include <cstdint>
 #include <mutex>
 #include <thread>
@@ -199,7 +200,7 @@ TEST_F(TestCommodityTariffContainers, UnorderedSet_SortEntries) {
 
 TEST_F(TestCommodityTariffContainers, UnorderedSet_Iteration) {
     CTC_UnorderedSet<int> set(5);
-    std::vector<int> expected = {10, 20, 30};
+    std::array<int, 3> expected = {10, 20, 30};
     
     for (int value : expected) {
         EXPECT_TRUE(set.insert(value));

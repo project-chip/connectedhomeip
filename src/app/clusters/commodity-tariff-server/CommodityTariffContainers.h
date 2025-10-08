@@ -36,10 +36,11 @@ protected:
     {
         createBuffer();
 
-        if (mMaxLimit <= aCapacity)
+        if (mMaxLimit == 0)
         {
             mMaxLimit = mCapacity;
         }
+        VerifyOrDie(mMaxLimit >= mCapacity);
     }
     
 public:
@@ -157,7 +158,7 @@ public:
     using Base = CTC_ContainerClassBase<ItemType>;
     using Base::Base;
 
-    CTC_UnorderedSet(size_t aCapacity) : Base(aCapacity) {}
+    CTC_UnorderedSet(size_t aCapacity, size_t aMaxLimit = 0) : Base(aCapacity, aMaxLimit) {}
 
     bool insert(const ItemType& item) override {
         // Check for duplicate using std::find
@@ -218,6 +219,10 @@ private:
         using Base = CTC_UnorderedSet<PairType>;
         using Base::Base;
 
+        bool insertUnchecked(const PairType& pair) {
+            return (this->insertAtEnd(pair) == Base::RetCode::kSuccess);
+        }
+
         // Override find to only compare keys
         PairType* find(const PairType& pair) override {
             return findByKey(pair.first);
@@ -244,8 +249,13 @@ private:
         }
 
         void removeByKey(const KeyType& key) {
-            if (auto* pair = findByKey(key)) {
-                this->remove(*pair);
+            if (auto* found = findByKey(key)) {
+                // Swap with the last element for O(1) removal (after finding).
+                auto* last = &this->mBuffer[this->mCount - 1];
+                if (found != last) {
+                    *found = std::move(*last);
+                }
+                --this->mCount;
             }
         }
 
@@ -262,9 +272,7 @@ private:
     PairSet mPairStorage;
 
 public:
-    CTC_UnorderedMap(size_t aCapacity) : mPairStorage(aCapacity) 
-    {
-    }
+    CTC_UnorderedMap(size_t aCapacity, size_t aMaxLimit = 0) : mPairStorage(aCapacity, aMaxLimit) {}
 
     bool insert(const KeyType& key, const ValueType& value) {
         return mPairStorage.insert(std::make_pair(key, value));
@@ -288,11 +296,13 @@ public:
         return pair ? &pair->second : nullptr;
     }
 
+    // In class CTC_UnorderedMap
     ValueType& operator[](const KeyType& key) {
         auto* pair = mPairStorage.findByKey(key);
         if (pair == nullptr) {
-            VerifyOrDie(insert(key, ValueType{}));
-            pair = &mPairStorage[mPairStorage.size() - 1];
+            // Use insertUnchecked since we already know the key is not present.
+            VerifyOrDie(mPairStorage.insertUnchecked(std::make_pair(key, ValueType{})));
+            pair = mPairStorage.findByKey(key);
             VerifyOrDie(pair != nullptr);
         }
         return pair->second;
