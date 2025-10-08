@@ -316,6 +316,11 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
         if (nodeData.resolutionData.isICDOperatingAsLIT.has_value())
         {
             result.isICDOperatingAsLIT = *(nodeData.resolutionData.isICDOperatingAsLIT);
+            if (result.isICDOperatingAsLIT)
+            {
+                result.mrpRemoteConfig.mIdleRetransTimeout = result.mrpRemoteConfig.mActiveThresholdTime + CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT;
+                ChipLogDetail(Discovery, "Operational node resolved as LIT and set IdleRetransTimeout to %d", result.mrpRemoteConfig.mIdleRetransTimeout.count());
+            }
         }
 
         for (size_t i = 0; i < nodeData.resolutionData.numIPs; i++)
