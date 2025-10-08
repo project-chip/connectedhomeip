@@ -784,7 +784,7 @@ void TCPEndPointImplSockets::HandlePendingIO(System::SocketEvents events, intptr
 void TCPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
 {
     // Prevent the end point from being freed while in the middle of a callback.
-    Ref();
+    TCPEndPointHandle ref(this);
 
     // If in the Listening state, and the app is ready to receive a connection, and there is a connection
     // ready to be received on the socket, process the incoming connection.
@@ -844,8 +844,6 @@ void TCPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
             ReceiveData();
         }
     }
-
-    Unref();
 }
 
 void TCPEndPointImplSockets::ReceiveData()

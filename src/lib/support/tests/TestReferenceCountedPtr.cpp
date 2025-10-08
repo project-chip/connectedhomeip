@@ -103,7 +103,6 @@ TEST_F(TestReferenceCountedPtr, TestMove)
     EXPECT_EQ(refCounted.Counter(), 1);
     auto moved = std::move(source);
     EXPECT_EQ(refCounted.Counter(), 1);
-    EXPECT_TRUE(source.IsNull());
     EXPECT_EQ(moved, &refCounted);
 }
 

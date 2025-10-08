@@ -572,6 +572,8 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
         return;
     }
 
+    // Prevent the endpoint from being freed while in the middle of a callback.
+    UDPEndPointHandle ref(this);
     CHIP_ERROR lStatus = CHIP_NO_ERROR;
     IPPacketInfo lPacketInfo;
     System::PacketBufferHandle lBuffer;

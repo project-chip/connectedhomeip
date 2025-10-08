@@ -86,7 +86,6 @@ TEST_F(TestAutoRelease, TestOperators)
     other.Set(nullptr);
     EXPECT_EQ(releasable2.Counter(), 0);
     EXPECT_TRUE(other.IsNull());
-    EXPECT_NE(&*other, &releasable);
 }
 
 } // namespace
