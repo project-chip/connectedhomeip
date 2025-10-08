@@ -539,7 +539,7 @@ void HandleTCPConnectionComplete(TCPEndPoint * aEndPoint, CHIP_ERROR aError)
     {
         printf("TCP connection FAILED: %s\n", ErrorStr(aError));
 
-        aEndPoint->Free();
+        aEndPoint->Release();
         aEndPoint = nullptr;
 
         gSendIntervalExpired = false;
@@ -563,7 +563,7 @@ static void HandleTCPConnectionClosed(TCPEndPoint * aEndPoint, CHIP_ERROR aError
         SetStatusFailed(sTestState.mStatus);
     }
 
-    aEndPoint->Free();
+    aEndPoint->Release();
 
     if (aEndPoint == sTCPIPEndPoint)
     {
@@ -888,14 +888,13 @@ static void CleanupTest()
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (sTCPIPEndPoint != nullptr)
     {
-        sTCPIPEndPoint->Close();
-        sTCPIPEndPoint->Free();
+        sTCPIPEndPoint->Release();
     }
 
     if (sTCPIPListenEndPoint != nullptr)
     {
         sTCPIPListenEndPoint->Shutdown();
-        sTCPIPListenEndPoint->Free();
+        sTCPIPListenEndPoint->Release();
     }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 

@@ -23,6 +23,8 @@ source_set("common") {
     "${chip_root}/src/platform/silabs/platformAbstraction/SilabsPlatform.h",
     "${chip_root}/src/platform/silabs/platformAbstraction/SilabsPlatformBase.h",
   ]
+
+  include_dirs = [ "${chip_root}/src/platform/silabs" ]
   public_deps = [
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/lib/core",
