@@ -60,13 +60,30 @@ protected:
     void TearDown() override { Platform::MemoryShutdown(); }
 };
 
-TEST_F(TestCommodityTariffContainers, CreateEmptyAndDestroy)
+TEST_F(TestCommodityTariffContainers, CreateEmptyInitAndDestroy)
 {
     {
         CTC_UnorderedSet<int> sample(10);
         EXPECT_EQ(sample.capacity(), 10u);
         EXPECT_EQ(sample.size(), 0u);
         EXPECT_TRUE(sample.empty());
+    }
+}
+
+TEST_F(TestCommodityTariffContainers, CreateEmptyNotInitAndDestroy)
+{
+    {
+        CTC_UnorderedSet<uint32_t> sample;
+        EXPECT_EQ(sample.capacity(), 0u);
+        EXPECT_EQ(sample.size(), 0u);
+        EXPECT_TRUE(sample.empty());
+
+        EXPECT_TRUE(sample.insert(0xAA550000));
+        EXPECT_EQ(sample.size(), 1u);
+
+        EXPECT_TRUE(sample.insert(0xAA550001));
+        EXPECT_TRUE(sample.insert(0xAA550002));
+        EXPECT_EQ(sample.size(), 3u); 
     }
 }
 

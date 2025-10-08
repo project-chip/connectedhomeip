@@ -36,20 +36,20 @@ class CTC_ContainerClassBase
     static_assert(std::is_trivially_destructible<T>::value, "T must be trivially destructible");
 
 protected:
-    CTC_ContainerClassBase(size_t aCapacity = 0, size_t aMaxLimit = 0) : mMaxLimit(aMaxLimit), mCapacity(aCapacity)
+    CTC_ContainerClassBase(size_t aCapacity = 0, bool aResizeIsEn = false) : mCapacity(aCapacity)
     {
-        createBuffer();
-
-        if (mMaxLimit == 0)
+        if (mCapacity == 0)
         {
-            mMaxLimit = mCapacity;
+            aResizeIsEn = true;
         }
-        VerifyOrDie(mMaxLimit >= mCapacity);
+        mResizeIsEn = aResizeIsEn;
+        createBuffer();
     }
 
     CTC_ContainerClassBase(CTC_ContainerClassBase && other) noexcept :
         mCapacity(other.mCapacity), mCount(other.mCount), mBuffer(std::move(other.mBuffer))
     {
+        other.mResizeIsEn = 0;
         other.mCapacity = 0;
         other.mCount    = 0;
     }
@@ -58,6 +58,7 @@ protected:
     {
         if (this != &other)
         {
+            mResizeIsEn       = other.mResizeIsEn; 
             mCapacity       = other.mCapacity;
             mCount          = other.mCount;
             mBuffer         = std::move(other.mBuffer);
@@ -111,7 +112,7 @@ public:
     const T * end() const { return mBuffer.Get() + mCount; }
 
 protected:
-    size_t mMaxLimit = 0;
+    bool mResizeIsEn = false;
     size_t mCapacity = 0;
     size_t mCount    = 0;
     Platform::ScopedMemoryBuffer<T> mBuffer;
@@ -163,17 +164,17 @@ protected:
 
     RetCode ensureCapacity(size_t requiredCapacity)
     {
-        if (requiredCapacity > mMaxLimit)
-        {
-            return RetCode::kNoMem;
-        }
-
         if (requiredCapacity <= mCapacity)
         {
             return RetCode::kSuccess;
         }
 
-        size_t newCapacity = std::min(std::max(requiredCapacity, mCapacity * 2), mMaxLimit);
+        if ((requiredCapacity > mCapacity) && !mResizeIsEn)
+        {
+            return RetCode::kNoMem;
+        }
+
+        size_t newCapacity = std::max(requiredCapacity, mCapacity * 2);
         return resize(newCapacity);
     }
 
@@ -200,7 +201,7 @@ public:
     using Base = CTC_ContainerClassBase<ItemType>;
     using Base::Base;
 
-    CTC_UnorderedSet(size_t aCapacity = 0, size_t aMaxLimit = 0) : Base(aCapacity, aMaxLimit) {}
+    CTC_UnorderedSet(size_t aCapacity = 0, bool aResizeIsEn = false) : Base(aCapacity, aResizeIsEn) {}
 
     CTC_UnorderedSet(CTC_UnorderedSet && other) noexcept             = default;
     CTC_UnorderedSet & operator=(CTC_UnorderedSet && other) noexcept = default;
@@ -356,7 +357,7 @@ private:
     PairSet mPairStorage;
 
 public:
-    CTC_UnorderedMap(size_t aCapacity = 0, size_t aMaxLimit = 0) : mPairStorage(aCapacity, aMaxLimit) {}
+    CTC_UnorderedMap(size_t aCapacity = 0, bool aResizeIsEn = false) : mPairStorage(aCapacity, aResizeIsEn) {}
 
     bool insert(const KeyType & key, const ValueType & value) { return mPairStorage.insert(std::make_pair(key, value)); }
 
