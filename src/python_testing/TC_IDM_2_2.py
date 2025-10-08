@@ -435,7 +435,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             # Use TH2 to read ALL attributes from ALL clusters at the endpoint
             read_request = await TH2.Read(
                 self.dut_node_id,
-                [(endpoint)]) 
+                [(endpoint)])
 
             # Verify the endpoint is in the response
             asserts.assert_in(endpoint, read_request.attributes,
