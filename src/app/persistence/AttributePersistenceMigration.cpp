@@ -2,7 +2,7 @@
 
 namespace chip::app {
 
-CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(SafeAttributePersistenceProvider & safeProvider,
+CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceProvider & safeProvider,
                                                        AttributePersistenceProvider & normProvider, ConcreteClusterPath path,
                                                        Span<AttributeId> attributes, MutableByteSpan & buffer)
 {

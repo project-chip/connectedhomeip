@@ -23,7 +23,7 @@
 #include <platform/DeviceInfoProvider.h>
 #include <tracing/macros.h>
 
-#ifndef CHIP_SKIP_PERSISTANCE_MIGRATION
+#ifndef CHIP_SKIP_PERSISTENCE_MIGRATION
 #include <app/persistence/AttributePersistenceMigration.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #endif
@@ -33,16 +33,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitLocalization;
 using namespace chip::app::Clusters::UnitLocalization::Attributes;
-
-namespace {
-CHIP_ERROR MigratePersistance(const ConcreteClusterPath & path, ServerClusterContext & context)
-{
-    AttributeId attributesToUpdate[] = { TemperatureUnit::Id };
-
-    return MigrateFromSafeAttributePersistanceProvider(path, Span(attributesToUpdate), context.storage);
-}
-
-} // namespace
 
 UnitLocalizationCluster::UnitLocalizationCluster(EndpointId endpointId, BitFlags<UnitLocalization::Feature> feature) :
     DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }), mfeatures{ feature }
@@ -69,7 +59,7 @@ CHIP_ERROR UnitLocalizationCluster::Startup(ServerClusterContext & context)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    MigratePersistance(mPath, context);
+    MigrateFromSafeAttributePersistenceProvider(path, Span(attributesToUpdate), context.storage);
 
     AttributePersistence attrPersistence{ context.attributeStorage };
 

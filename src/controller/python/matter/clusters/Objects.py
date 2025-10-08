@@ -20563,16 +20563,16 @@ class Groupcast(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="endpoints", Tag=1, Type=typing.List[uint]),
-                        ClusterObjectFieldDescriptor(Label="key", Tag=2, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="keyID", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="keyID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="key", Tag=3, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="gracePeriod", Tag=4, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="useAuxiliaryACL", Tag=5, Type=typing.Optional[bool]),
                     ])
 
             groupID: uint = 0
             endpoints: typing.List[uint] = field(default_factory=lambda: [])
-            key: bytes = b""
             keyID: uint = 0
+            key: typing.Optional[bytes] = None
             gracePeriod: typing.Optional[uint] = None
             useAuxiliaryACL: typing.Optional[bool] = None
 
@@ -20626,14 +20626,14 @@ class Groupcast(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="key", Tag=1, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="keyID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="keyID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="key", Tag=2, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="gracePeriod", Tag=3, Type=typing.Optional[uint]),
                     ])
 
             groupID: uint = 0
-            key: bytes = b""
             keyID: uint = 0
+            key: typing.Optional[bytes] = None
             gracePeriod: typing.Optional[uint] = None
 
         @dataclass
@@ -52784,20 +52784,12 @@ class TlsClientManagement(Cluster):
             kRootCertificateNotFound = 0x03
             kClientCertificateNotFound = 0x04
             kEndpointInUse = 0x05
+            kInvalidTime = 0x06
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 0
-
-        class TLSEndpointStatusEnum(MatterIntEnum):
-            kProvisioned = 0x00
-            kInUse = 0x01
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2
 
     class Structs:
         @dataclass
@@ -52811,7 +52803,7 @@ class TlsClientManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="port", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="caid", Tag=3, Type=uint),
                         ClusterObjectFieldDescriptor(Label="ccdid", Tag=4, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="status", Tag=5, Type=TlsClientManagement.Enums.TLSEndpointStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="referenceCount", Tag=5, Type=uint),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
@@ -52820,7 +52812,7 @@ class TlsClientManagement(Cluster):
             port: 'uint' = 0
             caid: 'uint' = 0
             ccdid: 'typing.Union[Nullable, uint]' = NullValue
-            status: 'TlsClientManagement.Enums.TLSEndpointStatusEnum' = 0
+            referenceCount: 'uint' = 0
             fabricIndex: 'uint' = 0
 
     class Commands:

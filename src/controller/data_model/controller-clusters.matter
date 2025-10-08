@@ -647,13 +647,13 @@ cluster LevelControl = 8 {
     int16u frequency = 0;
   }
 
-  /** Command description for MoveToLevel */
+  /** This command will move the device to the specified level. */
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
-  /** Command description for Move */
+  /** This command will move the device using the specified values. */
   command Move(MoveRequest): DefaultSuccess = 1;
-  /** Command description for Step */
+  /** This command will do a relative step change of the device using the specified values. */
   command Step(StepRequest): DefaultSuccess = 2;
-  /** Command description for Stop */
+  /** This command will stop the actions of various other commands that are still in progress. */
   command Stop(StopRequest): DefaultSuccess = 3;
   /** Command description for MoveToLevelWithOnOff */
   command MoveToLevelWithOnOff(MoveToLevelWithOnOffRequest): DefaultSuccess = 4;
@@ -663,8 +663,7 @@ cluster LevelControl = 8 {
   command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
   /** Command description for StopWithOnOff */
   command StopWithOnOff(StopWithOnOffRequest): DefaultSuccess = 7;
-  /** Change the currrent frequency to the provided one, or a close
-        approximation if the exact provided one is not possible. */
+  /** This command will cause the device to change the current frequency to the requested value. */
   command MoveToClosestFrequency(MoveToClosestFrequencyRequest): DefaultSuccess = 8;
 }
 
@@ -1380,7 +1379,7 @@ cluster PowerSourceConfiguration = 46 {
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 cluster PowerSource = 47 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 3;
 
   enum BatApprovedChemistryEnum : enum16 {
     kUnspecified = 0;
@@ -2913,7 +2912,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
@@ -4373,8 +4372,8 @@ cluster Groupcast = 101 {
   request struct JoinGroupRequest {
     group_id groupID = 0;
     endpoint_no endpoints[] = 1;
-    octet_string<16> key = 2;
-    int32u keyID = 3;
+    int32u keyID = 2;
+    optional octet_string<16> key = 3;
     optional epoch_s gracePeriod = 4;
     optional boolean useAuxiliaryACL = 5;
   }
@@ -4392,8 +4391,8 @@ cluster Groupcast = 101 {
 
   request struct UpdateGroupKeyRequest {
     group_id groupID = 0;
-    octet_string<16> key = 1;
-    int32u keyID = 2;
+    int32u keyID = 1;
+    optional octet_string<16> key = 2;
     optional epoch_s gracePeriod = 3;
   }
 
@@ -4410,7 +4409,7 @@ cluster Groupcast = 101 {
   fabric command access(invoke: manage) JoinGroup(JoinGroupRequest): DefaultSuccess = 0;
   /** This command SHALL allow a maintainer to request that the server withdraws itself or specific endpoints from a specific group or from all groups of this client's fabric. */
   fabric command access(invoke: manage) LeaveGroup(LeaveGroupRequest): LeaveGroupResponse = 1;
-  /** This command SHALL allow a fabric maintainer to update the group operational key for an existing group ID that the server is a member of. */
+  /** This command SHALL allow a fabric maintainer to update the OperationalGroupKey for an existing group ID that the server is a member of. */
   fabric command access(invoke: manage) UpdateGroupKey(UpdateGroupKeyRequest): DefaultSuccess = 3;
   /** This command SHALL allow a fabric maintainer to expire the grace period of the previous key for an existing group ID that the server is a member of. */
   fabric command access(invoke: manage) ExpireGracePeriod(ExpireGracePeriodRequest): DefaultSuccess = 4;
@@ -9183,7 +9182,7 @@ cluster LowPower = 1288 {
 
 /** This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT. */
 cluster KeypadInput = 1289 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum CECKeyCodeEnum : enum8 {
     kSelect = 0;
@@ -9300,7 +9299,7 @@ cluster KeypadInput = 1289 {
     StatusEnum status = 0;
   }
 
-  /** Upon receipt, this SHALL process a keycode as input to the media device. */
+  /** Upon receipt, this SHALL process a keycode as input to the media endpoint. */
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
 }
 
@@ -11330,11 +11329,7 @@ provisional cluster TlsClientManagement = 2050 {
     kRootCertificateNotFound = 3;
     kClientCertificateNotFound = 4;
     kEndpointInUse = 5;
-  }
-
-  enum TLSEndpointStatusEnum : enum8 {
-    kProvisioned = 0;
-    kInUse = 1;
+    kInvalidTime = 6;
   }
 
   fabric_scoped struct TLSEndpointStruct {
@@ -11343,7 +11338,7 @@ provisional cluster TlsClientManagement = 2050 {
     int16u port = 2;
     int16u caid = 3;
     nullable int16u ccdid = 4;
-    TLSEndpointStatusEnum status = 5;
+    int8u referenceCount = 5;
     fabric_idx fabricIndex = 254;
   }
 
@@ -11379,7 +11374,7 @@ provisional cluster TlsClientManagement = 2050 {
     int16u endpointID = 0;
   }
 
-  /** This command is used to provision a TLS Endpoint for the provided HostName / Port combination. */
+  /** This command is used to provision a TLS Endpoint for the provided Hostname / Port combination. */
   fabric command access(invoke: administer) ProvisionEndpoint(ProvisionEndpointRequest): ProvisionEndpointResponse = 0;
   /** This command is used to find a TLS Endpoint by its ID. */
   fabric command FindEndpoint(FindEndpointRequest): FindEndpointResponse = 2;

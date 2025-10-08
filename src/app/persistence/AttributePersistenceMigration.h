@@ -22,12 +22,12 @@
 
 namespace chip::app {
 
-CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(SafeAttributePersistenceProvider & safeProvider,
+CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceProvider & safeProvider,
     AttributePersistenceProvider & normProvider, ConcreteClusterPath path,
     Span<AttributeId> attributes, MutableByteSpan & buffer);
 
 template <int attributeBufferSize = 255>
-CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(ConcreteClusterPath path, Span<AttributeId> attributes,
+CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(ConcreteClusterPath path, Span<AttributeId> attributes,
     PersistentStorageDelegate & storageDelegate)
 {
     DefaultSafeAttributePersistenceProvider safeProvider;
@@ -38,7 +38,7 @@ CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(ConcreteClusterPath path,
     unsigned char attributeBuffer[attributeBufferSize] = { };
     MutableByteSpan buffer(attributeBuffer);
 
-    return MigrateFromSafeAttributePersistanceProvider(safeProvider, normProvider, path, attributes, buffer);
+    return MigrateFromSafeAttributePersistenceProvider(safeProvider, normProvider, path, attributes, buffer);
 };
 
 }
