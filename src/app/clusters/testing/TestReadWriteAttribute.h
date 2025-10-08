@@ -27,10 +27,10 @@ namespace chip {
 namespace Test {
 
 template <typename ClusterT, typename T>
-CHIP_ERROR ReadAttribute(ClusterT & cluster, const chip::app::ConcreteDataAttributePath & path, T & value)
+CHIP_ERROR ReadAttribute(ClusterT & cluster, const app::ConcreteDataAttributePath & path, T & value)
 {
     app::Testing::ReadOperation readOperation(path);
-    std::unique_ptr<chip::app::AttributeValueEncoder> encoder = readOperation.StartEncoding();
+    std::unique_ptr<app::AttributeValueEncoder> encoder = readOperation.StartEncoding();
     ReturnErrorOnFailure(cluster.ReadAttribute(readOperation.GetRequest(), *encoder).GetUnderlyingError());
     ReturnErrorOnFailure(readOperation.FinishEncoding());
 
@@ -38,15 +38,15 @@ CHIP_ERROR ReadAttribute(ClusterT & cluster, const chip::app::ConcreteDataAttrib
     ReturnErrorOnFailure(readOperation.GetEncodedIBs().Decode(attributeData));
     VerifyOrReturnError(attributeData.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
 
-    return chip::app::DataModel::Decode(attributeData[0].dataReader, value);
+    return app::DataModel::Decode(attributeData[0].dataReader, value);
 }
 
 // Helper function to write any attribute value of a given type
 template <typename ClusterT, typename T>
-CHIP_ERROR WriteAttribute(ClusterT & cluster, const chip::app::ConcreteAttributePath & path, const T & value)
+CHIP_ERROR WriteAttribute(ClusterT & cluster, const app::ConcreteAttributePath & path, const T & value)
 {
     app::Testing::WriteOperation writeOperation(path);
-    chip::app::AttributeValueDecoder decoder = writeOperation.DecoderFor(value);
+    app::AttributeValueDecoder decoder = writeOperation.DecoderFor(value);
     return cluster.WriteAttribute(writeOperation.GetRequest(), decoder).GetUnderlyingError();
 }
 
