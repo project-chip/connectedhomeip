@@ -206,23 +206,71 @@ class TC_SC_4_1(MatterBaseTest):
         # is randomized for privacy, the randomized version must be used each time.
         assert_valid_hostname(srv_record.hostname)
 
+
         # *** COMMISSIONABLE SUBTYPES CHECKS ***
         # **************************************
         # Get commissionable subtypes
         subtypes = await MdnsDiscovery().get_commissionable_subtypes(log_output=True)
 
+        # *** LONG DISCRIMINATOR SUBTYPE ***
         # Validate that the commissionable long discriminator subtype is a 12-bit long discriminator,
         # encoded as a variable-length decimal number in ASCII text, omitting any leading zeros
         long_discriminator_subtype = next((s for s in subtypes if s.startswith('_L')), None)
         asserts.assert_is_not_none(long_discriminator_subtype, "Long discriminator must be present.")
         assert_valid_long_discriminator_subtype(long_discriminator_subtype)
 
+        # Get Long Discriminator subtype PTR record
+        ptr_records = await MdnsDiscovery().get_ptr_records(
+            service_types=[long_discriminator_subtype],
+            log_output=True
+        )
+
+        # Verify Long Discriminator subtype PTR record is present
+        asserts.assert_greater(len(ptr_records), 0, "Long Discriminator subtype PTR record must be present.")
+        
+        # Verify that the Long Discriminator subtype PTR record's
+        # 'service_name'is the same as the SRV record 'service_name'
+        if len(ptr_records) > 0:
+            asserts.assert_equal(ptr_records[0].service_name, srv_record.service_name,
+                                "Long Discriminator subtype PTR record service name must be equal to the SRV record service name.")
+
+        # *** SHORT DISCRIMINATOR SUBTYPE ***
         # Validate that the short commissionable discriminator subtype is a 4-bit long discriminator,
         # encoded as a variable-length decimal number in ASCII text, omitting any leading zeros
         short_discriminator_subtype = next((s for s in subtypes if s.startswith('_S')), None)
         asserts.assert_is_not_none(short_discriminator_subtype, "Short discriminator must be present.")
         assert_valid_short_discriminator_subtype(short_discriminator_subtype)
 
+        # Get Short Discriminator subtype PTR record
+        ptr_records = await MdnsDiscovery().get_ptr_records(
+            service_types=[short_discriminator_subtype],
+            log_output=True
+        )
+
+        # Verify Short Discriminator subtype PTR record is present
+        asserts.assert_greater(len(ptr_records), 0, "Short Discriminator subtype PTR record must be present.")
+
+        # Verify that the Short Discriminator subtype PTR record's
+        # 'service_name'is the same as the SRV record 'service_name'
+        if len(ptr_records) > 0:
+            asserts.assert_equal(ptr_records[0].service_name, srv_record.service_name,
+                                "Short Discriminator subtype PTR record service name must be equal to the SRV record service name.")
+
+        # *** IN COMMISSIONING MODE SUBTYPE ***
+        # Verify presence of the _CM subtype
+        cm_subtype = f"_CM._sub.{MdnsServiceType.COMMISSIONABLE.value}"
+        asserts.assert_in(cm_subtype, subtypes, f"'{cm_subtype}' subtype must be present.")
+
+        # Get In Commissioning Mode subtype PTR record
+        ptr_records = await MdnsDiscovery().get_ptr_records(
+            service_types=[cm_subtype],
+            log_output=True
+        )
+
+        # Verify In Commissioning Mode subtype PTR record is present
+        asserts.assert_greater(len(ptr_records), 0, "In Commissioning Mode subtype PTR record must be present.")
+
+        # *** VENDOR SUBTYPE ***
         # If the commissionable vendor subtype is present, validate it's a
         # 16-bit vendor id, encoded as a variable-length decimal number in
         # ASCII text, omitting any leading zeros
@@ -230,15 +278,37 @@ class TC_SC_4_1(MatterBaseTest):
         if vendor_subtype:
             assert_valid_vendor_subtype(vendor_subtype)
 
+            # Get Vendor subtype PTR record
+            ptr_records = await MdnsDiscovery().get_ptr_records(
+                service_types=[vendor_subtype],
+                log_output=True
+            )
+
+            # If Vendor subtype PTR record is present, verify the its
+            # 'service_name'is the same as the SRV record 'service_name'
+            if len(ptr_records) > 0:
+                asserts.assert_equal(ptr_records[0].service_name, srv_record.service_name,
+                                    "Vendor subtype PTR record service name must be equal to the SRV record service name.")
+
+        # *** DEVTYPE SUBTYPE ***
         # If the commissionable devtype subtype is present, validate it's a
         # 32-bit variable length decimal number in ASCII without leading zeros
         devtype_subtype = next((s for s in subtypes if s.startswith('_T')), None)
         if devtype_subtype:
             assert_valid_devtype_subtype(devtype_subtype)
 
-        # Verify presence of the _CM subtype
-        cm_subtype = f"_CM._sub.{MdnsServiceType.COMMISSIONABLE.value}"
-        asserts.assert_in(cm_subtype, subtypes, f"'{cm_subtype}' subtype must be present.")
+            # Get Devtype subtype PTR record
+            ptr_records = await MdnsDiscovery().get_ptr_records(
+                service_types=[devtype_subtype],
+                log_output=True
+            )
+
+            # If Devtype subtype PTR record is present, verify the its
+            # 'service_name'is the same as the SRV record 'service_name'
+            if len(ptr_records) > 0:
+                asserts.assert_equal(ptr_records[0].service_name, srv_record.service_name,
+                                    "Devtype subtype PTR record service name must be equal to the SRV record service name.")
+
 
         # *** TXT RECORD CHECKS ***
         # *************************
@@ -406,6 +476,7 @@ class TC_SC_4_1(MatterBaseTest):
                 # assert_valid_pi_key(pi_key)
         else:
             logging.info("TXT record NOT required.")
+
 
         # *** AAAA RECORD CHECKS ***
         # **************************
