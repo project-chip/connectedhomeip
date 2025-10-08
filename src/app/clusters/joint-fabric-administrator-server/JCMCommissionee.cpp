@@ -43,6 +43,31 @@ void JCMCommissionee::VerifyTrustAgainstCommissionerAdmin()
     StartTrustVerification();
 }
 
+CHIP_ERROR JCMCommissionee::ReadAdminFabricIndexAttribute(
+    std::function<void(const ConcreteAttributePath &, const FabricIndexAttr::DecodableType &)> onSuccess, ReadErrorHandler onError)
+{
+    return ReadAttribute<FabricIndexAttr>(mInfo.adminEndpointId, std::move(onSuccess), std::move(onError), false);
+}
+
+CHIP_ERROR JCMCommissionee::ReadAdminFabricsAttribute(
+    std::function<void(const ConcreteAttributePath &, const FabricsAttr::DecodableType &)> onSuccess, ReadErrorHandler onError)
+{
+    return ReadAttribute<FabricsAttr>(kRootEndpointId, std::move(onSuccess), std::move(onError), false);
+}
+
+CHIP_ERROR JCMCommissionee::ReadAdminCertsAttribute(
+    std::function<void(const ConcreteAttributePath &, const CertsAttr::TypeInfo::DecodableType &)> onSuccess,
+    ReadErrorHandler onError)
+{
+    return ReadAttribute<CertsAttr>(kRootEndpointId, std::move(onSuccess), std::move(onError), false);
+}
+
+CHIP_ERROR JCMCommissionee::ReadAdminNOCsAttribute(
+    std::function<void(const ConcreteAttributePath &, const NOCsAttr::DecodableType &)> onSuccess, ReadErrorHandler onError)
+{
+    return ReadAttribute<NOCsAttr>(kRootEndpointId, std::move(onSuccess), std::move(onError), false);
+}
+
 CHIP_ERROR JCMCommissionee::OnLookupOperationalTrustAnchor(VendorId vendorID, Credentials::CertificateKeyId & subjectKeyId,
                                                            ByteSpan & globallyTrustedRootSpan)
 {
@@ -187,7 +212,7 @@ TrustVerificationError JCMCommissionee::ReadCommissionerAdminFabricIndex()
                                              TrustVerificationError::kReadAdminAttributeFailed);
     };
 
-    CHIP_ERROR err = ReadAttribute<Attr>(mInfo.adminEndpointId, onSuccess, onError, false);
+    CHIP_ERROR err = ReadAdminFabricIndexAttribute(onSuccess, onError);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -224,7 +249,7 @@ CHIP_ERROR JCMCommissionee::ReadAdminFabrics(OnCompletionFunc onComplete)
         ChipLogError(JointFabric, "JCM: Failed to read commissioner's Fabrics list: %" CHIP_ERROR_FORMAT, err.Format());
         onComplete(err);
     };
-    return ReadAttribute<FabricsAttr>(kRootEndpointId, onReadSuccess, onError, false);
+    return ReadAdminFabricsAttribute(onReadSuccess, onError);
 }
 
 void JCMCommissionee::FetchCommissionerInfo(OnCompletionFunc onComplete)
@@ -368,7 +393,7 @@ CHIP_ERROR JCMCommissionee::ReadAdminCerts(OnCompletionFunc onComplete)
         onComplete(err);
     };
 
-    return ReadAttribute<CertsAttr>(kRootEndpointId, onSuccess, onError, false);
+    return ReadAdminCertsAttribute(onSuccess, onError);
 }
 
 CHIP_ERROR JCMCommissionee::ReadAdminNOCs(OnCompletionFunc onComplete)
@@ -431,7 +456,7 @@ CHIP_ERROR JCMCommissionee::ReadAdminNOCs(OnCompletionFunc onComplete)
         onComplete(err);
     };
 
-    return ReadAttribute<NOCsAttr>(kRootEndpointId, onSuccess, onError, false);
+    return ReadAdminNOCsAttribute(onSuccess, onError);
 }
 
 } // namespace JointFabricAdministrator
