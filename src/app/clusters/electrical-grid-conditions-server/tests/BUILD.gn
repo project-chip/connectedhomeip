@@ -23,6 +23,9 @@ chip_test_suite("tests") {
   # Main test file
   test_sources = [ "TestElectricalGridConditionsCluster.cpp" ]
 
+  # Include the server implementation directly for testing
+  sources = [ "../electrical-grid-conditions-server.cpp" ]
+
   cflags = [ "-Wconversion" ]
 
   # Allows mock to replace MatterReportingAttributeChangeCallback in reporting.cpp
@@ -31,7 +34,11 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/app/clusters/electrical-grid-conditions-server",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/protocols",
+    "${chip_root}/zzz_generated/app-common/clusters/ElectricalGridConditions",
   ]
 }

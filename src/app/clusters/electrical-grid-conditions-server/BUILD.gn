@@ -16,7 +16,6 @@ import("//build_overrides/chip.gni")
 
 source_set("electrical-grid-conditions-server") {
   sources = [
-    "electrical-grid-conditions-server.cpp",
     "electrical-grid-conditions-server.h",
   ]
 
