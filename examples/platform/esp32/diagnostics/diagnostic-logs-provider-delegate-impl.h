@@ -26,7 +26,7 @@
 #include <esp_core_dump.h>
 #endif // defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
 
-#include <tracing/esp32_diagnostic_trace/DiagnosticStorage.h>
+#include <tracing/esp32_diagnostics/DiagnosticStorage.h>
 using namespace chip::Tracing::Diagnostics;
 namespace chip {
 namespace app {

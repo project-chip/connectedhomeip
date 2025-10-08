@@ -54,6 +54,7 @@ static_library("cluster-objects") {
   sources = [
     "${chip_app_zap_dir}/app-common/zap-generated/cluster-objects.cpp",
     "${chip_app_zap_dir}/app-common/zap-generated/cluster-objects.h",
+    "CompatClusterObjects.h",
   ]
 
   public_deps = [

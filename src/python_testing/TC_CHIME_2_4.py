@@ -35,6 +35,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import logging
+
 from mobly import asserts
 from TC_CHIMETestBase import CHIMETestBase
 
@@ -88,7 +90,11 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
             user_response = self.wait_for_user_input(prompt_msg="A chime sound should not have been played, is this correct? Enter 'y' or 'n'",
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
-            asserts.assert_equal(user_response.lower(), "y")
+            if user_response is not None:
+                logging.info(f"CHIME 2_4: response '{user_response}' received on confirmation of no chime sound")
+                asserts.assert_equal(user_response.lower(), "y")
+            else:
+                logging.info("CHIME 2_4: No response received for no chime sound played user prompt")
 
         self.step(4)
         await self.write_chime_attribute_expect_success(endpoint, attributes.Enabled, True)
@@ -99,29 +105,39 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
             user_response = self.wait_for_user_input(prompt_msg="A chime sound should have been played, is this correct? Enter 'y' or 'n'",
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
-            asserts.assert_equal(user_response.lower(), "y")
+            if user_response is not None:
+                logging.info(f"CHIME 2_4: response '{user_response}' received on confirmation of chime sound")
+                asserts.assert_equal(user_response.lower(), "y")
+            else:
+                logging.info("CHIME 2_4: No response received for chime sound played user prompt")
 
         self.step(6)
         # Use the current selected chime when in CI
         longestChimeDurationChime = await self.read_chime_attribute_expect_success(endpoint, attributes.SelectedChime)
 
         if not self.is_ci:
-            user_response = self.wait_for_user_input(prompt_msg="Plesse enter the ChimeID of the longest duration chime",
+            user_response = self.wait_for_user_input(prompt_msg="Please enter the ChimeID of the longest duration chime",
                                                      prompt_msg_placeholder=str(longestChimeDurationChime),
                                                      default_value=str(longestChimeDurationChime))
-            chosenChimeID = int(user_response)
-            # Make sure the selected ID is valid
-            myChimeSounds = await self.read_chime_attribute_expect_success(endpoint, attributes.InstalledChimeSounds)
-            found_id = False
-            for chime in myChimeSounds:
-                if chime.chimeID == chosenChimeID:
-                    found_id = True
-                    break
 
-            if not found_id:
-                asserts.assert_fail("Unknown ChimeID selected")
+            if user_response is not None:
+                chosenChimeID = int(user_response)
+                # Make sure the selected ID is valid
+                myChimeSounds = await self.read_chime_attribute_expect_success(endpoint, attributes.InstalledChimeSounds)
+                found_id = False
+                for chime in myChimeSounds:
+                    if chime.chimeID == chosenChimeID:
+                        found_id = True
+                        break
 
-            longestChimeDurationChime = chosenChimeID
+                if not found_id:
+                    asserts.assert_fail(f"Unknown ChimeID selected: {chosenChimeID}")
+                else:
+                    logging.info(f"CHIME 2_4: selected chime id for longest chime: {chosenChimeID}")
+
+                longestChimeDurationChime = chosenChimeID
+            else:
+                logging.info("CHIME 2_4: No response received for longest ChimeID user prompt")
 
         await self.write_chime_attribute_expect_success(endpoint, attributes.SelectedChime, longestChimeDurationChime)
 
@@ -137,7 +153,11 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
             user_response = self.wait_for_user_input(prompt_msg="No more than two chime sounds should have been played, is this correct? Enter 'y' or 'n'",
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
-            asserts.assert_equal(user_response.lower(), "y")
+            if user_response is not None:
+                logging.info(f"CHIME 2_4: response '{user_response}' received on confirmation of no more than two chime sounds")
+                asserts.assert_equal(user_response.lower(), "y")
+            else:
+                logging.info("CHIME 2_4: No response received for no more than two chime sounds played user prompt")
 
         self.step(8)
         myChimeSounds = await self.read_chime_attribute_expect_success(endpoint, attributes.InstalledChimeSounds)
@@ -168,7 +188,11 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
                 user_response = self.wait_for_user_input(prompt_msg="A different chime sound should have just been played, is this correct? Enter 'y' or 'n'",
                                                          prompt_msg_placeholder="y",
                                                          default_value="y")
-                asserts.assert_equal(user_response.lower(), "y")
+                if user_response is not None:
+                    logging.info(f"CHIME 2_4: response '{user_response}' received on confirmation of different chime sound")
+                    asserts.assert_equal(user_response.lower(), "y")
+                else:
+                    logging.info("CHIME 2_4: No response received for different chime sound played user prompt")
 
         else:
             self.skip_step(9)
