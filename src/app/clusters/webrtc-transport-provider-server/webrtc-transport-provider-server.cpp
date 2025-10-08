@@ -262,17 +262,33 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         return;
     }
 
-    bool privacyModeActive = false;
-    if (mDelegate.IsPrivacyModeActive(privacyModeActive) != CHIP_NO_ERROR)
+    bool hardPrivacyModeActive = false;
+    mDelegate.IsHardPrivacyModeActive(hardPrivacyModeActive);
+
+    if (hardPrivacyModeActive)
     {
-        ChipLogError(Zcl, "HandleSolicitOffer: Cannot determine privacy mode state");
+        ChipLogError(Zcl, "HandleSolicitOffer: Hard Privacy mode is enabled");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
         return;
     }
 
-    if (privacyModeActive)
+    bool softLivestreamPrivacyModeActive = false;
+    mDelegate.IsSoftLivestreamPrivacyModeActive(softLivestreamPrivacyModeActive);
+
+    if (softLivestreamPrivacyModeActive && req.streamUsage == StreamUsageEnum::kLiveView)
     {
-        ChipLogError(Zcl, "HandleSolicitOffer: Privacy mode is enabled");
+        ChipLogError(Zcl, "HandleSolicitOffer: Soft LivestreamPrivacy mode is enabled and StreamUsage is LiveView");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
+        return;
+    }
+
+    bool softRecordingPrivacyModeActive = false;
+    mDelegate.IsSoftRecordingPrivacyModeActive(softRecordingPrivacyModeActive);
+
+    if (softRecordingPrivacyModeActive &&
+        (req.streamUsage == StreamUsageEnum::kRecording || req.streamUsage == StreamUsageEnum::kAnalysis))
+    {
+        ChipLogError(Zcl, "HandleSolicitOffer: Soft RecordingPrivacy mode is enabled and StreamUsage is Recording or Analysis");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
         return;
     }
@@ -487,18 +503,33 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
     {
         // WebRTCSessionID is null - new session request
 
-        // Check privacy mode settings - if either is true, fail with INVALID_IN_STATE
-        bool privacyModeActive = false;
-        if (mDelegate.IsPrivacyModeActive(privacyModeActive) != CHIP_NO_ERROR)
+        bool hardPrivacyModeActive = false;
+        mDelegate.IsHardPrivacyModeActive(hardPrivacyModeActive);
+
+        if (hardPrivacyModeActive)
         {
-            ChipLogError(Zcl, "HandleProvideOffer: Cannot determine privacy mode state");
+            ChipLogError(Zcl, "HandleProvideOffer: Hard Privacy mode is enabled");
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
             return;
         }
 
-        if (privacyModeActive)
+        bool softLivestreamPrivacyModeActive = false;
+        mDelegate.IsSoftLivestreamPrivacyModeActive(softLivestreamPrivacyModeActive);
+
+        if (softLivestreamPrivacyModeActive && req.streamUsage == StreamUsageEnum::kLiveView)
         {
-            ChipLogError(Zcl, "HandleProvideOffer: Privacy mode is enabled");
+            ChipLogError(Zcl, "HandleProvideOffer: Soft LivestreamPrivacy mode is enabled and StreamUsage is LiveView");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
+            return;
+        }
+
+        bool softRecordingPrivacyModeActive = false;
+        mDelegate.IsSoftRecordingPrivacyModeActive(softRecordingPrivacyModeActive);
+
+        if (softRecordingPrivacyModeActive &&
+            (req.streamUsage == StreamUsageEnum::kRecording || req.streamUsage == StreamUsageEnum::kAnalysis))
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: Soft RecordingPrivacy mode is enabled and StreamUsage is Recording or Analysis");
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
             return;
         }

@@ -192,14 +192,30 @@ CHIP_ERROR CameraAVStreamManager::ValidateAudioStreamID(uint16_t audioStreamId)
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
-CHIP_ERROR CameraAVStreamManager::IsPrivacyModeActive(bool & isActive)
+CHIP_ERROR CameraAVStreamManager::IsHardPrivacyModeActive(bool & isActive)
 {
     // Check privacy mode attributes
-    bool hardPrivacyMode           = GetCameraAVStreamMgmtServer()->GetHardPrivacyModeOn();
-    bool softRecordingPrivacyMode  = GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled();
+    bool hardPrivacyMode = GetCameraAVStreamMgmtServer()->GetHardPrivacyModeOn();
+
+    isActive = hardPrivacyMode;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamManager::IsSoftRecordingPrivacyModeActive(bool & isActive)
+{
+    // Check privacy mode attributes
+    bool softRecordingPrivacyMode = GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled();
+
+    isActive = softRecordingPrivacyMode;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamManager::IsSoftLivestreamPrivacyModeActive(bool & isActive)
+{
+    // Check privacy mode attributes
     bool softLivestreamPrivacyMode = GetCameraAVStreamMgmtServer()->GetSoftLivestreamPrivacyModeEnabled();
 
-    isActive = hardPrivacyMode || softRecordingPrivacyMode || softLivestreamPrivacyMode;
+    isActive = softLivestreamPrivacyMode;
     return CHIP_NO_ERROR;
 }
 

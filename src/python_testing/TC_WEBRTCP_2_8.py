@@ -130,7 +130,7 @@ class TC_WebRTCProvider_2_8(MatterBaseTest, WEBRTCPTestBase):
                                  "Expected INVALID_IN_STATE when SoftRecordingPrivacyModeEnabled is True")
 
         self.step(5)
-        # Send SolicitOffer with StreamUsage = kLiveView (should fail)
+        # Send SolicitOffer with StreamUsage = kLiveView (should pass)
         solicit_offer_request_liveview = Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
             streamUsage=Clusters.Globals.Enums.StreamUsageEnum.kLiveView,
             originatingEndpointID=endpoint,
@@ -138,12 +138,9 @@ class TC_WebRTCProvider_2_8(MatterBaseTest, WEBRTCPTestBase):
             audioStreamID=audioStreamID
         )
 
-        try:
-            await self.send_single_cmd(cmd=solicit_offer_request_liveview, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-            asserts.fail("Unexpected success on SolicitOffer with SoftRecordingPrivacyModeEnabled is True")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.InvalidInState,
-                                 "Expected INVALID_IN_STATE when SoftRecordingPrivacyModeEnabled is True")
+        resp = await self.send_single_cmd(cmd=solicit_offer_request_liveview, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+        asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse,
+                             "Incorrect response type")
 
 
 if __name__ == "__main__":

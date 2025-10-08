@@ -242,15 +242,34 @@ public:
     virtual CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) = 0;
 
     /**
-     * @brief Check whether privacy mode is active.
+     * @brief Check whether hard privacy mode is active.
      *
-     * Reads the SoftLivestreamPrivacyModeEnabled and HardPrivacyModeOn attributes from the CameraAvStreamManagement
-     * cluster. Privacy mode is considered **active** when **either** attribute is true.
+     * Reads the HardPrivacyModeOn attribute from the CameraAvStreamManagement cluster.
      *
      * @param[out] isActive Set to true if privacy mode is active, false if inactive.
      * @return CHIP_NO_ERROR on success, error code if privacy mode state cannot be determined.
      */
-    virtual CHIP_ERROR IsPrivacyModeActive(bool & isActive) = 0;
+    virtual CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) = 0;
+
+    /**
+     * @brief Check whether soft recording privacy mode is active.
+     *
+     * Reads the SoftRecordingPrivacyModeEnabled attribute from the CameraAvStreamManagement cluster.
+     *
+     * @param[out] isActive Set to true if privacy mode is active, false if inactive.
+     * @return CHIP_NO_ERROR on success, error code if privacy mode state cannot be determined.
+     */
+    virtual CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) = 0;
+
+    /**
+     * @brief Check whether soft livestream privacy mode is active.
+     *
+     * Reads the SoftLivestreamPrivacyModeEnabled attribute from the CameraAvStreamManagement cluster.
+     *
+     * @param[out] isActive Set to true if privacy mode is active, false if inactive.
+     * @return CHIP_NO_ERROR on success, error code if privacy mode state cannot be determined.
+     */
+    virtual CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) = 0;
 
     /**
      * @brief Check if there are any allocated video streams.

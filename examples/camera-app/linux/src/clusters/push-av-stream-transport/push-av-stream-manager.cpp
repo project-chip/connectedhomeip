@@ -205,16 +205,26 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportSt
     if (transportStatus == TransportStatusEnum::kActive)
     {
         auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
-        bool isActive;
-        CHIP_ERROR status = avsmController.IsPrivacyModeActive(isActive);
+        bool isHardPrivacyModeActive;
+        CHIP_ERROR status = avsmController.IsHardPrivacyModeActive(isHardPrivacyModeActive);
         if (status != CHIP_NO_ERROR)
         {
             ChipLogError(Camera,
-                         "PushAvStreamTransportManager, Failed to retrieve Privacy Mode Status from AVStreamMgmtController.");
+                         "PushAvStreamTransportManager, Failed to retrieve Hard Privacy Mode Status from AVStreamMgmtController.");
             return Status::Failure;
         }
 
-        if (isActive)
+        bool isSoftRecordingPrivacyModeActive;
+        status = avsmController.IsSoftRecordingPrivacyModeActive(isSoftRecordingPrivacyModeActive);
+        if (status != CHIP_NO_ERROR)
+        {
+            ChipLogError(
+                Camera,
+                "PushAvStreamTransportManager, Failed to retrieve Soft Recording Privacy Mode Status from AVStreamMgmtController.");
+            return Status::Failure;
+        }
+
+        if (isHardPrivacyModeActive || isSoftRecordingPrivacyModeActive)
         {
             ChipLogError(Camera, "PushAvStreamTransportManager, Cannot set transport status to Active as privacy mode is enabled.");
             return Status::InvalidInState;

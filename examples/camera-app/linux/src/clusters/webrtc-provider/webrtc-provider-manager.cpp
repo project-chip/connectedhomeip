@@ -490,7 +490,7 @@ CHIP_ERROR WebRTCProviderManager::ValidateAudioStreamID(uint16_t audioStreamId)
     return avsmController.ValidateAudioStreamID(audioStreamId);
 }
 
-CHIP_ERROR WebRTCProviderManager::IsPrivacyModeActive(bool & isActive)
+CHIP_ERROR WebRTCProviderManager::IsHardPrivacyModeActive(bool & isActive)
 {
     if (mCameraDevice == nullptr)
     {
@@ -500,7 +500,33 @@ CHIP_ERROR WebRTCProviderManager::IsPrivacyModeActive(bool & isActive)
 
     auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
 
-    return avsmController.IsPrivacyModeActive(isActive);
+    return avsmController.IsHardPrivacyModeActive(isActive);
+}
+
+CHIP_ERROR WebRTCProviderManager::IsSoftRecordingPrivacyModeActive(bool & isActive)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.IsSoftRecordingPrivacyModeActive(isActive);
+}
+
+CHIP_ERROR WebRTCProviderManager::IsSoftLivestreamPrivacyModeActive(bool & isActive)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.IsSoftLivestreamPrivacyModeActive(isActive);
 }
 
 bool WebRTCProviderManager::HasAllocatedVideoStreams()
