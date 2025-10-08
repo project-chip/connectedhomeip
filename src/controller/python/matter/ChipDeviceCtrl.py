@@ -1727,7 +1727,7 @@ class ChipDeviceControllerBase():
                              attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
                              timedRequestTimeoutMs: typing.Optional[int] = None,
                              interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
-                             suppressResponse: typing.Optional[bool] = False,
+                             suppressResponse: bool = False,
                              payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Write a list of attributes on a target node.
@@ -1762,7 +1762,7 @@ class ChipDeviceControllerBase():
                               attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
                               timedRequestTimeoutMs: typing.Optional[int] = None,
                               interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
-                              suppressResponse: typing.Optional[bool] = False,
+                              suppressResponse: bool = False,
                               payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD, forceLegacyListEncoding: bool = False):
 
         self.CheckIsActive()
@@ -1783,7 +1783,7 @@ class ChipDeviceControllerBase():
                                                    attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
                                                    timedRequestTimeoutMs: typing.Optional[int] = None,
                                                    interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
-                                                   suppressResponse: typing.Optional[bool] = False,
+                                                   suppressResponse: bool = False,
                                                    payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Please see WriteAttribute for description.

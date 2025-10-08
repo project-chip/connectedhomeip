@@ -37,6 +37,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+from typing import Any, Optional
 
 from mobly import asserts
 
@@ -57,8 +58,14 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         self.endpoint = 0
 
     # Instead of hardcoding UnitTesting.TimedWriteBoolean, we will try to find real timed-write attributes
-    async def find_timed_write_attribute(self, endpoints_data):
-        """Find an attribute that requires timed write on the actual device"""
+    async def find_timed_write_attribute(
+        self, endpoints_data: dict[int, Any]
+    ) -> tuple[Optional[int], Optional[type[ClusterObjects.ClusterAttributeDescriptor]]]:
+        """Find an attribute that requires timed write on the actual device
+        
+        Uses the wildcard read data that's already in endpoints_data rather than
+        iterating through all possible attributes and checking with attribute_guard.
+        """
         logging.info(f"Searching for timed write attributes across {len(endpoints_data)} endpoints")
 
         for endpoint_id, endpoint in endpoints_data.items():
@@ -70,28 +77,17 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                                              global_attribute_ids.ClusterIdType.kTest]:
                     continue
 
-                # Check each attribute in this cluster
-                all_attrs = ClusterObjects.ALL_ATTRIBUTES.get(cluster_id, {})
-
-                for attr_id, attr_class in all_attrs.items():
-                    try:
-                        # Create an instance of the attribute to check its must_use_timed_write property
-                        # Using approach Cecille suggested: ClusterAttributeDescriptor.must_use_timed_write
-                        attr_instance = attr_class(None)  # Create with None value
-
-                        # Check if this attribute requires timed write using the must_use_timed_write property
-                        if hasattr(attr_instance, 'must_use_timed_write') and attr_instance.must_use_timed_write:
-                            if await self.attribute_guard(endpoint=endpoint_id, attribute=attr_class):
-                                logging.info(f"Found timed write attribute: {attr_class.__name__}(id={
-                                             attr_id}) in cluster {cluster_type.__name__}")
-                                return endpoint_id, attr_class
-                            else:
-                                logging.info(f"Device does not support timed write attribute: {attr_class.__name__} (id={attr_id})")
-
-                    except Exception as e:
-                        # Skip attributes that can't be instantiated or don't have the expected structure
-                        logging.debug(f"Could not check attribute {attr_id}: {e}")
-                        continue
+                # Check each attribute that the device actually has (from the wildcard read)
+                # cluster_data is a dict with attribute types as keys
+                for attr_type in cluster_data:
+                    # Check if this is an attribute descriptor class (skip metadata like DataVersion)
+                    if (isinstance(attr_type, type) and 
+                        issubclass(attr_type, ClusterObjects.ClusterAttributeDescriptor)):
+                        # Check if this attribute requires timed write using the must_use_timed_write class property
+                        if attr_type.must_use_timed_write:
+                            logging.info(f"Found timed write attribute: {attr_type.__name__} "
+                                         f"in cluster {cluster_type.__name__} on endpoint {endpoint_id}")
+                            return endpoint_id, attr_type
 
         logging.warning("No timed write attributes found on device")
         return None, None
