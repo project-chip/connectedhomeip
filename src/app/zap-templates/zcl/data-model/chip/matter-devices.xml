@@ -1192,6 +1192,25 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-doorbell</name>
+        <domain>CHIP</domain>
+        <typeName>Doorbell</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0148</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Chime" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Switch" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="MS" name="MomentarySwitch"></feature>
+                </features>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-closure</name>
         <domain>CHIP</domain>
         <typeName>Closure</typeName>
