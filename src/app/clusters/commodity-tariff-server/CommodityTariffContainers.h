@@ -22,18 +22,19 @@
 #include <cstddef>
 #include <utility>
 
-#include <lib/support/ScopedBuffer.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <lib/support/ScopedBuffer.h>
 
 namespace chip {
 namespace app {
 namespace CommodityTariffContainers {
 
-template<typename T>
+template <typename T>
 class CTC_ContainerClassBase
 {
     static_assert(std::is_trivially_destructible<T>::value, "T must be trivially destructible");
+
 protected:
     CTC_ContainerClassBase(size_t aCapacity = 0, size_t aMaxLimit = 0) : mMaxLimit(aMaxLimit), mCapacity(aCapacity)
     {
@@ -45,21 +46,23 @@ protected:
         }
         VerifyOrDie(mMaxLimit >= mCapacity);
     }
-    
-    CTC_ContainerClassBase(CTC_ContainerClassBase&& other) noexcept
-        : mCapacity(other.mCapacity), mCount(other.mCount), mBuffer(std::move(other.mBuffer))
+
+    CTC_ContainerClassBase(CTC_ContainerClassBase && other) noexcept :
+        mCapacity(other.mCapacity), mCount(other.mCount), mBuffer(std::move(other.mBuffer))
     {
         other.mCapacity = 0;
-        other.mCount = 0;
+        other.mCount    = 0;
     }
 
-    CTC_ContainerClassBase& operator=(CTC_ContainerClassBase&& other) noexcept {
-        if (this != &other) {
-            mCapacity = other.mCapacity;
-            mCount = other.mCount;
-            mBuffer = std::move(other.mBuffer);
+    CTC_ContainerClassBase & operator=(CTC_ContainerClassBase && other) noexcept
+    {
+        if (this != &other)
+        {
+            mCapacity       = other.mCapacity;
+            mCount          = other.mCount;
+            mBuffer         = std::move(other.mBuffer);
             other.mCapacity = 0;
-            other.mCount = 0;
+            other.mCount    = 0;
         }
         return *this;
     }
@@ -76,41 +79,52 @@ public:
         kGenericFail,
         kNotFound,
         kDuplicate,
-    }; 
+    };
 
-    virtual bool insert(const T& item) = 0;
-    virtual void remove(const T& item) = 0;
-    virtual void clear()    { mCount = 0; };
-    virtual bool contains(const T& item) const = 0;
-    virtual T* find(const T& item) = 0;
-    virtual const T* find(const T& item) const = 0;
+    virtual bool insert(const T & item) = 0;
+    virtual void remove(const T & item) = 0;
+    virtual void clear() { mCount = 0; };
+    virtual bool contains(const T & item) const  = 0;
+    virtual T * find(const T & item)             = 0;
+    virtual const T * find(const T & item) const = 0;
 
     size_t size() const { return mCount; }
     size_t capacity() const { return mCapacity; }
     bool empty() const { return (mCount == 0); }
 
     // Array-style access
-    T& operator[](size_t index) { VerifyOrDie( index < mCount ); return mBuffer[index]; }
-    const T& operator[](size_t index) const { VerifyOrDie( index < mCount ); return mBuffer[index]; }
+    T & operator[](size_t index)
+    {
+        VerifyOrDie(index < mCount);
+        return mBuffer[index];
+    }
+    const T & operator[](size_t index) const
+    {
+        VerifyOrDie(index < mCount);
+        return mBuffer[index];
+    }
 
     // Iterator support
-    T* begin() { return mBuffer.Get(); }
-    T* end() { return mBuffer.Get() + mCount; }
-    const T* begin() const { return mBuffer.Get(); }
-    const T* end() const { return mBuffer.Get() + mCount; }
+    T * begin() { return mBuffer.Get(); }
+    T * end() { return mBuffer.Get() + mCount; }
+    const T * begin() const { return mBuffer.Get(); }
+    const T * end() const { return mBuffer.Get() + mCount; }
 
 protected:
     size_t mMaxLimit = 0;
     size_t mCapacity = 0;
-    size_t mCount = 0;
+    size_t mCount    = 0;
     Platform::ScopedMemoryBuffer<T> mBuffer;
 
-    RetCode createBuffer() {
-        if (mCapacity == 0) {
+    RetCode createBuffer()
+    {
+        if (mCapacity == 0)
+        {
             return RetCode::kNoInit;
         }
 
-        if (!mBuffer.Calloc(mCapacity)) {
+        if (!mBuffer.Calloc(mCapacity))
+        {
             return RetCode::kNoMem;
         }
 
@@ -118,32 +132,38 @@ protected:
         return RetCode::kSuccess;
     }
 
-    RetCode resize(size_t newCapacity) {
-        if (newCapacity == mCapacity) {
+    RetCode resize(size_t newCapacity)
+    {
+        if (newCapacity == mCapacity)
+        {
             return RetCode::kSuccess;
         }
-      
-        if (newCapacity < mCount) {
+
+        if (newCapacity < mCount)
+        {
             return RetCode::kInUse;
         }
-      
+
         Platform::ScopedMemoryBuffer<T> newBuffer;
-        if (!newBuffer.Calloc(newCapacity)) {
+        if (!newBuffer.Calloc(newCapacity))
+        {
             return RetCode::kNoMem;
         }
-      
+
         // Use std::move for efficient transfer
-        if (mBuffer.Get() && mCount > 0) {
+        if (mBuffer.Get() && mCount > 0)
+        {
             std::move(mBuffer.Get(), mBuffer.Get() + mCount, newBuffer.Get());
         }
-      
-        mBuffer = std::move(newBuffer);
+
+        mBuffer   = std::move(newBuffer);
         mCapacity = newCapacity;
         return RetCode::kSuccess;
     }
 
-    RetCode ensureCapacity(size_t requiredCapacity) {
-        if (requiredCapacity > mMaxLimit) 
+    RetCode ensureCapacity(size_t requiredCapacity)
+    {
+        if (requiredCapacity > mMaxLimit)
         {
             return RetCode::kNoMem;
         }
@@ -152,18 +172,20 @@ protected:
         {
             return RetCode::kSuccess;
         }
-  
+
         size_t newCapacity = std::min(std::max(requiredCapacity, mCapacity * 2), mMaxLimit);
         return resize(newCapacity);
     }
 
-    RetCode insertAtEnd(const T& item) {
+    RetCode insertAtEnd(const T & item)
+    {
         // Check if we need to resize
         RetCode ret = ensureCapacity(mCount + 1);
-        if (ret != RetCode::kSuccess) {
+        if (ret != RetCode::kSuccess)
+        {
             return ret;
         }
-        
+
         // Append to the end
         mBuffer[mCount] = item;
         ++mCount;
@@ -171,7 +193,7 @@ protected:
     }
 };
 
-template<typename ItemType>
+template <typename ItemType>
 class CTC_UnorderedSet : public CTC_ContainerClassBase<ItemType>
 {
 public:
@@ -180,42 +202,47 @@ public:
 
     CTC_UnorderedSet(size_t aCapacity = 0, size_t aMaxLimit = 0) : Base(aCapacity, aMaxLimit) {}
 
-    CTC_UnorderedSet(CTC_UnorderedSet&& other) noexcept = default;
-    CTC_UnorderedSet& operator=(CTC_UnorderedSet&& other) noexcept = default;
+    CTC_UnorderedSet(CTC_UnorderedSet && other) noexcept             = default;
+    CTC_UnorderedSet & operator=(CTC_UnorderedSet && other) noexcept = default;
 
-    bool insert(const ItemType& item) override {
+    bool insert(const ItemType & item) override
+    {
         // Check for duplicate using std::find
-        if (this->find(item) != nullptr) {
-            return false; //Duplicate
+        if (this->find(item) != nullptr)
+        {
+            return false; // Duplicate
         }
-  
+
         // Append to the end (unordered)
-        return (this->insertAtEnd( item) == Base::RetCode::kSuccess);
+        return (this->insertAtEnd(item) == Base::RetCode::kSuccess);
     }
 
-    void remove(const ItemType& item) override {
-        auto* found = this->find(item);
-        if (found) {
+    void remove(const ItemType & item) override
+    {
+        auto * found = this->find(item);
+        if (found)
+        {
             // Swap with the last element for O(1) removal (after finding).
-            auto* last = &this->mBuffer[this->mCount - 1];
-            if (found != last) {
+            auto * last = &this->mBuffer[this->mCount - 1];
+            if (found != last)
+            {
                 *found = std::move(*last);
             }
             --this->mCount;
         }
     }
 
-    bool contains(const ItemType& item) const override {
-        return this->find(item) != nullptr;
-    }
+    bool contains(const ItemType & item) const override { return this->find(item) != nullptr; }
 
-    ItemType* find(const ItemType& item) override {
+    ItemType * find(const ItemType & item) override
+    {
         // Linear search using std::find
         auto it = std::find(this->begin(), this->end(), item);
         return (it != this->end()) ? it : nullptr;
     }
 
-    const ItemType* find(const ItemType& item) const override {
+    const ItemType * find(const ItemType & item) const override
+    {
         // Const version of linear search
         auto it = std::find(this->begin(), this->end(), item);
         return (it != this->end()) ? it : nullptr;
@@ -225,41 +252,46 @@ public:
      * @brief Merge another set into this set with automatic resizing
      * @param other The set to merge into this one
      * @return RetCode indicating success or failure
-     * 
+     *
      * @note Automatically resizes if needed (if ensureCapacity is implemented)
      * @note Duplicate items from 'other' are skipped
      */
-     void merge(CTC_UnorderedSet& other) {
+    void merge(CTC_UnorderedSet & other)
+    {
         // Calculate required capacity including only non-duplicates
         size_t nonDuplicateCount = 0;
-        for (const auto& item : other) {
-            if (!this->contains(item)) {
+        for (const auto & item : other)
+        {
+            if (!this->contains(item))
+            {
                 nonDuplicateCount++;
             }
         }
 
         size_t requiredCapacity = this->mCount + nonDuplicateCount;
-        
+
         // Try to ensure capacity (if implemented)
         auto ret = this->ensureCapacity(requiredCapacity);
         VerifyOrDie(ret == Base::RetCode::kSuccess);
 
         // Process all items in other set
-        while (other.mCount > 0) {
+        while (other.mCount > 0)
+        {
             // Always take the last element (for efficient removal)
             ItemType item = std::move(other.mBuffer[other.mCount - 1]);
             other.mCount--;
-            
+
             // Add to this set if not duplicate
-            if (!this->contains(item)) {
+            if (!this->contains(item))
+            {
                 ret = this->insertAtEnd(std::move(item));
                 VerifyOrDie(ret == Base::RetCode::kSuccess);
             }
         }
-     }
+    }
 };
 
-template<typename KeyType, typename ValueType>
+template <typename KeyType, typename ValueType>
 class CTC_UnorderedMap
 {
 public:
@@ -275,43 +307,40 @@ private:
         using Base = CTC_UnorderedSet<PairType>;
         using Base::Base;
 
-        PairType* insertUnchecked(const PairType& pair) {
-            if (this->insertAtEnd(pair) == Base::RetCode::kSuccess) {
+        PairType * insertUnchecked(const PairType & pair)
+        {
+            if (this->insertAtEnd(pair) == Base::RetCode::kSuccess)
+            {
                 return &this->mBuffer[this->mCount - 1];
             }
             return nullptr;
         }
 
         // Override find to only compare keys
-        PairType* find(const PairType& pair) override {
-            return findByKey(pair.first);
-        }
+        PairType * find(const PairType & pair) override { return findByKey(pair.first); }
 
-        const PairType* find(const PairType& pair) const override {
-            return findByKey(pair.first);
-        }
+        const PairType * find(const PairType & pair) const override { return findByKey(pair.first); }
 
-        PairType* findByKey(const KeyType& key) {
-            auto it = std::find_if(this->begin(), this->end(),
-                                  [&key](const PairType& item) {
-                                      return item.first == key;
-                                  });
+        PairType * findByKey(const KeyType & key)
+        {
+            auto it = std::find_if(this->begin(), this->end(), [&key](const PairType & item) { return item.first == key; });
             return (it != this->end()) ? it : nullptr;
         }
 
-        const PairType* findByKey(const KeyType& key) const {
-            auto it = std::find_if(this->begin(), this->end(),
-                                  [&key](const PairType& item) {
-                                      return item.first == key;
-                                  });
+        const PairType * findByKey(const KeyType & key) const
+        {
+            auto it = std::find_if(this->begin(), this->end(), [&key](const PairType & item) { return item.first == key; });
             return (it != this->end()) ? it : nullptr;
         }
 
-        void removeByKey(const KeyType& key) {
-            if (auto* found = findByKey(key)) {
+        void removeByKey(const KeyType & key)
+        {
+            if (auto * found = findByKey(key))
+            {
                 // Swap with the last element for O(1) removal (after finding).
-                auto* last = &this->mBuffer[this->mCount - 1];
-                if (found != last) {
+                auto * last = &this->mBuffer[this->mCount - 1];
+                if (found != last)
+                {
                     *found = std::move(*last);
                 }
                 --this->mCount;
@@ -319,13 +348,9 @@ private:
         }
 
         // Override contains to only check key
-        bool contains(const PairType& pair) const override {
-            return containsKey(pair.first);
-        }
+        bool contains(const PairType & pair) const override { return containsKey(pair.first); }
 
-        bool containsKey(const KeyType& key) const {
-            return findByKey(key) != nullptr;
-        }
+        bool containsKey(const KeyType & key) const { return findByKey(key) != nullptr; }
     };
 
     PairSet mPairStorage;
@@ -333,32 +358,30 @@ private:
 public:
     CTC_UnorderedMap(size_t aCapacity = 0, size_t aMaxLimit = 0) : mPairStorage(aCapacity, aMaxLimit) {}
 
-    bool insert(const KeyType& key, const ValueType& value) {
-        return mPairStorage.insert(std::make_pair(key, value));
-    }
+    bool insert(const KeyType & key, const ValueType & value) { return mPairStorage.insert(std::make_pair(key, value)); }
 
-    bool insert(const PairType& pair) {
-        return mPairStorage.insert(pair);
-    }
+    bool insert(const PairType & pair) { return mPairStorage.insert(pair); }
 
-    void remove(const KeyType& key) {
-        mPairStorage.removeByKey(key);
-    }
+    void remove(const KeyType & key) { mPairStorage.removeByKey(key); }
 
-    ValueType* find(const KeyType& key) {
-        auto* pair = mPairStorage.findByKey(key);
+    ValueType * find(const KeyType & key)
+    {
+        auto * pair = mPairStorage.findByKey(key);
         return pair ? &pair->second : nullptr;
     }
 
-    const ValueType* find(const KeyType& key) const {
-        auto* pair = mPairStorage.findByKey(key);
+    const ValueType * find(const KeyType & key) const
+    {
+        auto * pair = mPairStorage.findByKey(key);
         return pair ? &pair->second : nullptr;
     }
 
     // In class CTC_UnorderedMap
-    ValueType& operator[](const KeyType& key) {
-        auto* pair = mPairStorage.findByKey(key);
-        if (pair == nullptr) {
+    ValueType & operator[](const KeyType & key)
+    {
+        auto * pair = mPairStorage.findByKey(key);
+        if (pair == nullptr)
+        {
             // Use insertUnchecked since we already know the key is not present.
             pair = mPairStorage.insertUnchecked(std::make_pair(key, ValueType{}));
             VerifyOrDie(pair != nullptr);
@@ -366,9 +389,7 @@ public:
         return pair->second;
     }
 
-    bool contains(const KeyType& key) const {
-        return mPairStorage.containsKey(key);
-    }
+    bool contains(const KeyType & key) const { return mPairStorage.containsKey(key); }
 
     size_t size() const { return mPairStorage.size(); }
     size_t capacity() const { return mPairStorage.capacity(); }

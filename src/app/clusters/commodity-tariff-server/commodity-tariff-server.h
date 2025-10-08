@@ -140,6 +140,7 @@ public:
 
     void TryToactivateDelayedTariff(uint32_t now);
     void CleanupTariffData();
+
 private:
     // Primary attribute storage and management
     TariffUnitDataClass mTariffUnit_MgmtObj{};

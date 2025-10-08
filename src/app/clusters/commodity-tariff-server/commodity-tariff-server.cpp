@@ -39,7 +39,6 @@ namespace app {
 namespace Clusters {
 namespace CommodityTariff {
 
-
 void Delegate::TariffDataUpdate(uint32_t aNowTimestamp)
 {
 
@@ -279,12 +278,14 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
 
         // Validate Tariff Components
 
-        static constexpr size_t MAX_FEATURES = 16;
+        static constexpr size_t MAX_FEATURES   = 16;
         static constexpr size_t MAX_THRESHOLDS = 8;
 
         // At class level or file scope
-        struct ValidationContext {
-            struct FeatureEntry {
+        struct ValidationContext
+        {
+            struct FeatureEntry
+            {
                 uint32_t id;
                 int64_t thresholds[MAX_THRESHOLDS];
                 uint8_t thresholdCount;
@@ -293,34 +294,43 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
             FeatureEntry features[MAX_FEATURES];
             uint8_t featureCount;
 
-            void Reset() {
+            void Reset()
+            {
                 featureCount = 0;
-                for (auto& feature : features) {
+                for (auto & feature : features)
+                {
                     feature.thresholdCount = 0;
                 }
             }
 
-            bool AddThreshold(uint32_t featureId, int64_t threshold) {
+            bool AddThreshold(uint32_t featureId, int64_t threshold)
+            {
                 // Find existing feature
-                for (uint8_t i = 0; i < featureCount; i++) {
-                    if (features[i].id == featureId) {
+                for (uint8_t i = 0; i < featureCount; i++)
+                {
+                    if (features[i].id == featureId)
+                    {
                         // Check for duplicate threshold
-                        for (uint8_t j = 0; j < features[i].thresholdCount; j++) {
-                            if (features[i].thresholds[j] == threshold) {
+                        for (uint8_t j = 0; j < features[i].thresholdCount; j++)
+                        {
+                            if (features[i].thresholds[j] == threshold)
+                            {
                                 return false; // Duplicate found
                             }
                         }
                         // Add threshold
-                        if (features[i].thresholdCount >= MAX_THRESHOLDS) return false;
+                        if (features[i].thresholdCount >= MAX_THRESHOLDS)
+                            return false;
                         features[i].thresholds[features[i].thresholdCount++] = threshold;
                         return true;
                     }
                 }
 
                 // Create new feature entry
-                if (featureCount >= MAX_FEATURES) return false;
-                features[featureCount].id = featureId;
-                features[featureCount].thresholds[0] = threshold;
+                if (featureCount >= MAX_FEATURES)
+                    return false;
+                features[featureCount].id             = featureId;
+                features[featureCount].thresholds[0]  = threshold;
                 features[featureCount].thresholdCount = 1;
                 featureCount++;
                 return true;
@@ -345,8 +355,8 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
                 return CHIP_ERROR_KEY_NOT_FOUND; // Tariff component not found in map
             }
 
-            const auto  tariffComponent = tariffComponentsMap[tcID];
-            const uint32_t featureID    = UpdCtx.TariffComponentKeyIDsFeatureMap[tcID];
+            const auto tariffComponent = tariffComponentsMap[tcID];
+            const uint32_t featureID   = UpdCtx.TariffComponentKeyIDsFeatureMap[tcID];
 
             // Skip if threshold is null or featureID is 0
             if (tariffComponent->threshold.IsNull() || tariffComponent->predicted.ValueOr(false) || featureID == 0)
@@ -357,7 +367,8 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
             const int64_t thresholdValue = tariffComponent->threshold.Value();
 
             // Check for duplicate threshold for this feature
-            if (!validationCtx.AddThreshold(featureID, thresholdValue)) {
+            if (!validationCtx.AddThreshold(featureID, thresholdValue))
+            {
                 ChipLogError(NotSpecified,
                              "Duplicated threshold value among TCs for the 0x%" PRIx32 " feature in the same tariff period",
                              featureID);
@@ -901,7 +912,7 @@ const Structs::TariffPeriodStruct::Type * FindTariffPeriodByDayEntryId(CurrentTa
 }
 
 CTC_UnorderedSet<const Structs::TariffPeriodStruct::Type *> FindTariffPeriodsByTariffComponentId(CurrentTariffAttrsCtx & aCtx,
-                                                                                                   uint32_t componentID)
+                                                                                                 uint32_t componentID)
 {
     CTC_UnorderedSet<const Structs::TariffPeriodStruct::Type *> matchingPeriods;
 

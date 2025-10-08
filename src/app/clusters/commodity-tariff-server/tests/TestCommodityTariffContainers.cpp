@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file implements a unit test suite for the CommodityTariffContainers helper classes.  
+ *      This file implements a unit test suite for the CommodityTariffContainers helper classes.
  *
  */
 
@@ -60,7 +60,8 @@ protected:
     void TearDown() override { Platform::MemoryShutdown(); }
 };
 
-TEST_F(TestCommodityTariffContainers, CreateEmptyAndDestroy) {
+TEST_F(TestCommodityTariffContainers, CreateEmptyAndDestroy)
+{
     {
         CTC_UnorderedSet<int> sample(10);
         EXPECT_EQ(sample.capacity(), 10u);
@@ -69,7 +70,8 @@ TEST_F(TestCommodityTariffContainers, CreateEmptyAndDestroy) {
     }
 }
 
-TEST_F(TestCommodityTariffContainers, CreateAndPutItems) {
+TEST_F(TestCommodityTariffContainers, CreateAndPutItems)
+{
     {
         CTC_UnorderedSet<uint32_t> sample(10);
         EXPECT_EQ(sample.capacity(), 10u);
@@ -82,45 +84,51 @@ TEST_F(TestCommodityTariffContainers, CreateAndPutItems) {
         EXPECT_EQ(sample.size(), 2u);
         EXPECT_FALSE(sample.empty());
 
-        for (size_t i=sample.size(); i <= sample.capacity() + 1; i++)
+        for (size_t i = sample.size(); i <= sample.capacity() + 1; i++)
         {
-            bool ret = sample.insert( (uint32_t)( (i%2 ? 0x55AA : 0xAA55) << 16 ) | (uint32_t) i );
+            bool ret = sample.insert((uint32_t) ((i % 2 ? 0x55AA : 0xAA55) << 16) | (uint32_t) i);
 
             if (i < sample.capacity())
             {
-                EXPECT_TRUE(ret);                
+                EXPECT_TRUE(ret);
             }
-            else 
+            else
             {
                 EXPECT_FALSE(ret);
             }
         }
 
-        for (size_t i=0; i < sample.capacity(); i++)
+        for (size_t i = 0; i < sample.capacity(); i++)
         {
             uint32_t entry = sample[i];
-           if (i%2)
-           {
-                EXPECT_EQ( ( entry >> 16 ), 0x55AAu);
-           }
-           else {
-                EXPECT_EQ( ( entry >> 16 ), 0xAA55u);
-           }
+            if (i % 2)
+            {
+                EXPECT_EQ((entry >> 16), 0x55AAu);
+            }
+            else
+            {
+                EXPECT_EQ((entry >> 16), 0xAA55u);
+            }
 
-           EXPECT_EQ( ( entry & 0x0000ffff ), (uint32_t) i);
+            EXPECT_EQ((entry & 0x0000ffff), (uint32_t) i);
         }
     }
 }
 
-TEST_F(TestCommodityTariffContainers, UnorderedSet_BasicInsertAndContains) {
+TEST_F(TestCommodityTariffContainers, UnorderedSet_BasicInsertAndContains)
+{
     CTC_UnorderedSet<uint32_t> sample(12);
 
-    for (size_t i = 0; i <= sample.capacity() - 3; i++) {
-        bool ret = sample.insert((uint32_t)((i % 2 ? 0x55AA : 0xAA55) << 16) | (uint32_t)i);
+    for (size_t i = 0; i <= sample.capacity() - 3; i++)
+    {
+        bool ret = sample.insert((uint32_t) ((i % 2 ? 0x55AA : 0xAA55) << 16) | (uint32_t) i);
 
-        if (i < sample.capacity()) {
+        if (i < sample.capacity())
+        {
             EXPECT_TRUE(ret);
-        } else {
+        }
+        else
+        {
             EXPECT_FALSE(ret);
         }
     }
@@ -137,26 +145,27 @@ TEST_F(TestCommodityTariffContainers, UnorderedSet_BasicInsertAndContains) {
     EXPECT_TRUE(sample.insert(0x55AA0011));
 }
 
-TEST_F(TestCommodityTariffContainers, UnorderedSet_DuplicatePrevention) {
+TEST_F(TestCommodityTariffContainers, UnorderedSet_DuplicatePrevention)
+{
     CTC_UnorderedSet<int> set(10);
-    
+
     EXPECT_TRUE(set.insert(100));
     EXPECT_TRUE(set.insert(200));
     EXPECT_TRUE(set.insert(300));
-    
+
     EXPECT_FALSE(set.insert(100));
     EXPECT_FALSE(set.insert(200));
     EXPECT_FALSE(set.insert(300));
-
 }
 
-TEST_F(TestCommodityTariffContainers, UnorderedSet_RemoveEntry) {
+TEST_F(TestCommodityTariffContainers, UnorderedSet_RemoveEntry)
+{
     CTC_UnorderedSet<int> set(10);
-    
+
     EXPECT_TRUE(set.insert(100));
     EXPECT_TRUE(set.insert(200));
     EXPECT_TRUE(set.insert(300));
-    
+
     EXPECT_EQ(set[0], 100);
     EXPECT_EQ(set[1], 200);
     EXPECT_EQ(set[2], 300);
@@ -165,7 +174,7 @@ TEST_F(TestCommodityTariffContainers, UnorderedSet_RemoveEntry) {
 
     set.remove(200);
 
-    EXPECT_EQ(set.size(), 2u);   
+    EXPECT_EQ(set.size(), 2u);
 
     EXPECT_EQ(set[0], 100);
     EXPECT_EQ(set[1], 300);
@@ -177,47 +186,53 @@ TEST_F(TestCommodityTariffContainers, UnorderedSet_RemoveEntry) {
     EXPECT_EQ(set.size(), 3u);
 }
 
-TEST_F(TestCommodityTariffContainers, UnorderedSet_Iteration) {
+TEST_F(TestCommodityTariffContainers, UnorderedSet_Iteration)
+{
     CTC_UnorderedSet<int> set(5);
-    std::array<int, 3> expected = {10, 20, 30};
-    
-    for (int value : expected) {
+    std::array<int, 3> expected = { 10, 20, 30 };
+
+    for (int value : expected)
+    {
         EXPECT_TRUE(set.insert(value));
     }
-    
+
     EXPECT_EQ(set.size(), 3u);
-    
+
     // Test range-based for loop
     std::vector<int> actual;
-    for (const auto& item : set) {
+    for (const auto & item : set)
+    {
         actual.push_back(item);
     }
-    
+
     // Since it's unordered, we only check that all expected items are present
-    for (int expected_value : expected) {
+    for (int expected_value : expected)
+    {
         EXPECT_NE(std::find(actual.begin(), actual.end(), expected_value), actual.end());
     }
 }
 
-TEST_F(TestCommodityTariffContainers, UnorderedSet_CapacityLimits) {
+TEST_F(TestCommodityTariffContainers, UnorderedSet_CapacityLimits)
+{
     CTC_UnorderedSet<int> set(3);
-    
+
     EXPECT_TRUE(set.insert(1));
     EXPECT_TRUE(set.insert(2));
     EXPECT_TRUE(set.insert(3));
-    
+
     // Should fail to insert beyond capacity
     EXPECT_FALSE(set.insert(4));
     EXPECT_EQ(set.size(), 3u);
 }
 
-TEST_F(TestCommodityTariffContainers, UnorderedMap_BasicOperations) {
+TEST_F(TestCommodityTariffContainers, UnorderedMap_BasicOperations)
+{
     CTC_UnorderedMap<uint8_t, uint32_t> map(10);
-    
+
     EXPECT_TRUE(map.insert(1, 0x11));
     EXPECT_TRUE(map.insert(2, 0x12));
     EXPECT_TRUE(map.insert(3, 0x13));
-    
+
     EXPECT_EQ(map.size(), 3u);
     EXPECT_TRUE(map.contains(1));
     EXPECT_TRUE(map.contains(2));
@@ -232,14 +247,14 @@ TEST_F(TestCommodityTariffContainers, UnorderedMap_BasicOperations) {
 
     EXPECT_FALSE(map.contains(2));
     EXPECT_EQ(map[1], 0x11u);
-    EXPECT_EQ(map[3], 0x13u);   
+    EXPECT_EQ(map[3], 0x13u);
     EXPECT_EQ(map.size(), 2u);
 
     EXPECT_EQ(map[2], 0u);
     EXPECT_TRUE(map.contains(2));
     EXPECT_EQ(map.size(), 3u);
 
-    map[4]=0x14;
+    map[4] = 0x14;
     EXPECT_EQ(map[4], 0x14u);
 
     EXPECT_EQ(map.size(), 4u);

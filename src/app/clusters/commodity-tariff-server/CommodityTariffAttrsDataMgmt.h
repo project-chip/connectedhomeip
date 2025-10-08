@@ -18,8 +18,8 @@
 
 #pragma once
 #include "CommodityTariffConsts.h"
-#include <platform/LockTracker.h>
 #include "CommodityTariffContainers.h"
+#include <platform/LockTracker.h>
 
 #include <atomic>
 #include <cassert>
