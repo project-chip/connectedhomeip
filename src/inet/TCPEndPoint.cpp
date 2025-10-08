@@ -72,8 +72,6 @@ CHIP_ERROR TCPEndPoint::Listen(uint16_t backlog)
 
     if (res == CHIP_NO_ERROR)
     {
-        // Once Listening, bump the reference count.  The corresponding call to Release() will happen in DoClose().
-        Retain();
         mState = State::kListening;
     }
 
@@ -200,8 +198,7 @@ void TCPEndPoint::Free()
     // Ensure the end point is Closed or Closing.
     Close();
 
-    // Release the Retain() that happened when the end point was allocated.
-    Release();
+    GetEndPointManager().DeleteEndPoint(this);
 }
 
 #if INET_TCP_IDLE_CHECK_INTERVAL > 0
@@ -440,12 +437,6 @@ void TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
                 OnConnectionClosed(this, err);
             }
         }
-
-        // Decrement the ref count that was added when the connection started (in Connect()) or listening started (in Listen()).
-        if (oldState != State::kReady && oldState != State::kBound)
-        {
-            Release();
-        }
     }
 }
 
@@ -483,6 +474,10 @@ void TCPEndPoint::TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void
 }
 
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+
+#if INET_CONFIG_TEST
+bool TCPEndPoint::sForceEarlyFailureIncomingConnection = false;
+#endif
 
 } // namespace Inet
 } // namespace chip

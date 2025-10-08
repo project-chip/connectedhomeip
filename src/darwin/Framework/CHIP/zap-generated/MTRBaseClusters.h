@@ -6282,7 +6282,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command UpdateGroupKey
  *
- * This command SHALL allow a fabric maintainer to update the group operational key for an existing group ID that the server is a member of.
+ * This command SHALL allow a fabric maintainer to update the OperationalGroupKey for an existing group ID that the server is a member of.
  */
 - (void)updateGroupKeyWithParams:(MTRGroupcastClusterUpdateGroupKeyParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -13748,7 +13748,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command SendKey
  *
- * Upon receipt, this SHALL process a keycode as input to the media device.
+ * Upon receipt, this SHALL process a keycode as input to the media endpoint.
  */
 - (void)sendKeyWithParams:(MTRKeypadInputClusterSendKeyParams *)params completion:(void (^)(MTRKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
@@ -16363,7 +16363,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command ProvisionEndpoint
  *
- * This command is used to provision a TLS Endpoint for the provided HostName / Port combination.
+ * This command is used to provision a TLS Endpoint for the provided Hostname / Port combination.
  */
 - (void)provisionEndpointWithParams:(MTRTLSClientManagementClusterProvisionEndpointParams *)params completion:(void (^)(MTRTLSClientManagementClusterProvisionEndpointResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -22102,11 +22102,7 @@ typedef NS_ENUM(uint8_t, MTRTLSClientManagementStatusCode) {
     MTRTLSClientManagementStatusCodeRootCertificateNotFound MTR_PROVISIONALLY_AVAILABLE = 0x03,
     MTRTLSClientManagementStatusCodeClientCertificateNotFound MTR_PROVISIONALLY_AVAILABLE = 0x04,
     MTRTLSClientManagementStatusCodeEndpointInUse MTR_PROVISIONALLY_AVAILABLE = 0x05,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_ENUM(uint8_t, MTRTLSClientManagementTLSEndpointStatus) {
-    MTRTLSClientManagementTLSEndpointStatusProvisioned MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRTLSClientManagementTLSEndpointStatusInUse MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRTLSClientManagementStatusCodeInvalidTime MTR_PROVISIONALLY_AVAILABLE = 0x06,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRMeterIdentificationMeterType) {
