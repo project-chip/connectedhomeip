@@ -1801,9 +1801,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
     // Default to Operate when the command metadata is unknown so we can fail closed while still avoiding
     // leaking information about whether the path actually exists. When the metadata lookup succeeds we
     // enforce the precise privilege declared for the command.
-    Access::Privilege privilegeToCheck = (existenceStatus == Status::Success)
-        ? acceptedCommandEntry.GetInvokePrivilege()
-        : Access::Privilege::kOperate;
+    Access::Privilege privilegeToCheck =
+        (existenceStatus == Status::Success) ? acceptedCommandEntry.GetInvokePrivilege() : Access::Privilege::kOperate;
 
     Status accessStatus = CheckCommandAccess(request, privilegeToCheck);
     VerifyOrReturnValue(accessStatus == Status::Success, accessStatus);
