@@ -67,8 +67,13 @@ jobs:
                   # run_in_build_env.sh is used to ensure PATH is set to something that would otherwise find zap-cli
                   scripts/run_in_build_env.sh '(zap-cli --version && exit 1) || exit 0'
             - name: Build
-              working-directory: src/darwin/Framework
-              run: xcodebuild -target "Matter" ${{ matrix.options.arguments }}
+              working-directory: src/darwin
+              run: xcodebuild -scheme "Matter Framework" -derivedDataPath ./Framework/build ${{ matrix.options.arguments }}
+            - name: Build CHIPTool
+              if: ${{ matrix.options.flavor == 'ios-release' }}
+              working-directory: src/darwin
+              # Use the same derivedDataPath as the framework build, so we don't have to build the framework again and can use the one we already built.
+              run: xcodebuild -scheme "CHIP Tool App" -derivedDataPath ./Framework/build ${{ matrix.options.arguments }} CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 
     tests:
         name: Run framework tests

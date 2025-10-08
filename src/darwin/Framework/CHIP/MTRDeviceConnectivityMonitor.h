@@ -31,8 +31,13 @@ MTR_TESTABLE
 
 /**
  * Any time a path becomes satisfied or route becomes viable, the registered handler will be called.
+ *
+ * Note: If called while already monitoring, this will update the handler and queue without
+ * restarting the monitoring - existing callbacks will use the new handler.
+ *
+ * @return YES if monitoring started or is already running, NO if monitoring failed to start.
  */
-- (void)startMonitoringWithHandler:(MTRDeviceConnectivityMonitorHandler)handler queue:(dispatch_queue_t)queue;
+- (BOOL)startMonitoringWithHandler:(MTRDeviceConnectivityMonitorHandler)handler queue:(dispatch_queue_t)queue;
 
 /**
  * Stops the monitoring. After this method returns no more calls to the handler will be made.
