@@ -554,7 +554,13 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         }
 
         bool softRecordingPrivacyModeActive = false;
-        mDelegate.IsSoftRecordingPrivacyModeActive(softRecordingPrivacyModeActive);
+        CHIP_ERROR err = mDelegate.IsSoftRecordingPrivacyModeActive(softRecordingPrivacyModeActive);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: Failed to check Soft RecordingPrivacy mode: %" CHIP_ERROR_FORMAT, err.Format());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+            return;
+        }
 
         if (softRecordingPrivacyModeActive &&
             (req.streamUsage == StreamUsageEnum::kRecording || req.streamUsage == StreamUsageEnum::kAnalysis))
