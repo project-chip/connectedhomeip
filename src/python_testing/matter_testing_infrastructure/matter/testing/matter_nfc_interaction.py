@@ -46,8 +46,8 @@ def read_ndef_data(connection, length):
     asserts.assert_true((sw1, sw2) == (0x90, 0x00), f"Failed to read NDEF data: SW1={sw1:02X}, SW2={sw2:02X}")
     return bytes(data)
 
-def read_nfc_tag_data(nrf_reader_object):
-    nrf_reader_connection_object = nrf_reader_object[0].createConnection()
+def read_nfc_tag_data(nrf_reader_object,nfc_reader_index):
+    nrf_reader_connection_object = nrf_reader_object[nfc_reader_index].createConnection()
     nrf_reader_connection_object.connect()
     select_ndef_application(nrf_reader_connection_object)
     select_cc_file(nrf_reader_connection_object)
@@ -58,9 +58,9 @@ def read_nfc_tag_data(nrf_reader_object):
     record_data = ndef_records[0].data.decode("utf-8")
     return re.sub(r'[^\x20-\x7E]', '', record_data)
 
-def connect_read_nfc_tag_data():
+def connect_read_nfc_tag_data(nfc_reader_index):
     nrf_reader_object = readers()
     asserts.assert_true(len(nrf_reader_object) > 0,"No NFC readers found.")
-    logging.info(f"Available readers are: {nrf_reader_object} \n will use {nrf_reader_object[0]}")
-    nfc_tag_data = read_nfc_tag_data(nrf_reader_object)
+    logging.info(f"Available readers are: {nrf_reader_object} \n will use {nrf_reader_object[nfc_reader_index]}")
+    nfc_tag_data = read_nfc_tag_data(nrf_reader_object,nfc_reader_index)
     return nfc_tag_data

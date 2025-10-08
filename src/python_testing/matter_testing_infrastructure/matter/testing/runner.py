@@ -624,11 +624,14 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     # chip-tool that fabricID == commissioner_name == root of trust index
     config.fabric_id = args.fabric_id if args.fabric_id is not None else config.root_of_trust_index
 
-    if "nfc" in args.commissioning_method:
-        from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
-        nfc_tag_data = connect_read_nfc_tag_data()
-        args.qr_code.append(nfc_tag_data)
-
+    if args.commissioning_method and "nfc" in args.commissioning_method:
+        if args.int_arg(1)=="NFC_Reader_index":
+            from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
+            nfc_tag_data = connect_read_nfc_tag_data(args.int_args(0))
+            args.qr_code.append(nfc_tag_data)
+        else:
+            print("error: argument --int-arg NFC_Reader_index:<int-value> is need for NFC Tests" % args.chip_tool_credentials_path)
+            return False
     if args.chip_tool_credentials_path is not None and not args.chip_tool_credentials_path.exists():
         print("error: chip-tool credentials path %s doesn't exist!" % args.chip_tool_credentials_path)
         return False

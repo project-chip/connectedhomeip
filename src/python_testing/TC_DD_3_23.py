@@ -25,12 +25,16 @@
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
+#       --in-test-commissioning-method nfc-thread
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --int-arg NFC_Reader_index:0
 #       --storage-path admin_storage.json
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
 import logging
+from mobly import asserts
 
 from matter.setup_payload import SetupPayload
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -45,28 +49,28 @@ class TC_DD_3_23(MatterBaseTest):
 
     def steps_TC_DD_3_23(self) -> list[TestStep]:
         return [
-            TestStep(1, "Detecting the NFC Tag and reading Payload", is_commissioning=False),
-            TestStep(2, 'Check "Custom Flow" field of Onboarding data corresponds to "User-Intent commissioning flow",'
-                        'perform user action required to enter commissioning mode'),
-            TestStep(3, 'If "Custom Flow" field of Onboarding data corresponds to "Custom commissioning flow",'
-                        'perform vendor-specified interactions to enter commissioning mode'),
-            TestStep(4, "Bring or keep TH NFC reader close to the DUT’s NFC tag,"
-                        "and initiate commissioning through NFC interface (NTL)"),
-            TestStep(5, "Th Starts to re-check the DUT power state.")
+            TestStep(1, "Detecting the NFC Tag and reading the Payload", is_commissioning=False),
+            TestStep(2, 'Validate the NFC bit in payload and Perform the commissioning')
         ]
 
     @async_test_body
     async def test_TC_DD_3_23(self):
 
-        # Step 1: Begin commissioning with PASE and failsafe
+        if self.is_pics_sdk_ci_only:
+            self.mark_all_remaining_steps_skipped(1)
+            return
+
+        # Step 1: Here we check if the Tag is connected to the Host machine and read the NFC Tag data
         self.step(1)
-        nfc_tag_data = connect_read_nfc_tag_data()
+        nfc_tag_data = connect_read_nfc_tag_data(self.user_params.get("NFC_Reader_index",0))
+        logging.info(f"NFC Tag data : '{self.matter_test_config.qr_code_content}'")
         self.matter_test_config.qr_code_content.append(nfc_tag_data)
+
+        # Step 2: the NFC tag data is parse and checked if the device device supports NFC commissioning and commission begins
         self.step(2)
         payload = SetupPayload().ParseQrCode(nfc_tag_data)
-        logging.info(f"NFC Tag data read:{self.matter_test_config.qr_code_content}, length: {len(self.matter_test_config.qr_code_content)}")
+        asserts.assert_true(payload.supports_nfc_commissioning,"Device Deos not Support NFC Commissioning")
         self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
-        print(self.matter_test_config.thread_operational_dataset)
         await self.commission_devices()
 
 
