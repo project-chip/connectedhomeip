@@ -6,12 +6,14 @@ from smartcard.System import readers
 
 logger = logging.getLogger(__name__)
 
+
 def select_ndef_application(nrf_reader_connection_object):
     # Select NDEF Tag Application (AID: D2760000850101)
     SELECT_APDU = [0x00, 0xA4, 0x04, 0x00, 0x07, 0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x01, 0x00]
     data, sw1, sw2 = nrf_reader_connection_object.transmit(SELECT_APDU)
-    asserts.assert_true((sw1, sw2) == (0x90, 0x00),f"Failed to select NDEF application: SW1={sw1:02X}, SW2={sw2:02X}")
+    asserts.assert_true((sw1, sw2) == (0x90, 0x00), f"Failed to select NDEF application: SW1={sw1:02X}, SW2={sw2:02X}")
     logging.info("NDEF application selected.")
+
 
 def select_cc_file(nrf_reader_connection_object):
     # Select Capability Container file (E103)
@@ -46,6 +48,7 @@ def read_ndef_data(connection, length):
     asserts.assert_true((sw1, sw2) == (0x90, 0x00), f"Failed to read NDEF data: SW1={sw1:02X}, SW2={sw2:02X}")
     return bytes(data)
 
+
 def read_nfc_tag_data(nrf_reader_object, nfc_reader_index):
     nrf_reader_connection_object = nrf_reader_object[nfc_reader_index].createConnection()
     nrf_reader_connection_object.connect()
@@ -58,9 +61,10 @@ def read_nfc_tag_data(nrf_reader_object, nfc_reader_index):
     record_data = ndef_records[0].data.decode("utf-8")
     return re.sub(r'[^\x20-\x7E]', '', record_data)
 
+
 def connect_read_nfc_tag_data(nfc_reader_index):
     nrf_reader_object = readers()
-    asserts.assert_true(len(nrf_reader_object) > 0,"No NFC readers found.")
+    asserts.assert_true(len(nrf_reader_object) > 0, "No NFC readers found.")
     logging.info(f"Available readers are: {nrf_reader_object} \n will use {nrf_reader_object[nfc_reader_index]}")
-    nfc_tag_data = read_nfc_tag_data(nrf_reader_object,nfc_reader_index)
+    nfc_tag_data = read_nfc_tag_data(nrf_reader_object, nfc_reader_index)
     return nfc_tag_data

@@ -666,7 +666,6 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
             return False
         config.commissionee_ip_address_just_for_testing = args.ip_addr
 
-
     if args.qr_code != [] and args.manual_code != []:
         print("error: Cannot have both --qr-code and --manual-code present!")
         return False
