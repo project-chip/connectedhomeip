@@ -611,10 +611,10 @@ template("efr32_sdk") {
         ]
       }
 
-      if (use_brd4357a) {
+      if (ncp_module) {
         defines += [
           "USE_BYPASS_CLOCK=1",
-          "ACX_MODULE_BOARD=1",
+          "SL_SI91X_ACX_MODULE=1",
         ]
       }
 
