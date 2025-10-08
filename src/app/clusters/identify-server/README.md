@@ -103,31 +103,7 @@ API to the old API.
 We strongly recommend migrating to the new, direct instantiation method to
 improve performance and reduce your application's footprint.
 
-#### Legacy Way (Discouraged)
-
-Previously, you might have relied on static `Identify` structs or ZAP-generated
-callbacks:
-
-```cpp
-// This old pattern is found in `app/clusters/identify-server/identify-server.h`
-// and is now considered legacy.
-
-#include <app/clusters/identify-server/identify-server.h>
-
-void OnIdentifyStart(::Identify *) { /* ... */ }
-void OnIdentifyStop(::Identify *) { /* ... */ }
-void OnTriggerEffect(::Identify * identify) { /* ... */ }
-
-static Identify gIdentify0 = {
-    chip::EndpointId{ 0 }, OnIdentifyStart, OnIdentifyStop,
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-    OnTriggerEffect,
-};
-
-// No explicit registration was needed, as it was handled by the legacy system.
-```
-
-#### New Way (Recommended)
+#### Recommended Usage
 
 The new approach is to instantiate the cluster directly and register it with the
 `CodegenDataModelProvider`, as detailed in the "Usage" section above. This gives
@@ -163,94 +139,26 @@ void ApplicationInit()
 }
 ```
 
-## Unit Tests
+#### Legacy Usage (Discouraged)
 
-This cluster implementation contains a comprehensive set of unit tests. To build
-and run the unit tests you can run the following commands in Linux:
+Previously, you might have relied on static `Identify` structs or ZAP-generated
+callbacks:
 
-```
-$ gn gen out
+```cpp
+// This old pattern is found in `app/clusters/identify-server/identify-server.h`
+// and is now considered legacy.
 
-$ ninja -C out src/app/clusters/identify-server/tests:TestIdentifyCluster && ./out/tests/TestIdentifyCluster
+#include <app/clusters/identify-server/identify-server.h>
 
+void OnIdentifyStart(::Identify *) { /* ... */ }
+void OnIdentifyStop(::Identify *) { /* ... */ }
+void OnTriggerEffect(::Identify * identify) { /* ... */ }
 
-ninja: Entering directory `out'
-ninja: no work to do.
-[==========] Running all tests.
-[ RUN      ] TestIdentifyCluster.TestCreate
-[       OK ] TestIdentifyCluster.TestCreate
-[ RUN      ] TestIdentifyCluster.AttributeListTest
-[       OK ] TestIdentifyCluster.AttributeListTest
-[ RUN      ] TestIdentifyCluster.AcceptedCommandsMandatoryOnlyTest
-[       OK ] TestIdentifyCluster.AcceptedCommandsMandatoryOnlyTest
-[ RUN      ] TestIdentifyCluster.AcceptedCommandsWithOptionalTriggerEffectTest
-[       OK ] TestIdentifyCluster.AcceptedCommandsWithOptionalTriggerEffectTest
-[ RUN      ] TestIdentifyCluster.ReadAttributesTest
-[       OK ] TestIdentifyCluster.ReadAttributesTest
-[ RUN      ] TestIdentifyCluster.WriteUnchangedIdentifyTimeDoesNotNotify
-[       OK ] TestIdentifyCluster.WriteUnchangedIdentifyTimeDoesNotNotify
-[ RUN      ] TestIdentifyCluster.WriteReadOnlyAttributesReturnUnsupportedWriteTest
-[       OK ] TestIdentifyCluster.WriteReadOnlyAttributesReturnUnsupportedWriteTest
-[ RUN      ] TestIdentifyCluster.IdentifyTimeCountdownTest
-[       OK ] TestIdentifyCluster.IdentifyTimeCountdownTest
-[ RUN      ] TestIdentifyCluster.OnIdentifyStartStopCallbackTest
-[       OK ] TestIdentifyCluster.OnIdentifyStartStopCallbackTest
-[ RUN      ] TestIdentifyCluster.OnStartNotCalledMultipleTimes
-[       OK ] TestIdentifyCluster.OnStartNotCalledMultipleTimes
-[ RUN      ] TestIdentifyCluster.OnStopNotCalledIfNotIdentifying
-[       OK ] TestIdentifyCluster.OnStopNotCalledIfNotIdentifying
-[ RUN      ] TestIdentifyCluster.InvokeIdentifyCommandTest
-[       OK ] TestIdentifyCluster.InvokeIdentifyCommandTest
-[ RUN      ] TestIdentifyCluster.InvokeTriggerEffectCommandTest
-[1759950844.360] [608415:608415] [ZCL] RX identify:trigger effect identifier 0x0 variant 0x0
-[       OK ] TestIdentifyCluster.InvokeTriggerEffectCommandTest
-[ RUN      ] TestIdentifyCluster.InvokeTriggerEffectCommandAllEffectsTest
-[1759950844.360] [608415:608415] [ZCL] RX identify:trigger effect identifier 0x1 variant 0x0
-[1759950844.360] [608415:608415] [ZCL] RX identify:trigger effect identifier 0x2 variant 0x0
-[1759950844.360] [608415:608415] [ZCL] RX identify:trigger effect identifier 0xB variant 0x0
-[       OK ] TestIdentifyCluster.InvokeTriggerEffectCommandAllEffectsTest
-[ RUN      ] TestIdentifyCluster.InvokeTriggerEffectCommandInvalidVariantTest
-[1759950844.360] [608415:608415] [ZCL] RX identify:trigger effect identifier 0x0 variant 0x1
-[       OK ] TestIdentifyCluster.InvokeTriggerEffectCommandInvalidVariantTest
-[ RUN      ] TestIdentifyCluster.TriggerEffectWhileIdentifyingTest
-[1759950844.360] [608415:608415] [ZCL] RX identify:trigger effect identifier 0x0 variant 0x0
-[       OK ] TestIdentifyCluster.TriggerEffectWhileIdentifyingTest
-[ RUN      ] TestIdentifyCluster.TriggerEffectFinishEffectTest
-[1759950844.361] [608415:608415] [ZCL] RX identify:trigger effect identifier 0xFE variant 0x0
-[       OK ] TestIdentifyCluster.TriggerEffectFinishEffectTest
-[ RUN      ] TestIdentifyCluster.TriggerEffectStopEffectTest
-[1759950844.361] [608415:608415] [ZCL] RX identify:trigger effect identifier 0xFF variant 0x0
-[       OK ] TestIdentifyCluster.TriggerEffectStopEffectTest
-[ RUN      ] TestIdentifyCluster.IdentifyTimeAttributeReportingTest
-[       OK ] TestIdentifyCluster.IdentifyTimeAttributeReportingTest
-[ RUN      ] TestIdentifyCluster.TestGetters
-[       OK ] TestIdentifyCluster.TestGetters
-[==========] Done running all tests.
-[  PASSED  ] 20 test(s).
-```
+static Identify gIdentify0 = {
+    chip::EndpointId{ 0 }, OnIdentifyStart, OnIdentifyStop,
+    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    OnTriggerEffect,
+};
 
-### Backwards Compatibility Unit Tests
-
-```
-$ ninja -C out src/app/clusters/identify-server/tests:TestIdentifyClusterBackwardsCompatibility && ./out/tests/TestIdentifyClusterBackwardsCompatibility
-
-
-ninja: Entering directory `out'
-[16/16] ld tests/TestIdentifyClusterBackwardsCompatibility
-[==========] Running all tests.
-[ RUN      ] TestIdentifyClusterBackwardsCompatibility.TestLegacyInstantiattion
-[       OK ] TestIdentifyClusterBackwardsCompatibility.TestLegacyInstantiattion
-[ RUN      ] TestIdentifyClusterBackwardsCompatibility.TestLegacyCallbacks
-[1759950902.579] [608781:608781] [ZCL] RX identify:trigger effect identifier 0x0 variant 0x0
-[       OK ] TestIdentifyClusterBackwardsCompatibility.TestLegacyCallbacks
-[ RUN      ] TestIdentifyClusterBackwardsCompatibility.TestCurrentEffectIdentifierUpdate
-[1759950902.579] [608781:608781] [ZCL] RX identify:trigger effect identifier 0x0 variant 0x0
-[1759950902.579] [608781:608781] [ZCL] RX identify:trigger effect identifier 0xFE variant 0x0
-[       OK ] TestIdentifyClusterBackwardsCompatibility.TestCurrentEffectIdentifierUpdate
-[ RUN      ] TestIdentifyClusterBackwardsCompatibility.TestIdentifyTypeInitialization
-[       OK ] TestIdentifyClusterBackwardsCompatibility.TestIdentifyTypeInitialization
-[ RUN      ] TestIdentifyClusterBackwardsCompatibility.TestMActive
-[       OK ] TestIdentifyClusterBackwardsCompatibility.TestMActive
-[==========] Done running all tests.
-[  PASSED  ] 5 test(s).
+// No explicit registration was needed, as it was handled by the legacy system.
 ```
