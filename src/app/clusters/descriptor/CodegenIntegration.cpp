@@ -24,6 +24,7 @@
 #include <app/util/config.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <lib/core/CHIPConfig.h>
+#include <app/util/attribute-storage.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -47,7 +48,13 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServers[clusterInstanceIndex].Create(endpointId, DescriptorCluster::OptionalAttributesSet(optionalAttributeBits));
+        BitFlags<Descriptor::Feature> features(featureMap);
+        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList;
+        if (GetTagList(endpointId, tagList) == CHIP_NO_ERROR && !tagList.empty()) {
+            features.Set(Descriptor::Feature::kTagList);
+        }
+
+        gServers[clusterInstanceIndex].Create(endpointId, DescriptorCluster::OptionalAttributesSet(optionalAttributeBits), features, tagList);
         return gServers[clusterInstanceIndex].Registration();
     }
 
@@ -71,7 +78,7 @@ void MatterDescriptorClusterInitCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kDescriptorFixedClusterCount,
             .maxClusterInstanceCount   = kDescriptorMaxClusterCount,
             .fetchFeatureMap           = false,
-            .fetchOptionalAttributes   = false,
+            .fetchOptionalAttributes   = true,
         },
         integrationDelegate);
 }

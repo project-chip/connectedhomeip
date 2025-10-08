@@ -157,14 +157,6 @@ CHIP_ERROR CodeDrivenDataModelProvider::Endpoints(ReadOnlyBufferBuilder<DataMode
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR
-CodeDrivenDataModelProvider::SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & out)
-{
-    EndpointInterface * endpoint = GetEndpointInterface(endpointId);
-    VerifyOrReturnError(endpoint != nullptr, CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));
-    return endpoint->SemanticTags(out);
-}
-
 CHIP_ERROR CodeDrivenDataModelProvider::DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out)
 {
     EndpointInterface * endpoint = GetEndpointInterface(endpointId);

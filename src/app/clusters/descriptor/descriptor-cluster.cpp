@@ -62,13 +62,10 @@ bool IsDescendantOf(const DataModel::EndpointEntry * __restrict__ childEndpoint,
     }
 }
 
-CHIP_ERROR ReadTagListAttribute(DataModel::Provider & provider, EndpointId endpoint, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadTagListAttribute(Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type> semanticTagsList, EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    ReadOnlyBufferBuilder<DataModel::Provider::SemanticTag> semanticTagsList;
-    ReturnErrorOnFailure(provider.SemanticTags(endpoint, semanticTagsList));
-
     return aEncoder.EncodeList([&semanticTagsList](const auto & encoder) -> CHIP_ERROR {
-        for (const auto & tag : semanticTagsList.TakeBuffer())
+        for (const auto & tag : semanticTagsList)
         {
             ReturnErrorOnFailure(encoder.Encode(tag));
         }
@@ -168,13 +165,6 @@ CHIP_ERROR ReadPartsAttribute(DataModel::Provider & provider, EndpointId endpoin
     return CHIP_NO_ERROR;
 }
 
-bool HasSemanticTags(const EndpointId endpointId, ServerClusterContext * context)
-{
-    ReadOnlyBufferBuilder<DataModel::Provider::SemanticTag> semanticTagsList;
-    CHIP_ERROR err = context->provider.SemanticTags(endpointId, semanticTagsList);
-    return err == CHIP_NO_ERROR && !semanticTagsList.IsEmpty();
-}
-
 } // namespace
 
 namespace chip::app::Clusters {
@@ -183,17 +173,12 @@ CHIP_ERROR DescriptorCluster::Attributes(const ConcreteClusterPath & path,
 {
     AttributeListBuilder listBuilder(builder);
 
-    DataModel::AttributeEntry optionalAttributes[] = {
-        TagList::kMetadataEntry,
-        EndpointUniqueID::kMetadataEntry,
+    AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
+        { mFeatures.Has(Descriptor::Feature::kTagList), TagList::kMetadataEntry },
+        { mEnabledOptionalAttributes.IsSet(EndpointUniqueID::Id), EndpointUniqueID::kMetadataEntry },
     };
-    if (HasSemanticTags(path.mEndpointId, mContext))
-    {
-        mEnabledOptionalAttributes.Set<TagList::Id>();
-    }
 
-    return listBuilder.Append(Span(Descriptor::Attributes::kMandatoryMetadata), Span(optionalAttributes),
-                              mEnabledOptionalAttributes);
+    return listBuilder.Append(Span(Attributes::kMandatoryMetadata), Span(optionalAttributeEntries));
 }
 
 DataModel::ActionReturnStatus DescriptorCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -202,12 +187,7 @@ DataModel::ActionReturnStatus DescriptorCluster::ReadAttribute(const DataModel::
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id: {
-        BitFlags<Feature> featureFlags;
-        if (HasSemanticTags(request.path.mEndpointId, mContext))
-        {
-            featureFlags.Set(Descriptor::Feature::kTagList);
-        }
-        return encoder.Encode(featureFlags);
+        return encoder.Encode(mFeatures);
     }
     case ClusterRevision::Id:
         return encoder.Encode(Descriptor::kRevision);
@@ -240,7 +220,7 @@ DataModel::ActionReturnStatus DescriptorCluster::ReadAttribute(const DataModel::
     case PartsList::Id:
         return ReadPartsAttribute(mContext->provider, request.path.mEndpointId, encoder);
     case TagList::Id:
-        return ReadTagListAttribute(mContext->provider, request.path.mEndpointId, encoder);
+        return ReadTagListAttribute(mSemanticTags, request.path.mEndpointId, encoder);
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     case EndpointUniqueID::Id: {
         char buffer[EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };

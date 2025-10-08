@@ -33,10 +33,10 @@ class DescriptorCluster : public DefaultServerCluster
 {
 public:
     using OptionalAttributesSet =
-        chip::app::OptionalAttributeSet<Descriptor::Attributes::TagList::Id, Descriptor::Attributes::EndpointUniqueID::Id>;
+        chip::app::OptionalAttributeSet<Descriptor::Attributes::EndpointUniqueID::Id>;
 
-    DescriptorCluster(EndpointId endpointId, OptionalAttributesSet optionalAttributeSet) :
-        DefaultServerCluster({ endpointId, Descriptor::Id }), mEnabledOptionalAttributes(optionalAttributeSet)
+    DescriptorCluster(EndpointId endpointId, OptionalAttributesSet optionalAttributeSet, BitFlags<Descriptor::Feature> featureMap, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type> semanticTags) :
+        DefaultServerCluster({ endpointId, Descriptor::Id }), mEnabledOptionalAttributes(optionalAttributeSet), mFeatures(featureMap), mSemanticTags(semanticTags)
     {}
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
@@ -45,6 +45,8 @@ public:
 
 private:
     OptionalAttributesSet mEnabledOptionalAttributes;
+    BitFlags<Descriptor::Feature> mFeatures;
+    Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type> mSemanticTags;
 };
 
 } // namespace chip::app::Clusters
