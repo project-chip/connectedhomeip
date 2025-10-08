@@ -16,13 +16,17 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class BridgedDeviceBasicInformationClusterActiveChangedEvent(val promisedActiveDuration: UInt) {
+class BridgedDeviceBasicInformationClusterActiveChangedEvent(
+  val promisedActiveDuration: UInt
+) {
   override fun toString(): String = buildString {
     append("BridgedDeviceBasicInformationClusterActiveChangedEvent {\n")
     append("\tpromisedActiveDuration : $promisedActiveDuration\n")
@@ -40,14 +44,10 @@ class BridgedDeviceBasicInformationClusterActiveChangedEvent(val promisedActiveD
   companion object {
     private const val TAG_PROMISED_ACTIVE_DURATION = 0
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): BridgedDeviceBasicInformationClusterActiveChangedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : BridgedDeviceBasicInformationClusterActiveChangedEvent {
       tlvReader.enterStructure(tlvTag)
-      val promisedActiveDuration =
-        tlvReader.getUInt(ContextSpecificTag(TAG_PROMISED_ACTIVE_DURATION))
-
+      val promisedActiveDuration = tlvReader.getUInt(ContextSpecificTag(TAG_PROMISED_ACTIVE_DURATION))
+      
       tlvReader.exitContainer()
 
       return BridgedDeviceBasicInformationClusterActiveChangedEvent(promisedActiveDuration)

@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -27,7 +28,7 @@ class AccessControlClusterAccessRestrictionEntryStruct(
   val endpoint: UShort,
   val cluster: UInt,
   val restrictions: List<AccessControlClusterAccessRestrictionStruct>,
-  val fabricIndex: UByte,
+  val fabricIndex: UByte
 ) {
   override fun toString(): String = buildString {
     append("AccessControlClusterAccessRestrictionEntryStruct {\n")
@@ -59,31 +60,22 @@ class AccessControlClusterAccessRestrictionEntryStruct(
     private const val TAG_RESTRICTIONS = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): AccessControlClusterAccessRestrictionEntryStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AccessControlClusterAccessRestrictionEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val endpoint = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT))
       val cluster = tlvReader.getUInt(ContextSpecificTag(TAG_CLUSTER))
-      val restrictions =
-        buildList<AccessControlClusterAccessRestrictionStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_RESTRICTIONS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(AccessControlClusterAccessRestrictionStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
+      val restrictions = buildList<AccessControlClusterAccessRestrictionStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_RESTRICTIONS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(AccessControlClusterAccessRestrictionStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
-      return AccessControlClusterAccessRestrictionEntryStruct(
-        endpoint,
-        cluster,
-        restrictions,
-        fabricIndex,
-      )
+      return AccessControlClusterAccessRestrictionEntryStruct(endpoint, cluster, restrictions, fabricIndex)
     }
   }
 }

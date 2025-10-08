@@ -17,13 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class CommodityTariffClusterPeakPeriodStruct(val severity: UInt, val peakPeriod: UInt) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class CommodityTariffClusterPeakPeriodStruct (
+    val severity: UInt,
+    val peakPeriod: UInt) {
+  override fun toString(): String  = buildString {
     append("CommodityTariffClusterPeakPeriodStruct {\n")
     append("\tseverity : $severity\n")
     append("\tpeakPeriod : $peakPeriod\n")
@@ -43,11 +49,11 @@ class CommodityTariffClusterPeakPeriodStruct(val severity: UInt, val peakPeriod:
     private const val TAG_SEVERITY = 0
     private const val TAG_PEAK_PERIOD = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityTariffClusterPeakPeriodStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CommodityTariffClusterPeakPeriodStruct {
       tlvReader.enterStructure(tlvTag)
       val severity = tlvReader.getUInt(ContextSpecificTag(TAG_SEVERITY))
       val peakPeriod = tlvReader.getUInt(ContextSpecificTag(TAG_PEAK_PERIOD))
-
+      
       tlvReader.exitContainer()
 
       return CommodityTariffClusterPeakPeriodStruct(severity, peakPeriod)

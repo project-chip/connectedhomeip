@@ -13795,6 +13795,161 @@ using chip::System::Clock::Timeout;
 
 @end
 
+@implementation MTRClusterHumidistat
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeSupportedModesID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeModeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeModeID) params:params];
+}
+
+- (void)writeAttributeModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeModeWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeModeID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSystemStateWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeSystemStateID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeUserSetpointWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeUserSetpointID) params:params];
+}
+
+- (void)writeAttributeUserSetpointWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeUserSetpointWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeUserSetpointWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeUserSetpointID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMinSetpointWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeMinSetpointID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxSetpointWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeMaxSetpointID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeStepWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeStepID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeTargetSetpointWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeTargetSetpointID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMistTypeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeMistTypeID) params:params];
+}
+
+- (void)writeAttributeMistTypeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeMistTypeWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeMistTypeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeMistTypeID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeContinuousWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeContinuousID) params:params];
+}
+
+- (void)writeAttributeContinuousWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeContinuousWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeContinuousWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeContinuousID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSleepWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeSleepID) params:params];
+}
+
+- (void)writeAttributeSleepWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeSleepWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeSleepWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeSleepID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeOptimalWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeOptimalID) params:params];
+}
+
+- (void)writeAttributeOptimalWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeOptimalWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeOptimalWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeOptimalID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeHumidistatID) attributeID:@(MTRAttributeIDTypeClusterHumidistatAttributeClusterRevisionID) params:params];
+}
+
+@end
+
 @implementation MTRClusterColorControl
 
 - (void)moveToHueWithParams:(MTRColorControlClusterMoveToHueParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion

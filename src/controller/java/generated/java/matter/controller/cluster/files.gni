@@ -390,6 +390,7 @@ matter_clusters_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/GroupKeyManagementCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/GroupsCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/HepaFilterMonitoringCluster.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/HumidistatCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/IcdManagementCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/IdentifyCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/IlluminanceMeasurementCluster.kt",

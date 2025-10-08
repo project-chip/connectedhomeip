@@ -842,6 +842,15 @@ static BOOL CommandNeedsTimedInvokeInThermostatUserInterfaceConfigurationCluster
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInHumidistatCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Humidistat;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInColorControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ColorControl;
@@ -1610,6 +1619,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ThermostatUserInterfaceConfiguration::Id: {
         return CommandNeedsTimedInvokeInThermostatUserInterfaceConfigurationCluster(commandID);
+    }
+    case Clusters::Humidistat::Id: {
+        return CommandNeedsTimedInvokeInHumidistatCluster(commandID);
     }
     case Clusters::ColorControl::Id: {
         return CommandNeedsTimedInvokeInColorControlCluster(commandID);

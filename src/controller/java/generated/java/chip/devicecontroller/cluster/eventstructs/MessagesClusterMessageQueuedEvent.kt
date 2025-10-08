@@ -17,13 +17,18 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class MessagesClusterMessageQueuedEvent(val messageID: ByteArray) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class MessagesClusterMessageQueuedEvent (
+    val messageID: ByteArray) {
+  override fun toString(): String  = buildString {
     append("MessagesClusterMessageQueuedEvent {\n")
     append("\tmessageID : $messageID\n")
     append("}\n")
@@ -40,10 +45,10 @@ class MessagesClusterMessageQueuedEvent(val messageID: ByteArray) {
   companion object {
     private const val TAG_MESSAGE_ID = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MessagesClusterMessageQueuedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : MessagesClusterMessageQueuedEvent {
       tlvReader.enterStructure(tlvTag)
       val messageID = tlvReader.getByteArray(ContextSpecificTag(TAG_MESSAGE_ID))
-
+      
       tlvReader.exitContainer()
 
       return MessagesClusterMessageQueuedEvent(messageID)

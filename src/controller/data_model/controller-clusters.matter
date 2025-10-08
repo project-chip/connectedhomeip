@@ -7528,6 +7528,61 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster specifies an interface to control the humidity of an environment. */
+provisional cluster Humidistat = 517 {
+  revision 1;
+
+  enum ModeEnum : enum8 {
+    kHumidifier = 0;
+    kDehumidifier = 1;
+    kAuto = 2;
+    kFanOnly = 3;
+  }
+
+  enum SystemStateEnum : enum8 {
+    kHumidifying = 0;
+    kDehumidifying = 1;
+    kFan = 2;
+    kIdle = 3;
+  }
+
+  bitmap Feature : bitmap32 {
+    kHumidifier = 0x1;
+    kDehumidifier = 0x2;
+    kContinuous = 0x4;
+    kSensor = 0x8;
+    kAuto = 0x10;
+    kFanOnly = 0x20;
+    kOptimal = 0x40;
+    kWarmMist = 0x80;
+    kColdMist = 0x100;
+    kCondPump = 0x200;
+  }
+
+  bitmap MistTypeBitmap : bitmap8 {
+    kMistCold = 0x1;
+    kMistWarm = 0x2;
+  }
+
+  readonly attribute ModeEnum supportedModes[] = 0;
+  attribute ModeEnum mode = 1;
+  readonly attribute SystemStateEnum systemState = 2;
+  attribute optional percent userSetpoint = 3;
+  readonly attribute optional percent minSetpoint = 4;
+  readonly attribute optional percent maxSetpoint = 5;
+  readonly attribute optional percent step = 6;
+  readonly attribute optional percent targetSetpoint = 7;
+  attribute optional nullable MistTypeBitmap mistType = 8;
+  attribute optional boolean continuous = 9;
+  attribute optional boolean sleep = 10;
+  attribute optional boolean optimal = 11;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
   revision 7;

@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -25,7 +27,7 @@ import matter.tlv.TlvWriter
 class JointFabricDatastoreClusterDatastoreAccessControlTargetStruct(
   val cluster: UInt?,
   val endpoint: UShort?,
-  val deviceType: UInt?,
+  val deviceType: UInt?
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreAccessControlTargetStruct {\n")
@@ -62,40 +64,30 @@ class JointFabricDatastoreClusterDatastoreAccessControlTargetStruct(
     private const val TAG_ENDPOINT = 1
     private const val TAG_DEVICE_TYPE = 2
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): JointFabricDatastoreClusterDatastoreAccessControlTargetStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): JointFabricDatastoreClusterDatastoreAccessControlTargetStruct {
       tlvReader.enterStructure(tlvTag)
-      val cluster =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_CLUSTER))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_CLUSTER))
-          null
-        }
-      val endpoint =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_ENDPOINT))
-          null
-        }
-      val deviceType =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_DEVICE_TYPE))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_DEVICE_TYPE))
-          null
-        }
-
+      val cluster = if (!tlvReader.isNull()) {
+      tlvReader.getUInt(ContextSpecificTag(TAG_CLUSTER))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_CLUSTER))
+      null
+    }
+      val endpoint = if (!tlvReader.isNull()) {
+      tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_ENDPOINT))
+      null
+    }
+      val deviceType = if (!tlvReader.isNull()) {
+      tlvReader.getUInt(ContextSpecificTag(TAG_DEVICE_TYPE))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_DEVICE_TYPE))
+      null
+    }
+      
       tlvReader.exitContainer()
 
-      return JointFabricDatastoreClusterDatastoreAccessControlTargetStruct(
-        cluster,
-        endpoint,
-        deviceType,
-      )
+      return JointFabricDatastoreClusterDatastoreAccessControlTargetStruct(cluster, endpoint, deviceType)
     }
   }
 }

@@ -17,20 +17,22 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class CameraAvStreamManagementClusterSnapshotCapabilitiesStruct(
-  val resolution: CameraAvStreamManagementClusterVideoResolutionStruct,
-  val maxFrameRate: UInt,
-  val imageCodec: UInt,
-  val requiresEncodedPixels: Boolean,
-  val requiresHardwareEncoder: Optional<Boolean>,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class CameraAvStreamManagementClusterSnapshotCapabilitiesStruct (
+    val resolution: CameraAvStreamManagementClusterVideoResolutionStruct,
+    val maxFrameRate: UInt,
+    val imageCodec: UInt,
+    val requiresEncodedPixels: Boolean,
+    val requiresHardwareEncoder: Optional<Boolean>) {
+  override fun toString(): String  = buildString {
     append("CameraAvStreamManagementClusterSnapshotCapabilitiesStruct {\n")
     append("\tresolution : $resolution\n")
     append("\tmaxFrameRate : $maxFrameRate\n")
@@ -48,9 +50,9 @@ class CameraAvStreamManagementClusterSnapshotCapabilitiesStruct(
       put(ContextSpecificTag(TAG_IMAGE_CODEC), imageCodec)
       put(ContextSpecificTag(TAG_REQUIRES_ENCODED_PIXELS), requiresEncodedPixels)
       if (requiresHardwareEncoder.isPresent) {
-        val optrequiresHardwareEncoder = requiresHardwareEncoder.get()
-        put(ContextSpecificTag(TAG_REQUIRES_HARDWARE_ENCODER), optrequiresHardwareEncoder)
-      }
+      val optrequiresHardwareEncoder = requiresHardwareEncoder.get()
+      put(ContextSpecificTag(TAG_REQUIRES_HARDWARE_ENCODER), optrequiresHardwareEncoder)
+    }
       endStructure()
     }
   }
@@ -62,36 +64,21 @@ class CameraAvStreamManagementClusterSnapshotCapabilitiesStruct(
     private const val TAG_REQUIRES_ENCODED_PIXELS = 3
     private const val TAG_REQUIRES_HARDWARE_ENCODER = 4
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): CameraAvStreamManagementClusterSnapshotCapabilitiesStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CameraAvStreamManagementClusterSnapshotCapabilitiesStruct {
       tlvReader.enterStructure(tlvTag)
-      val resolution =
-        CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(
-          ContextSpecificTag(TAG_RESOLUTION),
-          tlvReader,
-        )
+      val resolution = CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(ContextSpecificTag(TAG_RESOLUTION), tlvReader)
       val maxFrameRate = tlvReader.getUInt(ContextSpecificTag(TAG_MAX_FRAME_RATE))
       val imageCodec = tlvReader.getUInt(ContextSpecificTag(TAG_IMAGE_CODEC))
-      val requiresEncodedPixels =
-        tlvReader.getBoolean(ContextSpecificTag(TAG_REQUIRES_ENCODED_PIXELS))
-      val requiresHardwareEncoder =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_REQUIRES_HARDWARE_ENCODER))) {
-          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_REQUIRES_HARDWARE_ENCODER)))
-        } else {
-          Optional.empty()
-        }
-
+      val requiresEncodedPixels = tlvReader.getBoolean(ContextSpecificTag(TAG_REQUIRES_ENCODED_PIXELS))
+      val requiresHardwareEncoder = if (tlvReader.isNextTag(ContextSpecificTag(TAG_REQUIRES_HARDWARE_ENCODER))) {
+      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_REQUIRES_HARDWARE_ENCODER)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return CameraAvStreamManagementClusterSnapshotCapabilitiesStruct(
-        resolution,
-        maxFrameRate,
-        imageCodec,
-        requiresEncodedPixels,
-        requiresHardwareEncoder,
-      )
+      return CameraAvStreamManagementClusterSnapshotCapabilitiesStruct(resolution, maxFrameRate, imageCodec, requiresEncodedPixels, requiresHardwareEncoder)
     }
   }
 }

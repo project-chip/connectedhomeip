@@ -98,6 +98,7 @@ Generally regenerate using one of:
 |        513 |      0x201 | Thermostat                                              |
 |        514 |      0x202 | FanControl                                              |
 |        516 |      0x204 | ThermostatUserInterfaceConfiguration                    |
+|        517 |      0x205 | Humidistat                                              |
 |        768 |      0x300 | ColorControl                                            |
 |        769 |      0x301 | BallastConfiguration                                    |
 |       1024 |      0x400 | IlluminanceMeasurement                                  |

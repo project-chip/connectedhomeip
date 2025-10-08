@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -25,7 +26,7 @@ import matter.tlv.TlvWriter
 
 class ScenesManagementClusterExtensionFieldSetStruct(
   val clusterID: UInt,
-  val attributeValueList: List<ScenesManagementClusterAttributeValuePairStruct>,
+  val attributeValueList: List<ScenesManagementClusterAttributeValuePairStruct>
 ) {
   override fun toString(): String = buildString {
     append("ScenesManagementClusterExtensionFieldSetStruct {\n")
@@ -54,15 +55,14 @@ class ScenesManagementClusterExtensionFieldSetStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ScenesManagementClusterExtensionFieldSetStruct {
       tlvReader.enterStructure(tlvTag)
       val clusterID = tlvReader.getUInt(ContextSpecificTag(TAG_CLUSTER_ID))
-      val attributeValueList =
-        buildList<ScenesManagementClusterAttributeValuePairStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))
-          while (!tlvReader.isEndOfContainer()) {
-            add(ScenesManagementClusterAttributeValuePairStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val attributeValueList = buildList<ScenesManagementClusterAttributeValuePairStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))
+      while(!tlvReader.isEndOfContainer()) {
+        add(ScenesManagementClusterAttributeValuePairStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return ScenesManagementClusterExtensionFieldSetStruct(clusterID, attributeValueList)

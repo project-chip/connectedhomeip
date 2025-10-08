@@ -2332,6 +2332,140 @@ public class ClusterWriteMapping {
     );
     writeThermostatUserInterfaceConfigurationInteractionInfo.put("writeScheduleProgrammingVisibilityAttribute", writeThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityAttributeInteractionInfo);
     writeAttributeMap.put("thermostatUserInterfaceConfiguration", writeThermostatUserInterfaceConfigurationInteractionInfo);
+    Map<String, InteractionInfo> writeHumidistatInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeHumidistatModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo humidistatmodeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeHumidistatModeCommandParams.put(
+        "value",
+        humidistatmodeCommandParameterInfo
+    );
+    InteractionInfo writeHumidistatModeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.HumidistatCluster) cluster).writeModeAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeHumidistatModeCommandParams
+    );
+    writeHumidistatInteractionInfo.put("writeModeAttribute", writeHumidistatModeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeHumidistatUserSetpointCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo humidistatuserSetpointCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeHumidistatUserSetpointCommandParams.put(
+        "value",
+        humidistatuserSetpointCommandParameterInfo
+    );
+    InteractionInfo writeHumidistatUserSetpointAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.HumidistatCluster) cluster).writeUserSetpointAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeHumidistatUserSetpointCommandParams
+    );
+    writeHumidistatInteractionInfo.put("writeUserSetpointAttribute", writeHumidistatUserSetpointAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeHumidistatMistTypeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo humidistatmistTypeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeHumidistatMistTypeCommandParams.put(
+        "value",
+        humidistatmistTypeCommandParameterInfo
+    );
+    InteractionInfo writeHumidistatMistTypeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.HumidistatCluster) cluster).writeMistTypeAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeHumidistatMistTypeCommandParams
+    );
+    writeHumidistatInteractionInfo.put("writeMistTypeAttribute", writeHumidistatMistTypeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeHumidistatContinuousCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo humidistatcontinuousCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeHumidistatContinuousCommandParams.put(
+        "value",
+        humidistatcontinuousCommandParameterInfo
+    );
+    InteractionInfo writeHumidistatContinuousAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.HumidistatCluster) cluster).writeContinuousAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeHumidistatContinuousCommandParams
+    );
+    writeHumidistatInteractionInfo.put("writeContinuousAttribute", writeHumidistatContinuousAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeHumidistatSleepCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo humidistatsleepCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeHumidistatSleepCommandParams.put(
+        "value",
+        humidistatsleepCommandParameterInfo
+    );
+    InteractionInfo writeHumidistatSleepAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.HumidistatCluster) cluster).writeSleepAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeHumidistatSleepCommandParams
+    );
+    writeHumidistatInteractionInfo.put("writeSleepAttribute", writeHumidistatSleepAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeHumidistatOptimalCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo humidistatoptimalCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeHumidistatOptimalCommandParams.put(
+        "value",
+        humidistatoptimalCommandParameterInfo
+    );
+    InteractionInfo writeHumidistatOptimalAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.HumidistatCluster) cluster).writeOptimalAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeHumidistatOptimalCommandParams
+    );
+    writeHumidistatInteractionInfo.put("writeOptimalAttribute", writeHumidistatOptimalAttributeInteractionInfo);
+    writeAttributeMap.put("humidistat", writeHumidistatInteractionInfo);
     Map<String, InteractionInfo> writeColorControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeColorControlOptionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControloptionsCommandParameterInfo =

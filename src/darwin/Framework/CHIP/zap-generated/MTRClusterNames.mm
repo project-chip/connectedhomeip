@@ -276,6 +276,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeThermostatUserInterfaceConfigurationID:
         result = @"ThermostatUserInterfaceConfiguration";
         break;
+    case MTRClusterIDTypeHumidistatID:
+        result = @"Humidistat";
+        break;
     case MTRClusterIDTypeColorControlID:
         result = @"ColorControl";
         break;
@@ -5855,6 +5858,86 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeHumidistatID:
+
+        switch (attributeID) {
+
+            // Cluster Humidistat attributes
+        case MTRAttributeIDTypeClusterHumidistatAttributeSupportedModesID:
+            result = @"SupportedModes";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeModeID:
+            result = @"Mode";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeSystemStateID:
+            result = @"SystemState";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeUserSetpointID:
+            result = @"UserSetpoint";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeMinSetpointID:
+            result = @"MinSetpoint";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeMaxSetpointID:
+            result = @"MaxSetpoint";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeStepID:
+            result = @"Step";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeTargetSetpointID:
+            result = @"TargetSetpoint";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeMistTypeID:
+            result = @"MistType";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeContinuousID:
+            result = @"Continuous";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeSleepID:
+            result = @"Sleep";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeOptimalID:
+            result = @"Optimal";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known Humidistat attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeColorControlID:
 
         switch (attributeID) {
@@ -11141,6 +11224,16 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeHumidistatID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeColorControlID:
 
         switch (commandID) {
@@ -13513,6 +13606,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeHumidistatID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeColorControlID:
 
         switch (commandID) {
@@ -15615,6 +15718,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeThermostatUserInterfaceConfigurationID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeHumidistatID:
 
         switch (eventID) {
 

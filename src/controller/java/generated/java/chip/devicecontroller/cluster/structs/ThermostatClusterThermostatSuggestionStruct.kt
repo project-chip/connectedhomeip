@@ -17,18 +17,21 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ThermostatClusterThermostatSuggestionStruct(
-  val uniqueID: UInt,
-  val presetHandle: ByteArray,
-  val effectiveTime: ULong,
-  val expirationTime: ULong,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ThermostatClusterThermostatSuggestionStruct (
+    val uniqueID: UInt,
+    val presetHandle: ByteArray,
+    val effectiveTime: ULong,
+    val expirationTime: ULong) {
+  override fun toString(): String  = buildString {
     append("ThermostatClusterThermostatSuggestionStruct {\n")
     append("\tuniqueID : $uniqueID\n")
     append("\tpresetHandle : $presetHandle\n")
@@ -54,21 +57,16 @@ class ThermostatClusterThermostatSuggestionStruct(
     private const val TAG_EFFECTIVE_TIME = 2
     private const val TAG_EXPIRATION_TIME = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterThermostatSuggestionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ThermostatClusterThermostatSuggestionStruct {
       tlvReader.enterStructure(tlvTag)
       val uniqueID = tlvReader.getUInt(ContextSpecificTag(TAG_UNIQUE_ID))
       val presetHandle = tlvReader.getByteArray(ContextSpecificTag(TAG_PRESET_HANDLE))
       val effectiveTime = tlvReader.getULong(ContextSpecificTag(TAG_EFFECTIVE_TIME))
       val expirationTime = tlvReader.getULong(ContextSpecificTag(TAG_EXPIRATION_TIME))
-
+      
       tlvReader.exitContainer()
 
-      return ThermostatClusterThermostatSuggestionStruct(
-        uniqueID,
-        presetHandle,
-        effectiveTime,
-        expirationTime,
-      )
+      return ThermostatClusterThermostatSuggestionStruct(uniqueID, presetHandle, effectiveTime, expirationTime)
     }
   }
 }

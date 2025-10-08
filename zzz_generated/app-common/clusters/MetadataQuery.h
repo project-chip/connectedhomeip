@@ -124,6 +124,8 @@
 #include <clusters/Groups/MetadataProvider.h>
 #include <clusters/HepaFilterMonitoring/Ids.h>
 #include <clusters/HepaFilterMonitoring/MetadataProvider.h>
+#include <clusters/Humidistat/Ids.h>
+#include <clusters/Humidistat/MetadataProvider.h>
 #include <clusters/IcdManagement/Ids.h>
 #include <clusters/IcdManagement/MetadataProvider.h>
 #include <clusters/Identify/Ids.h>
@@ -595,6 +597,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == HepaFilterMonitoring::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, HepaFilterMonitoring::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Humidistat::Id) || ...))
+    {
+        if (id == Humidistat::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Humidistat::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == IcdManagement::Id) || ...))
     {

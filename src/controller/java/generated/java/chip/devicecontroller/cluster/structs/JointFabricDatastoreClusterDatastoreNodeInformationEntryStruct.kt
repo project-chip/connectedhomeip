@@ -17,17 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
-  val nodeID: ULong,
-  val friendlyName: String,
-  val commissioningStatusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct (
+    val nodeID: ULong,
+    val friendlyName: String,
+    val commissioningStatusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct) {
+  override fun toString(): String  = buildString {
     append("JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct {\n")
     append("\tnodeID : $nodeID\n")
     append("\tfriendlyName : $friendlyName\n")
@@ -50,26 +53,15 @@ class JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
     private const val TAG_FRIENDLY_NAME = 2
     private const val TAG_COMMISSIONING_STATUS_ENTRY = 3
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val friendlyName = tlvReader.getString(ContextSpecificTag(TAG_FRIENDLY_NAME))
-      val commissioningStatusEntry =
-        JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(
-          ContextSpecificTag(TAG_COMMISSIONING_STATUS_ENTRY),
-          tlvReader,
-        )
-
+      val commissioningStatusEntry = JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(ContextSpecificTag(TAG_COMMISSIONING_STATUS_ENTRY), tlvReader)
+      
       tlvReader.exitContainer()
 
-      return JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
-        nodeID,
-        friendlyName,
-        commissioningStatusEntry,
-      )
+      return JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(nodeID, friendlyName, commissioningStatusEntry)
     }
   }
 }

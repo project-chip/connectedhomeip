@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +27,7 @@ import matter.tlv.TlvWriter
 class CommodityTariffClusterTariffPriceStruct(
   val priceType: UByte,
   val price: Optional<Long>,
-  val priceLevel: Optional<Short>,
+  val priceLevel: Optional<Short>
 ) {
   override fun toString(): String = buildString {
     append("CommodityTariffClusterTariffPriceStruct {\n")
@@ -60,19 +61,17 @@ class CommodityTariffClusterTariffPriceStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityTariffClusterTariffPriceStruct {
       tlvReader.enterStructure(tlvTag)
       val priceType = tlvReader.getUByte(ContextSpecificTag(TAG_PRICE_TYPE))
-      val price =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_PRICE)))
-        } else {
-          Optional.empty()
-        }
-      val priceLevel =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE_LEVEL))) {
-          Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_PRICE_LEVEL)))
-        } else {
-          Optional.empty()
-        }
-
+      val price = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE))) {
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_PRICE)))
+    } else {
+      Optional.empty()
+    }
+      val priceLevel = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE_LEVEL))) {
+      Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_PRICE_LEVEL)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return CommodityTariffClusterTariffPriceStruct(priceType, price, priceLevel)

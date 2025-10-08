@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -26,7 +27,7 @@ import matter.tlv.TlvWriter
 class EnergyEvseModeClusterModeOptionStruct(
   val label: String,
   val mode: UByte,
-  val modeTags: List<EnergyEvseModeClusterModeTagStruct>,
+  val modeTags: List<EnergyEvseModeClusterModeTagStruct>
 ) {
   override fun toString(): String = buildString {
     append("EnergyEvseModeClusterModeOptionStruct {\n")
@@ -59,15 +60,14 @@ class EnergyEvseModeClusterModeOptionStruct(
       tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
       val mode = tlvReader.getUByte(ContextSpecificTag(TAG_MODE))
-      val modeTags =
-        buildList<EnergyEvseModeClusterModeTagStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(EnergyEvseModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val modeTags = buildList<EnergyEvseModeClusterModeTagStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(EnergyEvseModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return EnergyEvseModeClusterModeOptionStruct(label, mode, modeTags)

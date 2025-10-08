@@ -79,6 +79,7 @@
 #include <clusters/Groupcast/EnumsCheck.h>
 #include <clusters/Groups/EnumsCheck.h>
 #include <clusters/HepaFilterMonitoring/EnumsCheck.h>
+#include <clusters/Humidistat/EnumsCheck.h>
 #include <clusters/IcdManagement/EnumsCheck.h>
 #include <clusters/Identify/EnumsCheck.h>
 #include <clusters/IlluminanceMeasurement/EnumsCheck.h>

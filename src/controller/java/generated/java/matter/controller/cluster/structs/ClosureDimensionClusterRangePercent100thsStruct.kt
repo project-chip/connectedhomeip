@@ -16,13 +16,18 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ClosureDimensionClusterRangePercent100thsStruct(val min: UShort, val max: UShort) {
+class ClosureDimensionClusterRangePercent100thsStruct(
+  val min: UShort,
+  val max: UShort
+) {
   override fun toString(): String = buildString {
     append("ClosureDimensionClusterRangePercent100thsStruct {\n")
     append("\tmin : $min\n")
@@ -43,14 +48,11 @@ class ClosureDimensionClusterRangePercent100thsStruct(val min: UShort, val max: 
     private const val TAG_MIN = 0
     private const val TAG_MAX = 1
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): ClosureDimensionClusterRangePercent100thsStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ClosureDimensionClusterRangePercent100thsStruct {
       tlvReader.enterStructure(tlvTag)
       val min = tlvReader.getUShort(ContextSpecificTag(TAG_MIN))
       val max = tlvReader.getUShort(ContextSpecificTag(TAG_MAX))
-
+      
       tlvReader.exitContainer()
 
       return ClosureDimensionClusterRangePercent100thsStruct(min, max)

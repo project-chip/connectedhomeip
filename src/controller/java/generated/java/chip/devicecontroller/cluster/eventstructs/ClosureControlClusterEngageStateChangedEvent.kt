@@ -17,13 +17,18 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ClosureControlClusterEngageStateChangedEvent(val engageValue: Boolean) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ClosureControlClusterEngageStateChangedEvent (
+    val engageValue: Boolean) {
+  override fun toString(): String  = buildString {
     append("ClosureControlClusterEngageStateChangedEvent {\n")
     append("\tengageValue : $engageValue\n")
     append("}\n")
@@ -40,10 +45,10 @@ class ClosureControlClusterEngageStateChangedEvent(val engageValue: Boolean) {
   companion object {
     private const val TAG_ENGAGE_VALUE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ClosureControlClusterEngageStateChangedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ClosureControlClusterEngageStateChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val engageValue = tlvReader.getBoolean(ContextSpecificTag(TAG_ENGAGE_VALUE))
-
+      
       tlvReader.exitContainer()
 
       return ClosureControlClusterEngageStateChangedEvent(engageValue)

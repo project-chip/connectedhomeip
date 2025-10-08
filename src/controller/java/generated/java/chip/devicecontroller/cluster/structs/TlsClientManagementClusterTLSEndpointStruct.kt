@@ -17,21 +17,24 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class TlsClientManagementClusterTLSEndpointStruct(
-  val endpointID: UInt,
-  val hostname: ByteArray,
-  val port: UInt,
-  val caid: UInt,
-  val ccdid: UInt?,
-  val referenceCount: UInt,
-  val fabricIndex: UInt,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class TlsClientManagementClusterTLSEndpointStruct (
+    val endpointID: UInt,
+    val hostname: ByteArray,
+    val port: UInt,
+    val caid: UInt,
+    val ccdid: UInt?,
+    val referenceCount: UInt,
+    val fabricIndex: UInt) {
+  override fun toString(): String  = buildString {
     append("TlsClientManagementClusterTLSEndpointStruct {\n")
     append("\tendpointID : $endpointID\n")
     append("\thostname : $hostname\n")
@@ -51,10 +54,10 @@ class TlsClientManagementClusterTLSEndpointStruct(
       put(ContextSpecificTag(TAG_PORT), port)
       put(ContextSpecificTag(TAG_CAID), caid)
       if (ccdid != null) {
-        put(ContextSpecificTag(TAG_CCDID), ccdid)
-      } else {
-        putNull(ContextSpecificTag(TAG_CCDID))
-      }
+      put(ContextSpecificTag(TAG_CCDID), ccdid)
+    } else {
+      putNull(ContextSpecificTag(TAG_CCDID))
+    }
       put(ContextSpecificTag(TAG_REFERENCE_COUNT), referenceCount)
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
@@ -70,33 +73,24 @@ class TlsClientManagementClusterTLSEndpointStruct(
     private const val TAG_REFERENCE_COUNT = 5
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TlsClientManagementClusterTLSEndpointStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : TlsClientManagementClusterTLSEndpointStruct {
       tlvReader.enterStructure(tlvTag)
       val endpointID = tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT_ID))
       val hostname = tlvReader.getByteArray(ContextSpecificTag(TAG_HOSTNAME))
       val port = tlvReader.getUInt(ContextSpecificTag(TAG_PORT))
       val caid = tlvReader.getUInt(ContextSpecificTag(TAG_CAID))
-      val ccdid =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_CCDID))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_CCDID))
-          null
-        }
+      val ccdid = if (!tlvReader.isNull()) {
+      tlvReader.getUInt(ContextSpecificTag(TAG_CCDID))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_CCDID))
+      null
+    }
       val referenceCount = tlvReader.getUInt(ContextSpecificTag(TAG_REFERENCE_COUNT))
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
-      return TlsClientManagementClusterTLSEndpointStruct(
-        endpointID,
-        hostname,
-        port,
-        caid,
-        ccdid,
-        referenceCount,
-        fabricIndex,
-      )
+      return TlsClientManagementClusterTLSEndpointStruct(endpointID, hostname, port, caid, ccdid, referenceCount, fabricIndex)
     }
   }
 }
