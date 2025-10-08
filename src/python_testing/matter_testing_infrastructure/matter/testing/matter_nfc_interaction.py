@@ -13,7 +13,7 @@ def select_ndef_application(nrf_reader_connection_object):
     SELECT_APDU = [0x00, 0xA4, 0x04, 0x00, 0x07, 0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x01, 0x00]
     data, sw1, sw2 = nrf_reader_connection_object.transmit(SELECT_APDU)
     asserts.assert_true((sw1, sw2) == (0x90, 0x00), f"Failed to select NDEF application: SW1={sw1:02X}, SW2={sw2:02X}")
-    logging.info("NDEF application selected.")
+    logger.info("NDEF application selected.")
 
 
 def select_cc_file(nrf_reader_connection_object):
@@ -21,7 +21,7 @@ def select_cc_file(nrf_reader_connection_object):
     SELECT_CC = [0x00, 0xA4, 0x00, 0x0C, 0x02, 0xE1, 0x03]
     data, sw1, sw2 = nrf_reader_connection_object.transmit(SELECT_CC)
     asserts.assert_true((sw1, sw2) == (0x90, 0x00), f"Failed to select CC file: SW1={sw1:02X}, SW2={sw2:02X}")
-    logging.info("CC file selected.")
+    logger.info("CC file selected.")
 
 
 def select_ndef_file(nrf_reader_connection_object):
@@ -29,7 +29,7 @@ def select_ndef_file(nrf_reader_connection_object):
     SELECT_NDEF = [0x00, 0xA4, 0x00, 0x0C, 0x02, 0xE1, 0x04]
     data, sw1, sw2 = nrf_reader_connection_object.transmit(SELECT_NDEF)
     asserts.assert_true((sw1, sw2) == (0x90, 0x00), f"Failed to select NDEF file: SW1={sw1:02X}, SW2={sw2:02X}")
-    logging.info("NDEF file selected.")
+    logger.info("NDEF file selected.")
 
 
 def read_ndef_length(connection):
@@ -38,7 +38,7 @@ def read_ndef_length(connection):
     data, sw1, sw2 = connection.transmit(READ_BINARY)
     asserts.assert_true((sw1, sw2) == (0x90, 0x00), f"Failed to read NDEF length: SW1={sw1:02X}, SW2={sw2:02X}")
     length = (data[0] << 8) + data[1]
-    logging.info(f"NDEF data length: {length} bytes")
+    logger.info(f"NDEF data length: {length} bytes")
     return length
 
 
@@ -66,6 +66,6 @@ def read_nfc_tag_data(nrf_reader_object, nfc_reader_index):
 def connect_read_nfc_tag_data(nfc_reader_index):
     nrf_reader_object = readers()
     asserts.assert_true(len(nrf_reader_object) > 0, "No NFC readers found.")
-    logging.info(f"Available readers are: {nrf_reader_object} \n will use {nrf_reader_object[nfc_reader_index]}")
+    logger.info(f"Available readers are: {nrf_reader_object} \n will use {nrf_reader_object[nfc_reader_index]}")
     nfc_tag_data = read_nfc_tag_data(nrf_reader_object, nfc_reader_index)
     return nfc_tag_data

@@ -295,7 +295,7 @@ RUN case ${TARGETPLATFORM} in \
     *) ;; \
     esac
 
-RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true -i out/python_env
+RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true --enable_nfc true -i out/python_env
 
 # Stage 3: Copy relevant cert bins to a minimal image to reduce size.
 FROM ubuntu:24.04
