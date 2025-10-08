@@ -65,6 +65,7 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
     }
     requestor_setup_pincode = 2123
     expected_software_version = 2
+    kvs_path = '/tmp/chip_kvs_provider'
 
     @async_test_body
     async def teardown_class(self):
@@ -79,11 +80,13 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
         ota_image_path = self.get_ota_image_path(version=self.expected_software_version)
         image_path = 'bdx://0000000000000141/' + ota_image_path
         extra_arguments = ['--queryImageStatus', 'updateAvailable', '--imageUri', image_path]
+
         self.start_provider(
             version=self.expected_software_version,
             setup_pincode=self.provider_data['setup_pincode'],
             discriminator=self.provider_data['discriminator'],
             port=5541,
+            kvs_path=self.kvs_path,
             log_file='/tmp/provider.log',
             extra_args=extra_arguments,
         )
