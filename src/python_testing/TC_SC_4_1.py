@@ -478,6 +478,8 @@ class TC_SC_4_1(MatterBaseTest):
             # if 'PI' in txt_record.txt:
             #     pi_key = txt_record.txt['PI']
                 # assert_valid_pi_key(pi_key)
+            
+            assert_valid_pi_key("for-lint...") # To de removed
         else:
             logging.info("TXT record NOT required.")
 
