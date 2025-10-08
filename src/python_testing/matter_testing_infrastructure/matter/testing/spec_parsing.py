@@ -1124,7 +1124,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                                 try:
                                     element_name = e.attrib['code']
                                 except KeyError:
-                                    element_namename = None
+                                    element_name = None
                             else:
                                 element_name = None
                         if element_name is None:
