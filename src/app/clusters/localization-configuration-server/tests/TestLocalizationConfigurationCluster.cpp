@@ -109,8 +109,8 @@ public:
         {
             CharSpan tempLocale;
             found = it->Next(tempLocale);
-            VerifyOrReturnValue(CopyCharSpanToMutableCharSpan(tempLocale, outLocale) == CHIP_NO_ERROR, false);
             it->Release();
+            VerifyOrReturnValue(CopyCharSpanToMutableCharSpan(tempLocale, outLocale) == CHIP_NO_ERROR, false);
         }
         return found;
     }

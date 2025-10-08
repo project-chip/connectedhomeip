@@ -34,24 +34,7 @@ constexpr size_t kActiveLocaleMaxLength = 35;
 class LocalizationConfigurationCluster : public DefaultServerCluster
 {
 public:
-    LocalizationConfigurationCluster(DeviceLayer::DeviceInfoProvider & aDeviceInfoProvider, CharSpan activeLocale) :
-        DefaultServerCluster({ kRootEndpointId, LocalizationConfiguration::Id }), mDeviceInfoProvider(aDeviceInfoProvider)
-    {
-        DataModel::ActionReturnStatus status = SetActiveLocale(activeLocale);
-        if (status != Protocols::InteractionModel::Status::Success)
-        {
-            char tempBuf[kActiveLocaleMaxLength];
-            MutableCharSpan validLocale(tempBuf);
-            if (GetDefaultLocale(validLocale))
-            {
-                status = SetActiveLocale(validLocale);
-                if (status != Protocols::InteractionModel::Status::Success)
-                {
-                    ChipLogError(AppServer, "Failed to set active locale on endpoint %u", kRootEndpointId);
-                }
-            }
-        }
-    }
+    LocalizationConfigurationCluster(DeviceLayer::DeviceInfoProvider & aDeviceInfoProvider, CharSpan activeLocale);
 
     // Server cluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;

@@ -31,7 +31,57 @@ using namespace chip::app::Clusters::LocalizationConfiguration::Attributes;
 
 using Protocols::InteractionModel::Status;
 
+namespace {
+class AutoReleaseIterator
+{
+public:
+    using Iterator = DeviceLayer::DeviceInfoProvider::SupportedLocalesIterator;
+
+    explicit AutoReleaseIterator(DeviceLayer::DeviceInfoProvider * provider) :
+        mIterator(provider != nullptr ? provider->IterateSupportedLocales() : nullptr)
+    {}
+    ~AutoReleaseIterator()
+    {
+        if (mIterator != nullptr)
+        {
+            mIterator->Release();
+        }
+    }
+
+    // Delete copy constructor and assignment
+    AutoReleaseIterator(const AutoReleaseIterator &)             = delete;
+    AutoReleaseIterator & operator=(const AutoReleaseIterator &) = delete;
+
+    bool IsValid() const { return mIterator != nullptr; }
+    bool Next(CharSpan & value) { return (mIterator == nullptr) ? false : mIterator->Next(value); }
+
+private:
+    Iterator * mIterator;
+};
+} // namespace
+
 namespace chip::app::Clusters {
+
+LocalizationConfigurationCluster::LocalizationConfigurationCluster(DeviceLayer::DeviceInfoProvider & aDeviceInfoProvider,
+                                                                   CharSpan activeLocale) :
+    DefaultServerCluster({ kRootEndpointId, LocalizationConfiguration::Id }),
+    mDeviceInfoProvider(aDeviceInfoProvider)
+{
+    DataModel::ActionReturnStatus status = SetActiveLocale(activeLocale);
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        char tempBuf[kActiveLocaleMaxLength];
+        MutableCharSpan validLocale(tempBuf);
+        if (GetDefaultLocale(validLocale))
+        {
+            status = SetActiveLocale(validLocale);
+            if (status != Protocols::InteractionModel::Status::Success)
+            {
+                ChipLogError(AppServer, "Failed to set active locale on endpoint %u", kRootEndpointId);
+            }
+        }
+    }
+}
 
 CHIP_ERROR LocalizationConfigurationCluster::Startup(ServerClusterContext & context)
 {
@@ -100,17 +150,17 @@ DataModel::ActionReturnStatus LocalizationConfigurationCluster::SetActiveLocale(
         return Status::ConstraintError;
     }
 
-    VerifyOrReturnError(mActiveLocale.SetContent(activeLocale), Status::Failure);
+    VerifyOrReturnError(mActiveLocale.SetContent(activeLocale), Status::ConstraintError);
     if (mContext != nullptr)
     {
         Storage::String<kActiveLocaleMaxLength> shortString;
-        VerifyOrReturnError(shortString.SetContent(activeLocale), Status::Failure);
+        VerifyOrReturnError(shortString.SetContent(activeLocale), Status::ConstraintError);
         AttributePersistence persistence(mContext->attributeStorage);
         if (persistence.StoreString({ mPath.mEndpointId, LocalizationConfiguration::Id, Attributes::ActiveLocale::Id },
                                     shortString) != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Failed to store active locale in persistence");
-            return Status::Failure;
+            return Status::ConstraintError;
         }
     }
 
@@ -124,43 +174,36 @@ CharSpan LocalizationConfigurationCluster::GetActiveLocale()
 
 CHIP_ERROR LocalizationConfigurationCluster::ReadSupportedLocales(AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err                                                 = CHIP_NO_ERROR;
-    DeviceLayer::DeviceInfoProvider::SupportedLocalesIterator * it = mDeviceInfoProvider.IterateSupportedLocales();
-    VerifyOrReturnValue(it, aEncoder.EncodeEmptyList());
+    AutoReleaseIterator it(&mDeviceInfoProvider);
+    VerifyOrReturnValue(it.IsValid(), aEncoder.EncodeEmptyList());
 
-    err = aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
         CharSpan supportedLocale;
 
-        while (it->Next(supportedLocale))
+        while (it.Next(supportedLocale))
         {
             ReturnErrorOnFailure(encoder.Encode(supportedLocale));
         }
 
         return CHIP_NO_ERROR;
     });
-
-    it->Release();
-
-    return err;
 }
 
 bool LocalizationConfigurationCluster::IsSupportedLocale(CharSpan newLangTag) const
 {
-    DeviceLayer::DeviceInfoProvider::SupportedLocalesIterator * it;
-    if ((it = mDeviceInfoProvider.IterateSupportedLocales()))
+    AutoReleaseIterator it(&mDeviceInfoProvider);
+    if (!it.IsValid())
     {
-        CharSpan outLocale;
+        return false;
+    }
 
-        while (it->Next(outLocale))
+    CharSpan outLocale;
+    while (it.Next(outLocale))
+    {
+        if (outLocale.data_equal(newLangTag))
         {
-            if (outLocale.data_equal(newLangTag))
-            {
-                it->Release();
-                return true;
-            }
+            return true;
         }
-
-        it->Release();
     }
 
     return false;
@@ -168,15 +211,16 @@ bool LocalizationConfigurationCluster::IsSupportedLocale(CharSpan newLangTag) co
 
 bool LocalizationConfigurationCluster::GetDefaultLocale(MutableCharSpan & outLocale)
 {
-    bool found = false;
-    DeviceLayer::DeviceInfoProvider::SupportedLocalesIterator * it;
-    if ((it = mDeviceInfoProvider.IterateSupportedLocales()))
+    AutoReleaseIterator it(&mDeviceInfoProvider);
+    if (!it.IsValid())
     {
-        CharSpan tempLocale;
-        found = it->Next(tempLocale);
-        VerifyOrReturnValue(CopyCharSpanToMutableCharSpan(tempLocale, outLocale) == CHIP_NO_ERROR, false);
-        it->Release();
+        return false;
     }
+
+    CharSpan tempLocale;
+    bool found = it.Next(tempLocale);
+    VerifyOrReturnValue(CopyCharSpanToMutableCharSpan(tempLocale, outLocale) == CHIP_NO_ERROR, false);
+
     return found;
 }
 } // namespace chip::app::Clusters
