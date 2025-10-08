@@ -187,15 +187,7 @@ TrustVerificationError JCMCommissionee::ReadCommissionerAdminFabricIndex()
                                              TrustVerificationError::kReadAdminAttributeFailed);
     };
 
-    Messaging::ExchangeContext * exchangeContext = mCommandHandle.Get()->GetExchangeContext();
-    if (exchangeContext == nullptr)
-    {
-        return TrustVerificationError::kReadAdminAttributeFailed;
-    }
-    SessionHandle session = exchangeContext->GetSessionHandle();
-
-    chip::Messaging::ExchangeManager * exchangeMgr = &chip::Server::GetInstance().GetExchangeManager();
-    CHIP_ERROR err = chip::Controller::ReadAttribute<Attr>(exchangeMgr, session, mInfo.adminEndpointId, onSuccess, onError, false);
+    CHIP_ERROR err = ReadAttribute<Attr>(mInfo.adminEndpointId, onSuccess, onError, false);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -209,8 +201,6 @@ CHIP_ERROR JCMCommissionee::ReadAdminFabrics(OnCompletionFunc onComplete)
 {
     using FabricsAttr = chip::app::Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo;
 
-    Messaging::ExchangeContext * exchangeContext = mCommandHandle.Get()->GetExchangeContext();
-    SessionHandle session                        = exchangeContext->GetSessionHandle();
     auto onReadSuccess = [this, onComplete](const ConcreteAttributePath &, const FabricsAttr::DecodableType & fabrics) {
         // Get the root public key from the fabric corresponding to the Administrator Fabric Index (mInfo.adminFabricIndex)
         auto iter = fabrics.begin();
@@ -234,8 +224,7 @@ CHIP_ERROR JCMCommissionee::ReadAdminFabrics(OnCompletionFunc onComplete)
         ChipLogError(JointFabric, "JCM: Failed to read commissioner's Fabrics list: %" CHIP_ERROR_FORMAT, err.Format());
         onComplete(err);
     };
-    return chip::Controller::ReadAttribute<FabricsAttr>(&chip::Server::GetInstance().GetExchangeManager(), session, kRootEndpointId,
-                                                        onReadSuccess, onError, false);
+    return ReadAttribute<FabricsAttr>(kRootEndpointId, onReadSuccess, onError, false);
 }
 
 void JCMCommissionee::FetchCommissionerInfo(OnCompletionFunc onComplete)
@@ -349,10 +338,6 @@ CHIP_ERROR JCMCommissionee::ReadAdminCerts(OnCompletionFunc onComplete)
 {
     using CertsAttr = chip::app::Clusters::OperationalCredentials::Attributes::TrustedRootCertificates::TypeInfo;
 
-    Messaging::ExchangeContext * exchangeContext = mCommandHandle.Get()->GetExchangeContext();
-    VerifyOrReturnError(exchangeContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    SessionHandle session = exchangeContext->GetSessionHandle();
-
     auto onSuccess = [this, onComplete](const ConcreteAttributePath &, const CertsAttr::DecodableType & roots) {
         // Find the RCAC
         auto iter = roots.begin();
@@ -383,17 +368,12 @@ CHIP_ERROR JCMCommissionee::ReadAdminCerts(OnCompletionFunc onComplete)
         onComplete(err);
     };
 
-    return chip::Controller::ReadAttribute<CertsAttr>(&chip::Server::GetInstance().GetExchangeManager(), session, kRootEndpointId,
-                                                      onSuccess, onError, false);
+    return ReadAttribute<CertsAttr>(kRootEndpointId, onSuccess, onError, false);
 }
 
 CHIP_ERROR JCMCommissionee::ReadAdminNOCs(OnCompletionFunc onComplete)
 {
     using NOCsAttr = chip::app::Clusters::OperationalCredentials::Attributes::NOCs::TypeInfo;
-
-    Messaging::ExchangeContext * exchangeContext = mCommandHandle.Get()->GetExchangeContext();
-    VerifyOrReturnError(exchangeContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    SessionHandle session = exchangeContext->GetSessionHandle();
 
     auto onSuccess = [this, onComplete](const ConcreteAttributePath &, const NOCsAttr::DecodableType & nocs) {
         auto iter = nocs.begin();
@@ -451,8 +431,7 @@ CHIP_ERROR JCMCommissionee::ReadAdminNOCs(OnCompletionFunc onComplete)
         onComplete(err);
     };
 
-    return chip::Controller::ReadAttribute<NOCsAttr>(&chip::Server::GetInstance().GetExchangeManager(), session, kRootEndpointId,
-                                                     onSuccess, onError, false);
+    return ReadAttribute<NOCsAttr>(kRootEndpointId, onSuccess, onError, false);
 }
 
 } // namespace JointFabricAdministrator

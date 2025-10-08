@@ -22,6 +22,9 @@
 #include <credentials/jcm/VendorIdVerificationClient.h>
 
 #include <app/CommandHandlerInterface.h>
+#include <app/server/Server.h>
+#include <controller/ReadInteraction.h>
+#include <controller/TypedReadCallback.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
@@ -72,6 +75,22 @@ protected:
     void PerformTrustVerificationStage(const Credentials::JCM::TrustVerificationStage & nextStage) override;
     void OnTrustVerificationComplete(Credentials::JCM::TrustVerificationError error) override;
 
+    /**
+     * Wrapper around chip::Controller::ReadAttribute to simplify callsites and unit testing
+     */
+    template <typename T>
+    CHIP_ERROR ReadAttribute(EndpointId endpointId,
+                             std::function<void(const ConcreteAttributePath &, const typename T::DecodableType &)> onSuccess,
+                             std::function<void(const ConcreteAttributePath *, CHIP_ERROR err)> onError, const bool fabricFiltered)
+    {
+        Messaging::ExchangeContext * exchangeContext = mCommandHandle.Get()->GetExchangeContext();
+        VerifyOrReturnError(exchangeContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        SessionHandle session                          = exchangeContext->GetSessionHandle();
+        chip::Messaging::ExchangeManager * exchangeMgr = &chip::Server::GetInstance().GetExchangeManager();
+
+        return chip::Controller::ReadAttribute<T>(exchangeMgr, session, endpointId, onSuccess, onError, fabricFiltered);
+    }
+
 private:
     CommandHandler::Handle & mCommandHandle;
     OnCompletionFunc mOnCompletion;
@@ -81,6 +100,8 @@ private:
     /**
      * Implements the following passage from JCM Trust Verification:
      * Ecosystem B Administrator SHALL save the value of the EndpointID
+     *
+     * Requires that mInfo.adminEndpointId is set to a valid endpoint.
      */
     Credentials::JCM::TrustVerificationError StoreEndpointId();
     /**
