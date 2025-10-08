@@ -21,6 +21,7 @@
 #include "DeviceWithDisplay.h"
 #include "Globals.h"
 #include "LEDWidget.h"
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #if CONFIG_HAVE_DISPLAY
 #include "ScreenManager.h"
 #endif
@@ -173,6 +174,12 @@ CHIP_ERROR AppTask::Init()
 #if CONFIG_HAVE_DISPLAY
     InitDeviceDisplay();
 #endif
+
+    // Initialize and register clusters
+    VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster0.Registration()) ==
+                CHIP_NO_ERROR);
+    VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster1.Registration()) ==
+                CHIP_NO_ERROR);
 
     return CHIP_NO_ERROR;
 }
