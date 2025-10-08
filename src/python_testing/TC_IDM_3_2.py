@@ -62,7 +62,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         self, endpoints_data: dict[int, Any]
     ) -> tuple[Optional[int], Optional[type[ClusterObjects.ClusterAttributeDescriptor]]]:
         """Find an attribute that requires timed write on the actual device
-        
+
         Uses the wildcard read data that's already in endpoints_data rather than
         iterating through all possible attributes and checking with attribute_guard.
         """
@@ -81,8 +81,8 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                 # cluster_data is a dict with attribute types as keys
                 for attr_type in cluster_data:
                     # Check if this is an attribute descriptor class (skip metadata like DataVersion)
-                    if (isinstance(attr_type, type) and 
-                        issubclass(attr_type, ClusterObjects.ClusterAttributeDescriptor)):
+                    if (isinstance(attr_type, type) and
+                            issubclass(attr_type, ClusterObjects.ClusterAttributeDescriptor)):
                         # Check if this attribute requires timed write using the must_use_timed_write class property
                         if attr_type.must_use_timed_write:
                             logging.info(f"Found timed write attribute: {attr_type.__name__} "
