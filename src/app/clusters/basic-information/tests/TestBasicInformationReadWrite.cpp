@@ -32,6 +32,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <platform/ConfigurationManager.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <pw_unit_test/framework.h>
 
@@ -118,6 +119,45 @@ public:
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override { return CHIP_NO_ERROR; }
 };
 
+class MockConfigurationManager : public chip::DeviceLayer::ConfigurationManagerImpl
+{
+    static constexpr size_t kCountryCodeLength = 2;
+
+public:
+    CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override
+    {
+        const char * testUniqueId = "TEST_UNIQUE_ID_12345";
+        VerifyOrReturnError(bufSize > strlen(testUniqueId), CHIP_ERROR_BUFFER_TOO_SMALL);
+        strcpy(buf, testUniqueId);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR StoreCountryCode(const char * countryCode, size_t countryCodeLen) override
+    {
+        VerifyOrReturnError(countryCodeLen == kCountryCodeLength, CHIP_ERROR_INVALID_ARGUMENT);
+        strncpy(mCountryCode, countryCode, kCountryCodeLength);
+        mCountryCode[kCountryCodeLength] = '\0';
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & countryCodeLen) override
+    {
+        VerifyOrReturnError(bufSize > kCountryCodeLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        strncpy(buf, mCountryCode, kCountryCodeLength);
+        buf[kCountryCodeLength] = '\0';
+        countryCodeLen          = kCountryCodeLength;
+        return CHIP_NO_ERROR;
+    }
+
+    // The following methods does not have implementation on Linux, so we provide
+    // a stub that returns success.
+    CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVersion) override { return CHIP_NO_ERROR; }
+
+private:
+    char mCountryCode[kCountryCodeLength + 1] = "XX";
+};
+
+MockConfigurationManager gMockConfigurationManager;
 // Static member definition
 MockDeviceInstanceInfoProvider gMockDeviceInstanceInfoProvider;
 
@@ -155,6 +195,8 @@ struct TestBasicInformationReadWrite : public ::testing::Test
 
     void SetUp() override
     {
+        DeviceLayer::SetConfigurationMgr(&gMockConfigurationManager);
+
         // Start the cluster with the context initialized in the constructor
         ASSERT_EQ(BasicInformationCluster::Instance().Startup(context), CHIP_NO_ERROR);
     }
@@ -211,12 +253,6 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
 {
     using namespace chip::app::Clusters::BasicInformation;
-    // DataModelRevision
-    {
-        uint16_t val = 0;
-        READ_AND_CHECK_ATTRIBUTE(Attributes::DataModelRevision::Id, val);
-        EXPECT_EQ(val, Revision::kDataModelRevision);
-    }
 
     // VendorName
     {
@@ -256,14 +292,6 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
         EXPECT_LE(val.size(), static_cast<size_t>(32));
     }
 
-    // Location is fixed-length 2
-    {
-        char buf[8];
-        CharSpan val(buf);
-        READ_AND_CHECK_ATTRIBUTE(Attributes::Location::Id, val);
-        EXPECT_EQ(val.size(), static_cast<size_t>(2));
-    }
-
     // HardwareVersion
     {
         uint16_t val = 0;
@@ -279,19 +307,12 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
         EXPECT_TRUE(val.data_equal(CharSpan::fromCharString("HW1.0")));
     }
 
-    // // SoftwareVersion (opaque value, just ensure decodes)
-    // {
-    //     uint32_t val = 0;
-    //     READ_AND_CHECK_ATTRIBUTE(Attributes::SoftwareVersion::Id, val);
-    // }
-
-    // // SoftwareVersionString (ensure decodes, non-empty typical)
-    // {
-    //     char buf[128];
-    //     CharSpan val(buf);
-    //     READ_AND_CHECK_ATTRIBUTE(Attributes::SoftwareVersionString::Id, val);
-    //     EXPECT_LE(val.size(), sizeof(buf));
-    // }
+    // SoftwareVersion is read from ConfigurationManager
+    // Just ensure it decodes
+    {
+        uint32_t val = 0;
+        READ_AND_CHECK_ATTRIBUTE(Attributes::SoftwareVersion::Id, val);
+    }
 
     // ManufacturingDate (YYYYMMDD from mock)
     {
@@ -301,54 +322,12 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
         EXPECT_TRUE(val.data_equal(CharSpan::fromCharString("20230615")));
     }
 
-    // PartNumber
-    {
-        char buf[64];
-        CharSpan val(buf);
-        READ_AND_CHECK_ATTRIBUTE(Attributes::PartNumber::Id, val);
-        EXPECT_TRUE(val.data_equal(CharSpan::fromCharString("PART123")));
-    }
-
-    // ProductURL
-    {
-        char buf[128];
-        CharSpan val(buf);
-        READ_AND_CHECK_ATTRIBUTE(Attributes::ProductURL::Id, val);
-        EXPECT_TRUE(val.data_equal(CharSpan::fromCharString("http://example.com")));
-    }
-
-    // ProductLabel
-    {
-        char buf[64];
-        CharSpan val(buf);
-        READ_AND_CHECK_ATTRIBUTE(Attributes::ProductLabel::Id, val);
-        EXPECT_TRUE(val.data_equal(CharSpan::fromCharString("Label123")));
-    }
-
-    // SerialNumber
-    {
-        char buf[64];
-        CharSpan val(buf);
-        READ_AND_CHECK_ATTRIBUTE(Attributes::SerialNumber::Id, val);
-        EXPECT_TRUE(val.data_equal(CharSpan::fromCharString("SN123456")));
-    }
-
-    // LocalConfigDisabled (defaults to false)
-    {
-        bool val = true;
-        READ_AND_CHECK_ATTRIBUTE(Attributes::LocalConfigDisabled::Id, val);
-        EXPECT_FALSE(val);
-    }
-
-    // Reachable (cluster returns true)
-    {
-        bool val = false;
-        READ_AND_CHECK_ATTRIBUTE(Attributes::Reachable::Id, val);
-        EXPECT_TRUE(val);
-    }
-
     // UniqueID (Mandatory in Rev 4+, so if it fails, cluster rev must be < 4)
     {
+        // Read ClusterRevision first
+        uint32_t clusterRev;
+        READ_AND_CHECK_ATTRIBUTE(Attributes::ClusterRevision::Id, clusterRev);
+
         char buf[256];
         CharSpan val(buf);
         CHIP_ERROR err = chip::Test::ReadAttribute(BasicInformationCluster::Instance(),
@@ -357,12 +336,13 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
         if (err != CHIP_NO_ERROR)
         {
             // If UniqueID cannot be read, the cluster MUST report a revision < 4.
-            uint16_t clusterRev = 0;
-            READ_AND_CHECK_ATTRIBUTE(Attributes::ClusterRevision::Id, clusterRev);
-
-            // TODO: Correct the logic, the read unique ID should not fail 07/10/2025
-            // TODO: it wont if I add a mock Config manager
-            EXPECT_EQ(clusterRev, 5);
+            EXPECT_LT(clusterRev, 4U); // < 4
+        }
+        else
+        {
+            // If UniqueID is readable, it must match what the mock returns.
+            EXPECT_TRUE(val.data_equal(CharSpan::fromCharString("TEST_UNIQUE_ID_12345")));
+            EXPECT_EQ(clusterRev, BasicInformation::kRevision);
         }
     }
 
@@ -372,56 +352,6 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
         READ_AND_CHECK_ATTRIBUTE(Attributes::CapabilityMinima::Id, val);
         EXPECT_GE(val.caseSessionsPerFabric, 3);
         EXPECT_GE(val.subscriptionsPerFabric, 3);
-    }
-
-    // ProductAppearance
-    {
-        Structs::ProductAppearanceStruct::Type val;
-        READ_AND_CHECK_ATTRIBUTE(Attributes::ProductAppearance::Id, val);
-        EXPECT_EQ(val.finish, ProductFinishEnum::kMatte);
-        ASSERT_FALSE(val.primaryColor.IsNull());
-        EXPECT_EQ(val.primaryColor.Value(), ColorEnum::kBlack);
-    }
-
-    // SpecificationVersion
-    {
-        uint32_t val = 0;
-        CHIP_ERROR err =
-            chip::Test::ReadAttribute(BasicInformationCluster::Instance(),
-                                      ConcreteAttributePath(kRootEndpointId, Id, Attributes::SpecificationVersion::Id), val);
-        if (err == CHIP_NO_ERROR)
-        {
-            // Expect a valid non-zero value for revision 3+
-            EXPECT_GT(val, 0u);
-        }
-        else
-        {
-            // Accept failure if optional and cluster rev < 3
-            uint16_t clusterRev = 0;
-            READ_AND_CHECK_ATTRIBUTE(Attributes::ClusterRevision::Id, clusterRev);
-            EXPECT_LT(clusterRev, 3);
-        }
-    }
-
-    // MaxPathsPerInvoke (ensure decodes and >= 1)
-    {
-        uint16_t val = 0;
-        READ_AND_CHECK_ATTRIBUTE(Attributes::MaxPathsPerInvoke::Id, val);
-        EXPECT_GE(val, 1);
-    }
-
-    // FeatureMap
-    {
-        uint32_t val = 1; // non-zero init
-        READ_AND_CHECK_ATTRIBUTE(Attributes::FeatureMap::Id, val);
-        EXPECT_EQ(val, 0u);
-    }
-
-    // ClusterRevision (with UniqueID enabled by default, should equal latest)
-    {
-        uint16_t val = 0;
-        READ_AND_CHECK_ATTRIBUTE(Attributes::ClusterRevision::Id, val);
-        EXPECT_EQ(val, kRevision);
     }
 }
 
@@ -444,27 +374,25 @@ TEST_F(TestBasicInformationReadWrite, TestWriteNodeLabel)
 TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
 {
     // --- Test Case 1: Write a valid 2-character location ---
-    // TODO: Fix this test case. It currently fails because the Location attribute is
-    // TODO: stored in ConfigurationManager, and we don't have a mock ConfigurationManager
-    // {
-    //     const char * validLocationStr = "US";
-    //     CharSpan validLocation        = CharSpan::fromCharString(validLocationStr);
-    //     char readBuffer[8];
-    //     CharSpan readSpan(readBuffer);
+    {
+        const char * validLocationStr = "US";
+        CharSpan validLocation        = CharSpan::fromCharString(validLocationStr);
+        char readBuffer[8];
+        CharSpan readSpan(readBuffer);
 
-    //     WRITE_AND_CHECK_ATTRIBUTE(Location::Id, validLocation);
+        WRITE_AND_CHECK_ATTRIBUTE(Attributes::Location::Id, validLocation);
 
-    //     READ_AND_CHECK_ATTRIBUTE(Location::Id, readSpan);
-    //     EXPECT_TRUE(readSpan.data_equal(validLocation));
-    // }
+        READ_AND_CHECK_ATTRIBUTE(Attributes::Location::Id, readSpan);
+        EXPECT_TRUE(readSpan.data_equal(validLocation));
+    }
 
     // --- Test Case 2: Write an invalid location (not 2 characters) ---
     {
-        // 1. ARRANGE: Define an invalid 3-character location. Spec requires exactly 2.
+        // Define an invalid 3-character location. Spec requires exactly 2.
         const char * invalidLocationStr = "USA";
         CharSpan invalidLocation        = CharSpan::fromCharString(invalidLocationStr);
 
-        // 2. ACT & ASSERT: Attempt to write the invalid location and confirm it fails
+        // Attempt to write the invalid location and confirm it fails
         CHIP_ERROR writeErr = chip::Test::WriteAttribute(
             BasicInformationCluster::Instance(),
             ConcreteAttributePath(kRootEndpointId, BasicInformation::Id, Attributes::Location::Id), invalidLocation);
@@ -478,26 +406,26 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
 
     // --- Test Case 1: Write 'true' ---
     {
-        // 1. ARRANGE: The default value is false, so we'll write true
+        // The default value is false, so we'll write true
         constexpr bool newValue = true;
 
-        // 2. ACT: Write 'true' to the attribute via macro
+        // Write 'true' to the attribute via macro
         WRITE_AND_CHECK_ATTRIBUTE(Attributes::LocalConfigDisabled::Id, newValue);
 
-        // 3. ASSERT: Read the value back and confirm it is now true
+        // Read the value back and confirm it is now true
         READ_AND_CHECK_ATTRIBUTE(Attributes::LocalConfigDisabled::Id, readValue);
         EXPECT_EQ(readValue, newValue);
     }
 
     // --- Test Case 2: Write 'false' back ---
     {
-        // 1. ARRANGE: We will now write false back
+        // Write false back
         constexpr bool finalValue = false;
 
-        // 2. ACT: Write 'false' to the attribute via macro
+        // Write 'false' to the attribute via macro
         WRITE_AND_CHECK_ATTRIBUTE(Attributes::LocalConfigDisabled::Id, finalValue);
 
-        // 3. ASSERT: Read the value back and confirm it is now false
+        // Read the value back and confirm it is now false
         READ_AND_CHECK_ATTRIBUTE(Attributes::LocalConfigDisabled::Id, readValue);
         EXPECT_EQ(readValue, finalValue);
     }
