@@ -3130,3 +3130,38 @@ MTRID.S.A0001=1
 MTRID.S.A0002=1
 MTRID.S.A0003=1
 MTRID.S.A0004=1
+
+# WebRTC Transport Provider Cluster
+# Server
+WEBRTCP.S=1
+
+# Features
+WEBRTCP.S.F00=1    # Metadata transmission feature
+WEBRTCP.S.F01=1    # SFrame End-to-End Encryption feature
+
+# Attributes  
+WEBRTCP.S.A0000=1  # CurrentSessions attribute
+
+# Commands Received
+WEBRTCP.S.C00.Rsp=1  # SolicitOffer
+WEBRTCP.S.C02.Rsp=1  # ProvideOffer
+WEBRTCP.S.C04.Rsp=1  # ProvideAnswer
+WEBRTCP.S.C05.Rsp=1  # ProvideICECandidates
+WEBRTCP.S.C06.Rsp=1  # EndSession
+
+# Commands Generated
+WEBRTCP.S.C01.Tx=1   # SolicitOfferResponse
+WEBRTCP.S.C03.Tx=1   # ProvideOfferResponse
+
+# WebRTC Transport Requestor Cluster
+# Server
+WEBRTCR.S=1
+
+# Attributes  
+WEBRTCR.S.A0000=1    # CurrentSessions attribute
+
+# Commands Received
+WEBRTCR.S.C00.Rsp=1  # Offer
+WEBRTCR.S.C01.Rsp=1  # Answer  
+WEBRTCR.S.C02.Rsp=1  # ICECandidates
+WEBRTCR.S.C03.Rsp=1  # End
