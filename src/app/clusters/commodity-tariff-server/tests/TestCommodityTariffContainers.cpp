@@ -177,27 +177,6 @@ TEST_F(TestCommodityTariffContainers, UnorderedSet_RemoveEntry) {
     EXPECT_EQ(set.size(), 3u);
 }
 
-TEST_F(TestCommodityTariffContainers, UnorderedSet_SortEntries) {
-    CTC_UnorderedSet<uint32_t> set(10);
-    
-    EXPECT_TRUE(set.insert(0xAA550004));
-    EXPECT_TRUE(set.insert(0x55AA0002));
-    EXPECT_TRUE(set.insert(0x55AA0001));
-    EXPECT_TRUE(set.insert(0xAA550003));
-    
-    EXPECT_EQ(set[0], 0xAA550004u);
-    EXPECT_EQ(set[1], 0x55AA0002u);
-    EXPECT_EQ(set[2], 0x55AA0001u);
-    EXPECT_EQ(set[3], 0xAA550003u);
-
-    set.sort();
-
-    EXPECT_EQ(set[0], 0x55AA0001u);
-    EXPECT_EQ(set[1], 0x55AA0002u);
-    EXPECT_EQ(set[2], 0xAA550003u);
-    EXPECT_EQ(set[3], 0xAA550004u);
-}
-
 TEST_F(TestCommodityTariffContainers, UnorderedSet_Iteration) {
     CTC_UnorderedSet<int> set(5);
     std::array<int, 3> expected = {10, 20, 30};

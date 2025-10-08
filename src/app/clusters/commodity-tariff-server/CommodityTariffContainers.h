@@ -18,10 +18,13 @@
 
 #pragma once
 
-#include "CommodityTariffAttrsDataMgmt.h"
 #include <algorithm>
 #include <cstddef>
 #include <utility>
+
+#include <lib/support/ScopedBuffer.h>
+#include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
 
 namespace chip {
 namespace app {
@@ -32,7 +35,7 @@ class CTC_ContainerClassBase
 {
     static_assert(std::is_trivially_destructible<T>::value, "T must be trivially destructible");
 protected:
-    CTC_ContainerClassBase(size_t aCapacity, size_t aMaxLimit = 0) : mMaxLimit(aMaxLimit), mCapacity(aCapacity)
+    CTC_ContainerClassBase(size_t aCapacity = 0, size_t aMaxLimit = 0) : mMaxLimit(aMaxLimit), mCapacity(aCapacity)
     {
         createBuffer();
 
@@ -43,6 +46,24 @@ protected:
         VerifyOrDie(mMaxLimit >= mCapacity);
     }
     
+    CTC_ContainerClassBase(CTC_ContainerClassBase&& other) noexcept
+        : mCapacity(other.mCapacity), mCount(other.mCount), mBuffer(std::move(other.mBuffer))
+    {
+        other.mCapacity = 0;
+        other.mCount = 0;
+    }
+
+    CTC_ContainerClassBase& operator=(CTC_ContainerClassBase&& other) noexcept {
+        if (this != &other) {
+            mCapacity = other.mCapacity;
+            mCount = other.mCount;
+            mBuffer = std::move(other.mBuffer);
+            other.mCapacity = 0;
+            other.mCount = 0;
+        }
+        return *this;
+    }
+
 public:
     virtual ~CTC_ContainerClassBase() = default;
 
@@ -60,7 +81,6 @@ public:
     virtual bool insert(const T& item) = 0;
     virtual void remove(const T& item) = 0;
     virtual void clear()    { mCount = 0; };
-    virtual void sort() = 0;
     virtual bool contains(const T& item) const = 0;
     virtual T* find(const T& item) = 0;
     virtual const T* find(const T& item) const = 0;
@@ -107,7 +127,7 @@ protected:
             return RetCode::kInUse;
         }
       
-        chip::Platform::ScopedMemoryBuffer<T> newBuffer;
+        Platform::ScopedMemoryBuffer<T> newBuffer;
         if (!newBuffer.Calloc(newCapacity)) {
             return RetCode::kNoMem;
         }
@@ -158,7 +178,10 @@ public:
     using Base = CTC_ContainerClassBase<ItemType>;
     using Base::Base;
 
-    CTC_UnorderedSet(size_t aCapacity, size_t aMaxLimit = 0) : Base(aCapacity, aMaxLimit) {}
+    CTC_UnorderedSet(size_t aCapacity = 0, size_t aMaxLimit = 0) : Base(aCapacity, aMaxLimit) {}
+
+    CTC_UnorderedSet(CTC_UnorderedSet&& other) noexcept = default;
+    CTC_UnorderedSet& operator=(CTC_UnorderedSet&& other) noexcept = default;
 
     bool insert(const ItemType& item) override {
         // Check for duplicate using std::find
@@ -182,12 +205,6 @@ public:
         }
     }
 
-    void sort() override {
-        if (this->mCount > 1) {
-            std::sort(this->mBuffer.Get(), this->mBuffer.Get() + this->mCount);
-        }
-    }
-
     bool contains(const ItemType& item) const override {
         return this->find(item) != nullptr;
     }
@@ -203,6 +220,43 @@ public:
         auto it = std::find(this->begin(), this->end(), item);
         return (it != this->end()) ? it : nullptr;
     }
+
+    /**
+     * @brief Merge another set into this set with automatic resizing
+     * @param other The set to merge into this one
+     * @return RetCode indicating success or failure
+     * 
+     * @note Automatically resizes if needed (if ensureCapacity is implemented)
+     * @note Duplicate items from 'other' are skipped
+     */
+     void merge(CTC_UnorderedSet& other) {
+        // Calculate required capacity including only non-duplicates
+        size_t nonDuplicateCount = 0;
+        for (const auto& item : other) {
+            if (!this->contains(item)) {
+                nonDuplicateCount++;
+            }
+        }
+
+        size_t requiredCapacity = this->mCount + nonDuplicateCount;
+        
+        // Try to ensure capacity (if implemented)
+        auto ret = this->ensureCapacity(requiredCapacity);
+        VerifyOrDie(ret == Base::RetCode::kSuccess);
+
+        // Process all items in other set
+        while (other.mCount > 0) {
+            // Always take the last element (for efficient removal)
+            ItemType item = std::move(other.mBuffer[other.mCount - 1]);
+            other.mCount--;
+            
+            // Add to this set if not duplicate
+            if (!this->contains(item)) {
+                ret = this->insertAtEnd(std::move(item));
+                VerifyOrDie(ret == Base::RetCode::kSuccess);
+            }
+        }
+     }
 };
 
 template<typename KeyType, typename ValueType>
@@ -277,7 +331,7 @@ private:
     PairSet mPairStorage;
 
 public:
-    CTC_UnorderedMap(size_t aCapacity, size_t aMaxLimit = 0) : mPairStorage(aCapacity, aMaxLimit) {}
+    CTC_UnorderedMap(size_t aCapacity = 0, size_t aMaxLimit = 0) : mPairStorage(aCapacity, aMaxLimit) {}
 
     bool insert(const KeyType& key, const ValueType& value) {
         return mPairStorage.insert(std::make_pair(key, value));
@@ -291,12 +345,12 @@ public:
         mPairStorage.removeByKey(key);
     }
 
-    ValueType* getValue(const KeyType& key) {
+    ValueType* find(const KeyType& key) {
         auto* pair = mPairStorage.findByKey(key);
         return pair ? &pair->second : nullptr;
     }
 
-    const ValueType* getValue(const KeyType& key) const {
+    const ValueType* find(const KeyType& key) const {
         auto* pair = mPairStorage.findByKey(key);
         return pair ? &pair->second : nullptr;
     }
@@ -328,5 +382,111 @@ public:
 };
 
 } // namespace CommodityTariffContainers
+
+namespace Clusters {
+namespace CommodityTariff {
+/**
+ * @struct TariffUpdateCtx
+ * @brief Context for validating tariff attribute updates and maintaining referential integrity
+ *
+ * This structure tracks relationships between tariff components during attribute updates
+ * to ensure all references are valid and consistent. It serves as a validation context
+ * that collects all IDs and references before checking their consistency.
+ *
+ * @section references Referential Integrity Tracking
+ * The context maintains several sets of IDs to validate that:
+ * - All referenced DayEntry IDs exist in the master set
+ * - All referenced TariffComponent IDs exist in the master set
+ * - All referenced DayPattern IDs exist in the master set
+ * - No dangling references exist between tariff components
+ *
+ * @section lifecycle Lifecycle
+ * - Created at the start of a tariff update operation
+ * - Populated during attribute parsing/processing
+ * - Used for validation before committing changes
+ * - Destroyed after update completion
+ */
+struct TariffUpdateCtx
+{
+    BlockModeEnum blockMode;
+
+    /**
+     * @brief Reference to the tariff's start timestamp
+     * @note This is a reference to allow validation against the actual attribute value
+     */
+    DataModel::Nullable<uint32_t> & TariffStartTimestamp;
+
+    /// @name DayEntry ID Tracking
+    /// @{
+    /**
+     * @brief Master set of all valid DayEntry IDs
+     * @details Contains all DayEntry IDs that exist in the tariff definition
+     */
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t> DayEntryKeyIDs;
+
+    /**
+     * @brief DayEntry IDs referenced by DayPattern items
+     * @details Collected separately for reference validation
+     */
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t> DayPatternsDayEntryIDs;
+
+    /**
+     * @brief DayEntry IDs referenced by IndividualDays items
+     * @details Collected separately for reference validation
+     */
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t> IndividualDaysDayEntryIDs;
+
+    /**
+     * @brief DayEntry IDs referenced by TariffPeriod items
+     * @details Collected separately for reference validation
+     */
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t> TariffPeriodsDayEntryIDs;
+
+    /// @}
+
+    /// @name TariffComponent ID Tracking
+    /// @{
+    /**
+     * @brief Master set of all valid TariffComponent IDs
+     * @details Contains all TariffComponent IDs that exist in the tariff definition
+     */
+    CommodityTariffContainers::CTC_UnorderedMap<uint32_t, uint32_t> TariffComponentKeyIDsFeatureMap;
+
+    /**
+     * @brief TariffComponent IDs referenced by TariffPeriod items
+     * @details Collected for validating period->component references
+     */
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t> TariffPeriodsTariffComponentIDs;
+    /// @}
+
+    /// @name DayPattern ID Tracking
+    /// @{
+    /**
+     * @brief Master set of all valid DayPattern IDs
+     * @details Contains all DayPattern IDs that exist in the tariff definition
+     */
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t> DayPatternKeyIDs;
+
+    /**
+     * @brief DayPattern IDs referenced by CalendarPeriod items
+     * @details Collected for validating calendar->pattern references
+     */
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t> CalendarPeriodsDayPatternIDs;
+    /// @}
+
+    /**
+     * @brief Bitmask of active tariff features
+     * @details Used to validate feature-dependent constraints
+     */
+    BitMask<Feature> mFeature;
+
+    /**
+     * @brief Timestamp when the tariff update was initiated
+     * @note Used for change tracking and versioning
+     */
+    uint32_t TariffUpdateTimestamp;
+};
+} // namespace CommodityTariff
+} // namespace Clusters
 } // namespace app
 } // namespace chip
