@@ -21,7 +21,11 @@
 #include <credentials/jcm/TrustVerification.h>
 #include <credentials/jcm/VendorIdVerificationClient.h>
 
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/server/Server.h>
+#include <controller/ReadInteraction.h>
+#include <controller/TypedReadCallback.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
@@ -72,6 +76,37 @@ protected:
     void PerformTrustVerificationStage(const Credentials::JCM::TrustVerificationStage & nextStage) override;
     void OnTrustVerificationComplete(Credentials::JCM::TrustVerificationError error) override;
 
+    // Wrappers around chip::Controller::ReadAttribute to simplify callsites and facilitate unit testing
+    using ReadErrorHandler = std::function<void(const ConcreteAttributePath *, CHIP_ERROR err)>;
+    using FabricIndexAttr  = Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::TypeInfo;
+    using FabricsAttr      = Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo;
+    using CertsAttr        = Clusters::OperationalCredentials::Attributes::TrustedRootCertificates::TypeInfo;
+    using NOCsAttr         = Clusters::OperationalCredentials::Attributes::NOCs::TypeInfo;
+    virtual CHIP_ERROR ReadAdminFabricIndexAttribute(
+        std::function<void(const ConcreteAttributePath &, const FabricIndexAttr::DecodableType &)> onSuccess,
+        ReadErrorHandler onError);
+    virtual CHIP_ERROR
+    ReadAdminFabricsAttribute(std::function<void(const ConcreteAttributePath &, const FabricsAttr::DecodableType &)> onSuccess,
+                              ReadErrorHandler onError);
+    virtual CHIP_ERROR
+    ReadAdminCertsAttribute(std::function<void(const ConcreteAttributePath &, const CertsAttr::DecodableType &)> onSuccess,
+                            ReadErrorHandler onError);
+    virtual CHIP_ERROR
+    ReadAdminNOCsAttribute(std::function<void(const ConcreteAttributePath &, const NOCsAttr::DecodableType &)> onSuccess,
+                           ReadErrorHandler onError);
+    template <typename T>
+    CHIP_ERROR ReadAttribute(EndpointId endpointId,
+                             std::function<void(const ConcreteAttributePath &, const typename T::DecodableType &)> onSuccess,
+                             std::function<void(const ConcreteAttributePath *, CHIP_ERROR err)> onError, const bool fabricFiltered)
+    {
+        Messaging::ExchangeContext * exchangeContext = mCommandHandle.Get()->GetExchangeContext();
+        VerifyOrReturnError(exchangeContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        SessionHandle session                          = exchangeContext->GetSessionHandle();
+        chip::Messaging::ExchangeManager * exchangeMgr = &chip::Server::GetInstance().GetExchangeManager();
+
+        return chip::Controller::ReadAttribute<T>(exchangeMgr, session, endpointId, onSuccess, onError, fabricFiltered);
+    }
+
 private:
     CommandHandler::Handle & mCommandHandle;
     OnCompletionFunc mOnCompletion;
@@ -81,6 +116,8 @@ private:
     /**
      * Implements the following passage from JCM Trust Verification:
      * Ecosystem B Administrator SHALL save the value of the EndpointID
+     *
+     * Requires that mInfo.adminEndpointId is set to a valid endpoint.
      */
     Credentials::JCM::TrustVerificationError StoreEndpointId();
     /**
