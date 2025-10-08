@@ -500,7 +500,7 @@ CHIP_ERROR WebRTCProviderManager::IsPrivacyModeActive(bool & isActive)
 
     auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
 
-    return avsmController.IsPrivacyModeActive(isActive);
+    return avsmController.IsStreamingPrivacyModeActive(isActive);
 }
 
 bool WebRTCProviderManager::HasAllocatedVideoStreams()

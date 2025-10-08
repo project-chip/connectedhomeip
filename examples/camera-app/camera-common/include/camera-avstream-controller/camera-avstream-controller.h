@@ -40,7 +40,9 @@ public:
 
     virtual CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) = 0;
 
-    virtual CHIP_ERROR IsPrivacyModeActive(bool & isActive) = 0;
+    virtual CHIP_ERROR IsStreamingPrivacyModeActive(bool & isActive) = 0;
+
+    virtual CHIP_ERROR IsRecordingPrivacyModeActive(bool & isActive) = 0;
 
     virtual CHIP_ERROR SetHardPrivacyModeOn(bool hardPrivacyMode) = 0;
 
