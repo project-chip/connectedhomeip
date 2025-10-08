@@ -90,7 +90,7 @@ constexpr size_t kMaxOneVideoStreamStructSerializedSize =
                                 sizeof(uint8_t)                          // referenceCount
     );
 constexpr size_t kMaxAllocatedVideoStreamsSerializedSize =
-    3 + (CHIP_CONFIG_MAX_NUM_CAMERA_STREAMS * kMaxOneVideoStreamStructSerializedSize);
+    kArrayTlvOverhead + (CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS * kMaxOneVideoStreamStructSerializedSize);
 
 // Calculate SnapshotStreamStruct TLV encoding size
 constexpr size_t kMaxOneSnapshotStructSerializedSize =
@@ -108,7 +108,7 @@ constexpr size_t kMaxOneSnapshotStructSerializedSize =
     );
 // Max size for the TLV-encoded array of SnapshotStreamStruct
 constexpr size_t kMaxAllocatedSnapshotStreamsSerializedSize =
-    3 + (CHIP_CONFIG_MAX_NUM_CAMERA_STREAMS * kMaxOneSnapshotStructSerializedSize);
+    kArrayTlvOverhead + (CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS * kMaxOneSnapshotStructSerializedSize);
 
 // Calculate AudioStreamStruct TLV encoding size
 constexpr size_t kMaxOneAudioStreamStructSerializedSize =
@@ -123,7 +123,7 @@ constexpr size_t kMaxOneAudioStreamStructSerializedSize =
     );
 // Max size for the TLV-encoded array of AudioStreamStruct
 constexpr size_t kMaxAllocatedAudioStreamsSerializedSize =
-    3 + (CHIP_CONFIG_MAX_NUM_CAMERA_STREAMS * kMaxOneAudioStreamStructSerializedSize);
+    kArrayTlvOverhead + (CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS * kMaxOneAudioStreamStructSerializedSize);
 
 enum class StreamAllocationAction
 {

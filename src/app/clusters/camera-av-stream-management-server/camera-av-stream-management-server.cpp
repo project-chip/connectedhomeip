@@ -1566,7 +1566,6 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
 
 CHIP_ERROR CameraAVStreamMgmtServer::StoreViewport(const Globals::Structs::ViewportStruct::Type & viewport)
 {
-
     uint8_t buffer[kViewportStructMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
     TLV::TLVWriter writer;
@@ -1681,8 +1680,6 @@ struct StreamTraits<Attributes::AllocatedSnapshotStreams::Id>
     static constexpr StreamType kStreamType    = StreamType::kSnapshot;
     static constexpr auto kStreamVectorMember  = &CameraAVStreamMgmtServer::mAllocatedSnapshotStreams;
 };
-
-} // namespace CameraAvStreamManagement
 
 template <AttributeId TAttributeId>
 CHIP_ERROR CameraAVStreamMgmtServer::PersistAndNotify()
@@ -2601,6 +2598,7 @@ bool CameraAVStreamMgmtServer::IsResourceAvailableForStreamAllocation(uint32_t c
     return true;
 }
 
+} // namespace CameraAvStreamManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip

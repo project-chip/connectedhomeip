@@ -817,7 +817,7 @@ CameraAVStreamManager::AllocatedSnapshotStreamsLoaded()
 CHIP_ERROR
 CameraAVStreamManager::PersistentAttributesLoadedCallback()
 {
-    ChipLogProgress(Camera, "Successfully loaded persistent attributes");
+    ChipLogDetail(Camera, "Successfully loaded persistent attributes");
 
     CHIP_ERROR err = AllocatedVideoStreamsLoaded();
     if (err != CHIP_NO_ERROR)

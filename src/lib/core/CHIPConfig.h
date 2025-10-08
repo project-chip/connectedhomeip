@@ -2004,14 +2004,31 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
 
 /**
- * @def CHIP_CONFIG_MAX_NUM_CAMERA_STREAMS
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
  *
- * @brief The maximum number of camera streams for each
- *        type(Audio/Video/Snapshot) per device
+ * @brief The maximum number of video streams per device
  */
-#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_STREAMS
-#define CHIP_CONFIG_MAX_NUM_CAMERA_STREAMS 8
-#endif // CHIP_CONFIG_MAX_NUM_CAMERA_STREAMS
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS
+ *
+ * @brief The maximum number of audio streams per device
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
+ *
+ * @brief The maximum number of snapshot streams per device
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
 /**
  * @}
  */

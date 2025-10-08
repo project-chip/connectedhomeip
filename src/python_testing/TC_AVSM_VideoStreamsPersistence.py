@@ -214,7 +214,6 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
             )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(11)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
