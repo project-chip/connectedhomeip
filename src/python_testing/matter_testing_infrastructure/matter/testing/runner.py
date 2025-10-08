@@ -760,7 +760,7 @@ def convert_args_to_matter_config(args: argparse.Namespace):
         config.global_test_params[name] = value
 
     if args.commissioning_method and "nfc" in args.commissioning_method:
-        if (config.global_test_params.get("NFC_Reader_index",None) and
+        if ("NFC_Reader_index" in config.global_test_params and
                 not any([args.passcodes,args.discriminators,args.manual_code])):
             from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
             nfc_tag_data = connect_read_nfc_tag_data(config.global_test_params.get("NFC_Reader_index"))
@@ -769,7 +769,7 @@ def convert_args_to_matter_config(args: argparse.Namespace):
             print("Error: Missing required argument --int-arg NFC_Reader_index:<int-value> for NFC tests. "
                   "Do not provide discriminator, passcode, or manual code, as the commissioning "
                   "payload is read directly from the NFC tag.")
-            return False
+            sys.exit(1)
 
     # Populate commissioning config if present, exiting on error
     if not populate_commissioning_args(args, config):
