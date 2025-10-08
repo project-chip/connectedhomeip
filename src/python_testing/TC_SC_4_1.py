@@ -38,6 +38,7 @@ import logging
 from typing import Any, Optional
 
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
+from mdns_discovery.data_classes.mdns_service_info import MdnsServiceInfo
 from mdns_discovery.data_classes.ptr_record import PtrRecord
 from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_valid_cm_key,
                                           assert_valid_commissionable_instance_name, assert_valid_d_key,
@@ -178,13 +179,9 @@ class TC_SC_4_1(MatterBaseTest):
         except ValueError:
             return False, f"T value ({t_value}) is not a valid integer"
 
-    async def verify_commissionable_node_advertisements(self, service_name: str, expected_cm: str) -> None:
-        mdns = MdnsDiscovery()
-
-        # *** SRV RECORD CHECKS ***
-        # *************************
+    async def _get_verify_srv_record(self, service_name: str) -> MdnsServiceInfo:
         # TH performs a query for the SRV record against the commissionable service service name.
-        srv_record = await mdns.get_srv_record(
+        srv_record = await MdnsDiscovery().get_srv_record(
             service_name=service_name,
             service_type=MdnsServiceType.COMMISSIONABLE.value,
             log_output=True
@@ -205,10 +202,10 @@ class TC_SC_4_1(MatterBaseTest):
         # expressed as a twelve or sixteen capital letter hex string. If the MAC
         # is randomized for privacy, the randomized version must be used each time.
         assert_valid_hostname(srv_record.hostname)
+        
+        return srv_record
 
-
-        # *** COMMISSIONABLE SUBTYPES CHECKS ***
-        # **************************************
+    async def _verify_commissionable_subtypes(self, srv_service_name: str) -> None:
         # Get commissionable subtypes
         subtypes = await MdnsDiscovery().get_commissionable_subtypes(log_output=True)
 
@@ -227,12 +224,11 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Verify Long Discriminator subtype PTR record is present
         asserts.assert_greater(len(ptr_records), 0, "Long Discriminator subtype PTR record must be present.")
-        
+
         # Verify that the Long Discriminator subtype PTR record's
-        # 'service_name'is the same as the SRV record 'service_name'
-        if len(ptr_records) > 0:
-            asserts.assert_equal(ptr_records[0].service_name, srv_record.service_name,
-                                "Long Discriminator subtype PTR record service name must be equal to the SRV record service name.")
+        # 'service_name' is the same as the SRV record 'service_name'
+        asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
+                            "Long Discriminator subtype PTR record service name must be equal to the SRV record service name.")
 
         # *** SHORT DISCRIMINATOR SUBTYPE ***
         # Validate that the short commissionable discriminator subtype is a 4-bit long discriminator,
@@ -251,24 +247,28 @@ class TC_SC_4_1(MatterBaseTest):
         asserts.assert_greater(len(ptr_records), 0, "Short Discriminator subtype PTR record must be present.")
 
         # Verify that the Short Discriminator subtype PTR record's
-        # 'service_name'is the same as the SRV record 'service_name'
-        if len(ptr_records) > 0:
-            asserts.assert_equal(ptr_records[0].service_name, srv_record.service_name,
-                                "Short Discriminator subtype PTR record service name must be equal to the SRV record service name.")
+        # 'service_name' is the same as the SRV record 'service_name'
+        asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
+                            "Short Discriminator subtype PTR record service name must be equal to the SRV record service name.")
 
         # *** IN COMMISSIONING MODE SUBTYPE ***
         # Verify presence of the _CM subtype
         cm_subtype = f"_CM._sub.{MdnsServiceType.COMMISSIONABLE.value}"
         asserts.assert_in(cm_subtype, subtypes, f"'{cm_subtype}' subtype must be present.")
 
-        # Get In Commissioning Mode subtype PTR record
+        # Get 'In Commissioning Mode' subtype PTR record
         ptr_records = await MdnsDiscovery().get_ptr_records(
             service_types=[cm_subtype],
             log_output=True
         )
 
-        # Verify In Commissioning Mode subtype PTR record is present
-        asserts.assert_greater(len(ptr_records), 0, "In Commissioning Mode subtype PTR record must be present.")
+        # Verify 'In Commissioning Mode' subtype PTR record is present
+        asserts.assert_greater(len(ptr_records), 0, "'In Commissioning Mode' subtype PTR record must be present.")
+
+        # Verify that the 'In Commissioning Mode' subtype PTR record's
+        # 'service_name' is the same as the SRV record 'service_name'
+        asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
+                            "'In Commissioning Mode' subtype PTR record service name must be equal to the SRV record service name.")
 
         # *** VENDOR SUBTYPE ***
         # If the commissionable vendor subtype is present, validate it's a
@@ -285,9 +285,9 @@ class TC_SC_4_1(MatterBaseTest):
             )
 
             # If Vendor subtype PTR record is present, verify the its
-            # 'service_name'is the same as the SRV record 'service_name'
+            # 'service_name' is the same as the SRV record 'service_name'
             if len(ptr_records) > 0:
-                asserts.assert_equal(ptr_records[0].service_name, srv_record.service_name,
+                asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
                                     "Vendor subtype PTR record service name must be equal to the SRV record service name.")
 
         # *** DEVTYPE SUBTYPE ***
@@ -304,16 +304,14 @@ class TC_SC_4_1(MatterBaseTest):
             )
 
             # If Devtype subtype PTR record is present, verify the its
-            # 'service_name'is the same as the SRV record 'service_name'
+            # 'service_name' is the same as the SRV record 'service_name'
             if len(ptr_records) > 0:
-                asserts.assert_equal(ptr_records[0].service_name, srv_record.service_name,
+                asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
                                     "Devtype subtype PTR record service name must be equal to the SRV record service name.")
 
-
-        # *** TXT RECORD CHECKS ***
-        # *************************
-        # TH performs a query for the TXT record against the commissionable service service name.
-        txt_record = await mdns.get_txt_record(
+    async def _verify_txt_record_keys(self, service_name: str, expected_cm: str) -> None:
+        # TH performs a query for the TXT record against the 'Commissionable Service' service name.
+        txt_record = await MdnsDiscovery().get_txt_record(
             service_name=service_name,
             service_type=MdnsServiceType.COMMISSIONABLE.value,
             log_output=True
@@ -427,6 +425,7 @@ class TC_SC_4_1(MatterBaseTest):
             result, message = self.verify_t_value(txt_record)
             asserts.assert_true(result, message)
 
+            # *** CM KEY ***
             # Verify that the CM key is present and is equal to the expected
             # CM value or ommitted if DUT is in Extended Discovery mode
             if 'CM' in txt_record.txt:
@@ -443,6 +442,7 @@ class TC_SC_4_1(MatterBaseTest):
                 if not extended_discovery_mode:
                     asserts.fail(f"CM key not present, was expecting CM='{expected_cm}'")
 
+            # *** DT KEY ***
             # If the DT key is present, it must contain the device type identifier from
             # Data Model Device Types and must be encoded as a variable length decimal
             # ASCII number without leading zeros
@@ -450,11 +450,13 @@ class TC_SC_4_1(MatterBaseTest):
                 dt_key = txt_record.txt['DT']
                 assert_valid_dt_key(dt_key)
 
+            # *** DN KEY ***
             # If the DN key is present, DN key must be a UTF-8 encoded string with a maximum length of 32B
             if 'DN' in txt_record.txt:
                 dn_key = txt_record.txt['DN']
                 assert_valid_dn_key(dn_key)
 
+            # *** RI KEY ***
             # If the RI key is present, key RI must include the Rotating Device Identifier
             # encoded as an uppercase string with a maximum length of 100 chars (each octet
             # encoded as a 2-digit hex number, max 50 octets)
@@ -462,6 +464,7 @@ class TC_SC_4_1(MatterBaseTest):
                 ri_key = txt_record.txt['RI']
                 assert_valid_ri_key(ri_key)
 
+            # *** PH KEY ***
             # If the PH key is present, key PH must be encoded as a variable-length decimal number
             # in ASCII text, omitting any leading zeros. If present value must be different of 0
             if 'PH' in txt_record.txt:
@@ -469,6 +472,7 @@ class TC_SC_4_1(MatterBaseTest):
                 assert_valid_ph_key(ph_key)
 
             # TODO: Fix PI key present but null/None ??
+            # *** PI KEY ***
             # If the PI key is present, key PI must be encoded as a valid UTF-8 string
             # with a maximum length of 128 bytes
             # if 'PI' in txt_record.txt:
@@ -477,6 +481,16 @@ class TC_SC_4_1(MatterBaseTest):
         else:
             logging.info("TXT record NOT required.")
 
+    async def verify_commissionable_node_advertisements(self, service_name: str, expected_cm: str) -> None:
+        
+        # Verify SRV record advertisements
+        srv_record = await self._get_verify_srv_record(service_name)
+
+        # Verify commissionable subtype advertisements
+        await self._verify_commissionable_subtypes(srv_record.service_name)
+
+        # Verify TXT record keys advertisements
+        await self._verify_txt_record_keys(service_name, expected_cm)
 
         # *** AAAA RECORD CHECKS ***
         # **************************
