@@ -6268,7 +6268,7 @@ cluster WakeOnLan = 1283 {
 
 /** This cluster provides an interface for managing low power mode on a device. */
 cluster LowPower = 1288 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6276,7 +6276,7 @@ cluster LowPower = 1288 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** This command shall put the device into low power mode. */
+  /** This command SHALL put the device into low power mode. */
   command Sleep(): DefaultSuccess = 0;
 }
 
@@ -8269,7 +8269,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command Stop;
     handle command Start;
@@ -8496,7 +8496,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
 
     handle command Pause;
     handle command Stop;
@@ -8518,7 +8518,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command Pause;
     handle command Resume;
