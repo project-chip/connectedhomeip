@@ -220,9 +220,8 @@ TimeSynchronizationCluster::TimeSynchronizationCluster(
     const BitFlags<TimeSynchronization::Feature> features,
     TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type supportsDNSResolve, TimeZoneDatabaseEnum timeZoneDatabase,
     TimeSynchronization::TimeSourceEnum timeSource) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mOptionalAttributeSet(optionalAttributeSet), mFeatures(features), mSupportsDNSResolve(supportsDNSResolve),
-    mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mOptionalAttributeSet(optionalAttributeSet), mFeatures(features),
+    mSupportsDNSResolve(supportsDNSResolve), mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -265,23 +264,23 @@ CHIP_ERROR TimeSynchronizationCluster::Attributes(const ConcreteClusterPath & pa
                                     >
         optionalAttributeSet(mOptionalAttributeSet);
 
-    if (HasFeature(Feature::kTimeSyncClient))
+    if (mFeatures.Has(Feature::kTimeSyncClient))
     {
         optionalAttributeSet.Set<TrustedTimeSource::Id>();
     }
 
-    if (HasFeature(Feature::kNTPClient))
+    if (mFeatures.Has(Feature::kNTPClient))
     {
         optionalAttributeSet.Set<DefaultNTP::Id>();
         optionalAttributeSet.Set<SupportsDNSResolve::Id>();
     }
 
-    if (HasFeature(Feature::kNTPServer))
+    if (mFeatures.Has(Feature::kNTPServer))
     {
         optionalAttributeSet.Set<NTPServerAvailable::Id>();
     }
 
-    if (HasFeature(Feature::kTimeZone))
+    if (mFeatures.Has(Feature::kTimeZone))
     {
         optionalAttributeSet.Set<TimeZone::Id>();
         optionalAttributeSet.Set<DSTOffset::Id>();
@@ -997,147 +996,44 @@ std::optional<DataModel::ActionReturnStatus> TimeSynchronizationCluster::InvokeC
 CHIP_ERROR TimeSynchronizationCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (HasFeature(Feature::kTimeSyncClient) && HasFeature(Feature::kTimeZone) && HasFeature(Feature::kNTPClient))
+    if (mFeatures.Has(Feature::kTimeSyncClient))
     {
-        static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
-            Commands::SetUTCTime::kMetadataEntry,           //
-            Commands::SetTrustedTimeSource::kMetadataEntry, //
-            Commands::SetTimeZone::kMetadataEntry,          //
-            Commands::SetDSTOffset::kMetadataEntry,         //
-            Commands::SetDefaultNTP::kMetadataEntry,        //
-        };
-        return builder.ReferenceExisting(kAcceptedCommands);
+        ReturnErrorOnFailure(builder.AppendElements({
+            Commands::SetTrustedTimeSource::kMetadataEntry,
+        }));
     }
 
-    if (HasFeature(Feature::kTimeZone) && HasFeature(Feature::kNTPClient))
+    if (mFeatures.Has(Feature::kTimeZone))
     {
-        static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
-            Commands::SetUTCTime::kMetadataEntry,    //
-            Commands::SetTimeZone::kMetadataEntry,   //
-            Commands::SetDSTOffset::kMetadataEntry,  //
-            Commands::SetDefaultNTP::kMetadataEntry, //
-        };
-        return builder.ReferenceExisting(kAcceptedCommands);
+        ReturnErrorOnFailure(builder.AppendElements({
+            Commands::SetTimeZone::kMetadataEntry,
+            Commands::SetDSTOffset::kMetadataEntry,
+        }));
     }
 
-    if (HasFeature(Feature::kTimeSyncClient) && HasFeature(Feature::kTimeZone))
+    if (mFeatures.Has(Feature::kNTPClient))
     {
-        static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
-            Commands::SetUTCTime::kMetadataEntry,           //
-            Commands::SetTrustedTimeSource::kMetadataEntry, //
-            Commands::SetTimeZone::kMetadataEntry,          //
-            Commands::SetDSTOffset::kMetadataEntry,         //
-        };
-        return builder.ReferenceExisting(kAcceptedCommands);
+        ReturnErrorOnFailure(builder.AppendElements({
+            Commands::SetDefaultNTP::kMetadataEntry,
+        }));
     }
 
-    if (HasFeature(Feature::kTimeSyncClient) && HasFeature(Feature::kNTPClient))
-    {
-        static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
-            Commands::SetUTCTime::kMetadataEntry,           //
-            Commands::SetTrustedTimeSource::kMetadataEntry, //
-            Commands::SetDefaultNTP::kMetadataEntry,        //
-        };
-        return builder.ReferenceExisting(kAcceptedCommands);
-    }
-
-    if (HasFeature(Feature::kTimeSyncClient))
-    {
-        static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
-            Commands::SetUTCTime::kMetadataEntry,           //
-            Commands::SetTrustedTimeSource::kMetadataEntry, //
-        };
-        return builder.ReferenceExisting(kAcceptedCommands);
-    }
-
-    if (HasFeature(Feature::kTimeZone))
-    {
-        static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
-            Commands::SetUTCTime::kMetadataEntry,   //
-            Commands::SetTimeZone::kMetadataEntry,  //
-            Commands::SetDSTOffset::kMetadataEntry, //
-        };
-        return builder.ReferenceExisting(kAcceptedCommands);
-    }
-
-    static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
-        Commands::SetUTCTime::kMetadataEntry,    //
-        Commands::SetDefaultNTP::kMetadataEntry, //
-    };
-    return builder.ReferenceExisting(kAcceptedCommands);
+    return builder.AppendElements({
+        Commands::SetUTCTime::kMetadataEntry,
+    });
 }
 
 CHIP_ERROR TimeSynchronizationCluster::GeneratedCommands(const ConcreteClusterPath & path,
                                                          ReadOnlyBufferBuilder<CommandId> & builder)
 {
-    if (HasFeature(Feature::kTimeSyncClient) && HasFeature(Feature::kTimeZone) && HasFeature(Feature::kNTPClient))
+    if (mFeatures.Has(Feature::kTimeZone))
     {
-        static constexpr CommandId kGeneratedCommands[] = {
-            Commands::SetUTCTime::Id,           //
-            Commands::SetTrustedTimeSource::Id, //
-            Commands::SetTimeZone::Id,          //
-            Commands::SetDSTOffset::Id,         //
-            Commands::SetDefaultNTP::Id,        //
-        };
-        return builder.ReferenceExisting(kGeneratedCommands);
+        ReturnErrorOnFailure(builder.AppendElements({
+            Commands::SetTimeZoneResponse::Id,
+        }));
     }
 
-    if (HasFeature(Feature::kTimeZone) && HasFeature(Feature::kNTPClient))
-    {
-        static constexpr CommandId kGeneratedCommands[] = {
-            Commands::SetUTCTime::Id,    //
-            Commands::SetTimeZone::Id,   //
-            Commands::SetDSTOffset::Id,  //
-            Commands::SetDefaultNTP::Id, //
-        };
-        return builder.ReferenceExisting(kGeneratedCommands);
-    }
-
-    if (HasFeature(Feature::kTimeSyncClient) && HasFeature(Feature::kTimeZone))
-    {
-        static constexpr CommandId kGeneratedCommands[] = {
-            Commands::SetUTCTime::Id,           //
-            Commands::SetTrustedTimeSource::Id, //
-            Commands::SetTimeZone::Id,          //
-            Commands::SetDSTOffset::Id,         //
-        };
-        return builder.ReferenceExisting(kGeneratedCommands);
-    }
-
-    if (HasFeature(Feature::kTimeSyncClient) && HasFeature(Feature::kNTPClient))
-    {
-        static constexpr CommandId kGeneratedCommands[] = {
-            Commands::SetUTCTime::Id,           //
-            Commands::SetTrustedTimeSource::Id, //
-            Commands::SetDefaultNTP::Id,        //
-        };
-        return builder.ReferenceExisting(kGeneratedCommands);
-    }
-
-    if (HasFeature(Feature::kTimeSyncClient))
-    {
-        static constexpr CommandId kGeneratedCommands[] = {
-            Commands::SetUTCTime::Id,           //
-            Commands::SetTrustedTimeSource::Id, //
-        };
-        return builder.ReferenceExisting(kGeneratedCommands);
-    }
-
-    if (HasFeature(Feature::kTimeZone))
-    {
-        static constexpr CommandId kGeneratedCommands[] = {
-            Commands::SetUTCTime::Id,   //
-            Commands::SetTimeZone::Id,  //
-            Commands::SetDSTOffset::Id, //
-        };
-        return builder.ReferenceExisting(kGeneratedCommands);
-    }
-
-    static constexpr CommandId kGeneratedCommands[] = {
-        Commands::SetUTCTime::Id,    //
-        Commands::SetDefaultNTP::Id, //
-    };
-    return builder.ReferenceExisting(kGeneratedCommands);
+    return CHIP_NO_ERROR;
 }
 
 std::optional<DataModel::ActionReturnStatus>
@@ -1227,7 +1123,7 @@ TimeSynchronizationCluster::HandleSetTimeZone(CommandHandler * commandObj, const
     response.DSTOffsetRequired = true;
     UpdateTimeZoneState();
     const auto & tzList = GetTimeZone();
-    if (HasFeature(TimeSynchronization::Feature::kTimeZone) && mTimeZoneDatabase != TimeZoneDatabaseEnum::kNone &&
+    if (mFeatures.Has(TimeSynchronization::Feature::kTimeZone) && mTimeZoneDatabase != TimeZoneDatabaseEnum::kNone &&
         tzList.size() != 0)
     {
         auto & tz = tzList[0].timeZone;

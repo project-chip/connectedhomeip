@@ -332,8 +332,6 @@ private:
         return mContext != nullptr ? &mContext->interactionContext.eventsGenerator : nullptr;
     }
 
-    bool HasFeature(TimeSynchronization::Feature feature) const { return mFeatures.Has(feature); }
-
     void ClearEventFlag(TimeSynchronization::TimeSyncEventFlag flag)
     {
         uint8_t eventFlag = to_underlying(mEventFlag) ^ to_underlying(flag);
