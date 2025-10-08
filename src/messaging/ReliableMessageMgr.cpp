@@ -189,7 +189,7 @@ void ReliableMessageMgr::ExecuteActions()
             ExchangeHandle ec(entry->ec);
 
             ChipLogError(ExchangeManager,
-                         "<<_ [E:" ChipLogFormatExchange " S:%u M:" ChipLogFormatMessageCounter
+                         "<< [E:" ChipLogFormatExchange " S:%u M:" ChipLogFormatMessageCounter
                          "] (%s) Msg Retransmission to %u:" ChipLogFormatX64 " failed: retry attempts(%d) exhausted",
                          ChipLogValueExchange(&entry->ec.Get()), session->SessionIdForLogging(), messageCounter,
                          Transport::GetSessionTypeString(session), fabricIndex, ChipLogValueX64(destination),
