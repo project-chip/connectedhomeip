@@ -12,7 +12,7 @@
 using namespace chip;
 using namespace chip::app;
 using chip::app::DataModel::DeviceTypeEntry;
-using SemanticTag = chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type;
+using SemanticTag = chip::app::Clusters::Globals::Structs::SemanticTagStruct::Type;
 
 using namespace chip::app;
 
