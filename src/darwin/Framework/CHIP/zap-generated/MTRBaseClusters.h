@@ -4206,19 +4206,19 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 /**
  * Command RegisterClient
  *
- * Register a client to the end device
+ * This command allows a client to register itself with the ICD to be notified when the device is available for communication.
  */
 - (void)registerClientWithParams:(MTRICDManagementClusterRegisterClientParams *)params completion:(void (^)(MTRICDManagementClusterRegisterClientResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 /**
  * Command UnregisterClient
  *
- * Unregister a client from an end device
+ * This command allows a client to unregister itself with the ICD.
  */
 - (void)unregisterClientWithParams:(MTRICDManagementClusterUnregisterClientParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 /**
  * Command StayActiveRequest
  *
- * Request the end device to stay in Active Mode for an additional ActiveModeThreshold
+ * This command allows a client to request that the server stays in active mode for at least a given time duration (in milliseconds) from when this command is received.
  */
 - (void)stayActiveRequestWithParams:(MTRICDManagementClusterStayActiveRequestParams *)params completion:(void (^)(MTRICDManagementClusterStayActiveResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
