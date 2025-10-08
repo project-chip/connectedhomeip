@@ -66,10 +66,10 @@ class TC_DD_3_23(MatterBaseTest):
         logging.info(f"NFC Tag data : '{self.matter_test_config.qr_code_content}'")
         self.matter_test_config.qr_code_content.append(nfc_tag_data)
 
-        # Step 2: the NFC tag data is parse and checked if the device device supports NFC commissioning and commission begins
+        # Step 2: the NFC tag data is parse and checked if the device supports NFC commissioning and commission begins
         self.step(2)
         payload = SetupPayload().ParseQrCode(nfc_tag_data)
-        asserts.assert_true(payload.supports_nfc_commissioning,"Device Deos not Support NFC Commissioning")
+        asserts.assert_true(payload.supports_nfc_commissioning, "Device does not Support NFC Commissioning")
         self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
         await self.commission_devices()
 

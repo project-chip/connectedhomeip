@@ -46,7 +46,7 @@ def read_ndef_data(connection, length):
     asserts.assert_true((sw1, sw2) == (0x90, 0x00), f"Failed to read NDEF data: SW1={sw1:02X}, SW2={sw2:02X}")
     return bytes(data)
 
-def read_nfc_tag_data(nrf_reader_object,nfc_reader_index):
+def read_nfc_tag_data(nrf_reader_object, nfc_reader_index):
     nrf_reader_connection_object = nrf_reader_object[nfc_reader_index].createConnection()
     nrf_reader_connection_object.connect()
     select_ndef_application(nrf_reader_connection_object)
