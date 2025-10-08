@@ -274,7 +274,7 @@ public:
 
     /**
      * @brief Verifies whether Soft or Hard privacy mode is active on the device as set against the stream management instance
-     * 
+     *
      * @param isActive boolean that is set by the delgate indicating privacy status, True is active
      * @return CHIP_ERROR indicating success or failure
      */
