@@ -624,14 +624,6 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     # chip-tool that fabricID == commissioner_name == root of trust index
     config.fabric_id = args.fabric_id if args.fabric_id is not None else config.root_of_trust_index
 
-    if args.commissioning_method and "nfc" in args.commissioning_method:
-        if args.int_arg and args.int_arg(1)=="NFC_Reader_index":
-            from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
-            nfc_tag_data = connect_read_nfc_tag_data(args.int_args(0))
-            args.qr_code.append(nfc_tag_data)
-        else:
-            print("error: argument --int-arg NFC_Reader_index:<int-value> is need for NFC Tests")
-            return False
     if args.chip_tool_credentials_path is not None and not args.chip_tool_credentials_path.exists():
         print("error: chip-tool credentials path %s doesn't exist!" % args.chip_tool_credentials_path)
         return False
@@ -756,6 +748,29 @@ def convert_args_to_matter_config(args: argparse.Namespace):
 
     config = MatterTestConfig()
 
+    # Accumulate all command-line-passed named args
+    all_global_args = []
+    argsets = [item for item in (args.int_arg, args.float_arg, args.string_arg, args.json_arg,
+                                 args.hex_arg, args.bool_arg) if item is not None]
+    for argset in chain.from_iterable(argsets):
+        all_global_args.extend(argset)
+
+    config.global_test_params = {}
+    for name, value in all_global_args:
+        config.global_test_params[name] = value
+
+    if args.commissioning_method and "nfc" in args.commissioning_method:
+        if (config.global_test_params.get("NFC_Reader_index",None) and
+                not any([args.passcodes,args.discriminators,args.manual_code])):
+            from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
+            nfc_tag_data = connect_read_nfc_tag_data(config.global_test_params.get("NFC_Reader_index"))
+            args.qr_code.append(nfc_tag_data)
+        else:
+            print("Error: Missing required argument --int-arg NFC_Reader_index:<int-value> for NFC tests. "
+                  "Do not provide discriminator, passcode, or manual code, as the commissioning "
+                  "payload is read directly from the NFC tag.")
+            return False
+
     # Populate commissioning config if present, exiting on error
     if not populate_commissioning_args(args, config):
         sys.exit(1)
@@ -791,17 +806,6 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.tc_version_to_simulate = args.tc_version_to_simulate
     config.tc_user_response_to_simulate = args.tc_user_response_to_simulate
     config.dac_revocation_set_path = args.dac_revocation_set_path
-
-    # Accumulate all command-line-passed named args
-    all_global_args = []
-    argsets = [item for item in (args.int_arg, args.float_arg, args.string_arg, args.json_arg,
-                                 args.hex_arg, args.bool_arg) if item is not None]
-    for argset in chain.from_iterable(argsets):
-        all_global_args.extend(argset)
-
-    config.global_test_params = {}
-    for name, value in all_global_args:
-        config.global_test_params[name] = value
 
     # Embed the rest of the config in the global test params dict which will be passed to Mobly tests
     config.global_test_params["meta_config"] = {k: v for k, v in dataclass_asdict(config).items() if k != "global_test_params"}
