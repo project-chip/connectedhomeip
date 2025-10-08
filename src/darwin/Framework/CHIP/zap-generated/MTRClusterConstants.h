@@ -139,6 +139,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeOperationalStateID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x00000060,
     MTRClusterIDTypeRVCOperationalStateID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x00000061,
     MTRClusterIDTypeScenesManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000062,
+    MTRClusterIDTypeGroupcastID MTR_PROVISIONALLY_AVAILABLE = 0x00000065,
     MTRClusterIDTypeHEPAFilterMonitoringID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x00000071,
     MTRClusterIDTypeActivatedCarbonFilterMonitoringID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x00000072,
     MTRClusterIDTypeBooleanStateConfigurationID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x00000080,
@@ -146,7 +147,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeElectricalPowerMeasurementID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x00000090,
     MTRClusterIDTypeElectricalEnergyMeasurementID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x00000091,
     MTRClusterIDTypeWaterHeaterManagementID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000094,
-    MTRClusterIDTypeDemandResponseLoadControlID MTR_PROVISIONALLY_AVAILABLE = 0x00000096,
+    MTRClusterIDTypeCommodityPriceID MTR_PROVISIONALLY_AVAILABLE = 0x00000095,
     MTRClusterIDTypeMessagesID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000097,
     MTRClusterIDTypeDeviceEnergyManagementID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000098,
     MTRClusterIDTypeEnergyEVSEID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000099,
@@ -155,9 +156,11 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeEnergyEVSEModeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0000009D,
     MTRClusterIDTypeWaterHeaterModeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0000009E,
     MTRClusterIDTypeDeviceEnergyManagementModeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0000009F,
+    MTRClusterIDTypeElectricalGridConditionsID MTR_PROVISIONALLY_AVAILABLE = 0x000000A0,
     MTRClusterIDTypeDoorLockID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000101,
     MTRClusterIDTypeWindowCoveringID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000102,
     MTRClusterIDTypeClosureControlID MTR_PROVISIONALLY_AVAILABLE = 0x00000104,
+    MTRClusterIDTypeClosureDimensionID MTR_PROVISIONALLY_AVAILABLE = 0x00000105,
     MTRClusterIDTypeServiceAreaID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000150,
     MTRClusterIDTypePumpConfigurationAndControlID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000200,
     MTRClusterIDTypeThermostatID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000201,
@@ -181,6 +184,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypePM10ConcentrationMeasurementID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0000042D,
     MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0000042E,
     MTRClusterIDTypeRadonConcentrationMeasurementID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0000042F,
+    MTRClusterIDTypeSoilMeasurementID MTR_PROVISIONALLY_AVAILABLE = 0x00000430,
     MTRClusterIDTypeWiFiNetworkManagementID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000451,
     MTRClusterIDTypeThreadBorderRouterManagementID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000452,
     MTRClusterIDTypeThreadNetworkDirectoryID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000453,
@@ -205,10 +209,15 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeWebRTCTransportRequestorID MTR_PROVISIONALLY_AVAILABLE = 0x00000554,
     MTRClusterIDTypePushAVStreamTransportID MTR_PROVISIONALLY_AVAILABLE = 0x00000555,
     MTRClusterIDTypeChimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000556,
+    MTRClusterIDTypeCommodityTariffID MTR_PROVISIONALLY_AVAILABLE = 0x00000700,
     MTRClusterIDTypeEcosystemInformationID MTR_PROVISIONALLY_AVAILABLE = 0x00000750,
     MTRClusterIDTypeCommissionerControlID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000751,
+    MTRClusterIDTypeJointFabricDatastoreID MTR_PROVISIONALLY_AVAILABLE = 0x00000752,
+    MTRClusterIDTypeJointFabricAdministratorID MTR_PROVISIONALLY_AVAILABLE = 0x00000753,
     MTRClusterIDTypeTLSCertificateManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000801,
     MTRClusterIDTypeTLSClientManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000802,
+    MTRClusterIDTypeMeterIdentificationID MTR_PROVISIONALLY_AVAILABLE = 0x00000B06,
+    MTRClusterIDTypeCommodityMeteringID MTR_PROVISIONALLY_AVAILABLE = 0x00000B07,
     MTRClusterIDTypeUnitTestingID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0xFFF1FC05,
     MTRClusterIDTypeSampleMEIID MTR_PROVISIONALLY_AVAILABLE = 0xFFF1FC20,
 
@@ -495,6 +504,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterDescriptorAttributeClientListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000002,
     MTRAttributeIDTypeClusterDescriptorAttributePartsListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000003,
     MTRAttributeIDTypeClusterDescriptorAttributeTagListID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterDescriptorAttributeEndpointUniqueIDID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
     MTRAttributeIDTypeClusterDescriptorAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterDescriptorAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterDescriptorAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
@@ -712,6 +722,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterBasicInformationAttributeProductAppearanceID MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x00000014,
     MTRAttributeIDTypeClusterBasicInformationAttributeSpecificationVersionID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000015,
     MTRAttributeIDTypeClusterBasicInformationAttributeMaxPathsPerInvokeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000016,
+    MTRAttributeIDTypeClusterBasicInformationAttributeConfigurationVersionID MTR_PROVISIONALLY_AVAILABLE = 0x00000018,
     MTRAttributeIDTypeClusterBasicInformationAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterBasicInformationAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterBasicInformationAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
@@ -872,6 +883,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 
     // Cluster UnitLocalization attributes
     MTRAttributeIDTypeClusterUnitLocalizationAttributeTemperatureUnitID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000000,
+    MTRAttributeIDTypeClusterUnitLocalizationAttributeSupportedTemperatureUnitsID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterUnitLocalizationAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterUnitLocalizationAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterUnitLocalizationAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
@@ -1098,6 +1110,9 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCAcknowledgementsID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
     MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCAcknowledgementsRequiredID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
     MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCUpdateDeadlineID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterGeneralCommissioningAttributeRecoveryIdentifierID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterGeneralCommissioningAttributeNetworkRecoveryReasonID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
+    MTRAttributeIDTypeClusterGeneralCommissioningAttributeIsCommissioningWithoutPowerID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
     MTRAttributeIDTypeClusterGeneralCommissioningAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterGeneralCommissioningAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterGeneralCommissioningAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
@@ -1557,6 +1572,8 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeChannelPage0MaskID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000003C,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeOperationalDatasetComponentsID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000003D,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeActiveNetworkFaultsListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000003E,
+    MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeExtAddressID MTR_PROVISIONALLY_AVAILABLE = 0x0000003F,
+    MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRloc16ID MTR_PROVISIONALLY_AVAILABLE = 0x00000040,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
@@ -1850,6 +1867,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeReachableID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000011,
     MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeUniqueIDID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000012,
     MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductAppearanceID MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x00000014,
+    MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeConfigurationVersionID MTR_PROVISIONALLY_AVAILABLE = 0x00000018,
     MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
@@ -2384,6 +2402,15 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterScenesManagementAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterScenesManagementAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
+    // Cluster Groupcast attributes
+    MTRAttributeIDTypeClusterGroupcastAttributeMembershipID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterGroupcastAttributeMaxMembershipCountID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterGroupcastAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterGroupcastAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterGroupcastAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterGroupcastAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterGroupcastAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
     // Cluster HEPAFilterMonitoring attributes
     MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeConditionID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x00000000,
     MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeDegradationDirectionID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x00000001,
@@ -2495,20 +2522,16 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterWaterHeaterManagementAttributeFeatureMapID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterWaterHeaterManagementAttributeClusterRevisionID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
-    // Cluster DemandResponseLoadControl attributes
-    MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeLoadControlProgramsID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfLoadControlProgramsID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeEventsID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeActiveEventsID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfEventsPerProgramID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
-    MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfTransitionsID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
-    MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDefaultRandomStartID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
-    MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDefaultRandomDurationID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
-    MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+    // Cluster CommodityPrice attributes
+    MTRAttributeIDTypeClusterCommodityPriceAttributeTariffUnitID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterCommodityPriceAttributeCurrencyID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterCommodityPriceAttributeCurrentPriceID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterCommodityPriceAttributePriceForecastID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterCommodityPriceAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterCommodityPriceAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterCommodityPriceAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterCommodityPriceAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterCommodityPriceAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster Messages attributes
     MTRAttributeIDTypeClusterMessagesAttributeMessagesID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
@@ -2611,6 +2634,16 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeAttributeListID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeFeatureMapID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeClusterRevisionID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster ElectricalGridConditions attributes
+    MTRAttributeIDTypeClusterElectricalGridConditionsAttributeLocalGenerationAvailableID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterElectricalGridConditionsAttributeCurrentConditionsID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterElectricalGridConditionsAttributeForecastConditionsID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterElectricalGridConditionsAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterElectricalGridConditionsAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterElectricalGridConditionsAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterElectricalGridConditionsAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterElectricalGridConditionsAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster DoorLock deprecated attribute names
     MTRClusterDoorLockAttributeLockStateID
@@ -2905,18 +2938,33 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterClosureControlAttributeCountdownTimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterClosureControlAttributeMainStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterClosureControlAttributeCurrentErrorListID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterClosureControlAttributeOverallStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterClosureControlAttributeOverallTargetID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
-    MTRAttributeIDTypeClusterClosureControlAttributeRestingProcedureID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
-    MTRAttributeIDTypeClusterClosureControlAttributeTriggerConditionID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
-    MTRAttributeIDTypeClusterClosureControlAttributeTriggerPositionID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
-    MTRAttributeIDTypeClusterClosureControlAttributeWaitingDelayID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
-    MTRAttributeIDTypeClusterClosureControlAttributeKickoffTimerID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterClosureControlAttributeOverallCurrentStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterClosureControlAttributeOverallTargetStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterClosureControlAttributeLatchControlModesID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
     MTRAttributeIDTypeClusterClosureControlAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterClosureControlAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterClosureControlAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterClosureControlAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterClosureControlAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster ClosureDimension attributes
+    MTRAttributeIDTypeClusterClosureDimensionAttributeCurrentStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterClosureDimensionAttributeTargetStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterClosureDimensionAttributeResolutionID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterClosureDimensionAttributeStepValueID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterClosureDimensionAttributeUnitID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterClosureDimensionAttributeUnitRangeID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterClosureDimensionAttributeLimitRangeID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterClosureDimensionAttributeTranslationDirectionID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterClosureDimensionAttributeRotationAxisID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterClosureDimensionAttributeOverflowID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterClosureDimensionAttributeModulationTypeID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterClosureDimensionAttributeLatchControlModesID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
+    MTRAttributeIDTypeClusterClosureDimensionAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterClosureDimensionAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterClosureDimensionAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterClosureDimensionAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterClosureDimensionAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ServiceArea attributes
     MTRAttributeIDTypeClusterServiceAreaAttributeSupportedAreasID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
@@ -3272,6 +3320,10 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterThermostatAttributePresetsID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000050,
     MTRAttributeIDTypeClusterThermostatAttributeSchedulesID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000051,
     MTRAttributeIDTypeClusterThermostatAttributeSetpointHoldExpiryTimestampID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000052,
+    MTRAttributeIDTypeClusterThermostatAttributeMaxThermostatSuggestionsID MTR_PROVISIONALLY_AVAILABLE = 0x00000053,
+    MTRAttributeIDTypeClusterThermostatAttributeThermostatSuggestionsID MTR_PROVISIONALLY_AVAILABLE = 0x00000054,
+    MTRAttributeIDTypeClusterThermostatAttributeCurrentThermostatSuggestionID MTR_PROVISIONALLY_AVAILABLE = 0x00000055,
+    MTRAttributeIDTypeClusterThermostatAttributeThermostatSuggestionNotFollowingReasonID MTR_PROVISIONALLY_AVAILABLE = 0x00000056,
     MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterThermostatAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterThermostatAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
@@ -4173,6 +4225,15 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeFeatureMapID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeClusterRevisionID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
+    // Cluster SoilMeasurement attributes
+    MTRAttributeIDTypeClusterSoilMeasurementAttributeSoilMoistureMeasurementLimitsID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterSoilMeasurementAttributeSoilMoistureMeasuredValueID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterSoilMeasurementAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterSoilMeasurementAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterSoilMeasurementAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterSoilMeasurementAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterSoilMeasurementAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
     // Cluster WiFiNetworkManagement attributes
     MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeSSIDID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
     MTRAttributeIDTypeClusterWiFiNetworkManagementAttributePassphraseSurrogateID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000001,
@@ -4637,10 +4698,13 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterContentAppObserverAttributeClusterRevisionID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ZoneManagement attributes
-    MTRAttributeIDTypeClusterZoneManagementAttributeSupportedZoneSourcesID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterZoneManagementAttributeZonesID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterZoneManagementAttributeTriggersID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterZoneManagementAttributeSensitivityID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterZoneManagementAttributeMaxUserDefinedZonesID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterZoneManagementAttributeMaxZonesID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterZoneManagementAttributeZonesID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterZoneManagementAttributeTriggersID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterZoneManagementAttributeSensitivityMaxID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterZoneManagementAttributeSensitivityID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterZoneManagementAttributeTwoDCartesianMaxID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
     MTRAttributeIDTypeClusterZoneManagementAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterZoneManagementAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterZoneManagementAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
@@ -4648,17 +4712,17 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterZoneManagementAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster CameraAVStreamManagement attributes
-    MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxConcurrentVideoEncodersID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxConcurrentEncodersID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxEncodedPixelRateID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeVideoSensorParamsID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeNightVisionCapableID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMinViewportID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeNightVisionUsesInfraredID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMinViewportResolutionID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeRateDistortionTradeOffPointsID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxContentBufferSizeID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMicrophoneCapabilitiesID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSpeakerCapabilitiesID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeTwoWayTalkSupportID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
-    MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSupportedSnapshotParamsID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSnapshotCapabilitiesID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxNetworkBandwidthID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeCurrentFrameRateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeHDRModeEnabledID MTR_PROVISIONALLY_AVAILABLE = 0x0000000D,
@@ -4666,7 +4730,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedVideoStreamsID MTR_PROVISIONALLY_AVAILABLE = 0x0000000F,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedAudioStreamsID MTR_PROVISIONALLY_AVAILABLE = 0x00000010,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedSnapshotStreamsID MTR_PROVISIONALLY_AVAILABLE = 0x00000011,
-    MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeRankedVideoStreamPrioritiesListID MTR_PROVISIONALLY_AVAILABLE = 0x00000012,
+    MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeStreamUsagePrioritiesID MTR_PROVISIONALLY_AVAILABLE = 0x00000012,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSoftRecordingPrivacyModeEnabledID MTR_PROVISIONALLY_AVAILABLE = 0x00000013,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSoftLivestreamPrivacyModeEnabledID MTR_PROVISIONALLY_AVAILABLE = 0x00000014,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeHardPrivacyModeOnID MTR_PROVISIONALLY_AVAILABLE = 0x00000015,
@@ -4699,12 +4763,13 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeMPTZPositionID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeMaxPresetsID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeMPTZPresetsID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeDPTZRelativeMoveID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeDPTZStreamsID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeZoomMaxID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
     MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeTiltMinID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
     MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeTiltMaxID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
     MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributePanMinID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
     MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributePanMaxID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeMovementStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
     MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
@@ -4728,9 +4793,8 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterWebRTCTransportRequestorAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster PushAVStreamTransport attributes
-    MTRAttributeIDTypeClusterPushAVStreamTransportAttributeSupportedContainerFormatsID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterPushAVStreamTransportAttributeSupportedIngestMethodsID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterPushAVStreamTransportAttributeCurrentConnectionsID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterPushAVStreamTransportAttributeSupportedFormatsID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterPushAVStreamTransportAttributeCurrentConnectionsID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterPushAVStreamTransportAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterPushAVStreamTransportAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterPushAVStreamTransportAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
@@ -4746,6 +4810,32 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterChimeAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterChimeAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterChimeAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster CommodityTariff attributes
+    MTRAttributeIDTypeClusterCommodityTariffAttributeTariffInfoID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeTariffUnitID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeStartDateID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeDayEntriesID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeDayPatternsID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeCalendarPeriodsID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeIndividualDaysID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentDayID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeNextDayID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentDayEntryID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentDayEntryDateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeNextDayEntryID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeNextDayEntryDateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeTariffComponentsID MTR_PROVISIONALLY_AVAILABLE = 0x0000000D,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeTariffPeriodsID MTR_PROVISIONALLY_AVAILABLE = 0x0000000E,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentTariffComponentsID MTR_PROVISIONALLY_AVAILABLE = 0x0000000F,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeNextTariffComponentsID MTR_PROVISIONALLY_AVAILABLE = 0x00000010,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeDefaultRandomizationOffsetID MTR_PROVISIONALLY_AVAILABLE = 0x00000011,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeDefaultRandomizationTypeID MTR_PROVISIONALLY_AVAILABLE = 0x00000012,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterCommodityTariffAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster EcosystemInformation attributes
     MTRAttributeIDTypeClusterEcosystemInformationAttributeDeviceDirectoryID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -4763,6 +4853,35 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterCommissionerControlAttributeAttributeListID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterCommissionerControlAttributeFeatureMapID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterCommissionerControlAttributeClusterRevisionID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster JointFabricDatastore attributes
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeAnchorRootCAID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeAnchorNodeIDID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeAnchorVendorIDID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeFriendlyNameID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeGroupKeySetListID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeGroupListID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeNodeListID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeAdminListID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeStatusID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeEndpointGroupIDListID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeEndpointBindingListID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeNodeKeySetListID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeNodeACLListID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeNodeEndpointListID MTR_PROVISIONALLY_AVAILABLE = 0x0000000D,
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterJointFabricDatastoreAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster JointFabricAdministrator attributes
+    MTRAttributeIDTypeClusterJointFabricAdministratorAttributeAdministratorFabricIndexID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterJointFabricAdministratorAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterJointFabricAdministratorAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterJointFabricAdministratorAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterJointFabricAdministratorAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterJointFabricAdministratorAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster TLSCertificateManagement attributes
     MTRAttributeIDTypeClusterTLSCertificateManagementAttributeMaxRootCertificatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -4783,6 +4902,29 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterTLSClientManagementAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterTLSClientManagementAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterTLSClientManagementAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster MeterIdentification attributes
+    MTRAttributeIDTypeClusterMeterIdentificationAttributeMeterTypeID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterMeterIdentificationAttributePointOfDeliveryID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterMeterIdentificationAttributeMeterSerialNumberID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterMeterIdentificationAttributeProtocolVersionID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterMeterIdentificationAttributePowerThresholdID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterMeterIdentificationAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterMeterIdentificationAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterMeterIdentificationAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterMeterIdentificationAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterMeterIdentificationAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster CommodityMetering attributes
+    MTRAttributeIDTypeClusterCommodityMeteringAttributeMeteredQuantityID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterCommodityMeteringAttributeMeteredQuantityTimestampID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterCommodityMeteringAttributeTariffUnitID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterCommodityMeteringAttributeMaximumMeteredQuantitiesID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterCommodityMeteringAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterCommodityMeteringAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterCommodityMeteringAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterCommodityMeteringAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterCommodityMeteringAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster TestCluster deprecated attribute names
     MTRClusterTestClusterAttributeBooleanID
@@ -5097,6 +5239,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterUnitTestingAttributeClusterErrorBooleanID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000032,
     MTRAttributeIDTypeClusterUnitTestingAttributeGlobalEnumID MTR_PROVISIONALLY_AVAILABLE = 0x00000033,
     MTRAttributeIDTypeClusterUnitTestingAttributeGlobalStructID MTR_PROVISIONALLY_AVAILABLE = 0x00000034,
+    MTRAttributeIDTypeClusterUnitTestingAttributeUnsupportedAttributeRequiringAdminPrivilegeID MTR_PROVISIONALLY_AVAILABLE = 0x000000FE,
     MTRAttributeIDTypeClusterUnitTestingAttributeUnsupportedID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x000000FF,
     MTRAttributeIDTypeClusterUnitTestingAttributeReadFailureCodeID MTR_PROVISIONALLY_AVAILABLE = 0x00003000,
     MTRAttributeIDTypeClusterUnitTestingAttributeFailureInt32UID MTR_PROVISIONALLY_AVAILABLE = 0x00003001,
@@ -6409,6 +6552,14 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterScenesManagementCommandCopySceneID MTR_PROVISIONALLY_AVAILABLE = 0x00000040,
     MTRCommandIDTypeClusterScenesManagementCommandCopySceneResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000040,
 
+    // Cluster Groupcast commands
+    MTRCommandIDTypeClusterGroupcastCommandJoinGroupID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterGroupcastCommandLeaveGroupID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterGroupcastCommandLeaveGroupResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterGroupcastCommandUpdateGroupKeyID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterGroupcastCommandExpireGracePeriodID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRCommandIDTypeClusterGroupcastCommandConfigureAuxiliaryACLID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+
     // Cluster HEPAFilterMonitoring commands
     MTRCommandIDTypeClusterHEPAFilterMonitoringCommandResetConditionID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x00000000,
 
@@ -6427,12 +6578,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterWaterHeaterManagementCommandBoostID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
     MTRCommandIDTypeClusterWaterHeaterManagementCommandCancelBoostID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000001,
 
-    // Cluster DemandResponseLoadControl commands
-    MTRCommandIDTypeClusterDemandResponseLoadControlCommandRegisterLoadControlProgramRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterDemandResponseLoadControlCommandUnregisterLoadControlProgramRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterDemandResponseLoadControlCommandAddLoadControlEventRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRCommandIDTypeClusterDemandResponseLoadControlCommandRemoveLoadControlEventRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRCommandIDTypeClusterDemandResponseLoadControlCommandClearLoadControlEventsRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    // Cluster CommodityPrice commands
+    MTRCommandIDTypeClusterCommodityPriceCommandGetDetailedPriceRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterCommodityPriceCommandGetDetailedPriceResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterCommodityPriceCommandGetDetailedForecastRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterCommodityPriceCommandGetDetailedForecastResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
 
     // Cluster Messages commands
     MTRCommandIDTypeClusterMessagesCommandPresentMessagesRequestID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
@@ -6609,8 +6759,10 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterClosureControlCommandStopID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterClosureControlCommandMoveToID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRCommandIDTypeClusterClosureControlCommandCalibrateID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRCommandIDTypeClusterClosureControlCommandConfigureFallbackID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRCommandIDTypeClusterClosureControlCommandCancelFallbackID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+
+    // Cluster ClosureDimension commands
+    MTRCommandIDTypeClusterClosureDimensionCommandSetTargetID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterClosureDimensionCommandStepID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
 
     // Cluster ServiceArea commands
     MTRCommandIDTypeClusterServiceAreaCommandSelectAreasID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
@@ -6640,9 +6792,12 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterThermostatCommandGetWeeklyScheduleResponseID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000000,
     MTRCommandIDTypeClusterThermostatCommandSetWeeklyScheduleID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000001,
     MTRCommandIDTypeClusterThermostatCommandGetWeeklyScheduleID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000002,
+    MTRCommandIDTypeClusterThermostatCommandAddThermostatSuggestionResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
     MTRCommandIDTypeClusterThermostatCommandClearWeeklyScheduleID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000003,
     MTRCommandIDTypeClusterThermostatCommandSetActiveScheduleRequestID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000005,
     MTRCommandIDTypeClusterThermostatCommandSetActivePresetRequestID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000006,
+    MTRCommandIDTypeClusterThermostatCommandAddThermostatSuggestionID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
+    MTRCommandIDTypeClusterThermostatCommandRemoveThermostatSuggestionID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
     MTRCommandIDTypeClusterThermostatCommandAtomicResponseID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x000000FD,
     MTRCommandIDTypeClusterThermostatCommandAtomicRequestID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x000000FE,
 
@@ -6968,9 +7123,9 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterZoneManagementCommandCreateTwoDCartesianZoneID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterZoneManagementCommandCreateTwoDCartesianZoneResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRCommandIDTypeClusterZoneManagementCommandUpdateTwoDCartesianZoneID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRCommandIDTypeClusterZoneManagementCommandGetTwoDCartesianZoneID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRCommandIDTypeClusterZoneManagementCommandGetTwoDCartesianZoneResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
-    MTRCommandIDTypeClusterZoneManagementCommandRemoveZoneID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRCommandIDTypeClusterZoneManagementCommandRemoveZoneID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterZoneManagementCommandCreateOrUpdateTriggerID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRCommandIDTypeClusterZoneManagementCommandRemoveTriggerID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
 
     // Cluster CameraAVStreamManagement commands
     MTRCommandIDTypeClusterCameraAVStreamManagementCommandAudioStreamAllocateID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -6998,19 +7153,19 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterCameraAVSettingsUserLevelManagementCommandDPTZRelativeMoveID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
 
     // Cluster WebRTCTransportProvider commands
-    MTRCommandIDTypeClusterWebRTCTransportProviderCommandSolicitOfferID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterWebRTCTransportProviderCommandSolicitOfferResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideOfferID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideOfferResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
-    MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideAnswerID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
-    MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideICECandidatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
-    MTRCommandIDTypeClusterWebRTCTransportProviderCommandEndSessionID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
+    MTRCommandIDTypeClusterWebRTCTransportProviderCommandSolicitOfferID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterWebRTCTransportProviderCommandSolicitOfferResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideOfferID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideOfferResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideAnswerID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideICECandidatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRCommandIDTypeClusterWebRTCTransportProviderCommandEndSessionID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
 
     // Cluster WebRTCTransportRequestor commands
-    MTRCommandIDTypeClusterWebRTCTransportRequestorCommandOfferID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterWebRTCTransportRequestorCommandAnswerID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRCommandIDTypeClusterWebRTCTransportRequestorCommandICECandidatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRCommandIDTypeClusterWebRTCTransportRequestorCommandEndID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRCommandIDTypeClusterWebRTCTransportRequestorCommandOfferID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterWebRTCTransportRequestorCommandAnswerID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterWebRTCTransportRequestorCommandICECandidatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterWebRTCTransportRequestorCommandEndID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
 
     // Cluster PushAVStreamTransport commands
     MTRCommandIDTypeClusterPushAVStreamTransportCommandAllocatePushTransportID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -7025,10 +7180,49 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster Chime commands
     MTRCommandIDTypeClusterChimeCommandPlayChimeSoundID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
+    // Cluster CommodityTariff commands
+    MTRCommandIDTypeClusterCommodityTariffCommandGetTariffComponentID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterCommodityTariffCommandGetTariffComponentResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterCommodityTariffCommandGetDayEntryID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterCommodityTariffCommandGetDayEntryResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+
     // Cluster CommissionerControl commands
     MTRCommandIDTypeClusterCommissionerControlCommandRequestCommissioningApprovalID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
     MTRCommandIDTypeClusterCommissionerControlCommandCommissionNodeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000001,
     MTRCommandIDTypeClusterCommissionerControlCommandReverseOpenCommissioningWindowID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000002,
+
+    // Cluster JointFabricDatastore commands
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandAddKeySetID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandUpdateKeySetID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandRemoveKeySetID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandAddGroupID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandUpdateGroupID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandRemoveGroupID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandAddAdminID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandUpdateAdminID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandRemoveAdminID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandAddPendingNodeID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandRefreshNodeID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandUpdateNodeID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandRemoveNodeID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandUpdateEndpointForNodeID MTR_PROVISIONALLY_AVAILABLE = 0x0000000D,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandAddGroupIDToEndpointForNodeID MTR_PROVISIONALLY_AVAILABLE = 0x0000000E,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandRemoveGroupIDFromEndpointForNodeID MTR_PROVISIONALLY_AVAILABLE = 0x0000000F,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandAddBindingToEndpointForNodeID MTR_PROVISIONALLY_AVAILABLE = 0x00000010,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandRemoveBindingFromEndpointForNodeID MTR_PROVISIONALLY_AVAILABLE = 0x00000011,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandAddACLToNodeID MTR_PROVISIONALLY_AVAILABLE = 0x00000012,
+    MTRCommandIDTypeClusterJointFabricDatastoreCommandRemoveACLFromNodeID MTR_PROVISIONALLY_AVAILABLE = 0x00000013,
+
+    // Cluster JointFabricAdministrator commands
+    MTRCommandIDTypeClusterJointFabricAdministratorCommandICACCSRRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterJointFabricAdministratorCommandICACCSRResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterJointFabricAdministratorCommandAddICACID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterJointFabricAdministratorCommandICACResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterJointFabricAdministratorCommandOpenJointCommissioningWindowID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRCommandIDTypeClusterJointFabricAdministratorCommandTransferAnchorRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRCommandIDTypeClusterJointFabricAdministratorCommandTransferAnchorResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTRCommandIDTypeClusterJointFabricAdministratorCommandTransferAnchorCompleteID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
+    MTRCommandIDTypeClusterJointFabricAdministratorCommandAnnounceJointFabricAdministratorID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
 
     // Cluster TLSCertificateManagement commands
     MTRCommandIDTypeClusterTLSCertificateManagementCommandProvisionRootCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -7038,8 +7232,8 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterTLSCertificateManagementCommandLookupRootCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
     MTRCommandIDTypeClusterTLSCertificateManagementCommandLookupRootCertificateResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
     MTRCommandIDTypeClusterTLSCertificateManagementCommandRemoveRootCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
-    MTRCommandIDTypeClusterTLSCertificateManagementCommandTLSClientCSRID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
-    MTRCommandIDTypeClusterTLSCertificateManagementCommandTLSClientCSRResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandClientCSRID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandClientCSRResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
     MTRCommandIDTypeClusterTLSCertificateManagementCommandProvisionClientCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
     MTRCommandIDTypeClusterTLSCertificateManagementCommandFindClientCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
     MTRCommandIDTypeClusterTLSCertificateManagementCommandFindClientCertificateResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
@@ -7200,6 +7394,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterUnitTestingCommandTestSecondBatchHelperRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000017,
     MTRCommandIDTypeClusterUnitTestingCommandStringEchoRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000018,
     MTRCommandIDTypeClusterUnitTestingCommandGlobalEchoRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000019,
+    MTRCommandIDTypeClusterUnitTestingCommandTestCheckCommandFlagsID MTR_PROVISIONALLY_AVAILABLE = 0x0000001A,
     MTRCommandIDTypeClusterUnitTestingCommandTestDifferentVendorMeiRequestID MTR_PROVISIONALLY_AVAILABLE = 0xFFF200AA,
     MTRCommandIDTypeClusterUnitTestingCommandTestDifferentVendorMeiResponseID MTR_PROVISIONALLY_AVAILABLE = 0xFFF200BB,
 
@@ -7489,8 +7684,8 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterWaterHeaterManagementEventBoostStartedID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
     MTREventIDTypeClusterWaterHeaterManagementEventBoostEndedID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000001,
 
-    // Cluster DemandResponseLoadControl events
-    MTREventIDTypeClusterDemandResponseLoadControlEventLoadControlEventStatusChangeID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    // Cluster CommodityPrice events
+    MTREventIDTypeClusterCommodityPriceEventPriceChangeID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
     // Cluster Messages events
     MTREventIDTypeClusterMessagesEventMessageQueuedID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
@@ -7510,6 +7705,9 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterEnergyEVSEEventEnergyTransferStoppedID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000003,
     MTREventIDTypeClusterEnergyEVSEEventFaultID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000004,
     MTREventIDTypeClusterEnergyEVSEEventRFIDID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000005,
+
+    // Cluster ElectricalGridConditions events
+    MTREventIDTypeClusterElectricalGridConditionsEventCurrentConditionsChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
     // Cluster DoorLock deprecated event names
     MTRClusterDoorLockEventDoorLockAlarmID
@@ -7534,6 +7732,12 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterDoorLockEventLockOperationID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000002,
     MTREventIDTypeClusterDoorLockEventLockOperationErrorID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000003,
     MTREventIDTypeClusterDoorLockEventLockUserChangeID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000004,
+
+    // Cluster ClosureControl events
+    MTREventIDTypeClusterClosureControlEventOperationalErrorID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterClosureControlEventMovementCompletedID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTREventIDTypeClusterClosureControlEventEngageStateChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTREventIDTypeClusterClosureControlEventSecureStateChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
 
     // Cluster PumpConfigurationAndControl deprecated event names
     MTRClusterPumpConfigurationAndControlEventSupplyVoltageLowID
@@ -7606,6 +7810,18 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterPumpConfigurationAndControlEventLeakageID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000000E,
     MTREventIDTypeClusterPumpConfigurationAndControlEventAirDetectionID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000000F,
     MTREventIDTypeClusterPumpConfigurationAndControlEventTurbineOperationID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000010,
+
+    // Cluster Thermostat deprecated event names
+
+    // Cluster Thermostat events
+    MTREventIDTypeClusterThermostatEventSystemModeChangeID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterThermostatEventLocalTemperatureChangeID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTREventIDTypeClusterThermostatEventOccupancyChangeID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTREventIDTypeClusterThermostatEventSetpointChangeID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTREventIDTypeClusterThermostatEventRunningStateChangeID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTREventIDTypeClusterThermostatEventRunningModeChangeID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTREventIDTypeClusterThermostatEventActiveScheduleChangeID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTREventIDTypeClusterThermostatEventActivePresetChangeID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
 
     // Cluster OccupancySensing deprecated event names
 
@@ -7689,6 +7905,7 @@ typedef NS_ENUM(uint32_t, MTRDeviceTypeIDType) {
     MTRDeviceTypeIDTypeWaterValveID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000042,
     MTRDeviceTypeIDTypeWaterLeakDetectorID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000043,
     MTRDeviceTypeIDTypeRainSensorID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000044,
+    MTRDeviceTypeIDTypeSoilSensorID MTR_PROVISIONALLY_AVAILABLE = 0x00000045,
     MTRDeviceTypeIDTypeRefrigeratorID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000070,
     MTRDeviceTypeIDTypeTemperatureControlledCabinetID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000071,
     MTRDeviceTypeIDTypeRoomAirConditionerID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000072,
@@ -7717,24 +7934,21 @@ typedef NS_ENUM(uint32_t, MTRDeviceTypeIDType) {
     MTRDeviceTypeIDTypeExtendedColorLightID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x0000010D,
     MTRDeviceTypeIDTypeMountedOnOffControlID MTR_PROVISIONALLY_AVAILABLE = 0x0000010F,
     MTRDeviceTypeIDTypeMountedDimmableLoadControlID MTR_PROVISIONALLY_AVAILABLE = 0x00000110,
+    MTRDeviceTypeIDTypeJointFabricAdministratorID MTR_PROVISIONALLY_AVAILABLE = 0x00000130,
+    MTRDeviceTypeIDTypeIntercomID MTR_PROVISIONALLY_AVAILABLE = 0x00000140,
+    MTRDeviceTypeIDTypeAudioDoorbellID MTR_PROVISIONALLY_AVAILABLE = 0x00000141,
     MTRDeviceTypeIDTypeCameraID MTR_PROVISIONALLY_AVAILABLE = 0x00000142,
+    MTRDeviceTypeIDTypeVideoDoorbellID MTR_PROVISIONALLY_AVAILABLE = 0x00000143,
+    MTRDeviceTypeIDTypeFloodlightCameraID MTR_PROVISIONALLY_AVAILABLE = 0x00000144,
+    MTRDeviceTypeIDTypeSnapshotCameraID MTR_PROVISIONALLY_AVAILABLE = 0x00000145,
+    MTRDeviceTypeIDTypeChimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000146,
+    MTRDeviceTypeIDTypeCameraControllerID MTR_PROVISIONALLY_AVAILABLE = 0x00000147,
+    MTRDeviceTypeIDTypeDoorbellID MTR_PROVISIONALLY_AVAILABLE = 0x00000148,
     MTRDeviceTypeIDTypeWindowCoveringID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000202,
     MTRDeviceTypeIDTypeWindowCoveringControllerID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000203,
-    MTRDeviceTypeIDTypeClosureBaseID MTR_PROVISIONALLY_AVAILABLE = 0x00000230,
-    MTRDeviceTypeIDTypeWindowID MTR_PROVISIONALLY_AVAILABLE = 0x00000231,
-    MTRDeviceTypeIDTypeShutterID MTR_PROVISIONALLY_AVAILABLE = 0x00000232,
-    MTRDeviceTypeIDTypeShadeID MTR_PROVISIONALLY_AVAILABLE = 0x00000233,
-    MTRDeviceTypeIDTypeCurtainID MTR_PROVISIONALLY_AVAILABLE = 0x00000234,
-    MTRDeviceTypeIDTypeBlindID MTR_PROVISIONALLY_AVAILABLE = 0x00000235,
-    MTRDeviceTypeIDTypeScreenID MTR_PROVISIONALLY_AVAILABLE = 0x00000236,
-    MTRDeviceTypeIDTypeAwningID MTR_PROVISIONALLY_AVAILABLE = 0x00000237,
-    MTRDeviceTypeIDTypePergolaID MTR_PROVISIONALLY_AVAILABLE = 0x00000238,
-    MTRDeviceTypeIDTypeDoorID MTR_PROVISIONALLY_AVAILABLE = 0x00000239,
-    MTRDeviceTypeIDTypeGarageDoorID MTR_PROVISIONALLY_AVAILABLE = 0x0000023A,
-    MTRDeviceTypeIDTypeGateID MTR_PROVISIONALLY_AVAILABLE = 0x0000023B,
-    MTRDeviceTypeIDTypeBarrierID MTR_PROVISIONALLY_AVAILABLE = 0x0000023C,
-    MTRDeviceTypeIDTypeCabinetID MTR_PROVISIONALLY_AVAILABLE = 0x0000023D,
-    MTRDeviceTypeIDTypeHeatingCoolingUnitID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000300,
+    MTRDeviceTypeIDTypeClosureID MTR_PROVISIONALLY_AVAILABLE = 0x00000230,
+    MTRDeviceTypeIDTypeClosurePanelID MTR_PROVISIONALLY_AVAILABLE = 0x00000231,
+    MTRDeviceTypeIDTypeClosureControllerID MTR_PROVISIONALLY_AVAILABLE = 0x0000023E,
     MTRDeviceTypeIDTypeThermostatID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000301,
     MTRDeviceTypeIDTypeTemperatureSensorID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000302,
     MTRDeviceTypeIDTypePumpID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000303,
@@ -7748,6 +7962,10 @@ typedef NS_ENUM(uint32_t, MTRDeviceTypeIDType) {
     MTRDeviceTypeIDTypeDeviceEnergyManagementID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x0000050D,
     MTRDeviceTypeIDTypeWaterHeaterID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0000050F,
     MTRDeviceTypeIDTypeElectricalSensorID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000510,
+    MTRDeviceTypeIDTypeElectricalUtilityMeterID MTR_PROVISIONALLY_AVAILABLE = 0x00000511,
+    MTRDeviceTypeIDTypeMeterReferencePointID MTR_PROVISIONALLY_AVAILABLE = 0x00000512,
+    MTRDeviceTypeIDTypeElectricalEnergyTariffID MTR_PROVISIONALLY_AVAILABLE = 0x00000513,
+    MTRDeviceTypeIDTypeElectricalMeterID MTR_PROVISIONALLY_AVAILABLE = 0x00000514,
     MTRDeviceTypeIDTypeControlBridgeID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000840,
     MTRDeviceTypeIDTypeOnOffSensorID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000850,
 } MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));

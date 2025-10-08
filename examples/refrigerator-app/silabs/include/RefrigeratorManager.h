@@ -44,7 +44,7 @@ class RefrigeratorManager
 public:
     CHIP_ERROR Init();
     void TempCtrlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size);
-    void RefAlaramAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size);
+    void RefAlarmAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size);
     uint8_t GetMode();
     int8_t GetCurrentTemp();
     int8_t SetMode();
@@ -53,7 +53,6 @@ private:
     friend RefrigeratorManager & RefrigeratorMgr();
 
     int16_t mCurrentMode;
-    int16_t mStartUpMode;
     int16_t mOnMode;
 
     int16_t mTemperatureSetpoint;

@@ -32,6 +32,7 @@ class Efr32App(Enum):
     PUMP = auto()
     UNIT_TEST = auto()
     AIR_QUALITY_SENSOR = auto()
+    CLOSURE = auto()
 
     def ExampleName(self):
         if self == Efr32App.LIGHT:
@@ -48,6 +49,8 @@ class Efr32App(Enum):
             return 'pump-app'
         elif self == Efr32App.AIR_QUALITY_SENSOR:
             return 'air-quality-sensor-app'
+        elif self == Efr32App.CLOSURE:
+            return 'closure-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -68,6 +71,8 @@ class Efr32App(Enum):
             return 'matter-silabs-device_tests'
         elif self == Efr32App.AIR_QUALITY_SENSOR:
             return 'matter-silabs-air-quality-sensor-example'
+        elif self == Efr32App.CLOSURE:
+            return 'matter-silabs-closure-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -88,6 +93,8 @@ class Efr32App(Enum):
             return os.path.join('tests', 'efr32_device_tests.flashbundle.txt')
         elif self == Efr32App.AIR_QUALITY_SENSOR:
             return 'air_quality_sensor_app.flashbundle.txt'
+        elif self == Efr32App.CLOSURE:
+            return 'closure_app.flashbundle.txt'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -114,6 +121,8 @@ class Efr32Board(Enum):
     BRD2605A = 13
     BRD4343A = 14
     BRD4342A = 15
+    BRD2708A = 16
+    BRD2911A = 17
 
     def GnArgName(self):
         if self == Efr32Board.BRD2704B:
@@ -146,6 +155,10 @@ class Efr32Board(Enum):
             return 'BRD4343A'
         elif self == Efr32Board.BRD4342A:
             return 'BRD4342A'
+        elif self == Efr32Board.BRD2708A:
+            return 'BRD2708A'
+        elif self == Efr32Board.BRD2911A:
+            return 'BRD2911A'
         else:
             raise Exception('Unknown board #: %r' % self)
 

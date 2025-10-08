@@ -649,7 +649,7 @@ $ ./chip-tool onoff on
 ```bash
 [1647417976.556313][404456:404456] CHIP:TOO: InitArgs: Wrong arguments number: 0 instead of 2
 Usage:
-  ./chip-tool onoff on node-id/group-id endpoint-id-ignored-for-group-commands [--paa-trust-store-path] [--commissioner-name] [--trace_file] [--trace_log] [--ble-adapter] [--timedInteractionTimeoutMs] [--suppressResponse]
+  ./chip-tool onoff on node-id/group-id endpoint-id-ignored-for-group-commands [--paa-trust-store-path] [--commissioner-name] [--trace_file] [--trace_log] [--ble-controller] [--timedInteractionTimeoutMs] [--suppressResponse]
 [1647417976.556362][404456:404456] CHIP:TOO: Run command failure: ../../examples/chip-tool/commands/common/Commands.cpp:135: Error 0x0000002F
 
 ```
@@ -661,21 +661,15 @@ command.
 
 ##### Choosing the Bluetooth adapter
 
-To choose the Bluetooth adapter used by the CHIP Tool, use the following command
-pattern:
-
-```
---ble-adapter <id>
-```
-
-In this command:
-
--   _<id\>_ is the ID of HCI device.
+To choose the Bluetooth adapter used by the CHIP Tool, use the
+`--ble-controller <selector>` switch where selector syntax is platform-specific.
+For Linux it's documented in
+[Linux BLE Settings](/platforms/linux/ble_settings.md).
 
 **Example of usage:**
 
 ```
-$ ./chip-tool pairing ble-thread 1 hex:0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8 20202021 3840 --ble-adapter 0
+$ ./chip-tool pairing ble-thread 1 hex:0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8 20202021 3840 --ble-controller 2
 ```
 
 ##### Using message tracing

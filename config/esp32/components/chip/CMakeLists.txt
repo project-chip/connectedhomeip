@@ -35,9 +35,9 @@ set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update co
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
     if (CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
-        set(is_debug TRUE)
-    else()
         set(is_debug FALSE)
+    else()
+        set(is_debug TRUE)
     endif()
 endif()
 
@@ -173,10 +173,6 @@ if (CONFIG_BUILD_CHIP_TESTS)
     chip_gn_arg_bool("chip_build_tests"     "true")
 endif()
 
-if (CONFIG_IM_PRETTY_PRINT)
-    chip_gn_arg_bool("enable_im_pretty_print"	"true")
-endif()
-
 if (NOT CONFIG_USE_MINIMAL_MDNS)
     chip_gn_arg_append("chip_mdns"                          "\"platform\"")
 else()
@@ -248,6 +244,10 @@ if (CONFIG_ENABLE_OTA_REQUESTOR)
     chip_gn_arg_append("chip_enable_ota_requestor"                 "true")
 endif()
 
+if (CONFIG_ENABLE_ACCESS_RESTRICTIONS)
+    chip_gn_arg_append("chip_enable_access_restrictions"                 "true")
+endif()
+
 if (CONFIG_ENABLE_ROTATING_DEVICE_ID)
     chip_gn_arg_append("chip_enable_additional_data_advertising"   "true")
     chip_gn_arg_append("chip_enable_rotating_device_id"            "true")
@@ -302,6 +302,11 @@ if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
   chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_trace:esp32_trace_tracing\"")
 endif()
 
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS)
+    chip_gn_arg_bool("matter_enable_tracing_support"  "true")
+    chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_diagnostics:esp32_diagnostic_tracing\"")
+endif()
+
 if (CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS)
      chip_gn_arg_append("matter_enable_esp_insights_system_stats"            "true")
 endif()
@@ -312,6 +317,10 @@ endif()
 
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
+endif()
+
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS)
+    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_diagnostics/include")
 endif()
 
 if (CONFIG_CHIP_DEVICE_ENABLE_DYNAMIC_SERVER)
@@ -378,6 +387,11 @@ endif()
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
   list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32TracingBackend.a")
 endif()
+
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS)
+  list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32DiagnosticsBackend.a")
+endif()
+
 
 # When using the pregenerated files, there is a edge case where an error appears for
 # undeclared argument chip_code_pre_generated_directory. To get around with it we are

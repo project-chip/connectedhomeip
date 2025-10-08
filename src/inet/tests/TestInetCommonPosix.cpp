@@ -358,14 +358,20 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
         }
     }
 
+#if !CHIP_SYSTEM_CONFIG_USE_DISPATCH
     // Start a timer (with a no-op callback) to ensure that WaitForEvents() does not block longer than aSleepTimeMilliseconds.
     gSystemLayer.StartTimer(
         System::Clock::Milliseconds32(aSleepTimeMilliseconds), [](System::Layer *, void *) -> void {}, nullptr);
+#endif
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_DISPATCH
     gSystemLayer.PrepareEvents();
     gSystemLayer.WaitForEvents();
     gSystemLayer.HandleEvents();
+#endif
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    gSystemLayer.HandleDispatchQueueEvents(System::Clock::Milliseconds32(aSleepTimeMilliseconds));
 #endif
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT

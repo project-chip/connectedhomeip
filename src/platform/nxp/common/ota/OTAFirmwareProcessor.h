@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023, 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,6 +50,9 @@ private:
 
     OTADataAccumulator mAccumulator;
     bool mDescriptorProcessed = false;
+#if OTA_ENCRYPTION_ENABLE
+    uint32_t mUnalignmentNum;
+#endif
 
     alignas(4) uint8_t mPostedOperationsStorage[NB_PENDING_TRANSACTIONS * TRANSACTION_SZ];
 };

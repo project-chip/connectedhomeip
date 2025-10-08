@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-# Copyright (c) 2023 Project CHIP Authors
+# Copyright (c) 2023-2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,8 +34,15 @@
 # --build-env-dir option. The build environment directory can be shared by any
 # number of build directories, independently of target / tool chain.
 
+# Check if this script is being sourced; this could be in any shell, not just bash.
+if [ -z "$BASH" -o "$BASH_SOURCE" != "$0" ]; then
+    echo "configure does not support being sourced" >&2
+    return 1
+fi
+
 set -o pipefail
 shopt -s extglob
+unset CDPATH
 
 function usage() { # status
     info "Usage: $0 [OPTIONS] [--project=... [PROJECT OPTIONS]]"
@@ -48,7 +55,7 @@ function usage() { # status
     info "  --enable-<ARG>[=no]   Enables (or disables with '=no') a bool build arg"
     info "  --<ARG>=<VALUE>       Sets a (non-bool) build arg to the given value"
     info "  GN argument names can be specified with '-' instead of '_' and prefixes"
-    info "  like 'chip_' can be ommitted from names. For the full list of available"
+    info "  like 'chip_' can be omitted from names. For the full list of available"
     info "  build arguments, see the generated args.configured file."
     info ""
     info "  By default, the toolchain for the GN build will be configured from the usual"
@@ -100,7 +107,7 @@ function main() { # ...
 
     if [[ -n "$PROJECT" ]]; then
         PROJECT_PATH="$(cd "${CHIP_ROOT}" 2>/dev/null && cd "${PROJECT}" 2>/dev/null && pwd)"
-        [[ -n "$PROJECT_PATH" && -r "${PROJECT_PATH}/.gn" ]] || fail "Invalid project '${PROJECT}' - missing .gn at '${PROJECT_PATH}'"
+        [[ -n "$PROJECT_PATH" && -r "${PROJECT_PATH}/.gn" ]] || fail "Invalid project '${PROJECT}' (no such directory or missing .gn file)"
     fi
 
     if [[ -n "$PW_ROOT" ]]; then
@@ -145,7 +152,7 @@ function main() { # ...
 
     # Create the build environment if necessary
     if ! check_build_env; then
-        check_python
+        check_python 3.11
         configure_python_env
         if [[ -z "$CHIP_PREGEN_DIR" ]] && ! check_binary zap-cli; then
             download_zap
@@ -281,7 +288,8 @@ function configure_python_env() {
     # Ensure pip and wheel are up to date first (using pip.pyz if necessary)
     "${BUILD_ENV_PATH}/bin/python3" "$pip" install --require-virtualenv --quiet --upgrade pip wheel
 
-    "${BUILD_ENV_PATH}/bin/pip" install --require-virtualenv --quiet \
+    # Install build dependencies. Use PEP517 to silence warnings (see https://github.com/pypa/pip/issues/6334)
+    "${BUILD_ENV_PATH}/bin/pip" install --require-virtualenv --quiet --use-pep517 \
         -r "${CHIP_ROOT}/scripts/setup/requirements.build.txt" \
         -c "${CHIP_ROOT}/scripts/setup/constraints.txt"
     info "ok"
@@ -321,19 +329,19 @@ function call_impl() { # func ...
     "$PYTHON" "${CHIP_ROOT}/scripts/configure.impl.py" "$@"
 }
 
-function check_python() {
-    progress "Checking for Python 3"
-    if have_binary python3; then
-        PYTHON="$(hash -t python3)"
+function check_python() { # version
+    local required="$1" major="${1%%.*}"
+    progress "Checking for Python $required or later"
+    if have_binary "python$major"; then
+        PYTHON="$(hash -t "python$major")"
     elif have_binary python; then
         PYTHON="$(hash -t python)"
-        local ver="$("$PYTHON" --version)"
-        if [[ "$ver" != "Python 3."* ]]; then
-            info "need Python 3 but found $ver"
-            return 1
-        fi
     else
         info "not found"
+        return 1
+    fi
+    if ! "$PYTHON" -c 'import sys; sys.exit(1 if sys.version_info < tuple(map(int,sys.argv[1].split("."))) else 0)' "$required"; then
+        info "not found ($PYTHON is $("$PYTHON" --version))"
         return 1
     fi
     info "$PYTHON"

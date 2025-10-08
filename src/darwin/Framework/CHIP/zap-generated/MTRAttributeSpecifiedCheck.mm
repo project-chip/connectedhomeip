@@ -49,6 +49,7 @@ static BOOL AttributeIsSpecifiedInIdentifyCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known Identify attribute.
         return NO;
     }
     }
@@ -76,6 +77,7 @@ static BOOL AttributeIsSpecifiedInGroupsCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known Groups attribute.
         return NO;
     }
     }
@@ -115,6 +117,7 @@ static BOOL AttributeIsSpecifiedInOnOffCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known OnOff attribute.
         return NO;
     }
     }
@@ -181,6 +184,7 @@ static BOOL AttributeIsSpecifiedInLevelControlCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known LevelControl attribute.
         return NO;
     }
     }
@@ -205,6 +209,7 @@ static BOOL AttributeIsSpecifiedInPulseWidthModulationCluster(AttributeId aAttri
         return YES;
     }
     default: {
+        // Not a known PulseWidthModulation attribute.
         return NO;
     }
     }
@@ -228,6 +233,9 @@ static BOOL AttributeIsSpecifiedInDescriptorCluster(AttributeId aAttributeId)
     case Attributes::TagList::Id: {
         return YES;
     }
+    case Attributes::EndpointUniqueID::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -244,6 +252,7 @@ static BOOL AttributeIsSpecifiedInDescriptorCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known Descriptor attribute.
         return NO;
     }
     }
@@ -271,6 +280,7 @@ static BOOL AttributeIsSpecifiedInBindingCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known Binding attribute.
         return NO;
     }
     }
@@ -316,6 +326,7 @@ static BOOL AttributeIsSpecifiedInAccessControlCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known AccessControl attribute.
         return NO;
     }
     }
@@ -349,6 +360,7 @@ static BOOL AttributeIsSpecifiedInActionsCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known Actions attribute.
         return NO;
     }
     }
@@ -426,6 +438,9 @@ static BOOL AttributeIsSpecifiedInBasicInformationCluster(AttributeId aAttribute
     case Attributes::MaxPathsPerInvoke::Id: {
         return YES;
     }
+    case Attributes::ConfigurationVersion::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -442,6 +457,7 @@ static BOOL AttributeIsSpecifiedInBasicInformationCluster(AttributeId aAttribute
         return YES;
     }
     default: {
+        // Not a known BasicInformation attribute.
         return NO;
     }
     }
@@ -466,6 +482,7 @@ static BOOL AttributeIsSpecifiedInOTASoftwareUpdateProviderCluster(AttributeId a
         return YES;
     }
     default: {
+        // Not a known OTASoftwareUpdateProvider attribute.
         return NO;
     }
     }
@@ -502,6 +519,7 @@ static BOOL AttributeIsSpecifiedInOTASoftwareUpdateRequestorCluster(AttributeId 
         return YES;
     }
     default: {
+        // Not a known OTASoftwareUpdateRequestor attribute.
         return NO;
     }
     }
@@ -532,6 +550,7 @@ static BOOL AttributeIsSpecifiedInLocalizationConfigurationCluster(AttributeId a
         return YES;
     }
     default: {
+        // Not a known LocalizationConfiguration attribute.
         return NO;
     }
     }
@@ -565,6 +584,7 @@ static BOOL AttributeIsSpecifiedInTimeFormatLocalizationCluster(AttributeId aAtt
         return YES;
     }
     default: {
+        // Not a known TimeFormatLocalization attribute.
         return NO;
     }
     }
@@ -574,6 +594,9 @@ static BOOL AttributeIsSpecifiedInUnitLocalizationCluster(AttributeId aAttribute
     using namespace Clusters::UnitLocalization;
     switch (aAttributeId) {
     case Attributes::TemperatureUnit::Id: {
+        return YES;
+    }
+    case Attributes::SupportedTemperatureUnits::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -592,6 +615,7 @@ static BOOL AttributeIsSpecifiedInUnitLocalizationCluster(AttributeId aAttribute
         return YES;
     }
     default: {
+        // Not a known UnitLocalization attribute.
         return NO;
     }
     }
@@ -619,6 +643,7 @@ static BOOL AttributeIsSpecifiedInPowerSourceConfigurationCluster(AttributeId aA
         return YES;
     }
     default: {
+        // Not a known PowerSourceConfiguration attribute.
         return NO;
     }
     }
@@ -739,6 +764,7 @@ static BOOL AttributeIsSpecifiedInPowerSourceCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known PowerSource attribute.
         return NO;
     }
     }
@@ -777,6 +803,15 @@ static BOOL AttributeIsSpecifiedInGeneralCommissioningCluster(AttributeId aAttri
     case Attributes::TCUpdateDeadline::Id: {
         return YES;
     }
+    case Attributes::RecoveryIdentifier::Id: {
+        return YES;
+    }
+    case Attributes::NetworkRecoveryReason::Id: {
+        return YES;
+    }
+    case Attributes::IsCommissioningWithoutPower::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -793,6 +828,7 @@ static BOOL AttributeIsSpecifiedInGeneralCommissioningCluster(AttributeId aAttri
         return YES;
     }
     default: {
+        // Not a known GeneralCommissioning attribute.
         return NO;
     }
     }
@@ -850,6 +886,7 @@ static BOOL AttributeIsSpecifiedInNetworkCommissioningCluster(AttributeId aAttri
         return YES;
     }
     default: {
+        // Not a known NetworkCommissioning attribute.
         return NO;
     }
     }
@@ -874,6 +911,7 @@ static BOOL AttributeIsSpecifiedInDiagnosticLogsCluster(AttributeId aAttributeId
         return YES;
     }
     default: {
+        // Not a known DiagnosticLogs attribute.
         return NO;
     }
     }
@@ -925,6 +963,7 @@ static BOOL AttributeIsSpecifiedInGeneralDiagnosticsCluster(AttributeId aAttribu
         return YES;
     }
     default: {
+        // Not a known GeneralDiagnostics attribute.
         return NO;
     }
     }
@@ -961,6 +1000,7 @@ static BOOL AttributeIsSpecifiedInSoftwareDiagnosticsCluster(AttributeId aAttrib
         return YES;
     }
     default: {
+        // Not a known SoftwareDiagnostics attribute.
         return NO;
     }
     }
@@ -1158,6 +1198,12 @@ static BOOL AttributeIsSpecifiedInThreadNetworkDiagnosticsCluster(AttributeId aA
     case Attributes::ActiveNetworkFaultsList::Id: {
         return YES;
     }
+    case Attributes::ExtAddress::Id: {
+        return YES;
+    }
+    case Attributes::Rloc16::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -1174,6 +1220,7 @@ static BOOL AttributeIsSpecifiedInThreadNetworkDiagnosticsCluster(AttributeId aA
         return YES;
     }
     default: {
+        // Not a known ThreadNetworkDiagnostics attribute.
         return NO;
     }
     }
@@ -1237,6 +1284,7 @@ static BOOL AttributeIsSpecifiedInWiFiNetworkDiagnosticsCluster(AttributeId aAtt
         return YES;
     }
     default: {
+        // Not a known WiFiNetworkDiagnostics attribute.
         return NO;
     }
     }
@@ -1288,6 +1336,7 @@ static BOOL AttributeIsSpecifiedInEthernetNetworkDiagnosticsCluster(AttributeId 
         return YES;
     }
     default: {
+        // Not a known EthernetNetworkDiagnostics attribute.
         return NO;
     }
     }
@@ -1351,6 +1400,7 @@ static BOOL AttributeIsSpecifiedInTimeSynchronizationCluster(AttributeId aAttrib
         return YES;
     }
     default: {
+        // Not a known TimeSynchronization attribute.
         return NO;
     }
     }
@@ -1410,6 +1460,9 @@ static BOOL AttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(Attribute
     case Attributes::ProductAppearance::Id: {
         return YES;
     }
+    case Attributes::ConfigurationVersion::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -1426,6 +1479,7 @@ static BOOL AttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(Attribute
         return YES;
     }
     default: {
+        // Not a known BridgedDeviceBasicInformation attribute.
         return NO;
     }
     }
@@ -1459,6 +1513,7 @@ static BOOL AttributeIsSpecifiedInSwitchCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known Switch attribute.
         return NO;
     }
     }
@@ -1492,6 +1547,7 @@ static BOOL AttributeIsSpecifiedInAdministratorCommissioningCluster(AttributeId 
         return YES;
     }
     default: {
+        // Not a known AdministratorCommissioning attribute.
         return NO;
     }
     }
@@ -1534,6 +1590,7 @@ static BOOL AttributeIsSpecifiedInOperationalCredentialsCluster(AttributeId aAtt
         return YES;
     }
     default: {
+        // Not a known OperationalCredentials attribute.
         return NO;
     }
     }
@@ -1570,6 +1627,7 @@ static BOOL AttributeIsSpecifiedInGroupKeyManagementCluster(AttributeId aAttribu
         return YES;
     }
     default: {
+        // Not a known GroupKeyManagement attribute.
         return NO;
     }
     }
@@ -1597,6 +1655,7 @@ static BOOL AttributeIsSpecifiedInFixedLabelCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known FixedLabel attribute.
         return NO;
     }
     }
@@ -1624,6 +1683,7 @@ static BOOL AttributeIsSpecifiedInUserLabelCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known UserLabel attribute.
         return NO;
     }
     }
@@ -1651,6 +1711,7 @@ static BOOL AttributeIsSpecifiedInBooleanStateCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known BooleanState attribute.
         return NO;
     }
     }
@@ -1705,6 +1766,7 @@ static BOOL AttributeIsSpecifiedInICDManagementCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known ICDManagement attribute.
         return NO;
     }
     }
@@ -1738,6 +1800,7 @@ static BOOL AttributeIsSpecifiedInTimerCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known Timer attribute.
         return NO;
     }
     }
@@ -1780,6 +1843,7 @@ static BOOL AttributeIsSpecifiedInOvenCavityOperationalStateCluster(AttributeId 
         return YES;
     }
     default: {
+        // Not a known OvenCavityOperationalState attribute.
         return NO;
     }
     }
@@ -1810,6 +1874,7 @@ static BOOL AttributeIsSpecifiedInOvenModeCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known OvenMode attribute.
         return NO;
     }
     }
@@ -1840,6 +1905,7 @@ static BOOL AttributeIsSpecifiedInLaundryDryerControlsCluster(AttributeId aAttri
         return YES;
     }
     default: {
+        // Not a known LaundryDryerControls attribute.
         return NO;
     }
     }
@@ -1882,6 +1948,7 @@ static BOOL AttributeIsSpecifiedInModeSelectCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known ModeSelect attribute.
         return NO;
     }
     }
@@ -1912,6 +1979,7 @@ static BOOL AttributeIsSpecifiedInLaundryWasherModeCluster(AttributeId aAttribut
         return YES;
     }
     default: {
+        // Not a known LaundryWasherMode attribute.
         return NO;
     }
     }
@@ -1942,6 +2010,7 @@ static BOOL AttributeIsSpecifiedInRefrigeratorAndTemperatureControlledCabinetMod
         return YES;
     }
     default: {
+        // Not a known RefrigeratorAndTemperatureControlledCabinetMode attribute.
         return NO;
     }
     }
@@ -1978,6 +2047,7 @@ static BOOL AttributeIsSpecifiedInLaundryWasherControlsCluster(AttributeId aAttr
         return YES;
     }
     default: {
+        // Not a known LaundryWasherControls attribute.
         return NO;
     }
     }
@@ -2008,6 +2078,7 @@ static BOOL AttributeIsSpecifiedInRVCRunModeCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known RVCRunMode attribute.
         return NO;
     }
     }
@@ -2038,6 +2109,7 @@ static BOOL AttributeIsSpecifiedInRVCCleanModeCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known RVCCleanMode attribute.
         return NO;
     }
     }
@@ -2080,6 +2152,7 @@ static BOOL AttributeIsSpecifiedInTemperatureControlCluster(AttributeId aAttribu
         return YES;
     }
     default: {
+        // Not a known TemperatureControl attribute.
         return NO;
     }
     }
@@ -2113,6 +2186,7 @@ static BOOL AttributeIsSpecifiedInRefrigeratorAlarmCluster(AttributeId aAttribut
         return YES;
     }
     default: {
+        // Not a known RefrigeratorAlarm attribute.
         return NO;
     }
     }
@@ -2143,6 +2217,7 @@ static BOOL AttributeIsSpecifiedInDishwasherModeCluster(AttributeId aAttributeId
         return YES;
     }
     default: {
+        // Not a known DishwasherMode attribute.
         return NO;
     }
     }
@@ -2170,6 +2245,7 @@ static BOOL AttributeIsSpecifiedInAirQualityCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known AirQuality attribute.
         return NO;
     }
     }
@@ -2233,6 +2309,7 @@ static BOOL AttributeIsSpecifiedInSmokeCOAlarmCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known SmokeCOAlarm attribute.
         return NO;
     }
     }
@@ -2269,6 +2346,7 @@ static BOOL AttributeIsSpecifiedInDishwasherAlarmCluster(AttributeId aAttributeI
         return YES;
     }
     default: {
+        // Not a known DishwasherAlarm attribute.
         return NO;
     }
     }
@@ -2299,6 +2377,7 @@ static BOOL AttributeIsSpecifiedInMicrowaveOvenModeCluster(AttributeId aAttribut
         return YES;
     }
     default: {
+        // Not a known MicrowaveOvenMode attribute.
         return NO;
     }
     }
@@ -2350,6 +2429,7 @@ static BOOL AttributeIsSpecifiedInMicrowaveOvenControlCluster(AttributeId aAttri
         return YES;
     }
     default: {
+        // Not a known MicrowaveOvenControl attribute.
         return NO;
     }
     }
@@ -2392,6 +2472,7 @@ static BOOL AttributeIsSpecifiedInOperationalStateCluster(AttributeId aAttribute
         return YES;
     }
     default: {
+        // Not a known OperationalState attribute.
         return NO;
     }
     }
@@ -2434,6 +2515,7 @@ static BOOL AttributeIsSpecifiedInRVCOperationalStateCluster(AttributeId aAttrib
         return YES;
     }
     default: {
+        // Not a known RVCOperationalState attribute.
         return NO;
     }
     }
@@ -2464,6 +2546,38 @@ static BOOL AttributeIsSpecifiedInScenesManagementCluster(AttributeId aAttribute
         return YES;
     }
     default: {
+        // Not a known ScenesManagement attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInGroupcastCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Groupcast;
+    switch (aAttributeId) {
+    case Attributes::Membership::Id: {
+        return YES;
+    }
+    case Attributes::MaxMembershipCount::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known Groupcast attribute.
         return NO;
     }
     }
@@ -2506,6 +2620,7 @@ static BOOL AttributeIsSpecifiedInHEPAFilterMonitoringCluster(AttributeId aAttri
         return YES;
     }
     default: {
+        // Not a known HEPAFilterMonitoring attribute.
         return NO;
     }
     }
@@ -2548,6 +2663,7 @@ static BOOL AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(Attribu
         return YES;
     }
     default: {
+        // Not a known ActivatedCarbonFilterMonitoring attribute.
         return NO;
     }
     }
@@ -2596,6 +2712,7 @@ static BOOL AttributeIsSpecifiedInBooleanStateConfigurationCluster(AttributeId a
         return YES;
     }
     default: {
+        // Not a known BooleanStateConfiguration attribute.
         return NO;
     }
     }
@@ -2653,6 +2770,7 @@ static BOOL AttributeIsSpecifiedInValveConfigurationAndControlCluster(AttributeI
         return YES;
     }
     default: {
+        // Not a known ValveConfigurationAndControl attribute.
         return NO;
     }
     }
@@ -2734,6 +2852,7 @@ static BOOL AttributeIsSpecifiedInElectricalPowerMeasurementCluster(AttributeId 
         return YES;
     }
     default: {
+        // Not a known ElectricalPowerMeasurement attribute.
         return NO;
     }
     }
@@ -2776,6 +2895,7 @@ static BOOL AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(AttributeId
         return YES;
     }
     default: {
+        // Not a known ElectricalEnergyMeasurement attribute.
         return NO;
     }
     }
@@ -2818,36 +2938,25 @@ static BOOL AttributeIsSpecifiedInWaterHeaterManagementCluster(AttributeId aAttr
         return YES;
     }
     default: {
+        // Not a known WaterHeaterManagement attribute.
         return NO;
     }
     }
 }
-static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInCommodityPriceCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::DemandResponseLoadControl;
+    using namespace Clusters::CommodityPrice;
     switch (aAttributeId) {
-    case Attributes::LoadControlPrograms::Id: {
+    case Attributes::TariffUnit::Id: {
         return YES;
     }
-    case Attributes::NumberOfLoadControlPrograms::Id: {
+    case Attributes::Currency::Id: {
         return YES;
     }
-    case Attributes::Events::Id: {
+    case Attributes::CurrentPrice::Id: {
         return YES;
     }
-    case Attributes::ActiveEvents::Id: {
-        return YES;
-    }
-    case Attributes::NumberOfEventsPerProgram::Id: {
-        return YES;
-    }
-    case Attributes::NumberOfTransitions::Id: {
-        return YES;
-    }
-    case Attributes::DefaultRandomStart::Id: {
-        return YES;
-    }
-    case Attributes::DefaultRandomDuration::Id: {
+    case Attributes::PriceForecast::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -2866,6 +2975,7 @@ static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId a
         return YES;
     }
     default: {
+        // Not a known CommodityPrice attribute.
         return NO;
     }
     }
@@ -2896,6 +3006,7 @@ static BOOL AttributeIsSpecifiedInMessagesCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known Messages attribute.
         return NO;
     }
     }
@@ -2944,6 +3055,7 @@ static BOOL AttributeIsSpecifiedInDeviceEnergyManagementCluster(AttributeId aAtt
         return YES;
     }
     default: {
+        // Not a known DeviceEnergyManagement attribute.
         return NO;
     }
     }
@@ -3037,6 +3149,7 @@ static BOOL AttributeIsSpecifiedInEnergyEVSECluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known EnergyEVSE attribute.
         return NO;
     }
     }
@@ -3076,6 +3189,7 @@ static BOOL AttributeIsSpecifiedInEnergyPreferenceCluster(AttributeId aAttribute
         return YES;
     }
     default: {
+        // Not a known EnergyPreference attribute.
         return NO;
     }
     }
@@ -3106,6 +3220,7 @@ static BOOL AttributeIsSpecifiedInPowerTopologyCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known PowerTopology attribute.
         return NO;
     }
     }
@@ -3136,6 +3251,7 @@ static BOOL AttributeIsSpecifiedInEnergyEVSEModeCluster(AttributeId aAttributeId
         return YES;
     }
     default: {
+        // Not a known EnergyEVSEMode attribute.
         return NO;
     }
     }
@@ -3166,6 +3282,7 @@ static BOOL AttributeIsSpecifiedInWaterHeaterModeCluster(AttributeId aAttributeI
         return YES;
     }
     default: {
+        // Not a known WaterHeaterMode attribute.
         return NO;
     }
     }
@@ -3196,6 +3313,41 @@ static BOOL AttributeIsSpecifiedInDeviceEnergyManagementModeCluster(AttributeId 
         return YES;
     }
     default: {
+        // Not a known DeviceEnergyManagementMode attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInElectricalGridConditionsCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalGridConditions;
+    switch (aAttributeId) {
+    case Attributes::LocalGenerationAvailable::Id: {
+        return YES;
+    }
+    case Attributes::CurrentConditions::Id: {
+        return YES;
+    }
+    case Attributes::ForecastConditions::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known ElectricalGridConditions attribute.
         return NO;
     }
     }
@@ -3355,6 +3507,7 @@ static BOOL AttributeIsSpecifiedInDoorLockCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known DoorLock attribute.
         return NO;
     }
     }
@@ -3445,6 +3598,7 @@ static BOOL AttributeIsSpecifiedInWindowCoveringCluster(AttributeId aAttributeId
         return YES;
     }
     default: {
+        // Not a known WindowCovering attribute.
         return NO;
     }
     }
@@ -3462,25 +3616,13 @@ static BOOL AttributeIsSpecifiedInClosureControlCluster(AttributeId aAttributeId
     case Attributes::CurrentErrorList::Id: {
         return YES;
     }
-    case Attributes::OverallState::Id: {
+    case Attributes::OverallCurrentState::Id: {
         return YES;
     }
-    case Attributes::OverallTarget::Id: {
+    case Attributes::OverallTargetState::Id: {
         return YES;
     }
-    case Attributes::RestingProcedure::Id: {
-        return YES;
-    }
-    case Attributes::TriggerCondition::Id: {
-        return YES;
-    }
-    case Attributes::TriggerPosition::Id: {
-        return YES;
-    }
-    case Attributes::WaitingDelay::Id: {
-        return YES;
-    }
-    case Attributes::KickoffTimer::Id: {
+    case Attributes::LatchControlModes::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -3499,6 +3641,68 @@ static BOOL AttributeIsSpecifiedInClosureControlCluster(AttributeId aAttributeId
         return YES;
     }
     default: {
+        // Not a known ClosureControl attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInClosureDimensionCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ClosureDimension;
+    switch (aAttributeId) {
+    case Attributes::CurrentState::Id: {
+        return YES;
+    }
+    case Attributes::TargetState::Id: {
+        return YES;
+    }
+    case Attributes::Resolution::Id: {
+        return YES;
+    }
+    case Attributes::StepValue::Id: {
+        return YES;
+    }
+    case Attributes::Unit::Id: {
+        return YES;
+    }
+    case Attributes::UnitRange::Id: {
+        return YES;
+    }
+    case Attributes::LimitRange::Id: {
+        return YES;
+    }
+    case Attributes::TranslationDirection::Id: {
+        return YES;
+    }
+    case Attributes::RotationAxis::Id: {
+        return YES;
+    }
+    case Attributes::Overflow::Id: {
+        return YES;
+    }
+    case Attributes::ModulationType::Id: {
+        return YES;
+    }
+    case Attributes::LatchControlModes::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known ClosureDimension attribute.
         return NO;
     }
     }
@@ -3541,6 +3745,7 @@ static BOOL AttributeIsSpecifiedInServiceAreaCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known ServiceArea attribute.
         return NO;
     }
     }
@@ -3634,6 +3839,7 @@ static BOOL AttributeIsSpecifiedInPumpConfigurationAndControlCluster(AttributeId
         return YES;
     }
     default: {
+        // Not a known PumpConfigurationAndControl attribute.
         return NO;
     }
     }
@@ -3822,6 +4028,18 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::SetpointHoldExpiryTimestamp::Id: {
         return YES;
     }
+    case Attributes::MaxThermostatSuggestions::Id: {
+        return YES;
+    }
+    case Attributes::ThermostatSuggestions::Id: {
+        return YES;
+    }
+    case Attributes::CurrentThermostatSuggestion::Id: {
+        return YES;
+    }
+    case Attributes::ThermostatSuggestionNotFollowingReason::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -3838,6 +4056,7 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known Thermostat attribute.
         return NO;
     }
     }
@@ -3898,6 +4117,7 @@ static BOOL AttributeIsSpecifiedInFanControlCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known FanControl attribute.
         return NO;
     }
     }
@@ -3931,6 +4151,7 @@ static BOOL AttributeIsSpecifiedInThermostatUserInterfaceConfigurationCluster(At
         return YES;
     }
     default: {
+        // Not a known ThermostatUserInterfaceConfiguration attribute.
         return NO;
     }
     }
@@ -4111,6 +4332,7 @@ static BOOL AttributeIsSpecifiedInColorControlCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known ColorControl attribute.
         return NO;
     }
     }
@@ -4177,6 +4399,7 @@ static BOOL AttributeIsSpecifiedInBallastConfigurationCluster(AttributeId aAttri
         return YES;
     }
     default: {
+        // Not a known BallastConfiguration attribute.
         return NO;
     }
     }
@@ -4216,6 +4439,7 @@ static BOOL AttributeIsSpecifiedInIlluminanceMeasurementCluster(AttributeId aAtt
         return YES;
     }
     default: {
+        // Not a known IlluminanceMeasurement attribute.
         return NO;
     }
     }
@@ -4252,6 +4476,7 @@ static BOOL AttributeIsSpecifiedInTemperatureMeasurementCluster(AttributeId aAtt
         return YES;
     }
     default: {
+        // Not a known TemperatureMeasurement attribute.
         return NO;
     }
     }
@@ -4303,6 +4528,7 @@ static BOOL AttributeIsSpecifiedInPressureMeasurementCluster(AttributeId aAttrib
         return YES;
     }
     default: {
+        // Not a known PressureMeasurement attribute.
         return NO;
     }
     }
@@ -4339,6 +4565,7 @@ static BOOL AttributeIsSpecifiedInFlowMeasurementCluster(AttributeId aAttributeI
         return YES;
     }
     default: {
+        // Not a known FlowMeasurement attribute.
         return NO;
     }
     }
@@ -4375,6 +4602,7 @@ static BOOL AttributeIsSpecifiedInRelativeHumidityMeasurementCluster(AttributeId
         return YES;
     }
     default: {
+        // Not a known RelativeHumidityMeasurement attribute.
         return NO;
     }
     }
@@ -4441,6 +4669,7 @@ static BOOL AttributeIsSpecifiedInOccupancySensingCluster(AttributeId aAttribute
         return YES;
     }
     default: {
+        // Not a known OccupancySensing attribute.
         return NO;
     }
     }
@@ -4498,6 +4727,7 @@ static BOOL AttributeIsSpecifiedInCarbonMonoxideConcentrationMeasurementCluster(
         return YES;
     }
     default: {
+        // Not a known CarbonMonoxideConcentrationMeasurement attribute.
         return NO;
     }
     }
@@ -4555,6 +4785,7 @@ static BOOL AttributeIsSpecifiedInCarbonDioxideConcentrationMeasurementCluster(A
         return YES;
     }
     default: {
+        // Not a known CarbonDioxideConcentrationMeasurement attribute.
         return NO;
     }
     }
@@ -4612,6 +4843,7 @@ static BOOL AttributeIsSpecifiedInNitrogenDioxideConcentrationMeasurementCluster
         return YES;
     }
     default: {
+        // Not a known NitrogenDioxideConcentrationMeasurement attribute.
         return NO;
     }
     }
@@ -4669,6 +4901,7 @@ static BOOL AttributeIsSpecifiedInOzoneConcentrationMeasurementCluster(Attribute
         return YES;
     }
     default: {
+        // Not a known OzoneConcentrationMeasurement attribute.
         return NO;
     }
     }
@@ -4726,6 +4959,7 @@ static BOOL AttributeIsSpecifiedInPM25ConcentrationMeasurementCluster(AttributeI
         return YES;
     }
     default: {
+        // Not a known PM25ConcentrationMeasurement attribute.
         return NO;
     }
     }
@@ -4783,6 +5017,7 @@ static BOOL AttributeIsSpecifiedInFormaldehydeConcentrationMeasurementCluster(At
         return YES;
     }
     default: {
+        // Not a known FormaldehydeConcentrationMeasurement attribute.
         return NO;
     }
     }
@@ -4840,6 +5075,7 @@ static BOOL AttributeIsSpecifiedInPM1ConcentrationMeasurementCluster(AttributeId
         return YES;
     }
     default: {
+        // Not a known PM1ConcentrationMeasurement attribute.
         return NO;
     }
     }
@@ -4897,6 +5133,7 @@ static BOOL AttributeIsSpecifiedInPM10ConcentrationMeasurementCluster(AttributeI
         return YES;
     }
     default: {
+        // Not a known PM10ConcentrationMeasurement attribute.
         return NO;
     }
     }
@@ -4954,6 +5191,7 @@ static BOOL AttributeIsSpecifiedInTotalVolatileOrganicCompoundsConcentrationMeas
         return YES;
     }
     default: {
+        // Not a known TotalVolatileOrganicCompoundsConcentrationMeasurement attribute.
         return NO;
     }
     }
@@ -5011,6 +5249,38 @@ static BOOL AttributeIsSpecifiedInRadonConcentrationMeasurementCluster(Attribute
         return YES;
     }
     default: {
+        // Not a known RadonConcentrationMeasurement attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInSoilMeasurementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::SoilMeasurement;
+    switch (aAttributeId) {
+    case Attributes::SoilMoistureMeasurementLimits::Id: {
+        return YES;
+    }
+    case Attributes::SoilMoistureMeasuredValue::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known SoilMeasurement attribute.
         return NO;
     }
     }
@@ -5041,6 +5311,7 @@ static BOOL AttributeIsSpecifiedInWiFiNetworkManagementCluster(AttributeId aAttr
         return YES;
     }
     default: {
+        // Not a known WiFiNetworkManagement attribute.
         return NO;
     }
     }
@@ -5083,6 +5354,7 @@ static BOOL AttributeIsSpecifiedInThreadBorderRouterManagementCluster(AttributeI
         return YES;
     }
     default: {
+        // Not a known ThreadBorderRouterManagement attribute.
         return NO;
     }
     }
@@ -5116,6 +5388,7 @@ static BOOL AttributeIsSpecifiedInThreadNetworkDirectoryCluster(AttributeId aAtt
         return YES;
     }
     default: {
+        // Not a known ThreadNetworkDirectory attribute.
         return NO;
     }
     }
@@ -5146,6 +5419,7 @@ static BOOL AttributeIsSpecifiedInWakeOnLANCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known WakeOnLAN attribute.
         return NO;
     }
     }
@@ -5179,6 +5453,7 @@ static BOOL AttributeIsSpecifiedInChannelCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known Channel attribute.
         return NO;
     }
     }
@@ -5209,6 +5484,7 @@ static BOOL AttributeIsSpecifiedInTargetNavigatorCluster(AttributeId aAttributeI
         return YES;
     }
     default: {
+        // Not a known TargetNavigator attribute.
         return NO;
     }
     }
@@ -5266,6 +5542,7 @@ static BOOL AttributeIsSpecifiedInMediaPlaybackCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known MediaPlayback attribute.
         return NO;
     }
     }
@@ -5296,6 +5573,7 @@ static BOOL AttributeIsSpecifiedInMediaInputCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known MediaInput attribute.
         return NO;
     }
     }
@@ -5320,6 +5598,7 @@ static BOOL AttributeIsSpecifiedInLowPowerCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known LowPower attribute.
         return NO;
     }
     }
@@ -5344,6 +5623,7 @@ static BOOL AttributeIsSpecifiedInKeypadInputCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known KeypadInput attribute.
         return NO;
     }
     }
@@ -5374,6 +5654,7 @@ static BOOL AttributeIsSpecifiedInContentLauncherCluster(AttributeId aAttributeI
         return YES;
     }
     default: {
+        // Not a known ContentLauncher attribute.
         return NO;
     }
     }
@@ -5404,6 +5685,7 @@ static BOOL AttributeIsSpecifiedInAudioOutputCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known AudioOutput attribute.
         return NO;
     }
     }
@@ -5434,6 +5716,7 @@ static BOOL AttributeIsSpecifiedInApplicationLauncherCluster(AttributeId aAttrib
         return YES;
     }
     default: {
+        // Not a known ApplicationLauncher attribute.
         return NO;
     }
     }
@@ -5482,6 +5765,7 @@ static BOOL AttributeIsSpecifiedInApplicationBasicCluster(AttributeId aAttribute
         return YES;
     }
     default: {
+        // Not a known ApplicationBasic attribute.
         return NO;
     }
     }
@@ -5506,6 +5790,7 @@ static BOOL AttributeIsSpecifiedInAccountLoginCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known AccountLogin attribute.
         return NO;
     }
     }
@@ -5554,6 +5839,7 @@ static BOOL AttributeIsSpecifiedInContentControlCluster(AttributeId aAttributeId
         return YES;
     }
     default: {
+        // Not a known ContentControl attribute.
         return NO;
     }
     }
@@ -5578,6 +5864,7 @@ static BOOL AttributeIsSpecifiedInContentAppObserverCluster(AttributeId aAttribu
         return YES;
     }
     default: {
+        // Not a known ContentAppObserver attribute.
         return NO;
     }
     }
@@ -5586,7 +5873,10 @@ static BOOL AttributeIsSpecifiedInZoneManagementCluster(AttributeId aAttributeId
 {
     using namespace Clusters::ZoneManagement;
     switch (aAttributeId) {
-    case Attributes::SupportedZoneSources::Id: {
+    case Attributes::MaxUserDefinedZones::Id: {
+        return YES;
+    }
+    case Attributes::MaxZones::Id: {
         return YES;
     }
     case Attributes::Zones::Id: {
@@ -5595,7 +5885,13 @@ static BOOL AttributeIsSpecifiedInZoneManagementCluster(AttributeId aAttributeId
     case Attributes::Triggers::Id: {
         return YES;
     }
+    case Attributes::SensitivityMax::Id: {
+        return YES;
+    }
     case Attributes::Sensitivity::Id: {
+        return YES;
+    }
+    case Attributes::TwoDCartesianMax::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5614,6 +5910,7 @@ static BOOL AttributeIsSpecifiedInZoneManagementCluster(AttributeId aAttributeId
         return YES;
     }
     default: {
+        // Not a known ZoneManagement attribute.
         return NO;
     }
     }
@@ -5622,7 +5919,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
 {
     using namespace Clusters::CameraAvStreamManagement;
     switch (aAttributeId) {
-    case Attributes::MaxConcurrentVideoEncoders::Id: {
+    case Attributes::MaxConcurrentEncoders::Id: {
         return YES;
     }
     case Attributes::MaxEncodedPixelRate::Id: {
@@ -5631,10 +5928,10 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::VideoSensorParams::Id: {
         return YES;
     }
-    case Attributes::NightVisionCapable::Id: {
+    case Attributes::NightVisionUsesInfrared::Id: {
         return YES;
     }
-    case Attributes::MinViewport::Id: {
+    case Attributes::MinViewportResolution::Id: {
         return YES;
     }
     case Attributes::RateDistortionTradeOffPoints::Id: {
@@ -5652,7 +5949,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::TwoWayTalkSupport::Id: {
         return YES;
     }
-    case Attributes::SupportedSnapshotParams::Id: {
+    case Attributes::SnapshotCapabilities::Id: {
         return YES;
     }
     case Attributes::MaxNetworkBandwidth::Id: {
@@ -5676,7 +5973,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::AllocatedSnapshotStreams::Id: {
         return YES;
     }
-    case Attributes::RankedVideoStreamPrioritiesList::Id: {
+    case Attributes::StreamUsagePriorities::Id: {
         return YES;
     }
     case Attributes::SoftRecordingPrivacyModeEnabled::Id: {
@@ -5761,6 +6058,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
         return YES;
     }
     default: {
+        // Not a known CameraAVStreamManagement attribute.
         return NO;
     }
     }
@@ -5778,7 +6076,7 @@ static BOOL AttributeIsSpecifiedInCameraAVSettingsUserLevelManagementCluster(Att
     case Attributes::MPTZPresets::Id: {
         return YES;
     }
-    case Attributes::DPTZRelativeMove::Id: {
+    case Attributes::DPTZStreams::Id: {
         return YES;
     }
     case Attributes::ZoomMax::Id: {
@@ -5794,6 +6092,9 @@ static BOOL AttributeIsSpecifiedInCameraAVSettingsUserLevelManagementCluster(Att
         return YES;
     }
     case Attributes::PanMax::Id: {
+        return YES;
+    }
+    case Attributes::MovementState::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5812,6 +6113,7 @@ static BOOL AttributeIsSpecifiedInCameraAVSettingsUserLevelManagementCluster(Att
         return YES;
     }
     default: {
+        // Not a known CameraAVSettingsUserLevelManagement attribute.
         return NO;
     }
     }
@@ -5839,6 +6141,7 @@ static BOOL AttributeIsSpecifiedInWebRTCTransportProviderCluster(AttributeId aAt
         return YES;
     }
     default: {
+        // Not a known WebRTCTransportProvider attribute.
         return NO;
     }
     }
@@ -5866,6 +6169,7 @@ static BOOL AttributeIsSpecifiedInWebRTCTransportRequestorCluster(AttributeId aA
         return YES;
     }
     default: {
+        // Not a known WebRTCTransportRequestor attribute.
         return NO;
     }
     }
@@ -5874,10 +6178,7 @@ static BOOL AttributeIsSpecifiedInPushAVStreamTransportCluster(AttributeId aAttr
 {
     using namespace Clusters::PushAvStreamTransport;
     switch (aAttributeId) {
-    case Attributes::SupportedContainerFormats::Id: {
-        return YES;
-    }
-    case Attributes::SupportedIngestMethods::Id: {
+    case Attributes::SupportedFormats::Id: {
         return YES;
     }
     case Attributes::CurrentConnections::Id: {
@@ -5899,6 +6200,7 @@ static BOOL AttributeIsSpecifiedInPushAVStreamTransportCluster(AttributeId aAttr
         return YES;
     }
     default: {
+        // Not a known PushAVStreamTransport attribute.
         return NO;
     }
     }
@@ -5932,6 +6234,89 @@ static BOOL AttributeIsSpecifiedInChimeCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known Chime attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInCommodityTariffCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommodityTariff;
+    switch (aAttributeId) {
+    case Attributes::TariffInfo::Id: {
+        return YES;
+    }
+    case Attributes::TariffUnit::Id: {
+        return YES;
+    }
+    case Attributes::StartDate::Id: {
+        return YES;
+    }
+    case Attributes::DayEntries::Id: {
+        return YES;
+    }
+    case Attributes::DayPatterns::Id: {
+        return YES;
+    }
+    case Attributes::CalendarPeriods::Id: {
+        return YES;
+    }
+    case Attributes::IndividualDays::Id: {
+        return YES;
+    }
+    case Attributes::CurrentDay::Id: {
+        return YES;
+    }
+    case Attributes::NextDay::Id: {
+        return YES;
+    }
+    case Attributes::CurrentDayEntry::Id: {
+        return YES;
+    }
+    case Attributes::CurrentDayEntryDate::Id: {
+        return YES;
+    }
+    case Attributes::NextDayEntry::Id: {
+        return YES;
+    }
+    case Attributes::NextDayEntryDate::Id: {
+        return YES;
+    }
+    case Attributes::TariffComponents::Id: {
+        return YES;
+    }
+    case Attributes::TariffPeriods::Id: {
+        return YES;
+    }
+    case Attributes::CurrentTariffComponents::Id: {
+        return YES;
+    }
+    case Attributes::NextTariffComponents::Id: {
+        return YES;
+    }
+    case Attributes::DefaultRandomizationOffset::Id: {
+        return YES;
+    }
+    case Attributes::DefaultRandomizationType::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known CommodityTariff attribute.
         return NO;
     }
     }
@@ -5962,6 +6347,7 @@ static BOOL AttributeIsSpecifiedInEcosystemInformationCluster(AttributeId aAttri
         return YES;
     }
     default: {
+        // Not a known EcosystemInformation attribute.
         return NO;
     }
     }
@@ -5989,6 +6375,102 @@ static BOOL AttributeIsSpecifiedInCommissionerControlCluster(AttributeId aAttrib
         return YES;
     }
     default: {
+        // Not a known CommissionerControl attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInJointFabricDatastoreCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::JointFabricDatastore;
+    switch (aAttributeId) {
+    case Attributes::AnchorRootCA::Id: {
+        return YES;
+    }
+    case Attributes::AnchorNodeID::Id: {
+        return YES;
+    }
+    case Attributes::AnchorVendorID::Id: {
+        return YES;
+    }
+    case Attributes::FriendlyName::Id: {
+        return YES;
+    }
+    case Attributes::GroupKeySetList::Id: {
+        return YES;
+    }
+    case Attributes::GroupList::Id: {
+        return YES;
+    }
+    case Attributes::NodeList::Id: {
+        return YES;
+    }
+    case Attributes::AdminList::Id: {
+        return YES;
+    }
+    case Attributes::Status::Id: {
+        return YES;
+    }
+    case Attributes::EndpointGroupIDList::Id: {
+        return YES;
+    }
+    case Attributes::EndpointBindingList::Id: {
+        return YES;
+    }
+    case Attributes::NodeKeySetList::Id: {
+        return YES;
+    }
+    case Attributes::NodeACLList::Id: {
+        return YES;
+    }
+    case Attributes::NodeEndpointList::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known JointFabricDatastore attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInJointFabricAdministratorCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::JointFabricAdministrator;
+    switch (aAttributeId) {
+    case Attributes::AdministratorFabricIndex::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known JointFabricAdministrator attribute.
         return NO;
     }
     }
@@ -6025,6 +6507,7 @@ static BOOL AttributeIsSpecifiedInTLSCertificateManagementCluster(AttributeId aA
         return YES;
     }
     default: {
+        // Not a known TLSCertificateManagement attribute.
         return NO;
     }
     }
@@ -6055,6 +6538,84 @@ static BOOL AttributeIsSpecifiedInTLSClientManagementCluster(AttributeId aAttrib
         return YES;
     }
     default: {
+        // Not a known TLSClientManagement attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInMeterIdentificationCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MeterIdentification;
+    switch (aAttributeId) {
+    case Attributes::MeterType::Id: {
+        return YES;
+    }
+    case Attributes::PointOfDelivery::Id: {
+        return YES;
+    }
+    case Attributes::MeterSerialNumber::Id: {
+        return YES;
+    }
+    case Attributes::ProtocolVersion::Id: {
+        return YES;
+    }
+    case Attributes::PowerThreshold::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known MeterIdentification attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInCommodityMeteringCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommodityMetering;
+    switch (aAttributeId) {
+    case Attributes::MeteredQuantity::Id: {
+        return YES;
+    }
+    case Attributes::MeteredQuantityTimestamp::Id: {
+        return YES;
+    }
+    case Attributes::TariffUnit::Id: {
+        return YES;
+    }
+    case Attributes::MaximumMeteredQuantities::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known CommodityMetering attribute.
         return NO;
     }
     }
@@ -6210,6 +6771,9 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
     case Attributes::GlobalStruct::Id: {
         return YES;
     }
+    case Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id: {
+        return YES;
+    }
     case Attributes::Unsupported::Id: {
         return YES;
     }
@@ -6346,6 +6910,7 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known UnitTesting attribute.
         return NO;
     }
     }
@@ -6373,6 +6938,7 @@ static BOOL AttributeIsSpecifiedInSampleMEICluster(AttributeId aAttributeId)
         return YES;
     }
     default: {
+        // Not a known SampleMEI attribute.
         return NO;
     }
     }
@@ -6549,6 +7115,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::ScenesManagement::Id: {
         return AttributeIsSpecifiedInScenesManagementCluster(aAttributeId);
     }
+    case Clusters::Groupcast::Id: {
+        return AttributeIsSpecifiedInGroupcastCluster(aAttributeId);
+    }
     case Clusters::HepaFilterMonitoring::Id: {
         return AttributeIsSpecifiedInHEPAFilterMonitoringCluster(aAttributeId);
     }
@@ -6570,8 +7139,8 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::WaterHeaterManagement::Id: {
         return AttributeIsSpecifiedInWaterHeaterManagementCluster(aAttributeId);
     }
-    case Clusters::DemandResponseLoadControl::Id: {
-        return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);
+    case Clusters::CommodityPrice::Id: {
+        return AttributeIsSpecifiedInCommodityPriceCluster(aAttributeId);
     }
     case Clusters::Messages::Id: {
         return AttributeIsSpecifiedInMessagesCluster(aAttributeId);
@@ -6597,6 +7166,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::DeviceEnergyManagementMode::Id: {
         return AttributeIsSpecifiedInDeviceEnergyManagementModeCluster(aAttributeId);
     }
+    case Clusters::ElectricalGridConditions::Id: {
+        return AttributeIsSpecifiedInElectricalGridConditionsCluster(aAttributeId);
+    }
     case Clusters::DoorLock::Id: {
         return AttributeIsSpecifiedInDoorLockCluster(aAttributeId);
     }
@@ -6605,6 +7177,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ClosureControl::Id: {
         return AttributeIsSpecifiedInClosureControlCluster(aAttributeId);
+    }
+    case Clusters::ClosureDimension::Id: {
+        return AttributeIsSpecifiedInClosureDimensionCluster(aAttributeId);
     }
     case Clusters::ServiceArea::Id: {
         return AttributeIsSpecifiedInServiceAreaCluster(aAttributeId);
@@ -6674,6 +7249,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::RadonConcentrationMeasurement::Id: {
         return AttributeIsSpecifiedInRadonConcentrationMeasurementCluster(aAttributeId);
+    }
+    case Clusters::SoilMeasurement::Id: {
+        return AttributeIsSpecifiedInSoilMeasurementCluster(aAttributeId);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return AttributeIsSpecifiedInWiFiNetworkManagementCluster(aAttributeId);
@@ -6747,17 +7325,32 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::Chime::Id: {
         return AttributeIsSpecifiedInChimeCluster(aAttributeId);
     }
+    case Clusters::CommodityTariff::Id: {
+        return AttributeIsSpecifiedInCommodityTariffCluster(aAttributeId);
+    }
     case Clusters::EcosystemInformation::Id: {
         return AttributeIsSpecifiedInEcosystemInformationCluster(aAttributeId);
     }
     case Clusters::CommissionerControl::Id: {
         return AttributeIsSpecifiedInCommissionerControlCluster(aAttributeId);
     }
+    case Clusters::JointFabricDatastore::Id: {
+        return AttributeIsSpecifiedInJointFabricDatastoreCluster(aAttributeId);
+    }
+    case Clusters::JointFabricAdministrator::Id: {
+        return AttributeIsSpecifiedInJointFabricAdministratorCluster(aAttributeId);
+    }
     case Clusters::TlsCertificateManagement::Id: {
         return AttributeIsSpecifiedInTLSCertificateManagementCluster(aAttributeId);
     }
     case Clusters::TlsClientManagement::Id: {
         return AttributeIsSpecifiedInTLSClientManagementCluster(aAttributeId);
+    }
+    case Clusters::MeterIdentification::Id: {
+        return AttributeIsSpecifiedInMeterIdentificationCluster(aAttributeId);
+    }
+    case Clusters::CommodityMetering::Id: {
+        return AttributeIsSpecifiedInCommodityMeteringCluster(aAttributeId);
     }
     case Clusters::UnitTesting::Id: {
         return AttributeIsSpecifiedInUnitTestingCluster(aAttributeId);

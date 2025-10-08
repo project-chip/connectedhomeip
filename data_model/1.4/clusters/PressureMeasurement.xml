@@ -77,27 +77,38 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" reportable="true"/>
       <mandatoryConform/>
-      <constraint type="between">
-        <from attribute="MinMeasuredValue"/>
-        <to attribute="MaxMeasuredValue"/>
+      <constraint>
+        <between>
+          <attribute name="MinMeasuredValue"/>
+          <attribute name="MaxMeasuredValue"/>
+        </between>
       </constraint>
     </attribute>
     <attribute id="0x0001" name="MinMeasuredValue" type="int16">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="max" value="32766"/>
+      <constraint>
+        <max value="32766"/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="MaxMeasuredValue" type="int16">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="between" from="MinMeasuredValue + 1" to="32767"/>
+      <constraint>
+        <between>
+          <from value="MinMeasuredValue + 1"/>
+          <to value="32767"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="Tolerance" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
-      <constraint type="max" value="2048"/>
+      <constraint>
+        <max value="2048"/>
+      </constraint>
     </attribute>
     <attribute id="0x0010" name="ScaledValue" type="int16" default="0">
       <access read="true" readPrivilege="view"/>
@@ -105,9 +116,11 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="EXT"/>
       </mandatoryConform>
-      <constraint type="between">
-        <from attribute="MinScaledValue"/>
-        <to attribute="MaxScaledValue"/>
+      <constraint>
+        <between>
+          <attribute name="MinScaledValue"/>
+          <attribute name="MaxScaledValue"/>
+        </between>
       </constraint>
     </attribute>
     <attribute id="0x0011" name="MinScaledValue" type="int16" default="0">
@@ -116,7 +129,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="EXT"/>
       </mandatoryConform>
-      <constraint type="max" value="32766"/>
+      <constraint>
+        <max value="32766"/>
+      </constraint>
     </attribute>
     <attribute id="0x0012" name="MaxScaledValue" type="int16" default="0">
       <access read="true" readPrivilege="view"/>
@@ -124,21 +139,30 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="EXT"/>
       </mandatoryConform>
-      <constraint type="between" from="MinScaledValue + 1" to="32767"/>
+      <constraint>
+        <between>
+          <from value="MinScaledValue + 1"/>
+          <to value="32767"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0013" name="ScaledTolerance" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
       <optionalConform>
         <feature name="EXT"/>
       </optionalConform>
-      <constraint type="max" value="2048"/>
+      <constraint>
+        <max value="2048"/>
+      </constraint>
     </attribute>
     <attribute id="0x0014" name="Scale" type="int8" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="EXT"/>
       </mandatoryConform>
-      <constraint type="min" value="-127"/>
+      <constraint>
+        <min value="-127"/>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>

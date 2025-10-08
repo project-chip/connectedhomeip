@@ -73,17 +73,27 @@ template("_chip_build_time_codegen") {
     sources = [ _idl_file ]
 
     outputs = []
+
+    _args = [
+      "--idl",
+      rebase_path(_idl_file, root_build_dir),
+    ]
     foreach(name, invoker.outputs) {
+      _args += [ name ]
+    }
+
+    _source_paths = exec_script("${chip_root}/scripts/codegen_paths.py",
+                                _args,
+                                "list lines",
+                                [ _idl_file ])
+
+    foreach(name, _source_paths) {
       outputs += [ "${target_gen_dir}/${name}" ]
     }
   }
 
   source_set(_name) {
-    sources = []
-    foreach(name, invoker.outputs) {
-      sources += [ "${target_gen_dir}/${name}" ]
-    }
-
+    sources = get_target_outputs(":${_name}_generate")
     public_configs = [ ":${_name}_config" ]
 
     if (defined(invoker.public_configs)) {
@@ -139,6 +149,9 @@ template("_chip_build_time_zapgen") {
       "${_template_dir}/endpoint_config.zapt",
       "${_template_dir}/gen_config.zapt",
       "${_template_dir}/im-cluster-command-handler.zapt",
+
+      # config data controls template contents (specifically command handling)
+      "${chip_root}/src/app/common/templates/config-data.yaml",
     ]
 
     _output_subdir = "zap-generated"
@@ -286,28 +299,52 @@ template("chip_codegen") {
   } else {
     not_needed(invoker, [ "options" ])
 
+    _idl_file = invoker.input
+
     # This constructs a path like:
     #  FROM all-clusters-app.matter (inside examples/all-clusters-app/all-clusters-common/)
     #  USING "cpp-app" for generator:
     #    => ${pregen_dir}/examples/all-clusters-app/all-clusters-common/all-clusters-app/codegen/cpp-app
     _generation_dir =
         chip_code_pre_generated_directory + "/" +
-        string_replace(rebase_path(invoker.input, chip_root), ".matter", "") +
+        string_replace(rebase_path(_idl_file, chip_root), ".matter", "") +
         "/codegen/" + invoker.generator
 
     # Generation in this case just involves some files copying
-    copy("${_name}_generate") {
-      sources = []
+    pw_python_action("${_name}_generate") {
+      script = "${chip_root}/scripts/copyfiles.py"
 
+      # Figure out what paths this IDL would generate/need
+      _path_get_args = [
+        "--idl",
+        rebase_path(_idl_file, root_build_dir),
+      ]
       foreach(name, invoker.outputs) {
-        sources += [ "${_generation_dir}/${name}" ]
+        _path_get_args += [ name ]
       }
 
-      # NOTE: we assume ALL outputs have a common subdir. This is generally the case with
-      #       paths like "app/callback-stub.cpp" and "app/PluginApplicationCallbacks.h"
-      _outputs = invoker.outputs
-      _dir_name = get_path_info(_outputs[0], "dir")
-      outputs = [ "${target_gen_dir}/${_dir_name}/{{source_file_part}}" ]
+      _source_paths = exec_script("${chip_root}/scripts/codegen_paths.py",
+                                  _path_get_args,
+                                  "list lines",
+                                  [ _idl_file ])
+
+      # at this point we can copy files
+
+      args = [
+        "--source-dir",
+        _generation_dir,
+        "--target-dir",
+        rebase_path(target_gen_dir, root_build_dir),
+      ]
+
+      inputs = []
+      outputs = []
+      foreach(name, _source_paths) {
+        args += [ "${_generation_dir}/${name}" ]
+
+        inputs += [ "${_generation_dir}/${name}" ]
+        outputs += [ "${target_gen_dir}/${name}" ]
+      }
 
       public_configs = [ ":${_name}_config" ]
     }

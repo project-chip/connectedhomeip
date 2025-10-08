@@ -78,7 +78,9 @@ Davis, CA 95616, USA
             <field name="Endpoint"/>
           </notTerm>
         </mandatoryConform>
-        <constraint type="min" value="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
       <field id="3" name="Endpoint" type="endpoint-no">
         <mandatoryConform>
@@ -99,7 +101,9 @@ Davis, CA 95616, USA
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage" fabricScoped="true"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>

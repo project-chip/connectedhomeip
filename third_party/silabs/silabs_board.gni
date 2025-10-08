@@ -61,6 +61,9 @@ declare_args() {
 
   # RGB LED support
   sl_enable_rgb_led = false
+
+  #Si917Y boards
+  is_si917y_mcu = false
 }
 
 declare_args() {
@@ -97,14 +100,36 @@ if (silabs_board == "" && sl_build_unit_tests) {
 assert(silabs_board != "", "silabs_board must be specified")
 
 # Si917 WIFI board ----------
-if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A" ||
-    silabs_board == "BRD4343A" || silabs_board == "BRD4342A") {
+si917_wifi_boards = [
+  "BRD4338A",
+  "BRD2605A",
+  "BRD4343A",
+  "BRD4342A",
+  "BRD2708A",
+  "BRD2911A",
+]
+
+# Check if silabs_board is a Si917 board
+is_si917_board = false
+foreach(board, si917_wifi_boards) {
+  if (silabs_board == board) {
+    is_si917_board = true
+  }
+}
+
+if (is_si917_board) {
   if (silabs_board == "BRD2605A") {
     sl_enable_rgb_led = true
   }
   silabs_family = "SiWx917-common"
-  silabs_mcu = "SiWG917M111MGTBA"
   wifi_soc = true
+
+  if (silabs_board == "BRD2708A" || silabs_board == "BRD2911A") {
+    is_si917y_mcu = true
+    silabs_mcu = "SIWG917Y111MGABA"
+  } else {
+    silabs_mcu = "SiWG917M111MGTBA"
+  }
 
   assert(!sl_enable_si70xx_sensor,
          "${silabs_board} does not support the si90xx sensor!")

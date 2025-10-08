@@ -2,7 +2,7 @@
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2021 Google LLC.
- *    Copyright 2024 NXP
+ *    Copyright 2024, 2025 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +30,10 @@
 #include <platform/nxp/common/NetworkCommissioningDriver.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
+#if CONFIG_CHIP_ETHERNET
+#include <platform/nxp/common/Ethernet/NxpEthDriver.h>
+#endif
+
 #ifdef ENABLE_CHIP_SHELL
 #include "AppCLIBase.h"
 #endif
@@ -51,8 +55,12 @@
 #endif
 
 #ifndef APP_TASK_STACK_SIZE
+#ifdef CONFIG_APP_TASK_STACK_SIZE
+#define APP_TASK_STACK_SIZE ((configSTACK_DEPTH_TYPE) CONFIG_APP_TASK_STACK_SIZE / sizeof(portSTACK_TYPE))
+#else
 #define APP_TASK_STACK_SIZE ((configSTACK_DEPTH_TYPE) 6144 / sizeof(portSTACK_TYPE))
-#endif
+#endif // CONFIG_APP_TASK_STACK_SIZE
+#endif // APP_TASK_STACK_SIZE
 
 #ifndef APP_TASK_PRIORITY
 #define APP_TASK_PRIORITY 2
@@ -63,8 +71,12 @@
 #endif
 
 #ifndef APP_QUEUE_TICKS_TO_WAIT
+#ifdef CONFIG_CHIP_APP_QUEUE_TICKS_TO_WAIT
+#define APP_QUEUE_TICKS_TO_WAIT CONFIG_CHIP_APP_QUEUE_TICKS_TO_WAIT
+#else
 #define APP_QUEUE_TICKS_TO_WAIT portMAX_DELAY
-#endif
+#endif // CONFIG_CHIP_APP_QUEUE_TICKS_TO_WAIT
+#endif // APP_QUEUE_TICKS_TO_WAIT
 
 using namespace chip;
 using namespace chip::TLV;
@@ -81,6 +93,14 @@ chip::DeviceLayer::NetworkCommissioning::WiFiDriver * chip::NXP::App::AppTaskFre
         &(::chip::DeviceLayer::NetworkCommissioning::NXPWiFiDriver::GetInstance()));
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+
+#if CONFIG_CHIP_ETHERNET
+chip::DeviceLayer::NetworkCommissioning::EthernetDriver * chip::NXP::App::AppTaskFreeRTOS::GetEthernetDriverInstance()
+{
+    return static_cast<chip::DeviceLayer::NetworkCommissioning::EthernetDriver *>(
+        &(::chip::DeviceLayer::NetworkCommissioning::NxpEthDriver::Instance()));
+}
+#endif
 
 CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::AppMatter_Register()
 {

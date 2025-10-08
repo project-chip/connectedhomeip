@@ -3,7 +3,7 @@
     "category": "matter",
     "version": 1,
     "requiredFeatureLevel": 102,
-    "xmlRoot": [".", "./data-model/chip/", "./data-model/silabs/"],
+    "xmlRoot": [".", "./data-model/chip"],
     "_comment": "Ensure access-control-definitions.xml is first in xmlFile array",
     "xmlFile": [
         "access-control-definitions.xml",
@@ -21,16 +21,20 @@
         "boolean-state-cluster.xml",
         "boolean-state-configuration-cluster.xml",
         "actions-cluster.xml",
-        "bridged-device-basic-information.xml",
+        "bridged-device-basic-information-cluster.xml",
         "camera-av-settings-user-level-management-cluster.xml",
         "camera-av-stream-management-cluster.xml",
         "chime-cluster.xml",
         "chip-ota.xml",
         "channel-cluster.xml",
         "closure-control-cluster.xml",
+        "closure-dimension-cluster.xml",
         "clusters-extensions.xml",
         "color-control-cluster.xml",
         "commissioner-control-cluster.xml",
+        "commodity-metering-cluster.xml",
+        "commodity-price-cluster.xml",
+        "commodity-tariff-cluster.xml",
         "concentration-measurement-cluster.xml",
         "content-launch-cluster.xml",
         "content-app-observer-cluster.xml",
@@ -41,11 +45,13 @@
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
+        "groupcast-cluster.xml",
         "microwave-oven-mode-cluster.xml",
+        "meter-identification-cluster.xml",
         "door-lock-cluster.xml",
-        "drlc-cluster.xml",
         "ecosystem-information-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
+        "electrical-grid-conditions-cluster.xml",
         "electrical-power-measurement-cluster.xml",
         "energy-evse-cluster.xml",
         "energy-evse-mode-cluster.xml",
@@ -66,6 +72,8 @@
         "icd-management-cluster.xml",
         "identify-cluster.xml",
         "illuminance-measurement-cluster.xml",
+        "joint-fabric-datastore-cluster.xml",
+        "joint-fabric-administrator-cluster.xml",
         "keypad-input-cluster.xml",
         "laundry-washer-mode-cluster.xml",
         "laundry-dryer-controls-cluster.xml",
@@ -100,14 +108,14 @@
         "refrigerator-and-temperature-controlled-cabinet-mode-cluster.xml",
         "refrigerator-alarm.xml",
         "relative-humidity-measurement-cluster.xml",
-        "rvc-clean-mode-cluster.xml ",
+        "rvc-clean-mode-cluster.xml",
         "rvc-run-mode-cluster.xml",
-        "replacable-monitoring-cluster.xml",
         "resource-monitoring-cluster.xml",
         "scene.xml",
         "service-area-cluster.xml",
         "smoke-co-alarm-cluster.xml",
         "software-diagnostics-cluster.xml",
+        "soil-measurement-cluster.xml",
         "switch-cluster.xml",
         "target-navigator-cluster.xml",
         "temperature-control-cluster.xml",
@@ -138,12 +146,9 @@
         "window-covering.xml",
         "matter-devices.xml",
         "sample-mei-cluster.xml",
-        "types/door-lock.xml",
-        "types/occupancy-sensing.xml",
-        "types/thermostat-user-interface-configuration.xml",
         "zone-management-cluster.xml"
     ],
-    "manufacturersXml": "../../../../src/app/zap-templates/zcl/data-model/manufacturers.xml",
+    "manufacturersXml": "./data-model/manufacturers.xml",
     "options": {
         "text": {
             "defaultResponsePolicy": ["Always", "Conditional", "Never"]
@@ -165,19 +170,24 @@
             "ClusterRevision",
             "SubjectsPerAccessControlEntry",
             "TargetsPerAccessControlEntry",
-            "AccessControlEntriesPerFabric"
+            "AccessControlEntriesPerFabric",
+            "FeatureMap"
         ],
         "Administrator Commissioning": [
+            "ClusterRevision",
             "WindowStatus",
             "AdminFabricIndex",
             "AdminVendorId"
         ],
         "Basic Information": [
+            "FeatureMap",
+            "ClusterRevision",
             "DataModelRevision",
             "VendorName",
             "VendorID",
             "ProductName",
             "ProductID",
+            "NodeLabel",
             "Location",
             "HardwareVersion",
             "HardwareVersionString",
@@ -188,15 +198,54 @@
             "ProductURL",
             "ProductLabel",
             "SerialNumber",
+            "LocalConfigDisabled",
+            "Reachable",
             "UniqueID",
             "CapabilityMinima",
             "ProductAppearance",
             "SpecificationVersion",
-            "MaxPathsPerInvoke"
+            "MaxPathsPerInvoke",
+            "ConfigurationVersion"
         ],
+        "Boolean State": ["ClusterRevision", "FeatureMap", "StateValue"],
         "Bridged Device Basic Information": ["ProductAppearance"],
+        "Binding": ["FeatureMap", "ClusterRevision"],
         "Chime": ["SelectedChime", "Enabled"],
-        "Closure Control": ["OverallState", "OverallTarget"],
+        "Closure Control": [
+            "CountdownTime",
+            "OverallCurrentState",
+            "OverallTargetState",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
+        "Closure Dimension": [
+            "CurrentState",
+            "TargetState",
+            "UnitRange",
+            "LimitRange",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
+        "Commodity Price": [
+            "TariffUnit",
+            "Currency",
+            "CurrentPrice",
+            "PriceForecast",
+            "FeatureMap"
+        ],
+        "Commodity Tariff": [
+            "TariffInfo",
+            "CurrentDay",
+            "NextDay",
+            "CurrentDayEntry",
+            "NextDayEntry"
+        ],
+        "Commodity Metering": [
+            "MeteredQuantity",
+            "MeteredQuantityTimestamp",
+            "TariffUnit",
+            "MaximumMeteredQuantities"
+        ],
         "Descriptor": ["ClusterRevision", "FeatureMap"],
         "Device Energy Management": [
             "ESAType",
@@ -214,6 +263,7 @@
             "CurrentMode",
             "FeatureMap"
         ],
+        "Diagnostic Logs": ["ClusterRevision", "FeatureMap"],
         "Door Lock": [
             "AliroReaderVerificationKey",
             "AliroReaderGroupIdentifier",
@@ -259,9 +309,13 @@
             "PacketTxCount",
             "TxErrCount",
             "CollisionCount",
-            "OverrunCount"
+            "OverrunCount",
+            "ClusterRevision"
         ],
         "General Commissioning": [
+            "FeatureMap",
+            "ClusterRevision",
+            "Breadcrumb",
             "RegulatoryConfig",
             "LocationCapability",
             "BasicCommissioningInfo",
@@ -296,20 +350,48 @@
             "OperatingMode",
             "FeatureMap"
         ],
+        "Joint Fabric Datastore": ["Status"],
+        "Meter Identification": [
+            "MeterType",
+            "PointOfDelivery",
+            "MeterSerialNumber",
+            "ProtocolVersion",
+            "PowerThreshold",
+            "FeatureMap"
+        ],
+        "Network Commissioning": [
+            "ClusterRevision",
+            "ConnectMaxTimeSeconds",
+            "FeatureMap",
+            "InterfaceEnabled",
+            "LastConnectErrorValue",
+            "LastNetworkID",
+            "LastNetworkingStatus",
+            "MaxNetworks",
+            "Networks",
+            "ScanMaxTimeSeconds",
+            "SupportedThreadFeatures",
+            "SupportedWiFiBands",
+            "ThreadVersion"
+        ],
         "Occupancy Sensing": [
             "HoldTimeLimits",
             "HoldTime",
             "PIROccupiedToUnoccupiedDelay",
             "UltrasonicOccupiedToUnoccupiedDelay",
             "PhysicalContactOccupiedToUnoccupiedDelay",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Operational Credentials": [
             "SupportedFabrics",
             "CommissionedFabrics",
-            "CurrentFabricIndex"
+            "CurrentFabricIndex",
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Software Diagnostics": [
+            "ClusterRevision",
             "CurrentHeapFree",
             "CurrentHeapHighWatermark",
             "CurrentHeapUsed",
@@ -393,7 +475,10 @@
             "Delay",
             "SecurityPolicy",
             "ChannelPage0Mask",
-            "OperationalDatasetComponents"
+            "OperationalDatasetComponents",
+            "ExtAddress",
+            "Rloc16",
+            "ClusterRevision"
         ],
         "Wi-Fi Network Diagnostics": [
             "BSSID",
@@ -638,6 +723,12 @@
             "CumulativeEnergyReset",
             "FeatureMap"
         ],
+        "Electrical Grid Conditions": [
+            "LocalGenerationAvailable",
+            "CurrentConditions",
+            "ForecastConditions",
+            "FeatureMap"
+        ],
         "Electrical Power Measurement": [
             "PowerMode",
             "NumberOfMeasurementTypes",
@@ -661,6 +752,7 @@
             "FeatureMap"
         ],
         "Power Topology": ["FeatureMap"],
+        "Power Source": ["ClusterRevision"],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"],
         "Water Heater Management": [
@@ -683,25 +775,18 @@
         "Service Area": ["CurrentArea", "EstimatedEndTime", "FeatureMap"],
         "Camera AV Stream Management": [
             "VideoSensorParams",
-            "MinViewport",
+            "MinViewportResolution",
             "MicrophoneCapabilities",
             "SpeakerCapabilities",
             "Viewport",
-            "MaxConcurrentVideoEncoders",
+            "MaxConcurrentEncoders",
             "MaxEncodedPixelRate",
-            "NightVisionCapable",
-            "RateDistortionTradeOffPoints",
+            "NightVisionUsesInfrared",
             "MaxContentBufferSize",
             "TwoWayTalkSupport",
-            "SupportedSnapshotParams",
             "MaxNetworkBandwidth",
             "CurrentFrameRate",
             "HDRModeEnabled",
-            "SupportedStreamUsages",
-            "AllocatedVideoStreams",
-            "AllocatedAudioStreams",
-            "AllocatedSnapshotStreams",
-            "RankedVideoStreamPrioritiesList",
             "SoftRecordingPrivacyModeEnabled",
             "SoftLivestreamPrivacyModeEnabled",
             "HardPrivacyModeOn",
@@ -725,7 +810,38 @@
             "StatusLightBrightness",
             "FeatureMap"
         ],
-        "Camera AV Settings User Level Management": ["MPTZPosition"]
+        "Camera AV Settings User Level Management": ["MPTZPosition"],
+        "Fixed Label": ["LabelList", "ClusterRevision", "FeatureMap"],
+        "Soil Measurement": [
+            "SoilMoistureMeasurementLimits",
+            "SoilMoistureMeasuredValue",
+            "ClusterRevision",
+            "FeatureMap"
+        ],
+        "Unit Localization": ["TemperatureUnit"],
+        "TLS Certificate Management": [
+            "ClusterRevision",
+            "MaxRootCertificates",
+            "MaxClientCertificates"
+        ],
+        "TLS Client Management": ["ClusterRevision", "MaxProvisioned"],
+        "Thermostat": [
+            "MaxThermostatSuggestions",
+            "CurrentThermostatSuggestion",
+            "ThermostatSuggestionNotFollowingReason",
+            "ClusterRevision"
+        ],
+        "Time Format Localization": ["ClusterRevision"],
+        "Window Covering": ["ClusterRevision"],
+        "Zone Management": [
+            "MaxUserDefinedZones",
+            "MaxZones",
+            "SensitivityMax",
+            "Sensitivity",
+            "TwoDCartesianMax",
+            "FeatureMap",
+            "ClusterRevision"
+        ]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",
@@ -738,5 +854,6 @@
     },
     "uiOptions": {
         "showProfileId": false
-    }
+    },
+    "upgradeRules": "./upgrade-rules-matter.json"
 }

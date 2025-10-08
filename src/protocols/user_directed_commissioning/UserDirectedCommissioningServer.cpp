@@ -386,6 +386,9 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
         case kCancelPasscodeTag:
             err = reader.Get(mCancelPasscode);
             break;
+        case kPasscodeLengthTag:
+            err = reader.Get(mPasscodeLength);
+            break;
         }
         if (err != CHIP_NO_ERROR)
         {
@@ -436,6 +439,8 @@ uint32_t CommissionerDeclaration::WritePayload(uint8_t * payloadBuffer, size_t p
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.PutBoolean(chip::TLV::ContextTag(kQRCodeDisplayedTag), mQRCodeDisplayed)),
                  LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.PutBoolean(chip::TLV::ContextTag(kCancelPasscodeTag), mCancelPasscode)),
+                 LogErrorOnFailure(err));
+    VerifyOrExit(CHIP_NO_ERROR == (err = writer.Put(chip::TLV::ContextTag(kPasscodeLengthTag), GetPasscodeLength())),
                  LogErrorOnFailure(err));
 
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.EndContainer(outerContainerType)), LogErrorOnFailure(err));
@@ -566,8 +571,9 @@ void UserDirectedCommissioningServer::PrintUDCClients()
             Encoding::BytesToUppercaseHexString(state->GetRotatingId(), chip::Dnssd::kMaxRotatingIdLen, rotatingIdString,
                                                 sizeof(rotatingIdString));
 
-            ChipLogProgress(AppServer, "UDC Client[%d] instance=%s deviceName=%s address=%s, vid/pid=%d/%d disc=%d rid=%s", i,
-                            state->GetInstanceName(), state->GetDeviceName(), addrBuffer, state->GetVendorId(),
+            ChipLogProgress(AppServer,
+                            "PrintUDCClients() UDC Client[%d] instance=%s deviceName=%s address=%s, vid/pid=%d/%d disc=%d rid=%s",
+                            i, state->GetInstanceName(), state->GetDeviceName(), addrBuffer, state->GetVendorId(),
                             state->GetProductId(), state->GetLongDiscriminator(), rotatingIdString);
         }
     }

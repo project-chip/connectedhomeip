@@ -28,8 +28,11 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
 
-using ICEServerDecodableStruct = Structs::ICEServerStruct::DecodableType;
-using WebRTCSessionStruct      = Structs::WebRTCSessionStruct::Type;
+using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
+using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
+using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
+using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
 /**
  * @brief
@@ -50,9 +53,9 @@ public:
         Optional<DataModel::Nullable<uint16_t>> audioStreamId;
         Optional<std::vector<ICEServerDecodableStruct>> iceServers;
         Optional<std::string> iceTransportPolicy;
-        Optional<BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
         NodeId peerNodeId;
         FabricIndex fabricIndex;
+        EndpointId originatingEndpointId;
     };
 
     struct ProvideOfferRequestArgs : OfferRequestArgs
@@ -124,23 +127,12 @@ public:
      *   method returns `CHIP_NO_ERROR`. If an error is returned, `outSession` is left unmodified or
      *   set to an invalid state.
      *
-     * @param[in]  peerId
-     *   Identifies the peer (requestor) connection over which this command was received. The delegate can
-     *   use this `PeerId` to retrieve or track any existing secure session state as needed.
-     *
-     * @param[in] originatingEndpointId
-     *   The server implementing this handler (acting as the WebRTC Provider) MUST use this
-     *   endpoint ID as the target when sending commands back to the Requestor device.
-     *   This ensures that commands sent back by this Provider server correctly reach the
-     *   corresponding application logic on the Requestor device.
-     *
      * @return
      *   - CHIP_NO_ERROR if the request succeeds and `outSession` is populated.
      *   - CHIP_ERROR_NO_MEMORY if the device cannot allocate a new session.
      *   - Appropriate error otherwise.
      */
-    virtual CHIP_ERROR HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession,
-                                          const ScopedNodeId & peerId, EndpointId originatingEndpointId) = 0;
+    virtual CHIP_ERROR HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession) = 0;
 
     /**
      * @brief
@@ -168,13 +160,15 @@ public:
      *   (i.e., Trickle ICE).
      *
      * @param[in] sessionId  The current session ID.
-     * @param[in] candidates A list of ICE candidate strings.
+     * @param[in] candidates A list of ICE candidate structs.
+     * Note: The callee cannot reference the `candidates` vector after this call
+     * returns, and must copy the contents over for later use, if required.
      *
      * @return CHIP_ERROR
      *   - CHIP_NO_ERROR on success
      *   - An error if the session is invalid or the candidates cannot be processed
      */
-    virtual CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates) = 0;
+    virtual CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates) = 0;
 
     /**
      * @brief
@@ -203,16 +197,82 @@ public:
      * The implementation SHALL ensure:
      *  - The requested stream usage (streamUsage) is allowed given the current allocation of
      *    camera resources (e.g. CPU, memory, network bandwidth) and the prioritized stream list.
+     *  - If the provided IDs are null, it matches against an allocated stream with the same stream usage
+     *    and updates the IDs to those for the matching stream
      *
      * @param[in] streamUsage    The desired usage type for the stream (e.g. live view, recording, etc.).
-     * @param[in] videoStreamId  Optional identifier for the requested video stream.
-     * @param[in] audioStreamId  Optional identifier for the requested audio stream.
+     * @param[in,out] videoStreamId  Optional identifier for the requested video stream.
+     * @param[in,out] audioStreamId  Optional identifier for the requested audio stream.
      *
      * @return CHIP_ERROR CHIP_NO_ERROR if the stream usage is valid; an appropriate error code otherwise.
      */
-    virtual CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                           const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                           const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
+    virtual CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                           Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
+
+    /**
+     * @brief
+     *   Validates that the given VideoStreamID matches a value in AllocatedVideoStreams.
+     *
+     *   This method is called during SolicitOffer command processing when a VideoStreamID
+     *   is present and not null. The implementation must check if the provided ID exists
+     *   in the AllocatedVideoStreams list from the CameraAvStreamManagement cluster.
+     *
+     * @param[in] videoStreamId  The video stream ID to validate.
+     *
+     * @return CHIP_ERROR
+     *   - CHIP_NO_ERROR if the VideoStreamID is valid and matches AllocatedVideoStreams.
+     *   - CHIP_ERROR_NOT_FOUND or other appropriate error if validation fails or a match can't be found
+     */
+    virtual CHIP_ERROR ValidateVideoStreamID(uint16_t videoStreamId) = 0;
+
+    /**
+     * @brief
+     *   Validates that the given AudioStreamID matches a value in AllocatedAudioStreams.
+     *
+     *   This method is called during SolicitOffer command processing when an AudioStreamID
+     *   is present and not null. The implementation must check if the provided ID exists
+     *   in the AllocatedAudioStreams list from the CameraAvStreamManagement cluster.
+     *
+     * @param[in] audioStreamId  The audio stream ID to validate.
+     *
+     * @return CHIP_ERROR
+     *   - CHIP_NO_ERROR if the AudioStreamID is valid and matches AllocatedAudioStreams.
+     *   - CHIP_ERROR_NOT_FOUND or other appropriate error if validation fails.
+     */
+    virtual CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) = 0;
+
+    /**
+     * @brief Check whether privacy mode is active.
+     *
+     * Reads the SoftLivestreamPrivacyModeEnabled and HardPrivacyModeOn attributes from the CameraAvStreamManagement
+     * cluster. Privacy mode is considered **active** when **either** attribute is true.
+     *
+     * @param[out] isActive Set to true if privacy mode is active, false if inactive.
+     * @return CHIP_NO_ERROR on success, error code if privacy mode state cannot be determined.
+     */
+    virtual CHIP_ERROR IsPrivacyModeActive(bool & isActive) = 0;
+
+    /**
+     * @brief Check if there are any allocated video streams.
+     *
+     * This method is called during ProvideOffer command processing when VideoStreamID
+     * is present and null to determine if automatic stream selection is possible.
+     *
+     * @return true if there are allocated video streams available.
+     * @return false if no video streams are currently allocated.
+     */
+    virtual bool HasAllocatedVideoStreams() = 0;
+
+    /**
+     * @brief Check if there are any allocated audio streams.
+     *
+     * This method is called during ProvideOffer command processing when AudioStreamID
+     * is present and null to determine if automatic stream selection is possible.
+     *
+     * @return true if there are allocated audio streams available.
+     * @return false if no audio streams are currently allocated.
+     */
+    virtual bool HasAllocatedAudioStreams() = 0;
 };
 
 class WebRTCTransportProviderServer : public AttributeAccessInterface, public CommandHandlerInterface
@@ -230,7 +290,8 @@ public:
 
     /**
      * @brief
-     *   Destructor. Cleans up any internal data, but does not destroy the delegate.
+     *   Destructor. Cleans up any internal data, including unregistering the command handler and attribute interface,
+     *   but does not destroy the delegate.
      */
     ~WebRTCTransportProviderServer() override;
 
@@ -245,9 +306,25 @@ public:
 
     /**
      * @brief
-     *   Unregisters the command handler and attribute interface, releasing resources.
+     *   Handles any cleanup required on the instance or app/delegate prior to the destructor being called.
      */
-    void Shutdown();
+    void Shutdown(){};
+
+    /**
+     * @brief Get a reference to the current WebRTC sessions.
+     *
+     * This method provides read-only access to the current list of active WebRTC sessions
+     * managed by this server instance.
+     *
+     * @return const std::vector<WebRTCSessionStruct>& Reference to the current sessions list.
+     */
+    const std::vector<WebRTCSessionStruct> & GetCurrentSessions() const { return mCurrentSessions; }
+
+    /**
+     * @brief Removes a WebRTC session given a session ID.
+     *
+     */
+    void RemoveSession(uint16_t sessionId);
 
 private:
     enum class UpsertResultEnum : uint8_t
@@ -263,8 +340,7 @@ private:
     WebRTCSessionStruct * FindSession(uint16_t sessionId);
     WebRTCSessionStruct * CheckForMatchingSession(HandlerContext & ctx, uint16_t sessionId);
     UpsertResultEnum UpsertSession(const WebRTCSessionStruct & session);
-    void RemoveSession(uint16_t sessionId);
-    uint16_t GenerateSessionId();
+    CHIP_ERROR GenerateSessionId(uint16_t & outSessionId);
 
     // Command Handlers
     void HandleSolicitOffer(HandlerContext & ctx, const Commands::SolicitOffer::DecodableType & req);

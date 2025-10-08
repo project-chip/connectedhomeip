@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    Copyright 2023 NXP
+ *    Copyright 2023, 2025 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -481,6 +481,45 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts(void)
 }
 
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
+
+#if CONFIG_CHIP_ETHERNET
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthFullDuplex(bool & fullDuplex)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthTimeSinceReset(uint64_t & timeSinceReset)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthPacketRxCount(uint64_t & packetRxCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthPacketTxCount(uint64_t & packetTxCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthTxErrCount(uint64_t & txErrCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthCollisionCount(uint64_t & collisionCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthOverrunCount(uint64_t & overrunCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+CHIP_ERROR DiagnosticDataProviderImpl::ResetEthNetworkDiagnosticsCounts()
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+#endif
 
 DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
 {

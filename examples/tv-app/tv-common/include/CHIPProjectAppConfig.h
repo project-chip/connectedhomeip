@@ -76,5 +76,7 @@
 // Change port to make it easy to run against tv-casting-app
 #define CHIP_PORT 5640
 
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
+
 // Include the CHIPProjectConfig from platform implementation config
 #include <CHIPProjectConfig.h>

@@ -62,27 +62,28 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial version of the Zone Management cluster"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0550" name="Zone Management"/>
+    <clusterId id="0x0550" name="Zone Management">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="ZONEMGMT" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="TWODCART" name="TwoDimensionalCartesianZone" summary="Support Two Dimensional Cartesian Zones">
+    <feature bit="0" code="TWODCART" name="TwoDimensionalCartesianZone" summary="Supports Two Dimensional Cartesian Zones">
       <mandatoryConform/>
     </feature>
     <feature bit="1" code="PERZONESENS" name="PerZoneSensitivity" summary="Supports a sensitivity value per Zone">
-      <optionalConform/>
+      <optionalConform>
+        <feature name="TWODCART"/>
+      </optionalConform>
+    </feature>
+    <feature bit="2" code="USERDEFINED" name="UserDefined" summary="Supports user defined zones">
+      <optionalConform>
+        <feature name="TWODCART"/>
+      </optionalConform>
     </feature>
   </features>
   <dataTypes>
     <number name="ZoneID" type="uint16"/>
-    <enum name="StatusCodeEnum">
-      <item value="0x02" name="ZoneNotFound" summary="The specified ZoneID does not exist on this Node.">
-        <mandatoryConform/>
-      </item>
-      <item value="0x03" name="ZoneInUse" summary="The Zone is in use.">
-        <mandatoryConform/>
-      </item>
-    </enum>
     <enum name="ZoneEventStoppedReasonEnum">
       <item value="0" name="ActionStopped" summary="Indicates that whatever triggered the Zone event has stopped being detected.">
         <mandatoryConform/>
@@ -132,7 +133,7 @@ Davis, CA 95616, USA
       <field id="0" name="Name" type="string">
         <mandatoryConform/>
         <constraint>
-          <maxLength value="16"/>
+          <maxLength value="32"/>
         </constraint>
       </field>
       <field id="1" name="Use" type="ZoneUseEnum">
@@ -170,50 +171,109 @@ Davis, CA 95616, USA
       </field>
     </struct>
     <struct name="ZoneTriggerControlStruct">
-      <field id="0" name="InitialDuration" type="uint16" default="10">
+      <field id="0" name="ZoneID" type="ZoneID">
         <mandatoryConform/>
       </field>
-      <field id="1" name="AugmentationDuration" type="uint16" default="5">
+      <field id="1" name="InitialDuration" type="elapsed-s" default="10">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="2" name="AugmentationDuration" type="elapsed-s" default="5">
+        <mandatoryConform/>
+        <constraint>
+          <max>
+            <field name="InitialDuration"/>
+          </max>
+        </constraint>
+      </field>
+      <field id="3" name="MaxDuration" type="elapsed-s" default="30">
+        <mandatoryConform/>
+        <constraint>
+          <min>
+            <field name="InitialDuration"/>
+          </min>
+        </constraint>
+      </field>
+      <field id="4" name="BlindDuration" type="elapsed-s" default="30">
         <mandatoryConform/>
       </field>
-      <field id="2" name="MaxDuration" type="elapsed-s" default="30">
-        <mandatoryConform/>
-      </field>
-      <field id="3" name="BlindDuration" type="uint16" default="30">
-        <mandatoryConform/>
-      </field>
-      <field id="4" name="Sensitivity" type="uint8" default="5">
+      <field id="5" name="Sensitivity" type="uint8" default="5">
         <mandatoryConform>
           <feature name="PERZONESENS"/>
         </mandatoryConform>
         <constraint>
           <between>
             <from value="1"/>
-            <to value="10"/>
+            <to>
+              <attribute name="SensitivityMax"/>
+            </to>
           </between>
         </constraint>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="SupportedZoneSources" type="list">
-      <entry type="ZoneSourceEnum"/>
+    <attribute id="0x0000" name="MaxUserDefinedZones" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <mandatoryConform/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="USERDEFINED"/>
+      </mandatoryConform>
+      <constraint>
+        <min value="5"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0001" name="Zones" type="list" default="empty">
+    <attribute id="0x0001" name="MaxZones" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="Zones" type="list" default="empty">
       <entry type="ZoneInformationStruct"/>
       <access read="true" readPrivilege="view"/>
-      <mandatoryConform>
-        <feature name="TWODCART"/>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x0002" name="Triggers" type="list" default="empty">
-      <entry type="ZoneTriggerControlStruct"/>
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <mandatoryConform/>
+      <constraint>
+        <countBetween>
+          <from value="0"/>
+          <to>
+            <attribute name="MaxZones"/>
+          </to>
+        </countBetween>
+      </constraint>
     </attribute>
-    <attribute id="0x0003" name="Sensitivity" type="uint8" default="5">
+    <attribute id="0x0003" name="Triggers" type="list" default="empty">
+      <entry type="ZoneTriggerControlStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+      <constraint>
+        <countBetween>
+          <from value="0"/>
+          <to>
+            <attribute name="MaxZones"/>
+          </to>
+        </countBetween>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="SensitivityMax" type="uint8" default="10">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="2"/>
+          <to value="10"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0005" name="Sensitivity" type="uint8" default="5">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <mandatoryConform>
         <notTerm>
@@ -223,7 +283,9 @@ Davis, CA 95616, USA
       <constraint>
         <between>
           <from value="1"/>
-          <to value="10"/>
+          <to>
+            <attribute name="SensitivityMax"/>
+          </to>
         </between>
       </constraint>
     </attribute>
@@ -232,7 +294,10 @@ Davis, CA 95616, USA
     <command id="0x00" name="CreateTwoDCartesianZone" direction="commandToServer" response="CreateTwoDCartesianZoneResponse">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
-        <feature name="TWODCART"/>
+        <andTerm>
+          <feature name="TWODCART"/>
+          <feature name="USERDEFINED"/>
+        </andTerm>
       </mandatoryConform>
       <field id="0" name="Zone" type="TwoDCartesianZoneStruct">
         <mandatoryConform/>
@@ -240,7 +305,10 @@ Davis, CA 95616, USA
     </command>
     <command id="0x01" name="CreateTwoDCartesianZoneResponse" direction="responseFromServer">
       <mandatoryConform>
-        <feature name="TWODCART"/>
+        <andTerm>
+          <feature name="TWODCART"/>
+          <feature name="USERDEFINED"/>
+        </andTerm>
       </mandatoryConform>
       <field id="0" name="ZoneID" type="ZoneID">
         <mandatoryConform/>
@@ -249,7 +317,10 @@ Davis, CA 95616, USA
     <command id="0x02" name="UpdateTwoDCartesianZone" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
-        <feature name="TWODCART"/>
+        <andTerm>
+          <feature name="TWODCART"/>
+          <feature name="USERDEFINED"/>
+        </andTerm>
       </mandatoryConform>
       <field id="0" name="ZoneID" type="ZoneID">
         <mandatoryConform/>
@@ -279,6 +350,22 @@ Davis, CA 95616, USA
     </command>
     <command id="0x05" name="RemoveZone" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="USERDEFINED"/>
+      </mandatoryConform>
+      <field id="0" name="ZoneID" type="ZoneID">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x06" name="CreateOrUpdateTrigger" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform/>
+      <field id="0" name="Trigger" type="ZoneTriggerControlStruct">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x07" name="RemoveTrigger" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
       <mandatoryConform/>
       <field id="0" name="ZoneID" type="ZoneID">
         <mandatoryConform/>
@@ -289,8 +376,7 @@ Davis, CA 95616, USA
     <event id="0x00" name="ZoneTriggered" priority="info">
       <access readPrivilege="view"/>
       <mandatoryConform/>
-      <field id="0" name="Zones" type="list">
-        <entry type="ZoneID"/>
+      <field id="0" name="Zone" type="ZoneID">
         <mandatoryConform/>
       </field>
       <field id="1" name="Reason" type="ZoneEventTriggeredReasonEnum">
@@ -300,8 +386,7 @@ Davis, CA 95616, USA
     <event id="0x01" name="ZoneStopped" priority="info">
       <access readPrivilege="view"/>
       <mandatoryConform/>
-      <field id="0" name="Zones" type="list">
-        <entry type="ZoneID"/>
+      <field id="0" name="Zone" type="ZoneID">
         <mandatoryConform/>
       </field>
       <field id="1" name="Reason" type="ZoneEventStoppedReasonEnum">

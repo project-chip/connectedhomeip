@@ -22,7 +22,10 @@
 #include "AppEvent.h"
 
 #include "LEDWidget.h"
-
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+#include "RGBLEDWidget.h"
+#endif //(defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -54,14 +57,17 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 
 namespace {
-LEDWidget sLightLED;
-}
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+RGBLEDWidget sLightLED; // Use RGBLEDWidget if RGB LED functionality is enabled
+#else
+LEDWidget sLightLED; // Use LEDWidget for basic LED functionality
+#endif
+} // namespace
 
 using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
-
 CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -136,6 +142,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     bool initiated = false;
     LightingManager::Action_t action;
     int32_t actor;
+    uint8_t value  = aEvent->LightEvent.Value;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (aEvent->Type == AppEvent::kEventType_Light)
@@ -155,7 +162,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
 
     if (err == CHIP_NO_ERROR)
     {
-        initiated = LightMgr().InitiateAction(actor, action);
+        initiated = LightMgr().InitiateAction(actor, action, &value);
 
         if (!initiated)
         {
@@ -163,6 +170,45 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
         }
     }
 }
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+void AppTask::LightControlEventHandler(AppEvent * aEvent)
+{
+    uint8_t light_action                = aEvent->LightControlEvent.Action;
+    RGBLEDWidget::ColorData_t colorData = aEvent->LightControlEvent.Value;
+    // Get currentLevel attribute
+    PlatformMgr().LockChipStack();
+    Protocols::InteractionModel::Status status;
+    app::DataModel::Nullable<uint8_t> currentlevel;
+    // Read currentlevel value
+    status = Clusters::LevelControl::Attributes::CurrentLevel::Get(1, currentlevel);
+    PlatformMgr().UnlockChipStack();
+    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
+                   ChipLogError(NotSpecified, "Failed to get CurrentLevel attribute"));
+    if (status == Protocols::InteractionModel::Status::Success && !currentlevel.IsNull())
+    {
+        sLightLED.SetLevel(currentlevel.Value());
+    }
+    switch (light_action)
+    {
+    case LightingManager::COLOR_ACTION_XY: {
+        sLightLED.SetColorFromXY(colorData.xy.x, colorData.xy.y);
+    }
+    break;
+    case LightingManager::COLOR_ACTION_HSV: {
+        sLightLED.SetColorFromHSV(colorData.hsv.h, colorData.hsv.s);
+    }
+    break;
+    case LightingManager::COLOR_ACTION_CT: {
+        sLightLED.SetColorFromCT(colorData.ct.ctMireds);
+    }
+    break;
+    default:
+        ChipLogProgress(NotSpecified, "LightMgr:Unknown");
+        break;
+    }
+}
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
 
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
@@ -182,21 +228,29 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     }
 }
 
-void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor, uint8_t * aValue)
 {
-    // Action initiated, update the light led
-    bool lightOn = aAction == LightingManager::ON_ACTION;
-    SILABS_LOG("Turning light %s", (lightOn) ? "On" : "Off")
+    if (aAction == LightingManager::LEVEL_ACTION)
+    {
+        VerifyOrReturn(aValue != nullptr);
+        sLightLED.SetLevel(*aValue);
+    }
+    else
+    {
+        // Action initiated, update the light led
+        bool lightOn = aAction == LightingManager::ON_ACTION;
+        SILABS_LOG("Turning light %s", (lightOn) ? "On" : "Off")
 
-    sLightLED.Set(lightOn);
+        sLightLED.Set(lightOn);
 
 #ifdef DISPLAY_ENABLED
-    sAppTask.GetLCD().WriteDemoUI(lightOn);
+        sAppTask.GetLCD().WriteDemoUI(lightOn);
 #endif
 
-    if (aActor == AppEvent::kEventType_Button)
-    {
-        sAppTask.mSyncClusterToButtonAction = true;
+        if (aActor == AppEvent::kEventType_Button)
+        {
+            sAppTask.mSyncClusterToButtonAction = true;
+        }
     }
 }
 
@@ -228,6 +282,19 @@ void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t a
     event.Handler           = LightActionEventHandler;
     PostEvent(&event);
 }
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+void AppTask::PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, RGBLEDWidget::ColorData_t * aValue)
+{
+    AppEvent light_event;
+    light_event.Type                     = AppEvent::kEventType_Light;
+    light_event.LightControlEvent.Actor  = aActor;
+    light_event.LightControlEvent.Action = aAction;
+    light_event.LightControlEvent.Value  = *aValue;
+    light_event.Handler                  = LightControlEventHandler;
+    PostEvent(&light_event);
+}
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
 
 void AppTask::UpdateClusterState(intptr_t context)
 {

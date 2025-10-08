@@ -216,6 +216,47 @@ FUZZ_TEST(PayloadDecoder, RunDecodeFuzz).WithDomains(Arbitrary<std::vector<std::
 -   A detailed reference for input domains can be found here:
     [FuzzTest Domain Reference](https://github.com/google/fuzztest/blob/main/doc/domains-reference.md#elementof-domains-element-of).
 
+#### Domain Combinators
+
+-   Domain Combinators: Useful when we have input domains that we want use to
+    create another domain; e.g. construct an object and pass it to the property
+    function.
+-   An example is `Map` documented in FuzzTest's official documentation
+    [Aggregate Combinators#Map](https://github.com/google/fuzztest/blob/main/doc/domains-reference.md#map)
+-   Using a Map, we can take several input domains, pass them into the mapping
+    function, and get a single Domain as output.
+-   An example from the Stack is `AnyValidationContext()` used in
+    `FUZZ_TEST(FuzzCASE, HandleSigma3b)`
+
+#### Seeds and Corpus
+
+-   Using initial seeds is very useful when fuzzing functions that take complex
+    inputs, such as large byte arrays
+-   The fuzzing engine starts by mutating these initial seeds instead of
+    generating completely random inputs
+-   This helps the fuzzing engine explore more realistic and meaningful code
+    paths faster, making it more likely to uncover issues
+
+-   Adding `.WithSeeds()` to the _Input Domains_ within a FUZZ_TEST Macro
+    invocation allow us to use initial seeds.
+-   Two Ways to use `.WithSeeds()`:
+
+    1. **Using variables as inputs**: Examples of this usage are in
+       `FuzzCASE.cpp` in the lambda `SeededEncodedSigma1()` used in the Fuzz
+       Test Case `FUZZ_TEST(FuzzCASE, ParseSigma1_RawPayload)`
+
+    2. **Using files as inputs** with `fuzztest::ReadFilesFromDirectory()`:
+        - Returns a vector of single-element tuples, each containing file
+          content as a string
+        - Use a lambda like `seedProvider` in `FuzzChipCertPW.cpp` to unpack the
+          tuples and extract contents
+        - The lambda should return `std::vector<std::string>` to be used with
+          `std::string` domain as shown below:
+
+    ```cpp
+        FUZZ_TEST(FuzzChipCert, ConvertX509CertToChipCertFuzz).WithDomains(Arbitrary<std::string>().WithSeeds(seedProvider(isDerFile)));
+    ```
+
 ### Running FuzzTests
 
 There are several ways to run the tests:
@@ -255,6 +296,56 @@ $ ./fuzz-chip-cert-pw --fuzz=ChipCert.DecodeChipCertFuzzer
 ./fuzz-chip-cert-pw --help
 
 ```
+
+### Coverage Report Generation
+
+> [!TIP]
+>
+> Use Coverage Reports to get more insights while writing FuzzTests.
+
+1. Build FuzzTests with coverage instrumentation
+   [Building pw_fuzzer FuzzTests](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md#pw_fuzzer-fuzztests).
+
+2. Run These FuzzTests using `scripts/tests/run_fuzztest_coverage.py`
+
+    - run them in `Continuous Fuzzing Mode` for as long as possible to get max
+      coverage
+
+3. The path for the HTML Coverage Report will be output after generation
+
+### Coverage Reports and Fuzz Blockers
+
+-   Coverage Reports can give (FuzzTest Developers) insights and help identify
+    `Fuzz Blockers`.
+-   **Fuzz Blocker**: something that prevents a fuzz test from exploring a
+    certain part of the code.
+
+#### Example of Fuzz Blocker Analysis:
+
+-   Screenshot below shows how we can use a Coverage Report to identify a Fuzz
+    Blocker
+-   We can see the number of executions of each line in the report.
+-   Line (#2159) was not reached, in at least 129,452 executions.
+-   The line (#2156) just above it is possibly a Fuzz Blocker.
+
+    -   The `data.fabricId` check is always failing and it is blocking the
+        execution of the function that follows it.
+
+![FuzzBlocker_before](img/fuzzblocker_before.png)
+
+-   Thus, we can adapt our FuzzTest in a way to be able to pass that check.
+-   **Solution**: One approach will be to:
+
+    1. Seed the Fuzzed `NOC` with a valid NOC Certificate
+    2. Fuzz the `FabricId`
+    3. Seed the `FabricId` using the same **valid** `FabricId` included in the
+       valid NOC Cert.
+
+-   After doing this, Screenshot below shows Line #2159 is now reached; We have
+    increased our coverage and we are sure that our FuzzTest is more effective:
+-   This approach was used FuzzTest Case `FUZZ_TEST(FuzzCASE, HandleSigma3b)`
+
+![FuzzBlocker_after](img/fuzzblocker_after.png)
 
 ### FAQ
 

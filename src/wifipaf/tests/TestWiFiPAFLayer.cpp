@@ -30,6 +30,7 @@
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <system/RAIIMockClock.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -71,6 +72,7 @@ public:
     CHIP_ERROR WiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg) override { return CHIP_NO_ERROR; }
     CHIP_ERROR WiFiPAFMessageSend(WiFiPAFSession & TxInfo, System::PacketBufferHandle && msg) override { return CHIP_NO_ERROR; }
     CHIP_ERROR WiFiPAFCloseSession(WiFiPAFSession & SessionInfo) override { return CHIP_NO_ERROR; }
+    bool WiFiPAFResourceAvailable() override { return mResourceAvailable; }
     static constexpr size_t kTestPacketLength     = 100;
     static constexpr size_t kTestPacketLengthLong = 500;
 
@@ -80,6 +82,9 @@ public:
     CHIP_ERROR EpDoSendStandAloneAck() { return mEndPoint->DoSendStandAloneAck(); }
     void EpSetRxNextSeqNum(SequenceNumber_t seq) { mEndPoint->mPafTP.mRxNextSeqNum = seq; }
     WiFiPAFTP::State_t EpGetTxState() { return mEndPoint->mPafTP.mTxState; }
+    bool mResourceAvailable = true;
+    bool isSendQueueNull() { return mEndPoint->mSendQueue.IsNull(); }
+    uint8_t GetResourceWaitCount() { return mEndPoint->mResourceWaitCount; }
 
 private:
     WiFiPAFEndPoint * mEndPoint;
@@ -349,6 +354,27 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
     packet_c1->AddToEnd(std::move(packet_c2));
     EXPECT_EQ(packet_c1->HasChainedBuffer(), true);
     EXPECT_EQ(newEndPoint->Send(std::move(packet_c1)), CHIP_NO_ERROR);
+    EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
+
+    // Test, Send the packet while resource is unavaialbe -> available
+    mResourceAvailable   = false;
+    auto packet_resource = System::PacketBufferHandle::NewWithData(buf_chain, sizeof(buf_chain));
+    EXPECT_EQ(newEndPoint->Send(std::move(packet_resource)), CHIP_NO_ERROR);
+    // break because resource is unavailable
+    EXPECT_EQ(isSendQueueNull(), false);
+    EXPECT_GT(GetResourceWaitCount(), 0);
+    // Resource is available now
+    mResourceAvailable = true;
+    // PAF packets should be sent within a second
+
+    System::Clock::Internal::RAIIMockClock clock;
+
+    constexpr System::Clock::Seconds64 pauseSec = System::Clock::Seconds64(2);
+    clock.SetMonotonic(pauseSec);
+    EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
+    // PAF packet has been sent
+    EXPECT_EQ(isSendQueueNull(), true);
+    EXPECT_EQ(GetResourceWaitCount(), 0);
 
     // Close the session
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);

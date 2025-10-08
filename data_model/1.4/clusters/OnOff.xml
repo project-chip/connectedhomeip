@@ -168,7 +168,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -199,11 +201,15 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="EffectIdentifier" type="EffectIdentifierEnum">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="EffectVariant" type="enum8" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x41" name="OnWithRecallGlobalScene" direction="commandToServer" response="Y">
@@ -219,15 +225,24 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="OnOffControl" type="OnOffControlBitmap">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="1"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="1"/>
+          </between>
+        </constraint>
       </field>
       <field id="1" name="OnTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="0xFFFE"/>
+        <constraint>
+          <max value="0xFFFE"/>
+        </constraint>
       </field>
       <field id="2" name="OffWaitTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="0xFFFE"/>
+        <constraint>
+          <max value="0xFFFE"/>
+        </constraint>
       </field>
     </command>
   </commands>

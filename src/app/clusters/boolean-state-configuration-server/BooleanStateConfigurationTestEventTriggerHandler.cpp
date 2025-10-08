@@ -23,6 +23,7 @@ namespace chip {
 
 CHIP_ERROR BooleanStateConfigurationTestEventTriggerHandler::HandleEventTrigger(uint64_t eventTrigger)
 {
+    eventTrigger = clearEndpointInEventTrigger(eventTrigger);
     if (HandleBooleanStateConfigurationTestEventTrigger(eventTrigger))
     {
         return CHIP_NO_ERROR;

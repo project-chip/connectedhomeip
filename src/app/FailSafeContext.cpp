@@ -87,10 +87,11 @@ void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addN
 
     ChipDeviceEvent event{ .Type                 = DeviceEventType::kFailSafeTimerExpired,
                            .FailSafeTimerExpired = {
-                               .fabricIndex                            = fabricIndex,
-                               .addNocCommandHasBeenInvoked            = addNocCommandInvoked,
-                               .updateNocCommandHasBeenInvoked         = updateNocCommandInvoked,
-                               .updateTermsAndConditionsHasBeenInvoked = mUpdateTermsAndConditionsHasBeenInvoked,
+                               .fabricIndex                               = fabricIndex,
+                               .addNocCommandHasBeenInvoked               = addNocCommandInvoked,
+                               .updateNocCommandHasBeenInvoked            = updateNocCommandInvoked,
+                               .updateTermsAndConditionsHasBeenInvoked    = mUpdateTermsAndConditionsHasBeenInvoked,
+                               .setVidVerificationStatementHasBeenInvoked = mSetVidVerificationStatementHasBeenInvoked,
                            } };
     CHIP_ERROR status = PlatformMgr().PostEvent(&event);
 

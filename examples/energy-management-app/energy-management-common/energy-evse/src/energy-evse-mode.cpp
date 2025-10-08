@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <EnergyManagementAppCommonMain.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <energy-evse-modes.h>
 
@@ -89,8 +90,27 @@ void EnergyEvseMode::Shutdown()
 
 void emberAfEnergyEvseModeClusterInitCallback(chip::EndpointId endpointId)
 {
+    if (endpointId != GetEnergyDeviceEndpointId())
+    {
+        return;
+    }
+
     VerifyOrDie(!gEnergyEvseModeDelegate && !gEnergyEvseModeInstance);
     gEnergyEvseModeDelegate = std::make_unique<EnergyEvseMode::EnergyEvseModeDelegate>();
     gEnergyEvseModeInstance = std::make_unique<ModeBase::Instance>(gEnergyEvseModeDelegate.get(), 0x1, EnergyEvseMode::Id, 0);
     gEnergyEvseModeInstance->Init();
+}
+
+void emberAfEnergyEvseModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (endpointId != GetEnergyDeviceEndpointId())
+    {
+        return;
+    }
+
+    if (gEnergyEvseModeInstance)
+    {
+        gEnergyEvseModeInstance->Shutdown();
+    }
+    EnergyEvseMode::Shutdown();
 }

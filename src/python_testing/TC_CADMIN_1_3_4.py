@@ -24,6 +24,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -36,6 +37,7 @@
 #       --storage-path admin_storage.json
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: false
@@ -43,55 +45,24 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
-import base64
+import logging
 import random
 from time import sleep
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.exceptions import ChipStackError
-from chip.interaction_model import Status
-from chip.tlv import TLVReader
-from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
-                                                                       default_matter_test_main)
-from mdns_discovery import mdns_discovery
 from mobly import asserts
+from support_modules.cadmin_support import CADMINBaseTest
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.exceptions import ChipStackError
+from matter.testing.matter_testing import TestStep, default_matter_test_main, has_cluster, has_feature, run_if_endpoint_matches
+from matter.tlv import TLVReader
 
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
 
 
-class TC_CADMIN(MatterBaseTest):
-    async def get_fabrics(self, th: ChipDeviceCtrl) -> int:
-        OC_cluster = Clusters.OperationalCredentials
-        fabric_info = await self.read_single_attribute_check_success(dev_ctrl=th, fabric_filtered=True, cluster=OC_cluster, attribute=OC_cluster.Attributes.Fabrics)
-        return fabric_info
-
-    async def get_txt_record(self):
-        discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
-        comm_service = await discovery.get_commissionable_service(
-            discovery_timeout_sec=240,
-            log_output=False,
-        )
-        return comm_service
-
-    async def write_nl_attr(self, th: ChipDeviceCtrl, attr_val: object):
-        result = await th.WriteAttribute(nodeid=self.dut_node_id, attributes=[(0, attr_val)])
-        asserts.assert_equal(result[0].Status, Status.Success, f"{th} node label write failed")
-
-    async def read_nl_attr(self, th: ChipDeviceCtrl, attr_val: object):
-        try:
-            await th.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, attr_val)])
-        except Exception as e:
-            asserts.assert_equal(e.err, "Received error message from read attribute attempt")
-            self.print_step(0, e)
-
-    async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
-        cluster = Clusters.OperationalCredentials
-        attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
-        current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
-        return current_fabric_index
-
+class TC_CADMIN(CADMINBaseTest):
     async def combined_commission_val_steps(self, commission_type: str):
         """
         Combined test function for commissioning tests.
@@ -131,16 +102,24 @@ class TC_CADMIN(MatterBaseTest):
             asserts.fail(f"Unknown commissioning type: {commission_type}")
 
         self.step("3b")
-        services = await self.get_txt_record()
-        expected_cm_value = "2" if commission_type == "ECM" else "1"
-        if services.txt_record['CM'] != expected_cm_value:
-            asserts.fail(f"Expected cm record value {expected_cm_value}, but found {services.txt_record['CM']}")
+        if commission_type == "ECM":
+            service = await self.wait_for_correct_cm_value(
+                expected_cm_value=2,
+                expected_discriminator=1234
+            )
+            logging.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
+        elif commission_type == "BCM":
+            service = await self.wait_for_correct_cm_value(
+                expected_cm_value=1,
+                expected_discriminator=setupPayloadInfo[0].filter_value
+            )
+            logging.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
 
         self.step("3c")
         BI_cluster = Clusters.BasicInformation
         self.nl_attribute = BI_cluster.Attributes.NodeLabel
-        await self.write_nl_attr(th=self.th1, attr_val=self.nl_attribute)
-        await self.read_nl_attr(th=self.th1, attr_val=self.nl_attribute)
+        await self.write_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
+        await self.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
 
         self.step(4)
         # Establishing TH2
@@ -171,8 +150,8 @@ class TC_CADMIN(MatterBaseTest):
         self.step(5)
         # TH_CR1 reads the Fabrics attribute
         th1_fabric_info = await self.get_fabrics(th=self.th1)
-        th1_cam_rcac = TLVReader(base64.b64decode(
-            self.certificate_authority_manager.activeCaList[0]._persistentStorage._jsonData["sdk-config"]["f/1/r"])).get()["Any"][9]
+        th1_cam_rcac = TLVReader(
+            self.certificate_authority_manager.activeCaList[0]._persistentStorage.GetSdkKey("f/1/r")).get()["Any"][9]
         if th1_fabric_info[0].rootPublicKey != th1_cam_rcac:
             asserts.fail("Public keys from fabric and certs for TH1 are not the same.")
         if th1_fabric_info[0].nodeID != self.dut_node_id:
@@ -189,15 +168,15 @@ class TC_CADMIN(MatterBaseTest):
         if commission_type == "ECM":
             self.step(7)
             # TH_CR1 writes and reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE
-            await self.write_nl_attr(th=self.th1, attr_val=self.nl_attribute)
-            await self.read_nl_attr(th=self.th1, attr_val=self.nl_attribute)
+            await self.write_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
+            await self.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
 
             self.step(8)
             # TH_CR2 writes and reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE
-            val = await self.read_nl_attr(th=self.th2, attr_val=self.nl_attribute)
+            val = await self.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th2, attr_val=self.nl_attribute)
             self.print_step("basic information cluster node label attr value", val)
-            await self.write_nl_attr(th=self.th2, attr_val=self.nl_attribute)
-            await self.read_nl_attr(th=self.th2, attr_val=self.nl_attribute)
+            await self.write_nl_attr(dut_node_id=self.dut_node_id, th=self.th2, attr_val=self.nl_attribute)
+            await self.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th2, attr_val=self.nl_attribute)
 
             self.step(9)
             # TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM
@@ -233,7 +212,7 @@ class TC_CADMIN(MatterBaseTest):
                 await self.th1.CommissionOnNetwork(
                     nodeId=self.dut_node_id, setupPinCode=params2.setupPinCode,
                     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
-            except ChipStackError as e:
+            except ChipStackError as e:  # chipstack-ok: This disables ChipStackError linter check. Error occurs if a NOC for the fabric already exists, which may depend on device state. Can not use assert_raises because it not always fails
                 asserts.assert_equal(e.err,  0x0000007E,
                                      "Expected to return Trying to add NOC for fabric that already exists")
             """
@@ -242,13 +221,14 @@ class TC_CADMIN(MatterBaseTest):
                 [2024-10-08 11:57:43.144365][TEST][STDOUT][MatterTest] 10-08 11:57:42.777 INFO Add NOC failed with error src/controller/CHIPDeviceController.cpp:1712: CHIP Error 0x0000007E: Trying to add a NOC for a fabric that already exists
             """
 
+            self.step(14)
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
             await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
             # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
             sleep(1)
 
         if commission_type == "ECM":
-            self.step(14)
+            self.step(15)
 
         elif commission_type == "BCM":
             self.step(7)
@@ -291,12 +271,14 @@ class TC_CADMIN(MatterBaseTest):
                      "DUT_CE opens its Commissioning window to allow a new commissioning"),
             TestStep(13, "TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 12",
                      "Since DUT_CE was already commissioned by TH_CR1 in step 1, AddNOC fails with NOCResponse with StatusCode field set to FabricConflict (9)"),
-            TestStep(14, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx",
+            TestStep(14, "TH_CR1 sends an RevokeCommissioning command to the DUT to cleanup step 13",
+                     "Successfully revoked commissioning"),
+            TestStep(15, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx",
                      "TH_CR1 removes TH_CR2 fabric using th2_idx")
         ]
 
     def pics_TC_CADMIN_1_4(self) -> list[str]:
-        return ["CADMIN.S"]
+        return ["CADMIN.S.F00"]
 
     def steps_TC_CADMIN_1_4(self) -> list[TestStep]:
         return [
@@ -317,11 +299,11 @@ class TC_CADMIN(MatterBaseTest):
                      "TH_CR1 removes TH_CR2 fabric using th2_idx")
         ]
 
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(Clusters.AdministratorCommissioning))
     async def test_TC_CADMIN_1_3(self):
         await self.combined_commission_val_steps(commission_type="ECM")
 
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(cluster=Clusters.AdministratorCommissioning, feature=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic))
     async def test_TC_CADMIN_1_4(self):
         await self.combined_commission_val_steps(commission_type="BCM")
 

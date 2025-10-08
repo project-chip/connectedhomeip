@@ -34,6 +34,8 @@ declare_args() {
   ota_periodic_query_timeout_sec = 86400
 }
 
+chip_detail_logging = sl_verbose_mode
+
 # Sanity check
 assert(chip_enable_wifi)
 silabs_plat_dir = "${chip_root}/src/platform/silabs"
@@ -51,6 +53,7 @@ config("chip_examples_project_config") {
     "-Wl,--wrap=_realloc_r",
     "-Wl,--wrap=_free_r",
     "-Wl,--wrap=_calloc_r",
+    "-Wl,--wrap=main",
   ]
 }
 
@@ -95,7 +98,11 @@ config("siwx917-common-config") {
 }
 
 source_set("siwx917-common") {
-  deps = [ "${silabs_common_plat_dir}/provision:storage" ]
+  deps = [
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
+    "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",
+    "${silabs_common_plat_dir}/provision:storage",
+  ]
   defines = []
   public_deps = []
 
@@ -121,6 +128,11 @@ source_set("siwx917-common") {
     "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
   ]
+
+  if (sl_enable_rgb_led) {
+    sources += [ "${silabs_common_plat_dir}/rgb_led/RGBLEDWidget.cpp" ]
+    include_dirs += [ "${silabs_common_plat_dir}/rgb_led" ]
+  }
 
   if (chip_enable_pw_rpc || chip_build_libshell || sl_uart_log_output) {
     sources += [ "${silabs_common_plat_dir}/uart.cpp" ]
@@ -166,7 +178,7 @@ source_set("siwx917-common") {
   }
 
   public_deps += [
-    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
     "${chip_root}/src/data-model-providers/codegen:instance-header",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",

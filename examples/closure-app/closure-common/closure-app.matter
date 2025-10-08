@@ -42,7 +42,6 @@ enum AreaTypeTag : enum8 {
   kGardenDoor = 37;
   kGuestBathroom = 38;
   kGuestBedroom = 39;
-  kGuestRestroom = 40;
   kGuestRoom = 41;
   kGym = 42;
   kHallway = 43;
@@ -50,13 +49,12 @@ enum AreaTypeTag : enum8 {
   kKidsRoom = 45;
   kKidsBedroom = 46;
   kKitchen = 47;
-  kLarder = 48;
   kLaundryRoom = 49;
   kLawn = 50;
   kLibrary = 51;
   kLivingRoom = 52;
   kLounge = 53;
-  kMediaTVRoom = 54;
+  kMediaTVRoom = 54 [spec_name = "Media/TV Room"];
   kMudRoom = 55;
   kMusicRoom = 56;
   kNursery = 57;
@@ -75,7 +73,6 @@ enum AreaTypeTag : enum8 {
   kRamp = 70;
   kReceptionRoom = 71;
   kRecreationRoom = 72;
-  kRestroom = 73;
   kRoof = 74;
   kSauna = 75;
   kScullery = 76;
@@ -97,39 +94,13 @@ enum AreaTypeTag : enum8 {
   kUtilityRoom = 92;
   kWard = 93;
   kWorkshop = 94;
+  kToilet = 95;
 }
 
 enum AtomicRequestTypeEnum : enum8 {
   kBeginWrite = 0;
   kCommitWrite = 1;
   kRollbackWrite = 2;
-}
-
-enum FloorSurfaceTag : enum8 {
-  kCarpet = 0;
-  kCeramic = 1;
-  kConcrete = 2;
-  kCork = 3;
-  kDeepCarpet = 4;
-  kDirt = 5;
-  kEngineeredWood = 6;
-  kGlass = 7;
-  kGrass = 8;
-  kHardwood = 9;
-  kLaminate = 10;
-  kLinoleum = 11;
-  kMat = 12;
-  kMetal = 13;
-  kPlastic = 14;
-  kPolishedConcrete = 15;
-  kRubber = 16;
-  kRug = 17;
-  kSand = 18;
-  kStone = 19;
-  kTatami = 20;
-  kTerrazzo = 21;
-  kTile = 22;
-  kVinyl = 23;
 }
 
 enum LandmarkTag : enum8 {
@@ -186,6 +157,34 @@ enum LandmarkTag : enum8 {
   kWineCooler = 50;
 }
 
+enum LocationTag : enum8 {
+  kIndoor = 0;
+  kOutdoor = 1;
+  kInside = 2;
+  kOutside = 3;
+}
+
+enum MeasurementTypeEnum : enum16 {
+  kUnspecified = 0;
+  kVoltage = 1;
+  kActiveCurrent = 2;
+  kReactiveCurrent = 3;
+  kApparentCurrent = 4;
+  kActivePower = 5;
+  kReactivePower = 6;
+  kApparentPower = 7;
+  kRMSVoltage = 8;
+  kRMSCurrent = 9;
+  kRMSPower = 10;
+  kFrequency = 11;
+  kPowerFactor = 12;
+  kNeutralCurrent = 13;
+  kElectricalEnergy = 14;
+  kReactiveEnergy = 15;
+  kApparentEnergy = 16;
+  kSoilMoisture = 17;
+}
+
 enum PositionTag : enum8 {
   kLeft = 0;
   kRight = 1;
@@ -196,6 +195,12 @@ enum PositionTag : enum8 {
   kColumn = 6;
 }
 
+enum PowerThresholdSourceEnum : enum8 {
+  kContract = 0;
+  kRegulator = 1;
+  kEquipment = 2;
+}
+
 enum RelativePositionTag : enum8 {
   kUnder = 0;
   kNextTo = 1;
@@ -204,6 +209,26 @@ enum RelativePositionTag : enum8 {
   kAbove = 4;
   kFrontOf = 5;
   kBehind = 6;
+}
+
+enum StreamUsageEnum : enum8 {
+  kInternal = 0;
+  kRecording = 1;
+  kAnalysis = 2;
+  kLiveView = 3;
+}
+
+enum TariffPriceTypeEnum : enum8 {
+  kStandard = 0;
+  kCritical = 1;
+  kVirtual = 2;
+  kIncentive = 3;
+  kIncentiveSignal = 4;
+}
+
+enum TariffUnitEnum : enum8 {
+  kKWh = 0;
+  kKVAh = 1;
 }
 
 enum TestGlobalEnum : enum8 {
@@ -219,15 +244,72 @@ enum ThreeLevelAutoEnum : enum8 {
   kHigh = 3;
 }
 
+enum WebRTCEndReasonEnum : enum8 {
+  kICEFailed = 0;
+  kICETimeout = 1;
+  kUserHangup = 2;
+  kUserBusy = 3;
+  kReplaced = 4;
+  kNoUserMedia = 5;
+  kInviteTimeout = 6;
+  kAnsweredElsewhere = 7;
+  kOutOfResources = 8;
+  kMediaTimeout = 9;
+  kLowPower = 10;
+  kPrivacyMode = 11;
+  kUnknownReason = 12;
+}
+
 bitmap TestGlobalBitmap : bitmap32 {
   kFirstBit = 0x1;
   kSecondBit = 0x2;
 }
 
-struct TestGlobalStruct {
-  char_string<128> name = 0;
-  nullable TestGlobalBitmap myBitmap = 1;
-  optional nullable TestGlobalEnum myEnum = 2;
+struct CurrencyStruct {
+  int16u currency = 0;
+  int8u decimalPoints = 1;
+}
+
+struct PriceStruct {
+  money amount = 0;
+  CurrencyStruct currency = 1;
+}
+
+struct MeasurementAccuracyRangeStruct {
+  int64s rangeMin = 0;
+  int64s rangeMax = 1;
+  optional percent100ths percentMax = 2;
+  optional percent100ths percentMin = 3;
+  optional percent100ths percentTypical = 4;
+  optional int64u fixedMax = 5;
+  optional int64u fixedMin = 6;
+  optional int64u fixedTypical = 7;
+}
+
+struct MeasurementAccuracyStruct {
+  MeasurementTypeEnum measurementType = 0;
+  boolean measured = 1;
+  int64s minMeasuredValue = 2;
+  int64s maxMeasuredValue = 3;
+  MeasurementAccuracyRangeStruct accuracyRanges[] = 4;
+}
+
+struct AtomicAttributeStatusStruct {
+  attrib_id attributeID = 0;
+  status statusCode = 1;
+}
+
+struct ICECandidateStruct {
+  char_string candidate = 0;
+  nullable char_string SDPMid = 1;
+  nullable int16u SDPMLineIndex = 2;
+}
+
+struct ICEServerStruct {
+  char_string URLs[] = 0;
+  optional long_char_string<508> username = 1;
+  optional long_char_string<512> credential = 2;
+  optional int16u caid = 3;
 }
 
 struct LocationDescriptorStruct {
@@ -236,14 +318,39 @@ struct LocationDescriptorStruct {
   nullable AreaTypeTag areaType = 2;
 }
 
-struct AtomicAttributeStatusStruct {
-  attrib_id attributeID = 0;
-  status statusCode = 1;
+struct PowerThresholdStruct {
+  optional power_mw powerThreshold = 0;
+  optional power_mva apparentPowerThreshold = 1;
+  nullable PowerThresholdSourceEnum powerThresholdSource = 2;
+}
+
+struct TestGlobalStruct {
+  char_string<128> name = 0;
+  nullable TestGlobalBitmap myBitmap = 1;
+  optional nullable TestGlobalEnum myEnum = 2;
+}
+
+struct ViewportStruct {
+  int16u x1 = 0;
+  int16u y1 = 1;
+  int16u x2 = 2;
+  int16u y2 = 3;
+}
+
+fabric_scoped struct WebRTCSessionStruct {
+  int16u id = 0;
+  node_id peerNodeID = 1;
+  endpoint_no peerEndpointID = 2;
+  StreamUsageEnum streamUsage = 3;
+  nullable int16u videoStreamID = 4;
+  nullable int16u audioStreamID = 5;
+  boolean metadataEnabled = 6;
+  fabric_idx fabricIndex = 254;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
-  revision 4;
+  revision 5;
 
   enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
@@ -271,7 +378,6 @@ cluster Identify = 3 {
   readonly attribute IdentifyTypeEnum identifyType = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -285,92 +391,15 @@ cluster Identify = 3 {
     EffectVariantEnum effectVariant = 1;
   }
 
-  /** Command description for Identify */
+  /** This command starts or stops the receiving device identifying itself. */
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
-  /** Command description for TriggerEffect */
+  /** This command allows the support of feedback to the user, such as a certain light effect. */
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
-}
-
-/** Attributes and commands for group configuration and manipulation. */
-cluster Groups = 4 {
-  revision 4;
-
-  bitmap Feature : bitmap32 {
-    kGroupNames = 0x1;
-  }
-
-  bitmap NameSupportBitmap : bitmap8 {
-    kGroupNames = 0x80;
-  }
-
-  readonly attribute NameSupportBitmap nameSupport = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct AddGroupRequest {
-    group_id groupID = 0;
-    char_string<16> groupName = 1;
-  }
-
-  response struct AddGroupResponse = 0 {
-    enum8 status = 0;
-    group_id groupID = 1;
-  }
-
-  request struct ViewGroupRequest {
-    group_id groupID = 0;
-  }
-
-  response struct ViewGroupResponse = 1 {
-    enum8 status = 0;
-    group_id groupID = 1;
-    char_string<16> groupName = 2;
-  }
-
-  request struct GetGroupMembershipRequest {
-    group_id groupList[] = 0;
-  }
-
-  response struct GetGroupMembershipResponse = 2 {
-    nullable int8u capacity = 0;
-    group_id groupList[] = 1;
-  }
-
-  request struct RemoveGroupRequest {
-    group_id groupID = 0;
-  }
-
-  response struct RemoveGroupResponse = 3 {
-    enum8 status = 0;
-    group_id groupID = 1;
-  }
-
-  request struct AddGroupIfIdentifyingRequest {
-    group_id groupID = 0;
-    char_string<16> groupName = 1;
-  }
-
-  /** Command description for AddGroup */
-  fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
-  /** Command description for ViewGroup */
-  fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
-  /** Command description for GetGroupMembership */
-  fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
-  /** Command description for RemoveGroup */
-  fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
-  /** Command description for RemoveAllGroups */
-  fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
-  /** Command description for AddGroupIfIdentifying */
-  fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 cluster Descriptor = 29 {
-  revision 2;
+  revision 3;
 
   bitmap Feature : bitmap32 {
     kTagList = 0x1;
@@ -385,7 +414,7 @@ cluster Descriptor = 29 {
     nullable vendor_id mfgCode = 0;
     enum8 namespaceID = 1;
     enum8 tag = 2;
-    optional nullable char_string label = 3;
+    optional nullable char_string<64> label = 3;
   }
 
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
@@ -393,9 +422,9 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
+  readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -409,8 +438,8 @@ cluster AccessControl = 31 {
   revision 2;
 
   enum AccessControlEntryAuthModeEnum : enum8 {
-    kPASE = 1;
-    kCASE = 2;
+    kPASE = 1 [spec_name = "PASE"];
+    kCASE = 2 [spec_name = "CASE"];
     kGroup = 3;
   }
 
@@ -509,7 +538,6 @@ cluster AccessControl = 31 {
   readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -530,7 +558,7 @@ cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 3;
+  revision 5;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -613,9 +641,9 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
   readonly attribute int16u maxPathsPerInvoke = 22;
+  readonly attribute int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -636,7 +664,7 @@ cluster OtaSoftwareUpdateProvider = 41 {
   enum DownloadProtocolEnum : enum8 {
     kBDXSynchronous = 0;
     kBDXAsynchronous = 1;
-    kHTTPS = 2;
+    kHTTPS = 2 [spec_name = "HTTPS"];
     kVendorSpecific = 3;
   }
 
@@ -649,7 +677,6 @@ cluster OtaSoftwareUpdateProvider = 41 {
 
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -699,392 +726,12 @@ cluster OtaSoftwareUpdateProvider = 41 {
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
 
-/** Provides an interface for downloading and applying OTA software updates */
-cluster OtaSoftwareUpdateRequestor = 42 {
-  revision 1; // NOTE: Default/not specifically set
-
-  enum AnnouncementReasonEnum : enum8 {
-    kSimpleAnnouncement = 0;
-    kUpdateAvailable = 1;
-    kUrgentUpdateAvailable = 2;
-  }
-
-  enum ChangeReasonEnum : enum8 {
-    kUnknown = 0;
-    kSuccess = 1;
-    kFailure = 2;
-    kTimeOut = 3;
-    kDelayByProvider = 4;
-  }
-
-  enum UpdateStateEnum : enum8 {
-    kUnknown = 0;
-    kIdle = 1;
-    kQuerying = 2;
-    kDelayedOnQuery = 3;
-    kDownloading = 4;
-    kApplying = 5;
-    kDelayedOnApply = 6;
-    kRollingBack = 7;
-    kDelayedOnUserConsent = 8;
-  }
-
-  fabric_scoped struct ProviderLocation {
-    node_id providerNodeID = 1;
-    endpoint_no endpoint = 2;
-    fabric_idx fabricIndex = 254;
-  }
-
-  info event StateTransition = 0 {
-    UpdateStateEnum previousState = 0;
-    UpdateStateEnum newState = 1;
-    ChangeReasonEnum reason = 2;
-    nullable int32u targetSoftwareVersion = 3;
-  }
-
-  critical event VersionApplied = 1 {
-    int32u softwareVersion = 0;
-    int16u productID = 1;
-  }
-
-  info event DownloadError = 2 {
-    int32u softwareVersion = 0;
-    int64u bytesDownloaded = 1;
-    nullable int8u progressPercent = 2;
-    nullable int64s platformCode = 3;
-  }
-
-  attribute access(write: administer) ProviderLocation defaultOTAProviders[] = 0;
-  readonly attribute boolean updatePossible = 1;
-  readonly attribute UpdateStateEnum updateState = 2;
-  readonly attribute nullable int8u updateStateProgress = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct AnnounceOTAProviderRequest {
-    node_id providerNodeID = 0;
-    vendor_id vendorID = 1;
-    AnnouncementReasonEnum announcementReason = 2;
-    optional octet_string<512> metadataForNode = 3;
-    endpoint_no endpoint = 4;
-  }
-
-  /** Announce the presence of an OTA Provider */
-  command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
-}
-
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing common languages, units of measurements, and numerical formatting
-      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
-      they can be configured to use a user’s preferred language, units, etc */
-cluster LocalizationConfiguration = 43 {
-  revision 1; // NOTE: Default/not specifically set
-
-  attribute access(write: manage) char_string<35> activeLocale = 0;
-  readonly attribute char_string supportedLocales[] = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing preferences for the units in which values are conveyed in communication to a
-      user. As such, Nodes that visually or audibly convey measurable values to the user need a
-      mechanism by which they can be configured to use a user’s preferred unit. */
-cluster UnitLocalization = 45 {
-  revision 1;
-
-  enum TempUnitEnum : enum8 {
-    kFahrenheit = 0;
-    kCelsius = 1;
-    kKelvin = 2;
-  }
-
-  bitmap Feature : bitmap32 {
-    kTemperatureUnit = 0x1;
-  }
-
-  attribute access(write: manage) optional TempUnitEnum temperatureUnit = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
-cluster PowerSource = 47 {
-  revision 1; // NOTE: Default/not specifically set
-
-  enum BatApprovedChemistryEnum : enum16 {
-    kUnspecified = 0;
-    kAlkaline = 1;
-    kLithiumCarbonFluoride = 2;
-    kLithiumChromiumOxide = 3;
-    kLithiumCopperOxide = 4;
-    kLithiumIronDisulfide = 5;
-    kLithiumManganeseDioxide = 6;
-    kLithiumThionylChloride = 7;
-    kMagnesium = 8;
-    kMercuryOxide = 9;
-    kNickelOxyhydride = 10;
-    kSilverOxide = 11;
-    kZincAir = 12;
-    kZincCarbon = 13;
-    kZincChloride = 14;
-    kZincManganeseDioxide = 15;
-    kLeadAcid = 16;
-    kLithiumCobaltOxide = 17;
-    kLithiumIon = 18;
-    kLithiumIonPolymer = 19;
-    kLithiumIronPhosphate = 20;
-    kLithiumSulfur = 21;
-    kLithiumTitanate = 22;
-    kNickelCadmium = 23;
-    kNickelHydrogen = 24;
-    kNickelIron = 25;
-    kNickelMetalHydride = 26;
-    kNickelZinc = 27;
-    kSilverZinc = 28;
-    kSodiumIon = 29;
-    kSodiumSulfur = 30;
-    kZincBromide = 31;
-    kZincCerium = 32;
-  }
-
-  enum BatChargeFaultEnum : enum8 {
-    kUnspecified = 0;
-    kAmbientTooHot = 1;
-    kAmbientTooCold = 2;
-    kBatteryTooHot = 3;
-    kBatteryTooCold = 4;
-    kBatteryAbsent = 5;
-    kBatteryOverVoltage = 6;
-    kBatteryUnderVoltage = 7;
-    kChargerOverVoltage = 8;
-    kChargerUnderVoltage = 9;
-    kSafetyTimeout = 10;
-  }
-
-  enum BatChargeLevelEnum : enum8 {
-    kOK = 0;
-    kWarning = 1;
-    kCritical = 2;
-  }
-
-  enum BatChargeStateEnum : enum8 {
-    kUnknown = 0;
-    kIsCharging = 1;
-    kIsAtFullCharge = 2;
-    kIsNotCharging = 3;
-  }
-
-  enum BatCommonDesignationEnum : enum16 {
-    kUnspecified = 0;
-    kAAA = 1;
-    kAA = 2;
-    kC = 3;
-    kD = 4;
-    k4v5 = 5;
-    k6v0 = 6;
-    k9v0 = 7;
-    k12AA = 8;
-    kAAAA = 9;
-    kA = 10;
-    kB = 11;
-    kF = 12;
-    kN = 13;
-    kNo6 = 14;
-    kSubC = 15;
-    kA23 = 16;
-    kA27 = 17;
-    kBA5800 = 18;
-    kDuplex = 19;
-    k4SR44 = 20;
-    k523 = 21;
-    k531 = 22;
-    k15v0 = 23;
-    k22v5 = 24;
-    k30v0 = 25;
-    k45v0 = 26;
-    k67v5 = 27;
-    kJ = 28;
-    kCR123A = 29;
-    kCR2 = 30;
-    k2CR5 = 31;
-    kCRP2 = 32;
-    kCRV3 = 33;
-    kSR41 = 34;
-    kSR43 = 35;
-    kSR44 = 36;
-    kSR45 = 37;
-    kSR48 = 38;
-    kSR54 = 39;
-    kSR55 = 40;
-    kSR57 = 41;
-    kSR58 = 42;
-    kSR59 = 43;
-    kSR60 = 44;
-    kSR63 = 45;
-    kSR64 = 46;
-    kSR65 = 47;
-    kSR66 = 48;
-    kSR67 = 49;
-    kSR68 = 50;
-    kSR69 = 51;
-    kSR516 = 52;
-    kSR731 = 53;
-    kSR712 = 54;
-    kLR932 = 55;
-    kA5 = 56;
-    kA10 = 57;
-    kA13 = 58;
-    kA312 = 59;
-    kA675 = 60;
-    kAC41E = 61;
-    k10180 = 62;
-    k10280 = 63;
-    k10440 = 64;
-    k14250 = 65;
-    k14430 = 66;
-    k14500 = 67;
-    k14650 = 68;
-    k15270 = 69;
-    k16340 = 70;
-    kRCR123A = 71;
-    k17500 = 72;
-    k17670 = 73;
-    k18350 = 74;
-    k18500 = 75;
-    k18650 = 76;
-    k19670 = 77;
-    k25500 = 78;
-    k26650 = 79;
-    k32600 = 80;
-  }
-
-  enum BatFaultEnum : enum8 {
-    kUnspecified = 0;
-    kOverTemp = 1;
-    kUnderTemp = 2;
-  }
-
-  enum BatReplaceabilityEnum : enum8 {
-    kUnspecified = 0;
-    kNotReplaceable = 1;
-    kUserReplaceable = 2;
-    kFactoryReplaceable = 3;
-  }
-
-  enum PowerSourceStatusEnum : enum8 {
-    kUnspecified = 0;
-    kActive = 1;
-    kStandby = 2;
-    kUnavailable = 3;
-  }
-
-  enum WiredCurrentTypeEnum : enum8 {
-    kAC = 0;
-    kDC = 1;
-  }
-
-  enum WiredFaultEnum : enum8 {
-    kUnspecified = 0;
-    kOverVoltage = 1;
-    kUnderVoltage = 2;
-  }
-
-  bitmap Feature : bitmap32 {
-    kWired = 0x1;
-    kBattery = 0x2;
-    kRechargeable = 0x4;
-    kReplaceable = 0x8;
-  }
-
-  struct BatChargeFaultChangeType {
-    BatChargeFaultEnum current[] = 0;
-    BatChargeFaultEnum previous[] = 1;
-  }
-
-  struct BatFaultChangeType {
-    BatFaultEnum current[] = 0;
-    BatFaultEnum previous[] = 1;
-  }
-
-  struct WiredFaultChangeType {
-    WiredFaultEnum current[] = 0;
-    WiredFaultEnum previous[] = 1;
-  }
-
-  info event WiredFaultChange = 0 {
-    WiredFaultEnum current[] = 0;
-    WiredFaultEnum previous[] = 1;
-  }
-
-  info event BatFaultChange = 1 {
-    BatFaultEnum current[] = 0;
-    BatFaultEnum previous[] = 1;
-  }
-
-  info event BatChargeFaultChange = 2 {
-    BatChargeFaultEnum current[] = 0;
-    BatChargeFaultEnum previous[] = 1;
-  }
-
-  readonly attribute PowerSourceStatusEnum status = 0;
-  readonly attribute int8u order = 1;
-  readonly attribute char_string<60> description = 2;
-  readonly attribute optional nullable int32u wiredAssessedInputVoltage = 3;
-  readonly attribute optional nullable int16u wiredAssessedInputFrequency = 4;
-  readonly attribute optional WiredCurrentTypeEnum wiredCurrentType = 5;
-  readonly attribute optional nullable int32u wiredAssessedCurrent = 6;
-  readonly attribute optional int32u wiredNominalVoltage = 7;
-  readonly attribute optional int32u wiredMaximumCurrent = 8;
-  readonly attribute optional boolean wiredPresent = 9;
-  readonly attribute optional WiredFaultEnum activeWiredFaults[] = 10;
-  readonly attribute optional nullable int32u batVoltage = 11;
-  readonly attribute optional nullable int8u batPercentRemaining = 12;
-  readonly attribute optional nullable int32u batTimeRemaining = 13;
-  readonly attribute optional BatChargeLevelEnum batChargeLevel = 14;
-  readonly attribute optional boolean batReplacementNeeded = 15;
-  readonly attribute optional BatReplaceabilityEnum batReplaceability = 16;
-  readonly attribute optional boolean batPresent = 17;
-  readonly attribute optional BatFaultEnum activeBatFaults[] = 18;
-  readonly attribute optional char_string<60> batReplacementDescription = 19;
-  readonly attribute optional BatCommonDesignationEnum batCommonDesignation = 20;
-  readonly attribute optional char_string<20> batANSIDesignation = 21;
-  readonly attribute optional char_string<20> batIECDesignation = 22;
-  readonly attribute optional BatApprovedChemistryEnum batApprovedChemistry = 23;
-  readonly attribute optional int32u batCapacity = 24;
-  readonly attribute optional int8u batQuantity = 25;
-  readonly attribute optional BatChargeStateEnum batChargeState = 26;
-  readonly attribute optional nullable int32u batTimeToFullCharge = 27;
-  readonly attribute optional boolean batFunctionalWhileCharging = 28;
-  readonly attribute optional nullable int32u batChargingCurrent = 29;
-  readonly attribute optional BatChargeFaultEnum activeBatChargeFaults[] = 30;
-  readonly attribute endpoint_no endpointList[] = 31;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 cluster GeneralCommissioning = 48 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum CommissioningErrorEnum : enum8 {
-    kOK = 0;
+    kOK = 0 [spec_name = "OK"];
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
     kNoFailSafe = 3;
@@ -1092,6 +739,12 @@ cluster GeneralCommissioning = 48 {
     kRequiredTCNotAccepted = 5;
     kTCAcknowledgementsNotReceived = 6;
     kTCMinVersionNotMet = 7;
+  }
+
+  enum NetworkRecoveryReasonEnum : enum8 {
+    kUnspecified = 0;
+    kAuth = 1;
+    kVisibility = 2;
   }
 
   enum RegulatoryLocationTypeEnum : enum8 {
@@ -1102,6 +755,7 @@ cluster GeneralCommissioning = 48 {
 
   bitmap Feature : bitmap32 {
     kTermsAndConditions = 0x1;
+    kNetworkRecovery = 0x2;
   }
 
   struct BasicCommissioningInfo {
@@ -1119,9 +773,11 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
   provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
   provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
+  provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
+  provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
+  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -1161,19 +817,19 @@ cluster GeneralCommissioning = 48 {
     CommissioningErrorEnum errorCode = 0;
   }
 
-  /** Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock */
+  /** This command is used to arm or disarm the fail-safe timer. */
   command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
-  /** Set the regulatory configuration to be used during commissioning */
+  /** This command is used to set the regulatory configuration for the device. */
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
-  /** Signals the Server that the Client has successfully completed all steps of Commissioning/Recofiguration needed during fail-safe period. */
+  /** This command is used to indicate that the commissioning process is complete. */
   fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
-  /** This command sets the user acknowledgements received in the Enhanced Setup Flow Terms and Conditions into the node. */
+  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms & Conditions into the node. */
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 cluster NetworkCommissioning = 49 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
@@ -1192,12 +848,12 @@ cluster NetworkCommissioning = 49 {
   }
 
   enum WiFiBandEnum : enum8 {
-    k2G4 = 0;
-    k3G65 = 1;
-    k5G = 2;
-    k6G = 3;
-    k60G = 4;
-    k1G = 5;
+    k2G4 = 0 [spec_name = "2G4"];
+    k3G65 = 1 [spec_name = "3G65"];
+    k5G = 2 [spec_name = "5G"];
+    k6G = 3 [spec_name = "6G"];
+    k60G = 4 [spec_name = "60G"];
+    k1G = 5 [spec_name = "1G"];
   }
 
   bitmap Feature : bitmap32 {
@@ -1217,11 +873,11 @@ cluster NetworkCommissioning = 49 {
 
   bitmap WiFiSecurityBitmap : bitmap8 {
     kUnencrypted = 0x1;
-    kWEP = 0x2;
-    kWPAPersonal = 0x4;
-    kWPA2Personal = 0x8;
-    kWPA3Personal = 0x10;
-    kWPA3MatterPDC = 0x20;
+    kWEP = 0x2 [spec_name = "WEP"];
+    kWPAPersonal = 0x4 [spec_name = "WPA-PERSONAL"];
+    kWPA2Personal = 0x8 [spec_name = "WPA2-PERSONAL"];
+    kWPA3Personal = 0x10 [spec_name = "WPA3-PERSONAL"];
+    kWPA3MatterPDC = 0x20 [spec_name = "WPA3-Matter-PDC"];
   }
 
   struct NetworkInfoStruct {
@@ -1264,7 +920,6 @@ cluster NetworkCommissioning = 49 {
   provisional readonly attribute optional int16u threadVersion = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -1449,7 +1104,6 @@ cluster GeneralDiagnostics = 51 {
   readonly attribute boolean testEventTriggersEnabled = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -1484,7 +1138,7 @@ cluster GeneralDiagnostics = 51 {
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster SoftwareDiagnostics = 52 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   bitmap Feature : bitmap32 {
     kWatermarks = 0x1;
@@ -1501,7 +1155,7 @@ cluster SoftwareDiagnostics = 52 {
   info event SoftwareFault = 0 {
     int64u id = 0;
     optional char_string name = 1;
-    optional octet_string faultRecording = 2;
+    optional long_octet_string faultRecording = 2;
   }
 
   readonly attribute optional ThreadMetricsStruct threadMetrics[] = 0;
@@ -1510,18 +1164,17 @@ cluster SoftwareDiagnostics = 52 {
   readonly attribute optional int64u currentHeapHighWatermark = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute. */
+  /** This command is used to reset the high watermarks for heap and stack memory. */
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
 }
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 cluster ThreadNetworkDiagnostics = 53 {
-  revision 2;
+  revision 3;
 
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
@@ -1540,7 +1193,7 @@ cluster ThreadNetworkDiagnostics = 53 {
     kUnassigned = 1;
     kSleepyEndDevice = 2;
     kEndDevice = 3;
-    kREED = 4;
+    kREED = 4 [spec_name = "REED"];
     kRouter = 5;
     kLeader = 6;
   }
@@ -1674,20 +1327,21 @@ cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute nullable octet_string<4> channelPage0Mask = 60;
   readonly attribute nullable OperationalDatasetComponents operationalDatasetComponents = 61;
   readonly attribute NetworkFaultEnum activeNetworkFaultsList[] = 62;
+  provisional readonly attribute nullable int64u extAddress = 63;
+  provisional readonly attribute nullable int16u rloc16 = 64;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reception of this command SHALL reset the OverrunCount attributes to 0 */
+  /** Reception of this command SHALL reset the following attributes to 0: */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster WiFiNetworkDiagnostics = 54 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum AssociationFailureCauseEnum : enum8 {
     kUnknown = 0;
@@ -1704,10 +1358,10 @@ cluster WiFiNetworkDiagnostics = 54 {
   enum SecurityTypeEnum : enum8 {
     kUnspecified = 0;
     kNone = 1;
-    kWEP = 2;
-    kWPA = 3;
-    kWPA2 = 4;
-    kWPA3 = 5;
+    kWEP = 2 [spec_name = "WEP"];
+    kWPA = 3 [spec_name = "WPA"];
+    kWPA2 = 4 [spec_name = "WPA2"];
+    kWPA3 = 5 [spec_name = "WPA3"];
   }
 
   enum WiFiVersionEnum : enum8 {
@@ -1753,24 +1407,23 @@ cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute optional nullable int64u overrunCount = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reception of this command SHALL reset the Breacon and Packet related count attributes to 0 */
+  /** This command is used to reset the count attributes. */
   command ResetCounts(): DefaultSuccess = 0;
 }
 
 /** The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster EthernetNetworkDiagnostics = 55 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum PHYRateEnum : enum8 {
     kRate10M = 0;
     kRate100M = 1;
     kRate1G = 2;
-    kRate25G = 3;
+    kRate25G = 3 [spec_name = "Rate2_5G"];
     kRate5G = 4;
     kRate10G = 5;
     kRate40G = 6;
@@ -1795,12 +1448,11 @@ cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute optional int64u timeSinceReset = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0 */
+  /** This command is used to reset the count attributes. */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
@@ -1829,7 +1481,6 @@ cluster AdministratorCommissioning = 60 {
   readonly attribute nullable vendor_id adminVendorId = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -1864,7 +1515,7 @@ cluster OperationalCredentials = 62 {
   }
 
   enum NodeOperationalCertStatusEnum : enum8 {
-    kOK = 0;
+    kOK = 0 [spec_name = "OK"];
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
     kInvalidNOC = 3;
@@ -1901,7 +1552,6 @@ cluster OperationalCredentials = 62 {
   readonly attribute int8u currentFabricIndex = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -2005,7 +1655,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
@@ -2046,7 +1696,6 @@ cluster GroupKeyManagement = 63 {
   readonly attribute int16u maxGroupKeysPerFabric = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -2081,30 +1730,11 @@ cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
-/** The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
-labels. */
-cluster FixedLabel = 64 {
-  revision 1; // NOTE: Default/not specifically set
-
-  struct LabelStruct {
-    char_string<16> label = 0;
-    char_string<16> value = 1;
-  }
-
-  readonly attribute LabelStruct labelList[] = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
 cluster UserLabel = 65 {
   revision 1; // NOTE: Default/not specifically set
 
-  struct LabelStruct {
+  shared struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
   }
@@ -2112,7 +1742,6 @@ cluster UserLabel = 65 {
   attribute access(write: manage) LabelStruct labelList[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -2128,8 +1757,8 @@ cluster IcdManagement = 70 {
   }
 
   enum OperatingModeEnum : enum8 {
-    kSIT = 0;
-    kLIT = 1;
+    kSIT = 0 [spec_name = "SIT"];
+    kLIT = 1 [spec_name = "LIT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -2178,7 +1807,6 @@ cluster IcdManagement = 70 {
   readonly attribute optional int32u maximumCheckInBackOff = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -2216,21 +1844,25 @@ cluster IcdManagement = 70 {
   command access(invoke: manage) StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
 }
 
-/** This cluster provides an interface for controlling a Closure device. */
-cluster ClosureControl = 260 {
+/** This cluster provides an interface for controlling a Closure. */
+provisional cluster ClosureControl = 260 {
   revision 1;
 
   enum ClosureErrorEnum : enum8 {
-    kBlocked = 0;
-    kTemperatureLimited = 1;
-    kMaintenanceRequired = 2;
-    kInternalInterference = 3;
+    kPhysicallyBlocked = 0;
+    kBlockedBySensor = 1;
+    kTemperatureLimited = 2;
+    kMaintenanceRequired = 3;
+    kInternalInterference = 4;
   }
 
-  enum LatchingEnum : enum8 {
-    kLatchedAndSecured = 0;
-    kLatchedButNotSecured = 1;
-    kNotLatched = 2;
+  enum CurrentPositionEnum : enum8 {
+    kFullyClosed = 0;
+    kFullyOpened = 1;
+    kPartiallyOpened = 2;
+    kOpenedForPedestrian = 3;
+    kOpenedForVentilation = 4;
+    kOpenedAtSignature = 5;
   }
 
   enum MainStateEnum : enum8 {
@@ -2242,51 +1874,14 @@ cluster ClosureControl = 260 {
     kProtected = 5;
     kDisengaged = 6;
     kSetupRequired = 7;
-    kPendingFallback = 8;
   }
 
-  enum PositioningEnum : enum8 {
-    kFullyClosed = 0;
-    kFullyOpened = 1;
-    kPartiallyOpened = 2;
-    kOpenedForPedestrian = 3;
-    kOpenedForVentilation = 4;
-    kOpenedAtSignature = 5;
-  }
-
-  enum RestingProcedureEnum : enum8 {
-    kDoNothing = 0;
-    kReturnToFullyOpened = 1;
-    kReturnToFullyClosed = 2;
-  }
-
-  enum TagLatchEnum : enum8 {
-    kLatch = 0;
-    kUnlatch = 1;
-  }
-
-  enum TagPositionEnum : enum8 {
-    kCloseInFull = 0;
-    kOpenInFull = 1;
-    kPedestrian = 2;
-    kVentilation = 3;
-    kSignature = 4;
-    kSequenceNextStep = 5;
-    kPedestrianNextStep = 6;
-  }
-
-  enum TriggerConditionEnum : enum8 {
-    kAfterDelay = 0;
-    kAfterApplicativeTrigger = 1;
-    kAfterDelayOrApplicativeTrigger = 2;
-  }
-
-  enum TriggerPositionEnum : enum8 {
-    kAtFullyClosed = 0;
-    kAtFullyOpened = 1;
-    kInBetween = 2;
-    kAtVentilation = 3;
-    kAtPedestrian = 4;
+  enum TargetPositionEnum : enum8 {
+    kMoveToFullyClosed = 0;
+    kMoveToFullyOpen = 1;
+    kMoveToPedestrianPosition = 2;
+    kMoveToVentilationPosition = 3;
+    kMoveToSignaturePosition = 4;
   }
 
   bitmap Feature : bitmap32 {
@@ -2299,66 +1894,202 @@ cluster ClosureControl = 260 {
     kCalibration = 0x40;
     kProtection = 0x80;
     kManuallyOperable = 0x100;
-    kFallback = 0x200;
   }
 
-  struct OverallStateStruct {
-    optional PositioningEnum positioning = 0;
-    optional LatchingEnum latching = 1;
-    optional ThreeLevelAutoEnum speed = 2;
-    optional bitmap32 extraInfo = 3;
+  bitmap LatchControlModesBitmap : bitmap8 {
+    kRemoteLatching = 0x1;
+    kRemoteUnlatching = 0x2;
   }
 
-  struct OverallTargetStruct {
-    optional TagPositionEnum tagPosition = 0;
-    optional TagLatchEnum tagLatch = 1;
+  struct OverallCurrentStateStruct {
+    optional nullable CurrentPositionEnum position = 0;
+    optional nullable boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
+    nullable boolean secureState = 3;
+  }
+
+  struct OverallTargetStateStruct {
+    optional nullable TargetPositionEnum position = 0;
+    optional nullable boolean latch = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  critical event OperationalError = 0 {
+    ClosureErrorEnum errorState[] = 0;
+  }
+
+  info event MovementCompleted = 1 {
+  }
+
+  info event EngageStateChanged = 2 {
+    boolean engageValue = 0;
+  }
+
+  info event SecureStateChanged = 3 {
+    boolean secureValue = 0;
   }
 
   readonly attribute optional nullable elapsed_s countdownTime = 0;
   readonly attribute MainStateEnum mainState = 1;
   readonly attribute ClosureErrorEnum currentErrorList[] = 2;
-  readonly attribute nullable OverallStateStruct overallState = 3;
-  readonly attribute nullable OverallTargetStruct overallTarget = 4;
-  readonly attribute optional RestingProcedureEnum restingProcedure = 5;
-  readonly attribute optional TriggerConditionEnum triggerCondition = 6;
-  readonly attribute optional TriggerPositionEnum triggerPosition = 7;
-  readonly attribute optional elapsed_s waitingDelay = 8;
-  readonly attribute optional elapsed_s kickoffTimer = 9;
+  readonly attribute nullable OverallCurrentStateStruct overallCurrentState = 3;
+  readonly attribute nullable OverallTargetStateStruct overallTargetState = 4;
+  readonly attribute optional LatchControlModesBitmap latchControlModes = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct MoveToRequest {
-    optional TagPositionEnum tag = 0;
-    optional TagLatchEnum latch = 1;
+    optional TargetPositionEnum position = 0;
+    optional boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
   }
 
-  request struct ConfigureFallbackRequest {
-    optional RestingProcedureEnum restingProcedure = 0;
-    optional TriggerConditionEnum triggerCondition = 1;
-    optional TriggerPositionEnum triggerPosition = 2;
-    optional elapsed_s waitingDelay = 3;
+  /** On receipt of this command, the closure SHALL stop its movement as fast as the closure is able too. */
+  command Stop(): DefaultSuccess = 0;
+  /** On receipt of this command, the closure SHALL operate to update its position, latch state and/or motion speed. */
+  timed command MoveTo(MoveToRequest): DefaultSuccess = 1;
+  /** This command is used to trigger a calibration of the closure. */
+  timed command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
+}
+
+/** This cluster provides an interface to reflect and control a closure's range of movement, usually involving a panel, by using 6-axis framework. */
+provisional cluster ClosureDimension = 261 {
+  revision 1;
+
+  enum ClosureUnitEnum : enum8 {
+    kMillimeter = 0;
+    kDegree = 1;
   }
 
-  /** On receipt of this command, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
-  command Stop(): DefaultSuccess = 0;
-  /** Upon receipt, this SHALL move the product in the most fitting state following the data as follows: */
-  command MoveTo(MoveToRequest): DefaultSuccess = 1;
-  /** Upon receipt, this SHALL initiate a calibration. */
-  command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
-  /** Upon receipt, this SHALL configure the Fallback feature behavior using the data as follows: */
-  command ConfigureFallback(ConfigureFallbackRequest): DefaultSuccess = 3;
-  /** Upon receipt, this SHALL cancel the current PendingFallback. */
-  command CancelFallback(): DefaultSuccess = 4;
+  enum ModulationTypeEnum : enum8 {
+    kSlatsOrientation = 0;
+    kSlatsOpenwork = 1;
+    kStripesAlignment = 2;
+    kOpacity = 3;
+    kVentilation = 4;
+  }
+
+  enum OverflowEnum : enum8 {
+    kNoOverflow = 0;
+    kInside = 1;
+    kOutside = 2;
+    kTopInside = 3;
+    kTopOutside = 4;
+    kBottomInside = 5;
+    kBottomOutside = 6;
+    kLeftInside = 7;
+    kLeftOutside = 8;
+    kRightInside = 9;
+    kRightOutside = 10;
+  }
+
+  enum RotationAxisEnum : enum8 {
+    kLeft = 0;
+    kCenteredVertical = 1;
+    kLeftAndRight = 2;
+    kRight = 3;
+    kTop = 4;
+    kCenteredHorizontal = 5;
+    kTopAndBottom = 6;
+    kBottom = 7;
+    kLeftBarrier = 8;
+    kLeftAndRightBarriers = 9;
+    kRightBarrier = 10;
+  }
+
+  enum StepDirectionEnum : enum8 {
+    kDecrease = 0;
+    kIncrease = 1;
+  }
+
+  enum TranslationDirectionEnum : enum8 {
+    kDownward = 0;
+    kUpward = 1;
+    kVerticalMask = 2;
+    kVerticalSymmetry = 3;
+    kLeftward = 4;
+    kRightward = 5;
+    kHorizontalMask = 6;
+    kHorizontalSymmetry = 7;
+    kForward = 8;
+    kBackward = 9;
+    kDepthMask = 10;
+    kDepthSymmetry = 11;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPositioning = 0x1;
+    kMotionLatching = 0x2;
+    kUnit = 0x4;
+    kLimitation = 0x8;
+    kSpeed = 0x10;
+    kTranslation = 0x20;
+    kRotation = 0x40;
+    kModulation = 0x80;
+  }
+
+  bitmap LatchControlModesBitmap : bitmap8 {
+    kRemoteLatching = 0x1;
+    kRemoteUnlatching = 0x2;
+  }
+
+  struct DimensionStateStruct {
+    optional nullable percent100ths position = 0;
+    optional nullable boolean latch = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  struct RangePercent100thsStruct {
+    percent100ths min = 0;
+    percent100ths max = 1;
+  }
+
+  struct UnitRangeStruct {
+    int16s min = 0;
+    int16s max = 1;
+  }
+
+  readonly attribute nullable DimensionStateStruct currentState = 0;
+  readonly attribute nullable DimensionStateStruct targetState = 1;
+  readonly attribute optional percent100ths resolution = 2;
+  readonly attribute optional percent100ths stepValue = 3;
+  readonly attribute optional ClosureUnitEnum unit = 4;
+  readonly attribute optional nullable UnitRangeStruct unitRange = 5;
+  readonly attribute optional RangePercent100thsStruct limitRange = 6;
+  readonly attribute optional TranslationDirectionEnum translationDirection = 7;
+  readonly attribute optional RotationAxisEnum rotationAxis = 8;
+  readonly attribute optional OverflowEnum overflow = 9;
+  readonly attribute optional ModulationTypeEnum modulationType = 10;
+  readonly attribute optional LatchControlModesBitmap latchControlModes = 11;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetTargetRequest {
+    optional percent100ths position = 0;
+    optional boolean latch = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  request struct StepRequest {
+    StepDirectionEnum direction = 0;
+    int16u numberOfSteps = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  /** This command is used to move a dimension of the closure to a target position. */
+  timed command SetTarget(SetTargetRequest): DefaultSuccess = 0;
+  /** This command is used to move a dimension of the closure to a target position by a number of steps. */
+  timed command Step(StepRequest): DefaultSuccess = 1;
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 3;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2378,14 +2109,13 @@ endpoint 0 {
     emits event AccessControlEntryChanged;
     emits event AccessControlExtensionChanged;
     callback attribute acl;
-    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -2398,7 +2128,7 @@ endpoint 0 {
     callback attribute vendorID;
     callback attribute productName;
     callback attribute productID;
-    persist  attribute nodeLabel;
+    callback attribute nodeLabel;
     callback attribute location;
     callback attribute hardwareVersion;
     callback attribute hardwareVersionString;
@@ -2409,70 +2139,21 @@ endpoint 0 {
     callback attribute productURL;
     callback attribute productLabel;
     callback attribute serialNumber;
-    persist  attribute localConfigDisabled default = 0;
+    callback attribute localConfigDisabled;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
+    callback attribute configurationVersion;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
-  }
-
-  server cluster OtaSoftwareUpdateRequestor {
-    emits event StateTransition;
-    emits event VersionApplied;
-    emits event DownloadError;
-    callback attribute defaultOTAProviders;
-    ram      attribute updatePossible default = 1;
-    ram      attribute updateState default = 0;
-    ram      attribute updateStateProgress default = 0;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-
-    handle command AnnounceOTAProvider;
-  }
-
-  server cluster LocalizationConfiguration {
-    ram      attribute activeLocale;
-    callback attribute supportedLocales;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster UnitLocalization {
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster PowerSource {
-    ram      attribute status;
-    ram      attribute order;
-    ram      attribute description;
-    ram      attribute batVoltage;
-    ram      attribute batPercentRemaining;
-    ram      attribute batTimeRemaining;
-    ram      attribute batChargeLevel;
-    callback attribute activeBatFaults;
-    ram      attribute batChargeState;
-    callback attribute endpointList;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster GeneralCommissioning {
-    ram      attribute breadcrumb default = 0x0000000000000000;
+    callback attribute breadcrumb;
     callback attribute basicCommissioningInfo;
     callback attribute regulatoryConfig;
     callback attribute locationCapability;
@@ -2480,8 +2161,8 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
@@ -2492,19 +2173,19 @@ endpoint 0 {
   }
 
   server cluster NetworkCommissioning {
-    ram      attribute maxNetworks;
+    callback attribute maxNetworks;
     callback attribute networks;
-    ram      attribute scanMaxTimeSeconds;
-    ram      attribute connectMaxTimeSeconds;
-    ram      attribute interfaceEnabled;
-    ram      attribute lastNetworkingStatus;
-    ram      attribute lastNetworkID;
-    ram      attribute lastConnectErrorValue;
+    callback attribute scanMaxTimeSeconds;
+    callback attribute connectMaxTimeSeconds;
+    callback attribute interfaceEnabled;
+    callback attribute lastNetworkingStatus;
+    callback attribute lastNetworkID;
+    callback attribute lastConnectErrorValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
@@ -2524,9 +2205,6 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute activeHardwareFaults;
-    callback attribute activeRadioFaults;
-    callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -2545,7 +2223,7 @@ endpoint 0 {
     callback attribute currentHeapUsed;
     callback attribute currentHeapHighWatermark;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command ResetWatermarks;
   }
@@ -2615,7 +2293,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
@@ -2638,7 +2316,7 @@ endpoint 0 {
     callback attribute currentMaxRate;
     callback attribute overrunCount;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
 
     handle command ResetCounts;
   }
@@ -2654,7 +2332,7 @@ endpoint 0 {
     callback attribute carrierDetect;
     callback attribute timeSinceReset;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster AdministratorCommissioning {
@@ -2665,7 +2343,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
     handle command RevokeCommissioning;
@@ -2681,8 +2359,8 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AttestationRequest;
     handle command AttestationResponse;
@@ -2696,6 +2374,9 @@ endpoint 0 {
     handle command UpdateFabricLabel;
     handle command RemoveFabric;
     handle command AddTrustedRootCertificate;
+    handle command SetVIDVerificationStatement;
+    handle command SignVIDVerificationRequest;
+    handle command SignVIDVerificationResponse;
   }
 
   server cluster GroupKeyManagement {
@@ -2717,12 +2398,6 @@ endpoint 0 {
     handle command KeySetReadAllIndicesResponse;
   }
 
-  server cluster FixedLabel {
-    callback attribute labelList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
   server cluster UserLabel {
     callback attribute labelList;
     ram      attribute featureMap default = 0;
@@ -2741,40 +2416,19 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_closurebase = 560, version 1;
+  device type ma_closure = 560, version 1;
 
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x05;
+    ram      attribute identifyType default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0006;
 
     handle command Identify;
-    handle command TriggerEffect;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command AddGroup;
-    handle command AddGroupResponse;
-    handle command ViewGroup;
-    handle command ViewGroupResponse;
-    handle command GetGroupMembership;
-    handle command GetGroupMembershipResponse;
-    handle command RemoveGroup;
-    handle command RemoveGroupResponse;
-    handle command RemoveAllGroups;
-    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {
@@ -2782,6 +2436,7 @@ endpoint 1 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2790,17 +2445,101 @@ endpoint 1 {
   }
 
   server cluster ClosureControl {
+    emits event OperationalError;
+    emits event MovementCompleted;
+    emits event EngageStateChanged;
+    emits event SecureStateChanged;
+    callback attribute countdownTime;
     ram      attribute mainState;
     callback attribute currentErrorList;
-    callback attribute overallState;
-    callback attribute overallTarget;
+    callback attribute overallCurrentState;
+    callback attribute overallTargetState;
+    ram      attribute latchControlModes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
+    handle command Stop;
     handle command MoveTo;
+    handle command Calibrate;
+  }
+}
+endpoint 2 {
+  device type ma_closure_panel = 561, version 1;
+
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute tagList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster ClosureDimension {
+    callback attribute currentState;
+    callback attribute targetState;
+    ram      attribute resolution;
+    ram      attribute stepValue;
+    ram      attribute unit;
+    callback attribute unitRange;
+    callback attribute limitRange;
+    ram      attribute rotationAxis;
+    ram      attribute overflow;
+    ram      attribute latchControlModes;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+
+    handle command SetTarget;
+    handle command Step;
+  }
+}
+endpoint 3 {
+  device type ma_closure_panel = 561, version 1;
+
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute tagList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster ClosureDimension {
+    callback attribute currentState;
+    callback attribute targetState;
+    ram      attribute resolution;
+    ram      attribute stepValue;
+    ram      attribute unit;
+    callback attribute unitRange;
+    callback attribute limitRange;
+    ram      attribute rotationAxis;
+    ram      attribute overflow;
+    ram      attribute latchControlModes;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+
+    handle command SetTarget;
+    handle command Step;
   }
 }
 

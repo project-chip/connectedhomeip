@@ -21,7 +21,7 @@
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
 #include <crypto/RandUtils.h>
-#include <data-model-providers/codegen/Instance.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/Span.h>
 #include <messaging/tests/echo/common.h>
@@ -53,33 +53,51 @@ void ResetDirtyFlags()
     sWindowStatusDirty     = false;
 }
 
-} // namespace
-
-void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
+class TestCommissioningWindowManagerDataModelProvider : public chip::app::CodegenDataModelProvider
 {
-    using namespace chip::app::Clusters;
-    using namespace chip::app::Clusters::AdministratorCommissioning::Attributes;
-    if (endpoint != chip::kRootEndpointId || clusterId != AdministratorCommissioning::Id)
+public:
+    TestCommissioningWindowManagerDataModelProvider()  = default;
+    ~TestCommissioningWindowManagerDataModelProvider() = default;
+
+    void Temporary_ReportAttributeChanged(const chip::app::AttributePathParams & path) override
     {
-        return;
+        using namespace chip::app::Clusters;
+        using namespace chip::app::Clusters::AdministratorCommissioning::Attributes;
+        if (path.mEndpointId != chip::kRootEndpointId || path.mClusterId != AdministratorCommissioning::Id)
+        {
+            return;
+        }
+
+        switch (path.mAttributeId)
+        {
+        case WindowStatus::Id:
+            sWindowStatusDirty = true;
+            break;
+        case AdminVendorId::Id:
+            sAdminVendorIdDirty = true;
+            break;
+        case AdminFabricIndex::Id:
+            sAdminFabricIndexDirty = true;
+            break;
+        default:
+            break;
+        }
+    }
+};
+
+chip::app::DataModel::Provider * TestDataModelProviderInstance(chip::PersistentStorageDelegate * delegate)
+{
+    static TestCommissioningWindowManagerDataModelProvider gTestModel;
+
+    if (delegate != nullptr)
+    {
+        gTestModel.SetPersistentStorageDelegate(delegate);
     }
 
-    switch (attributeId)
-    {
-    case WindowStatus::Id:
-        sWindowStatusDirty = true;
-        break;
-    case AdminVendorId::Id:
-        sAdminVendorIdDirty = true;
-        break;
-    case AdminFabricIndex::Id:
-        sAdminFabricIndexDirty = true;
-        break;
-    default:
-        break;
-    }
+    return &gTestModel;
 }
 
+} // namespace
 namespace {
 
 void TearDownTask(intptr_t context)
@@ -111,7 +129,7 @@ public:
         static chip::SimpleTestEventTriggerDelegate sSimpleTestEventTriggerDelegate;
         initParams.testEventTriggerDelegate = &sSimpleTestEventTriggerDelegate;
         (void) initParams.InitializeStaticResourcesBeforeServerInit();
-        initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+        initParams.dataModelProvider = TestDataModelProviderInstance(initParams.persistentStorageDelegate);
         // Use whatever server port the kernel decides to give us.
         initParams.operationalServicePort = 0;
 

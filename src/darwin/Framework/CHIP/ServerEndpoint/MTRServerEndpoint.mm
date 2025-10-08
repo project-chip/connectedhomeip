@@ -19,6 +19,8 @@
 #import "MTRLogging_Internal.h"
 #import "MTRServerCluster_Internal.h"
 #import "MTRServerEndpoint_Internal.h"
+#import "MTRUnfairLock.h"
+
 #import <Matter/MTRClusterConstants.h>
 #import <Matter/MTRServerEndpoint.h>
 
@@ -51,8 +53,20 @@ MTR_DIRECT_MEMBERS
     std::unique_ptr<EmberAfDeviceType[]> _matterDeviceTypes;
     std::unique_ptr<DataVersion[]> _matterDataVersions;
 
+    NSSet<MTRAccessGrant *> * _matterAccessGrants;
+
     // _endpointIndex has a value only when we have the endpoint configured.
     std::optional<uint16_t> _endpointIndex;
+
+    /**
+     * _lock always protects access to all our mutable ivars (the ones that are
+     * modified after init), except when we are on the Matter queue.  The
+     * interaction with the Matter queue is handled by ensuring that mutation of
+     * members can only happen on the matter queue (when we are associated with
+     * a controller) or not on the matter queue (when we are not associated with
+     * a controller).  And controller association changes happen under the lock.
+     */
+    os_unfair_lock _lock;
 }
 
 - (nullable instancetype)initWithEndpointID:(NSNumber *)endpointID deviceTypes:(NSArray<MTRDeviceTypeRevision *> *)deviceTypes
@@ -95,6 +109,7 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
+    _lock = OS_UNFAIR_LOCK_INIT;
     _endpointID = [endpointID copy];
     _deviceTypes = [deviceTypes copy];
     _accessGrants = [[NSMutableSet alloc] init];
@@ -118,6 +133,8 @@ MTR_DIRECT_MEMBERS
 
 - (void)updateMatterAccessGrants
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+
     MTRDeviceController * deviceController = _deviceController;
     if (deviceController == nil) {
         // _matterAccessGrants will be updated when we get bound to a controller.
@@ -133,6 +150,8 @@ MTR_DIRECT_MEMBERS
 
 - (void)addAccessGrant:(MTRAccessGrant *)accessGrant
 {
+    std::lock_guard lock(self->_lock);
+
     [_accessGrants addObject:accessGrant];
 
     [self updateMatterAccessGrants];
@@ -140,13 +159,24 @@ MTR_DIRECT_MEMBERS
 
 - (void)removeAccessGrant:(MTRAccessGrant *)accessGrant;
 {
+    std::lock_guard lock(self->_lock);
+
     [_accessGrants removeObject:accessGrant];
 
     [self updateMatterAccessGrants];
 }
 
+- (NSArray<MTRAccessGrant *> *)matterAccessGrants
+{
+    std::lock_guard lock(self->_lock);
+
+    return [_matterAccessGrants allObjects];
+}
+
 - (BOOL)addServerCluster:(MTRServerCluster *)serverCluster
 {
+    std::lock_guard lock(self->_lock);
+
     MTRDeviceController * deviceController = _deviceController;
     if (deviceController != nil) {
         MTR_LOG_ERROR("Cannot add cluster on endpoint %llu which is already in use", _endpointID.unsignedLongLongValue);
@@ -184,6 +214,8 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
 - (BOOL)associateWithController:(nullable MTRDeviceController *)controller
 {
+    std::lock_guard lock(self->_lock);
+
     MTRDeviceController * existingController = _deviceController;
     if (existingController != nil) {
         MTR_LOG_ERROR("Cannot associate MTRServerEndpoint with controller %@; already associated with controller %@",
@@ -193,7 +225,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
     // After this point we have to make sure we clean up on any failures.
     if (![self finishAssociationWithController:controller]) {
-        [self invalidate];
+        [self _invalidateWhileLocked];
         return NO;
     }
 
@@ -202,6 +234,8 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
 - (BOOL)finishAssociationWithController:(nullable MTRDeviceController *)controller
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+
     for (MTRServerCluster * cluster in _serverClusters) {
         if (![cluster associateWithController:controller]) {
             return NO;
@@ -311,7 +345,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
     _deviceController = controller;
 
     MTR_LOG("Associated %@, cluster count %llu, with controller %@",
-        self, static_cast<unsigned long long>(clusterCount), controller);
+        [self _descriptionWhileLocked], static_cast<unsigned long long>(clusterCount), controller);
 
     return YES;
 }
@@ -360,8 +394,9 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
     if (_endpointIndex.has_value()) {
         emberAfClearDynamicEndpoint(_endpointIndex.value());
-        _endpointIndex.reset();
     }
+
+    _endpointIndex.reset();
 
     for (MTRServerCluster * cluster in _serverClusters) {
         [cluster unregisterMatterCluster];
@@ -370,6 +405,14 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
 - (void)invalidate
 {
+    std::lock_guard lock(self->_lock);
+    [self _invalidateWhileLocked];
+}
+
+- (void)_invalidateWhileLocked
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
     // Undo any work associateWithController did.
     for (MTRServerCluster * cluster in _serverClusters) {
         [cluster invalidate];
@@ -403,16 +446,27 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
 - (NSArray<MTRAccessGrant *> *)accessGrants
 {
+    std::lock_guard lock(_lock);
+
     return [_accessGrants allObjects];
 }
 
 - (NSArray<MTRServerCluster *> *)serverClusters
 {
+    std::lock_guard lock(_lock);
+
     return [_serverClusters copy];
 }
 
 - (NSString *)description
 {
+    std::lock_guard lock(_lock);
+    return [self _descriptionWhileLocked];
+}
+
+- (NSString *)_descriptionWhileLocked
+{
+    os_unfair_lock_assert_owner(&self->_lock);
     return [NSString stringWithFormat:@"<MTRServerEndpoint id %u>", static_cast<EndpointId>(_endpointID.unsignedLongLongValue)];
 }
 

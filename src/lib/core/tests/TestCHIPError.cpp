@@ -27,44 +27,44 @@ namespace {
 
 TEST(ChipErrorTest, RangeConstructor)
 {
-    ChipError error(ChipError::Range::kSDK, /*value=*/1, __FILE__, __LINE__);
+    ChipError error(ChipError::Range::kSDK, /*value=*/1 CHIP_ERROR_SOURCE_LOCATION);
 #if CHIP_CONFIG_ERROR_SOURCE
     EXPECT_EQ(error.GetFile(), __FILE__);
     EXPECT_EQ(error.GetLine(), 30u);
-#if __cplusplus >= 202002L
+#if CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
     std::source_location location = error.GetSourceLocation();
     EXPECT_EQ(location.line(), 30u);
     EXPECT_EQ(location.file_name(), __FILE__);
-#endif // __cplusplus >= 202002L
+#endif // CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
 #endif // CHIP_CONFIG_ERROR_SOURCE
 }
 
 TEST(ChipErrorTest, SdkPartConstructor)
 {
-    ChipError error(ChipError::SdkPart::kCore, /*code=*/1, __FILE__, __LINE__);
+    ChipError error(ChipError::SdkPart::kCore, /*code=*/1 CHIP_ERROR_SOURCE_LOCATION);
 #if CHIP_CONFIG_ERROR_SOURCE
     EXPECT_EQ(error.GetFile(), __FILE__);
     EXPECT_EQ(error.GetLine(), 44u);
-#if __cplusplus >= 202002L
+#if CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
     std::source_location location = error.GetSourceLocation();
     EXPECT_EQ(location.line(), 44u);
     EXPECT_EQ(location.file_name(), __FILE__);
-#endif // __cplusplus >= 202002L
+#endif // CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
 #endif // CHIP_CONFIG_ERROR_SOURCE
 }
 
 TEST(ChipErrorTest, StorageTypeConstructor)
 {
-    ChipError error(/*error=*/1, __FILE__, __LINE__);
+    ChipError error(/*error=*/1 CHIP_ERROR_SOURCE_LOCATION);
     EXPECT_EQ(error.AsInteger(), 1u);
 #if CHIP_CONFIG_ERROR_SOURCE
     EXPECT_EQ(error.GetFile(), __FILE__);
     EXPECT_EQ(error.GetLine(), 58u);
-#if __cplusplus >= 202002L
+#if CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
     std::source_location location = error.GetSourceLocation();
     EXPECT_EQ(location.line(), 58u);
     EXPECT_EQ(location.file_name(), __FILE__);
-#endif // __cplusplus >= 202002L
+#endif // CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
 #endif // CHIP_CONFIG_ERROR_SOURCE
 }
 

@@ -122,21 +122,27 @@ Davis, CA 95616, USA
       <field id="3" name="ProtocolsSupported" type="list">
         <entry type="DownloadProtocolEnum"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="8"/>
+        <constraint>
+          <maxCount value="8"/>
+        </constraint>
       </field>
       <field id="4" name="HardwareVersion" type="uint16">
         <optionalConform/>
       </field>
       <field id="5" name="Location" type="string">
         <optionalConform/>
-        <constraint type="allowed" value="2"/>
+        <constraint>
+          <allowed value="2"/>
+        </constraint>
       </field>
       <field id="6" name="RequestorCanConsent" type="bool" default="false">
         <optionalConform/>
       </field>
       <field id="7" name="MetadataForProvider" type="octstr">
         <optionalConform/>
-        <constraint type="maxLength" value="512"/>
+        <constraint>
+          <maxLength value="512"/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="QueryImageResponse" direction="responseFromServer">
@@ -149,25 +155,39 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="ImageURI" type="string">
         <optionalConform/>
-        <constraint type="maxLength" value="256"/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
       </field>
       <field id="3" name="SoftwareVersion" type="uint32">
         <optionalConform/>
       </field>
       <field id="4" name="SoftwareVersionString" type="string">
         <optionalConform/>
-        <constraint type="lengthBetween" from="1" to="64"/>
+        <constraint>
+          <lengthBetween>
+            <from value="1"/>
+            <to value="64"/>
+          </lengthBetween>
+        </constraint>
       </field>
       <field id="5" name="UpdateToken" type="octstr">
         <optionalConform/>
-        <constraint type="lengthBetween" from="8" to="32"/>
+        <constraint>
+          <lengthBetween>
+            <from value="8"/>
+            <to value="32"/>
+          </lengthBetween>
+        </constraint>
       </field>
       <field id="6" name="UserConsentNeeded" type="bool" default="false">
         <optionalConform/>
       </field>
       <field id="7" name="MetadataForRequestor" type="octstr">
         <optionalConform/>
-        <constraint type="maxLength" value="512"/>
+        <constraint>
+          <maxLength value="512"/>
+        </constraint>
       </field>
     </command>
     <command id="0x02" name="ApplyUpdateRequest" direction="commandToServer" response="ApplyUpdateResponse">
@@ -175,7 +195,12 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="UpdateToken" type="octstr">
         <mandatoryConform/>
-        <constraint type="lengthBetween" from="8" to="32"/>
+        <constraint>
+          <lengthBetween>
+            <from value="8"/>
+            <to value="32"/>
+          </lengthBetween>
+        </constraint>
       </field>
       <field id="1" name="NewVersion" type="uint32">
         <mandatoryConform/>
@@ -195,7 +220,12 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="UpdateToken" type="octstr">
         <mandatoryConform/>
-        <constraint type="lengthBetween" from="8" to="32"/>
+        <constraint>
+          <lengthBetween>
+            <from value="8"/>
+            <to value="32"/>
+          </lengthBetween>
+        </constraint>
       </field>
       <field id="1" name="SoftwareVersion" type="uint32">
         <mandatoryConform/>

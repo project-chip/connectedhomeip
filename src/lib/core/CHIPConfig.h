@@ -516,14 +516,27 @@
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
 /**
+ *  @def CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+ *
+ *  If asserted (1) along with CHIP_CONFIG_ERROR_SOURCE, then CHIP_ERROR will store the error location
+ *  using the std::source_location (requires at least C++20) instead of keeping raw __FILE__ and __LINE__.
+ *  This feature comes with FLASH and RAM overhead, so it is disabled by default.
+ */
+#ifndef CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+#define CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION 0
+#endif // CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+
+/**
  *  @def CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
  *
  *  If asserted (1) along with CHIP_CONFIG_ERROR_SOURCE, then instances of CHIP_NO_ERROR will also include
  *  the source location of their expansion. Otherwise, CHIP_NO_ERROR is excluded from source tracking.
+ *  Since CHIP_NO_ERROR is used in many places and tracking it adds marginal debugging value, it is
+ *  disabled by default.
  */
 #ifndef CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
-#define CHIP_CONFIG_ERROR_SOURCE_NO_ERROR 1
-#endif // CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_CONFIG_ERROR_SOURCE_NO_ERROR 0
+#endif // CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
 
 /**
  *  @def CHIP_CONFIG_ERROR_FORMAT_AS_STRING
@@ -532,7 +545,6 @@
  *  If 1, then ChipError::Format() returns a const char *, from chip::ErrorStr().
  *  In either case, the macro CHIP_ERROR_FORMAT expands to a suitable printf format.
  */
-
 #ifndef CHIP_CONFIG_ERROR_FORMAT_AS_STRING
 #define CHIP_CONFIG_ERROR_FORMAT_AS_STRING 0
 #endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
@@ -1111,6 +1123,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC
+ *
+ * @brief Defines the number of binding entries per fabric.
+ */
+#ifndef CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC
+#define CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC 4
+#endif
+
+/**
  * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
  *
  * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.
@@ -1229,6 +1250,18 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT
 #define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+ *
+ * If set to 1, the `Extension` attribute of the ACL Cluster will be enabled
+ * and supported. This attribute is optional and costly to implement. It is required by
+ * some device types, so some applications must enable it in their CHIPProjectConfig.h
+ * as an override.
+ */
+#ifndef CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 0
 #endif
 
 /**
@@ -1914,6 +1947,61 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_MRP_ANALYTICS_ENABLED 0
 #endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
 
+/**
+ *  @def CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+ *
+ *  @brief
+ *    Enables EndpointUniqueId attribute for the endpoint in descriptor cluster
+ *
+ * The purpose of this macro is to prevent compiling code related to EndpointUniqueId
+ * for devices that are not interested to support this optional attribute in descriptor cluster by
+ * overriding this macro in project specific configuration.
+ */
+#ifndef CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+#define CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID 0
+#endif // CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+
+/**
+ * @def CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES
+ *
+ * @brief The maximum number of bytes taken by the TLS root certificate in persistent storage. This needs
+ * to be increased if the size of TLSCertStruct changes.
+ *
+ * @note The default is based on real-world testing of serialization for the worst case allowed by the spec.
+ */
+#ifndef CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES
+#define CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES 3200
+#endif // CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES
+
+/**
+ * @def CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES
+ *
+ * @brief The maximum number of bytes taken by the TLS client certificate in persistent storage. This needs
+ * to be increased if the size of TLSClientCertificateDetailStruct changes.
+ *
+ * @note The default is based on real-world testing of serialization for the worst case allowed by the spec.
+ */
+#ifndef CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES
+#define CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES 31000
+#endif // CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES
+
+/**
+ * @def CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
+ *
+ * @brief The maximum number of client certificates per fabric for the TLS table
+ */
+#ifndef CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
+#define CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE 5
+#endif // CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
+
+/**
+ * @def CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
+ *
+ * @brief The maximum number of root certificates per fabric for the TLS table
+ */
+#ifndef CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
+#define CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE 5
+#endif // CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
 /**
  * @}
  */

@@ -56,6 +56,10 @@ declare_args() {
   chip_im_static_global_interaction_model_engine =
       current_os != "linux" && current_os != "mac" && current_os != "ios" &&
       current_os != "android"
+
+  # Set for integration into build systems: defines visibility
+  # for files that chip_data_model requires.
+  chip_app_data_model_target = "${chip_root}/examples/*"
 }
 
 buildconfig_header("app_buildconfig") {
@@ -121,7 +125,7 @@ source_set("global-attributes") {
   # as a dependency
   public_deps = [
     ":app_config",
-    "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/common:global-ids",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/lib/support",
   ]
@@ -201,13 +205,7 @@ static_library("interaction-model") {
     "reporting/ReportSchedulerImpl.h",
     "reporting/SynchronizedReportSchedulerImpl.cpp",
     "reporting/SynchronizedReportSchedulerImpl.h",
-
-    # TODO: reporting header is part of interaction-model, however actual implementation depends
-    #       on generated code as subscriptions depend on attribute data versioning to determine
-    #       when "data changed" reports should be sent.
-    #
-    #       This breaks having `.h` and `.cpp` based off the same compilation unit and
-    #       should ideally be cleaned up.
+    "reporting/reporting.cpp",
     "reporting/reporting.h",
   ]
 
@@ -260,7 +258,6 @@ static_library("interaction-model") {
 
   if (chip_build_controller_dynamic_server) {
     sources += [
-      "clusters/ota-provider/ota-provider.cpp",
       "dynamic_server/AccessControl.cpp",
       "dynamic_server/AccessControl.h",
     ]
@@ -279,6 +276,8 @@ static_library("interaction-model") {
       ":global-attributes",
       "${chip_root}/src/access",
       "${chip_root}/src/access:provider-impl",
+      "${chip_root}/src/app:required-privileges",
+      "${chip_root}/src/app/clusters/ota-provider",
       "${chip_root}/src/app/common:attribute-type",
     ]
 
@@ -296,6 +295,7 @@ source_set("events") {
   deps = [
     ":paths",
     "${chip_root}/src/access:types",
+    "${chip_root}/src/app/data-model:data-model",
     "${chip_root}/src/lib/core",
   ]
 }
@@ -319,6 +319,7 @@ static_library("attribute-access") {
     "${chip_root}/src/access:types",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/data-model-provider:core",
     "${chip_root}/src/app/util:af-types",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
@@ -346,6 +347,38 @@ source_set("required-privileges") {
     ]
 
     public_configs = [ ":config-controller-dynamic-server" ]
+  }
+
+  # These files are for CODE GENERATION ONLY, so technically
+  # CodegenDataModelProvider should be the only one using this. Since CodegenDataModelProvider
+  # is part of application code, the visibility is broad. However generally DO NOT USE THIS
+  # unless you are creating a new CodegenDataModelProvider based item
+  visibility = [
+    # Test data models: mock models for testing
+    # TODO: Some of these are questionable as they would not work as part of a monolith
+    #       (single app) test build: in particular the energy management bits seem wrong
+    "${chip_root}/examples/common/server-cluster-shim:mock_data_model_with_shim",
+    "${chip_root}/examples/energy-management-app/energy-management-common",
+    "${chip_root}/src/app/util/mock/*",
+    "${chip_root}/src/data-model-providers/codegen/tests/*",
+
+    # Controller data models:
+    #   linked by controllers only, never by applications
+    "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/controller/java:jni",
+    "${chip_root}/src/controller/python:ChipDeviceCtrl",
+  ]
+
+  # Application integration: `chip_data_model` target should be set here
+  if (chip_app_data_model_target != "") {
+    visibility += [ chip_app_data_model_target ]
+  }
+
+  # We still have some strong coupling in this case
+  # Eventually dynamic server should be replaced with code-driven and not try
+  # to fake out ember codegen
+  if (chip_build_controller_dynamic_server) {
+    visibility += [ ":interaction-model" ]
   }
 }
 
@@ -385,6 +418,7 @@ source_set("command-handler-interface") {
     "CommandHandlerInterface.h",
     "CommandHandlerInterfaceRegistry.cpp",
     "CommandHandlerInterfaceRegistry.h",
+    "CommandHandlerInterfaceShim.h",
   ]
 
   public_deps = [
@@ -409,7 +443,6 @@ source_set("command-handler-impl") {
   public_deps = [
     ":command-handler-interface",
     ":paths",
-    ":required-privileges",
     ":status-response",
     "${chip_root}/src/access:types",
     "${chip_root}/src/app/MessageDef",
@@ -474,7 +507,17 @@ source_set("generic-test-event-trigger-handler") {
 
   public_deps = [
     ":test-event-trigger",
+    "${chip_root}/src/app/clusters/general-diagnostics-server:general-diagnostics-server",
     "${chip_root}/src/platform",
+  ]
+}
+
+source_set("user-consent") {
+  sources = [ "OTAUserConsentCommon.h" ]
+  deps = [
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:span",
   ]
 }
 
@@ -493,7 +536,6 @@ static_library("app") {
     "EventManagement.h",
     "FailSafeContext.cpp",
     "FailSafeContext.h",
-    "OTAUserConsentCommon.h",
     "ReadHandler.cpp",
     "TimerDelegates.cpp",
     "TimerDelegates.h",

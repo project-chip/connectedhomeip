@@ -27,8 +27,8 @@ except ModuleNotFoundError:
 import unittest
 from typing import Optional
 
-from matter.idl.generators import GeneratorStorage
 from matter.idl.generators.idl import IdlGenerator
+from matter.idl.generators.storage import GeneratorStorage
 from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeInstantiation, AttributeQuality,
                                          AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation, CommandQuality,
                                          ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality,
@@ -334,6 +334,29 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertIdlEqual(actual, expected)
 
+    def test_cluster_enum_with_spec_name(self):
+        actual = parseText("""
+            client cluster WithEnums = 0xab {
+                enum TestEnum : ENUM16 {
+                    A = 0x123 [ spec_name = "foo/bar" ];
+                    B = 0x234 [spec_name = "B_"];
+                }
+            }
+        """)
+        expected = Idl(clusters=[
+            Cluster(name="WithEnums",
+                    code=0xab,
+                    enums=[
+                        Enum(name="TestEnum", base_type="ENUM16",
+                             entries=[
+                                 ConstantEntry(name="A", code=0x123,
+                                               specification_name="foo/bar"),
+                                 ConstantEntry(name="B", code=0x234,
+                                               specification_name="B_"),
+                             ])],
+                    )])
+        self.assertIdlEqual(actual, expected)
+
     def test_event_field_api_maturity(self):
         actual = parseText("""
             server cluster MaturityTest = 1 {
@@ -407,6 +430,32 @@ class TestParser(unittest.TestCase):
                                        name="kInternal", code=0x2, api_maturity=ApiMaturity.INTERNAL),
                                    ConstantEntry(
                                        name="kProvisional", code=0x4, api_maturity=ApiMaturity.PROVISIONAL),
+                               ])],
+                    )])
+        self.assertIdlEqual(actual, expected)
+
+    def test_bitmap_constant_spec_name(self):
+        actual = parseText("""
+            client cluster Test = 0xab {
+                bitmap TestBitmap : BITMAP32 {
+                    kStable = 0x1 [spec_name="STABLE"];
+                    internal kInternal = 0x2;
+                    provisional kProvisional = 0x4 [ spec_name = "Pr" ];
+                }
+            }
+        """)
+        expected = Idl(clusters=[
+            Cluster(name="Test",
+                    code=0xab,
+                    bitmaps=[
+                        Bitmap(name="TestBitmap", base_type="BITMAP32",
+                               entries=[
+                                   ConstantEntry(
+                                       name="kStable", code=0x1, specification_name="STABLE"),
+                                   ConstantEntry(
+                                       name="kInternal", code=0x2, api_maturity=ApiMaturity.INTERNAL),
+                                   ConstantEntry(
+                                       name="kProvisional", code=0x4, api_maturity=ApiMaturity.PROVISIONAL, specification_name="Pr"),
                                ])],
                     )])
         self.assertIdlEqual(actual, expected)
@@ -699,7 +748,7 @@ server cluster A = 1 { /* Test comment */ }
                                                ServerClusterInstantiation(
                                                    name="Bar"),
                                            ],
-                                           client_bindings=["Bar", "Test"],)
+                                           client_bindings=["Bar", "Test"])
                                   ])
         self.assertIdlEqual(actual, expected)
 
@@ -734,7 +783,7 @@ server cluster A = 1 { /* Test comment */ }
                                                                           storage=AttributeStorage.CALLBACK, default=True),
                                                ]),
                                            ],
-                                           client_bindings=[],)
+                                           client_bindings=[])
                                   ])
         self.assertIdlEqual(actual, expected)
 
@@ -859,7 +908,7 @@ server cluster A = 1 { /* Test comment */ }
                     ],
                     structs=[
                         Struct(name="MyStruct", fields=[
-                            Field(name="subStruct", code=0, data_type=DataType(name="TestStruct"), qualities=FieldQuality.NULLABLE), ],
+                            Field(name="subStruct", code=0, data_type=DataType(name="TestStruct"), qualities=FieldQuality.NULLABLE)],
                         ),
                         global_struct,
                     ],
@@ -1008,6 +1057,40 @@ server cluster A = 1 { /* Test comment */ }
             Cluster(name="C", code=3, revision=2),
             Cluster(name="D", code=4, revision=123),
         ])
+        self.assertIdlEqual(actual, expected)
+
+    def test_marks_shared_items(self):
+        actual = parseText("""
+            server cluster WithSharedItems = 1 {
+                shared struct SharedStruct { nullable int16u abc = 0; }
+                shared enum SharedEnum : ENUM16 { A = 1; B = 2; }
+                shared bitmap SharedBitmap : BITMAP32 { X = 100; Y = 200; }
+            }
+        """)
+
+        expected = Idl(clusters=[
+            Cluster(name="WithSharedItems", code=1,
+                    structs=[
+                        Struct(name="SharedStruct", is_shared=True, fields=[
+                            Field(name="abc", code=0, data_type=DataType(
+                                name="int16u"), qualities=FieldQuality.NULLABLE),
+                        ]),
+                    ],
+                    enums=[
+                        Enum(name="SharedEnum", is_shared=True, base_type="ENUM16",
+                             entries=[
+                                 ConstantEntry(name="A", code=1),
+                                 ConstantEntry(name="B", code=2),
+                             ])],
+                    bitmaps=[
+                        Bitmap(name="SharedBitmap", is_shared=True, base_type="BITMAP32",
+                               entries=[
+                                   ConstantEntry(name="X", code=100),
+                                   ConstantEntry(name="Y", code=200),
+                               ])],
+                    )
+        ])
+
         self.assertIdlEqual(actual, expected)
 
     def test_handle_commands(self):

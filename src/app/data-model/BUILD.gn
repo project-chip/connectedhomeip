@@ -40,7 +40,6 @@ source_set("data-model") {
     "List.h",
     "PreEncodedValue.cpp",
     "PreEncodedValue.h",
-    "WrappedStructEncoder.h",
   ]
 
   deps = [
@@ -52,6 +51,24 @@ source_set("data-model") {
   ]
 
   public_deps = [ ":nullable" ]
+}
+
+source_set("encode-decode") {
+  sources = [
+    "StructDecodeIterator.cpp",
+    "StructDecodeIterator.h",
+    "WrappedStructEncoder.cpp",
+    "WrappedStructEncoder.h",
+  ]
+
+  deps = [
+    ":data-model",
+    "${chip_root}/src/lib/core",
+  ]
+
+  public_deps = [ ":nullable" ]
+
+  visibility = [ "${chip_root}/src/app/common:cluster-objects" ]
 }
 
 # Provides extensions that use heap and should be

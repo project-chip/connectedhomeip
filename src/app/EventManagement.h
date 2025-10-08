@@ -75,7 +75,7 @@ namespace app {
 inline constexpr const uint32_t kEventManagementProfile = 0x1;
 inline constexpr const uint32_t kFabricIndexTag         = 0x1;
 inline constexpr size_t kMaxEventSizeReserve            = 512;
-constexpr uint16_t kRequiredEventField =
+inline constexpr uint16_t kRequiredEventField =
     (1 << to_underlying(EventDataIB::Tag::kPriority)) | (1 << to_underlying(EventDataIB::Tag::kPath));
 
 /**
@@ -202,6 +202,13 @@ class EventManagement : public DataModel::EventsGenerator
 {
 public:
     /**
+     * Note: Even though this class is used as a singleton, the default constructor is public in
+     * order to preserve the ability to instantiate this class in test code. This is meant to be
+     * temporary until we find a better solution.
+     */
+    constexpr EventManagement() = default;
+
+    /**
      * Initialize the EventManagement with an array of LogStorageResources and
      * an equal-length array of CircularEventBuffers that correspond to those
      * LogStorageResources. The array of LogStorageResources must provide a
@@ -290,14 +297,6 @@ public:
      * threshold specified in the LoggingConfiguration.  If the event's
      * priority does not meet the current threshold, it is dropped and
      * the function returns a `0` as the resulting event ID.
-     *
-     * This variant of the invocation permits the caller to set any
-     * combination of `EventOptions`:
-     * - timestamp, when 0 defaults to the current time at the point of
-     *   the call,
-     * - "root" section of the event source (event source and cluster ID);
-     *   if NULL, it defaults to the current device. the event is marked as
-     *   relating to the device that is making the call,
      *
      * @param[in] apDelegate The EventLoggingDelegate to serialize the event data
      *
@@ -396,8 +395,19 @@ public:
     /* EventsGenerator implementation */
     CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventPayloadWriter, const EventOptions & options,
                              EventNumber & generatedEventNumber) override;
+    void ScheduleUrgentEventDeliverySync(std::optional<FabricIndex> fabricIndex = std::nullopt) override;
 
 private:
+    static EventManagement sInstance;
+
+    class InternalEventOptions : public EventOptions
+    {
+    public:
+        InternalEventOptions() {}
+        InternalEventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp) {}
+        Timestamp mTimestamp;
+    };
+
     /**
      * @brief
      *  Internal structure for traversing events.
@@ -422,7 +432,8 @@ private:
     };
 
     void VendEventNumber();
-    CHIP_ERROR CalculateEventSize(EventLoggingDelegate * apDelegate, const EventOptions * apOptions, uint32_t & requiredSize);
+    CHIP_ERROR CalculateEventSize(EventLoggingDelegate * apDelegate, const InternalEventOptions * apOptions,
+                                  uint32_t & requiredSize);
     /**
      * @brief Helper function for writing event header and data according to event
      *   logging protocol.
@@ -433,11 +444,12 @@ private:
      *
      * @param[in] apDelegate The EventLoggingDelegate to serialize the event data
      *
-     * @param[in] apOptions     EventOptions describing timestamp and other tags
+     * @param[in] apOptions     InternalEventOptions describing timestamp and other tags
      *                          relevant to this event.
      *
      */
-    CHIP_ERROR ConstructEvent(EventLoadOutContext * apContext, EventLoggingDelegate * apDelegate, const EventOptions * apOptions);
+    CHIP_ERROR ConstructEvent(EventLoadOutContext * apContext, EventLoggingDelegate * apDelegate,
+                              const InternalEventOptions * apOptions);
 
     // Internal function to log event
     CHIP_ERROR LogEventPrivate(EventLoggingDelegate * apDelegate, const EventOptions & aEventOptions, EventNumber & aEventNumber);
@@ -565,9 +577,9 @@ private:
     MonotonicallyIncreasingCounter<EventNumber> * mpEventNumberCounter = nullptr;
 
     EventNumber mLastEventNumber = 0; ///< Last event Number vended
-    Timestamp mLastEventTimestamp;    ///< The timestamp of the last event in this buffer
+    Timestamp mLastEventTimestamp{};  ///< The timestamp of the last event in this buffer
 
-    System::Clock::Milliseconds64 mMonotonicStartupTime;
+    System::Clock::Milliseconds64 mMonotonicStartupTime{};
 
     EventReporter * mpEventReporter = nullptr;
 };

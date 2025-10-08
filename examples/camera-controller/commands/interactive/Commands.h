@@ -28,6 +28,7 @@ void registerCommandsInteractive(Commands & commands, CredentialIssuerCommands *
 
     commands_list clusterCommands = {
         make_unique<InteractiveStartCommand>(&commands, credsIssuerConfig),
+        make_unique<InteractiveServerCommand>(&commands, credsIssuerConfig),
     };
 
     commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for starting long-lived interactive modes.");

@@ -26,14 +26,16 @@ import matter.tlv.TlvWriter
 
 class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
   val ccdid: UInt,
-  val clientCertificate: Optional<ByteArray>,
+  val clientCertificate: Optional<ByteArray>?,
   val intermediateCertificates: Optional<List<ByteArray>>,
+  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("TlsCertificateManagementClusterTLSClientCertificateDetailStruct {\n")
     append("\tccdid : $ccdid\n")
     append("\tclientCertificate : $clientCertificate\n")
     append("\tintermediateCertificates : $intermediateCertificates\n")
+    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -41,9 +43,13 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CCDID), ccdid)
-      if (clientCertificate.isPresent) {
-        val optclientCertificate = clientCertificate.get()
-        put(ContextSpecificTag(TAG_CLIENT_CERTIFICATE), optclientCertificate)
+      if (clientCertificate != null) {
+        if (clientCertificate.isPresent) {
+          val optclientCertificate = clientCertificate.get()
+          put(ContextSpecificTag(TAG_CLIENT_CERTIFICATE), optclientCertificate)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_CLIENT_CERTIFICATE))
       }
       if (intermediateCertificates.isPresent) {
         val optintermediateCertificates = intermediateCertificates.get()
@@ -53,6 +59,7 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
         }
         endArray()
       }
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -61,6 +68,7 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
     private const val TAG_CCDID = 0
     private const val TAG_CLIENT_CERTIFICATE = 1
     private const val TAG_INTERMEDIATE_CERTIFICATES = 2
+    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
@@ -69,10 +77,15 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
       tlvReader.enterStructure(tlvTag)
       val ccdid = tlvReader.getUInt(ContextSpecificTag(TAG_CCDID))
       val clientCertificate =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLIENT_CERTIFICATE))) {
-          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_CERTIFICATE)))
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLIENT_CERTIFICATE))) {
+            Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_CERTIFICATE)))
+          } else {
+            Optional.empty()
+          }
         } else {
-          Optional.empty()
+          tlvReader.getNull(ContextSpecificTag(TAG_CLIENT_CERTIFICATE))
+          null
         }
       val intermediateCertificates =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))) {
@@ -88,6 +101,7 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
         } else {
           Optional.empty()
         }
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
@@ -95,6 +109,7 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
         ccdid,
         clientCertificate,
         intermediateCertificates,
+        fabricIndex,
       )
     }
   }

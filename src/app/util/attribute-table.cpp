@@ -356,7 +356,7 @@ Status emAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWrite
             return Status::InvalidDataType;
         }
 
-        if (metadata->IsReadOnly())
+        if (!metadata->IsWritable())
         {
             ChipLogProgress(Zcl, "WRITE ERR: attr not writable");
             return Status::UnsupportedWrite;

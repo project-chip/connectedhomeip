@@ -15,9 +15,16 @@
 import dataclasses
 import enum
 import logging
+import sys
 from typing import Callable, Dict, List, Optional, Protocol, TypeVar
 
+import click
+import coloredlogs
+
+from matter.idl.matter_idl_parser import CreateParser
 from matter.idl.matter_idl_types import ApiMaturity, Attribute, Bitmap, Cluster, Command, Enum, Event, Field, Idl, Struct
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Compatibility(enum.Enum):
@@ -65,10 +72,9 @@ class CompatibilityChecker:
         self._updated_idl = updated
         self.compatible = Compatibility.UNKNOWN
         self.errors: List[str] = []
-        self.logger = logging.getLogger(__name__)
 
     def _mark_incompatible(self, reason: str):
-        self.logger.error(reason)
+        LOGGER.error(reason)
         self.errors.append(reason)
         self.compatible = Compatibility.INCOMPATIBLE
 
@@ -152,7 +158,7 @@ class CompatibilityChecker:
             f"Event {cluster_name}::{event.name}", event.fields, updated_event.fields)
 
     def _check_command_compatible(self, cluster_name: str, command: Command, updated_command: Optional[Command]):
-        self.logger.debug(f"  Checking command {cluster_name}::{command.name}")
+        LOGGER.debug(f"  Checking command {cluster_name}::{command.name}")
         if not updated_command:
             self._mark_incompatible(
                 f"Command {cluster_name}::{command.name} was removed")
@@ -175,7 +181,7 @@ class CompatibilityChecker:
                 f"Command {cluster_name}::{command.name} qualities changed from {command.qualities} to {updated_command.qualities}")
 
     def _check_struct_compatible(self, cluster_name: str, original: Struct, updated: Optional[Struct]):
-        self.logger.debug(f"  Checking struct {original.name}")
+        LOGGER.debug(f"  Checking struct {original.name}")
         if not updated:
             self._mark_incompatible(
                 f"Struct {cluster_name}::{original.name} has been deleted.")
@@ -197,7 +203,7 @@ class CompatibilityChecker:
                 f"Struct {cluster_name}::{original.name} has modified qualities")
 
     def _check_attribute_compatible(self, cluster_name: str, original: Attribute, updated: Optional[Attribute]):
-        self.logger.debug(
+        LOGGER.debug(
             f"  Checking attribute {cluster_name}::{original.definition.name}")
         if not updated:
             self._mark_incompatible(
@@ -288,7 +294,7 @@ class CompatibilityChecker:
             self._check_cluster_compatible(original_cluster, updated_cluster)
 
     def _check_cluster_compatible(self, original_cluster: Cluster, updated_cluster: Optional[Cluster]):
-        self.logger.debug(
+        LOGGER.debug(
             f"Checking cluster {original_cluster.name}")
         if not updated_cluster:
             self._mark_incompatible(
@@ -335,3 +341,50 @@ def is_backwards_compatible(original: Idl, updated: Idl):
     """
     checker = CompatibilityChecker(original, updated)
     return checker.check() == Compatibility.COMPATIBLE
+
+
+# Supported log levels, mapping string values required for argument
+# parsing into logging constants
+__LOG_LEVELS__ = {
+    'debug': logging.DEBUG,
+    'info': logging.INFO,
+    'warn': logging.WARN,
+    'fatal': logging.FATAL,
+}
+
+
+@click.command()
+@click.option(
+    '--log-level',
+    default='INFO',
+    type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
+    help='Determines the verbosity of script output')
+@click.argument(
+    'old_idl',
+    type=click.Path(exists=True))
+@click.argument(
+    'new_idl',
+    type=click.Path(exists=True))
+def main(log_level, old_idl, new_idl):
+    """
+    Parses MATTER IDL files (.matter) and validates that <new_idl> is backwards compatible
+    when compared to <old_idl>.
+
+    Generally additions are safe, but not deletes or id changes. Actual set of rules
+    defined in `backwards_compatibility` module.
+    """
+    coloredlogs.install(
+        level=__LOG_LEVELS__[log_level],
+        fmt='%(asctime)s %(levelname)-7s %(message)s',
+    )
+
+    LOGGER.info("Parsing OLD idl from %s" % old_idl)
+    old_tree = CreateParser().parse(open(old_idl, "rt").read())
+
+    LOGGER.info("Parsing NEW idl from %s" % new_idl)
+    new_tree = CreateParser().parse(open(new_idl, "rt").read())
+
+    if not is_backwards_compatible(original=old_tree, updated=new_tree):
+        sys.exit(1)
+
+    sys.exit(0)

@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/reporting/reporting.h>
 #include <app/util/endpoint-config-api.h>
+#include <bridged-actions-stub.h>
 #include <lib/support/ZclString.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -30,7 +31,24 @@ LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 namespace {
 bool sTurnedOn;
 uint8_t sLevel;
+
+std::unique_ptr<chip::app::Clusters::Actions::ActionsDelegateImpl> sActionsDelegateImpl;
+std::unique_ptr<chip::app::Clusters::Actions::ActionsServer> sActionsServer;
 } // namespace
+
+void emberAfActionsClusterInitCallback(chip::EndpointId endpoint)
+{
+    VerifyOrReturn(endpoint == 1,
+                   ChipLogError(Zcl, "Actions cluster delegate is not implemented for endpoint with id %d.", endpoint));
+    VerifyOrReturn(emberAfContainsServer(endpoint, chip::app::Clusters::Actions::Id) == true,
+                   ChipLogError(Zcl, "Endpoint %d does not support Actions cluster.", endpoint));
+    VerifyOrReturn(!sActionsDelegateImpl && !sActionsServer);
+
+    sActionsDelegateImpl = std::make_unique<chip::app::Clusters::Actions::ActionsDelegateImpl>();
+    sActionsServer       = std::make_unique<chip::app::Clusters::Actions::ActionsServer>(endpoint, *sActionsDelegateImpl.get());
+
+    sActionsServer->Init();
+}
 
 AppTask AppTask::sAppTask;
 #include <app/InteractionModelEngine.h>

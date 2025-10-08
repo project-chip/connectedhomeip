@@ -28,7 +28,7 @@ cd connectedhomeip
 
 # Generate Conformance Report
 source scripts/activate.sh
-./scripts/build_python.sh -i out/python_env
+./scripts/build_python.sh -w false -i out/python_env
 python3 -u scripts/examples/conformance_report.py
 cp /tmp/conformance_report/conformance_report.html out/coverage/coverage/html
 

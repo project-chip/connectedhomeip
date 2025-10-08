@@ -165,7 +165,12 @@ void ChipDeviceScanner::OnDeviceAdded(BluezDevice1 & device)
 void ChipDeviceScanner::OnDevicePropertyChanged(BluezDevice1 & device, GVariant * changedProps,
                                                 const char * const * invalidatedProps)
 {
-    ReportDevice(device);
+    int16_t value;
+    // If the RSSI property was changed it means that the device is still in range so we can report it.
+    if (g_variant_lookup(changedProps, "RSSI", "n", &value))
+    {
+        ReportDevice(device);
+    }
 }
 
 void ChipDeviceScanner::ReportDevice(BluezDevice1 & device)

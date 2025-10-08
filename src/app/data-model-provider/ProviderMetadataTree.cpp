@@ -17,7 +17,7 @@
 
 #include <app/data-model-provider/ProviderMetadataTree.h>
 
-#include <app/data-model-provider/MetadataList.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 namespace chip {
 namespace app {
@@ -26,7 +26,7 @@ namespace DataModel {
 ReadOnlyBuffer<EndpointEntry> ProviderMetadataTree::EndpointsIgnoreError()
 {
 
-    ListBuilder<EndpointEntry> builder;
+    ReadOnlyBufferBuilder<EndpointEntry> builder;
     (void) Endpoints(builder);
     return builder.TakeBuffer();
 }
@@ -34,14 +34,14 @@ ReadOnlyBuffer<EndpointEntry> ProviderMetadataTree::EndpointsIgnoreError()
 ReadOnlyBuffer<ServerClusterEntry> ProviderMetadataTree::ServerClustersIgnoreError(EndpointId endpointId)
 {
 
-    ListBuilder<ServerClusterEntry> builder;
+    ReadOnlyBufferBuilder<ServerClusterEntry> builder;
     (void) ServerClusters(endpointId, builder);
     return builder.TakeBuffer();
 }
 
 ReadOnlyBuffer<AttributeEntry> ProviderMetadataTree::AttributesIgnoreError(const ConcreteClusterPath & path)
 {
-    ListBuilder<AttributeEntry> builder;
+    ReadOnlyBufferBuilder<AttributeEntry> builder;
     (void) Attributes(path, builder);
     return builder.TakeBuffer();
 }

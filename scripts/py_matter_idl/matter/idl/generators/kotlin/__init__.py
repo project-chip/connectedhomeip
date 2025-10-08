@@ -19,12 +19,15 @@ import logging
 import os
 from typing import List, Optional, Set
 
-from matter.idl.generators import CodeGenerator, GeneratorStorage
+from matter.idl.generators import CodeGenerator
 from matter.idl.generators.filters import upfirst
+from matter.idl.generators.storage import GeneratorStorage
 from matter.idl.generators.type_definitions import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
                                                     ParseDataType, TypeLookupContext)
 from matter.idl.matter_idl_types import (Attribute, Cluster, Command, DataType, Field, FieldQuality, Idl, Struct, StructQuality,
                                          StructTag)
+
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
@@ -81,7 +84,7 @@ def _UnderlyingType(field: Field, context: TypeLookupContext) -> Optional[str]:
         elif actual == FundamentalType.DOUBLE:
             return 'Double'
         else:
-            logging.warn('Unknown fundamental type: %r' % actual)
+            LOGGER.warning('Unknown fundamental type: %r' % actual)
 
     return None
 
@@ -623,7 +626,7 @@ class __KotlinCodeGenerator(CodeGenerator):
 
     def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):
         """
-        Inintialization is specific for kotlin generation and will add
+        Initialization is specific for kotlin generation and will add
         filters as required by the kotlin .jinja templates to function.
         """
         super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))

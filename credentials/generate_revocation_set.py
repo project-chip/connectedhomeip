@@ -864,7 +864,7 @@ def cli():
 @optgroup.option('--use-test-net-dcld', type=str, default='', metavar='PATH', help="Location of `dcld` binary, to use `dcld` for mirroring TestNet.")
 @optgroup.option('--use-main-net-http', is_flag=True, type=str, help="Use RESTful API with HTTPS against public MainNet observer.")
 @optgroup.option('--use-test-net-http', is_flag=True, type=str, help="Use RESTful API with HTTPS against public TestNet observer.")
-@optgroup.option('--use-local-data', is_flag=True, type=bool, help="Fake response directory: see \" DATA_DIR/",)
+@optgroup.option('--use-local-data', is_flag=True, type=bool, help="Fake response directory: see \" DATA_DIR/")
 @optgroup.group('Required arguments if use-local-data is used', cls=AllOptionGroup)
 @optgroup.option('--certificates', type=click.File('rb'), multiple=True, help='Paths to PEM formated certificates (i.e. PAA) in DCL but missing from the revocation-points-response file.')
 @optgroup.option('--crls', type=click.File('rb'), multiple=True, help='Paths to the crl der files')
@@ -1006,14 +1006,11 @@ class TestRevocationSetGeneration(unittest.TestCase):
     def get_test_file_path(self, filename):
         return os.path.join(self.test_base_dir, 'test', filename)
 
-    def compare_revocation_sets(self, generated_set, expected_file):
-        with open(os.path.join(self.test_base_dir, expected_file), 'r') as f:
-            expected_set = [RevocationSet(**r) for r in json.load(f)]
+    def get_expected_revocation_set(self, idx):
+        with open(os.path.join(self.test_base_dir, 'test/revoked-attestation-certificates/revocation-sets/revocation-set.json'), 'r') as f:
+            return RevocationSet(**json.load(f)[idx])
 
-        # Compare the contents
-        self.assertEqual(len([generated_set]), len(expected_set))
-        expected = expected_set[0]
-
+    def compare_revocation_sets(self, generated_set, expected):
         # Compare required fields
         self.assertEqual(generated_set.type, expected.type)
         self.assertEqual(generated_set.issuer_subject_key_id, expected.issuer_subject_key_id)
@@ -1038,10 +1035,7 @@ class TestRevocationSetGeneration(unittest.TestCase):
         revocation_set = generate_revocation_set_from_crl(
             crl, crl_signer, ca_name_b64, ca_akid_hex, None)
 
-        self.compare_revocation_sets(
-            revocation_set,
-            'test/revoked-attestation-certificates/revocation-sets/revocation-set-for-paa.json'
-        )
+        self.compare_revocation_sets(revocation_set, self.get_expected_revocation_set(0))
 
     def test_pai_revocation_set(self):
         """Test generation of PAI revocation set"""
@@ -1057,10 +1051,23 @@ class TestRevocationSetGeneration(unittest.TestCase):
         revocation_set = generate_revocation_set_from_crl(
             crl, crl_signer, ca_name_b64, ca_akid_hex, None)
 
-        self.compare_revocation_sets(
-            revocation_set,
-            'test/revoked-attestation-certificates/revocation-sets/revocation-set-for-pai.json'
-        )
+        self.compare_revocation_sets(revocation_set, self.get_expected_revocation_set(1))
+
+    def test_revoked_pai_revocation_set(self):
+        """Test generation of revocation set of revoked PAI"""
+        with open(self.get_test_file_path('revoked-attestation-certificates/Chip-Test-PAI-FFF1-noPID-Revoked-CRL.pem'), 'rb') as f:
+            crl = x509.load_pem_x509_crl(f.read())
+        with open(self.get_test_file_path('revoked-attestation-certificates/Chip-Test-PAI-FFF1-noPID-Revoked-Cert.pem'), 'rb') as f:
+            crl_signer = x509.load_pem_x509_certificate(f.read())
+        with open(self.get_test_file_path('revoked-attestation-certificates/Chip-Test-PAA-FFF1-Cert.pem'), 'rb') as f:
+            paa = x509.load_pem_x509_certificate(f.read())
+
+        ca_name_b64, ca_akid_hex = get_certificate_authority_details(
+            crl_signer, None, paa, False)
+        revocation_set = generate_revocation_set_from_crl(
+            crl, crl_signer, ca_name_b64, ca_akid_hex, None)
+
+        self.compare_revocation_sets(revocation_set, self.get_expected_revocation_set(2))
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -32,13 +32,15 @@
 #include <zephyr/net/net_event.h>
 #include <zephyr/net/net_if.h>
 #include <zephyr/net/net_stats.h>
+#include <zephyr/version.h>
 
 extern "C" {
+#ifdef CONFIG_WIFI_NM_WPA_SUPPLICANT
 #include <common/defs.h>
 #include <wpa_supplicant/config.h>
 #include <wpa_supplicant/driver_i.h>
 #include <wpa_supplicant/scan.h>
-
+#endif // CONFIG_WIFI_NM_WPA_SUPPLICANT
 // extern function to obtain bssid from status buffer
 // It is defined in zephyr/subsys/net/ip/utils.c
 extern char * net_sprint_ll_addr_buf(const uint8_t * ll, uint8_t ll_len, char * buf, int buflen);
@@ -151,27 +153,45 @@ const Map<wifi_iface_state, WiFiManager::StationStatus, 10>
                               { WIFI_STATE_4WAY_HANDSHAKE, WiFiManager::StationStatus::PROVISIONING },
                               { WIFI_STATE_GROUP_HANDSHAKE, WiFiManager::StationStatus::PROVISIONING },
                               { WIFI_STATE_COMPLETED, WiFiManager::StationStatus::FULLY_PROVISIONED } });
-
-const Map<uint32_t, WiFiManager::NetEventHandler, 5> WiFiManager::sEventHandlerMap({
-    { NET_EVENT_WIFI_SCAN_RESULT, WiFiManager::ScanResultHandler },
-    { NET_EVENT_WIFI_SCAN_DONE, WiFiManager::ScanDoneHandler },
-    { NET_EVENT_WIFI_CONNECT_RESULT, WiFiManager::ConnectHandler },
-    { NET_EVENT_WIFI_DISCONNECT_RESULT, WiFiManager::DisconnectHandler },
-    { NET_EVENT_WIFI_DISCONNECT_COMPLETE, WiFiManager::DisconnectHandler },
-});
-
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 2
+void WiFiManager::WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint64_t mgmtEvent, net_if * iface)
+#else
 void WiFiManager::WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface)
+#endif
 {
     if (iface == Instance().mNetIf)
     {
         Platform::UniquePtr<uint8_t> eventData(new uint8_t[cb->info_length]);
         VerifyOrReturn(eventData);
         memcpy(eventData.get(), cb->info, cb->info_length);
-        sEventHandlerMap[mgmtEvent](std::move(eventData), cb->info_length);
+        switch (mgmtEvent)
+        {
+        case NET_EVENT_WIFI_SCAN_RESULT:
+            WiFiManager::ScanResultHandler(std::move(eventData), cb->info_length);
+            break;
+        case NET_EVENT_WIFI_SCAN_DONE:
+            WiFiManager::ScanDoneHandler(std::move(eventData), cb->info_length);
+            break;
+        case NET_EVENT_WIFI_CONNECT_RESULT:
+            WiFiManager::ConnectHandler(std::move(eventData), cb->info_length);
+            break;
+        case NET_EVENT_WIFI_DISCONNECT_RESULT:
+            WiFiManager::DisconnectHandler(std::move(eventData), cb->info_length);
+            break;
+        case NET_EVENT_WIFI_DISCONNECT_COMPLETE:
+            WiFiManager::DisconnectHandler(std::move(eventData), cb->info_length);
+            break;
+        default:
+            break;
+        }
     }
 }
 
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 2
+void WiFiManager::IPv6MgmtEventHandler(net_mgmt_event_callback * cb, uint64_t mgmtEvent, net_if * iface)
+#else
 void WiFiManager::IPv6MgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface)
+#endif
 {
     if (((mgmtEvent == NET_EVENT_IPV6_ADDR_ADD) || (mgmtEvent == NET_EVENT_IPV6_ADDR_DEL)) && cb->info)
     {
@@ -241,7 +261,7 @@ CHIP_ERROR WiFiManager::ClearStationProvisioningData()
 
 CHIP_ERROR WiFiManager::Connect(const ByteSpan & ssid, const ByteSpan & credentials, const ConnectionHandling & handling)
 {
-    ChipLogDetail(DeviceLayer, "Connecting to WiFi network: %.*s", ssid.size(), ssid.data());
+    ChipLogDetail(DeviceLayer, "Connecting to WiFi network: %s", NullTerminated(ssid).c_str());
 
     mHandling = handling;
 
@@ -296,12 +316,16 @@ CHIP_ERROR WiFiManager::GetWiFiInfo(WiFiInfo & info) const
 
     if (status.state >= WIFI_STATE_ASSOCIATED)
     {
-        info.mSecurityType   = MapToMatterSecurityType(status.security);
-        info.mWiFiVersion    = MapToMatterWiFiVersionCode(status.link_mode);
-        info.mRssi           = static_cast<int8_t>(status.rssi);
-        info.mChannel        = static_cast<uint16_t>(status.channel);
-        info.mSsidLen        = status.ssid_len;
+        info.mSecurityType = MapToMatterSecurityType(status.security);
+        info.mWiFiVersion  = MapToMatterWiFiVersionCode(status.link_mode);
+        info.mRssi         = static_cast<int8_t>(status.rssi);
+        info.mChannel      = static_cast<uint16_t>(status.channel);
+        info.mSsidLen      = status.ssid_len;
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 1
+        info.mCurrentPhyRate = static_cast<uint64_t>(status.current_phy_tx_rate);
+#else
         info.mCurrentPhyRate = static_cast<uint64_t>(status.current_phy_rate);
+#endif
         memcpy(info.mSsid, status.ssid, status.ssid_len);
         memcpy(info.mBssId, status.bssid, sizeof(status.bssid));
 
@@ -318,20 +342,11 @@ CHIP_ERROR WiFiManager::GetNetworkStatistics(NetworkStatistics & stats) const
 
     stats.mPacketMulticastRxCount = data.multicast.rx;
     stats.mPacketMulticastTxCount = data.multicast.tx;
-#ifdef CONFIG_WIFI_NXP
-    // Workaround as unicast stats are missing on NXP wifi driver
-    stats.mPacketUnicastRxCount = data.pkts.rx - (data.broadcast.rx + data.multicast.rx);
-    stats.mPacketUnicastTxCount = data.pkts.tx - (data.broadcast.tx + data.multicast.tx);
-    // Most of the cases in stats.errors are overrun.
-    // TODO: Use Zephyr's overrun_count once it's supported by the WiFi Driver
-    stats.mOverRunCount = data.errors.rx + data.errors.tx;
-#else
-    stats.mPacketUnicastRxCount = data.unicast.rx;
-    stats.mPacketUnicastTxCount = data.unicast.tx;
-    stats.mOverRunCount         = data.overrun_count;
-#endif
-    stats.mBeaconsSuccessCount = data.sta_mgmt.beacons_rx;
-    stats.mBeaconsLostCount    = data.sta_mgmt.beacons_miss;
+    stats.mPacketUnicastRxCount   = data.unicast.rx;
+    stats.mPacketUnicastTxCount   = data.unicast.tx;
+    stats.mOverRunCount           = data.overrun_count;
+    stats.mBeaconsSuccessCount    = data.sta_mgmt.beacons_rx;
+    stats.mBeaconsLostCount       = data.sta_mgmt.beacons_miss;
 
     return CHIP_NO_ERROR;
 }
@@ -539,7 +554,7 @@ void WiFiManager::ConnectHandler(Platform::UniquePtr<uint8_t> data, size_t lengt
             CHIP_ERROR error = chip::DeviceLayer::PlatformMgr().PostEvent(&event);
             if (error != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "Cannot post event [error: %s]", ErrorStr(error));
+                ChipLogError(DeviceLayer, "Cannot post event: %" CHIP_ERROR_FORMAT, error.Format());
             }
 
             WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
@@ -569,8 +584,8 @@ void WiFiManager::DisconnectHandler(Platform::UniquePtr<uint8_t> data, size_t le
         Platform::UniquePtr<uint8_t> safePtr(capturedData);
         uint8_t * rawData          = safePtr.get();
         const wifi_status * status = reinterpret_cast<const wifi_status *>(rawData);
-        uint16_t reason;
-
+        uint16_t reason            = 0;
+#ifdef CONFIG_WIFI_NM_WPA_SUPPLICANT
         switch (status->disconn_reason)
         {
         case WIFI_REASON_DISCONN_UNSPECIFIED:
@@ -589,6 +604,9 @@ void WiFiManager::DisconnectHandler(Platform::UniquePtr<uint8_t> data, size_t le
             reason = WLAN_REASON_UNSPECIFIED;
             break;
         }
+#else
+        reason               = status->disconn_reason;
+#endif
         Instance().SetLastDisconnectReason(reason);
 
         ChipLogProgress(DeviceLayer, "WiFi station disconnected");

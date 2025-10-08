@@ -71,7 +71,7 @@ Davis, CA 95616, USA
   <clusters>
     <cluster id="0x0048" name="Oven Cavity Operational State" side="server">
       <optionalConform>
-        <attribute name="Heater"/>
+        <condition name="Heater"/>
       </optionalConform>
       <commands>
         <command id="0x0000" name="Pause">
@@ -84,7 +84,7 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0049" name="Oven Mode" side="server">
       <optionalConform>
-        <attribute name="Heater"/>
+        <condition name="Heater"/>
       </optionalConform>
       <features>
         <feature code="" name="OnOff">
@@ -99,7 +99,7 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0052" name="Refrigerator and Temperature Controlled Cabinet Mode" side="server">
       <optionalConform>
-        <attribute name="Cooler"/>
+        <condition name="Cooler"/>
       </optionalConform>
       <features>
         <feature code="" name="OnOff">

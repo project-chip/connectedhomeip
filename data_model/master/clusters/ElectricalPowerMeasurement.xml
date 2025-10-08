@@ -57,10 +57,11 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0090" name="Electrical Power Measurement Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0090" name="Electrical Power Measurement Cluster" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Changed reactive and apparent power fields to use new data types"/>
+    <revision revision="3" summary="Changed range of apparent current field to allow negative apparent current"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0090" name="Electrical Power Measurement"/>
@@ -147,6 +148,7 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </field>
       <field id="4" name="EndTimestamp" type="epoch-s">
+        <describedConform/>
         <constraint>
           <min value="StartTimestamp + 1"/>
         </constraint>
@@ -170,6 +172,7 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </field>
       <field id="8" name="EndSystime" type="systime-ms">
+        <describedConform/>
         <constraint>
           <min value="StartSystime + 1"/>
         </constraint>
@@ -208,8 +211,11 @@ Davis, CA 95616, USA
       <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint>
-        <countBetween value="1">
-          <attribute name="NumberOfMeasurementTypes"/>
+        <countBetween>
+          <from value="1"/>
+          <to>
+            <attribute name="NumberOfMeasurementTypes"/>
+          </to>
         </countBetween>
       </constraint>
     </attribute>
@@ -219,8 +225,11 @@ Davis, CA 95616, USA
       <quality quieterReporting="true"/>
       <optionalConform/>
       <constraint>
-        <countBetween value="0">
-          <attribute name="NumberOfMeasurementTypes"/>
+        <countBetween>
+          <from value="0"/>
+          <to>
+            <attribute name="NumberOfMeasurementTypes"/>
+          </to>
         </countBetween>
       </constraint>
     </attribute>
@@ -267,7 +276,7 @@ Davis, CA 95616, USA
       </optionalConform>
       <constraint>
         <between>
-          <from value="0"/>
+          <from value="-4611686018427387904"/>
           <to value="4611686018427387904"/>
         </between>
       </constraint>

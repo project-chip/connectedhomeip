@@ -28,6 +28,8 @@ void registerCommandsWebRTC(Commands & commands, CredentialIssuerCommands * cred
     commands_list clusterCommands = {
         make_unique<webrtc::ConnectCommand>(credsIssuerConfig),
         make_unique<webrtc::ProvideOfferCommand>(credsIssuerConfig),
+        make_unique<webrtc::SolicitOfferCommand>(credsIssuerConfig),
+        make_unique<webrtc::EstablishSessionCommand>(credsIssuerConfig),
     };
 
     commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for WebRTC.");

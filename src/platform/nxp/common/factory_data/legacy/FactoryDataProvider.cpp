@@ -15,14 +15,8 @@
  *    limitations under the License.
  */
 
-#if (!CONFIG_CHIP_LOAD_REAL_FACTORY_DATA || !(defined CONFIG_CHIP_LOAD_REAL_FACTORY_DATA))
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <credentials/examples/ExampleDACs.h>
-#include <credentials/examples/ExamplePAI.h>
-#endif
-
 #include <credentials/CHIPCert.h>
-#include <credentials/CertificationDeclaration.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
@@ -30,8 +24,18 @@
 #include <lib/support/Span.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
-
+#if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
+#endif
 #include <cctype>
+
+#ifndef CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION
+#define CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION 0
+#endif // CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION
+
+#define CBC_INITIAL_VECTOR_SIZE 16
+
+using namespace chip::DeviceLayer::PersistedStorage;
 
 namespace chip {
 namespace DeviceLayer {
@@ -167,6 +171,106 @@ CHIP_ERROR FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t * pBuf
 
     return CHIP_ERROR_NOT_FOUND;
 }
+
+#if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+
+extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism()
+{
+    CHIP_ERROR error           = CHIP_NO_ERROR;
+    FactoryDataDriver * driver = &FactoryDataDrv();
+
+    VerifyOrReturnError(driver != nullptr, CHIP_ERROR_INTERNAL);
+
+    // Check if key related to factory data backup exists.
+    // If it does, it means an external event (such as a power loss)
+    // interrupted the factory data update process and the section
+    // from internal flash is most likely erased and should be restored.
+    error = driver->ReadBackupInRam();
+
+    if (error == CHIP_NO_ERROR)
+    {
+        error = driver->UpdateFactoryData();
+        if (error == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(DeviceLayer, "Factory data was restored successfully");
+        }
+    }
+
+    ReturnErrorOnFailure(driver->ClearRamBackup());
+
+    if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        return CHIP_NO_ERROR;
+
+    return error;
+}
+
+CHIP_ERROR FactoryDataProvider::PreResetCheck()
+{
+    OTARequestorInterface * requestor = nullptr;
+    uint32_t targetVersion;
+    /* Check integrity of freshly copied data. If validation fails, OTA will be aborted
+     * and factory data will be restored to the previous version. Use device instance info
+     * provider getter to access the factory data provider instance. The instance is created
+     * by the application, so it's easier to access it this way.*/
+    ReturnErrorOnFailure(Validate());
+
+    requestor = GetRequestorInstance();
+    VerifyOrReturnError(requestor != nullptr, CHIP_ERROR_INVALID_ADDRESS);
+
+    targetVersion = requestor->GetTargetVersion();
+    ReturnErrorOnFailure(FactoryDataProvider::SaveTargetVersion(targetVersion));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FactoryDataProvider::PostResetCheck()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint32_t targetVersion, currentVersion;
+
+    err = FactoryDataProvider::GetTargetVersion(targetVersion);
+    if (err != CHIP_NO_ERROR)
+        ChipLogProgress(DeviceLayer, "Could not get target version");
+
+    err = DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion);
+    if (err != CHIP_NO_ERROR)
+        ChipLogProgress(DeviceLayer, "Could not get current version");
+
+    if (targetVersion == currentVersion)
+    {
+        ChipLogProgress(DeviceLayer, "OTA successfully applied");
+        // If this point is reached, it means the new image successfully booted.
+        // Delete the factory data backup to stop doing a restore.
+        // This ensures that both the factory data and app were updated, otherwise
+        // revert to the backed up factory data.
+        mFactoryDataDriver->DeleteBackup();
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FactoryDataProvider::GetTargetVersion(uint32_t & version)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    uint16_t len     = sizeof(uint32_t);
+    size_t bytesRead = 0;
+
+    error = KeyValueStoreMgr().Get(FactoryDataProvider::GetTargetVersionKey().KeyName(), (uint8_t *) &version, len, &bytesRead);
+    ReturnErrorOnFailure(error);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FactoryDataProvider::SaveTargetVersion(uint32_t & version)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    error = KeyValueStoreMgr().Put(FactoryDataProvider::GetTargetVersionKey().KeyName(), (uint8_t *) &version, sizeof(uint32_t));
+    ReturnErrorOnFailure(error);
+
+    return CHIP_NO_ERROR;
+}
+#endif // CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
 
 CHIP_ERROR FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & outBuffer)
 {
@@ -357,9 +461,9 @@ CHIP_ERROR FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & 
     if (length == 10 && isdigit(date[0]) && isdigit(date[1]) && isdigit(date[2]) && isdigit(date[3]) && date[4] == '-' &&
         isdigit(date[5]) && isdigit(date[6]) && date[7] == '-' && isdigit(date[8]) && isdigit(date[9]))
     {
-        year  = 1000 * (date[0] - '0') + 100 * (date[1] - '0') + 10 * (date[2] - '0') + date[3] - '0';
-        month = 10 * (date[5] - '0') + date[6] - '0';
-        day   = 10 * (date[8] - '0') + date[9] - '0';
+        year  = (uint16_t) (1000 * (date[0] - '0') + 100 * (date[1] - '0') + 10 * (date[2] - '0') + date[3] - '0');
+        month = (uint8_t) (10 * (date[5] - '0') + date[6] - '0');
+        day   = (uint8_t) (10 * (date[8] - '0') + date[9] - '0');
     }
     else
     {
@@ -436,6 +540,40 @@ CHIP_ERROR FactoryDataProvider::GetProductPrimaryColor(app::Clusters::BasicInfor
     *primaryColor = static_cast<app::Clusters::BasicInformation::ColorEnum>(color);
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FactoryDataProvider::SetAesKey(const uint8_t * keyAes, AESKeySize keySize)
+{
+    CHIP_ERROR error = CHIP_ERROR_INVALID_ARGUMENT;
+    if (keyAes != nullptr)
+    {
+        pAesKey     = keyAes;
+        pAESKeySize = keySize;
+        error       = CHIP_NO_ERROR;
+    }
+    return error;
+}
+
+CHIP_ERROR FactoryDataProvider::SetEncryptionMode(EncryptionMode mode)
+{
+    CHIP_ERROR error = CHIP_ERROR_INVALID_ARGUMENT;
+    if (mode <= encrypt_cbc)
+    {
+        encryptMode = mode;
+        error       = CHIP_NO_ERROR;
+    }
+    return error;
+}
+
+CHIP_ERROR FactoryDataProvider::SetCbcInitialVector(const uint8_t * iv, uint16_t ivSize)
+{
+    CHIP_ERROR error = CHIP_ERROR_INVALID_ARGUMENT;
+    if (ivSize == CBC_INITIAL_VECTOR_SIZE)
+    {
+        cbcInitialVector = iv;
+        error            = CHIP_NO_ERROR;
+    }
+    return error;
 }
 
 } // namespace DeviceLayer

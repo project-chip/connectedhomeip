@@ -21,7 +21,7 @@ from xml.sax.xmlreader import AttributesImpl
 from matter.idl.generators.type_definitions import GetDataTypeSizeInBits, IsSignedDataType
 from matter.idl.matter_idl_types import AccessPrivilege, Attribute, Command, ConstantEntry, DataType, Event, EventPriority, Field
 
-LOGGER = logging.getLogger('data-model-xml-data-parsing')
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclass
@@ -104,8 +104,14 @@ _REF_NAME_MAPPING = {
 
 # Handle odd casing and naming
 _CASE_RENAMES_MAPPING = {
+    "amperage_mA": "amperage_ma",
     "power_mW": "power_mw",
-    "energy_mWh": "energy_mwh"
+    "power_mVA": "power_mva",
+    "power_mVAR": "power_mvar",
+    "energy_mWh": "energy_mwh",
+    "energy_mVAh": "energy_mvah",
+    "energy_mVARh": "energy_mvarh",
+    "voltage_mV": "voltage_mv",
 }
 
 
@@ -164,7 +170,7 @@ def NormalizeName(name: str) -> str:
 
     while '_' in name:
         idx = name.find('_')
-        name = name[:idx] + name[idx+1].upper() + name[idx+2:]
+        name = name[:idx] + name[idx + 1].upper() + name[idx + 2:]
 
     return name
 
@@ -265,8 +271,8 @@ def AttributesToEvent(attrs: AttributesImpl) -> Event:
     elif attrs["priority"] == "debug":
         priority = EventPriority.DEBUG
     elif attrs["priority"] == "desc":
-        LOGGER.warn("Found an event with 'desc' priority: %s" %
-                    [item for item in attrs.items()])
+        LOGGER.warning("Found an event with 'desc' priority: %s" %
+                       [item for item in attrs.items()])
         priority = EventPriority.CRITICAL
     else:
         raise Exception("UNKNOWN event priority: %r" % attrs["priority"])
@@ -296,7 +302,7 @@ def AttributesToCommand(attrs: AttributesImpl) -> Command:
     assert "name" in attrs
 
     if "response" not in attrs:
-        LOGGER.warn(f"Command {attrs['name']} has no response set.")
+        LOGGER.warning(f"Command {attrs['name']} has no response set.")
         # Matter IDL has no concept of "no response sent"
         # Example is DoorLock::"Operating Event Notification"
         #
@@ -356,4 +362,4 @@ def ApplyConstraint(attrs, field: Field):
         field.data_type.min_length = ParseOptionalInt(attrs["from"])
         field.data_type.max_length = ParseOptionalInt(attrs["to"])
     else:
-        logging.error(f"UNKNOWN constraint type {constraint_type}")
+        LOGGER.error(f"UNKNOWN constraint type {constraint_type}")

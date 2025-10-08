@@ -67,6 +67,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <string>
+#include <vector>
+
 #if CHIP_CRYPTO_MBEDTLS || CHIP_CRYPTO_PSA
 #include <mbedtls/memory_buffer_alloc.h>
 #endif
@@ -91,6 +94,24 @@ using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2p_P256_SHA256_HKDF_HMAC;
 using TestPBKDF2_sha256                 = PBKDF2_sha256;
 using TestHKDF_sha                      = HKDF_sha;
 using TestHMAC_sha                      = HMAC_sha;
+
+// Trivial StringJoin to use for PEM encoding testing.
+std::string StringJoin(const std::vector<std::string> & elements, const std::string & delimiter)
+{
+    if (elements.empty())
+    {
+        return "";
+    }
+
+    std::string outStr = elements[0];
+
+    for (size_t i = 1; i < elements.size(); ++i)
+    {
+        outStr += delimiter + elements[i];
+    }
+
+    return outStr;
+}
 
 // Helper class to verify that all mbedTLS heap objects are released at the end of a test.
 #if defined(MBEDTLS_MEMORY_DEBUG)
@@ -330,36 +351,41 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128EncryptTestVectors)
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
         const ccm_128_test_vector * vector = ccm_128_test_vectors[vectorIndex];
-        if (vector->pt_len > 0)
+        numOfTestsRan++;
+
+        chip::Platform::ScopedMemoryBuffer<uint8_t> out_ct;
+        uint8_t * out_ct_ptr = nullptr;
+        // for a plaintext with length = 0, the ciphertext buffer must be a nullptr (for OpenSSL)
+        if (vector->ct_len > 0)
         {
-            numOfTestsRan++;
-            chip::Platform::ScopedMemoryBuffer<uint8_t> out_ct;
             out_ct.Alloc(vector->ct_len);
             EXPECT_TRUE(out_ct);
-            chip::Platform::ScopedMemoryBuffer<uint8_t> out_tag;
-            out_tag.Alloc(vector->tag_len);
-            EXPECT_TRUE(out_tag);
+            out_ct_ptr = out_ct.Get();
+        }
 
-            TestAesKey key(vector->key, vector->key_len);
+        chip::Platform::ScopedMemoryBuffer<uint8_t> out_tag;
+        out_tag.Alloc(vector->tag_len);
+        EXPECT_TRUE(out_tag);
 
-            CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, key.key, vector->nonce,
-                                             vector->nonce_len, out_ct.Get(), out_tag.Get(), vector->tag_len);
-            EXPECT_EQ(err, vector->result);
+        TestAesKey key(vector->key, vector->key_len);
 
-            if (vector->result == CHIP_NO_ERROR)
+        CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, key.key, vector->nonce,
+                                         vector->nonce_len, out_ct_ptr, out_tag.Get(), vector->tag_len);
+        EXPECT_EQ(err, vector->result);
+
+        if (vector->result == CHIP_NO_ERROR)
+        {
+            bool areCTsEqual  = memcmp(out_ct_ptr, vector->ct, vector->ct_len) == 0;
+            bool areTagsEqual = memcmp(out_tag.Get(), vector->tag, vector->tag_len) == 0;
+            EXPECT_TRUE(areCTsEqual);
+            EXPECT_TRUE(areTagsEqual);
+            if (!areCTsEqual)
             {
-                bool areCTsEqual  = memcmp(out_ct.Get(), vector->ct, vector->ct_len) == 0;
-                bool areTagsEqual = memcmp(out_tag.Get(), vector->tag, vector->tag_len) == 0;
-                EXPECT_TRUE(areCTsEqual);
-                EXPECT_TRUE(areTagsEqual);
-                if (!areCTsEqual)
-                {
-                    printf("\n Test %d failed due to mismatching ciphertext\n", vector->tcId);
-                }
-                if (!areTagsEqual)
-                {
-                    printf("\n Test %d failed due to mismatching tags\n", vector->tcId);
-                }
+                printf("\n Test %d failed due to mismatching ciphertext\n", vector->tcId);
+            }
+            if (!areTagsEqual)
+            {
+                printf("\n Test %d failed due to mismatching tags\n", vector->tcId);
             }
         }
     }
@@ -374,27 +400,132 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128DecryptTestVectors)
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
         const ccm_128_test_vector * vector = ccm_128_test_vectors[vectorIndex];
+        numOfTestsRan++;
+
+        chip::Platform::ScopedMemoryBuffer<uint8_t> out_pt;
+        // for a ciphertext with length = 0, the plaintext buffer must be a nullptr (for OpenSSL)
+        uint8_t * out_pt_ptr = nullptr;
         if (vector->pt_len > 0)
         {
-            numOfTestsRan++;
-            chip::Platform::ScopedMemoryBuffer<uint8_t> out_pt;
             out_pt.Alloc(vector->pt_len);
             EXPECT_TRUE(out_pt);
+            out_pt_ptr = out_pt.Get();
+        }
 
-            TestAesKey key(vector->key, vector->key_len);
+        TestAesKey key(vector->key, vector->key_len);
 
-            CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
-                                             key.key, vector->nonce, vector->nonce_len, out_pt.Get());
+        CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
+                                         key.key, vector->nonce, vector->nonce_len, out_pt_ptr);
 
-            EXPECT_EQ(err, vector->result);
-            if (vector->result == CHIP_NO_ERROR)
+        EXPECT_EQ(err, vector->result);
+        if (vector->result == CHIP_NO_ERROR)
+        {
+            bool arePTsEqual = memcmp(vector->pt, out_pt_ptr, vector->pt_len) == 0;
+            EXPECT_TRUE(arePTsEqual);
+            if (!arePTsEqual)
             {
-                bool arePTsEqual = memcmp(vector->pt, out_pt.Get(), vector->pt_len) == 0;
-                EXPECT_TRUE(arePTsEqual);
-                if (!arePTsEqual)
-                {
-                    printf("\n Test %d failed due to mismatching plaintext\n", vector->tcId);
-                }
+                printf("\n Test %d failed due to mismatching plaintext\n", vector->tcId);
+            }
+        }
+    }
+    EXPECT_GT(numOfTestsRan, 0);
+}
+
+// Testing in-place encryption: same buffer for plaintext input and ciphertext output
+// This pattern is more widely used in the Matter Stack
+TEST_F(TestChipCryptoPAL, TestAES_CCM_128InPlaceEncryption)
+{
+    HeapChecker heapChecker;
+    int numOfTestVectors = MATTER_ARRAY_SIZE(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+
+    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[vectorIndex];
+        numOfTestsRan++;
+
+        ASSERT_EQ(vector->ct_len, vector->pt_len);
+
+        chip::Platform::ScopedMemoryBuffer<uint8_t> inplace_buffer;
+        uint8_t * inplace_buffer_ptr = nullptr;
+
+        if (vector->ct_len > 0)
+        {
+            ASSERT_TRUE(inplace_buffer.Alloc(vector->ct_len));
+            inplace_buffer_ptr = inplace_buffer.Get();
+
+            // Copy the PlainText Buffer so we can do inplace encryption
+            memcpy(inplace_buffer_ptr, vector->pt, vector->pt_len);
+        }
+        chip::Platform::ScopedMemoryBuffer<uint8_t> out_tag;
+        out_tag.Alloc(vector->tag_len);
+        EXPECT_TRUE(out_tag);
+
+        TestAesKey key(vector->key, vector->key_len);
+
+        CHIP_ERROR err = AES_CCM_encrypt(inplace_buffer_ptr, vector->pt_len, vector->aad, vector->aad_len, key.key, vector->nonce,
+                                         vector->nonce_len, inplace_buffer_ptr, out_tag.Get(), vector->tag_len);
+
+        EXPECT_EQ(err, vector->result);
+        if (vector->result == CHIP_NO_ERROR)
+        {
+            bool areCTsEqual  = memcmp(inplace_buffer_ptr, vector->ct, vector->ct_len) == 0;
+            bool areTagsEqual = memcmp(out_tag.Get(), vector->tag, vector->tag_len) == 0;
+            EXPECT_TRUE(areCTsEqual);
+            EXPECT_TRUE(areTagsEqual);
+            if (!areCTsEqual)
+            {
+                ADD_FAILURE() << "Test " << vector->tcId << " failed due to mismatching ciphertext.";
+            }
+            if (!areTagsEqual)
+            {
+                ADD_FAILURE() << "Test " << vector->tcId << " failed due to mismatching tags.";
+            }
+        }
+    }
+    EXPECT_GT(numOfTestsRan, 0);
+}
+
+// Testing in-place decryption: same buffer for ciphertext input and plaintext output
+// This pattern is more widely used in the Matter Stack
+TEST_F(TestChipCryptoPAL, TestAES_CCM_128InPlaceDecryption)
+{
+    HeapChecker heapChecker;
+    int numOfTestVectors = MATTER_ARRAY_SIZE(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+
+    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[vectorIndex];
+        numOfTestsRan++;
+
+        ASSERT_EQ(vector->ct_len, vector->pt_len);
+
+        chip::Platform::ScopedMemoryBuffer<uint8_t> inplace_buffer;
+        uint8_t * inplace_buffer_ptr = nullptr;
+
+        if (vector->pt_len > 0)
+        {
+            ASSERT_TRUE(inplace_buffer.Alloc(vector->pt_len));
+            inplace_buffer_ptr = inplace_buffer.Get();
+
+            // Copy the Ciphertext Buffer so we can do inplace decryption
+            memcpy(inplace_buffer_ptr, vector->ct, vector->ct_len);
+        }
+
+        TestAesKey key(vector->key, vector->key_len);
+
+        CHIP_ERROR err = AES_CCM_decrypt(inplace_buffer_ptr, vector->ct_len, vector->aad, vector->aad_len, vector->tag,
+                                         vector->tag_len, key.key, vector->nonce, vector->nonce_len, inplace_buffer_ptr);
+
+        EXPECT_EQ(err, vector->result);
+        if (vector->result == CHIP_NO_ERROR)
+        {
+            bool arePTsEqual = memcmp(vector->pt, inplace_buffer_ptr, vector->pt_len) == 0;
+            EXPECT_TRUE(arePTsEqual);
+            if (!arePTsEqual)
+            {
+                ADD_FAILURE() << "Test " << vector->tcId << " failed due to mismatching plaintext.";
             }
         }
     }
@@ -1558,14 +1689,14 @@ TEST_F(TestChipCryptoPAL, TestCSR_GenByKeypair)
 
     Test_P256Keypair keypair;
     EXPECT_EQ(keypair.Initialize(ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
-    EXPECT_EQ(keypair.NewCertificateSigningRequest(csr, length), CHIP_NO_ERROR);
-    EXPECT_GT(length, 0u);
+    ASSERT_EQ(keypair.NewCertificateSigningRequest(csr, length), CHIP_NO_ERROR);
+    ASSERT_GT(length, 2u);
 
     P256PublicKey pubkey;
     CHIP_ERROR err = VerifyCertificateSigningRequest(csr, length, pubkey);
     if (err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
         EXPECT_EQ(pubkey.Length(), kP256_PublicKey_Length);
         EXPECT_EQ(memcmp(pubkey.ConstBytes(), keypair.Pubkey().ConstBytes(), pubkey.Length()), 0);
 
@@ -2144,6 +2275,10 @@ TEST_F(TestChipCryptoPAL, TestX509_VerifyAttestationCertificateFormat)
         {  ByteSpan{kPaiPathLen1},                        Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
         {  ByteSpan{kPaaPathLen2},                        Crypto::AttestationCertType::kPAA, CHIP_ERROR_INTERNAL         },
         {  ByteSpan{kWrongPathLenFormat},                 Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kDacMalformedSkid},                   Crypto::AttestationCertType::kDAC, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kDacMalformedAkid},                   Crypto::AttestationCertType::kDAC, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kPaiMalformedSkid},                   Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kPaiMalformedAkid},                   Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
     };
     // clang-format on
 
@@ -2811,13 +2946,24 @@ TEST_F(TestChipCryptoPAL, TestVIDPID_x509Extraction)
         // VID and PID not present cases:
         { sTestCert_PAA_NoVID_Cert, false, false, chip::VendorId::NotSpecified, 0x0000, CHIP_NO_ERROR },
         { kOpCertNoVID, false, false, chip::VendorId::NotSpecified, 0x0000, CHIP_NO_ERROR },
+        { ByteSpan(), false, false, chip::VendorId::NotSpecified, 0x0000, CHIP_ERROR_INVALID_ARGUMENT },
+
     };
 
     for (const auto & testCase : kTestCases)
     {
         AttestationCertVidPid vidpid;
         CHIP_ERROR result = ExtractVIDPIDFromX509Cert(testCase.cert, vidpid);
-        EXPECT_EQ(result, testCase.expectedResult);
+        if (testCase.cert.empty())
+        {
+            // mbedTLS implementations will return CHIP_ERROR_INTERNAL for empty certs. It's impractical to modify all
+            // implementations to return CHIP_ERROR_INVALID_ARGUMENT, so we allow either to pass for this case.
+            EXPECT_TRUE(result == CHIP_ERROR_INVALID_ARGUMENT || result == CHIP_ERROR_INTERNAL);
+        }
+        else
+        {
+            EXPECT_EQ(result, testCase.expectedResult);
+        }
         ASSERT_EQ(vidpid.mVendorId.HasValue(), testCase.expectedVidPresent);
         ASSERT_EQ(vidpid.mProductId.HasValue(), testCase.expectedPidPresent);
 
@@ -3016,4 +3162,430 @@ TEST_F(TestChipCryptoPAL, TestGroup_PrivacyKeyDerivation)
     encryption_key = ByteSpan(kGroupOperationalKey3, sizeof(kGroupOperationalKey3));
     EXPECT_EQ(CHIP_NO_ERROR, DeriveGroupPrivacyKey(encryption_key, privacy_key));
     EXPECT_EQ(0, memcmp(privacy_key.data(), kGroupPrivacyKey3, sizeof(kGroupPrivacyKey3)));
+}
+
+// Test vectors for this come from Matter Spec test vectors (Matter spec Appendix F.5).
+TEST_F(TestChipCryptoPAL, GenerateVendorFabricBindingMessageWorks)
+{
+    const uint8_t kSomePublicKeyBytes[] = { 0x04, 0xd5, 0x9f, 0x3e, 0xb0, 0xb9, 0xc2, 0x16, 0xa4, 0x6f, 0x04, 0x0a, 0xff,
+                                            0xdf, 0xd5, 0x58, 0x17, 0xca, 0x8a, 0x3d, 0xc9, 0x21, 0xaa, 0x62, 0x4d, 0xa5,
+                                            0x16, 0x8b, 0xa9, 0x07, 0x66, 0xd7, 0x3b, 0xf0, 0x8e, 0x48, 0x0c, 0xd0, 0xf5,
+                                            0xcc, 0x94, 0x65, 0x3a, 0x92, 0xd7, 0x77, 0x19, 0xd9, 0xb0, 0x04, 0x74, 0x7d,
+                                            0x5f, 0x7d, 0xa3, 0x9d, 0xed, 0xb6, 0x7e, 0xc5, 0x4f, 0x7c, 0xbc, 0x6a, 0xde };
+
+    Crypto::P256PublicKey rootPublicKey(kSomePublicKeyBytes);
+    FabricId kFabricId = 0x1122334455667788ULL;
+    uint16_t kVendorId = 0xFFF1U;
+
+    // Try with invalid FabricBinding version.
+    {
+        uint8_t bigEnoughBuffer[Crypto::kVendorFabricBindingMessageV1Size];
+        MutableByteSpan vendorFabricBindingMessage{ bigEnoughBuffer };
+        EXPECT_EQ(GenerateVendorFabricBindingMessage(static_cast<Crypto::FabricBindingVersion>(123u), rootPublicKey, kFabricId,
+                                                     kVendorId, vendorFabricBindingMessage),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Try with buffer too small.
+    {
+        uint8_t bufferTooSmall[Crypto::kVendorFabricBindingMessageV1Size - 1];
+        MutableByteSpan bufferTooSmallSpan{ bufferTooSmall };
+        EXPECT_EQ(GenerateVendorFabricBindingMessage(Crypto::FabricBindingVersion::kVersion1, rootPublicKey, kFabricId, kVendorId,
+                                                     bufferTooSmallSpan),
+                  CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
+
+    // Try with a correct set of arguments, expect success and matching payload.
+    {
+        const uint8_t kExpectedFabricBindingMessage[] = {
+            0x01, 0x04, 0xd5, 0x9f, 0x3e, 0xb0, 0xb9, 0xc2, 0x16, 0xa4, 0x6f, 0x04, 0x0a, 0xff, 0xdf, 0xd5, 0x58, 0x17, 0xca,
+            0x8a, 0x3d, 0xc9, 0x21, 0xaa, 0x62, 0x4d, 0xa5, 0x16, 0x8b, 0xa9, 0x07, 0x66, 0xd7, 0x3b, 0xf0, 0x8e, 0x48, 0x0c,
+            0xd0, 0xf5, 0xcc, 0x94, 0x65, 0x3a, 0x92, 0xd7, 0x77, 0x19, 0xd9, 0xb0, 0x04, 0x74, 0x7d, 0x5f, 0x7d, 0xa3, 0x9d,
+            0xed, 0xb6, 0x7e, 0xc5, 0x4f, 0x7c, 0xbc, 0x6a, 0xde, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0xff, 0xf1
+        };
+
+        uint8_t bigEnoughBuffer[Crypto::kVendorFabricBindingMessageV1Size + 1];
+        MutableByteSpan vendorFabricBindingMessage{ bigEnoughBuffer };
+        EXPECT_EQ(GenerateVendorFabricBindingMessage(Crypto::FabricBindingVersion::kVersion1, rootPublicKey, kFabricId, kVendorId,
+                                                     vendorFabricBindingMessage),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(vendorFabricBindingMessage.data_equal(ByteSpan{ kExpectedFabricBindingMessage }));
+    }
+}
+
+// Test vectors for this come from Matter Spec test vectors (Matter spec Appendix F.5).
+TEST_F(TestChipCryptoPAL, GenerateVendorIdVerificationToBeSignedWorks)
+{
+    FabricIndex kFabricIndex = 5u;
+
+    const uint8_t kVendorFabricBindingMessage[76] = {
+        0x01, 0x04, 0xd5, 0x9f, 0x3e, 0xb0, 0xb9, 0xc2, 0x16, 0xa4, 0x6f, 0x04, 0x0a, 0xff, 0xdf, 0xd5, 0x58, 0x17, 0xca,
+        0x8a, 0x3d, 0xc9, 0x21, 0xaa, 0x62, 0x4d, 0xa5, 0x16, 0x8b, 0xa9, 0x07, 0x66, 0xd7, 0x3b, 0xf0, 0x8e, 0x48, 0x0c,
+        0xd0, 0xf5, 0xcc, 0x94, 0x65, 0x3a, 0x92, 0xd7, 0x77, 0x19, 0xd9, 0xb0, 0x04, 0x74, 0x7d, 0x5f, 0x7d, 0xa3, 0x9d,
+        0xed, 0xb6, 0x7e, 0xc5, 0x4f, 0x7c, 0xbc, 0x6a, 0xde, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0xff, 0xf1,
+    };
+    ByteSpan kVendorFabricBindingMessageSpan{ kVendorFabricBindingMessage };
+
+    const uint8_t kVidVerificationStatementSample[85] = {
+        0x21, 0xfa, 0xc0, 0xe7, 0xd0, 0x08, 0x94, 0x73, 0xf1, 0x5c, 0x2d, 0xfe, 0xfe, 0x54, 0x6f, 0xff, 0xa0,
+        0xb0, 0x0a, 0x8b, 0xb2, 0x32, 0x32, 0x84, 0xaf, 0x77, 0x38, 0xf9, 0xb3, 0x21, 0xd0, 0x0b, 0xbf, 0x2b,
+        0xff, 0x94, 0x2c, 0x82, 0x15, 0xc4, 0x98, 0xdf, 0xdd, 0xb1, 0xb6, 0x6b, 0x34, 0xfb, 0xd7, 0xdb, 0x31,
+        0x8a, 0xd7, 0x54, 0x82, 0x9c, 0xd5, 0xca, 0x1d, 0x9c, 0xf5, 0x3b, 0xeb, 0x2c, 0x93, 0x57, 0x1a, 0xf3,
+        0x52, 0x57, 0xee, 0xad, 0x67, 0x14, 0xf6, 0x8e, 0x91, 0x0f, 0x7b, 0xb7, 0xac, 0x9a, 0x90, 0x9a, 0x72,
+    };
+    ByteSpan kVidVerificationStatementSampleSpan{ kVidVerificationStatementSample };
+
+    const uint8_t kAttestationChallenge1[16] = {
+        0x90, 0x4b, 0x82, 0xe6, 0x6e, 0x98, 0x57, 0x85, 0xb4, 0xa3, 0xff, 0x18, 0xc2, 0x59, 0x47, 0xf3,
+    };
+    ByteSpan kAttestationChallengeSpan1{ kAttestationChallenge1 };
+
+    const uint8_t kClientChallenge1[32] = {
+        0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf, 0xb0,
+        0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf, 0xc0,
+    };
+    ByteSpan kClientChallengeSpan1{ kClientChallenge1 };
+
+    // Try with buffer too small.
+    {
+        uint8_t smallBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize - 1];
+        MutableByteSpan vendorIdVerificationTbsTooSmall{ smallBuffer };
+
+        EXPECT_EQ(GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeSpan1, kAttestationChallengeSpan1,
+                                                         kVendorFabricBindingMessageSpan, kVidVerificationStatementSampleSpan,
+                                                         vendorIdVerificationTbsTooSmall),
+                  CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
+
+    // Try with invalid FabricBinding version.
+    {
+        const uint8_t kVendorFabricBindingMessageBadVersion[76] = {
+            0x55, 0x04, 0xd5, 0x9f, 0x3e, 0xb0, 0xb9, 0xc2, 0x16, 0xa4, 0x6f, 0x04, 0x0a, 0xff, 0xdf, 0xd5, 0x58, 0x17, 0xca,
+            0x8a, 0x3d, 0xc9, 0x21, 0xaa, 0x62, 0x4d, 0xa5, 0x16, 0x8b, 0xa9, 0x07, 0x66, 0xd7, 0x3b, 0xf0, 0x8e, 0x48, 0x0c,
+            0xd0, 0xf5, 0xcc, 0x94, 0x65, 0x3a, 0x92, 0xd7, 0x77, 0x19, 0xd9, 0xb0, 0x04, 0x74, 0x7d, 0x5f, 0x7d, 0xa3, 0x9d,
+            0xed, 0xb6, 0x7e, 0xc5, 0x4f, 0x7c, 0xbc, 0x6a, 0xde, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0xff, 0xf1,
+        };
+
+        uint8_t bigEnoughBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
+        MutableByteSpan vendorIdVerificationTbs{ bigEnoughBuffer };
+
+        EXPECT_EQ(GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeSpan1, kAttestationChallengeSpan1,
+                                                         ByteSpan{ kVendorFabricBindingMessageBadVersion },
+                                                         kVidVerificationStatementSampleSpan, vendorIdVerificationTbs),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Try with invalid attestation challenge size.
+    {
+        uint8_t bigEnoughBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
+        MutableByteSpan vendorIdVerificationTbs{ bigEnoughBuffer };
+
+        ByteSpan kAttestationChallengeWrongSize{ kAttestationChallengeSpan1.data(), kAttestationChallengeSpan1.size() - 1 };
+        EXPECT_EQ(GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeSpan1, kAttestationChallengeWrongSize,
+                                                         kVendorFabricBindingMessageSpan, kVidVerificationStatementSampleSpan,
+                                                         vendorIdVerificationTbs),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Try with invalid client challenge size.
+    {
+        uint8_t bigEnoughBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
+        MutableByteSpan vendorIdVerificationTbs{ bigEnoughBuffer };
+
+        ByteSpan kClientChallengeWrongSize{ kClientChallengeSpan1.data(), kClientChallengeSpan1.size() - 1 };
+        EXPECT_EQ(GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeWrongSize, kAttestationChallengeSpan1,
+                                                         kVendorFabricBindingMessageSpan, kVidVerificationStatementSampleSpan,
+                                                         vendorIdVerificationTbs),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Try with invalid client challenge size.
+    {
+        uint8_t bigEnoughBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
+        MutableByteSpan vendorIdVerificationTbs{ bigEnoughBuffer };
+
+        ByteSpan kClientChallengeWrongSize{ kClientChallengeSpan1.data(), kClientChallengeSpan1.size() - 1 };
+        EXPECT_EQ(GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeWrongSize, kAttestationChallengeSpan1,
+                                                         kVendorFabricBindingMessageSpan, kVidVerificationStatementSampleSpan,
+                                                         vendorIdVerificationTbs),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Try with fabric binding message that is empty (invalid).
+    {
+        uint8_t bigEnoughBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
+        MutableByteSpan vendorIdVerificationTbs{ bigEnoughBuffer };
+
+        ByteSpan kEmptyVendorFabricBindingMessageSpan{};
+        EXPECT_EQ(GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeSpan1, kAttestationChallengeSpan1,
+                                                         kEmptyVendorFabricBindingMessageSpan, kVidVerificationStatementSampleSpan,
+                                                         vendorIdVerificationTbs),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Success case without VidVerificationStatement.
+    {
+        const uint8_t kExpectedVendorIdVerificationTbs[126] = {
+            0x01, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf, 0xb0, 0xb1,
+            0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf, 0xc0, 0x90, 0x4b, 0x82,
+            0xe6, 0x6e, 0x98, 0x57, 0x85, 0xb4, 0xa3, 0xff, 0x18, 0xc2, 0x59, 0x47, 0xf3, 0x05, 0x01, 0x04, 0xd5, 0x9f,
+            0x3e, 0xb0, 0xb9, 0xc2, 0x16, 0xa4, 0x6f, 0x04, 0x0a, 0xff, 0xdf, 0xd5, 0x58, 0x17, 0xca, 0x8a, 0x3d, 0xc9,
+            0x21, 0xaa, 0x62, 0x4d, 0xa5, 0x16, 0x8b, 0xa9, 0x07, 0x66, 0xd7, 0x3b, 0xf0, 0x8e, 0x48, 0x0c, 0xd0, 0xf5,
+            0xcc, 0x94, 0x65, 0x3a, 0x92, 0xd7, 0x77, 0x19, 0xd9, 0xb0, 0x04, 0x74, 0x7d, 0x5f, 0x7d, 0xa3, 0x9d, 0xed,
+            0xb6, 0x7e, 0xc5, 0x4f, 0x7c, 0xbc, 0x6a, 0xde, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0xff, 0xf1,
+        };
+        ByteSpan kExpectedVendorIdVerificationTbsSpan{ kExpectedVendorIdVerificationTbs };
+
+        uint8_t bigEnoughBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
+        MutableByteSpan vendorIdVerificationTbs{ bigEnoughBuffer };
+
+        ByteSpan kEmptyVidVerificationStatementSpan{};
+        EXPECT_EQ(GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeSpan1, kAttestationChallengeSpan1,
+                                                         kVendorFabricBindingMessageSpan, kEmptyVidVerificationStatementSpan,
+                                                         vendorIdVerificationTbs),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(vendorIdVerificationTbs.data_equal(kExpectedVendorIdVerificationTbsSpan));
+    }
+
+    // Success case with VidVerificationStatement.
+    {
+        const uint8_t kExpectedVendorIdVerificationTbs[211] = {
+            0x01, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd1, 0xd2, 0xd3,
+            0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf, 0xe0, 0x14, 0x5f, 0x2e, 0xf3, 0x9e, 0x3e, 0x4f,
+            0xfc, 0xf5, 0x64, 0x9c, 0x09, 0x09, 0xcb, 0xc8, 0xe4, 0x05, 0x01, 0x04, 0xd5, 0x9f, 0x3e, 0xb0, 0xb9, 0xc2, 0x16, 0xa4,
+            0x6f, 0x04, 0x0a, 0xff, 0xdf, 0xd5, 0x58, 0x17, 0xca, 0x8a, 0x3d, 0xc9, 0x21, 0xaa, 0x62, 0x4d, 0xa5, 0x16, 0x8b, 0xa9,
+            0x07, 0x66, 0xd7, 0x3b, 0xf0, 0x8e, 0x48, 0x0c, 0xd0, 0xf5, 0xcc, 0x94, 0x65, 0x3a, 0x92, 0xd7, 0x77, 0x19, 0xd9, 0xb0,
+            0x04, 0x74, 0x7d, 0x5f, 0x7d, 0xa3, 0x9d, 0xed, 0xb6, 0x7e, 0xc5, 0x4f, 0x7c, 0xbc, 0x6a, 0xde, 0x11, 0x22, 0x33, 0x44,
+            0x55, 0x66, 0x77, 0x88, 0xff, 0xf1, 0x21, 0xfa, 0xc0, 0xe7, 0xd0, 0x08, 0x94, 0x73, 0xf1, 0x5c, 0x2d, 0xfe, 0xfe, 0x54,
+            0x6f, 0xff, 0xa0, 0xb0, 0x0a, 0x8b, 0xb2, 0x32, 0x32, 0x84, 0xaf, 0x77, 0x38, 0xf9, 0xb3, 0x21, 0xd0, 0x0b, 0xbf, 0x2b,
+            0xff, 0x94, 0x2c, 0x82, 0x15, 0xc4, 0x98, 0xdf, 0xdd, 0xb1, 0xb6, 0x6b, 0x34, 0xfb, 0xd7, 0xdb, 0x31, 0x8a, 0xd7, 0x54,
+            0x82, 0x9c, 0xd5, 0xca, 0x1d, 0x9c, 0xf5, 0x3b, 0xeb, 0x2c, 0x93, 0x57, 0x1a, 0xf3, 0x52, 0x57, 0xee, 0xad, 0x67, 0x14,
+            0xf6, 0x8e, 0x91, 0x0f, 0x7b, 0xb7, 0xac, 0x9a, 0x90, 0x9a, 0x72,
+        };
+        ByteSpan kExpectedVendorIdVerificationTbsSpan{ kExpectedVendorIdVerificationTbs };
+
+        const uint8_t kAttestationChallenge2[16] = {
+            0x14, 0x5f, 0x2e, 0xf3, 0x9e, 0x3e, 0x4f, 0xfc, 0xf5, 0x64, 0x9c, 0x09, 0x09, 0xcb, 0xc8, 0xe4,
+        };
+        ByteSpan kAttestationChallengeSpan2{ kAttestationChallenge2 };
+
+        const uint8_t kClientChallenge2[32] = {
+            0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0,
+            0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf, 0xe0,
+        };
+        ByteSpan kClientChallengeSpan2{ kClientChallenge2 };
+
+        uint8_t bigEnoughBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
+        MutableByteSpan vendorIdVerificationTbs{ bigEnoughBuffer };
+
+        EXPECT_EQ(GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeSpan2, kAttestationChallengeSpan2,
+                                                         kVendorFabricBindingMessageSpan, kVidVerificationStatementSampleSpan,
+                                                         vendorIdVerificationTbs),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(vendorIdVerificationTbs.data_equal(kExpectedVendorIdVerificationTbsSpan));
+    }
+}
+
+TEST_F(TestChipCryptoPAL, PemEncodingWorks)
+{
+    // Known cert case: sTestCert_PAA_FFF1_Cert should succeed
+    {
+        size_t numLines = 0;
+        std::vector<std::string> pemLines;
+        const char * pemLine = nullptr;
+
+        PemEncoder encoder("CERTIFICATE", TestCerts::sTestCert_PAA_FFF1_Cert);
+        while ((pemLine = encoder.NextLine()))
+        {
+            ++numLines;
+            pemLines.push_back(std::string{ pemLine });
+        }
+        ASSERT_EQ(pemLine, nullptr);
+
+        // Asking for lines when done always gives more nullptr.
+        ASSERT_EQ(encoder.NextLine(), nullptr);
+        ASSERT_EQ(encoder.NextLine(), nullptr);
+
+        const char * kExpectedPemForPaa =
+            "-----BEGIN "
+            "CERTIFICATE-----"
+            "\nMIIBvTCCAWSgAwIBAgIITqjoMYLUHBwwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP\nTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMT"
+            "AgFw0yMTA2Mjgx\nNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3Qg\nUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTBZ"
+            "MBMGByqGSM49AgEGCCqGSM49AwEH\nA0IABLbLY3KIfyko9brIGqnZOuJDHK2p154kL2UXfvnO2TKijs0Duq9qj8oYShpQ\nNUKWDUU/"
+            "MD8fGUIddR6Pjxqam3WjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD\nVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRq/"
+            "SJ3H1Ef7L8WQZdnENzcMaFxfjAfBgNV\nHSMEGDAWgBRq/"
+            "SJ3H1Ef7L8WQZdnENzcMaFxfjAKBggqhkjOPQQDAgNHADBEAiBQ\nqoAC9NkyqaAFOPZTaK0P/8jvu8m+t9pWmDXPmqdRDgIgI7rI/"
+            "g8j51RFtlM5CBpH\nmUkpxyqvChVI1A0DTVFLJd4=\n-----END CERTIFICATE-----";
+
+        std::string finalPem = StringJoin(pemLines, "\n");
+        EXPECT_STREQ(finalPem.c_str(), kExpectedPemForPaa);
+        EXPECT_EQ(numLines, 12u);
+    }
+
+    // Known cert case, different heading requested: sTestCert_PAA_FFF1_Cert should succeed with "ROBOTO" instead of "CERTIFICATE".
+    {
+        size_t numLines = 0;
+        std::vector<std::string> pemLines;
+        const char * pemLine = nullptr;
+
+        PemEncoder encoder("ROBOTO", TestCerts::sTestCert_PAA_FFF1_Cert);
+        while ((pemLine = encoder.NextLine()))
+        {
+            ++numLines;
+            pemLines.push_back(std::string{ pemLine });
+        }
+        ASSERT_EQ(pemLine, nullptr);
+
+        // Result should match exactly the expected PEM.
+        const char * kExpectedPemForPaa =
+            "-----BEGIN "
+            "ROBOTO-----"
+            "\nMIIBvTCCAWSgAwIBAgIITqjoMYLUHBwwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP\nTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMT"
+            "AgFw0yMTA2Mjgx\nNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3Qg\nUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTBZ"
+            "MBMGByqGSM49AgEGCCqGSM49AwEH\nA0IABLbLY3KIfyko9brIGqnZOuJDHK2p154kL2UXfvnO2TKijs0Duq9qj8oYShpQ\nNUKWDUU/"
+            "MD8fGUIddR6Pjxqam3WjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD\nVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRq/"
+            "SJ3H1Ef7L8WQZdnENzcMaFxfjAfBgNV\nHSMEGDAWgBRq/"
+            "SJ3H1Ef7L8WQZdnENzcMaFxfjAKBggqhkjOPQQDAgNHADBEAiBQ\nqoAC9NkyqaAFOPZTaK0P/8jvu8m+t9pWmDXPmqdRDgIgI7rI/"
+            "g8j51RFtlM5CBpH\nmUkpxyqvChVI1A0DTVFLJd4=\n-----END ROBOTO-----";
+
+        std::string finalPem = StringJoin(pemLines, "\n");
+        EXPECT_STREQ(finalPem.c_str(), kExpectedPemForPaa);
+        EXPECT_EQ(numLines, 12u);
+    }
+
+    // Empty body case shoudld succeed. Casedness is for the client to deal with.
+    {
+        size_t numLines = 0;
+        std::vector<std::string> pemLines;
+        const char * pemLine = nullptr;
+
+        PemEncoder encoder("EMPTY_thing", ByteSpan{});
+        while ((pemLine = encoder.NextLine()))
+        {
+            ++numLines;
+            pemLines.push_back(std::string{ pemLine });
+        }
+        ASSERT_EQ(pemLine, nullptr);
+
+        const char * kExpectedPem = "-----BEGIN EMPTY_thing-----\n-----END EMPTY_thing-----";
+        std::string finalPem      = StringJoin(pemLines, "\n");
+        EXPECT_STREQ(finalPem.c_str(), kExpectedPem);
+        EXPECT_EQ(numLines, 2u);
+    }
+
+    // Single-byte should also work.
+    {
+        size_t numLines = 0;
+        std::vector<std::string> pemLines;
+        const char * pemLine = nullptr;
+
+        const uint8_t kOneByte[1] = { 0 };
+        PemEncoder encoder("SINGLE_BYTE", ByteSpan{ kOneByte });
+        while ((pemLine = encoder.NextLine()))
+        {
+            ++numLines;
+            pemLines.push_back(std::string{ pemLine });
+        }
+        ASSERT_EQ(pemLine, nullptr);
+
+        const char * kExpectedPem = "-----BEGIN SINGLE_BYTE-----\nAA==\n-----END SINGLE_BYTE-----";
+        std::string finalPem      = StringJoin(pemLines, "\n");
+        EXPECT_STREQ(finalPem.c_str(), kExpectedPem);
+        EXPECT_EQ(numLines, 3u);
+    }
+
+    // Clamping of very long headings should work.
+    {
+        size_t numLines = 0;
+        std::vector<std::string> pemLines;
+
+        PemEncoder encoder("SOME_EXCESSIVE_LENGTH_123456789_ABCDEDFHIJKLMNOPQRSTUVWXYZ_123456789", ByteSpan{});
+        const char * pemLine = encoder.NextLine();
+        while (pemLine)
+        {
+            ++numLines;
+            pemLines.push_back(std::string{ pemLine });
+            pemLine = encoder.NextLine();
+        }
+        ASSERT_EQ(pemLine, nullptr);
+
+        const char * kExpectedPem = "-----BEGIN SOME_EXCESSIVE_LENGTH_123456789_ABCDEDFHIJKLMNOP-----\n-----END "
+                                    "SOME_EXCESSIVE_LENGTH_123456789_ABCDEDFHIJKLMNOPQR-----";
+
+        std::string finalPem = StringJoin(pemLines, "\n");
+        EXPECT_STREQ(finalPem.c_str(), kExpectedPem);
+        EXPECT_EQ(numLines, 2u);
+    }
+}
+
+TEST_F(TestChipCryptoPAL, KeyIdStringifierWorks)
+{
+    KeyIdStringifier stringifier;
+    const char * result = nullptr;
+
+    // Case with Empty ByteSpan.
+    result = stringifier.KeyIdToHex(ByteSpan{});
+    EXPECT_STREQ(result, "<EMPTY KEY ID>");
+
+    // Case with 1 byte (no colons!).
+    const uint8_t oneByte[] = { 0xAB };
+    result                  = stringifier.KeyIdToHex(ByteSpan{ oneByte });
+    EXPECT_STREQ(result, "AB");
+
+    // Case with specific key that is < the typical length.
+    const uint8_t kDeadBeefBytes[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0x12, 0x34 };
+    result                         = stringifier.KeyIdToHex(ByteSpan{ kDeadBeefBytes });
+    EXPECT_STREQ(result, "DE:AD:BE:EF:12:34");
+
+    // Case with 20 bytes (typical SKID/AKID length).
+    uint8_t kTypicalKeyId[kAuthorityKeyIdentifierLength] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+                                                             0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13 };
+    result                                               = stringifier.KeyIdToHex(ByteSpan{ kTypicalKeyId });
+    EXPECT_STREQ(result, "00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F:10:11:12:13");
+
+    // Case with 21 bytes (truncation) with ellipsis.
+    uint8_t kTooLongKeyId[kAuthorityKeyIdentifierLength + 1] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A,
+                                                                 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x14 };
+
+    result = stringifier.KeyIdToHex(ByteSpan{ kTooLongKeyId });
+    EXPECT_TRUE(strstr(result, "...") != nullptr);
+    EXPECT_STREQ(result, "00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F:10:11:12:...");
+}
+
+TEST_F(TestChipCryptoPAL, TestHazardousOperationLoadKeypairFromRaw)
+{
+    HeapChecker heapChecker;
+
+    // Load valid private and public keys from the test certs
+    P256Keypair keypair;
+    CHIP_ERROR err =
+        keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0000_2CDPs_PrivateKey),
+                                                     ByteSpan(TestCerts::sTestCert_DAC_FFF1_8000_0000_2CDPs_PublicKey));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Sign a message
+    const char * msg = "Test message for HazardousOperationLoadKeypairFromRaw";
+    size_t msg_len   = strlen(msg);
+    P256ECDSASignature signature;
+    EXPECT_EQ(keypair.ECDSA_sign_msg(reinterpret_cast<const uint8_t *>(msg), msg_len, signature), CHIP_NO_ERROR);
+
+    // Verify with public part of the keypair
+    EXPECT_EQ(keypair.Pubkey().ECDSA_validate_msg_signature(reinterpret_cast<const uint8_t *>(msg), msg_len, signature),
+              CHIP_NO_ERROR);
+
+    // Negative test: invalid buffer sizes
+    P256Keypair badKeypair;
+    uint8_t tooShortPriv[10] = { 0 };
+    uint8_t tooShortPub[10]  = { 0 };
+    CHIP_ERROR badErr        = badKeypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(tooShortPriv, sizeof(tooShortPriv)),
+                                                                               ByteSpan(tooShortPub, sizeof(tooShortPub)));
+    EXPECT_EQ(badErr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Load public key separately
+    P256PublicKey pubkey;
+    memcpy(pubkey.Bytes(), TestCerts::sTestCert_DAC_FFF1_8000_0000_2CDPs_PublicKey.data(), kP256_PublicKey_Length);
+    EXPECT_EQ(pubkey.Length(), kP256_PublicKey_Length);
+
+    // Verify again with that instance
+    EXPECT_EQ(pubkey.ECDSA_validate_msg_signature(reinterpret_cast<const uint8_t *>(msg), msg_len, signature), CHIP_NO_ERROR);
 }

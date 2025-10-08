@@ -28,6 +28,8 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/TypeTraits.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/LockTracker.h>
 #include <tracing/macros.h>
 
@@ -71,9 +73,8 @@ constexpr size_t IndexInfoTLVMaxSize()
     return TLV::EstimateStructOverhead(sizeof(FabricIndex), CHIP_CONFIG_MAX_FABRICS * (1 + sizeof(FabricIndex)) + 1);
 }
 
-CHIP_ERROR AddNewFabricForTestInternal(FabricTable & fabricTable, bool leavePending, const ByteSpan & rootCert,
-                                       const ByteSpan & icacCert, const ByteSpan & nocCert, const ByteSpan & opKeySpan,
-                                       FabricIndex * outFabricIndex)
+CHIP_ERROR AddNewFabricForTestInternal(FabricTable & fabricTable, bool leavePending, ByteSpan rootCert, ByteSpan icacCert,
+                                       ByteSpan nocCert, ByteSpan opKeySpan, FabricIndex * outFabricIndex)
 {
     VerifyOrReturnError(outFabricIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -384,10 +385,9 @@ CHIP_ERROR FabricInfo::FetchRootPubkey(Crypto::P256PublicKey & outPublicKey) con
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricTable::VerifyCredentials(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
-                                          ValidationContext & context, CompressedFabricId & outCompressedFabricId,
-                                          FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
-                                          Crypto::P256PublicKey * outRootPublicKey) const
+CHIP_ERROR FabricTable::VerifyCredentials(FabricIndex fabricIndex, ByteSpan noc, ByteSpan icac, ValidationContext & context,
+                                          CompressedFabricId & outCompressedFabricId, FabricId & outFabricId, NodeId & outNodeId,
+                                          Crypto::P256PublicKey & outNocPubkey, Crypto::P256PublicKey * outRootPublicKey) const
 {
     MATTER_TRACE_SCOPE("VerifyCredentials", "Fabric");
     assertChipStackLockedByCurrentThread();
@@ -398,10 +398,9 @@ CHIP_ERROR FabricTable::VerifyCredentials(FabricIndex fabricIndex, const ByteSpa
                              outRootPublicKey);
 }
 
-CHIP_ERROR FabricTable::VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
-                                          ValidationContext & context, CompressedFabricId & outCompressedFabricId,
-                                          FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
-                                          Crypto::P256PublicKey * outRootPublicKey)
+CHIP_ERROR FabricTable::VerifyCredentials(ByteSpan noc, ByteSpan icac, ByteSpan rcac, ValidationContext & context,
+                                          CompressedFabricId & outCompressedFabricId, FabricId & outFabricId, NodeId & outNodeId,
+                                          Crypto::P256PublicKey & outNocPubkey, Crypto::P256PublicKey * outRootPublicKey)
 {
     // TODO - Optimize credentials verification logic
     //        The certificate chain construction and verification is a compute and memory intensive operation.
@@ -732,14 +731,13 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric, FabricIndex newFabr
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricTable::AddNewFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
-                                            const ByteSpan & opKeySpan, FabricIndex * outFabricIndex)
+CHIP_ERROR FabricTable::AddNewFabricForTest(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan opKeySpan,
+                                            FabricIndex * outFabricIndex)
 {
     return AddNewFabricForTestInternal(*this, /*leavePending=*/false, rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
 }
 
-CHIP_ERROR FabricTable::AddNewUncommittedFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert,
-                                                       const ByteSpan & nocCert, const ByteSpan & opKeySpan,
+CHIP_ERROR FabricTable::AddNewUncommittedFabricForTest(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan opKeySpan,
                                                        FabricIndex * outFabricIndex)
 {
     return AddNewFabricForTestInternal(*this, /*leavePending=*/true, rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
@@ -1795,6 +1793,30 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
     const auto * fabricInfo = FindFabricWithIndex(fabricIndex);
     VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
+    // Cannot have a VVSC already if ICAC is provided.
+    if (!icac.empty())
+    {
+        uint8_t vvscBuffer[kMaxCHIPCertLength];
+        MutableByteSpan vvscSpan{ vvscBuffer };
+
+        CHIP_ERROR err = mOpCertStore->GetVidVerificationElement(
+            fabricIndex, OperationalCertificateStore::VidVerificationElement::kVvsc, vvscSpan);
+        if (err == CHIP_NO_ERROR)
+        {
+            if (!vvscSpan.empty())
+            {
+                ChipLogError(
+                    FabricProvisioning,
+                    "Received an UpdateNOC storage request with ICAC when VVSC already present. VVSC must be removed first.");
+                return CHIP_ERROR_INCORRECT_STATE;
+            }
+        }
+        else if (err != CHIP_ERROR_NOT_IMPLEMENTED)
+        {
+            return err;
+        }
+    }
+
     // Check for an existing fabric matching RCAC and FabricID. We must find a correct
     // existing fabric that chains to same root. We assume the stored root is correct.
     if (!mStateFlags.Has(StateFlags::kAreCollidingFabricsIgnored))
@@ -2176,6 +2198,139 @@ CHIP_ERROR FabricTable::SetShouldAdvertiseIdentity(FabricIndex fabricIndex, Adve
     VerifyOrReturnError(fabricIsInitialized, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     fabricInfo->SetShouldAdvertiseIdentity(advertiseIdentity == AdvertiseIdentity::Yes);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FabricTable::FetchVIDVerificationStatement(FabricIndex fabricIndex, MutableByteSpan & outVIDVerificationStatement) const
+{
+    VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return mOpCertStore->GetVidVerificationElement(
+        fabricIndex, OperationalCertificateStore::VidVerificationElement::kVidVerificationStatement, outVIDVerificationStatement);
+}
+
+CHIP_ERROR FabricTable::FetchVVSC(FabricIndex fabricIndex, MutableByteSpan & outVVSC) const
+{
+    VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    return mOpCertStore->GetVidVerificationElement(fabricIndex, OperationalCertificateStore::VidVerificationElement::kVvsc,
+                                                   outVVSC);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FabricTable::SignVIDVerificationRequest(FabricIndex fabricIndex, ByteSpan clientChallenge, ByteSpan attestationChallenge,
+                                                   SignVIDVerificationResponseData & outResponse)
+{
+    FabricInfo * fabricInfo = GetMutableFabricByIndex(fabricIndex);
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    P256PublicKey rootPublicKey;
+    ReturnErrorOnFailure(fabricInfo->FetchRootPubkey(rootPublicKey));
+
+    // Step 1: Generate FabricBindingMessage for given fabric.
+    uint8_t fabricBindingMessageBuffer[kVendorFabricBindingMessageV1Size];
+    MutableByteSpan fabricBindingMessageSpan{ fabricBindingMessageBuffer };
+
+    ReturnErrorOnFailure(
+        GenerateVendorFabricBindingMessage(FabricBindingVersion::kVersion1, rootPublicKey, fabricInfo->GetFabricId(),
+                                           static_cast<uint16_t>(fabricInfo->GetVendorId()), fabricBindingMessageSpan));
+    VerifyOrReturnError(fabricBindingMessageSpan.size() == kVendorFabricBindingMessageV1Size, CHIP_ERROR_INTERNAL);
+
+    // Step 2: Recover VIDVerificationStatement, if any.
+    uint8_t vidVerificationStatementBuffer[kVendorIdVerificationStatementV1Size];
+    MutableByteSpan vidVerificationStatementSpan{ vidVerificationStatementBuffer };
+
+    ReturnErrorOnFailure(FetchVIDVerificationStatement(fabricIndex, vidVerificationStatementSpan));
+
+    // Step 3: Generate VidVerificationToBeSigned
+    uint8_t vidVerificationTbsBuffer[kVendorIdVerificationTbsV1MaxSize];
+    MutableByteSpan vidVerificationTbsSpan{ vidVerificationTbsBuffer };
+
+    P256ECDSASignature signature;
+    auto signatureBuffer = Platform::ScopedMemoryBufferWithSize<uint8_t>();
+    VerifyOrReturnError(signatureBuffer.Calloc(signature.Capacity()), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    ReturnErrorOnFailure(GenerateVendorIdVerificationToBeSigned(fabricIndex, clientChallenge, attestationChallenge,
+                                                                fabricBindingMessageSpan, vidVerificationStatementSpan,
+                                                                vidVerificationTbsSpan));
+
+    // Step 4: Sign the statement with the operational key.
+    ReturnErrorOnFailure(SignWithOpKeypair(fabricIndex, vidVerificationTbsSpan, signature));
+    memcpy(signatureBuffer.Get(), signature.Bytes(), signature.Capacity());
+
+    outResponse.fabricIndex          = fabricIndex;
+    outResponse.fabricBindingVersion = fabricBindingMessageSpan[0];
+    outResponse.signature            = std::move(signatureBuffer);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FabricTable::SetVIDVerificationStatementElements(FabricIndex fabricIndex, Optional<uint16_t> vendorId,
+                                                            Optional<ByteSpan> VIDVerificationStatement, Optional<ByteSpan> VVSC,
+                                                            bool & outFabricTableWasChanged)
+{
+    VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_ARGUMENT);
+
+    FabricInfo * fabricInfo = GetMutableFabricByIndex(fabricIndex);
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // PendingNew fabric means AddNOC had been called. ShadowPending fabric is the overlay version
+    // that is used when UpdateNOC had been called. This is to detect either condition of not
+    // fully committed fabric.
+    bool isTargetFabricPending = (GetPendingNewFabricIndex() == fabricIndex) ||
+        ((GetShadowPendingFabricEntry() != nullptr) && (GetShadowPendingFabricEntry()->GetFabricIndex() == fabricIndex));
+
+    outFabricTableWasChanged = false;
+
+    // Start with VVSC first as it's the most likely to fail.
+    if (VVSC.HasValue())
+    {
+        if (mOpCertStore->HasCertificateForFabric(fabricIndex, OperationalCertificateStore::CertChainElement::kIcac))
+        {
+            ChipLogError(FabricProvisioning,
+                         "Received SetVIDVerificationStatement storage request with VVSC when ICAC already present. ICAC must be "
+                         "removed first.");
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        ReturnErrorOnFailure(mOpCertStore->UpdateVidVerificationSignerCertForFabric(fabricIndex, VVSC.Value()));
+    }
+
+    if (VIDVerificationStatement.HasValue())
+    {
+        bool wasVvsEqual = false;
+        {
+            // This is in a scope to save stack space from getting too deep.
+            uint8_t vidVerificationStatementBuffer[Crypto::kVendorIdVerificationStatementV1Size];
+            MutableByteSpan vidVerificationStatementSpan{ vidVerificationStatementBuffer };
+            ReturnErrorOnFailure(mOpCertStore->GetVidVerificationElement(
+                fabricIndex, OperationalCertificateStore::VidVerificationElement::kVidVerificationStatement,
+                vidVerificationStatementSpan));
+            wasVvsEqual = vidVerificationStatementSpan.data_equal(VIDVerificationStatement.Value());
+        }
+
+        if (!wasVvsEqual)
+        {
+            ReturnErrorOnFailure(
+                mOpCertStore->UpdateVidVerificationStatementForFabric(fabricIndex, VIDVerificationStatement.Value()));
+            outFabricTableWasChanged = true;
+        }
+    }
+
+    if (vendorId.HasValue())
+    {
+        if (static_cast<uint16_t>(fabricInfo->GetVendorId()) != vendorId.Value())
+        {
+            fabricInfo->SetVendorId(static_cast<VendorId>(vendorId.Value()));
+            // Immediately commit Vendor ID if not a pending fabric. Otherwise the commit occurs on CommissioningComplete.
+            if (!isTargetFabricPending)
+            {
+                ReturnErrorOnFailure(StoreFabricMetadata(fabricInfo));
+                outFabricTableWasChanged = true;
+            }
+        }
+    }
 
     return CHIP_NO_ERROR;
 }

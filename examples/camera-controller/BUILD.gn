@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("//build_overrides/editline.gni")
+import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/examples/camera-controller/camera-controller.gni")
 import("${chip_root}/src/lib/core/core.gni")
@@ -23,10 +24,15 @@ import("${chip_root}/src/lib/core/core.gni")
 assert(chip_build_tools)
 
 config("config") {
-  cflags = [
-    "-Wconversion",
-    "-Wno-shadow",
-  ]
+  cflags = [ "-Wno-shadow" ]
+
+  if (is_clang) {
+    # libdatachannel has a lot of these like:
+    #   ...... libdatachannel/repo/include/rtc/h265nalunit.hpp:40:60: error: implicit conversion loses integer precision: 'int'
+    #   to 'uint8_t' (aka 'unsigned char') [-Werror,-Wimplicit-int-conversion]
+    #   40 |         uint8_t nuhLayerId() const { return ((_first & 0x1) << 5) | ((_second & 0b1111'1000) >> 3); }
+    cflags += [ "-Wno-implicit-int-conversion" ]
+  }
 
   include_dirs = [
     ".",
@@ -65,22 +71,36 @@ static_library("camera-controller-utils") {
     "commands/common/HexConversion.h",
     "commands/common/RemoteDataModelLogger.cpp",
     "commands/common/RemoteDataModelLogger.h",
+    "commands/delay/SleepCommand.cpp",
+    "commands/delay/WaitForCommissioneeCommand.cpp",
+    "commands/liveview/LiveViewCommands.cpp",
+    "commands/liveview/LiveViewCommands.h",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
     "commands/pairing/ToTLVCert.cpp",
     "commands/webrtc/WebRTCProviderCommands.cpp",
     "commands/webrtc/WebRTCProviderCommands.h",
-    "webrtc_manager/WebRTCManager.cpp",
-    "webrtc_manager/WebRTCManager.h",
-    "webrtc_manager/WebRTCProviderClient.cpp",
-    "webrtc_manager/WebRTCProviderClient.h",
+    "device-manager/AVStreamManagement.cpp",
+    "device-manager/AVStreamManagement.h",
+    "device-manager/DeviceManager.cpp",
+    "device-manager/DeviceManager.h",
+    "webrtc-manager/WebRTCManager.cpp",
+    "webrtc-manager/WebRTCManager.h",
+    "webrtc-manager/WebRTCProviderClient.cpp",
+    "webrtc-manager/WebRTCProviderClient.h",
+    "webrtc-manager/WebRTCRequestorDelegate.cpp",
+    "webrtc-manager/WebRTCRequestorDelegate.h",
   ]
 
-  deps = [ "${chip_root}/src/app:events" ]
+  deps = [
+    "${chip_root}/src/app:events",
+    "${chip_root}/src/app/clusters/webrtc-transport-requestor-server",
+  ]
 
   sources += [ "commands/interactive/InteractiveCommands.cpp" ]
   deps += [
+    "${chip_root}/examples/common/websocket-server",
     "${chip_root}/src/platform/logging:headers",
     "${editline_root}:editline",
   ]
@@ -94,6 +114,7 @@ static_library("camera-controller-utils") {
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/tests/suites/commands/interaction_model",
     "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/controller/webrtc/access_control",
     "${chip_root}/src/credentials:file_attestation_trust_store",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core:types",
@@ -121,10 +142,6 @@ executable("chip-camera-controller") {
     "${chip_root}/src/platform/logging:stdio",
     "${chip_root}/third_party/libdatachannel:libdatachannel",
   ]
-
-  libs = [ "datachannel" ]
-  lib_dirs =
-      [ rebase_path("${chip_root}/third_party/libdatachannel/repo/build") ]
 
   output_dir = root_out_dir
 }

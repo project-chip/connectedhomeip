@@ -26,6 +26,7 @@
 #include <app/EventLogging.h>
 #include <app/clusters/thread-network-diagnostics-server/thread-network-diagnostics-provider.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/ThreadNetworkDiagnostics/Metadata.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLVTypes.h>
@@ -66,6 +67,9 @@ CHIP_ERROR ThreadDiagnosticsAttrAccess::Read(const ConcreteReadAttributePath & a
 
     switch (aPath.mAttributeId)
     {
+    case Attributes::ClusterRevision::Id:
+        return aEncoder.Encode(ThreadNetworkDiagnostics::kRevision);
+
     case ThreadNetworkDiagnostics::Attributes::NeighborTable::Id:
     case ThreadNetworkDiagnostics::Attributes::RouteTable::Id:
     case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id:
@@ -129,6 +133,8 @@ CHIP_ERROR ThreadDiagnosticsAttrAccess::Read(const ConcreteReadAttributePath & a
     case ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id:
     case ThreadNetworkDiagnostics::Attributes::Delay::Id:
     case ThreadNetworkDiagnostics::Attributes::ChannelPage0Mask::Id:
+    case ThreadNetworkDiagnostics::Attributes::ExtAddress::Id:
+    case ThreadNetworkDiagnostics::Attributes::Rloc16::Id:
         return WriteThreadNetworkDiagnosticAttributeToTlv(aPath.mAttributeId, aEncoder);
     default:
         break;

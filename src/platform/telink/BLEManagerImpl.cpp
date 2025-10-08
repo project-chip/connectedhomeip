@@ -160,6 +160,7 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 CHIP_ERROR BLEManagerImpl::_Init(void)
 {
     mBLERadioInitialized  = false;
+    mReadyToAttachThread  = false;
     mconId                = NULL;
     mInternalScanCallback = new InternalScanCallback(this);
 
@@ -507,9 +508,12 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(const ChipDeviceEvent * event)
 CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
 {
     const BleConnEventType * connEvent = &event->Platform.BleConnEvent;
+    const uint8_t hciResult            = connEvent->HciResult;
 
-    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02x)", connEvent->HciResult);
+    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02x)", hciResult);
 
+    mNeedToResetFailSafeTimer = !ConfigurationMgr().IsFullyProvisioned() &&
+        (hciResult == BT_HCI_ERR_REMOTE_USER_TERM_CONN || hciResult == BT_HCI_ERR_CONN_TIMEOUT);
     mGAPConns--;
 
     // If indications were enabled for this connection, record that they are now disabled and
@@ -517,7 +521,7 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
     if (UnsetSubscribed(connEvent->BtConn))
     {
         CHIP_ERROR disconReason;
-        switch (connEvent->HciResult)
+        switch (hciResult)
         {
         case BT_HCI_ERR_REMOTE_USER_TERM_CONN:
             // Do not treat proper connection termination as an error and exit.
@@ -921,13 +925,35 @@ CHIP_ERROR BLEManagerImpl::HandleOperationalNetworkEnabled(const ChipDeviceEvent
 {
     ChipLogDetail(DeviceLayer, "HandleOperationalNetworkEnabled");
 
-    int error = bt_conn_disconnect(BLEMgrImpl().mconId, BT_HCI_ERR_LOCALHOST_TERM_CONN);
-    if (error)
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    /* On first commissioning BLE disconnects before switching to Thread operational network.
+       All subsequent Thread operational network changes are handled in a bit different way */
+    if (!mReadyToAttachThread)
     {
-        ChipLogError(DeviceLayer, "Close BLEConn err: %d", error);
+        error = MapErrorZephyr(bt_conn_disconnect(BLEMgrImpl().mconId, BT_HCI_ERR_LOCALHOST_TERM_CONN));
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Close BLEConn err: %" CHIP_ERROR_FORMAT, error.Format());
+        }
+        mReadyToAttachThread = true;
+    }
+    else
+    {
+        ThreadStackMgrImpl().SetThreadEnabled(false);
+        SwitchToIeee802154();
+
+        ChipDeviceEvent attachEvent;
+        attachEvent.Type                            = DeviceEventType::kThreadConnectivityChange;
+        attachEvent.ThreadConnectivityChange.Result = kConnectivity_Established;
+
+        error = PlatformMgr().PostEvent(&attachEvent);
+        VerifyOrExit(error == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "PostEvent err: %" CHIP_ERROR_FORMAT, error.Format()));
+
+        ThreadStackMgrImpl().CommitConfiguration();
     }
 
-    return MapErrorZephyr(error);
+exit:
+    return error;
 }
 
 CHIP_ERROR BLEManagerImpl::HandleThreadStateChange(const ChipDeviceEvent * event)
@@ -981,5 +1007,13 @@ void BLEManagerImpl::SwitchToIeee802154(void)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
+
+#if !defined(CONFIG_ZEPHYR_VERSION_3_3)
+// Implementation for Zephyr Bluetooth host.
+int bt_rand(void * buf, size_t len)
+{
+    return sys_csrand_get(buf, len);
+}
+#endif
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Ambient Context Sensing Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="First release of this cluster"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId name="Ambient Context Sensing"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="TBD" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="HA" name="Human Activity" summary="Supports sensing various human actions and activities.">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="HumanActivityTypeEnum">
+      <item value="0" name="Other" summary="Other or unknown human activity is detected.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Fall" summary="Human fall is detected.">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="2" name="Sleep" summary="Human sleeping is detected.">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="3" name="Walk" summary="Human walking is detected.">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="4" name="Sit" summary="Human sitting is detected.">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="5" name="Stand" summary="Human standing is detected.">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+      <item value="6" name="Run" summary="Human running is detected.">
+        <optionalConform choice="a" more="true" min="1"/>
+      </item>
+    </enum>
+    <struct name="HoldTimeLimitsStruct">
+      <field id="0" name="HoldTimeMin" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="1" name="HoldTimeMax" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="HoldTimeDefault" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from>
+              <field name="HoldTimeMin"/>
+            </from>
+            <to>
+              <field name="HoldTimeMax"/>
+            </to>
+          </between>
+        </constraint>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="HumanActivityDetected" type="bool">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="HA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0001" name="HumanActivityType" type="HumanActivityTypeEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="HA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0002" name="HoldTime" type="unit16">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="HoldTimeLimits">
+              <field name="HoldTimeMin"/>
+            </attribute>
+          </from>
+          <to>
+            <attribute name="HoldTimeLimits">
+              <field name="HoldTimeMax"/>
+            </attribute>
+          </to>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="HoldTimeLimits" type="HoldTimeLimitsStruct">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <attribute name="HoldTime"/>
+      </mandatoryConform>
+    </attribute>
+  </attributes>
+</cluster>

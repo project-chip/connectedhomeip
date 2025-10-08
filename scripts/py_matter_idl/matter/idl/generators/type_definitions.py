@@ -20,6 +20,8 @@ from typing import Optional, Union
 from matter.idl import matter_idl_types  # to explicitly say 'Enum'
 from matter.idl.matter_idl_types import DataType
 
+LOGGER = logging.getLogger(__name__)
+
 
 def ToPowerOfTwo(bits: int) -> int:
     """
@@ -197,7 +199,9 @@ __CHIP_SIZED_TYPES__ = {
     "devtype_id": BasicInteger(idl_name="devtype_id", byte_count=4, is_signed=False),
     "elapsed_s": BasicInteger(idl_name="elapsed_s", byte_count=4, is_signed=False),
     "endpoint_no": BasicInteger(idl_name="endpoint_no", byte_count=2, is_signed=False),
-    "energy_mwh":  BasicInteger(idl_name="energy_mwh", byte_count=8, is_signed=True),
+    "energy_mwh": BasicInteger(idl_name="energy_mwh", byte_count=8, is_signed=True),
+    "energy_mvah": BasicInteger(idl_name="energy_mvah", byte_count=8, is_signed=True),
+    "energy_mvarh": BasicInteger(idl_name="energy_mvarh", byte_count=8, is_signed=True),
     "entry_idx": BasicInteger(idl_name="entry_idx", byte_count=2, is_signed=False),
     "epoch_s": BasicInteger(idl_name="epoch_s", byte_count=4, is_signed=False),
     "epoch_us": BasicInteger(idl_name="epoch_us", byte_count=8, is_signed=False),
@@ -207,12 +211,15 @@ __CHIP_SIZED_TYPES__ = {
     "fabric_idx": BasicInteger(idl_name="fabric_idx", byte_count=1, is_signed=False),
     "field_id": BasicInteger(idl_name="field_id", byte_count=4, is_signed=False),
     "group_id": BasicInteger(idl_name="group_id", byte_count=2, is_signed=False),
+    "money": BasicInteger(idl_name="money", byte_count=8, is_signed=True),
     "namespace": BasicInteger(idl_name="namespace", byte_count=1, is_signed=False),
     "node_id": BasicInteger(idl_name="node_id", byte_count=8, is_signed=False),
     "percent": BasicInteger(idl_name="percent", byte_count=1, is_signed=False),
     "percent100ths": BasicInteger(idl_name="percent100ths", byte_count=2, is_signed=False),
     "posix_ms": BasicInteger(idl_name="posix_ms", byte_count=8, is_signed=False),
     "power_mw": BasicInteger(idl_name="power_mw", byte_count=8, is_signed=True),
+    "power_mva": BasicInteger(idl_name="power_mva", byte_count=8, is_signed=True),
+    "power_mvar": BasicInteger(idl_name="power_mvar", byte_count=8, is_signed=True),
     "priority": BasicInteger(idl_name="priority", byte_count=1, is_signed=False),
     "semtag": BasicInteger(idl_name="semtag", byte_count=4, is_signed=False),
     "status": BasicInteger(idl_name="status", byte_count=1, is_signed=False),
@@ -411,7 +418,7 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
     if lookup.find_struct(data_type.name):
         result.item_type = IdlItemType.STRUCT
     else:
-        logging.warning(
+        LOGGER.warning(
             "Data type %s is NOT known, but treating it as a generic IDL type." % data_type)
 
     return result

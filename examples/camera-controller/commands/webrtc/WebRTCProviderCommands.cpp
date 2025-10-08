@@ -19,25 +19,25 @@
 #include "WebRTCProviderCommands.h"
 #include <commands/common/RemoteDataModelLogger.h>
 #include <commands/interactive/InteractiveCommands.h>
+#include <device-manager/DeviceManager.h>
 #include <thread>
 #include <unistd.h>
-#include <webrtc_manager/WebRTCManager.h>
+#include <webrtc-manager/WebRTCManager.h>
 
 using namespace ::chip;
+using StreamUsageEnum = chip::app::Clusters::Globals::StreamUsageEnum;
 
 namespace webrtc {
 
 CHIP_ERROR ConnectCommand::RunCommand()
 {
-    // print to console
-    std::cout << "Run ConnectCommand" << std::endl;
-
+    ChipLogProgress(Camera, "Run ConnectCommand");
     return WebRTCManager::Instance().Connnect(CurrentCommissioner(), mPeerNodeId, mPeerEndpointId);
 }
 
 CHIP_ERROR ProvideOfferCommand::RunCommand()
 {
-    std::cout << "Run ProvideOfferCommand" << std::endl;
+    ChipLogProgress(Camera, "Run ProvideOfferCommand");
 
     app::DataModel::Nullable<uint16_t> webrtcSessionId;
     if (mWebRTCSessionId.HasValue())
@@ -50,9 +50,85 @@ CHIP_ERROR ProvideOfferCommand::RunCommand()
     }
 
     // Convert the stream usage into its enum type:
-    auto streamUsage = static_cast<app::Clusters::WebRTCTransportProvider::StreamUsageEnum>(mStreamUsage);
+    auto streamUsage = static_cast<StreamUsageEnum>(mStreamUsage);
 
-    return WebRTCManager::Instance().ProvideOffer(webrtcSessionId, streamUsage);
+    chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamIdOptional;
+    if (mVideoStreamId.HasValue())
+    {
+        auto videoStreamIdNullable = app::DataModel::MakeNullable(mVideoStreamId.Value());
+        videoStreamIdOptional      = MakeOptional(videoStreamIdNullable);
+    }
+    else
+    {
+        videoStreamIdOptional = NullOptional;
+    }
+
+    chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamIdOptional;
+    if (mAudioStreamId.HasValue())
+    {
+        auto audioStreamIdNullable = app::DataModel::MakeNullable(mAudioStreamId.Value());
+        audioStreamIdOptional      = MakeOptional(audioStreamIdNullable);
+    }
+    else
+    {
+        audioStreamIdOptional = NullOptional;
+    }
+
+    return WebRTCManager::Instance().ProvideOffer(webrtcSessionId, streamUsage, videoStreamIdOptional, audioStreamIdOptional);
+}
+
+CHIP_ERROR SolicitOfferCommand::RunCommand()
+{
+    ChipLogProgress(Camera, "Run SolicitOfferCommand");
+
+    // Convert the stream usage into its enum type:
+    auto streamUsage = static_cast<StreamUsageEnum>(mStreamUsage);
+
+    chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamIdOptional;
+    if (mVideoStreamId.HasValue())
+    {
+        auto videoStreamIdNullable = app::DataModel::MakeNullable(mVideoStreamId.Value());
+        videoStreamIdOptional      = MakeOptional(videoStreamIdNullable);
+    }
+    else
+    {
+        videoStreamIdOptional = NullOptional;
+    }
+
+    chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamIdOptional;
+    if (mAudioStreamId.HasValue())
+    {
+        auto audioStreamIdNullable = app::DataModel::MakeNullable(mAudioStreamId.Value());
+        audioStreamIdOptional      = MakeOptional(audioStreamIdNullable);
+    }
+    else
+    {
+        audioStreamIdOptional = NullOptional;
+    }
+
+    return WebRTCManager::Instance().SolicitOffer(streamUsage, videoStreamIdOptional, audioStreamIdOptional);
+}
+
+CHIP_ERROR EstablishSessionCommand::RunCommand()
+{
+    ChipLogProgress(Camera, "Run EstablishSessionCommand");
+
+    if (mPeerNodeId == chip::kUndefinedNodeId)
+    {
+        ChipLogError(Camera, "Missing --node-id");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    uint8_t streamUsage = static_cast<uint8_t>(StreamUsageEnum::kRecording);
+
+    // Use provided offer type or default to ProvideOffer
+    camera::WebRTCOfferType offerType = camera::WebRTCOfferType::kProvideOffer;
+    if (mOfferType.HasValue())
+    {
+        offerType = static_cast<camera::WebRTCOfferType>(mOfferType.Value());
+    }
+
+    return camera::DeviceManager::Instance().AllocateVideoStream(mPeerNodeId, streamUsage, offerType);
 }
 
 } // namespace webrtc

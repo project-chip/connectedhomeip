@@ -32,7 +32,6 @@ declare_args() {
   chip_enable_ble_controller = false
   chip_use_secure_cert_dac_provider = false
   chip_use_esp32_ecdsa_peripheral = false
-  chip_enable_ethernet = false
   chip_enable_route_hook = false
   chip_memory_alloc_mode = "default"
 }
@@ -59,15 +58,15 @@ static_library("ESP32") {
     "ESP32Utils.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "LwIPCoreLock.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
-    "SystemTimeSupport.h",
   ]
 
   deps = [
     "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/common:metadata",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",

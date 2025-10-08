@@ -70,7 +70,12 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="lengthBetween" from="1" to="32"/>
+      <constraint>
+        <lengthBetween>
+          <from value="1"/>
+          <to value="32"/>
+        </lengthBetween>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="PassphraseSurrogate" type="uint64" default="null">
       <access read="true" readPrivilege="manage"/>
@@ -87,7 +92,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field name="Passphrase" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="64"/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
       </field>
     </command>
   </commands>

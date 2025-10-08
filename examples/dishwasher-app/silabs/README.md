@@ -9,6 +9,8 @@ An example showing the use of Matter on the Silicon Labs EFR32 MG24 boards.
     -   [Building](#building)
     -   [Flashing the Application](#flashing-the-application)
     -   [Viewing Logging Output](#viewing-logging-output)
+        -   [SeggerRTT](#segger-rtt)
+        -   [Serial Console](#console-log)
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Commissioning](#commissioning)
 
@@ -126,6 +128,8 @@ Releases page on
 
 ## Viewing Logging Output
 
+### SEGGER RTT
+
 The example application is built to use the SEGGER Real Time Transfer (RTT)
 facility for log output. RTT is a feature built-in to the J-Link Interface MCU
 on the WSTK development board. It allows bi-directional communication with an
@@ -167,6 +171,30 @@ combination with JLinkRTTClient as follows:
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
           $ JLinkRTTClient
+
+### Console Log
+
+If the binary was built with this option or if you're using the Siwx917 WiFi
+SoC, the logs and the CLI (if enabled) will be available on the serial console.
+
+This console required a baudrate of **115200** with CTS/RTS. This is the default
+configuration of Silicon Labs dev kits.
+
+**HOWEVER** the console will required a baudrate of **921600** with CTS/RTS if
+the verbose mode is selected (--verbose)
+
+#### Configuring the VCOM
+
+-   Using (Simplicity
+    Studio)[https://community.silabs.com/s/article/wstk-virtual-com-port-baudrate-setting?language=en_US]
+-   Using commander-cli
+    ```
+    commander vcom config --baudrate 921600 --handshake rtscts
+    ```
+
+### Using the console
+
+With any serial terminal application such as screen, putty, minicom etc.
 
 ## Running the Complete Example
 
@@ -241,5 +269,5 @@ Pi image. For more info on using `chip-tool`, see
 
 Here is an example using `chip-tool`:
 
-    $ chip-tool pairing ble-thread 1 hex:0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8 20202021 3840 --ble-adapter 0
+    $ chip-tool pairing ble-thread 1 hex:0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8 20202021 3840 --ble-controller 0
     $ chip-tool operationalstate start 1 1

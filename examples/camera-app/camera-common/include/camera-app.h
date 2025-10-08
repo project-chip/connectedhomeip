@@ -32,18 +32,28 @@ class CameraApp
 
 public:
     // This class is responsible for initialising all the camera clusters and managing the interactions between them
-    explicit CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface * cameraDevice) :
-        mChimeServer(aClustersEndpoint, cameraDevice->GetChimeDelegate()),
-        mWebRTCTransportProvider(cameraDevice->GetWebRTCProviderDelegate(), aClustersEndpoint)
-    {}
+    CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface * cameraDevice);
 
     // Initialize all the camera device clusters.
     void InitCameraDeviceClusters();
 
+    // Shutdown all the camera device clusters
+    void ShutdownCameraDeviceClusters();
+
 private:
+    chip::EndpointId mEndpoint;
+    CameraDeviceInterface * mCameraDevice;
+
     // SDK cluster servers
-    chip::app::Clusters::ChimeServer mChimeServer;
-    chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderServer mWebRTCTransportProvider;
+    std::unique_ptr<chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderServer> mWebRTCTransportProviderPtr;
+    std::unique_ptr<chip::app::Clusters::ChimeServer> mChimeServerPtr;
+    std::unique_ptr<chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtServer> mAVStreamMgmtServerPtr;
+    std::unique_ptr<chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelMgmtServer>
+        mAVSettingsUserLevelMgmtServerPtr;
+    std::unique_ptr<chip::app::Clusters::ZoneManagement::ZoneMgmtServer> mZoneMgmtServerPtr;
+
+    // Helper to set attribute defaults for CameraAVStreamMgmt
+    void InitializeCameraAVStreamMgmt();
 };
 
 void CameraAppInit(CameraDeviceInterface * cameraDevice);

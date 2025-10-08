@@ -17,6 +17,59 @@ import("//build_overrides/build.gni")
 import("${build_root}/config/android/config.gni")
 import("${build_root}/config/android_abi.gni")
 
+# Determine NDK host platform based on actual host OS, not target OS
+# This handles cross-compilation scenarios where current_os might be "android"
+# but we're building on a different host platform
+if (host_os == "linux") {
+  android_ndk_host_platform = "linux-x86_64"
+} else if (host_os == "mac") {
+  android_ndk_host_platform = "darwin-x86_64"
+} else if (host_os == "win") {
+  android_ndk_host_platform = "windows-x86_64"
+} else {
+  # Fallback to current_os logic for compatibility. Older GN versions or certain
+  # build configurations might not have `host_os` defined or it might be
+  # empty/undefined.
+  if (current_os == "linux" || current_os == "android") {
+    android_ndk_host_platform = "linux-x86_64"
+  } else if (current_os == "mac") {
+    android_ndk_host_platform = "darwin-x86_64"
+  } else {
+    assert(
+        false,
+        "Unsupported host OS for Android NDK prebuilts: host_os=${host_os}, current_os=${current_os}")
+  }
+}
+
+# DEBUG: Print critical build information
+print("=== CHIP Java BUILD.gn Debug ===")
+print("host_os: ${host_os}")
+print("current_os: ${current_os}")
+print("current_cpu: ${current_cpu}")
+print("android_ndk_host_platform: ${android_ndk_host_platform}")
+print("android_ndk_root: ${android_ndk_root}")
+print("android_sdk_root: ${android_sdk_root}")
+print("android_abi: ${android_abi}")
+print("build_root: ${build_root}")
+print("root_out_dir: ${root_out_dir}")
+
+if (current_cpu == "arm") {
+  android_toolchain_dir = "arm-linux-androideabi"
+} else if (current_cpu == "arm64") {
+  android_toolchain_dir = "aarch64-linux-android"
+} else if (current_cpu == "x64") {
+  android_toolchain_dir = "x86_64-linux-android"
+} else if (current_cpu == "x86") {
+  android_toolchain_dir = "i686-linux-android"
+} else if (current_cpu == "riscv64") {
+  android_toolchain_dir = "riscv64-linux-android"
+} else {
+  assert(false, "Unsupported target_cpu for Android: ${current_cpu}")
+}
+
+# DEBUG: Print determined toolchain directory
+print("android_toolchain_dir: ${android_toolchain_dir}")
+
 # Place a copy of the shared c++ support library in the jni output directory
 # See:
 #   https://developer.android.com/ndk/guides/cpp-support
@@ -24,6 +77,13 @@ import("${build_root}/config/android_abi.gni")
 # Generally CHIP cannot ensure a single shared library per java application, so a shared
 # CPP support library is used
 copy("shared_cpplib") {
-  sources = [ "${android_ndk_root}/sources/cxx-stl/llvm-libc++/libs/${android_abi}/libc++_shared.so" ]
+  sources = [ "${android_ndk_root}/toolchains/llvm/prebuilt/${android_ndk_host_platform}/sysroot/usr/lib/${android_toolchain_dir}/libc++_shared.so" ]
   outputs = [ "${root_out_dir}/lib/jni/${android_abi}/libc++_shared.so" ]
+
+  # DEBUG: Print critical paths
+  print(
+      "libc++_shared.so source: ${android_ndk_root}/toolchains/llvm/prebuilt/${android_ndk_host_platform}/sysroot/usr/lib/${android_toolchain_dir}/libc++_shared.so")
+  print(
+      "libc++_shared.so output: ${root_out_dir}/lib/jni/${android_abi}/libc++_shared.so")
+  print("=== End Debug ===")
 }

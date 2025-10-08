@@ -16,12 +16,6 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -42,76 +36,4 @@ void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Clus
     ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%" PRIx32 "', EndPoint ID: '0x%x', Attribute ID: '0x%" PRIx32 "'",
              clusterId, endpointId, attributeId);
     ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
-}
-
-namespace {
-
-class ActionsAttrAccess : public AttributeAccessInterface
-{
-public:
-    // Register for the Actions cluster on all endpoints.
-    ActionsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Actions::Id) {}
-
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-private:
-    static constexpr uint16_t ClusterRevision = 1;
-
-    CHIP_ERROR ReadActionListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadEndpointListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadSetupUrlAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder);
-};
-
-constexpr uint16_t ActionsAttrAccess::ClusterRevision;
-
-CHIP_ERROR ActionsAttrAccess::ReadActionListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
-{
-    // Just return an empty list
-    return aEncoder.EncodeEmptyList();
-}
-
-CHIP_ERROR ActionsAttrAccess::ReadEndpointListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
-{
-    // Just return an empty list
-    return aEncoder.EncodeEmptyList();
-}
-
-CHIP_ERROR ActionsAttrAccess::ReadSetupUrlAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
-{
-    static const char SetupUrl[] = "https://example.com";
-    return aEncoder.Encode(chip::CharSpan::fromCharString(SetupUrl));
-}
-
-CHIP_ERROR ActionsAttrAccess::ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder)
-{
-    return aEncoder.Encode(ClusterRevision);
-}
-
-ActionsAttrAccess gAttrAccess;
-
-CHIP_ERROR ActionsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    VerifyOrDie(aPath.mClusterId == Actions::Id);
-
-    switch (aPath.mAttributeId)
-    {
-    case ActionList::Id:
-        return ReadActionListAttribute(aPath.mEndpointId, aEncoder);
-    case EndpointLists::Id:
-        return ReadEndpointListAttribute(aPath.mEndpointId, aEncoder);
-    case SetupURL::Id:
-        return ReadSetupUrlAttribute(aPath.mEndpointId, aEncoder);
-    case ClusterRevision::Id:
-        return ReadClusterRevision(aPath.mEndpointId, aEncoder);
-    default:
-        break;
-    }
-    return CHIP_NO_ERROR;
-}
-} // anonymous namespace
-
-void MatterActionsPluginServerInitCallback(void)
-{
-    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }

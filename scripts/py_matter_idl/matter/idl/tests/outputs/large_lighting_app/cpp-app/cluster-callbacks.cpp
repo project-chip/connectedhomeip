@@ -58,9 +58,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::NetworkCommissioning::Id:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
         break;
-    case app::Clusters::OccupancySensing::Id:
-        emberAfOccupancySensingClusterInitCallback(endpoint);
-        break;
     case app::Clusters::OnOff::Id:
         emberAfOnOffClusterInitCallback(endpoint);
         break;
@@ -73,14 +70,8 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::SoftwareDiagnostics::Id:
         emberAfSoftwareDiagnosticsClusterInitCallback(endpoint);
         break;
-    case app::Clusters::Switch::Id:
-        emberAfSwitchClusterInitCallback(endpoint);
-        break;
     case app::Clusters::ThreadNetworkDiagnostics::Id:
         emberAfThreadNetworkDiagnosticsClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::TimeFormatLocalization::Id:
-        emberAfTimeFormatLocalizationClusterInitCallback(endpoint);
         break;
     case app::Clusters::UserLabel::Id:
         emberAfUserLabelClusterInitCallback(endpoint);
@@ -147,9 +138,6 @@ void emberAfClusterShutdownCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::NetworkCommissioning::Id:
         emberAfNetworkCommissioningClusterShutdownCallback(endpoint);
         break;
-    case app::Clusters::OccupancySensing::Id:
-        emberAfOccupancySensingClusterShutdownCallback(endpoint);
-        break;
     case app::Clusters::OnOff::Id:
         emberAfOnOffClusterShutdownCallback(endpoint);
         break;
@@ -162,14 +150,8 @@ void emberAfClusterShutdownCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::SoftwareDiagnostics::Id:
         emberAfSoftwareDiagnosticsClusterShutdownCallback(endpoint);
         break;
-    case app::Clusters::Switch::Id:
-        emberAfSwitchClusterShutdownCallback(endpoint);
-        break;
     case app::Clusters::ThreadNetworkDiagnostics::Id:
         emberAfThreadNetworkDiagnosticsClusterShutdownCallback(endpoint);
-        break;
-    case app::Clusters::TimeFormatLocalization::Id:
-        emberAfTimeFormatLocalizationClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::UserLabel::Id:
         emberAfUserLabelClusterShutdownCallback(endpoint);

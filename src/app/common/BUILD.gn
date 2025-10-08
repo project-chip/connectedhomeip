@@ -16,13 +16,23 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
 
 config("includes") {
-  include_dirs = [ "${chip_app_zap_dir}" ]
+  include_dirs = [
+    "${chip_app_zap_dir}",
+    "${chip_root}/zzz_generated/app-common/",
+  ]
 }
 
 source_set("attribute-type") {
   sources = [ "${chip_app_zap_dir}/app-common/zap-generated/attribute-type.h" ]
 
   public_configs = [ ":includes" ]
+}
+
+source_set("global-ids") {
+  sources =
+      [ "${chip_root}/zzz_generated/app-common/clusters/shared/GlobalIds.h" ]
+
+  deps = [ "${chip_root}/src/lib/core:types" ]
 }
 
 source_set("ids") {
@@ -33,7 +43,7 @@ source_set("ids") {
     "${chip_app_zap_dir}/app-common/zap-generated/ids/Events.h",
   ]
 
-  public_deps = [ "${chip_root}/src/app/util:types" ]
+  public_deps = [ "${chip_root}/zzz_generated/app-common/clusters:all-ids" ]
 
   public_configs = [ ":includes" ]
 }
@@ -44,6 +54,7 @@ static_library("cluster-objects") {
   sources = [
     "${chip_app_zap_dir}/app-common/zap-generated/cluster-objects.cpp",
     "${chip_app_zap_dir}/app-common/zap-generated/cluster-objects.h",
+    "CompatClusterObjects.h",
   ]
 
   public_deps = [
@@ -51,10 +62,13 @@ static_library("cluster-objects") {
     "${chip_root}/src/app:events",
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/data-model:encode-decode",
     "${chip_root}/src/app/util:types",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/protocols/interaction_model",
+    "${chip_root}/zzz_generated/app-common/clusters:all-headers",
+    "${chip_root}/zzz_generated/app-common/clusters/shared:headers",
   ]
 
   public_configs = [ ":includes" ]
@@ -67,5 +81,17 @@ source_set("enums") {
     "CompatEnumNames.h",
   ]
 
+  deps = [
+    "${chip_root}/zzz_generated/app-common/clusters:all-enums",
+    "${chip_root}/zzz_generated/app-common/clusters/shared:enums",
+  ]
+  public_configs = [ ":includes" ]
+}
+
+source_set("metadata") {
+  public_deps = [
+    "${chip_root}/zzz_generated/app-common/clusters:all-metadata",
+    "${chip_root}/zzz_generated/app-common/clusters:metadata-query",
+  ]
   public_configs = [ ":includes" ]
 }

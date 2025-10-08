@@ -171,8 +171,11 @@ MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
  * @param uniqueIdentifier The unique id to assign to the controller.
  *
  */
+- (instancetype)initWithXPCConnectionBlock:(NSXPCConnection * (^)(void) )xpcConnectionBlock
+                          uniqueIdentifier:(NSUUID *)uniqueIdentifier MTR_AVAILABLE(ios(26.0), macos(26.0), watchos(26.0), tvos(26.0));
+
 - (instancetype)initWithXPConnectionBlock:(NSXPCConnection * (^)(void) )xpcConnectionBlock
-                         uniqueIdentifier:(NSUUID *)uniqueIdentifier;
+                         uniqueIdentifier:(NSUUID *)uniqueIdentifier MTR_DEPRECATED("Please use initWithXPCConnectionBlock:uniqueIdentifier:", ios(18.2, 26.0), macos(15.2, 26.0), watchos(11.2, 26.0), tvos(18.2, 26.0));
 
 @property (atomic, readonly, retain) NSUUID * uniqueIdentifier MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 @property (readonly, strong, nonatomic) NSXPCConnection * (^xpcConnectionBlock)(void) MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));

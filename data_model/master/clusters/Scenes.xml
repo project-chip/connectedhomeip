@@ -148,10 +148,8 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="LastConfiguredBy" type="node-id" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
-      <optionalConform/>
+    <attribute id="0x0000" name="DoNotUse">
+      <disallowConform/>
     </attribute>
     <attribute id="0x0001" name="SceneTableSize" type="uint16" default="16">
       <access read="true" readPrivilege="view"/>

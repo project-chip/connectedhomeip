@@ -46,7 +46,6 @@
 #include <openthread/srp_client.h>
 #endif
 
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
@@ -72,28 +71,7 @@ namespace Internal {
 
 static_assert(OPENTHREAD_API_VERSION >= 219, "OpenThread version too old");
 
-// Network commissioning
 namespace {
-#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
-NetworkCommissioning::GenericThreadDriver sGenericThreadDriver;
-app::Clusters::NetworkCommissioning::Instance
-    sThreadNetworkCommissioningInstance(CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID /* Endpoint Id */, &sGenericThreadDriver);
-#endif
-
-void initNetworkCommissioningThreadDriver()
-{
-#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
-    sThreadNetworkCommissioningInstance.Init();
-#endif
-}
-
-void resetGenericThreadDriver()
-{
-#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
-    sGenericThreadDriver.ClearNetwork();
-#endif
-}
-
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 CHIP_ERROR ReadDomainNameComponent(const char *& in, char * out, size_t outSize)
 {
@@ -1027,7 +1005,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyFull failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyFull failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 #endif // CHIP_PROGRESS_LOGGING
     return err;
@@ -1182,8 +1160,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
 
     err = ConfigureThreadStack(otInst);
 
-    initNetworkCommissioningThreadDriver();
-
 exit:
     return err;
 }
@@ -1264,7 +1240,12 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo()
     otThreadSetEnabled(mOTInst, false);
     otIp6SetEnabled(mOTInst, false);
     otInstanceErasePersistentInfo(mOTInst);
-    resetGenericThreadDriver();
+
+    if (mpCommissioningDriver)
+    {
+        mpCommissioningDriver->ClearNetwork();
+    }
+
     Impl()->UnlockThreadStack();
 }
 
@@ -1900,7 +1881,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
 {
     CHIP_ERROR error;
     // type buffer size is kDnssdTypeAndProtocolMaxSize + . + kMaxDomainNameSize + . + termination character
-    char type[Dnssd::kDnssdTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    char type[Dnssd::kDnssdFullTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
     // hostname buffer size is kHostNameMaxLength + . + kMaxDomainNameSize + . + termination character
     char hostname[Dnssd::kHostNameMaxLength + SrpClient::kMaxDomainNameSize + 3];
     // secure space for the raw TXT data in the worst-case scenario relevant for Matter:

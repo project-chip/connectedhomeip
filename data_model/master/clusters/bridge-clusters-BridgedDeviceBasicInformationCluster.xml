@@ -86,6 +86,7 @@ Davis, CA 95616, USA
     <attribute id="0x0001" name="VendorName" type="string" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
+      <describedConform/>
       <constraint>
         <maxLength value="32"/>
       </constraint>
@@ -93,6 +94,7 @@ Davis, CA 95616, USA
     <attribute id="0x0002" name="VendorID" type="vendor-id" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
+      <describedConform/>
     </attribute>
     <attribute id="0x0003" name="ProductName" type="string" default="MS">
       <access read="true" readPrivilege="view"/>
@@ -105,6 +107,7 @@ Davis, CA 95616, USA
     <attribute id="0x0004" name="ProductID" type="uint16" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
+      <describedConform/>
     </attribute>
     <attribute id="0x0005" name="NodeLabel" type="string" default="&quot;&quot;">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>

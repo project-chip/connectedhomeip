@@ -143,8 +143,10 @@ Davis, CA 95616, USA
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="maxCount">
-          <value attribute="SubjectsPerAccessControlEntry"/>
+        <constraint>
+          <maxCount>
+            <attribute name="SubjectsPerAccessControlEntry"/>
+          </maxCount>
         </constraint>
       </field>
       <field id="4" name="Targets" type="list">
@@ -152,8 +154,10 @@ Davis, CA 95616, USA
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="maxCount">
-          <value attribute="TargetsPerAccessControlEntry"/>
+        <constraint>
+          <maxCount>
+            <attribute name="TargetsPerAccessControlEntry"/>
+          </maxCount>
         </constraint>
       </field>
       <access fabricScoped="true"/>
@@ -162,7 +166,9 @@ Davis, CA 95616, USA
       <field id="1" name="Data" type="octstr">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="128"/>
+        <constraint>
+          <maxLength value="128"/>
+        </constraint>
       </field>
       <access fabricScoped="true"/>
     </struct>
@@ -193,7 +199,9 @@ Davis, CA 95616, USA
         <entry type="AccessRestrictionStruct"/>
         <access fabricSensitive="true"/>
         <mandatoryConform/>
-        <constraint type="minCount" value="1"/>
+        <constraint>
+          <minCount value="1"/>
+        </constraint>
       </field>
       <access fabricScoped="true"/>
     </struct>
@@ -216,7 +224,9 @@ Davis, CA 95616, USA
       <field id="2" name="Restrictions" type="list">
         <entry type="AccessRestrictionStruct"/>
         <mandatoryConform/>
-        <constraint type="minCount" value="1"/>
+        <constraint>
+          <minCount value="1"/>
+        </constraint>
       </field>
     </struct>
   </dataTypes>
@@ -225,7 +235,9 @@ Davis, CA 95616, USA
       <entry type="AccessControlEntryStruct"/>
       <access read="true" write="true" readPrivilege="admin" writePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="Extension" type="list" default="desc">
       <entry type="AccessControlExtensionStruct"/>
@@ -233,25 +245,33 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="EXTS"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="SubjectsPerAccessControlEntry" type="uint16" default="4">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="min" value="4"/>
+      <constraint>
+        <min value="4"/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="TargetsPerAccessControlEntry" type="uint16" default="3">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="min" value="3"/>
+      <constraint>
+        <min value="3"/>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="AccessControlEntriesPerFabric" type="uint16" default="4">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="min" value="4"/>
+      <constraint>
+        <min value="4"/>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="CommissioningARL" type="list" default="empty">
       <entry type="CommissioningAccessRestrictionEntryStruct"/>
@@ -260,7 +280,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="MNGD"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0006" name="ARL" type="list" default="empty">
       <entry type="AccessRestrictionEntryStruct"/>
@@ -268,7 +290,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="MNGD"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -280,7 +304,9 @@ Davis, CA 95616, USA
       <field id="0" name="ARL" type="list" default="desc">
         <entry type="CommissioningAccessRestrictionEntryStruct"/>
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="ReviewFabricRestrictionsResponse" direction="responseFromServer">
@@ -299,12 +325,16 @@ Davis, CA 95616, USA
       <field id="1" name="AdminNodeID" type="node-id">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="2" name="AdminPasscodeID" type="uint16">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="ChangeType" type="ChangeTypeEnum">
         <mandatoryConform/>
@@ -322,12 +352,16 @@ Davis, CA 95616, USA
       <field id="1" name="AdminNodeID" type="node-id">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="2" name="AdminPasscodeID" type="uint16">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="ChangeType" type="ChangeTypeEnum">
         <mandatoryConform/>
@@ -347,11 +381,15 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Instruction" type="string">
         <optionalConform/>
-        <constraint type="maxLength" value="512"/>
+        <constraint>
+          <maxLength value="512"/>
+        </constraint>
       </field>
       <field id="2" name="ARLRequestFlowUrl" type="string">
         <optionalConform/>
-        <constraint type="maxLength" value="256"/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
       </field>
     </event>
   </events>

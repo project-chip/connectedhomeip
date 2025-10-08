@@ -62,7 +62,9 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0551" name="Camera AV Stream Management"/>
+    <clusterId id="0x0551" name="Camera AV Stream Management">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="AVSM" scope="Endpoint"/>
   <features>
@@ -79,19 +81,44 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="4" code="SPKR" name="Speaker" summary="Speaker supported">
-      <optionalConform/>
+      <optionalConform>
+        <feature name="ADO"/>
+      </optionalConform>
     </feature>
     <feature bit="5" code="ICTL" name="ImageControl" summary="Image control supported">
-      <optionalConform/>
+      <optionalConform>
+        <orTerm>
+          <feature name="VDO"/>
+          <feature name="SNP"/>
+        </orTerm>
+      </optionalConform>
     </feature>
     <feature bit="6" code="WMARK" name="Watermark" summary="Watermark supported">
-      <optionalConform/>
+      <optionalConform>
+        <orTerm>
+          <feature name="VDO"/>
+          <feature name="SNP"/>
+        </orTerm>
+      </optionalConform>
     </feature>
     <feature bit="7" code="OSD" name="OnScreenDisplay" summary="OSD supported">
-      <optionalConform/>
+      <optionalConform>
+        <orTerm>
+          <feature name="VDO"/>
+          <feature name="SNP"/>
+        </orTerm>
+      </optionalConform>
     </feature>
     <feature bit="8" code="STOR" name="LocalStorage" summary="Local Storage available">
       <optionalConform/>
+    </feature>
+    <feature bit="9" code="HDR" name="HighDynamicRange" summary="High Dynamic Range supported">
+      <optionalConform>
+        <orTerm>
+          <feature name="VDO"/>
+          <feature name="SNP"/>
+        </orTerm>
+      </optionalConform>
     </feature>
   </features>
   <dataTypes>
@@ -119,7 +146,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </item>
       <item value="2" name="Analysis" summary="Stream for analysis and entity detection.">
-        <mandatoryConform/>
+        <optionalConform/>
       </item>
       <item value="3" name="LiveView" summary="Stream for liveview.">
         <mandatoryConform/>
@@ -249,9 +276,12 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="MinBitRate" type="uint32">
         <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
     </struct>
-    <struct name="SnapshotParamsStruct">
+    <struct name="SnapshotCapabilitiesStruct">
       <field id="0" name="Resolution" type="VideoResolutionStruct">
         <mandatoryConform/>
       </field>
@@ -263,6 +293,17 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="ImageCodec" type="ImageCodecEnum">
         <mandatoryConform/>
+      </field>
+      <field id="3" name="RequiresEncodedPixels" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="RequiresHardwareEncoder" type="bool">
+        <mandatoryConform>
+          <equalTerm>
+            <field name="RequiresEncodedPixels"/>
+            <literal value="1"/>
+          </equalTerm>
+        </mandatoryConform>
       </field>
     </struct>
     <struct name="SnapshotStreamStruct">
@@ -278,19 +319,13 @@ Davis, CA 95616, USA
           <min value="1"/>
         </constraint>
       </field>
-      <field id="3" name="BitRate" type="uint32">
-        <mandatoryConform/>
-        <constraint>
-          <min value="1"/>
-        </constraint>
-      </field>
-      <field id="4" name="MinResolution" type="VideoResolutionStruct">
+      <field id="3" name="MinResolution" type="VideoResolutionStruct">
         <mandatoryConform/>
       </field>
-      <field id="5" name="MaxResolution" type="VideoResolutionStruct">
+      <field id="4" name="MaxResolution" type="VideoResolutionStruct">
         <mandatoryConform/>
       </field>
-      <field id="6" name="Quality" type="uint8">
+      <field id="5" name="Quality" type="uint8">
         <mandatoryConform/>
         <constraint>
           <between>
@@ -299,7 +334,13 @@ Davis, CA 95616, USA
           </between>
         </constraint>
       </field>
-      <field id="7" name="ReferenceCount" type="uint8" default="0">
+      <field id="6" name="ReferenceCount" type="uint8" default="0">
+        <mandatoryConform/>
+      </field>
+      <field id="7" name="EncodedPixels" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="8" name="HardwareEncoder" type="bool">
         <mandatoryConform/>
       </field>
     </struct>
@@ -330,19 +371,23 @@ Davis, CA 95616, USA
           <min value="64"/>
         </constraint>
       </field>
-      <field id="2" name="HDRCapable" type="bool">
-        <mandatoryConform/>
-      </field>
-      <field id="3" name="MaxFPS" type="uint16">
+      <field id="2" name="MaxFPS" type="uint16">
         <mandatoryConform/>
         <constraint>
           <min value="1"/>
         </constraint>
       </field>
-      <field id="4" name="MaxHDRFPS" type="uint16">
-        <mandatoryConform/>
+      <field id="3" name="MaxHDRFPS" type="uint16">
+        <mandatoryConform>
+          <feature name="HDR"/>
+        </mandatoryConform>
         <constraint>
-          <min value="1"/>
+          <between>
+            <from value="1"/>
+            <to>
+              <field name="MaxFPS"/>
+            </to>
+          </between>
         </constraint>
       </field>
     </struct>
@@ -359,8 +404,11 @@ Davis, CA 95616, USA
       <field id="3" name="MinFrameRate" type="uint16">
         <mandatoryConform/>
         <constraint>
-          <between value="1">
-            <field name="MaxFrameRate"/>
+          <between>
+            <from value="1"/>
+            <to>
+              <field name="MaxFrameRate"/>
+            </to>
           </between>
         </constraint>
       </field>
@@ -379,8 +427,11 @@ Davis, CA 95616, USA
       <field id="7" name="MinBitRate" type="uint32">
         <mandatoryConform/>
         <constraint>
-          <between value="1">
-            <field name="MaxBitRate"/>
+          <between>
+            <from value="1"/>
+            <to>
+              <field name="MaxBitRate"/>
+            </to>
           </between>
         </constraint>
       </field>
@@ -401,8 +452,11 @@ Davis, CA 95616, USA
       <field id="10" name="MaxFragmentLen" type="uint16" default="4000">
         <mandatoryConform/>
         <constraint>
-          <between value="65500">
-            <field name="MinFragmentLen"/>
+          <between>
+            <from>
+              <field name="MinFragmentLen"/>
+            </from>
+            <to value="65500"/>
           </between>
         </constraint>
       </field>
@@ -436,18 +490,24 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="MaxConcurrentVideoEncoders" type="uint8">
+    <attribute id="0x0000" name="MaxConcurrentEncoders" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
-        <feature name="VDO"/>
+        <orTerm>
+          <feature name="VDO"/>
+          <feature name="SNP"/>
+        </orTerm>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0001" name="MaxEncodedPixelRate" type="uint32">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
-        <feature name="VDO"/>
+        <orTerm>
+          <feature name="VDO"/>
+          <feature name="SNP"/>
+        </orTerm>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0002" name="VideoSensorParams" type="VideoSensorParamsStruct">
@@ -482,9 +542,7 @@ Davis, CA 95616, USA
     <attribute id="0x0006" name="MaxContentBufferSize" type="uint32">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
-      <mandatoryConform>
-        <feature name="VDO"/>
-      </mandatoryConform>
+      <mandatoryConform/>
     </attribute>
     <attribute id="0x0007" name="MicrophoneCapabilities" type="AudioCapabilitiesStruct">
       <access read="true" readPrivilege="view"/>
@@ -497,24 +555,18 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
-        <andTerm>
-          <feature name="ADO"/>
-          <feature name="SPKR"/>
-        </andTerm>
+        <feature name="SPKR"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0009" name="TwoWayTalkSupport" type="TwoWayTalkSupportTypeEnum">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
-        <andTerm>
-          <feature name="ADO"/>
-          <feature name="SPKR"/>
-        </andTerm>
+        <feature name="SPKR"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x000A" name="SupportedSnapshotParams" type="list">
-      <entry type="SnapshotParamsStruct"/>
+    <attribute id="0x000A" name="SnapshotCapabilities" type="list">
+      <entry type="SnapshotCapabilitiesStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
@@ -535,13 +587,14 @@ Davis, CA 95616, USA
     <attribute id="0x000D" name="HDRModeEnabled" type="bool" default="false">
       <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
-      <optionalConform>
-        <feature name="VDO"/>
-      </optionalConform>
+      <mandatoryConform>
+        <feature name="HDR"/>
+      </mandatoryConform>
     </attribute>
-    <attribute id="0x000E" name="FabricsUsingCamera" type="list" default="empty">
-      <entry type="fabric-idx"/>
+    <attribute id="0x000E" name="SupportedStreamUsages" type="list" default="desc">
+      <entry type="StreamUsageEnum"/>
       <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x000F" name="AllocatedVideoStreams" type="list" default="empty">
@@ -578,14 +631,14 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0013" name="SoftRecordingPrivacyModeEnabled" type="bool" default="false">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality persistence="nonVolatile"/>
+      <quality persistence="nonVolatile" sourceAttribution="true"/>
       <mandatoryConform>
         <feature name="PRIV"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0014" name="SoftLivestreamPrivacyModeEnabled" type="bool" default="false">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality persistence="nonVolatile"/>
+      <quality persistence="nonVolatile" sourceAttribution="true"/>
       <mandatoryConform>
         <feature name="PRIV"/>
       </mandatoryConform>
@@ -625,49 +678,44 @@ Davis, CA 95616, USA
       <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform>
-        <andTerm>
-          <feature name="ADO"/>
-          <feature name="SPKR"/>
-        </andTerm>
+        <feature name="SPKR"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x001A" name="SpeakerVolumeLevel" type="uint8">
       <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform>
-        <andTerm>
-          <feature name="ADO"/>
-          <feature name="SPKR"/>
-        </andTerm>
+        <feature name="SPKR"/>
       </mandatoryConform>
       <constraint>
         <between>
-          <attribute name="SpeakerMinLevel"/>
-          <attribute name="SpeakerMaxLevel"/>
+          <from>
+            <attribute name="SpeakerMinLevel"/>
+          </from>
+          <to>
+            <attribute name="SpeakerMaxLevel"/>
+          </to>
         </between>
       </constraint>
     </attribute>
     <attribute id="0x001B" name="SpeakerMaxLevel" type="uint8">
       <access read="true" readPrivilege="manage"/>
       <mandatoryConform>
-        <andTerm>
-          <feature name="ADO"/>
-          <feature name="SPKR"/>
-        </andTerm>
+        <feature name="SPKR"/>
       </mandatoryConform>
       <constraint>
-        <between value="254">
-          <attribute name="SpeakerMinLevel"/>
+        <between>
+          <from>
+            <attribute name="SpeakerMinLevel"/>
+          </from>
+          <to value="254"/>
         </between>
       </constraint>
     </attribute>
     <attribute id="0x001C" name="SpeakerMinLevel" type="uint8">
       <access read="true" readPrivilege="manage"/>
       <mandatoryConform>
-        <andTerm>
-          <feature name="ADO"/>
-          <feature name="SPKR"/>
-        </andTerm>
+        <feature name="SPKR"/>
       </mandatoryConform>
       <constraint>
         <max>
@@ -690,8 +738,12 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint>
         <between>
-          <attribute name="MicrophoneMinLevel"/>
-          <attribute name="MicrophoneMaxLevel"/>
+          <from>
+            <attribute name="MicrophoneMinLevel"/>
+          </from>
+          <to>
+            <attribute name="MicrophoneMaxLevel"/>
+          </to>
         </between>
       </constraint>
     </attribute>
@@ -701,8 +753,11 @@ Davis, CA 95616, USA
         <feature name="ADO"/>
       </mandatoryConform>
       <constraint>
-        <between value="254">
-          <attribute name="MicrophoneMinLevel"/>
+        <between>
+          <from>
+            <attribute name="MicrophoneMinLevel"/>
+          </from>
+          <to value="254"/>
         </between>
       </constraint>
     </attribute>
@@ -834,9 +889,6 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="AudioStreamID" type="AudioStreamID">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
     </command>
     <command id="0x02" name="AudioStreamDeallocate" direction="commandToServer" response="Y">
@@ -846,9 +898,6 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="AudioStreamID" type="AudioStreamID">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
     </command>
     <command id="0x03" name="VideoStreamAllocate" direction="commandToServer" response="VideoStreamAllocateResponse">
@@ -856,47 +905,53 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="VDO"/>
       </mandatoryConform>
-      <field id="1" name="StreamUsage" type="StreamUsageEnum">
+      <field id="0" name="StreamUsage" type="StreamUsageEnum">
         <mandatoryConform/>
       </field>
-      <field id="2" name="VideoCodec" type="VideoCodecEnum">
+      <field id="1" name="VideoCodec" type="VideoCodecEnum">
         <mandatoryConform/>
       </field>
-      <field id="3" name="MinFrameRate" type="uint16">
+      <field id="2" name="MinFrameRate" type="uint16">
         <mandatoryConform/>
         <constraint>
-          <between value="1">
-            <field name="MaxFrameRate"/>
+          <between>
+            <from value="1"/>
+            <to>
+              <field name="MaxFrameRate"/>
+            </to>
           </between>
         </constraint>
       </field>
-      <field id="4" name="MaxFrameRate" type="uint16">
+      <field id="3" name="MaxFrameRate" type="uint16">
         <mandatoryConform/>
         <constraint>
           <min value="1"/>
         </constraint>
       </field>
-      <field id="5" name="MinResolution" type="VideoResolutionStruct">
+      <field id="4" name="MinResolution" type="VideoResolutionStruct">
         <mandatoryConform/>
       </field>
-      <field id="6" name="MaxResolution" type="VideoResolutionStruct">
+      <field id="5" name="MaxResolution" type="VideoResolutionStruct">
         <mandatoryConform/>
       </field>
-      <field id="7" name="MinBitRate" type="uint32">
+      <field id="6" name="MinBitRate" type="uint32">
         <mandatoryConform/>
         <constraint>
-          <between value="1">
-            <field name="MaxBitRate"/>
+          <between>
+            <from value="1"/>
+            <to>
+              <field name="MaxBitRate"/>
+            </to>
           </between>
         </constraint>
       </field>
-      <field id="8" name="MaxBitRate" type="uint32">
+      <field id="7" name="MaxBitRate" type="uint32">
         <mandatoryConform/>
         <constraint>
           <min value="1"/>
         </constraint>
       </field>
-      <field id="9" name="MinFragmentLen" type="uint16" default="4000">
+      <field id="8" name="MinFragmentLen" type="uint16" default="4000">
         <mandatoryConform/>
         <constraint>
           <max>
@@ -904,20 +959,23 @@ Davis, CA 95616, USA
           </max>
         </constraint>
       </field>
-      <field id="10" name="MaxFragmentLen" type="uint16" default="4000">
+      <field id="9" name="MaxFragmentLen" type="uint16" default="4000">
         <mandatoryConform/>
         <constraint>
-          <between value="65500">
-            <field name="MinFragmentLen"/>
+          <between>
+            <from>
+              <field name="MinFragmentLen"/>
+            </from>
+            <to value="65500"/>
           </between>
         </constraint>
       </field>
-      <field id="11" name="WatermarkEnabled" type="bool" default="0">
+      <field id="10" name="WatermarkEnabled" type="bool" default="false">
         <mandatoryConform>
           <feature name="WMARK"/>
         </mandatoryConform>
       </field>
-      <field id="12" name="OSDEnabled" type="bool" default="0">
+      <field id="11" name="OSDEnabled" type="bool" default="false">
         <mandatoryConform>
           <feature name="OSD"/>
         </mandatoryConform>
@@ -929,9 +987,6 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="VideoStreamID" type="VideoStreamID">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
     </command>
     <command id="0x05" name="VideoStreamModify" direction="commandToServer" response="Y">
@@ -947,25 +1002,16 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="VideoStreamID" type="VideoStreamID">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
       <field id="1" name="WatermarkEnabled" type="bool">
         <mandatoryConform>
           <feature name="WMARK"/>
         </mandatoryConform>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
       <field id="2" name="OSDEnabled" type="bool">
         <mandatoryConform>
           <feature name="OSD"/>
         </mandatoryConform>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
     </command>
     <command id="0x06" name="VideoStreamDeallocate" direction="commandToServer" response="Y">
@@ -975,9 +1021,6 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="VideoStreamID" type="VideoStreamID">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
     </command>
     <command id="0x07" name="SnapshotStreamAllocate" direction="commandToServer" response="SnapshotStreamAllocateResponse">
@@ -985,28 +1028,22 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SNP"/>
       </mandatoryConform>
-      <field id="1" name="ImageCodec" type="ImageCodecEnum">
+      <field id="0" name="ImageCodec" type="ImageCodecEnum">
         <mandatoryConform/>
       </field>
-      <field id="2" name="MaxFrameRate" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <min value="1"/>
-        </constraint>
-      </field>
-      <field id="3" name="BitRate" type="uint32">
+      <field id="1" name="MaxFrameRate" type="uint16">
         <mandatoryConform/>
         <constraint>
           <min value="1"/>
         </constraint>
       </field>
-      <field id="4" name="MinResolution" type="VideoResolutionStruct">
+      <field id="2" name="MinResolution" type="VideoResolutionStruct">
         <mandatoryConform/>
       </field>
-      <field id="5" name="MaxResolution" type="VideoResolutionStruct">
+      <field id="3" name="MaxResolution" type="VideoResolutionStruct">
         <mandatoryConform/>
       </field>
-      <field id="6" name="Quality" type="uint8">
+      <field id="4" name="Quality" type="uint8">
         <mandatoryConform/>
         <constraint>
           <between>
@@ -1015,6 +1052,16 @@ Davis, CA 95616, USA
           </between>
         </constraint>
       </field>
+      <field id="5" name="WatermarkEnabled" type="bool" default="false">
+        <mandatoryConform>
+          <feature name="WMARK"/>
+        </mandatoryConform>
+      </field>
+      <field id="6" name="OSDEnabled" type="bool" default="false">
+        <mandatoryConform>
+          <feature name="OSD"/>
+        </mandatoryConform>
+      </field>
     </command>
     <command id="0x08" name="SnapshotStreamAllocateResponse" direction="responseFromServer">
       <mandatoryConform>
@@ -1022,24 +1069,43 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="SnapshotStreamID" type="SnapshotStreamID">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
     </command>
-    <command id="0x09" name="SnapshotStreamDeallocate" direction="commandToServer" response="Y">
+    <command id="0x09" name="SnapshotStreamModify" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="SNP"/>
+          <orTerm>
+            <feature name="WMARK"/>
+            <feature name="OSD"/>
+          </orTerm>
+        </andTerm>
+      </mandatoryConform>
+      <field id="0" name="SnapshotStreamID" type="SnapshotStreamID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="WatermarkEnabled" type="bool">
+        <mandatoryConform>
+          <feature name="WMARK"/>
+        </mandatoryConform>
+      </field>
+      <field id="2" name="OSDEnabled" type="bool">
+        <mandatoryConform>
+          <feature name="OSD"/>
+        </mandatoryConform>
+      </field>
+    </command>
+    <command id="0x0A" name="SnapshotStreamDeallocate" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="SNP"/>
       </mandatoryConform>
       <field id="0" name="SnapshotStreamID" type="SnapshotStreamID">
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
     </command>
-    <command id="0x0A" name="SetStreamPriorities" direction="commandToServer" response="Y">
+    <command id="0x0B" name="SetStreamPriorities" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform/>
       <field id="0" name="StreamPriorities" type="list">
@@ -1050,20 +1116,21 @@ Davis, CA 95616, USA
         </constraint>
       </field>
     </command>
-    <command id="0x0B" name="CaptureSnapshot" direction="commandToServer" response="CaptureSnapshotResponse">
+    <command id="0x0C" name="CaptureSnapshot" direction="commandToServer" response="CaptureSnapshotResponse">
       <quality largeMessage="true"/>
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="SNP"/>
       </mandatoryConform>
       <field id="0" name="SnapshotStreamID" type="SnapshotStreamID">
+        <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="RequestedResolution" type="VideoResolutionStruct">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x0C" name="CaptureSnapshotResponse" direction="responseFromServer">
+    <command id="0x0D" name="CaptureSnapshotResponse" direction="responseFromServer">
       <quality largeMessage="true"/>
       <mandatoryConform>
         <feature name="SNP"/>
@@ -1079,161 +1146,4 @@ Davis, CA 95616, USA
       </field>
     </command>
   </commands>
-  <events>
-    <event id="0x00" name="VideoStreamChanged" priority="info">
-      <access readPrivilege="view"/>
-      <mandatoryConform>
-        <feature name="VDO"/>
-      </mandatoryConform>
-      <field id="0" name="VideoStreamID" type="VideoStreamID">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="StreamUsage" type="StreamUsageEnum">
-        <optionalConform/>
-      </field>
-      <field id="2" name="VideoCodec" type="VideoCodecEnum">
-        <optionalConform/>
-      </field>
-      <field id="3" name="MinFrameRate" type="uint16">
-        <optionalConform/>
-        <constraint>
-          <between value="1">
-            <field name="MaxFrameRate"/>
-          </between>
-        </constraint>
-      </field>
-      <field id="4" name="MaxFrameRate" type="uint16">
-        <optionalConform/>
-        <constraint>
-          <min value="1"/>
-        </constraint>
-      </field>
-      <field id="5" name="MinResolution" type="VideoResolutionStruct">
-        <optionalConform/>
-      </field>
-      <field id="6" name="MaxResolution" type="VideoResolutionStruct">
-        <optionalConform/>
-      </field>
-      <field id="7" name="MinBitRate" type="uint32">
-        <optionalConform/>
-        <constraint>
-          <between value="1">
-            <field name="MaxBitRate"/>
-          </between>
-        </constraint>
-      </field>
-      <field id="8" name="MaxBitRate" type="uint32">
-        <optionalConform/>
-        <constraint>
-          <min value="1"/>
-        </constraint>
-      </field>
-      <field id="9" name="MinFragmentLen" type="uint16">
-        <optionalConform/>
-        <constraint>
-          <max>
-            <field name="MaxFragmentLen"/>
-          </max>
-        </constraint>
-      </field>
-      <field id="10" name="MaxFragmentLen" type="uint16">
-        <optionalConform/>
-        <constraint>
-          <between value="65500">
-            <field name="MinFragmentLen"/>
-          </between>
-        </constraint>
-      </field>
-    </event>
-    <event id="0x01" name="AudioStreamChanged" priority="info">
-      <access readPrivilege="view"/>
-      <mandatoryConform>
-        <feature name="ADO"/>
-      </mandatoryConform>
-      <field id="0" name="AudioStreamID" type="AudioStreamID">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="StreamUsage" type="StreamUsageEnum">
-        <optionalConform/>
-      </field>
-      <field id="2" name="AudioCodec" type="AudioCodecEnum">
-        <optionalConform/>
-      </field>
-      <field id="3" name="ChannelCount" type="uint8">
-        <optionalConform/>
-        <constraint>
-          <between>
-            <from value="1"/>
-            <to value="8"/>
-          </between>
-        </constraint>
-      </field>
-      <field id="4" name="SampleRate" type="uint32">
-        <optionalConform/>
-        <constraint>
-          <min value="1"/>
-        </constraint>
-      </field>
-      <field id="5" name="BitRate" type="uint32">
-        <optionalConform/>
-        <constraint>
-          <min value="1"/>
-        </constraint>
-      </field>
-      <field id="6" name="BitDepth" type="uint8">
-        <optionalConform/>
-        <constraint>
-          <allowed value="8"/>
-        </constraint>
-        <constraint>
-          <allowed value="16"/>
-        </constraint>
-        <constraint>
-          <allowed value="24"/>
-        </constraint>
-        <constraint>
-          <allowed value="32"/>
-        </constraint>
-      </field>
-    </event>
-    <event id="0x02" name="SnapshotStreamChanged" priority="info">
-      <access readPrivilege="view"/>
-      <mandatoryConform>
-        <feature name="SNP"/>
-      </mandatoryConform>
-      <field id="0" name="SnapshotStreamID" type="SnapshotStreamID">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="ImageCodec" type="ImageCodecEnum">
-        <optionalConform/>
-      </field>
-      <field id="2" name="FrameRate" type="uint16">
-        <optionalConform/>
-        <constraint>
-          <min value="1"/>
-        </constraint>
-      </field>
-      <field id="3" name="BitRate" type="uint32">
-        <optionalConform/>
-        <constraint>
-          <min value="1"/>
-        </constraint>
-      </field>
-      <field id="4" name="MinResolution" type="VideoResolutionStruct">
-        <optionalConform/>
-      </field>
-      <field id="5" name="MaxResolution" type="VideoResolutionStruct">
-        <optionalConform/>
-      </field>
-      <field id="6" name="Quality" type="uint8">
-        <optionalConform/>
-        <constraint>
-          <between>
-            <from value="1"/>
-            <to value="100"/>
-          </between>
-        </constraint>
-      </field>
-    </event>
-  </events>
 </cluster>

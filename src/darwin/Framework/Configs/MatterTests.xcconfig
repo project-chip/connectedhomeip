@@ -1,0 +1,9 @@
+CLANG_ENABLE_MODULES = YES
+HEADER_SEARCH_PATHS = $(PROJECT_DIR)/../../../src
+INFOPLIST_FILE = CHIPTests/Info.plist
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks @loader_path/Frameworks
+PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPTests
+PRODUCT_NAME = $(TARGET_NAME)
+SWIFT_OBJC_BRIDGING_HEADER = CHIPTests/MatterTests-Bridging-Header.h
+
+#include? "MatterTests.override.xcconfig"

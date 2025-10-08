@@ -92,7 +92,9 @@ CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId)
     /* Manufacturer may optionally not support all features, commands & attributes */
     gEvseInstance = std::make_unique<EnergyEvseManager>(
         EndpointId(endpointId), *gEvseDelegate,
-        BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences, EnergyEvse::Feature::kRfid),
+        BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences, EnergyEvse::Feature::kRfid,
+                                               EnergyEvse::Feature::kSoCReporting, EnergyEvse::Feature::kPlugAndCharge,
+                                               EnergyEvse::Feature::kV2x),
         BitMask<EnergyEvse::OptionalAttributes, uint32_t>(EnergyEvse::OptionalAttributes::kSupportsUserMaximumChargingCurrent,
                                                           EnergyEvse::OptionalAttributes::kSupportsRandomizationWindow,
                                                           EnergyEvse::OptionalAttributes::kSupportsApproximateEvEfficiency),
@@ -144,6 +146,11 @@ CHIP_ERROR EnergyEvseShutdown()
     if (gEvseDelegate)
     {
         gEvseDelegate.reset();
+    }
+
+    if (gEvseTargetsDelegate)
+    {
+        gEvseTargetsDelegate.reset();
     }
 
     return CHIP_NO_ERROR;

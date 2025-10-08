@@ -79,7 +79,8 @@ jobject convertMatterErrorFromCppToJava(CHIP_ERROR inErr)
         return nullptr;
     }
 
-    return env->NewObject(jMatterErrorClass, jMatterErrorConstructor, inErr.AsInteger(), nullptr);
+    // Explicitly cast to jlong for JNI: Java ctor expects long (64-bit), ensures correct arg size on 32-bit platforms
+    return env->NewObject(jMatterErrorClass, jMatterErrorConstructor, static_cast<jlong>(inErr.AsInteger()), nullptr);
 }
 
 jobject convertEndpointFromCppToJava(matter::casting::memory::Strong<core::Endpoint> endpoint)
@@ -447,6 +448,7 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
     jfieldID commissionerPasscodeReadyField = env->GetFieldID(idOptionsClass, "commissionerPasscodeReady", "Z");
     jfieldID cancelPasscodeField            = env->GetFieldID(idOptionsClass, "cancelPasscode", "Z");
     jfieldID targetAppInfosField            = env->GetFieldID(idOptionsClass, "targetAppInfos", "Ljava/util/List;");
+    jfieldID passcodeLengthField            = env->GetFieldID(idOptionsClass, "passcodeLength", "I");
     VerifyOrReturnValue(
         noPasscodeField != nullptr, nullptr,
         ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() noPasscodeField not found!"));
@@ -466,6 +468,9 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
     VerifyOrReturnValue(
         targetAppInfosField != nullptr, nullptr,
         ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() targetAppInfosField not found!"));
+    VerifyOrReturnValue(
+        passcodeLengthField != nullptr, nullptr,
+        ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() passcodeLengthField not found!"));
 
     matter::casting::core::IdentificationDeclarationOptions * cppIdOptions =
         new matter::casting::core::IdentificationDeclarationOptions();
@@ -475,6 +480,7 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
     cppIdOptions->mCommissionerPasscode      = env->GetBooleanField(jIdOptions, commissionerPasscodeField);
     cppIdOptions->mCommissionerPasscodeReady = env->GetBooleanField(jIdOptions, commissionerPasscodeReadyField);
     cppIdOptions->mCancelPasscode            = env->GetBooleanField(jIdOptions, cancelPasscodeField);
+    cppIdOptions->mPasscodeLength            = static_cast<uint8_t>(env->GetIntField(jIdOptions, passcodeLengthField));
 
     jobject targetAppInfosList = env->GetObjectField(jIdOptions, targetAppInfosField);
     VerifyOrReturnValue(
@@ -528,7 +534,7 @@ convertCommissionerDeclarationFromCppToJava(const chip::Protocols::UserDirectedC
                                                                          jCommissionerDeclarationClass);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr);
 
-    jmethodID jCommissionerDeclarationConstructor = env->GetMethodID(jCommissionerDeclarationClass, "<init>", "(IZZZZZZ)V");
+    jmethodID jCommissionerDeclarationConstructor = env->GetMethodID(jCommissionerDeclarationClass, "<init>", "(IZZZZZZI)V");
     if (jCommissionerDeclarationConstructor == nullptr)
     {
         ChipLogError(AppServer,
@@ -540,7 +546,7 @@ convertCommissionerDeclarationFromCppToJava(const chip::Protocols::UserDirectedC
     return env->NewObject(jCommissionerDeclarationClass, jCommissionerDeclarationConstructor,
                           static_cast<jint>(cppCd.GetErrorCode()), cppCd.GetNeedsPasscode(), cppCd.GetNoAppsFound(),
                           cppCd.GetPasscodeDialogDisplayed(), cppCd.GetCommissionerPasscode(), cppCd.GetQRCodeDisplayed(),
-                          cppCd.GetCancelPasscode());
+                          cppCd.GetCancelPasscode(), cppCd.GetPasscodeLength());
 }
 
 }; // namespace support

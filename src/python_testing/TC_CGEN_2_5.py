@@ -32,17 +32,18 @@
 #           --int-arg PIXIT.CGEN.TCRevision:1
 #           --qr-code MT:-24J0AFN00KA0648G00
 #           --trace-to json:log
-#       factoryreset: True
+#       factory-reset: true
 #       quiet: True
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.clusters.Types import Nullable
-from chip.commissioning import ROOT_ENDPOINT_ID
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.clusters.Types import Nullable
+from matter.commissioning import ROOT_ENDPOINT_ID
+from matter.testing import matter_asserts
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_CGEN_2_5(MatterBaseTest):

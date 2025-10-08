@@ -17,6 +17,7 @@
  */
 
 #include "../common/CHIPCommandStorageDelegate.h"
+#include "../common/CommissionerInfos.h"
 #include "../common/ControllerStorage.h"
 #include "../common/PreferencesStorage.h"
 
@@ -60,7 +61,7 @@ CHIP_ERROR StorageViewAll::Run()
     }
 
     const char * commissionerName = mCommissionerName.Value();
-    __auto_type * fabricId = CHIPCommandBridge::GetCommissionerFabricId(commissionerName);
+    __auto_type * fabricId = GetCommissionerFabricId(commissionerName);
     __auto_type * uuidString = [NSString stringWithFormat:@"%@%@", @(kControllerIdPrefix), fabricId];
     __auto_type * controllerId = [[NSUUID alloc] initWithUUIDString:uuidString];
     __auto_type * storage = [[ControllerStorage alloc] initWithControllerID:controllerId];

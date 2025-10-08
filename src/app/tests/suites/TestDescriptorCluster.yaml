@@ -33,41 +33,42 @@ tests:
       attribute: "DeviceTypeList"
       response:
           value:
-              [{ DeviceType: 17, Revision: 1 }, { DeviceType: 22, Revision: 1 }]
+              [{ DeviceType: 17, Revision: 1 }, { DeviceType: 22, Revision: 3 }]
 
     - label: "Read attribute Server list"
       command: "readAttribute"
       attribute: "ServerList"
       response:
-          value: [
-                  0x0004, # Groups
-                  0x001D, # Descriptor
-                  0x001E, # Binding
-                  0x001F, # Access Control
-                  0x0028, # Basic Information
-                  0x002A, # OTA Software Update Requestor
-                  0x002B, # Localization Configuration
-                  0x002C, # Time Format Localization
-                  0x002D, # Unit Localization
-                  0x002E, # Power Source Configuration
-                  0x002F, # Power Source
-                  0x0030, # General Commissioning
-                  0x0031, # Network Commissioning
-                  0x0032, # Diagnostic Logs
-                  0x0033, # General Diagnostics
-                  0x0034, # Software Diagnostics
-                  0x0035, # Thread Network Diagnostiscs
-                  0x0036, # Wi-Fi Network Diagnostics
-                  0x0037, # Ethernet Network Diagnostics
-                  0x0038, # Time Synchronization
-                  0x003C, # Administrator Commissioning
-                  0x003E, # Operational Credentials
-                  0x003F, # Group Key Management
-                  0x0040, # Fixed Label
-                  0x0041, # User Label
-                  0x0405, # Relative Humidity Measurement (why on EP0?)
-                  0xFFF1FC06, # Fault Injection
-              ]
+          constraints:
+              isSetOfValues: [
+                      0x0004, # Groups
+                      0x001D, # Descriptor
+                      0x001E, # Binding
+                      0x001F, # Access Control
+                      0x0028, # Basic Information
+                      0x002A, # OTA Software Update Requestor
+                      0x002B, # Localization Configuration
+                      0x002C, # Time Format Localization
+                      0x002D, # Unit Localization
+                      0x002E, # Power Source Configuration
+                      0x002F, # Power Source
+                      0x0030, # General Commissioning
+                      0x0031, # Network Commissioning
+                      0x0032, # Diagnostic Logs
+                      0x0033, # General Diagnostics
+                      0x0034, # Software Diagnostics
+                      0x0035, # Thread Network Diagnostiscs
+                      0x0036, # Wi-Fi Network Diagnostics
+                      0x0037, # Ethernet Network Diagnostics
+                      0x0038, # Time Synchronization
+                      0x003C, # Administrator Commissioning
+                      0x003E, # Operational Credentials
+                      0x003F, # Group Key Management
+                      0x0040, # Fixed Label
+                      0x0041, # User Label
+                      0x0405, # Relative Humidity Measurement (why on EP0?)
+                      0xFFF1FC06, # Fault Injection
+                  ]
 
     - label: "Read attribute Client list"
       command: "readAttribute"
@@ -87,7 +88,7 @@ tests:
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 2
+          value: 3
           constraints:
               type: int16u
 

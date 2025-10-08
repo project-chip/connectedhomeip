@@ -300,7 +300,7 @@ CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "sl_bt_connection_close() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "sl_bt_connection_close() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err;
@@ -395,7 +395,7 @@ void BLEManagerImpl::DriveBLEState(void)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }
@@ -471,14 +471,14 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         ret = sl_bt_advertiser_create_set(&advertising_set_handle);
         VerifyOrExit(ret == SL_STATUS_OK, {
             err = MapBLEError(ret);
-            ChipLogError(DeviceLayer, "sl_bt_advertiser_create_set() failed: %s", ErrorStr(err));
+            ChipLogError(DeviceLayer, "sl_bt_advertiser_create_set() failed: %" CHIP_ERROR_FORMAT, err.Format());
         });
 
         ret =
             sl_bt_advertiser_set_random_address(advertising_set_handle, sl_bt_gap_static_address, randomizedAddr, &randomizedAddr);
         VerifyOrExit(ret == SL_STATUS_OK, {
             err = MapBLEError(ret);
-            ChipLogError(DeviceLayer, "sl_bt_advertiser_set_random_address() failed: %s", ErrorStr(err));
+            ChipLogError(DeviceLayer, "sl_bt_advertiser_set_random_address() failed: %" CHIP_ERROR_FORMAT, err.Format());
         });
         ChipLogDetail(DeviceLayer, "BLE Static Device Address %02X:%02X:%02X:%02X:%02X:%02X", randomizedAddr.addr[5],
                       randomizedAddr.addr[4], randomizedAddr.addr[3], randomizedAddr.addr[2], randomizedAddr.addr[1],
@@ -490,7 +490,8 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     VerifyOrExit(ret == SL_STATUS_OK, {
         err = MapBLEError(ret);
-        ChipLogError(DeviceLayer, "sl_bt_legacy_advertiser_set_data() - Advertising Data failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "sl_bt_legacy_advertiser_set_data() - Advertising Data failed: %" CHIP_ERROR_FORMAT,
+                     err.Format());
     });
 
     index = 0;
@@ -510,7 +511,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     VerifyOrExit(ret == SL_STATUS_OK, {
         err = MapBLEError(ret);
-        ChipLogError(DeviceLayer, "sl_bt_legacy_advertiser_set_data() - Scan Response failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "sl_bt_legacy_advertiser_set_data() - Scan Response failed: %" CHIP_ERROR_FORMAT, err.Format());
     });
 
     err = MapBLEError(ret);
@@ -799,7 +800,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(volatile sl_bt_msg_t * evt)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -829,7 +830,7 @@ void BLEManagerImpl::HandleRXCharWrite(volatile sl_bt_msg_t * evt)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -940,22 +941,24 @@ CHIP_ERROR BLEManagerImpl::EncodeAdditionalDataTlv()
     MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
 
     err = DeviceLayer::GetDeviceInstanceInfoProvider()->GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
-    SuccessOrExit(err);
+
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to GetRotatingDeviceIdUniqueId"));
+
     err = ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter);
-    SuccessOrExit(err);
+
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to GetLifetimeCounter"));
+
     additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
 #endif /* CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID) */
 
-    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(additionalDataPayloadParams, c3AdditionalDataBufferHandle,
-                                                                         additionalDataFields);
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(
+        additionalDataPayloadParams, sInstance.c3AdditionalDataBufferHandle, additionalDataFields);
 
-exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data (%s)", __func__);
+        ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data: %" CHIP_ERROR_FORMAT, err.Format());
     }
-
     return err;
 }
 

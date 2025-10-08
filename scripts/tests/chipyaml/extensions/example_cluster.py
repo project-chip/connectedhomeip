@@ -14,7 +14,7 @@
 #    limitations under the License.
 
 
-from matter_yamltests.pseudo_clusters.pseudo_cluster import PseudoCluster
+from matter.yamltests.pseudo_clusters.pseudo_cluster import PseudoCluster
 
 
 class example_cluster(PseudoCluster):

@@ -38,6 +38,8 @@ extern "C" {
 #if SL_MBEDTLS_USE_TINYCRYPT
 #include "sl_si91x_constants.h"
 #include "sl_si91x_trng.h"
+#else
+#include <psa/crypto.h>
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 
 #include <sl_net.h>
@@ -70,13 +72,13 @@ extern "C" {
 using namespace chip::DeviceLayer::Silabs;
 using WiFiBandEnum = chip::app::Clusters::NetworkCommissioning::WiFiBandEnum;
 
-// TODO : Temporary work-around for wifi-init failure in 917NCP ACX module boards.
-// Can be removed after Wiseconnect fixes region code for all ACX module boards.
-#if defined(ACX_MODULE_BOARD)
-#define REGION_CODE IGNORE_REGION
-#else
+// The REGION_CODE macro defines the regulatory region for the Wi-Fi device.
+// The default value is 'US'. Users can override this macro to specify a different region code.
+// The region code must match one of the values defined in the 'sl_wifi_region_code_t' enum,
+// which is located in 'wifi-sdk/inc/sl_wifi_constants.h'. Example values include US, EU, JP, etc.
+#ifndef REGION_CODE
 #define REGION_CODE US
-#endif // ACX_MODULE_BOARD
+#endif // !REGION_CODE
 
 // TODO: This needs to be refactored so we don't need the global object
 WfxRsi_t wfx_rsi;
@@ -171,7 +173,7 @@ const sl_wifi_device_configuration_t config = {
 constexpr int8_t kAdvScanThreshold           = -40;
 constexpr uint8_t kAdvRssiToleranceThreshold = 5;
 constexpr uint8_t kAdvActiveScanDuration     = 15;
-constexpr uint8_t kAdvPassiveScanDuration    = 20;
+constexpr uint8_t kAdvPassiveScanDuration    = 110;
 constexpr uint8_t kAdvMultiProbe             = 1;
 constexpr uint8_t kAdvScanPeriodicity        = 10;
 constexpr uint8_t kAdvEnableInstantbgScan    = 1;
@@ -263,6 +265,7 @@ sl_status_t SiWxPlatformInit(void)
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #ifdef ENABLE_CHIP_SHELL
+#ifdef RTE_UULP_GPIO_1_PIN
     // While using the matter shell with a Low Power Build, GPIO 1 is used to check the UULP PIN 1 status
     // since UART doesn't act as a wakeup source in the UULP mode.
 
@@ -274,6 +277,7 @@ sl_status_t SiWxPlatformInit(void)
 
     // Enable the REN
     RSI_NPSSGPIO_InputBufferEn(RTE_UULP_GPIO_1_PIN, 1);
+#endif // RTE_UULP_GPIO_1_PIN
 #endif // ENABLE_CHIP_SHELL
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // SLI_SI91X_MCU_INTERFACE
@@ -318,9 +322,10 @@ sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_res
             status = *reinterpret_cast<sl_status_t *>(scan_result);
             ChipLogError(DeviceLayer, "ScanCallback: failed: 0x%lx", status);
         }
-
+        // SET FALLBACK VALUES FOR THE SCAN
+        wfx_rsi.ap_chan = SL_WIFI_AUTO_CHANNEL;
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
-        security = SL_WIFI_WPA3;
+        security = SL_WIFI_WPA3_TRANSITION;
 #else
         security = SL_WIFI_WPA_WPA2_MIXED;
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
@@ -329,7 +334,10 @@ sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_res
     {
         security        = static_cast<sl_wifi_security_t>(scan_result->scan_info[0].security_mode);
         wfx_rsi.ap_chan = scan_result->scan_info[0].rf_channel;
-        memcpy(wfx_rsi.ap_mac.data(), scan_result->scan_info[0].bssid, kWifiMacAddressLength);
+
+        chip::MutableByteSpan bssidSpan(wfx_rsi.ap_bssid.data(), kWifiMacAddressLength);
+        chip::ByteSpan inBssid(scan_result->scan_info[0].bssid, kWifiMacAddressLength);
+        chip::CopySpanToMutableSpan(inBssid, bssidSpan);
     }
 
     osSemaphoreRelease(sScanCompleteSemaphore);
@@ -361,6 +369,7 @@ sl_status_t InitiateScan()
     }
 
     osSemaphoreRelease(sScanInProgressSemaphore);
+    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogProgress(DeviceLayer, "sl_wifi_start_scan failed: 0x%lx", status));
 
     return status;
 }
@@ -370,11 +379,12 @@ sl_status_t SetWifiConfigurations()
     sl_status_t status = SL_STATUS_OK;
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    sl_wifi_listen_interval_t sleep_interval = { .listen_interval =
-                                                     chip::ICDConfigurationData::GetInstance().GetSlowPollingInterval().count() };
-    status                                   = sl_wifi_set_listen_interval(SL_WIFI_CLIENT_INTERFACE, sleep_interval);
+    sl_wifi_listen_interval_v2_t sleep_interval = {
+        .listen_interval = chip::ICDConfigurationData::GetInstance().GetSlowPollingInterval().count()
+    };
+    status = sl_wifi_set_listen_interval_v2(SL_WIFI_CLIENT_INTERFACE, sleep_interval);
     VerifyOrReturnError(status == SL_STATUS_OK, status,
-                        ChipLogError(DeviceLayer, "sl_wifi_set_listen_interval failed: 0x%lx", status));
+                        ChipLogError(DeviceLayer, "sl_wifi_set_listen_interval_v2 failed: 0x%lx", status));
 
     // This is be triggered on the disconnect use case, providing the amount of TA tries
     // Setting the TA retry to 1 and giving the control to the M4 for improved power efficiency
@@ -427,6 +437,17 @@ sl_status_t SetWifiConfigurations()
     chip::MutableByteSpan output(profile.config.ssid.value, WFX_MAX_SSID_LENGTH);
     chip::ByteSpan input(wfx_rsi.credentials.ssid, wfx_rsi.credentials.ssidLength);
     chip::CopySpanToMutableSpan(input, output);
+
+    if (wfx_rsi.ap_chan != SL_WIFI_AUTO_CHANNEL)
+    {
+        // AP channel is known - This indicates that the network scan was done for a specific SSID.
+        // Providing the channel and BSSID in the profile avoids scanning all channels again.
+        profile.config.channel.channel = wfx_rsi.ap_chan;
+
+        chip::MutableByteSpan bssidSpan(profile.config.bssid.octet, kWifiMacAddressLength);
+        chip::ByteSpan inBssid(wfx_rsi.ap_bssid.data(), kWifiMacAddressLength);
+        chip::CopySpanToMutableSpan(inBssid, bssidSpan);
+    }
 
     status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
     VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_set_profile failed: 0x%lx", status));
@@ -540,7 +561,11 @@ CHIP_ERROR WifiInterfaceImpl::InitWiFiStack(void)
     // Create the message queue
     sWifiEventQueue = osMessageQueueNew(kWfxQueueSize, sizeof(WiseconnectWifiInterface::WifiPlatformEvent), nullptr);
     VerifyOrReturnError(sWifiEventQueue != nullptr, CHIP_ERROR_NO_MEMORY);
-
+#ifndef SL_MBEDTLS_USE_TINYCRYPT
+    // PSA Crypto initialization
+    VerifyOrReturnError(psa_crypto_init() == PSA_SUCCESS, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "psa_crypto_init failed: %lx", static_cast<uint32_t>(status)));
+#endif // SL_MBEDTLS_USE_TINYCRYPT
     return CHIP_NO_ERROR;
 }
 
@@ -551,6 +576,7 @@ void WifiInterfaceImpl::ProcessEvent(WiseconnectWifiInterface::WifiPlatformEvent
     case WiseconnectWifiInterface::WifiPlatformEvent::kStationConnect:
         ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationConnect");
         wfx_rsi.dev_state.Set(WifiInterface::WifiState::kStationConnected);
+        wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kStationConnecting);
         ResetConnectivityNotificationFlags();
         break;
 
@@ -631,12 +657,21 @@ void WifiInterfaceImpl::ProcessEvent(WiseconnectWifiInterface::WifiPlatformEvent
             }
 
             osSemaphoreRelease(sScanInProgressSemaphore);
+            if (status != SL_STATUS_OK)
+            {
+                ChipLogError(DeviceLayer, "sl_wifi_start_scan failed: 0x%lx", status);
+            }
         }
         break;
 
     case WiseconnectWifiInterface::WifiPlatformEvent::kStationStartJoin:
         ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationStartJoin");
 
+// To avoid IOP issues, it is recommended to enable high-performance mode before joining the network.
+// TODO: Remove this once the IOP issue related to power save mode switching is fixed in the Wi-Fi SDK.
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformanceWithTransition();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
         InitiateScan();
         JoinWifiNetwork();
         break;
@@ -682,15 +717,22 @@ sl_status_t WifiInterfaceImpl::JoinWifiNetwork(void)
     status = sl_wifi_set_join_callback(JoinCallback, nullptr);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
 
-// To avoid IOP issues, it is recommended to enable high-performance mode before joining the network.
-// TODO: Remove this once the IOP issue related to power save mode switching is fixed in the Wi-Fi SDK.
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-    chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformanceWithTransition();
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-
     status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);
 
-    if (status == SL_STATUS_OK || status == SL_STATUS_IN_PROGRESS)
+    if (!(wfx_rsi.dev_state.Has(WifiInterface::WifiState::kStationConnecting)))
+    {
+        // TODO: Remove this check once the sl_net_up is fixed, sl_net_up is not completely synchronous
+        // and issue is mostly seen on OPEN access points
+
+        // sl_net_up can return SL_STATUS_SUCCESS, even if the join callback has been called
+        // If the state has changed, it means that the join callback has already been called
+        // rejoin already started, so we should not proceed with further processing
+        ChipLogDetail(DeviceLayer, "JoinCallback already called, skipping further processing");
+
+        status = SL_STATUS_FAIL;
+    }
+
+    if (status == SL_STATUS_OK)
     {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         // Remove High performance request that might have been added during the connect/retry process
@@ -703,7 +745,7 @@ sl_status_t WifiInterfaceImpl::JoinWifiNetwork(void)
     }
 
     // failure only happens when the firmware returns an error
-    ChipLogError(DeviceLayer, "sl_wifi_connect failed: 0x%lx", static_cast<uint32_t>(status));
+    ChipLogError(DeviceLayer, "sl_net_up failed: 0x%lx", static_cast<uint32_t>(status));
 
     wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kStationConnecting).Clear(WifiInterface::WifiState::kStationConnected);
     ScheduleConnectionAttempt();
@@ -714,7 +756,20 @@ sl_status_t WifiInterfaceImpl::JoinWifiNetwork(void)
 sl_status_t WifiInterfaceImpl::JoinCallback(sl_wifi_event_t event, char * result, uint32_t resultLenght, void * arg)
 {
     sl_status_t status = SL_STATUS_OK;
-    wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kStationConnecting);
+    // If the failed event is encountered when sl_net_up is in-progress,
+    // we ignore it and wait for the sl_net_up to complete.
+    if (wfx_rsi.dev_state.Has(WifiInterface::WifiState::kStationConnecting))
+    {
+        wfx_rsi.dev_state.Clear(WifiState::kStationConnecting);
+        if (SL_WIFI_CHECK_IF_EVENT_FAILED(event))
+        {
+            // Returning SL_STATUS_IN_PROGRESS here is intentional: if a failed event is encountered while sl_net_up is still in
+            // progress, we do not want to report a final failure yet, as the connection process may still be ongoing and the final
+            // outcome will be determined once sl_net_up completes. This prevents premature error handling by higher layers.
+            return SL_STATUS_IN_PROGRESS;
+        }
+    }
+
     if (SL_WIFI_CHECK_IF_EVENT_FAILED(event))
     {
         status = *reinterpret_cast<sl_status_t *>(result);
@@ -739,9 +794,9 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(wfx_wifi_scan_result_t & info)
     chip::CopySpanToMutableSpan(ssid, output);
     info.ssid_length = output.size();
 
-    chip::ByteSpan apMacSpan(wfx_rsi.ap_mac.data(), wfx_rsi.ap_mac.size());
+    chip::ByteSpan apBssidSpan(wfx_rsi.ap_bssid.data(), wfx_rsi.ap_bssid.size());
     chip::MutableByteSpan bssidSpan(info.bssid, kWifiMacAddressLength);
-    chip::CopySpanToMutableSpan(apMacSpan, bssidSpan);
+    chip::CopySpanToMutableSpan(apBssidSpan, bssidSpan);
 
     // TODO: add error processing
     sl_wifi_get_signal_strength(SL_WIFI_CLIENT_INTERFACE, &(rssi));
@@ -810,15 +865,14 @@ CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave(PowerSaveInterface::PowerSaveCo
     VerifyOrReturnError(error == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "rsi_bt_power_save_profile failed: %ld", error));
 
-    sl_wifi_performance_profile_t wifi_profile = { .profile = ConvertPowerSaveConfiguration(configuration),
-                                                   // TODO: Performance profile fails if not alligned with DTIM
-                                                   .dtim_aligned_type = SL_SI91X_ALIGN_WITH_DTIM_BEACON,
-                                                   // TODO: Different types need to be fixed in the Wi-Fi SDK
-                                                   .listen_interval = static_cast<uint16_t>(listenInterval) };
+    sl_wifi_performance_profile_v2_t wifi_profile = { .profile = ConvertPowerSaveConfiguration(configuration),
+                                                      // TODO: Performance profile fails if not aligned with DTIM
+                                                      .dtim_aligned_type = SL_SI91X_ALIGN_WITH_DTIM_BEACON,
+                                                      .listen_interval   = listenInterval };
 
-    sl_status_t status = sl_wifi_set_performance_profile(&wifi_profile);
+    sl_status_t status = sl_wifi_set_performance_profile_v2(&wifi_profile);
     VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "sl_wifi_set_performance_profile failed: 0x%lx", status));
+                        ChipLogError(DeviceLayer, "sl_wifi_set_performance_profile_v2 failed: 0x%lx", status));
 
     return CHIP_NO_ERROR;
 }

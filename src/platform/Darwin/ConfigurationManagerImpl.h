@@ -34,7 +34,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-static constexpr int kCountryCodeLength = 2;
+inline constexpr int kCountryCodeLength = 2;
 
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the Darwin platform.
@@ -70,6 +70,8 @@ private:
     CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
     CHIP_ERROR GetRegulatoryLocation(uint8_t & location) override;
     CHIP_ERROR GetLocationCapability(uint8_t & location) override;
+    CHIP_ERROR GetConfigurationVersion(uint32_t & configurationVersion) override;
+    CHIP_ERROR StoreConfigurationVersion(uint32_t configurationVersion) override;
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
 

@@ -66,7 +66,9 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="VALCC" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="TS" name="TimeSync" summary="UTC time is used for time indications"/>
+    <feature bit="0" code="TS" name="TimeSync" summary="UTC time is used for time indications">
+      <describedConform/>
+    </feature>
     <feature bit="1" code="LVL" name="Level" summary="Device supports setting the specific position of the valve">
       <optionalConform/>
     </feature>

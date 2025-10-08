@@ -27,22 +27,23 @@
 #include <app/EventPathParams.h>
 #include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
-#include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterContext.h>
+#include <app/server-cluster/ServerClusterInterface.h>
 #include <app/util/DataModelHandler.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
-#include <app/util/persistence/AttributePersistenceProvider.h>
-#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
-#include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/SpanSearchValue.h>
 
@@ -57,13 +58,13 @@ DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(const ConcreteCommandPat
 {
     const CommandId commandId = path.mCommandId;
 
-    DataModel::AcceptedCommandEntry entry;
-
-    entry.commandId       = path.mCommandId;
-    entry.invokePrivilege = RequiredPrivilege::ForInvokeCommand(path);
-    entry.flags.Set(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(path.mClusterId, commandId));
-    entry.flags.Set(DataModel::CommandQualityFlags::kFabricScoped, CommandIsFabricScoped(path.mClusterId, commandId));
-    entry.flags.Set(DataModel::CommandQualityFlags::kLargeMessage, CommandHasLargePayload(path.mClusterId, commandId));
+    DataModel::AcceptedCommandEntry entry(
+        path.mCommandId,
+        BitFlags<DataModel::CommandQualityFlags>{}
+            .Set(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(path.mClusterId, commandId))
+            .Set(DataModel::CommandQualityFlags::kFabricScoped, CommandIsFabricScoped(path.mClusterId, commandId))
+            .Set(DataModel::CommandQualityFlags::kLargeMessage, CommandHasLargePayload(path.mClusterId, commandId)),
+        RequiredPrivilege::ForInvokeCommand(path));
 
     return entry;
 }
@@ -96,23 +97,20 @@ DataModel::ServerClusterEntry ServerClusterEntryFrom(EndpointId endpointId, cons
 
 DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & clusterPath, const EmberAfAttributeMetadata & attribute)
 {
-    DataModel::AttributeEntry entry;
-
     const ConcreteAttributePath attributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
 
-    entry.attributeId   = attribute.attributeId;
-    entry.readPrivilege = RequiredPrivilege::ForReadAttribute(attributePath);
-    if (!attribute.IsReadOnly())
-    {
-        entry.writePrivilege = RequiredPrivilege::ForWriteAttribute(attributePath);
-    }
+    using DataModel::AttributeQualityFlags;
 
-    entry.flags.Set(DataModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
-    entry.flags.Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite());
+    DataModel::AttributeEntry entry(
+        attribute.attributeId,
+        BitFlags<DataModel::AttributeQualityFlags>{}
+            .Set(AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE))
+            .Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite()),
+        attribute.IsReadable() ? std::make_optional(RequiredPrivilege::ForReadAttribute(attributePath)) : std::nullopt,
+        attribute.IsWritable() ? std::make_optional(RequiredPrivilege::ForWriteAttribute(attributePath)) : std::nullopt);
 
     // NOTE: we do NOT provide additional info for:
-    //    - IsExternal/IsSingleton/IsAutomaticallyPersisted is not used by IM handling
-    //    - IsSingleton spec defines it for CLUSTERS where as we have it for ATTRIBUTES
+    //    - IsExternal/IsAutomaticallyPersisted is not used by IM handling
     //    - Several specification flags are not available (reportable, quieter reporting,
     //      fixed, source attribution)
 
@@ -123,8 +121,6 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
     return entry;
 }
 
-const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
-
 DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 
 } // namespace
@@ -132,13 +128,18 @@ DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 CHIP_ERROR CodegenDataModelProvider::Shutdown()
 {
     Reset();
+    mContext.reset();
     mRegistry.ClearContext();
-    return CHIP_NO_ERROR;
+    return DataModel::Provider::Shutdown();
 }
 
 CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext context)
 {
+    // server clusters require a valid persistent storage delegate
+    VerifyOrReturnError(mPersistentStorageDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(DataModel::Provider::Startup(context));
+
+    mContext.emplace(context);
 
     // Ember NVM requires have a data model provider. attempt to create one if one is not available
     //
@@ -149,25 +150,17 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 #if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
         ChipLogProgress(DataManagement, "Ember attribute persistence requires setting up");
 #endif
-        if (mPersistentStorageDelegate != nullptr)
-        {
-            ReturnErrorOnFailure(gDefaultAttributePersistence.Init(mPersistentStorageDelegate));
-            SetAttributePersistenceProvider(&gDefaultAttributePersistence);
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        }
-        else
-        {
-            ChipLogError(DataManagement, "No storage delegate available, will not set up attribute persistence.");
-#endif
-        }
+        ReturnErrorOnFailure(gDefaultAttributePersistence.Init(mPersistentStorageDelegate));
+        SetAttributePersistenceProvider(&gDefaultAttributePersistence);
     }
 
     InitDataModelForTesting();
 
     return mRegistry.SetContext(ServerClusterContext{
-        .provider           = this,
-        .storage            = mPersistentStorageDelegate,
-        .interactionContext = &mContext,
+        .provider           = *this,
+        .storage            = *mPersistentStorageDelegate,
+        .attributeStorage   = *GetAttributePersistenceProvider(), // guaranteed set up by the above logic
+        .interactionContext = *mContext,                          // NOLINT(bugprone-unchecked-optional-access): emplaced above
     });
 }
 
@@ -200,7 +193,7 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
     return std::nullopt;
 }
 
-CHIP_ERROR CodegenDataModelProvider::Endpoints(DataModel::ListBuilder<DataModel::EndpointEntry> & builder)
+CHIP_ERROR CodegenDataModelProvider::Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & builder)
 {
     const uint16_t endpointCount = emberAfEndpointCount();
 
@@ -253,8 +246,19 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointI
     return std::make_optional<unsigned>(idx);
 }
 
+CHIP_ERROR CodegenDataModelProvider::EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo)
+{
+    if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
+    {
+        return cluster->EventInfo(path, eventInfo);
+    }
+
+    eventInfo.readPrivilege = RequiredPrivilege::ForReadEvent(path);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
-                                                    DataModel::ListBuilder<DataModel::ServerClusterEntry> & builder)
+                                                    ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> & builder)
 {
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
 
@@ -271,7 +275,7 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
     //
     // To allow cluster implementations to be incrementally converted to storing their own data versions,
     // instead of relying on the out-of-band emberAfDataVersionStorage, first check for clusters that are
-    // using the new data version storage and are registered via ServerClusterInterfaceRegistry, then fill
+    // using the new data version storage and are registered via SingleEndpointServerClusterRegistry, then fill
     // in the data versions for the rest via the out-of-band mechanism.
 
     // assume the clusters on endpoint does not change in between these two loops
@@ -284,20 +288,25 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
 
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(registryClusterCount));
 
-    DataModel::ListBuilder<ClusterId> knownClustersBuilder;
+    ReadOnlyBufferBuilder<ClusterId> knownClustersBuilder;
     ReturnErrorOnFailure(knownClustersBuilder.EnsureAppendCapacity(registryClusterCount));
-    for (auto * cluster : mRegistry.ClustersOnEndpoint(endpointId))
+    for (const auto clusterId : mRegistry.ClustersOnEndpoint(endpointId))
     {
-        const ConcreteClusterPath path = cluster->GetPath();
+        ConcreteClusterPath path(endpointId, clusterId);
+        ServerClusterInterface * cluster = mRegistry.Get(path);
+
+        // path MUST be valid: we just got it from iterating our registrations...
+        VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INTERNAL);
+
         ReturnErrorOnFailure(builder.Append({
             .clusterId   = path.mClusterId,
-            .dataVersion = cluster->GetDataVersion(),
-            .flags       = cluster->GetClusterFlags(),
+            .dataVersion = cluster->GetDataVersion(path),
+            .flags       = cluster->GetClusterFlags(path),
         }));
         ReturnErrorOnFailure(knownClustersBuilder.Append(path.mClusterId));
     }
 
-    DataModel::ReadOnlyBuffer<ClusterId> knownClusters = knownClustersBuilder.TakeBuffer();
+    ReadOnlyBuffer<ClusterId> knownClusters = knownClustersBuilder.TakeBuffer();
 
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(emberAfClusterCountForEndpointType(endpoint, /* server = */ true)));
 
@@ -335,7 +344,7 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
 }
 
 CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path,
-                                                DataModel::ListBuilder<DataModel::AttributeEntry> & builder)
+                                                ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
     {
@@ -364,28 +373,26 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
         ReturnErrorOnFailure(builder.Append(AttributeEntryFrom(path, attribute)));
     }
 
-    // This "GlobalListEntry" is specific for metadata that ember does not include
-    // in its attribute list metadata.
-    //
-    // By spec these Attribute/AcceptedCommands/GeneratedCommants lists are:
-    //   - lists of elements
-    //   - read-only, with read privilege view
-    //   - fixed value (no such flag exists, so this is not a quality flag we set/track)
-    DataModel::AttributeEntry globalListEntry;
-
-    globalListEntry.readPrivilege = Access::Privilege::kView;
-    globalListEntry.flags.Set(DataModel::AttributeQualityFlags::kListAttribute);
-
-    for (auto & attribute : GlobalAttributesNotInMetadata)
+    for (auto & attributeId : GlobalAttributesNotInMetadata)
     {
-        globalListEntry.attributeId = attribute;
-        ReturnErrorOnFailure(builder.Append(globalListEntry));
+
+        // This "GlobalListEntry" is specific for metadata that ember does not include
+        // in its attribute list metadata.
+        //
+        // By spec these Attribute/AcceptedCommands/GeneratedCommants lists are:
+        //   - lists of elements
+        //   - read-only, with read privilege view
+        //   - fixed value (no such flag exists, so this is not a quality flag we set/track)
+        DataModel::AttributeEntry globalListEntry(attributeId, DataModel::AttributeQualityFlags::kListAttribute,
+                                                  Access::Privilege::kView, std::nullopt);
+
+        ReturnErrorOnFailure(builder.Append(std::move(globalListEntry)));
     }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CodegenDataModelProvider::ClientClusters(EndpointId endpointId, DataModel::ListBuilder<ClusterId> & builder)
+CHIP_ERROR CodegenDataModelProvider::ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder)
 {
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
 
@@ -428,7 +435,7 @@ const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const Concret
 }
 
 CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path,
-                                                      DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
+                                                      ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
     {
@@ -445,52 +452,9 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
     if (interface != nullptr)
     {
-        size_t commandCount = 0;
-
-        CHIP_ERROR err = interface->EnumerateAcceptedCommands(
-            path,
-            [](CommandId id, void * context) -> Loop {
-                *reinterpret_cast<size_t *>(context) += 1;
-                return Loop::Continue;
-            },
-            reinterpret_cast<void *>(&commandCount));
-
-        if (err == CHIP_NO_ERROR)
-        {
-            using EnumerationData = struct
-            {
-                ConcreteCommandPath commandPath;
-                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> * acceptedCommandList;
-                CHIP_ERROR processingError;
-            };
-
-            EnumerationData enumerationData;
-            enumerationData.commandPath         = ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId);
-            enumerationData.processingError     = CHIP_NO_ERROR;
-            enumerationData.acceptedCommandList = &builder;
-
-            ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
-
-            ReturnErrorOnFailure(interface->EnumerateAcceptedCommands(
-                path,
-                [](CommandId commandId, void * context) -> Loop {
-                    auto input                    = reinterpret_cast<EnumerationData *>(context);
-                    input->commandPath.mCommandId = commandId;
-                    CHIP_ERROR appendError        = input->acceptedCommandList->Append(AcceptedCommandEntryFor(input->commandPath));
-                    if (appendError != CHIP_NO_ERROR)
-                    {
-                        input->processingError = appendError;
-                        return Loop::Break;
-                    }
-                    return Loop::Continue;
-                },
-                reinterpret_cast<void *>(&enumerationData)));
-            ReturnErrorOnFailure(enumerationData.processingError);
-
-            // the two invocations MUST return the same sizes.
-            VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);
-            return CHIP_NO_ERROR;
-        }
+        CHIP_ERROR err = interface->RetrieveAcceptedCommands(path, builder);
+        // If retrieving the accepted commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal procesing.
+        // Otherwise we finished.
         VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
 
@@ -516,8 +480,7 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path,
-                                                       DataModel::ListBuilder<CommandId> & builder)
+CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
     if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
     {
@@ -534,49 +497,9 @@ CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
     if (interface != nullptr)
     {
-        size_t commandCount = 0;
-
-        CHIP_ERROR err = interface->EnumerateGeneratedCommands(
-            path,
-            [](CommandId id, void * context) -> Loop {
-                *reinterpret_cast<size_t *>(context) += 1;
-                return Loop::Continue;
-            },
-            reinterpret_cast<void *>(&commandCount));
-
-        if (err == CHIP_NO_ERROR)
-        {
-            ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
-
-            using EnumerationData = struct
-            {
-                DataModel::ListBuilder<CommandId> * generatedCommandList;
-                CHIP_ERROR processingError;
-            };
-            EnumerationData enumerationData;
-            enumerationData.processingError      = CHIP_NO_ERROR;
-            enumerationData.generatedCommandList = &builder;
-
-            ReturnErrorOnFailure(interface->EnumerateGeneratedCommands(
-                path,
-                [](CommandId id, void * context) -> Loop {
-                    auto input = reinterpret_cast<EnumerationData *>(context);
-
-                    CHIP_ERROR appendError = input->generatedCommandList->Append(id);
-                    if (appendError != CHIP_NO_ERROR)
-                    {
-                        input->processingError = appendError;
-                        return Loop::Break;
-                    }
-                    return Loop::Continue;
-                },
-                reinterpret_cast<void *>(&enumerationData)));
-            ReturnErrorOnFailure(enumerationData.processingError);
-
-            // the two invocations MUST return the same sizes.
-            VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);
-            return CHIP_NO_ERROR;
-        }
+        CHIP_ERROR err = interface->RetrieveGeneratedCommands(path, builder);
+        // If retrieving generated commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal procesing.
+        // Otherwise we finished.
         VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
 
@@ -597,8 +520,7 @@ void CodegenDataModelProvider::InitDataModelForTesting()
     InitDataModelHandler();
 }
 
-CHIP_ERROR CodegenDataModelProvider::DeviceTypes(EndpointId endpointId,
-                                                 DataModel::ListBuilder<DataModel::DeviceTypeEntry> & builder)
+CHIP_ERROR CodegenDataModelProvider::DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & builder)
 {
     std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpointId);
     if (!endpoint_index.has_value())
@@ -608,11 +530,10 @@ CHIP_ERROR CodegenDataModelProvider::DeviceTypes(EndpointId endpointId,
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    builder.ReferenceExisting(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
-    return CHIP_NO_ERROR;
+    return builder.ReferenceExisting(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
 }
 
-CHIP_ERROR CodegenDataModelProvider::SemanticTags(EndpointId endpointId, DataModel::ListBuilder<SemanticTag> & builder)
+CHIP_ERROR CodegenDataModelProvider::SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder)
 {
     DataModel::Provider::SemanticTag semanticTag;
     size_t count = 0;
@@ -632,6 +553,17 @@ CHIP_ERROR CodegenDataModelProvider::SemanticTags(EndpointId endpointId, DataMod
 
     return CHIP_NO_ERROR;
 }
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+CHIP_ERROR CodegenDataModelProvider::EndpointUniqueID(EndpointId endpointId, MutableCharSpan & epUniqueId)
+{
+    char buffer[Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
+    MutableCharSpan epUniqueIdSpan(buffer);
+    emberAfGetEndpointUniqueIdForEndPoint(endpointId, epUniqueIdSpan);
+
+    memcpy(epUniqueId.data(), epUniqueIdSpan.data(), epUniqueIdSpan.size());
+    return CHIP_NO_ERROR;
+}
+#endif
 
 } // namespace app
 } // namespace chip

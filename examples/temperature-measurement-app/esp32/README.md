@@ -40,6 +40,21 @@ main/diagnostic_logs
 
 These files contain dummy data.
 
+#### To use diagnostic tracing
+
+Open menuconfig
+
+```
+ idf.py menuconfig
+```
+
+Enable `ENABLE_ESP_DIAGNOSTICS` option from menuconfig
+
+Set diagnostic storage buffer size from `Platform Diagnostics` menu
+
+-   End user buffer default size 4096
+-   Retrieval buffer default size 4096
+
 #### To test the diagnostic logs cluster
 
 ```

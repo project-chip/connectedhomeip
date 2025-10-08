@@ -25,3 +25,5 @@
  */
 
 #pragma once
+
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1

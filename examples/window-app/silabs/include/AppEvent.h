@@ -18,21 +18,17 @@
 
 #pragma once
 
-struct AppEvent;
-typedef void (*EventHandler)(AppEvent *);
-
+#include "BaseAppEvent.h"
 #include <app/clusters/window-covering-server/window-covering-server.h>
 #include <lib/core/CHIPError.h>
 
 using namespace chip::app::Clusters::WindowCovering;
 
-struct AppEvent
+struct AppEvent : public BaseAppEvent
 {
     enum AppEventTypes
     {
-        kEventType_Button = 0,
-        kEventType_Timer,
-        kEventType_ResetWarning,
+        kEventType_ResetWarning = BaseAppEvent::kEventType_Max + 1,
         kEventType_ResetCanceled,
         // Button events
         kEventType_UpPressed,
@@ -48,7 +44,6 @@ struct AppEvent
         kEventType_AttributeChange,
     };
 
-    uint16_t Type;
     chip::EndpointId mEndpoint = 0;
     chip::AttributeId mAttributeId;
 
@@ -56,18 +51,7 @@ struct AppEvent
     {
         struct
         {
-            uint8_t Action;
-        } ButtonEvent;
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-
-        struct
-        {
             void * Context;
         } WindowEvent;
     };
-
-    EventHandler Handler;
 };

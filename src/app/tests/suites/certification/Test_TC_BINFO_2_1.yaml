@@ -89,7 +89,7 @@ tests:
       command: "readAttribute"
       attribute: "DataModelRevision"
       response:
-          value: 18
+          value: 19
           saveAs: DataModelRevisionValue
           constraints:
               type: int16u
@@ -724,7 +724,7 @@ tests:
       response:
           saveAs: SpecificationVersionValue
           constraints:
-              anyOf: [0x01040000, 0x01040100]
+              anyOf: [0x01040000, 0x01040100, 0x01040200, 0x01050000]
               hasMasksClear: [0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80]
 
     - label:
@@ -770,3 +770,29 @@ tests:
       attribute: "MaxPathsPerInvoke"
       response:
           value: MaxPathsPerInvokeValue
+
+    - label: "Step 68: TH reads ConfigurationVersion from the DUT."
+      PICS: BINFO.S.A0018
+      command: "readAttribute"
+      attribute: "ConfigurationVersion"
+      response:
+          saveAs: ConfigurationVersionValue
+          constraints:
+              type: int32u
+              minValue: 1
+
+    - label: "Step 69: TH writes ConfigurationVersion as '0x1124' "
+      PICS: BINFO.S.A0018
+      command: "writeAttribute"
+      attribute: "ConfigurationVersion"
+      arguments:
+          value: 4388
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 70: TH reads ConfigurationVersion from the DUT."
+      PICS: BINFO.S.A0018
+      command: "readAttribute"
+      attribute: "ConfigurationVersion"
+      response:
+          value: ConfigurationVersionValue

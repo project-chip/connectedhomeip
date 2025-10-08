@@ -118,6 +118,13 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ConfigurationVersion))
+    {
+        // The first boot after factory reset of the Node.
+        err = StoreConfigurationVersion(1);
+        SuccessOrExit(err);
+    }
+
     err = CHIP_NO_ERROR;
 
 exit:
@@ -279,13 +286,13 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     err = PosixConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Failed to factory reset configurations: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Failed to factory reset configurations: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     err = PosixConfig::FactoryResetCounters();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Failed to factory reset counters: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Failed to factory reset counters: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -374,6 +381,16 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
     }
 
     return err;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetConfigurationVersion(uint32_t & configurationVersion)
+{
+    return ReadConfigValue(PosixConfig::kConfigKey_ConfigurationVersion, configurationVersion);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreConfigurationVersion(uint32_t configurationVersion)
+{
+    return WriteConfigValue(PosixConfig::kConfigKey_ConfigurationVersion, configurationVersion);
 }
 
 ConfigurationManager & ConfigurationMgrImpl()

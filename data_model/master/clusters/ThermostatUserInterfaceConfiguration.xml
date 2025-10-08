@@ -106,17 +106,23 @@ Davis, CA 95616, USA
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="TemperatureDisplayMode" type="TemperatureDisplayModeEnum">
-      <enum default="Celsius"/>
+      <default>
+        <enum default="Celsius"/>
+      </default>
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="KeypadLockout" type="KeypadLockoutEnum">
-      <enum default="NoLockout"/>
+      <default>
+        <enum default="NoLockout"/>
+      </default>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="ScheduleProgrammingVisibility" type="ScheduleProgrammingVisibilityEnum">
-      <enum default="ScheduleProgrammingPermitted"/>
+      <default>
+        <enum default="ScheduleProgrammingPermitted"/>
+      </default>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
     </attribute>

@@ -40,7 +40,7 @@ config ASSERT_NO_MSG_INFO
 config HW_STACK_PROTECTION
     default y
 
-config POSIX_MAX_FDS
+config ZVFS_OPEN_MAX
     default 16
 
 config MAIN_STACK_SIZE
@@ -53,14 +53,27 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
     default 2560 if CHIP_WIFI
     default 2048 if CHIP_ICD_LIT_SUPPORT
 
+if CHIP_WIFI
+
 config HEAP_MEM_POOL_SIZE
-    default 110720 if CHIP_WIFI
+    default 48336 if BUILD_WITH_TFM
+    default 40144
+
+config NRF_WIFI_DATA_HEAP_SIZE
+    default 42384 if BUILD_WITH_TFM
+    default 50576
+
+endif # CHIP_WIFI
 
 config HEAP_MEM_POOL_IGNORE_MIN
     default y if CHIP_WIFI
 
 config CHIP_MALLOC_SYS_HEAP_SIZE
+    default 10240 if SOC_SERIES_NRF54LX # nRF54L requires more memory due to crypto backend
     default 8192 if NET_L2_OPENTHREAD
+
+config MPSL_WORK_STACK_SIZE
+    default 2048 if SOC_SERIES_NRF54LX # nRF54L requires more memory due to crypto backend
 
 # We use sys_heap based allocators, so make sure we don't reserve unused libc heap anyway
 config COMMON_LIBC_MALLOC_ARENA_SIZE
@@ -157,6 +170,10 @@ config BT_BUF_ACL_RX_SIZE
 config BT_BUF_ACL_TX_SIZE
     default 251
 
+# It is set based on BT_BUF_ACL_RX_COUNT_EXTRA = 6 - (BT_MAX_CONN + 1)
+config BT_BUF_ACL_RX_COUNT_EXTRA
+    default 4
+
 config BT_RX_STACK_SIZE
     default 1200
 
@@ -207,12 +224,12 @@ config CHIP_QSPI_NOR
 
 # nRF7002DK uses SPI NOR external flash
 
-if BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF7001_NRF5340_CPUAPP || BOARD_NRF54L15DK
+if BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF5340_CPUAPP_NRF7001 || BOARD_NRF54L15DK
 
 config CHIP_SPI_NOR
     default y
 
-endif # BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF7001_NRF5340_CPUAPP || BOARD_NRF54L15DK
+endif # BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF5340_CPUAPP_NRF7001 || BOARD_NRF54L15DK
 
 config BOOT_IMAGE_ACCESS_HOOKS
     default y if SOC_SERIES_NRF53X
@@ -232,7 +249,7 @@ config NRF_WIFI_FW_PATCH_DFU
 # ==============================================================================
 
 config NET_L2_OPENTHREAD
-    default y if !WIFI_NRF70
+    default y if !WIFI_NRF70 && NETWORKING
 
 if NET_L2_OPENTHREAD
 
@@ -247,9 +264,35 @@ config OPENTHREAD_THREAD_STACK_SIZE
 config OPENTHREAD_DEFAULT_TX_POWER
     default 20 if MPSL_FEM
     default 3 if SOC_SERIES_NRF53X
-    default 8 if SOC_SERIES_NRF52X
+    default 8 if SOC_SERIES_NRF52X || SOC_SERIES_NRF54LX
 
 endif # NET_L2_OPENTHREAD
+
+# ==============================================================================
+# ICD configuration
+# ==============================================================================
+
+if CHIP_ENABLE_ICD_SUPPORT
+
+config CHIP_ICD_SLOW_POLL_INTERVAL
+    default 300000 if CHIP_ICD_LIT_SUPPORT # Use the same value as CONFIG_CHIP_ICD_IDLE_MODE_DURATION
+    default 2500
+
+config CHIP_ICD_SIT_SLOW_POLL_LIMIT
+ 	default 15000
+
+config CHIP_ICD_FAST_POLLING_INTERVAL
+ 	default 500
+
+config CHIP_ICD_IDLE_MODE_DURATION
+ 	default 300 if CHIP_ICD_LIT_SUPPORT
+ 	default 120
+
+config CHIP_ICD_ACTIVE_MODE_THRESHOLD
+ 	default 5000 if CHIP_ICD_LIT_SUPPORT
+ 	default 0
+
+endif # CHIP_ENABLE_ICD_SUPPORT
 
 # ==============================================================================
 # Wi-Fi configuration
@@ -316,8 +359,12 @@ config MBEDTLS_HEAP_SIZE
 config CHIP_CRYPTO_PSA
     default y if !CHIP_WIFI
     imply PSA_WANT_ALG_SPAKE2P_MATTER
+    imply PSA_WANT_KEY_TYPE_SPAKE2P_KEY_PAIR_IMPORT if PSA_CRYPTO_DRIVER_OBERON
 
 if CHIP_CRYPTO_PSA
+
+config CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
+    default y if SOC_SERIES_NRF54LX
 
 config PSA_CRYPTO_DRIVER_OBERON
     default y if (SOC_SERIES_NRF52X || SOC_SERIES_NRF53X)

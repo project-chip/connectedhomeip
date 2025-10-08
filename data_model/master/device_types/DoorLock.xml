@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <!--
 Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
@@ -61,7 +61,7 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial Zigbee 3.0 revision"/>
     <revision revision="2" summary="Initial Matter revision"/>
-    <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
+    <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062; as noted below, this cluster remains disallowed in this device type"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>
@@ -79,16 +79,13 @@ Davis, CA 95616, USA
       <features>
         <feature code="" name="User">
           <mandatoryConform>
-            <andTerm>
-              <condition name="Matter"/>
-              <orTerm>
-                <feature name="PIN"/>
-                <feature name="RID"/>
-                <feature name="FPG"/>
-                <feature name="FACE"/>
-                <feature name="ALIRO"/>
-              </orTerm>
-            </andTerm>
+            <orTerm>
+              <feature name="PIN"/>
+              <feature name="RID"/>
+              <feature name="FGP"/>
+              <feature name="FACE"/>
+              <feature name="ALIRO"/>
+            </orTerm>
           </mandatoryConform>
         </feature>
         <feature code="" name="RFIDCredential">

@@ -25,6 +25,11 @@
 
 #pragma once
 #include <sdkconfig.h>
+#include <string>
+
+#if CONFIG_BT_NIMBLE_ENABLED
+#include <vector>
+#endif
 
 #include <lib/core/Optional.h>
 
@@ -192,8 +197,7 @@ private:
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
 #ifdef CONFIG_BT_NIMBLE_ENABLED
-    virtual void OnDeviceScanned(const struct ble_hs_adv_fields & fields, const ble_addr_t & addr,
-                                 const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
+    virtual void OnDeviceScanned(const ble_addr_t & addr, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
 #elif defined(CONFIG_BT_BLUEDROID_ENABLED)
     virtual void OnDeviceScanned(esp_ble_addr_type_t & addr_type, esp_bd_addr_t & addr,
                                  const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;

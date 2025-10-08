@@ -262,9 +262,6 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
     ReturnErrorOnFailure(static_cast<System::LayerSockets &>(GetSystemLayer())
                              .SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this)));
 
-    // Once Connecting or Connected, bump the reference count.  The corresponding Release() will happen in DoClose().
-    Retain();
-
     if (conRes == 0)
     {
         mState = State::kConnected;
@@ -1023,6 +1020,13 @@ void TCPEndPointImplSockets::HandleIncomingConnection()
         }
     }
 
+#if INET_CONFIG_TEST
+    if (TCPEndPoint::sForceEarlyFailureIncomingConnection)
+    {
+        err = CHIP_ERROR_INCORRECT_STATE;
+    }
+#endif
+
     // Attempt to allocate an end point object.
     if (err == CHIP_NO_ERROR)
     {
@@ -1045,7 +1049,6 @@ void TCPEndPointImplSockets::HandleIncomingConnection()
 #else  // !INET_CONFIG_ENABLE_IPV4
             conEP->mAddrType = IPAddressType::kIPv6;
 #endif // !INET_CONFIG_ENABLE_IPV4
-            conEP->Retain();
 
             // Wait for ability to read on this endpoint.
             auto & conEPLayer = static_cast<System::LayerSockets &>(conEP->GetSystemLayer());
@@ -1070,10 +1073,6 @@ void TCPEndPointImplSockets::HandleIncomingConnection()
     }
     if (conEP != nullptr)
     {
-        if (conEP->mState == State::kConnected)
-        {
-            conEP->Release();
-        }
         conEP->Release();
     }
     if (OnAcceptError != nullptr)

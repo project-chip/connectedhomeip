@@ -31,8 +31,20 @@
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-#include <platform/silabs/wifi/WifiInterface.h>
+#include <platform/silabs/wifi/WifiInterface.h> //nogncheck
 #endif
+
+#include "sl_component_catalog.h"
+#ifdef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
+#include "ZigbeeCallbacks.h"
+#endif // SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
+
+#if !SLI_SI91X_MCU_INTERFACE
+extern "C" {
+#include "btl_interface.h"
+#include "btl_reset_info.h"
+}
+#endif // !SLI_SI91X_MCU_INTERFACE
 
 namespace chip {
 namespace DeviceLayer {
@@ -51,7 +63,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     CHIP_ERROR err;
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<SilabsConfig>::Init();
+    err = GenericConfigurationManagerImpl<SilabsConfig>::Init();
     SuccessOrExit(err);
 
     IncreaseBootCount();
@@ -92,8 +104,16 @@ CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
 CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 {
     // rebootCause is obtained at bootup.
-    BootReasonType matterBootCause;
     uint32_t rebootCause = Silabs::GetPlatform().GetRebootCause();
+
+    // Before looking into the bootloader reboot cause, check if we performed a matter update
+    if (rebootCause == to_underlying(BootReasonType::kSoftwareUpdateCompleted))
+    {
+        bootReason = to_underlying(BootReasonType::kSoftwareUpdateCompleted);
+        return CHIP_NO_ERROR;
+    }
+
+    BootReasonType matterBootCause;
 
 #if defined(_RMU_RSTCAUSE_MASK)
     if (rebootCause & RMU_RSTCAUSE_PORST || rebootCause & RMU_RSTCAUSE_EXTRST) // PowerOn or External pin reset
@@ -283,10 +303,13 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     error = SilabsConfig::FactoryResetConfig();
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", chip::ErrorStr(error));
+        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %" CHIP_ERROR_FORMAT, error.Format());
     }
 
     GetDefaultInstance().ClearThreadStack();
+#ifdef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
+    Zigbee::TokenFactoryReset();
+#endif
 
     PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
 
@@ -294,7 +317,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     error = WifiInterface::GetInstance().TriggerDisconnection();
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %s", chip::ErrorStr(error));
+        ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %" CHIP_ERROR_FORMAT, error.Format());
     }
 
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
