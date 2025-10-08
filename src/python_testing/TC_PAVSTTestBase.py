@@ -307,7 +307,7 @@ class PAVSTTestBase:
         except InteractionModelError as e:
             if (e.status == Status.Busy):
                 asserts.assert_true(
-                    e.status == Status.NotFound, "Busy Status,Transport is currently uploading data" 
+                    e.status == Status.NotFound, "Busy Status,Transport is currently uploading data"
                 )
             asserts.assert_true(
                 e.status == Status.NotFound, "Unexpected error returned"
@@ -326,7 +326,7 @@ class PAVSTTestBase:
         except InteractionModelError as e:
             if (e.status == Status.Busy):
                 asserts.assert_true(
-                    e.status == Status.NotFound, "Busy Status,Transport is currently uploading data" 
+                    e.status == Status.NotFound, "Busy Status,Transport is currently uploading data"
                 )
             asserts.assert_true(
                 e.status == Status.NotFound, "Unexpected error returned"
