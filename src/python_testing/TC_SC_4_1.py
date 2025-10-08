@@ -353,7 +353,7 @@ class TC_SC_4_1(MatterBaseTest):
             #   - supports_icd is False.
             #   - supports_icd is True and supports_lit is True and ICD == '1'.
             sit_mode = self.supports_icd and (not self.supports_lit or icd_key == '0')
-            logging.info(f"\n\n\t** sit_mode: {sit_mode}\n")
+            logging.info("\n\n\t** sit_mode: {sit_mode}\n")
 
             # *** SII KEY ***
             if sit_mode:
@@ -557,7 +557,7 @@ class TC_SC_4_1(MatterBaseTest):
         #   - DUT starts advertising Commissionable Node Discovery service through DNS-SD.
         self.step(3)
         if supports_obcw:
-            logging.info(f"\n\n\t ** Open Basic Commissioning Window supported\n")
+            logging.info("\n\n\t ** Open Basic Commissioning Window supported\n")
             await self.default_controller.SendCommand(
                 nodeid=self.dut_node_id,
                 endpoint=0,
@@ -577,7 +577,7 @@ class TC_SC_4_1(MatterBaseTest):
             # Close commissioning window
             await self.close_commissioning_window()
         else:
-            logging.info(f"\n\n\t ** Open Basic Commissioning Window unsupported, skipping step.\n")
+            logging.info("\n\n\t ** Open Basic Commissioning Window unsupported, skipping step.\n")
 
         # *** STEP 4 ***
         # DUT is put in Commissioning Mode using Open Commissioning Window command and
