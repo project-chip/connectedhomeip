@@ -660,7 +660,6 @@ void PushAvStreamTransportManager::RecordingStreamPrivacyModeChanged(bool privac
     // To Do:
     // Depending on the change delegate should set transport status for each known connection to either active or inactive, plus
     // any other needed work.
-
 }
 
 CHIP_ERROR PushAvStreamTransportManager::IsPrivacyModeActive(bool & isActive)

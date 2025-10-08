@@ -205,8 +205,8 @@ CHIP_ERROR CameraAVStreamManager::IsStreamingPrivacyModeActive(bool & isActive)
 CHIP_ERROR CameraAVStreamManager::IsRecordingPrivacyModeActive(bool & isActive)
 {
     // Check privacy mode attributes
-    bool hardPrivacyMode           = GetCameraAVStreamMgmtServer()->GetHardPrivacyModeOn();
-    bool softRecordingPrivacyMode  = GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled();
+    bool hardPrivacyMode          = GetCameraAVStreamMgmtServer()->GetHardPrivacyModeOn();
+    bool softRecordingPrivacyMode = GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled();
 
     isActive = hardPrivacyMode || softRecordingPrivacyMode;
     return CHIP_NO_ERROR;
