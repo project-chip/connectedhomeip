@@ -220,7 +220,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         await asyncio.sleep(5)
 
-        blocks = provider_1.read_from_logs("QueryImage", regex=True, before=0, after=15)
+        blocks = provider_1.read_from_logs("QueryImage", before=0, after=15)
 
         parsed = {}
         for b in blocks:
