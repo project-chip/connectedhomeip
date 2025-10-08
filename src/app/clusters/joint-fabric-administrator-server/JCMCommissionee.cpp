@@ -28,7 +28,6 @@
 #include <controller/ReadInteraction.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
-#include <lib/support/logging/BinaryLogging.h>
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -39,13 +38,9 @@ namespace app {
 namespace Clusters {
 namespace JointFabricAdministrator {
 
-/*
- * DeviceCommissioner public interface and override implementation
- */
-CHIP_ERROR JCMCommissionee::VerifyTrustAgainstCommissionerAdmin()
+void JCMCommissionee::VerifyTrustAgainstCommissionerAdmin()
 {
     StartTrustVerification();
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR JCMCommissionee::OnLookupOperationalTrustAnchor(VendorId vendorID, Credentials::CertificateKeyId & subjectKeyId,
@@ -164,330 +159,146 @@ TrustVerificationError JCMCommissionee::ReadCommissionerAdminFabricIndex()
 {
     using Attr = chip::app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::TypeInfo;
 
-    mLocalAdminFabricIndex = kUndefinedFabricIndex;
-
     auto onSuccess = [this](const ConcreteAttributePath & path, const Attr::DecodableType & val) {
         if (val.IsNull())
         {
             ChipLogError(JointFabric, "JCM: Failed to read commissioner's AdministratorFabricIndex: received null");
             this->TrustVerificationStageFinished(kReadingCommissionerAdminFabricIndex,
-                                                 TrustVerificationError::kReadAdminFabricIndexFailed);
+                                                 TrustVerificationError::kReadAdminAttributeFailed);
         }
         else
         {
             FabricIndex remoteFabricIndex = static_cast<FabricIndex>(val.Value());
             if (!IsValidFabricIndex(remoteFabricIndex))
             {
-                ChipLogError(JointFabric, "JCM: AdministratorFabricIndex %u is out of range",
-                             static_cast<unsigned>(remoteFabricIndex));
+                ChipLogError(JointFabric, "JCM: AdministratorFabricIndex %u is invalid", static_cast<unsigned>(remoteFabricIndex));
                 this->TrustVerificationStageFinished(kReadingCommissionerAdminFabricIndex,
                                                      TrustVerificationError::kInvalidAdministratorFabricIndex);
                 return;
             }
             mInfo.adminFabricIndex = remoteFabricIndex;
-            ChipLogProgress(JointFabric, "JCM: Commissioner reports AdministratorFabricIndex=%u; resolving local fabric entry",
-                            static_cast<unsigned>(remoteFabricIndex));
-            this->FetchAdministratorFabricDescriptor(remoteFabricIndex);
+            this->TrustVerificationStageFinished(kReadingCommissionerAdminFabricIndex, TrustVerificationError::kSuccess);
         }
     };
 
     auto onError = [this](const ConcreteAttributePath *, CHIP_ERROR err) {
         ChipLogError(JointFabric, "JCM: Failed to read commissioner's AdministratorFabricIndex: %" CHIP_ERROR_FORMAT, err.Format());
         this->TrustVerificationStageFinished(kReadingCommissionerAdminFabricIndex,
-                                             TrustVerificationError::kReadAdminFabricIndexFailed);
+                                             TrustVerificationError::kReadAdminAttributeFailed);
     };
 
     Messaging::ExchangeContext * exchangeContext = mCommandHandle.Get()->GetExchangeContext();
-    SessionHandle session                        = exchangeContext->GetSessionHandle();
+    if (exchangeContext == nullptr)
+    {
+        return TrustVerificationError::kReadAdminAttributeFailed;
+    }
+    SessionHandle session = exchangeContext->GetSessionHandle();
 
     chip::Messaging::ExchangeManager * exchangeMgr = &chip::Server::GetInstance().GetExchangeManager();
-    CHIP_ERROR err = chip::Controller::ReadAttribute<Attr>(exchangeMgr, session, mInfo.adminEndpointId, onSuccess, onError,
-                                                           /*fabricFiltered=*/true);
+    CHIP_ERROR err = chip::Controller::ReadAttribute<Attr>(exchangeMgr, session, mInfo.adminEndpointId, onSuccess, onError, false);
 
     if (err == CHIP_NO_ERROR)
     {
         return TrustVerificationError::kAsync;
     }
 
-    return TrustVerificationError::kReadAdminFabricIndexFailed;
+    return TrustVerificationError::kReadAdminAttributeFailed;
 }
 
-void JCMCommissionee::FetchAdministratorFabricDescriptor(FabricIndex remoteFabricIndex)
+CHIP_ERROR JCMCommissionee::ReadAdminFabrics(OnCompletionFunc onComplete)
 {
-    using FabricsAttr                            = chip::app::Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo;
+    using FabricsAttr = chip::app::Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo;
+
     Messaging::ExchangeContext * exchangeContext = mCommandHandle.Get()->GetExchangeContext();
-    if (exchangeContext == nullptr)
-    {
-        ChipLogError(JointFabric, "JCM: Exchange context is no longer valid while resolving AdministratorFabricIndex");
-        TrustVerificationStageFinished(kReadingCommissionerAdminFabricIndex, TrustVerificationError::kReadAdminFabricIndexFailed);
-        return;
-    }
-    SessionHandle session = exchangeContext->GetSessionHandle();
-    auto onSuccess        = [this, remoteFabricIndex](const ConcreteAttributePath &, const FabricsAttr::DecodableType & fabrics) {
-        TrustVerificationError error = TrustVerificationError::kInvalidAdministratorFabricIndex;
-        auto iter                    = fabrics.begin();
+    SessionHandle session                        = exchangeContext->GetSessionHandle();
+    auto onReadSuccess = [this, onComplete](const ConcreteAttributePath &, const FabricsAttr::DecodableType & fabrics) {
+        // Get the root public key from the fabric corresponding to the Administrator Fabric Index (mInfo.adminFabricIndex)
+        auto iter = fabrics.begin();
         while (iter.Next())
         {
             const auto & fabricDescriptor = iter.GetValue();
-            if (fabricDescriptor.fabricIndex == remoteFabricIndex)
+            if (fabricDescriptor.fabricIndex == mInfo.adminFabricIndex)
             {
-                error = PopulateLocalAdminFabricInfo(remoteFabricIndex, fabricDescriptor);
+                mInfo.rootPublicKey.CopyFromSpan(fabricDescriptor.rootPublicKey);
+                mInfo.adminFabricId = fabricDescriptor.fabricID;
+                mInfo.adminVendorId = fabricDescriptor.vendorID;
+                ChipLogProgress(
+                    JointFabric,
+                    "JCM: Copied rootPublicKey, fabricID, and vendorID from fabric indicated by Administrator Fabric Index");
                 break;
             }
         }
-        if ((error == TrustVerificationError::kInvalidAdministratorFabricIndex) && (iter.GetStatus() != CHIP_NO_ERROR))
-        {
-            ChipLogError(JointFabric, "JCM: Failed to decode Fabrics list while resolving AdministratorFabricIndex %u",
-                                static_cast<unsigned>(remoteFabricIndex));
-            error = TrustVerificationError::kInternalError;
-        }
-        if (error == TrustVerificationError::kSuccess)
-        {
-            CHIP_ERROR credsErr = FetchAdministratorOperationalCredentials(remoteFabricIndex);
-            if (credsErr == CHIP_NO_ERROR)
-            {
-                return;
-            }
-            ChipLogError(JointFabric, "JCM: Failed to initiate administrator credential read: %" CHIP_ERROR_FORMAT,
-                                credsErr.Format());
-            error = TrustVerificationError::kInternalError;
-        }
-        if (error != TrustVerificationError::kSuccess)
-        {
-            ChipLogError(JointFabric, "JCM: Unable to resolve AdministratorFabricIndex %u to a local fabric entry",
-                                static_cast<unsigned>(remoteFabricIndex));
-        }
-        TrustVerificationStageFinished(kReadingCommissionerAdminFabricIndex, error);
+        onComplete(CHIP_NO_ERROR);
     };
-    auto onError = [this](const ConcreteAttributePath *, CHIP_ERROR err) {
+    auto onError = [this, onComplete](const ConcreteAttributePath *, CHIP_ERROR err) {
         ChipLogError(JointFabric, "JCM: Failed to read commissioner's Fabrics list: %" CHIP_ERROR_FORMAT, err.Format());
-        TrustVerificationStageFinished(kReadingCommissionerAdminFabricIndex, TrustVerificationError::kReadAdminFabricIndexFailed);
+        onComplete(err);
     };
-    CHIP_ERROR err = chip::Controller::ReadAttribute<FabricsAttr>(&chip::Server::GetInstance().GetExchangeManager(), session,
-                                                                  kRootEndpointId, onSuccess, onError,
-                                                                  /*fabricFiltered=*/true);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(JointFabric, "JCM: Failed to initiate Fabrics read: %" CHIP_ERROR_FORMAT, err.Format());
-        TrustVerificationStageFinished(kReadingCommissionerAdminFabricIndex, TrustVerificationError::kReadAdminFabricIndexFailed);
-    }
-}
-Credentials::JCM::TrustVerificationError JCMCommissionee::PopulateLocalAdminFabricInfo(
-    FabricIndex remoteFabricIndex,
-    const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType & fabricDescriptor)
-{
-    if (fabricDescriptor.rootPublicKey.size() != Crypto::kP256_PublicKey_Length)
-    {
-        ChipLogError(JointFabric, "JCM: Root public key size mismatch while resolving AdministratorFabricIndex %u",
-                     static_cast<unsigned>(remoteFabricIndex));
-        return TrustVerificationError::kInternalError;
-    }
-    Crypto::P256PublicKey remoteRootPublicKey;
-    memcpy(remoteRootPublicKey.Bytes(), fabricDescriptor.rootPublicKey.data(), fabricDescriptor.rootPublicKey.size());
-    const FabricTable & fabricTable = Server::GetInstance().GetFabricTable();
-    const FabricInfo * localFabric  = fabricTable.FindFabric(remoteRootPublicKey, fabricDescriptor.fabricID);
-    if (localFabric == nullptr)
-    {
-        for (const auto & candidate : fabricTable)
-        {
-            if (candidate.GetFabricId() != fabricDescriptor.fabricID)
-            {
-                continue;
-            }
-            Crypto::P256PublicKey candidateRoot;
-            if ((candidate.FetchRootPubkey(candidateRoot) == CHIP_NO_ERROR) &&
-                (candidateRoot.Length() == fabricDescriptor.rootPublicKey.size()) &&
-                (memcmp(candidateRoot.ConstBytes(), fabricDescriptor.rootPublicKey.data(), candidateRoot.Length()) == 0))
-            {
-                localFabric = &candidate;
-                break;
-            }
-        }
-    }
-    if (localFabric == nullptr)
-    {
-        return TrustVerificationError::kInvalidAdministratorFabricIndex;
-    }
-    mLocalAdminFabricIndex = localFabric->GetFabricIndex();
-    ChipLogProgress(JointFabric, "JCM: Administrator fabric resolved: remote=%u local=%u", static_cast<unsigned>(remoteFabricIndex),
-                    static_cast<unsigned>(mLocalAdminFabricIndex));
-    return TrustVerificationError::kSuccess;
+    return chip::Controller::ReadAttribute<FabricsAttr>(&chip::Server::GetInstance().GetExchangeManager(), session, kRootEndpointId,
+                                                        onReadSuccess, onError, false);
 }
 
-CHIP_ERROR JCMCommissionee::FetchAdministratorOperationalCredentials(FabricIndex remoteFabricIndex)
+void JCMCommissionee::FetchCommissionerInfo(OnCompletionFunc onComplete)
 {
-    using TrustedRootAttr = chip::app::Clusters::OperationalCredentials::Attributes::TrustedRootCertificates::TypeInfo;
-
-    Messaging::ExchangeContext * exchangeContext = mCommandHandle.Get()->GetExchangeContext();
-    VerifyOrReturnError(exchangeContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    SessionHandle session = exchangeContext->GetSessionHandle();
-
-    auto onSuccess = [this, remoteFabricIndex](const ConcreteAttributePath &, const TrustedRootAttr::DecodableType & roots) {
-        TrustVerificationError result = TrustVerificationError::kInternalError;
-
-        auto iter = roots.begin();
-        if (iter.Next())
+    CHIP_ERROR fabricReadErr = ReadAdminFabrics([this, onComplete](CHIP_ERROR err) {
+        if (err != CHIP_NO_ERROR)
         {
-            ByteSpan rootSpan = iter.GetValue();
-            mInfo.adminRCAC.CopyFromSpan(rootSpan);
-            if ((rootSpan.size() == 0) || (mInfo.adminRCAC.AllocatedSize() != rootSpan.size()))
-            {
-                ChipLogError(JointFabric, "JCM: Failed to store administrator root cert");
-                result = TrustVerificationError::kInternalError;
-            }
-            else
-            {
-                ChipLogProgress(JointFabric, "JCM: Admin RCAC contents");
-                ChipLogByteSpan(JointFabric, rootSpan);
-                result = TrustVerificationError::kSuccess;
-            }
-        }
-        else if (iter.GetStatus() == CHIP_NO_ERROR)
-        {
-            ChipLogError(JointFabric, "JCM: Trusted root list empty for AdministratorFabricIndex %u",
-                         static_cast<unsigned>(remoteFabricIndex));
-            result = TrustVerificationError::kInvalidAdministratorFabricIndex;
-        }
-        else
-        {
-            ChipLogError(JointFabric, "JCM: Failed to decode trusted roots while resolving AdministratorFabricIndex %u",
-                         static_cast<unsigned>(remoteFabricIndex));
-            result = TrustVerificationError::kInternalError;
-        }
-
-        if (result == TrustVerificationError::kSuccess)
-        {
-            CHIP_ERROR err = FetchAdministratorNOCs(remoteFabricIndex);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(JointFabric, "JCM: Failed to initiate commissioner's NOCs read: %" CHIP_ERROR_FORMAT, err.Format());
-                TrustVerificationStageFinished(kReadingCommissionerAdminFabricIndex, TrustVerificationError::kInternalError);
-            }
+            onComplete(err);
             return;
         }
 
-        TrustVerificationStageFinished(kReadingCommissionerAdminFabricIndex, result);
-    };
-
-    auto onError = [this](const ConcreteAttributePath *, CHIP_ERROR err) {
-        ChipLogError(JointFabric, "JCM: Failed to read commissioner's trusted roots: %" CHIP_ERROR_FORMAT, err.Format());
-        TrustVerificationStageFinished(kReadingCommissionerAdminFabricIndex, TrustVerificationError::kInternalError);
-    };
-
-    return chip::Controller::ReadAttribute<TrustedRootAttr>(&chip::Server::GetInstance().GetExchangeManager(), session,
-                                                            kRootEndpointId, onSuccess, onError, /*fabricFiltered=*/true);
-}
-
-CHIP_ERROR JCMCommissionee::FetchAdministratorNOCs(FabricIndex remoteFabricIndex)
-{
-    using NOCsAttr = chip::app::Clusters::OperationalCredentials::Attributes::NOCs::TypeInfo;
-
-    Messaging::ExchangeContext * exchangeContext = mCommandHandle.Get()->GetExchangeContext();
-    VerifyOrReturnError(exchangeContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    SessionHandle session = exchangeContext->GetSessionHandle();
-
-    auto onSuccess = [this, remoteFabricIndex](const ConcreteAttributePath &, const NOCsAttr::DecodableType & nocs) {
-        TrustVerificationError result = TrustVerificationError::kInvalidAdministratorFabricIndex;
-
-        auto iter = nocs.begin();
-        while (iter.Next())
-        {
-            const auto & nocStruct = iter.GetValue();
-
-            if (nocStruct.fabricIndex == remoteFabricIndex)
+        CHIP_ERROR certReadErr = ReadAdminCerts([this, onComplete](CHIP_ERROR err) {
+            if (err != CHIP_NO_ERROR)
             {
-                ByteSpan nocSpan = nocStruct.noc;
-                mInfo.adminNOC.CopyFromSpan(nocSpan);
-                if ((nocSpan.size() == 0) || (mInfo.adminNOC.AllocatedSize() != nocSpan.size()))
-                {
-                    ChipLogError(JointFabric, "JCM: Failed to store administrator NOC");
-                    result = TrustVerificationError::kInternalError;
-                    break;
-                }
-
-                if (!nocStruct.icac.IsNull())
-                {
-                    ByteSpan icacSpan = nocStruct.icac.Value();
-                    mInfo.adminICAC.CopyFromSpan(icacSpan);
-                    if ((icacSpan.size() != 0) && (mInfo.adminICAC.AllocatedSize() != icacSpan.size()))
-                    {
-                        ChipLogError(JointFabric, "JCM: Failed to store administrator ICAC");
-                        result = TrustVerificationError::kInternalError;
-                        break;
-                    }
-                    if (icacSpan.size() != 0)
-                    {
-                        ChipLogProgress(JointFabric, "JCM: Admin ICAC contents");
-                        ChipLogByteSpan(JointFabric, icacSpan);
-                    }
-                }
-                else
-                {
-                    mInfo.adminICAC.Free();
-                }
-
-                ChipLogProgress(JointFabric, "JCM: Admin NOC contents");
-                ChipLogByteSpan(JointFabric, nocSpan);
-
-                result = TrustVerificationError::kSuccess;
-                break;
+                onComplete(err);
+                return;
             }
-        }
 
-        if (iter.GetStatus() != CHIP_NO_ERROR)
+            CHIP_ERROR nocReadErr = ReadAdminNOCs([this, onComplete](CHIP_ERROR err) { onComplete(err); });
+            if (nocReadErr != CHIP_NO_ERROR)
+            {
+                onComplete(nocReadErr);
+            }
+        });
+        if (certReadErr != CHIP_NO_ERROR)
         {
-            ChipLogError(JointFabric, "JCM: Failed to decode NOCs list while resolving AdministratorFabricIndex %u",
-                         static_cast<unsigned>(remoteFabricIndex));
-            result = TrustVerificationError::kInternalError;
+            onComplete(certReadErr);
         }
-        else if (result != TrustVerificationError::kSuccess)
-        {
-            ChipLogError(JointFabric, "JCM: Unable to locate NOC entry for AdministratorFabricIndex %u",
-                         static_cast<unsigned>(remoteFabricIndex));
-        }
+    });
 
-        TrustVerificationStageFinished(kReadingCommissionerAdminFabricIndex, result);
-    };
-
-    auto onError = [this](const ConcreteAttributePath *, CHIP_ERROR err) {
-        ChipLogError(JointFabric, "JCM: Failed to read commissioner's NOCs list: %" CHIP_ERROR_FORMAT, err.Format());
-        TrustVerificationStageFinished(kReadingCommissionerAdminFabricIndex, TrustVerificationError::kReadAdminFabricIndexFailed);
-    };
-
-    return chip::Controller::ReadAttribute<NOCsAttr>(&chip::Server::GetInstance().GetExchangeManager(), session, kRootEndpointId,
-                                                     onSuccess, onError, /*fabricFiltered=*/true);
+    if (fabricReadErr != CHIP_NO_ERROR)
+    {
+        onComplete(fabricReadErr);
+    }
 }
 
 TrustVerificationError JCMCommissionee::PerformVendorIdVerification()
 {
-    TrustVerificationError parseError = this->ParseCommissionerAdminInfo();
-    if (parseError != TrustVerificationError::kSuccess)
-    {
-        ChipLogError(JointFabric, "JCM: Failed to parse commissioner administrator info");
-        return parseError;
-    }
-
-    chip::Messaging::ExchangeManager * exchangeMgr = &chip::Server::GetInstance().GetExchangeManager();
-
-    auto sessionHandleGetter = [this]() -> Optional<SessionHandle> {
-        Messaging::ExchangeContext * ec = this->mCommandHandle.Get()->GetExchangeContext();
-        if (ec == nullptr)
+    FetchCommissionerInfo([this](CHIP_ERROR err) {
+        if (err != CHIP_NO_ERROR)
         {
-            return Optional<SessionHandle>::Missing();
+            ChipLogError(JointFabric, "Failed to read commissioner info. Error: %" CHIP_ERROR_FORMAT, err.Format());
+            OnVendorIdVerficationComplete(err);
         }
-        return MakeOptional(ec->GetSessionHandle());
-    };
 
-    // Kick off async vendor ID verification
-    CHIP_ERROR err = VerifyVendorId(exchangeMgr, sessionHandleGetter, &mInfo);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(JointFabric, "JCM: Failed to start VendorId verification: %s", ErrorStr(err));
-        OnVendorIdVerficationComplete(err);
-        return TrustVerificationError::kVendorIdVerificationFailed;
-    }
+        chip::Messaging::ExchangeManager * exchangeMgr = &chip::Server::GetInstance().GetExchangeManager();
+
+        auto sessionHandleGetter = [this]() -> Optional<SessionHandle> {
+            Messaging::ExchangeContext * ec = this->mCommandHandle.Get()->GetExchangeContext();
+            if (ec == nullptr)
+            {
+                return Optional<SessionHandle>::Missing();
+            }
+            return MakeOptional(ec->GetSessionHandle());
+        };
+
+        CHIP_ERROR verifyErr = VerifyVendorId(exchangeMgr, sessionHandleGetter, &mInfo);
+        if (verifyErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(JointFabric, "JCM: Failed to start VendorId verification: %s", ErrorStr(err));
+            OnVendorIdVerficationComplete(verifyErr);
+        }
+    });
 
     return TrustVerificationError::kAsync;
 }
@@ -509,10 +320,19 @@ TrustVerificationError JCMCommissionee::CrossCheckAdministratorIds()
 
     Crypto::P256PublicKey accessingRootPubKey;
     CHIP_ERROR err = accessingFabricInfo->FetchRootPubkey(accessingRootPubKey);
-    if (err != CHIP_NO_ERROR || accessingRootPubKey.Length() != Crypto::kP256_PublicKey_Length ||
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(JointFabric, "JCM: Unable to fetch accessing RootPublicKey");
+    }
+    const size_t accessingKeyLen    = accessingRootPubKey.Length();
+    const size_t commissionerKeyLen = mInfo.rootPublicKey.AllocatedSize();
+    if (accessingRootPubKey.Length() != Crypto::kP256_PublicKey_Length ||
         mInfo.rootPublicKey.AllocatedSize() != Crypto::kP256_PublicKey_Length)
     {
-        ChipLogError(JointFabric, "JCM: Unable to fetch or size-mismatch accessing RootPublicKey");
+        ChipLogError(JointFabric,
+                     "JCM: RootPublicKey length mismatch: Accessing RootPublicKey length is %ld, but RootPublicKey read from "
+                     "commissioner is %ld",
+                     accessingKeyLen, commissionerKeyLen);
         return TrustVerificationError::kInternalError;
     }
 
@@ -525,68 +345,114 @@ TrustVerificationError JCMCommissionee::CrossCheckAdministratorIds()
     return TrustVerificationError::kSuccess;
 }
 
-TrustVerificationError JCMCommissionee::ParseCommissionerAdminInfo()
+CHIP_ERROR JCMCommissionee::ReadAdminCerts(OnCompletionFunc onComplete)
 {
-    const FabricIndex fabricIndex       = mLocalAdminFabricIndex;
-    const FabricIndex remoteFabricIndex = mInfo.adminFabricIndex;
-    if (!IsValidFabricIndex(fabricIndex))
-    {
-        ChipLogError(JointFabric, "JCM: Local administrator fabric index not resolved");
-        return TrustVerificationError::kInvalidAdministratorFabricIndex;
-    }
+    using CertsAttr = chip::app::Clusters::OperationalCredentials::Attributes::TrustedRootCertificates::TypeInfo;
 
-    // Populate mInfo from local FabricTable for the target fabric
-    const FabricTable & fabricTable = Server::GetInstance().GetFabricTable();
-    const FabricInfo * fabricInfo   = fabricTable.FindFabricWithIndex(fabricIndex);
-    VerifyOrReturnError(fabricInfo != nullptr, TrustVerificationError::kInvalidAdministratorFabricIndex);
+    Messaging::ExchangeContext * exchangeContext = mCommandHandle.Get()->GetExchangeContext();
+    VerifyOrReturnError(exchangeContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    SessionHandle session = exchangeContext->GetSessionHandle();
 
-    mInfo.adminVendorId = fabricInfo->GetVendorId();
-    mInfo.adminFabricId = fabricInfo->GetFabricId();
+    auto onSuccess = [this, onComplete](const ConcreteAttributePath &, const CertsAttr::DecodableType & roots) {
+        // Find the RCAC
+        auto iter = roots.begin();
+        if (!iter.Next())
+        {
+            CHIP_ERROR status = iter.GetStatus();
+            ChipLogError(JointFabric, "JCM: Admin RCAC not found. iter status: %" CHIP_ERROR_FORMAT, status.Format());
+            onComplete(CHIP_ERROR_INTERNAL);
+            return;
+        }
+        ByteSpan rootSpan = iter.GetValue();
 
-    ChipLogProgress(
-        JointFabric, "JCM: Administrator fabric mapped remote index %u to local index %u (FabricID=0x" ChipLogFormatX64 ")",
-        static_cast<unsigned>(remoteFabricIndex), static_cast<unsigned>(fabricIndex), ChipLogValueX64(mInfo.adminFabricId));
+        // Copy the RCAC to mInfo
+        mInfo.adminRCAC.CopyFromSpan(rootSpan);
+        if ((rootSpan.size() == 0) || (mInfo.adminRCAC.AllocatedSize() != rootSpan.size()))
+        {
+            ChipLogError(JointFabric, "JCM: Failed to store administrator root cert");
+            onComplete(CHIP_ERROR_INTERNAL);
+            return;
+        }
+        ChipLogProgress(JointFabric, "JCM: Successfully read admin RCAC");
 
-    // Fetch root public key
-    Crypto::P256PublicKey rootPubKey;
-    if (fabricInfo->FetchRootPubkey(rootPubKey) != CHIP_NO_ERROR)
-    {
-        ChipLogError(JointFabric, "JCM: Failed to fetch fabric root key");
-        return TrustVerificationError::kInternalError;
-    }
-    if (rootPubKey.Length() != Crypto::kP256_PublicKey_Length)
-    {
-        ChipLogError(JointFabric, "JCM: Fabric root key size mismatch");
-        return TrustVerificationError::kInternalError;
-    }
-    const chip::ByteSpan keySpan(rootPubKey.ConstBytes(), rootPubKey.Length());
-    mInfo.rootPublicKey.CopyFromSpan(keySpan);
-    ChipLogProgress(JointFabric, "JCM: Admin RootPublicKey contents");
-    ChipLogByteSpan(JointFabric, keySpan);
+        onComplete(CHIP_NO_ERROR);
+    };
 
-    if (mInfo.adminRCAC.AllocatedSize() == 0 || mInfo.adminNOC.AllocatedSize() == 0)
-    {
-        ChipLogError(JointFabric, "JCM: Administrator credentials missing after remote fetch");
-        return TrustVerificationError::kInternalError;
-    }
+    auto onError = [this, onComplete](const ConcreteAttributePath *, CHIP_ERROR err) {
+        ChipLogError(JointFabric, "JCM: Failed to read commissioner RCAC: %" CHIP_ERROR_FORMAT, err.Format());
+        onComplete(err);
+    };
 
-    ChipLogProgress(JointFabric, "JCM: Admin RCAC contents");
-    ChipLogByteSpan(JointFabric, ByteSpan(mInfo.adminRCAC.Get(), mInfo.adminRCAC.AllocatedSize()));
+    return chip::Controller::ReadAttribute<CertsAttr>(&chip::Server::GetInstance().GetExchangeManager(), session, kRootEndpointId,
+                                                      onSuccess, onError, false);
+}
 
-    if (mInfo.adminICAC.AllocatedSize() > 0)
-    {
-        ChipLogProgress(JointFabric, "JCM: Admin ICAC contents");
-        ChipLogByteSpan(JointFabric, ByteSpan(mInfo.adminICAC.Get(), mInfo.adminICAC.AllocatedSize()));
-    }
-    else
-    {
-        ChipLogProgress(JointFabric, "JCM: Admin ICAC not present");
-    }
+CHIP_ERROR JCMCommissionee::ReadAdminNOCs(OnCompletionFunc onComplete)
+{
+    using NOCsAttr = chip::app::Clusters::OperationalCredentials::Attributes::NOCs::TypeInfo;
 
-    ChipLogProgress(JointFabric, "JCM: Admin NOC contents");
-    ChipLogByteSpan(JointFabric, ByteSpan(mInfo.adminNOC.Get(), mInfo.adminNOC.AllocatedSize()));
+    Messaging::ExchangeContext * exchangeContext = mCommandHandle.Get()->GetExchangeContext();
+    VerifyOrReturnError(exchangeContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    SessionHandle session = exchangeContext->GetSessionHandle();
 
-    return TrustVerificationError::kSuccess;
+    auto onSuccess = [this, onComplete](const ConcreteAttributePath &, const NOCsAttr::DecodableType & nocs) {
+        auto iter = nocs.begin();
+
+        while (iter.Next())
+        {
+            auto & nocStruct = iter.GetValue();
+
+            // Search for the NOC struct that matches the Administrator Fabric Index
+            if (nocStruct.fabricIndex != mInfo.adminFabricIndex)
+            {
+                continue;
+            }
+
+            // Get the NOC and ICAC from the noc struct
+            mInfo.adminNOC.CopyFromSpan(nocStruct.noc);
+            size_t nocSize = nocStruct.noc.size();
+            if ((nocSize == 0) || (mInfo.adminNOC.AllocatedSize() != nocSize))
+            {
+                ChipLogError(JointFabric, "JCM: Failed to store administrator NOC");
+                onComplete(CHIP_ERROR_INTERNAL);
+                return;
+            }
+
+            if (nocStruct.icac.IsNull())
+            {
+                ChipLogError(JointFabric, "JCM: ICAC not found");
+                onComplete(CHIP_ERROR_INTERNAL);
+                return;
+            }
+            ByteSpan icacSpan = nocStruct.icac.Value();
+            mInfo.adminICAC.CopyFromSpan(icacSpan);
+            size_t icacSize = icacSpan.size();
+            if ((icacSize == 0) || (mInfo.adminICAC.AllocatedSize() != icacSize))
+            {
+                ChipLogError(JointFabric, "JCM: Failed to store administrator ICAC");
+                onComplete(CHIP_ERROR_INTERNAL);
+                return;
+            }
+        }
+        CHIP_ERROR err = iter.GetStatus();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(JointFabric, "JCM: Error decoding NOCs. iter status: %" CHIP_ERROR_FORMAT, err.Format());
+            onComplete(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogProgress(JointFabric, "JCM: Successfully read NOC and ICAC");
+        onComplete(CHIP_NO_ERROR);
+    };
+
+    auto onError = [this, onComplete](const ConcreteAttributePath *, CHIP_ERROR err) {
+        ChipLogError(JointFabric, "JCM: Failed to read commissioner NOCs: %" CHIP_ERROR_FORMAT, err.Format());
+        onComplete(err);
+    };
+
+    return chip::Controller::ReadAttribute<NOCsAttr>(&chip::Server::GetInstance().GetExchangeManager(), session, kRootEndpointId,
+                                                     onSuccess, onError, false);
 }
 
 } // namespace JointFabricAdministrator

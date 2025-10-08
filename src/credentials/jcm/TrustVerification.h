@@ -73,7 +73,7 @@ enum class TrustVerificationError : uint16_t
     kTrustVerificationDelegateNotSet = 103,
     kUserDeniedConsent               = 104,
     kVendorIdVerificationFailed      = 105,
-    kReadAdminFabricIndexFailed      = 106,
+    kReadAdminAttributeFailed        = 106,
     kAdministratorIdMismatched       = 107,
 
     kInternalError = 200,
@@ -121,8 +121,8 @@ inline std::string EnumToString(TrustVerificationError error)
         return "USER_DENIED_CONSENT";
     case TrustVerificationError::kVendorIdVerificationFailed:
         return "VENDOR_ID_VERIFICATION_FAILED";
-    case TrustVerificationError::kReadAdminFabricIndexFailed:
-        return "READ_ADMIN_FABRIC_INDEX_FAILED";
+    case TrustVerificationError::kReadAdminAttributeFailed:
+        return "READ_ADMIN_ATTRIBUTE_FAILED";
     case TrustVerificationError::kAdministratorIdMismatched:
         return "ADMINISTRATOR_ID_MISMATCHED";
     case TrustVerificationError::kInternalError:
