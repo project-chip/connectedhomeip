@@ -706,10 +706,6 @@
 
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS                                                                                                  \
-    const EmberAfGenericClusterFunction chipFuncArrayFixedLabelServer[] = {                                                        \
-        (EmberAfGenericClusterFunction) emberAfFixedLabelClusterServerInitCallback,                                                \
-        (EmberAfGenericClusterFunction) MatterFixedLabelClusterServerShutdownCallback,                                             \
-    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayIdentifyServer[] = {                                                          \
         (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerInitCallback,                                                  \
         (EmberAfGenericClusterFunction) MatterIdentifyClusterServerAttributeChangedCallback,                                       \
@@ -1310,7 +1306,7 @@
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
         { ZAP_CLUSTER_INDEX(0), 21, 87 },                                                                                          \
-        { ZAP_CLUSTER_INDEX(21), 8, 107 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(21), 8, 105 },                                                                                         \
     }
 
 // Largest attribute size is needed for various buffers
@@ -1322,7 +1318,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (194)
+#define ATTRIBUTE_MAX_SIZE (192)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)

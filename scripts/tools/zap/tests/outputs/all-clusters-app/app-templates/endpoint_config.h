@@ -2927,10 +2927,6 @@
     const EmberAfGenericClusterFunction chipFuncArrayGroupsServer[] = {                                                            \
         (EmberAfGenericClusterFunction) emberAfGroupsClusterServerInitCallback,                                                    \
     };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayFixedLabelServer[] = {                                                        \
-        (EmberAfGenericClusterFunction) emberAfFixedLabelClusterServerInitCallback,                                                \
-        (EmberAfGenericClusterFunction) MatterFixedLabelClusterServerShutdownCallback,                                             \
-    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayIdentifyServer[] = {                                                          \
         (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerInitCallback,                                                  \
         (EmberAfGenericClusterFunction) MatterIdentifyClusterServerAttributeChangedCallback,                                       \
@@ -4951,9 +4947,9 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 28, 197 },                                                                                         \
-        { ZAP_CLUSTER_INDEX(28), 73, 3438 },                                                                                       \
-        { ZAP_CLUSTER_INDEX(101), 7, 112 },                                                                                        \
+        { ZAP_CLUSTER_INDEX(0), 28, 195 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(28), 73, 3428 },                                                                                       \
+        { ZAP_CLUSTER_INDEX(101), 7, 108 },                                                                                        \
         { ZAP_CLUSTER_INDEX(108), 2, 0 },                                                                                          \
     }
 
@@ -4966,7 +4962,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (3747)
+#define ATTRIBUTE_MAX_SIZE (3731)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (4)
