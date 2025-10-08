@@ -2566,6 +2566,64 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::MicrowaveOvenMode::Structs::ModeTagStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("MfgCode", indent + 1, value.mfgCode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MfgCode'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Value", indent + 1, value.value);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Value'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::MicrowaveOvenMode::Structs::ModeOptionStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Label", indent + 1, value.label);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Label'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Mode", indent + 1, value.mode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Mode'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ModeTags", indent + 1, value.modeTags);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ModeTags'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::DecodableType & value)

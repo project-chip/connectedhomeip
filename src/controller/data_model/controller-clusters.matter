@@ -3959,7 +3959,7 @@ cluster DishwasherAlarm = 93 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster MicrowaveOvenMode = 94 {
-  revision 1;
+  revision 2;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3976,12 +3976,12 @@ cluster MicrowaveOvenMode = 94 {
     kDefrost = 16385;
   }
 
-  shared struct ModeTagStruct {
+  struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
 
-  shared struct ModeOptionStruct {
+  struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
     ModeTagStruct modeTags[] = 2;
