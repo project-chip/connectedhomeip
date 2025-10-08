@@ -12,17 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import os
-import re
 import signal
 import re
 import tempfile
 from dataclasses import dataclass
-from datetime import datetime
-from sys import stderr, stdout
-from time import sleep
 from typing import BinaryIO, Optional, Union
+from sys import stdout
 
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
@@ -59,7 +55,7 @@ class AppServerSubprocess(Subprocess):
     PREFIX = b"[SERVER]"
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: list[str] = [], f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
+                 passcode: int, port: int = 5540, extra_args: list[str] = [], f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stdout.buffer):
         # Create a temporary KVS file and keep the descriptor to avoid leaks.
         self.kvs_fd, kvs_path = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")
         try:
@@ -150,8 +146,6 @@ class OTAProviderSubprocess(AppServerSubprocess):
     """Wrapper class for starting an OTA Provider application server in a subprocess."""
 
     DEFAULT_ADMIN_NODE_ID = 112233
-    log_file = ""
-    err_log_file = ""
 
     # Prefix for log messages from the OTA provider application.
     PREFIX = b"[OTA-PROVIDER]"
@@ -160,7 +154,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5541, extra_args: list[str] = [], log_file: Union[str, BinaryIO] = stdout.buffer, err_log_file: Union[str, BinaryIO] = stderr.buffer):
+                 port: int = 5541, extra_args: list[str] = [], log_file: str = "/tmp/provider.log", err_log_file: str = ""):
         """Initialize the OTA Provider subprocess.
 
         Args:
@@ -171,17 +165,17 @@ class OTAProviderSubprocess(AppServerSubprocess):
             port: UDP port for secure connections (default: 5541)
             ota_source: Either OtaImagePath or ImageListPath specifying the OTA image source
             extra_args: Additional command line arguments
-            log_file: Path to create the BinaryIO logger for stdoutput, if not use the default stdout.buffer.
-            err_log_file: Path to create the BinaryIO logger for stderr, if not use the default stderr.buffer.
+            log_file: Destination as str for the log file that will be handled as BinaryIO
+            err_log_file: Destination of error log file that will be handled as BinaryIO, if not provided, errors log will be sent into log_file
         """
-        # Create the BinaryIO fp allow to use
-        if isinstance(log_file, str):
-            f_stdout = open(log_file, 'a+b')
-            self.log_file = log_file
-
-        if isinstance(err_log_file, str):
-            f_stderr = open(err_log_file, 'a+b')
-            self.err_log_file = err_log_file
+        # Create the BinaryIO fp.
+        f_stdout = open(log_file, 'a+b')
+        if err_log_file == "":
+            f_stderr = f_stdout
+        else:
+            f_stdout = open(err_log_file, 'a+b')
+        self.log_file = log_file
+        self.err_log_file = err_log_file
 
         # Build OTA-specific arguments using the ota_source property
         combined_extra_args = ota_source.ota_args + extra_args
@@ -199,21 +193,8 @@ class OTAProviderSubprocess(AppServerSubprocess):
     def get_pid(self) -> int:
         return self.p.pid
 
-    def read_from_logs(self, pattern: str, regex: bool = True, before: int = 4, after: int = 4) -> list[dict]:
-        """Search for a string a return the matches. 
-
-        Args:
-            pattern (str): _description_
-            regex (bool, optional): _description_. Defaults to True.
-            before (int, optional): _description_. Defaults to 4.
-            after (int, optional): _description_. Defaults to 4.
-
-        Raises:
-            FileNotFoundError: _description_
-
-        Returns:
-            list[dict]: _description_
-        """
+    def read_from_logs(self, pattern: str, regex: bool = True) -> list[str]:
+        "Reads from logs for an especific pattern a return the found lines"
         if not os.path.exists(self.log_file):
             raise FileNotFoundError
 
@@ -223,29 +204,17 @@ class OTAProviderSubprocess(AppServerSubprocess):
             all_lines = fp.readlines()
 
         found_lines = []
-        re_expr = re.compile(pattern=pattern)
+        re_expr = None
+        if regex:
+            re_expr = re.compile(pattern=pattern)
 
-        for index, line in enumerate(all_lines):
-            n_line = line.decode("utf-8", 'replace')
-            if regex and re_expr.match(n_line) is not None:
-                match = {
-                    'before': [],
-                    'match': n_line,
-                    'line': index,
-                    'after': []
-                }
-                found_lines.append(match)
+        for line in all_lines:
+            n_line = line.decode("utf-8")
+            if regex and re_expr.match(n_line):
+                found_lines.append(n_line)
             else:
                 if pattern in n_line:
-                    before_lines = all_lines[(index-before):index]
-                    after_lines = all_lines[index+1:(index+after+1)]
-                    match = {
-                        'before': list(map(lambda x: x.decode("utf-8"), before_lines)),
-                        'match': n_line,
-                        'line': index,
-                        'after': list(map(lambda x: x.decode("utf-8"), after_lines))
-                    }
-                    found_lines.append(match)
+                    found_lines.append(n_line)
 
         return found_lines
 
@@ -295,32 +264,3 @@ class OTAProviderSubprocess(AppServerSubprocess):
             nodeid=provider_node_id,
             attributes=[(0, acl_attribute)]
         )
-
-
-## Basic testing Remove after Complete##
-## Remove libaries only used on this test ##
-if __name__ == "__main__":
-    ota_image_path = OtaImagePath(path='/Users/<>/workspace/github/connectedhomeip/chip-ota-requestor-app_v2.min.ota')
-    now = datetime.now()
-    ts = int(now.timestamp())
-    log_file = f"/tmp/provider_{ts}.log"
-    print("LOGFILE:" + log_file)
-
-    proc = OTAProviderSubprocess(
-        app='/Users/<>/workspace/github/connectedhomeip/out/debug/chip-ota-provider-app',
-        storage_dir='/tmp',
-        port=5541,
-        discriminator=321,
-        passcode=2321,
-        ota_source=ota_image_path,
-        extra_args=[],
-        log_file=log_file,
-    )
-    proc.start(
-        expected_output="Server initialization complete",
-        timeout=10)
-    sleep(2)
-    lines = proc.read_from_logs(pattern="Using WiFi MAC for hostname", regex=False)
-    print(json.dumps(lines))
-
-    proc.terminate()
