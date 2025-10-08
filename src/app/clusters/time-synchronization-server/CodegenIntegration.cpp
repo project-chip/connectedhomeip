@@ -17,7 +17,6 @@
  */
 
 #include <app/clusters/time-synchronization-server/CodegenIntegration.h>
-#include <app/clusters/time-synchronization-server/DefaultTimeSyncDelegate.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/TimeSynchronization.h>
@@ -36,11 +35,10 @@ namespace {
 static constexpr size_t kTimeSynchronizationFixedClusterCount =
     TimeSynchronization::StaticApplicationConfig::kFixedClusterConfig.size();
 
-// TODO: Enable this check later
-// static_assert((kTimeSynchronizationFixedClusterCount == 0) ||
-//                  ((kTimeSynchronizationFixedClusterCount == 1) &&
-//                   TimeSynchronization::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId),
-//              "Time Synchronization cluster MUST be on endpoint 0");
+static_assert((kTimeSynchronizationFixedClusterCount == 0) ||
+                  ((kTimeSynchronizationFixedClusterCount == 1) &&
+                   TimeSynchronization::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId),
+              "Time Synchronization cluster MUST be on endpoint 0");
 
 LazyRegisteredServerCluster<TimeSynchronizationCluster> gServer;
 
@@ -88,8 +86,7 @@ public:
 
 void MatterTimeSynchronizationClusterInitCallback(EndpointId endpointId)
 {
-    // TODO: Enable this check later
-    // VerifyOrReturn(endpointId == kRootEndpointId);
+    VerifyOrReturn(endpointId == kRootEndpointId);
 
     IntegrationDelegate integrationDelegate;
 
@@ -108,8 +105,7 @@ void MatterTimeSynchronizationClusterInitCallback(EndpointId endpointId)
 
 void MatterTimeSynchronizationClusterShutdownCallback(EndpointId endpointId)
 {
-    // TODO: Enable this check later
-    // VerifyOrReturn(endpointId == kRootEndpointId);
+    VerifyOrReturn(endpointId == kRootEndpointId);
 
     IntegrationDelegate integrationDelegate;
 
@@ -130,35 +126,23 @@ namespace chip::app::Clusters::TimeSynchronization {
 
 TimeSynchronizationCluster * GetClusterInstance()
 {
-    // TODO: Enable this check later
-    // VerifyOrReturnValue(endpointId == kRootEndpointId, nullptr);
-
     return static_cast<TimeSynchronizationCluster *>(&gServer.Cluster());
 }
 
-// -----------------------------------------------------------------------------
-// Delegate Implementation
-
-Delegate * gDelegate = nullptr;
-
-Delegate * GetDelegate()
+void SetDefaultDelegate(TimeSynchronization::Delegate * delegate)
 {
-    if (gDelegate == nullptr)
-    {
-        static DefaultTimeSyncDelegate dg;
-        gDelegate = &dg;
-    }
-    return gDelegate;
+    auto timeSynchronization = GetClusterInstance();
+    VerifyOrReturn(timeSynchronization != nullptr);
+
+    timeSynchronization->SetDefaultDelegate(delegate);
 }
 
-void SetDefaultDelegate(Delegate * delegate)
+TimeSynchronization::Delegate * GetDefaultDelegate()
 {
-    gDelegate = delegate;
-}
+    auto timeSynchronization = GetClusterInstance();
+    VerifyOrReturnValue(timeSynchronization != nullptr, nullptr);
 
-Delegate * GetDefaultDelegate()
-{
-    return GetDelegate();
+    return timeSynchronization->GetDefaultDelegate();
 }
 
 } // namespace chip::app::Clusters::TimeSynchronization

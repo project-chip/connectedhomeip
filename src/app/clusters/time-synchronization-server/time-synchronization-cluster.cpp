@@ -137,6 +137,9 @@ bool emitTimeZoneStatusEvent(EndpointId ep, DataModel::EventsGenerator * eventsG
 
 bool emitTimeFailureEvent(EndpointId ep, DataModel::EventsGenerator * eventsGenerator)
 {
+    auto timeSynchronization = GetClusterInstance();
+    VerifyOrReturnValue(timeSynchronization != nullptr, false);
+
     Events::TimeFailure::Type event;
 
     std::optional<EventNumber> eventNumber;
@@ -153,7 +156,7 @@ bool emitTimeFailureEvent(EndpointId ep, DataModel::EventsGenerator * eventsGene
     // TODO: re-schedule event for after min 1hr if no time is still available
     // https://github.com/project-chip/connectedhomeip/issues/27200
     ChipLogProgress(Zcl, "Emit TimeFailure event [ep=%d]", ep);
-    GetDelegate()->NotifyTimeFailure();
+    timeSynchronization->GetDelegate()->NotifyTimeFailure();
     return true;
 }
 
@@ -217,9 +220,8 @@ TimeSynchronizationCluster::TimeSynchronizationCluster(
     const BitFlags<TimeSynchronization::Feature> features,
     TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type supportsDNSResolve, TimeZoneDatabaseEnum timeZoneDatabase,
     TimeSynchronization::TimeSourceEnum timeSource) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mOptionalAttributeSet(optionalAttributeSet), mFeatures(features), mSupportsDNSResolve(supportsDNSResolve),
-    mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mOptionalAttributeSet(optionalAttributeSet), mFeatures(features),
+    mSupportsDNSResolve(supportsDNSResolve), mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),

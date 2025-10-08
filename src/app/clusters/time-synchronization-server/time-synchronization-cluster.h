@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/clusters/time-synchronization-server/DefaultTimeSyncDelegate.h>
 #include <app/clusters/time-synchronization-server/TimeSyncDataProvider.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-delegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -127,6 +128,18 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
+
+    TimeSynchronization::Delegate * GetDelegate()
+    {
+        if (mDelegate == nullptr)
+        {
+            static TimeSynchronization::DefaultTimeSyncDelegate dg;
+            mDelegate = &dg;
+        }
+        return mDelegate;
+    }
+    void SetDefaultDelegate(TimeSynchronization::Delegate * delegate) { mDelegate = delegate; }
+    TimeSynchronization::Delegate * GetDefaultDelegate() { return GetDelegate(); }
 
 private:
     CHIP_ERROR SetTrustedTimeSource(const DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & tts);
@@ -329,6 +342,8 @@ private:
 
     TimeSynchronization::TimeState UpdateTimeZoneState();
     TimeSynchronization::TimeState UpdateDSTOffsetState();
+
+    TimeSynchronization::Delegate * mDelegate = nullptr;
 };
 
 } // namespace chip::app::Clusters
