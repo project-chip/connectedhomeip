@@ -67,7 +67,7 @@ class TC_WEBRTCP_2_14(MatterBaseTest, WEBRTCPTestBase):
             TestStep(4, "TH sends the ProvideOffer command with null WebRTCSessionID and StreamUsage = 2 (kAnalysis)",
                      "DUT responds with INVALID_IN_STATE status code"),
             TestStep(5, "TH sends the ProvideOffer command with null WebRTCSessionID and StreamUsage = 3 (kLiveView)",
-                     "DUT responds with INVALID_IN_STATE status code"),
+                     "DUT responds with a valid ProvideOfferResponse"),
         ]
         return steps
 

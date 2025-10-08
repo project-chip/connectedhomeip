@@ -54,10 +54,14 @@ class TC_WebRTCProvider_2_8(MatterBaseTest, WEBRTCPTestBase):
     def steps_TC_WEBRTCP_2_8(self) -> list[TestStep]:
         steps = [
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement"),
-            TestStep(2, "TH writes SoftRecordingPrivacyModeEnabled to TRUE on CameraAVStreamManagement cluster"),
-            TestStep(3, "TH sends the SolicitOffer command with valid parameters and StreamUsage = 1 (kRecording)"),
-            TestStep(4, "TH sends the SolicitOffer command with valid parameters and StreamUsage = 2 (kAnalysis)"),
-            TestStep(5, "TH sends the SolicitOffer command with valid parameters and StreamUsage = 3 (kLiveView)"),
+            TestStep(2, "TH writes SoftRecordingPrivacyModeEnabled to TRUE on CameraAVStreamManagement cluster",
+                     "DUT responds with success"),
+            TestStep(3, "TH sends the SolicitOffer command with valid parameters and StreamUsage = 1 (kRecording)",
+                     "DUT responds with INVALID_IN_STATE status code"),
+            TestStep(4, "TH sends the SolicitOffer command with valid parameters and StreamUsage = 2 (kAnalysis)",
+                     "DUT responds with INVALID_IN_STATE status code"),
+            TestStep(5, "TH sends the SolicitOffer command with valid parameters and StreamUsage = 3 (kLiveView)",
+                     "DUT responds with a valid SolicitOfferResponse"),
         ]
         return steps
 
