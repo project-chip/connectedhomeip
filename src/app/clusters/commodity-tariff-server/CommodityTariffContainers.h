@@ -50,15 +50,15 @@ protected:
         mCapacity(other.mCapacity), mCount(other.mCount), mBuffer(std::move(other.mBuffer))
     {
         other.mResizeIsEn = 0;
-        other.mCapacity = 0;
-        other.mCount    = 0;
+        other.mCapacity   = 0;
+        other.mCount      = 0;
     }
 
     CTC_ContainerClassBase & operator=(CTC_ContainerClassBase && other) noexcept
     {
         if (this != &other)
         {
-            mResizeIsEn       = other.mResizeIsEn; 
+            mResizeIsEn     = other.mResizeIsEn;
             mCapacity       = other.mCapacity;
             mCount          = other.mCount;
             mBuffer         = std::move(other.mBuffer);

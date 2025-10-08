@@ -83,7 +83,7 @@ TEST_F(TestCommodityTariffContainers, CreateEmptyNotInitAndDestroy)
 
         EXPECT_TRUE(sample.insert(0xAA550001));
         EXPECT_TRUE(sample.insert(0xAA550002));
-        EXPECT_EQ(sample.size(), 3u); 
+        EXPECT_EQ(sample.size(), 3u);
     }
 }
 
