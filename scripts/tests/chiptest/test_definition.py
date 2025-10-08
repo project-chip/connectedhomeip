@@ -76,7 +76,10 @@ class App:
             with self.cv_stopped:
                 self.stopped = True
                 self.cv_stopped.notify()
-            self.__terminateProcess()
+            ok = self.__terminateProcess()
+            if not ok:
+                # For now just raise an exception; no other way to get tests to fail in this situation.
+                raise Exception('Stopped subprocess terminated abnormally')
             return True
         return False
 
@@ -100,8 +103,9 @@ class App:
         return True
 
     def kill(self):
-        self.__terminateProcess()
+        ok = self.__terminateProcess()
         self.killed = True
+        return ok
 
     def wait(self, timeout=None):
         while True:
@@ -168,12 +172,16 @@ class App:
         self.setupCode = qrLine.group(1)
 
     def __terminateProcess(self):
+        """
+        Returns False if the process existed and had a nonzero exit code.
+        """
         if self.process:
             self.process.terminate()  # sends SIGTERM
             try:
                 exit_code = self.process.wait(10)
                 if exit_code:
-                    raise Exception('Subprocess failed with exit code: %d' % exit_code)
+                    logging.error('Subprocess failed with exit code: %d' % exit_code)
+                    return False
             except subprocess.TimeoutExpired:
                 logging.debug('Subprocess did not terminate on SIGTERM, killing it now')
                 self.process.kill()
@@ -183,6 +191,7 @@ class App:
                 self.process.wait(10)
             self.process = None
             self.outpipe = None
+        return True
 
 
 class TestTarget(Enum):
@@ -356,6 +365,8 @@ class TestDefinition:
 
         tool_storage_dir = None
 
+        loggedCapturedLogs = False
+
         try:
             if self.target == TestTarget.ALL_CLUSTERS:
                 target_app = paths.all_clusters_app
@@ -472,10 +483,17 @@ class TestDefinition:
         except Exception:
             logging.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
             runner.capture_delegate.LogContents()
+            loggedCapturedLogs = True
             raise
         finally:
-            apps_register.killAll()
+            ok = apps_register.killAll()
             apps_register.factoryResetAll()
             apps_register.removeAll()
             if tool_storage_dir is not None:
                 shutil.rmtree(tool_storage_dir, ignore_errors=True)
+            # If loggedCapturedLogs then we are already throwing, so no need to
+            # try to trigger test failure due to our abnormal termination.
+            if not ok and not loggedCapturedLogs:
+                logging.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
+                runner.capture_delegate.LogContents()
+                raise Exception('Subprocess terminated abnormally')
