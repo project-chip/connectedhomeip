@@ -19,6 +19,7 @@
 
 #include "window-covering-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/af-types.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -66,6 +67,18 @@ struct AbsoluteLimits
 {
     uint16_t open;
     uint16_t closed;
+};
+
+/**
+ * @brief  Window Covering Attribute Access Interface.
+ */
+class WindowCoverAttrAccess : public AttributeAccessInterface
+{
+public:
+    // Register for the Window Covering cluster on all endpoints.
+    WindowCoverAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), WindowCovering::Id) {}
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
 bool HasFeature(chip::EndpointId endpoint, Feature feature);

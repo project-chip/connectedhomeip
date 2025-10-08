@@ -170,12 +170,7 @@ constexpr osThreadAttr_t kMainTaskAttr = { .name       = "main",
                                            .cb_size    = 0U,
                                            .stack_mem  = NULL,
                                            .stack_size = kMainTaskStackSize,
-#ifdef SLI_SI91X_MCU_INTERFACE
-                                           .priority = osPriorityRealtime4
-#else
-                                           .priority = osPriorityRealtime5 // Must be above BLE Link Layer priority
-#endif // SLI_SI91X_MCU_INTERFACE
-};
+                                           .priority   = osPriorityRealtime7 };
 osThreadId_t sMainTaskHandle;
 static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
@@ -205,6 +200,14 @@ void ApplicationStart(void * unused)
 
 void SilabsMatterConfig::AppInit()
 {
+#ifdef SL_WIFI
+    // Init Chip memory management before the stack for Wi-Fi platforms
+    // Because OpenThread needs to use memory allocation during its Key operations, we initialize the memory management for thread
+    // and set the allocation functions inside sl_ot_create_instance, which is called earlier by sl_system_init.
+    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
+    VerifyOrDie(chip::Platform::MemoryInit() == CHIP_NO_ERROR);
+#endif // SL_WIFI
+
     GetPlatform().Init();
     sMainTaskHandle = osThreadNew(ApplicationStart, nullptr, &kMainTaskAttr);
     ChipLogProgress(DeviceLayer, "Starting scheduler");
@@ -243,12 +246,10 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     ChipLogProgress(DeviceLayer, "Init CHIP Stack");
 
 #ifdef SL_WIFI
-    // Init Chip memory management before the stack
-    // Because OpenThread needs to use memory allocation during its Key operations, we initialize the memory management for thread
-    // and set the allocation functions inside sl_ot_create_instance, which is called earlier by sl_system_init.
-    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
-    ReturnErrorOnFailure(chip::Platform::MemoryInit());
     ReturnErrorOnFailure(WifiInterface::GetInstance().InitWiFiStack());
+    // Needs to be done post InitWifiStack for 917.
+    // TODO move it in InitWiFiStack
+    GetPlatform().NvmInit();
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     ReturnErrorOnFailure(WifiSleepManager::GetInstance().Init(&WifiInterface::GetInstance(), &WifiInterface::GetInstance()));

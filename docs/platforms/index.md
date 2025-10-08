@@ -11,7 +11,6 @@ bouffalolab/index
 esp32/index
 infineon/index
 linux/index
-mbedos/index
 nrf/index
 nxp/index
 openthread/index
@@ -26,7 +25,6 @@ ti/index
 -   [ESP32](./esp32/)
 -   [Infineon](./infineon/)
 -   [Linux](./linux/)
--   [MbedOS](./mbedos/)
 -   [NRF](./nrf/)
 -   [NXP](./nxp/)
 -   [OpenThread](./openthread/)
