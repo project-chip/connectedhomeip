@@ -2467,7 +2467,7 @@ static NSString * FormatPossiblyWildcardClusterElement(NSNumber * _Nullable poss
 
 - (NSUInteger)hash
 {
-    return _endpoint.unsignedShortValue ^ _cluster.unsignedLongValue ^ _attribute.unsignedLongValue;
+    return _endpoint.unsignedShortValue ^ (_cluster.unsignedLongValue << 8) ^ (_attribute.unsignedLongValue << 16);
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -2594,7 +2594,7 @@ static NSString * const sAttributeIDKey = @"attributeIDKey";
 
 - (NSUInteger)hash
 {
-    return _endpoint.unsignedShortValue ^ _cluster.unsignedLongValue ^ _event.unsignedLongValue;
+    return _endpoint.unsignedShortValue ^ (_cluster.unsignedLongValue << 8) ^ (_event.unsignedLongValue << 16);
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -2715,7 +2715,7 @@ static NSString * const sEventAttributeIDKey = @"attributeIDKey";
 
 - (NSUInteger)hash
 {
-    return _endpoint.unsignedShortValue ^ _cluster.unsignedLongValue;
+    return _endpoint.unsignedShortValue ^ (_cluster.unsignedLongValue << 8);
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -2805,7 +2805,7 @@ static NSString * const sClusterKey = @"clusterKey";
 
 - (NSUInteger)hash
 {
-    return self.endpoint.unsignedShortValue ^ self.cluster.unsignedLongValue ^ _attribute.unsignedLongValue;
+    return self.endpoint.unsignedShortValue ^ (self.cluster.unsignedLongValue << 8) ^ (_attribute.unsignedLongValue << 16);
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -2901,7 +2901,7 @@ static NSString * const sAttributeKey = @"attributeKey";
 
 - (NSUInteger)hash
 {
-    return self.endpoint.unsignedShortValue ^ self.cluster.unsignedLongValue ^ _event.unsignedLongValue;
+    return self.endpoint.unsignedShortValue ^ (self.cluster.unsignedLongValue << 8) ^ (_event.unsignedLongValue << 16);
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -2992,7 +2992,7 @@ static NSString * const sEventKey = @"eventKey";
 
 - (NSUInteger)hash
 {
-    return self.endpoint.unsignedShortValue ^ self.cluster.unsignedLongValue ^ _command.unsignedLongValue;
+    return self.endpoint.unsignedShortValue ^ (self.cluster.unsignedLongValue << 8) ^ (_command.unsignedLongValue << 16);
 }
 
 - (id)copyWithZone:(NSZone *)zone

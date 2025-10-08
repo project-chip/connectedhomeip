@@ -313,6 +313,9 @@
             "ClusterRevision"
         ],
         "General Commissioning": [
+            "FeatureMap",
+            "ClusterRevision",
+            "Breadcrumb",
             "RegulatoryConfig",
             "LocationCapability",
             "BasicCommissioningInfo",
@@ -383,7 +386,9 @@
         "Operational Credentials": [
             "SupportedFabrics",
             "CommissionedFabrics",
-            "CurrentFabricIndex"
+            "CurrentFabricIndex",
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Software Diagnostics": [
             "ClusterRevision",
@@ -748,6 +753,7 @@
             "FeatureMap"
         ],
         "Power Topology": ["FeatureMap"],
+        "Power Source": ["ClusterRevision"],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"],
         "Water Heater Management": [
@@ -849,5 +855,6 @@
     },
     "uiOptions": {
         "showProfileId": false
-    }
+    },
+    "upgradeRules": "./upgrade-rules-matter.json"
 }
