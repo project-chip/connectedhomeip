@@ -538,7 +538,13 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         }
 
         bool softLivestreamPrivacyModeActive = false;
-        mDelegate.IsSoftLivestreamPrivacyModeActive(softLivestreamPrivacyModeActive);
+        CHIP_ERROR err = mDelegate.IsSoftLivestreamPrivacyModeActive(softLivestreamPrivacyModeActive);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: Failed to get SoftLivestreamPrivacyModeActive status: %" CHIP_ERROR_FORMAT, err.Format());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+            return;
+        }
 
         if (softLivestreamPrivacyModeActive && req.streamUsage == StreamUsageEnum::kLiveView)
         {
