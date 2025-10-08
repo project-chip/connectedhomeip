@@ -232,7 +232,7 @@ class PAVSTTestBase:
 
         containerOptions = {
             "containerType": cluster.Enums.ContainerFormatEnum.kCmaf,
-            "CMAFContainerOptions": {"CMAFInterface": cluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 500,
+            "CMAFContainerOptions": {"CMAFInterface": cluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 4000,
                                      "sessionGroup": 3, "trackName": " "},
         }
 

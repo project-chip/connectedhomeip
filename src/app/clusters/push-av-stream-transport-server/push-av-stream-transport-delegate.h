@@ -150,9 +150,11 @@ public:
      * @brief Validates the provided Segment Duration.
      *
      * @param segmentDuration The Segment Duration to validate
-     * @return true if Segment Duration is multiple of KeyFrameInterval, false otherwise
+     * @param videoStreamId   The video stream to eb validated against
+     * @return true if Segment Duration is multiple of KeyFrameInterval for the provided videoStreamId, false otherwise
      */
-    virtual bool ValidateSegmentDuration(uint16_t segmentDuration) = 0;
+    virtual bool ValidateSegmentDuration(uint16_t segmentDuration,
+                                         const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) = 0;
 
     /**
      * @brief Validates bandwidth requirements against camera's resource management.

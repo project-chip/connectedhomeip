@@ -542,19 +542,22 @@
             "OperationalState",
             "OperationalError",
             "CurrentPhase",
-            "CountdownTime"
+            "CountdownTime",
+            "ClusterRevision"
         ],
         "RVC Operational State": [
             "OperationalState",
             "OperationalError",
             "CurrentPhase",
-            "CountdownTime"
+            "CountdownTime",
+            "ClusterRevision"
         ],
         "Oven Cavity Operational State": [
             "OperationalState",
             "OperationalError",
             "CurrentPhase",
-            "CountdownTime"
+            "CountdownTime",
+            "ClusterRevision"
         ],
         "Activated Carbon Filter Monitoring": [
             "Condition",
@@ -855,5 +858,6 @@
     },
     "uiOptions": {
         "showProfileId": false
-    }
+    },
+    "upgradeRules": "./upgrade-rules-matter.json"
 }
