@@ -24,15 +24,15 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class PushAvStreamTransportClusterTransportOptionsStruct(
-    val streamUsage: UByte,
-    val videoStreamID: Optional<UShort>?,
-    val audioStreamID: Optional<UShort>?,
-    val TLSEndpointID: UShort,
-    val url: String,
-    val triggerOptions: PushAvStreamTransportClusterTransportTriggerOptionsStruct,
-    val ingestMethod: UByte,
-    val containerOptions: PushAvStreamTransportClusterContainerOptionsStruct,
-    val expiryTime: Optional<UInt>
+  val streamUsage: UByte,
+  val videoStreamID: Optional<UShort>?,
+  val audioStreamID: Optional<UShort>?,
+  val TLSEndpointID: UShort,
+  val url: String,
+  val triggerOptions: PushAvStreamTransportClusterTransportTriggerOptionsStruct,
+  val ingestMethod: UByte,
+  val containerOptions: PushAvStreamTransportClusterContainerOptionsStruct,
+  val expiryTime: Optional<UInt>
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportOptionsStruct {\n")
@@ -95,7 +95,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
     fun fromTlv(
       tlvTag: Tag, 
       tlvReader: TlvReader
-      ): PushAvStreamTransportClusterTransportOptionsStruct {
+    ): PushAvStreamTransportClusterTransportOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val streamUsage = tlvReader.getUByte(ContextSpecificTag(TAG_STREAM_USAGE))
       val videoStreamID = 
@@ -126,13 +126,13 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
         PushAvStreamTransportClusterTransportTriggerOptionsStruct.fromTlv(
           ContextSpecificTag(TAG_TRIGGER_OPTIONS), 
           tlvReader
-          )
+        )
       val ingestMethod = tlvReader.getUByte(ContextSpecificTag(TAG_INGEST_METHOD))
       val containerOptions = 
         PushAvStreamTransportClusterContainerOptionsStruct.fromTlv(
           ContextSpecificTag(TAG_CONTAINER_OPTIONS), 
           tlvReader
-          )
+        )
       val expiryTime = 
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXPIRY_TIME))) {
           Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_EXPIRY_TIME)))
@@ -152,7 +152,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
         ingestMethod, 
         containerOptions, 
         expiryTime
-        )
+      )
     }
   }
 }
