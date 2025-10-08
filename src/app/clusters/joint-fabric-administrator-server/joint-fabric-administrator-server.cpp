@@ -250,10 +250,7 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
     mActiveCommandHandle.emplace(&ctx.mCommandHandler);
     mActiveCommissionee.emplace(mActiveCommandHandle.value(), commandData.endpointID, std::move(onComplete));
 
-    VerifyOrExit(mActiveCommissionee->VerifyTrustAgainstCommissionerAdmin() == CHIP_NO_ERROR, {
-        CleanupAnnounceJFA();
-        globalStatus = Status::Failure;
-    });
+    mActiveCommissionee->VerifyTrustAgainstCommissionerAdmin();
 
     return;
 exit:
@@ -261,8 +258,6 @@ exit:
     {
         ChipLogProgress(JointFabric, "Failed to handle AnnounceJointFabricAdministrator");
         ctx.mCommandHandler.AddStatus(cachedPath, globalStatus.value());
-        // CommandHandler::Handle handle(&ctx.mCommandHandler);
-        // handle.Get()->AddStatus(cachedPath, globalStatus.value());
     }
 }
 
