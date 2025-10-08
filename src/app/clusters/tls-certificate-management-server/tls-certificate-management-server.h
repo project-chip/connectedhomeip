@@ -34,7 +34,9 @@ namespace Clusters {
 
 class TlsCertificateManagementDelegate;
 
-class TlsCertificateManagementServer : private AttributeAccessInterface, private CommandHandlerInterface
+class TlsCertificateManagementServer : private AttributeAccessInterface,
+                                       private CommandHandlerInterface,
+                                       private FabricTable::Delegate
 {
 public:
     /**
@@ -130,6 +132,8 @@ private:
     // Encodes all provisioned client certificates
     CHIP_ERROR EncodeProvisionedClientCertificates(EndpointId matterEndpoint, FabricIndex fabric, bool largePayload,
                                                    const AttributeValueEncoder::ListEncodeHelper & encoder);
+
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 };
 
 /** @brief

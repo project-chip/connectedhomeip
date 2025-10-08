@@ -1,0 +1,131 @@
+<!--
+Copyright (c) 2020 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+This file is constructed based on the wpa_supplicant D-Bus API exposed by the
+wpa_supplicant daemon. The list of methods and properties is available at:
+https://w1.fi/wpa_supplicant/devel/dbus.html
+
+Please note that this file is not a complete representation of the
+wpa_supplicant D-Bus API, but only includes the methods that are relevant for
+the wpa_supplicant integration with the Matter SDK.
+-->
+
+<!DOCTYPE node PUBLIC
+  "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+  "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+
+<node>
+    <interface name="fi.w1.wpa_supplicant1.Interface">
+
+        <method name="Scan">
+            <arg name="args" type="a{sv}" direction="in" />
+        </method>
+
+        <method name="Disconnect" />
+
+        <method name="AddNetwork">
+            <arg name="args" type="a{sv}" direction="in" />
+            <arg name="path" type="o" direction="out" />
+        </method>
+
+        <method name="RemoveNetwork">
+            <arg name="path" type="o" direction="in" />
+        </method>
+
+        <method name="RemoveAllNetworks" />
+
+        <method name="SelectNetwork">
+            <arg name="path" type="o" direction="in" />
+        </method>
+
+        <method name="AddBlob">
+            <arg name="name" type="s" direction="in" />
+            <arg name="data" type="ay" direction="in">
+                <!-- gdbus-codegen maps "ay" to `gchar *` by default, which truncates at NUL bytes -->
+                <annotation name="org.gtk.GDBus.C.ForceGVariant" value="true"/>
+            </arg>
+        </method>
+
+        <method name="RemoveBlob">
+            <arg name="name" type="s" direction="in" />
+        </method>
+
+        <method name="AutoScan">
+            <arg name="arg" type="s" direction="in" />
+        </method>
+
+        <method name="NANPublish">
+            <arg name="nan_args" type="a{sv}" direction="in" />
+            <arg name="publish_id" type="u" direction="out" />
+        </method>
+
+        <method name="NANCancelPublish">
+            <arg name="nan_args" type="u" direction="in" />
+        </method>
+        <method name="NANUpdatePublish">
+            <arg name="nan_args" type="a{sv}" direction="in" />
+        </method>
+
+        <method name="NANSubscribe">
+            <arg name="nan_args" type="a{sv}" direction="in" />
+            <arg name="subscribe_id" type="u" direction="out" />
+        </method>
+
+        <method name="NANCancelSubscribe">
+            <arg name="nan_args" type="u" direction="in" />
+        </method>
+
+        <method name="NANTransmit">
+            <arg name="nan_args" type="a{sv}" direction="in" />
+        </method>
+
+        <method name="SaveConfig" />
+        <signal name="NANDiscoveryResult">
+            <arg name="args" type="a{sv}" />
+        </signal>
+        <signal name="NANReplied">
+            <arg name="args" type="a{sv}" />
+        </signal>
+        <signal name="NANReceive">
+            <arg name="args" type="a{sv}" />
+        </signal>
+        <signal name="NANPublishTerminated">
+            <arg name="publish_id" type="u" />
+            <arg name="reason" type="s" />
+        </signal>
+        <signal name="NANSubscribeTerminated">
+            <arg name="subscribe_id" type="u" />
+            <arg name="reason" type="s" />
+        </signal>
+        <signal name="PropertiesChanged">
+            <arg name="properties" type="a{sv}" />
+        </signal>
+        <property name="State" type="s" access="read" />
+        <property name="Scanning" type="b" access="read" />
+        <property name="CurrentNetwork" type="o" access="read" />
+        <property name="CurrentAuthMode" type="s" access="read" />
+        <property name="BSSs" type="ao" access="read" />
+        <property name="DisconnectReason" type="i" access="read" />
+        <property name="AuthStatusCode" type="i" access="read" />
+        <property name="AssocStatusCode" type="i" access="read" />
+
+        <signal name="ScanDone">
+            <arg name="success" type="b" />
+        </signal>
+
+    </interface>
+</node>

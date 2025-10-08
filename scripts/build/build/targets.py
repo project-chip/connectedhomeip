@@ -24,7 +24,6 @@ from builders.genio import GenioApp, GenioBuilder
 from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary, HostFuzzingType
 from builders.imx import IMXApp, IMXBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
-from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
 from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpLogLevel, NxpOsUsed
@@ -401,36 +400,6 @@ def BuildAndroidTarget():
 
     # Modifiers
     target.AppendModifier('no-debug', profile=AndroidProfile.RELEASE)
-
-    return target
-
-
-def BuildMbedTarget():
-    target = BuildTarget('mbed', MbedBuilder)
-
-    # board
-    target.AppendFixedTargets([
-        TargetPart('CY8CPROTO_062_4343W', board=MbedBoard.CY8CPROTO_062_4343W),
-    ])
-
-    # apps
-    target.AppendFixedTargets([
-        TargetPart('lock', app=MbedApp.LOCK),
-        TargetPart('light', app=MbedApp.LIGHT),
-        TargetPart('all-clusters', app=MbedApp.ALL_CLUSTERS),
-        TargetPart('all-clusters-minimal', app=MbedApp.ALL_CLUSTERS_MINIMAL),
-        TargetPart('pigweed', app=MbedApp.PIGWEED),
-        TargetPart('ota-requestor', app=MbedApp.OTA_REQUESTOR),
-        TargetPart('shell', app=MbedApp.SHELL),
-    ])
-
-    # Modifiers
-    target.AppendModifier('release', profile=MbedProfile.RELEASE).ExceptIfRe(
-        '-(develop|debug)')
-    target.AppendModifier('develop', profile=MbedProfile.DEVELOP).ExceptIfRe(
-        '-(release|debug)')
-    target.AppendModifier('debug', profile=MbedProfile.DEBUG).ExceptIfRe(
-        '-(release|develop)')
 
     return target
 
@@ -871,7 +840,6 @@ BUILD_TARGETS = [
     BuildIMXTarget(),
     BuildInfineonTarget(),
     BuildNxpTarget(),
-    BuildMbedTarget(),
     BuildNrfTarget(),
     BuildNrfNativeTarget(),
     BuildNuttXTarget(),
