@@ -63,7 +63,7 @@ class TC_DD_3_23(MatterBaseTest):
         # Step 1: Here we check if the Tag is connected to the Host machine and read the NFC Tag data
         self.step(1)
         nfc_tag_data = connect_read_nfc_tag_data(self.user_params.get("NFC_Reader_index",0))
-        logging.info(f"NFC Tag data : '{self.matter_test_config.qr_code_content}'")
+        logging.info(f"NFC Tag data : '{nfc_tag_data}'")
         self.matter_test_config.qr_code_content.append(nfc_tag_data)
 
         # Step 2: the NFC tag data is parse and checked if the device supports NFC commissioning and commission begins
