@@ -341,12 +341,13 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             )
 
             status = await self.psvt_manually_trigger_transport(cmd, expected_status=Status.InvalidInState)
-            asserts.assert_true(status == Status.InvalidInState, f"Unexpected response {status} received on Manually Triggered push with privacy mode enabled")
+            asserts.assert_true(status == Status.InvalidInState, f"Unexpected response {
+                                status} received on Manually Triggered push with privacy mode enabled")
 
             await self.write_single_attribute(
                 attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftRecordingPrivacyModeEnabled(False),
                 endpoint_id=endpoint,
-            )            
+            )
 
         self.step(13)
         status = await self.psvt_manually_trigger_transport(cmd)
@@ -354,6 +355,7 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             status == Status.Success,
             "DUT responds with Success status code.",
         )
+
 
 if __name__ == "__main__":
     default_matter_test_main()
