@@ -786,8 +786,8 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
                              help='A list of tests in the test class to execute.')
     basic_group.add_argument('--test-list', nargs='+', type=str, metavar='SCRIPT_CLASS_PAIRS',
                              help='List of script_path and class_name pairs for batch test info retrieval')
-    basic_group.add_argument('--th_client_test', nargs=2, type=str, metavar=('SCRIPT_PATH', 'CLASS_NAME'),
-                             help='Test Helper client test with script path and class name (e.g., sdk/TC_ACE_1_3 TC_ACE_1_3)')
+    basic_group.add_argument('--th-client-test', nargs=2, type=str, metavar=('SCRIPT_PATH', 'CLASS_NAME'),
+                             help='Test Harness client test with script path and class name (e.g., sdk/TC_ACE_1_3 TC_ACE_1_3)')
     basic_group.add_argument('--get_test_info', action="store_true", default=False,
                              help="Retrieve test information (steps, descriptions, PICS) without running tests")
     basic_group.add_argument('--fail-on-skipped', action="store_true", default=False,
