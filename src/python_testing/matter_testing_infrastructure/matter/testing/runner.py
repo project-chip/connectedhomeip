@@ -625,7 +625,7 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     config.fabric_id = args.fabric_id if args.fabric_id is not None else config.root_of_trust_index
 
     if args.commissioning_method and "nfc" in args.commissioning_method:
-        if args.int_arg(1)=="NFC_Reader_index":
+        if not args.int_arg and args.int_arg(1)=="NFC_Reader_index":
             from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
             nfc_tag_data = connect_read_nfc_tag_data(args.int_args(0))
             args.qr_code.append(nfc_tag_data)
