@@ -123,6 +123,23 @@ public:
      */
     CommodityTariffAttrsDataMgmt::CTC_BaseDataClassBase & GetMgmtObj(CommodityTariffAttrTypeEnum aType);
 
+    /**
+     * @brief Process incoming tariff data updates
+     *
+     * This method implements a three-phase update process:
+     * 1. Initial validation (TariffDataUpd_Init)
+     * 2. Cross-field validation (TariffDataUpd_CrossValidator)
+     * 3. Commit or abort (TariffDataUpd_Commit/Abort)
+     */
+    void TariffDataUpdate(uint32_t aNowTimestamp);
+
+    // Primary attrs update pipeline methods
+    CHIP_ERROR TariffDataUpd_Init(TariffUpdateCtx & UpdCtx);
+    CHIP_ERROR TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx);
+    void TariffDataUpd_Finish(bool is_success);
+
+    void TryToactivateDelayedTariff(uint32_t now);
+    void CleanupTariffData();
 private:
     // Primary attribute storage and management
     TariffUnitDataClass mTariffUnit_MgmtObj{};
