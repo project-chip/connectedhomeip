@@ -98,7 +98,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
     ): PushAvStreamTransportClusterTransportOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val streamUsage = tlvReader.getUByte(ContextSpecificTag(TAG_STREAM_USAGE))
-      val videoStreamID = 
+      val videoStreamID =
         if (!tlvReader.isNull()) {
           if (tlvReader.isNextTag(ContextSpecificTag(TAG_VIDEO_STREAM_ID))) {
             Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_VIDEO_STREAM_ID)))
@@ -109,7 +109,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
           null
         }
-      val audioStreamID = 
+      val audioStreamID =
         if (!tlvReader.isNull()) {
           if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_STREAM_ID))) {
             Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_AUDIO_STREAM_ID)))
@@ -122,35 +122,35 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
         }
       val TLSEndpointID = tlvReader.getUShort(ContextSpecificTag(TAG_TLS_ENDPOINT_ID))
       val url = tlvReader.getString(ContextSpecificTag(TAG_URL))
-      val triggerOptions = 
+      val triggerOptions =
         PushAvStreamTransportClusterTransportTriggerOptionsStruct.fromTlv(
           ContextSpecificTag(TAG_TRIGGER_OPTIONS), 
           tlvReader
         )
       val ingestMethod = tlvReader.getUByte(ContextSpecificTag(TAG_INGEST_METHOD))
-      val containerOptions = 
+      val containerOptions =
         PushAvStreamTransportClusterContainerOptionsStruct.fromTlv(
           ContextSpecificTag(TAG_CONTAINER_OPTIONS), 
           tlvReader
         )
-      val expiryTime = 
+      val expiryTime =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXPIRY_TIME))) {
           Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_EXPIRY_TIME)))
         } else {
           Optional.empty()
         }
-      
+
       tlvReader.exitContainer()
 
       return PushAvStreamTransportClusterTransportOptionsStruct(
-        streamUsage, 
-        videoStreamID, 
-        audioStreamID, 
-        TLSEndpointID, 
-        url, 
-        triggerOptions, 
-        ingestMethod, 
-        containerOptions, 
+        streamUsage,
+        videoStreamID,
+        audioStreamID,
+        TLSEndpointID,
+        url,
+        triggerOptions,
+        ingestMethod,
+        containerOptions,
         expiryTime
       )
     }

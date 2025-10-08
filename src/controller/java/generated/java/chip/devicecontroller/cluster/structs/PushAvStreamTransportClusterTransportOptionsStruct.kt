@@ -93,12 +93,12 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
     private const val TAG_EXPIRY_TIME = 8
 
     fun fromTlv(
-      tlvTag: Tag, 
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): PushAvStreamTransportClusterTransportOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val streamUsage = tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_USAGE))
-      val videoStreamID = 
+      val videoStreamID =
         if (!tlvReader.isNull()) {
           if (tlvReader.isNextTag(ContextSpecificTag(TAG_VIDEO_STREAM_ID))) {
             Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_STREAM_ID)))
@@ -109,7 +109,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
           null
         }
-      val audioStreamID = 
+      val audioStreamID =
         if (!tlvReader.isNull()) {
           if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_STREAM_ID))) {
             Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_STREAM_ID)))
@@ -122,7 +122,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
         }
       val TLSEndpointID = tlvReader.getUInt(ContextSpecificTag(TAG_TLS_ENDPOINT_ID))
       val url = tlvReader.getString(ContextSpecificTag(TAG_URL))
-      val triggerOptions = 
+      val triggerOptions =
         PushAvStreamTransportClusterTransportTriggerOptionsStruct.fromTlv(
           ContextSpecificTag(TAG_TRIGGER_OPTIONS), 
           tlvReader
@@ -143,14 +143,14 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
       tlvReader.exitContainer()
 
       return PushAvStreamTransportClusterTransportOptionsStruct(
-        streamUsage, 
-        videoStreamID, 
-        audioStreamID, 
-        TLSEndpointID, 
-        url, 
-        triggerOptions, 
-        ingestMethod, 
-        containerOptions, 
+        streamUsage,
+        videoStreamID,
+        audioStreamID,
+        TLSEndpointID,
+        url,
+        triggerOptions,
+        ingestMethod,
+        containerOptions,
         expiryTime
       )
     }

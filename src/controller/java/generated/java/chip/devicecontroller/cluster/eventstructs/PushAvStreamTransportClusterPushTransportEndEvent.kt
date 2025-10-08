@@ -41,12 +41,12 @@ class PushAvStreamTransportClusterPushTransportEndEvent(val connectionID: UInt) 
     private const val TAG_CONNECTION_ID = 0
 
     fun fromTlv(
-      tlvTag: Tag, 
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): PushAvStreamTransportClusterPushTransportEndEvent {
       tlvReader.enterStructure(tlvTag)
       val connectionID = tlvReader.getUInt(ContextSpecificTag(TAG_CONNECTION_ID))
-      
+
       tlvReader.exitContainer()
 
       return PushAvStreamTransportClusterPushTransportEndEvent(connectionID)
