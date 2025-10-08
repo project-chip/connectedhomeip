@@ -522,7 +522,13 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         // WebRTCSessionID is null - new session request
 
         bool hardPrivacyModeActive = false;
-        mDelegate.IsHardPrivacyModeActive(hardPrivacyModeActive);
+        CHIP_ERROR err = mDelegate.IsHardPrivacyModeActive(hardPrivacyModeActive);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: Failed to check Hard Privacy mode: %" CHIP_ERROR_FORMAT, err.Format());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+            return;
+        }
 
         if (hardPrivacyModeActive)
         {
