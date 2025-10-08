@@ -44,9 +44,9 @@
 import asyncio
 import logging
 import re
+from subprocess import run
 
 from mobly import asserts
-from subprocess import run
 from TC_SUTestBase import SoftwareUpdateBaseTest
 
 import matter.clusters as Clusters
@@ -156,7 +156,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         downloading = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
         applying = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying
 
-        target_version = 2
+        target_version = 3
 
         endpoint = self.get_endpoint(default=0)
         dut_node_id = self.dut_node_id
@@ -321,6 +321,8 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         # Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P. DUT sends QueryImage command to TH2/OTA-P
         self.step(2)
 
+        provider_ota_file = OtaImagePath(path="firmware_v3.ota")
+
         logging.info("Starting OTA Provider 2")
         provider_2 = OTAProviderSubprocess(
             app=app_path,
@@ -427,11 +429,11 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         self.verify_state_transition_event(event_report=event_idle_to_querying, previous_state=idle, new_state=querying)
 
-        # event_querying_to_downloading = event_cb.wait_for_event_report(
-        #     Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
-#
-        # self.verify_state_transition_event(event_report=event_querying_to_downloading,
-        #                                    previous_state=querying, new_state=downloading, target_version=target_version)
+        event_querying_to_downloading = event_cb.wait_for_event_report(
+            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
+
+        self.verify_state_transition_event(event_report=event_querying_to_downloading,
+                                           previous_state=querying, new_state=downloading, target_version=target_version)
 
         event_cb.reset()
         await event_cb.cancel()
