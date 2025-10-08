@@ -277,7 +277,7 @@ TEST(TestAttributePersistence, TestNoOpOnSameValueArithmetic)
     // Verify the value is still loadable and unchanged
     {
         uint32_t loadedValue = 0;
-        EXPECT_TRUE(persistence.LoadNativeEndianValue(path, loadedValue, 0u));
+        EXPECT_TRUE(persistence.LoadNativeEndianValue(path, loadedValue, static_cast<uint32_t>(0)));
         EXPECT_EQ(loadedValue, kInitialValue);
     }
 }
