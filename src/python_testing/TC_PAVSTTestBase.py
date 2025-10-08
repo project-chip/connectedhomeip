@@ -306,12 +306,11 @@ class PAVSTTestBase:
             return Status.Success
         except InteractionModelError as e:
             if (e.status == Status.Busy):
+                asserts.fail("Transport is busy, currently uploading data")
+            else:
                 asserts.assert_true(
-                    e.status == Status.NotFound, "Busy Status,Transport is currently uploading data"
+                    e.status == Status.NotFound, "Unexpected error returned"
                 )
-            asserts.assert_true(
-                e.status == Status.NotFound, "Unexpected error returned"
-            )
             return e.status
         pass
 
@@ -325,12 +324,11 @@ class PAVSTTestBase:
             return Status.Success
         except InteractionModelError as e:
             if (e.status == Status.Busy):
+                asserts.fail("Transport is busy, currently uploading data")
+            else:
                 asserts.assert_true(
-                    e.status == Status.NotFound, "Busy Status,Transport is currently uploading data"
+                    e.status == Status.NotFound, "Unexpected error returned"
                 )
-            asserts.assert_true(
-                e.status == Status.NotFound, "Unexpected error returned"
-            )
             return e.status
         pass
 
@@ -382,12 +380,10 @@ class PAVSTTestBase:
                 )
                 return e.clusterStatus
             elif (e.status == Status.Busy):
-                asserts.assert_true(
-                    e.status == Status.NotFound, "Busy Status,Transport is currently uploading data"
-                )
+                asserts.fail("Transport is busy, currently uploading data")
             else:
                 if (expected_status is not None):
-                    asserts.assert_true(e.status == expected_status, "TUnexpected error returned")
+                    asserts.assert_true(e.status == expected_status, "Unexpected error returned")
                 else:
                     asserts.assert_true(
                         e.status == Status.NotFound, "Unexpected error returned"
