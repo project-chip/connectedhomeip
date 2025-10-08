@@ -22,8 +22,6 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
 class PushAvStreamTransportClusterPushTransportEndEvent(val connectionID: UInt) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterPushTransportEndEvent {\n")
@@ -45,7 +43,7 @@ class PushAvStreamTransportClusterPushTransportEndEvent(val connectionID: UInt) 
     fun fromTlv(
       tlvTag: Tag, 
       tlvReader: TlvReader
-    ) : PushAvStreamTransportClusterPushTransportEndEvent {
+    ): PushAvStreamTransportClusterPushTransportEndEvent {
       tlvReader.enterStructure(tlvTag)
       val connectionID = tlvReader.getUInt(ContextSpecificTag(TAG_CONNECTION_ID))
       

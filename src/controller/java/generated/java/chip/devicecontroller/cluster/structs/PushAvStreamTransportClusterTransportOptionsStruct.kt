@@ -95,7 +95,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
     fun fromTlv(
       tlvTag: Tag, 
       tlvReader: TlvReader
-    ) : PushAvStreamTransportClusterTransportOptionsStruct {
+    ): PushAvStreamTransportClusterTransportOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val streamUsage = tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_USAGE))
       val videoStreamID = 
@@ -139,7 +139,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
         } else {
           Optional.empty()
         }
-      
+
       tlvReader.exitContainer()
 
       return PushAvStreamTransportClusterTransportOptionsStruct(
