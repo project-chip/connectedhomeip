@@ -630,7 +630,7 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
             nfc_tag_data = connect_read_nfc_tag_data(args.int_args(0))
             args.qr_code.append(nfc_tag_data)
         else:
-            print("error: argument --int-arg NFC_Reader_index:<int-value> is need for NFC Tests" % args.chip_tool_credentials_path)
+            print("error: argument --int-arg NFC_Reader_index:<int-value> is need for NFC Tests")
             return False
     if args.chip_tool_credentials_path is not None and not args.chip_tool_credentials_path.exists():
         print("error: chip-tool credentials path %s doesn't exist!" % args.chip_tool_credentials_path)
