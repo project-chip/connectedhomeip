@@ -55,9 +55,9 @@
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -160,15 +160,15 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp4TagList[] = { {
 DefaultTimerDelegate sTimerDelegate;
 IdentifyDelegateImpl sIdentifyDelegate;
 
-RegisteredServerCluster<Clusters::IdentifyCluster> gIdentifyCluster0(
-    Clusters::IdentifyCluster::Config(0, sTimerDelegate)
-        .WithIdentifyType(Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
-        .WithDelegate(&sIdentifyDelegate));
+RegisteredServerCluster<Clusters::IdentifyCluster>
+    gIdentifyCluster0(Clusters::IdentifyCluster::Config(0, sTimerDelegate)
+                          .WithIdentifyType(Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
+                          .WithDelegate(&sIdentifyDelegate));
 
-RegisteredServerCluster<Clusters::IdentifyCluster> gIdentifyCluster1(
-    Clusters::IdentifyCluster::Config(1, sTimerDelegate)
-        .WithIdentifyType(Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
-        .WithDelegate(&sIdentifyDelegate));
+RegisteredServerCluster<Clusters::IdentifyCluster>
+    gIdentifyCluster1(Clusters::IdentifyCluster::Config(1, sTimerDelegate)
+                          .WithIdentifyType(Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
+                          .WithDelegate(&sIdentifyDelegate));
 
 } // namespace
 

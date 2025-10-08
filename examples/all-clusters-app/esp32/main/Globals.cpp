@@ -32,12 +32,10 @@ using namespace chip::app::Clusters;
 DefaultTimerDelegate sTimerDelegate;
 IdentifyDelegateImpl sIdentifyDelegate;
 
-RegisteredServerCluster<IdentifyCluster> gIdentifyCluster0(
-    IdentifyCluster::Config(0, sTimerDelegate)
-        .WithIdentifyType(Identify::IdentifyTypeEnum::kVisibleIndicator)
-        .WithDelegate(&sIdentifyDelegate));
+RegisteredServerCluster<IdentifyCluster> gIdentifyCluster0(IdentifyCluster::Config(0, sTimerDelegate)
+                                                               .WithIdentifyType(Identify::IdentifyTypeEnum::kVisibleIndicator)
+                                                               .WithDelegate(&sIdentifyDelegate));
 
-RegisteredServerCluster<IdentifyCluster> gIdentifyCluster1(
-    IdentifyCluster::Config(1, sTimerDelegate)
-        .WithIdentifyType(Identify::IdentifyTypeEnum::kVisibleIndicator)
-        .WithDelegate(&sIdentifyDelegate));
+RegisteredServerCluster<IdentifyCluster> gIdentifyCluster1(IdentifyCluster::Config(1, sTimerDelegate)
+                                                               .WithIdentifyType(Identify::IdentifyTypeEnum::kVisibleIndicator)
+                                                               .WithDelegate(&sIdentifyDelegate));
