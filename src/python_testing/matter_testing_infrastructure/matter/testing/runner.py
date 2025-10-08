@@ -649,7 +649,7 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
             return False
 
         if args.wifi_passphrase is None:
-            print("error: missing --wifi-passphrase <passphrasse> for --commissioning-method ble-wifi!")
+            print("error: missing --wifi-passphrase <passphrase> for --commissioning-method ble-wifi!")
             return False
 
         config.wifi_ssid = args.wifi_ssid
@@ -761,7 +761,7 @@ def convert_args_to_matter_config(args: argparse.Namespace):
 
     if args.commissioning_method and "nfc" in args.commissioning_method:
         if ("NFC_Reader_index" in config.global_test_params and
-                not any([args.passcodes,args.discriminators,args.manual_code])):
+                not any([args.passcodes, args.discriminators, args.manual_code])):
             from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
             nfc_tag_data = connect_read_nfc_tag_data(config.global_test_params.get("NFC_Reader_index"))
             args.qr_code.append(nfc_tag_data)
