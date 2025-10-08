@@ -433,7 +433,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportOptionsStorage)
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(1);
     transportOptions.audioStreamID.SetValue(2);
-    transportOptions.TLSEndpointID       = 1;
+    transportOptions.TLSEndpointID    = 1;
     std::string url                   = "rtsp://192.168.1.100:554/stream";
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
@@ -565,7 +565,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(1);
     transportOptions.audioStreamID.SetValue(2);
-    transportOptions.TLSEndpointID       = 1;
+    transportOptions.TLSEndpointID    = 1;
     std::string url                   = "rtsp://192.168.1.100:554/stream";
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;

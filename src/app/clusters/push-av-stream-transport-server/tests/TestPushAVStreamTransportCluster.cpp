@@ -1041,7 +1041,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(1);
     transportOptions.audioStreamID.SetValue(2);
-    transportOptions.TLSEndpointID       = 1;
+    transportOptions.TLSEndpointID    = 1;
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
     transportOptions.containerOptions = containerOptions;
