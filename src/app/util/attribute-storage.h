@@ -193,7 +193,7 @@ chip::DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPa
 uint16_t emberAfFixedEndpointCount();
 
 /**
- * Get semantic tag list associated with the provided endpoint. 
+ * Get semantic tag list associated with the provided endpoint.
  * Returns CHIP_ERROR_NOT_FOUND if the endpoint is invalid.
  * @param endpoint The target endpoint.
  * @param semanticTags The Span of SemanticTagStructs that will point to the tag list.
