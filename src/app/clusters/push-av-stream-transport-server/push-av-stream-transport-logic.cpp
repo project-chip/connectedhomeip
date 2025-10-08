@@ -29,6 +29,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <set>
 
 static constexpr uint16_t kMaxConnectionId = 65535; // This is also invalid connectionID
 static constexpr uint16_t kMaxEndpointId   = 65534;
@@ -541,40 +542,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     Commands::AllocatePushTransportResponse::Type response;
     auto & transportOptions = commandData.transportOptions;
 
-    IngestMethodsEnum ingestMethod = commandData.transportOptions.ingestMethod;
-
-    bool isFormatSupported = false;
-
-    for (auto & supportsFormat : mSupportedFormats)
-    {
-        if ((supportsFormat.ingestMethod == ingestMethod) &&
-            (supportsFormat.containerFormat == commandData.transportOptions.containerOptions.containerType))
-        {
-            isFormatSupported = true;
-        }
-    }
-
-    if (isFormatSupported == false)
-    {
-        auto status = to_underlying(StatusCodeEnum::kInvalidCombination);
-        ChipLogError(Zcl,
-                     "HandleAllocatePushTransport[ep=%d]: Invalid Ingest Method and Container Format Combination : (Ingest Method: "
-                     "%02X and Container Format: %02X)",
-                     mEndpointId, to_underlying(ingestMethod),
-                     to_underlying(commandData.transportOptions.containerOptions.containerType));
-        handler.AddClusterSpecificFailure(commandPath, status);
-        return std::nullopt;
-    }
-
-    /*Spec issue for invalid Trigger Type: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/11701*/
-    if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kUnknownEnumValue)
-    {
-        auto status = to_underlying(StatusCodeEnum::kInvalidTriggerType);
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Trigger type", mEndpointId);
-        handler.AddClusterSpecificFailure(commandPath, status);
-        return std::nullopt;
-    }
-
+    // Handle constraint checks against the provided command fields
     Status transportOptionsValidityStatus = ValidateIncomingTransportOptions(transportOptions);
 
     VerifyOrDo(transportOptionsValidityStatus == Status::Success, {
@@ -583,6 +551,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     });
 
+    // Validate the TLS Endpoint
     TlsClientManagementDelegate::EndpointStructType TLSEndpoint;
     if (mTLSClientManagementDelegate != nullptr)
     {
@@ -599,13 +568,6 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         // Use heap allocation for large certificate buffers to reduce stack usage
         auto rootCertBuffer   = std::make_unique<PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>>();
         auto clientCertBuffer = std::make_unique<PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>>();
-
-        if (!rootCertBuffer || !clientCertBuffer)
-        {
-            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Memory allocation failed for certificate buffers", mEndpointId);
-            handler.AddStatus(commandPath, Status::ResourceExhausted);
-            return std::nullopt;
-        }
 
         Tls::CertificateTable::BufferedClientCert clientCertEntry(*clientCertBuffer);
         Tls::CertificateTable::BufferedRootCert rootCertEntry(*rootCertBuffer);
@@ -631,36 +593,32 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    // here add check for valid zoneid
-    if ((transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion) &&
-        (transportOptions.triggerOptions.motionZones.HasValue()) && (!transportOptions.triggerOptions.motionZones.Value().IsNull()))
+    // IngestMethod has alread been validated against the constraints above, this is handling the subsequent required spec logic
+    // to cross-reference use against the ContainerType
+    IngestMethodsEnum ingestMethod = commandData.transportOptions.ingestMethod;
+
+    bool isFormatSupported = false;
+
+    for (auto & supportsFormat : mSupportedFormats)
     {
-
-        auto & motionZonesList = transportOptions.triggerOptions.motionZones;
-        auto iter              = motionZonesList.Value().Value().begin();
-        uint16_t zonesize      = 0;
-        auto itsz              = motionZonesList.Value().Value().begin();
-        while (itsz.Next())
+        if ((supportsFormat.ingestMethod == ingestMethod) &&
+            (supportsFormat.containerFormat == commandData.transportOptions.containerOptions.containerType))
         {
-            zonesize += 1;
+            isFormatSupported = true;
+            break;
         }
-        bool isValidZoneSize = mDelegate->ValidateMotionZoneSize(zonesize);
-        VerifyOrReturnValue(
-            isValidZoneSize, Status::ConstraintError,
-            ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid Motion Zone Size ", mEndpointId));
+    }
 
-        while (iter.Next())
-        {
-            auto & transportZoneOption = iter.GetValue();
-            Status zoneIdStatus        = mDelegate->ValidateZoneId(transportZoneOption.zone.Value());
-            if (zoneIdStatus != Status::Success)
-            {
-                auto status = to_underlying(StatusCodeEnum::kInvalidZone);
-                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid ZoneId", mEndpointId);
-                handler.AddClusterSpecificFailure(commandPath, status);
-                return std::nullopt;
-            }
-        }
+    if (isFormatSupported == false)
+    {
+        auto status = to_underlying(StatusCodeEnum::kInvalidCombination);
+        ChipLogError(Zcl,
+                     "HandleAllocatePushTransport[ep=%d]: Invalid Ingest Method and Container Format Combination : (Ingest Method: "
+                     "%02X and Container Format: %02X)",
+                     mEndpointId, to_underlying(ingestMethod),
+                     to_underlying(commandData.transportOptions.containerOptions.containerType));
+        handler.AddClusterSpecificFailure(commandPath, status);
+        return std::nullopt;
     }
 
     bool isValidUrl = mDelegate->ValidateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
@@ -683,7 +641,79 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    // Todo:Validate MotionZones
+    // Validate the motion zones in the trigger options
+    if ((transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion) &&
+        (transportOptions.triggerOptions.motionZones.HasValue()) && (!transportOptions.triggerOptions.motionZones.Value().IsNull()))
+    {
+
+        auto & motionZonesList = transportOptions.triggerOptions.motionZones;
+        auto iterDupCheck      = motionZonesList.Value().Value().begin();
+        size_t zoneListSize    = 0;
+        motionZonesList.Value().Value().ComputeSize(&zoneListSize);
+
+        // If there are duplicate entries, reject the command
+        std::set<uint16_t> zoneIDsFound;
+        bool nullFound = false;
+
+        while (iterDupCheck.Next())
+        {
+            auto & transportZoneOption = iterDupCheck.GetValue();
+            if (!transportZoneOption.zone.IsNull())
+            {
+                uint16_t zoneID = transportZoneOption.zone.Value();
+                if (zoneIDsFound.count(zoneID) == 0)
+                {
+                    // Zone ID not found, add to set of IDs
+                    zoneIDsFound.emplace(zoneID);
+                }
+                else
+                {
+                    // This is a duplicate
+                    ChipLogError(
+                        Zcl, "Transport Options verification from command data[ep=%d]: Duplicate Zone ID (=%d) in Motion Zones. ",
+                        mEndpointId, zoneID);
+                    return Status::AlreadyExists;
+                }
+            }
+            else
+            {
+                if (nullFound)
+                {
+                    // This is the second null, therefore also a duplicate entry
+                    ChipLogError(
+                        Zcl, "Transport Options verification from command data[ep=%d]: Duplicate Null Zone ID in Motion Zones. ",
+                        mEndpointId);
+                    return Status::AlreadyExists;
+                }
+                nullFound = true;
+            }
+        }
+
+        bool isValidZoneSize = mDelegate->ValidateMotionZoneListSize(zoneListSize);
+        VerifyOrReturnValue(
+            isValidZoneSize, Status::DynamicConstraintError,
+            ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid Motion Zone Size ", mEndpointId));
+
+        auto iter = motionZonesList.Value().Value().begin();
+        while (iter.Next())
+        {
+            auto & transportZoneOption = iter.GetValue();
+
+            // The Zone can be Null, meaning this trigger applies to all zones, if not null, verify with the delegate that the
+            // ZoneID (in the ZoneManagement cluster instance) is valid
+            if (!transportZoneOption.zone.IsNull())
+            {
+                Status zoneIdStatus = mDelegate->ValidateZoneId(transportZoneOption.zone.Value());
+                if (zoneIdStatus != Status::Success)
+                {
+                    auto status = to_underlying(StatusCodeEnum::kInvalidZone);
+                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid ZoneId", mEndpointId);
+                    handler.AddClusterSpecificFailure(commandPath, status);
+                    return std::nullopt;
+                }
+            }
+        }
+    }
 
     // Validate Bandwidth Requirement
     Status status = mDelegate->ValidateBandwidthLimit(transportOptions.streamUsage, transportOptions.videoStreamID,

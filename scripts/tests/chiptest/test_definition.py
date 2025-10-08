@@ -465,6 +465,7 @@ class TestDefinition:
                 test_cmd = paths.chip_tool_with_python_cmd + ['tests', self.run_name] + ['--PICS', pics_file]
                 server_args = ['--server_path', paths.chip_tool[-1]] + \
                     ['--server_arguments', 'interactive server' +
+                        (' --interface-id -1' if test_runtime == TestRunTime.CHIP_TOOL_PYTHON else '') +
                         (' ' if len(tool_storage_args) else '') + ' '.join(tool_storage_args) +
                         (' ' if len(pairing_server_args) else '') + ' '.join(pairing_server_args)]
                 pairing_cmd += server_args

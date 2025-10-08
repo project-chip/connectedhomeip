@@ -76,15 +76,6 @@ RUN set -x \
   && chmod -R a+w /opt/android/sdk/licenses \
   && : # last line
 
-# mbedos requirements are generally just PIP packages
-RUN set -x \
-  && pip3 install --break-system-packages --no-cache-dir -U mbed-cli==1.10.5 mbed-tools==7.44.0 \
-  && : # last line
-RUN set -x \
-  && mbed config -G GCC_ARM_PATH /opt/mbed-os-toolchain/gcc-arm-none-eabi-9-2019-q4-major/bin/ \
-  && mbed toolchain -G -s GCC_ARM \
-  && : # last line
-
 # Required for the Tizen SDK:
 #   - zip
 # Required for the Open IoT SDK platform

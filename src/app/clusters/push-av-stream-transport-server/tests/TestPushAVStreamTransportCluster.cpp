@@ -333,7 +333,7 @@ public:
         return Status::Success;
     }
 
-    bool ValidateMotionZoneSize(uint16_t zoneSize) override
+    bool ValidateMotionZoneListSize(size_t zoneListSize) override
     {
         // TODO: Validate motion zone size
         // Returning true to pass through checks in the Server Implementation.
@@ -377,7 +377,7 @@ public:
         // No-op implementation for tests
     }
 
-    void SetPushAvStreamTransportServer(PushAvStreamTransportServerLogic * serverLogic) override
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) override
     {
         // No-op implementation for tests
     }
@@ -391,29 +391,43 @@ class TestTlsClientManagementDelegate : public TlsClientManagementDelegate
 
 public:
     CHIP_ERROR GetProvisionedEndpointByIndex(EndpointId matterEndpoint, FabricIndex fabric, size_t index,
-                                             EndpointStructType & endpoint) const
+                                             EndpointStructType & endpoint) const override
     {
         return CHIP_NO_ERROR;
     }
 
     Protocols::InteractionModel::ClusterStatusCode
     ProvisionEndpoint(EndpointId matterEndpoint, FabricIndex fabric,
-                      const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & provisionReq, uint16_t & endpointID)
+                      const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & provisionReq,
+                      uint16_t & endpointID) override
     {
         return ClusterStatusCode(Status::Success);
     }
 
     Protocols::InteractionModel::Status FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                    uint16_t endpointID, EndpointStructType & endpoint) const
+                                                                    uint16_t endpointID,
+                                                                    EndpointStructType & endpoint) const override
     {
         return Status::Success;
     }
 
-    Protocols::InteractionModel::ClusterStatusCode RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                                 uint16_t endpointID)
+    Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                      uint16_t endpointID) override
     {
-        return ClusterStatusCode(Status::Success);
+        return Status::Success;
     }
+
+    CHIP_ERROR RootCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR ClientCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    void RemoveFabric(FabricIndex fabric) override {}
 };
 
 class TestPushAVStreamTransportServerLogic : public ::testing::Test

@@ -24,7 +24,6 @@ assert(chip_device_platform == "linux" || chip_device_platform == "nuttx")
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
-  import("//build_overrides/ot_br_posix.gni")
 }
 
 if (chip_mdns == "platform") {

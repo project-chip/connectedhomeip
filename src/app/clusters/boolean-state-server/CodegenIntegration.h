@@ -22,6 +22,6 @@
 
 namespace chip::app::Clusters::BooleanState {
 
-BooleanStateCluster * GetClusterForEndpointIndex(EndpointId endpointId);
+BooleanStateCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
 } // namespace chip::app::Clusters::BooleanState

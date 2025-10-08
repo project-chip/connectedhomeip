@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:167
+            image: ghcr.io/project-chip/chip-build-nxp:168
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -102,8 +102,10 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-mcxw72-freertos-contact-sensor-low-power \
-                      --target nxp-mcxw72-freertos-lock-app \
+                      --target nxp-mcxw72-freertos-contact-sensor-thread-mtd-low-power-cmake-frdm \
+                      --target nxp-mcxw72-freertos-lighting-thread-cmake-frdm \
+                      --target nxp-mcxw72-freertos-lock-app-thread-mtd-low-power-cmake-frdm \
+                      --target nxp-mcxw72-freertos-contact-sensor-ota-low-power \
                       build \
                   "
 
@@ -177,6 +179,13 @@ jobs:
                       --target nxp-rw61x-freertos-thermostat-ethernet-cmake-frdm \
                       build \
                   "
+            - name: Build RW61X unit test example app
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-rw61x-freertos-unit-test-cmake-frdm \
+                      build \
+                  "
 
             - name: clean build
               run: rm -rf ./out
@@ -193,7 +202,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:167
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:168
 
         steps:
             - name: Checkout
