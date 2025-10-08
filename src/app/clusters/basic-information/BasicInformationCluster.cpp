@@ -418,13 +418,6 @@ CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
 
     AttributePersistence persistence(context.attributeStorage);
 
-    AttributeId attributesToUpdate[] = { NodeLabel::Id, LocalConfigDisabled::Id, Attributes::NodeLabel::Id,
-                                         Attributes::LocalConfigDisabled::Id };
-    unsigned char buffer[255];
-    MutableByteSpan bsBuffer(buffer);
-    MigrateFromSafeAttributePersistanceProvider(kRootEndpointId, BasicInformation::Id, Span(attributesToUpdate), bsBuffer,
-                                                context.storage);
-
     (void) persistence.LoadString({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, mNodeLabel);
     // Specialization because some platforms `#define` true/false as 1/0 and we get;
     // error: no matching function for call to

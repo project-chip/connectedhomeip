@@ -1,24 +1,20 @@
 #include "AttributePersistenceMigration.h"
 
 namespace chip::app {
-// Only available in little endian for the moment
-CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(EndpointId endpointId, ClusterId clusterId, Span<AttributeId> attributes,
-                                                       MutableByteSpan & buffer, PersistentStorageDelegate & storageDelegate)
+
+CHIP_ERROR MigrateFromSafeAttributePersistanceProvider(SafeAttributePersistenceProvider & safeProvider,
+                                                       AttributePersistenceProvider & normProvider, ConcreteClusterPath path,
+                                                       Span<AttributeId> attributes, MutableByteSpan & buffer)
 {
-
     ChipError err;
-    DefaultSafeAttributePersistenceProvider safeProvider;
-    safeProvider.Init(&storageDelegate);
-    DefaultAttributePersistenceProvider normProvider;
-    normProvider.Init(&storageDelegate);
-
     for (auto attr : attributes)
     {
         // We make a copy of the buffer so it can be resized
+        // Still refers to same internal buffer though
         MutableByteSpan copyOfBuffer = buffer;
 
-        auto safePath = DefaultStorageKeyAllocator::SafeAttributeValue(endpointId, clusterId, attr);
-        auto attrPath = ConcreteAttributePath(endpointId, clusterId, attr);
+        auto safePath = DefaultStorageKeyAllocator::SafeAttributeValue(path.mEndpointId, path.mClusterId, attr);
+        auto attrPath = ConcreteAttributePath(path.mEndpointId, path.mClusterId, attr);
         // Read Value, will resize copyOfBuffer to read size
         err = safeProvider.SafeReadValue(attrPath, copyOfBuffer);
         if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
