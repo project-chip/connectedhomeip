@@ -18,13 +18,18 @@
 #include <app/clusters/joint-fabric-administrator-server/JCMCommissionee.h>
 #include <app/tests/AppTestContext.h>
 #include <credentials/jcm/TrustVerification.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/TLV.h>
+#include <lib/support/Span.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <access/SubjectDescriptor.h>
 #include <app/CommandHandler.h>
+#include <app/server/Server.h>
 
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -85,13 +90,16 @@ private:
     Access::SubjectDescriptor mSubjectDescriptor;
 };
 
-class TestableJCMCommissionee : public JCMCommissionee
+/**
+ * Intended for testing JCMCommissionee's progression through the stages of JCM
+ */
+class ProgressionJCMCommissionee : public JCMCommissionee
 {
 public:
     using Base             = JCMCommissionee;
     using OnCompletionFunc = Base::OnCompletionFunc;
 
-    TestableJCMCommissionee(CommandHandler::Handle & handle, EndpointId endpointId, OnCompletionFunc onCompletion) :
+    ProgressionJCMCommissionee(CommandHandler::Handle & handle, EndpointId endpointId, OnCompletionFunc onCompletion) :
         Base(handle, endpointId, std::move(onCompletion))
     {}
 
@@ -119,6 +127,301 @@ private:
     std::vector<TrustVerificationError> mCompletionEvents;
 };
 
+/**
+ * Intended for testing the outcomes of a single stage of trust verification.
+ */
+class SingleStageJCMCommissionee : public JCMCommissionee
+{
+public:
+    TrustVerificationError mError;
+    bool mReadShouldSucceed;
+
+protected:
+    void TrustVerificationStageFinished(const TrustVerificationStage & completedStage, const TrustVerificationError & error)
+    {
+        mError = error;
+    }
+
+    template <typename T>
+    CHIP_ERROR ReadAttribute(EndpointId endpointId,
+                             std::function<void(const ConcreteAttributePath &, const typename T::DecodableType &)> onSuccess,
+                             std::function<void(const ConcreteAttributePath *, CHIP_ERROR err)> onError, const bool fabricFiltered)
+    {
+        (void) fabricFiltered;
+
+        using AdminFabricIndexAttr = Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::TypeInfo;
+        using FabricsAttr          = Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo;
+        using CertsAttr            = Clusters::OperationalCredentials::Attributes::TrustedRootCertificates::TypeInfo;
+        using NocsAttr             = Clusters::OperationalCredentials::Attributes::NOCs::TypeInfo;
+
+        if (!mReadShouldSucceed)
+        {
+            onError(nullptr, CHIP_ERROR_INTERNAL);
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        ConcreteAttributePath path(endpointId, T::GetClusterId(), T::GetAttributeId());
+
+        if constexpr (std::is_same_v<T, AdminFabricIndexAttr>)
+        {
+            typename T::DecodableType value;
+            value.SetNonNull(static_cast<FabricIndex>(1));
+            onSuccess(path, value);
+            return CHIP_NO_ERROR;
+        }
+        else if constexpr (std::is_same_v<T, FabricsAttr>)
+        {
+            constexpr uint8_t kDummyRootKey[Crypto::kP256_PublicKey_Length] = {
+                0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11,
+                0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x20, 0x21, 0x22,
+                0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33,
+                0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x41
+            };
+            FabricIndex fabricIndex =
+                (mInfo.adminFabricIndex == kUndefinedFabricIndex) ? static_cast<FabricIndex>(1) : mInfo.adminFabricIndex;
+
+            typename T::DecodableType value;
+
+            uint8_t buffer[256];
+            TLV::TLVWriter writer;
+            writer.Init(buffer, sizeof(buffer));
+            TLV::TLVType outerType;
+            CHIP_ERROR err = writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType);
+            if (err != CHIP_NO_ERROR)
+            {
+                onError(&path, err);
+                return err;
+            }
+
+            TLV::TLVType structType;
+            err = writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType);
+            if (err != CHIP_NO_ERROR)
+            {
+                onError(&path, err);
+                return err;
+            }
+
+            err = writer.Put(TLV::ContextTag(static_cast<uint8_t>(
+                                 Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kRootPublicKey)),
+                             ByteSpan(kDummyRootKey, sizeof(kDummyRootKey)));
+            if (err == CHIP_NO_ERROR)
+            {
+                err = writer.Put(TLV::ContextTag(static_cast<uint8_t>(
+                                     Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kVendorID)),
+                                 static_cast<uint16_t>(0x1234));
+            }
+            if (err == CHIP_NO_ERROR)
+            {
+                err = writer.Put(TLV::ContextTag(static_cast<uint8_t>(
+                                     Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kFabricID)),
+                                 static_cast<FabricId>(0x1122334455667788ULL));
+            }
+            if (err == CHIP_NO_ERROR)
+            {
+                err = writer.Put(TLV::ContextTag(static_cast<uint8_t>(
+                                     Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kFabricIndex)),
+                                 fabricIndex);
+            }
+            if (err != CHIP_NO_ERROR)
+            {
+                onError(&path, err);
+                return err;
+            }
+
+            err = writer.EndContainer(structType);
+            if (err != CHIP_NO_ERROR)
+            {
+                onError(&path, err);
+                return err;
+            }
+
+            err = writer.EndContainer(outerType);
+            if (err != CHIP_NO_ERROR)
+            {
+                onError(&path, err);
+                return err;
+            }
+
+            TLV::TLVReader reader;
+            reader.Init(buffer, writer.GetLengthWritten());
+            err = reader.Next();
+            if (err != CHIP_NO_ERROR)
+            {
+                onError(&path, err);
+                return err;
+            }
+
+            TLV::TLVType innerType;
+            err = reader.EnterContainer(innerType);
+            if (err != CHIP_NO_ERROR)
+            {
+                onError(&path, err);
+                return err;
+            }
+
+            value.SetReader(reader);
+            value.SetFabricIndex(fabricIndex);
+
+            err = reader.ExitContainer(innerType);
+            if (err != CHIP_NO_ERROR)
+            {
+                onError(&path, err);
+                return err;
+            }
+
+            onSuccess(path, value);
+            return CHIP_NO_ERROR;
+        }
+        else if constexpr (std::is_same_v<T, CertsAttr>)
+        {
+            constexpr uint8_t kDummyRootCert[] = { 0xA1, 0xB2, 0xC3, 0xD4 };
+
+            typename T::DecodableType value;
+
+            uint8_t buffer[64];
+            TLV::TLVWriter writer;
+            writer.Init(buffer, sizeof(buffer));
+            TLV::TLVType outerType;
+            CHIP_ERROR err = writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType);
+            if (err == CHIP_NO_ERROR)
+            {
+                err = writer.Put(TLV::AnonymousTag(), ByteSpan(kDummyRootCert, sizeof(kDummyRootCert)));
+            }
+            if (err == CHIP_NO_ERROR)
+            {
+                err = writer.EndContainer(outerType);
+            }
+            if (err != CHIP_NO_ERROR)
+            {
+                onError(&path, err);
+                return err;
+            }
+
+            TLV::TLVReader reader;
+            reader.Init(buffer, writer.GetLengthWritten());
+            err = reader.Next();
+            if (err != CHIP_NO_ERROR)
+            {
+                onError(&path, err);
+                return err;
+            }
+
+            TLV::TLVType innerType;
+            err = reader.EnterContainer(innerType);
+            if (err != CHIP_NO_ERROR)
+            {
+                onError(&path, err);
+                return err;
+            }
+
+            value.SetReader(reader);
+
+            err = reader.ExitContainer(innerType);
+            if (err != CHIP_NO_ERROR)
+            {
+                onError(&path, err);
+                return err;
+            }
+
+            onSuccess(path, value);
+            return CHIP_NO_ERROR;
+        }
+        else if constexpr (std::is_same_v<T, NocsAttr>)
+        {
+            constexpr uint8_t kDummyNoc[]  = { 0x0A, 0x0B, 0x0C };
+            constexpr uint8_t kDummyIcac[] = { 0x1A, 0x1B, 0x1C, 0x1D };
+
+            FabricIndex fabricIndex =
+                (mInfo.adminFabricIndex == kUndefinedFabricIndex) ? static_cast<FabricIndex>(1) : mInfo.adminFabricIndex;
+
+            typename T::DecodableType value;
+
+            uint8_t buffer[128];
+            TLV::TLVWriter writer;
+            writer.Init(buffer, sizeof(buffer));
+            TLV::TLVType outerType;
+            CHIP_ERROR err = writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType);
+            if (err != CHIP_NO_ERROR)
+            {
+                onError(&path, err);
+                return err;
+            }
+
+            TLV::TLVType structType;
+            err = writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType);
+            if (err == CHIP_NO_ERROR)
+            {
+                err = writer.Put(
+                    TLV::ContextTag(static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::NOCStruct::Fields::kNoc)),
+                    ByteSpan(kDummyNoc, sizeof(kDummyNoc)));
+            }
+            if (err == CHIP_NO_ERROR)
+            {
+                err = writer.Put(
+                    TLV::ContextTag(static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::NOCStruct::Fields::kIcac)),
+                    ByteSpan(kDummyIcac, sizeof(kDummyIcac)));
+            }
+            if (err == CHIP_NO_ERROR)
+            {
+                err = writer.Put(TLV::ContextTag(static_cast<uint8_t>(
+                                     Clusters::OperationalCredentials::Structs::NOCStruct::Fields::kFabricIndex)),
+                                 fabricIndex);
+            }
+            if (err != CHIP_NO_ERROR)
+            {
+                onError(&path, err);
+                return err;
+            }
+
+            err = writer.EndContainer(structType);
+            if (err == CHIP_NO_ERROR)
+            {
+                err = writer.EndContainer(outerType);
+            }
+            if (err != CHIP_NO_ERROR)
+            {
+                onError(&path, err);
+                return err;
+            }
+
+            TLV::TLVReader reader;
+            reader.Init(buffer, writer.GetLengthWritten());
+            err = reader.Next();
+            if (err != CHIP_NO_ERROR)
+            {
+                onError(&path, err);
+                return err;
+            }
+
+            TLV::TLVType innerType;
+            err = reader.EnterContainer(innerType);
+            if (err != CHIP_NO_ERROR)
+            {
+                onError(&path, err);
+                return err;
+            }
+
+            value.SetReader(reader);
+            value.SetFabricIndex(fabricIndex);
+
+            err = reader.ExitContainer(innerType);
+            if (err != CHIP_NO_ERROR)
+            {
+                onError(&path, err);
+                return err;
+            }
+
+            onSuccess(path, value);
+            return CHIP_NO_ERROR;
+        }
+        else
+        {
+            onError(&path, CHIP_ERROR_NOT_IMPLEMENTED);
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+    }
+};
+
 class TestJCMCommissionee : public chip::Test::AppContext
 {
 public:
@@ -138,14 +441,16 @@ protected:
     void SetUp() override { AppContext::SetUp(); }
     void TearDown() override { AppContext::TearDown(); }
 
-    void NextStageFollowsExpectedOrder();
-    void SuccessfulProgressionAdvancesAllStages();
-    void ErrorDuringStagePropagatesToCompletion();
+    void TestNextStageFollowsExpectedOrder();
+    void TestSuccessfulProgressionAdvancesAllStages();
+    void TestErrorDuringStagePropagatesToCompletion();
+    void TestStoreEndpointId();
+    void TestReadCommissionerAdminFabricIndex();
 };
 
 } // namespace
 
-TEST_F_FROM_FIXTURE(TestJCMCommissionee, NextStageFollowsExpectedOrder)
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestNextStageFollowsExpectedOrder)
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
@@ -153,7 +458,7 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, NextStageFollowsExpectedOrder)
     bool completionCalled      = false;
     CHIP_ERROR completionError = CHIP_ERROR_INTERNAL;
 
-    TestableJCMCommissionee commissionee(handle, EndpointId{ 1 }, [&](CHIP_ERROR err) {
+    ProgressionJCMCommissionee commissionee(handle, EndpointId{ 1 }, [&](CHIP_ERROR err) {
         completionCalled = true;
         completionError  = err;
     });
@@ -171,7 +476,7 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, NextStageFollowsExpectedOrder)
     EXPECT_EQ(completionError, CHIP_ERROR_INTERNAL);
 }
 
-TEST_F_FROM_FIXTURE(TestJCMCommissionee, SuccessfulProgressionAdvancesAllStages)
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestSuccessfulProgressionAdvancesAllStages)
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
@@ -179,7 +484,7 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, SuccessfulProgressionAdvancesAllStages)
     bool completionCalled      = false;
     CHIP_ERROR completionError = CHIP_ERROR_INTERNAL;
 
-    TestableJCMCommissionee commissionee(handle, EndpointId{ 2 }, [&](CHIP_ERROR err) {
+    ProgressionJCMCommissionee commissionee(handle, EndpointId{ 2 }, [&](CHIP_ERROR err) {
         completionCalled = true;
         completionError  = err;
     });
@@ -213,7 +518,7 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, SuccessfulProgressionAdvancesAllStages)
     EXPECT_EQ(completionError, CHIP_NO_ERROR);
 }
 
-TEST_F_FROM_FIXTURE(TestJCMCommissionee, ErrorDuringStagePropagatesToCompletion)
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestErrorDuringStagePropagatesToCompletion)
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
@@ -221,7 +526,7 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, ErrorDuringStagePropagatesToCompletion)
     bool completionCalled      = false;
     CHIP_ERROR completionError = CHIP_NO_ERROR;
 
-    TestableJCMCommissionee commissionee(handle, EndpointId{ 3 }, [&](CHIP_ERROR err) {
+    ProgressionJCMCommissionee commissionee(handle, EndpointId{ 3 }, [&](CHIP_ERROR err) {
         completionCalled = true;
         completionError  = err;
     });
@@ -236,4 +541,71 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, ErrorDuringStagePropagatesToCompletion)
 
     EXPECT_TRUE(completionCalled);
     EXPECT_EQ(completionError, CHIP_ERROR_INTERNAL);
+}
+
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestStoreEndpointId)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    class StoreEndpointIdOnlyCommissionee : public JCMCommissionee
+    {
+    public:
+        StoreEndpointIdOnlyCommissionee(CommandHandler::Handle & handle, EndpointId endpointId, OnCompletionFunc onCompletion) :
+            JCMCommissionee(handle, endpointId, std::move(onCompletion))
+        {}
+
+    protected:
+        TrustVerificationStage GetNextTrustVerificationStage(const TrustVerificationStage & currentStage) override
+        {
+            switch (currentStage)
+            {
+            case TrustVerificationStage::kIdle:
+                return TrustVerificationStage::kStoringEndpointID;
+            case TrustVerificationStage::kStoringEndpointID:
+                return TrustVerificationStage::kComplete;
+            default:
+                return TrustVerificationStage::kComplete;
+            }
+        }
+
+        void PerformTrustVerificationStage(const TrustVerificationStage & nextStage) override
+        {
+            if (nextStage == TrustVerificationStage::kStoringEndpointID || nextStage == TrustVerificationStage::kComplete)
+            {
+                JCMCommissionee::PerformTrustVerificationStage(nextStage);
+                return;
+            }
+
+            TrustVerificationStageFinished(nextStage, TrustVerificationError::kInternalError);
+        }
+    };
+
+    FakeCommandHandler commandHandler;
+    CommandHandler::Handle handle(&commandHandler);
+
+    bool completionCalled      = false;
+    CHIP_ERROR completionError = CHIP_ERROR_INTERNAL;
+
+    constexpr EndpointId kExpectedEndpointId{ 55 };
+    Server::GetInstance().GetJointFabricAdministrator().SetPeerJFAdminClusterEndpointId(kInvalidEndpointId);
+
+    StoreEndpointIdOnlyCommissionee commissionee(handle, kExpectedEndpointId, [&](CHIP_ERROR err) {
+        completionCalled = true;
+        completionError  = err;
+    });
+
+    commissionee.VerifyTrustAgainstCommissionerAdmin();
+
+    EXPECT_TRUE(completionCalled);
+    EXPECT_EQ(completionError, CHIP_NO_ERROR);
+    EXPECT_EQ(Server::GetInstance().GetJointFabricAdministrator().GetPeerJFAdminClusterEndpointId(), kExpectedEndpointId);
+
+    Server::GetInstance().GetJointFabricAdministrator().SetPeerJFAdminClusterEndpointId(kInvalidEndpointId);
+#else
+    GTEST_SKIP() << "Joint Fabric Administrator feature disabled.";
+#endif
+}
+
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadCommissionerAdminFabricIndex)
+{
+    // TODO: implement
 }
