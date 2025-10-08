@@ -177,6 +177,9 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                                           f"AttributeList not found in cluster {cluster_id} on endpoint {ep}")
 
                         # Verify that returned attributes match the AttributeList
+                        # Extra assertion to ensure cluster_id exists before accessing (defense in depth)
+                        asserts.assert_in(cluster_id, read_response.tlvAttributes[ep],
+                                          f"Cluster {cluster_id} not found in endpoint {ep}")
                         returned_attrs = sorted([x for x in read_response.tlvAttributes[ep][cluster_id].keys()])
                         attr_list = sorted([x for x in read_response.tlvAttributes[ep][cluster_id][
                             ClusterObjects.ALL_CLUSTERS[cluster_id].Attributes.AttributeList.attribute_id]])
@@ -413,58 +416,63 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             [(self.endpoint, Clusters.AccessControl.Attributes.Acl)])
         dut_acl_original = read_acl.attributes[self.endpoint][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
 
-        # Create an ACE that grants View access to TH2 for only ONE specific cluster
-        ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=cluster_id)],
-            subjects=[TH2_nodeid])
-        dut_acl = copy.deepcopy(dut_acl_original)
-        dut_acl.append(ace)
+        try:
+            # Create an ACE that grants View access to TH2 for only ONE specific cluster
+            ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=cluster_id)],
+                subjects=[TH2_nodeid])
+            dut_acl = copy.deepcopy(dut_acl_original)
+            dut_acl.append(ace)
 
-        # Write the modified ACL to grant TH2 limited access
-        await self.default_controller.WriteAttribute(
-            self.dut_node_id,
-            [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl))])
-        logging.info(f"Granted TH2 View access to only cluster {cluster_id}")
+            # Write the modified ACL to grant TH2 limited access
+            await self.default_controller.WriteAttribute(
+                self.dut_node_id,
+                [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl))])
+            logging.info(f"Granted TH2 View access to only cluster {cluster_id}")
 
-        # Use TH2 to read ALL attributes from ALL clusters at the endpoint
-        read_request = await TH2.Read(
-            self.dut_node_id,
-            [(endpoint)])  # Read everything at this endpoint with limited access
+            # Use TH2 to read ALL attributes from ALL clusters at the endpoint
+            read_request = await TH2.Read(
+                self.dut_node_id,
+                [(endpoint)]) 
 
-        # Verify the endpoint is in the response
-        asserts.assert_in(endpoint, read_request.attributes,
-                          f"Endpoint {endpoint} not found in response - may not exist or have no accessible clusters")
+            # Verify the endpoint is in the response
+            asserts.assert_in(endpoint, read_request.attributes,
+                              f"Endpoint {endpoint} not found in response - may not exist or have no accessible clusters")
 
-        # Verify only the allowed cluster is returned
-        returned_clusters = list(read_request.attributes[endpoint].keys())
-        logging.info(f"Clusters returned with limited access (TH2): {[c.id for c in returned_clusters]}")
+            # Verify only the allowed cluster is returned
+            returned_clusters = list(read_request.attributes[endpoint].keys())
+            logging.info(f"Clusters returned with limited access (TH2): {[c.id for c in returned_clusters]}")
 
-        # The allowed cluster should be present
-        allowed_cluster_obj = None
-        for cluster_obj in returned_clusters:
-            if cluster_obj.id == cluster_id:
-                allowed_cluster_obj = cluster_obj
-                break
-        asserts.assert_is_not_none(allowed_cluster_obj,
-                                   f"Expected cluster {cluster_id} (allowed) to be present in response")
+            # The allowed cluster should be present
+            allowed_cluster_obj = None
+            for cluster_obj in returned_clusters:
+                if cluster_obj.id == cluster_id:
+                    allowed_cluster_obj = cluster_obj
+                    break
+            asserts.assert_is_not_none(allowed_cluster_obj,
+                                       f"Expected cluster {cluster_id} (allowed) to be present in response")
 
-        # Verify NO OTHER clusters are returned
-        for cluster_obj in returned_clusters:
-            if cluster_obj.id != cluster_id:
-                asserts.fail(f"Unexpected cluster {cluster_obj.id} returned - should only get allowed cluster {cluster_id}")
+            for cluster_obj in returned_clusters:
+                if cluster_obj.id != cluster_id:
+                    asserts.fail(f"Unexpected cluster {cluster_obj.id} returned - should only get allowed cluster {cluster_id}")
 
-        # Restore original ACL
-        await self.default_controller.WriteAttribute(
-            self.dut_node_id,
-            [(self.endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl_original))])
-        logging.info("Restored original ACL")
+            return dut_acl_original, read_request
 
-        # Removes TH2 controller
-        TH2.Shutdown()
+        finally:
+            # Ensure cleanup happens even if an exception occurs
+            # Restore original ACL
+            try:
+                await self.default_controller.WriteAttribute(
+                    self.dut_node_id,
+                    [(self.endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl_original))])
+                logging.info("Restored original ACL")
+            except Exception as e:
+                logging.error(f"Failed to restore original ACL: {e}")
 
-        return dut_acl_original, read_request
+            # Removes TH2 controller
+            TH2.Shutdown()
 
     async def _read_all_events_attributes(self):
         return await self.default_controller.Read(nodeid=self.dut_node_id, attributes=[()], events=[()])
