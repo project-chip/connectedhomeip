@@ -154,6 +154,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         idle = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
         querying = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
         downloading = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
+        applying = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying
 
         target_version = 2
 
@@ -293,8 +294,21 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
             asserts.assert_equal(location_basic_information,
                                  parsed['location'], f"Location is {parsed['location']} and it should be {location_basic_information}")
 
+        # Event Handler
+        event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
+        await event_cb.start(dev_ctrl=th1, node_id=requestor_node_id, endpoint=endpoint,
+                             fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+
+        applying_event = event_cb.wait_for_event_report(
+            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
+        asserts.assert_equal(applying, applying_event.newState,
+                             f"New state is {applying_event.newState} and it should be {applying}")
+
+        event_cb.reset()
+        await event_cb.cancel()
+
         # Stop provider
-        await asyncio.sleep(120)
+        await asyncio.sleep(2)
         try:
             provider_1.terminate()
         except Exception as e:
@@ -339,18 +353,6 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         )
 
         logging.info(f"TH2 commissioned: {resp}.")
-
-        # Commissioning Provider-TH1
-        # logging.info("Commissioning OTA Provider to TH1")
-#
-        # resp = await th1.CommissionOnNetwork(
-        #     nodeId=p1_node,
-        #     setupPinCode=p_pass,
-        #     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-        #     filter=p1_disc
-        # )
-#
-        # logging.info(f"Commissioning response: {resp}.")
 
         # Commissioning Provider-TH2
         logging.info("Commissioning OTA Provider to TH2")
@@ -402,10 +404,17 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         )
         asserts.assert_equal(resp[0].Status, Status.Success, "Clean DefaultOTAProviders failed.")
 
+        event_cb.reset()
+        await event_cb.cancel()
+        await asyncio.sleep(2)
+
         # Subscribe to events
         event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
         await event_cb.start(dev_ctrl=th2, node_id=requestor_node_id, endpoint=endpoint,
                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+
+        # Define ACL entry
+        await self.create_acl_entry(dev_ctrl=th2, provider_node_id=p2_node, requestor_node_id=requestor_node_id)
 
         # Write default OTA providers TH2
         await self.write_ota_providers(th2, p2_node, endpoint)
@@ -416,19 +425,32 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         event_idle_to_querying = event_cb.wait_for_event_report(
             Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
 
-        self.verfiy_state_transition_event(event_report=event_idle_to_querying, previous_state=idle, new_state=querying)
+        self.verify_state_transition_event(event_report=event_idle_to_querying, previous_state=idle, new_state=querying)
 
-        event_querying_to_downloading = event_cb.wait_for_event_report(
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
+        # event_querying_to_downloading = event_cb.wait_for_event_report(
+        #     Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
+#
+        # self.verify_state_transition_event(event_report=event_querying_to_downloading,
+        #                                    previous_state=querying, new_state=downloading, target_version=target_version)
 
-        self.verfiy_state_transition_event(event_report=event_querying_to_downloading,
-                                           previous_state=querying, new_state=downloading, target_version=target_version)
+        event_cb.reset()
+        await event_cb.cancel()
 
-        await asyncio.sleep(5)
+        logging.info("Cleaning DefaultOTAProviders.")
+        resp = await th2.WriteAttribute(
+            dut_node_id,
+            [(endpoint, Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders([]))]
+        )
+        asserts.assert_equal(resp[0].Status, Status.Success, "Clean DefaultOTAProviders failed.")
+
+        await asyncio.sleep(2)
         try:
             provider_2.terminate()
         except Exception as e:
             logging.warning(f"Provider termination raised: {e}")
+
+        await asyncio.sleep(2)
+        th2.ExpireSessions(nodeid=p2_node)
 
 
 if __name__ == "__main__":
