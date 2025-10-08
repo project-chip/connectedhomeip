@@ -34,11 +34,12 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+
 from mobly import asserts
 
 from matter.setup_payload import SetupPayload
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 

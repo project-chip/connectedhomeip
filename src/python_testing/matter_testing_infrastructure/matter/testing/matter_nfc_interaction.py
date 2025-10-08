@@ -1,5 +1,6 @@
 import logging
 import re
+
 import ndef
 from mobly import asserts
 from smartcard.System import readers
