@@ -12,14 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import os
+import re
 import signal
 import tempfile
 from dataclasses import dataclass
 from sys import stderr, stdout
 from typing import BinaryIO, Optional, Union
 
+import matter.clusters as Clusters
+from matter.ChipDeviceCtrl import ChipDeviceController
+from matter.clusters.Types import NullValue
 from matter.testing.tasks import Subprocess
 
 
@@ -195,19 +198,20 @@ class OTAProviderSubprocess(AppServerSubprocess):
     def get_pid(self) -> int:
         return self.p.pid
 
-    def read_from_logs(self, pattern: str, before: int = 4, after: int = 4) -> list[dict]:
+    def read_from_logs(self, pattern: str, regex: bool = True, before: int = 4, after: int = 4) -> list[dict]:
         """Search for a string a return the matches. 
 
         Args:
             pattern (str): _description_
-            before (int, optional): Number of lines before the found line. Defaults to 4.
-            after (int, optional): Number of lines after the found line. Defaults to 4.
+            regex (bool, optional): _description_. Defaults to True.
+            before (int, optional): _description_. Defaults to 4.
+            after (int, optional): _description_. Defaults to 4.
 
         Raises:
             FileNotFoundError: _description_
 
         Returns:
-            list[dict]: List with a dict of the info retrieved.
+            list[dict]: _description_
         """
         if not os.path.exists(self.log_file):
             raise FileNotFoundError
@@ -218,18 +222,76 @@ class OTAProviderSubprocess(AppServerSubprocess):
             all_lines = fp.readlines()
 
         found_lines = []
+        re_expr = re.compile(pattern=pattern)
 
         for index, line in enumerate(all_lines):
             n_line = line.decode("utf-8", 'replace')
-            if pattern in n_line:
-                before_lines = all_lines[(index-before):index]
-                after_lines = all_lines[index+1:(index+after+1)]
+            if regex and re_expr.match(n_line) is not None:
                 match = {
-                    'before': list(map(lambda x: x.decode("utf-8"), before_lines)),
+                    'before': [],
                     'match': n_line,
                     'line': index,
-                    'after': list(map(lambda x: x.decode("utf-8"), after_lines))
+                    'after': []
                 }
                 found_lines.append(match)
+            else:
+                if pattern in n_line:
+                    before_lines = all_lines[(index-before):index]
+                    after_lines = all_lines[index+1:(index+after+1)]
+                    match = {
+                        'before': list(map(lambda x: x.decode("utf-8"), before_lines)),
+                        'match': n_line,
+                        'line': index,
+                        'after': list(map(lambda x: x.decode("utf-8"), after_lines))
+                    }
+                    found_lines.append(match)
 
         return found_lines
+
+    # PROPOSE THIS TO REMOVE THIS AND MOVE TO BASE CLASS
+    def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int, requestor_node_id: Optional[int] = None):
+        """Create ACL entries to allow OTA requestors to access the provider.
+
+        Args:
+            dev_ctrl: Device controller for sending commands
+            provider_node_id: Node ID of the OTA provider
+            requestor_node_id: Optional specific requestor node ID for targeted access
+
+        Returns:
+            Result of the ACL write operation
+        """
+        # Standard ACL entry for OTA Provider cluster
+        admin_node_id = dev_ctrl.nodeId if hasattr(dev_ctrl, 'nodeId') else self.DEFAULT_ADMIN_NODE_ID
+        requestor_subjects = [requestor_node_id] if requestor_node_id else NullValue
+
+        # Create ACL entries using proper struct constructors
+        acl_entries = [
+            # Admin entry
+            Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,  # type: ignore
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
+                subjects=[admin_node_id],  # type: ignore
+                targets=NullValue
+            ),
+            # Operate entry
+            Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,  # type: ignore
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
+                subjects=requestor_subjects,  # type: ignore
+                targets=[
+                    Clusters.AccessControl.Structs.AccessControlTargetStruct(  # type: ignore
+                        cluster=Clusters.OtaSoftwareUpdateProvider.id,  # type: ignore
+                        endpoint=NullValue,
+                        deviceType=NullValue
+                    )
+                ],
+            )
+        ]
+
+        # Create the attribute descriptor for the ACL attribute
+        acl_attribute = Clusters.AccessControl.Attributes.Acl(acl_entries)
+
+        return dev_ctrl.WriteAttribute(
+            nodeid=provider_node_id,
+            attributes=[(0, acl_attribute)]
+        )
