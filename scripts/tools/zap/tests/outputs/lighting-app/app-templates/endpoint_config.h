@@ -53,7 +53,7 @@
 #define GENERATED_DEFAULTS_COUNT (1)
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
-#define GENERATED_MIN_MAX_DEFAULT_COUNT 4
+#define GENERATED_MIN_MAX_DEFAULT_COUNT 5
 #define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
     {                                                                                                                              \
                                                                                                                                    \
@@ -62,7 +62,8 @@
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Level Control (server) */                                                                         \
         { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x3 },   /* Options */                                                        \
-        { (uint16_t) 0x32, (uint16_t) 0x1, (uint16_t) 0xFF }, /* DefaultMoveRate */                                                \
+        { (uint16_t) 0xFF, (uint16_t) 0x1, (uint16_t) 0xFE }, /* OnLevel */                                                        \
+        { (uint16_t) 0x32, (uint16_t) 0x1, (uint16_t) 0xFE }, /* DefaultMoveRate */                                                \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Color Control (server) */                                                                         \
         { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF } /* StartUpColorTemperatureMireds */                                  \
@@ -577,13 +578,14 @@
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* Options */               \
         { ZAP_SIMPLE_DEFAULT(0x0000), 0x00000010, 2, ZAP_TYPE(INT16U),                                                             \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* OnOffTransitionTime */                                 \
-        { ZAP_SIMPLE_DEFAULT(0xFF), 0x00000011, 1, ZAP_TYPE(INT8U),                                                                \
-          ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* OnLevel */              \
+        { ZAP_MIN_MAX_DEFAULTS_INDEX(2), 0x00000011, 1, ZAP_TYPE(INT8U),                                                           \
+          ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) |                              \
+              ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* OnLevel */                                                                        \
         { ZAP_EMPTY_DEFAULT(), 0x00000012, 2, ZAP_TYPE(INT16U),                                                                    \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* OnTransitionTime */     \
         { ZAP_EMPTY_DEFAULT(), 0x00000013, 2, ZAP_TYPE(INT16U),                                                                    \
           ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* OffTransitionTime */    \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(2), 0x00000014, 1, ZAP_TYPE(INT8U),                                                           \
+        { ZAP_MIN_MAX_DEFAULTS_INDEX(3), 0x00000014, 1, ZAP_TYPE(INT8U),                                                           \
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) |                              \
               ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* DefaultMoveRate */                                                                \
         { ZAP_SIMPLE_DEFAULT(255), 0x00004000, 1, ZAP_TYPE(INT8U),                                                                 \
@@ -652,7 +654,7 @@
           ZAP_ATTRIBUTE_MASK(READABLE) }, /* ColorTempPhysicalMaxMireds */                                                         \
         { ZAP_EMPTY_DEFAULT(), 0x0000400D, 2, ZAP_TYPE(INT16U),                                                                    \
           ZAP_ATTRIBUTE_MASK(READABLE) }, /* CoupleColorTempToLevelMinMireds */                                                    \
-        { ZAP_MIN_MAX_DEFAULTS_INDEX(3), 0x00004010, 2, ZAP_TYPE(INT16U),                                                          \
+        { ZAP_MIN_MAX_DEFAULTS_INDEX(4), 0x00004010, 2, ZAP_TYPE(INT16U),                                                          \
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE) |                              \
               ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* StartUpColorTemperatureMireds */                   \
         { ZAP_SIMPLE_DEFAULT(0x1F), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */            \
@@ -708,10 +710,6 @@
     const EmberAfGenericClusterFunction chipFuncArrayLocalizationConfigurationServer[] = {                                         \
         (EmberAfGenericClusterFunction) emberAfLocalizationConfigurationClusterServerInitCallback,                                 \
         (EmberAfGenericClusterFunction) MatterLocalizationConfigurationClusterServerPreAttributeChangedCallback,                   \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayFixedLabelServer[] = {                                                        \
-        (EmberAfGenericClusterFunction) emberAfFixedLabelClusterServerInitCallback,                                                \
-        (EmberAfGenericClusterFunction) MatterFixedLabelClusterServerShutdownCallback,                                             \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayGroupsServer[] = {                                                            \
         (EmberAfGenericClusterFunction) emberAfGroupsClusterServerInitCallback,                                                    \
@@ -1175,8 +1173,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(201), \
       .attributeCount = 3, \
       .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
-      .functions = chipFuncArrayFixedLabelServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = nullptr, \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \

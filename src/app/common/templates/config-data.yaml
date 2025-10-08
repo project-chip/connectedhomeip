@@ -89,7 +89,6 @@ CommandHandlerInterfaceOnlyClusters:
 ClustersWithInitFunctions:
     # keep-sorted start
     - Color Control
-    - Fixed Label
     - Groups
     - Level Control
     - Localization Configuration
@@ -117,7 +116,6 @@ ClustersWithShutdownFunctions:
     - Barrier Control
     - Color Control
     - Door Lock
-    - Fixed Label
     - Level Control
     - On/Off
     - Sample MEI
@@ -151,6 +149,7 @@ CodeDrivenClusters:
     - Boolean State
     - Diagnostic Logs
     - Ethernet Network Diagnostics
+    - Fixed Label
     - General Commissioning
     - General Diagnostics
     - Group Key Management

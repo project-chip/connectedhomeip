@@ -324,6 +324,13 @@ struct PowerThresholdStruct {
   nullable PowerThresholdSourceEnum powerThresholdSource = 2;
 }
 
+struct SemanticTagStruct {
+  nullable vendor_id mfgCode = 0;
+  enum8 namespaceID = 1;
+  enum8 tag = 2;
+  optional nullable char_string<64> label = 3;
+}
+
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -767,13 +774,13 @@ cluster LevelControl = 8 {
     int16u frequency = 0;
   }
 
-  /** Command description for MoveToLevel */
+  /** This command will move the device to the specified level. */
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
-  /** Command description for Move */
+  /** This command will move the device using the specified values. */
   command Move(MoveRequest): DefaultSuccess = 1;
-  /** Command description for Step */
+  /** This command will do a relative step change of the device using the specified values. */
   command Step(StepRequest): DefaultSuccess = 2;
-  /** Command description for Stop */
+  /** This command will stop the actions of various other commands that are still in progress. */
   command Stop(StopRequest): DefaultSuccess = 3;
   /** Command description for MoveToLevelWithOnOff */
   command MoveToLevelWithOnOff(MoveToLevelWithOnOffRequest): DefaultSuccess = 4;
@@ -783,8 +790,7 @@ cluster LevelControl = 8 {
   command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
   /** Command description for StopWithOnOff */
   command StopWithOnOff(StopWithOnOffRequest): DefaultSuccess = 7;
-  /** Change the currrent frequency to the provided one, or a close
-        approximation if the exact provided one is not possible. */
+  /** This command will cause the device to change the current frequency to the requested value. */
   command MoveToClosestFrequency(MoveToClosestFrequencyRequest): DefaultSuccess = 8;
 }
 
@@ -891,13 +897,13 @@ cluster LevelControl = 8 {
     int16u frequency = 0;
   }
 
-  /** Command description for MoveToLevel */
+  /** This command will move the device to the specified level. */
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
-  /** Command description for Move */
+  /** This command will move the device using the specified values. */
   command Move(MoveRequest): DefaultSuccess = 1;
-  /** Command description for Step */
+  /** This command will do a relative step change of the device using the specified values. */
   command Step(StepRequest): DefaultSuccess = 2;
-  /** Command description for Stop */
+  /** This command will stop the actions of various other commands that are still in progress. */
   command Stop(StopRequest): DefaultSuccess = 3;
   /** Command description for MoveToLevelWithOnOff */
   command MoveToLevelWithOnOff(MoveToLevelWithOnOffRequest): DefaultSuccess = 4;
@@ -907,8 +913,7 @@ cluster LevelControl = 8 {
   command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
   /** Command description for StopWithOnOff */
   command StopWithOnOff(StopWithOnOffRequest): DefaultSuccess = 7;
-  /** Change the currrent frequency to the provided one, or a close
-        approximation if the exact provided one is not possible. */
+  /** This command will cause the device to change the current frequency to the requested value. */
   command MoveToClosestFrequency(MoveToClosestFrequencyRequest): DefaultSuccess = 8;
 }
 
@@ -923,13 +928,6 @@ cluster Descriptor = 29 {
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
-  }
-
-  struct SemanticTagStruct {
-    nullable vendor_id mfgCode = 0;
-    enum8 namespaceID = 1;
-    enum8 tag = 2;
-    optional nullable char_string<64> label = 3;
   }
 
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
@@ -7709,7 +7707,7 @@ cluster MediaInput = 1287 {
 
 /** This cluster provides an interface for managing low power mode on a device. */
 cluster LowPower = 1288 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -7717,7 +7715,7 @@ cluster LowPower = 1288 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** This command shall put the device into low power mode. */
+  /** This command SHALL put the device into low power mode. */
   command Sleep(): DefaultSuccess = 0;
 }
 
