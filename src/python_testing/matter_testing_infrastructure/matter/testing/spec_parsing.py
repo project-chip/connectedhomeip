@@ -1027,7 +1027,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
             else:
                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                 severity=ProblemSeverity.WARNING, problem=f"Device type {device_name} does not have an ID listed"))
-                return
+                return device_types, problems
         try:
             id = int(str_id, 0)
             revision = int(d.attrib['revision'], 0)
@@ -1035,7 +1035,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
             problems.append(ProblemNotice("Parse Device Type XML", location=location,
                             severity=ProblemSeverity.WARNING,
                             problem=f"Device type {device_name} does not a valid ID or revision. ID: {str_id} revision: {d.get('revision', 'UNKNOWN')}"))
-            return
+            return device_types, problems
         if id in DEVICE_TYPE_NAME_FIXES:
             device_name = DEVICE_TYPE_NAME_FIXES[id]
 
@@ -1056,7 +1056,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                 location = DeviceTypePathLocation(device_type_id=id)
                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                 severity=ProblemSeverity.WARNING, problem="Unable to find classification data for device type"))
-                return
+                return device_types, problems
         device_types[id] = XmlDeviceType(name=device_name, revision=revision, server_clusters={}, client_clusters={},
                                          classification_class=device_class, classification_scope=scope, superset_of_device_type_name=superset_of_device_type_name)
         try:
@@ -1124,7 +1124,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                                 try:
                                     element_name = e.attrib['code']
                                 except KeyError:
-                                    element_name = None
+                                    element_namename = None
                             else:
                                 element_name = None
                         if element_name is None:
