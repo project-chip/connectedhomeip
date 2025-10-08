@@ -21,10 +21,10 @@
 #include <app/static-cluster-config/Descriptor.h>
 #endif // CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
 
+#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <lib/core/CHIPConfig.h>
-#include <app/util/attribute-storage.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -50,11 +50,13 @@ public:
     {
         BitFlags<Descriptor::Feature> features(featureMap);
         Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList;
-        if (GetTagList(endpointId, tagList) == CHIP_NO_ERROR && !tagList.empty()) {
+        if (GetTagList(endpointId, tagList) == CHIP_NO_ERROR && !tagList.empty())
+        {
             features.Set(Descriptor::Feature::kTagList);
         }
 
-        gServers[clusterInstanceIndex].Create(endpointId, DescriptorCluster::OptionalAttributesSet(optionalAttributeBits), features, tagList);
+        gServers[clusterInstanceIndex].Create(endpointId, DescriptorCluster::OptionalAttributesSet(optionalAttributeBits), features,
+                                              tagList);
         return gServers[clusterInstanceIndex].Registration();
     }
 

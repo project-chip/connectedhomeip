@@ -62,7 +62,8 @@ bool IsDescendantOf(const DataModel::EndpointEntry * __restrict__ childEndpoint,
     }
 }
 
-CHIP_ERROR ReadTagListAttribute(Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type> semanticTagsList, EndpointId endpoint, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadTagListAttribute(Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type> semanticTagsList,
+                                EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([&semanticTagsList](const auto & encoder) -> CHIP_ERROR {
         for (const auto & tag : semanticTagsList)
