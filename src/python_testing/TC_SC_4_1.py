@@ -68,7 +68,7 @@ class TC_SC_4_1(MatterBaseTest):
 
     def steps_TC_SC_4_1(self):
         return [TestStep(1, "DUT is commissioned.", is_commissioning=True),
-                TestStep(2, "TH reads ServerList attribute from the Descriptor cluster on EP0. ","""
+                TestStep(2, "TH reads ServerList attribute from the Descriptor cluster on EP0. ", """
                                 - If the ICD Management cluster ID (70,0x46) is present in the list, set supports_icd to true, otherwise set supports_icd to false.
                                 - If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold.                         
                                 """),
@@ -142,7 +142,7 @@ class TC_SC_4_1(MatterBaseTest):
                                                   endpoint=0,
                                                   payload=revoke_cmd,
                                                   timedRequestTimeoutMs=6000)
-        sleep(1) # Give some time for failsafe cleanup scheduling
+        sleep(1)  # Give some time for failsafe cleanup scheduling
 
     def verify_t_value(self, record):
         has_t = record and record.txt and 'T' in record.txt
@@ -189,7 +189,7 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Verify SRV record is returned
         srv_record_returned = srv_record is not None and srv_record.service_name == service_name
-        asserts.assert_true(srv_record_returned, "SRV record was not returned")        
+        asserts.assert_true(srv_record_returned, "SRV record was not returned")
 
         # Verify DUT's commissionable service is a valid DNS-SD instance name
         # (64-bit randomly selected ID expressed as a sixteen-char hex string with capital letters)
@@ -202,7 +202,7 @@ class TC_SC_4_1(MatterBaseTest):
         # expressed as a twelve or sixteen capital letter hex string. If the MAC
         # is randomized for privacy, the randomized version must be used each time.
         assert_valid_hostname(srv_record.hostname)
-        
+
         return srv_record
 
     async def _verify_commissionable_subtypes(self, srv_service_name: str) -> None:
@@ -228,7 +228,7 @@ class TC_SC_4_1(MatterBaseTest):
         # Verify that the Long Discriminator subtype PTR record's
         # 'service_name' is the same as the SRV record 'service_name'
         asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
-                            "Long Discriminator subtype PTR record service name must be equal to the SRV record service name.")
+                             "Long Discriminator subtype PTR record service name must be equal to the SRV record service name.")
 
         # *** SHORT DISCRIMINATOR SUBTYPE ***
         # Validate that the short commissionable discriminator subtype is a 4-bit long discriminator,
@@ -249,7 +249,7 @@ class TC_SC_4_1(MatterBaseTest):
         # Verify that the Short Discriminator subtype PTR record's
         # 'service_name' is the same as the SRV record 'service_name'
         asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
-                            "Short Discriminator subtype PTR record service name must be equal to the SRV record service name.")
+                             "Short Discriminator subtype PTR record service name must be equal to the SRV record service name.")
 
         # *** IN COMMISSIONING MODE SUBTYPE ***
         # Verify presence of the _CM subtype
@@ -268,7 +268,7 @@ class TC_SC_4_1(MatterBaseTest):
         # Verify that the 'In Commissioning Mode' subtype PTR record's
         # 'service_name' is the same as the SRV record 'service_name'
         asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
-                            "'In Commissioning Mode' subtype PTR record service name must be equal to the SRV record service name.")
+                             "'In Commissioning Mode' subtype PTR record service name must be equal to the SRV record service name.")
 
         # *** VENDOR SUBTYPE ***
         # If the commissionable vendor subtype is present, validate it's a
@@ -288,7 +288,7 @@ class TC_SC_4_1(MatterBaseTest):
             # 'service_name' is the same as the SRV record 'service_name'
             if len(ptr_records) > 0:
                 asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
-                                    "Vendor subtype PTR record service name must be equal to the SRV record service name.")
+                                     "Vendor subtype PTR record service name must be equal to the SRV record service name.")
 
         # *** DEVTYPE SUBTYPE ***
         # If the commissionable devtype subtype is present, validate it's a
@@ -307,7 +307,7 @@ class TC_SC_4_1(MatterBaseTest):
             # 'service_name' is the same as the SRV record 'service_name'
             if len(ptr_records) > 0:
                 asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
-                                    "Devtype subtype PTR record service name must be equal to the SRV record service name.")
+                                     "Devtype subtype PTR record service name must be equal to the SRV record service name.")
 
     async def _verify_txt_record_keys(self, service_name: str, expected_cm: str) -> None:
         # TH performs a query for the TXT record against the 'Commissionable Service' service name.
@@ -322,7 +322,8 @@ class TC_SC_4_1(MatterBaseTest):
         txt_record_returned = (txt_record is not None) and (len(txt_record.txt) > 0)
 
         # Verify that the TXT record, when required, is returned and is non-empty
-        asserts.assert_true((not txt_record_required) or txt_record_returned, "TXT record is required and was not returned or contains no values")
+        asserts.assert_true((not txt_record_required) or txt_record_returned,
+                            "TXT record is required and was not returned or contains no values")
 
         if txt_record_returned:
 
@@ -478,13 +479,12 @@ class TC_SC_4_1(MatterBaseTest):
             # if 'PI' in txt_record.txt:
             #     pi_key = txt_record.txt['PI']
                 # assert_valid_pi_key(pi_key)
-            
-            assert_valid_pi_key("for-lint...") # To de removed
+
+            assert_valid_pi_key("for-lint...")  # To de removed
         else:
             logging.info("TXT record NOT required.")
 
     async def verify_commissionable_node_advertisements(self, service_name: str, expected_cm: str) -> None:
-        
         # Verify SRV record advertisements
         srv_record = await self._get_verify_srv_record(service_name)
 
@@ -501,7 +501,7 @@ class TC_SC_4_1(MatterBaseTest):
         quada_records = await MdnsDiscovery().get_quada_records(hostname=srv_record.hostname, log_output=True)
 
         # Verify that at least 1 AAAA record is returned for each IPv6 a address
-        asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{srv_record.hostname}'")            
+        asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{srv_record.hostname}'")
 
     def desc_TC_TC_SC_4_1(self) -> str:
         return "[TC-SC-4.1] Commissionable Node Discovery with DUT as Commissionee"
