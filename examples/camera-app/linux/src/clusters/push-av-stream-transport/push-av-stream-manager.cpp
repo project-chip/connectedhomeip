@@ -204,9 +204,9 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportSt
 
     if (transportStatus == TransportStatusEnum::kActive)
     {
-        auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
-        bool isHardPrivacyModeActive;
-        CHIP_ERROR status = avsmController.IsHardPrivacyModeActive(isHardPrivacyModeActive);
+        auto & avsmController        = mCameraDevice->GetCameraAVStreamMgmtController();
+        bool isHardPrivacyModeActive = false;
+        CHIP_ERROR status            = avsmController.IsHardPrivacyModeActive(isHardPrivacyModeActive);
         if (status != CHIP_NO_ERROR)
         {
             ChipLogError(Camera,
@@ -214,8 +214,8 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportSt
             return Status::Failure;
         }
 
-        bool isSoftRecordingPrivacyModeActive;
-        status = avsmController.IsSoftRecordingPrivacyModeActive(isSoftRecordingPrivacyModeActive);
+        bool isSoftRecordingPrivacyModeActive = false;
+        status                                = avsmController.IsSoftRecordingPrivacyModeActive(isSoftRecordingPrivacyModeActive);
         if (status != CHIP_NO_ERROR)
         {
             ChipLogError(

@@ -263,7 +263,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     }
 
     bool hardPrivacyModeActive = false;
-    CHIP_ERROR err = mDelegate.IsHardPrivacyModeActive(hardPrivacyModeActive);
+    CHIP_ERROR err             = mDelegate.IsHardPrivacyModeActive(hardPrivacyModeActive);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleSolicitOffer: Failed to check Hard Privacy mode: %" CHIP_ERROR_FORMAT, err.Format());
@@ -279,7 +279,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     }
 
     bool softLivestreamPrivacyModeActive = false;
-    CHIP_ERROR err = mDelegate.IsSoftLivestreamPrivacyModeActive(softLivestreamPrivacyModeActive);
+    err                                  = mDelegate.IsSoftLivestreamPrivacyModeActive(softLivestreamPrivacyModeActive);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleSolicitOffer: Failed to check Soft LivestreamPrivacy mode: %" CHIP_ERROR_FORMAT, err.Format());
@@ -295,7 +295,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     }
 
     bool softRecordingPrivacyModeActive = false;
-    CHIP_ERROR err = mDelegate.IsSoftRecordingPrivacyModeActive(softRecordingPrivacyModeActive);
+    err                                 = mDelegate.IsSoftRecordingPrivacyModeActive(softRecordingPrivacyModeActive);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleSolicitOffer: Failed to check SoftRecordingPrivacyModeActive: %" CHIP_ERROR_FORMAT, err.Format());
@@ -377,7 +377,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
 
     // Check resource management and stream priorities. If the IDs are null the delegate will populate with
     // a stream that matches the stream usage
-    CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID);
+    err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleSolicitOffer: Cannot provide the stream usage requested");
@@ -522,7 +522,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         // WebRTCSessionID is null - new session request
 
         bool hardPrivacyModeActive = false;
-        CHIP_ERROR err = mDelegate.IsHardPrivacyModeActive(hardPrivacyModeActive);
+        CHIP_ERROR err             = mDelegate.IsHardPrivacyModeActive(hardPrivacyModeActive);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleProvideOffer: Failed to check Hard Privacy mode: %" CHIP_ERROR_FORMAT, err.Format());
@@ -538,10 +538,11 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         }
 
         bool softLivestreamPrivacyModeActive = false;
-        CHIP_ERROR err = mDelegate.IsSoftLivestreamPrivacyModeActive(softLivestreamPrivacyModeActive);
+        err                                  = mDelegate.IsSoftLivestreamPrivacyModeActive(softLivestreamPrivacyModeActive);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "HandleProvideOffer: Failed to get SoftLivestreamPrivacyModeActive status: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(Zcl, "HandleProvideOffer: Failed to get SoftLivestreamPrivacyModeActive status: %" CHIP_ERROR_FORMAT,
+                         err.Format());
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
             return;
         }
@@ -554,7 +555,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         }
 
         bool softRecordingPrivacyModeActive = false;
-        CHIP_ERROR err = mDelegate.IsSoftRecordingPrivacyModeActive(softRecordingPrivacyModeActive);
+        err                                 = mDelegate.IsSoftRecordingPrivacyModeActive(softRecordingPrivacyModeActive);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleProvideOffer: Failed to check Soft RecordingPrivacy mode: %" CHIP_ERROR_FORMAT, err.Format());
@@ -629,7 +630,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         }
 
         // Check resource management and stream priorities
-        CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID);
+        err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleProvideOffer: Cannot provide stream usage requested");
