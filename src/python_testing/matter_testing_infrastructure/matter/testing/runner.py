@@ -694,7 +694,7 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
 
         config.wifi_ssid = args.wifi_ssid
         config.wifi_passphrase = args.wifi_passphrase
-    elif config.commissioning_method == ["ble-thread", "nfc-thread"] or config.in_test_commissioning_method == ["ble-thread", "nfc-thread"]:
+    elif config.commissioning_method in ["ble-thread", "nfc-thread"] or config.in_test_commissioning_method in ["ble-thread", "nfc-thread"]:
         if args.thread_dataset_hex is None:
             print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method ble-thread or nfc-thread!")
             return False
