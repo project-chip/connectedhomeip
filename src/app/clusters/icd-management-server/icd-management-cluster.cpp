@@ -38,6 +38,14 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 #if CHIP_CONFIG_ENABLE_ICD_CIP
+/**
+ * @brief Function checks if the client has admin permissions to the cluster in the commandPath
+ *
+ * @param[out] isClientAdmin True : Client has admin permissions
+ *                           False : Client does not have admin permissions
+ *                           If an error occurs, isClientAdmin is not changed
+ * @return CHIP_ERROR
+ */
 CHIP_ERROR CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, bool & isClientAdmin)
 {
     RequestPath requestPath{ .cluster     = commandPath.mClusterId,
@@ -80,40 +88,18 @@ void IcdManagementFabricDelegate::OnFabricRemoved(const FabricTable & fabricTabl
 namespace chip::app::Clusters {
 
 ICDManagementCluster::ICDManagementCluster(EndpointId endpointId, PersistentStorageDelegate & storage,
-                                           Crypto::SymmetricKeystore & symmetricKeystore, FabricTable & fabricTable,
+                                           chip::Crypto::SessionKeystore & symmetricKeystore, FabricTable & fabricTable,
                                            ICDConfigurationData & icdConfigurationData, OptionalAttributeSet optionalAttributeSet,
                                            BitMask<IcdManagement::OptionalCommands> aEnabledCommands,
                                            BitMask<IcdManagement::UserActiveModeTriggerBitmap> aUserActiveModeTriggerBitmap,
                                            CharSpan aUserActiveModeTriggerInstruction) :
-    DefaultServerCluster({ endpointId, IcdManagement::Id })
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-    ,
-    mStorage(storage), mSymmetricKeystore(symmetricKeystore), mFabricTable(fabricTable)
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
-    ,
+    DefaultServerCluster({ endpointId, IcdManagement::Id }),
+    mStorage(storage), mSymmetricKeystore(symmetricKeystore), mFabricTable(fabricTable),
     mICDConfigurationData(icdConfigurationData), mOptionalAttributeSet(optionalAttributeSet), mEnabledCommands(aEnabledCommands),
     mUserActiveModeTriggerBitmap(aUserActiveModeTriggerBitmap)
 {
     MutableCharSpan buffer(mUserActiveModeTriggerInstruction);
     CopyCharSpanToMutableCharSpanWithTruncation(aUserActiveModeTriggerInstruction, buffer);
-}
-
-CHIP_ERROR ICDManagementCluster::Startup(ServerClusterContext & context)
-{
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-    // Initialize and register Fabric delegate
-    mFabricDelegate.Init(mStorage, &mSymmetricKeystore, mICDConfigurationData);
-    mFabricTable.AddFabricDelegate(&mFabricDelegate);
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
-    return CHIP_NO_ERROR;
-}
-
-void ICDManagementCluster::Shutdown()
-{
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-    // Unregister Fabric delegate
-    mFabricTable.RemoveFabricDelegate(&mFabricDelegate);
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 }
 
 DataModel::ActionReturnStatus ICDManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -135,20 +121,6 @@ DataModel::ActionReturnStatus ICDManagementCluster::ReadAttribute(const DataMode
 
     case IcdManagement::Attributes::ActiveModeThreshold::Id:
         return aEncoder.Encode(mICDConfigurationData.GetActiveModeThreshold().count());
-
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-    case IcdManagement::Attributes::RegisteredClients::Id:
-        return ReadRegisteredClients(aEncoder);
-
-    case IcdManagement::Attributes::ICDCounter::Id:
-        return aEncoder.Encode(mICDConfigurationData.GetICDCounter().GetValue());
-
-    case IcdManagement::Attributes::ClientsSupportedPerFabric::Id:
-        return aEncoder.Encode(mICDConfigurationData.GetClientsSupportedPerFabric());
-
-    case IcdManagement::Attributes::MaximumCheckInBackOff::Id:
-        return aEncoder.Encode(mICDConfigurationData.GetMaximumCheckInBackoff().count());
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 #if CHIP_CONFIG_ENABLE_ICD_LIT
     case IcdManagement::Attributes::OperatingMode::Id:
@@ -201,19 +173,133 @@ std::optional<DataModel::ActionReturnStatus> ICDManagementCluster::InvokeCommand
 {
     switch (request.path.mCommandId)
     {
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-    case IcdManagement::Commands::RegisterClient::Id: {
-        uint32_t icdCounter = 0;
+    case IcdManagement::Commands::StayActiveRequest::Id: {
+// TODO(#32321): Remove #if after issue is resolved
+// Note: We only need this #if statement for platform examples that enable the ICD management server without building the sample
+// as an ICD. Since this is not spec compliant, we should remove this #if statement once we stop compiling the ICD management
+// server in those examples.
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        Commands::StayActiveRequest::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
+        IcdManagement::Commands::StayActiveResponse::Type response;
+        response.promisedActiveDuration = Server::GetInstance().GetICDManager().StayActiveRequest(commandData.stayActiveDuration);
+        handler->AddResponse(request.path, response);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+        break;
+    }
+    default:
+        return Status::UnsupportedCommand;
+    }
+    return Status::Success;
+}
+
+CHIP_ERROR ICDManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                  ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+{
+    BitFlags<IcdManagement::Feature> featureMap = mICDConfigurationData.GetFeatureMap();
+    const bool hasCIP                           = featureMap.Has(IcdManagement::Feature::kCheckInProtocolSupport);
+
+    if (hasCIP)
+    {
+        static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
+            Commands::RegisterClient::kMetadataEntry,
+            Commands::UnregisterClient::kMetadataEntry,
+        };
+        ReturnErrorOnFailure(builder.ReferenceExisting(kAcceptedCommands));
+    }
+
+    if (mICDConfigurationData.GetFeatureMap().Has(IcdManagement::Feature::kLongIdleTimeSupport) ||
+        mEnabledCommands.Has(IcdManagement::OptionalCommands::kStayActive))
+    {
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
+        ReturnErrorOnFailure(builder.Append(Commands::StayActiveRequest::kMetadataEntry));
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ICDManagementCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    BitFlags<IcdManagement::Feature> featureMap = mICDConfigurationData.GetFeatureMap();
+    const bool hasCIP                           = featureMap.Has(IcdManagement::Feature::kCheckInProtocolSupport);
+
+    if (hasCIP)
+    {
+        static constexpr CommandId kGeneratedCommands[] = {
+            Commands::RegisterClientResponse::Id,
+        };
+        ReturnErrorOnFailure(builder.ReferenceExisting(kGeneratedCommands));
+    }
+
+    if (mICDConfigurationData.GetFeatureMap().Has(IcdManagement::Feature::kLongIdleTimeSupport) ||
+        mEnabledCommands.Has(IcdManagement::OptionalCommands::kStayActive))
+    {
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
+        ReturnErrorOnFailure(builder.Append(Commands::StayActiveResponse::Id));
+    }
+    return CHIP_NO_ERROR;
+}
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+
+ICDManagementClusterWithCIP::ICDManagementClusterWithCIP(
+    EndpointId endpointId, PersistentStorageDelegate & storage, chip::Crypto::SessionKeystore & symmetricKeystore,
+    FabricTable & fabricTable, ICDConfigurationData & icdConfigurationData, OptionalAttributeSet optionalAttributeSet,
+    BitMask<IcdManagement::OptionalCommands> aEnabledCommands,
+    BitMask<IcdManagement::UserActiveModeTriggerBitmap> aUserActiveModeTriggerBitmap, CharSpan aUserActiveModeTriggerInstruction) :
+    ICDManagementCluster(endpointId, storage, symmetricKeystore, fabricTable, icdConfigurationData, optionalAttributeSet,
+                         aEnabledCommands, aUserActiveModeTriggerBitmap, aUserActiveModeTriggerInstruction)
+{}
+
+CHIP_ERROR ICDManagementClusterWithCIP::Startup(ServerClusterContext & context)
+{
+    // Initialize and register Fabric delegate
+    mFabricDelegate.Init(mStorage, &mSymmetricKeystore, mICDConfigurationData);
+    mFabricTable.AddFabricDelegate(&mFabricDelegate);
+    return CHIP_NO_ERROR;
+}
+
+void ICDManagementClusterWithCIP::Shutdown()
+{
+    // Unregister Fabric delegate
+    mFabricTable.RemoveFabricDelegate(&mFabricDelegate);
+}
+
+DataModel::ActionReturnStatus ICDManagementClusterWithCIP::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                         AttributeValueEncoder & aEncoder)
+{
+    switch (request.path.mAttributeId)
+    {
+    case IcdManagement::Attributes::RegisteredClients::Id:
+        return ReadRegisteredClients(aEncoder);
+    case IcdManagement::Attributes::ICDCounter::Id:
+        return aEncoder.Encode(mICDConfigurationData.GetICDCounter().GetValue());
+    case IcdManagement::Attributes::ClientsSupportedPerFabric::Id:
+        return aEncoder.Encode(mICDConfigurationData.GetClientsSupportedPerFabric());
+    case IcdManagement::Attributes::MaximumCheckInBackOff::Id:
+        return aEncoder.Encode(mICDConfigurationData.GetMaximumCheckInBackoff().count());
+    default:
+        // Delegate to base class for all other attributes
+        return ICDManagementCluster::ReadAttribute(request, aEncoder);
+    }
+}
+
+std::optional<DataModel::ActionReturnStatus> ICDManagementClusterWithCIP::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                        TLV::TLVReader & input_arguments,
+                                                                                        CommandHandler * handler)
+{
+    switch (request.path.mCommandId)
+    {
+    case IcdManagement::Commands::RegisterClient::Id: {
         Commands::RegisterClient::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(input_arguments, handler->GetAccessingFabricIndex()));
 
-        Status status = RegisterClient(handler, request.path, commandData, icdCounter);
-
-        if (Status::Success == status)
+        uint32_t icdCounter = 0;
+        Status status       = RegisterClient(handler, request.path, commandData, icdCounter);
+        if (status == Status::Success)
         {
-            // Response
-            IcdManagement::Commands::RegisterClientResponse::Type response{ .ICDCounter = icdCounter };
+            Commands::RegisterClientResponse::Type response;
+            response.ICDCounter = icdCounter;
             handler->AddResponse(request.path, response);
         }
         else
@@ -230,71 +316,19 @@ std::optional<DataModel::ActionReturnStatus> ICDManagementCluster::InvokeCommand
         handler->AddStatus(request.path, status);
         break;
     }
-    case IcdManagement::Commands::StayActiveRequest::Id: {
-// TODO(#32321): Remove #if after issue is resolved
-// Note: We only need this #if statement for platform examples that enable the ICD management server without building the sample
-// as an ICD. Since this is not spec compliant, we should remove this #if statement once we stop compiling the ICD management
-// server in those examples.
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-        Commands::StayActiveRequest::DecodableType commandData;
-        ReturnErrorOnFailure(commandData.Decode(input_arguments));
-
-        IcdManagement::Commands::StayActiveResponse::Type response;
-        response.promisedActiveDuration = Server::GetInstance().GetICDManager().StayActiveRequest(commandData.stayActiveDuration);
-        handler->AddResponse(request.path, response);
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-        break;
-    }
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
     default:
-        return Status::UnsupportedCommand;
+        // Delegate to base class for all other commands
+        return ICDManagementCluster::InvokeCommand(request, input_arguments, handler);
     }
-    return Status::Success;
+    return Protocols::InteractionModel::Status::Success;
 }
 
-CHIP_ERROR ICDManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
-                                                  ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR ICDManagementClusterWithCIP::ReadRegisteredClients(AttributeValueEncoder & encoder)
 {
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-    static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
-        Commands::RegisterClient::kMetadataEntry,
-        Commands::UnregisterClient::kMetadataEntry,
-    };
-    ReturnErrorOnFailure(builder.ReferenceExisting(kAcceptedCommands));
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
-    if (mICDConfigurationData.GetFeatureMap().Has(IcdManagement::Feature::kLongIdleTimeSupport) ||
-        mEnabledCommands.Has(IcdManagement::OptionalCommands::kStayActive))
-    {
-        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
-        ReturnErrorOnFailure(builder.Append(Commands::StayActiveRequest::kMetadataEntry));
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ICDManagementCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
-{
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-    static constexpr CommandId kGeneratedCommands[] = {
-        Commands::RegisterClientResponse::Id,
-    };
-    ReturnErrorOnFailure(builder.ReferenceExisting(kGeneratedCommands));
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
-    if (mICDConfigurationData.GetFeatureMap().Has(IcdManagement::Feature::kLongIdleTimeSupport) ||
-        mEnabledCommands.Has(IcdManagement::OptionalCommands::kStayActive))
-    {
-        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
-        ReturnErrorOnFailure(builder.Append(Commands::StayActiveResponse::Id));
-    }
-    return CHIP_NO_ERROR;
-}
-
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-CHIP_ERROR ICDManagementCluster::ReadRegisteredClients(AttributeValueEncoder & encoder)
-{
-    uint16_t supported_clients                    = mICDConfigurationData.GetClientsSupportedPerFabric();
-    PersistentStorageDelegate & storage           = mStorage;
-    Crypto::SymmetricKeystore & symmetricKeystore = mSymmetricKeystore;
-    const FabricTable & fabricTable               = mFabricTable;
+    uint16_t supported_clients                        = mICDConfigurationData.GetClientsSupportedPerFabric();
+    PersistentStorageDelegate & storage               = mStorage;
+    chip::Crypto::SessionKeystore & symmetricKeystore = mSymmetricKeystore;
+    const FabricTable & fabricTable                   = mFabricTable;
 
     return encoder.EncodeList(
         [supported_clients, &storage, &symmetricKeystore, &fabricTable](const auto & subEncoder) -> CHIP_ERROR {
@@ -324,17 +358,14 @@ CHIP_ERROR ICDManagementCluster::ReadRegisteredClients(AttributeValueEncoder & e
         });
 }
 
-/**
- * @brief Function checks if the client has admin permissions to the cluster in the commandPath
- *
- * @param[out] isClientAdmin True : Client has admin permissions
- *                           False : Client does not have admin permissions
- *                           If an error occurs, isClientAdmin is not changed
- * @return CHIP_ERROR
- */
+void ICDManagementClusterWithCIP::TriggerICDMTableUpdatedEvent()
+{
+    ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
+}
 
-Status ICDManagementCluster::RegisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                            const Commands::RegisterClient::DecodableType & commandData, uint32_t & icdCounter)
+Status ICDManagementClusterWithCIP::RegisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                   const Commands::RegisterClient::DecodableType & commandData,
+                                                   uint32_t & icdCounter)
 {
     FabricIndex fabricIndex            = commandObj->GetAccessingFabricIndex();
     NodeId nodeId                      = commandData.checkInNodeID;
@@ -413,8 +444,8 @@ Status ICDManagementCluster::RegisterClient(CommandHandler * commandObj, const C
     return Status::Success;
 }
 
-Status ICDManagementCluster::UnregisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                              const Commands::UnregisterClient::DecodableType & commandData)
+Status ICDManagementClusterWithCIP::UnregisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                     const Commands::UnregisterClient::DecodableType & commandData)
 {
     FabricIndex fabricIndex            = commandObj->GetAccessingFabricIndex();
     NodeId nodeId                      = commandData.checkInNodeID;
@@ -448,11 +479,6 @@ Status ICDManagementCluster::UnregisterClient(CommandHandler * commandObj, const
     }
 
     return Status::Success;
-}
-
-void ICDManagementCluster::TriggerICDMTableUpdatedEvent()
-{
-    ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
 }
 
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP

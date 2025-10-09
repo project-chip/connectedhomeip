@@ -32,7 +32,11 @@ static_assert((IcdManagement::StaticApplicationConfig::kFixedClusterConfig.size(
                IcdManagement::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId) ||
               IcdManagement::StaticApplicationConfig::kFixedClusterConfig.size() == 0);
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+LazyRegisteredServerCluster<ICDManagementClusterWithCIP> gServer;
+#else
 LazyRegisteredServerCluster<ICDManagementCluster> gServer;
+#endif
 
 constexpr chip::BitMask<OptionalCommands> kEnabledCommands()
 {

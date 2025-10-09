@@ -21,7 +21,9 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/IcdManagement/Enums.h>
 #include <clusters/IcdManagement/Metadata.h>
+#include <credentials/FabricTable.h>
 #include <crypto/DefaultSessionKeystore.h>
+#include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>

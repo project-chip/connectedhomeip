@@ -23,7 +23,6 @@
 #include <app/util/basic-types.h>
 #include <clusters/IcdManagement/Commands.h>
 #include <clusters/IcdManagement/Metadata.h>
-#include <crypto/SessionKeystore.h>
 #include <lib/core/Optional.h>
 #include <lib/support/Span.h>
 
@@ -31,14 +30,11 @@
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 #include <credentials/FabricTable.h>
+#include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 namespace chip {
-namespace Crypto {
-using SymmetricKeystore = SessionKeystore;
-} // namespace Crypto
-
 namespace app {
 namespace Clusters {
 
@@ -50,7 +46,60 @@ enum class OptionalCommands : uint32_t
 constexpr size_t kUserActiveModeTriggerInstructionMaxLength = 128;
 } // namespace IcdManagement
 
+/**
+ * @brief ICD Management Cluster
+ *
+ * This class provides the core ICD Management functionality. When CIP (Check-In Protocol)
+ * features are needed, use ICDManagementClusterWithCIP which extends this class.
+ */
+class ICDManagementCluster : public DefaultServerCluster
+{
+public:
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id>;
+
+    ICDManagementCluster(EndpointId endpointId, PersistentStorageDelegate & storage, Crypto::SessionKeystore & symmetricKeystore,
+                         FabricTable & fabricTable, ICDConfigurationData & icdConfigurationData,
+                         OptionalAttributeSet optionalAttributeSet, BitMask<IcdManagement::OptionalCommands> aEnabledCommands,
+                         BitMask<IcdManagement::UserActiveModeTriggerBitmap> aUserActiveModeTriggerBitmap,
+                         CharSpan aUserActiveModeTriggerInstruction);
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
+
+protected:
+#if CHIP_CONFIG_ENABLE_ICD_LIT
+    CHIP_ERROR ReadOperatingMode(AttributeValueEncoder & encoder)
+    {
+        return mICDConfigurationData.GetICDMode() == ICDConfigurationData::ICDMode::SIT
+            ? encoder.Encode(IcdManagement::OperatingModeEnum::kSit)
+            : encoder.Encode(IcdManagement::OperatingModeEnum::kLit);
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT
+
+    PersistentStorageDelegate & mStorage;
+    Crypto::SessionKeystore & mSymmetricKeystore;
+    FabricTable & mFabricTable;
+    ICDConfigurationData & mICDConfigurationData;
+    const OptionalAttributeSet mOptionalAttributeSet;
+    BitMask<IcdManagement::OptionalCommands> mEnabledCommands;
+    BitMask<IcdManagement::UserActiveModeTriggerBitmap> mUserActiveModeTriggerBitmap;
+    char mUserActiveModeTriggerInstruction[IcdManagement::kUserActiveModeTriggerInstructionMaxLength];
+};
+
 #if CHIP_CONFIG_ENABLE_ICD_CIP
+namespace Crypto {
+using SymmetricKeystore = chip::Crypto::SessionKeystore;
+} // namespace Crypto
+
 /**
  * @brief Implementation of Fabric Delegate for ICD Management cluster
  */
@@ -67,47 +116,36 @@ private:
     Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
     ICDConfigurationData * mICDConfigurationData   = nullptr;
 };
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
-class ICDManagementCluster : public DefaultServerCluster
+/**
+ * @brief ICD Management Cluster with CIP (Check-In Protocol) support
+ *
+ * This subclass extends ICDManagementCluster with CIP functionality,
+ * including client registration/unregistration and fabric delegate management.
+ * The fabric delegate is automatically registered/unregistered in Startup/Shutdown.
+ */
+class ICDManagementClusterWithCIP : public ICDManagementCluster
 {
 public:
-    using OptionalAttributeSet = chip::app::OptionalAttributeSet<IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id>;
-
-    ICDManagementCluster(EndpointId endpointId, PersistentStorageDelegate & storage, Crypto::SymmetricKeystore & symmetricKeystore,
-                         FabricTable & fabricTable, ICDConfigurationData & icdConfigurationData,
-                         OptionalAttributeSet optionalAttributeSet, BitMask<IcdManagement::OptionalCommands> aEnabledCommands,
-                         BitMask<IcdManagement::UserActiveModeTriggerBitmap> aUserActiveModeTriggerBitmap,
-                         CharSpan aUserActiveModeTriggerInstruction);
+    ICDManagementClusterWithCIP(EndpointId endpointId, PersistentStorageDelegate & storage,
+                                chip::Crypto::SessionKeystore & symmetricKeystore, FabricTable & fabricTable,
+                                ICDConfigurationData & icdConfigurationData, OptionalAttributeSet optionalAttributeSet,
+                                BitMask<IcdManagement::OptionalCommands> aEnabledCommands,
+                                BitMask<IcdManagement::UserActiveModeTriggerBitmap> aUserActiveModeTriggerBitmap,
+                                CharSpan aUserActiveModeTriggerInstruction);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-
     void Shutdown() override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
-    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
-
-    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
-
 private:
-#if CHIP_CONFIG_ENABLE_ICD_LIT
-    CHIP_ERROR ReadOperatingMode(AttributeValueEncoder & encoder)
-    {
-        return mICDConfigurationData.GetICDMode() == ICDConfigurationData::ICDMode::SIT
-            ? encoder.Encode(IcdManagement::OperatingModeEnum::kSit)
-            : encoder.Encode(IcdManagement::OperatingModeEnum::kLit);
-    }
-#endif // CHIP_CONFIG_ENABLE_ICD_LIT
-
-#if CHIP_CONFIG_ENABLE_ICD_CIP
     CHIP_ERROR ReadRegisteredClients(AttributeValueEncoder & encoder);
+
     /**
      * @brief Triggers table update events to notify subscribers that an entry was added or removed
      *        from the ICDMonitoringTable.
@@ -130,18 +168,9 @@ private:
     UnregisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                      const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
 
-    chip::PersistentStorageDelegate & mStorage;
-    Crypto::SymmetricKeystore & mSymmetricKeystore;
-    chip::FabricTable & mFabricTable;
     IcdManagementFabricDelegate mFabricDelegate;
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
-
-    chip::ICDConfigurationData & mICDConfigurationData;
-    const OptionalAttributeSet mOptionalAttributeSet;
-    BitMask<IcdManagement::OptionalCommands> mEnabledCommands;
-    BitMask<IcdManagement::UserActiveModeTriggerBitmap> mUserActiveModeTriggerBitmap;
-    char mUserActiveModeTriggerInstruction[IcdManagement::kUserActiveModeTriggerInstructionMaxLength];
 };
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 } // namespace Clusters
 } // namespace app
