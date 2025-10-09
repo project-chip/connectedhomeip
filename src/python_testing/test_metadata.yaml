@@ -67,6 +67,8 @@ not_automated:
       reason: Shared code for TC_SEPR, not a standalone test
     - name: TC_SETRF_TestBase.py
       reason: Shared code for TC_SETRF, not a standalone test
+    - name: TC_SUTestBase.py
+      reason: Shared code for TC_SU, not a standalone test
     - name: TC_COMMTR_TestBase.py
       reason: Shared code for TC_COMMTR, not a standalone test
     - name: TC_MTRIDTestBase.py
@@ -78,8 +80,6 @@ not_automated:
     - name: TestDefaultWarnings.py
       reason: Unit test - does not run against an app
     - name: TestIdChecks.py
-      reason: Unit test - does not run against an app
-    - name: TestSpecParsingDataType.py
       reason: Unit test - does not run against an app
     - name: TestSpecParsingDeviceType.py
       reason: Unit test - does not run against an app
