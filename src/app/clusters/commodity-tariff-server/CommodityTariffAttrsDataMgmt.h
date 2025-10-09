@@ -255,48 +255,6 @@ struct SpanCopier<char>
     }
 };
 
-/// @brief Helper for string to span conversions
-struct StrToSpan
-{
-    /// @brief Copies std::string to a CharSpan
-    /// @param source Input string to copy from
-    /// @param destination Output span to populate
-    /// @param maxCount Maximum number of characters to copy (default: unlimited)
-    /// @return CHIP_NO_ERROR on success, error code on failure
-    static CHIP_ERROR Copy(const std::string & source, CharSpan & destination,
-                           size_t maxCount = CommodityTariffConsts::kDefaultStringValuesMaxBufLength)
-    {
-        if (source.empty())
-        {
-            destination = CharSpan();
-            return CHIP_NO_ERROR;
-        }
-
-        if (source.size() > maxCount)
-        {
-            return CHIP_ERROR_INVALID_STRING_LENGTH;
-        }
-
-        char * buffer = static_cast<char *>(Platform::MemoryAlloc(source.size()));
-        if (!buffer)
-            return CHIP_ERROR_NO_MEMORY;
-
-        memcpy(buffer, source.data(), source.size());
-        destination = CharSpan(buffer, source.size());
-        return CHIP_NO_ERROR;
-    }
-
-    /// @brief Releases memory allocated by a CharSpan
-    static void Release(CharSpan & span)
-    {
-        if (!span.empty())
-        {
-            Platform::MemoryFree(const_cast<char *>(span.data()));
-            span = CharSpan();
-        }
-    }
-};
-
 template <typename T, auto X, size_t Capacity>
 void ListToMap(const DataModel::List<T> & aList, CommodityTariffContainers::CTC_UnorderedMap<uint32_t, const T *, Capacity> & aMap)
 {
