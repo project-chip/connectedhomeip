@@ -483,7 +483,7 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
     else
     {
         // Clear the candidates after successful send to prevent resending them during trickle ICE
-        ChipLogProgress(Camera, "Sent %zu ICE candidate(s), clearing list", mLocalCandidates.size());
+        ChipLogProgress(Camera, "Sent %lu ICE candidate(s), clearing list", mLocalCandidates.size());
         mLocalCandidates.clear();
     }
 
