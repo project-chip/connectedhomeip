@@ -45,7 +45,7 @@ Python tests located in src/python_testing
 
 ### A simple test
 
-```
+```python
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
@@ -321,7 +321,7 @@ callbacks are called on update.
 
 Example for setting callbacks:
 
-```
+```python
 cb = EventSubscriptionHandler(cluster, cluster_id, event_id)
 
 urgent = 1
@@ -345,7 +345,7 @@ PyChipError
 
 Example:
 
-```
+```python
 res = await devCtrl.WriteAttribute(nodeid=0, attributes=[(0,Clusters.BasicInformation.Attributes.NodeLabel("Test"))])
 asserts.assert_equal(ret[0].status, Status.Success, “write failed”)
 ```
@@ -532,11 +532,11 @@ Note: The name of the pipe can be anything while is a valid file path.
 
 Example of usage:
 
-```bash
-First run the app with the desired app-pipe path:
+```shell
+# First run the app with the desired app-pipe path:
 ./out/darwin-arm64-all-clusters/chip-all-clusters-app --app-pipe  /tmp/ref_alm_2_2
 
-Then execute the test with the app-pipe argument with the value defined while running the app.
+# Then execute the test with the app-pipe argument with the value defined while running the app.
 python3 src/python_testing/TC_REFALM_2_2.py --commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00  --PICS src/app/tests/suites/certification/ci-pics-values --app-pipe /tmp/ref_alm_2_2  --int-arg PIXIT.REFALM.AlarmThreshold:1
 ```
 
@@ -682,15 +682,15 @@ First ensure the device is in commissioning mode. Then run the test against the
 device by supplying either the QR code, the manual pairing code or the
 discriminator / password pair.
 
-```
+```shell
 python3 TC_DeviceConformance.py --qr-code MT:-24J0AFN00KA0648G00
 ```
 
-```
+```shell
 python3 TC_DeviceConformance.py --manual-code 34970112332
 ```
 
-```
+```shell
 python3 TC_DeviceConformance.py --discriminator 3840 --passcode 20202021
 ```
 
@@ -699,7 +699,7 @@ python3 TC_DeviceConformance.py --discriminator 3840 --passcode 20202021
 If the device has already been commissioned into the python testing fabric, you
 can run the test directly
 
-```
+```shell
 python3 TC_DeviceConformance.py
 ```
 
@@ -712,7 +712,7 @@ using the `--commissioning-method` flag and the `--qr-code`, `--manual-code` or
 
 For example:
 
-```
+```shell
 python3 TC_DeviceConformance.py --discriminator 3840 --passcode 20202021 --commissioning-method on-network
 ```
 
@@ -736,7 +736,7 @@ the device, they can also be run against a MatterTlvJson machine readable file
 without requiring the device to be physically present. To run against a
 previously generated MatterTlvJson device dump file:
 
-```
+```shell
 python3 TC_DeviceConformance.py --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json
 ```
 
@@ -744,7 +744,7 @@ You can generate a MatterTlvJson file for a device by leveraging the
 certification test that generates these (TC-IDM-12.1, implemented in
 TC_DeviceBasicComposition.py).
 
-```
+```shell
 python3 TC_DeviceBasicComposition.py --qr-code MT:-24J0AFN00KA0648G00 --tests test_TC_IDM_12_1
 ```
 

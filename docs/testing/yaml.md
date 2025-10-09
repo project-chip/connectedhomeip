@@ -29,7 +29,7 @@ that is used to display the test easily in the test harness.
 
 The following shows a test step sending a simple command with no arguments.
 
-```
+```yaml
     - label: "This label gets printed"
       cluster: "On/Off"
       command: "On"
@@ -46,7 +46,7 @@ also be overwritten in the individual test steps.
 
 The following shows how to send a command with arguments:
 
-```
+```yaml
     - label: "This label gets printed before the test step"
       command: "MoveToColor"
       arguments:
@@ -82,7 +82,7 @@ a special command that requires an additional "attribute" tag.
 The following YAML would appear as a test step, and shows how to read an
 attribute.
 
-```
+```yaml
 - label: "TH reads the ClusterRevision from DUT"
   command: "readAttribute"
   attribute: "ClusterRevision"
@@ -91,7 +91,7 @@ attribute.
 The following YAML would appear as a test step and shows how to write an
 attribute. Commands to write attributes always require an argument: tag.
 
-```
+```yaml
 - label: "Write example attribute"
   command: "writeAttribute"
   attribute: "ExampleAttribute"
@@ -108,7 +108,7 @@ sub-tags.
 The following shows a simple response parsing with two (somewhat redundant)
 checks.
 
-```
+```yaml
 - label: "TH reads the ClusterRevision from DUT"
   command: "readAttribute"
   attribute: "ClusterRevision"
@@ -137,7 +137,7 @@ structs: `{field1:value, field2:value}`
 
 lists of structs:
 
-```
+```yaml
 [
 
 {field1:value, field2:value, optionalfield:value},
@@ -162,7 +162,7 @@ Some of the more common functionality is shown below:
 Establishing a connection to the DUT. This is the first step in nearly every
 test.
 
-```
+```yaml
     - label: "Establish a connection to the DUT"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -174,7 +174,7 @@ test.
 
 Wait for a user action:
 
-```
+```yaml
     - label: "Do a simple user prompt message. Expect 'y' to pass."
       cluster: "LogCommands"
       command: "UserPrompt"
@@ -188,7 +188,7 @@ Wait for a user action:
 
 Wait for a time:
 
-```
+```yaml
     - label: "Wait for 5S"
       cluster: "DelayCommands"
       command: "WaitForMs"
@@ -211,7 +211,7 @@ in the test harness.
 To declare config variables in the config section, use a label with the desired
 name, then provide the type and defaultValue tags as sub-tags.
 
-```
+```yaml
 config:
     nodeId: 0x12344321
     cluster: "Unit Testing"
@@ -223,7 +223,7 @@ config:
 
 Variables can also be saved from responses:
 
-```
+```yaml
     - label: "Send Test Add Arguments Command"
       command: "TestAddArguments"
       arguments:
@@ -241,7 +241,7 @@ Variables can also be saved from responses:
 
 Variables can then be used in later steps:
 
-```
+```yaml
     - label: "Send Test Add Arguments Command"
       command: "TestAddArguments"
       arguments:
@@ -317,13 +317,13 @@ before using any YAML runner script.
 
 First activate the matter environment using either
 
-```
+```shell
 . ./scripts/bootstrap.sh
 ```
 
 or
 
-```
+```shell
 . ./scripts/activate.sh
 ```
 
@@ -332,16 +332,15 @@ subsequent setups as it is faster.
 
 Next build the python wheels and create a venv
 
-```
+```shell
 ./scripts/build_python.sh -i out/python_env
 source out/python_env/bin/activate
 ```
 
 Compile chip-tool:
 
-```
+```shell
 ./scripts/build/build_examples.py --target linux-x64-chip-tool build
-
 ```
 
 NOTE: use the target appropriate to your system
@@ -350,7 +349,7 @@ NOTE: use the target appropriate to your system
 can be used to run tests against a commissioned DUT (commissioned by chip-tool).
 To commission a DUT using chip-tool use the pairing command. For example:
 
-```
+```shell
 ./out/linux-x64-chip-tool/chip-tool pairing code 0x12344321 MT:-24J0AFN00KA0648G00
 ```
 
@@ -359,25 +358,23 @@ MT:-24J0AFN00KA0648G00 is the QR code.
 
 The chiptool.py tool can then be used to run the tests. For example:
 
-```
+```shell
 ./scripts/tests/chipyaml/chiptool.py tests Test_TC_OO_2_1 --server_path ./out/linux-x64-chip-tool/chip-tool
-
 ```
 
 NOTE: substitute the appropriate test name and chip-tool path as appropriate.
 
 A list of available tests can be generated using:
 
-```
+```shell
 ./scripts/tests/chipyaml/chiptool.py list
 ```
 
 Config variables can be passed to chiptool.py after the script by separating
 with --
 
-```
+```shell
 ./scripts/tests/chipyaml/chiptool.py tests Test_TC_OO_2_1 --server_path ./out/linux-x64-chip-tool/chip-tool -- nodeId 0x12344321
-
 ```
 
 Each test defines a default endpoint to target. Root node cluster tests run

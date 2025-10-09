@@ -99,7 +99,7 @@ To add new fault injection code paths:
 
 ### Fault Injection example
 
-```
+```cpp
 CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec,
    const PayloadHeader & payloadHeader,
                                         System::PacketBufferHandle && payload)
