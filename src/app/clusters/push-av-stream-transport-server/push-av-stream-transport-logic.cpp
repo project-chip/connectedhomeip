@@ -551,6 +551,22 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     });
 
+    // Ensure that Privacy is not active
+    bool privacyModeActive = false;
+    if (mDelegate->IsPrivacyModeActive(privacyModeActive) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleAllocatePushTransport: Cannot determine privacy mode state");
+        handler.AddStatus(commandPath, Status::InvalidInState);
+        return std::nullopt;
+    }
+
+    if (privacyModeActive)
+    {
+        ChipLogError(Zcl, "HandleAllocatePushTransport: Privacy mode is enabled");
+        handler.AddStatus(commandPath, Status::InvalidInState);
+        return std::nullopt;
+    }
+
     // Validate the TLS Endpoint
     TlsClientManagementDelegate::EndpointStructType TLSEndpoint;
     if (mTLSClientManagementDelegate != nullptr)
@@ -1058,6 +1074,22 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
             handler.AddStatus(commandPath, Status::ConstraintError);
             return std::nullopt;
         });
+    }
+
+    // Ensure that Privacy is not active
+    bool privacyModeActive = false;
+    if (mDelegate->IsPrivacyModeActive(privacyModeActive) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleManuallyTriggerTransport: Cannot determine privacy mode state");
+        handler.AddStatus(commandPath, Status::InvalidInState);
+        return std::nullopt;
+    }
+
+    if (privacyModeActive)
+    {
+        ChipLogError(Zcl, "HandleManuallyTriggerTransport: Privacy mode is enabled");
+        handler.AddStatus(commandPath, Status::InvalidInState);
+        return std::nullopt;
     }
 
     FabricIndex fabricIndex                                = handler.GetAccessingFabricIndex();

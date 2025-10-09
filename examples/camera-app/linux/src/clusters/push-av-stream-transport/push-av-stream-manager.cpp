@@ -204,9 +204,8 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportSt
 
     if (transportStatus == TransportStatusEnum::kActive)
     {
-        auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
         bool isActive;
-        CHIP_ERROR status = avsmController.IsPrivacyModeActive(isActive);
+        CHIP_ERROR status = IsPrivacyModeActive(isActive);
         if (status != CHIP_NO_ERROR)
         {
             ChipLogError(Camera,
@@ -653,4 +652,30 @@ void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedCl
     }
 
     mBufferClientCertKey.assign(keypairDer.data(), keypairDer.data() + keypairDer.size());
+}
+
+void PushAvStreamTransportManager::RecordingStreamPrivacyModeChanged(bool privacyModeEnabled)
+{
+    // To Do:
+    // Depending on the change delegate should set transport status for each known connection to either active or inactive, plus
+    // any other needed work.
+}
+
+CHIP_ERROR PushAvStreamTransportManager::IsPrivacyModeActive(bool & isActive)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController                = mCameraDevice->GetCameraAVStreamMgmtController();
+    bool isHardPrivacyModeActive         = false;
+    bool isSoftRecordingPrivacyModeActve = false;
+
+    CHIP_ERROR status = avsmController.IsHardPrivacyModeActive(isHardPrivacyModeActive);
+    status            = avsmController.IsSoftRecordingPrivacyModeActive(isSoftRecordingPrivacyModeActve);
+
+    isActive = isHardPrivacyModeActive || isSoftRecordingPrivacyModeActve;
+    return CHIP_NO_ERROR;
 }
