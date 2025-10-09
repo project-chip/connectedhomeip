@@ -28,12 +28,13 @@
 #      quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from mobly import asserts
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body
-from matter.testing.runner import default_matter_test_main
+import asyncio
 
 import nfc_helpers
-import asyncio
+from mobly import asserts
+
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_DD_1_5(MatterBaseTest):

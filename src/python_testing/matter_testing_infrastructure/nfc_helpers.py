@@ -16,14 +16,15 @@
 #    limitations under the License.
 #
 
-import smartcard
-import smartcard.CardMonitoring
-import ndef
-import sys
-import threading
 import asyncio
 import logging
+import sys
+import threading
 import time
+
+import ndef
+import smartcard
+import smartcard.CardMonitoring
 
 
 class TagEventObserver(smartcard.CardMonitoring.CardObserver):
