@@ -24,35 +24,42 @@
 
 namespace chip {
 namespace app {
-    namespace Clusters {
+namespace Clusters {
 
-        inline constexpr uint8_t kMinSupportedLocalizationUnits = 2;
-        inline constexpr uint8_t kMaxSupportedLocalizationUnits = 3;
+namespace UnitLocalization {
+inline constexpr uint16_t kClusterRevision              = 2;
+inline constexpr uint8_t kMinSupportedLocalizationUnits = 2;
+inline constexpr uint8_t kMaxSupportedLocalizationUnits = 3;
+} // namespace UnitLocalization
 
-        class UnitLocalizationCluster : public DefaultServerCluster {
-        public:
-            UnitLocalizationCluster(EndpointId endpointId,
-                BitFlags<UnitLocalization::Feature> feature);
+class UnitLocalizationCluster : public DefaultServerCluster
+{
+public:
+    UnitLocalizationCluster(EndpointId endpointId, BitFlags<UnitLocalization::Feature> feature);
 
-            CHIP_ERROR Startup(ServerClusterContext & context) override;
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
 
-            // Server cluster implementation
-            DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                AttributeValueEncoder & encoder) override;
-            DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                AttributeValueDecoder & decoder) override;
-            CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    // Server cluster implementation
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-        private:
-            UnitLocalization::TempUnitEnum mTemperatureUnit = UnitLocalization::TempUnitEnum::kCelsius;
-            UnitLocalization::TempUnitEnum mUnitsBuffer[kMaxSupportedLocalizationUnits] = {
-                UnitLocalization::TempUnitEnum::kFahrenheit,
-                UnitLocalization::TempUnitEnum::kCelsius,
-                UnitLocalization::TempUnitEnum::kKelvin
-            };
-            DataModel::List<UnitLocalization::TempUnitEnum> mSupportedTemperatureUnits { mUnitsBuffer };
-        };
+    CHIP_ERROR SetSupportedTemperatureUnits(DataModel::List<UnitLocalization::TempUnitEnum> & units);
 
-    } // namespace Clusters
+private:
+    BitFlags<UnitLocalization::Feature> mFeatures   = {};
+    UnitLocalization::TempUnitEnum mTemperatureUnit = UnitLocalization::TempUnitEnum::kCelsius;
+    UnitLocalization::TempUnitEnum mUnitsBuffer[UnitLocalization::kMaxSupportedLocalizationUnits] = {
+        UnitLocalization::TempUnitEnum::kFahrenheit, UnitLocalization::TempUnitEnum::kCelsius,
+        UnitLocalization::TempUnitEnum::kKelvin
+    };
+    DataModel::List<UnitLocalization::TempUnitEnum> mSupportedTemperatureUnits{ mUnitsBuffer };
+
+    DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
+};
+
+} // namespace Clusters
 } // namespace app
 } // namespace chip

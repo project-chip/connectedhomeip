@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/unit-localization-cluster/unit-localization-cluster.h>
+#include <app/clusters/unit-localization-server/unit-localization-cluster.h>
 #include <app/persistence/AttributePersistence.h>
 
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -35,10 +35,10 @@ using namespace chip::app::Clusters::UnitLocalization;
 using namespace chip::app::Clusters::UnitLocalization::Attributes;
 
 UnitLocalizationCluster::UnitLocalizationCluster(EndpointId endpointId, BitFlags<UnitLocalization::Feature> feature) :
-    DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }), mfeatures{ feature }
+    DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }), mFeatures{ feature }
 {}
 
-CHIP_ERROR UnitLocalizationServer::SetSupportedTemperatureUnits(DataModel::List<TempUnitEnum> & units)
+CHIP_ERROR UnitLocalizationCluster::SetSupportedTemperatureUnits(DataModel::List<TempUnitEnum> & units)
 {
     VerifyOrReturnError(units.size() >= kMinSupportedLocalizationUnits, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(units.size() <= kMaxSupportedLocalizationUnits, CHIP_IM_GLOBAL_STATUS(ConstraintError));
@@ -56,24 +56,25 @@ CHIP_ERROR UnitLocalizationServer::SetSupportedTemperatureUnits(DataModel::List<
 
 CHIP_ERROR UnitLocalizationCluster::Startup(ServerClusterContext & context)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    MigrateFromSafeAttributePersistenceProvider(path, Span(attributesToUpdate), context.storage);
+    AttributeId attributesToUpdate[] = { TemperatureUnit::Id };
+
+    MigrateFromSafeAttributePersistenceProvider(mPath, Span(attributesToUpdate), context.storage);
 
     AttributePersistence attrPersistence{ context.attributeStorage };
 
     auto defTempUnit = mTemperatureUnit;
-    err = attrPersistence.LoadNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, TemperatureUnit::Id),
-                                                mTemperatureUnit, defTempUnit);
-    return err;
+    attrPersistence.LoadNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, TemperatureUnit::Id),
+                                          mTemperatureUnit, defTempUnit);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR UnitLocalizationCluster::Attributes(const ConcreteClusterPath & path,
                                                ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
 
-    ReturnErrorOnFailure(DefaultServerCluster::Attributes(path, builder););
+    ReturnErrorOnFailure(DefaultServerCluster::Attributes(path, builder));
     if (mFeatures.Has(UnitLocalization::Feature::kTemperatureUnit))
     {
         return builder.AppendElements({ TemperatureUnit::kMetadataEntry, SupportedTemperatureUnits::kMetadataEntry });
@@ -106,17 +107,17 @@ DataModel::ActionReturnStatus UnitLocalizationCluster::ReadAttribute(const DataM
 {
     switch (request.path.mAttributeId)
     {
-    case UnitLocalizationCluster::Attributes::TemperatureUnit::Id:
+    case UnitLocalization::Attributes::TemperatureUnit::Id:
         return encoder.Encode(mTemperatureUnit);
 
-    case UnitLocalizationCluster::Attributes::SupportedTemperatureUnits::Id:
+    case UnitLocalization::Attributes::SupportedTemperatureUnits::Id:
         return encoder.Encode(mSupportedTemperatureUnits);
 
-    case UnitLocalizationCluster::Attributes::FeatureMap::Id:
+    case UnitLocalization::Attributes::FeatureMap::Id:
         return encoder.Encode(mFeatures);
 
-    case UnitLocalizationCluster::Attributes::ClusterRevision::Id:
-        return encoder.Encode(UnitLocalizationCluster::kRevision);
+    case UnitLocalization::Attributes::ClusterRevision::Id:
+        return encoder.Encode(UnitLocalization::kRevision);
 
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;

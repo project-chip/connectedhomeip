@@ -16,6 +16,7 @@
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/unit-localization-server/unit-localization-cluster.h>
+#include <app/static-cluster-config/UnitLocalization.h>
 #include <app/util/attribute-metadata.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -27,12 +28,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace Protocols::InteractionModel;
-
-#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-#define CodegenInitError(...) ChipLogError(AppServer, __VA_ARGS__)
-#else // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-#define CodegenInitError(...) (void) 0;
-#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
 
 namespace {
 
@@ -63,3 +58,35 @@ public:
 };
 
 } // namespace
+
+void MatterUnitLocalizationClusterInitCallback(EndpointId endpointId)
+{
+    IntegrationDelegate integrationDelegate;
+
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = UnitLocalization::Id,
+            .fixedClusterInstanceCount = UnitLocalization::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
+            .fetchFeatureMap           = false,
+            .fetchOptionalAttributes   = false,
+        },
+        integrationDelegate);
+}
+
+void MatterUnitLocalizationClusterShutdownCallback(EndpointId endpointId)
+{
+    IntegrationDelegate integrationDelegate;
+
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = UnitLocalization::Id,
+            .fixedClusterInstanceCount = UnitLocalization::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
+        },
+        integrationDelegate);
+}
+
+void MatterUnitLocalizationPluginServerInitCallback() {}
