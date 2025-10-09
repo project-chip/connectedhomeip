@@ -91,6 +91,8 @@ declare_args() {
 
   # Enable TestEventTrigger in GeneralDiagnostics cluster
   sl_enable_test_event_trigger = false
+
+  sl_verbose_mode = false
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
@@ -609,6 +611,13 @@ template("efr32_sdk") {
         ]
       }
 
+      if (wifi_ncp_module) {
+        defines += [
+          "USE_BYPASS_CLOCK=1",
+          "SL_SI91X_ACX_MODULE=1",
+        ]
+      }
+
       if (use_wf200 || use_rs9116 || use_SiWx917) {
         import("${chip_root}/src/platform/silabs/wifi/args.gni")
       }
@@ -666,6 +675,10 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emdrv/uartdrv/config",
         "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
       ]
+    }
+
+    if (sl_verbose_mode) {
+      defines += [ "VERBOSE_MODE=1" ]
     }
 
     if (sl_use_subscription_syncing) {

@@ -294,7 +294,7 @@ config("strict_warnings") {
   # we can.  Ideally this would be checking chip_device_platform or so
   # to be more fine-grained than current_os, but it's not clear that
   # we can access that here.
-  if (current_os != "freertos" && current_os != "mbed" &&
+  if (current_os != "freertos" &&
       # cmsis-rtos is OpenIOT
       current_os != "cmsis-rtos" &&
       # cyw30739 is one of the Infineon builds

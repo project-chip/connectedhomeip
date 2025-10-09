@@ -85,12 +85,17 @@ public:
     CHIP_ERROR
     ValidateAudioStreamID(uint16_t audioStreamId) override;
 
-    CHIP_ERROR
-    IsPrivacyModeActive(bool & isActive) override;
+    CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override;
 
     bool HasAllocatedVideoStreams() override;
 
     bool HasAllocatedAudioStreams() override;
+
+    CHIP_ERROR SetHardPrivacyModeOn(bool hardPrivacyMode) override;
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 

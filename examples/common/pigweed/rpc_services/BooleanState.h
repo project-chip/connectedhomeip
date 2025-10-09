@@ -44,16 +44,16 @@ public:
         EndpointId endpointId = request.endpoint_id;
         bool newState         = request.state_value;
 
-        EventNumber eventNumber;
+        std::optional<EventNumber> eventNumber;
         {
             DeviceLayer::StackLock lock;
 
-            auto booleanState = app::Clusters::BooleanState::GetClusterForEndpointIndex(endpointId);
+            auto booleanState = app::Clusters::BooleanState::FindClusterOnEndpoint(endpointId);
             VerifyOrReturnError(booleanState != nullptr, pw::Status::InvalidArgument());
-            booleanState->SetStateValue(newState, &eventNumber);
+            eventNumber = booleanState->SetStateValue(newState);
         }
 
-        response.event_number = static_cast<uint64_t>(eventNumber);
+        response.event_number = eventNumber.value_or(0);
         return pw::OkStatus();
 #else
         return pw::Status::InvalidArgument();
@@ -69,7 +69,7 @@ public:
         {
             DeviceLayer::StackLock lock;
 
-            auto booleanState = app::Clusters::BooleanState::GetClusterForEndpointIndex(endpointId);
+            auto booleanState = app::Clusters::BooleanState::FindClusterOnEndpoint(endpointId);
             VerifyOrReturnError(booleanState != nullptr, pw::Status::InvalidArgument());
             state_value = booleanState->GetStateValue();
         }

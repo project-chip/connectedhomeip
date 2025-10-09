@@ -273,36 +273,80 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
 
 CommissioningStage AutoCommissioner::GetNextCommissioningStageNetworkSetup(CommissioningStage currentStage, CHIP_ERROR & lastErr)
 {
-    if (IsSecondaryNetworkSupported())
+    if (!IsSomeNetworkSupported())
     {
-        if (TryingSecondaryNetwork())
-        {
-            // Try secondary network interface.
-            return mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId ? CommissioningStage::kThreadNetworkSetup
-                                                                                     : CommissioningStage::kWiFiNetworkSetup;
-        }
-        // Try primary network interface
-        return mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId ? CommissioningStage::kWiFiNetworkSetup
-                                                                                 : CommissioningStage::kThreadNetworkSetup;
+        ChipLogError(Controller, "Network setup is needed, but commissionee does not support any network types we know about");
+        lastErr = CHIP_ERROR_INCORRECT_STATE;
+        return CommissioningStage::kCleanup;
     }
 
-    if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId)
+    enum class NetworkType
     {
-        return CommissioningStage::kWiFiNetworkSetup;
+        kWiFi,
+        kThread,
+    };
+
+    NetworkType networkToUse;
+    if (TryingSecondaryNetwork())
+    {
+        // Try secondary network interface.
+        networkToUse =
+            mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId ? NetworkType::kThread : NetworkType::kWiFi;
     }
-    if (mParams.GetThreadOperationalDataset().HasValue() && mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
+    else if (IsSecondaryNetworkSupported())
     {
+        // Try primary network interface.
+        TryPrimaryNetwork();
+        networkToUse =
+            mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId ? NetworkType::kWiFi : NetworkType::kThread;
+    }
+    else if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId)
+    {
+        networkToUse = NetworkType::kWiFi;
+    }
+    else if (mParams.GetThreadOperationalDataset().HasValue() &&
+             mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
+    {
+        networkToUse = NetworkType::kThread;
+    }
+    else
+    {
+        // If we have ended up here, then the commissionee does not support trying two different
+        // network technologies.  If it did, then either we would have credentials for one of them
+        // and take one of those branches, or we would not have credentials for either one and
+        // IsSecondaryNetworkSupported() would have tested true.
+        //
+        // Also, since we got here, we don't (yet) have credentials for the one network technology
+        // the commissionee supports. Go ahead and just try to use that one network technology,
+        // which should be the primary network (on the root endpoint).
+        //
+        // Note that we don't call TryPrimaryNetwork() here, because that's only used when there
+        // will be a secondary network to try.  Which in this case there isn't.
+        networkToUse =
+            mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId ? NetworkType::kWiFi : NetworkType::kThread;
+    }
+
+    if (networkToUse == NetworkType::kWiFi)
+    {
+        if (mParams.GetWiFiCredentials().HasValue())
+        {
+            // Just go ahead and set that up.
+            return CommissioningStage::kWiFiNetworkSetup;
+        }
+
+        // We need credentials but don't have them.  We need to ask for those.
+        return CommissioningStage::kRequestWiFiCredentials;
+    }
+
+    // networkToUse must be kThread here.
+    if (mParams.GetThreadOperationalDataset().HasValue())
+    {
+        // Just go ahead and set that up.
         return CommissioningStage::kThreadNetworkSetup;
     }
 
-    ChipLogError(Controller, "Required network information not provided in commissioning parameters");
-    ChipLogError(Controller, "Parameters supplied: wifi (%s) thread (%s)", mParams.GetWiFiCredentials().HasValue() ? "yes" : "no",
-                 mParams.GetThreadOperationalDataset().HasValue() ? "yes" : "no");
-    ChipLogError(Controller, "Device supports: wifi (%s) thread(%s)",
-                 mDeviceCommissioningInfo.network.wifi.endpoint == kInvalidEndpointId ? "no" : "yes",
-                 mDeviceCommissioningInfo.network.thread.endpoint == kInvalidEndpointId ? "no" : "yes");
-    lastErr = CHIP_ERROR_INVALID_ARGUMENT;
-    return CommissioningStage::kCleanup;
+    // We need credentials but don't have them.  We need to ask for those.
+    return CommissioningStage::kRequestThreadCredentials;
 }
 
 CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr)
@@ -457,6 +501,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             return CommissioningStage::kEvictPreviousCaseSessions;
         }
     case CommissioningStage::kScanNetworks:
+    case CommissioningStage::kRequestWiFiCredentials:
+    case CommissioningStage::kRequestThreadCredentials:
         return CommissioningStage::kNeedsNetworkCreds;
     case CommissioningStage::kNeedsNetworkCreds:
         return GetNextCommissioningStageNetworkSetup(currentStage, lastErr);
@@ -578,9 +624,11 @@ EndpointId AutoCommissioner::GetEndpoint(const CommissioningStage & stage) const
 {
     switch (stage)
     {
+    case CommissioningStage::kRequestWiFiCredentials:
     case CommissioningStage::kWiFiNetworkSetup:
     case CommissioningStage::kWiFiNetworkEnable:
         return mDeviceCommissioningInfo.network.wifi.endpoint;
+    case CommissioningStage::kRequestThreadCredentials:
     case CommissioningStage::kThreadNetworkSetup:
     case CommissioningStage::kThreadNetworkEnable:
         return mDeviceCommissioningInfo.network.thread.endpoint;
@@ -731,10 +779,7 @@ CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, Byte
 
 void AutoCommissioner::CleanupCommissioning()
 {
-    if (IsSecondaryNetworkSupported() && TryingSecondaryNetwork())
-    {
-        ResetTryingSecondaryNetwork();
-    }
+    ResetNetworkAttemptType();
     mPAI.Free();
     mDAC.Free();
     mCommissioneeDeviceProxy = nullptr;
@@ -783,6 +828,10 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 
             // If we are configured to scan networks, then don't error out.
             // Instead, allow the app to try another network.
+            //
+            // TODO: This doesn't actually work, because in order to provide credentials someone
+            // had to SetWiFiCredentials() or SetThreadOperationalDataset() on our params, so
+            // IsScanNeeded() will no longer test true for that network technology.
             if (IsScanNeeded())
             {
                 if (completionStatus.err == CHIP_NO_ERROR)
@@ -796,9 +845,28 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             }
         }
 
-        if (err != CHIP_NO_ERROR && IsSecondaryNetworkSupported() && !TryingSecondaryNetwork() &&
-            completionStatus.failedStage.HasValue() && completionStatus.failedStage.Value() >= kWiFiNetworkSetup &&
-            completionStatus.failedStage.Value() <= kICDSendStayActive)
+        auto isNetworkFailureStage = [](CommissioningStage stage) {
+            // If we were somewhere between network setup and and trying to finish up commissioning,
+            // treat that as a network failure stage; trying the secondary network might work
+            // better.
+            if (stage >= kWiFiNetworkSetup && stage <= kICDSendStayActive)
+            {
+                return true;
+            }
+
+            // If we were trying to request credentials and failed (because our delegate does not
+            // implement that functionality, for example), treat that as a network failure stage and
+            // try the other network type.
+            if (stage == kRequestThreadCredentials || stage == kRequestWiFiCredentials || stage == kNeedsNetworkCreds)
+            {
+                return true;
+            }
+
+            return false;
+        };
+
+        if (err != CHIP_NO_ERROR && TryingPrimaryNetwork() && completionStatus.failedStage.HasValue() &&
+            isNetworkFailureStage(completionStatus.failedStage.Value()))
         {
             // Primary network failed, disable primary network interface and try secondary network interface.
             TrySecondaryNetwork();

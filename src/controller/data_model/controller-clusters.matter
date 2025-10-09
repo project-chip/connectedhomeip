@@ -324,6 +324,13 @@ struct PowerThresholdStruct {
   nullable PowerThresholdSourceEnum powerThresholdSource = 2;
 }
 
+struct SemanticTagStruct {
+  nullable vendor_id mfgCode = 0;
+  enum8 namespaceID = 1;
+  enum8 tag = 2;
+  optional nullable char_string<64> label = 3;
+}
+
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -350,7 +357,7 @@ fabric_scoped struct WebRTCSessionStruct {
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
-  revision 5;
+  revision 6;
 
   enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
@@ -647,13 +654,13 @@ cluster LevelControl = 8 {
     int16u frequency = 0;
   }
 
-  /** Command description for MoveToLevel */
+  /** This command will move the device to the specified level. */
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
-  /** Command description for Move */
+  /** This command will move the device using the specified values. */
   command Move(MoveRequest): DefaultSuccess = 1;
-  /** Command description for Step */
+  /** This command will do a relative step change of the device using the specified values. */
   command Step(StepRequest): DefaultSuccess = 2;
-  /** Command description for Stop */
+  /** This command will stop the actions of various other commands that are still in progress. */
   command Stop(StopRequest): DefaultSuccess = 3;
   /** Command description for MoveToLevelWithOnOff */
   command MoveToLevelWithOnOff(MoveToLevelWithOnOffRequest): DefaultSuccess = 4;
@@ -663,8 +670,7 @@ cluster LevelControl = 8 {
   command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
   /** Command description for StopWithOnOff */
   command StopWithOnOff(StopWithOnOffRequest): DefaultSuccess = 7;
-  /** Change the currrent frequency to the provided one, or a close
-        approximation if the exact provided one is not possible. */
+  /** This command will cause the device to change the current frequency to the requested value. */
   command MoveToClosestFrequency(MoveToClosestFrequencyRequest): DefaultSuccess = 8;
 }
 
@@ -690,13 +696,6 @@ cluster Descriptor = 29 {
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
-  }
-
-  struct SemanticTagStruct {
-    nullable vendor_id mfgCode = 0;
-    enum8 namespaceID = 1;
-    enum8 tag = 2;
-    optional nullable char_string<64> label = 3;
   }
 
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
@@ -1380,7 +1379,7 @@ cluster PowerSourceConfiguration = 46 {
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 cluster PowerSource = 47 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 3;
 
   enum BatApprovedChemistryEnum : enum16 {
     kUnspecified = 0;
@@ -2716,7 +2715,7 @@ cluster Switch = 59 {
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum CommissioningWindowStatusEnum : enum8 {
     kWindowNotOpen = 0;
@@ -2745,7 +2744,7 @@ cluster AdministratorCommissioning = 60 {
 
   request struct OpenCommissioningWindowRequest {
     int16u commissioningTimeout = 0;
-    octet_string PAKEPasscodeVerifier = 1;
+    octet_string<97> PAKEPasscodeVerifier = 1;
     int16u discriminator = 2;
     int32u iterations = 3;
     octet_string<32> salt = 4;
@@ -2755,11 +2754,11 @@ cluster AdministratorCommissioning = 60 {
     int16u commissioningTimeout = 0;
   }
 
-  /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method. */
+  /** This command is used by a current Administrator to instruct a Node to go into commissioning mode. */
   timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using basic commissioning method, if the node supports it. */
+  /** This command MAY be used by a current Administrator to instruct a Node to go into commissioning mode, if the node supports the Basic Commissioning Method. */
   timed command access(invoke: administer) OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
-  /** This command is used by a current Administrator to instruct a Node to revoke any active Open Commissioning Window or Open Basic Commissioning Window command. */
+  /** This command is used by a current Administrator to instruct a Node to revoke any active OpenCommissioningWindow or OpenBasicCommissioningWindow command. */
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
@@ -2913,7 +2912,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
@@ -4342,6 +4341,80 @@ provisional cluster ScenesManagement = 98 {
   fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
   /** This command allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
   fabric command access(invoke: manage) CopyScene(CopySceneRequest): CopySceneResponse = 64;
+}
+
+/** The Groupcast cluster manages the content of the node-wide multicast Group membership that is part of the underlying interaction layer. */
+cluster Groupcast = 101 {
+  revision 1;
+
+  bitmap Feature : bitmap32 {
+    kListener = 0x1;
+    kSender = 0x2;
+  }
+
+  fabric_scoped struct MembershipStruct {
+    group_id groupID = 0;
+    endpoint_no endpoints[] = 1;
+    fabric_sensitive int32u keyID = 2;
+    boolean hasAuxiliaryACL = 3;
+    optional fabric_sensitive int32u expiringKeyID = 4;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute MembershipStruct membership[] = 0;
+  readonly attribute int16u maxMembershipCount = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct JoinGroupRequest {
+    group_id groupID = 0;
+    endpoint_no endpoints[] = 1;
+    int32u keyID = 2;
+    optional octet_string<16> key = 3;
+    optional epoch_s gracePeriod = 4;
+    optional boolean useAuxiliaryACL = 5;
+  }
+
+  request struct LeaveGroupRequest {
+    group_id groupID = 0;
+    optional endpoint_no endpoints[] = 1;
+  }
+
+  response struct LeaveGroupResponse = 2 {
+    group_id groupID = 0;
+    optional endpoint_no endpoints[] = 1;
+    optional boolean listTooLarge = 2;
+  }
+
+  request struct UpdateGroupKeyRequest {
+    group_id groupID = 0;
+    int32u keyID = 1;
+    optional octet_string<16> key = 2;
+    optional epoch_s gracePeriod = 3;
+  }
+
+  request struct ExpireGracePeriodRequest {
+    group_id groupID = 0;
+  }
+
+  request struct ConfigureAuxiliaryACLRequest {
+    group_id groupID = 0;
+    boolean useAuxiliaryACL = 1;
+  }
+
+  /** This command SHALL be used to instruct the server to join a multicast group. */
+  fabric command access(invoke: manage) JoinGroup(JoinGroupRequest): DefaultSuccess = 0;
+  /** This command SHALL allow a maintainer to request that the server withdraws itself or specific endpoints from a specific group or from all groups of this client's fabric. */
+  fabric command access(invoke: manage) LeaveGroup(LeaveGroupRequest): LeaveGroupResponse = 1;
+  /** This command SHALL allow a fabric maintainer to update the OperationalGroupKey for an existing group ID that the server is a member of. */
+  fabric command access(invoke: manage) UpdateGroupKey(UpdateGroupKeyRequest): DefaultSuccess = 3;
+  /** This command SHALL allow a fabric maintainer to expire the grace period of the previous key for an existing group ID that the server is a member of. */
+  fabric command access(invoke: manage) ExpireGracePeriod(ExpireGracePeriodRequest): DefaultSuccess = 4;
+  /** This command SHALL allow an Administrator to enable or disable the generation of AuxiliaryACL entries in the Access Control Cluster based on the groups joined (see Groupcast Auxiliary ACL Handling). */
+  fabric command access(invoke: administer) ConfigureAuxiliaryACL(ConfigureAuxiliaryACLRequest): DefaultSuccess = 5;
 }
 
 /** Attributes and commands for monitoring HEPA filters in a device */
@@ -7027,6 +7100,7 @@ cluster Thermostat = 513 {
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
     kEvents = 0x200;
+    kThermostatSuggestions = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -7098,6 +7172,7 @@ cluster Thermostat = 513 {
     kVacationMode = 0x10;
     kTimeOfUseCostSavings = 0x20;
     kPreCoolingOrPreHeating = 0x40;
+    kConflictingSuggestions = 0x80;
   }
 
   struct ScheduleTransitionStruct {
@@ -9093,7 +9168,7 @@ cluster MediaInput = 1287 {
 
 /** This cluster provides an interface for managing low power mode on a device. */
 cluster LowPower = 1288 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -9101,13 +9176,13 @@ cluster LowPower = 1288 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** This command shall put the device into low power mode. */
+  /** This command SHALL put the device into low power mode. */
   command Sleep(): DefaultSuccess = 0;
 }
 
 /** This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT. */
 cluster KeypadInput = 1289 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum CECKeyCodeEnum : enum8 {
     kSelect = 0;
@@ -9224,7 +9299,7 @@ cluster KeypadInput = 1289 {
     StatusEnum status = 0;
   }
 
-  /** Upon receipt, this SHALL process a keycode as input to the media device. */
+  /** Upon receipt, this SHALL process a keycode as input to the media endpoint. */
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
 }
 
@@ -11254,11 +11329,7 @@ provisional cluster TlsClientManagement = 2050 {
     kRootCertificateNotFound = 3;
     kClientCertificateNotFound = 4;
     kEndpointInUse = 5;
-  }
-
-  enum TLSEndpointStatusEnum : enum8 {
-    kProvisioned = 0;
-    kInUse = 1;
+    kInvalidTime = 6;
   }
 
   fabric_scoped struct TLSEndpointStruct {
@@ -11267,7 +11338,7 @@ provisional cluster TlsClientManagement = 2050 {
     int16u port = 2;
     int16u caid = 3;
     nullable int16u ccdid = 4;
-    TLSEndpointStatusEnum status = 5;
+    int8u referenceCount = 5;
     fabric_idx fabricIndex = 254;
   }
 
@@ -11303,7 +11374,7 @@ provisional cluster TlsClientManagement = 2050 {
     int16u endpointID = 0;
   }
 
-  /** This command is used to provision a TLS Endpoint for the provided HostName / Port combination. */
+  /** This command is used to provision a TLS Endpoint for the provided Hostname / Port combination. */
   fabric command access(invoke: administer) ProvisionEndpoint(ProvisionEndpointRequest): ProvisionEndpointResponse = 0;
   /** This command is used to find a TLS Endpoint by its ID. */
   fabric command FindEndpoint(FindEndpointRequest): FindEndpointResponse = 2;

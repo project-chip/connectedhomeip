@@ -120,10 +120,6 @@ static_library("shell") {
     sources += [ "MainLoopDefault.cpp" ]
   }
 
-  if (current_os == "mbed") {
-    sources += [ "streamer_mbed.cpp" ]
-  }
-
   cflags = [ "-Wconversion" ]
 
   public_deps = [

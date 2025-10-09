@@ -192,14 +192,30 @@ CHIP_ERROR CameraAVStreamManager::ValidateAudioStreamID(uint16_t audioStreamId)
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
-CHIP_ERROR CameraAVStreamManager::IsPrivacyModeActive(bool & isActive)
+CHIP_ERROR CameraAVStreamManager::IsHardPrivacyModeActive(bool & isActive)
 {
     // Check privacy mode attributes
-    bool softRecordingPrivacyMode  = GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled();
-    bool softLivestreamPrivacyMode = GetCameraAVStreamMgmtServer()->GetSoftLivestreamPrivacyModeEnabled();
-
-    isActive = softRecordingPrivacyMode || softLivestreamPrivacyMode;
+    isActive = GetCameraAVStreamMgmtServer()->GetHardPrivacyModeOn();
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamManager::IsSoftRecordingPrivacyModeActive(bool & isActive)
+{
+    // Check privacy mode attributes
+    isActive = GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamManager::IsSoftLivestreamPrivacyModeActive(bool & isActive)
+{
+    // Check privacy mode attributes
+    isActive = GetCameraAVStreamMgmtServer()->GetSoftLivestreamPrivacyModeEnabled();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamManager::SetHardPrivacyModeOn(bool hardPrivacyMode)
+{
+    return GetCameraAVStreamMgmtServer()->SetHardPrivacyModeOn(hardPrivacyMode);
 }
 
 bool CameraAVStreamManager::HasAllocatedVideoStreams()
@@ -217,38 +233,66 @@ bool CameraAVStreamManager::HasAllocatedAudioStreams()
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
                                                                                uint16_t & outStreamID)
 {
-    outStreamID = kInvalidStreamID;
+    outStreamID                                 = kInvalidStreamID;
+    bool isRequestSupportedByAnyAvailableStream = false;
 
-    for (VideoStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
+    // Check if allocation request can be supported
+    for (const auto & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
     {
         if (stream.IsCompatible(allocateArgs))
         {
-            outStreamID = stream.videoStreamParams.videoStreamID;
-            if (!stream.isAllocated)
+            isRequestSupportedByAnyAvailableStream = true;
+            break;
+        }
+    }
+
+    if (!isRequestSupportedByAnyAvailableStream)
+    {
+        return Status::DynamicConstraintError;
+    }
+
+    // Try to reuse an allocated stream
+    for (auto & stream : GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams())
+    {
+        if (GetCameraAVStreamMgmtServer()->IsAllocatedVideoStreamReusable(stream, allocateArgs))
+        {
+            // Found a stream that can be reused
+            outStreamID = stream.videoStreamID;
+            ChipLogProgress(Camera, "Matching pre-allocated stream with ID: %d exists", outStreamID);
+            return Status::Success;
+        }
+    }
+
+    // Try to find an unused compatible available stream
+    for (auto & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
+    {
+        if (!stream.isAllocated && stream.IsCompatible(allocateArgs))
+        {
+            uint32_t candidateEncodedPixelRate =
+                allocateArgs.maxFrameRate * allocateArgs.maxResolution.height * allocateArgs.maxResolution.width;
+            bool encoderRequired = true;
+            if (!GetCameraAVStreamMgmtServer()->IsResourceAvailableForStreamAllocation(candidateEncodedPixelRate, encoderRequired))
             {
-                stream.isAllocated = true;
-                // Set the default viewport on the newly allocated stream
-                mCameraDeviceHAL->GetCameraHALInterface().SetViewport(stream,
-                                                                      mCameraDeviceHAL->GetCameraHALInterface().GetViewport());
-
-                // Inform DPTZ that there's an allocated stream
-                mCameraDeviceHAL->GetCameraAVSettingsUserLevelMgmtDelegate().VideoStreamAllocated(outStreamID);
-
-                // Set the current frame rate attribute from HAL
-                GetCameraAVStreamMgmtServer()->SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
-
-                return Status::Success;
+                return Status::ResourceExhausted;
             }
-            else
-            {
-                ChipLogProgress(Camera, "Matching pre-allocated stream with ID: %d exists", outStreamID);
-            }
+            stream.isAllocated = true;
+            outStreamID        = stream.videoStreamParams.videoStreamID;
+
+            // Set the default viewport on the newly allocated stream
+            mCameraDeviceHAL->GetCameraHALInterface().SetViewport(stream, mCameraDeviceHAL->GetCameraHALInterface().GetViewport());
+
+            // Inform DPTZ that there's an allocated stream
+            mCameraDeviceHAL->GetCameraAVSettingsUserLevelMgmtDelegate().VideoStreamAllocated(outStreamID);
+
+            // Set the current frame rate attribute from HAL
+            GetCameraAVStreamMgmtServer()->SetCurrentFrameRate(mCameraDeviceHAL->GetCameraHALInterface().GetCurrentFrameRate());
 
             return Status::Success;
         }
     }
 
-    return Status::DynamicConstraintError;
+    // No compatible stream available for use.
+    return Status::ResourceExhausted;
 }
 
 void CameraAVStreamManager::OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, StreamAllocationAction action)
@@ -386,32 +430,51 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate
 Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
                                                                                   uint16_t & outStreamID)
 {
-    outStreamID = kInvalidStreamID;
+    outStreamID                                 = kInvalidStreamID;
+    bool isRequestSupportedByAnyAvailableStream = false;
 
-    for (SnapshotStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableSnapshotStreams())
+    // Check if allocation request can be supported
+    for (const auto & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableSnapshotStreams())
     {
         if (stream.IsCompatible(allocateArgs))
         {
-            outStreamID = stream.snapshotStreamParams.snapshotStreamID;
-            if (!stream.isAllocated)
-            {
-                stream.isAllocated = true;
+            isRequestSupportedByAnyAvailableStream = true;
+            break;
+        }
+    }
 
-                // Set the optional Watermark and OSD values that may have been provided.  This is the initial
-                // setting of these values, they may be subsequently modified. If the values have no value that
-                // is ok, the allocated stream will store as such and ignore.
-                stream.snapshotStreamParams.watermarkEnabled = allocateArgs.watermarkEnabled;
-                stream.snapshotStreamParams.OSDEnabled       = allocateArgs.OSDEnabled;
+    if (!isRequestSupportedByAnyAvailableStream)
+    {
+        return Status::DynamicConstraintError;
+    }
 
-                // Start the snapshot stream for serving.
-                mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(outStreamID);
-            }
-            else
-            {
-                ChipLogProgress(Camera, "Matching pre-allocated stream with ID: %d exists", outStreamID);
-            }
+    // Try to reuse an allocated stream.
+    for (auto & stream : GetCameraAVStreamMgmtServer()->GetAllocatedSnapshotStreams())
+    {
+        if (GetCameraAVStreamMgmtServer()->IsAllocatedSnapshotStreamReusable(stream, allocateArgs))
+        {
+            // Found a stream that can be reused
+            outStreamID = stream.snapshotStreamID;
+            ChipLogProgress(Camera, "Matching pre-allocated stream with ID: %d exists", outStreamID);
             return Status::Success;
         }
+    }
+
+    uint32_t candidateEncodedPixelRate = 0;
+    bool encoderRequired               = false;
+    if (allocateArgs.encodedPixels)
+    {
+        candidateEncodedPixelRate +=
+            allocateArgs.maxFrameRate * allocateArgs.maxResolution.height * allocateArgs.maxResolution.width;
+        if (allocateArgs.hardwareEncoder)
+        {
+            encoderRequired = true;
+        }
+    }
+
+    if (!GetCameraAVStreamMgmtServer()->IsResourceAvailableForStreamAllocation(candidateEncodedPixelRate, encoderRequired))
+    {
+        return Status::ResourceExhausted;
     }
 
     // If no pre-allocated stream matches, try allocating a new one.
@@ -421,7 +484,29 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
         return Status::Success;
     }
 
-    return Status::DynamicConstraintError;
+    // Try to find an unused compatible available stream
+    for (auto & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableSnapshotStreams())
+    {
+        if (!stream.isAllocated && stream.IsCompatible(allocateArgs))
+        {
+            stream.isAllocated = true;
+            outStreamID        = stream.snapshotStreamParams.snapshotStreamID;
+
+            // Set the optional Watermark and OSD values that may have been provided.  This is the initial
+            // setting of these values, they may be subsequently modified. If the values have no value that
+            // is ok, the allocated stream will store as such and ignore.
+            stream.snapshotStreamParams.watermarkEnabled = allocateArgs.watermarkEnabled;
+            stream.snapshotStreamParams.OSDEnabled       = allocateArgs.OSDEnabled;
+
+            // Start the snapshot stream for serving.
+            mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(outStreamID);
+
+            return Status::Success;
+        }
+    }
+
+    // No compatible stream available for use.
+    return Status::ResourceExhausted;
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(const uint16_t streamID,
@@ -501,6 +586,10 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
     case SoftLivestreamPrivacyModeEnabled::Id: {
         mCameraDeviceHAL->GetCameraHALInterface().SetSoftLivestreamPrivacyModeEnabled(
             GetCameraAVStreamMgmtServer()->GetSoftLivestreamPrivacyModeEnabled());
+        break;
+    }
+    case HardPrivacyModeOn::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetHardPrivacyMode(GetCameraAVStreamMgmtServer()->GetHardPrivacyModeOn());
         break;
     }
     case NightVision::Id: {

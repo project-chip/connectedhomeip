@@ -19,7 +19,6 @@
 #pragma once
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-logic.h>
 #include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
 #include <camera-device-interface.h>
 #include <credentials/CHIPCert.h>
@@ -56,7 +55,7 @@ public:
     void Init();
     void SetMediaController(MediaController * mediaController);
     void SetCameraDevice(CameraDeviceInterface * cameraDevice);
-    void SetPushAvStreamTransportServer(PushAvStreamTransportServerLogic * server) override;
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) override;
 
     // Add missing override keywords and fix signatures
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
@@ -81,7 +80,7 @@ public:
 
     bool ValidateStreamUsage(StreamUsageEnum streamUsage) override;
 
-    bool ValidateSegmentDuration(uint16_t segmentDuration) override;
+    bool ValidateSegmentDuration(uint16_t segmentDuration, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override;
 
     Protocols::InteractionModel::Status
     ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
@@ -89,7 +88,7 @@ public:
 
     Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) override;
 
-    bool ValidateMotionZoneSize(uint16_t zoneSize) override;
+    bool ValidateMotionZoneListSize(size_t zoneListSize) override;
 
     Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId) override;
 
@@ -107,13 +106,17 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
+    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override;
+
     void OnZoneTriggeredEvent(uint16_t zoneId);
+
+    void RecordingStreamPrivacyModeChanged(bool privacyModeEnabled);
 
 private:
     std::vector<PushAvStream> pushavStreams;
-    MediaController * mMediaController                              = nullptr;
-    CameraDeviceInterface * mCameraDevice                           = nullptr;
-    PushAvStreamTransportServerLogic * mPushAvStreamTransportServer = nullptr;
+    MediaController * mMediaController                         = nullptr;
+    CameraDeviceInterface * mCameraDevice                      = nullptr;
+    PushAvStreamTransportServer * mPushAvStreamTransportServer = nullptr;
 
     AudioStreamStruct mAudioStreamParams;
     VideoStreamStruct mVideoStreamParams;

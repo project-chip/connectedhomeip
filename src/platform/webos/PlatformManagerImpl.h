@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,10 @@
  */
 
 #pragma once
+
+#include "lib/core/CHIPError.h"
+#include <condition_variable>
+#include <mutex>
 
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
@@ -51,6 +55,46 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+
+    /**
+     * @brief Invoke a function on the Matter GLib context.
+     *
+     * If execution of the function will have to be scheduled on other thread,
+     * this call will block the current thread until the function is executed.
+     *
+     * @param[in] function The function to call.
+     * @param[in] userData User data to pass to the function.
+     * @returns The result of the function.
+     */
+    template <typename T>
+    CHIP_ERROR GLibMatterContextInvokeSync(CHIP_ERROR (*func)(T *), T * userData)
+    {
+        struct
+        {
+            CHIP_ERROR returnValue = CHIP_NO_ERROR;
+            CHIP_ERROR (*functionToCall)(T *);
+            T * userData;
+        } context;
+
+        context.functionToCall = func;
+        context.userData       = userData;
+
+        LambdaBridge bridge;
+        bridge.Initialize([&context]() { context.returnValue = context.functionToCall(context.userData); });
+
+        _GLibMatterContextInvokeSync(std::move(bridge));
+        return context.returnValue;
+    }
+
+    unsigned int GLibMatterContextAttachSource(GSource * source)
+    {
+        VerifyOrDie(mGLibMainLoop != nullptr);
+        return g_source_attach(source, g_main_loop_get_context(mGLibMainLoop));
+    }
+
+#endif
+
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
 private:
@@ -69,16 +113,40 @@ private:
 
     static PlatformManagerImpl sInstance;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
-    // This should be removed or find a better place once we deprecate the rendezvous session.
-    static void WiFiIPChangeListener();
-#endif
-
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
-    GMainLoop * mGLibMainLoop;
-    GThread * mGLibMainLoopThread;
-#endif
+
+    struct GLibMatterContextInvokeData
+    {
+        LambdaBridge bridge;
+        // Sync primitives to wait for the function to be executed
+        std::condition_variable mDoneCond;
+        bool mDone = false;
+    };
+
+    /**
+     * @brief Invoke a function on the Matter GLib context.
+     *
+     * @param[in] bridge a LambdaBridge object that holds the lambda to be invoked within the GLib context.
+     *
+     * @note This function moves the LambdaBridge into the GLib context for invocation.
+     *       The LambdaBridge is created and initialised in GLibMatterContextInvokeSync().
+     *       use the GLibMatterContextInvokeSync() template function instead of this one.
+     */
+    void _GLibMatterContextInvokeSync(LambdaBridge && bridge);
+
+    // XXX: Mutex for guarding access to glib main event loop callback indirection
+    //      synchronization primitives. This is a workaround to suppress TSAN warnings.
+    //      TSAN does not know that from the thread synchronization perspective the
+    //      g_source_attach() function should be treated as pthread_create(). Memory
+    //      access to shared data before the call to g_source_attach() without mutex
+    //      is not a race condition - the callback will not be executed on glib main
+    //      event loop thread before the call to g_source_attach().
+    std::mutex mGLibMainLoopCallbackIndirectionMutex;
+
+    GMainLoop * mGLibMainLoop     = nullptr;
+    GThread * mGLibMainLoopThread = nullptr;
+
+#endif // CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 };
 
 /**

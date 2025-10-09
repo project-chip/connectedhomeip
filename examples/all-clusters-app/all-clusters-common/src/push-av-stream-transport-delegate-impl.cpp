@@ -105,7 +105,8 @@ bool PushAvStreamTransportManager::ValidateStreamUsage(StreamUsageEnum streamUsa
     return true;
 }
 
-bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDuration)
+bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDuration,
+                                                           const Optional<DataModel::Nullable<uint16_t>> & videoStreamId)
 {
     return true;
 }
@@ -162,7 +163,7 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateZoneId
     return Status::Success;
 }
 
-bool PushAvStreamTransportManager::ValidateMotionZoneSize(uint16_t zoneSize)
+bool PushAvStreamTransportManager::ValidateMotionZoneListSize(size_t zoneListSize)
 {
     // TODO: Validate motion zone size
     // Returning true to pass through checks in the Server Implementation.
@@ -203,5 +204,11 @@ PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
 {
     ChipLogProgress(Zcl, "Push AV Stream Transport Persistent attributes loaded");
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PushAvStreamTransportManager::IsPrivacyModeActive(bool & isActive)
+{
+    isActive = false;
     return CHIP_NO_ERROR;
 }

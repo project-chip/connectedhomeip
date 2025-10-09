@@ -167,10 +167,33 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     tcpip_init(NULL, NULL);
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    err = WiFiInterfaceInit();
+    /*
+     * Wait Wifi to init.
+     * Initializing the 15.4 controller too early, before the wifi fw is finished initializing,
+     * can lead to a blockage in IMU communication between CPU1 and CPU2.
+     */
+    vTaskDelay(1500 / portTICK_PERIOD_MS); // TODO: Replace with a proper synchronization mechanism
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DeviceLayer,
+                        "Wi-Fi module initialization failed. Make sure the Wi-Fi/BLE module is properly configured and connected "
+                        "with the board and start again!");
+        chipDie();
+    }
+    ChipLogProgress(DeviceLayer, "Wi-Fi module initialization done.");
+
+    /* Initialize platform services */
+    err = ServiceInit();
+    SuccessOrExit(err);
+
+#endif
+
     /*
      * Initialize controllers here before initializing BLE/OT/WIFI,
-     * this will load the firmware in CPU1/CPU2 depending on the
-     * connectivity used
+     * this will load the firmware in CPU2 depending on the
+     * connectivity used. CPU1 is loaded when the WiFiInterfaceInit is called
      */
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_ZIGBEE
@@ -179,9 +202,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     controllerMask |= connBle_c;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE */
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    controllerMask |= connWlan_c;
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 
     PLATFORM_InitControllers(controllerMask);
 
@@ -210,24 +230,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         err = CHIP_ERROR_NO_MEMORY;
         goto exit;
     }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    err = WiFiInterfaceInit();
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(DeviceLayer,
-                        "Wi-Fi module initialization failed. Make sure the Wi-Fi/BLE module is properly configured and connected "
-                        "with the board and start again!");
-        chipDie();
-    }
-    ChipLogProgress(DeviceLayer, "Wi-Fi module initialization done.");
-
-    /* Initialize platform services */
-    err = ServiceInit();
-    SuccessOrExit(err);
-
-#endif
 
 #if CONFIG_CHIP_ETHERNET
     /* Initialize platform services */

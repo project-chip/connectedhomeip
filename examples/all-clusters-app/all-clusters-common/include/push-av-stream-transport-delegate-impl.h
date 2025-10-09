@@ -66,7 +66,7 @@ public:
 
     bool ValidateStreamUsage(StreamUsageEnum streamUsage) override;
 
-    bool ValidateSegmentDuration(uint16_t segmentDuration) override;
+    bool ValidateSegmentDuration(uint16_t segmentDuration, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override;
 
     Protocols::InteractionModel::Status SelectAudioStream(StreamUsageEnum streamUsage, uint16_t & audioStreamId) override;
 
@@ -76,7 +76,7 @@ public:
 
     Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) override;
 
-    bool ValidateMotionZoneSize(uint16_t zoneSize) override;
+    bool ValidateMotionZoneListSize(size_t zoneListSize) override;
 
     PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) override;
 
@@ -91,7 +91,10 @@ public:
     {
         // Handle TLS certificates if needed for implementation
     }
-    void SetPushAvStreamTransportServer(PushAvStreamTransportServerLogic * serverLogic) override
+
+    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override;
+
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServer * serverLogic) override
     {
         // Store pointer to server logic if needed for implementation
     }
