@@ -26,6 +26,8 @@ import ndef
 import smartcard
 import smartcard.CardMonitoring
 
+logger = logging.getLogger(__name__)
+
 
 class TagEventObserver(smartcard.CardMonitoring.CardObserver):
     """
@@ -40,15 +42,15 @@ class TagEventObserver(smartcard.CardMonitoring.CardObserver):
     def update(self, observable, actions):
         (added_tags, removed_tags) = actions
         for tag in added_tags:
-            logging.debug("NFC tag detected")
+            logger.debug("NFC tag detected")
             try:
                 ndef_bytes = self.reader_helper.read_t4t_ndef()
                 self.last_ndef = ndef_bytes
-                logging.debug(self.reader_helper.ndef_content_to_string(ndef_bytes))
+                logger.debug(self.reader_helper.ndef_content_to_string(ndef_bytes))
             except Exception as e:
-                logging.info(f"Error reading NFC tag: {e}")
+                logger.info(f"Error reading NFC tag: {e}")
         for tag in removed_tags:
-            logging.debug("Tag removed.")
+            logger.debug("Tag removed.")
 
 
 class TagMonitorManager:
@@ -67,13 +69,13 @@ class TagMonitorManager:
         self.tag_monitor = smartcard.CardMonitoring.CardMonitor()
         self.observer = TagEventObserver(self.reader_helper)
         self.tag_monitor.addObserver(self.observer)
-        logging.info("Start monitoring NFC tags")
+        logger.info("Start monitoring NFC tags")
         try:
             while not self._stop_event.is_set():
                 time.sleep(0.1)
         finally:
             self.tag_monitor.deleteObserver(self.observer)
-            logging.info("Stopped monitoring NFC tags")
+            logger.info("Stopped monitoring NFC tags")
 
     async def activate(self):
         self._stop_event.clear()
@@ -118,13 +120,13 @@ class NFCReaderHelper:
         """
         reader_list = smartcard.System.readers()
         if not reader_list:
-            logging.info("No smartcard reader found.")
+            logger.info("No smartcard reader found.")
             return None
-        logging.debug("Available readers:")
+        logger.debug("Available readers:")
         for idx, reader in enumerate(reader_list):
-            logging.debug(f"{idx}: {reader}")
+            logger.debug(f"{idx}: {reader}")
         reader = reader_list[0]  # Use the first reader found
-        logging.debug(f"Using NFC reader: {reader}")
+        logger.debug(f"Using NFC reader: {reader}")
         return reader
 
     def activate_tag_monitoring(self):
@@ -177,35 +179,35 @@ class NFCReaderHelper:
             SELECT_AID = [0x00, 0xA4, 0x04, 0x00, 0x07, 0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x01, 0x00]
             _, sw1, sw2 = connection.transmit(SELECT_AID)
             if (sw1, sw2) != (0x90, 0x00):
-                logging.debug(f"SELECT_AID failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
+                logger.debug(f"SELECT_AID failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
                 return None
 
             # Select CC file (E103)
             SELECT_CC = [0x00, 0xA4, 0x00, 0x0C, 0x02, 0xE1, 0x03]
             _, sw1, sw2 = connection.transmit(SELECT_CC)
             if (sw1, sw2) != (0x90, 0x00):
-                logging.debug(f"SELECT_CC failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
+                logger.debug(f"SELECT_CC failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
                 return None
 
             # Read CC file
             READ_CC = [0x00, 0xB0, 0x00, 0x00, 0x0F]
             cc_bytes, sw1, sw2 = connection.transmit(READ_CC)
             if (sw1, sw2) != (0x90, 0x00):
-                logging.debug(f"READ_CC failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
+                logger.debug(f"READ_CC failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
                 return None
 
             # Select NDEF file (E104)
             SELECT_NDEF = [0x00, 0xA4, 0x00, 0x0C, 0x02, 0xE1, 0x04]
             _, sw1, sw2 = connection.transmit(SELECT_NDEF)
             if (sw1, sw2) != (0x90, 0x00):
-                logging.debug(f"SELECT_NDEF failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
+                logger.debug(f"SELECT_NDEF failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
                 return None
 
             # Read NDEF length
             READ_NLEN = [0x00, 0xB0, 0x00, 0x00, 0x02]
             nlen, sw1, sw2 = connection.transmit(READ_NLEN)
             if (sw1, sw2) != (0x90, 0x00):
-                logging.debug(f"READ_NLEN failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
+                logger.debug(f"READ_NLEN failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
                 return None
             length = (nlen[0] << 8) + nlen[1]
 
@@ -213,10 +215,10 @@ class NFCReaderHelper:
             READ_NDEF = [0x00, 0xB0, 0x00, 0x02, length]
             ndef_data, sw1, sw2 = connection.transmit(READ_NDEF)
             if (sw1, sw2) != (0x90, 0x00):
-                logging.debug(f"READ_NDEF failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
+                logger.debug(f"READ_NDEF failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
                 return None
 
-        logging.debug(self.ndef_content_to_string(bytes(ndef_data)))
+        logger.debug(self.ndef_content_to_string(bytes(ndef_data)))
         return bytes(ndef_data)
 
     def is_onboarding_data(self, ndef_bytes):
@@ -230,15 +232,15 @@ class NFCReaderHelper:
             bool: True if a URI record starts with 'MT:' (case-insensitive), else False.
         """
         if not ndef_bytes:
-            logging.debug(f"No NDEF!")
+            logger.debug("No NDEF!")
             return False
         try:
             for record in ndef.message_decoder(ndef_bytes):
                 if hasattr(record, "uri") and record.uri and record.uri.lower().startswith("mt:"):
-                    logging.debug(f"Found Matter URI: {record.uri}")
+                    logger.debug(f"Found Matter URI: {record.uri}")
                     return True
         except Exception as e:
-            logging.error(f"NDEF parsing error: {e}")
+            logger.error(f"NDEF parsing error: {e}")
         return False
 
     def write_t4t_ndef_uri(self, uri):
@@ -257,7 +259,7 @@ class NFCReaderHelper:
             SELECT_NDEF = [0x00, 0xA4, 0x00, 0x0C, 0x02, 0xE1, 0x04]
             _, sw1, sw2 = connection.transmit(SELECT_NDEF)
             if (sw1, sw2) != (0x90, 0x00):
-                logging.debug(f"SELECT_NDEF failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
+                logger.debug(f"SELECT_NDEF failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
                 return False
 
             # Create NDEF message with a single URI record
@@ -269,7 +271,7 @@ class NFCReaderHelper:
             WRITE_NLEN = [0x00, 0xD6, 0x00, 0x00, 0x02, (ndef_length >> 8) & 0xFF, ndef_length & 0xFF]
             _, sw1, sw2 = connection.transmit(WRITE_NLEN)
             if (sw1, sw2) != (0x90, 0x00):
-                logging.debug(f"WRITE_NLEN failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
+                logger.debug(f"WRITE_NLEN failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
                 return False
 
             # Write the NDEF message itself
@@ -281,11 +283,11 @@ class NFCReaderHelper:
                 WRITE_NDEF = [0x00, 0xD6, (offset + 2) >> 8, (offset + 2) & 0xFF, chunk_len] + list(chunk)
                 _, sw1, sw2 = connection.transmit(WRITE_NDEF)
                 if (sw1, sw2) != (0x90, 0x00):
-                    logging.debug(f"WRITE_NDEF failed at offset {offset}: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
+                    logger.debug(f"WRITE_NDEF failed at offset {offset}: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
                     return False
                 offset += chunk_len
 
-        logging.info(f"Successfully wrote URI '{uri}' to NFC tag.")
+        logger.info(f"Successfully wrote URI '{uri}' to NFC tag.")
         return True
 
 
@@ -304,7 +306,7 @@ class NFCConnectionManager:
             if self.connection:
                 self.connection.disconnect()
         except Exception as e:
-            logging.warning(f"Failed to disconnect NFC connection: {e}")
+            logger.warning(f"Failed to disconnect NFC connection: {e}")
         return False
 
 # Main function to set up monitoring and handle tag events
@@ -315,7 +317,7 @@ def main():
     reader = NFCReaderHelper.get_connected_reader()
     if reader is None:
         sys.exit(1)
-    helper = NFCReaderHelper(reader)
+    NFCReaderHelper(reader)
     # Example usage: helper.read_t4t_ndef(), etc.
 
 

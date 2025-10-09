@@ -82,9 +82,7 @@ class TC_DD_1_5(MatterBaseTest):
             await user_input_task
             reader.deactivate_tag_monitoring()
             tag = await monitoring_task
-            asserts.assert_false(
-                reader.is_onboarding_data(tag), "Found NFC tag with Onboarding data"
-            )
+            asserts.assert_false(reader.is_onboarding_data(tag), "Found NFC tag with Onboarding data")
 
         ###########
         self.step("2a")
