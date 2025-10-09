@@ -37,19 +37,17 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import time
-
 import logging
+import time
 
 from mobly import asserts
 from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
 from TC_PAVSTTestBase import PAVSTTestBase
 
 import matter.clusters as Clusters
-from matter.interaction_model import Status
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
                                            run_if_endpoint_matches)
-from matter.interaction_model import InteractionModelError, Status
 
 logger = logging.getLogger(__name__)
 
