@@ -18,6 +18,7 @@
 #include <app/clusters/joint-fabric-administrator-server/JCMCommissionee.h>
 #include <app/tests/AppTestContext.h>
 #include <credentials/jcm/TrustVerification.h>
+#include <credentials/tests/CHIPCert_test_vectors.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
@@ -29,6 +30,8 @@
 #include <app/CommandHandler.h>
 #include <app/server/Server.h>
 
+#include <cstring>
+
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -38,7 +41,10 @@ using namespace chip::app;
 using namespace chip::app::Clusters::JointFabricAdministrator;
 using namespace chip::Credentials::JCM;
 
-namespace {
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace JointFabricAdministrator {
 
 class FakeCommandHandler : public CommandHandler
 {
@@ -147,8 +153,6 @@ public:
      * Error message returned by the invoked Trust Verification stage.
      */
     TrustVerificationError mError = TrustVerificationError::kInternalError;
-
-    TrustVerificationInfo & GetInfo() { return mInfo; }
 
 protected:
     void OnTrustVerificationComplete(TrustVerificationError error) override { mError = error; }
@@ -365,13 +369,11 @@ protected:
     void TestStoreEndpointIdError();
     void TestReadCommissionerAdminFabricIndexSuccess();
     void TestReadCommissionerAdminFabricIndexError();
-    void TestPerformVendorIdVerificationSuccess();
-    void TestPerformVendorIdVerificationError();
-    void TestCrossCheckAdministratorIdsSuccess();
-    void TestCrossCheckAdministratorIdsError();
+    void TestValidateAdministratorIdsMatch();
+    void TestReadAdminFabricsPopulatesCommissionerInfo();
+    void TestReadAdminCertsPopulatesCommissionerRcac();
+    void TestReadAdminNOCsPopulatesCommissionerCerts();
 };
-
-} // namespace
 
 TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestNextStageFollowsExpectedOrder)
 {
@@ -514,7 +516,6 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestStoreEndpointIdError)
 
 TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadCommissionerAdminFabricIndexSuccess)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
 
@@ -524,8 +525,138 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadCommissionerAdminFabricIndexSuc
     commissionee.VerifyTrustAgainstCommissionerAdmin();
 
     EXPECT_EQ(commissionee.mError, TrustVerificationError::kSuccess);
-    EXPECT_EQ(commissionee.GetInfo().adminFabricIndex, FabricIndex{ 1 });
-#else
-    GTEST_SKIP() << "Joint Fabric Administrator feature disabled.";
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    EXPECT_EQ(commissionee.mInfo.adminFabricIndex, FabricIndex{ 1 });
 }
+
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadAdminFabricsPopulatesCommissionerInfo)
+{
+    FakeCommandHandler commandHandler;
+    CommandHandler::Handle handle(&commandHandler);
+
+    SingleStageJCMCommissionee commissionee(handle, EndpointId{ 78 }, [](CHIP_ERROR) {});
+    commissionee.mInfo.adminFabricIndex = FabricIndex{ 1 };
+
+    bool callbackCalled      = false;
+    CHIP_ERROR callbackError = CHIP_ERROR_INTERNAL;
+
+    CHIP_ERROR readError = commissionee.ReadAdminFabrics([&](CHIP_ERROR err) {
+        callbackCalled = true;
+        callbackError  = err;
+    });
+
+    EXPECT_EQ(readError, CHIP_NO_ERROR);
+    EXPECT_TRUE(callbackCalled);
+    EXPECT_EQ(callbackError, CHIP_NO_ERROR);
+
+    EXPECT_EQ(commissionee.mInfo.adminFabricId, static_cast<FabricId>(0x1122334455667788ULL));
+    EXPECT_EQ(commissionee.mInfo.adminVendorId, VendorId{ 0x1234 });
+
+    ASSERT_EQ(commissionee.mInfo.rootPublicKey.AllocatedSize(), Crypto::kP256_PublicKey_Length);
+    ASSERT_NE(commissionee.mInfo.rootPublicKey.Get(), nullptr);
+    for (size_t idx = 0; idx < Crypto::kP256_PublicKey_Length; ++idx)
+    {
+        EXPECT_EQ(commissionee.mInfo.rootPublicKey.Get()[idx], static_cast<uint8_t>(idx + 1));
+    }
+}
+
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadAdminCertsPopulatesCommissionerRcac)
+{
+    FakeCommandHandler commandHandler;
+    CommandHandler::Handle handle(&commandHandler);
+
+    SingleStageJCMCommissionee commissionee(handle, EndpointId{ 79 }, [](CHIP_ERROR) {});
+
+    bool callbackCalled      = false;
+    CHIP_ERROR callbackError = CHIP_ERROR_INTERNAL;
+
+    CHIP_ERROR readError = commissionee.ReadAdminCerts([&](CHIP_ERROR resultErr) {
+        callbackCalled = true;
+        callbackError  = resultErr;
+    });
+
+    EXPECT_EQ(readError, CHIP_NO_ERROR);
+    EXPECT_TRUE(callbackCalled);
+    EXPECT_EQ(callbackError, CHIP_NO_ERROR);
+
+    constexpr uint8_t kExpectedRootCert[] = { 0xA1, 0xB2, 0xC3, 0xD4 };
+
+    ASSERT_EQ(commissionee.mInfo.adminRCAC.AllocatedSize(), sizeof(kExpectedRootCert));
+    ASSERT_NE(commissionee.mInfo.adminRCAC.Get(), nullptr);
+    EXPECT_EQ(memcmp(commissionee.mInfo.adminRCAC.Get(), kExpectedRootCert, sizeof(kExpectedRootCert)), 0);
+}
+
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadAdminNOCsPopulatesCommissionerCerts)
+{
+    FakeCommandHandler commandHandler;
+    CommandHandler::Handle handle(&commandHandler);
+
+    SingleStageJCMCommissionee commissionee(handle, EndpointId{ 80 }, [](CHIP_ERROR) {});
+    commissionee.mInfo.adminFabricIndex = FabricIndex{ 1 };
+
+    bool callbackCalled      = false;
+    CHIP_ERROR callbackError = CHIP_ERROR_INTERNAL;
+
+    CHIP_ERROR readError = commissionee.ReadAdminNOCs([&](CHIP_ERROR err) {
+        callbackCalled = true;
+        callbackError  = err;
+    });
+
+    EXPECT_EQ(readError, CHIP_NO_ERROR);
+    EXPECT_TRUE(callbackCalled);
+    EXPECT_EQ(callbackError, CHIP_NO_ERROR);
+
+    constexpr uint8_t kExpectedNoc[]  = { 0x0A, 0x0B, 0x0C };
+    constexpr uint8_t kExpectedIcac[] = { 0x1A, 0x1B, 0x1C, 0x1D };
+
+    ASSERT_EQ(commissionee.mInfo.adminNOC.AllocatedSize(), sizeof(kExpectedNoc));
+    ASSERT_NE(commissionee.mInfo.adminNOC.Get(), nullptr);
+    EXPECT_EQ(memcmp(commissionee.mInfo.adminNOC.Get(), kExpectedNoc, sizeof(kExpectedNoc)), 0);
+
+    ASSERT_EQ(commissionee.mInfo.adminICAC.AllocatedSize(), sizeof(kExpectedIcac));
+    ASSERT_NE(commissionee.mInfo.adminICAC.Get(), nullptr);
+    EXPECT_EQ(memcmp(commissionee.mInfo.adminICAC.Get(), kExpectedIcac, sizeof(kExpectedIcac)), 0);
+}
+
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestValidateAdministratorIdsMatch)
+{
+    FakeCommandHandler commandHandler;
+    CommandHandler::Handle handle(&commandHandler);
+
+    SingleStageJCMCommissionee commissionee(handle, EndpointId{ 92 }, [](CHIP_ERROR) {});
+
+    constexpr FabricId kAdminFabricId = static_cast<FabricId>(0x0123456789ABCDEFULL);
+    commissionee.mInfo.adminFabricId  = kAdminFabricId;
+
+    uint8_t adminRootKey[Crypto::kP256_PublicKey_Length];
+    adminRootKey[0] = 0x04;
+    for (size_t idx = 1; idx < Crypto::kP256_PublicKey_Length; ++idx)
+    {
+        adminRootKey[idx] = static_cast<uint8_t>(idx);
+    }
+
+    commissionee.mInfo.rootPublicKey.CopyFromSpan(ByteSpan(adminRootKey, sizeof(adminRootKey)));
+    ASSERT_EQ(commissionee.mInfo.rootPublicKey.AllocatedSize(), Crypto::kP256_PublicKey_Length);
+
+    Crypto::P256PublicKey matchingKey;
+    memcpy(matchingKey.Bytes(), adminRootKey, sizeof(adminRootKey));
+
+    EXPECT_EQ(commissionee.ValidateAdministratorIdsMatch(kAdminFabricId, matchingKey), TrustVerificationError::kSuccess);
+
+    Crypto::P256PublicKey mismatchingKey = matchingKey;
+    mismatchingKey.Bytes()[Crypto::kP256_PublicKey_Length - 1] ^= 0xFF;
+    EXPECT_EQ(commissionee.ValidateAdministratorIdsMatch(kAdminFabricId, mismatchingKey),
+              TrustVerificationError::kAdministratorIdMismatched);
+
+    constexpr FabricId kDifferentFabricId = static_cast<FabricId>(0xFEDCBA9876543210ULL);
+    EXPECT_EQ(commissionee.ValidateAdministratorIdsMatch(kDifferentFabricId, matchingKey),
+              TrustVerificationError::kAdministratorIdMismatched);
+
+    commissionee.mInfo.rootPublicKey.CopyFromSpan(ByteSpan(adminRootKey, Crypto::kP256_PublicKey_Length - 1));
+    ASSERT_EQ(commissionee.mInfo.rootPublicKey.AllocatedSize(), Crypto::kP256_PublicKey_Length - 1);
+    EXPECT_EQ(commissionee.ValidateAdministratorIdsMatch(kAdminFabricId, matchingKey), TrustVerificationError::kInternalError);
+}
+
+} // namespace JointFabricAdministrator
+} // namespace Clusters
+} // namespace app
+} // namespace chip

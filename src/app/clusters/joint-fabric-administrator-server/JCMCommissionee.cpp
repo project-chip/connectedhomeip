@@ -321,38 +321,13 @@ TrustVerificationError JCMCommissionee::CrossCheckAdministratorIds()
     const FabricInfo * accessingFabricInfo = fabricTable.FindFabricWithIndex(mAccessingFabricIndex);
     VerifyOrReturnError(accessingFabricInfo != nullptr, TrustVerificationError::kInternalError);
 
-    const FabricId accessingFabricId = accessingFabricInfo->GetFabricId();
-    if (accessingFabricId != mInfo.adminFabricId)
-    {
-        ChipLogError(JointFabric, "JCM: Accessing FabricID does not match AdministratorFabricID");
-        return TrustVerificationError::kAdministratorIdMismatched;
-    }
-
     Crypto::P256PublicKey accessingRootPubKey;
     CHIP_ERROR err = accessingFabricInfo->FetchRootPubkey(accessingRootPubKey);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(JointFabric, "JCM: Unable to fetch accessing RootPublicKey");
     }
-    const size_t accessingKeyLen    = accessingRootPubKey.Length();
-    const size_t commissionerKeyLen = mInfo.rootPublicKey.AllocatedSize();
-    if (accessingRootPubKey.Length() != Crypto::kP256_PublicKey_Length ||
-        mInfo.rootPublicKey.AllocatedSize() != Crypto::kP256_PublicKey_Length)
-    {
-        ChipLogError(JointFabric,
-                     "JCM: RootPublicKey length mismatch: Accessing RootPublicKey length is %ld, but RootPublicKey read from "
-                     "commissioner is %ld",
-                     accessingKeyLen, commissionerKeyLen);
-        return TrustVerificationError::kInternalError;
-    }
-
-    if (memcmp(mInfo.rootPublicKey.Get(), accessingRootPubKey.ConstBytes(), Crypto::kP256_PublicKey_Length) != 0)
-    {
-        ChipLogError(JointFabric, "JCM: Accessing RootPublicKey does not match Administrator RootPublicKey");
-        return TrustVerificationError::kAdministratorIdMismatched;
-    }
-
-    return TrustVerificationError::kSuccess;
+    return ValidateAdministratorIdsMatch(accessingFabricInfo->GetFabricId(), accessingRootPubKey);
 }
 
 CHIP_ERROR JCMCommissionee::ReadAdminCerts(OnCompletionFunc onComplete)
@@ -449,6 +424,35 @@ CHIP_ERROR JCMCommissionee::ReadAdminNOCs(OnCompletionFunc onComplete)
     };
 
     return ReadAdminNOCsAttribute(onSuccess, onError);
+}
+
+TrustVerificationError JCMCommissionee::ValidateAdministratorIdsMatch(FabricId accessingFabricId,
+                                                                      const Crypto::P256PublicKey & accessingRootPubKey) const
+{
+    if (accessingFabricId != mInfo.adminFabricId)
+    {
+        ChipLogError(JointFabric, "JCM: Accessing FabricID does not match AdministratorFabricID");
+        return TrustVerificationError::kAdministratorIdMismatched;
+    }
+
+    const size_t accessingKeyLen    = accessingRootPubKey.Length();
+    const size_t commissionerKeyLen = mInfo.rootPublicKey.AllocatedSize();
+    if (accessingKeyLen != Crypto::kP256_PublicKey_Length || commissionerKeyLen != Crypto::kP256_PublicKey_Length)
+    {
+        ChipLogError(JointFabric,
+                     "JCM: RootPublicKey length mismatch: Accessing RootPublicKey length is %ld, but RootPublicKey read from "
+                     "commissioner is %ld",
+                     accessingKeyLen, commissionerKeyLen);
+        return TrustVerificationError::kInternalError;
+    }
+
+    if (memcmp(mInfo.rootPublicKey.Get(), accessingRootPubKey.ConstBytes(), Crypto::kP256_PublicKey_Length) != 0)
+    {
+        ChipLogError(JointFabric, "JCM: Accessing RootPublicKey does not match Administrator RootPublicKey");
+        return TrustVerificationError::kAdministratorIdMismatched;
+    }
+
+    return TrustVerificationError::kSuccess;
 }
 
 } // namespace JointFabricAdministrator
