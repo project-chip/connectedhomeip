@@ -358,7 +358,7 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
             streamUsage = aStreamUsagePriorities[0]
 
-            if (streamUsage == Globals.Enums.StreamUsageEnum.kRecording) or (streamUsage == Global.Enums.StreamUsageEnum.kAnalysis):
+            if (streamUsage == Globals.Enums.StreamUsageEnum.kRecording) or (streamUsage == Globals.Enums.StreamUsageEnum.kAnalysis):
                 # Write SoftRecordingPrivacyModeEnabled=true and test INVALID_IN_STATE
                 await self.write_single_attribute(
                     attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftRecordingPrivacyModeEnabled(True),
