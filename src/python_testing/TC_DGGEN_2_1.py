@@ -21,14 +21,10 @@ import logging
 import os
 from typing import List
 
-import matter.clusters as Clusters
-from matter.testing.matter_testing import (
-    MatterBaseTest,
-    TestStep,
-    async_test_body,
-    default_matter_test_main,
-)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 REQ_NODE_ID = 0x12344321  # you can adjust if your lab uses another
 REQ_ENDPOINT = 0
