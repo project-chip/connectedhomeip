@@ -141,6 +141,12 @@ private:
     Credentials::JCM::TrustVerificationError CrossCheckAdministratorIds();
 
     /**
+     * Checks that the accessing fabric's identity matches the administrator metadata discovered during verification.
+     */
+    Credentials::JCM::TrustVerificationError ValidateAdministratorIdsMatch(FabricId accessingFabricId,
+                                                                           const Crypto::P256PublicKey & accessingRootPubKey) const;
+
+    /**
      * Asynchronously reads attributes from the commissioning administrator to gather data needed for Vendor ID verification.
      */
     void FetchCommissionerInfo(OnCompletionFunc onComplete);
@@ -156,6 +162,8 @@ private:
      * Asynchronously reads needed information from the TrustedRootCertificates attribute on the OperationalCredentials cluster
      */
     CHIP_ERROR ReadAdminNOCs(OnCompletionFunc onComplete);
+
+    friend class TestJCMCommissionee;
 };
 
 } // namespace JointFabricAdministrator

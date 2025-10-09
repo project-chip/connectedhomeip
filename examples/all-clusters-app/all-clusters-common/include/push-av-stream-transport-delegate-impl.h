@@ -91,6 +91,9 @@ public:
     {
         // Handle TLS certificates if needed for implementation
     }
+
+    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override;
+
     void SetPushAvStreamTransportServer(PushAvStreamTransportServer * serverLogic) override
     {
         // Store pointer to server logic if needed for implementation

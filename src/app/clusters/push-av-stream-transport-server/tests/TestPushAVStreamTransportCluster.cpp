@@ -355,6 +355,12 @@ public:
         return PushAvStreamTransportStatusEnum::kUnknown;
     }
 
+    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override
+    {
+        isActive = false;
+        return CHIP_NO_ERROR;
+    }
+
     void OnAttributeChanged(AttributeId attributeId) override
     {
         ChipLogProgress(Zcl, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
