@@ -27,6 +27,11 @@ import logging
 import sys
 
 import click
+import os.path
+import subprocess
+import traceback
+
+from tools.zap.clang_format import getClangFormatBinary
 
 try:
     import coloredlogs
@@ -169,6 +174,18 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
                     logging.fatal("   '%s' was expected but not generated" % name)
 
                 sys.exit(1)
+
+    for file in storage.generated_paths:
+        _, ext = os.path.splitext(file)
+        if ext in ['.h', '.cpp', '.c', '.hpp']:
+            try:
+                logging.info("Formatting %s file:", file)
+                for name in file:
+                    logging.info("    %s" % name)
+
+                subprocess.check_call([getClangFormatBinary(), "-i"] + file)
+            except Exception:
+                traceback.print_exc()
 
     logging.info("Done")
 
