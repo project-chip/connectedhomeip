@@ -36,7 +36,7 @@ jobs:
           fetch-depth: 0
       - name: Install dependencies
         run: |
-          pip3 install sdbus
+          pip3 install --break-system-packages sdbus
       - name: Run checks
         run: |
           python3 scripts/tests/matter_yaml_linter.py
