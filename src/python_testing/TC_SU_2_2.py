@@ -455,7 +455,9 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_2]: Step #2.2 - Track OTA attributes: UpdateState (Busy sequence)
         # UpdateState (Busy sequence) matcher: DelayedOnQuery > Downloading > Idle
         # ------------------------------------------------------------------------------------
-        # TODO: Cancelling mid-update is not yet implemented (#685), this validation doesn't require a full OTA update.
+        # TODO: Cancelling mid-update is not yet implemented (#685). Once implemented, skip full Downloading validation since the full OTA update is not required.
+        # TODO: Refactor Step 2 to only validate that during the 120 s minimum delay the DUT remains in DelayedOnQuery or Querying, then end the step
+
         logger.info(
             f'{step_number_s2}: Step #2.1 - Started subscription for UpdateState attribute (Busy sequence) '
             'before AnnounceOTAProvider to avoid missing OTA events')
@@ -780,7 +782,6 @@ class TC_SU_2_2(MatterBaseTest):
         # Start AttributeSubscriptionHandler first to avoid missing any rapid OTA events (race condition)
         # Atrributes: UpdateState (Busy, 180s DelayedActionTime)
         # ------------------------------------------------------------------------------------
-        t_start_query = time.time()
 
         subscription_attr_state_busy_180s = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -830,6 +831,8 @@ class TC_SU_2_2(MatterBaseTest):
         state_sequence = []  # Full OTA state flow
         final_downloading_seen = False
         final_idle_seen = False
+        t_start_busy_180 = None
+        t_start_downloading_180 = None
 
         def matcher_busy_state_delayed_180s(report):
             """
@@ -837,8 +840,7 @@ class TC_SU_2_2(MatterBaseTest):
             Tracks state transitions: DelayedOnQuery > Downloading after ~180s delay > Idle.
             Records each observed state only once and captures the timestamp when Downloading starts (~180s after DelayedOnQuery).
             """
-            nonlocal observed_states, final_downloading_seen, final_idle_seen, state_sequence
-            global t_start_downloading
+            nonlocal observed_states, final_downloading_seen, final_idle_seen, state_sequence, t_start_busy_180, t_start_downloading_180
             val = report.value
 
             if val is None:
@@ -848,13 +850,14 @@ class TC_SU_2_2(MatterBaseTest):
                 if val not in observed_states:
                     observed_states.add(val)
                     state_sequence.append(val)
+                    t_start_busy_180 = time.time()
                     logger.info(f'{step_number_s4}: Step #4.2 - UpdateState (Busy, 180s DelayedActionTime sequence) recorded: {val}')
 
             elif val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading:   # 4
                 if not final_downloading_seen:  # log only once
                     final_downloading_seen = True
                     state_sequence.append(val)
-                    t_start_downloading = time.time()
+                    t_start_downloading_180 = time.time()
                     logger.info(f'{step_number_s4}: Step #4.2 - UpdateState (Busy, 180s DelayedActionTime sequence) recorded: {val}')
                     logger.info(
                         f'{step_number_s4}: Step #4.2 - OTA UpdateState (Busy, 180s DelayedActionTime sequence) transitioned to Downloading after Busy (expect ~180s).')
@@ -893,8 +896,8 @@ class TC_SU_2_2(MatterBaseTest):
         # [STEP_4]: Step # 4.4 - Verify image transfer from TH/OTA-P to DUT is Busy (180s DelayedActionTime)
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s4}: Step #4.4 - Full OTA state (Busy, 180s DelayedActionTime sequence) observed: {state_sequence}')
-        logger.info(f'{step_number_s4}: Step #4.4 - Time Start as Busy: {t_start_query}, Time Start Downloading: {t_start_downloading}')
-        delayed_action_time = t_start_downloading - t_start_query
+        logger.info(f'{step_number_s4}: Step #4.4 - Time Start as Busy: {t_start_busy_180}, Time Start Downloading: {t_start_downloading_180}')
+        delayed_action_time = t_start_downloading_180 - t_start_busy_180
         logger.info(f'{step_number_s4}: Step #4.4 - Observed delay:: {delayed_action_time:.2f} s.')
 
         asserts.assert_true(delayed_action_time >= 180,
