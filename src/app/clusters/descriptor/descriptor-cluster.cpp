@@ -178,7 +178,7 @@ CHIP_ERROR DescriptorCluster::Attributes(const ConcreteClusterPath & path,
     AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
         { mFeatures.Has(Descriptor::Feature::kTagList), TagList::kMetadataEntry },
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-        { mEnabledOptionalAttributes.IsSet(EndpointUniqueID::Id), EndpointUniqueID::kMetadataEntry },        
+        { mEnabledOptionalAttributes.IsSet(EndpointUniqueID::Id), EndpointUniqueID::kMetadataEntry },
 #endif
     };
 
