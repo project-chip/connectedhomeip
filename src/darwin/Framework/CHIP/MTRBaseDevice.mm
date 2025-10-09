@@ -222,7 +222,7 @@ static NSUInteger HashPath(NSNumber * _Nullable endpoint, NSNumber * _Nullable c
         // Give endpoint its own 8 bits.  Then give 12 bits to each of the others.
         return endpointValue ^ (clusterValue << 8) ^ (entityValue << 20);
     } else {
-        // sizeof(NSUinteger) >= 8.  Give endpoint 10 bits, 27 bits each to the others.
+        // sizeof(NSUInteger) >= 8.  Give endpoint 10 bits, 27 bits each to the others.
         return endpointValue ^ (clusterValue << 10) ^ (((NSUInteger)entityValue) << 37);
     }
 }
@@ -2740,7 +2740,7 @@ static NSString * const sEventAttributeIDKey = @"attributeIDKey";
 
 - (NSUInteger)hash
 {
-    return _endpoint.unsignedShortValue ^ (_cluster.unsignedLongValue << 10);
+    return HashPath(_endpoint, _cluster, nil);
 }
 
 - (id)copyWithZone:(NSZone *)zone
