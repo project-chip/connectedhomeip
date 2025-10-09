@@ -365,7 +365,7 @@ class PAVSTTestBase:
             return e.status
         pass
 
-    async def psvt_manually_trigger_transport(self, cmd, expected_cluster_status=None, devCtrl=None, expected_status=None):
+    async def psvt_manually_trigger_transport(self, cmd, expected_cluster_status=None, expected_status=None, devCtrl=None):
         endpoint = self.get_endpoint(default=1)
         dev_ctrl = self.default_controller
         if (devCtrl is not None):
@@ -383,12 +383,15 @@ class PAVSTTestBase:
                 asserts.fail("Transport is busy, currently uploading data")
             else:
                 if (expected_status is not None):
-                    asserts.assert_true(e.status == expected_status, "Unexpected error returned")
+                    asserts.assert_true(
+                        e.status == expected_status, "Unexpected error returned"
+                    )
+                    return e.status
                 else:
                     asserts.assert_true(
                         e.status == Status.NotFound, "Unexpected error returned"
                     )
-                return e.status
+                    return e.status
         pass
 
     async def psvt_create_test_harness_controller(self):

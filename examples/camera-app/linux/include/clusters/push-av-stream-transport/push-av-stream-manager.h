@@ -106,7 +106,11 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
+    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override;
+
     void OnZoneTriggeredEvent(uint16_t zoneId);
+
+    void RecordingStreamPrivacyModeChanged(bool privacyModeEnabled);
 
 private:
     std::vector<PushAvStream> pushavStreams;

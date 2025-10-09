@@ -1216,6 +1216,9 @@ CameraError CameraDevice::SetSoftRecordingPrivacyModeEnabled(bool softRecordingP
 {
     mSoftRecordingPrivacyModeEnabled = softRecordingPrivacyMode;
 
+    // Notify the PushAVManager about change
+    mPushAVTransportManager.RecordingStreamPrivacyModeChanged(softRecordingPrivacyMode);
+
     return CameraError::SUCCESS;
 }
 
