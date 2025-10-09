@@ -124,8 +124,7 @@ class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                         cmd=pvcluster.Commands.DeallocatePushTransport(ConnectionID=cfg.ConnectionID),
                         endpoint=endpoint)
                 except InteractionModelError as e:
-                    asserts.assert_true(e.status == Status.Success,
-                                        "Unexpected error during cleanup")
+                    logging.warning(f"Failed to deallocate connection {cfg.ConnectionID} during cleanup: {e}")
 
         # Read supported formats (step 2)
         self.step(2)
@@ -135,29 +134,36 @@ class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         # Read allocated video streams (step 3)
         self.step(3)
         aAllocatedVideoStreams = await self.allocate_one_video_stream()
+        asserts.assert_greater_equal(
+            len(aAllocatedVideoStreams),
+            1,
+            "AllocatedVideoStreams must not be empty",
+        )
 
         # Read allocated audio streams (step 4)
         self.step(4)
         aAllocatedAudioStreams = await self.allocate_one_audio_stream()
+        asserts.assert_greater_equal(
+            len(aAllocatedAudioStreams),
+            1,
+            "AllocatedAudioStreams must not be empty",
+        )
 
-                # Define invalid URL cases
+        # Define invalid URL cases
+        stream_id = self.server.create_stream()
         invalid_cases = [
-            ("non‑https scheme", f"http://{host_ip}:1234/streams/{{}}/".format(self.server.create_stream())),
-            ("fragment", f"https://{host_ip}:1234/streams/{{}}#/frag".format(self.server.create_stream())),
-            ("query", f"https://{host_ip}:1234/streams/{{}}?bad=query".format(self.server.create_stream())),
-            ("no trailing slash", f"https://{host_ip}:1234/streams/{{}}".format(self.server.create_stream())),
-            ("missing host", f"https:///streams/{{}}/".format(self.server.create_stream())),
+            ("non‑https scheme", f"http://{host_ip}:1234/streams/{stream_id}/"),
+            ("fragment", f"https://{host_ip}:1234/streams/{stream_id}#/frag"),
+            ("query", f"https://{host_ip}:1234/streams/{stream_id}?bad=query"),
+            ("no trailing slash", f"https://{host_ip}:1234/streams/{stream_id}"),
+            ("missing host", f"https:///streams/{stream_id}/"),
         ]
 
         for idx, (desc, url) in enumerate(invalid_cases, start=5):
             self.step(idx)
-            try:
-                status = await self.allocate_one_pushav_transport(
-                    endpoint, tlsEndPoint=tlsEndpointId, url=url, expiryTime=30)
-                asserts.assert_equal(status, Status.InvalidURL, "Push AV Transport shoud return InvalidURL for {desc}")
-            except InteractionModelError as e:
-                asserts.assert_true(e.status == Status.InvalidURL,
-                                    f"Expected InvalidURL status for {desc}, got {{e.status}}")
+            status = await self.allocate_one_pushav_transport(
+                endpoint, tlsEndPoint=tlsEndpointId, url=url, expiryTime=30)
+            asserts.assert_equal(status, Status.InvalidURL, f"Push AV Transport should return InvalidURL for {desc}")
 
 if __name__ == "__main__":
     default_matter_test_main()
