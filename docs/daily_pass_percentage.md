@@ -1,9 +1,9 @@
 |                                |   Pass Rate |
 |:-------------------------------|------------:|
-| darwin                         |           0 |
-| tests                          |          67 |
-| builds                         |          94 |
-| build-example-qpg              |          95 |
+| tests                          |          75 |
+| darwin                         |          83 |
+| build-example-nrf-connect-sdk  |          95 |
+| builds                         |         100 |
 | tv-casting-example-darwin      |         100 |
 | build-example-nxp              |         100 |
 | build-example-infineon         |         100 |
@@ -22,18 +22,16 @@
 | unit-integration-tests         |         100 |
 | codeql                         |         100 |
 | qemu                           |         100 |
-| process-stale-issues-and-prs   |         100 |
-| build-example-bouffalolab      |         100 |
 | build-example-linux-standalone |         100 |
+| build-example-bouffalolab      |         100 |
 | issue-labeler                  |         100 |
-| build-example-nrf-connect-sdk  |         100 |
 | minimal-build-linux-configure  |         100 |
+| build-example-qpg              |         100 |
 | build-example-stm32            |         100 |
 | build-example-esp32            |         100 |
 | build-example-telink           |         100 |
-| build-example-nuttx            |         100 |
 | test-tv-casting-example        |         100 |
-| recent-fail-summary            |         100 |
+| build-example-nuttx            |         100 |
 | build-example-realtek          |         100 |
 | build-example-ti-cc13xx-26xx   |         100 |
 | darwin-tests                   |         100 |
