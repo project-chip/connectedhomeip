@@ -2667,7 +2667,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
                                 @{
                                     MTRAttributePathKey : globalAttributePath(@(MTRClusterIDTypeDescriptorID), MTRAttributeIDTypeGlobalAttributeAttributeListID),
                                     MTRDataKey : arrayOfUnsignedIntegersValue(@[
-                                        @(0), @(1), @(2), @(3), @(0xFFFD), @(0xFFFC), @(0xFFFB), @(0xFFF9), @(0xFFF8)
+                                        @(0), @(1), @(2), @(3), @(0xFFFC), @(0xFFFD), @(0xFFF8), @(0xFFF9), @(0xFFFB)
                                     ]),
                                 },
 
