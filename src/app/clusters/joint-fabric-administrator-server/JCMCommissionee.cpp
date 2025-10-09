@@ -440,8 +440,8 @@ TrustVerificationError JCMCommissionee::ValidateAdministratorIdsMatch(FabricId a
     if (accessingKeyLen != Crypto::kP256_PublicKey_Length || commissionerKeyLen != Crypto::kP256_PublicKey_Length)
     {
         ChipLogError(JointFabric,
-                     "JCM: RootPublicKey length mismatch: Accessing RootPublicKey length is %ld, but RootPublicKey read from "
-                     "commissioner is %ld",
+                     "JCM: RootPublicKey length mismatch: Accessing RootPublicKey length is %zu, but RootPublicKey read from "
+                     "commissioner is %zu",
                      accessingKeyLen, commissionerKeyLen);
         return TrustVerificationError::kInternalError;
     }
