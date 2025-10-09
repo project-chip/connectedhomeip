@@ -524,7 +524,10 @@ class DeviceConformanceTests(BasicCompositionTests):
         # TODO: change this once https://github.com/project-chip/matter-test-scripts/issues/689 is implemented
 
         def get_namespace_id(name: str) -> uint:
-            return [id for id, xml in one_five_namespaces.items() if xml.name.lower() == name.lower()][0]
+            ids = [id for id, xml in one_five_namespaces.items() if xml.name.lower() == name.lower()]
+            if len(ids) != 1:
+                raise ValueError(f"Unable to find unique namespace for '{name}'")
+            return ids[0]
 
         closure_id = self._get_device_type_id('Closure', one_five_device_types)
         closure_panel_id = self._get_device_type_id('Closure Panel', one_five_device_types)
