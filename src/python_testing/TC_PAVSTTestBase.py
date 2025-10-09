@@ -232,7 +232,7 @@ class PAVSTTestBase:
 
         containerOptions = {
             "containerType": cluster.Enums.ContainerFormatEnum.kCmaf,
-            "CMAFContainerOptions": {"CMAFInterface": cluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 500,
+            "CMAFContainerOptions": {"CMAFInterface": cluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 4000,
                                      "sessionGroup": 3, "trackName": " "},
         }
 
@@ -359,7 +359,7 @@ class PAVSTTestBase:
             return e.status
         pass
 
-    async def psvt_manually_trigger_transport(self, cmd, expected_cluster_status=None, devCtrl=None):
+    async def psvt_manually_trigger_transport(self, cmd, expected_cluster_status=None, expected_status=None, devCtrl=None):
         endpoint = self.get_endpoint(default=1)
         dev_ctrl = self.default_controller
         if (devCtrl is not None):
@@ -374,10 +374,16 @@ class PAVSTTestBase:
                 )
                 return e.clusterStatus
             else:
-                asserts.assert_true(
-                    e.status == Status.NotFound, "Unexpected error returned"
-                )
-                return e.status
+                if (expected_status is not None):
+                    asserts.assert_true(
+                        e.status == expected_status, "Unexpected error returned"
+                    )
+                    return e.status
+                else:
+                    asserts.assert_true(
+                        e.status == Status.NotFound, "Unexpected error returned"
+                    )
+                    return e.status
         pass
 
     async def psvt_create_test_harness_controller(self):
