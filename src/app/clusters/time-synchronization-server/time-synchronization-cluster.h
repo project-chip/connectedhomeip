@@ -104,13 +104,13 @@ public:
         return mTrustedTimeSource;
     }
 
-    const Span<TimeSyncDataProvider::TimeZoneStore> & GetTimeZone() const
+    Span<TimeSyncDataProvider::TimeZoneStore> & GetTimeZone()
     {
         mTimeZoneObj.timeZoneList = mTimeZoneObj.timeZoneList.SubSpan(0, mTimeZoneObj.validSize);
         return mTimeZoneObj.timeZoneList;
     }
 
-    const DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> & GetDSTOffset() const
+    DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> & GetDSTOffset()
     {
         mDstOffsetObj.dstOffsetList = mDstOffsetObj.dstOffsetList.SubSpan(0, mDstOffsetObj.validSize);
         return mDstOffsetObj.dstOffsetList;
@@ -157,10 +157,9 @@ private:
 
     static constexpr size_t kMaxDefaultNTPSize = 128;
     DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> mTrustedTimeSource;
-    mutable TimeSyncDataProvider::TimeZoneObj mTimeZoneObj{ Span<TimeSyncDataProvider::TimeZoneStore>(mTz), 0 };
-    mutable TimeSyncDataProvider::DSTOffsetObj mDstOffsetObj{
-        DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type>(mDst), 0
-    };
+    TimeSyncDataProvider::TimeZoneObj mTimeZoneObj{ Span<TimeSyncDataProvider::TimeZoneStore>(mTz), 0 };
+    TimeSyncDataProvider::DSTOffsetObj mDstOffsetObj{ DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type>(mDst),
+                                                      0 };
     TimeSynchronization::GranularityEnum mGranularity = TimeSynchronization::GranularityEnum::kNoTimeGranularity;
 
     TimeSyncDataProvider::TimeZoneStore mTz[CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE];
