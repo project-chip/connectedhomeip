@@ -103,9 +103,9 @@ class TC_DD_1_5(MatterBaseTest):
         ###########
         self.step("3")
         asserts.assert_false(reader.write_t4t_ndef_uri("MT:-24J029Q00OC0000000"))
-        tag_after = reader.read_t4t_ndef()
-        asserts.assert_equal(ndef, tag_after)
-        
+        ndef_after = reader.read_t4t_ndef()
+        asserts.assert_equal(ndef, ndef_after)
+
     async def wait_for_user_input_async(self, *args, **kwargs):
         loop = asyncio.get_running_loop()
         # Run the blocking function in a thread pool executor

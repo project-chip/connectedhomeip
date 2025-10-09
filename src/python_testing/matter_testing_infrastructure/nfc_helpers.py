@@ -16,8 +16,7 @@
 #    limitations under the License.
 #
 
-import smartcard.System
-import smartcard.util
+import smartcard
 import smartcard.CardMonitoring
 import ndef
 import sys
@@ -165,55 +164,55 @@ class NFCReaderHelper:
         Returns:
             bytes: The raw NDEF message bytes, or None if an error occurs.
         """
-        connection = self.reader.createConnection()
-        connection.connect()
+        with NFCConnectionManager(self) as connection:
 
-        # Select NDEF Tag Application
-        SELECT_AID = [0x00, 0xA4, 0x04, 0x00, 0x07, 0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x01, 0x00]
-        _, sw1, sw2 = connection.transmit(SELECT_AID)
-        if (sw1, sw2) != (0x90, 0x00):
-            logging.debug(f"SELECT_AID failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
-            return None
+            # Select NDEF Tag Application
+            SELECT_AID = [0x00, 0xA4, 0x04, 0x00, 0x07, 0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x01, 0x00]
+            _, sw1, sw2 = connection.transmit(SELECT_AID)
+            if (sw1, sw2) != (0x90, 0x00):
+                logging.debug(f"SELECT_AID failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
+                return None
 
-        # Select CC file (E103)
-        SELECT_CC = [0x00, 0xA4, 0x00, 0x0C, 0x02, 0xE1, 0x03]
-        _, sw1, sw2 = connection.transmit(SELECT_CC)
-        if (sw1, sw2) != (0x90, 0x00):
-            logging.debug(f"SELECT_CC failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
-            return None
+            # Select CC file (E103)
+            SELECT_CC = [0x00, 0xA4, 0x00, 0x0C, 0x02, 0xE1, 0x03]
+            _, sw1, sw2 = connection.transmit(SELECT_CC)
+            if (sw1, sw2) != (0x90, 0x00):
+                logging.debug(f"SELECT_CC failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
+                return None
 
-        # Read CC file
-        READ_CC = [0x00, 0xB0, 0x00, 0x00, 0x0F]
-        cc_bytes, sw1, sw2 = connection.transmit(READ_CC)
-        if (sw1, sw2) != (0x90, 0x00):
-            logging.debug(f"READ_CC failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
-            return None
+            # Read CC file
+            READ_CC = [0x00, 0xB0, 0x00, 0x00, 0x0F]
+            cc_bytes, sw1, sw2 = connection.transmit(READ_CC)
+            if (sw1, sw2) != (0x90, 0x00):
+                logging.debug(f"READ_CC failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
+                return None
 
-        # Select NDEF file (E104)
-        SELECT_NDEF = [0x00, 0xA4, 0x00, 0x0C, 0x02, 0xE1, 0x04]
-        _, sw1, sw2 = connection.transmit(SELECT_NDEF)
-        if (sw1, sw2) != (0x90, 0x00):
-            logging.debug(f"SELECT_NDEF failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
-            return None
+            # Select NDEF file (E104)
+            SELECT_NDEF = [0x00, 0xA4, 0x00, 0x0C, 0x02, 0xE1, 0x04]
+            _, sw1, sw2 = connection.transmit(SELECT_NDEF)
+            if (sw1, sw2) != (0x90, 0x00):
+                logging.debug(f"SELECT_NDEF failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
+                return None
 
-        # Read NDEF length
-        READ_NLEN = [0x00, 0xB0, 0x00, 0x00, 0x02]
-        nlen, sw1, sw2 = connection.transmit(READ_NLEN)
-        if (sw1, sw2) != (0x90, 0x00):
-            logging.debug(f"READ_NLEN failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
-            return None
-        length = (nlen[0] << 8) + nlen[1]
+            # Read NDEF length
+            READ_NLEN = [0x00, 0xB0, 0x00, 0x00, 0x02]
+            nlen, sw1, sw2 = connection.transmit(READ_NLEN)
+            if (sw1, sw2) != (0x90, 0x00):
+                logging.debug(f"READ_NLEN failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
+                return None
+            length = (nlen[0] << 8) + nlen[1]
 
-        # Read NDEF message
-        READ_NDEF = [0x00, 0xB0, 0x00, 0x02, length]
-        ndef_data, sw1, sw2 = connection.transmit(READ_NDEF)
-        if (sw1, sw2) != (0x90, 0x00):
-            logging.debug(f"READ_NDEF failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
-            return None
+            # Read NDEF message
+            READ_NDEF = [0x00, 0xB0, 0x00, 0x02, length]
+            ndef_data, sw1, sw2 = connection.transmit(READ_NDEF)
+            if (sw1, sw2) != (0x90, 0x00):
+                logging.debug(f"READ_NDEF failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
+                return None
 
         logging.debug(self.ndef_content_to_string(bytes(ndef_data)))
         return bytes(ndef_data)
 
+    
     def is_onboarding_data(self, ndef_bytes):
         """
         Checks if the NDEF message contains a URI record starting with 'MT:' (case-insensitive).
@@ -246,44 +245,61 @@ class NFCReaderHelper:
         Returns:
             bool: True if write was successful, False otherwise.
         """
-        connection = self.reader.createConnection()
-        connection.connect()
+        with NFCConnectionManager(self) as connection:
 
-        # Select NDEF file (E104)
-        SELECT_NDEF = [0x00, 0xA4, 0x00, 0x0C, 0x02, 0xE1, 0x04]
-        _, sw1, sw2 = connection.transmit(SELECT_NDEF)
-        if (sw1, sw2) != (0x90, 0x00):
-            logging.debug(f"SELECT_NDEF failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
-            return False
-
-        # Create NDEF message with a single URI record
-        record = ndef.UriRecord(uri)
-        ndef_message = b''.join(ndef.message_encoder([record]))
-        ndef_length = len(ndef_message)
-
-        # Write NDEF length (first 2 bytes)
-        WRITE_NLEN = [0x00, 0xD6, 0x00, 0x00, 0x02, (ndef_length >> 8) & 0xFF, ndef_length & 0xFF]
-        _, sw1, sw2 = connection.transmit(WRITE_NLEN)
-        if (sw1, sw2) != (0x90, 0x00):
-            logging.debug(f"WRITE_NLEN failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
-            return False
-
-        # Write the NDEF message itself
-        # The maximum length per APDU is usually 255 bytes; split if needed
-        offset = 0
-        while offset < ndef_length:
-            chunk = ndef_message[offset:offset+0xFF]
-            chunk_len = len(chunk)
-            WRITE_NDEF = [0x00, 0xD6, (offset + 2) >> 8, (offset + 2) & 0xFF, chunk_len] + list(chunk)
-            _, sw1, sw2 = connection.transmit(WRITE_NDEF)
+            # Select NDEF file (E104)
+            SELECT_NDEF = [0x00, 0xA4, 0x00, 0x0C, 0x02, 0xE1, 0x04]
+            _, sw1, sw2 = connection.transmit(SELECT_NDEF)
             if (sw1, sw2) != (0x90, 0x00):
-                logging.debug(f"WRITE_NDEF failed at offset {offset}: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
+                logging.debug(f"SELECT_NDEF failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
                 return False
-            offset += chunk_len
+
+            # Create NDEF message with a single URI record
+            record = ndef.UriRecord(uri)
+            ndef_message = b''.join(ndef.message_encoder([record]))
+            ndef_length = len(ndef_message)
+
+            # Write NDEF length (first 2 bytes)
+            WRITE_NLEN = [0x00, 0xD6, 0x00, 0x00, 0x02, (ndef_length >> 8) & 0xFF, ndef_length & 0xFF]
+            _, sw1, sw2 = connection.transmit(WRITE_NLEN)
+            if (sw1, sw2) != (0x90, 0x00):
+                logging.debug(f"WRITE_NLEN failed: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
+                return False
+
+            # Write the NDEF message itself
+            # The maximum length per APDU is usually 255 bytes; split if needed
+            offset = 0
+            while offset < ndef_length:
+                chunk = ndef_message[offset:offset+0xFF]
+                chunk_len = len(chunk)
+                WRITE_NDEF = [0x00, 0xD6, (offset + 2) >> 8, (offset + 2) & 0xFF, chunk_len] + list(chunk)
+                _, sw1, sw2 = connection.transmit(WRITE_NDEF)
+                if (sw1, sw2) != (0x90, 0x00):
+                    logging.debug(f"WRITE_NDEF failed at offset {offset}: SW1=0x{sw1:02X}, SW2=0x{sw2:02X}")
+                    return False
+                offset += chunk_len
 
         logging.info(f"Successfully wrote URI '{uri}' to NFC tag.")
         return True
 
+    
+class NFCConnectionManager:
+    def __init__(self, reader_helper: NFCReaderHelper):
+        self.reader_helper = reader_helper
+        self.connection = None
+
+    def __enter__(self):
+        self.connection = self.reader_helper.reader.createConnection()
+        self.connection.connect()
+        return self.connection
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        try:
+            if self.connection:
+                self.connection.disconnect()
+        except Exception as e:
+            logging.warning(f"Failed to disconnect NFC connection: {e}")
+        return False
     
 ########### Main function to set up monitoring and handle tag events
 # it allows testing basic operation without a test.
