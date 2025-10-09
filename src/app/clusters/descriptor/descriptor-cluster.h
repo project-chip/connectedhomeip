@@ -30,7 +30,7 @@ namespace chip::app::Clusters {
 class DescriptorCluster : public DefaultServerCluster
 {
 public:
-    using SemanticTag = ::chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type;
+    using SemanticTag           = ::chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type;
     using OptionalAttributesSet = ::chip::app::OptionalAttributeSet<Descriptor::Attributes::EndpointUniqueID::Id>;
 
     DescriptorCluster(EndpointId endpointId, OptionalAttributesSet optionalAttributeSet, BitFlags<Descriptor::Feature> featureMap,
