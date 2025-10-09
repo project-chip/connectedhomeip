@@ -102,7 +102,7 @@ class IsolatedNetworkNamespace:
         "ip link set dev {app_link_name}-switch up",
         # Force IPv6 to use ULAs that we control.
         "ip netns exec app ip -6 addr flush {app_link_name}",
-        "ip netns exec app ip -6 a add fd00:0:1:1::3/64 dev {app_link_name}",
+        "ip netns exec app ip -6 a add fd00:0:1:1::1/64 dev {app_link_name}",
 
     ]
 
