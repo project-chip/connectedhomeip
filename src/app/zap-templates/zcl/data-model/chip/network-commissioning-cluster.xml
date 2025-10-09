@@ -96,6 +96,7 @@ limitations under the License.
         <define>NETWORK_COMMISSIONING_CLUSTER</define>
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
+        <globalAttribute side="either" code="0xFFFD" value="2"/>
 
         <features>
             <feature bit="0" code="WI" name="WiFiNetworkInterface" summary="Wi-Fi related features">

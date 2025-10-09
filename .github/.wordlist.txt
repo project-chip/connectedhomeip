@@ -49,6 +49,7 @@ amebad
 amebaiot
 AmebaZ
 amebaz2
+ANC
 announcementReason
 AnnounceOTAProvider
 AnnounceOTAProviderRequest
@@ -79,12 +80,18 @@ armeabi
 armino
 ARMmbed
 armv
+ARD
+SCL
+SDA
+VCC
 ASAN
 asdk
 ASR
 AssertionError
 AST
 ASYNC
+AsyncZeroconfServiceTypes
+ATL
 ATLs
 atomics
 att
@@ -114,6 +121,7 @@ avahi
 avL
 AwaitNextAction
 AXXXF
+Axxxx
 AYNJV
 babaf
 backend
@@ -124,6 +132,7 @@ BallastConfiguration
 BarrierControl
 BasicCHIPRegression
 BasicInformation
+Batcher
 baudrate
 BCM
 BD
@@ -136,6 +145,7 @@ betaprogram
 BinaryInputBasic
 Binfmt
 bitbake
+bitrate
 bld
 BLE
 BleApplicationDelegate
@@ -252,6 +262,7 @@ ClusterName
 ClusterObjectTests
 ClusterRevision
 ClusterTestGeneration
+CMAC
 cmake
 CMakeLists
 CMD
@@ -262,14 +273,16 @@ cn
 COAP
 codeaurora
 codebase
+codec
 codegen
 CodeGenerator
 CodeLab
 codelabs
 ColorControl
+Combinators
 Comcast
-Commandline
 CommandHandlerInterface
+Commandline
 CommandName
 Commissionable
 CommissionableDataProvider
@@ -297,13 +310,14 @@ connstring
 conntype
 const
 ContentApp
-ContentApp's
 ContentAppPlatform
+ContentApp's
 ContentLaunch
 ContentLauncher
 contrib
 controllee
 conv
+Cooktop
 CopperConcentrationMeasurement
 Corstone
 cortexa
@@ -315,6 +329,7 @@ CPROTO
 cpuapp
 cpython
 CQM
+CRL
 crypto
 cryptographic
 CSA
@@ -324,12 +339,14 @@ cstdint
 csu
 csv
 ctl
+CTS
 ctrl
 ctypes
 CurrentHue
 CurrentLevel
 CurrentSaturation
 customAcl
+customizable
 customizations
 cvfJ
 cxx
@@ -364,6 +381,7 @@ decrypt
 decrypted
 DEDEDEDE
 deepnote
+deepwiki
 DefaultOTAProviders
 DefaultOTARequestor
 DefaultOTARequestorDriver
@@ -436,6 +454,7 @@ DL
 DM
 DMG
 DMM
+DMTT
 DNS
 Dnsmasq
 dnsmasqd
@@ -461,8 +480,8 @@ DS
 DSLS
 duplicative
 DUT
-DUTS
 DUT's
+DUTS
 DV
 DVK
 dynload
@@ -507,6 +526,7 @@ entrypoint
 enum
 Enums
 env
+EP
 epochKey
 epochStartTime
 eq
@@ -521,10 +541,10 @@ EthernetNetworkDiagnostics
 ethernets
 EthyleneConcentrationMeasurement
 EthyleneOxideConcentrationMeasurement
+EV
 EvalCode
 EvalCodeWithName
 EvalFrameDefault
-EV
 EVB
 EventLogging
 evk
@@ -538,6 +558,7 @@ ExtendedPAN
 ExtensionEntry
 extern
 extpanid
+Exx
 FabricId
 fabricIdx
 fabricIndex
@@ -558,9 +579,10 @@ feff
 ffaa
 ffeebaefa
 FFF
-FFFFFFFFFFFF0102
 fffe
 fffff
+FFFFFFFFFFFF0102
+FFmpeg
 Fi
 filepath
 fini
@@ -575,6 +597,7 @@ formatters
 FOTA
 FreeRTOS
 FreeRTOSConfig
+FRDM
 FS
 fsl
 fstab
@@ -585,6 +608,7 @@ fuzzer
 fuzzers
 fuzztest
 FW
+Fxx
 gbl
 gcloud
 GDB
@@ -603,13 +627,13 @@ GenericWiFiConfigurationManagerImpl
 GetDeviceId
 GetDeviceInfo
 GetDns
-getter
-getters
 GetInDevelopmentTests
 GetIP
 getManualTests
 GetSafeAttributePersistenceProvider
 getstarted
+getter
+getters
 GH
 ghcr
 ghp
@@ -662,9 +686,10 @@ HomePod
 HomePods
 hostapd
 hostname
+hotfixes
 href
-HSM
 hsm
+HSM
 HTTPS
 Humidistat
 HW
@@ -684,6 +709,7 @@ ICMP
 IDF
 IDL
 IDLs
+IDM
 idt
 idx
 ifconfig
@@ -744,7 +770,9 @@ itemName
 iterable
 itsfoss
 IW
+JCM
 JDK
+jf
 jinja
 JLink
 JLinkExe
@@ -820,6 +848,8 @@ LightingApp
 LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
+linter
+linters
 lladdr
 LocalConfigDisabled
 localedef
@@ -827,6 +857,7 @@ localhost
 LocalizationConfiguration
 localstatedir
 LockingState
+lookups
 LogEvent
 loopback
 LowPower
@@ -939,6 +970,7 @@ Murata
 mutex
 mutexes
 mv
+mve
 MX
 mydir
 MyPASSWORD
@@ -1010,7 +1042,6 @@ OnOffSwitchConfiguration
 OnPlatformEvent
 onwards
 OO
-openiotsdk
 openjdk
 OpenOCD
 OpenSSL
@@ -1027,6 +1058,7 @@ optionOverride
 optionsMask
 optionsOverride
 orgs
+Orchestrator
 OSS
 OTA
 OTADownloader
@@ -1053,6 +1085,7 @@ otatesting
 otaURL
 OTBR
 otcli
+OU
 outform
 outgoingCommands
 overridable
@@ -1121,6 +1154,7 @@ PowerProfile
 PowerSource
 PowerSourceConfiguration
 pre
+PrebuiltDataModelDirectory
 preprocessor
 Presetup
 PressureMeasurement
@@ -1144,6 +1178,7 @@ PRs
 PSA
 PSCAN
 PSECT
+Pseudocode
 PSK
 PSoC
 PTR
@@ -1162,8 +1197,10 @@ PyFunction
 pylint
 PyObject
 pypi
+pyproject
 PyRun
 pytest
+PYTHONPATH
 QEMU
 Qorvo
 QPG
@@ -1191,6 +1228,7 @@ READMEs
 readonly
 readthedocs
 Reag
+Realtek
 rebase
 recommand
 recommanded
@@ -1211,8 +1249,8 @@ repo
 repos
 req
 Requestor
-Requestor's
 RequestorCanConsent
+Requestor's
 Requestors
 responder
 RestrictedEvent
@@ -1225,6 +1263,7 @@ RGB
 riscv
 rloc
 rmw
+rnd
 rodata
 Rollershade
 rootfs
@@ -1235,6 +1274,7 @@ RPi's
 RPis
 RSA
 rsn
+Rsp
 RSSI
 RST
 rsync
@@ -1243,17 +1283,19 @@ rtd
 RTL
 rtld
 RTOS
+RTS
 RTT
 RTX
 runArgs
-runIf
 RUNAS
+runIf
 RunMain
 runtime
 RVC
 rw
 RXD
 sandboxed
+sankey
 saveAs
 saveDataVersschemaionAs
 sbin
@@ -1269,8 +1311,8 @@ SDB
 SDC
 SDHC
 SDK
-SDK's
 sdkconfig
+SDK's
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1281,6 +1323,7 @@ semver
 SendButton
 SendNewInputEvent
 sendto
+SEPR
 seqdiag
 SERIALDEVICE
 serialno
@@ -1341,6 +1384,7 @@ SRP
 SRV
 SSBL
 SSID
+SSL
 startoffset
 StartScan
 startsWith
@@ -1371,6 +1415,7 @@ SubscribeResponse
 SubscriptionId
 substeps
 subtype
+subtypes
 sudo
 SulfateConcentrationMeasurement
 SulfurDioxideConcentrationMeasurement
@@ -1395,6 +1440,7 @@ sysv
 TargetNavigator
 TBD
 tbody
+TBR
 tcl
 TCP
 teardown
@@ -1464,6 +1510,7 @@ TotalTrihalomethanesConcentrationMeasurement
 TPK
 trackAlloc
 trackFree
+transcoder
 TransferSession
 transitionTime
 TransportMgrBase
@@ -1471,8 +1518,8 @@ triaged
 triaging
 TriggerEffect
 TRNG
-trustm
 TrustedRootCertificates
+trustm
 tsan
 TSG
 tsv
@@ -1504,10 +1551,12 @@ Ultrafast
 UNBLUR
 uncommissioned
 Unencrypted
+unfixable
 unfocus
 Unicast
 UniFlash
 UnitLocalization
+unittest
 unpair
 unprovisioned
 Unsecure
@@ -1536,8 +1585,8 @@ util
 utils
 UUID
 ux
-validator
 valgrind
+validator
 vcom
 VCP
 Vectorcall
@@ -1563,6 +1612,7 @@ VSC
 VSCode
 WaitNewInputEvent
 WakeOnLan
+Walkthrough
 WantedBy
 watchdogTimeout
 watchOS
@@ -1622,6 +1672,7 @@ xFFFF
 xfffff
 xFFFFFFEFFFFFFFFF
 XMLPICSValidator
+XMLs
 xtensa
 xvzf
 xwayland
@@ -1645,8 +1696,8 @@ zclwrite
 ZephyrConfig
 zephyrproject
 zhengyaohan
+Zeroconf
 Zigbee
 zigbeealliance
 zigbeethread
 zsdk
-TBR

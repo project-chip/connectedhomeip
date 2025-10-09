@@ -40,7 +40,7 @@ void LaundryWasherModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Co
 
 CHIP_ERROR LaundryWasherModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -49,7 +49,7 @@ CHIP_ERROR LaundryWasherModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chi
 
 CHIP_ERROR LaundryWasherModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -59,7 +59,7 @@ CHIP_ERROR LaundryWasherModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uin
 
 CHIP_ERROR LaundryWasherModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }

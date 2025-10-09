@@ -3,7 +3,7 @@
     originalCluster, and struct, where cluster and struct are uppercased }}
 {{#*inline "interfaceImpl"}}
 {{#if (isSupported cluster struct=struct)}}
-@implementation {{asObjectiveCClass struct cluster}}
+@implementation {{asObjectiveCClass struct originalCluster}}
 - (instancetype)init
 {
   if (self = [super init]) {
@@ -18,7 +18,7 @@
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-  auto other = [[{{asObjectiveCClass struct cluster}} alloc] init];
+  auto other = [[{{asObjectiveCClass struct originalCluster}} alloc] init];
 
   {{#zcl_struct_items}}
   {{#if (isSupported ../cluster struct=../struct structField=(asStructPropertyName label))}}

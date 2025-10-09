@@ -40,7 +40,9 @@ namespace app {
 class BufferedReadCallback : public ReadClient::Callback
 {
 public:
-    BufferedReadCallback(Callback & callback) : mCallback(callback) {}
+    BufferedReadCallback(Callback & callback, bool allowLargePayload = false) :
+        mAllowLargePayload(allowLargePayload), mCallback(callback)
+    {}
 
 private:
     /*
@@ -134,6 +136,7 @@ private:
     CHIP_ERROR BufferListItem(TLV::TLVReader & reader);
     ConcreteDataAttributePath mBufferedPath;
     std::vector<System::PacketBufferHandle> mBufferedList;
+    bool mAllowLargePayload = false;
     Callback & mCallback;
 };
 

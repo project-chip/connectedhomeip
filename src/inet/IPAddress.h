@@ -42,7 +42,7 @@
 
 #include "inet/IANAConstants.h"
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #include <lwip/init.h>
 #include <lwip/ip_addr.h>
 #if INET_CONFIG_ENABLE_IPV4
@@ -51,10 +51,15 @@
 #include <lwip/inet.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #include <openthread/icmp6.h>
 #include <openthread/ip6.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+// Currently to use openthread endpoint in nRFConnect, we must fetch defines from zephyr's net
+// OpenThread header. It will be removed once the Zephyr version is updated to 4.2.0.
+#include <zephyr/net/openthread.h>
+#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 #include <net/if.h>
@@ -63,10 +68,10 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
-#include <zephyr/net/socket.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
+#include "ZephyrSocket.h" // nogncheck
+#endif
 
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT && INET_CONFIG_ENABLE_IPV4
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT && INET_CONFIG_ENABLE_IPV4
 #error Forbidden : native Open Thread implementation with IPV4 enabled
 #endif
 
@@ -152,14 +157,14 @@ public:
     /**
      * Maximum length of the string representation of an IP address, including a terminating NUL.
      */
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     static constexpr uint16_t kMaxStringLength = IP6ADDR_STRLEN_MAX;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     static constexpr uint16_t kMaxStringLength = INET6_ADDRSTRLEN;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #ifndef INET6_ADDRSTRLEN
 #define INET6_ADDRSTRLEN OT_IP6_ADDRESS_STRING_SIZE
 #endif
@@ -168,7 +173,7 @@ public:
 
     IPAddress() = default;
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     explicit IPAddress(const ip6_addr_t & ipv6Addr);
 #if INET_CONFIG_ENABLE_IPV4 || LWIP_IPV4
     explicit IPAddress(const ip4_addr_t & ipv4Addr);
@@ -183,7 +188,7 @@ public:
 #endif // INET_CONFIG_ENABLE_IPV4
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     explicit IPAddress(const otIp6Address & ipv6Addr);
 #endif
 
@@ -520,7 +525,7 @@ public:
      *      either unspecified or not an IPv4 address.
      */
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
     /**
      * @fn      ToLwIPAddr() const
@@ -584,10 +589,10 @@ public:
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_USE_NETWORK_FRAMEWORK
 
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     otIp6Address ToIPv6() const;
     static IPAddress FromOtAddr(const otIp6Address & address);
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
     /**
      * @brief   Construct an IPv6 unique-local address (ULA) from its parts.

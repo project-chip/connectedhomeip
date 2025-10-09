@@ -37,8 +37,10 @@ public:
     virtual bool GetGPIO(uint32_t port, uint32_t pin) { return false; }
     virtual uint32_t GetRebootCause() = 0;
 
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
     // Scheduler
     virtual void StartScheduler(void) = 0;
+#endif // SL_CATALOG_CUSTOM_MAIN_PRESENT
 
     // Buttons
     typedef void (*SilabsButtonCb)(uint8_t, uint8_t);
@@ -51,10 +53,23 @@ public:
     virtual bool GetLedState(uint8_t led) { return 0; }
     virtual CHIP_ERROR ToggleLed(uint8_t led) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
+    // RGB LEDS
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+    virtual bool GetRGBLedState(uint8_t led) { return 0; }
+    virtual CHIP_ERROR SetLedColor(uint8_t led, uint8_t r, uint8_t g, uint8_t b) { return CHIP_ERROR_NOT_IMPLEMENTED; };
+    virtual CHIP_ERROR GetLedColor(uint8_t led, uint16_t & r, uint16_t & g, uint16_t & b) { return CHIP_ERROR_NOT_IMPLEMENTED; };
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
+
     // Flash
     virtual CHIP_ERROR FlashInit() { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual CHIP_ERROR FlashErasePage(uint32_t addr) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual CHIP_ERROR FlashWritePage(uint32_t addr, const uint8_t * data, size_t size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * @brief Function trigger the platform to execute a software reset.
+     *              Anything after this function will not be executed since the device will reboot.
+     */
+    virtual void SoftwareReset(void) = 0;
 
     // BLE Specific Method
 

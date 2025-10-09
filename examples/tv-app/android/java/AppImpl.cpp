@@ -255,7 +255,7 @@ DECLARE_DYNAMIC_ENDPOINT(contentAppEndpoint, contentAppClusters);
 
 namespace {
 
-DataVersion gDataVersions[APP_LIBRARY_SIZE][ArraySize(contentAppClusters)];
+DataVersion gDataVersions[APP_LIBRARY_SIZE][MATTER_ARRAY_SIZE(contentAppClusters)];
 
 EmberAfDeviceType gContentAppDeviceType[] = { { DEVICE_TYPE_CONTENT_APP, 1 } };
 
@@ -272,8 +272,8 @@ std::vector<SupportedCluster> make_default_supported_clusters()
 ContentAppFactoryImpl::ContentAppFactoryImpl() :
     mContentApps{ new ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "20202021", make_default_supported_clusters(),
                                      nullptr, nullptr),
-                  new ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "20202021",
-                                     make_default_supported_clusters(), nullptr, nullptr),
+                  new ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "0", make_default_supported_clusters(),
+                                     nullptr, nullptr),
                   new ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021", make_default_supported_clusters(),
                                      nullptr, nullptr),
                   new ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021",
@@ -440,11 +440,11 @@ EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint1
                                                 uint16_t productId, const char * szApplicationVersion,
                                                 std::vector<SupportedCluster> supportedClusters, jobject manager)
 {
-    DataVersion * dataVersionBuf = new DataVersion[ArraySize(contentAppClusters)];
+    DataVersion * dataVersionBuf = new DataVersion[MATTER_ARRAY_SIZE(contentAppClusters)];
     ContentAppImpl * app = new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "",
                                               std::move(supportedClusters), mAttributeDelegate, mCommandDelegate);
     EndpointId epId      = ContentAppPlatform::GetInstance().AddContentApp(
-        app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, ArraySize(contentAppClusters)),
+        app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, MATTER_ARRAY_SIZE(contentAppClusters)),
         Span<const EmberAfDeviceType>(gContentAppDeviceType));
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl AddContentApp endpoint returned %d. Endpoint set %d", epId,
                     app->GetEndpointId());
@@ -461,11 +461,11 @@ EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint1
                                                 std::vector<SupportedCluster> supportedClusters, EndpointId desiredEndpointId,
                                                 jobject manager)
 {
-    DataVersion * dataVersionBuf = new DataVersion[ArraySize(contentAppClusters)];
+    DataVersion * dataVersionBuf = new DataVersion[MATTER_ARRAY_SIZE(contentAppClusters)];
     ContentAppImpl * app = new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "",
                                               std::move(supportedClusters), mAttributeDelegate, mCommandDelegate);
     EndpointId epId      = ContentAppPlatform::GetInstance().AddContentApp(
-        app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, ArraySize(contentAppClusters)),
+        app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, MATTER_ARRAY_SIZE(contentAppClusters)),
         Span<const EmberAfDeviceType>(gContentAppDeviceType), desiredEndpointId);
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl AddContentApp endpoint returned %d. Endpoint set %d", epId,
                     app->GetEndpointId());
@@ -481,7 +481,7 @@ EndpointId ContentAppFactoryImpl::RemoveContentApp(EndpointId epId)
 {
     for (size_t i = 0; i < mContentApps.size(); ++i)
     {
-        auto & app = mContentApps.at(i);
+        auto app = mContentApps.at(i);
         if (app->GetEndpointId() == epId)
         {
             ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl RemoveContentApp endpointId %d", epId);
@@ -580,7 +580,7 @@ CHIP_ERROR InitVideoPlayerPlatform(jobject contentAppEndpointManager)
     gFactory.setContentAppCommandDelegate(new ContentAppCommandDelegate(contentAppEndpointManager));
 
     ChipLogProgress(AppServer, "Starting registration of command handler delegates");
-    for (size_t i = 0; i < ArraySize(contentAppClusters); i++)
+    for (size_t i = 0; i < MATTER_ARRAY_SIZE(contentAppClusters); i++)
     {
         ContentAppCommandDelegate * delegate =
             new ContentAppCommandDelegate(contentAppEndpointManager, contentAppClusters[i].clusterId);

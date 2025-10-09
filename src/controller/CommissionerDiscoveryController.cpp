@@ -436,11 +436,13 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
 
     if (mPasscodeService != nullptr)
     {
+        ChipLogDetail(AppServer, "UX Ok: have a passcodeService");
         // if CommissionerPasscode
         //    - if CommissionerPasscodeReady, then start commissioning
         //    - if CommissionerPasscode, then call new UX method to show passcode, send CDC
         if (passcode == 0 && client->GetCommissionerPasscode() && client->GetCdPort() != 0)
         {
+            ChipLogDetail(AppServer, "UX Ok: commissioner passcode and passcode from apps is 0");
             char rotatingIdBuffer[Dnssd::kMaxRotatingIdLen * 2];
             size_t rotatingIdLength = client->GetRotatingIdLength();
             CHIP_ERROR err = Encoding::BytesToUppercaseHexBuffer(client->GetRotatingId(), rotatingIdLength, rotatingIdBuffer,
@@ -455,7 +457,9 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
             // first step of commissioner passcode
             ChipLogError(AppServer, "UX Ok: commissioner passcode, sending CDC");
             // generate a passcode
-            passcode = mPasscodeService->GetCommissionerPasscode(client->GetVendorId(), client->GetProductId(), rotatingIdSpan);
+            PasscodeInfo passcodeInfo =
+                mPasscodeService->GetCommissionerPasscode(client->GetVendorId(), client->GetProductId(), rotatingIdSpan);
+            passcode = passcodeInfo.passcode;
             if (passcode == 0)
             {
                 // passcode feature disabled
@@ -473,6 +477,7 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
 
             CommissionerDeclaration cd;
             cd.SetCommissionerPasscode(true);
+            cd.SetPasscodeLength(passcodeInfo.displayLength);
             if (mUserPrompter->DisplaysPasscodeAndQRCode())
             {
                 cd.SetQRCodeDisplayed(true);
@@ -488,11 +493,13 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
                           client->GetPairingInst(), ChipLogValueMEI(client->GetVendorId()), ChipLogValueMEI(client->GetProductId()),
                           client->GetInstanceName());
             mUserPrompter->PromptWithCommissionerPasscode(client->GetVendorId(), client->GetProductId(), client->GetDeviceName(),
-                                                          passcode, client->GetPairingHint(), client->GetPairingInst());
+                                                          passcode, client->GetPasscodeLength(), client->GetPairingHint(),
+                                                          client->GetPairingInst());
             return;
         }
         if (passcode != 0)
         {
+            ChipLogDetail(AppServer, "UX Ok: passcode is not 0, commissioning");
             CommissionWithPasscode(passcode);
             return;
         }
@@ -522,7 +529,7 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
     if (mUserPrompter != nullptr)
     {
         mUserPrompter->PromptForCommissionPasscode(client->GetVendorId(), client->GetProductId(), client->GetDeviceName(),
-                                                   client->GetPairingHint(), client->GetPairingInst());
+                                                   client->GetPairingHint(), client->GetPairingInst(), client->GetPasscodeLength());
     }
     ChipLogDetail(Controller, "------Via Shell Enter: controller ux ok [passcode]");
 }

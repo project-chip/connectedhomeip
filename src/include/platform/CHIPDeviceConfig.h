@@ -160,6 +160,19 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL
+ *
+ * The SIT slow polling interval (in milliseconds) is a configuration that allows LIT capable devices
+ * operating in SIT mode to use a shorter slow polling interval than their typical
+ * Slow polling interval.
+ *
+ * The SIT slow polling interval cannot be set to a value greater than CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT
+ */
+#ifndef CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL
+#define CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT
+#endif // CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL
+
+/**
  * CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL
  *
  * The default amount of time in milliseconds that the sleepy end device will use as an active interval.
@@ -269,6 +282,15 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_DEVICE_CONFIGURATION_VERSION
+ *
+ * A monothonic number identifying the configuration version running on the device.
+ */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_CONFIGURATION_VERSION
+#define CHIP_DEVICE_CONFIG_DEVICE_CONFIGURATION_VERSION 1
 #endif
 
 /**
@@ -447,6 +469,69 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF 0
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+ *
+ * Enable support for Joint Fabric in core SDK.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+#define CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_MIN_ADVERTISING_TIMEOUT_SECS
+ *
+ * The min amount of time (in seconds) after which the chip platform will stop PAF advertisement
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_MIN_ADVERTISING_TIMEOUT_SECS
+#define CHIP_DEVICE_CONFIG_WIFIPAF_MIN_ADVERTISING_TIMEOUT_SECS (3 * 60)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT_SECS
+ *
+ * The max amount of time (in seconds) after which the chip platform will stop PAF advertisement
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT_SECS
+#define CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT_SECS (15 * 60)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS
+ *
+ * The max amount of time (in seconds) the chip controller will discovery Wi-Fi PAF
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS
+#define CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS (15 * 60)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL
+ *
+ * The default channel of Wi-Fi PAF in 2.4G band (channel#6)
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL
+#define CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL 2437
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_5G_LOW_DEFAUTL_CHNL
+ *
+ * The default channel of Wi-Fi PAF in 5G lower band (channel#44)
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_5G_LOW_DEFAUTL_CHNL
+#define CHIP_DEVICE_CONFIG_WIFIPAF_5G_LOW_DEFAUTL_CHNL 5220
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_5G_HI_DEFAUTL_CHNL
+ *
+ * The default channel of Wi-Fi PAF in 5G upper band (channel#149)
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_5G_UP_DEFAUTL_CHNL
+#define CHIP_DEVICE_CONFIG_WIFIPAF_5G_UP_DEFAUTL_CHNL 5745
+#endif
+
 // -------------------- WiFi AP Configuration --------------------
 
 /**
@@ -512,6 +597,17 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_LWIP_WIFI_AP_IF_NAME
 #define CHIP_DEVICE_CONFIG_LWIP_WIFI_AP_IF_NAME "ap"
+#endif
+
+// -------------------- NFC/CHIPoNFC Configuration --------------------
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+ *
+ * Enable support for NFC Commissioning (chip-over-NFC).
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#define CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING 0
 #endif
 
 // -------------------- BLE/CHIPoBLE Configuration --------------------
@@ -1579,10 +1675,10 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_NFC enables NFC communication for commissioning.
+ * CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD enables configuration of NFC onboarding payload.
  */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_NFC
-#define CHIP_DEVICE_CONFIG_ENABLE_NFC 0
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD
+#define CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD 0
 #endif
 
 /**

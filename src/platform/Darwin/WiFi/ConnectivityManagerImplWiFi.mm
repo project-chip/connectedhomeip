@@ -79,7 +79,7 @@ namespace DeviceLayer {
         bool status = false;
 
         if (_GetWiFiStationMode() == kWiFiStationMode_Enabled) {
-            char interfaceName[IFNAMSIZ];
+            char interfaceName[Inet::InterfaceId::kMaxIfNameLength];
             VerifyOrReturnError(CHIP_NO_ERROR == GetWiFiInterfaceName(interfaceName, sizeof(interfaceName)), false);
             VerifyOrReturnError(CHIP_NO_ERROR == GetInterfaceStatus(interfaceName, &status), false);
         }
@@ -96,8 +96,6 @@ namespace DeviceLayer {
     {
         ConfigurationManagerImpl::GetDefaultInstance().ClearWiFiNetworkInformations();
     }
-
-    bool ConnectivityManagerImpl::_CanStartWiFiScan() { return _IsWiFiStationConnected(); }
 
     CHIP_ERROR ConnectivityManagerImpl::GetWiFiInterfaceName(char * outName, size_t maxLen)
     {

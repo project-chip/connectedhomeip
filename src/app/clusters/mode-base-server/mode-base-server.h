@@ -21,7 +21,7 @@
 #include "mode-base-cluster-objects.h"
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
-#include <app/util/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <lib/support/IntrusiveList.h>
 
 namespace chip {
@@ -179,19 +179,10 @@ private:
 
 class Delegate
 {
-protected:
-    Instance * mInstance = nullptr;
-
 public:
     Delegate() = default;
 
     virtual ~Delegate() = default;
-
-    /**
-     * This method is used by the SDK to set the instance pointer. This is done during the instantiation of an Instance object.
-     * @param aInstance A pointer to the Instance object related to this delegate object.
-     */
-    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
 
     // The following functions should be overridden by the SDK user to implement the business logic of their application.
     /**
@@ -257,6 +248,30 @@ public:
      *
      */
     virtual void HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response) = 0;
+
+    /**
+     * This method is used by the SDK to set the instance pointer. This is done during the instantiation of an Instance object.
+     * @param aInstance A pointer to the Instance object related to this delegate object.
+     */
+    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
+
+private:
+    Instance * mInstance = nullptr;
+
+protected:
+    /**
+     * @brief Provides access to the const Instance pointer.
+     *
+     * @return A const pointer to the Instance object associated with this delegate.
+     */
+    const Instance * GetInstance() const { return mInstance; }
+
+    /**
+     * @brief Provides access to the Instance pointer.
+     *
+     * @return A pointer to the Instance object associated with this delegate.
+     */
+    Instance * GetInstance() { return mInstance; }
 };
 
 // A set of pointers to all initialised ModeBase instances. It provides a way to access all ModeBase derived clusters.

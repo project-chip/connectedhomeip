@@ -37,11 +37,12 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 
 class TC_ACE_1_5(MatterBaseTest):
@@ -71,7 +72,7 @@ class TC_ACE_1_5(MatterBaseTest):
         self.th2 = new_fabric_admin.NewController(nodeId=TH2_nodeid,
                                                   paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
 
-        params = await self.openCommissioningWindow(self.th1, self.dut_node_id)
+        params = await self.open_commissioning_window(self.th1, self.dut_node_id)
         self.print_step(2, "TH1 opens the commissioning window on the DUT")
 
         await self.th2.CommissionOnNetwork(

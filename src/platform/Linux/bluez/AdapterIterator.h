@@ -20,7 +20,7 @@
 #include <cstdint>
 
 #include <platform/GLibTypeDeleter.h>
-#include <platform/Linux/dbus/bluez/DbusBluez.h>
+#include <platform/Linux/dbus/bluez/DBusBluez.h>
 
 #include "BluezObjectIterator.h"
 #include "BluezObjectManager.h"

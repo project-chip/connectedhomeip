@@ -20,8 +20,7 @@
 #import <Matter/MTRDeviceControllerFactory.h>
 #import <dns_sd.h>
 
-class MTROperationalBrowser
-{
+class MTROperationalBrowser {
 public:
     // Should be created at a point when the dispatch queue is available.
     MTROperationalBrowser(MTRDeviceControllerFactory * aFactory, dispatch_queue_t aQueue);
@@ -40,7 +39,7 @@ public:
 
 private:
     static void OnBrowse(DNSServiceRef aServiceRef, DNSServiceFlags aFlags, uint32_t aInterfaceId, DNSServiceErrorType aError,
-                         const char * aName, const char * aType, const char * aDomain, void * aContext);
+        const char * aName, const char * aType, const char * aDomain, void * aContext);
 
     void EnsureBrowse();
     void StopBrowse();
@@ -58,4 +57,7 @@ private:
     // Count of controllers that are currently active; we aim to have a browse
     // going while this is nonzero;
     size_t mActiveControllerCount = 0;
+
+    // Queued-up instance names to notify about.
+    NSMutableSet<NSString *> * mAddedInstanceNames = nil;
 };

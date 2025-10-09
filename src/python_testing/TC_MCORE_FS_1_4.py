@@ -26,14 +26,34 @@
 # test-runner-runs:
 #   run1:
 #     app: examples/fabric-admin/scripts/fabric-sync-app.py
-#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --discriminator=1234
 #     app-ready-pattern: "Successfully opened pairing window on the device"
+#     app-stdin-pipe: dut-fsa-stdin
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234 --passcode 20202021
 #       --string-arg th_fsa_app_path:examples/fabric-admin/scripts/fabric-sync-app.py th_fsa_admin_path:${FABRIC_ADMIN_APP} th_fsa_bridge_path:${FABRIC_BRIDGE_APP} th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID} dut_fsa_stdin_pipe:dut-fsa-stdin
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${FABRIC_SYNC_APP}
+#     app-args: --discriminator=1234
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234 --passcode 20202021
+#       --bool-arg unified_fabric_sync_app:true
+#       --string-arg th_fsa_app_path:examples/fabric-admin/scripts/fabric-sync-app.py
+#       --string-arg th_fsa_admin_path:${FABRIC_ADMIN_APP}
+#       --string-arg th_fsa_bridge_path:${FABRIC_BRIDGE_APP}
+#       --string-arg th_server_no_uid_app_path:${LIGHTING_APP_NO_UNIQUE_ID}
+#       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -46,13 +66,14 @@ import os
 import random
 import tempfile
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import Status
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
-from chip.testing.tasks import Subprocess
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import Status
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from matter.testing.tasks import Subprocess
 
 
 class FabricSyncApp(Subprocess):
@@ -129,11 +150,11 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             asserts.fail(f"The path {th_fsa_bridge_path} does not exist")
 
         # Get the path to the TH_SERVER_NO_UID app from the user params.
-        th_server_app = self.user_params.get("th_server_no_uid_app_path", None)
-        if not th_server_app:
+        th_server_no_uid_app = self.user_params.get("th_server_no_uid_app_path", None)
+        if not th_server_no_uid_app:
             asserts.fail("This test requires a TH_SERVER_NO_UID app. Specify app path with --string-arg th_server_no_uid_app_path:<path_to_app>")
-        if not os.path.exists(th_server_app):
-            asserts.fail(f"The path {th_server_app} does not exist")
+        if not os.path.exists(th_server_no_uid_app):
+            asserts.fail(f"The path {th_server_no_uid_app} does not exist")
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
@@ -171,7 +192,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
 
         # Start the TH_SERVER_NO_UID app.
         self.th_server = AppServerSubprocess(
-            th_server_app,
+            th_server_no_uid_app,
             storage_dir=self.storage.name,
             port=self.th_server_port,
             discriminator=self.th_server_discriminator,
@@ -292,7 +313,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             attribute=Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID,
             node_id=th_fsa_bridge_th_node_id,
             endpoint=th_fsa_bridge_th_server_endpoint)
-        asserts.assert_true(type_matches(th_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
+        asserts.assert_true(matchers.is_type(th_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
         asserts.assert_true(th_fsa_bridge_th_server_unique_id, "UniqueID should not be an empty string")
         logging.info("UniqueID generated for TH_SERVER_NO_UID: %s", th_fsa_bridge_th_server_unique_id)
 
@@ -321,8 +342,12 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
                 f"If using FabricSync Admin, you may type:\n"
                 f">>> fabricsync add-bridge <desired_node_id> {params.setupPinCode} <th_host_ip> {self.th_fsa_bridge_port}")
         else:
-            self.dut_fsa_stdin.write(
-                f"fabricsync add-bridge 10 {params.setupPinCode} {self.th_fsa_bridge_address} {self.th_fsa_bridge_port}\n")
+            if self.user_params.get("unified_fabric_sync_app"):
+                self.dut_fsa_stdin.write(
+                    f"app add-bridge 10 {params.setupPinCode} {self.th_fsa_bridge_address} {self.th_fsa_bridge_port}\n")
+            else:
+                self.dut_fsa_stdin.write(
+                    f"fabricsync add-bridge 10 {params.setupPinCode} {self.th_fsa_bridge_address} {self.th_fsa_bridge_port}\n")
             self.dut_fsa_stdin.flush()
             # Wait for the commissioning to complete.
             await asyncio.sleep(5)
@@ -346,7 +371,10 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
                 f"If using FabricSync Admin, you may type:\n"
                 f">>> fabricsync sync-device {th_fsa_bridge_th_server_endpoint}")
         else:
-            self.dut_fsa_stdin.write(f"fabricsync sync-device {th_fsa_bridge_th_server_endpoint}\n")
+            if self.user_params.get("unified_fabric_sync_app"):
+                self.dut_fsa_stdin.write(f"app sync-device {th_fsa_bridge_th_server_endpoint}\n")
+            else:
+                self.dut_fsa_stdin.write(f"fabricsync sync-device {th_fsa_bridge_th_server_endpoint}\n")
             self.dut_fsa_stdin.flush()
             # Wait for the synchronization to complete.
             await asyncio.sleep(5)
@@ -366,7 +394,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         asserts.assert_true(dut_fsa_bridge_endpoints_new.issuperset(dut_fsa_bridge_endpoints),
                             "Expected only new endpoints to be added")
         unique_endpoints_set = dut_fsa_bridge_endpoints_new - dut_fsa_bridge_endpoints
-        asserts.assert_equal(len(unique_endpoints_set), 1, "Expected only one new endpoint on DUT_FSA")
+        asserts.assert_equal(len(unique_endpoints_set), 1, "Expected exactly one new endpoint on DUT_FSA")
         dut_fsa_bridge_th_server_endpoint = list(unique_endpoints_set)[0]
 
         # Verify that DUT_FSA copied the TH_SERVER_NO_UID UniqueID from TH_FSA.
@@ -374,7 +402,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             cluster=Clusters.BridgedDeviceBasicInformation,
             attribute=Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID,
             endpoint=dut_fsa_bridge_th_server_endpoint)
-        asserts.assert_true(type_matches(dut_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
+        asserts.assert_true(matchers.is_type(dut_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
         asserts.assert_true(dut_fsa_bridge_th_server_unique_id, "UniqueID should not be an empty string")
         logging.info("UniqueID for TH_SERVER_NO_UID on DUT_FSA: %s", th_fsa_bridge_th_server_unique_id)
 

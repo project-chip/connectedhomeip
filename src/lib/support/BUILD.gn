@@ -183,6 +183,7 @@ static_library("support") {
   output_name = "libSupportLayer"
 
   sources = [
+    "AutoRelease.h",
     "Base64.cpp",
     "Base64.h",
     "BitFlags.h",
@@ -229,6 +230,8 @@ static_library("support") {
     "PoolWrapper.h",
     "PrivateHeap.cpp",
     "PrivateHeap.h",
+    "ReadOnlyBuffer.cpp",
+    "ReadOnlyBuffer.h",
     "ReferenceCountedHandle.h",
     "SafePointerCast.h",
     "SafeString.h",
@@ -236,6 +239,8 @@ static_library("support") {
     "ScopedBuffer.h",
     "SetupDiscriminator.h",
     "SortUtils.h",
+    "SpanSearchValue.h",
+    "SplitLambda.h",
     "StateMachine.h",
     "StringBuilder.cpp",
     "StringBuilder.h",
@@ -334,9 +339,7 @@ static_library("support") {
   }
 }
 
-static_library("test_utils") {
-  output_name = "libTestUtils"
-  output_dir = "${root_out_dir}/lib"
+source_set("test_utils") {
   deps = [ "${chip_root}/src/platform" ]
 
   sources = [

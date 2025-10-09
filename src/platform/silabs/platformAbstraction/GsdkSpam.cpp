@@ -27,7 +27,11 @@
 #include "sl_se_manager_types.h"
 #include <sl_se_manager_extmem.h>
 #endif // _SILICON_LABS_32B_SERIES_2
+
+// Use sl_system for projects upgraded to 2025.6, identified by the presence of SL_CATALOG_CUSTOM_MAIN_PRESENT
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
 #include "sl_system_kernel.h"
+#endif
 
 #ifdef ENABLE_WSTK_LEDS
 extern "C" {
@@ -92,6 +96,7 @@ SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 
 CHIP_ERROR SilabsPlatform::Init(void)
 {
+    NvmInit();
 #ifdef _SILICON_LABS_32B_SERIES_2
     // Read the cause of last reset.
     mRebootCause = RMU_ResetCauseGet();
@@ -124,9 +129,16 @@ CHIP_ERROR SilabsPlatform::Init(void)
     return CHIP_NO_ERROR;
 }
 
+void SilabsPlatform::SoftwareReset()
+{
+    NVIC_SystemReset();
+}
+
 CHIP_ERROR SilabsPlatform::FlashInit()
 {
-#if defined(_SILICON_LABS_32B_SERIES_2)
+#if defined(SL_TRUSTZONE_NONSECURE)
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#elif defined(_SILICON_LABS_32B_SERIES_2)
     MSC_Init();
 #elif defined(_SILICON_LABS_32B_SERIES_3)
     sl_status_t status;
@@ -140,7 +152,9 @@ CHIP_ERROR SilabsPlatform::FlashInit()
 
 CHIP_ERROR SilabsPlatform::FlashErasePage(uint32_t addr)
 {
-#if defined(_SILICON_LABS_32B_SERIES_2)
+#if defined(SL_TRUSTZONE_NONSECURE)
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#elif defined(_SILICON_LABS_32B_SERIES_2)
     MSC_ErasePage((uint32_t *) addr);
 #elif defined(_SILICON_LABS_32B_SERIES_3)
     sl_status_t status;
@@ -158,7 +172,9 @@ CHIP_ERROR SilabsPlatform::FlashErasePage(uint32_t addr)
 
 CHIP_ERROR SilabsPlatform::FlashWritePage(uint32_t addr, const uint8_t * data, size_t size)
 {
-#if defined(_SILICON_LABS_32B_SERIES_2)
+#if defined(SL_TRUSTZONE_NONSECURE)
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#elif defined(_SILICON_LABS_32B_SERIES_2)
     MSC_WriteWord((uint32_t *) addr, data, size);
 #elif defined(_SILICON_LABS_32B_SERIES_3)
     sl_status_t status;
@@ -212,10 +228,13 @@ CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
 }
 #endif // ENABLE_WSTK_LEDS
 
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
+// Use sl_system for projects upgraded to 2025.6, identified by the presence of SL_CATALOG_CUSTOM_MAIN_PRESENT
 void SilabsPlatform::StartScheduler()
 {
     sl_system_kernel_start();
 }
+#endif
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 extern "C" void sl_button_on_change(const sl_button_t * handle)

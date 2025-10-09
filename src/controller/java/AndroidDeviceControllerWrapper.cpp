@@ -25,12 +25,12 @@
 
 #include <string.h>
 
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/Dnssd.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/java/AndroidICDClient.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
@@ -49,32 +49,7 @@ using namespace TLV;
 
 AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 {
-    getICDClientStorage()->Shutdown();
-    mController->Shutdown();
-
-    if (mKeypairBridge != nullptr)
-    {
-        chip::Platform::Delete(mKeypairBridge);
-        mKeypairBridge = nullptr;
-    }
-
-    if (mDeviceAttestationDelegateBridge != nullptr)
-    {
-        delete mDeviceAttestationDelegateBridge;
-        mDeviceAttestationDelegateBridge = nullptr;
-    }
-
-    if (mDeviceAttestationVerifier != nullptr)
-    {
-        delete mDeviceAttestationVerifier;
-        mDeviceAttestationVerifier = nullptr;
-    }
-
-    if (mAttestationTrustStoreBridge != nullptr)
-    {
-        delete mAttestationTrustStoreBridge;
-        mAttestationTrustStoreBridge = nullptr;
-    }
+    Shutdown();
 }
 
 void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
@@ -181,9 +156,15 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     else
     {
         const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-        chip::Credentials::SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+        // TODO: Ensure that attestation revocation data is actually provided.
+        chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+        chip::Credentials::SetDeviceAttestationVerifier(
+            GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked));
     }
 
+    // Because garbage collection may delay the removal of old controller instances, two instances could temporarily exist.
+    // To avoid issues with the shared ICD client storage, reset the storage before creating a new controller.
+    getICDClientStorage()->Shutdown();
     *errInfoOnFailure = getICDClientStorage()->Init(wrapperStorage, &wrapper->mSessionKeystore);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
@@ -209,7 +190,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     setupParams.defaultCommissioner            = &wrapper->mAutoCommissioner;
     initParams.fabricIndependentStorage        = wrapperStorage;
     initParams.sessionKeystore                 = &wrapper->mSessionKeystore;
-    initParams.dataModelProvider               = app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider               = app::CodegenDataModelProviderInstance(wrapperStorage);
 
     wrapper->mGroupDataProvider.SetStorageDelegate(wrapperStorage);
     wrapper->mGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
@@ -412,14 +393,41 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     {
         return nullptr;
     }
-
+    wrapper->mIsInitialized = true;
     return wrapper.release();
 }
 
 void AndroidDeviceControllerWrapper::Shutdown()
 {
+    VerifyOrReturn(mIsInitialized);
+    getICDClientStorage()->Shutdown();
     mController->Shutdown();
     DeviceControllerFactory::GetInstance().Shutdown();
+
+    if (mKeypairBridge != nullptr)
+    {
+        chip::Platform::Delete(mKeypairBridge);
+        mKeypairBridge = nullptr;
+    }
+
+    if (mDeviceAttestationDelegateBridge != nullptr)
+    {
+        delete mDeviceAttestationDelegateBridge;
+        mDeviceAttestationDelegateBridge = nullptr;
+    }
+
+    if (mDeviceAttestationVerifier != nullptr)
+    {
+        delete mDeviceAttestationVerifier;
+        mDeviceAttestationVerifier = nullptr;
+    }
+
+    if (mAttestationTrustStoreBridge != nullptr)
+    {
+        delete mAttestationTrustStoreBridge;
+        mAttestationTrustStoreBridge = nullptr;
+    }
+    mIsInitialized = false;
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Controller::CommissioningParameters & params,
@@ -630,6 +638,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::UpdateAttestationTrustStoreBridge(job
 
     deviceAttestationVerifier = new Credentials::DefaultDACVerifier(attestationTrustStoreBridge);
     VerifyOrExit(deviceAttestationVerifier != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    deviceAttestationVerifier->EnableVerboseLogs(true);
 
     if (mAttestationTrustStoreBridge != nullptr)
     {
@@ -849,7 +858,8 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
     err = JniReferences::GetInstance().FindMethod(
         env, mJavaObjectRef.ObjectRef(), "onScanNetworksSuccess",
         "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error invoking Java callback: %s", ErrorStr(err)));
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(Controller, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, err.Format()));
 
     jobject NetworkingStatus;
     std::string NetworkingStatusClassName     = "java/lang/Integer";

@@ -166,6 +166,7 @@ silabs_executable("energy-management-app") {
   }
 
   sources = [
+    "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyManagementAppCommonMain.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DEMTestEventTriggers.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
@@ -183,7 +184,6 @@ silabs_executable("energy-management-app") {
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/EnergyReportingEventTriggers.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/FakeReadings.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/PowerTopologyDelegate.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WaterHeaterMain.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmInstance.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmMain.cpp",
@@ -195,6 +195,7 @@ silabs_executable("energy-management-app") {
 
   deps = [
     ":sdk",
+    "${chip_root}/src/app:attribute-persistence",
     app_data_model,
   ]
 

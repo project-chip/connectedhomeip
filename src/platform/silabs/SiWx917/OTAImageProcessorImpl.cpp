@@ -19,9 +19,14 @@
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <platform/silabs/OTAImageProcessorImpl.h>
-
 #include <platform/silabs/SilabsConfig.h>
-#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+#include <platform/silabs/wifi/WifiInterface.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
+#endif                                                 // CHIP_CONFIG_ENABLE_ICD_SERVER
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,9 +41,12 @@ extern "C" {
 #define RPS_HEADER 1
 #define RPS_DATA 2
 
-#define SL_STATUS_FW_UPDATE_DONE SL_STATUS_SI91X_NO_AP_FOUND
 uint8_t flag = RPS_HEADER;
 static chip::OTAImageProcessorImpl gImageProcessor;
+
+using namespace chip::DeviceLayer;
+using namespace chip::DeviceLayer::Silabs;
+using namespace chip::DeviceLayer::Internal;
 
 namespace chip {
 
@@ -60,24 +68,24 @@ CHIP_ERROR OTAImageProcessorImpl::Init(OTADownloader * downloader)
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
+    PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
+    PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
+    PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
+    PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -95,7 +103,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
         ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
+    PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -120,7 +128,7 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 
     uint32_t currentVersion;
     uint32_t targetVersion = requestor->GetTargetVersion();
-    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
+    ReturnErrorOnFailure(ConfigurationMgr().GetSoftwareVersion(currentVersion));
     if (currentVersion != targetVersion)
     {
         ChipLogError(SoftwareUpdate, "Current software version = %" PRIu32 ", expected software version = %" PRIu32, currentVersion,
@@ -133,7 +141,6 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 
 void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
-    int32_t status        = SL_STATUS_OK;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
 
     if (imageProcessor == nullptr)
@@ -157,13 +164,9 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     imageProcessor->mHeaderParser.Init();
 
-    // Setting the device is in high performace - no-sleepy mode while OTA tranfer
-#if (CHIP_CONFIG_ENABLE_ICD_SERVER)
-    status = wfx_power_save(RSI_ACTIVE, HIGH_PERFORMANCE);
-    if (status != SL_STATUS_OK)
-    {
-        ChipLogError(DeviceLayer, "Failed to enable the TA Deep Sleep");
-    }
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // Setting the device in high performance - no-sleep mode during OTA tranfer
+    WifiSleepManager::GetInstance().RequestHighPerformanceWithTransition();
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER*/
 
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
@@ -186,13 +189,13 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 
         if (status != SL_STATUS_OK)
         {
-            if (status == SL_STATUS_FW_UPDATE_DONE)
+            if (status == SL_STATUS_SI91X_FW_UPDATE_DONE)
             {
                 mReset = true;
             }
             else
             {
-                ChipLogError(SoftwareUpdate, "ERROR: In HandleFinalize for last chunk sl_si91x_fwup_load() error %ld", status);
+                ChipLogError(SoftwareUpdate, "ERROR: In HandleFinalize for last chunk sl_si91x_fwup_load() error 0x%lx", status);
                 imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
                 return;
             }
@@ -200,13 +203,9 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     }
     imageProcessor->ReleaseBlock();
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Setting the device back to power save mode when transfer is completed successfully
-#if (CHIP_CONFIG_ENABLE_ICD_SERVER)
-    sl_status_t err = wfx_power_save(RSI_SLEEP_MODE_2, ASSOCIATED_POWER_SAVE);
-    if (err != SL_STATUS_OK)
-    {
-        ChipLogError(DeviceLayer, "Power save config for Wifi failed");
-    }
+    WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER*/
 
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully");
@@ -214,22 +213,16 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
-    int32_t status = SL_STATUS_OK;
-
     ChipLogProgress(SoftwareUpdate, "OTAImageProcessorImpl::HandleApply()");
 
     // Force KVS to store pending keys such as data from StoreCurrentUpdateInfo()
-    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().ForceKeyMapSave();
+    PersistedStorage::KeyValueStoreMgrImpl().ForceKeyMapSave();
 
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully in HandleApply");
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Setting the device is in high performace - no-sleepy mode before soft reset as soft reset is not happening in sleep mode
-#if (CHIP_CONFIG_ENABLE_ICD_SERVER)
-    status = wfx_power_save(RSI_ACTIVE, HIGH_PERFORMANCE);
-    if (status != SL_STATUS_OK)
-    {
-        ChipLogError(DeviceLayer, "Failed to enable the TA Deep Sleep");
-    }
+    WifiSleepManager::GetInstance().RequestHighPerformanceWithTransition();
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER*/
 
     if (mReset)
@@ -237,8 +230,9 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         ChipLogProgress(SoftwareUpdate, "M4 Firmware update complete");
         // send system reset request to reset the MCU and upgrade the m4 image
         ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
-        // Reboots the device
-        sl_si91x_soc_soft_reset();
+        // Write that we are rebooting after a software update and reboot the device
+        SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_MatterUpdateReboot, true);
+        GetPlatform().SoftwareReset();
     }
 }
 
@@ -250,13 +244,9 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Setting the device back to power save mode when transfer is aborted in the middle
-#if (CHIP_CONFIG_ENABLE_ICD_SERVER)
-    sl_status_t err = wfx_power_save(RSI_SLEEP_MODE_2, ASSOCIATED_POWER_SAVE);
-    if (err != SL_STATUS_OK)
-    {
-        ChipLogError(DeviceLayer, "Power save config for Wifi failed");
-    }
+    WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER*/
 
     // Not clearing the image storage area as it is done during each write
@@ -266,7 +256,6 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 {
     int32_t status        = SL_STATUS_OK;
-    int32_t content_block = 0;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
@@ -284,7 +273,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
     if (chip_error != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Matter image header parser error %s", chip::ErrorStr(chip_error));
+        ChipLogError(SoftwareUpdate, "Matter image header parser error: %" CHIP_ERROR_FORMAT, chip_error.Format());
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INVALID_FILE_IDENTIFIER);
         return;
     }
@@ -315,13 +304,13 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
                 {
                     // If the last chunk of last block-writeBufOffset length is exactly kAlignmentBytes(64) bytes then mReset value
                     // should be set to true in HandleProcessBlock
-                    if (status == SL_STATUS_FW_UPDATE_DONE)
+                    if (status == SL_STATUS_SI91X_FW_UPDATE_DONE)
                     {
                         mReset = true;
                     }
                     else
                     {
-                        ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock sl_si91x_fwup_load() error %ld", status);
+                        ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock sl_si91x_fwup_load() error 0x%lx", status);
                         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
                         return;
                     }

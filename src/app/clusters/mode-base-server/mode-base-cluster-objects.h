@@ -125,6 +125,7 @@ struct Type
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status = static_cast<uint8_t>(0);
     Optional<CharSpan> statusText;
@@ -140,6 +141,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status = static_cast<uint8_t>(0);
     Optional<CharSpan> statusText;
@@ -160,6 +162,7 @@ struct Type
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t newMode = static_cast<uint8_t>(0);
 
@@ -174,6 +177,8 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
     uint8_t newMode = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

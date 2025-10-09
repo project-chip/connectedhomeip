@@ -75,9 +75,14 @@ function atomicType(arg)
   case 'percent100ths':
     return 'chip::Percent100ths';
   case 'power_mw':
+  case 'power_mva':
+  case 'power_mvar':
   case 'amperage_ma':
   case 'voltage_mv':
   case 'energy_mwh':
+  case 'energy_mvah':
+  case 'energy_mvarh':
+  case 'money':
     return 'int64_t';
   case 'epoch_us':
   case 'systime_us':

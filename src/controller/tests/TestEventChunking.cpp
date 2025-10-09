@@ -30,12 +30,12 @@
 #include <app/EventLogging.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/DataModelHandler.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -86,7 +86,7 @@ protected:
         // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
         VerifyOrDieWithMsg((err = mEventCounter.Init(0)) == CHIP_NO_ERROR, AppServer,
                            "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format());
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
+        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
@@ -287,12 +287,12 @@ TEST_F(TestEventChunking, TestEventChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    CodegenDataModelProviderInstance()->Shutdown();
-    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
+    CodegenDataModelProviderInstance(nullptr /* delegate */)->Shutdown();
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
+    DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     chip::EventNumber firstEventNumber;
@@ -355,12 +355,12 @@ TEST_F(TestEventChunking, TestMixedEventsAndAttributesChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    CodegenDataModelProviderInstance()->Shutdown();
-    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
+    CodegenDataModelProviderInstance(nullptr /* delegate */)->Shutdown();
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
+    DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     chip::EventNumber firstEventNumber;
@@ -407,7 +407,7 @@ TEST_F(TestEventChunking, TestMixedEventsAndAttributesChunking)
         // Always returns the same number of attributes read (5 + revision + GlobalAttributesNotInMetadata).
         //
         EXPECT_TRUE(readCallback.mOnReportEnd);
-        EXPECT_EQ(readCallback.mAttributeCount, 6 + ArraySize(GlobalAttributesNotInMetadata));
+        EXPECT_EQ(readCallback.mAttributeCount, 6 + MATTER_ARRAY_SIZE(GlobalAttributesNotInMetadata));
         EXPECT_EQ(readCallback.mEventCount, static_cast<uint32_t>(lastEventNumber - firstEventNumber + 1));
 
         EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
@@ -433,12 +433,12 @@ TEST_F(TestEventChunking, TestMixedEventsAndLargeAttributesChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    CodegenDataModelProviderInstance()->Shutdown();
-    engine->SetDataModelProvider(CodegenDataModelProviderInstance());
+    CodegenDataModelProviderInstance(nullptr /* delegate */)->Shutdown();
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
+    DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint4, Span<DataVersion>(dataVersionStorage));
 
     chip::EventNumber firstEventNumber;

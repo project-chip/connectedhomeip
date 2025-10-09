@@ -25,7 +25,7 @@
 namespace chip {
 
 #define CHIP_ERROR_TLV_PROCESSOR(e)                                                                                                \
-    ChipError(ChipError::Range::kLastRange, ((uint8_t) ChipError::Range::kLastRange << 3) | e, __FILE__, __LINE__)
+    CHIP_GENERIC_ERROR(ChipError::Range::kLastRange, ((uint8_t) ChipError::Range::kLastRange << 3) | e)
 
 #define CHIP_ERROR_OTA_CHANGE_PROCESSOR CHIP_ERROR_TLV_PROCESSOR(0x02)
 #define CHIP_ERROR_OTA_PROCESSOR_NOT_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x03)

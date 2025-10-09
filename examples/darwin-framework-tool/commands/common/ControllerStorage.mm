@@ -19,7 +19,9 @@
 #import "ControllerStorage.h"
 #import "PreferencesStorage.h"
 
+#ifdef LOG_DEBUG_CONTROLLER_STORAGE
 #include <lib/support/logging/CHIPLogging.h>
+#endif // LOG_DEBUG_CONTROLLER_STORAGE
 
 NSString * const kDarwinFrameworkToolControllerDomain = @"com.apple.darwin-framework-tool.controller";
 

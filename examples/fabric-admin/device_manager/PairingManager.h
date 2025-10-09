@@ -134,6 +134,12 @@ public:
      */
     CHIP_ERROR UnpairDevice(chip::NodeId nodeId);
 
+    /**
+     * Resets the PairingManager's internal state to a baseline, making it ready to handle a new command.
+     * This method clears all internal states and resets all members to their initial values.
+     */
+    void ResetForNextCommand();
+
 private:
     // Constructors
     PairingManager();

@@ -32,6 +32,7 @@ import java.util.Objects;
  */
 public class MatterCastingPlayer implements CastingPlayer {
   private static final String TAG = MatterCastingPlayer.class.getSimpleName();
+
   /**
    * Time (in sec) to keep the commissioning window open, if commissioning is required. Must be >= 3
    * minutes.
@@ -267,4 +268,28 @@ public class MatterCastingPlayer implements CastingPlayer {
 
   @Override
   public native void disconnect();
+
+  /**
+   * @brief Get CastingPlayer's current ConnectionState.
+   * @throws IllegalArgumentException or NullPointerException when native layer returns invalid
+   *     state.
+   * @return Current ConnectionState.
+   */
+  @Override
+  public ConnectionState getConnectionState() {
+    return ConnectionState.valueOf(getConnectionStateNative());
+  }
+
+  /*
+   * @brief Get the Current ConnectionState of a CastingPlayer from the native layer.
+   *
+   * @returns A String representation of the CastingPlayer's current connectation.
+   *          Possible return values are
+   *            - "NOT_CONNECTED"
+   *            - "CONNECTING"
+   *            - "CONNECTED"
+   *            - Error message or NULL on error
+   */
+  @Override
+  public native String getConnectionStateNative();
 }

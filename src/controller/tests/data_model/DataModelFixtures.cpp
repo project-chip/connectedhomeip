@@ -26,8 +26,8 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/InteractionModelEngine.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/TextOnlyLogging.h>
 #include <optional>
@@ -39,6 +39,9 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitTesting;
 using namespace chip::Protocols;
+
+// Mock function for linking
+void InitDataModelHandler() {}
 
 namespace chip {
 namespace app {
@@ -86,8 +89,8 @@ CommandHandler::Handle gAsyncCommandHandle;
 } // namespace DataModelTests
 
 static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                        const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                        AttributeEncodeState * apEncoderState)
+                                        bool allowInfiniteReads, const ConcreteReadAttributePath & aPath,
+                                        AttributeReportIBs::Builder & aAttributeReports, AttributeEncodeState * apEncoderState)
 {
     if (aPath.mEndpointId >= chip::Test::kMockEndpointMin)
     {
@@ -143,6 +146,7 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
 
             return valueEncoder.Encode(++gInt16uTotalReadCount);
         }
+
         if (aPath.mClusterId == kPerpetualClusterId ||
             (aPath.mClusterId == app::Clusters::UnitTesting::Id && aPath.mAttributeId == kPerpetualAttributeid))
         {
@@ -150,9 +154,9 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
             AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion, aIsFabricFiltered,
                                                state);
 
-            CHIP_ERROR err = valueEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+            CHIP_ERROR err = valueEncoder.EncodeList([allowInfiniteReads](const auto & encoder) -> CHIP_ERROR {
                 encoder.Encode(static_cast<uint8_t>(1));
-                return CHIP_ERROR_NO_MEMORY;
+                return allowInfiniteReads ? CHIP_ERROR_NO_MEMORY : CHIP_NO_ERROR;
             });
 
             if (err != CHIP_NO_ERROR)
@@ -328,8 +332,9 @@ ActionReturnStatus CustomDataModel::ReadAttribute(const ReadAttributeRequest & r
         subjectDescriptor = *request.subjectDescriptor;
     }
 
-    CHIP_ERROR err = ReadSingleClusterData(subjectDescriptor, request.readFlags.Has(ReadFlags::kFabricFiltered), request.path,
-                                           TestOnlyAttributeValueEncoderAccessor(encoder).Builder(), &mutableState);
+    CHIP_ERROR err =
+        ReadSingleClusterData(subjectDescriptor, request.readFlags.Has(ReadFlags::kFabricFiltered), mAllowInfiniteReads,
+                              request.path, TestOnlyAttributeValueEncoderAccessor(encoder).Builder(), &mutableState);
 
     // state must survive CHIP_ERRORs as it is used for chunking
     TestOnlyAttributeValueEncoderAccessor(encoder).SetState(mutableState);
@@ -467,87 +472,11 @@ ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest &
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-std::optional<ActionReturnStatus> CustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                                                          CommandHandler * handler)
+std::optional<ActionReturnStatus> CustomDataModel::InvokeCommand(const InvokeRequest & request,
+                                                                 chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
     DispatchSingleClusterCommand(request.path, input_arguments, handler);
     return std::nullopt; // handler status is set by the dispatch
-}
-
-EndpointId CustomDataModel::FirstEndpoint()
-{
-    return CodegenDataModelProviderInstance()->FirstEndpoint();
-}
-
-EndpointId CustomDataModel::NextEndpoint(EndpointId before)
-{
-    return CodegenDataModelProviderInstance()->NextEndpoint(before);
-}
-
-std::optional<DataModel::DeviceTypeEntry> CustomDataModel::FirstDeviceType(EndpointId endpoint)
-{
-    return std::nullopt;
-}
-
-std::optional<DataModel::DeviceTypeEntry> CustomDataModel::NextDeviceType(EndpointId endpoint,
-                                                                          const DataModel::DeviceTypeEntry & previous)
-{
-    return std::nullopt;
-}
-
-ClusterEntry CustomDataModel::FirstCluster(EndpointId endpoint)
-{
-    return CodegenDataModelProviderInstance()->FirstCluster(endpoint);
-}
-
-ClusterEntry CustomDataModel::NextCluster(const ConcreteClusterPath & before)
-{
-    return CodegenDataModelProviderInstance()->NextCluster(before);
-}
-
-std::optional<ClusterInfo> CustomDataModel::GetClusterInfo(const ConcreteClusterPath & path)
-{
-    return CodegenDataModelProviderInstance()->GetClusterInfo(path);
-}
-
-AttributeEntry CustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)
-{
-    return CodegenDataModelProviderInstance()->FirstAttribute(cluster);
-}
-
-AttributeEntry CustomDataModel::NextAttribute(const ConcreteAttributePath & before)
-{
-    return CodegenDataModelProviderInstance()->NextAttribute(before);
-}
-
-std::optional<AttributeInfo> CustomDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
-{
-    return CodegenDataModelProviderInstance()->GetAttributeInfo(path);
-}
-
-CommandEntry CustomDataModel::FirstAcceptedCommand(const ConcreteClusterPath & cluster)
-{
-    return CodegenDataModelProviderInstance()->FirstAcceptedCommand(cluster);
-}
-
-CommandEntry CustomDataModel::NextAcceptedCommand(const ConcreteCommandPath & before)
-{
-    return CodegenDataModelProviderInstance()->NextAcceptedCommand(before);
-}
-
-std::optional<CommandInfo> CustomDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
-{
-    return CodegenDataModelProviderInstance()->GetAcceptedCommandInfo(path);
-}
-
-ConcreteCommandPath CustomDataModel::FirstGeneratedCommand(const ConcreteClusterPath & cluster)
-{
-    return CodegenDataModelProviderInstance()->FirstGeneratedCommand(cluster);
-}
-
-ConcreteCommandPath CustomDataModel::NextGeneratedCommand(const ConcreteCommandPath & before)
-{
-    return CodegenDataModelProviderInstance()->NextGeneratedCommand(before);
 }
 
 } // namespace app

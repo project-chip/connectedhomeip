@@ -9,6 +9,8 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
     -   [Building](#building)
     -   [Flashing the Application](#flashing-the-application)
     -   [Viewing Logging Output](#viewing-logging-output)
+        -   [SeggerRTT](#segger-rtt)
+        -   [Serial Console](#console-log)
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
     -   [OTA Software Update](#ota-software-update)
@@ -81,6 +83,13 @@ Silicon Labs platform.
     -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
     -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
+*   Region code Setting (917 WiFi projects)
+
+    -   In Wifi configurations, the region code can be set in this
+        [file](https://github.com/project-chip/connectedhomeip/blob/85e9d5fd42071d52fa3940238739544fd2a3f717/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.cpp#L104).
+        The available region codes can be found
+        [here](https://github.com/SiliconLabs/wiseconnect/blob/f675628eefa1ac4990e94146abb75dd08b522571/components/device/silabs/si91x/wireless/inc/sl_si91x_types.h#L71)
+
 *   Build the example application:
 
           cd ~/connectedhomeip
@@ -147,6 +156,8 @@ Releases page on
 
 ## Viewing Logging Output
 
+### SEGGER RTT
+
 The example application is built to use the SEGGER Real Time Transfer (RTT)
 facility for log output. RTT is a feature built-in to the J-Link Interface MCU
 on the WSTK development board. It allows bi-directional communication with an
@@ -190,6 +201,30 @@ combination with JLinkRTTClient as follows:
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
           $ JLinkRTTClient
+
+### Console Log
+
+If the binary was built with this option or if you're using the Siwx917 WiFi
+SoC, the logs and the CLI (if enabled) will be available on the serial console.
+
+This console required a baudrate of **115200** with CTS/RTS. This is the default
+configuration of Silicon Labs dev kits.
+
+**HOWEVER** the console will required a baudrate of **921600** with CTS/RTS if
+the verbose mode is selected (--verbose)
+
+#### Configuring the VCOM
+
+-   Using (Simplicity
+    Studio)[https://community.silabs.com/s/article/wstk-virtual-com-port-baudrate-setting?language=en_US]
+-   Using commander-cli
+    ```
+    commander vcom config --baudrate 921600 --handshake rtscts
+    ```
+
+### Using the console
+
+With any serial terminal application such as screen, putty, minicom etc.
 
 ## Running the Complete Example
 

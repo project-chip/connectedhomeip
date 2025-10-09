@@ -117,7 +117,7 @@ public:
     /**
      * @brief   Called at start up to apply hardware settings
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(chip::EndpointId powerSourceEndpointId);
 
     /**
      * @brief   Called at shutdown
@@ -129,6 +129,15 @@ public:
      */
     static void ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_t arg);
 
+    /**
+     * @brief   Helper functions used by ComputeChargingSchedule
+     */
+    CHIP_ERROR DetermineRequiredEnergy(EnergyEvseDelegate * dg, int64_t & requiredEnergy_mWh,
+                                       DataModel::Nullable<Percent> & targetSoC,
+                                       DataModel::Nullable<int64_t> & targetAddedEnergy_mWh);
+
+    CHIP_ERROR ComputeStartTime(EnergyEvseDelegate * dg, DataModel::Nullable<uint32_t> & startTime_epoch_s,
+                                uint32_t targetTime_epoch_s, uint32_t now_epoch_s, int64_t requiredEnergy_mWh);
     /**
      * @brief   Simple example to demonstrate how an EVSE can compute the start time
      *          and duration of a charging schedule
@@ -143,7 +152,7 @@ public:
     /**
      * @brief   Allows a client application to initialise the PowerSource cluster
      */
-    CHIP_ERROR InitializePowerSourceCluster();
+    CHIP_ERROR InitializePowerSourceCluster(chip::EndpointId endpointId);
 
     /**
      * @brief   Allows a client application to send in power readings into the system

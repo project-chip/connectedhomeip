@@ -22,15 +22,32 @@
 # test-runner-runs:
 #   run1:
 #     app: examples/fabric-admin/scripts/fabric-sync-app.py
-#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --discriminator=1234
 #     app-ready-pattern: "Successfully opened pairing window on the device"
+#     app-stdin-pipe: dut-fsa-stdin
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --endpoint 0
+#       --endpoint 1
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${FABRIC_SYNC_APP}
+#     app-args: --discriminator=1234
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
 #       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -46,13 +63,14 @@ import random
 import tempfile
 import time
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
-                                         run_if_endpoint_matches)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
+                                           run_if_endpoint_matches)
 
 
 class TC_CCTRL_2_3(MatterBaseTest):

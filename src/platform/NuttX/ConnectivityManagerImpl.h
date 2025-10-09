@@ -193,7 +193,6 @@ private:
     bool _IsWiFiStationApplicationControlled();
     bool _IsWiFiStationProvisioned();
     void _ClearWiFiStationProvision();
-    bool _CanStartWiFiScan();
 
     WiFiAPMode _GetWiFiAPMode();
     CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
@@ -248,7 +247,7 @@ private:
 
     // ===== Private members reserved for use by this class only.
 
-    char mEthIfName[IFNAMSIZ];
+    char mEthIfName[Inet::InterfaceId::kMaxIfNameLength];
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
@@ -260,7 +259,7 @@ private:
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    char sWiFiIfName[IFNAMSIZ];
+    char sWiFiIfName[Inet::InterfaceId::kMaxIfNameLength];
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA

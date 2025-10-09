@@ -433,6 +433,7 @@ tests:
 
           ./chip-tool administratorcommissioning revoke-commissioning 2 0 --timedInteractionTimeoutMs 1000 --commissioner-name beta
 
+          Note: The specified value of the timedInteractionTimeoutMs argument is intended for the RPI platform. While validating with a real device, the test step may fail due to the lesser timeout. In such cases, please increase the value of the timedInteractionTimeoutMs argument(Max value 65535 milliseconds).
 
           Verify the Commissioning window is closed in TH_CE(all-clusters-app) Log
           [1661485834.635244][6993:6993] CHIP:DIS: mDNS service published: _matter._tcp

@@ -72,7 +72,7 @@ void DeviceScanner::OnNodeDiscovered(const DiscoveredNodeData & nodeData)
 
     for (size_t i = 0; i < resolutionData.numIPs; i++)
     {
-        auto params                = Controller::SetUpCodePairerParameters(resolutionData, i);
+        auto params                = Controller::SetUpCodePairerParameters(resolutionData, std::make_optional(discriminator), i);
         DeviceScannerResult result = { params, vendorId, productId, discriminator, chip::MakeOptional(resolutionData) };
         interfaceData.push_back(result);
     }

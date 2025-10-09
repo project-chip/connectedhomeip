@@ -19,5 +19,6 @@
 @interface MTRDeviceController_XPC (Internal)
 
 - (id)initWithMachServiceName:(NSString *)machServiceName options:(NSXPCConnectionOptions)options;
+- (void)_updateRegistrationInfo;
 
 @end

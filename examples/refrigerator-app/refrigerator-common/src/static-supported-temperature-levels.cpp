@@ -32,9 +32,9 @@ CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { Ch
 const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints
     [MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {
         EndpointPair(2, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions,
-                     ArraySize(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions)), // Options for Endpoint 2
+                     MATTER_ARRAY_SIZE(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions)), // Options for Endpoint 2
         EndpointPair(3, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions,
-                     ArraySize(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions)), // Options for Endpoint 3
+                     MATTER_ARRAY_SIZE(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions)), // Options for Endpoint 3
     };
 
 uint8_t AppSupportedTemperatureLevelsDelegate::Size()
@@ -60,7 +60,7 @@ CHIP_ERROR AppSupportedTemperatureLevelsDelegate::Next(MutableCharSpan & item)
                 CHIP_ERROR err = CopyCharSpanToMutableCharSpan(endpointPair.mTemperatureLevels[mIndex], item);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Error copying char span to mutable char span %s", ErrorStr(err));
+                    ChipLogError(Zcl, "Error copying char span to mutable char span: %" CHIP_ERROR_FORMAT, err.Format());
                     return err;
                 }
                 mIndex++;

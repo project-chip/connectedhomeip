@@ -1,4 +1,4 @@
-# NXP `MCXW71/K32W1` OTA guide
+# NXP `MCXW71` OTA guide
 
 ### Convert `srec` into `sb3` file
 
@@ -14,7 +14,7 @@ In `OTAP` application
 
 -   select OTA protocol => `OTAP` Matter
 -   Browse File
--   follow default options (KW45/K32W148, Preserve NVM)
+-   follow default options (Preserve NVM)
 -   image information: will update "Application Core (MCU)" - this will generate
     the image only for the CM33 core
 -   keep other settings at default values
@@ -73,7 +73,7 @@ The OTA image used must be updated to include the new factory data.
 The OTA topology used for OTA testing is illustrated in the figure below.
 Topology is similar with the one used for Matter Test Events.
 
-![OTA_TOPOLOGY](../../../examples/platform/nxp/mcxw71_k32w1/doc/images/ota_topology.JPG)
+![OTA_TOPOLOGY](../../../examples/platform/nxp/mcxw71/doc/images/ota_topology.JPG)
 
 The concept for OTA is the next one:
 
@@ -90,7 +90,7 @@ The concept for OTA is the next one:
 -   during commissioning, each device is assigned a node id by the chip-tool
     (can be specified manually by the user). Using the node id of the device and
     of the reference application, chip-tool triggers the OTA transfer by
-    invoking the `announce-ota-provider` command - basically, the OTA Requestor
+    invoking the `announce-otaprovider` command - basically, the OTA Requestor
     is informed of the node id of the OTA Provider Application.
 
 _Computer #1_ can be any system running an Ubuntu distribution. We recommand
@@ -142,7 +142,7 @@ user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing ble-th
 Start the OTA process:
 
 ```
-user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupdaterequestor announce-otaprovider 1 0 0 0 2 0
 ```
 
 ### Known issues

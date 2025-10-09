@@ -42,6 +42,7 @@ restyle-paths() {
     image=restyled/restyler:edge
 
     docker run \
+        --rm \
         --env LOG_LEVEL \
         --env LOG_DESTINATION \
         --env LOG_FORMAT \
@@ -76,6 +77,11 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+# Use AMD64 images on Apple Silicon since restyler doesn't provide ARM64 images
+if [[ -z "$DOCKER_DEFAULT_PLATFORM" && "$(uname -sm)" == "Darwin arm64" ]]; then
+    export DOCKER_DEFAULT_PLATFORM=linux/amd64
+fi
+
 if [[ -z "$ref" ]]; then
     ref="master"
     git remote | grep -qxF upstream && ref="upstream/master"
@@ -87,4 +93,4 @@ fi
 
 paths=$(git diff --ignore-submodules --name-only --merge-base "$ref")
 
-echo "$paths" | xargs -n "$MAX_ARGS" bash -c 'restyle-paths "$@"'
+echo "$paths" | xargs -n "$MAX_ARGS" "$BASH" -c 'restyle-paths "$@"' -

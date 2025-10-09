@@ -62,6 +62,7 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     // Save our initialization state that we can't recover later from a
     // created-but-shut-down system state.
     mListenPort                = params.listenPort;
+    mInterfaceId               = params.interfaceId;
     mFabricIndependentStorage  = params.fabricIndependentStorage;
     mOperationalKeystore       = params.operationalKeystore;
     mOpCertStore               = params.opCertStore;
@@ -91,6 +92,7 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.bleLayer = mSystemState->BleLayer();
 #endif
     params.listenPort                = mListenPort;
+    params.interfaceId               = mInterfaceId;
     params.fabricIndependentStorage  = mFabricIndependentStorage;
     params.enableServerInteractions  = mEnableServerInteractions;
     params.groupDataProvider         = mSystemState->GetGroupDataProvider();
@@ -132,10 +134,17 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ChipLogError(Controller, "Warning: Device Controller Factory should be with a CHIP Device Layer...");
 #endif // CONFIG_DEVICE_LAYER
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    auto tcpListenParams = Transport::TcpListenParameters(stateParams.tcpEndPointManager)
+                               .SetAddressType(IPAddressType::kIPv6)
+                               .SetListenPort(params.listenPort)
+                               .SetServerListenEnabled(false); // Initialize as a TCP Client
+#endif
+
     if (params.dataModelProvider == nullptr)
     {
         ChipLogError(AppServer, "Device Controller Factory requires a `dataModelProvider` value.");
-        ChipLogError(AppServer, "For backwards compatibility, you likely can use `CodegenDataModelProviderInstance()`");
+        ChipLogError(AppServer, "For backwards compatibility, you likely can use `CodegenDataModelProviderInstance(...)`");
     }
 
     VerifyOrReturnError(params.dataModelProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -162,13 +171,18 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.transportMgr = chip::Platform::New<DeviceTransportMgr>();
 
     //
-    // The logic below expects IPv6 to be at index 0 of this tuple. Please do not alter that.
+    // The logic below expects IPv6 to be at index 0 of this tuple. Keep that logic in sync with
+    // this code.
     //
     ReturnErrorOnFailure(stateParams.transportMgr->Init(Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv6)
                                                             .SetListenPort(params.listenPort)
 #if INET_CONFIG_ENABLE_IPV4
                                                             ,
+                                                        //
+                                                        // The logic below expects IPv4 to be at index 1 of this tuple,
+                                                        // if it's enabled. Keep that logic in sync with this code.
+                                                        //
                                                         Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv4)
                                                             .SetListenPort(params.listenPort)
@@ -179,13 +193,15 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #endif
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                                             ,
-                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
-                                                            .SetAddressType(IPAddressType::kIPv6)
-                                                            .SetListenPort(params.listenPort)
+                                                        tcpListenParams
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-                                                            ,
+                                                        ,
                                                         Transport::WiFiPAFListenParameters()
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+                                                            ,
+                                                        Transport::NfcListenParameters(nullptr)
 #endif
                                                             ));
 
@@ -252,15 +268,9 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     chip::app::InteractionModelEngine * interactionModelEngine = chip::app::InteractionModelEngine::GetInstance();
 
-    // Note placement of this BEFORE `InitDataModelHandler` since InitDataModelHandler may
-    // rely on ember (does emberAfInit() and configure which may load data from NVM).
-    //
-    // Expected forward path is that we will move move and more things inside datamodel
-    // provider (e.g. storage settings) so we want datamodelprovider available before
-    // `InitDataModelHandler`.
+    // Initialize the data model now that everything cluster implementations might
+    // depend on is initalized.
     interactionModelEngine->SetDataModelProvider(params.dataModelProvider);
-
-    InitDataModelHandler();
 
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
 
@@ -273,13 +283,20 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
             stateParams.exchangeMgr, stateParams.sessionMgr, stateParams.fabricTable, sessionResumptionStorage,
             stateParams.certificateValidityPolicy, stateParams.groupDataProvider));
 
-        //
-        // We need to advertise the port that we're listening to for unsolicited messages over UDP. However, we have both a IPv4
-        // and IPv6 endpoint to pick from. Given that the listen port passed in may be set to 0 (which then has the kernel select
-        // a valid port at bind time), that will result in two possible ports being provided back from the resultant endpoint
-        // initializations. Since IPv6 is POR for Matter, let's go ahead and pick that port.
-        //
-        app::DnssdServer::Instance().SetSecuredPort(stateParams.transportMgr->GetTransport().GetImplAtIndex<0>().GetBoundPort());
+        // Our IPv6 transport is at index 0.
+        app::DnssdServer::Instance().SetSecuredIPv6Port(
+            stateParams.transportMgr->GetTransport().GetImplAtIndex<0>().GetBoundPort());
+
+#if INET_CONFIG_ENABLE_IPV4
+        // If enabled, our IPv4 transport is at index 1.
+        app::DnssdServer::Instance().SetSecuredIPv4Port(
+            stateParams.transportMgr->GetTransport().GetImplAtIndex<1>().GetBoundPort());
+#endif // INET_CONFIG_ENABLE_IPV4
+
+        if (params.interfaceId)
+        {
+            app::DnssdServer::Instance().SetInterfaceId(*params.interfaceId);
+        }
 
         //
         // TODO: This is a hack to workaround the fact that we have a bi-polar stack that has controller and server modalities that
@@ -290,6 +307,11 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         // Consequently, reach in set the fabric table pointer to point to the right version.
         //
         app::DnssdServer::Instance().SetFabricTable(stateParams.fabricTable);
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        // Disable the TCP Server based on the TCPListenParameters setting.
+        app::DnssdServer::Instance().SetTCPServerEnabled(tcpListenParams.IsServerListenEnabled());
+#endif
     }
 
     stateParams.sessionSetupPool = Platform::New<DeviceControllerSystemStateParams::SessionSetupPool>();

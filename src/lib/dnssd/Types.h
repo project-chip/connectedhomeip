@@ -29,9 +29,18 @@
 #include <lib/support/Variant.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 
 namespace chip {
 namespace Dnssd {
+
+enum class JointFabricMode : uint8_t
+{
+    kAvailable     = 1 << 0, // This device is capable of acting as a Joint Fabric Administrator.
+    kAdministrator = 1 << 1, // This device is acting as a Joint Fabric Administrator.
+    kAnchor        = 1 << 2, // This device is acting as a Joint Fabric Anchor Administrator.
+    kDatastore     = 1 << 3  // This device is acting as a Joint Fabric Datastore.
+};
 
 enum class DiscoveryFilterType : uint8_t
 {
@@ -234,6 +243,9 @@ struct CommissionNodeData : public CommonResolutionData
     char instanceName[Commission::kInstanceNameMaxLength + 1] = {};
     char deviceName[kMaxDeviceNameLen + 1]                    = {};
     char pairingInstruction[kMaxPairingInstructionLen + 1]    = {};
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    BitFlags<JointFabricMode> jointFabricMode;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     CommissionNodeData() {}
 
@@ -292,6 +304,9 @@ struct CommissionNodeData : public CommonResolutionData
         ChipLogDetail(Discovery, "\tCommissioning Mode: %u", commissioningMode);
         ChipLogDetail(Discovery, "\tSupports Commissioner Generated Passcode: %s",
                       supportsCommissionerGeneratedPasscode ? "true" : "false");
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        ChipLogDetail(Discovery, "\tJoint Fabric Mode: 0x%02X", jointFabricMode.Raw());
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     }
 };
 

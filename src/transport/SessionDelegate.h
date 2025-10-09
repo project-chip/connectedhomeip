@@ -18,9 +18,15 @@
 
 #include <inttypes.h>
 
+#include <lib/core/CHIPError.h>
 #include <lib/support/DLLUtil.h>
 
 namespace chip {
+
+namespace Transport {
+class ActiveTCPConnectionHolder;
+struct ActiveTCPConnectionState;
+} // namespace Transport
 
 class DLL_EXPORT SessionDelegate
 {
@@ -66,7 +72,8 @@ public:
     virtual void OnSessionHang() {}
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    virtual void OnSessionConnectionClosed(CHIP_ERROR conErr) {}
+    virtual void OnSessionConnectionClosed(const Transport::ActiveTCPConnectionState & conn, CHIP_ERROR connErr) {}
+    virtual void OnConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR connErr) {}
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 

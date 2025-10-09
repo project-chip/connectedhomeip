@@ -1,12 +1,15 @@
+#include "DeviceTypes.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app/data-model/Nullable.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/core/DataModelTypes.h>
 
 using chip::app::DataModel::Nullable;
 
+using namespace chef;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -38,7 +41,46 @@ using namespace chip::app::Clusters;
 #include "refrigerator-and-temperature-controlled-cabinet-mode/tcc-mode.h"
 #endif // MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
 
-#ifdef MATTER_DM_PLUGIN_REFRIGERATOR_ALARM_SERVER
+#ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+#include "chef-pump.h"
+#endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+
+#if MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include <app/clusters/identify-server/identify-server.h>
+
+namespace {
+// TODO: Move this to a standalone cluster cpp file.
+
+constexpr size_t kIdentifyTableSize = MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT;
+static_assert(kIdentifyTableSize <= kEmberInvalidEndpointIndex, "Identify table size error");
+std::unique_ptr<struct Identify> gIdentifyInstanceTable[kIdentifyTableSize];
+
+void InitIdentifyCluster()
+{
+    const uint16_t endpointCount = emberAfEndpointCount();
+
+    for (uint16_t endpointIndex = 0; endpointIndex < endpointCount; endpointIndex++)
+    {
+        chip::EndpointId endpointId = emberAfEndpointFromIndex(endpointIndex);
+        if (endpointId == kInvalidEndpointId)
+        {
+            continue;
+        }
+
+        // Check if endpoint has Identify cluster enabled
+        uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, chip::app::Clusters::Identify::Id,
+                                                                MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT);
+        if (epIndex >= kIdentifyTableSize)
+            continue;
+
+        gIdentifyInstanceTable[epIndex] =
+            std::make_unique<struct Identify>(endpointId, nullptr, nullptr, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone);
+    }
+}
+} // namespace
+#endif // MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT
 namespace {
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
@@ -46,13 +88,25 @@ constexpr const uint8_t kNamespaceRefrigerator = 0x41;
 // Refrigerator Namespace: 0x41, tag 0x00 (Refrigerator)
 constexpr const uint8_t kTagRefrigerator = 0x00;
 // Refrigerator Namespace: 0x41, tag 0x01 (Freezer)
-constexpr const uint8_t kTagFreezer                                                = 0x01;
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type refrigeratorTagList[] = { { .namespaceID = kNamespaceRefrigerator,
-                                                                                         .tag         = kTagRefrigerator } };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[]      = { { .namespaceID = kNamespaceRefrigerator,
-                                                                                         .tag         = kTagFreezer } };
+constexpr const uint8_t kTagFreezer                                                 = 0x01;
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type gRefrigeratorTagList[] = { { .namespaceID = kNamespaceRefrigerator,
+                                                                                          .tag         = kTagRefrigerator } };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type gFreezerTagList[]      = { { .namespaceID = kNamespaceRefrigerator,
+                                                                                          .tag         = kTagFreezer } };
 } // namespace
-#endif // MATTER_DM_PLUGIN_REFRIGERATOR_ALARM_SERVER
+
+namespace PostionSemanticTag {
+
+constexpr const uint8_t kNamespace                                   = 0x08; // Common Position Namespace
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeft   = { .namespaceID = kNamespace, .tag = 0x00 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kRight  = { .namespaceID = kNamespace, .tag = 0x01 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTop    = { .namespaceID = kNamespace, .tag = 0x02 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kBottom = { .namespaceID = kNamespace, .tag = 0x03 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kMiddle = { .namespaceID = kNamespace, .tag = 0x04 };
+
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTopTagList[]  = { PostionSemanticTag::kTop };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeftTagList[] = { PostionSemanticTag::kLeft };
+} // namespace PostionSemanticTag
 
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
 #include "chef-rvc-operational-state-delegate.h"
@@ -80,6 +134,26 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[]   
 #ifdef MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
 #include "temperature-control/static-supported-temperature-levels.h"
 #endif // MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
+
+#ifdef MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
+#include "window-covering/chef-window-covering.h"
+#endif // MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
+
+#ifdef MATTER_DM_PLUGIN_OVEN_MODE_SERVER
+#include "oven-mode/chef-oven-mode.h"
+#endif // MATTER_DM_PLUGIN_OVEN_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
+#include "oven-cavity-operational-state/chef-oven-cavity-operational-state.h"
+#endif // MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
+#include "microwave-oven-mode/chef-microwave-oven-mode.h"
+#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
+#include "microwave-oven-control/chef-microwave-oven-control.h"
+#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
 
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
@@ -248,11 +322,36 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     {
         ChipLogProgress(Zcl, "OnOff attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u", ChipLogValueMEI(attributeId),
                         type, *value, size);
+#ifdef MATTER_DM_PLUGIN_FAN_CONTROL_SERVER // Handle OnOff for fan
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+        HandleOnOffAttributeChangeForFan(attributePath.mEndpointId, bool(*value));
+#endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
+
+#ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, chef::DeviceTypes::kPumpDeviceId))
+        {
+            chef::pump::postOnOff(attributePath.mEndpointId, bool(*value));
+        }
+#endif // #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
     }
     else if (clusterId == LevelControl::Id)
     {
         ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
+
+#ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
+        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, chef::DeviceTypes::kPumpDeviceId))
+        {
+            chef::pump::postMoveToLevel(attributePath.mEndpointId, *value);
+        }
+#endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
+#endif // #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 
         // WIP Apply attribute change to Light
     }
@@ -281,12 +380,17 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint) {}
 
 #ifdef MATTER_DM_PLUGIN_CHANNEL_SERVER
 #include "channel/ChannelManager.h"
-static ChannelManager channelManager;
+static ChannelManager channelManager[MATTER_DM_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 void emberAfChannelClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: Channel::SetDefaultDelegate");
-    Channel::SetDefaultDelegate(endpoint, &channelManager);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Channel::Id, MATTER_DM_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (ep < MATTER_DM_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        channelManager[ep].SetEndpoint(endpoint);
+        Channel::SetDefaultDelegate(endpoint, &channelManager[ep]);
+    }
 }
 #endif
 
@@ -334,27 +438,153 @@ void emberAfWakeOnLanClusterInitCallback(EndpointId endpoint)
 }
 #endif
 
+/**
+ * This initializer is for the application having refrigerator on EP1 and child
+ * temperatureControlledCabinet endpoints on EP2 and EP3.
+ */
+void RefrigeratorTemperatureControlledCabinetInit()
+{
+    EndpointId kRefEndpointId           = DeviceTypes::ExpectedEndpointId::kRefrigerator;
+    EndpointId kColdCabinetEndpointId   = DeviceTypes::ExpectedEndpointId::kColdCabinetPartOfRefrigerator;
+    EndpointId kFreezeCabinetEndpointId = DeviceTypes::ExpectedEndpointId::kFreezeCabinetPartOfRefrigerator;
+    if (!DeviceTypes::EndpointHasDeviceType(kRefEndpointId, DeviceTypes::kRefrigeratorDeviceId))
+    {
+        return;
+    }
+    ChipLogDetail(NotSpecified, "Refrigerator device type on EP: %d", kRefEndpointId);
+    SetTreeCompositionForEndpoint(kRefEndpointId);
+
+    if (DeviceTypes::EndpointHasDeviceType(kColdCabinetEndpointId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    {
+        ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kColdCabinetEndpointId);
+        SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
+        SetTagList(kColdCabinetEndpointId,
+                   Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gRefrigeratorTagList));
+    }
+
+    if (DeviceTypes::EndpointHasDeviceType(kFreezeCabinetEndpointId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    {
+        ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kFreezeCabinetEndpointId);
+        SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
+        SetTagList(kFreezeCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gFreezerTagList));
+    }
+}
+
+/**
+ * This initializer is for the application having cooktop. The cooktop can be a part of an oven
+ * or standalone cooktop.
+ *     Standalone Cooktop: Cooktop on EP1 and optional CookSurface on EP2.
+ *     Cooktop part of Oven: Oven on EP1, Cooktop on EP3 and optional CookSurface on EP4.
+ */
+void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
+{
+    SetTreeCompositionForEndpoint(kCooktopEpId);
+    switch (kCooktopEpId)
+    {
+    case DeviceTypes::ExpectedEndpointId::kCooktopStandAlone:
+        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, DeviceTypes::kCooktopDeviceId))
+        {
+            ChipLogDetail(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
+            EndpointId kCookSurfaceEpId = DeviceTypes::ExpectedEndpointId::kCookSurfacePartOfCooktop;
+            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, DeviceTypes::kCookSurfaceDeviceId))
+            {
+                ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
+                SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
+                SetTagList(kCookSurfaceEpId,
+                           Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(PostionSemanticTag::kLeftTagList));
+            }
+        }
+        break;
+    case DeviceTypes::ExpectedEndpointId::kCooktopPartOfOven:
+        EndpointId kOvenEpId = DeviceTypes::ExpectedEndpointId::kOven;
+        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, DeviceTypes::kCooktopDeviceId) &&
+            DeviceTypes::EndpointHasDeviceType(kOvenEpId, DeviceTypes::kOvenDeviceId))
+        {
+            ChipLogDetail(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
+            SetParentEndpointForEndpoint(kCooktopEpId, kOvenEpId);
+            EndpointId kCookSurfaceEpId = DeviceTypes::ExpectedEndpointId::kCookSurfacePartOfCooktopOven;
+            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, DeviceTypes::kCookSurfaceDeviceId))
+            {
+                ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
+                SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
+                SetTagList(kCookSurfaceEpId,
+                           Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(PostionSemanticTag::kLeftTagList));
+            }
+        }
+    }
+}
+
+/**
+ * This initializer is for the application having oven on EP1 and child endpoints -
+ * temperatureControlledCabinet on EP2, cooktop on EP3 and cooksurface on EP4.
+ */
+void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
+{
+    EndpointId kOvenEpId                         = DeviceTypes::ExpectedEndpointId::kOven;
+    EndpointId kTemperatureControlledCabinetEpId = DeviceTypes::ExpectedEndpointId::kTopCabinetPartOfOven;
+    EndpointId kCooktopEpId                      = DeviceTypes::ExpectedEndpointId::kCooktopPartOfOven;
+    if (!DeviceTypes::EndpointHasDeviceType(kOvenEpId, DeviceTypes::kOvenDeviceId))
+    {
+        return;
+    }
+
+    ChipLogDetail(NotSpecified, "Oven device type on EP: %d", kOvenEpId);
+    SetTreeCompositionForEndpoint(kOvenEpId);
+
+    if (DeviceTypes::EndpointHasDeviceType(kTemperatureControlledCabinetEpId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    {
+        ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kTemperatureControlledCabinetEpId);
+        SetParentEndpointForEndpoint(kTemperatureControlledCabinetEpId, kOvenEpId);
+        SetTagList(kTemperatureControlledCabinetEpId,
+                   Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(PostionSemanticTag::kTopTagList));
+#ifdef MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
+        Clusters::OvenCavityOperationalState::InitChefOvenCavityOperationalStateCluster();
+#endif // MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
+    }
+    CooktopCookSurfaceInit(kCooktopEpId);
+}
+
 void ApplicationInit()
 {
-    ChipLogProgress(NotSpecified, "Chef Application Init !!!")
+    ChipLogProgress(NotSpecified, "Chef Application Init !!!");
 
-#ifdef MATTER_DM_PLUGIN_REFRIGERATOR_ALARM_SERVER
-        // set Parent Endpoint and Composition Type for an Endpoint
-        EndpointId kRefEndpointId       = 1;
-    EndpointId kColdCabinetEndpointId   = 2;
-    EndpointId kFreezeCabinetEndpointId = 3;
-    SetTreeCompositionForEndpoint(kRefEndpointId);
-    SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
-    SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
-    // set TagList
-    SetTagList(kColdCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList));
-    SetTagList(kFreezeCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
-#endif // MATTER_DM_PLUGIN_REFRIGERATOR_ALARM_SERVER
+    RefrigeratorTemperatureControlledCabinetInit();
+    OvenTemperatureControlledCabinetCooktopCookSurfaceInit();
+
+#ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+    chef::pump::init();
+#endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+
+#ifdef MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
+    ChipLogProgress(NotSpecified, "Initializing WindowCovering cluster delegate.");
+    ChefWindowCovering::InitChefWindowCoveringCluster();
+#endif // MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
+
+#ifdef MATTER_DM_PLUGIN_OVEN_MODE_SERVER
+    ChipLogProgress(NotSpecified, "Initializing OvenMode cluster.");
+    ChefOvenMode::InitChefOvenModeCluster();
+#endif // MATTER_DM_PLUGIN_OVEN_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
+    ChipLogProgress(NotSpecified, "Initializing MicrowaveOvenMode cluster.");
+    ChefMicrowaveOvenMode::InitChefMicrowaveOvenModeCluster();
+#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
+    ChipLogProgress(NotSpecified, "Initializing MicrowaveOvenControl cluster.");
+    InitChefMicrowaveOvenControlCluster();
+#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
+
+#if MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    InitIdentifyCluster();
+#endif // MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT
 }
 
 void ApplicationShutdown()
 {
-    ChipLogProgress(NotSpecified, "Chef Application Down !!!")
+    ChipLogProgress(NotSpecified, "Chef Application Down !!!");
 }
 
 // No-op function, used to force linking this file,

@@ -35,6 +35,7 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
 #endif
 
+#include <freertos/timers.h>
 #include <platform/ESP32/ESP32Config.h>
 
 namespace chip {
@@ -70,8 +71,8 @@ private:
 
     CHIP_ERROR Init(void) override;
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-    CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;
-    CHIP_ERROR GetPrimaryEthernetMACAddress(MutableByteSpan buf);
+    CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan & buf) override;
+    CHIP_ERROR GetPrimaryEthernetMACAddress(MutableByteSpan & buf);
 #endif
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
     bool CanFactoryReset(void) override;

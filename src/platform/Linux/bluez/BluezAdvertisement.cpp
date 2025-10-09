@@ -29,7 +29,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/Linux/dbus/bluez/DbusBluez.h>
+#include <platform/Linux/dbus/bluez/DBusBluez.h>
 #include <platform/PlatformManager.h>
 
 #include "BluezEndpoint.h"
@@ -96,7 +96,7 @@ gboolean BluezAdvertisement::BluezLEAdvertisement1Release(BluezLEAdvertisement1 
     mIsAdvertising = false;
     bluez_leadvertisement1_complete_release(aAdv, aInvocation);
     BLEManagerImpl::NotifyBLEPeripheralAdvReleased();
-    return TRUE;
+    return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
 
 CHIP_ERROR BluezAdvertisement::InitImpl()

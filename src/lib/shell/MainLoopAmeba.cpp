@@ -135,7 +135,7 @@ namespace Shell {
 void Engine::RunMainLoop()
 {
     char line[CHIP_SHELL_MAX_LINE_SIZE];
-    while (true)
+    while (mRunning)
     {
         memset(line, 0, CHIP_SHELL_MAX_LINE_SIZE);
         if (ReadLine(line, CHIP_SHELL_MAX_LINE_SIZE) > 0u)

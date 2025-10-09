@@ -21,11 +21,15 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Decode.h>
+#include <app/data-model/FabricScoped.h>
 #include <app/data-model/List.h> // So we can encode lists
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Iterators.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
+#include <type_traits>
 namespace chip {
 namespace app {
 
@@ -104,25 +108,16 @@ public:
     typedef Loop (*CommandIdCallback)(CommandId id, void * context);
 
     /**
-     * Function that may be implemented to enumerate accepted (client-to-server)
+     * Function that may be implemented to retrieve accepted (client-to-server)
      * commands for the given cluster.
      *
      * If this function returns CHIP_ERROR_NOT_IMPLEMENTED, the list of accepted
      * commands will come from the endpoint metadata for the cluster.
      *
-     * If this function returns any other error, that will be treated as an
-     * error condition by the caller, and handling will depend on the caller.
-     *
-     * Otherwise the list of accepted commands will be the list of values passed
-     * to the provided callback.
-     *
-     * The implementation _must_ pass the provided context to the callback.
-     *
-     * If the callback returns Loop::Break, there must be no more calls to it.
-     * This is used by callbacks that just look for a particular value in the
-     * list.
+     * Otherwise the list of accepted commands will be added to the builder.
      */
-    virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+    virtual CHIP_ERROR RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -131,22 +126,12 @@ public:
      * Function that may be implemented to enumerate generated (response)
      * commands for the given cluster.
      *
-     * If this function returns CHIP_ERROR_NOT_IMPLEMENTED, the list of
-     * generated commands will come from the endpoint metadata for the cluster.
+     * If this function returns CHIP_ERROR_NOT_IMPLEMENTED, the list of generated
+     * commands will come from the endpoint metadata for the cluster.
      *
-     * If this function returns any other error, that will be treated as an
-     * error condition by the caller, and handling will depend on the caller.
-     *
-     * Otherwise the list of generated commands will be the list of values
-     * passed to the provided callback.
-     *
-     * The implementation _must_ pass the provided context to the callback.
-     *
-     * If the callback returns Loop::Break, there must be no more calls to it.
-     * This is used by callbacks that just look for a particular value in the
-     * list.
+     * Otherwise the list of generated commands will be added to the builder.
      */
-    virtual CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+    virtual CHIP_ERROR RetrieveGeneratedCommands(const ConcreteClusterPath & cluster, ReadOnlyBufferBuilder<CommandId> & builder)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -197,7 +182,8 @@ protected:
      * The provided function is expected to have the following signature:
      *  void Func(HandlerContext &handlerContext, const RequestT &requestPayload);
      */
-    template <typename RequestT, typename FuncT>
+    template <typename RequestT, typename FuncT,
+              typename std::enable_if_t<!DataModel::IsFabricScoped<RequestT>::value, bool> = true>
     void HandleCommand(HandlerContext & handlerContext, FuncT func)
     {
         if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mClusterId == RequestT::GetClusterId()) &&
@@ -214,6 +200,45 @@ protected:
             handlerContext.SetCommandHandled();
 
             if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
+            {
+                handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
+                                                         Protocols::InteractionModel::Status::InvalidCommand);
+                return;
+            }
+
+            func(handlerContext, requestPayload);
+        }
+    }
+
+    /*
+     * Helper function to automatically de-serialize the data payload into a cluster object
+     * of type RequestT if the Cluster ID and Command ID in the context match. Upon successful
+     * de-serialization, the provided function is invoked and passed in a reference to the cluster object.
+     *
+     * Any errors encountered in this function prior to calling func result in the automatic generation of a status response.
+     * If `func` is called, the responsibility for doing so shifts to the callee to handle any further errors that are encountered.
+     *
+     * The provided function is expected to have the following signature:
+     *  void Func(HandlerContext &handlerContext, const RequestT &requestPayload);
+     */
+    template <typename RequestT, typename FuncT, typename std::enable_if_t<DataModel::IsFabricScoped<RequestT>::value, bool> = true>
+    void HandleCommand(HandlerContext & handlerContext, FuncT func)
+    {
+        if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mClusterId == RequestT::GetClusterId()) &&
+            (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
+        {
+            RequestT requestPayload;
+
+            //
+            // If the command matches what the caller is looking for, let's mark this as being handled
+            // even if errors happen after this. This ensures that we don't execute any fall-back strategies
+            // to handle this command since at this point, the caller is taking responsibility for handling
+            // the command in its entirety, warts and all.
+            //
+            handlerContext.SetCommandHandled();
+
+            if (requestPayload.Decode(handlerContext.mPayload, handlerContext.mCommandHandler.GetAccessingFabricIndex()) !=
+                CHIP_NO_ERROR)
             {
                 handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
                                                          Protocols::InteractionModel::Status::InvalidCommand);

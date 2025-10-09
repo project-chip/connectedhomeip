@@ -33,8 +33,8 @@ chip_subscription_timeout_resumption = false
 sl_use_subscription_syncing = true
 
 # Openthread Configuration flags
-sl_ot_idle_interval_ms = 5000  # 5s Idle Intervals
-sl_ot_active_interval_ms = 500  # 500ms Active Intervals
+sl_transport_idle_interval_ms = 5000  # 5s Idle Intervals
+sl_transport_active_interval_ms = 500  # 500ms Active Intervals
 
 # ICD Matter Configuration flags
 sl_idle_mode_duration_s = 600  # 10min Idle Mode Duration

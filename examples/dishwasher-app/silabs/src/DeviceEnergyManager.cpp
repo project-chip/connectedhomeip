@@ -23,7 +23,6 @@
 #include "DeviceEnergyManagementDelegateImpl.h"
 #include "DeviceEnergyManager.h"
 #include "DishwasherManager.h"
-#include "EnergyTimeUtils.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -165,3 +164,12 @@ DeviceEnergyManagementDelegate * DeviceEnergyManager::GetDEMDelegate()
 {
     return gDEMDelegate.get();
 };
+
+/**
+ * @brief Returns the EndpointID of the DeviceEnergyManagement cluster.
+ *        The energy management cluster assumes this functions is global to be able to leverage it.
+ */
+EndpointId GetEnergyDeviceEndpointId()
+{
+    return DataModelHelper::GetEndpointIdFromCluster(DeviceEnergyManagement::Id);
+}

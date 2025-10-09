@@ -27,93 +27,13 @@
 #pragma once
 
 #include "CHIPCryptoPAL.h"
-#include <lib/core/DataModelTypes.h>
+#include "PSAKeyAllocator.h"
 #include <lib/support/SafePointerCast.h>
 
 #include <psa/crypto.h>
 
 namespace chip {
 namespace Crypto {
-
-/**
- * @def CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
- *
- * @brief
- *   Base of the PSA key identifier range used by Matter.
- *
- * Cryptographic keys stored in the PSA Internal Trusted Storage must have
- * a user-assigned identifer from the range PSA_KEY_ID_USER_MIN to
- * PSA_KEY_ID_USER_MAX. This option allows to override the base used to derive
- * key identifiers used by Matter to avoid overlapping with other firmware
- * components that also use PSA crypto API. The default value was selected
- * not to interfere with OpenThread's default base that is 0x20000.
- *
- * Note that volatile keys like ephemeral keys used for ECDH have identifiers
- * auto-assigned by the PSA backend.
- */
-#ifndef CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
-#define CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE 0x30000
-#endif // CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
-
-/**
- * @def CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END
- *
- * @brief
- *   End of the PSA key identifier range used by Matter.
- *
- * This setting establishes the maximum limit for the key range specific to Matter, in order to
- * prevent any overlap with other firmware components that also employ the PSA crypto API.
- */
-#ifndef CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END
-#define CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END 0x3FFFF
-#endif // CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END
-
-static_assert(PSA_KEY_ID_USER_MIN <= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE && CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END <= PSA_KEY_ID_USER_MAX,
-              "Matter specific PSA key range doesn't fit within PSA allowed range");
-
-// Each ICD client requires storing two keys- AES and HMAC
-static constexpr uint32_t kMaxICDClientKeys = 2 * CHIP_CONFIG_CRYPTO_PSA_ICD_MAX_CLIENTS;
-
-static_assert(kMaxICDClientKeys >= CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS,
-              "Number of allocated ICD key slots is lower than maximum number of supported ICD clients");
-
-/**
- * @brief Defines subranges of the PSA key identifier space used by Matter.
- */
-enum class KeyIdBase : psa_key_id_t
-{
-    Minimum          = CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE,
-    Operational      = Minimum, ///< Base of the PSA key ID range for Node Operational Certificate private keys
-    DACPrivKey       = Operational + kMaxValidFabricIndex + 1,
-    ICDKeyRangeStart = DACPrivKey + 1,
-    Maximum          = ICDKeyRangeStart + kMaxICDClientKeys,
-};
-
-static_assert(to_underlying(KeyIdBase::Minimum) >= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE &&
-                  to_underlying(KeyIdBase::Maximum) <= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END,
-              "PSA key ID base out of allowed range");
-
-/**
- * @brief Finds first free persistent Key slot ID within range.
- *
- * @param[out] keyId Key ID handler to which free ID will be set.
- * @param[in]  start Starting ID in search range.
- * @param[in]  range Search range.
- *
- * @retval CHIP_NO_ERROR               On success.
- * @retval CHIP_ERROR_INTERNAL         On PSA crypto API error.
- * @retval CHIP_ERROR_NOT_FOUND        On no free Key ID within range.
- * @retval CHIP_ERROR_INVALID_ARGUMENT On search arguments out of PSA allowed range.
- */
-CHIP_ERROR FindFreeKeySlotInRange(psa_key_id_t & keyId, psa_key_id_t start, uint32_t range);
-
-/**
- * @brief Calculates PSA key ID for Node Operational Certificate private key for the given fabric.
- */
-constexpr psa_key_id_t MakeOperationalKeyId(FabricIndex fabricIndex)
-{
-    return to_underlying(KeyIdBase::Operational) + static_cast<psa_key_id_t>(fabricIndex);
-}
 
 /**
  * @brief Concrete P256 keypair context used by PSA crypto backend.

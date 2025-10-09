@@ -19,10 +19,11 @@ import json
 from typing import List
 
 import click
-from matter_chip_tool_adapter.decoder import MatterLog
-from matter_yamltests.websocket_runner import WebSocketRunner, WebSocketRunnerConfig
+from chipyaml.adapters.chiptool.decoder import MatterLog
 from runner import runner_base
 from tests_logger import TestColoredLogPrinter, WebSocketRunnerLogger
+
+from matter.yamltests.websocket_runner import WebSocketRunner, WebSocketRunnerConfig
 
 
 @click.pass_context

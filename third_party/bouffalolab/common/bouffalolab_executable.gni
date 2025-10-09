@@ -21,12 +21,15 @@ import("${build_root}/toolchain/flashable_executable.gni")
 template("bouffalolab_executable") {
   output_base_name = get_path_info(invoker.output_name, "name")
 
-  objcopy_image_name = output_base_name + ".bin"
   objcopy_image_format = "binary"
 
   objcopy = "riscv64-unknown-elf-objcopy"
   if ("linux" == host_os) {
-    objcopy = "${bouffalolab_sdk_root}/toolchain/riscv/Linux/bin/riscv64-unknown-elf-objcopy"
+    if (invoker.bl_plat_name == "bl616") {
+      objcopy = "${bouffalolab_sdk_root}/toolchain/t-head-riscv/gcc_t-head_v2.6.1/bin/riscv64-unknown-elf-objcopy"
+    } else {
+      objcopy = "${bouffalolab_sdk_root}/toolchain/riscv/Linux/bin/riscv64-unknown-elf-objcopy"
+    }
   } else if ("mac" == host_os || "darwin" == host_os) {
     objcopy = "${bouffalolab_sdk_root}/toolchain/riscv/Darwin/bin/riscv64-unknown-elf-objcopy"
   }
@@ -46,17 +49,30 @@ template("bouffalolab_executable") {
   }
 
   flashing_config_target = target_name + ".config"
+  if (invoker.bl_plat_name == "bl616") {
+    objcopy_image_name = output_base_name + ".raw"
+    flashing_config_inputs = [
+      "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_4M.toml",
+      "${chip_root}/third_party/bouffalolab/bouffalo_sdk/bsp/board/bl616dk/config/bl_factory_params_IoTKitA_auto.dts",
+      "${chip_root}/third_party/bouffalolab/bouffalo_sdk/bsp/board/bl616dk/config/boot2_bl616_isp_release_v8.1.6.bin",
+    ]
 
-  objcopy_image_name = output_base_name + ".bin"
-  if (invoker.bl_plat_name == "bl602") {
-    flashing_config_inputs = [ "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_4M.toml" ]
+    copy(flashing_config_target) {
+      sources = flashing_config_inputs
+      outputs = [ "${root_out_dir}/config/{{source_file_part}}" ]
+    }
   } else {
-    flashing_config_inputs = [ "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_2M.toml" ]
-  }
+    objcopy_image_name = output_base_name + ".bin"
+    if (invoker.bl_plat_name == "bl602") {
+      flashing_config_inputs = [ "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_4M.toml" ]
+    } else {
+      flashing_config_inputs = [ "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_2M.toml" ]
+    }
 
-  copy(flashing_config_target) {
-    sources = flashing_config_inputs
-    outputs = [ "${root_out_dir}/{{source_file_part}}" ]
+    copy(flashing_config_target) {
+      sources = flashing_config_inputs
+      outputs = [ "${root_out_dir}/{{source_file_part}}" ]
+    }
   }
 
   flashing_script_generator =
@@ -66,27 +82,34 @@ template("bouffalolab_executable") {
   flashing_options += [ "--chipname" ]
   flashing_options += [ "${invoker.bl_plat_name}" ]
 
-  flashing_options += [ "--xtal" ]
-  if (invoker.bl_plat_name == "bl602") {
-    flashing_options += [ "40M" ]
-  } else if (invoker.bl_plat_name == "bl702") {
-    flashing_options += [ "32M" ]
-  } else if (invoker.bl_plat_name == "bl702l") {
-    flashing_options += [ "32M" ]
-  }
-
-  flashing_options += [ "--pt" ]
-  if (invoker.bl_plat_name == "bl602") {
-    flashing_options +=
-        [ rebase_path("partition_cfg_4M.toml", root_out_dir, root_out_dir) ]
-  } else if (defined(invoker.enable_openthread_border_router) &&
-             invoker.enable_openthread_border_router) {
-    flashing_options += [ rebase_path("partition_cfg_2M_noOTA.toml",
-                                      root_out_dir,
-                                      root_out_dir) ]
+  if (invoker.bl_plat_name == "bl616") {
+    flashing_options += [
+      "--config",
+      "${root_out_dir}/flash_prog_cfg.ini",
+    ]
   } else {
-    flashing_options +=
-        [ rebase_path("partition_cfg_2M.toml", root_out_dir, root_out_dir) ]
+    flashing_options += [ "--xtal" ]
+    if (invoker.bl_plat_name == "bl602") {
+      flashing_options += [ "40M" ]
+    } else if (invoker.bl_plat_name == "bl702") {
+      flashing_options += [ "32M" ]
+    } else if (invoker.bl_plat_name == "bl702l") {
+      flashing_options += [ "32M" ]
+    }
+
+    flashing_options += [ "--pt" ]
+    if (invoker.bl_plat_name == "bl602") {
+      flashing_options +=
+          [ rebase_path("partition_cfg_4M.toml", root_out_dir, root_out_dir) ]
+    } else if (defined(invoker.enable_openthread_border_router) &&
+               invoker.enable_openthread_border_router) {
+      flashing_options += [ rebase_path("partition_cfg_2M_noOTA.toml",
+                                        root_out_dir,
+                                        root_out_dir) ]
+    } else {
+      flashing_options +=
+          [ rebase_path("partition_cfg_2M.toml", root_out_dir, root_out_dir) ]
+    }
   }
 
   # set 2000000 baudrate for image download by default

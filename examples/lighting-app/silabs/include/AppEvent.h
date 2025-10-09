@@ -18,38 +18,36 @@
  */
 
 #pragma once
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+#include "RGBLEDWidget.h"
+#endif //(defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 
-struct AppEvent;
-typedef void (*EventHandler)(AppEvent *);
+#include "BaseAppEvent.h"
 
-struct AppEvent
+struct AppEvent : public BaseAppEvent
 {
     enum AppEventTypes
     {
-        kEventType_Button = 0,
-        kEventType_Timer,
-        kEventType_Light,
+        kEventType_Light = BaseAppEvent::kEventType_Max + 1,
         kEventType_Install,
     };
-
-    uint16_t Type;
 
     union
     {
         struct
         {
             uint8_t Action;
-        } ButtonEvent;
-        struct
-        {
-            void * Context;
-        } TimerEvent;
+            int32_t Actor;
+            uint8_t Value;
+        } LightEvent;
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
         struct
         {
             uint8_t Action;
             int32_t Actor;
-        } LightEvent;
+            RGBLEDWidget::ColorData_t Value;
+        } LightControlEvent;
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     };
-
-    EventHandler Handler;
 };

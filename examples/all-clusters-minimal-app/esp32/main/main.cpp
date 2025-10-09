@@ -35,7 +35,6 @@
 #include "shell_extension/launch.h"
 #include <common/CHIPDeviceManager.h>
 
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/util/endpoint-config-api.h>
 #include <binding-handler.h>
 #include <common/Esp32AppServer.h>
@@ -43,6 +42,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/ESP32Utils.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <static-supported-modes-manager.h>
 
 #if CONFIG_HAVE_DISPLAY
@@ -186,7 +186,6 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed : %" CHIP_ERROR_FORMAT, error.Format());
     }
 
-    ESPOpenThreadInit();
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }
 

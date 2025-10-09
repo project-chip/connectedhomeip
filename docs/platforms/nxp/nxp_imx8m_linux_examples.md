@@ -190,13 +190,11 @@ The generated executable files supports to work with below commandline argument:
     The Wi-Fi device on **i.MX 8M Mini EVK** is a module based on the NXP
     88W8987 Wi-Fi/Bluetooth SoC.
 
--   `--ble-device <interface id>`
+-   `--ble-controller <selector>`
 
-    Use the specific Bluetooth interface for BLE advertisement and connections.
-
-    `interface id`: the number after `hci` when listing BLE interfaces using the
-    `hciconfig` command, for example, `--ble-device 1` means using `hci1`
-    interface. Default: `0`.
+    Use the specific Bluetooth controller for BLE advertisement and connections.
+    For details on controller selection refer to
+    [Linux BLE Settings](/platforms/linux/ble_settings.md).
 
     The BLE device on **i.MX 8M Mini EVK** is a module based on the NXP 88W8987
     Wi-Fi/Bluetooth SoC.
@@ -264,23 +262,13 @@ Thermostat-app is used as an example below.
               hciattach /dev/ttymxc0 any 115200 flow              # Initialize the BT device
               ```
 
-    -   Find the Bluetooth device id for **i.MX 8M Mini EVK** by executing the
-        command below. The number following string `hci` is the Bluetooth device
-        id, `0` in this example.
-
-              ```
-              $ hciconfig
-              hci0:   Type: Primary  Bus: USB
-                      BD Address: 00:1A:7D:DA:71:13  ACL MTU: 310:10  SCO MTU: 64:8
-                      UP RUNNING
-                      RX bytes:73311 acl:1527 sco:0 events:3023 errors:0
-                      TX bytes:48805 acl:1459 sco:0 commands:704 errors:0
-              ```
+    -   Find the Bluetooth controller selector for **i.MX 8M Mini EVK**
+        according to [Linux BLE Settings](/platforms/linux/ble_settings.md).
 
     -   Run the Linux Example App
 
               ```
-              /home/root/thermostat-app --ble-device 0 --wifi  # The bluetooth device used is hci0 and support wifi network
+              /home/root/thermostat-app --ble-controller 1 --wifi  # The bluetooth controller used is hci1 and support wifi network
               ```
 
     -   Run [ChipDeviceController](../../../src/controller/python) on the

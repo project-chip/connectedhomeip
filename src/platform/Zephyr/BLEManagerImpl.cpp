@@ -44,10 +44,15 @@
 #include <zephyr/random/random.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
+#include <zephyr/version.h>
 
 #ifdef CONFIG_BT_BONDABLE
 #include <zephyr/settings/settings.h>
 #endif // CONFIG_BT_BONDABLE
+
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#include <ncs_version.h>
+#endif
 
 #include <array>
 
@@ -75,7 +80,18 @@ const bt_uuid_128 UUID128_CHIPoBLEChar_C3 =
 
 bt_uuid_16 UUID16_CHIPoBLEService = BT_UUID_INIT_16(0xFFF6);
 
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 2
+bt_gatt_ccc_managed_user_data CHIPoBLEChar_TX_CCC =
+    BT_GATT_CCC_MANAGED_USER_DATA_INIT(nullptr, BLEManagerImpl::HandleTXCCCWrite, nullptr);
+// nRF Connect SDK 3.1.0 supports Zephyr 4.1.99 version, so unfortunately it needs a separate check
+#elif CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#if NCS_VERSION_MAJOR >= 3 && NCS_VERSION_MINOR >= 1
+bt_gatt_ccc_managed_user_data CHIPoBLEChar_TX_CCC =
+    BT_GATT_CCC_MANAGED_USER_DATA_INIT(nullptr, BLEManagerImpl::HandleTXCCCWrite, nullptr);
+#endif
+#else
 _bt_gatt_ccc CHIPoBLEChar_TX_CCC = BT_GATT_CCC_INITIALIZER(nullptr, BLEManagerImpl::HandleTXCCCWrite, nullptr);
+#endif
 
 // clang-format off
 
@@ -122,13 +138,14 @@ int InitRandomStaticAddress(bool idPresent, int & id)
     // generating the address
     addr.type = BT_ADDR_LE_RANDOM;
     error     = sys_csrand_get(addr.a.val, sizeof(addr.a.val));
-    BT_ADDR_SET_STATIC(&addr.a);
 
     if (error)
     {
         ChipLogError(DeviceLayer, "Failed to create BLE address: %d", error);
         return error;
     }
+
+    BT_ADDR_SET_STATIC(&addr.a);
 
     if (!idPresent)
     {
@@ -284,6 +301,13 @@ struct BLEManagerImpl::ServiceData
 
 inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest()
 {
+#ifdef CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
+    if (mCustomAdvertising.empty())
+    {
+        ChipLogError(DeviceLayer, "mCustomAdvertising should be set when CONFIG_CHIP_CUSTOM_BLE_ADV_DATA is define");
+        return CHIP_ERROR_INTERNAL;
+    }
+#else
     static ServiceData serviceData;
     static std::array<bt_data, 2> advertisingData;
     static std::array<bt_data, 1> scanResponseData;
@@ -304,9 +328,10 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest()
     }
 #endif
 
-    advertisingData[0]  = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
-    advertisingData[1]  = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
-    scanResponseData[0] = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
+    advertisingData[0]                   = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
+    advertisingData[1]                   = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
+    scanResponseData[0]                  = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
+#endif // CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
 
     mAdvertisingRequest.priority = CHIP_DEVICE_BLE_ADVERTISING_PRIORITY;
     mAdvertisingRequest.options  = kAdvertisingOptions;
@@ -328,9 +353,13 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest()
         mAdvertisingRequest.minInterval = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
         mAdvertisingRequest.maxInterval = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
     }
+#ifdef CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
+    mAdvertisingRequest.advertisingData  = mCustomAdvertising;
+    mAdvertisingRequest.scanResponseData = mCustomScanResponse;
+#else
     mAdvertisingRequest.advertisingData  = Span<bt_data>(advertisingData);
     mAdvertisingRequest.scanResponseData = nameSize ? Span<bt_data>(scanResponseData) : Span<bt_data>{};
-
+#endif
     mAdvertisingRequest.onStarted = [](int rc) {
         if (rc == 0)
         {
@@ -964,6 +993,17 @@ ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gat
     // field is 2 bytes long. So, the cast to uint16_t should be fine.
     return bt_gatt_attr_read(conId, attr, buf, len, offset, sInstance.c3CharDataBufferHandle->Start(),
                              static_cast<uint16_t>(sInstance.c3CharDataBufferHandle->DataLength()));
+}
+#endif
+
+#ifdef CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
+void BLEManagerImpl::SetCustomAdvertising(Span<bt_data> CustomAdvertising)
+{
+    mCustomAdvertising = CustomAdvertising;
+}
+void BLEManagerImpl::SetCustomScanResponse(Span<bt_data> CustomScanResponse)
+{
+    mCustomScanResponse = CustomScanResponse;
 }
 #endif
 

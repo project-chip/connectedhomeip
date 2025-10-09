@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelTimeout.h>
@@ -162,9 +164,15 @@ public:
 
     /**
      *  Encode a possibly-chunked list attribute value.  Will create a new chunk when necessary.
+     *
+     * Note: As an exception, for attributes in the Access Control cluster, this method will attempt to encode as many list items
+     * as possible into a single AttributeDataIB with Change set to REPLACE.
+     * If the list is too large, the WriteRequest will be chunked and remaining items will be encoded as individual AttributeDataIBs
+     * with Change set to ADD, chunking them as needed.
+     *
      */
     template <class T>
-    CHIP_ERROR EncodeAttribute(const AttributePathParams & attributePath, const DataModel::List<T> & value,
+    CHIP_ERROR EncodeAttribute(const AttributePathParams & attributePath, const DataModel::List<T> & listValue,
                                const Optional<DataVersion> & aDataVersion = NullOptional)
     {
         // Here, we are using kInvalidEndpointId for missing endpoint id, which is used when sending group write requests.
@@ -172,15 +180,50 @@ public:
             ConcreteDataAttributePath(attributePath.HasWildcardEndpointId() ? kInvalidEndpointId : attributePath.mEndpointId,
                                       attributePath.mClusterId, attributePath.mAttributeId, aDataVersion);
 
+        ListIndex firstItemToAppendIndex = 0;
+        uint16_t encodedItemCount        = 0;
+        bool chunkingNeeded              = false;
+
+        // By convention, and as tested against all cluster servers, clients have historically encoded an empty list as a
+        // ReplaceAll, (i.e. the entire attribute contents are cleared before appending the new list’s items). However, this
+        // behavior can be problematic, especially for the ACL attribute; sending an empty ReplaceAll list can cause clients to be
+        // locked out. This is because the empty list first deletes all existing ACL entries, and if the new (malformed) ACL is
+        // rejected, the server is left without valid (or with incomplete) ACLs.
+        // SOLUTION: we treat ACL as an exception and avoid encoding an empty ReplaceAll list. Instead, we pack as many ACL entries
+        // as possible into the ReplaceAll list, and send  any remaining entries in subsequent chunks are part of the AppendItem
+        // list operation.
+        // TODO (#38270): Generalize this behavior; send a non-empty ReplaceAll list for all clusters in a later Matter version and
+        // enforce all clusters to support it in testing and in certification.
+        bool encodeEmptyListAsReplaceAll = !(path.mClusterId == Clusters::AccessControl::Id);
+
         ReturnErrorOnFailure(EnsureMessage());
 
-        // Encode an empty list for the chunking protocol.
-        ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
+        if (encodeEmptyListAsReplaceAll)
+        {
+            ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
+        }
+        else
+        {
+            // Encode as many list-items as possible into a single AttributeDataIB, which will be included in a single
+            // WriteRequestMessage chunk.
+            ReturnErrorOnFailure(TryEncodeListIntoSingleAttributeDataIB(path, listValue, chunkingNeeded, encodedItemCount));
+
+            // If all list items fit perfectly into a single AttributeDataIB, there is no need for any `append-item` or chunking,
+            // and we can exit early.
+            VerifyOrReturnError(chunkingNeeded, CHIP_NO_ERROR);
+
+            // Start a new WriteRequest chunk, as there are still remaining list items to encode. These remaining items will be
+            // appended one by one, each into its own AttributeDataIB. Unlike the first chunk (which contains only one
+            // AttributeDataIB), subsequent chunks may contain multiple AttributeDataIBs if space allows it.
+            ReturnErrorOnFailure(StartNewMessage());
+            firstItemToAppendIndex = encodedItemCount;
+        }
 
         path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
-        for (size_t i = 0; i < value.size(); i++)
+
+        for (ListIndex i = firstItemToAppendIndex; i < listValue.size(); i++)
         {
-            ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, value.data()[i]));
+            ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, listValue[i]));
         }
 
         return CHIP_NO_ERROR;
@@ -208,14 +251,24 @@ public:
         return EncodeAttribute(attributePath, value.Value(), aDataVersion);
     }
 
+    enum class TestListEncodingOverride
+    {
+        kNoOverride,
+        kForceLegacyEncoding
+    };
+
     /**
      * Encode an attribute value which is already encoded into a TLV. The TLVReader is expected to be initialized and the read head
      * is expected to point to the element to be encoded.
      *
      * Note: When encoding lists with this function, you may receive more than one write status for a single list. You can refer
      * to ChunkedWriteCallback.h for a high level API which will merge status codes for chunked write requests.
+     *
+     * Note: forceLegacyListEncoding is used by Test Harness and Python Tests to test backward compatibility and ensure end devices
+     * support legacy WriteClients
      */
-    CHIP_ERROR PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data);
+    CHIP_ERROR PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data,
+                                      TestListEncodingOverride encodingBehavior = TestListEncodingOverride::kNoOverride);
 
     /**
      *  Once SendWriteRequest returns successfully, the WriteClient will
@@ -228,10 +281,17 @@ public:
      */
     CHIP_ERROR SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout = System::Clock::kZero);
 
+    /**
+     *  Returns true if the WriteRequest is Chunked.
+     *  WARNING: This method is only used for UnitTests. It should only be called AFTER a call
+     * EncodeAttribute/PutPreencodedAttribute AND BEFORE a call to SendWriteRequest(); only during this window does
+     * "!mChunks.IsNull()" reliably indicate that the WriteRequest is chunked.
+     */
+    bool IsWriteRequestChunked() const { return !mChunks.IsNull(); };
+
 private:
     friend class TestWriteInteraction;
     friend class InteractionModelEngine;
-
     enum class State
     {
         Initialized = 0,     // The client has been initialized
@@ -250,6 +310,32 @@ private:
     CHIP_ERROR ProcessWriteResponseMessage(System::PacketBufferHandle && payload);
     CHIP_ERROR ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAttributeStatusIB);
     const char * GetStateStr() const;
+
+    // TODO (#38453) Clarify and fix the API contract of EnsureListStarted, TryToStartList and EnsureListEnded; in the case of
+    // encoding failure, should we just undo buffer reservation? rollback to a checkpoint that we create within EnsureListStarted?
+    // or just leave the WriteClient in a bad state.
+    /**
+     *     A wrapper for TryToStartList which will start a new chunk when TryToStartList fails with CHIP_ERROR_NO_MEMORY or
+     * CHIP_ERROR_BUFFER_TOO_SMALL.
+     *
+     * @note Must always be followed by a call to EnsureListEnded(), to undo buffer reservation that took place within
+     * it, and properly close TLV Containers.
+     */
+    CHIP_ERROR EnsureListStarted(const ConcreteDataAttributePath & attributePath);
+
+    /**
+     * Prepare the Encoding of an Attribute with List DataType into an AttributeDataIB.
+     *
+     */
+    CHIP_ERROR TryToStartList(const ConcreteDataAttributePath & attributePath);
+
+    /**
+     * Complete the Encoding of an Attribute with List DataType into an AttributeDataIB.
+     *
+     * @note Must always be called after EnsureListStarted(), even in cases of encoding failures; to undo buffer reservation that
+     * took place in EnsureListStarted.
+     */
+    CHIP_ERROR EnsureListEnded();
 
     /**
      *  Encode an attribute value that can be directly encoded using DataModel::Encode.
@@ -281,9 +367,56 @@ private:
         return CHIP_NO_ERROR;
     }
 
+    template <class T>
+    CHIP_ERROR TryEncodeListIntoSingleAttributeDataIB(const ConcreteDataAttributePath & attributePath,
+                                                      const DataModel::List<T> & list, bool & outChunkingNeeded,
+                                                      uint16_t & outEncodedItemCount)
+    {
+        ReturnErrorOnFailure(EnsureListStarted(attributePath));
+
+        AttributeDataIB::Builder & attributeDataIB = mWriteRequestBuilder.GetWriteRequests().GetAttributeDataIBBuilder();
+        TLV::TLVWriter backupWriter;
+        outEncodedItemCount = 0;
+
+        for (auto & item : list)
+        {
+            // Try to put all the list items into the list we just started, until we either run out of items
+            // or run out of space.
+            // Make sure that if we run out of space we don't leave a partially-encoded list item around.
+            attributeDataIB.Checkpoint(backupWriter);
+            CHIP_ERROR err = CHIP_NO_ERROR;
+
+            if constexpr (DataModel::IsFabricScoped<T>::value)
+            {
+                err = DataModel::EncodeForWrite(*attributeDataIB.GetWriter(), TLV::AnonymousTag(), item);
+            }
+            else
+            {
+                err = DataModel::Encode(*attributeDataIB.GetWriter(), TLV::AnonymousTag(), item);
+            }
+
+            if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
+            {
+                // Rollback through the attributeDataIB, which also resets the Builder's error state.
+                // This returns the object to the state it was in before attempting to encode the list item.
+                attributeDataIB.Rollback(backupWriter);
+                outChunkingNeeded = true;
+                break;
+            }
+            ReturnErrorOnFailure(err);
+            outEncodedItemCount++;
+        }
+
+        return EnsureListEnded();
+    }
+
     /**
      * A wrapper for TryEncodeSingleAttributeDataIB which will start a new chunk when failed with CHIP_ERROR_NO_MEMORY or
      * CHIP_ERROR_BUFFER_TOO_SMALL.
+     *
+     * NOTE: This method must not be used for encoding non-empty lists, even if the template accepts a list type.
+     * For such cases, use TryEncodeListIntoSingleAttributeDataIB as part of a suitable encoding strategy,
+     * since it has a different contract and has different usage expectations.
      */
     template <class T>
     CHIP_ERROR EncodeSingleAttributeDataIB(const ConcreteDataAttributePath & attributePath, const T & value)
@@ -310,7 +443,7 @@ private:
     }
 
     /**
-     * Encode a preencoded attribute data, returns TLV encode error if the ramaining space of current chunk is too small for the
+     * Encode a preencoded attribute data, returns TLV encode error if the remaining space of current chunk is too small for the
      * AttributeDataIB.
      */
     CHIP_ERROR TryPutSinglePreencodedAttributeWritePayload(const ConcreteDataAttributePath & attributePath,
@@ -322,6 +455,13 @@ private:
     CHIP_ERROR PutSinglePreencodedAttributeWritePayload(const ConcreteDataAttributePath & attributePath,
                                                         const TLV::TLVReader & data);
 
+    /**
+     * Encodes preencoded attribute data into a list, that will be decoded by cluster servers as a REPLACE Change.
+     * Returns outChunkingNeeded = true if it was not possible to fit all the data into a single list.
+     */
+    CHIP_ERROR TryPutPreencodedAttributeWritePayloadIntoList(const chip::app::ConcreteDataAttributePath & attributePath,
+                                                             TLV::TLVReader & valueReader, bool & outChunkingNeeded,
+                                                             uint16_t & outEncodedItemCount);
     CHIP_ERROR EnsureMessage();
 
     /**
@@ -423,6 +563,11 @@ private:
     static constexpr uint16_t kReservedSizeForTLVEncodingOverhead = kReservedSizeForIMRevision + kReservedSizeForMoreChunksFlag +
         kReservedSizeForEndOfContainer + kReservedSizeForEndOfContainer;
     bool mHasDataVersion = false;
+
+    static constexpr uint16_t kReservedSizeForEndOfListAttributeIB =
+        kReservedSizeForEndOfContainer + AttributeDataIB::Builder::GetSizeToEndAttributeDataIB();
+
+    static constexpr TLV::TLVType kAttributeDataIBType = TLV::kTLVType_Structure;
 };
 
 } // namespace app

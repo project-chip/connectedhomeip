@@ -27,6 +27,7 @@ typedef NS_OPTIONS(NSUInteger, MTRDiscoveryCapabilities) {
     MTRDiscoveryCapabilitiesSoftAP = 1 << 0, // Device supports WiFi softAP
     MTRDiscoveryCapabilitiesBLE = 1 << 1, // Device supports BLE
     MTRDiscoveryCapabilitiesOnNetwork = 1 << 2, // Device supports On Network setup
+    MTRDiscoveryCapabilitiesNFC MTR_PROVISIONALLY_AVAILABLE = 1 << 4, // Device supports NFC-based commissioning
 
     // Note: New values added here need to be included in MTRDiscoveryCapabilitiesAsString()
 
@@ -175,7 +176,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Generate a random Matter-valid setup PIN.
  */
-+ (NSUInteger)generateRandomPIN;
++ (NSUInteger)generateRandomPIN MTR_DEPRECATED("Please use generateRandomSetupPasscode", ios(16.1, 18.4), macos(13.0, 15.4), watchos(9.1, 11.4), tvos(16.1, 18.4));
 
 /**
  * Generate a random Matter-valid setup passcode.
@@ -213,6 +214,12 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * - discoveryCapabilities (not MTRDiscoveryCapabilitiesUnknown)
  */
 - (NSString * _Nullable)qrCodeString MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+
+/**
+ * Check whether the provided setup passcode (represented as an unsigned
+ * integer) is a valid setup passcode.
+ */
++ (BOOL)isValidSetupPasscode:(NSNumber *)setupPasscode MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 @end
 

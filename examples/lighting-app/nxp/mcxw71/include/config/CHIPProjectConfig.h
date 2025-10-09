@@ -37,11 +37,11 @@
 // Use hard-coded test certificates already embedded in generic chip code => set it to 0
 // Use real/development certificates => set it to 1 + file the provisioning section from
 //                                      the internal flash
-#ifndef CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
-#define CONFIG_CHIP_LOAD_REAL_FACTORY_DATA 0
+#ifndef CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
+#define CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA 0
 #endif
 
-#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+#if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
 
 // VID/PID for product => will be used by Basic Information Cluster
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x1037
@@ -120,7 +120,7 @@
  */
 #define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
 
-#endif // CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+#endif // CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
@@ -188,12 +188,12 @@
 #define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT (15 * 60 * 1000)
 
 /**
- * CONFIG_CHIP_NFC_COMMISSIONING, CHIP_DEVICE_CONFIG_ENABLE_NFC
+ * CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD, CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD
  *
- * NFC commissioning is not supported on K32W1
+ * NFC onboarding payload is not supported
  */
-#define CONFIG_CHIP_NFC_COMMISSIONING 0
-#define CHIP_DEVICE_CONFIG_ENABLE_NFC 0
+#define CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD 0
+#define CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD 0
 
 /**
  *  @def CHIP_CONFIG_MAX_FABRICS

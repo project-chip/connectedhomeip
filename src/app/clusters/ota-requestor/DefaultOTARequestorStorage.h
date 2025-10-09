@@ -49,6 +49,10 @@ public:
     CHIP_ERROR ClearTargetVersion() override;
 
 private:
+    /**
+     * Check whether a provider is already present in a list of providers.
+     */
+    bool ProviderAlreadyInList(ProviderLocationList & listProviders, ProviderLocationType provider);
     CHIP_ERROR Load(const char * key, MutableByteSpan & buffer);
     PersistentStorageDelegate * mPersistentStorage = nullptr;
 };

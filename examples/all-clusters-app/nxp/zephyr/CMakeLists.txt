@@ -51,6 +51,7 @@ target_include_directories(app
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/device_callbacks/include
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/include
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_task/include
+    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/include
 )
 
 target_sources(app
@@ -67,9 +68,15 @@ target_sources(app
     ${EXAMPLE_PLATFORM_NXP_ZEPHYR_DIR}/factory_data/source/AppFactoryDataExample.cpp
 )
 
-target_compile_definitions(app PUBLIC
-    "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/zephyr/FactoryDataProviderImpl.h\""
-)
+if(CONFIG_CHIP_CUSTOM_BLE_ADV_DATA)
+    target_sources(app PRIVATE
+                    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/BleZephyrManagerApp.cpp
+    )
+else()
+    target_sources(app PRIVATE
+                    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/BLEApplicationManagerEmpty.cpp
+    )
+endif()
 
 if(CONFIG_CHIP_OTA_REQUESTOR)
     target_sources(app PRIVATE
@@ -108,6 +115,7 @@ target_sources(app
     ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/chime-instance.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/icd/source/ICDUtil.cpp

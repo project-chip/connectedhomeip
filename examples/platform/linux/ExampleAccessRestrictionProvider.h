@@ -39,7 +39,7 @@ public:
 protected:
     CHIP_ERROR DoRequestFabricRestrictionReview(const FabricIndex fabricIndex, uint64_t token, const std::vector<Entry> & arl)
     {
-        // this example simply removes all restrictions and will generate AccessRestrictionEntryChanged events
+        // this example simply removes all restrictions when a review command is received
         Access::GetAccessControl().GetAccessRestrictionProvider()->SetEntries(fabricIndex, std::vector<Entry>{});
 
         chip::app::Clusters::AccessControl::Events::FabricRestrictionReviewUpdate::Type event{ .token       = token,

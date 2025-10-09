@@ -107,7 +107,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mpConnectCallback = nullptr;
     mpScanCallback    = nullptr;
 
-    if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, IFNAMSIZ) == CHIP_NO_ERROR)
+    if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Got Ethernet interface: %s", mEthIfName);
     }
@@ -128,7 +128,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    if (ConnectivityUtils::GetWiFiInterfaceName(sWiFiIfName, IFNAMSIZ) == CHIP_NO_ERROR)
+    if (ConnectivityUtils::GetWiFiInterfaceName(sWiFiIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Got WiFi interface: %s", sWiFiIfName);
     }
@@ -274,16 +274,6 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision()
                             err ? err->message : "unknown error");
         }
     }
-}
-
-bool ConnectivityManagerImpl::_CanStartWiFiScan()
-{
-    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-
-    bool ret = mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED &&
-        mWpaSupplicant.scanState == GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
-
-    return ret;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
@@ -535,7 +525,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
         CHIP_ERROR errInner = StopAutoScan();
         if (errInner != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "wpa_supplicant: Failed to stop auto scan: %s", ErrorStr(errInner));
+            ChipLogError(DeviceLayer, "wpa_supplicant: Failed to stop auto scan: %" CHIP_ERROR_FORMAT, errInner.Format());
         }
     });
 }
@@ -919,7 +909,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         SetWiFiAPMode(kWiFiAPMode_Disabled);
-        ChipLogError(DeviceLayer, "Drive AP state failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Drive AP state failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -1272,7 +1262,7 @@ void ConnectivityManagerImpl::PostNetworkConnect()
     // This should be removed or find a better place once we depercate the rendezvous session.
     for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
     {
-        char ifName[chip::Inet::InterfaceId::kMaxIfNameLength];
+        char ifName[Inet::InterfaceId::kMaxIfNameLength];
         if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)) &&
             strncmp(ifName, sWiFiIfName, sizeof(ifName)) == 0)
         {
@@ -1710,8 +1700,8 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         bssidLen = 0;
         ChipLogError(DeviceLayer, "Got a network with bssid not equals to 6");
     }
-    ChipLogDetail(DeviceLayer, "Network Found: %.*s (%s) Signal:%d", int(ssidLen), StringOrNullMarker((const gchar *) ssidStr),
-                  bssidStr, signal);
+    ChipLogDetail(DeviceLayer, "Network Found: %s (%s) Signal:%d",
+                  NullTerminated(StringOrNullMarker((const gchar *) ssidStr), ssidLen).c_str(), bssidStr, signal);
 
     // A flag for enterprise encryption option to avoid returning open for these networks by mistake
     // TODO: The following code will mistakenly recognize WEP encryption as OPEN network, this should be fixed by reading

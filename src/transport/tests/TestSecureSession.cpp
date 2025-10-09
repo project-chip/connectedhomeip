@@ -78,7 +78,7 @@ TEST(TestSecureSession, SecureChannelEncryptTest)
 
     packetHeader.SetSessionId(1);
     EXPECT_TRUE(packetHeader.IsEncrypted());
-    EXPECT_EQ(packetHeader.MICTagLength(), 16);
+    EXPECT_EQ(packetHeader.MICTagLength(), CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     CryptoContext::NonceStorage nonce;
     CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), 0);
@@ -119,7 +119,7 @@ TEST(TestSecureSession, SecureChannelDecryptTest)
 
     packetHeader.SetSessionId(1);
     EXPECT_TRUE(packetHeader.IsEncrypted());
-    EXPECT_EQ(packetHeader.MICTagLength(), 16);
+    EXPECT_EQ(packetHeader.MICTagLength(), CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     CryptoContext::NonceStorage nonce;
     CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), 0);

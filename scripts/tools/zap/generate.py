@@ -16,17 +16,19 @@
 #
 
 import argparse
+import glob
 import json
+import logging
 import os
 import shutil
 import subprocess
 import sys
 import tempfile
-import traceback
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Generator, Optional
 
+from clang_format import getClangFormatBinary
 from zap_execution import ZapTool
 
 # TODO: Can we share this constant definition with zap_regen_all.py?
@@ -248,71 +250,46 @@ def runGeneration(cmdLineArgs):
         extractGeneratedIdl(output_dir, matter_name)
 
 
-def getClangFormatBinaryChoices():
+def expandPlaceholderWildcards(path: str) -> Generator[str, None, None]:
     """
-    Returns an ordered list of paths that may be suitable clang-format versions
+    Generates expanded path lists from ZAP output paths.
+    ZAP allows to use iterators (see https://github.com/project-chip/zap/blob/master/docs/sdk-integration.md#individual-template)
+    and then paths may include placeholders such as '{name}'.
+
+    If such placehoders exist in `path` this method will do a filesystem glob
+    to select the actual outputs.
     """
-    PW_CLANG_FORMAT_PATH = 'cipd/packages/pigweed/bin/clang-format'
+    if '{' not in path:
+        yield path
+        return
 
-    if 'PW_ENVIRONMENT_ROOT' in os.environ:
-        yield os.path.join(os.environ["PW_ENVIRONMENT_ROOT"], PW_CLANG_FORMAT_PATH)
+    while '{' in path:
+        s = path.find('{')
+        e = path.find('}')
+        path = path[:s] + '*' + path[e+1:]
 
-    dot_name = os.path.join(CHIP_ROOT_DIR, '.environment', PW_CLANG_FORMAT_PATH)
-    if os.path.exists(dot_name):
-        yield dot_name
-
-    os_name = shutil.which('clang-format')
-    if os_name:
-        yield os_name
-
-
-def getClangFormatBinary():
-    """Fetches the clang-format binary that is to be used for formatting.
-
-    Tries to figure out where the pigweed-provided binary is (via cipd)
-    """
-    for binary in getClangFormatBinaryChoices():
-        # Running the binary with `--version` yields a string of the form:
-        # "Fuchsia clang-format version 17.0.0 (https://llvm.googlesource.com/llvm-project 6d667d4b261e81f325756fdfd5bb43b3b3d2451d)"
-        #
-        # the SHA at the end generally should match pigweed version
-
-        try:
-            version_string = subprocess.check_output([binary, '--version']).decode('utf8')
-
-            pigweed_config = json.load(
-                open(os.path.join(CHIP_ROOT_DIR, 'third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json')))
-            clang_config = [p for p in pigweed_config['packages'] if p['path'].startswith('fuchsia/third_party/clang/')][0]
-
-            # Tags should be like:
-            #   ['git_revision:895b55537870cdaf6e4c304a09f4bf01954ccbd6']
-            prefix, sha = clang_config['tags'][0].split(':')
-
-            if sha not in version_string:
-                print('WARNING: clang-format may not be the right version:')
-                print('   PIGWEED TAG:    %s' % clang_config['tags'][0])
-                print('   ACTUAL VERSION: %s' % version_string)
-        except Exception:
-            print("Failed to validate clang version.")
-            traceback.print_last()
-
-        return binary
-
-    raise Exception('Could not find a suitable clang-format')
+    # path is a glob target, expand it
+    for result in glob.glob(path):
+        yield result
 
 
 def runClangPrettifier(templates_file, output_dir):
     listOfSupportedFileExtensions = [
-        '.js', '.h', '.c', '.hpp', '.cpp', '.m', '.mm']
+        '.js', '.h', '.c', '.hpp', '.cpp', '.m', '.mm', '.ipp']
 
     try:
         jsonData = json.loads(Path(templates_file).read_text())
         outputs = [(os.path.join(output_dir, template['output']))
                    for template in jsonData['templates']]
-        clangOutputs = list(filter(lambda filepath: os.path.splitext(
+        rawPaths = list(filter(lambda filepath: os.path.splitext(
             filepath)[1] in listOfSupportedFileExtensions, outputs))
 
-        if len(clangOutputs) > 0:
+        clangOutputs = []
+        for path in rawPaths:
+            clangOutputs.extend(expandPlaceholderWildcards(path))
+        clangOutputs = list(set(clangOutputs))  # unique paths in case of glob overlap
+
+        if clangOutputs:
             # NOTE: clang-format differs output in time. We generally would be
             #       compatible only with pigweed provided clang-format (which is
             #       tracking non-released clang).
@@ -320,9 +297,10 @@ def runClangPrettifier(templates_file, output_dir):
             args = [clang_format, '-i']
             args.extend(clangOutputs)
             subprocess.check_call(args)
-            print('Formatted using %s (%s)' % (clang_format, subprocess.check_output([clang_format, '--version'])))
+            print('Formatted %d files using %s (%s)' %
+                  (len(clangOutputs), clang_format, subprocess.check_output([clang_format, '--version'])))
             for outputName in clangOutputs:
-                print('  - %s' % outputName)
+                logging.debug("Formatted: %s", outputName)
     except subprocess.CalledProcessError as err:
         print('clang-format error: %s', err)
 
@@ -370,8 +348,9 @@ def main():
         if cmdLineArgs.runBootstrap:
             subprocess.check_call(getFilePath("scripts/tools/zap/zap_bootstrap.sh"), shell=True)
 
-        # The maximum memory usage is over 4GB (#15620)
-        os.environ["NODE_OPTIONS"] = "--max-old-space-size=8192"
+        # on 64 bit systems, allow maximum memory usage to go over 4GB (#15620)
+        if sys.maxsize >= 2**32:
+            os.environ["NODE_OPTIONS"] = "--max-old-space-size=8192"
 
         # `zap-cli` may extract things into a temporary directory. ensure extraction
         # does not conflict.
@@ -385,6 +364,23 @@ def main():
                 os.environ['TEMP'] = old_temp
             else:
                 del os.environ['TEMP']
+
+        # Post-process fixes: zap needs some fixes from
+        # https://github.com/project-chip/zap/pull/1569
+        #
+        # While that is going on, we need to post-process outputs
+        renames = {
+            '../../clusters/Pm2.5ConcentrationMeasurement': '../../clusters/Pm25ConcentrationMeasurement',
+        }
+        for src, dest in renames.items():
+            srcDir = f'{cmdLineArgs.outputDir}/{src}'
+            if not os.path.exists(srcDir):
+                continue
+            print(f"Moving files from {srcDir} INTO {cmdLineArgs.outputDir}/{dest}")
+            # move all files
+            for name in glob.glob(f'{srcDir}/*'):
+                os.rename(name, f'{cmdLineArgs.outputDir}/{dest}/{os.path.basename(name)}')
+            os.rmdir(srcDir)
 
     if cmdLineArgs.prettify_output:
         prettifiers = [

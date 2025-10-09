@@ -153,7 +153,7 @@ class CHIPToolActivity :
 
     lateinit var setupPayload: OnboardingPayload
     try {
-      setupPayload = OnboardingPayloadParser().parseQrCode(uri.toString().toUpperCase())
+      setupPayload = OnboardingPayloadParser().parseQrCode(uri.toString().uppercase())
     } catch (ex: UnrecognizedQrCodeException) {
       Log.e(TAG, "Unrecognized QR Code", ex)
       Toast.makeText(this, "Unrecognized QR Code", Toast.LENGTH_SHORT).show()

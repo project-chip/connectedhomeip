@@ -19,7 +19,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3))
 @interface MTRAttributeValueWaiter : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -31,7 +31,7 @@ MTR_NEWLY_AVAILABLE
  */
 - (void)cancel;
 
-@property (readonly, nonatomic) NSUUID * UUID;
+@property (readonly, nonatomic) NSUUID * UUID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 @end
 

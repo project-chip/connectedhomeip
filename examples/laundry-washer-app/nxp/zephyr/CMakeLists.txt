@@ -53,6 +53,7 @@ target_include_directories(app
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/device_callbacks/include
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/include
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_task/include
+    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/include
 )
 
 target_sources(app
@@ -69,9 +70,15 @@ target_sources(app
     ${EXAMPLE_PLATFORM_NXP_ZEPHYR_DIR}/factory_data/source/AppFactoryDataExample.cpp
 )
 
-target_compile_definitions(app PUBLIC
-    "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/zephyr/FactoryDataProviderImpl.h\""
-)
+if(CONFIG_CHIP_CUSTOM_BLE_ADV_DATA)
+    target_sources(app PRIVATE
+                    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/BleZephyrManagerApp.cpp
+    )
+else()
+    target_sources(app PRIVATE
+                    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/BLEApplicationManagerEmpty.cpp
+    )
+endif()
 
 if(CONFIG_CHIP_OTA_REQUESTOR)
     target_sources(app PRIVATE
@@ -106,10 +113,9 @@ target_sources(app
     PRIVATE
     ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
-    ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
-    ${ALL_CLUSTERS_COMMON_DIR}/src/laundry-washer-mode.cpp
+    ${LAUNDRY_WASHER_NXP_COMMON_DIR}/main/laundry-washer-mode.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/laundry-washer-controls-delegate-impl.cpp
-    ${LAUNDRY_WASHER_NXP_COMMON_DIR}/main/operational-state-delegate-impl.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/operational-state-delegate-impl.cpp
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/icd/source/ICDUtil.cpp
 )

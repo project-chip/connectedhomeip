@@ -18,7 +18,7 @@
 #pragma once
 
 #include <crypto/OperationalKeystore.h>
-#include <src/lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip::NXP::App::OperationalKeystore {
 

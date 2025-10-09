@@ -29,6 +29,7 @@ openthread_external_mbedtls = mbedtls_target
 # default to platform crypto implementation but allow commandline override
 if (chip_crypto == "") {
   chip_crypto = "platform"
+  chip_crypto_keystore = "psa"
 }
 
 chip_device_platform = "efr32"
@@ -38,7 +39,7 @@ lwip_platform = "silabs"
 chip_mdns = "platform"
 chip_inet_config_enable_ipv4 = false
 chip_inet_config_enable_tcp_endpoint = false
-chip_system_config_use_open_thread_inet_endpoints = true
+chip_system_config_use_openthread_inet_endpoints = true
 chip_with_lwip = false
 
 chip_build_tests = false

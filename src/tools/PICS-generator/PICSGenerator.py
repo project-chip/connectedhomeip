@@ -20,15 +20,17 @@ import os
 import pathlib
 import sys
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
-import chip.clusters as Clusters
 from pics_generator_support import map_cluster_name_to_pics_xml, pics_xml_file_list_loader
 from rich.console import Console
 
-# Add the path to python_testing folder, in order to be able to import from chip.testing.matter_testing
+import matter.clusters as Clusters
+
+# Add the path to python_testing folder, in order to be able to import from matter.testing.matter_testing
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main  # noqa: E402
-from chip.testing.spec_parsing import build_xml_clusters  # noqa: E402
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main  # noqa: E402
+from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters  # noqa: E402
 
 console = None
 xml_clusters = None
@@ -360,6 +362,7 @@ def cleanDirectory(pathToClean):
 parser = argparse.ArgumentParser()
 parser.add_argument('--pics-template', required=True)
 parser.add_argument('--pics-output', required=True)
+parser.add_argument('--dm-xml')
 args, unknown = parser.parse_known_args()
 
 xmlTemplatePathStr = args.pics_template
@@ -414,7 +417,24 @@ class DeviceMappingTest(MatterBaseTest):
         console = Console()
 
         global xml_clusters
-        xml_clusters, problems = build_xml_clusters()
+        if args.dm_xml:
+            xml_clusters, problems = build_xml_clusters(Path(f"{args.dm_xml}/clusters"))
+        else:
+            specVersionResponse = await self.default_controller.ReadAttribute(self.dut_node_id, [(rootNodeEndpointID, Clusters.BasicInformation.Attributes.SpecificationVersion)])
+            specVersion = specVersionResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
+            console.print(f"Specification version received from device: {specVersion:x}")
+
+            if specVersion == 0x1030000:
+                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
+            elif specVersion == 0x1040000:
+                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
+            elif specVersion == 0x1040100:
+                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
+            elif specVersion == 0x1040200:
+                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
+            else:
+                console.print("FAILURE: Specification version reported by device not supported")
+                return
 
         # Run device mapping function
         await DeviceMapping(self.default_controller, self.dut_node_id, outputPathStr)

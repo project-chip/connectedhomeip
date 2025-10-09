@@ -153,7 +153,13 @@ extern uint32_t SystemCoreClock;
 #define configUSE_TICKLESS_IDLE 0
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
 
+// Set the FreeRTOS tick rate depending on the MCU interface.
+#ifdef SLI_SI91X_MCU_INTERFACE
+// For Si91x SoCs, a 1000Hz tick rate provides an exact 1ms systick period
+#define configTICK_RATE_HZ (1000)
+#else // EFR32 platforms
 #define configTICK_RATE_HZ (1024)
+#endif // SLI_SI91X_MCU_INTERFACE
 
 /* Definition used by Keil to replace default system clock source. */
 #define configOVERRIDE_DEFAULT_TICK_CONFIGURATION 1
@@ -174,11 +180,8 @@ extern uint32_t SystemCoreClock;
 
 /* Software timer related definitions. */
 #define configUSE_TIMERS (1)
-#ifdef SLI_SI917
+// Keep the timerTask at the highest prio as some of our stacks tasks leverage eventing with timers.
 #define configTIMER_TASK_PRIORITY (55) /* Highest priority */
-#else
-#define configTIMER_TASK_PRIORITY (40) /* Highest priority */
-#endif                                 // SLI_SI917
 #define configTIMER_QUEUE_LENGTH (10)
 #define configTIMER_TASK_STACK_DEPTH (1024)
 
@@ -203,7 +206,10 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configENABLE_FPU 1
 #define configENABLE_MPU 0
 /* FreeRTOS Secure Side Only and TrustZone Security Extension */
+#ifndef configRUN_FREERTOS_SECURE_ONLY
+// prevent redefinition with Series 3
 #define configRUN_FREERTOS_SECURE_ONLY 1
+#endif
 #define configENABLE_TRUSTZONE 0
 /* FreeRTOS MPU specific definitions. */
 #define configINCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS (0)
@@ -231,7 +237,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configUSE_TRACE_FACILITY 1
 #define configQUEUE_REGISTRY_SIZE (10)
 #define configUSE_QUEUE_SETS (0)
-#define configUSE_NEWLIB_REENTRANT (1)
+#define configUSE_NEWLIB_REENTRANT (0)
 #define configENABLE_BACKWARD_COMPATIBILITY (1)
 #define configSUPPORT_STATIC_ALLOCATION (1)
 #define configSUPPORT_DYNAMIC_ALLOCATION (1)
@@ -268,7 +274,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define INCLUDE_vTaskDelete (1)
 #define INCLUDE_vTaskSuspend (1)
 #define INCLUDE_xResumeFromISR (1)
-#define INCLUDE_vTaskDelayUntil (1)
+#define INCLUDE_xTaskDelayUntil (1)
 #define INCLUDE_vTaskDelay (1)
 #define INCLUDE_xTaskGetSchedulerState (1)
 #define INCLUDE_xTaskGetCurrentTaskHandle (1)
@@ -282,6 +288,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define INCLUDE_xSemaphoreGetMutexHolder (1)
 #define INCLUDE_xTimerPendFunctionCall (1)
 #define INCLUDE_xTaskGetHandle (1)
+#define INCLUDE_xTaskAbortDelay (1)
 
 /* Stop if an assertion fails. */
 #define configASSERT(x)                                                                                                            \
@@ -310,7 +317,7 @@ standard names. */
 /* Thread local storage pointers used by the SDK */
 
 #ifndef configNUM_USER_THREAD_LOCAL_STORAGE_POINTERS
-#define configNUM_USER_THREAD_LOCAL_STORAGE_POINTERS 2
+#define configNUM_USER_THREAD_LOCAL_STORAGE_POINTERS 0
 #endif
 
 #ifndef configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS

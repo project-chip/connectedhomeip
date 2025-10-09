@@ -38,7 +38,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan buf)
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan & buf)
 {
     if (buf.size() != ConfigurationManager::kPrimaryMACAddressLength)
         return CHIP_ERROR_INVALID_ARGUMENT;

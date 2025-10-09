@@ -27,11 +27,6 @@
 
 #include "../provider/OTAProviderDelegate.h"
 
-inline constexpr char kIdentityAlpha[] = "alpha";
-inline constexpr char kIdentityBeta[] = "beta";
-inline constexpr char kIdentityGamma[] = "gamma";
-inline constexpr char kControllerIdPrefix[] = "8DCADB14-AF1F-45D0-B084-00000000000";
-
 class CHIPCommandBridge : public Command {
 public:
     CHIPCommandBridge(const char * commandName, const char * helpText = nullptr)
@@ -52,6 +47,7 @@ public:
         AddArgument("commissioner-vendor-id", 0, UINT16_MAX, &mCommissionerVendorId,
             "The vendor id to use for darwin-framework-tool. If not provided, chip::VendorId::TestVendor1 (65521, 0xFFF1) will be "
             "used.");
+        AddArgument("use-xpc", &mUseXPC, "Use a controller that will connect to an XPC endpoint instead of talking to devices directly. If a string argument is provided, it must identify a Mach service name that can be used to connect to a remote endpoint. If no argument is provided, a local endpoint will be used.");
     }
 
     /////////// Command Interface /////////
@@ -69,8 +65,6 @@ public:
     }
 
     static OTAProviderDelegate * mOTADelegate;
-
-    static NSNumber * GetCommissionerFabricId(const char * identity);
 
 protected:
     // Will be called in a setting in which it's safe to touch the CHIP
@@ -168,4 +162,5 @@ private:
     chip::Optional<char *> mPaaTrustStorePath;
     chip::Optional<chip::VendorId> mCommissionerVendorId;
     std::string mCurrentIdentity;
+    chip::Optional<chip::app::DataModel::Nullable<char *>> mUseXPC;
 };

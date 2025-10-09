@@ -23,42 +23,14 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
+#include "CHIPProjectConfig.h"
 
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 
-struct WeekDaysScheduleInfo
-{
-    DlScheduleStatus status;
-    EmberAfPluginDoorLockWeekDaySchedule schedule;
-};
+#include <lib/support/DefaultStorageKeyAllocator.h>
 
-struct YearDayScheduleInfo
-{
-    DlScheduleStatus status;
-    EmberAfPluginDoorLockYearDaySchedule schedule;
-};
-
-struct HolidayScheduleInfo
-{
-    DlScheduleStatus status;
-    EmberAfPluginDoorLockHolidaySchedule schedule;
-};
-
-namespace EFR32DoorLock {
-namespace ResourceRanges {
-// Used to size arrays
-static constexpr uint16_t kMaxUsers                  = 10;
-static constexpr uint8_t kMaxCredentialsPerUser      = 10;
-static constexpr uint8_t kMaxWeekdaySchedulesPerUser = 10;
-static constexpr uint8_t kMaxYeardaySchedulesPerUser = 10;
-static constexpr uint8_t kMaxHolidaySchedules        = 10;
-static constexpr uint8_t kMaxCredentialSize          = 20;
-static constexpr uint8_t kNumCredentialTypes         = 6;
-
-static constexpr uint8_t kMaxCredentials = kMaxUsers * kMaxCredentialsPerUser;
-
-} // namespace ResourceRanges
+namespace SilabsDoorLock {
 
 namespace LockInitParams {
 
@@ -107,10 +79,57 @@ private:
 };
 
 } // namespace LockInitParams
-} // namespace EFR32DoorLock
+
+namespace Storage {
+
+using namespace SilabsDoorLockConfig::ResourceRanges;
+struct WeekDayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockWeekDaySchedule schedule;
+};
+
+struct YearDayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockYearDaySchedule schedule;
+};
+
+struct HolidayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockHolidaySchedule schedule;
+};
+
+struct LockUserInfo
+{
+    char userName[DOOR_LOCK_MAX_USER_NAME_SIZE];
+    size_t userNameSize;
+    uint32_t userUniqueId;
+    UserStatusEnum userStatus;
+    UserTypeEnum userType;
+    CredentialRuleEnum credentialRule;
+    chip::EndpointId endpointId;
+    chip::FabricIndex createdBy;
+    chip::FabricIndex lastModifiedBy;
+    uint16_t currentCredentialCount;
+};
+
+struct LockCredentialInfo
+{
+    DlCredentialStatus status;
+    CredentialTypeEnum credentialType;
+    chip::FabricIndex createdBy;
+    chip::FabricIndex lastModifiedBy;
+    uint8_t credentialData[kMaxCredentialSize];
+    size_t credentialDataSize;
+};
+} // namespace Storage
+} // namespace SilabsDoorLock
 
 using namespace ::chip;
-using namespace EFR32DoorLock::ResourceRanges;
+using namespace SilabsDoorLockConfig::ResourceRanges;
+using namespace SilabsDoorLock::Storage;
 
 class LockManager
 {
@@ -135,7 +154,7 @@ public:
     } State;
 
     CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
-                    EFR32DoorLock::LockInitParams::LockParam lockParam);
+                    SilabsDoorLock::LockInitParams::LockParam lockParam, PersistentStorageDelegate * storage);
     bool NextState();
     bool IsActionInProgress();
     bool InitiateAction(int32_t aActor, Action_t aAction);
@@ -192,8 +211,6 @@ public:
                       OperationErrorEnum & err);
     const char * lockStateToString(DlLockState lockState) const;
 
-    bool ReadConfigValues();
-
     void UnlockAfterUnlatch();
 
 private:
@@ -244,17 +261,42 @@ private:
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 
     osTimerId_t mLockTimer;
-    EmberAfPluginDoorLockUserInfo mLockUsers[kMaxUsers];
-    EmberAfPluginDoorLockCredentialInfo mLockCredentials[kNumCredentialTypes][kMaxCredentials];
-    WeekDaysScheduleInfo mWeekdaySchedule[kMaxUsers][kMaxWeekdaySchedulesPerUser];
-    YearDayScheduleInfo mYeardaySchedule[kMaxUsers][kMaxYeardaySchedulesPerUser];
-    HolidayScheduleInfo mHolidaySchedule[kMaxHolidaySchedules];
 
-    char mUserNames[ArraySize(mLockUsers)][DOOR_LOCK_MAX_USER_NAME_SIZE];
-    uint8_t mCredentialData[kNumCredentialTypes][kMaxCredentials][kMaxCredentialSize];
-    CredentialStruct mCredentials[kMaxUsers][kMaxCredentials];
+    SilabsDoorLock::LockInitParams::LockParam LockParams;
 
-    EFR32DoorLock::LockInitParams::LockParam LockParams;
+    // Stores LockUserInfo corresponding to a user index
+    static StorageKeyName LockUserEndpoint(chip::EndpointId endpoint, uint16_t userIndex)
+    {
+        return StorageKeyName::Formatted("g/e/%x/lu/%x", endpoint, userIndex);
+    }
+    // Stores LockCredentialInfo corresponding to a credential index and type
+    static StorageKeyName LockCredentialEndpoint(chip::EndpointId endpoint, CredentialTypeEnum credentialType,
+                                                 uint16_t credentialIndex)
+    {
+        return StorageKeyName::Formatted("g/e/%x/ct/%x/lc/%x", endpoint, to_underlying(credentialType), credentialIndex);
+    }
+    // Stores all the credential indices that belong to a user
+    static StorageKeyName LockUserCredentialMap(uint16_t userIndex) { return StorageKeyName::Formatted("g/lu/%x/lc", userIndex); }
+    // Stores WeekDayScheduleInfo corresponding to a user and schedule index
+    static StorageKeyName LockUserWeekDayScheduleEndpoint(chip::EndpointId endpoint, uint16_t userIndex, uint16_t scheduleIndex)
+    {
+        return StorageKeyName::Formatted("g/e/%x/lu/%x/lw/%x", endpoint, userIndex, scheduleIndex);
+    }
+    // Stores YearDayScheduleInfo corresponding to a user and schedule index
+    static StorageKeyName LockUserYearDayScheduleEndpoint(chip::EndpointId endpoint, uint16_t userIndex, uint16_t scheduleIndex)
+    {
+        return StorageKeyName::Formatted("g/e/%x/lu/%x/ly/%x", endpoint, userIndex, scheduleIndex);
+    }
+    // Stores HolidayScheduleInfo corresponding to a schedule index
+    static StorageKeyName LockHolidayScheduleEndpoint(chip::EndpointId endpoint, uint16_t scheduleIndex)
+    {
+        return StorageKeyName::Formatted("g/e/%x/lh/%x", endpoint, scheduleIndex);
+    }
+
+    bool MigrateConfig(const SilabsDoorLock::LockInitParams::LockParam & params);
+
+    // Pointer to the PeristentStorage
+    PersistentStorageDelegate * mStorage = nullptr;
 };
 
 LockManager & LockMgr();

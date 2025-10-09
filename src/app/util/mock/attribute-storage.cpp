@@ -33,7 +33,6 @@
 #include <app/MessageDef/AttributeDataIB.h>
 #include <app/MessageDef/AttributeReportIB.h>
 #include <app/MessageDef/AttributeStatusIB.h>
-#include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/mock/Constants.h>
@@ -207,6 +206,14 @@ uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
     return (server) ? emberAfGetClusterCountForEndpoint(endpoint) : 0;
 }
 
+uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * type, bool server)
+{
+    const EmberAfClusterMask cluster_mask = server ? MATTER_CLUSTER_FLAG_SERVER : MATTER_CLUSTER_FLAG_CLIENT;
+
+    return static_cast<uint8_t>(std::count_if(type->cluster, type->cluster + type->clusterCount,
+                                              [=](const EmberAfCluster & cluster) { return (cluster.mask & cluster_mask) != 0; }));
+}
+
 uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpointId, chip::ClusterId clusterId)
 {
     auto cluster = GetMockNodeConfig().clusterByIds(endpointId, clusterId);
@@ -235,6 +242,53 @@ chip::EndpointId emberAfEndpointFromIndex(uint16_t index)
     auto & config = GetMockNodeConfig();
     VerifyOrDie(index < config.endpoints.size());
     return config.endpoints[index].id;
+}
+
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+CHIP_ERROR emberAfGetEndpointUniqueIdForEndPoint(EndpointId endpoint, MutableCharSpan & epUniqueIdSpan)
+{
+
+    // Retrieve the endpoint configuration from the mock node configuration
+    auto epConfig = GetMockNodeConfig().endpointById(endpoint);
+    VerifyOrReturnError(epConfig != nullptr, CHIP_ERROR_NOT_FOUND);
+
+    // Copy the unique ID into the provided span
+    CharSpan targetSpan(epConfig->endpointUniqueIdBuffer, epConfig->endpointUniqueIdSize);
+    return CopyCharSpanToMutableCharSpan(targetSpan, epUniqueIdSpan);
+}
+#endif
+
+namespace chip {
+namespace app {
+
+EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
+{
+    return GetMockNodeConfig().endpoints[endpointIndex].composition;
+}
+
+} // namespace app
+} // namespace chip
+
+EndpointId emberAfParentEndpointFromIndex(uint16_t index)
+{
+    return kInvalidEndpointId;
+}
+
+CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
+                                            Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag)
+{
+    auto ep = GetMockNodeConfig().endpointById(endpoint);
+
+    if (ep)
+    {
+        auto semanticTags = ep->semanticTags();
+        if (index < semanticTags.size())
+        {
+            tag = semanticTags[index];
+            return CHIP_NO_ERROR;
+        }
+    }
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 chip::Optional<chip::ClusterId> emberAfGetNthClusterId(chip::EndpointId endpointId, uint8_t n, bool server)
@@ -273,7 +327,7 @@ chip::Optional<chip::AttributeId> emberAfGetServerAttributeIdByIndex(chip::Endpo
 
 uint8_t emberAfClusterIndex(chip::EndpointId endpointId, chip::ClusterId clusterId, EmberAfClusterMask mask)
 {
-    VerifyOrReturnValue(mask == 0 || (mask & CLUSTER_MASK_SERVER) != 0, UINT8_MAX); // only server clusters supported
+    VerifyOrReturnValue(mask == 0 || (mask & MATTER_CLUSTER_FLAG_SERVER) != 0, UINT8_MAX); // only server clusters supported
     ptrdiff_t index;
     auto cluster = GetMockNodeConfig().clusterByIds(endpointId, clusterId, &index);
     VerifyOrReturnValue(cluster != nullptr, UINT8_MAX);
@@ -341,6 +395,11 @@ void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, Attribute
 {
     dataVersion++;
     listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
+}
+
+void emberAfEndpointChanged(EndpointId endpoint, AttributesChangedListener * listener)
+{
+    listener->MarkDirty(AttributePathParams(endpoint));
 }
 
 unsigned emberAfMetadataStructureGeneration()
@@ -497,7 +556,9 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
     ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB());
     return attributeReport.EndOfAttributeReportIB();
 }
-
+// WARNING: Ensure that ResetMockNodeConfig() is called after SetMockNodeConfig().
+// When platform unit tests are merged into a single binary,
+// stale MockNodeConfig instances may leak between tests.
 void SetMockNodeConfig(const MockNodeConfig & config)
 {
     metadataStructureGeneration++;

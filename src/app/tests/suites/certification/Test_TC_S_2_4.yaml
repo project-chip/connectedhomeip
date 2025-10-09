@@ -132,7 +132,7 @@ tests:
                 value: 20000
               - name: "SceneName"
                 value: "Scene1"
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value: []
 
       response:

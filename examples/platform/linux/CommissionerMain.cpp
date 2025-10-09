@@ -16,23 +16,21 @@
  *    limitations under the License.
  */
 
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/PlatformManager.h>
-
-#include <string>
+#include "CommissionerMain.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/Dnssd.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/RawKeySessionKeystore.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/DeviceAttestationVendorReserved.h>
@@ -48,23 +46,23 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/KeyValueStoreManager.h>
+#include <platform/PlatformManager.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
-#include <controller/CHIPDeviceControllerFactory.h>
-#include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <platform/KeyValueStoreManager.h>
+#include <controller/CHIPDeviceControllerFactory.h>         // nogncheck
+#include <controller/ExampleOperationalCredentialsIssuer.h> // nogncheck
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include "TraceHandlers.h"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 #include <signal.h>
-
-#include "CommissionerMain.h"
+#include <string>
 
 using namespace chip;
 using namespace chip::Credentials;
@@ -135,7 +133,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     factoryParams.fabricIndependentStorage = &gServerStorage;
     factoryParams.fabricTable              = &Server::GetInstance().GetFabricTable();
     factoryParams.sessionKeystore          = &gSessionKeystore;
-    factoryParams.dataModelProvider        = chip::app::CodegenDataModelProviderInstance();
+    factoryParams.dataModelProvider        = chip::app::CodegenDataModelProviderInstance(&gServerStorage);
 
     gGroupDataProvider.SetStorageDelegate(&gServerStorage);
     gGroupDataProvider.SetSessionKeystore(factoryParams.sessionKeystore);
@@ -161,7 +159,12 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     // Initialize device attestation verifier
     // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
     const Credentials::AttestationTrustStore * testingRootStore = Credentials::GetTestAttestationTrustStore();
-    SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+    Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+    auto * dacVerifier = GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked);
+
+    VerifyOrDie(dacVerifier != nullptr);
+    dacVerifier->EnableVerboseLogs(true);
+    SetDeviceAttestationVerifier(dacVerifier);
 
     Platform::ScopedMemoryBuffer<uint8_t> noc;
     VerifyOrReturnError(noc.Alloc(Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
@@ -459,7 +462,7 @@ CommissionerDiscoveryController * GetCommissionerDiscoveryController()
     return &gCommissionerDiscoveryController;
 }
 
-SessionKeystore * GetSessionKeystore()
+Crypto::SessionKeystore * GetSessionKeystore()
 {
     return &gSessionKeystore;
 }

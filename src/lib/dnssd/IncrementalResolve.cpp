@@ -320,7 +320,7 @@ CHIP_ERROR IncrementalResolver::OnTxtRecord(const ResourceData & data, BytesRang
 
 CHIP_ERROR IncrementalResolver::OnIpAddress(Inet::InterfaceId interface, const Inet::IPAddress & addr)
 {
-    if (mCommonResolutionData.numIPs >= ArraySize(mCommonResolutionData.ipAddress))
+    if (mCommonResolutionData.numIPs >= MATTER_ARRAY_SIZE(mCommonResolutionData.ipAddress))
     {
         return CHIP_ERROR_NO_MEMORY;
     }

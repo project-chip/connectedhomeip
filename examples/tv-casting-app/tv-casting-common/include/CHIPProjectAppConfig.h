@@ -47,6 +47,23 @@
 
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 
+/**
+ * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
+ *
+ * 0xFFF1 (65521): Test Vendor #1 is reserved for test and development by device manufacturers or hobbyists. A Vendor Identifier
+ * (Vendor ID or VID) is a 16-bit number that uniquely identifies a particular product manufacturer, vendor, or group thereof.
+ * For production, replace with the Vendor ID allocated for you by the Connectivity Standards Alliance.
+ */
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
+
+/**
+ * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
+ *
+ * 0x8001 (32769): A Product Identifier (Product ID or PID) is a 16-bit number that uniquely identifies a product of a vendor.
+ * The Product ID is assigned by the vendor and SHALL be unique for each product within a Vendor ID.
+ */
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8001
+
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
 #define CHIP_DEVICE_CONFIG_DEVICE_NAME "Test TV casting app"
@@ -66,8 +83,9 @@
  * For casting, we need to allow for more binding table entries because the Casting App can connect to many Matter Casting Players,
  * each with many Content Apps. Each Casting Player will set 1 binding per endpoint on it. A Casting Player will have 1 endpoint for
  * every Matter Content App installed on it + 1 endpoint representing the Casting Player + 1 endpoint representing a speaker.
+ * We define CHIP_CONFIG_MAX_FABRICS to 16 by default, so the maximum binding table is 64.
  */
-#define MATTER_BINDING_TABLE_SIZE 64
+#define CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC 4
 
 // Enable some test-only interaction model APIs.
 #define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
@@ -89,6 +107,8 @@
 
 // delay (in sec) before which we assume undiscovered cached players may be in STR mode
 #define CHIP_DEVICE_CONFIG_STR_DISCOVERY_DELAY_SEC 5
+
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
 
 // Include the CHIPProjectConfig from config/standalone
 // Add this at the end so that we can hit our #defines first

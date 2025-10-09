@@ -22,8 +22,10 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <clusters/Identify/Metadata.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <tracing/macros.h>
@@ -40,6 +42,17 @@ using chip::Protocols::InteractionModel::Status;
 static Identify * firstIdentify = nullptr;
 
 static void onIdentifyClusterTick(chip::System::Layer * systemLayer, void * appState);
+
+// The Q quality rules for the Identify cluster are:
+// 1. When it changes from 0 to any other value and vice versa, or
+// 2. When it is written by a client, or
+// 3. When the value (identifytime) is set by an Identify command.
+//
+// Changes to identifytime by either a write or a command will result
+// in the attribute being set and marked dirty. This covers rules 2 and 3.
+// Rule 1 is handled by not marking the regular countdown changes as dirty
+// in the onIdentifyClusterTick function and only marking the attribute dirty
+// when the identifytime is set to 0.
 
 static Identify * inst(EndpointId endpoint)
 {
@@ -93,19 +106,28 @@ void emberAfIdentifyClusterServerInitCallback(EndpointId endpoint)
 
 static void onIdentifyClusterTick(chip::System::Layer * systemLayer, void * appState)
 {
-    uint16_t identifyTime = 0;
-    Identify * identify   = reinterpret_cast<Identify *>(appState);
+    Identify * identify = reinterpret_cast<Identify *>(appState);
 
     if (nullptr != identify)
     {
         EndpointId endpoint = identify->mEndpoint;
 
+        uint16_t identifyTime = 0;
         if (Status::Success == Attributes::IdentifyTime::Get(endpoint, &identifyTime) && 0 != identifyTime)
         {
-            identifyTime = static_cast<uint16_t>(identifyTime == 0 ? 0 : identifyTime - 1);
+            auto markDirty = MarkAttributeDirty::kNo;
+            identifyTime   = static_cast<uint16_t>(identifyTime - 1);
+
+            // If the new identify time is 0, we need to mark the attribute dirty so that
+            // the attribute change is reported
+            if (identifyTime == 0)
+            {
+                markDirty = MarkAttributeDirty::kYes;
+            }
+
             // This tick writes the new attribute, which will trigger the Attribute
             // Changed callback.
-            (void) Attributes::IdentifyTime::Set(endpoint, identifyTime);
+            (void) Attributes::IdentifyTime::Set(endpoint, identifyTime, markDirty);
         }
     }
 }
@@ -252,4 +274,48 @@ Identify::~Identify()
     unreg(this);
 }
 
-void MatterIdentifyPluginServerInitCallback() {}
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Identify {
+
+/**
+ * @brief  Identify Attribute Access Interface.
+ */
+class IdentifyAttrAccess : public AttributeAccessInterface
+{
+public:
+    // Register for the Identify cluster on all endpoints.
+    IdentifyAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Identify::Id) {}
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+};
+
+CHIP_ERROR IdentifyAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::ClusterRevision::Id:
+        return aEncoder.Encode(Identify::kRevision);
+    default:
+        break;
+    }
+    return CHIP_NO_ERROR;
+}
+} // namespace Identify
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+namespace {
+IdentifyAttrAccess gAttrAccess;
+} // namespace
+
+void MatterIdentifyPluginServerInitCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+}
+void MatterIdentifyPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+}

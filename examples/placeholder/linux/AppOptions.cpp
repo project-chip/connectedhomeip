@@ -22,11 +22,9 @@ using chip::ArgParser::OptionDef;
 using chip::ArgParser::OptionSet;
 using chip::ArgParser::PrintArgError;
 
-constexpr uint16_t kOptionDacProviderFilePath = 0xFF01;
 constexpr uint16_t kOptionInteractiveMode     = 0xFF02;
 constexpr uint16_t kOptionInteractiveModePort = 0xFF03;
 
-static chip::Credentials::Examples::TestHarnessDACProvider mDacProvider;
 static bool gInteractiveMode = false;
 static chip::Optional<uint16_t> gInteractiveModePort;
 
@@ -35,9 +33,6 @@ bool AppOptions::HandleOptions(const char * program, OptionSet * options, int id
     bool retval = true;
     switch (identifier)
     {
-    case kOptionDacProviderFilePath:
-        mDacProvider.Init(value);
-        break;
     case kOptionInteractiveMode:
         gInteractiveMode = true;
         break;
@@ -56,28 +51,18 @@ bool AppOptions::HandleOptions(const char * program, OptionSet * options, int id
 OptionSet * AppOptions::GetOptions()
 {
     static OptionDef optionsDef[] = {
-        { "dac_provider", chip::ArgParser::kArgumentRequired, kOptionDacProviderFilePath },
         { "interactive", chip::ArgParser::kNoArgument, kOptionInteractiveMode },
         { "port", chip::ArgParser::kArgumentRequired, kOptionInteractiveModePort },
         {},
     };
 
-    static OptionSet options = {
-        AppOptions::HandleOptions, optionsDef, "PROGRAM OPTIONS",
-        "  --dac_provider <filepath>\n"
-        "       A json file with data used by the example dac provider to validate device attestation procedure.\n"
-        "  --interactive\n"
-        "       Enable server interactive mode.\n"
-        "  --port <port>\n"
-        "       Specify the listening port for the server interactive mode.\n"
-    };
+    static OptionSet options = { AppOptions::HandleOptions, optionsDef, "PROGRAM OPTIONS",
+                                 "  --interactive\n"
+                                 "       Enable server interactive mode.\n"
+                                 "  --port <port>\n"
+                                 "       Specify the listening port for the server interactive mode.\n" };
 
     return &options;
-}
-
-chip::Credentials::DeviceAttestationCredentialsProvider * AppOptions::GetDACProvider()
-{
-    return &mDacProvider;
 }
 
 bool AppOptions::GetInteractiveMode()

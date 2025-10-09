@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2022-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #import <Matter/MTRAttributeValueWaiter.h>
 #import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRBaseDevice.h>
+#import <Matter/MTRCommandWithRequiredResponse.h>
 #import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -114,19 +115,19 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * A non-nil value if the vendor identifier has been determined from the device, nil if unknown.
  */
-@property (nonatomic, readonly, nullable, copy) NSNumber * vendorID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly, nullable, copy) NSNumber * vendorID MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 
 /**
  * The Product Identifier associated with the device.
  *
  * A non-nil value if the product identifier has been determined from the device, nil if unknown.
  */
-@property (nonatomic, readonly, nullable, copy) NSNumber * productID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly, nullable, copy) NSNumber * productID MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 
 /**
  * Network commissioning features supported by the device.
  */
-@property (nonatomic, readonly) MTRNetworkCommissioningFeature networkCommissioningFeatures MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly) MTRNetworkCommissioningFeature networkCommissioningFeatures MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 /**
  * Set the delegate to receive asynchronous callbacks about the device.
@@ -222,6 +223,15 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (NSArray<NSDictionary<NSString *, id> *> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
 
 /**
+ * Read all known attributes from descriptor clusters on all known endpoints.
+ *
+ * @return A dictionary with the paths of the attributes as keys and the
+ *         data-values (as described in the documentation for
+ *         MTRDeviceResponseHandler) as values.
+ */
+- (NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> *)descriptorClusters MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+/**
  * Invoke a command with a designated command path
  *
  * @param commandFields command fields object. If not nil, the object must be a data-value
@@ -284,6 +294,31 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Invoke one or more groups of commands.
+ *
+ * For any given group, if any command in any preceding group failed, the group
+ * will be skipped.  If all commands in all preceding groups succeeded, the
+ * commands within the group will be invoked, with no ordering guarantees within
+ * that group.
+ *
+ * Results from all commands that were invoked will be passed to the provided
+ * completion as an array of response-value dictionaries.  Each of these will
+ * have the command path of the command (see MTRCommandPathKey) and one of three
+ * things:
+ *
+ * 1) No other fields, indicating that the command invoke returned a succcess
+ *    status.
+ * 2) A field for MTRErrorKey, indicating that the invoke returned a failure
+ *    status (which is the value of the field).
+ * 3) A field for MTRDataKey, indicating that the invoke returned a data
+ *    response.  In this case the data-value representing the response will be
+ *    the value of this field.
+ */
+- (void)invokeCommands:(NSArray<NSArray<MTRCommandWithRequiredResponse *> *> *)commands
+                 queue:(dispatch_queue_t)queue
+            completion:(MTRDeviceResponseHandler)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 /**
  * Open a commissioning window on the device.
@@ -362,7 +397,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (MTRAttributeValueWaiter *)waitForAttributeValues:(NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> *)values
                                             timeout:(NSTimeInterval)timeout
                                               queue:(dispatch_queue_t)queue
-                                         completion:(void (^)(NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+                                         completion:(void (^)(NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 
 @end
 

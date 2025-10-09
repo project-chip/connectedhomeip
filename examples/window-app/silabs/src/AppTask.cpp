@@ -23,9 +23,9 @@
 
 #include "WindowManager.h"
 
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <assert.h>
 
@@ -45,21 +45,10 @@ using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 
-CHIP_ERROR AppTask::Init()
+CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(WindowManager::ButtonEventHandler);
-
-#ifdef DISPLAY_ENABLED
-    GetLCD().Init((uint8_t *) "Window-App");
-#endif
-
-    err = BaseApplication::Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        SILABS_LOG("BaseApplication::Init() failed");
-        appError(err);
-    }
 
     err = WindowManager::sWindow.Init();
 
@@ -96,7 +85,9 @@ void AppTask::AppTaskMain(void * pvParameter)
     SILABS_LOG("App Task started");
 
     WindowManager::sWindow.UpdateLED();
+#ifdef DISPLAY_ENABLED
     WindowManager::sWindow.UpdateLCD();
+#endif // DISPLAY_ENABLED
 
     while (true)
     {

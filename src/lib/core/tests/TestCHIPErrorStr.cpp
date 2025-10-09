@@ -207,6 +207,9 @@ TEST(TestCHIPErrorStr, CheckCoreErrorStr)
         // ErrorStr with static char array.
         CheckCoreErrorStrHelper(ErrorStr(err, /*withSourceLocation=*/true), err);
     }
+
+    // Deregister the layer error formatter
+    DeregisterCHIPLayerErrorFormatter();
 }
 
 TEST(TestCHIPErrorStr, CheckCoreErrorStrStorage)
@@ -222,6 +225,9 @@ TEST(TestCHIPErrorStr, CheckCoreErrorStrStorage)
         ErrorStrStorage storage;
         CheckCoreErrorStrHelper(ErrorStr(err, /*withSourceLocation=*/true, storage), err);
     }
+
+    // Deregister the layer error formatter
+    DeregisterCHIPLayerErrorFormatter();
 }
 
 void CheckCoreErrorStrWithoutSourceLocationHelper(const char * errStr, CHIP_ERROR err)
@@ -258,6 +264,9 @@ TEST(TestCHIPErrorStr, CheckCoreErrorStrWithoutSourceLocation)
         // ErrorStr with static char array.
         CheckCoreErrorStrWithoutSourceLocationHelper(ErrorStr(err, /*withSourceLocation=*/false), err);
     }
+
+    // Deregister the layer error formatter
+    DeregisterCHIPLayerErrorFormatter();
 }
 
 TEST(TestCHIPErrorStr, CheckCoreErrorStrStorageWithoutSourceLocation)
@@ -273,4 +282,7 @@ TEST(TestCHIPErrorStr, CheckCoreErrorStrStorageWithoutSourceLocation)
         ErrorStrStorage storage;
         CheckCoreErrorStrWithoutSourceLocationHelper(ErrorStr(err, /*withSourceLocation=*/false, storage), err);
     }
+
+    // Deregister the layer error formatter
+    DeregisterCHIPLayerErrorFormatter();
 }

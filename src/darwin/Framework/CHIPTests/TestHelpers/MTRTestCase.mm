@@ -14,45 +14,123 @@
  *    limitations under the License.
  */
 
+#import "MTRTestCase.h"
+
+#import "MTRMockCB.h"
+#import "MTRTestDeclarations.h"
+#import "MTRTestKeys.h"
+#import "MTRTestStorage.h"
+
 #include <stdlib.h>
 #include <unistd.h>
 
-#import "MTRTestCase.h"
-
 #if HAVE_NSTASK
 // Tasks that are not scoped to a specific test, but rather to a specific test suite.
-static NSMutableSet<NSTask *> * runningCrossTestTasks;
+static NSMutableSet<NSTask *> * sRunningCrossTestTasks;
+
+static void TerminateTask(NSTask * task)
+{
+    NSLog(@"Terminating task %@", task);
+
+    [task terminate]; // Sends SIGTERM
+
+    // Wait up to 10 seconds for graceful shutdown
+    BOOL terminated = NO;
+    for (int i = 0; i < 100; i++) {
+        if (![task isRunning]) {
+            terminated = YES;
+            break;
+        }
+        [NSThread sleepForTimeInterval:0.1];
+    }
+
+    if (!terminated) {
+        NSLog(@"Force killing unresponsive task %@", task);
+        kill(task.processIdentifier, SIGKILL);
+    }
+
+    [task waitUntilExit];
+}
 
 static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 {
     for (NSTask * task in tasks) {
-        NSLog(@"Terminating task %@", task);
-        [task terminate];
+        TerminateTask(task);
     }
     tasks = nil;
 }
 #endif // HAVE_NSTASK
 
+// Controllers are managed in a weak NSHashTable to allow tests
+// to manually shutdown and free controllers where necessary.
+// Additionally we need to keep track of when to shut down
+// the controller factory.
+typedef NS_ENUM(NSInteger, MTRTestScope) {
+    MTRTestScopeNone = 0,
+    MTRTestScopeSuite,
+    MTRTestScopeTestCase,
+};
+static MTRTestScope sControllerFactoryScope;
+static NSHashTable<MTRDeviceController *> * sStartedControllers;
+
+static void ClearControllerSet(NSHashTable<MTRDeviceController *> * __strong & controllers, MTRTestScope scope)
+{
+    for (MTRDeviceController * controller in controllers) {
+        [controller shutdown];
+        XCTAssertFalse([controller isRunning]);
+    }
+    controllers = nil;
+
+    if (sControllerFactoryScope == scope) {
+        [MTRDeviceControllerFactory.sharedInstance stopControllerFactory];
+        sControllerFactoryScope = MTRTestScopeNone;
+    }
+}
+
+static MTRMockCB * sMockCB;
+
 @implementation MTRTestCase {
 #if HAVE_NSTASK
     NSMutableSet<NSTask *> * _runningTasks;
 #endif // NSTask
+    NSHashTable<MTRDeviceController *> * _startedControllers;
 }
 
 + (void)setUp
 {
     [super setUp];
 
+    sMockCB = [[MTRMockCB alloc] init];
+
+    sControllerFactoryScope = MTRTestScopeNone;
+    sStartedControllers = [NSHashTable weakObjectsHashTable];
+
+#ifdef DEBUG
+    // Force our controllers to only advertise on localhost, to avoid DNS-SD
+    // crosstalk.
+    [MTRDeviceController forceLocalhostAdvertisingOnly];
+#endif // DEBUG
+
 #if HAVE_NSTASK
-    runningCrossTestTasks = [[NSMutableSet alloc] init];
+    sRunningCrossTestTasks = [[NSMutableSet alloc] init];
 #endif // HAVE_NSTASK
 }
 
 + (void)tearDown
 {
 #if HAVE_NSTASK
-    ClearTaskSet(runningCrossTestTasks);
+    ClearTaskSet(sRunningCrossTestTasks);
 #endif // HAVE_NSTASK
+
+    ClearControllerSet(sStartedControllers, MTRTestScopeSuite);
+
+    [sMockCB stopMocking];
+    sMockCB = nil;
+}
+
++ (MTRMockCB *)mockCoreBluetooth
+{
+    return sMockCB;
 }
 
 - (void)setUp
@@ -60,6 +138,7 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 #if HAVE_NSTASK
     _runningTasks = [[NSMutableSet alloc] init];
 #endif // HAVE_NSTASK
+    _startedControllers = [NSHashTable weakObjectsHashTable];
 }
 
 - (void)tearDown
@@ -103,7 +182,49 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
     ClearTaskSet(_runningTasks);
 #endif // HAVE_NSTASK
 
+    ClearControllerSet(_startedControllers, MTRTestScopeTestCase);
+
     [super tearDown];
+}
+
++ (MTRDeviceController *)_createControllerOnTestFabricWithFactoryScope:(MTRTestScope)scope
+{
+    __auto_type * factory = MTRDeviceControllerFactory.sharedInstance;
+    if (sControllerFactoryScope == MTRTestScopeNone) {
+        __auto_type * storage = [[MTRTestStorage alloc] init];
+        __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
+        XCTAssertTrue([factory startControllerFactory:factoryParams error:nil]);
+        sControllerFactoryScope = scope;
+    } else if (sControllerFactoryScope == MTRTestScopeTestCase && scope == MTRTestScopeSuite) {
+        sControllerFactoryScope = MTRTestScopeSuite; // extend factory lifetime
+    }
+
+    __auto_type * testKeys = [[MTRTestKeys alloc] init];
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:testKeys.ipk fabricID:@1 nocSigner:testKeys];
+    params.vendorID = @0xFFF1;
+    MTRDeviceController * controller = [factory createControllerOnNewFabric:params error:nil];
+    XCTAssertNotNil(controller);
+
+    return controller;
+}
+
++ (MTRDeviceController *)createControllerOnTestFabric
+{
+    MTRDeviceController * controller = [self _createControllerOnTestFabricWithFactoryScope:MTRTestScopeSuite];
+    [sStartedControllers addObject:controller];
+    return controller;
+}
+
+- (MTRDeviceController *)createControllerOnTestFabric
+{
+    MTRDeviceController * controller = [self.class _createControllerOnTestFabricWithFactoryScope:MTRTestScopeTestCase];
+    [_startedControllers addObject:controller];
+    return controller;
+}
+
++ (void)controllerWithSuiteScopeCreatedBySubclass
+{
+    sControllerFactoryScope = MTRTestScopeSuite; // Make sure we don't shut down the controller too early.
 }
 
 #if HAVE_NSTASK
@@ -147,8 +268,28 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 {
     [self doLaunchTask:task];
 
-    [runningCrossTestTasks addObject:task];
+    [sRunningCrossTestTasks addObject:task];
 }
+
+- (NSTask *)relaunchTask:(NSTask *)task additionalArguments:(NSArray<NSString *> *)additionalArguments
+{
+    TerminateTask(task);
+    [_runningTasks removeObject:task];
+
+    NSTask * newTask = [[NSTask alloc] init];
+    [newTask setExecutableURL:task.executableURL];
+    NSMutableArray<NSString *> * arguments = [task.arguments mutableCopy];
+    if (additionalArguments != nil) {
+        [arguments addObjectsFromArray:additionalArguments];
+    }
+    [newTask setArguments:arguments];
+    newTask.standardOutput = task.standardOutput;
+    newTask.standardError = task.standardError;
+
+    [self launchTask:newTask];
+    return newTask;
+}
+
 #endif // HAVE_NSTASK
 
 - (NSString *)absolutePathFor:(NSString *)matterRootRelativePath

@@ -24,8 +24,24 @@
 # test-runner-runs:
 #   run1:
 #     app: examples/fabric-admin/scripts/fabric-sync-app.py
-#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --stdin-pipe=dut-fsa-stdin --discriminator=1234
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --discriminator=1234
 #     app-ready-pattern: "Successfully opened pairing window on the device"
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${FABRIC_SYNC_APP}
+#     app-args: --discriminator=1234
+#     app-stdin-pipe: dut-fsa-stdin
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
@@ -45,11 +61,12 @@ import random
 import tempfile
 import time
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 _DEVICE_TYPE_AGGREGATOR = 0x000E
 
@@ -110,13 +127,14 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         super().teardown_class()
 
     def steps_TC_MCORE_FS_1_1(self) -> list[TestStep]:
-        steps = [TestStep(1, "Enable Fabric Synchronization on DUT_FSA using the manufacturer specified mechanism.", is_commissioning=True),
-                 TestStep(2, "Commission DUT_FSA onto TH_FSA fabric."),
-                 TestStep(3, "Reverse Commission TH_FSAs onto DUT_FSA fabric."),
-                 TestStep("3a", "TH_FSA sends RequestCommissioningApproval"),
-                 TestStep("3b", "TH_FSA sends CommissionNode"),
-                 TestStep("3c", "DUT_FSA commissions TH_FSA")]
-        return steps
+        return [
+            TestStep("precondition", "Commissioning already done.", is_commissioning=True),
+            TestStep(1, "Enable Fabric Synchronization on DUT_FSA using the manufacturer specified mechanism."),
+            TestStep(2, "Commission DUT_FSA onto TH_FSA fabric."),
+            TestStep("3a", "TH_FSA sends RequestCommissioningApproval"),
+            TestStep("3b", "TH_FSA sends CommissionNode"),
+            TestStep("3c", "DUT_FSA commissions TH_FSA"),
+        ]
 
     # This test has some manual steps and one sleep for up to 30 seconds. Test typically
     # runs under 1 mins, so 3 minutes is more than enough.
@@ -126,6 +144,10 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_1(self):
+
+        # Commissioning
+        self.step("precondition")
+
         dut_commissioning_control_endpoint = 0
 
         # Get the list of endpoints on the DUT_FSA_BRIDGE before adding the TH_SERVER_NO_UID.
@@ -156,7 +178,6 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
         self.step(1)
         self.step(2)
-        self.step(3)
         th_fsa_server_fabrics = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
         th_fsa_server_vid = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.VendorID, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
         th_fsa_server_pid = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.ProductID, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)

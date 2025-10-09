@@ -194,22 +194,24 @@ intervals:
 -   `CONFIG_CHIP_ICD_SLOW_POLL_INTERVAL`
 -   `CONFIG_CHIP_ICD_FAST_POLLING_INTERVAL`
 
-#### Commissioning with NFC support
+#### Onboarding payload delivered over NFC
 
-You can configure the Matter protocol to use an NFC tag for commissioning,
-instead of using a QR code, which is the default configuration.
+You can configure the Matter protocol to use an NFC tag for delivering the
+onboarding payload, instead of using a QR code, which is the default
+configuration.
 
-To enable NFC for commissioning and share the onboarding payload in an NFC tag,
-set the `CONFIG_CHIP_NFC_COMMISSIONING` option.
+To enable sharing the onboarding payload in an NFC tag, set the
+`CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD` option.
 
 #### Factory reset behavior
 
 By default, the factory reset procedure implemented in the Matter stack removes
 Matter-related settings only. If your application does not depend on any
 device-lifelong data stored in the non-volatile storage, set the
-`CONFIG_CHIP_FACTORY_RESET_ERASE_NVS` option to fully erase the NVS partition at
-the factory reset. This approach is more robust and regains the original NVS
-performance in case it has been polluted with unwanted entries.
+`CONFIG_CHIP_FACTORY_RESET_ERASE_SETTINGS` option to fully erase the
+non-volatile settings partition at the factory reset. This approach is more
+robust and regains the original non-volatile performance in case it has been
+polluted with unwanted entries.
 
 #### Logging
 

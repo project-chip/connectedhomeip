@@ -194,6 +194,19 @@ public:
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+
+    /**
+     * @brief Retrieves the current Joint Fabric mode.
+     *
+     * This method is intended to provide the current Joint Fabric Mode value when the node is capable of being a Joint Fabric
+     * Administrator.
+     * By default, it returns CHIP_ERROR_NOT_IMPLEMENTED and does not modify the output parameter.
+     *
+     * @param[out] jointFabricMode Reference to a uint8_t variable where the joint fabric mode will be stored.
+     * @returns CHIP_NO_ERROR on success or CHIP_ERROR_NOT_IMPLEMENTED when device is not capable of being a Joint Fabric
+     * Administrator.
+     */
+    virtual CHIP_ERROR GetJointFabricMode(uint8_t & jointFabricMode) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 };
 
 /**

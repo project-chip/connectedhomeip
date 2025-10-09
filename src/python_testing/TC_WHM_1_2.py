@@ -31,7 +31,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
-#       --endpoint 1
+#       --endpoint 2
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -40,9 +40,10 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_WHM_1_2(MatterBaseTest):

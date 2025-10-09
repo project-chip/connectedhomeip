@@ -39,13 +39,14 @@ import logging
 import random
 from collections import namedtuple
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
-from chip.clusters import Globals
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl  # Needed before matter.FabricAdmin
+from matter.clusters import Globals
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -203,7 +204,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
     def desc_TC_TSTAT_4_2(self) -> str:
         """Returns a description of this test"""
-        return "3.2.4 [TC-TSTAT-4-2] Preset write and command attributes test case with server as DUT"
+        return "3.2.4 [TC-TSTAT-4-2] Test cases to read/write attributes and invoke commands for Preset feature with server as DUT"
 
     def pics_TC_TSTAT_4_2(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
@@ -251,7 +252,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
         return steps
 
-    @ async_test_body
+    @async_test_body
     async def test_TC_TSTAT_4_2(self):
         endpoint = self.get_endpoint()
 
@@ -431,7 +432,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 test_presets.remove(builtInPreset)
 
                 # Send the AtomicRequest begin command
-                await self.send_atomic_request_begin_command(timeout=5000, expected_timeout=3000)
+                await self.send_atomic_request_begin_command()
 
                 # Write to the presets attribute after calling AtomicRequest command
                 await self.write_presets(endpoint=endpoint, presets=test_presets)

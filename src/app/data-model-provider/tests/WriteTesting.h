@@ -16,11 +16,11 @@
  */
 #pragma once
 
-#include "lib/core/DataModelTypes.h"
 #include <app/AttributeValueDecoder.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/tests/TestConstants.h>
 #include <app/data-model/Encode.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/TLVReader.h>
 
 namespace chip {
@@ -57,12 +57,6 @@ public:
     WriteOperation & SetSubjectDescriptor(const chip::Access::SubjectDescriptor & descriptor)
     {
         mRequest.subjectDescriptor = &descriptor;
-        return *this;
-    }
-
-    WriteOperation & SetPreviousSuccessPath(std::optional<ConcreteAttributePath> path)
-    {
-        mRequest.previousSuccessPath = path;
         return *this;
     }
 

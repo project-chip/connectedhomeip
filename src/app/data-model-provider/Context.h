@@ -31,9 +31,9 @@ namespace DataModel {
 /// as well as fetching current state (via actionContext)
 struct InteractionModelContext
 {
-    EventsGenerator * eventsGenerator;
-    ProviderChangeListener * dataModelChangeListener;
-    ActionContext * actionContext;
+    EventsGenerator & eventsGenerator;
+    ProviderChangeListener & dataModelChangeListener;
+    ActionContext & actionContext;
 };
 
 } // namespace DataModel

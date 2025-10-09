@@ -253,7 +253,7 @@ tests:
                 value: 1000
               - name: "SceneName"
                 value: "Scene1"
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value:
                     [
                         {
@@ -328,7 +328,7 @@ tests:
                 value: 0x01
               - name: "TransitionTime"
                 value: 1000
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value:
                     [
                         {
@@ -515,7 +515,7 @@ tests:
                 value: 1000
               - name: "SceneName"
                 value: "Scene1"
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value:
                     [
                         {
@@ -572,7 +572,7 @@ tests:
                 value: 0x03
               - name: "TransitionTime"
                 value: 1000
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value:
                     [
                         {

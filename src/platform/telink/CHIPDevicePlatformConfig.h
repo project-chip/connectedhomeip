@@ -145,6 +145,8 @@
 #if !defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_NEWLIB_LIBC)
 /// Use mallinfo() to obtain the heap usage statistics exposed by SoftwareDiagnostics cluster attributes.
 #define CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO 1
+#else
+#define CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO 0
 #endif // !defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_NEWLIB_LIBC)
 #endif // CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
 

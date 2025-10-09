@@ -27,10 +27,11 @@ namespace Access {
 // Auth mode should have only one value expressed, which should not be None.
 enum class AuthMode : uint8_t
 {
-    kNone  = 0,
-    kPase  = 1 << 5,
-    kCase  = 1 << 6,
-    kGroup = 1 << 7
+    kNone                 = 0,
+    kInternalDeviceAccess = 1 << 4, // Not part of an external interaction
+    kPase                 = 1 << 5,
+    kCase                 = 1 << 6,
+    kGroup                = 1 << 7
 };
 
 } // namespace Access

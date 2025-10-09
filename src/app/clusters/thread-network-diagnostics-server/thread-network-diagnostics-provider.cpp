@@ -92,6 +92,8 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
         case Attributes::SecurityPolicy::Id:
         case Attributes::ChannelPage0Mask::Id:
         case Attributes::OperationalDatasetComponents::Id:
+        case Attributes::ExtAddress::Id:
+        case Attributes::Rloc16::Id:
             return encoder.EncodeNull();
         }
     }
@@ -248,8 +250,6 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
 
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
             uint8_t maxRouterId = otThreadGetMaxRouterId(otInst);
-            CHIP_ERROR chipErr  = CHIP_ERROR_INCORRECT_STATE;
-
             for (uint8_t i = 0; i <= maxRouterId; i++)
             {
                 if (otThreadGetRouterInfo(otInst, i, &routerInfo) == OT_ERROR_NONE)
@@ -268,11 +268,10 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
                     routeTable.linkEstablished = routerInfo.mLinkEstablished;
 
                     ReturnErrorOnFailure(aEncoder.Encode(routeTable));
-                    chipErr = CHIP_NO_ERROR;
                 }
             }
-
-            return chipErr;
+            // Returning empty list with no error in case thread network is not up
+            return CHIP_NO_ERROR;
 
 #else // OPENTHREAD_MTD
             otError otErr = otThreadGetParentInfo(otInst, &routerInfo);
@@ -675,7 +674,24 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
         err = encoder.EncodeEmptyList();
     }
     break;
-
+    case Attributes::ExtAddress::Id: {
+        const otExtAddress * extAddress = otLinkGetExtendedAddress(otInst);
+        if (!extAddress)
+        {
+            err = encoder.EncodeNull();
+        }
+        else
+        {
+            // This attribute's value is composed by taking the 8 octets of the extended address EUI-64 and
+            // treating them as a big-endian integer.
+            static_assert(sizeof(extAddress->m8) == sizeof(uint64_t), "Unexpected buffer size");
+            err = encoder.Encode(Encoding::BigEndian::Get64(extAddress->m8));
+        }
+    }
+    break;
+    case Attributes::Rloc16::Id:
+        err = encoder.Encode(otThreadGetRloc16(otInst));
+        break;
     default: {
         err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
@@ -707,6 +723,8 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
     case Attributes::ChannelPage0Mask::Id:
     case Attributes::SecurityPolicy::Id:
     case Attributes::OperationalDatasetComponents::Id:
+    case Attributes::ExtAddress::Id:
+    case Attributes::Rloc16::Id:
         err = encoder.EncodeNull();
         break;
     case Attributes::OverrunCount::Id:

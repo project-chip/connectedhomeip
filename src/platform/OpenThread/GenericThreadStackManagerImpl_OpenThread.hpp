@@ -46,7 +46,6 @@
 #include <openthread/srp_client.h>
 #endif
 
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
@@ -72,21 +71,7 @@ namespace Internal {
 
 static_assert(OPENTHREAD_API_VERSION >= 219, "OpenThread version too old");
 
-// Network commissioning
 namespace {
-#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
-NetworkCommissioning::GenericThreadDriver sGenericThreadDriver;
-app::Clusters::NetworkCommissioning::Instance
-    sThreadNetworkCommissioningInstance(CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID /* Endpoint Id */, &sGenericThreadDriver);
-#endif
-
-void initNetworkCommissioningThreadDriver()
-{
-#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
-    sThreadNetworkCommissioningInstance.Init();
-#endif
-}
-
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 CHIP_ERROR ReadDomainNameComponent(const char *& in, char * out, size_t outSize)
 {
@@ -1020,7 +1005,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyFull failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyFull failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 #endif // CHIP_PROGRESS_LOGGING
     return err;
@@ -1175,8 +1160,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
 
     err = ConfigureThreadStack(otInst);
 
-    initNetworkCommissioningThreadDriver();
-
 exit:
     return err;
 }
@@ -1257,6 +1240,12 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo()
     otThreadSetEnabled(mOTInst, false);
     otIp6SetEnabled(mOTInst, false);
     otInstanceErasePersistentInfo(mOTInst);
+
+    if (mpCommissioningDriver)
+    {
+        mpCommissioningDriver->ClearNetwork();
+    }
+
     Impl()->UnlockThreadStack();
 }
 
@@ -1510,7 +1499,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     srpService->mService.mName         = alloc.Clone(aName);
     srpService->mService.mPort         = aPort;
 
-    VerifyOrExit(aSubTypes.size() < ArraySize(srpService->mSubTypes), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(aSubTypes.size() < MATTER_ARRAY_SIZE(srpService->mSubTypes), error = CHIP_ERROR_BUFFER_TOO_SMALL);
     entryId = 0;
 
     for (const char * subType : aSubTypes)
@@ -1522,7 +1511,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     srpService->mService.mSubTypeLabels = srpService->mSubTypes;
 
     // Initialize TXT entries
-    VerifyOrExit(aTxtEntries.size() <= ArraySize(srpService->mTxtEntries), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(aTxtEntries.size() <= MATTER_ARRAY_SIZE(srpService->mTxtEntries), error = CHIP_ERROR_BUFFER_TOO_SMALL);
     entryId = 0;
 
     for (const chip::Dnssd::TextEntry & entry : aTxtEntries)
@@ -1539,7 +1528,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     }
 
     using OtNumTxtEntries = decltype(srpService->mService.mNumTxtEntries);
-    static_assert(ArraySize(srpService->mTxtEntries) <= std::numeric_limits<OtNumTxtEntries>::max(),
+    static_assert(MATTER_ARRAY_SIZE(srpService->mTxtEntries) <= std::numeric_limits<OtNumTxtEntries>::max(),
                   "Number of DNS TXT entries may not fit in otSrpClientService structure");
     srpService->mService.mNumTxtEntries = static_cast<OtNumTxtEntries>(aTxtEntries.size());
     srpService->mService.mTxtEntries    = srpService->mTxtEntries;
@@ -1892,7 +1881,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
 {
     CHIP_ERROR error;
     // type buffer size is kDnssdTypeAndProtocolMaxSize + . + kMaxDomainNameSize + . + termination character
-    char type[Dnssd::kDnssdTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    char type[Dnssd::kDnssdFullTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
     // hostname buffer size is kHostNameMaxLength + . + kMaxDomainNameSize + . + termination character
     char hostname[Dnssd::kHostNameMaxLength + SrpClient::kMaxDomainNameSize + 3];
     // secure space for the raw TXT data in the worst-case scenario relevant for Matter:
@@ -1935,7 +1924,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
         {
             // Invoke callback for every service one by one instead of for the whole
             // list due to large memory size needed to allocate on stack.
-            static_assert(ArraySize(dnsResult->mMdnsService.mName) >= ArraySize(serviceName),
+            static_assert(MATTER_ARRAY_SIZE(dnsResult->mMdnsService.mName) >= MATTER_ARRAY_SIZE(serviceName),
                           "The target buffer must be big enough");
             Platform::CopyString(dnsResult->mMdnsService.mName, serviceName);
             DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowse, reinterpret_cast<intptr_t>(dnsResult));

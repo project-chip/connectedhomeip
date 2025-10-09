@@ -83,6 +83,7 @@ void FabricSyncAddBridgeCommand::OnCommissioningComplete(NodeId deviceId, CHIP_E
                      ChipLogValueX64(deviceId), err.Format());
     }
 
+    PairingManager::Instance().ResetForNextCommand();
     mBridgeNodeId = kUndefinedNodeId;
 }
 
@@ -123,6 +124,7 @@ void FabricSyncRemoveBridgeCommand::OnDeviceRemoved(NodeId deviceId, CHIP_ERROR 
                      ChipLogValueX64(deviceId), err.Format());
     }
 
+    PairingManager::Instance().ResetForNextCommand();
     mBridgeNodeId = kUndefinedNodeId;
 }
 
@@ -174,6 +176,7 @@ void FabricSyncAddLocalBridgeCommand::OnCommissioningComplete(NodeId deviceId, C
                      ChipLogValueX64(deviceId), err.Format());
     }
 
+    PairingManager::Instance().ResetForNextCommand();
     mLocalBridgeNodeId = kUndefinedNodeId;
 }
 
@@ -215,6 +218,7 @@ void FabricSyncRemoveLocalBridgeCommand::OnDeviceRemoved(NodeId deviceId, CHIP_E
                      ChipLogValueX64(deviceId), err.Format());
     }
 
+    PairingManager::Instance().ResetForNextCommand();
     mLocalBridgeNodeId = kUndefinedNodeId;
 }
 
@@ -290,6 +294,8 @@ void FabricSyncDeviceCommand::OnCommissioningComplete(NodeId deviceId, CHIP_ERRO
         ChipLogError(NotSpecified, "Failed to pair synced device (0x:" ChipLogFormatX64 ") with error: %" CHIP_ERROR_FORMAT,
                      ChipLogValueX64(deviceId), err.Format());
     }
+
+    PairingManager::Instance().ResetForNextCommand();
 }
 
 CHIP_ERROR FabricSyncDeviceCommand::RunCommand(EndpointId remoteEndpointId)

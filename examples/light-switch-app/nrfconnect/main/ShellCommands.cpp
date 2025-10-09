@@ -213,10 +213,11 @@ void RegisterSwitchCommands()
     static const shell_command_t sSwitchCommand = { &SwitchCommandHandler, "switch",
                                                     "Light-switch commands. Usage: switch [onoff|groups]" };
 
-    sShellSwitchGroupsOnOffSubCommands.RegisterCommands(sSwichGroupsOnOffSubCommands, ArraySize(sSwichGroupsOnOffSubCommands));
-    sShellSwitchOnOffSubCommands.RegisterCommands(sSwitchOnOffSubCommands, ArraySize(sSwitchOnOffSubCommands));
-    sShellSwitchGroupsSubCommands.RegisterCommands(sSwitchGroupsSubCommands, ArraySize(sSwitchGroupsSubCommands));
-    sShellSwitchSubCommands.RegisterCommands(sSwitchSubCommands, ArraySize(sSwitchSubCommands));
+    sShellSwitchGroupsOnOffSubCommands.RegisterCommands(sSwichGroupsOnOffSubCommands,
+                                                        MATTER_ARRAY_SIZE(sSwichGroupsOnOffSubCommands));
+    sShellSwitchOnOffSubCommands.RegisterCommands(sSwitchOnOffSubCommands, MATTER_ARRAY_SIZE(sSwitchOnOffSubCommands));
+    sShellSwitchGroupsSubCommands.RegisterCommands(sSwitchGroupsSubCommands, MATTER_ARRAY_SIZE(sSwitchGroupsSubCommands));
+    sShellSwitchSubCommands.RegisterCommands(sSwitchSubCommands, MATTER_ARRAY_SIZE(sSwitchSubCommands));
 
     Engine::Root().RegisterCommands(&sSwitchCommand, 1);
 }

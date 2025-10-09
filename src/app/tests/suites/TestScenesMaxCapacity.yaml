@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # !!!!!!!!!! TEST INFORMATION !!!!!!!!!!!!!!!!!!
-# This test covers multi fabric support for scenes cluster attributes such as LastConfiguredBy and FabricSceneInfo
+# This test covers multi fabric support for scenes cluster attributes such as FabricSceneInfo
 
 name: Scenes Multi-fabric testing
 

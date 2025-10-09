@@ -1,0 +1,19 @@
+// DO NOT EDIT MANUALLY - Generated file
+//
+// Identifier constant values for cluster {{cluster.name}} (cluster code: {{"%d/0x%X" | format(cluster.code, cluster.code)}})
+// based on {{input_name}}
+#pragma once
+
+#include <lib/core/DataModelTypes.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace {{cluster.name}} {
+
+inline constexpr ClusterId Id = {{"0x%08X" | format(cluster.code)}};
+
+} // namespace {{cluster.name}}
+} // namespace Clusters
+} // namespace app
+} // namespace chip

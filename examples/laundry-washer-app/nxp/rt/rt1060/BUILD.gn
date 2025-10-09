@@ -44,6 +44,8 @@ declare_args() {
 
   # Setup discriminator as argument
   setup_discriminator = 3840
+
+  chip_with_diag_logs_demo = true
 }
 
 example_platform_dir =
@@ -75,6 +77,21 @@ rt_sdk("sdk") {
     include_dirs += [ "${example_platform_dir}/board/${evkname}/" ]
     sources += [ "${example_platform_dir}/board/${evkname}/pin_mux.c" ]
   }
+
+  if (iw416_transceiver || w8801_transceiver || iwx12_transceiver) {
+    if (evkname == "evkmimxrt1060") {
+      include_dirs += [ "${example_platform_dir}/board/evkbmimxrt1060/" ]
+      sources +=
+          [ "${example_platform_dir}/board/evkbmimxrt1060/sdmmc_config.c" ]
+      sources +=
+          [ "${example_platform_dir}/board/evkbmimxrt1060/wifi_bt_config.c" ]
+    } else {
+      include_dirs += [ "${example_platform_dir}/board/${evkname}/" ]
+      sources += [ "${example_platform_dir}/board/${evkname}/sdmmc_config.c" ]
+      sources += [ "${example_platform_dir}/board/${evkname}/wifi_bt_config.c" ]
+    }
+  }
+
   sources += [ "${example_platform_dir}/board/hardware_init.c" ]
   sources += [ "${example_platform_dir}/board/clock_config.c" ]
   sources += [ "${example_platform_dir}/board/board.c" ]
@@ -116,6 +133,13 @@ rt_executable("laundry-washer") {
     defines += [ "CONFIG_NET_L2_OPENTHREAD=1" ]
   }
 
+  if (chip_with_diag_logs_demo) {
+    defines += [
+      "CONFIG_DIAG_LOGS_DEMO=1",
+      "CHIP_DEVICE_CONFIG_MAX_DIAG_LOG_SIZE=1024",
+    ]
+  }
+
   include_dirs = [
     "../../common/main/include",
     "../../common/main",
@@ -135,6 +159,17 @@ rt_executable("laundry-washer") {
     "../../common/main/main.cpp",
   ]
 
+  if (chip_with_diag_logs_demo) {
+    include_dirs += [
+      "${common_example_dir}/diagnostic_logs/include",
+      "${chip_root}",
+    ]
+    sources += [
+      "${common_example_dir}/diagnostic_logs/source/DiagnosticLogsDemo.cpp",
+      "${common_example_dir}/diagnostic_logs/source/DiagnosticLogsProviderDelegateImpl.cpp",
+    ]
+  }
+
   # App common files
   include_dirs += [
     "${common_example_dir}/icd/include",
@@ -153,21 +188,22 @@ rt_executable("laundry-washer") {
     "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
     "${common_example_dir}/icd/source/ICDUtil.cpp",
-    "${common_example_dir}/matter_button/source/ButtonDefault.cpp",
-    "${common_example_dir}/matter_button/source/ButtonManager.cpp",
-    "${common_example_dir}/matter_button/source/ButtonRegistrationDefault.cpp",
+    "${common_example_dir}/matter_button/source/ButtonRegistrationEmpty.cpp",
   ]
 
-  deps = [ "${chip_root}/examples/${app_common_folder}" ]
+  deps = [
+    "${chip_root}/examples/${app_common_folder}",
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
+    "${chip_root}/src/setup_payload:onboarding-codes-utils",
+  ]
 
   sources += [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
     "../../common/main/laundry-washer-mode.cpp",
-    "../../common/main/operational-state-delegate-impl.cpp",
   ]
 
   if (nxp_enable_matter_cli) {

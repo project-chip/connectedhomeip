@@ -289,3 +289,8 @@ void MatterContentLauncherPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gContentLauncherAttrAccess);
 }
+
+void MatterContentLauncherPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gContentLauncherAttrAccess);
+}

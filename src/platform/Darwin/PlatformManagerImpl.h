@@ -34,6 +34,7 @@
 
 #include <atomic>
 #include <dispatch/dispatch.h>
+#include <map>
 
 namespace chip {
 namespace DeviceLayer {
@@ -62,6 +63,10 @@ public:
 
     CHIP_ERROR StartBleScan(BleScannerDelegate * delegate, BleScanMode mode = BleScanMode::kDefault);
     CHIP_ERROR StopBleScan();
+
+    bool RegisterSignalHandler(int sig, dispatch_block_t block);
+    bool UnregisterSignalHandler(int sig);
+    void UnregisterAllSignalHandlers();
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
@@ -97,7 +102,7 @@ private:
 
     System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
-    dispatch_queue_t mWorkQueue;
+    dispatch_queue_t mWorkQueue = nullptr;
 
     enum class WorkQueueState
     {
@@ -109,7 +114,10 @@ private:
     std::atomic<WorkQueueState> mWorkQueueState = WorkQueueState::kSuspended;
 
     // Semaphore used to implement blocking behavior in _RunEventLoop.
-    dispatch_semaphore_t mRunLoopSem;
+    dispatch_semaphore_t mRunLoopSem = nullptr;
+
+    dispatch_queue_t mSignalQueue = nullptr;
+    std::map<int, dispatch_source_t> mSignalSources;
 };
 
 /**

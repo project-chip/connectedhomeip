@@ -1,0 +1,29 @@
+[tool.autopep8]
+max_line_length = 132
+
+[tool.isort]
+line_length = 132
+known_first_party = "matter"
+
+[tool.ruff]
+line-length = 132
+target-version = "py310"
+exclude = [
+    ".environment",
+    ".git",
+    ".github",
+    ".*",
+    "build",
+    "out",
+    "third_party",
+    "examples/common/QRCode/",
+    # TODO(#37698)
+    "docs/development_controllers/matter-repl/*.ipynb",
+]
+
+[tool.ruff.lint]
+select = ["COM", "E1", "E4", "E7", "E9", "F", "W6"]
+ignore = [
+    "COM812", # Do not enforce trailing commas in multi-line collections
+    "E721", # We use it for good reasons
+]

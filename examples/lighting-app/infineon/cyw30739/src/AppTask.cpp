@@ -78,7 +78,7 @@ void AppTaskMain(intptr_t args)
     {
         ChipLogError(Zcl, "ERROR app_button_init %d\n", result);
     }
-    LEDWid().Init(chip_lighting_led_config, ArraySize(chip_lighting_led_config));
+    LEDWid().Init(chip_lighting_led_config, MATTER_ARRAY_SIZE(chip_lighting_led_config));
     LightMgr().SetCallbacks(LightManagerCallback, nullptr);
 
     CYW30739MatterConfig::InitApp();

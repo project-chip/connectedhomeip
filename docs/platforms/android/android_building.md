@@ -21,7 +21,8 @@ There are following Apps on Android
         -   [Linux](#linux)
         -   [MacOS](#macos)
         -   [ABIs and TARGET_CPU](#abis-and-target_cpu)
-        -   [Gradle & JDK Version](#gradle--jdk-version)
+        -   [Gradle \& JDK Version](#gradle--jdk-version)
+        -   [Kotlin Version](#kotlin-version)
     -   [Preparing for build](#preparing-for-build)
     -   [Building Android CHIPTool from scripts](#building-android-chiptool-from-scripts)
     -   [Building Android CHIPTool from Android Studio](#building-android-chiptool-from-android-studio)
@@ -42,41 +43,41 @@ directory.
 
 ## Requirements for building
 
-You need Android SDK 26 & NDK 23.2.8568313 downloaded to your machine. Set the
+You need Android SDK 34 & NDK 28.2.13676358 downloaded to your machine. Set the
 `$ANDROID_HOME` environment variable to where the SDK is downloaded and the
 `$ANDROID_NDK_HOME` environment variable to point to where the NDK package is
-downloaded. The build also requires `kotlinc` to be in your `$PATH`.
+downloaded.
 
 1. Install [Android Studio](https://developer.android.com/studio)
 2. Install NDK:
     1. Tools -> SDK Manager -> SDK Tools Tab
     2. Click [x] Show Package Details
-    3. Select NDK (Side by Side) -> 23.2.8568313
+    3. Select NDK (Side by Side) -> 28.2.13676358
     4. Apply
 3. Install Command Line Tools:
     1. Tools -> SDK Manager -> SDK Tools Tab -> Android SDK Command Line Tools
-       (latest)
+       10.0
     2. Apply
-4. Install SDK 26:
-    1. Tools -> SDK Manager -> SDK Platforms Tab -> Android 8.0 (Oreo) SDK Level
-       26
+4. Install SDK 34:
+    1. Tools -> SDK Manager -> SDK Platforms Tab -> Android 14.0 (Upside Down
+       Cake) API Level 34
     2. Apply
 5. Install Emulator:
-    1. Tools -> Device Manager -> Create device -> Pixel 5 -> Android S API 31
+    1. Tools -> Device Manager -> Create device -> Pixel 5 -> Android S API 34
        -> Download
 
 ### Linux
 
 ```
 export ANDROID_HOME=~/Android/Sdk
-export ANDROID_NDK_HOME=~/Android/Sdk/ndk/23.2.8568313
+export ANDROID_NDK_HOME=~/Android/Sdk/ndk/28.2.13676358
 ```
 
 ### MacOS
 
 ```
 export ANDROID_HOME=~/Library/Android/sdk
-export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/23.2.8568313
+export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/28.2.13676358
 ```
 
 <a name="abi"></a>
@@ -97,22 +98,45 @@ architecture:
 
 ### Gradle & JDK Version
 
-We are using Gradle 7.1.1 for all android project which does not support Java 17
-(https://docs.gradle.org/current/userguide/compatibility.html) while the default
-JDK version on MacOS for Apple Silicon is 'openjdk 17.0.1' or above.
+All Android projects utilize Gradle plugin version 8.5.1, Gradle version 8.7 and
+JDK version 17.0.
 
-Using JDK bundled with Android Studio will help with that.
+For developer using java 17 in MacOS, the JAVA can be configured as follows via
+`sdkman`:
 
-Android Studio Dolphin and below:
-
-```shell
-export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/Contents/Home/
+```
+sdk install java 17.0.14-tem
 ```
 
-Android Studio Electric Eel 2022.1.1 and above:
+For developer using openjdk-17-jdk in Linux, the JAVA_HOME environment variable
+can be configured as follows:
 
-```shell
-export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jbr/Contents/Home/
+```
+sudo apt-get install openjdk-17-jdk
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+```
+
+<a name="kotlin"></a>
+
+### Kotlin Version
+
+The build requires `kotlinc` to be in your `$PATH`.
+
+For Linux:
+
+```
+cd /usr/lib
+wget -q https://github.com/JetBrains/kotlin/releases/download/v2.1.10/kotlin-compiler-2.1.10.zip
+unzip kotlin-compiler-*.zip
+rm kotlin-compiler-*.zip
+rm -f kotlinc/bin/*.bat
+export PATH=$PATH:/usr/lib/kotlinc/bin
+```
+
+For MacOS:
+
+```
+sdk install kotlin 2.1.10
 ```
 
 <hr>

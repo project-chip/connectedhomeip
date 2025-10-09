@@ -18,7 +18,6 @@
 #pragma once
 
 #include <app/util/af-types.h>
-#include <app/util/att-storage.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/config.h>
 #include <app/util/endpoint-config-defines.h>
@@ -39,7 +38,7 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 #endif
 
 #define DECLARE_DYNAMIC_ENDPOINT(endpointName, clusterList)                                                                        \
-    EmberAfEndpointType endpointName = { clusterList, ArraySize(clusterList), 0 }
+    EmberAfEndpointType endpointName = { clusterList, MATTER_ARRAY_SIZE(clusterList), 0 }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName) EmberAfCluster clusterListName[] = {
 
@@ -47,7 +46,7 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 // It can be assigned with the ZAP_CLUSTER_MASK(SERVER) or ZAP_CLUSTER_MASK(CLUSTER) values.
 #define DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, role, incomingCommands, outgoingCommands)                                 \
     {                                                                                                                              \
-        clusterId, clusterAttrs, ArraySize(clusterAttrs), 0, role, NULL, incomingCommands, outgoingCommands                        \
+        clusterId, clusterAttrs, MATTER_ARRAY_SIZE(clusterAttrs), 0, role, NULL, incomingCommands, outgoingCommands                \
     }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_END }
@@ -56,19 +55,24 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 
 #define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END()                                                                                       \
     {                                                                                                                              \
-        ZAP_EMPTY_DEFAULT(), 0xFFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)                                     \
+        ZAP_EMPTY_DEFAULT(), 0xFFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE)      \
     } /* cluster revision */                                                                                                       \
     }
 
-// The attrMask must contain the relevant ATTRIBUTE_MASK_* bits from
+// The attrMask must contain the relevant MATTER_ATTRIBUTE_FLAG_* bits from
 // attribute-metadata.h.  Specifically:
 //
-// * Writable attributes must have ATTRIBUTE_MASK_WRITABLE
-// * Nullable attributes (have X in the quality column in the spec) must have ATTRIBUTE_MASK_NULLABLE
-// * Attributes that have T in the Access column in the spec must have ATTRIBUTE_MASK_MUST_USE_TIMED_WRITE
+// * Writable attributes must have MATTER_ATTRIBUTE_FLAG_WRITABLE
+// * Nullable attributes (have X in the quality column in the spec) must have MATTER_ATTRIBUTE_FLAG_NULLABLE
+// * Attributes that have T in the Access column in the spec must have MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE
+//
+// NOTE: ZAP_ATTRIBUTE_MASK(READABLE) is added by default to ensure backward compatibility, since DECLARE_DYNAMIC_ATTRIBUTE() is a
+// widely used API. If you want to add a write-only dynamic attribute, either expand the macro or contribute a
+// DECLARE_WRITEONLY_DYNAMIC_ATTRIBUTE API.
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
     {                                                                                                                              \
-        ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)               \
+        ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType),                                                               \
+            attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE)                                         \
     }
 
 /**
@@ -209,6 +213,10 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(chip::EndpointId endpoint, size_t in
 CHIP_ERROR SetTagList(chip::EndpointId endpoint,
                       chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList);
 
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+CHIP_ERROR emberAfGetEndpointUniqueIdForEndPoint(chip::EndpointId endpoint, chip::MutableCharSpan & epUniqueIdMutSpan);
+#endif
+
 // Returns number of clusters put into the passed cluster list
 // for the given endpoint and client/server polarity
 uint8_t emberAfGetClustersFromEndpoint(chip::EndpointId endpoint, chip::ClusterId * clusterList, uint8_t listLen, bool server);
@@ -223,8 +231,8 @@ uint8_t emberAfGetClusterCountForEndpoint(chip::EndpointId endpoint);
 // Check if a cluster is implemented or not. If yes, the cluster is returned.
 //
 // mask = 0 -> find either client or server
-// mask = CLUSTER_MASK_CLIENT -> find client
-// mask = CLUSTER_MASK_SERVER -> find server
+// mask = MATTER_CLUSTER_FLAG_CLIENT -> find client
+// mask = MATTER_CLUSTER_FLAG_SERVER -> find server
 //
 // If a pointer to an index is provided, it will be updated to point to the relative index of the cluster
 // within the set of clusters that match the mask criteria.
@@ -260,6 +268,37 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const 
                                      const chip::Span<chip::DataVersion> & dataVersionStorage,
                                      chip::Span<const EmberAfDeviceType> deviceTypeList = {},
                                      chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
+
+// Register a dynamic endpoint. This involves registering descriptors that describe
+// the composition of the endpoint (encapsulated in the 'ep' argument) as well as providing
+// storage for data versions.
+//
+// dataVersionStorage.size() needs to be at least as large as the number of
+// server clusters on this endpoint.  If it's not, the endpoint will not be able
+// to store data versions, which may break consumers.
+//
+// The memory backing dataVersionStorage needs to remain allocated until this dynamic
+// endpoint is cleared.
+//
+// An optional device type list can be passed in as well. If provided, the memory
+// backing the list needs to remain allocated until this dynamic endpoint is cleared.
+//
+// An optional endpointUniqueId can be passed, the data will be copied out of
+// endpointUniqueId and it does not need to survive once this call returns.
+//
+// An optional parent endpoint id should be passed for child endpoints of composed device.
+//
+// Returns  CHIP_NO_ERROR                   No error.
+//          CHIP_ERROR_NO_MEMORY            MAX_ENDPOINT_COUNT is reached or when no storage is left for clusters
+//          CHIP_ERROR_INVALID_ARGUMENT     The EndpointId value passed is kInvalidEndpointId
+//          CHIP_ERROR_ENDPOINT_EXISTS      If the EndpointId value passed already exists
+//
+CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
+                                                   const chip::Span<chip::DataVersion> & dataVersionStorage,
+                                                   chip::Span<const EmberAfDeviceType> deviceTypeList = {},
+                                                   chip::CharSpan endpointUniqueId                    = {},
+                                                   chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
+
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 /**
@@ -272,6 +311,10 @@ void emberAfInitializeAttributes(chip::EndpointId endpoint);
 // If server == true, returns the number of server clusters,
 // otherwise number of client clusters on this endpoint
 uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server);
+
+// If server == true, returns the number of server clusters,
+// otherwise number of client clusters on the endpoint at the given index.
+uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * endpointType, bool server);
 
 // Returns the cluster of Nth server or client cluster,
 // depending on server toggle.
@@ -377,6 +420,18 @@ bool IsFlatCompositionForEndpoint(EndpointId endpoint);
  * @brief Returns true is an Endpoint has tree composition
  */
 bool IsTreeCompositionForEndpoint(EndpointId endpoint);
+
+enum class EndpointComposition : uint8_t
+{
+    kFullFamily,
+    kTree,
+    kInvalid,
+};
+
+/**
+ * @brief Returns the composition for a given endpoint index
+ */
+EndpointComposition GetCompositionForEndpointIndex(uint16_t index);
 
 } // namespace app
 } // namespace chip

@@ -21,9 +21,9 @@
 #include <crypto/CryptoBuildConfig.h>
 #endif
 
-#if CHIP_CRYPTO_PSA
+#if CHIP_CRYPTO_KEYSTORE_PSA
 #include <crypto/PSASessionKeystore.h>
-#else
+#elif CHIP_CRYPTO_KEYSTORE_RAW
 #include <crypto/RawKeySessionKeystore.h>
 #endif
 
@@ -34,9 +34,9 @@ namespace Crypto {
 // when the PSA crypto backend is used, AES encryption/decryption function assume that the input
 // key handle carries a key reference instead of raw key material, so PSASessionKeystore must be
 // used instead of RawKeySessionKeystore to initialize the key handle.
-#if CHIP_CRYPTO_PSA
+#if CHIP_CRYPTO_KEYSTORE_PSA
 using DefaultSessionKeystore = PSASessionKeystore;
-#else
+#elif CHIP_CRYPTO_KEYSTORE_RAW
 using DefaultSessionKeystore = RawKeySessionKeystore;
 #endif
 

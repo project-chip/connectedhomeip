@@ -41,6 +41,8 @@
 ///    Expected: .... == CHIP_ERROR(0, "src/setup_payload/tests/TestAdditionalDataPayload.cpp", 234)
 ///    Actual: CHIP_ERROR:<src/lib/core/TLVReader.cpp:889: Error 0x00000022> == CHIP_NO_ERROR
 
+#include <chrono>
+
 #include <pw_string/string_builder.h>
 #include <pw_unit_test/framework.h>
 
@@ -50,6 +52,14 @@ namespace pw {
 
 template <>
 StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffer);
+
+// Adapters for chip::System::Clock::Microseconds64 and Milliseconds64
+template <>
+StatusWithSize ToString<std::chrono::duration<uint64_t, std::milli>>(const std::chrono::duration<uint64_t, std::milli> & time,
+                                                                     pw::span<char> buffer);
+template <>
+StatusWithSize ToString<std::chrono::duration<uint64_t, std::micro>>(const std::chrono::duration<uint64_t, std::micro> & time,
+                                                                     pw::span<char> buffer);
 
 } // namespace pw
 #if CHIP_CONFIG_TEST_GOOGLETEST
@@ -69,5 +79,10 @@ namespace chip {
 ///
 /// This enhances the readability and diagnostic information in GoogleTest test logs.
 void PrintTo(const CHIP_ERROR & err, std::ostream * os);
+
+// Adapters for chip::System::Clock::Microseconds64 and Milliseconds64
+void PrintTo(const std::chrono::duration<uint64_t, std::milli> & time, std::ostream * os);
+void PrintTo(const std::chrono::duration<uint64_t, std::micro> & time, std::ostream * os);
+
 } // namespace chip
 #endif // CHIP_CONFIG_TEST_GOOGLETEST

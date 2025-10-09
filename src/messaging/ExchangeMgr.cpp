@@ -284,8 +284,15 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     }
     else
     {
-        ChipLogProgress(ExchangeManager, "Received Groupcast Message with GroupId 0x%04X (%d)",
-                        packetHeader.GetDestinationGroupId().Value(), packetHeader.GetDestinationGroupId().Value());
+        if (packetHeader.GetDestinationGroupId().HasValue())
+        {
+            ChipLogProgress(ExchangeManager, "Received Groupcast Message with GroupId 0x%04X (%d)",
+                            packetHeader.GetDestinationGroupId().Value(), packetHeader.GetDestinationGroupId().Value());
+        }
+        else
+        {
+            ChipLogProgress(ExchangeManager, "Received Groupcast Message without GroupId");
+        }
     }
 
     // Do not handle messages that don't match an existing exchange on an
@@ -446,15 +453,31 @@ void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * deleg
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-void ExchangeManager::OnTCPConnectionClosed(const SessionHandle & session, CHIP_ERROR conErr)
+void ExchangeManager::OnTCPConnectionClosed(const Transport::ActiveTCPConnectionState & conn, const SessionHandle & session,
+                                            CHIP_ERROR conErr)
 {
     mContextPool.ForEachActiveObject([&](auto * ec) {
         if (ec->HasSessionHandle() && ec->GetSessionHandle() == session)
         {
-            ec->OnSessionConnectionClosed(conErr);
+            ec->OnSessionConnectionClosed(conn, conErr);
         }
         return Loop::Continue;
     });
+}
+
+bool ExchangeManager::OnTCPConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr)
+{
+    bool foundHandler = false;
+    mContextPool.ForEachActiveObject([&](auto * ec) {
+        if (ec->HasSessionHandle())
+        {
+            ec->OnConnectionAttemptComplete(conn, conErr);
+            foundHandler = true;
+        }
+        return Loop::Continue;
+    });
+
+    return foundHandler;
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 

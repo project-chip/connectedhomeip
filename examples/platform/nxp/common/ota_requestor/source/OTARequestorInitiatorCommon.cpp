@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2022 Project CHIP Authors
- *    Copyright 2023-2024 NXP
+ *    Copyright 2023-2025 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,18 +21,22 @@
 
 using namespace chip;
 
+constexpr uint16_t requestedOtaBlockSize = 1024;
+
 void chip::NXP::App::OTARequestorInitiator::InitOTA(intptr_t context)
 {
     auto * otaRequestorInit = reinterpret_cast<OTARequestorInitiator *>(context);
+    auto & imageProcessor   = OTAImageProcessorImpl::GetDefaultInstance();
     // Set the global instance of the OTA requestor core component
     SetRequestorInstance(&otaRequestorInit->gRequestorCore);
 
     otaRequestorInit->gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     otaRequestorInit->gRequestorCore.Init(chip::Server::GetInstance(), otaRequestorInit->gRequestorStorage,
                                           otaRequestorInit->gRequestorUser, otaRequestorInit->gDownloader);
-    otaRequestorInit->gRequestorUser.Init(&otaRequestorInit->gRequestorCore, &otaRequestorInit->gImageProcessor);
-    otaRequestorInit->gImageProcessor.SetOTADownloader(&otaRequestorInit->gDownloader);
+    otaRequestorInit->gRequestorUser.SetMaxDownloadBlockSize(requestedOtaBlockSize);
+    otaRequestorInit->gRequestorUser.Init(&otaRequestorInit->gRequestorCore, &imageProcessor);
+    imageProcessor.Init(&otaRequestorInit->gDownloader);
 
     // Set the image processor instance used for handling image being downloaded
-    otaRequestorInit->gDownloader.SetImageProcessorDelegate(&otaRequestorInit->gImageProcessor);
+    otaRequestorInit->gDownloader.SetImageProcessorDelegate(&imageProcessor);
 }

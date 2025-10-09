@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2020-2024 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,10 @@
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 
+#include "../dcl/DCLClient.h"
+#include "../dcl/DisplayTermsAndConditions.h"
+
+#include <iostream>
 #include <string>
 
 using namespace ::chip;
@@ -66,6 +70,10 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         err = Unpair(remoteId);
         break;
     case PairingMode::Code:
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        chip::DeviceLayer::ConnectivityMgr().WiFiPafSetApFreq(
+            mApFreqStr.HasValue() ? static_cast<uint16_t>(std::stol(mApFreqStr.Value())) : 0);
+#endif
         err = PairWithCode(remoteId);
         break;
     case PairingMode::CodePaseOnly:
@@ -73,6 +81,17 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         break;
     case PairingMode::Ble:
         err = Pair(remoteId, PeerAddress::BLE());
+        break;
+    case PairingMode::Nfc:
+        if (mDiscriminator.has_value())
+        {
+            err = Pair(remoteId, PeerAddress::NFC(mDiscriminator.value()));
+        }
+        else
+        {
+            // Discriminator is mandatory
+            err = CHIP_ERROR_MESSAGE_INCOMPLETE;
+        }
         break;
     case PairingMode::OnNetwork:
         err = PairWithMdns(remoteId);
@@ -82,6 +101,8 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         break;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     case PairingMode::WiFiPAF:
+        chip::DeviceLayer::ConnectivityMgr().WiFiPafSetApFreq(
+            mApFreqStr.HasValue() ? static_cast<uint16_t>(std::stol(mApFreqStr.Value())) : 0);
         err = Pair(remoteId, PeerAddress::WiFiPAF(remoteId));
         break;
 #endif
@@ -127,6 +148,17 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
     if (mCountryCode.HasValue())
     {
         params.SetCountryCode(CharSpan::fromCharString(mCountryCode.Value()));
+    }
+
+    // mTCAcknowledgements and mTCAcknowledgementVersion are optional, but related. When one is missing, default the value to 0, to
+    // increase the test tools ability to test the applications.
+    if (mTCAcknowledgements.HasValue() || mTCAcknowledgementVersion.HasValue())
+    {
+        TermsAndConditionsAcknowledgement termsAndConditionsAcknowledgement = {
+            .acceptedTermsAndConditions        = mTCAcknowledgements.ValueOr(0),
+            .acceptedTermsAndConditionsVersion = mTCAcknowledgementVersion.ValueOr(0),
+        };
+        params.SetTermsAndConditionsAcknowledgement(termsAndConditionsAcknowledgement);
     }
 
     // mTimeZoneList is an optional argument managed by TypedComplexArgument mComplex_TimeZones.
@@ -221,6 +253,7 @@ CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
         discoveryType = DiscoveryType::kDiscoveryNetworkOnlyWithoutPASEAutoRetry;
     }
 
+    ReturnErrorOnFailure(MaybeDisplayTermsAndConditions(commissioningParams));
     return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams, discoveryType);
 }
 
@@ -505,6 +538,115 @@ void PairingCommand::OnICDStayActiveComplete(ScopedNodeId deviceId, uint32_t pro
                     ChipLogValueX64(deviceId.GetNodeId()), promisedActiveDuration);
 }
 
+void PairingCommand::OnCommissioningStageStart(PeerId peerId, CommissioningStage stageStarting)
+{
+    ChipLogDetail(chipTool, "Starting commissioning stage '%s'", StageToString(stageStarting));
+}
+
+CHIP_ERROR PairingCommand::WiFiCredentialsNeeded(EndpointId endpoint)
+{
+    if (mNetworkType != PairingNetworkType::None)
+    {
+        // We only support prompting for credentials when no credentials were
+        // provided up front, for now.
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    // We block while prompting for the information, and that does not seem to
+    // work well if we do it synchronously: we seem to lose the BLE connection
+    // to the commissionee.  So do all the rest of the work async.  The
+    // outermost ScheduleLambda is only there to avoid the prompt interleaving
+    // with logging that happens on the Matter thread after this function
+    // returns.
+    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+        mPrompterThread.emplace([this] {
+            do
+            {
+                std::cout << "Enter the Wi-Fi SSID: ";
+                std::getline(std::cin, mPromptedSSID);
+                if (OctetStringFromCharString(mPromptedSSID.data(), &mSSID))
+                {
+                    break;
+                }
+                ChipLogError(chipTool, "Invalid value for SSID");
+            } while (true);
+
+            do
+            {
+                std::cout << "Enter the Wi-Fi password (empty for an open network): ";
+                std::getline(std::cin, mPromptedPassword);
+                if (OctetStringFromCharString(mPromptedPassword.data(), &mPassword))
+                {
+                    break;
+                }
+                ChipLogError(chipTool, "Invalid value for password");
+            } while (true);
+
+            DeviceLayer::SystemLayer().ScheduleLambda([this] {
+                // Ensure that the background thread (and its writes to our members) is done.
+                mPrompterThread->join();
+                mPrompterThread.reset();
+
+                auto & commissioner            = CurrentCommissioner();
+                CommissioningParameters params = commissioner.GetCommissioningParameters();
+                auto credentials               = Controller::WiFiCredentials(mSSID, mPassword);
+                params.SetWiFiCredentials(credentials);
+                commissioner.UpdateCommissioningParameters(params);
+
+                commissioner.NetworkCredentialsReady();
+            });
+        });
+    });
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PairingCommand::ThreadCredentialsNeeded(EndpointId endpoint)
+{
+    if (mNetworkType != PairingNetworkType::None)
+    {
+        // We only support prompting for credentials when no credentials were
+        // provided up front, for now.
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    // We block while prompting for the information, and that does not seem to
+    // work well if we do it synchronously: we seem to lose the BLE connection
+    // to the commissionee.  So do all the rest of the work async.  The
+    // outermost ScheduleLambda is only there to avoid the prompt interleaving
+    // with logging that happens on the Matter thread after this function
+    // returns.
+    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+        mPrompterThread.emplace([this] {
+            do
+            {
+                std::cout << "Enter the operational dataset (probably as a hex string prefixed with \"hex:\"): ";
+                std::getline(std::cin, mPromptedOperationalDataset);
+                if (OctetStringFromCharString(mPromptedOperationalDataset.data(), &mOperationalDataset))
+                {
+                    break;
+                }
+                ChipLogError(chipTool, "Invalid value for operational dataset");
+            } while (true);
+
+            DeviceLayer::SystemLayer().ScheduleLambda([this] {
+                // Ensure that the background thread (and its writes to our members) is done.
+                mPrompterThread->join();
+                mPrompterThread.reset();
+
+                auto & commissioner            = CurrentCommissioner();
+                CommissioningParameters params = commissioner.GetCommissioningParameters();
+                params.SetThreadOperationalDataset(mOperationalDataset);
+                commissioner.UpdateCommissioningParameters(params);
+
+                commissioner.NetworkCredentialsReady();
+            });
+        });
+    });
+
+    return CHIP_NO_ERROR;
+}
+
 void PairingCommand::OnDiscoveredDevice(const Dnssd::CommissionNodeData & nodeData)
 {
     // Ignore nodes with closed commissioning window
@@ -573,4 +715,27 @@ void PairingCommand::OnDeviceAttestationCompleted(Controller::DeviceCommissioner
     {
         SetCommandExitStatus(err);
     }
+}
+
+CHIP_ERROR PairingCommand::MaybeDisplayTermsAndConditions(CommissioningParameters & params)
+{
+    VerifyOrReturnError(mUseDCL.ValueOr(false), CHIP_NO_ERROR);
+
+    Json::Value tc;
+    auto client = tool::dcl::DCLClient(mDCLHostName, mDCLPort);
+    ReturnErrorOnFailure(client.TermsAndConditions(mOnboardingPayload, tc));
+    if (tc != Json::nullValue)
+    {
+        uint16_t version      = 0;
+        uint16_t userResponse = 0;
+        ReturnErrorOnFailure(tool::dcl::DisplayTermsAndConditions(tc, version, userResponse, mCountryCode));
+
+        TermsAndConditionsAcknowledgement termsAndConditionsAcknowledgement = {
+            .acceptedTermsAndConditions        = userResponse,
+            .acceptedTermsAndConditionsVersion = version,
+        };
+        params.SetTermsAndConditionsAcknowledgement(termsAndConditionsAcknowledgement);
+    }
+
+    return CHIP_NO_ERROR;
 }

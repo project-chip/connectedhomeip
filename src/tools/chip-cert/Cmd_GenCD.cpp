@@ -400,7 +400,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         }
         break;
     case 'p':
-        if (gCertElements.ProductIdsCount == ArraySize(gCertElements.ProductIds))
+        if (gCertElements.ProductIdsCount == MATTER_ARRAY_SIZE(gCertElements.ProductIds))
         {
             PrintArgError("%s: Too many Product Ids are specified: %s\n", progName, arg);
             return false;
@@ -474,7 +474,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         gCertElements.DACOriginVIDandPIDPresent = true;
         break;
     case 'a':
-        if (gCertElements.AuthorizedPAAListCount >= ArraySize(gCertElements.AuthorizedPAAList))
+        if (gCertElements.AuthorizedPAAListCount >= MATTER_ARRAY_SIZE(gCertElements.AuthorizedPAAList))
         {
             PrintArgError("%s: Too many Authorized PAA Certificates are specified: %s\n", progName, arg);
             return false;

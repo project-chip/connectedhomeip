@@ -56,7 +56,7 @@ class TIApp(Enum):
             raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root, board):
-        return os.path.join(root, 'examples', self.ExampleName(), board.FamilyName())
+        return os.path.join(root, 'examples', self.ExampleName() + '/ti/', board.FamilyName())
 
 
 class TIBoard(Enum):

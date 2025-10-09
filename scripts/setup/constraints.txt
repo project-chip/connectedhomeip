@@ -34,7 +34,7 @@ certifi==2022.12.7
     # via requests
 charset-normalizer==3.0.1
     # via requests
-click==8.1.3
+click==8.1.6
     # via
     #   -r requirements.build.txt
     #   -r requirements.esp32.txt
@@ -55,7 +55,7 @@ contextlib2==21.6.0
     # via
     #   idf-component-manager
     #   schema
-cryptography==39.0.2
+cryptography==43.0.0
     # via
     #   -c constraints.esp32.txt
     #   -r requirements.all.txt
@@ -70,7 +70,7 @@ distlib==0.3.6
     # via virtualenv
 docopt==0.6.2
     # via pykwalify
-ecdsa==0.18.0
+ecdsa==0.19.0
     # via
     #   -r requirements.esp32.txt
     #   esptool
@@ -126,7 +126,7 @@ mobly==1.12.1
     # via -r requirements.all.txt
 msgpack==1.0.4
     # via cachecontrol
-mypy==1.10.1
+mypy==1.16.0
     # via -r requirements.all.txt
 mypy-extensions==1.0.0
     # via mypy
@@ -141,7 +141,7 @@ packaging==23.0
     #   ghapi
     #   idf-component-manager
     #   west
-pandas==2.1.4 ; platform_machine != "aarch64" and platform_machine != "arm64"
+pandas==2.2.3 ; platform_machine != "aarch64" and platform_machine != "arm64"
     # via -r requirements.memory.txt
 parso==0.8.3
     # via jedi
@@ -163,7 +163,7 @@ portpicker==1.5.2
     #   mobly
 prompt-toolkit==3.0.43
     # via ipython
-protobuf==4.24.4
+protobuf==5.28.3
     # via
     #   -r requirements.all.txt
     #   mypy-protobuf
@@ -253,11 +253,11 @@ traitlets==5.9.0
     # via
     #   ipython
     #   matplotlib-inline
-types-protobuf==4.24.0.2
+types-protobuf==5.29.1.20250208
     # via
     #   -r requirements.all.txt
     #   mypy-protobuf
-typing-extensions==4.6.0
+typing-extensions==4.8.0
     # via mypy
 urllib3==1.26.14
     # via requests

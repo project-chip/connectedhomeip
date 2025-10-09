@@ -203,7 +203,7 @@ public:
      * @note            This allows easily storing flags as a base FlagsEnum in a POD type,
      *                  and enables equality comparisons.
      */
-    operator FlagsEnum() const { return static_cast<FlagsEnum>(mValue); }
+    constexpr operator FlagsEnum() const { return static_cast<FlagsEnum>(mValue); }
 
     /**
      * Set and/or clear all flags with a value of the underlying storage type.

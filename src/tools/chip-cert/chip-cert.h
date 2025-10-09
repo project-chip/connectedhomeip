@@ -476,6 +476,7 @@ extern int gNIDChipNodeId;
 extern int gNIDChipFirmwareSigningId;
 extern int gNIDChipICAId;
 extern int gNIDChipRootId;
+extern int gNIDChipVidVerificationSignerId;
 extern int gNIDChipFabricId;
 extern int gNIDChipCASEAuthenticatedTag;
 extern int gNIDChipCurveP256;

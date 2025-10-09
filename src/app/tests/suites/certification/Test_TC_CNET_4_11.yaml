@@ -160,7 +160,7 @@ tests:
           "Step 7: TH sends ConnectNetwork command to the DUT with NetworkID
           field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field
           set to 2"
-      PICS: CNET.C.C06.Tx
+      PICS: CNET.S.C06.Rsp
       timedInteractionTimeoutMs: 5000
       command: "ConnectNetwork"
       arguments:

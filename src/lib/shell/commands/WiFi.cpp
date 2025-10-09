@@ -154,7 +154,8 @@ void RegisterWiFiCommands()
         { &WiFiDisconnectHandler, "disconnect", "Disconnect device from AP. Usage: wifi disconnect" },
     };
 
-    static constexpr Command wifiCommand = { &SubShellCommand<ArraySize(subCommands), subCommands>, "wifi", "Wi-Fi commands" };
+    static constexpr Command wifiCommand = { &SubShellCommand<MATTER_ARRAY_SIZE(subCommands), subCommands>, "wifi",
+                                             "Wi-Fi commands" };
 
     Engine::Root().RegisterCommands(&wifiCommand, 1);
 }

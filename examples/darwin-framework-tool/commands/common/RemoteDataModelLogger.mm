@@ -53,8 +53,8 @@ std::string JsonToString(Json::Value & json)
 
 CHIP_ERROR LogError(Json::Value & value, const chip::app::StatusIB & status)
 {
-    if (status.mClusterStatus.HasValue()) {
-        auto statusValue = status.mClusterStatus.Value();
+    if (status.mClusterStatus.has_value()) {
+        auto statusValue = *status.mClusterStatus;
         value[kClusterErrorIdKey] = statusValue;
     }
 

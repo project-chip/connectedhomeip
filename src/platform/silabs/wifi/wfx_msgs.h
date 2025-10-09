@@ -26,10 +26,7 @@
 #include "sl_wfx_api.h"
 #include "sl_wfx_constants.h"
 #else
-typedef struct
-{
-    uint8_t octet[6]; ///< Table to store a MAC address
-} sl_wfx_mac_address_t;
+
 /**
  * @brief General Message header structure
  *

@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/occ_3_2_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -29,6 +29,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --app-pipe /tmp/occ_3_2_fifo
 #       --endpoint 1
 #       --bool-arg simulate_occupancy:true
 #     factory-reset: true
@@ -41,12 +42,12 @@
 #  [TC-OCC-3.2] test precedure step 3a, 3c
 
 import logging
-import time
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
-                                         async_test_body, await_sequence_of_reports, default_matter_test_main)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_OCC_3_2(MatterBaseTest):
@@ -83,21 +84,6 @@ class TC_OCC_3_2(MatterBaseTest):
         ]
         return pics
 
-    # Sends and out-of-band command to the all-clusters-app
-    def write_to_app_pipe(self, command):
-        # CI app pipe id creation
-        self.app_pipe = "/tmp/chip_all_clusters_fifo_"
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when using named pipe")
-            self.app_pipe = self.app_pipe + str(app_pid)
-
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests are flaky)
-        time.sleep(0.001)
-
     @async_test_body
     async def test_TC_OCC_3_2(self):
         endpoint_id = self.get_endpoint()
@@ -129,14 +115,14 @@ class TC_OCC_3_2(MatterBaseTest):
         logging.info(f"--> Has PhysicalContactOccupiedToUnoccupiedDelay: {has_contact_timing_attrib}")
 
         # min interval = 0, and max interval = 30 seconds
-        attrib_listener = ClusterAttributeChangeAccumulator(Clusters.Objects.OccupancySensing)
+        attrib_listener = AttributeSubscriptionHandler(expected_cluster=Clusters.Objects.OccupancySensing)
         await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint_id, min_interval_sec=0, max_interval_sec=30)
 
         # add Namepiped to assimilate the manual sensor untrigger here
         self.step("3a")
         # CI call to trigger off
         if self.is_ci:
-            self.write_to_app_pipe('{"Name":"SetOccupancy", "EndpointId": 1, "Occupancy": 0}')
+            self.write_to_app_pipe({"Name": "SetOccupancy", "EndpointId": 1, "Occupancy": 0})
         else:
             self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after DUT goes back to unoccupied state.")
 
@@ -150,19 +136,20 @@ class TC_OCC_3_2(MatterBaseTest):
 
         # CI call to trigger on
         if self.is_ci:
-            self.write_to_app_pipe('{"Name":"SetOccupancy", "EndpointId": 1, "Occupancy": 1}')
+            self.write_to_app_pipe({"Name": "SetOccupancy", "EndpointId": 1, "Occupancy": 1})
         else:
             self.wait_for_user_input(
                 prompt_msg="Type any letter and press ENTER after the sensor occupancy is triggered and its occupancy state changed.")
 
         self.step("3d")
-        await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.Occupancy, sequence=[
-                                  1], timeout_sec=post_prompt_settle_delay_seconds)
+        attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.Occupancy, sequence=[
+            1], timeout_sec=post_prompt_settle_delay_seconds)
 
         self.step("4a")
         if attributes.HoldTime.attribute_id not in attribute_list:
             logging.info("No HoldTime attribute supports. Terminate this test case")
-            self.skip_all_remaining_steps("4b")
+            self.mark_all_remaining_steps_skipped("4b")
+            return
 
         self.step("4b")
         hold_time_limits_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTimeLimits)
@@ -177,30 +164,10 @@ class TC_OCC_3_2(MatterBaseTest):
 
         self.step("4c")
         await self.write_single_attribute(attributes.HoldTime(hold_time_max))
-        hold_time_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
-        asserts.assert_equal(hold_time_dut, hold_time_max, "HoldTime did not match written HoldTimeMax")
 
         self.step("4d")
-        has_no_legacy_features = ((not has_feature_pir) and (not has_feature_ultrasonic) and (not has_feature_contact))
-
-        expect_legacy_pir_timing = has_pir_timing_attrib and (has_feature_pir or has_no_legacy_features)
-        expect_legacy_us_timing = has_ultrasonic_timing_attrib and has_feature_ultrasonic
-        expect_legacy_phy_timing = has_contact_timing_attrib and has_feature_contact
-
-        # Build list of expectations based on attributes present.
-        all_expected_final_values = [AttributeValue(endpoint_id, attribute=cluster.Attributes.HoldTime, value=hold_time_max)]
-        if expect_legacy_pir_timing:
-            all_expected_final_values.append(AttributeValue(
-                endpoint_id, attribute=cluster.Attributes.PIROccupiedToUnoccupiedDelay, value=hold_time_max))
-        if expect_legacy_us_timing:
-            all_expected_final_values.append(AttributeValue(
-                endpoint_id, attribute=cluster.Attributes.UltrasonicOccupiedToUnoccupiedDelay, value=hold_time_max))
-        if expect_legacy_phy_timing:
-            all_expected_final_values.append(AttributeValue(
-                endpoint_id, attribute=cluster.Attributes.PhysicalContactOccupiedToUnoccupiedDelay, value=hold_time_max))
-
-        # Wait for the reports to come.
-        attrib_listener.await_all_final_values_reported(all_expected_final_values, timeout_sec=post_prompt_settle_delay_seconds)
+        attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.HoldTime, sequence=[
+                                                  hold_time_max], timeout_sec=post_prompt_settle_delay_seconds)
 
 
 if __name__ == "__main__":

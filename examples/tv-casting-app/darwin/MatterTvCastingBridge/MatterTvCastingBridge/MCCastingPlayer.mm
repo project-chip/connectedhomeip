@@ -190,6 +190,35 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     });
 }
 
+- (NSError * _Nullable)getConnectionState:(MCCastingPlayerConnectionState * _Nonnull)state;
+{
+    ChipLogProgress(AppServer, "MCCastingPlayer.getConnectionState() called");
+    VerifyOrReturnValue([[MCCastingApp getSharedInstance] isRunning], [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INCORRECT_STATE], ChipLogError(AppServer, "MCCastingPlayer.getConnectionState() MCCastingApp NOT running"));
+
+    __block matter::casting::core::ConnectionState native_state = matter::casting::core::ConnectionState::CASTING_PLAYER_NOT_CONNECTED;
+    dispatch_queue_t workQueue = [[MCCastingApp getSharedInstance] getWorkQueue];
+    dispatch_sync(workQueue, ^{
+        native_state = _cppCastingPlayer->GetConnectionState();
+    });
+
+    switch (native_state) {
+    case matter::casting::core::ConnectionState::CASTING_PLAYER_NOT_CONNECTED:
+        *state = MC_CASTING_PLAYER_NOT_CONNECTED;
+        break;
+    case matter::casting::core::ConnectionState::CASTING_PLAYER_CONNECTING:
+        *state = MC_CASTING_PLAYER_CONNECTING;
+        break;
+    case matter::casting::core::ConnectionState::CASTING_PLAYER_CONNECTED:
+        *state = MC_CASTING_PLAYER_CONNECTED;
+        break;
+    default:
+        [NSException raise:@"Unhandled matter::casting::core::ConnectionState" format:@"%d is not handled", native_state];
+        break;
+    }
+
+    return nil;
+}
+
 - (instancetype _Nonnull)initWithCppCastingPlayer:(matter::casting::memory::Strong<matter::casting::core::CastingPlayer>)cppCastingPlayer
 {
     if (self = [super init]) {

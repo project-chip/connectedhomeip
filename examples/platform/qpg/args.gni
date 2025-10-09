@@ -17,7 +17,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/platform/qpg/args.gni")
 
 chip_enable_openthread = true
-chip_system_config_use_open_thread_inet_endpoints = true
+chip_system_config_use_openthread_inet_endpoints = true
 chip_with_lwip = false
 openthread_project_core_config_file = "OpenThreadConfig.h"
 openthread_core_config_deps = []

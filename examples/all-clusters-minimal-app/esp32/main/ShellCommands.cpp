@@ -26,7 +26,7 @@ void OnOffCommands::Register()
     static const shell_command_t subCommands[] = { { &OnLightHandler, "on", "Usage: OnOff on endpoint-id" },
                                                    { &OffLightHandler, "off", "Usage: OnOff off endpoint-id" },
                                                    { &ToggleLightHandler, "toggle", "Usage: OnOff toggle endpoint-id" } };
-    sSubShell.RegisterCommands(subCommands, ArraySize(subCommands));
+    sSubShell.RegisterCommands(subCommands, MATTER_ARRAY_SIZE(subCommands));
 
     // Register the root `OnOff` command in the top-level shell.
     static const shell_command_t onOffCommand = { &OnOffHandler, "OnOff", "OnOff commands" };
@@ -43,7 +43,7 @@ void CASECommands::Register()
     static const shell_command_t subCommands[] = {
         { &ConnectToNodeHandler, "connect", "Establish CASESession to a node, Usage: case connect <fabric-index> <node-id>" },
     };
-    sSubShell.RegisterCommands(subCommands, ArraySize(subCommands));
+    sSubShell.RegisterCommands(subCommands, MATTER_ARRAY_SIZE(subCommands));
 
     static const shell_command_t CASECommand = { &CASEHandler, "case", "Case Commands" };
     Engine::Root().RegisterCommands(&CASECommand, 1);

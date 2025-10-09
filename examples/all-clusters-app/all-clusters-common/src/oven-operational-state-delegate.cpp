@@ -59,6 +59,11 @@ void emberAfOvenCavityOperationalStateClusterInitCallback(chip::EndpointId endpo
     gOvenCavityOperationalStateInstance->Init();
 }
 
+void emberAfOvenCavityOperationalStateClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    OvenCavityOperationalState::Shutdown();
+}
+
 CHIP_ERROR
 OvenCavityOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
                                                                OperationalState::GenericOperationalState & operationalState)

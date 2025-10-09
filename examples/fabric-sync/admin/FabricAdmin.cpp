@@ -16,9 +16,11 @@
  */
 
 #include "FabricAdmin.h"
+
 #include <AppMain.h>
 #include <CommissionerMain.h>
-#include <bridge/include/FabricBridge.h>
+#include <app/server/Server.h>
+#include <bridge/FabricBridge.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 
 using namespace ::chip;
@@ -44,8 +46,11 @@ CHIP_ERROR FabricAdmin::Init()
     auto engine = chip::app::InteractionModelEngine::GetInstance();
     VerifyOrReturnError(engine != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnLogErrorOnFailure(IcdManager::Instance().Init(&sICDClientStorage, engine));
-    ReturnLogErrorOnFailure(sCheckInHandler.Init(Controller::DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
-                                                 &sICDClientStorage, &IcdManager::Instance(), engine));
+
+    ReturnLogErrorOnFailure(sCheckInHandler.Init(&chip::Server::GetInstance().GetExchangeManager(), &sICDClientStorage,
+                                                 &IcdManager::Instance(), engine));
+
+    ReturnLogErrorOnFailure(PairingManager::Instance().Init(GetDeviceCommissioner()));
 
     return CHIP_NO_ERROR;
 }

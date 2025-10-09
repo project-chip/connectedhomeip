@@ -14,20 +14,32 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "AttestationKey.h"
-#include "ProvisionEncoder.h"
-#include "ProvisionStorage.h"
 #include <algorithm>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <headers/AttestationKey.h>
+#include <headers/ProvisionEncoder.h>
+#include <headers/ProvisionStorage.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <string.h>
-#ifdef OTA_ENCRYPTION_ENABLE
+#ifndef NDEBUG
+#if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && (SL_MATTER_GN_BUILD == 0)
+#include <sl_matter_test_event_trigger_config.h>
+#endif // defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && (SL_MATTER_GN_BUILD == 0)
+#endif // NDEBUG
+#if defined(SL_MATTER_ENABLE_OTA_ENCRYPTION) && SL_MATTER_ENABLE_OTA_ENCRYPTION
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
-#endif // OTA_ENCRYPTION_ENABLE
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
+
+#include <app/TestEventTriggerDelegate.h>
+
+#if !(SL_MATTER_GN_BUILD || defined(SL_PROVISION_GENERATOR))
+#include <sl_matter_provision_config.h>
+#endif
 
 using namespace chip::Credentials;
 
@@ -578,13 +590,13 @@ CHIP_ERROR Storage::GetCertificationDeclaration(MutableByteSpan & value)
 {
     size_t size    = 0;
     CHIP_ERROR err = (Flash::Get(Parameters::ID::kCertification, value.data(), value.size(), size));
-#ifdef CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#ifdef SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
         // Example CD
         return Examples::GetExampleDACProvider()->GetCertificationDeclaration(value);
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#endif // SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     ReturnErrorOnFailure(err);
     value.reduce_size(size);
     return CHIP_NO_ERROR;
@@ -599,13 +611,13 @@ CHIP_ERROR Storage::GetProductAttestationIntermediateCert(MutableByteSpan & valu
 {
     size_t size    = 0;
     CHIP_ERROR err = (Flash::Get(Parameters::ID::kPaiCert, value.data(), value.size(), size));
-#ifdef CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#ifdef SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
         // Example PAI
         return Examples::GetExampleDACProvider()->GetProductAttestationIntermediateCert(value);
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#endif // SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     ReturnErrorOnFailure(err);
     value.reduce_size(size);
     return CHIP_NO_ERROR;
@@ -620,13 +632,13 @@ CHIP_ERROR Storage::GetDeviceAttestationCert(MutableByteSpan & value)
 {
     size_t size    = 0;
     CHIP_ERROR err = (Flash::Get(Parameters::ID::kDacCert, value.data(), value.size(), size));
-#ifdef CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#ifdef SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
         // Example DAC
         return Examples::GetExampleDACProvider()->GetDeviceAttestationCert(value);
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#endif // SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     ReturnErrorOnFailure(err);
     value.reduce_size(size);
     return CHIP_NO_ERROR;
@@ -649,20 +661,27 @@ CHIP_ERROR Storage::GetDeviceAttestationCSR(uint16_t vid, uint16_t pid, const Ch
 
 CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, MutableByteSpan & signature)
 {
-    AttestationKey key;
     uint8_t temp[kDeviceAttestationKeySizeMax] = { 0 };
     size_t size                                = 0;
     CHIP_ERROR err                             = Flash::Get(Parameters::ID::kDacKey, temp, sizeof(temp), size);
-#ifdef CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#ifdef SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
         // Example DAC key
         return Examples::GetExampleDACProvider()->SignWithDeviceAttestationKey(message, signature);
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#endif // SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     ReturnErrorOnFailure(err);
+#ifdef SL_MBEDTLS_USE_TINYCRYPT
+    uint8_t key_buffer[kDeviceAttestationKeySizeMax] = { 0 };
+    MutableByteSpan private_key(key_buffer);
+    AttestationKey::Unwrap(temp, size, private_key);
+    return AttestationKey::SignMessageWithKey((const uint8_t *) key_buffer, message, signature);
+#else
+    AttestationKey key;
     ReturnErrorOnFailure(key.Import(temp, size));
     return key.SignMessage(message, signature);
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 }
 
 //
@@ -712,22 +731,121 @@ CHIP_ERROR Storage::GetProvisionRequest(bool & value)
     // return Flash::Set(Parameters::ID::kProvisionRequest, value);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
-#if OTA_ENCRYPTION_ENABLE
+
+#if defined(SL_MATTER_ENABLE_OTA_ENCRYPTION) && SL_MATTER_ENABLE_OTA_ENCRYPTION
 CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
+{
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
+    // Tinycrypt doesn't support the key ID, so we need to store the key as a binary blob
+    return Flash::Set(Parameters::ID::kOtaTlvEncryptionKey, value.data(), value.size());
+#else  // MBEDTLS_USE_PSA_CRYPTO
+    Silabs::OtaTlvEncryptionKey key;
+    ReturnErrorOnFailure(key.Import(value.data(), value.size()));
+    return Flash::Set(Parameters::ID::kOtaTlvEncryptionKey, key.GetId());
+#endif // SL_MBEDTLS_USE_TINYCRYPT
+}
+
+CHIP_ERROR Storage::GetOtaTlvEncryptionKeyId(uint32_t & keyId)
+{
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
+    // Tinycrypt doesn't support the key ID
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // MBEDTLS_USE_PSA_CRYPTO
+    return Flash::Get(Parameters::ID::kOtaTlvEncryptionKey, keyId);
+#endif // SL_MBEDTLS_USE_TINYCRYPT
+}
+
+CHIP_ERROR Storage::DecryptUsingOtaTlvEncryptionKey(MutableByteSpan & block, uint32_t & ivOffset)
+{
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
+    uint8_t keyBuffer[Silabs::OtaTlvEncryptionKey::kOTAEncryptionKeyLength] = { 0 };
+    size_t keyLen                                                           = 0;
+
+    // Read the key from the provisioning storage
+    MutableByteSpan keySpan = MutableByteSpan(keyBuffer);
+
+    ReturnErrorOnFailure(Flash::Get(Parameters::ID::kOtaTlvEncryptionKey, keySpan.data(), keySpan.size(), keyLen));
+    keySpan.reduce_size(keyLen);
+
+    VerifyOrReturnError(keySpan.size() == Silabs::OtaTlvEncryptionKey::kOTAEncryptionKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+    Silabs::OtaTlvEncryptionKey::Decrypt((const ByteSpan) keySpan, block, ivOffset);
+    return CHIP_NO_ERROR;
+#else  // MBEDTLS_USE_PSA_CRYPTO
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // SL_MBEDTLS_USE_TINYCRYPT
+}
+#else
+CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR Storage::GetOtaTlvEncryptionKeyId(uint32_t & keyId)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR Storage::DecryptUsingOtaTlvEncryptionKey(MutableByteSpan & block, uint32_t & ivOffset)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
+
+#if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+CHIP_ERROR Storage::SetTestEventTriggerKey(const ByteSpan & value)
+{
+    // Verify that the provided key has the correct length
+    VerifyOrReturnError(value.size() == TestEventTriggerDelegate::kEnableKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Write the key to the configuration storage
+    return Flash::Set(Parameters::ID::kTestEventTriggerKey, value.data(), value.size());
+}
+
+CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
+{
+    CHIP_ERROR err   = CHIP_NO_ERROR;
+    size_t keyLength = 0;
+
+    VerifyOrReturnError(keySpan.size() >= TestEventTriggerDelegate::kEnableKeyLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    err = Flash::Get(Parameters::ID::kTestEventTriggerKey, keySpan.data(), TestEventTriggerDelegate::kEnableKeyLength, keyLength);
+
+#ifndef NDEBUG
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY
+    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
+    {
+        constexpr char enableKey[] = SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY;
+        if (chip::Encoding::HexToBytes(enableKey, strlen(enableKey), keySpan.data(), TestEventTriggerDelegate::kEnableKeyLength) !=
+            TestEventTriggerDelegate::kEnableKeyLength)
+        {
+            // enableKey Hex String doesn't have the correct length
+            memset(keySpan.data(), 0, keySpan.size());
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
+    return CHIP_NO_ERROR;
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY
+#endif // NDEBUG
+
+    keySpan.reduce_size(TestEventTriggerDelegate::kEnableKeyLength);
+    return err;
+}
+
+#else // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+
+CHIP_ERROR Storage::SetTestEventTriggerKey(const ByteSpan & value)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
-#endif // OTA_ENCRYPTION_ENABLE
-
 CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+
 } // namespace Provision
-
-void MigrateDacProvider(void) {}
-
 } // namespace Silabs
 } // namespace DeviceLayer
 } // namespace chip

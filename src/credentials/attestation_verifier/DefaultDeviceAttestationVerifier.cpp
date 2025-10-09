@@ -29,6 +29,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
+#include <lib/support/StringBuilder.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::Crypto;
 using chip::TestCerts::GetTestPaaRootStore;
@@ -308,6 +310,123 @@ AttestationVerificationResult MapError(CertificateChainValidationResult certific
         return AttestationVerificationResult::kInternalError;
     }
 }
+
+// CertificateType class doesn't work since it doesn't encode PAA.
+enum class AttestationChainElement : uint8_t
+{
+    kPAA = 0,
+    kPAI = 1,
+    kDAC = 2
+};
+
+enum class KeyIdType : uint8_t
+{
+    kAuthorityKeyId = 0,
+    kSubjectKeyId   = 1,
+};
+
+#if CHIP_PROGRESS_LOGGING
+const char * CertTypeAsString(AttestationChainElement certType)
+{
+    switch (certType)
+    {
+    case AttestationChainElement::kPAA:
+        return "PAA";
+    case AttestationChainElement::kPAI:
+        return "PAI";
+    case AttestationChainElement::kDAC:
+        return "DAC";
+    default:
+        break;
+    }
+    return "<UNKNOWN>";
+}
+#endif // CHIP_PROGRESS_LOGGING
+
+void LogOneKeyId(KeyIdType keyIdType, AttestationChainElement certType, ByteSpan derBuffer)
+{
+#if CHIP_PROGRESS_LOGGING
+    const char * certTypeName = CertTypeAsString(certType);
+
+    uint8_t keyIdBuf[Crypto::kAuthorityKeyIdentifierLength]; // Big enough for SKID/AKID.
+    MutableByteSpan keyIdSpan{ keyIdBuf };
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    const char * keyIdTypeString = "<UNKNOWN>";
+    switch (keyIdType)
+    {
+    case KeyIdType::kAuthorityKeyId:
+        err             = ExtractAKIDFromX509Cert(derBuffer, keyIdSpan);
+        keyIdTypeString = "AKID";
+        break;
+    case KeyIdType::kSubjectKeyId:
+        err             = ExtractSKIDFromX509Cert(derBuffer, keyIdSpan);
+        keyIdTypeString = "SKID";
+        break;
+    default:
+        err = CHIP_ERROR_INTERNAL;
+        break;
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to extract %s from %s: %" CHIP_ERROR_FORMAT, keyIdTypeString, certTypeName,
+                     err.Format());
+        return;
+    }
+
+    KeyIdStringifier KeyIdStringifier;
+    const char * keyIdString = KeyIdStringifier.KeyIdToHex(keyIdSpan);
+
+    ChipLogProgress(NotSpecified, "--> %s certificate %s: %s", certTypeName, keyIdTypeString, keyIdString);
+#else
+    IgnoreUnusedVariable(keyIdType);
+    IgnoreUnusedVariable(certType);
+    IgnoreUnusedVariable(derBuffer);
+#endif // CHIP_PROGRESS_LOGGING
+}
+
+void LogCertificateAsPem(AttestationChainElement element, ByteSpan derBuffer)
+{
+#if CHIP_PROGRESS_LOGGING
+    ChipLogProgress(NotSpecified, "==== %s certificate considered (%u bytes) ====", CertTypeAsString(element),
+                    static_cast<unsigned>(derBuffer.size()));
+    PemEncoder encoder("CERTIFICATE", derBuffer);
+    for (const char * pemLine = encoder.NextLine(); pemLine != nullptr; pemLine = encoder.NextLine())
+    {
+        ChipLogProgress(NotSpecified, "%s", pemLine);
+    }
+#else
+    IgnoreUnusedVariable(element);
+    IgnoreUnusedVariable(derBuffer);
+#endif // CHIP_PROGRESS_LOGGING
+}
+
+void LogCertDebugData(AttestationChainElement element, ByteSpan derBuffer)
+{
+    LogCertificateAsPem(element, derBuffer);
+    LogOneKeyId(KeyIdType::kSubjectKeyId, element, derBuffer);
+    LogOneKeyId(KeyIdType::kAuthorityKeyId, element, derBuffer);
+}
+
+#if CHIP_PROGRESS_LOGGING
+const char * CertificationTypeAsString(CertificationType certificationType)
+{
+    switch (certificationType)
+    {
+    case CertificationType::kDevelopmentAndTest:
+        return "Development and testing";
+    case CertificationType::kProvisional:
+        return "Provisional certification";
+    case CertificationType::kOfficial:
+        return "Certified device";
+    default:
+        break;
+    }
+    return "<UNKNOWN>";
+}
+#endif
+
 } // namespace
 
 void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
@@ -356,6 +475,18 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
         }
     }
 
+    // Log info about the DAC chain so far (DAC, PAI).
+    if (AreVerboseLogsEnabled())
+    {
+        ChipLogProgress(NotSpecified, "Device candidate DAC chain details:");
+        ChipLogProgress(NotSpecified, "--> DAC's VID: 0x%04X, PID: 0x%04X", dacVidPid.mVendorId.Value(),
+                        dacVidPid.mProductId.Value());
+
+        LogCertDebugData(AttestationChainElement::kDAC, info.dacDerBuffer);
+        LogCertDebugData(AttestationChainElement::kPAI, info.paiDerBuffer);
+    }
+
+    // Validate overall attestation signature on attestation information.
     {
         P256PublicKey remoteManufacturerPubkey;
         P256ECDSASignature deviceSignature;
@@ -363,7 +494,6 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
         VerifyOrExit(ExtractPubkeyFromX509Cert(info.dacDerBuffer, remoteManufacturerPubkey) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kDacFormatInvalid);
 
-        // Validate overall attestation signature on attestation information
         // SetLength will fail if signature doesn't fit
         VerifyOrExit(deviceSignature.SetLength(info.attestationSignatureBuffer.size()) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kAttestationSignatureInvalidFormat);
@@ -373,26 +503,42 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
                      attestationError = AttestationVerificationResult::kAttestationSignatureInvalid);
     }
 
+    // Find PAA and validate it.
     {
-        uint8_t akidBuf[Crypto::kAuthorityKeyIdentifierLength];
-        MutableByteSpan akid(akidBuf);
+        uint8_t paiAkidBuf[Crypto::kAuthorityKeyIdentifierLength];
+        MutableByteSpan paiAkid(paiAkidBuf);
         constexpr size_t paaCertAllocatedLen = kMaxDERCertLength;
         CHIP_ERROR err                       = CHIP_NO_ERROR;
 
-        VerifyOrExit(ExtractAKIDFromX509Cert(info.paiDerBuffer, akid) == CHIP_NO_ERROR,
+        VerifyOrExit(ExtractAKIDFromX509Cert(info.paiDerBuffer, paiAkid) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kPaiFormatInvalid);
 
         VerifyOrExit(paaCert.Alloc(paaCertAllocatedLen), attestationError = AttestationVerificationResult::kNoMemory);
 
         paaDerBuffer = MutableByteSpan(paaCert.Get(), paaCertAllocatedLen);
-        err          = mAttestationTrustStore->GetProductAttestationAuthorityCert(akid, paaDerBuffer);
-        VerifyOrExit(err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_IMPLEMENTED,
-                     attestationError = AttestationVerificationResult::kPaaNotFound);
-
+        err          = mAttestationTrustStore->GetProductAttestationAuthorityCert(paiAkid, paaDerBuffer);
         if (err == CHIP_ERROR_NOT_IMPLEMENTED)
         {
-            VerifyOrExit(gTestAttestationTrustStore->GetProductAttestationAuthorityCert(akid, paaDerBuffer) == CHIP_NO_ERROR,
-                         attestationError = AttestationVerificationResult::kPaaNotFound);
+            err = gTestAttestationTrustStore->GetProductAttestationAuthorityCert(paiAkid, paaDerBuffer);
+        }
+
+        if (err != CHIP_NO_ERROR)
+        {
+            attestationError = AttestationVerificationResult::kPaaNotFound;
+#if CHIP_ERROR_LOGGING
+            KeyIdStringifier paiAkidWriter;
+            [[maybe_unused]] const char * paiAkidHexString = paiAkidWriter.KeyIdToHex(paiAkid);
+
+            ChipLogError(NotSpecified, "Unable to find PAA, err: %" CHIP_ERROR_FORMAT ", PAI's AKID: %s", err.Format(),
+                         paiAkidHexString);
+#endif // CHIP_ERROR_LOGGING
+            ExitNow();
+        }
+
+        if (AreVerboseLogsEnabled())
+        {
+            // PAA details following the DAC/PAI above.
+            LogCertDebugData(AttestationChainElement::kPAA, paaDerBuffer);
         }
 
         VerifyOrExit(ExtractVIDPIDFromX509Cert(paaDerBuffer, paaVidPid) == CHIP_NO_ERROR,
@@ -473,10 +619,25 @@ AttestationVerificationResult DefaultDACVerifier::ValidateCertificationDeclarati
     CHIP_ERROR err = mCdKeysTrustStore.LookupVerifyingKey(kid, verifyingKey);
     VerifyOrReturnError(err == CHIP_NO_ERROR, AttestationVerificationResult::kCertificationDeclarationNoCertificateFound);
 
-    // Disallow test key if support not enabled
-    if (mCdKeysTrustStore.IsCdTestKey(kid) && !IsCdTestKeySupported())
+#if CHIP_PROGRESS_LOGGING
+    if (AreVerboseLogsEnabled())
     {
-        return AttestationVerificationResult::kCertificationDeclarationNoCertificateFound;
+        KeyIdStringifier cdAkidWriter;
+        const char * cdAkidHexString = cdAkidWriter.KeyIdToHex(kid);
+        ChipLogProgress(NotSpecified, "CD signing key identifier: %s", cdAkidHexString);
+    }
+#endif
+
+    if (mCdKeysTrustStore.IsCdTestKey(kid))
+    {
+        // Disallow test key if support not enabled
+        if (!IsCdTestKeySupported())
+        {
+            ChipLogError(NotSpecified, "Disallowing CD signed by test key");
+            return AttestationVerificationResult::kCertificationDeclarationNoCertificateFound;
+        }
+
+        ChipLogProgress(NotSpecified, "Allowing CD signed by test key");
     }
 
     VerifyOrReturnError(CMS_Verify(cmsEnvelopeBuffer, verifyingKey, certDeclBuffer) == CHIP_NO_ERROR,
@@ -568,6 +729,22 @@ AttestationVerificationResult DefaultDACVerifier::ValidateCertificateDeclaration
                             AttestationVerificationResult::kCertificationDeclarationInvalidPAA);
     }
 
+    if (AreVerboseLogsEnabled())
+    {
+        ChipLogProgress(NotSpecified, "Device certification declaration details:");
+        ChipLogProgress(NotSpecified, "--> VID: 0x%04X", cdContent.vendorId);
+        // TODO (https://github.com/project-chip/connectedhomeip/issues/39714): Figure out how to
+        // log the product_id_array, which is not in cdContent.
+        ChipLogProgress(NotSpecified, "--> Device type ID: " ChipLogFormatMEI, ChipLogValueMEI(cdContent.deviceTypeId));
+        ChipLogProgress(NotSpecified, "--> Certification type: %d (%s)", cdContent.certificationType,
+                        CertificationTypeAsString(static_cast<CertificationType>(cdContent.certificationType)));
+        if (cdContent.dacOriginVIDandPIDPresent)
+        {
+            ChipLogProgress(NotSpecified, "--> DAC origin VID: 0x%04X, PID: 0x%04X", cdContent.dacOriginVendorId,
+                            cdContent.dacOriginProductId);
+        }
+    }
+
     return AttestationVerificationResult::kSuccess;
 }
 
@@ -616,6 +793,7 @@ void DefaultDACVerifier::CheckForRevokedDACChain(const AttestationInfo & info,
     }
     else
     {
+        ChipLogProgress(NotSpecified, "WARNING: No revocation delegate available. Revocation checks will be skipped!");
         onCompletion->mCall(onCompletion->mContext, info, AttestationVerificationResult::kSuccess);
     }
 }

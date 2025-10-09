@@ -54,8 +54,9 @@ public:
         VerifyOrDie(databuf != nullptr || datalen == 0); // not constexpr on some platforms
     }
 
-    // A Span can only point to null if it is empty (size == 0). The default constructor
-    // should be used to construct empty Spans. All other cases involving null are invalid.
+    // The only valid length for a span pointing to null is 0 (i.e. it's an empty span).  Disallow
+    // construction of spans from compile-time-known null.  The default constructor should be used
+    // to construct empty Spans. All other cases involving null are invalid.
     Span(std::nullptr_t null, size_t size) = delete;
 
     // Creates a Span view of a plain array.
@@ -204,9 +205,20 @@ private:
     size_t mDataLen;
 };
 
+// Template deduction guides to allow construction of Span from a pointer or
+// array without having to specify the type of the entries explicitly.
+template <class T>
+Span(T * data, size_t size) -> Span<T>;
+template <class T, size_t N>
+Span(T (&databuf)[N]) -> Span<T>;
+template <class T, size_t N>
+Span(std::array<T, N> & data) -> Span<T>;
+template <class T, size_t N>
+Span(const std::array<T, N> & data) -> Span<const T>;
+
 inline namespace literals {
 
-inline constexpr Span<const char> operator"" _span(const char * literal, size_t size)
+inline constexpr Span<const char> operator""_span(const char * literal, size_t size)
 {
     return Span<const char>(Unchecked, literal, size);
 }
@@ -374,7 +386,8 @@ inline CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan &
 {
     VerifyOrReturnError(out_buf.size() >= span_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    memcpy(out_buf.data(), span_to_copy.data(), span_to_copy.size());
+    // There is no guarantee that span_to_copy and out_buf don't overlap, so use memmove()
+    memmove(out_buf.data(), span_to_copy.data(), span_to_copy.size());
     out_buf.reduce_size(span_to_copy.size());
 
     return CHIP_NO_ERROR;
@@ -384,7 +397,8 @@ inline CHIP_ERROR CopyCharSpanToMutableCharSpan(CharSpan cspan_to_copy, MutableC
 {
     VerifyOrReturnError(out_buf.size() >= cspan_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    memcpy(out_buf.data(), cspan_to_copy.data(), cspan_to_copy.size());
+    // There is no guarantee that cspan_to_copy and out_buf don't overlap, so use memmove()
+    memmove(out_buf.data(), cspan_to_copy.data(), cspan_to_copy.size());
     out_buf.reduce_size(cspan_to_copy.size());
 
     return CHIP_NO_ERROR;
@@ -400,7 +414,8 @@ inline void CopyCharSpanToMutableCharSpanWithTruncation(CharSpan span_to_copy, M
 {
     size_t size_to_copy = std::min(span_to_copy.size(), out_span.size());
 
-    memcpy(out_span.data(), span_to_copy.data(), size_to_copy);
+    // There is no guarantee that span_to_copy and out_buf don't overlap, so use memmove()
+    memmove(out_span.data(), span_to_copy.data(), size_to_copy);
     out_span.reduce_size(size_to_copy);
 }
 
