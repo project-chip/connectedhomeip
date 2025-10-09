@@ -63,7 +63,11 @@ void SmokeCOAlarmApp::AppTask::PreInitMatterStack()
 void SmokeCOAlarmApp::AppTask::PostInitMatterStack()
 {
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&chip::NXP::App::GetICDUtil());
-	if (AlarmMgr().Init() != CHIP_NO_ERROR)
+}
+
+void SmokeCOAlarmApp::AppTask::PostInitMatterServerInstance()
+{
+    if (AlarmMgr().Init() != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Init AlarmMgr failed");
     }

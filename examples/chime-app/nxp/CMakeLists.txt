@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2024 Project CHIP Authors
+# Copyright (c) 2024-2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 #
 
 # ****************************************************************
-# Matter Smoke CO Alarm application for NXP FreeRTOS platforms
+# Matter Chime application for NXP FreeRTOS platforms
 # ****************************************************************
 
 cmake_minimum_required(VERSION 3.30)
@@ -42,6 +42,9 @@ get_filename_component(NXP_MATTER_SUPPORT_DIR ${CHIP_ROOT}/third_party/nxp/nxp_m
 # Add the CHIP stack & NXP port libs as an external module
 list(APPEND EXTRA_MCUX_MODULES ${CHIP_ROOT}/config/nxp/chip-cmake-freertos)
 
+# Add secure element lib as an external module
+list(APPEND EXTRA_MCUX_MODULES ${CHIP_ROOT}/third_party/simw-top-mini/repo/matter)
+
 # If CONF_FILE_NAME is provided, add the full path in front of CONF_FILE
 if (DEFINED CONF_FILE_NAME)
     set(CONF_FILE ${CHIP_ROOT}/examples/platform/nxp/config/${CONF_FILE_NAME} ${CONF_FILE})
@@ -66,7 +69,7 @@ endif()
 include(${NXP_SDK_RECONFIG_CMAKE_DIR}/nxp_sdk_reconfig.cmake)
 
 # Define application project name
-project(chip-nxp-smoke-co-amarm-app-example)
+project(chip-nxp-chime-app-example)
 
 # Add application definitions, include paths and source files
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
@@ -76,8 +79,8 @@ include(${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_common.cmake)
 
 target_include_directories(app
     PRIVATE
-    ${NXP_EXAMPLE_DIR}/main/include
     ${ALL_CLUSTERS_COMMON_DIR}/include
+    ${NXP_EXAMPLE_DIR}/main/include
     ${GEN_DIR}/app-common
 )
 
@@ -87,24 +90,26 @@ target_sources(app
     ${NXP_EXAMPLE_DIR}/main/AppTask.cpp
     ${NXP_EXAMPLE_DIR}/main/DeviceCallbacks.cpp
     ${NXP_EXAMPLE_DIR}/main/ZclCallbacks.cpp
-    ${NXP_EXAMPLE_DIR}/main/SmokeCoAlarmManager.cpp
+    ${NXP_EXAMPLE_DIR}/main/chime-instance.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
 )
-
-if(CONFIG_CHIP_ETHERNET)
-    message(FATAL_ERROR "Ethernet configuration is not supported in this application.")
-endif()
 
 if(CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD)
     message(FATAL_ERROR "WiFi + Thread (Border Router) configuration is not supported in this application.")
 elseif(CONFIG_CHIP_WIFI AND NOT CONFIG_NET_L2_OPENTHREAD)
     chip_configure_data_model(app
         INCLUDE_SERVER
-        ZAP_FILE ${NXP_EXAMPLE_ZAP_DIR}/smoke-co-alarm-app-wifi.zap
+        ZAP_FILE ${NXP_EXAMPLE_ZAP_DIR}/chime_matter_wifi.zap
     )
 elseif(CONFIG_NET_L2_OPENTHREAD AND NOT CONFIG_CHIP_WIFI)
     chip_configure_data_model(app
         INCLUDE_SERVER
-        ZAP_FILE ${NXP_EXAMPLE_ZAP_DIR}/smoke-co-alarm-app-ot.zap
+        ZAP_FILE ${NXP_EXAMPLE_ZAP_DIR}/chime_matter_thread.zap
+    )
+elseif(CONFIG_CHIP_ETHERNET)
+    chip_configure_data_model(app
+        INCLUDE_SERVER
+        ZAP_FILE ${NXP_EXAMPLE_ZAP_DIR}/chime_matter_eth.zap
     )
 endif()
+
