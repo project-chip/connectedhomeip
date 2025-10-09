@@ -83,10 +83,11 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     {
         // Stream has been validated and potentially selected by ValidateStreamUsage()
         // in the cluster server before invoking this delegate method
-        outSession.videoStreamID = args.videoStreamId.Value();
-        if (!args.videoStreamId.Value().IsNull())
+        const auto & videoStreamIdNullable = args.videoStreamId.Value();
+        outSession.videoStreamID           = videoStreamIdNullable;
+        if (!videoStreamIdNullable.IsNull())
         {
-            videoStreamID = args.videoStreamId.Value().Value();
+            videoStreamID = videoStreamIdNullable.Value();
         }
     }
     else
@@ -99,10 +100,11 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     {
         // Stream has been validated and potentially selected by ValidateStreamUsage()
         // in the cluster server before invoking this delegate method
-        outSession.audioStreamID = args.audioStreamId.Value();
-        if (!args.audioStreamId.Value().IsNull())
+        const auto & audioStreamIdNullable = args.audioStreamId.Value();
+        outSession.audioStreamID           = audioStreamIdNullable;
+        if (!audioStreamIdNullable.IsNull())
         {
-            audioStreamID = args.audioStreamId.Value().Value();
+            audioStreamID = audioStreamIdNullable.Value();
         }
     }
     else
@@ -246,10 +248,11 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     {
         // Stream has been validated and potentially selected by ValidateStreamUsage()
         // in the cluster server before invoking this delegate method
-        outSession.videoStreamID = args.videoStreamId.Value();
-        if (!args.videoStreamId.Value().IsNull())
+        const auto & videoStreamIdNullable = args.videoStreamId.Value();
+        outSession.videoStreamID           = videoStreamIdNullable;
+        if (!videoStreamIdNullable.IsNull())
         {
-            videoStreamID = args.videoStreamId.Value().Value();
+            videoStreamID = videoStreamIdNullable.Value();
         }
     }
     else
@@ -262,10 +265,11 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     {
         // Stream has been validated and potentially selected by ValidateStreamUsage()
         // in the cluster server before invoking this delegate method
-        outSession.audioStreamID = args.audioStreamId.Value();
-        if (!args.audioStreamId.Value().IsNull())
+        const auto & audioStreamIdNullable = args.audioStreamId.Value();
+        outSession.audioStreamID           = audioStreamIdNullable;
+        if (!audioStreamIdNullable.IsNull())
         {
-            audioStreamID = args.audioStreamId.Value().Value();
+            audioStreamID = audioStreamIdNullable.Value();
         }
     }
     else
