@@ -16,7 +16,7 @@
 #
 
 
-from typing import Callable
+from typing import Callable, Optional
 
 import matter.clusters as Clusters
 from matter.testing.basic_composition import BasicCompositionTests
@@ -76,8 +76,10 @@ class DeviceConformanceTests(BasicCompositionTests):
         await super().setup_class_helper()
         self.build_spec_xmls()
 
-    def _get_device_type_id(self, device_type_name: str) -> int:
-        id = [id for id, dt in self.xml_device_types.items() if dt.name.lower() == device_type_name.lower()]
+    def _get_device_type_id(self, device_type_name: str, xml_device_types: Optional[dict[uint, XmlDeviceType]] = None) -> int:
+        if xml_device_types is None:
+            xml_device_types = self.xml_device_types
+        id = [id for id, dt in xml_device_types.items() if dt.name.lower() == device_type_name.lower()]
         if len(id) != 1:
             self.fail_current_test(f"Unable to find {device_type_name} device type")
         return id[0]
@@ -489,9 +491,9 @@ class DeviceConformanceTests(BasicCompositionTests):
         one_five_device_types, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
         # TODO: change this once https://github.com/project-chip/matter-test-scripts/issues/689 is implemented
 
-        window_covering_id = self._get_device_type_id('Window Covering')
-        closure_id = self._get_device_type_id('Closure')
-        closure_panel_id = self._get_device_type_id('Closure Panel')
+        window_covering_id = self._get_device_type_id('Window Covering', one_five_device_types)
+        closure_id = self._get_device_type_id('Closure', one_five_device_types)
+        closure_panel_id = self._get_device_type_id('Closure Panel', one_five_device_types)
         restricted_device_type_ids = [window_covering_id, closure_id, closure_panel_id]
 
         problems = []
