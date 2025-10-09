@@ -159,8 +159,8 @@ class DeviceConformanceTests(BasicCompositionTests):
 
                 feature_map = cluster[GlobalAttributeIds.FEATURE_MAP_ID]
                 attribute_list = cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
-                all_command_list = cluster[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] +
-                cluster[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID]
+                all_command_list = cluster[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] + \
+                    cluster[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID]
 
                 # Feature conformance checking
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
@@ -531,6 +531,24 @@ class DeviceConformanceTests(BasicCompositionTests):
         closure_namespace_id = get_namespace_id('Closure')
         closure_panel_namespace_id = get_namespace_id('Closure Panel')
 
+        def check_tags_on_endpoint(device_type_id: int, allowed_namespace: int, max_num_tags_allowed_namespace: int, disallowed_namespace: int):
+            tag_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList]
+            allowed_tag_count = 0
+
+            for tag in tag_list:
+                if tag.namespaceID == disallowed_namespace:
+                    problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
+                                                  problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has semantic tag {tag.tag} from namespace {one_five_namespaces[disallowed_namespace].name}"))
+                elif tag.namespaceID == allowed_namespace:
+                    allowed_tag_count += 1
+
+            if allowed_tag_count == 0:
+                problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
+                                              problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} is missing a {one_five_namespaces[allowed_namespace].name} namespace tag"))
+            elif allowed_tag_count > 1:
+                problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
+                                              problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has multiple {one_five_namespaces[allowed_namespace].name} namespace tags"))
+
         problems = []
         for endpoint_id, endpoint in self.endpoints.items():
             # If a Cloure or Closure Panel does not implement TagList, this is also invalid but is verified by another IDM test,
@@ -540,42 +558,9 @@ class DeviceConformanceTests(BasicCompositionTests):
             device_types = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
 
             for dt in device_types:
-                device_type_id = dt.deviceType
-
-                if device_type_id == closure_id:
-                    tag_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList]
-                    closure_tag_count = 0
-
-                    for tag in tag_list:
-                        if tag.namespaceID == closure_panel_namespace_id:
-                            problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
-                                                          problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has semantic tag {tag.tag} from Closure Panel namespace"))
-                        elif tag.namespaceID == closure_namespace_id:
-                            closure_tag_count += 1
-
-                    if closure_tag_count == 0:
-                        problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
-                                                      problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} is missing a Closure namespace tag"))
-                    elif closure_tag_count > 1:
-                        problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
-                                                      problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has multiple Closure namespace tags"))
-
-                elif device_type_id == closure_panel_id:
-                    tag_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList]
-                    closure_panel_tag_count = 0
-
-                    for tag in tag_list:
-                        if tag.namespaceID == closure_namespace_id:
-                            problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
-                                                          problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has semantic tag {tag.tag} from Closure namespace"))
-                        elif tag.namespaceID == closure_panel_namespace_id:
-                            closure_panel_tag_count += 1
-
-                    if closure_panel_tag_count == 0:
-                        problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
-                                                      problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} is missing a Closure Panel namespace tag"))
-                    elif closure_panel_tag_count > 1:
-                        problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
-                                                      problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has multiple Closure Panel namespace tags"))
+                if dt.deviceType == closure_id:
+                    check_tags_on_endpoint(closure_id, closure_namespace_id, 1, closure_panel_namespace_id)
+                elif dt.deviceType == closure_panel_id:
+                    check_tags_on_endpoint(closure_panel_id, closure_panel_namespace_id, 1, closure_namespace_id)
 
         return problems
