@@ -886,6 +886,13 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
         return std::nullopt;
     }
 
+    if (mDelegate->GetTransportBusyStatus(connectionID) == PushAvStreamTransportStatusEnum::kBusy)
+    {
+        ChipLogError(Zcl, "HandleDeallocatePushTransport[ep=%d]: Connection is Busy", mEndpointId);
+        handler.AddStatus(commandPath, Status::Busy);
+        return std::nullopt;
+    }
+
     // Call the delegate
     auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(mDelegate->DeallocatePushTransport(connectionID));
 
