@@ -268,6 +268,8 @@ class PAVSTTestBase:
                     e.clusterStatus == expected_cluster_status, "Unexpected error returned"
                 )
                 return e.clusterStatus
+            if (e.status == Status.ResourceExhausted):
+                asserts.fail("RESOURCE_EXHAUSTED")
             return e.status
         pass
 

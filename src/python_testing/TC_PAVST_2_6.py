@@ -167,6 +167,10 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
         aConnectionID = transportConfigs[0].connectionID
         aTransportStatus = transportConfigs[0].transportStatus
+        aTransportOptions = transportConfigs[0].transportOptions
+        aModifiedTransportOptions = aTransportOptions.expiryTime
+        aModifiedTransportOptions = aModifiedTransportOptions + 3
+        aTransportOptions.expiryTime = aModifiedTransportOptions
 
         # TH1 sends command
         self.step(3)
@@ -206,6 +210,14 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             transportStatus=not aTransportStatus
         )
         status = await self.psvt_set_transport_status(cmd)
+        cmd = pvcluster.Commands.ModifyPushTransport(
+            connectionID=aConnectionID,
+            transportOptions=aTransportOptions,
+        )
+        status1 = await self.psvt_modify_push_transport(cmd)
+        asserts.assert_true(
+            status1 == Status.Success,
+            "DUT responds with SUCCESS status code.")
         asserts.assert_true(
             status == Status.Success,
             "DUT responds with SUCCESS status code.")
@@ -213,9 +225,17 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step(6)
         cmd = pvcluster.Commands.SetTransportStatus(
             connectionID=Nullable(),
-            transportStatus=not aTransportStatus
+            transportStatus=Clusters.PushAvStreamTransport.Enums.TransportStatusEnum.kInactive
         )
         status = await self.psvt_set_transport_status(cmd)
+        cmd = pvcluster.Commands.ModifyPushTransport(
+            connectionID=aConnectionID,
+            transportOptions=aTransportOptions,
+        )
+        status1 = await self.psvt_modify_push_transport(cmd)
+        asserts.assert_true(
+            status1 == Status.Success,
+            "DUT responds with SUCCESS status code.")
         asserts.assert_true(
             status == Status.Success,
             "DUT responds with SUCCESS status code.")
@@ -229,7 +249,7 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
         asserts.assert_true(
             transportConfigs[0].transportStatus
-            == (not aTransportStatus),
+            == (Clusters.PushAvStreamTransport.Enums.TransportStatusEnum.kInactive),
             "Transport Status must be same the modified one",
         )
 
