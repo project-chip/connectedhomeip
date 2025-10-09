@@ -133,6 +133,11 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             ),
             TestStep(
                 12,
+                "TH1 sends the ManuallyTriggerTransport command with ConnectionID = aConnectionID and TimeControl field is omitted.",
+                "DUT responds with DYNAMIC_CONSTRAINT_ERROR status code.",
+            ),
+            TestStep(
+                13,
                 "TH1 sends the ManuallyTriggerTransport command with ConnectionID = aConnectionID.",
                 "DUT responds with SUCCESS status code.",
             ),
@@ -316,6 +321,17 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             "DUT responds with SUCCESS status code.")
 
         self.step(12)
+        cmd = pvcluster.Commands.ManuallyTriggerTransport(
+            connectionID=aConnectionID,
+            activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kUserInitiated,
+        )
+        status = await self.psvt_manually_trigger_transport(cmd, expected_status=Status.DynamicConstraintError)
+        asserts.assert_true(
+            status == Status.DynamicConstraintError,
+            "DUT responds with DynamicConstraintError status code.",
+        )
+
+        self.step(13)
         timeControl = {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}
         cmd = pvcluster.Commands.ManuallyTriggerTransport(
             connectionID=aConnectionID,

@@ -44,6 +44,7 @@ from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
 
 import matter.clusters as Clusters
 from matter.clusters import Globals
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -106,28 +107,42 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             ),
             TestStep(
                 6,
+                "TH establishes a subscription to all of the Events from the Cluster",
+            ),
+            TestStep(
+                7,
                 "TH sends the SetTransportStatus command with ConnectionID = aConnectionID and TransportStatus = Active.",
                 "DUT responds with SUCCESS status code.",
             ),
             TestStep(
-                7,
+                8,
                 "TH sends the ManuallyTriggerTransport command with ConnectionID = aConnectionID.",
                 "DUT responds with SUCCESS status code and begins transmission.",
             ),
             TestStep(
-                8,
-                "View the video stream in TH UI",
-                "Verify the transmitted video stream is of CMAF Format.",
-            ),
-            TestStep(
                 9,
-                "TH sends the SetTransportStatus command with ConnectionID = aConnectionID and TransportStatus = Inactive.",
-                "DUT responds with SUCCESS status code",
+                "TH verifies that a PushTransportBegin Event was received.",
+                "TH validates that the connectionID = aConnectionID, triggerType = Command, and activationReason = UserInitiated.",
             ),
             TestStep(
                 10,
                 "View the video stream in TH UI",
+                "Verify the transmitted video stream is of CMAF Format.",
+            ),
+            TestStep(
+                11,
+                "TH sends the SetTransportStatus command with ConnectionID = aConnectionID and TransportStatus = Inactive.",
+                "DUT responds with SUCCESS status code",
+            ),
+            TestStep(
+                12,
+                "View the video stream in TH UI",
                 "Verify the transmission of video stream has stopped.",
+            ),
+            TestStep(
+                13,
+                "TH verifies that a PushTransportEnd Event was received.",
+                "TH validates that the connectionID = aConnectionID.",
             ),
         ]
 
@@ -235,6 +250,12 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         )
 
         self.step(6)
+        event_callback = EventSubscriptionHandler(expected_cluster=pushavCluster)
+        await event_callback.start(self.default_controller,
+                                   self.dut_node_id,
+                                   self.get_endpoint(1))
+
+        self.step(7)
         aConnectionID = (
             allocatePushTransportResponse.transportConfiguration.connectionID
         )
@@ -244,7 +265,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             endpoint=endpoint,
         )
 
-        self.step(7)
+        self.step(8)
         await self.send_single_cmd(
             cmd=pushavCluster.Commands.ManuallyTriggerTransport(
                 connectionID=aConnectionID,
@@ -260,7 +281,17 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             endpoint=endpoint,
         )
 
-        self.step(8)
+        self.step(9)
+        # Verify event received
+        event_data = event_callback.wait_for_event_report(pushavCluster.Events.PushTransportBegin, timeout_sec=5)
+        logger.info(f"Event data {event_data}")
+        asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
+        asserts.assert_equal(event_data.triggerType, pushavCluster.Enums.TransportTriggerTypeEnum.kCommand,
+                             "Unexpected value for TriggerType returned")
+        asserts.assert_equal(event_data.activationReason, pushavCluster.Enums.TriggerActivationReasonEnum.kUserInitiated,
+                             "Unexpected value for ActivationReason returned")
+
+        self.step(10)
         if not self.check_pics("PICS_SDK_CI_ONLY"):
             skipped = self.user_verify_push_av_stream(
                 prompt_msg="Verify the video stream is being transmitted and is of CMAF format."
@@ -274,14 +305,14 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                 )
                 asserts.assert_equal(user_response.lower(), "y")
 
-        self.step(9)
+        self.step(11)
         await self.send_single_cmd(
             cmd=pushavCluster.Commands.SetTransportStatus(
                 connectionID=aConnectionID, transportStatus=pushavCluster.Enums.TransportStatusEnum.kInactive),
             endpoint=endpoint,
         )
 
-        self.step(10)
+        self.step(12)
         if not self.check_pics("PICS_SDK_CI_ONLY"):
             skipped = self.user_verify_push_av_stream(
                 prompt_msg="Verify the transmission of video stream has stopped."
@@ -294,6 +325,12 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                     default_value="y",
                 )
                 asserts.assert_equal(user_response.lower(), "y")
+
+        self.step(13)
+        # Verify event received
+        event_data = event_callback.wait_for_event_report(pushavCluster.Events.PushTransportEnd, timeout_sec=5)
+        logger.info(f"Event data {event_data}")
+        asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
 
 
 if __name__ == "__main__":

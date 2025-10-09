@@ -73,6 +73,13 @@ Alchemy: v1.5.55
     <item fieldId="1" name="Currency" type="CurrencyStruct"/>
   </struct>
 
+  <struct name="SemanticTagStruct">
+    <item fieldId="0" name="MfgCode" type="vendor_id" isNullable="true"/>
+    <item fieldId="1" name="NamespaceID" type="enum8"/>
+    <item fieldId="2" name="Tag" type="enum8"/>
+    <item fieldId="3" name="Label" type="char_string" isNullable="true" optional="true" length="64"/>
+  </struct>
+
   <struct name="TestGlobalStruct">
     <item fieldId="0" name="Name" type="char_string" length="128"/>
     <item fieldId="1" name="MyBitmap" type="TestGlobalBitmap" isNullable="true"/>
