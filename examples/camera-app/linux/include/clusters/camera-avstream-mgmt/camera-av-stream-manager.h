@@ -94,6 +94,10 @@ public:
 
     CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
 
+    const std::vector<chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct> & GetAllocatedVideoStreams() const override;
+
+    const std::vector<chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct> & GetAllocatedAudioStreams() const override;
+
     void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                 const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, uint32_t & outBandwidthbps) override;
 
