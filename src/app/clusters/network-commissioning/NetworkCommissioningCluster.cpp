@@ -227,14 +227,7 @@ CHIP_ERROR NetworkCommissioningCluster::Attributes(const ConcreteClusterPath & p
     using NetworkCommissioning::Feature;
 
     // mandatory attributes
-    ReturnErrorOnFailure(builder.AppendElements({
-        MaxNetworks::kMetadataEntry,
-        Networks::kMetadataEntry,
-        InterfaceEnabled::kMetadataEntry,
-        LastNetworkingStatus::kMetadataEntry,
-        LastNetworkID::kMetadataEntry,
-        LastConnectErrorValue::kMetadataEntry,
-    }));
+    ReturnErrorOnFailure(builder.AppendElements(kMandatoryMetadata));
 
     // NOTE: thread and wifi are mutually exclusive features
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
