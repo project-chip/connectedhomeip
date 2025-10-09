@@ -56,7 +56,7 @@ public:
 
 } // namespace
 
-void emberAfFixedLabelClusterServerInitCallback(EndpointId endpointId)
+void MatterFixedLabelClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -73,7 +73,7 @@ void emberAfFixedLabelClusterServerInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterFixedLabelClusterServerShutdownCallback(EndpointId endpointId)
+void MatterFixedLabelClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
