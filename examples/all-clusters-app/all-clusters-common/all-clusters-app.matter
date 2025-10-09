@@ -356,6 +356,7 @@ fabric_scoped struct WebRTCSessionStruct {
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
+
 cluster Identify = 3 {
   revision 6;
 
@@ -404,6 +405,7 @@ cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 /** Attributes and commands for group configuration and manipulation. */
+
 cluster Groups = 4 {
   revision 4;
 
@@ -479,6 +481,7 @@ cluster Groups = 4 {
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
+
 cluster OnOff = 6 {
   revision 6;
 
@@ -549,6 +552,7 @@ cluster OnOff = 6 {
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
+
 cluster OnOff = 6 {
   revision 6;
 
@@ -619,6 +623,7 @@ cluster OnOff = 6 {
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
 /** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
+
 cluster LevelControl = 8 {
   revision 6;
 
@@ -741,6 +746,7 @@ cluster LevelControl = 8 {
   command MoveToClosestFrequency(MoveToClosestFrequencyRequest): DefaultSuccess = 8;
 }
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
+
 cluster Descriptor = 29 {
   revision 3;
 
@@ -766,6 +772,7 @@ cluster Descriptor = 29 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
+
 cluster Binding = 30 {
   revision 1;
 
@@ -788,6 +795,7 @@ cluster Binding = 30 {
       Node's Access Control List (ACL), which codifies the rules used to manage
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
+
 cluster AccessControl = 31 {
   revision 2;
 
@@ -908,6 +916,7 @@ cluster AccessControl = 31 {
   fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
 /** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information. */
+
 cluster Actions = 37 {
   revision 1;
 
@@ -1085,6 +1094,7 @@ cluster Actions = 37 {
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
+
 cluster BasicInformation = 40 {
   revision 5;
 
@@ -1179,6 +1189,7 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 /** Provides an interface for providing OTA software updates */
+
 cluster OtaSoftwareUpdateProvider = 41 {
   revision 1; // NOTE: Default/not specifically set
 
@@ -1253,6 +1264,7 @@ cluster OtaSoftwareUpdateProvider = 41 {
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
 /** Provides an interface for downloading and applying OTA software updates */
+
 cluster OtaSoftwareUpdateRequestor = 42 {
   revision 1; // NOTE: Default/not specifically set
 
@@ -1332,6 +1344,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
       may have differing common languages, units of measurements, and numerical formatting
       standards. As such, Nodes that visually or audibly convey information need a mechanism by which
       they can be configured to use a user’s preferred language, units, etc */
+
 cluster LocalizationConfiguration = 43 {
   revision 1;
 
@@ -1347,6 +1360,7 @@ cluster LocalizationConfiguration = 43 {
       may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
       or audibly convey time information need a mechanism by which they can be configured to use a
       user’s preferred format. */
+
 cluster TimeFormatLocalization = 44 {
   revision 1;
 
@@ -1389,6 +1403,7 @@ cluster TimeFormatLocalization = 44 {
       may have differing preferences for the units in which values are conveyed in communication to a
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
       mechanism by which they can be configured to use a user’s preferred unit. */
+
 cluster UnitLocalization = 45 {
   revision 2;
 
@@ -1411,6 +1426,7 @@ cluster UnitLocalization = 45 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** This cluster is used to describe the configuration and capabilities of a Device's power system. */
+
 cluster PowerSourceConfiguration = 46 {
   revision 1;
 
@@ -1422,6 +1438,7 @@ cluster PowerSourceConfiguration = 46 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
+
 cluster PowerSource = 47 {
   revision 3;
 
@@ -1679,6 +1696,7 @@ cluster PowerSource = 47 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** This cluster is used to manage global aspects of the Commissioning flow. */
+
 cluster GeneralCommissioning = 48 {
   revision 2;
 
@@ -1779,6 +1797,7 @@ cluster GeneralCommissioning = 48 {
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
+
 cluster NetworkCommissioning = 49 {
   revision 2;
 
@@ -1957,6 +1976,7 @@ cluster NetworkCommissioning = 49 {
   command access(invoke: administer) QueryIdentity(QueryIdentityRequest): QueryIdentityResponse = 9;
 }
 /** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
+
 cluster DiagnosticLogs = 50 {
   revision 1;
 
@@ -2002,6 +2022,7 @@ cluster DiagnosticLogs = 50 {
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
 }
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
+
 cluster GeneralDiagnostics = 51 {
   revision 2;
 
@@ -2131,6 +2152,7 @@ cluster GeneralDiagnostics = 51 {
   command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
+
 cluster SoftwareDiagnostics = 52 {
   revision 1;
 
@@ -2166,6 +2188,7 @@ cluster SoftwareDiagnostics = 52 {
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
 }
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
+
 cluster ThreadNetworkDiagnostics = 53 {
   revision 3;
 
@@ -2332,6 +2355,7 @@ cluster ThreadNetworkDiagnostics = 53 {
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
+
 cluster WiFiNetworkDiagnostics = 54 {
   revision 1;
 
@@ -2407,6 +2431,7 @@ cluster WiFiNetworkDiagnostics = 54 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 /** The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
+
 cluster EthernetNetworkDiagnostics = 55 {
   revision 1;
 
@@ -2447,6 +2472,7 @@ cluster EthernetNetworkDiagnostics = 55 {
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 /** Accurate time is required for a number of reasons, including scheduling, display and validating security materials. */
+
 cluster TimeSynchronization = 56 {
   revision 2;
 
@@ -2595,6 +2621,7 @@ cluster TimeSynchronization = 56 {
 /** This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
 Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
+
 cluster Switch = 59 {
   revision 2;
 
@@ -2647,6 +2674,7 @@ cluster Switch = 59 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
+
 cluster AdministratorCommissioning = 60 {
   revision 1;
 
@@ -2695,6 +2723,7 @@ cluster AdministratorCommissioning = 60 {
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
+
 cluster OperationalCredentials = 62 {
   revision 2;
 
@@ -2842,6 +2871,7 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) SignVIDVerificationRequest(SignVIDVerificationRequestRequest): SignVIDVerificationResponse = 13;
 }
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
+
 cluster GroupKeyManagement = 63 {
   revision 2;
 
@@ -2919,6 +2949,7 @@ cluster GroupKeyManagement = 63 {
 }
 /** The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
 labels. */
+
 cluster FixedLabel = 64 {
   revision 1; // NOTE: Default/not specifically set
 
@@ -2935,6 +2966,7 @@ cluster FixedLabel = 64 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
+
 cluster UserLabel = 65 {
   revision 1; // NOTE: Default/not specifically set
 
@@ -2951,6 +2983,7 @@ cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** This cluster provides an interface to a boolean state called StateValue. */
+
 cluster BooleanState = 69 {
   revision 1;
 
@@ -2966,6 +2999,7 @@ cluster BooleanState = 69 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven. */
+
 cluster OvenCavityOperationalState = 72 {
   revision 1;
 
@@ -3026,6 +3060,7 @@ cluster OvenCavityOperationalState = 72 {
   command Start(): OperationalCommandResponse = 2;
 }
 /** Attributes and commands for selecting a mode from a list of supported options. */
+
 cluster OvenMode = 73 {
   revision 1;
 
@@ -3088,6 +3123,7 @@ cluster OvenMode = 73 {
 }
 /** This cluster provides a way to access options associated with the operation of
             a laundry dryer device type. */
+
 cluster LaundryDryerControls = 74 {
   revision 1;
 
@@ -3107,6 +3143,7 @@ cluster LaundryDryerControls = 74 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes and commands for selecting a mode from a list of supported options. */
+
 cluster ModeSelect = 80 {
   revision 2;
 
@@ -3148,6 +3185,7 @@ cluster ModeSelect = 80 {
   command SampleMfgExtensionCommand(): DefaultSuccess = 4293984257;
 }
 /** Attributes and commands for selecting a mode from a list of supported options. */
+
 cluster LaundryWasherMode = 81 {
   revision 2;
 
@@ -3201,6 +3239,7 @@ cluster LaundryWasherMode = 81 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 /** Attributes and commands for selecting a mode from a list of supported options. */
+
 cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
   revision 2;
 
@@ -3252,6 +3291,7 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 /** This cluster supports remotely monitoring and controlling the different types of functionality available to a washing device, such as a washing machine. */
+
 cluster LaundryWasherControls = 83 {
   revision 1;
 
@@ -3278,6 +3318,7 @@ cluster LaundryWasherControls = 83 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes and commands for selecting a mode from a list of supported options. */
+
 cluster RvcRunMode = 84 {
   revision 3;
 
@@ -3345,6 +3386,7 @@ cluster RvcRunMode = 84 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 /** Attributes and commands for selecting a mode from a list of supported options. */
+
 cluster RvcCleanMode = 85 {
   revision 3;
 
@@ -3406,6 +3448,7 @@ cluster RvcCleanMode = 85 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 /** Attributes and commands for configuring the temperature control, and reporting temperature. */
+
 cluster TemperatureControl = 86 {
   revision 1;
 
@@ -3436,6 +3479,7 @@ cluster TemperatureControl = 86 {
   command SetTemperature(SetTemperatureRequest): DefaultSuccess = 0;
 }
 /** Attributes and commands for configuring the Refrigerator alarm. */
+
 cluster RefrigeratorAlarm = 87 {
   revision 1;
 
@@ -3460,6 +3504,7 @@ cluster RefrigeratorAlarm = 87 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes and commands for selecting a mode from a list of supported options. */
+
 cluster DishwasherMode = 89 {
   revision 2;
 
@@ -3512,6 +3557,7 @@ cluster DishwasherMode = 89 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 /** Attributes for reporting air quality classification */
+
 cluster AirQuality = 91 {
   revision 1;
 
@@ -3540,6 +3586,7 @@ cluster AirQuality = 91 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** This cluster provides an interface for observing and managing the state of smoke and CO alarms. */
+
 cluster SmokeCoAlarm = 92 {
   revision 1;
 
@@ -3650,6 +3697,7 @@ cluster SmokeCoAlarm = 92 {
   command SelfTestRequest(): DefaultSuccess = 0;
 }
 /** Attributes and commands for configuring the Dishwasher alarm. */
+
 cluster DishwasherAlarm = 93 {
   revision 1;
 
@@ -3697,6 +3745,7 @@ cluster DishwasherAlarm = 93 {
   command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
 }
 /** Attributes and commands for selecting a mode from a list of supported options. */
+
 cluster MicrowaveOvenMode = 94 {
   revision 1;
 
@@ -3735,6 +3784,7 @@ cluster MicrowaveOvenMode = 94 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
+
 cluster OperationalState = 96 {
   revision 1;
 
@@ -3799,6 +3849,7 @@ cluster OperationalState = 96 {
   command Resume(): OperationalCommandResponse = 3;
 }
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum. */
+
 cluster RvcOperationalState = 97 {
   revision 1;
 
@@ -3883,7 +3934,8 @@ cluster RvcOperationalState = 97 {
   command GoHome(): OperationalCommandResponse = 128;
 }
 /** Attributes and commands for scene configuration and manipulation. */
-provisional cluster ScenesManagement = 98 {
+provisional 
+cluster ScenesManagement = 98 {
   revision 1;
 
   bitmap CopyModeBitmap : bitmap8 {
@@ -4036,6 +4088,7 @@ provisional cluster ScenesManagement = 98 {
   fabric command access(invoke: manage) CopyScene(CopySceneRequest): CopySceneResponse = 64;
 }
 /** Attributes and commands for monitoring HEPA filters in a device */
+
 cluster HepaFilterMonitoring = 113 {
   revision 1; // NOTE: Default/not specifically set
 
@@ -4085,6 +4138,7 @@ cluster HepaFilterMonitoring = 113 {
   command ResetCondition(): DefaultSuccess = 0;
 }
 /** Attributes and commands for monitoring activated carbon filters in a device */
+
 cluster ActivatedCarbonFilterMonitoring = 114 {
   revision 1; // NOTE: Default/not specifically set
 
@@ -4134,6 +4188,7 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
   command ResetCondition(): DefaultSuccess = 0;
 }
 /** This cluster is used to configure a boolean sensor. */
+
 cluster BooleanStateConfiguration = 128 {
   revision 1;
 
@@ -4190,6 +4245,7 @@ cluster BooleanStateConfiguration = 128 {
   command EnableDisableAlarm(EnableDisableAlarmRequest): DefaultSuccess = 1;
 }
 /** This cluster is used to configure a valve. */
+
 cluster ValveConfigurationAndControl = 129 {
   revision 2;
 
@@ -4254,7 +4310,8 @@ cluster ValveConfigurationAndControl = 129 {
   command Close(): DefaultSuccess = 1;
 }
 /** This cluster provides an interface to specify preferences for how devices should consume energy. */
-provisional cluster EnergyPreference = 155 {
+provisional 
+cluster EnergyPreference = 155 {
   revision 1;
 
   enum EnergyPriorityEnum : enum8 {
@@ -4286,6 +4343,7 @@ provisional cluster EnergyPreference = 155 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Provides an interface for controlling and adjusting automatic window coverings. */
+
 cluster WindowCovering = 258 {
   revision 5;
 
@@ -4437,6 +4495,7 @@ cluster WindowCovering = 258 {
   command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
 }
 /** An interface for configuring and controlling pumps. */
+
 cluster PumpConfigurationAndControl = 512 {
   revision 4;
 
@@ -4559,6 +4618,7 @@ cluster PumpConfigurationAndControl = 512 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** An interface for configuring and controlling the functionality of a thermostat. */
+
 cluster Thermostat = 513 {
   revision 9;
 
@@ -4993,6 +5053,7 @@ cluster Thermostat = 513 {
   command access(invoke: manage) AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
 }
 /** An interface for controlling a fan in a heating/cooling system. */
+
 cluster FanControl = 514 {
   revision 5;
 
@@ -5073,6 +5134,7 @@ cluster FanControl = 514 {
   command Step(StepRequest): DefaultSuccess = 0;
 }
 /** An interface for configuring the user interface of a thermostat (which may be remote from the thermostat). */
+
 cluster ThermostatUserInterfaceConfiguration = 516 {
   revision 2;
 
@@ -5105,6 +5167,7 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes and commands for controlling the color properties of a color-capable light. */
+
 cluster ColorControl = 768 {
   revision 7;
 
@@ -5431,7 +5494,8 @@ cluster ColorControl = 768 {
   command StepColorTemperature(StepColorTemperatureRequest): DefaultSuccess = 76;
 }
 /** Attributes and commands for configuring a lighting ballast. */
-provisional cluster BallastConfiguration = 769 {
+provisional 
+cluster BallastConfiguration = 769 {
   revision 4;
 
   bitmap BallastStatusBitmap : bitmap8 {
@@ -5464,6 +5528,7 @@ provisional cluster BallastConfiguration = 769 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements. */
+
 cluster IlluminanceMeasurement = 1024 {
   revision 3;
 
@@ -5484,6 +5549,7 @@ cluster IlluminanceMeasurement = 1024 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
+
 cluster TemperatureMeasurement = 1026 {
   revision 4;
 
@@ -5498,6 +5564,7 @@ cluster TemperatureMeasurement = 1026 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements. */
+
 cluster PressureMeasurement = 1027 {
   revision 3;
 
@@ -5521,6 +5588,7 @@ cluster PressureMeasurement = 1027 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
+
 cluster FlowMeasurement = 1028 {
   revision 3;
 
@@ -5535,6 +5603,7 @@ cluster FlowMeasurement = 1028 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements. */
+
 cluster RelativeHumidityMeasurement = 1029 {
   revision 3;
 
@@ -5549,6 +5618,7 @@ cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status. */
+
 cluster OccupancySensing = 1030 {
   revision 5;
 
@@ -5611,6 +5681,7 @@ cluster OccupancySensing = 1030 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes for reporting carbon monoxide concentration measurements */
+
 cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   revision 3;
 
@@ -5666,6 +5737,7 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes for reporting carbon dioxide concentration measurements */
+
 cluster CarbonDioxideConcentrationMeasurement = 1037 {
   revision 3;
 
@@ -5721,6 +5793,7 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes for reporting nitrogen dioxide concentration measurements */
+
 cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   revision 3;
 
@@ -5776,6 +5849,7 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes for reporting ozone concentration measurements */
+
 cluster OzoneConcentrationMeasurement = 1045 {
   revision 3;
 
@@ -5831,6 +5905,7 @@ cluster OzoneConcentrationMeasurement = 1045 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes for reporting PM2.5 concentration measurements */
+
 cluster Pm25ConcentrationMeasurement = 1066 {
   revision 3;
 
@@ -5886,6 +5961,7 @@ cluster Pm25ConcentrationMeasurement = 1066 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes for reporting formaldehyde concentration measurements */
+
 cluster FormaldehydeConcentrationMeasurement = 1067 {
   revision 3;
 
@@ -5941,6 +6017,7 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes for reporting PM1 concentration measurements */
+
 cluster Pm1ConcentrationMeasurement = 1068 {
   revision 3;
 
@@ -5996,6 +6073,7 @@ cluster Pm1ConcentrationMeasurement = 1068 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes for reporting PM10 concentration measurements */
+
 cluster Pm10ConcentrationMeasurement = 1069 {
   revision 3;
 
@@ -6051,6 +6129,7 @@ cluster Pm10ConcentrationMeasurement = 1069 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes for reporting total volatile organic compounds concentration measurements */
+
 cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   revision 3;
 
@@ -6106,6 +6185,7 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes for reporting radon concentration measurements */
+
 cluster RadonConcentrationMeasurement = 1071 {
   revision 3;
 
@@ -6161,7 +6241,8 @@ cluster RadonConcentrationMeasurement = 1071 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** This cluster provides an interface to soil measurement functionality, including configuration and provision of notifications of soil measurements. */
-provisional cluster SoilMeasurement = 1072 {
+provisional 
+cluster SoilMeasurement = 1072 {
   revision 1;
 
   readonly attribute MeasurementAccuracyStruct soilMoistureMeasurementLimits = 0;
@@ -6173,6 +6254,7 @@ provisional cluster SoilMeasurement = 1072 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
+
 cluster WakeOnLan = 1283 {
   revision 1;
 
@@ -6185,6 +6267,7 @@ cluster WakeOnLan = 1283 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** This cluster provides an interface for managing low power mode on a device. */
+
 cluster LowPower = 1288 {
   revision 1;
 
@@ -6198,7 +6281,8 @@ cluster LowPower = 1288 {
   command Sleep(): DefaultSuccess = 0;
 }
 /** The Camera AV Stream Management cluster is used to allow clients to manage, control, and configure various audio, video, and snapshot streams on a camera. */
-provisional cluster CameraAvStreamManagement = 1361 {
+provisional 
+cluster CameraAvStreamManagement = 1361 {
   revision 1;
 
   enum AudioCodecEnum : enum8 {
@@ -6470,7 +6554,8 @@ provisional cluster CameraAvStreamManagement = 1361 {
   command CaptureSnapshot(CaptureSnapshotRequest): CaptureSnapshotResponse = 12;
 }
 /** This cluster provides an interface into controls associated with the operation of a device that provides pan, tilt, and zoom functions, either mechanically, or against a digital image. */
-provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
+provisional 
+cluster CameraAvSettingsUserLevelManagement = 1362 {
   revision 1;
 
   enum PhysicalMovementEnum : enum8 {
@@ -6572,7 +6657,8 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   command DPTZRelativeMove(DPTZRelativeMoveRequest): DefaultSuccess = 6;
 }
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
-provisional cluster PushAvStreamTransport = 1365 {
+provisional 
+cluster PushAvStreamTransport = 1365 {
   revision 1;
 
   enum CMAFInterfaceEnum : enum8 {
@@ -6753,7 +6839,8 @@ provisional cluster PushAvStreamTransport = 1365 {
   fabric command FindTransport(FindTransportRequest): FindTransportResponse = 6;
 }
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
-provisional cluster Chime = 1366 {
+provisional 
+cluster Chime = 1366 {
   revision 1;
 
   struct ChimeSoundStruct {
@@ -6774,7 +6861,8 @@ provisional cluster Chime = 1366 {
 }
 /** This Cluster is used to manage TLS Client Certificates and to provision
       TLS endpoints with enough information to facilitate subsequent connection. */
-provisional cluster TlsCertificateManagement = 2049 {
+provisional 
+cluster TlsCertificateManagement = 2049 {
   revision 1;
 
   fabric_scoped struct TLSCertStruct {
@@ -6886,7 +6974,8 @@ provisional cluster TlsCertificateManagement = 2049 {
   fabric command access(invoke: administer) RemoveClientCertificate(RemoveClientCertificateRequest): DefaultSuccess = 14;
 }
 /** This Cluster is used to provision TLS Endpoints with enough information to facilitate subsequent connection. */
-provisional cluster TlsClientManagement = 2050 {
+provisional 
+cluster TlsClientManagement = 2050 {
   revision 1;
 
   enum StatusCodeEnum : enum8 {
@@ -6947,7 +7036,8 @@ provisional cluster TlsClientManagement = 2050 {
   fabric command access(invoke: administer) RemoveEndpoint(RemoveEndpointRequest): DefaultSuccess = 4;
 }
 /** The Test Cluster is meant to validate the generated code */
-internal cluster UnitTesting = 4294048773 {
+internal 
+cluster UnitTesting = 4294048773 {
   revision 1; // NOTE: Default/not specifically set
 
   enum SimpleEnum : enum8 {
@@ -7467,7 +7557,8 @@ internal cluster UnitTesting = 4294048773 {
   command TestDifferentVendorMeiRequest(TestDifferentVendorMeiRequestRequest): TestDifferentVendorMeiResponse = 4294049962;
 }
 /** The Fault Injection Cluster provide a means for a test harness to configure faults(for example triggering a fault in the system). */
-internal cluster FaultInjection = 4294048774 {
+internal 
+cluster FaultInjection = 4294048774 {
   revision 1; // NOTE: Default/not specifically set
 
   enum FaultType : enum8 {

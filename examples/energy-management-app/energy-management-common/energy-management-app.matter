@@ -356,6 +356,7 @@ fabric_scoped struct WebRTCSessionStruct {
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
+
 cluster Identify = 3 {
   revision 6;
 
@@ -404,6 +405,7 @@ cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
+
 cluster Descriptor = 29 {
   revision 3;
 
@@ -432,6 +434,7 @@ cluster Descriptor = 29 {
       Node's Access Control List (ACL), which codifies the rules used to manage
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
+
 cluster AccessControl = 31 {
   revision 2;
 
@@ -554,6 +557,7 @@ cluster AccessControl = 31 {
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
+
 cluster BasicInformation = 40 {
   revision 5;
 
@@ -648,6 +652,7 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 /** Provides an interface for providing OTA software updates */
+
 cluster OtaSoftwareUpdateProvider = 41 {
   revision 1; // NOTE: Default/not specifically set
 
@@ -722,6 +727,7 @@ cluster OtaSoftwareUpdateProvider = 41 {
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
 /** Provides an interface for downloading and applying OTA software updates */
+
 cluster OtaSoftwareUpdateRequestor = 42 {
   revision 1; // NOTE: Default/not specifically set
 
@@ -801,6 +807,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
       may have differing common languages, units of measurements, and numerical formatting
       standards. As such, Nodes that visually or audibly convey information need a mechanism by which
       they can be configured to use a user’s preferred language, units, etc */
+
 cluster LocalizationConfiguration = 43 {
   revision 1;
 
@@ -816,6 +823,7 @@ cluster LocalizationConfiguration = 43 {
       may have differing preferences for the units in which values are conveyed in communication to a
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
       mechanism by which they can be configured to use a user’s preferred unit. */
+
 cluster UnitLocalization = 45 {
   revision 2;
 
@@ -838,6 +846,7 @@ cluster UnitLocalization = 45 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
+
 cluster PowerSource = 47 {
   revision 3;
 
@@ -1095,6 +1104,7 @@ cluster PowerSource = 47 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** This cluster is used to manage global aspects of the Commissioning flow. */
+
 cluster GeneralCommissioning = 48 {
   revision 2;
 
@@ -1195,6 +1205,7 @@ cluster GeneralCommissioning = 48 {
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
+
 cluster NetworkCommissioning = 49 {
   revision 2;
 
@@ -1373,6 +1384,7 @@ cluster NetworkCommissioning = 49 {
   command access(invoke: administer) QueryIdentity(QueryIdentityRequest): QueryIdentityResponse = 9;
 }
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
+
 cluster GeneralDiagnostics = 51 {
   revision 2;
 
@@ -1502,6 +1514,7 @@ cluster GeneralDiagnostics = 51 {
   command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
+
 cluster AdministratorCommissioning = 60 {
   revision 1;
 
@@ -1550,6 +1563,7 @@ cluster AdministratorCommissioning = 60 {
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
+
 cluster OperationalCredentials = 62 {
   revision 2;
 
@@ -1697,6 +1711,7 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) SignVIDVerificationRequest(SignVIDVerificationRequestRequest): SignVIDVerificationResponse = 13;
 }
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
+
 cluster GroupKeyManagement = 63 {
   revision 2;
 
@@ -1773,6 +1788,7 @@ cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 /** This cluster provides a mechanism for querying data about electrical power as measured by the server. */
+
 cluster ElectricalPowerMeasurement = 144 {
   revision 3;
 
@@ -1878,6 +1894,7 @@ cluster ElectricalPowerMeasurement = 144 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
+
 cluster ElectricalEnergyMeasurement = 145 {
   revision 2;
 
@@ -1969,7 +1986,8 @@ cluster ElectricalEnergyMeasurement = 145 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** This cluster is used to allow clients to control the operation of a hot water heating appliance so that it can be used with energy management. */
-provisional cluster WaterHeaterManagement = 148 {
+provisional 
+cluster WaterHeaterManagement = 148 {
   revision 2;
 
   enum BoostStateEnum : enum8 {
@@ -2028,7 +2046,8 @@ provisional cluster WaterHeaterManagement = 148 {
   command access(invoke: manage) CancelBoost(): DefaultSuccess = 1;
 }
 /** This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA). */
-provisional cluster DeviceEnergyManagement = 152 {
+provisional 
+cluster DeviceEnergyManagement = 152 {
   revision 4;
 
   enum AdjustmentCauseEnum : enum8 {
@@ -2247,6 +2266,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   command CancelRequest(): DefaultSuccess = 7;
 }
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
+
 cluster EnergyEvse = 153 {
   revision 3;
 
@@ -2426,6 +2446,7 @@ cluster EnergyEvse = 153 {
   timed command ClearTargets(): DefaultSuccess = 7;
 }
 /** The Power Topology Cluster provides a mechanism for expressing how power is flowing between endpoints. */
+
 cluster PowerTopology = 156 {
   revision 1;
 
@@ -2445,6 +2466,7 @@ cluster PowerTopology = 156 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Attributes and commands for selecting a mode from a list of supported options. */
+
 cluster EnergyEvseMode = 157 {
   revision 2;
 
@@ -2501,6 +2523,7 @@ cluster EnergyEvseMode = 157 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 /** Attributes and commands for selecting a mode from a list of supported options. */
+
 cluster WaterHeaterMode = 158 {
   revision 1;
 
@@ -2556,7 +2579,8 @@ cluster WaterHeaterMode = 158 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 /** Attributes and commands for selecting a mode from a list of supported options. */
-provisional cluster DeviceEnergyManagementMode = 159 {
+provisional 
+cluster DeviceEnergyManagementMode = 159 {
   revision 2;
 
   enum ModeTag : enum16 {

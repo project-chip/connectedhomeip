@@ -356,6 +356,7 @@ fabric_scoped struct WebRTCSessionStruct {
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
+
 cluster Identify = 3 {
   revision 6;
 
@@ -404,6 +405,7 @@ cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
+
 cluster Descriptor = 29 {
   revision 3;
 
@@ -432,6 +434,7 @@ cluster Descriptor = 29 {
       Node's Access Control List (ACL), which codifies the rules used to manage
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
+
 cluster AccessControl = 31 {
   revision 2;
 
@@ -554,6 +557,7 @@ cluster AccessControl = 31 {
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
+
 cluster BasicInformation = 40 {
   revision 5;
 
@@ -648,6 +652,7 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 /** Provides an interface for providing OTA software updates */
+
 cluster OtaSoftwareUpdateProvider = 41 {
   revision 1; // NOTE: Default/not specifically set
 
@@ -722,6 +727,7 @@ cluster OtaSoftwareUpdateProvider = 41 {
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
 /** This cluster is used to manage global aspects of the Commissioning flow. */
+
 cluster GeneralCommissioning = 48 {
   revision 2;
 
@@ -822,6 +828,7 @@ cluster GeneralCommissioning = 48 {
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
+
 cluster NetworkCommissioning = 49 {
   revision 2;
 
@@ -1000,6 +1007,7 @@ cluster NetworkCommissioning = 49 {
   command access(invoke: administer) QueryIdentity(QueryIdentityRequest): QueryIdentityResponse = 9;
 }
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
+
 cluster GeneralDiagnostics = 51 {
   revision 2;
 
@@ -1129,6 +1137,7 @@ cluster GeneralDiagnostics = 51 {
   command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
+
 cluster SoftwareDiagnostics = 52 {
   revision 1;
 
@@ -1164,6 +1173,7 @@ cluster SoftwareDiagnostics = 52 {
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
 }
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
+
 cluster ThreadNetworkDiagnostics = 53 {
   revision 3;
 
@@ -1330,6 +1340,7 @@ cluster ThreadNetworkDiagnostics = 53 {
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
+
 cluster WiFiNetworkDiagnostics = 54 {
   revision 1;
 
@@ -1405,6 +1416,7 @@ cluster WiFiNetworkDiagnostics = 54 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 /** The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
+
 cluster EthernetNetworkDiagnostics = 55 {
   revision 1;
 
@@ -1445,6 +1457,7 @@ cluster EthernetNetworkDiagnostics = 55 {
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
+
 cluster AdministratorCommissioning = 60 {
   revision 1;
 
@@ -1493,6 +1506,7 @@ cluster AdministratorCommissioning = 60 {
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
+
 cluster OperationalCredentials = 62 {
   revision 2;
 
@@ -1640,6 +1654,7 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) SignVIDVerificationRequest(SignVIDVerificationRequestRequest): SignVIDVerificationResponse = 13;
 }
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
+
 cluster GroupKeyManagement = 63 {
   revision 2;
 
@@ -1716,6 +1731,7 @@ cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
+
 cluster UserLabel = 65 {
   revision 1; // NOTE: Default/not specifically set
 
@@ -1732,6 +1748,7 @@ cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 /** Allows servers to ensure that listed clients are notified when a server is available for communication. */
+
 cluster IcdManagement = 70 {
   revision 3;
 
@@ -1828,7 +1845,8 @@ cluster IcdManagement = 70 {
   command access(invoke: manage) StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
 }
 /** This cluster provides an interface for controlling a Closure. */
-provisional cluster ClosureControl = 260 {
+provisional 
+cluster ClosureControl = 260 {
   revision 1;
 
   enum ClosureErrorEnum : enum8 {
@@ -1938,7 +1956,8 @@ provisional cluster ClosureControl = 260 {
   timed command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
 }
 /** This cluster provides an interface to reflect and control a closure's range of movement, usually involving a panel, by using 6-axis framework. */
-provisional cluster ClosureDimension = 261 {
+provisional 
+cluster ClosureDimension = 261 {
   revision 1;
 
   enum ClosureUnitEnum : enum8 {

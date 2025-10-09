@@ -356,6 +356,7 @@ fabric_scoped struct WebRTCSessionStruct {
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
+
 cluster Identify = 3 {
   revision 6;
 
@@ -404,6 +405,7 @@ cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 /** Attributes and commands for group configuration and manipulation. */
+
 cluster Groups = 4 {
   revision 4;
 
@@ -479,6 +481,7 @@ cluster Groups = 4 {
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
+
 cluster OnOff = 6 {
   revision 6;
 
@@ -549,6 +552,7 @@ cluster OnOff = 6 {
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
 /** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
+
 cluster LevelControl = 8 {
   revision 6;
 
@@ -671,6 +675,7 @@ cluster LevelControl = 8 {
   command MoveToClosestFrequency(MoveToClosestFrequencyRequest): DefaultSuccess = 8;
 }
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
+
 cluster Descriptor = 29 {
   revision 3;
 
@@ -699,6 +704,7 @@ cluster Descriptor = 29 {
       Node's Access Control List (ACL), which codifies the rules used to manage
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
+
 cluster AccessControl = 31 {
   revision 2;
 
@@ -821,6 +827,7 @@ cluster AccessControl = 31 {
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
+
 cluster BasicInformation = 40 {
   revision 5;
 
@@ -915,6 +922,7 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 /** Provides an interface for providing OTA software updates */
+
 cluster OtaSoftwareUpdateProvider = 41 {
   revision 1; // NOTE: Default/not specifically set
 
@@ -989,6 +997,7 @@ cluster OtaSoftwareUpdateProvider = 41 {
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
 /** Provides an interface for downloading and applying OTA software updates */
+
 cluster OtaSoftwareUpdateRequestor = 42 {
   revision 1; // NOTE: Default/not specifically set
 
@@ -1065,6 +1074,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
   command access(invoke: administer) AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 /** This cluster is used to manage global aspects of the Commissioning flow. */
+
 cluster GeneralCommissioning = 48 {
   revision 2;
 
@@ -1165,6 +1175,7 @@ cluster GeneralCommissioning = 48 {
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
+
 cluster NetworkCommissioning = 49 {
   revision 2;
 
@@ -1343,6 +1354,7 @@ cluster NetworkCommissioning = 49 {
   command access(invoke: administer) QueryIdentity(QueryIdentityRequest): QueryIdentityResponse = 9;
 }
 /** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
+
 cluster DiagnosticLogs = 50 {
   revision 1;
 
@@ -1388,6 +1400,7 @@ cluster DiagnosticLogs = 50 {
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
 }
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
+
 cluster GeneralDiagnostics = 51 {
   revision 2;
 
@@ -1517,6 +1530,7 @@ cluster GeneralDiagnostics = 51 {
   command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
+
 cluster SoftwareDiagnostics = 52 {
   revision 1;
 
@@ -1552,6 +1566,7 @@ cluster SoftwareDiagnostics = 52 {
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
 }
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
+
 cluster AdministratorCommissioning = 60 {
   revision 1;
 
@@ -1600,6 +1615,7 @@ cluster AdministratorCommissioning = 60 {
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
+
 cluster OperationalCredentials = 62 {
   revision 2;
 
@@ -1747,6 +1763,7 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) SignVIDVerificationRequest(SignVIDVerificationRequestRequest): SignVIDVerificationResponse = 13;
 }
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
+
 cluster GroupKeyManagement = 63 {
   revision 2;
 
@@ -1823,6 +1840,7 @@ cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 /** Attributes and commands for controlling the color properties of a color-capable light. */
+
 cluster ColorControl = 768 {
   revision 7;
 
