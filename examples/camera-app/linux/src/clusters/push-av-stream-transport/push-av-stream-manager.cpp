@@ -669,12 +669,12 @@ CHIP_ERROR PushAvStreamTransportManager::IsPrivacyModeActive(bool & isActive)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
-    bool isHardPrivacyModeActive = false;
+    auto & avsmController                = mCameraDevice->GetCameraAVStreamMgmtController();
+    bool isHardPrivacyModeActive         = false;
     bool isSoftRecordingPrivacyModeActve = false;
 
     CHIP_ERROR status = avsmController.IsHardPrivacyModeActive(isHardPrivacyModeActive);
-    status = avsmController.IsSoftRecordingPrivacyModeActive(isSoftRecordingPrivacyModeActve);
+    status            = avsmController.IsSoftRecordingPrivacyModeActive(isSoftRecordingPrivacyModeActve);
 
     isActive = isHardPrivacyModeActive || isSoftRecordingPrivacyModeActve;
     return CHIP_NO_ERROR;
