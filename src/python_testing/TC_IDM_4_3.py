@@ -422,7 +422,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
             # Subscribe to attribute
             self.fprint(f"Will sub TO: {attr_path}", "black", 7)
-            logging.info(f"Attribute of type 'bool' was found")
+            logging.info("Attribute of type 'bool' was found")
             sub_th_step2: SubscriptionTransaction = await TH.ReadAttribute(
                 nodeid=self.dut_node_id,
                 attributes=attr_path,
