@@ -17,21 +17,18 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class JointFabricDatastoreClusterDatastoreACLEntryStruct (
-    val nodeID: ULong,
-    val listID: UInt,
-    val ACLEntry: JointFabricDatastoreClusterDatastoreAccessControlEntryStruct,
-    val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct) {
-  override fun toString(): String  = buildString {
+class JointFabricDatastoreClusterDatastoreACLEntryStruct(
+  val nodeID: ULong,
+  val listID: UInt,
+  val ACLEntry: JointFabricDatastoreClusterDatastoreAccessControlEntryStruct,
+  val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct,
+) {
+  override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreACLEntryStruct {\n")
     append("\tnodeID : $nodeID\n")
     append("\tlistID : $listID\n")
@@ -57,16 +54,32 @@ class JointFabricDatastoreClusterDatastoreACLEntryStruct (
     private const val TAG_ACL_ENTRY = 2
     private const val TAG_STATUS_ENTRY = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : JointFabricDatastoreClusterDatastoreACLEntryStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): JointFabricDatastoreClusterDatastoreACLEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val listID = tlvReader.getUInt(ContextSpecificTag(TAG_LIST_ID))
-      val ACLEntry = JointFabricDatastoreClusterDatastoreAccessControlEntryStruct.fromTlv(ContextSpecificTag(TAG_ACL_ENTRY), tlvReader)
-      val statusEntry = JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(ContextSpecificTag(TAG_STATUS_ENTRY), tlvReader)
-      
+      val ACLEntry =
+        JointFabricDatastoreClusterDatastoreAccessControlEntryStruct.fromTlv(
+          ContextSpecificTag(TAG_ACL_ENTRY),
+          tlvReader,
+        )
+      val statusEntry =
+        JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(
+          ContextSpecificTag(TAG_STATUS_ENTRY),
+          tlvReader,
+        )
+
       tlvReader.exitContainer()
 
-      return JointFabricDatastoreClusterDatastoreACLEntryStruct(nodeID, listID, ACLEntry, statusEntry)
+      return JointFabricDatastoreClusterDatastoreACLEntryStruct(
+        nodeID,
+        listID,
+        ACLEntry,
+        statusEntry,
+      )
     }
   }
 }

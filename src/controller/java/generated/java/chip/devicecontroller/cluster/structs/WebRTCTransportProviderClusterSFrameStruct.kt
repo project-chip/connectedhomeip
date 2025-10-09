@@ -17,20 +17,17 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class WebRTCTransportProviderClusterSFrameStruct (
-    val cipherSuite: UInt,
-    val baseKey: ByteArray,
-    val kid: ByteArray) {
-  override fun toString(): String  = buildString {
+class WebRTCTransportProviderClusterSFrameStruct(
+  val cipherSuite: UInt,
+  val baseKey: ByteArray,
+  val kid: ByteArray,
+) {
+  override fun toString(): String = buildString {
     append("WebRTCTransportProviderClusterSFrameStruct {\n")
     append("\tcipherSuite : $cipherSuite\n")
     append("\tbaseKey : $baseKey\n")
@@ -53,12 +50,12 @@ class WebRTCTransportProviderClusterSFrameStruct (
     private const val TAG_BASE_KEY = 1
     private const val TAG_KID = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : WebRTCTransportProviderClusterSFrameStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): WebRTCTransportProviderClusterSFrameStruct {
       tlvReader.enterStructure(tlvTag)
       val cipherSuite = tlvReader.getUInt(ContextSpecificTag(TAG_CIPHER_SUITE))
       val baseKey = tlvReader.getByteArray(ContextSpecificTag(TAG_BASE_KEY))
       val kid = tlvReader.getByteArray(ContextSpecificTag(TAG_KID))
-      
+
       tlvReader.exitContainer()
 
       return WebRTCTransportProviderClusterSFrameStruct(cipherSuite, baseKey, kid)

@@ -16,18 +16,13 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ZoneManagementClusterTwoDCartesianVertexStruct(
-  val x: UShort,
-  val y: UShort
-) {
+class ZoneManagementClusterTwoDCartesianVertexStruct(val x: UShort, val y: UShort) {
   override fun toString(): String = buildString {
     append("ZoneManagementClusterTwoDCartesianVertexStruct {\n")
     append("\tx : $x\n")
@@ -52,7 +47,7 @@ class ZoneManagementClusterTwoDCartesianVertexStruct(
       tlvReader.enterStructure(tlvTag)
       val x = tlvReader.getUShort(ContextSpecificTag(TAG_X))
       val y = tlvReader.getUShort(ContextSpecificTag(TAG_Y))
-      
+
       tlvReader.exitContainer()
 
       return ZoneManagementClusterTwoDCartesianVertexStruct(x, y)

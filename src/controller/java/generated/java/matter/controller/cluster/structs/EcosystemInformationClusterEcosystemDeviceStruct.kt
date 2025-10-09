@@ -32,7 +32,7 @@ class EcosystemInformationClusterEcosystemDeviceStruct(
   val deviceTypes: List<EcosystemInformationClusterDeviceTypeStruct>,
   val uniqueLocationIDs: List<String>,
   val uniqueLocationIDsLastEdit: ULong,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("EcosystemInformationClusterEcosystemDeviceStruct {\n")
@@ -86,40 +86,57 @@ class EcosystemInformationClusterEcosystemDeviceStruct(
     private const val TAG_UNIQUE_LOCATION_I_DS_LAST_EDIT = 6
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EcosystemInformationClusterEcosystemDeviceStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): EcosystemInformationClusterEcosystemDeviceStruct {
       tlvReader.enterStructure(tlvTag)
-      val deviceName = if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEVICE_NAME))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_DEVICE_NAME)))
-    } else {
-      Optional.empty()
-    }
-      val deviceNameLastEdit = if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEVICE_NAME_LAST_EDIT))) {
-      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_DEVICE_NAME_LAST_EDIT)))
-    } else {
-      Optional.empty()
-    }
+      val deviceName =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEVICE_NAME))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_DEVICE_NAME)))
+        } else {
+          Optional.empty()
+        }
+      val deviceNameLastEdit =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEVICE_NAME_LAST_EDIT))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_DEVICE_NAME_LAST_EDIT)))
+        } else {
+          Optional.empty()
+        }
       val bridgedEndpoint = tlvReader.getUShort(ContextSpecificTag(TAG_BRIDGED_ENDPOINT))
       val originalEndpoint = tlvReader.getUShort(ContextSpecificTag(TAG_ORIGINAL_ENDPOINT))
-      val deviceTypes = buildList<EcosystemInformationClusterDeviceTypeStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_DEVICE_TYPES))
-      while(!tlvReader.isEndOfContainer()) {
-        add(EcosystemInformationClusterDeviceTypeStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-      val uniqueLocationIDs = buildList<String> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_UNIQUE_LOCATION_I_DS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getString(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      val uniqueLocationIDsLastEdit = tlvReader.getULong(ContextSpecificTag(TAG_UNIQUE_LOCATION_I_DS_LAST_EDIT))
+      val deviceTypes =
+        buildList<EcosystemInformationClusterDeviceTypeStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_DEVICE_TYPES))
+          while (!tlvReader.isEndOfContainer()) {
+            add(EcosystemInformationClusterDeviceTypeStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+      val uniqueLocationIDs =
+        buildList<String> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_UNIQUE_LOCATION_I_DS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getString(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+      val uniqueLocationIDsLastEdit =
+        tlvReader.getULong(ContextSpecificTag(TAG_UNIQUE_LOCATION_I_DS_LAST_EDIT))
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return EcosystemInformationClusterEcosystemDeviceStruct(deviceName, deviceNameLastEdit, bridgedEndpoint, originalEndpoint, deviceTypes, uniqueLocationIDs, uniqueLocationIDsLastEdit, fabricIndex)
+      return EcosystemInformationClusterEcosystemDeviceStruct(
+        deviceName,
+        deviceNameLastEdit,
+        bridgedEndpoint,
+        originalEndpoint,
+        deviceTypes,
+        uniqueLocationIDs,
+        uniqueLocationIDsLastEdit,
+        fabricIndex,
+      )
     }
   }
 }

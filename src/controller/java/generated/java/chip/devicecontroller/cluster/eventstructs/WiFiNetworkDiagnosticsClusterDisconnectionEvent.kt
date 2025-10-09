@@ -17,18 +17,13 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class WiFiNetworkDiagnosticsClusterDisconnectionEvent (
-    val reasonCode: UInt) {
-  override fun toString(): String  = buildString {
+class WiFiNetworkDiagnosticsClusterDisconnectionEvent(val reasonCode: UInt) {
+  override fun toString(): String = buildString {
     append("WiFiNetworkDiagnosticsClusterDisconnectionEvent {\n")
     append("\treasonCode : $reasonCode\n")
     append("}\n")
@@ -45,10 +40,13 @@ class WiFiNetworkDiagnosticsClusterDisconnectionEvent (
   companion object {
     private const val TAG_REASON_CODE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : WiFiNetworkDiagnosticsClusterDisconnectionEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): WiFiNetworkDiagnosticsClusterDisconnectionEvent {
       tlvReader.enterStructure(tlvTag)
       val reasonCode = tlvReader.getUInt(ContextSpecificTag(TAG_REASON_CODE))
-      
+
       tlvReader.exitContainer()
 
       return WiFiNetworkDiagnosticsClusterDisconnectionEvent(reasonCode)

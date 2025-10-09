@@ -17,19 +17,16 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CameraAvSettingsUserLevelManagementClusterDPTZStruct (
-    val videoStreamID: UInt,
-    val viewport: CameraAvSettingsUserLevelManagementClusterViewportStruct) {
-  override fun toString(): String  = buildString {
+class CameraAvSettingsUserLevelManagementClusterDPTZStruct(
+  val videoStreamID: UInt,
+  val viewport: CameraAvSettingsUserLevelManagementClusterViewportStruct,
+) {
+  override fun toString(): String = buildString {
     append("CameraAvSettingsUserLevelManagementClusterDPTZStruct {\n")
     append("\tvideoStreamID : $videoStreamID\n")
     append("\tviewport : $viewport\n")
@@ -49,11 +46,18 @@ class CameraAvSettingsUserLevelManagementClusterDPTZStruct (
     private const val TAG_VIDEO_STREAM_ID = 0
     private const val TAG_VIEWPORT = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CameraAvSettingsUserLevelManagementClusterDPTZStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): CameraAvSettingsUserLevelManagementClusterDPTZStruct {
       tlvReader.enterStructure(tlvTag)
       val videoStreamID = tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
-      val viewport = CameraAvSettingsUserLevelManagementClusterViewportStruct.fromTlv(ContextSpecificTag(TAG_VIEWPORT), tlvReader)
-      
+      val viewport =
+        CameraAvSettingsUserLevelManagementClusterViewportStruct.fromTlv(
+          ContextSpecificTag(TAG_VIEWPORT),
+          tlvReader,
+        )
+
       tlvReader.exitContainer()
 
       return CameraAvSettingsUserLevelManagementClusterDPTZStruct(videoStreamID, viewport)

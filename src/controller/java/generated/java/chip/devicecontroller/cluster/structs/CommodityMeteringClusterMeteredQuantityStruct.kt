@@ -20,16 +20,14 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CommodityMeteringClusterMeteredQuantityStruct (
-    val tariffComponentIDs: List<ULong>,
-    val quantity: Long) {
-  override fun toString(): String  = buildString {
+class CommodityMeteringClusterMeteredQuantityStruct(
+  val tariffComponentIDs: List<ULong>,
+  val quantity: Long,
+) {
+  override fun toString(): String = buildString {
     append("CommodityMeteringClusterMeteredQuantityStruct {\n")
     append("\ttariffComponentIDs : $tariffComponentIDs\n")
     append("\tquantity : $quantity\n")
@@ -53,17 +51,18 @@ class CommodityMeteringClusterMeteredQuantityStruct (
     private const val TAG_TARIFF_COMPONENT_I_DS = 0
     private const val TAG_QUANTITY = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CommodityMeteringClusterMeteredQuantityStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityMeteringClusterMeteredQuantityStruct {
       tlvReader.enterStructure(tlvTag)
-      val tariffComponentIDs = buildList<ULong> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_TARIFF_COMPONENT_I_DS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getULong(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
+      val tariffComponentIDs =
+        buildList<ULong> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_TARIFF_COMPONENT_I_DS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getULong(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
       val quantity = tlvReader.getLong(ContextSpecificTag(TAG_QUANTITY))
-      
+
       tlvReader.exitContainer()
 
       return CommodityMeteringClusterMeteredQuantityStruct(tariffComponentIDs, quantity)

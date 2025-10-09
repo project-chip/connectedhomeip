@@ -18,7 +18,6 @@ package matter.controller.cluster.eventstructs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class ThermostatClusterSystemModeChangeEvent(
   val previousSystemMode: Optional<UByte>,
-  val currentSystemMode: UByte
+  val currentSystemMode: UByte,
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterSystemModeChangeEvent {\n")
@@ -51,15 +50,16 @@ class ThermostatClusterSystemModeChangeEvent(
     private const val TAG_PREVIOUS_SYSTEM_MODE = 0
     private const val TAG_CURRENT_SYSTEM_MODE = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ThermostatClusterSystemModeChangeEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterSystemModeChangeEvent {
       tlvReader.enterStructure(tlvTag)
-      val previousSystemMode = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_SYSTEM_MODE))) {
-        Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_PREVIOUS_SYSTEM_MODE)))
-      } else {
-        Optional.empty()
-      }
+      val previousSystemMode =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_SYSTEM_MODE))) {
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_PREVIOUS_SYSTEM_MODE)))
+        } else {
+          Optional.empty()
+        }
       val currentSystemMode = tlvReader.getUByte(ContextSpecificTag(TAG_CURRENT_SYSTEM_MODE))
-      
+
       tlvReader.exitContainer()
 
       return ThermostatClusterSystemModeChangeEvent(previousSystemMode, currentSystemMode)

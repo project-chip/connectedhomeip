@@ -16,18 +16,13 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ZoneManagementClusterZoneTriggeredEvent(
-  val zone: UShort,
-  val reason: UByte
-) {
+class ZoneManagementClusterZoneTriggeredEvent(val zone: UShort, val reason: UByte) {
   override fun toString(): String = buildString {
     append("ZoneManagementClusterZoneTriggeredEvent {\n")
     append("\tzone : $zone\n")
@@ -48,11 +43,11 @@ class ZoneManagementClusterZoneTriggeredEvent(
     private const val TAG_ZONE = 0
     private const val TAG_REASON = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ZoneManagementClusterZoneTriggeredEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ZoneManagementClusterZoneTriggeredEvent {
       tlvReader.enterStructure(tlvTag)
       val zone = tlvReader.getUShort(ContextSpecificTag(TAG_ZONE))
       val reason = tlvReader.getUByte(ContextSpecificTag(TAG_REASON))
-      
+
       tlvReader.exitContainer()
 
       return ZoneManagementClusterZoneTriggeredEvent(zone, reason)

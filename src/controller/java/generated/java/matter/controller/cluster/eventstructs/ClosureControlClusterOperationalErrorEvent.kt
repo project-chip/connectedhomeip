@@ -16,7 +16,6 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -24,9 +23,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ClosureControlClusterOperationalErrorEvent(
-  val errorState: List<UByte>
-) {
+class ClosureControlClusterOperationalErrorEvent(val errorState: List<UByte>) {
   override fun toString(): String = buildString {
     append("ClosureControlClusterOperationalErrorEvent {\n")
     append("\terrorState : $errorState\n")
@@ -48,16 +45,17 @@ class ClosureControlClusterOperationalErrorEvent(
   companion object {
     private const val TAG_ERROR_STATE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ClosureControlClusterOperationalErrorEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ClosureControlClusterOperationalErrorEvent {
       tlvReader.enterStructure(tlvTag)
-      val errorState = buildList <UByte> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_ERROR_STATE))
-        while(!tlvReader.isEndOfContainer()) {
-          this.add(tlvReader.getUByte(AnonymousTag))
+      val errorState =
+        buildList<UByte> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_ERROR_STATE))
+          while (!tlvReader.isEndOfContainer()) {
+            this.add(tlvReader.getUByte(AnonymousTag))
+          }
+          tlvReader.exitContainer()
         }
-        tlvReader.exitContainer()
-      }
-      
+
       tlvReader.exitContainer()
 
       return ClosureControlClusterOperationalErrorEvent(errorState)

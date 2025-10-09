@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -28,7 +27,7 @@ class OperationalCredentialsClusterNOCStruct(
   val noc: ByteArray,
   val icac: ByteArray?,
   val vvsc: Optional<ByteArray>,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("OperationalCredentialsClusterNOCStruct {\n")
@@ -66,19 +65,21 @@ class OperationalCredentialsClusterNOCStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): OperationalCredentialsClusterNOCStruct {
       tlvReader.enterStructure(tlvTag)
       val noc = tlvReader.getByteArray(ContextSpecificTag(TAG_NOC))
-      val icac = if (!tlvReader.isNull()) {
-      tlvReader.getByteArray(ContextSpecificTag(TAG_ICAC))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_ICAC))
-      null
-    }
-      val vvsc = if (tlvReader.isNextTag(ContextSpecificTag(TAG_VVSC))) {
-      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_VVSC)))
-    } else {
-      Optional.empty()
-    }
+      val icac =
+        if (!tlvReader.isNull()) {
+          tlvReader.getByteArray(ContextSpecificTag(TAG_ICAC))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_ICAC))
+          null
+        }
+      val vvsc =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_VVSC))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_VVSC)))
+        } else {
+          Optional.empty()
+        }
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
       return OperationalCredentialsClusterNOCStruct(noc, icac, vvsc, fabricIndex)

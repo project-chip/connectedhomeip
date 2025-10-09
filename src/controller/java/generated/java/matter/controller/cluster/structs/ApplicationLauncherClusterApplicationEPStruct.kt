@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class ApplicationLauncherClusterApplicationEPStruct(
   val application: ApplicationLauncherClusterApplicationStruct,
-  val endpoint: Optional<UShort>
+  val endpoint: Optional<UShort>,
 ) {
   override fun toString(): String = buildString {
     append("ApplicationLauncherClusterApplicationEPStruct {\n")
@@ -53,13 +52,18 @@ class ApplicationLauncherClusterApplicationEPStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ApplicationLauncherClusterApplicationEPStruct {
       tlvReader.enterStructure(tlvTag)
-      val application = ApplicationLauncherClusterApplicationStruct.fromTlv(ContextSpecificTag(TAG_APPLICATION), tlvReader)
-      val endpoint = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT))) {
-      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT)))
-    } else {
-      Optional.empty()
-    }
-      
+      val application =
+        ApplicationLauncherClusterApplicationStruct.fromTlv(
+          ContextSpecificTag(TAG_APPLICATION),
+          tlvReader,
+        )
+      val endpoint =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT))) {
+          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return ApplicationLauncherClusterApplicationEPStruct(application, endpoint)

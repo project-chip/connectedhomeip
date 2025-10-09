@@ -17,19 +17,17 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class PushAvStreamTransportClusterContainerOptionsStruct (
-    val containerType: UInt,
-    val CMAFContainerOptions: Optional<PushAvStreamTransportClusterCMAFContainerOptionsStruct>) {
-  override fun toString(): String  = buildString {
+class PushAvStreamTransportClusterContainerOptionsStruct(
+  val containerType: UInt,
+  val CMAFContainerOptions: Optional<PushAvStreamTransportClusterCMAFContainerOptionsStruct>,
+) {
+  override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterContainerOptionsStruct {\n")
     append("\tcontainerType : $containerType\n")
     append("\tCMAFContainerOptions : $CMAFContainerOptions\n")
@@ -41,9 +39,9 @@ class PushAvStreamTransportClusterContainerOptionsStruct (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CONTAINER_TYPE), containerType)
       if (CMAFContainerOptions.isPresent) {
-      val optCMAFContainerOptions = CMAFContainerOptions.get()
-      optCMAFContainerOptions.toTlv(ContextSpecificTag(TAG_CMAF_CONTAINER_OPTIONS), this)
-    }
+        val optCMAFContainerOptions = CMAFContainerOptions.get()
+        optCMAFContainerOptions.toTlv(ContextSpecificTag(TAG_CMAF_CONTAINER_OPTIONS), this)
+      }
       endStructure()
     }
   }
@@ -52,15 +50,24 @@ class PushAvStreamTransportClusterContainerOptionsStruct (
     private const val TAG_CONTAINER_TYPE = 0
     private const val TAG_CMAF_CONTAINER_OPTIONS = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : PushAvStreamTransportClusterContainerOptionsStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): PushAvStreamTransportClusterContainerOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val containerType = tlvReader.getUInt(ContextSpecificTag(TAG_CONTAINER_TYPE))
-      val CMAFContainerOptions = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CMAF_CONTAINER_OPTIONS))) {
-      Optional.of(PushAvStreamTransportClusterCMAFContainerOptionsStruct.fromTlv(ContextSpecificTag(TAG_CMAF_CONTAINER_OPTIONS), tlvReader))
-    } else {
-      Optional.empty()
-    }
-      
+      val CMAFContainerOptions =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CMAF_CONTAINER_OPTIONS))) {
+          Optional.of(
+            PushAvStreamTransportClusterCMAFContainerOptionsStruct.fromTlv(
+              ContextSpecificTag(TAG_CMAF_CONTAINER_OPTIONS),
+              tlvReader,
+            )
+          )
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return PushAvStreamTransportClusterContainerOptionsStruct(containerType, CMAFContainerOptions)
