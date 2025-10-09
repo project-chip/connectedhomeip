@@ -22,8 +22,6 @@ on:
     pull_request:
     merge_group:
     workflow_dispatch:
-    schedule:
-        - cron: '0 2 * * *' # Daily at 2 AM UTC, run job on other macOS versions as well
 
 concurrency:
     group:
