@@ -109,6 +109,15 @@ public:
 
     std::vector<std::string> GetCandidates() { return mLocalCandidates; }
 
+    // Drain candidates - returns all accumulated candidates and clears the internal list
+    // This prevents resending the same candidates multiple times during trickle ICE
+    std::vector<std::string> DrainCandidates()
+    {
+        std::vector<std::string> candidates = std::move(mLocalCandidates);
+        mLocalCandidates.clear();
+        return candidates;
+    }
+
     void SetCandidates(std::vector<std::string> candidates) { mLocalCandidates = candidates; }
 
     void AddRemoteCandidate(const std::string & candidate, const std::string & mid);
