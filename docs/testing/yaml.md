@@ -30,9 +30,9 @@ that is used to display the test easily in the test harness.
 The following shows a test step sending a simple command with no arguments.
 
 ```yaml
-    - label: "This label gets printed"
-      cluster: "On/Off"
-      command: "On"
+- label: "This label gets printed"
+  cluster: "On/Off"
+  command: "On"
 ```
 
 -   label - label to print before performing the test step
@@ -47,20 +47,20 @@ also be overwritten in the individual test steps.
 The following shows how to send a command with arguments:
 
 ```yaml
-    - label: "This label gets printed before the test step"
-      command: "MoveToColor"
-      arguments:
-          values:
-              - name: "ColorX"
-                value: 32768
-              - name: "ColorY"
-                value: 19660
-              - name: "TransitionTime"
-                value: 0
-              - name: "OptionsMask"
-                value: 0
-              - name: "OptionsOverride"
-                value: 0
+- label: "This label gets printed before the test step"
+  command: "MoveToColor"
+  arguments:
+      values:
+          - name: "ColorX"
+            value: 32768
+          - name: "ColorY"
+            value: 19660
+          - name: "TransitionTime"
+            value: 0
+          - name: "OptionsMask"
+            value: 0
+          - name: "OptionsOverride"
+            value: 0
 ```
 
 -   label - label to print before performing the test step
@@ -96,7 +96,7 @@ attribute. Commands to write attributes always require an argument: tag.
   command: "writeAttribute"
   attribute: "ExampleAttribute"
   arguments:
-    value: 1
+      value: 1
 ```
 
 #### Parsing Responses
@@ -113,9 +113,9 @@ checks.
   command: "readAttribute"
   attribute: "ClusterRevision"
   response:
-    value: 1
-    constraints:
-      minValue: 1
+      value: 1
+      constraints:
+          minValue: 1
 ```
 
 The following tags can be used to parse the response
@@ -139,11 +139,9 @@ lists of structs:
 
 ```yaml
 [
+    { field1:value, field2:value, optionalfield:value },
 
-{field1:value, field2:value, optionalfield:value},
-
-{field1:value, field2:value},
-
+    { field1:value, field2:value },
 ]
 ```
 
@@ -163,39 +161,39 @@ Establishing a connection to the DUT. This is the first step in nearly every
 test.
 
 ```yaml
-    - label: "Establish a connection to the DUT"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+- label: "Establish a connection to the DUT"
+  cluster: "DelayCommands"
+  command: "WaitForCommissionee"
+  arguments:
+      values:
+          - name: "nodeId"
+            value: nodeId
 ```
 
 Wait for a user action:
 
 ```yaml
-    - label: "Do a simple user prompt message. Expect 'y' to pass."
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+- label: "Do a simple user prompt message. Expect 'y' to pass."
+  cluster: "LogCommands"
+  command: "UserPrompt"
+  arguments:
+      values:
+          - name: "message"
+            value: "Please enter 'y' for success"
+          - name: "expectedValue"
+            value: "y"
 ```
 
 Wait for a time:
 
 ```yaml
-    - label: "Wait for 5S"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 5000
+- label: "Wait for 5S"
+  cluster: "DelayCommands"
+  command: "WaitForMs"
+  arguments:
+      values:
+          - name: "ms"
+            value: 5000
 ```
 
 A full description of the available pseudo-clusters and their commands is
@@ -224,36 +222,36 @@ config:
 Variables can also be saved from responses:
 
 ```yaml
-    - label: "Send Test Add Arguments Command"
-      command: "TestAddArguments"
-      arguments:
-          values:
-              - name: "arg1"
-                value: 3
-              - name: "arg2"
-                value: 17
-      response:
-          values:
-              - name: "returnValue"
-                saveAs: TestAddArgumentDefaultValue
-                value: 20
+- label: "Send Test Add Arguments Command"
+  command: "TestAddArguments"
+  arguments:
+      values:
+          - name: "arg1"
+            value: 3
+          - name: "arg2"
+            value: 17
+  response:
+      values:
+          - name: "returnValue"
+            saveAs: TestAddArgumentDefaultValue
+            value: 20
 ```
 
 Variables can then be used in later steps:
 
 ```yaml
-    - label: "Send Test Add Arguments Command"
-      command: "TestAddArguments"
-      arguments:
-          values:
-              - name: "arg1"
-                value: 3
-              - name: "arg2"
-                value: 17
-      response:
-          values:
-              - name: "returnValue"
-                value: TestAddArgumentDefaultValue
+- label: "Send Test Add Arguments Command"
+  command: "TestAddArguments"
+  arguments:
+      values:
+          - name: "arg1"
+            value: 3
+          - name: "arg2"
+            value: 17
+  response:
+      values:
+          - name: "returnValue"
+            value: TestAddArgumentDefaultValue
 ```
 
 Tags where variables can be used are noted in the
