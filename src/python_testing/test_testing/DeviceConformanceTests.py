@@ -27,7 +27,7 @@ from matter.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType
                                                  device_type_id_type, is_valid_device_type_id)
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                             ProblemNotice, ProblemSeverity)
-from matter.testing.spec_parsing import build_xml_device_types, CommandType, PrebuiltDataModelDirectory, XmlDeviceType, XmlDeviceTypeClusterRequirements
+from matter.testing.spec_parsing import build_xml_device_types, build_xml_namespaces, CommandType, PrebuiltDataModelDirectory, XmlDeviceType, XmlDeviceTypeClusterRequirements
 from matter.tlv import uint
 
 
@@ -513,4 +513,68 @@ class DeviceConformanceTests(BasicCompositionTests):
             if have_closure and have_window_covering:
                 problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
                                               problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has both window covering and closure clusters"))
+        return problems
+
+    def check_closure_restricted_sem_tags(self) -> list[ProblemNotice]:
+        # This is a test that is SPECIFIC to the 1.5 spec, and thus we need the 1.5 spec information specifically
+        # to assess the revisions.
+        one_five_device_types, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
+        one_five_namespaces, _ = build_xml_namespaces(PrebuiltDataModelDirectory.k1_5)
+        # TODO: change this once https://github.com/project-chip/matter-test-scripts/issues/689 is implemented
+
+        def get_namespace_id(name: str) -> uint:
+            return [id for id, xml in one_five_namespaces.items() if xml.name.lower() == name.lower()][0]
+
+        closure_id = self._get_device_type_id('Closure', one_five_device_types)
+        closure_panel_id = self._get_device_type_id('Closure Panel', one_five_device_types)
+        closure_namespace_id = get_namespace_id('Closure')
+        closure_panel_namespace_id = get_namespace_id('Closure Panel')
+
+        problems = []
+        for endpoint_id, endpoint in self.endpoints.items():
+            # If a Cloure or Closure Panel does not implement TagList, this is also invalid but is verified by another IDM test,
+            if Clusters.Descriptor.Attributes.TagList not in endpoint[Clusters.Descriptor]:
+                continue
+
+            device_types = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
+
+            for dt in device_types:
+                device_type_id = dt.deviceType
+
+                if device_type_id == closure_id:
+                    tag_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList]
+                    closure_tag_count = 0
+
+                    for tag in tag_list:
+                        if tag.namespaceID == closure_panel_namespace_id:
+                            problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
+                                                          problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has semantic tag {tag.tag} from Closure Panel namespace"))
+                        elif tag.namespaceID == closure_namespace_id:
+                            closure_tag_count += 1
+
+                    if closure_tag_count == 0:
+                        problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
+                                                      problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} is missing a Closure namespace tag"))
+                    elif closure_tag_count > 1:
+                        problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
+                                                      problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has multiple Closure namespace tags"))
+
+                elif device_type_id == closure_panel_id:
+                    tag_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList]
+                    closure_panel_tag_count = 0
+
+                    for tag in tag_list:
+                        if tag.namespaceID == closure_namespace_id:
+                            problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
+                                                          problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has semantic tag {tag.tag} from Closure namespace"))
+                        elif tag.namespaceID == closure_panel_namespace_id:
+                            closure_panel_tag_count += 1
+
+                    if closure_panel_tag_count == 0:
+                        problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
+                                                      problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} is missing a Closure Panel namespace tag"))
+                    elif closure_panel_tag_count > 1:
+                        problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
+                                                      problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has multiple Closure Panel namespace tags"))
+
         return problems

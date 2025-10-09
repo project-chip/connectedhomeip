@@ -28,7 +28,7 @@ from matter.testing.basic_composition import arls_populated
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation, ProblemLocation
 from matter.testing.runner import default_matter_test_main
-from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types
+from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, build_xml_namespaces
 
 
 def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]:
@@ -496,6 +496,140 @@ class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
         test_as_extra_cluster([Clusters.ClosureDimension])
         test_as_extra_cluster([Clusters.WindowCovering])
         test_as_extra_cluster([Clusters.WindowCovering, Clusters.ClosureControl, Clusters.ClosureDimension])
+
+    def test_closure_restricted_tags(self):
+        # This test is specific to clusters at 1.5 revisions
+        xml_clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
+        xml_device_types, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
+        xml_namespaces, _ = build_xml_namespaces(PrebuiltDataModelDirectory.k1_5)
+        # TODO: change this once https://github.com/project-chip/matter-test-scripts/issues/689 is implemented
+        closure_id = [id for id, xml in xml_device_types.items() if xml.name == 'Closure'][0]
+        closure_panel_id = [id for id, xml in xml_device_types.items() if xml.name == 'Closure Panel'][0]
+        closure_namespace_id = [id for id, xml in xml_namespaces.items() if xml.name == 'Closure'][0]
+        closure_panel_namespace_id = [id for id, xml in xml_namespaces.items() if xml.name == 'Closure Panel'][0]
+
+        def create_endpoint(id: int, rev: int, tag_list: list[Clusters.Globals.Structs.SemanticTagStruct]):
+            self.endpoints = {1: create_minimal_dt(xml_clusters, xml_device_types, id, is_tlv_endpoint=False)}
+            # For the purposes of this test, I don't care that no clusters are present
+
+            self.endpoints[1][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList][0].revision = rev
+            self.endpoints[1][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = tag_list
+
+        # Closure
+        one_five_revision = xml_device_types[closure_id].revision
+
+        # No Closure tags present - not OK
+        tags = []
+        create_endpoint(closure_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem with Closure tags")
+
+        # Multiple Closure tags present - not OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_namespace_id, tag=0), Clusters.Globals.Structs.SemanticTagStruct(namespaceID=closure_namespace_id, tag=1)]
+        create_endpoint(closure_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem with Closure tags")
+
+        # Closure Panel and Closure tag present - not OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_namespace_id, tag=0), Clusters.Globals.Structs.SemanticTagStruct(namespaceID=closure_panel_namespace_id, tag=0)]
+        create_endpoint(closure_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem with Closure tags")
+
+        # Only Closure Panel tag present - not OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(namespaceID=closure_panel_namespace_id, tag=0)]
+        create_endpoint(closure_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 2, "Did not find expected problem with Closure tags")
+
+        # Multiple Closure Panel tags present and no Closure tag - not OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_panel_namespace_id, tag=0), Clusters.Globals.Structs.SemanticTagStruct(namespaceID=closure_panel_namespace_id, tag=1)]
+        create_endpoint(closure_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 3, "Did not find expected problem with Closure tags")
+
+        # Other tag from unrelated namespace and no Closure tag
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=0x11, tag=0x31)]
+        create_endpoint(closure_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem with Closure tags")
+
+        # Single Closure tag - OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_namespace_id, tag=0)]
+        create_endpoint(closure_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 0, "Unexpected problem with Closure tags")
+
+        # Single Closure tag with other tag from unrelated namespace - OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_namespace_id, tag=0), Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=0x11, tag=0x31)]
+        create_endpoint(closure_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 0, "Unexpected problem with Closure tags")
+
+        # Closure Panel
+        one_five_revision = xml_device_types[closure_panel_id].revision
+
+        # No Closure Panel tags present - not OK
+        tags = []
+        create_endpoint(closure_panel_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem with Closure Panel tags")
+
+        # Multiple Closure Panel tags present - not OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_panel_namespace_id, tag=0), Clusters.Globals.Structs.SemanticTagStruct(namespaceID=closure_panel_namespace_id, tag=1)]
+        create_endpoint(closure_panel_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem with Closure Panel tags")
+
+        # Closure Panel and Closure tag present - not OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_namespace_id, tag=0), Clusters.Globals.Structs.SemanticTagStruct(namespaceID=closure_panel_namespace_id, tag=0)]
+        create_endpoint(closure_panel_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem with Closure Panel tags")
+
+        # Only Closure tag present - not OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(namespaceID=closure_namespace_id, tag=0)]
+        create_endpoint(closure_panel_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 2, "Did not find expected problem with Closure Panel tags")
+
+        # Multiple Closure tags present and no Closure Panel tag - not OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_namespace_id, tag=0), Clusters.Globals.Structs.SemanticTagStruct(namespaceID=closure_namespace_id, tag=1)]
+        create_endpoint(closure_panel_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 3, "Did not find expected problem with Closure Panel tags")
+
+        # Other tag from unrelated namespace and no Closure Panel tag
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=0x11, tag=0x31)]
+        create_endpoint(closure_panel_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem with Closure Panel tags")
+
+        # Single Closure Panel tag - OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_panel_namespace_id, tag=0)]
+        create_endpoint(closure_panel_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 0, "Unexpected problem with Closure Panel tags")
+
+        # Single Closure Panel tag with other tag from unrelated namespace - OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_panel_namespace_id, tag=0), Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=0x11, tag=0x31)]
+        create_endpoint(closure_panel_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 0, "Unexpected problem with Closure Panel tags")
 
 
 if __name__ == "__main__":
