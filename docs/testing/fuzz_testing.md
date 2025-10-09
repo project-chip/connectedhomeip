@@ -51,7 +51,7 @@ for an example of a simple fuzz test.
 
     -   Example
 
-        ```gn
+        ```
         import("${chip_root}/build/chip/fuzz_test.gni")
 
         if (enable_fuzz_test_targets) {
@@ -85,7 +85,7 @@ for an example of a simple fuzz test.
 
     -   Add Fuzzing Target like that
 
-        ```gn
+        ```
         if (enable_fuzz_test_targets) {
             group("fuzz_tests") {
             deps = [

@@ -71,18 +71,16 @@ class TC_MYTEST_1_1(MatterBaseTest):
     async def test_TC_MYTEST_1_1(self):
 
         vendor_name = await self.read_single_attribute_check_success(
-            dev_ctrl=self.default_controller, <span style="color:#38761D"># defaults to
-self.default_controlller</span>
-            node_id = self.dut_node_id, <span style="color:#38761D"># defaults to
-self.dut_node_id</span>
+            dev_ctrl=self.default_controller,  # defaults to self.default_controller
+            node_id = self.dut_node_id,  # defaults to self.dut_node_id
             cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.VendorName,
-            endpoint = 0, <span style="color:#38761D">#defaults to 0</span>
+            endpoint = 0,  # defaults to 0
         )
-        asserts.assert_equal(vendor_name, “Test vendor name”, “Unexpected vendor name”)
+        asserts.assert_equal(vendor_name, "Test vendor name", "Unexpected vendor name")
 
 if __name__ == "__main__":
-default_matter_test_main()
+    default_matter_test_main()
 ```
 
 ---
@@ -347,7 +345,7 @@ Example:
 
 ```python
 res = await devCtrl.WriteAttribute(nodeid=0, attributes=[(0,Clusters.BasicInformation.Attributes.NodeLabel("Test"))])
-asserts.assert_equal(ret[0].status, Status.Success, “write failed”)
+asserts.assert_equal(ret[0].status, Status.Success, "write failed")
 ```
 
 ### [SendCommand](./ChipDeviceCtrlAPI.md#sendcommand)

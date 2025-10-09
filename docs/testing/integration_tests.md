@@ -131,7 +131,6 @@ flowchart TD
     org.bluez.hci0 --- DUT
     org.bluez.hci1 --- CONTROLLER
 
-
 ```
 
 In order to run tests with mocked BLE and Wi-Fi connectivity and Linux network

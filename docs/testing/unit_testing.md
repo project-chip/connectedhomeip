@@ -311,7 +311,7 @@ own text context class.
 
     -   Example
 
-        ```cpp
+        ```
         chip_test_suite("tests") {
             output_name = "libSomethingTests"
 
