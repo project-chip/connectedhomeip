@@ -20,9 +20,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libTestBasicInformationCluster"
 
-  test_sources = [
-    "TestBasicInformationCluster.cpp",
-  ]
+  test_sources = [ "TestBasicInformationCluster.cpp"]
 
   # The following tests are excluded for NXP / FREERTOS
   # because the ConfigurationManagerImpl is defined final
