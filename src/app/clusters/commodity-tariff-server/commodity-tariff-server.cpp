@@ -124,7 +124,7 @@ struct ThresholdsPerFeatureValidationContext
                 // Add threshold
                 VerifyOrReturnError(CommodityTariffConsts::kTariffComponentsAttrMaxLength, CHIP_ERROR_INTERNAL);
                 features[i].thresholds[features[i].thresholdCount++] = threshold;
-                ret = CHIP_NO_ERROR;
+                ret                                                  = CHIP_NO_ERROR;
                 break;
             }
         }
@@ -376,8 +376,7 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
             }
             else if (sts != CHIP_NO_ERROR)
             {
-                ChipLogError(AppServer,
-                             "An error at thresholds duplication checking per feature");
+                ChipLogError(AppServer, "An error at thresholds duplication checking per feature");
                 return sts;
             }
         }
