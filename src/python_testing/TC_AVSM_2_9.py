@@ -121,14 +121,9 @@ class TC_AVSM_2_9(MatterBaseTest, AVSMTestBase):
                 Status.NotFound,
                 "Unexpected error returned when expecting NOT_FOUND due to videoStreamID set to aStreamIDToDelete + 1",
             )
-            pass
 
         self.step(4)
-        try:
-            await self.send_single_cmd(endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=(aStreamIDToDelete)))
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
+        await self.send_single_cmd(endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=(aStreamIDToDelete)))
 
         self.step(5)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
