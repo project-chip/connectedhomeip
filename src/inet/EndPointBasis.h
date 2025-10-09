@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2015-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,10 +47,10 @@ template <class EndPointType>
 class EndPointHandle;
 
 /**
- * Basis of internet transport endpoint classes. Guarded by EndPointManager::CreateEndPoint to guarantee proper ref-counting.
+ * Base class of internet transport endpoint classes. Guarded by EndPointManager::CreateEndPoint to guarantee proper ref-counting.
  */
 template <typename EndPointType>
-class DLL_EXPORT EndPointBasis : public ReferenceCountedProtected<EndPointType, EndPointDeletor<EndPointType>, 0>
+class DLL_EXPORT EndPointBasis : public ReferenceCountedProtected<EndPointType, EndPointDeletor<EndPointType>>
 {
 public:
     using EndPoint = EndPointType;
@@ -71,7 +71,6 @@ public:
 
 protected:
     friend class EndPointHandle<EndPointType>;
-    friend class ReferenceCountedPtr<EndPointType>;
 
     inline void Delete() { GetEndPointManager().DeleteEndPoint(static_cast<EndPointType *>(this)); }
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -221,7 +221,7 @@ private:
     /**
      * Find an allocated connection that matches the corresponding TCPEndPoint.
      */
-    ActiveTCPConnectionHandle FindInUseConnection(const Inet::TCPEndPointHandle & endPoint);
+    ActiveTCPConnectionHandle FindInUseConnection(const Inet::TCPEndPoint & endPoint);
 
     /**
      * Sends the specified message once a connection has been established.

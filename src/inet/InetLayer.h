@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,22 +58,6 @@ public:
 
     // For printing
     inline operator const void *() const { return this->mRefCounted; }
-
-    // This is bad and should not normally be done; we are explicitly closing the connection
-    // instead of gracefully releasing our reference, which will cause anyone holding a reference to have issues
-    inline void ForceDisconnect()
-    {
-        EndPointType * endpoint = this->mRefCounted;
-        if ((endpoint != nullptr) && endpoint->GetReferenceCount() > 1)
-        {
-            this->Release();
-            endpoint->Free();
-        }
-        else
-        {
-            this->Release();
-        }
-    }
 };
 
 /**
@@ -85,7 +69,7 @@ class EndPointManager
 public:
     using EndPoint            = EndPointType;
     using TypedEndPointHandle = EndPointHandle<EndPoint>;
-    using EndPointVisitor     = Loop (*)(TypedEndPointHandle &);
+    using EndPointVisitor     = Loop (*)(const TypedEndPointHandle &);
 
     EndPointManager() {}
     virtual ~EndPointManager() { VerifyOrDie(mLayerState.Destroy()); }
@@ -114,7 +98,7 @@ public:
         assertChipStackLockedByCurrentThread();
         VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-        retEndPoint = CreateEndPoint();
+        retEndPoint = std::move(CreateEndPoint());
         if (retEndPoint.IsNull())
         {
             ChipLogError(Inet, "%s endpoint pool FULL", EndPointProperties<EndPointType>::kName);

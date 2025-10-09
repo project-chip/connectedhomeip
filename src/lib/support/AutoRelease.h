@@ -22,10 +22,8 @@
 
 #pragma once
 
-#include <lib/core/ReferenceCounted.h>
 #include <lib/support/CodeUtils.h>
 #include <stddef.h>
-#include <type_traits>
 
 namespace chip {
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -212,13 +212,8 @@ ActiveTCPConnectionState * TCPBase::FindActiveConnection(const Inet::TCPEndPoint
     return nullptr;
 }
 
-ActiveTCPConnectionHandle TCPBase::FindInUseConnection(const Inet::TCPEndPointHandle & endPoint)
+ActiveTCPConnectionHandle TCPBase::FindInUseConnection(const Inet::TCPEndPoint & endPoint)
 {
-    if (endPoint.IsNull())
-    {
-        return nullptr;
-    }
-
     for (size_t i = 0; i < mActiveConnectionsSize; i++)
     {
         if (mActiveConnections[i].mEndPoint == endPoint)
@@ -526,7 +521,7 @@ void TCPBase::HandleTCPEndPointConnectComplete(const Inet::TCPEndPointHandle & e
 
     PeerAddress addr;
     char addrStr[Transport::PeerAddress::kMaxToStringSize];
-    activeConnection = tcp->FindInUseConnection(endPoint);
+    activeConnection = tcp->FindInUseConnection(*endPoint);
     if (activeConnection.IsNull())
     {
         err = GetPeerAddress(*endPoint, addr);
@@ -601,9 +596,8 @@ void TCPBase::HandleTCPEndPointConnectComplete(const Inet::TCPEndPointHandle & e
 
 void TCPBase::HandleTCPEndPointConnectionClosed(Inet::TCPEndPoint & endPoint, CHIP_ERROR err)
 {
-    TCPBase * tcp = reinterpret_cast<TCPBase *>(endPoint.mAppState);
-    Inet::TCPEndPointHandle handle(&endPoint);
-    ActiveTCPConnectionHandle activeConnection = tcp->FindInUseConnection(handle);
+    TCPBase * tcp                              = reinterpret_cast<TCPBase *>(endPoint.mAppState);
+    ActiveTCPConnectionHandle activeConnection = tcp->FindInUseConnection(endPoint);
 
     if (activeConnection.IsNull())
     {
@@ -664,10 +658,6 @@ void TCPBase::HandleIncomingConnection(const Inet::TCPEndPointHandle & listenEnd
 
 void TCPBase::HandleAcceptError(const Inet::TCPEndPointHandle & endPoint, CHIP_ERROR err)
 {
-    // We don't own endPoint & so we don't free it;
-    // It's either mListenSocket, which is owned by this & we want to keep open & will close in Close(),
-    // Or it's a new incoming connection which failed in e.g. HandleIncomingConnection,
-    // and that method owns the connection & will release it
     ChipLogError(Inet, "Accept error: %" CHIP_ERROR_FORMAT, err.Format());
     TCPBase * tcp = reinterpret_cast<TCPBase *>(endPoint->mAppState);
 

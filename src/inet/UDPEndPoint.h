@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
@@ -299,7 +299,7 @@ protected:
     /**
      * Close the endpoint and recycle its memory.
      *
-     *  Invokes the \c Close method, then invokes the <tt>EndPointBasis::Free</tt> method to return the object to its
+     *  Invokes the \c Close method, then invokes the <tt>EndPointBasis::Delete</tt> method to return the object to its
      *  memory pool.
      *
      *  On LwIP systems, this method must not be called with the LwIP stack lock already acquired.

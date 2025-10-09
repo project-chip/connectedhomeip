@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -262,6 +262,7 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
     ReturnErrorOnFailure(static_cast<System::LayerSockets &>(GetSystemLayer())
                              .SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this)));
 
+    TCPEndPointHandle handle(this);
     if (conRes == 0)
     {
         mState = State::kConnected;
@@ -269,7 +270,6 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
         ReturnErrorOnFailure(static_cast<System::LayerSockets &>(GetSystemLayer()).RequestCallbackOnPendingRead(mWatch));
         if (OnConnectComplete != nullptr)
         {
-            TCPEndPointHandle handle(this);
             OnConnectComplete(handle, CHIP_NO_ERROR);
         }
     }
@@ -481,6 +481,7 @@ CHIP_ERROR TCPEndPointImplSockets::DriveSendingImpl()
         return err;
     });
 
+    TCPEndPointHandle handle(this);
     while (!mSendQueue.IsNull())
     {
         size_t bufLen = mSendQueue->DataLength();
@@ -527,7 +528,6 @@ CHIP_ERROR TCPEndPointImplSockets::DriveSendingImpl()
 
         if (OnDataSent != nullptr)
         {
-            TCPEndPointHandle handle(this);
             OnDataSent(handle, lenSent);
         }
 
@@ -741,7 +741,8 @@ CHIP_ERROR TCPEndPointImplSockets::GetSocket(IPAddressType addrType)
             mSocket = kInvalidSocketFd;
         });
         ReturnErrorOnFailure(static_cast<System::LayerSockets &>(GetSystemLayer()).StartWatchingSocket(mSocket, &mWatch));
-        mAddrType = addrType;
+        auto watchCleanup = ScopeExit([&]() { static_cast<System::LayerSockets &>(GetSystemLayer()).StopWatchingSocket(&mWatch); });
+        mAddrType         = addrType;
 
         // If creating an IPv6 socket, tell the kernel that it will be IPv6 only.  This makes it
         // posible to bind two sockets to the same port, one for IPv4 and one for IPv6.
@@ -765,6 +766,7 @@ CHIP_ERROR TCPEndPointImplSockets::GetSocket(IPAddressType addrType)
             }
         }
 #endif // defined(SO_NOSIGPIPE)
+        watchCleanup.release();
         connectionCleanup.release();
     }
     else if (mAddrType != addrType)
@@ -784,7 +786,7 @@ void TCPEndPointImplSockets::HandlePendingIO(System::SocketEvents events, intptr
 void TCPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
 {
     // Prevent the end point from being freed while in the middle of a callback.
-    TCPEndPointHandle ref(this);
+    TCPEndPointHandle handle(this);
 
     // If in the Listening state, and the app is ready to receive a connection, and there is a connection
     // ready to be received on the socket, process the incoming connection.
@@ -795,7 +797,6 @@ void TCPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
             CHIP_ERROR error = HandleIncomingConnection();
             if (error != CHIP_NO_ERROR && OnAcceptError != nullptr)
             {
-                TCPEndPointHandle handle(this);
                 OnAcceptError(handle, error);
             }
         }
@@ -990,8 +991,7 @@ CHIP_ERROR TCPEndPointImplSockets::HandleIncomingConnection()
     socklen_t saLen = sizeof(sa);
 
     // Accept the new connection.
-    int conSocket = accept(mSocket, &sa.any, &saLen);
-    // On exit from failure, close the connection, clean up and call the app's error callback.
+    int conSocket       = accept(mSocket, &sa.any, &saLen);
     auto failureCleanup = ScopeExit([&] {
         if (conSocket != -1)
         {
@@ -1044,10 +1044,11 @@ CHIP_ERROR TCPEndPointImplSockets::HandleIncomingConnection()
 
     // If all went well...
     // Put the new end point into the Connected state.
-    conEP.mSocket = conSocket;
     ReturnErrorOnFailure(static_cast<System::LayerSockets &>(GetSystemLayer()).StartWatchingSocket(conSocket, &conEP.mWatch));
 
-    conEP.mState = State::kConnected;
+    failureCleanup.release(); // Transfer ownership of socket to conEp
+    conEP.mSocket = conSocket;
+    conEP.mState  = State::kConnected;
 #if INET_CONFIG_ENABLE_IPV4
     conEP.mAddrType = (sa.any.sa_family == AF_INET6) ? IPAddressType::kIPv6 : IPAddressType::kIPv4;
 #else  // !INET_CONFIG_ENABLE_IPV4
@@ -1063,8 +1064,6 @@ CHIP_ERROR TCPEndPointImplSockets::HandleIncomingConnection()
     // Call the app's callback function.
     TCPEndPointHandle handle(this);
     OnConnectionReceived(handle, connectEndPoint, peerAddr, peerPort);
-
-    failureCleanup.release();
 
     return CHIP_NO_ERROR;
 }

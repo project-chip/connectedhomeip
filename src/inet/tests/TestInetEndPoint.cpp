@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC.
  *    Copyright (c) 2016-2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -389,9 +389,8 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // we assume NO open endpoints
-    gUDP.ForEachEndPoint([](UDPEndPointHandle & ep) {
-        ChipLogError(Test, "NOTE: Unexpected UDP endpoint in use. Will free it");
-        ep.ForceDisconnect();
+    gUDP.ForEachEndPoint([](const UDPEndPointHandle & ep) {
+        ADD_FAILURE("Unexpected UDP endpoint in use")
         return Loop::Continue;
     });
 
@@ -422,9 +421,8 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // we assume NO open endpoints
-    gTCP.ForEachEndPoint([](TCPEndPointHandle & ep) {
-        ChipLogError(Test, "NOTE: Unexpected TCP endpoint in use. Will free it");
-        ep.ForceDisconnect();
+    gTCP.ForEachEndPoint([](const TCPEndPointHandle & ep) {
+        ADD_FAILURE("Unexpected TCP endpoint in use")
         return Loop::Continue;
     });
 

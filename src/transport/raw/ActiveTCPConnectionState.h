@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,8 +67,7 @@ public:
  */
 class ActiveTCPConnectionHandle;
 struct ActiveTCPConnectionState
-    : public ReferenceCountedProtected<ActiveTCPConnectionState, ActiveTCPConnectionStateDeleter<ActiveTCPConnectionState>, 0,
-                                       uint16_t>
+    : public ReferenceCountedProtected<ActiveTCPConnectionState, ActiveTCPConnectionStateDeleter<ActiveTCPConnectionState>>
 {
     using ReleaseFnType = std::function<void(ActiveTCPConnectionState & connection)>;
 
@@ -115,7 +114,6 @@ private:
     friend class TCPBase;
     friend class ActiveTCPConnectionStateDeleter<ActiveTCPConnectionState>;
     friend class ActiveTCPConnectionHandle;
-    friend class ReferenceCountedPtr<ActiveTCPConnectionState>;
     // Allow tests to access private members.
     template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
     friend class TCPBaseTestAccess;

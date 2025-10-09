@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -226,7 +226,7 @@ void TCPEndPoint::HandleIdleTimer(chip::System::Layer * aSystemLayer, void * aAp
     auto & endPointManager = *reinterpret_cast<EndPointManager<TCPEndPoint> *>(aAppState);
     bool lTimerRequired    = IsIdleTimerRunning(endPointManager);
 
-    endPointManager.ForEachEndPoint([](TCPEndPointHandle & lEndPoint) -> Loop {
+    endPointManager.ForEachEndPoint([](const TCPEndPointHandle & lEndPoint) -> Loop {
         if (!lEndPoint->IsConnected())
             return Loop::Continue;
         if (lEndPoint->mIdleTimeout == 0)
@@ -254,7 +254,7 @@ void TCPEndPoint::HandleIdleTimer(chip::System::Layer * aSystemLayer, void * aAp
 bool TCPEndPoint::IsIdleTimerRunning(EndPointManager<TCPEndPoint> & endPointManager)
 {
     // See if there are any TCP connections with the idle timer check in use.
-    return Loop::Break == endPointManager.ForEachEndPoint([](TCPEndPointHandle & lEndPoint) {
+    return Loop::Break == endPointManager.ForEachEndPoint([](const TCPEndPointHandle & lEndPoint) {
         return (lEndPoint->mIdleTimeout == 0) ? Loop::Continue : Loop::Break;
     });
 }
@@ -324,6 +324,8 @@ CHIP_ERROR TCPEndPoint::DriveSending()
 
 void TCPEndPoint::DriveReceiving()
 {
+    TCPEndPointHandle handle(this);
+
     // If there's data in the receive queue and the app is ready to receive it then call the app's callback
     // with the entire receive queue.
     if (!mRcvQueue.IsNull() && mReceiveEnabled && OnDataReceived != nullptr)
@@ -331,8 +333,7 @@ void TCPEndPoint::DriveReceiving()
         // Acknowledgement is done after handling the buffers to allow the
         // application processing to throttle flow.
         size_t ackLength = mRcvQueue->TotalLength();
-        TCPEndPointHandle handle(this);
-        CHIP_ERROR err = OnDataReceived(handle, std::move(mRcvQueue));
+        CHIP_ERROR err   = OnDataReceived(handle, std::move(mRcvQueue));
         if (err != CHIP_NO_ERROR)
         {
             DoClose(err, false);
@@ -351,6 +352,7 @@ void TCPEndPoint::DriveReceiving()
 
 void TCPEndPoint::HandleConnectComplete(CHIP_ERROR err)
 {
+    TCPEndPointHandle handle(this);
     // If the connect succeeded enter the Connected state and call the app's callback.
     if (err == CHIP_NO_ERROR)
     {
@@ -366,7 +368,6 @@ void TCPEndPoint::HandleConnectComplete(CHIP_ERROR err)
 
         if (OnConnectComplete != nullptr)
         {
-            TCPEndPointHandle handle(this);
             OnConnectComplete(handle, CHIP_NO_ERROR);
         }
     }
