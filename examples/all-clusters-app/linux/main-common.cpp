@@ -161,11 +161,6 @@ DefaultTimerDelegate sTimerDelegate;
 IdentifyDelegateImpl sIdentifyDelegate;
 
 RegisteredServerCluster<Clusters::IdentifyCluster>
-    gIdentifyCluster0(Clusters::IdentifyCluster::Config(0, sTimerDelegate)
-                          .WithIdentifyType(Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
-                          .WithDelegate(&sIdentifyDelegate));
-
-RegisteredServerCluster<Clusters::IdentifyCluster>
     gIdentifyCluster1(Clusters::IdentifyCluster::Config(1, sTimerDelegate)
                           .WithIdentifyType(Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
                           .WithDelegate(&sIdentifyDelegate));
@@ -206,7 +201,6 @@ void ApplicationInit()
     Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(chip::EndpointId(1),
                                                                     &Clusters::TlsClientManagementCommandDelegate::GetInstance());
 
-    VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster0.Registration()) == CHIP_NO_ERROR);
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster1.Registration()) == CHIP_NO_ERROR);
 
     SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));

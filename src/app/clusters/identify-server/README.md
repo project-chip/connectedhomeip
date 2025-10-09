@@ -122,7 +122,7 @@ MyIdentifyDelegate gMyIdentifyDelegate;
 DefaultTimerDelegate gTimerDelegate;
 
 chip::app::RegisteredServerCluster<chip::app::Clusters::IdentifyCluster> gIdentifyCluster(
-    chip::app::Clusters::IdentifyCluster::Config(0, gTimerDelegate)
+    chip::app::Clusters::IdentifyCluster::Config(1, gTimerDelegate)
         .WithIdentifyType(chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
         .WithDelegate(&gMyIdentifyDelegate));
 
@@ -154,8 +154,8 @@ void OnIdentifyStart(::Identify *) { /* ... */ }
 void OnIdentifyStop(::Identify *) { /* ... */ }
 void OnTriggerEffect(::Identify * identify) { /* ... */ }
 
-static Identify gIdentify0 = {
-    chip::EndpointId{ 0 }, OnIdentifyStart, OnIdentifyStop,
+static Identify gIdentify1 = {
+    chip::EndpointId{ 1 }, OnIdentifyStart, OnIdentifyStop,
     Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
     OnTriggerEffect,
 };
