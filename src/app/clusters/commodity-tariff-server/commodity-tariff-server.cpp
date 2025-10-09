@@ -209,15 +209,18 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
         static_cast<TariffComponentsDataClass &>(GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffComponents)).GetNewValue().Value();
 
     // Create lookup maps with const correctness
-    CTC_UnorderedMap<uint32_t, const Structs::DayEntryStruct::Type *, CommodityTariffConsts::kDayEntriesAttrMaxLength> dayEntriesMap;
-    CTC_UnorderedMap<uint32_t, const Structs::TariffComponentStruct::Type *, CommodityTariffConsts::kTariffComponentMaxLabelLength> tariffComponentsMap;
+    CTC_UnorderedMap<uint32_t, const Structs::DayEntryStruct::Type *, CommodityTariffConsts::kDayEntriesAttrMaxLength>
+        dayEntriesMap;
+    CTC_UnorderedMap<uint32_t, const Structs::TariffComponentStruct::Type *, CommodityTariffConsts::kTariffComponentMaxLabelLength>
+        tariffComponentsMap;
 
-    CommodityTariffAttrsDataMgmt::ListToMap<Structs::DayEntryStruct::Type, &Structs::DayEntryStruct::Type::dayEntryID, CommodityTariffConsts::kDayEntriesAttrMaxLength>(
-        dayEntries, dayEntriesMap);
+    CommodityTariffAttrsDataMgmt::ListToMap<Structs::DayEntryStruct::Type, &Structs::DayEntryStruct::Type::dayEntryID,
+                                            CommodityTariffConsts::kDayEntriesAttrMaxLength>(dayEntries, dayEntriesMap);
 
     CommodityTariffAttrsDataMgmt::ListToMap<Structs::TariffComponentStruct::Type,
-                                            &Structs::TariffComponentStruct::Type::tariffComponentID, CommodityTariffConsts::kTariffComponentMaxLabelLength>(tariffComponents,
-                                                                                                      tariffComponentsMap);
+                                            &Structs::TariffComponentStruct::Type::tariffComponentID,
+                                            CommodityTariffConsts::kTariffComponentMaxLabelLength>(tariffComponents,
+                                                                                                   tariffComponentsMap);
 
     struct DeStartDurationPair
     {
@@ -911,9 +914,9 @@ const Structs::TariffPeriodStruct::Type * FindTariffPeriodByDayEntryId(CurrentTa
     return nullptr;
 }
 
-template<size_t ReturnCapacity = CommodityTariffConsts::kTariffPeriodsAttrMaxLength>
-CTC_UnorderedSet<const Structs::TariffPeriodStruct::Type *, ReturnCapacity> FindTariffPeriodsByTariffComponentId(CurrentTariffAttrsCtx & aCtx,
-                                                                                                 uint32_t componentID)
+template <size_t ReturnCapacity = CommodityTariffConsts::kTariffPeriodsAttrMaxLength>
+CTC_UnorderedSet<const Structs::TariffPeriodStruct::Type *, ReturnCapacity>
+FindTariffPeriodsByTariffComponentId(CurrentTariffAttrsCtx & aCtx, uint32_t componentID)
 {
     const auto & tariffPeriods = aCtx.mTariffProvider->GetTariffPeriods().Value();
     CTC_UnorderedSet<const Structs::TariffPeriodStruct::Type *, ReturnCapacity> matchingPeriods;

@@ -71,7 +71,7 @@ static void CleanUpIDs(DataModel::List<const uint32_t> & IDs)
     }
 }
 
-template<size_t Capacity>
+template <size_t Capacity>
 static bool HasDuplicateIDs(const DataModel::List<const uint32_t> & IDs,
                             chip::app::CommodityTariffContainers::CTC_UnorderedSet<uint32_t, Capacity> & seen)
 {

@@ -262,31 +262,32 @@ TEST_F(TestCommodityTariffContainers, UnorderedMap_BasicOperations)
     EXPECT_FALSE(map.insert(1, 100)); // Duplicate key
 }
 
-TEST_F(TestCommodityTariffContainers, UnorderedMap_OperatorBracket) {
+TEST_F(TestCommodityTariffContainers, UnorderedMap_OperatorBracket)
+{
     CTC_UnorderedMap<uint8_t, uint32_t, 3> map;
-    
-    map.insert(1, 10);  
-    
-    // Access existing element  
-    EXPECT_EQ(map[1], 10u);  
-    map[1] = 11; // Modify existing  
-    EXPECT_EQ(map[1], 11u);  
-    EXPECT_EQ(map.size(), 1u);  
-    
-    // Create new element  
-    map[2] = 20;  
-    EXPECT_EQ(map.size(), 2u);  
-    EXPECT_EQ(map[2], 20u);  
-    
-    // Create another new element up to capacity  
-    map[3] = 30;  
-    EXPECT_EQ(map.size(), 3u);  
-    EXPECT_EQ(map[3], 30u);  
 
-    // Check all values  
-    EXPECT_EQ(map[1], 11u);  
-    EXPECT_EQ(map[2], 20u);  
-    EXPECT_EQ(map[3], 30u);  
+    map.insert(1, 10);
+
+    // Access existing element
+    EXPECT_EQ(map[1], 10u);
+    map[1] = 11; // Modify existing
+    EXPECT_EQ(map[1], 11u);
+    EXPECT_EQ(map.size(), 1u);
+
+    // Create new element
+    map[2] = 20;
+    EXPECT_EQ(map.size(), 2u);
+    EXPECT_EQ(map[2], 20u);
+
+    // Create another new element up to capacity
+    map[3] = 30;
+    EXPECT_EQ(map.size(), 3u);
+    EXPECT_EQ(map[3], 30u);
+
+    // Check all values
+    EXPECT_EQ(map[1], 11u);
+    EXPECT_EQ(map[2], 20u);
+    EXPECT_EQ(map[3], 30u);
 }
 
 } // namespace app

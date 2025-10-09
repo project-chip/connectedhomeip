@@ -31,13 +31,14 @@ namespace chip {
 namespace app {
 namespace CommodityTariffContainers {
 
-template<typename T, size_t Capacity>
+template <typename T, size_t Capacity>
 class CTC_ContainerClassBase
 {
     static_assert(std::is_trivially_destructible<T>::value, "T must be trivially destructible");
 
 protected:
-    CTC_ContainerClassBase()  = default;
+    CTC_ContainerClassBase() = default;
+
 public:
     virtual ~CTC_ContainerClassBase() = default;
 
@@ -60,7 +61,7 @@ public:
     virtual const T * find(const T & item) const = 0;
 
     size_t size() const { return mCount; }
-    constexpr size_t  capacity() const { return Capacity; }
+    constexpr size_t capacity() const { return Capacity; }
     bool empty() const { return (mCount == 0); }
 
     // Array-style access
@@ -88,7 +89,8 @@ protected:
 
     RetCode insertAtEnd(const T & item)
     {
-        if (mCount >= Capacity) {
+        if (mCount >= Capacity)
+        {
             return RetCode::kNoMem;
         }
 
@@ -160,11 +162,13 @@ public:
      * @note Automatically resizes if needed (if ensureCapacity is implemented)
      * @note Duplicate items from 'other' are skipped
      */
-    template<typename InputIterator>
+    template <typename InputIterator>
     void mergeIt(InputIterator first, InputIterator last)
     {
-        for (auto it = first; it != last; ++it) {
-            if (!this->contains(*it)) {
+        for (auto it = first; it != last; ++it)
+        {
+            if (!this->contains(*it))
+            {
                 auto ret = this->insertAtEnd(*it);
                 VerifyOrDie(ret == Base::RetCode::kSuccess);
             }
@@ -174,9 +178,10 @@ public:
     /**
      * @brief Merge from any container (std::vector, std::array, etc.)
      */
-    template<typename Container>
-    void merge(const Container& container) {
-                auto ret = Base::RetCode::kSuccess;
+    template <typename Container>
+    void merge(const Container & container)
+    {
+        auto ret = Base::RetCode::kSuccess;
         // Calculate required capacity including only non-duplicates
         size_t nonDuplicateCount = 0;
         for (const auto & item : container)
@@ -188,7 +193,8 @@ public:
         }
 
         size_t requiredCapacity = this->mCount + nonDuplicateCount;
-        if (requiredCapacity > Capacity) {
+        if (requiredCapacity > Capacity)
+        {
             ret = Base::RetCode::kNoMem;
         }
 
@@ -362,7 +368,8 @@ struct TariffUpdateCtx
      * @brief DayEntry IDs referenced by IndividualDays items
      * @details Collected separately for reference validation
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength> IndividualDaysDayEntryIDs;
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength>
+        IndividualDaysDayEntryIDs;
 
     /**
      * @brief DayEntry IDs referenced by TariffPeriod items
@@ -378,13 +385,15 @@ struct TariffUpdateCtx
      * @brief Master set of all valid TariffComponent IDs
      * @details Contains all TariffComponent IDs that exist in the tariff definition
      */
-    CommodityTariffContainers::CTC_UnorderedMap<uint32_t, uint32_t, CommodityTariffConsts::kTariffComponentMaxLabelLength> TariffComponentKeyIDsFeatureMap;
+    CommodityTariffContainers::CTC_UnorderedMap<uint32_t, uint32_t, CommodityTariffConsts::kTariffComponentMaxLabelLength>
+        TariffComponentKeyIDsFeatureMap;
 
     /**
      * @brief TariffComponent IDs referenced by TariffPeriod items
      * @details Collected for validating period->component references
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kTariffComponentMaxLabelLength> TariffPeriodsTariffComponentIDs;
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kTariffComponentMaxLabelLength>
+        TariffPeriodsTariffComponentIDs;
     /// @}
 
     /// @name DayPattern ID Tracking
@@ -399,7 +408,8 @@ struct TariffUpdateCtx
      * @brief DayPattern IDs referenced by CalendarPeriod items
      * @details Collected for validating calendar->pattern references
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayPatternsAttrMaxLength> CalendarPeriodsDayPatternIDs;
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayPatternsAttrMaxLength>
+        CalendarPeriodsDayPatternIDs;
     /// @}
 
     /**
