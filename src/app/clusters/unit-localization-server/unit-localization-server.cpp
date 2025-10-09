@@ -73,13 +73,10 @@ CHIP_ERROR UnitLocalizationCluster::Startup(ServerClusterContext & context)
 CHIP_ERROR UnitLocalizationCluster::Attributes(const ConcreteClusterPath & path,
                                                ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-
-    static constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {};
+    static constexpr DataModel::AttributeEntry optionalAttributes[] = { TemperatureUnit::kMetadataEntry,
+                                                                        SupportedTemperatureUnits::kMetadataEntry };
 
     AttributeListBuilder listBuilder(builder);
-
-    const DataModel::AttributeEntry optionalAttributes[] = { TemperatureUnit::kMetadataEntry,
-                                                             SupportedTemperatureUnits::kMetadataEntry };
 
     OptionalAttributeSet<TemperatureUnit::Id, SupportedTemperatureUnits::Id> optionalAttributeSet;
 
@@ -89,7 +86,7 @@ CHIP_ERROR UnitLocalizationCluster::Attributes(const ConcreteClusterPath & path,
         optionalAttributeSet.Set<SupportedTemperatureUnits::Id>();
     }
 
-    return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributes), optionalAttributeSet);
+    return listBuilder.Append(Span<DataModel::AttributeEntry>(), Span(optionalAttributes), optionalAttributeSet);
 }
 
 DataModel::ActionReturnStatus UnitLocalizationCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,
