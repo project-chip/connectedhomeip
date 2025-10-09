@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <string>
 #include <vector>
 
@@ -360,6 +361,7 @@ private:
     WebRTCSessionStruct * CheckForMatchingSession(HandlerContext & ctx, uint16_t sessionId);
     UpsertResultEnum UpsertSession(const WebRTCSessionStruct & session);
     CHIP_ERROR GenerateSessionId(uint16_t & outSessionId);
+    Protocols::InteractionModel::Status CheckPrivacyModes(const char * commandName, StreamUsageEnum streamUsage);
 
     // Command Handlers
     void HandleSolicitOffer(HandlerContext & ctx, const Commands::SolicitOffer::DecodableType & req);
