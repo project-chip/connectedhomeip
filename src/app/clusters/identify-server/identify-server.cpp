@@ -22,8 +22,10 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <clusters/Identify/Metadata.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <tracing/macros.h>
@@ -272,5 +274,48 @@ Identify::~Identify()
     unreg(this);
 }
 
-void MatterIdentifyPluginServerInitCallback() {}
-void MatterIdentifyPluginServerShutdownCallback() {}
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Identify {
+
+/**
+ * @brief  Identify Attribute Access Interface.
+ */
+class IdentifyAttrAccess : public AttributeAccessInterface
+{
+public:
+    // Register for the Identify cluster on all endpoints.
+    IdentifyAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Identify::Id) {}
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+};
+
+CHIP_ERROR IdentifyAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::ClusterRevision::Id:
+        return aEncoder.Encode(Identify::kRevision);
+    default:
+        break;
+    }
+    return CHIP_NO_ERROR;
+}
+} // namespace Identify
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+namespace {
+IdentifyAttrAccess gAttrAccess;
+} // namespace
+
+void MatterIdentifyPluginServerInitCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+}
+void MatterIdentifyPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+}
