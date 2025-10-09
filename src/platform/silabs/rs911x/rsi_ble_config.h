@@ -24,8 +24,6 @@ extern "C" {
 #if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #include "rsi_bt_common_apis.h"
 #include "rsi_user.h"
-#else
-#include <rsi_data_types.h>
 #endif
 
 #ifdef __cplusplus
@@ -98,23 +96,13 @@ extern "C" {
 
 #if (defined(RSI_M4_INTERFACE) || defined(SLI_SI91X_MCU_INTERFACE))
 #define RSI_BLE_MAX_NBR_ATT_REC (20)
-
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #define RSI_BLE_MAX_NBR_PERIPHERALS (1)
-#else
-#define RSI_BLE_MAX_NBR_SLAVES (1)
-#endif // (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-
+#define RSI_BLE_MAX_NBR_SLAVES (3)
 #define RSI_BLE_NUM_CONN_EVENTS (2)
 #else
 #define RSI_BLE_MAX_NBR_ATT_REC (80)
-
-#if (EXP_BOARD)
 #define RSI_BLE_MAX_NBR_PERIPHERALS (3)
-#else
 #define RSI_BLE_MAX_NBR_SLAVES (3)
-#endif // (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-
 #define RSI_BLE_NUM_CONN_EVENTS (20)
 #endif // (defined(RSI_M4_INTERFACE) || defined(SLI_SI91X_MCU_INTERFACE))
 
@@ -256,7 +244,7 @@ extern "C" {
 #define SL_WFX_BT_INVALID_RANGE (0x4E60)
 
 /***********************************************************************************************************************************************/
-//! RS9116 Firmware Configurations
+//! SiWx917 Firmware Configurations
 /***********************************************************************************************************************************************/
 /*=======================================================================*/
 //! Power save command parameters
