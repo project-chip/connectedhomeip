@@ -337,8 +337,6 @@ CHIP_ERROR JCMCommissionee::ReadAdminCerts(OnCompletionFunc onComplete)
         auto iter = roots.begin();
         if (!iter.Next())
         {
-            CHIP_ERROR status = iter.GetStatus();
-            ChipLogError(JointFabric, "JCM: Admin RCAC not found. iter status: %" CHIP_ERROR_FORMAT, status.Format());
             onComplete(CHIP_ERROR_INTERNAL);
             return;
         }
