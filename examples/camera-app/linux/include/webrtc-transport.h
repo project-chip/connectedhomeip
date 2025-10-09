@@ -128,9 +128,6 @@ public:
     void SetRequestArgs(const RequestArgs & args);
     RequestArgs & GetRequestArgs();
 
-    bool HasSentInitialICECandidates() const { return mHasSentInitialICECandidates; }
-    void SetHasSentInitialICECandidates(bool sent) { mHasSentInitialICECandidates = sent; }
-
 private:
     CommandType mCommandType = CommandType::kUndefined;
     State mState             = State::Idle;

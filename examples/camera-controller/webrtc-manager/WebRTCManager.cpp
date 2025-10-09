@@ -170,6 +170,13 @@ CHIP_ERROR WebRTCManager::HandleAnswer(uint16_t sessionId, const std::string & s
         [](chip::System::Layer * systemLayer, void * appState) {
             auto * self = static_cast<WebRTCManager *>(appState);
             self->ProvideICECandidates(self->mPendingSessionId);
+            // Mark that we've sent the initial batch, enabling trickle ICE
+            if (!self->mHasSentInitialICECandidates)
+            {
+                self->mHasSentInitialICECandidates = true;
+                ChipLogProgress(Camera, "Initial ICE candidates batch sent for session %u, trickle ICE enabled",
+                                self->mPendingSessionId);
+            }
         },
         this);
 
@@ -241,8 +248,9 @@ void WebRTCManager::Disconnect()
     audioTrack.reset();
 
     // Clear state
-    mCurrentVideoStreamId = 0;
-    mPendingSessionId     = 0;
+    mCurrentVideoStreamId        = 0;
+    mPendingSessionId            = 0;
+    mHasSentInitialICECandidates = false;
     mLocalDescription.clear();
     mLocalCandidates.clear();
 }
@@ -284,6 +292,14 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
         mLocalCandidates.push_back(candidateStr);
         ChipLogProgress(Camera, "Local Candidate:");
         ChipLogProgress(Camera, "%s", candidateStr.c_str());
+
+        // If we've already sent the initial batch, send this candidate immediately (trickle ICE)
+        if (mHasSentInitialICECandidates)
+        {
+            ChipLogProgress(Camera, "Sending trickle ICE candidate immediately for session %u", mPendingSessionId);
+            // Send only the new candidate(s) that were just added
+            ProvideICECandidates(mPendingSessionId);
+        }
     });
 
     mPeerConnection->onStateChange([this](rtc::PeerConnection::State state) {

@@ -99,6 +99,9 @@ private:
     // Track the current video stream ID for the session
     uint16_t mCurrentVideoStreamId = 0;
 
+    // Flag to track if initial ICE candidates batch has been sent
+    bool mHasSentInitialICECandidates = false;
+
     // UDP socket for RTP forwarding
     int mRTPSocket      = -1;
     int mAudioRTPSocket = -1;
