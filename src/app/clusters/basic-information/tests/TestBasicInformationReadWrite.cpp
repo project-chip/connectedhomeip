@@ -14,11 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "lib/support/Span.h"
-#include <app/AttributeValueDecoder.h>
-#include <app/AttributeValueEncoder.h>
-#include <app/SpecificationDefinedRevisions.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/TestReadWriteAttribute.h>
@@ -28,7 +23,6 @@
 #include <clusters/BasicInformation/Enums.h>
 #include <clusters/BasicInformation/Metadata.h>
 #include <clusters/BasicInformation/Structs.h>
-#include <cstring>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CHIPMemString.h>
@@ -165,23 +159,7 @@ private:
 MockConfigurationManager gMockConfigurationManager;
 // Static member definition
 MockDeviceInstanceInfoProvider gMockDeviceInstanceInfoProvider;
-
-// Macros for reading and writing attributes
-#define READ_AND_CHECK_ATTRIBUTE(attr, val)                                                                                        \
-    {                                                                                                                              \
-        ASSERT_EQ(chip::Test::ReadAttribute(BasicInformationCluster::Instance(),                                                   \
-                                            ConcreteAttributePath(kRootEndpointId, BasicInformation::Id, attr), val),              \
-                  CHIP_NO_ERROR);                                                                                                  \
-    }
-
-#define WRITE_AND_CHECK_ATTRIBUTE(attr, val)                                                                                       \
-    {                                                                                                                              \
-        ASSERT_EQ(chip::Test::WriteAttribute(BasicInformationCluster::Instance(),                                                  \
-                                             ConcreteAttributePath(kRootEndpointId, BasicInformation::Id, attr), val),             \
-                  CHIP_NO_ERROR);                                                                                                  \
-    }
-
-// Test fixture (unchanged)
+// Test fixture
 struct TestBasicInformationReadWrite : public ::testing::Test
 {
     static void SetUpTestSuite()
@@ -201,16 +179,31 @@ struct TestBasicInformationReadWrite : public ::testing::Test
     void SetUp() override
     {
         DeviceLayer::SetConfigurationMgr(&gMockConfigurationManager);
-
-        // Start the cluster with the context initialized in the constructor
-        ASSERT_EQ(BasicInformationCluster::Instance().Startup(context), CHIP_NO_ERROR);
+        ASSERT_EQ(basicInformationClusterInstance.Startup(context), CHIP_NO_ERROR);
     }
 
-    void TearDown() override { BasicInformationCluster::Instance().Shutdown(); }
+    void TearDown() override { basicInformationClusterInstance.Shutdown(); }
+
+    template <typename T>
+    inline CHIP_ERROR ReadInformationClusterAttribute(AttributeId attr, T & val)
+    {
+        return chip::Test::ReadClusterAttribute(basicInformationClusterInstance,
+                                                ConcreteAttributePath(kRootEndpointId, BasicInformation::Id, attr), val);
+    }
+
+    template <typename T>
+    inline CHIP_ERROR WriteInformationClusterAttribute(AttributeId attr, const T & val)
+    {
+        return chip::Test::WriteClusterAttribute(basicInformationClusterInstance,
+                                                 ConcreteAttributePath(kRootEndpointId, BasicInformation::Id, attr), val);
+    }
 
     chip::Test::TestServerClusterContext testContext;
     ServerClusterContext context;
+    static BasicInformationCluster & basicInformationClusterInstance;
 };
+
+BasicInformationCluster & TestBasicInformationReadWrite::basicInformationClusterInstance = BasicInformationCluster::Instance();
 
 TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 {
@@ -227,15 +220,14 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 
     // 2. WHEN: The BasicInformationCluster starts up.
     // We must shut down the one from SetUp and re-start it to force a load.
-    BasicInformationCluster::Instance().Shutdown();
-    BasicInformationCluster::Instance().Startup(context);
-
+    basicInformationClusterInstance.Shutdown();
+    ASSERT_EQ(basicInformationClusterInstance.Startup(context), CHIP_NO_ERROR);
     // 3. THEN: The cluster should have loaded "Old Label" into its memory.
     char readBuffer[32];
     CharSpan readSpan(readBuffer);
 
     // Read NodeLabel via macro
-    READ_AND_CHECK_ATTRIBUTE(Attributes::NodeLabel::Id, readSpan);
+    ASSERT_EQ(ReadInformationClusterAttribute(Attributes::NodeLabel::Id, readSpan), CHIP_NO_ERROR);
     EXPECT_TRUE(readSpan.data_equal(oldLabelSpan));
 
     // 4. WHEN: A "New Label" is written to the attribute.
@@ -243,11 +235,11 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
     CharSpan newLabelSpan = CharSpan::fromCharString(newLabel);
 
     // Write NodeLabel via macro
-    WRITE_AND_CHECK_ATTRIBUTE(Attributes::NodeLabel::Id, newLabelSpan);
+    ASSERT_EQ(WriteInformationClusterAttribute(Attributes::NodeLabel::Id, newLabelSpan), CHIP_NO_ERROR);
 
     // 5. THEN: The cluster's in-memory value should be updated to "New Label".
     // Read NodeLabel via macro
-    READ_AND_CHECK_ATTRIBUTE(Attributes::NodeLabel::Id, readSpan);
+    ASSERT_EQ(ReadInformationClusterAttribute(Attributes::NodeLabel::Id, readSpan), CHIP_NO_ERROR);
     EXPECT_TRUE(readSpan.data_equal(newLabelSpan));
 
     // 6. AND THEN: The "New Label" should have been saved back to persistent storage.
@@ -264,14 +256,14 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
     {
         char buf[64];
         CharSpan val(buf);
-        READ_AND_CHECK_ATTRIBUTE(Attributes::VendorName::Id, val);
+        ASSERT_EQ(ReadInformationClusterAttribute(Attributes::VendorName::Id, val), CHIP_NO_ERROR);
         EXPECT_TRUE(val.data_equal(CharSpan::fromCharString(kVendorName)));
     }
 
     // VendorID
     {
         VendorId val = VendorId::NotSpecified;
-        READ_AND_CHECK_ATTRIBUTE(Attributes::VendorID::Id, val);
+        ASSERT_EQ(ReadInformationClusterAttribute(Attributes::VendorID::Id, val), CHIP_NO_ERROR);
         EXPECT_EQ(val, kVendorId);
     }
 
@@ -279,14 +271,13 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
     {
         char buf[64];
         CharSpan val(buf);
-        READ_AND_CHECK_ATTRIBUTE(Attributes::ProductName::Id, val);
+        ASSERT_EQ(ReadInformationClusterAttribute(Attributes::ProductName::Id, val), CHIP_NO_ERROR);
         EXPECT_TRUE(val.data_equal(CharSpan::fromCharString(kProductName)));
     }
-
     // ProductID
     {
         uint16_t val = 0;
-        READ_AND_CHECK_ATTRIBUTE(Attributes::ProductID::Id, val);
+        ASSERT_EQ(ReadInformationClusterAttribute(Attributes::ProductID::Id, val), CHIP_NO_ERROR);
         EXPECT_EQ(val, kProductId);
     }
 
@@ -294,14 +285,14 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
     {
         char buf[32];
         CharSpan val(buf);
-        READ_AND_CHECK_ATTRIBUTE(Attributes::NodeLabel::Id, val);
+        ASSERT_EQ(ReadInformationClusterAttribute(Attributes::NodeLabel::Id, val), CHIP_NO_ERROR);
         EXPECT_LE(val.size(), static_cast<size_t>(32));
     }
 
     // HardwareVersion
     {
         uint16_t val = 0;
-        READ_AND_CHECK_ATTRIBUTE(Attributes::HardwareVersion::Id, val);
+        ASSERT_EQ(ReadInformationClusterAttribute(Attributes::HardwareVersion::Id, val), CHIP_NO_ERROR);
         EXPECT_EQ(val, kHardwareVersion);
     }
 
@@ -309,7 +300,7 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
     {
         char buf[64];
         CharSpan val(buf);
-        READ_AND_CHECK_ATTRIBUTE(Attributes::HardwareVersionString::Id, val);
+        ASSERT_EQ(ReadInformationClusterAttribute(Attributes::HardwareVersionString::Id, val), CHIP_NO_ERROR);
         EXPECT_TRUE(val.data_equal(CharSpan::fromCharString(kHardwareVersionString)));
     }
 
@@ -317,14 +308,14 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
     // Just ensure it decodes
     {
         uint32_t val = 0;
-        READ_AND_CHECK_ATTRIBUTE(Attributes::SoftwareVersion::Id, val);
+        ASSERT_EQ(ReadInformationClusterAttribute(Attributes::SoftwareVersion::Id, val), CHIP_NO_ERROR);
     }
 
     // ManufacturingDate (YYYYMMDD from mock)
     {
         char buf[32];
         CharSpan val(buf);
-        READ_AND_CHECK_ATTRIBUTE(Attributes::ManufacturingDate::Id, val);
+        ASSERT_EQ(ReadInformationClusterAttribute(Attributes::ManufacturingDate::Id, val), CHIP_NO_ERROR);
         EXPECT_TRUE(val.data_equal(CharSpan::fromCharString("20230615")));
     }
 
@@ -332,12 +323,10 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
     {
         // Read ClusterRevision first
         uint32_t clusterRev;
-        READ_AND_CHECK_ATTRIBUTE(Attributes::ClusterRevision::Id, clusterRev);
-
+        ASSERT_EQ(ReadInformationClusterAttribute(Attributes::ClusterRevision::Id, clusterRev), CHIP_NO_ERROR);
         char buf[256];
         CharSpan val(buf);
-        CHIP_ERROR err = chip::Test::ReadAttribute(BasicInformationCluster::Instance(),
-                                                   ConcreteAttributePath(kRootEndpointId, Id, Attributes::UniqueID::Id), val);
+        CHIP_ERROR err = ReadInformationClusterAttribute(Attributes::UniqueID::Id, val);
 
         if (err != CHIP_NO_ERROR)
         {
@@ -355,7 +344,7 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
     // CapabilityMinima
     {
         Structs::CapabilityMinimaStruct::Type val;
-        READ_AND_CHECK_ATTRIBUTE(Attributes::CapabilityMinima::Id, val);
+        ASSERT_EQ(ReadInformationClusterAttribute(Attributes::CapabilityMinima::Id, val), CHIP_NO_ERROR);
         EXPECT_GE(val.caseSessionsPerFabric, 3);
         EXPECT_GE(val.subscriptionsPerFabric, 3);
     }
@@ -370,10 +359,10 @@ TEST_F(TestBasicInformationReadWrite, TestWriteNodeLabel)
     CharSpan readSpan(readBuffer);
 
     // 2. ACT: Write the new label to the attribute via macro
-    WRITE_AND_CHECK_ATTRIBUTE(Attributes::NodeLabel::Id, newLabel);
+    ASSERT_EQ(WriteInformationClusterAttribute(Attributes::NodeLabel::Id, newLabel), CHIP_NO_ERROR);
 
     // 3. ASSERT: Read the attribute back and verify it matches the new label
-    READ_AND_CHECK_ATTRIBUTE(Attributes::NodeLabel::Id, readSpan);
+    ASSERT_EQ(ReadInformationClusterAttribute(Attributes::NodeLabel::Id, readSpan), CHIP_NO_ERROR);
     EXPECT_TRUE(readSpan.data_equal(newLabel));
 }
 
@@ -385,10 +374,8 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
         CharSpan validLocation        = CharSpan::fromCharString(validLocationStr);
         char readBuffer[8];
         CharSpan readSpan(readBuffer);
-
-        WRITE_AND_CHECK_ATTRIBUTE(Attributes::Location::Id, validLocation);
-
-        READ_AND_CHECK_ATTRIBUTE(Attributes::Location::Id, readSpan);
+        ASSERT_EQ(WriteInformationClusterAttribute(Attributes::Location::Id, validLocation), CHIP_NO_ERROR);
+        ASSERT_EQ(ReadInformationClusterAttribute(Attributes::Location::Id, readSpan), CHIP_NO_ERROR);
         EXPECT_TRUE(readSpan.data_equal(validLocation));
     }
 
@@ -399,9 +386,7 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
         CharSpan invalidLocation        = CharSpan::fromCharString(invalidLocationStr);
 
         // Attempt to write the invalid location and confirm it fails
-        CHIP_ERROR writeErr = chip::Test::WriteAttribute(
-            BasicInformationCluster::Instance(),
-            ConcreteAttributePath(kRootEndpointId, BasicInformation::Id, Attributes::Location::Id), invalidLocation);
+        CHIP_ERROR writeErr = WriteInformationClusterAttribute(Attributes::Location::Id, invalidLocation);
         EXPECT_NE(writeErr, CHIP_NO_ERROR); // Expect a failure (ConstraintError)
     }
 }
@@ -414,12 +399,10 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
     {
         // The default value is false, so we'll write true
         constexpr bool newValue = true;
-
         // Write 'true' to the attribute via macro
-        WRITE_AND_CHECK_ATTRIBUTE(Attributes::LocalConfigDisabled::Id, newValue);
-
+        ASSERT_EQ(WriteInformationClusterAttribute(Attributes::LocalConfigDisabled::Id, newValue), CHIP_NO_ERROR);
         // Read the value back and confirm it is now true
-        READ_AND_CHECK_ATTRIBUTE(Attributes::LocalConfigDisabled::Id, readValue);
+        ASSERT_EQ(ReadInformationClusterAttribute(Attributes::LocalConfigDisabled::Id, readValue), CHIP_NO_ERROR);
         EXPECT_EQ(readValue, newValue);
     }
 
@@ -427,12 +410,10 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
     {
         // Write false back
         constexpr bool finalValue = false;
-
         // Write 'false' to the attribute via macro
-        WRITE_AND_CHECK_ATTRIBUTE(Attributes::LocalConfigDisabled::Id, finalValue);
-
+        ASSERT_EQ(WriteInformationClusterAttribute(Attributes::LocalConfigDisabled::Id, finalValue), CHIP_NO_ERROR);
         // Read the value back and confirm it is now false
-        READ_AND_CHECK_ATTRIBUTE(Attributes::LocalConfigDisabled::Id, readValue);
+        ASSERT_EQ(ReadInformationClusterAttribute(Attributes::LocalConfigDisabled::Id, readValue), CHIP_NO_ERROR);
         EXPECT_EQ(readValue, finalValue);
     }
 }

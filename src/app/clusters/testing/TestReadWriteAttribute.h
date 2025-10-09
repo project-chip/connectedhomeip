@@ -27,7 +27,7 @@ namespace chip {
 namespace Test {
 
 template <typename ClusterT, typename T>
-CHIP_ERROR ReadAttribute(ClusterT & cluster, const app::ConcreteDataAttributePath & path, T & value)
+CHIP_ERROR ReadClusterAttribute(ClusterT & cluster, const app::ConcreteDataAttributePath & path, T & value)
 {
     app::Testing::ReadOperation readOperation(path);
     std::unique_ptr<app::AttributeValueEncoder> encoder = readOperation.StartEncoding();
@@ -43,7 +43,7 @@ CHIP_ERROR ReadAttribute(ClusterT & cluster, const app::ConcreteDataAttributePat
 
 // Helper function to write any attribute value of a given type
 template <typename ClusterT, typename T>
-CHIP_ERROR WriteAttribute(ClusterT & cluster, const app::ConcreteAttributePath & path, const T & value)
+CHIP_ERROR WriteClusterAttribute(ClusterT & cluster, const app::ConcreteAttributePath & path, const T & value)
 {
     app::Testing::WriteOperation writeOperation(path);
     app::AttributeValueDecoder decoder = writeOperation.DecoderFor(value);
