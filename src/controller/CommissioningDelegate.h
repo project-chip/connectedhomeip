@@ -24,7 +24,7 @@
 #include <controller/CommissioneeDeviceProxy.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
-#include <credentials/jcm/TrustVerification.h> // nogncheck
+#include <credentials/jcm/TrustVerification.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Span.h>
 #include <lib/support/Variant.h>
