@@ -275,8 +275,7 @@ DataModel::ActionReturnStatus GeneralCommissioningCluster::WriteAttribute(const 
         uint64_t value;
         ReturnErrorOnFailure(decoder.Decode(value));
         // SetBreadCrumb handles notification internally via NotifyAttributeChanged(),
-        // so we don't need to implement WriteImpl() which would cause double-notification.
-        // See: https://project-chip.github.io/connectedhomeip-doc/guides/writing_clusters.html#attribute-change-notifications
+        // so we don't need to call NotifyAttributeChangedIfSuccess here.
         SetBreadCrumb(value);
         return CHIP_NO_ERROR;
     }
