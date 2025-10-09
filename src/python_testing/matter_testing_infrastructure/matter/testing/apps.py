@@ -226,3 +226,13 @@ class OTAProviderSubprocess(AppServerSubprocess):
             nodeid=provider_node_id,
             attributes=[(0, acl_attribute)]
         )
+
+
+class OTARequestorProcess(AppServerSubprocess):
+    PREFIX = b"[OTA-REQUESTOR]"
+
+    def __init__(self, app: str, storage_dir: str, discriminator: int,
+                 passcode: int, port: int = 5542, extra_args: list[str] = [],
+                 kvs_path: Optional[str] = None):
+        super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator,
+                         passcode=passcode, port=port, extra_args=extra_args, kvs_path=kvs_path)
