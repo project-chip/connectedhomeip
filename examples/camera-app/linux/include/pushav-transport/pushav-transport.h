@@ -103,7 +103,10 @@ public:
         mZoneSensitivityList = zoneSensitivityList;
     }
 
-    void SetCurrentlyUsedBandwidthbps(uint32_t currentlyUsedBandwidthbps) { mCurrentlyUsedBandwidthbps = currentlyUsedBandwidthbps; }
+    void SetCurrentlyUsedBandwidthbps(uint32_t currentlyUsedBandwidthbps)
+    {
+        mCurrentlyUsedBandwidthbps = currentlyUsedBandwidthbps;
+    }
 
     uint32_t GetCurrentlyUsedBandwidthbps() { return mCurrentlyUsedBandwidthbps; }
 
