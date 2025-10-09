@@ -140,7 +140,7 @@ RUN mkdir /root/connectedhomeip
 RUN git clone https://github.com/project-chip/connectedhomeip.git /root/connectedhomeip
 WORKDIR /root/connectedhomeip/
 RUN git checkout ${COMMITHASH}
-RUN ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
+RUN ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --jobs 4 --platform linux
 RUN bash scripts/bootstrap.sh
 
 # Stage 2: Build.
@@ -302,7 +302,7 @@ FROM ubuntu:24.04
 ENV TZ=Etc/UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update -y
-RUN apt-get install -y libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev avahi-utils iproute2 libcairo2-dev libgirepository1.0-dev python3-pip libpcsclite1 pcscd
+RUN apt-get install -y libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev avahi-utils iproute2 libcairo2-dev libgirepository1.0-dev python3-pip libpcsclite1 pcscd libcurl4 libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 libavformat60 libavcodec60 libavutil58
 WORKDIR /root/
 COPY --from=chip-build-cert-bins /root/.sdk-sha-version .sdk-sha-version
 RUN mkdir apps

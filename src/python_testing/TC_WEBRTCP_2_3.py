@@ -63,8 +63,8 @@ class TC_WebRTCProvider_2_3(MatterBaseTest, WEBRTCPTestBase):
             TestStep(4, "Allocate Audio and Video Streams"),
             TestStep(5, "Send ProvideOffer with VideoStreamID that doesn't match AllocatedVideoStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
             TestStep(6, "Send ProvideOffer with AudioStreamID that doesn't match AllocatedAudioStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
-            TestStep(7, "Write SoftLivestreamPrivacyModeEnabled=true, send ProvideOffer => expect INVALID_IN_STATE"),
-            TestStep(8, "Write SoftLivestreamPrivacyModeEnabled=false, send valid ProvideOffer => expect ProvideOfferResponse"),
+            TestStep(7, "Write SoftLivestreamPrivacyModeEnabled=true, send ProvideOffer with StreamUsage = LiveView => expect INVALID_IN_STATE"),
+            TestStep(8, "Write SoftLivestreamPrivacyModeEnabled=false, send valid ProvideOffer with StreamUsage = LiveView => expect ProvideOfferResponse"),
             TestStep(9, "Read CurrentSessions attribute => expect 1"),
         ]
         return steps
@@ -205,7 +205,7 @@ class TC_WebRTCProvider_2_3(MatterBaseTest, WEBRTCPTestBase):
         cmd = cluster.Commands.ProvideOffer(
             webRTCSessionID=NullValue,
             sdp=test_sdp,
-            streamUsage=3,
+            streamUsage=3,  # LiveView
             originatingEndpointID=endpoint,
             videoStreamID=videoStreamID,
             audioStreamID=audioStreamID
