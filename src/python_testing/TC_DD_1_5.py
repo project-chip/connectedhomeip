@@ -28,8 +28,6 @@
 #      quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-
 from mobly import asserts
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body
 from matter.testing.runner import default_matter_test_main
