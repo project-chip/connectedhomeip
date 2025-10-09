@@ -351,6 +351,7 @@
             "OperatingMode",
             "FeatureMap"
         ],
+        "Identify": ["ClusterRevision"],
         "Joint Fabric Datastore": ["Status"],
         "Meter Identification": [
             "MeterType",
@@ -542,19 +543,22 @@
             "OperationalState",
             "OperationalError",
             "CurrentPhase",
-            "CountdownTime"
+            "CountdownTime",
+            "ClusterRevision"
         ],
         "RVC Operational State": [
             "OperationalState",
             "OperationalError",
             "CurrentPhase",
-            "CountdownTime"
+            "CountdownTime",
+            "ClusterRevision"
         ],
         "Oven Cavity Operational State": [
             "OperationalState",
             "OperationalError",
             "CurrentPhase",
-            "CountdownTime"
+            "CountdownTime",
+            "ClusterRevision"
         ],
         "Activated Carbon Filter Monitoring": [
             "Condition",
