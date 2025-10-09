@@ -76,25 +76,25 @@ public:
      */
     struct Config
     {
-        Config(EndpointId endpoint, reporting::ReportScheduler::TimerDelegate & delegate) :
+        constexpr Config(EndpointId endpoint, reporting::ReportScheduler::TimerDelegate & delegate) :
             endpointId(endpoint), timerDelegate(delegate)
         {}
-        Config & WithIdentifyType(Identify::IdentifyTypeEnum type)
+        constexpr Config & WithIdentifyType(Identify::IdentifyTypeEnum type)
         {
             identifyType = type;
             return *this;
         }
-        Config & WithDelegate(IdentifyDelegate * delegate)
+        constexpr Config & WithDelegate(IdentifyDelegate * delegate)
         {
             identifyDelegate = delegate;
             return *this;
         }
-        Config & WithEffectIdentifier(Identify::EffectIdentifierEnum effect)
+        constexpr Config & WithEffectIdentifier(Identify::EffectIdentifierEnum effect)
         {
             effectIdentifier = effect;
             return *this;
         }
-        Config & WithEffectVariant(Identify::EffectVariantEnum variant)
+        constexpr Config & WithEffectVariant(Identify::EffectVariantEnum variant)
         {
             effectVariant = variant;
             return *this;

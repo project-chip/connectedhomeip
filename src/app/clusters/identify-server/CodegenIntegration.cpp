@@ -178,6 +178,12 @@ void MatterIdentifyClusterInitCallback(EndpointId endpointId)
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
         }
     }
+#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
+    else
+    {
+        ChipLogError(AppServer, "Failed to find Instance of Identify cluster for endpoint %u", endpointId);
+    }
+#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
 }
 
 void MatterIdentifyClusterShutdownCallback(EndpointId endpointId)
