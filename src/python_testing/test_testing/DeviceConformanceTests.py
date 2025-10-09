@@ -27,7 +27,8 @@ from matter.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType
                                                  device_type_id_type, is_valid_device_type_id)
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                             ProblemNotice, ProblemSeverity)
-from matter.testing.spec_parsing import build_xml_device_types, CommandType, PrebuiltDataModelDirectory, XmlDeviceType, XmlDeviceTypeClusterRequirements
+from matter.testing.spec_parsing import (CommandType, PrebuiltDataModelDirectory, XmlDeviceType, XmlDeviceTypeClusterRequirements,
+                                         build_xml_device_types)
 from matter.tlv import uint
 
 
