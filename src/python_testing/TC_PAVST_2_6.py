@@ -44,6 +44,7 @@ from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
 from TC_PAVSTTestBase import PAVSTTestBase
 
 import matter.clusters as Clusters
+from matter.clusters.Types import Nullable
 from matter.interaction_model import Status
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
                                            run_if_endpoint_matches)
@@ -103,6 +104,11 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             ),
             TestStep(
                 6,
+                "TH1 sends the SetTransportStatus  command with ConnectionID = Null.",
+                "DUT responds with SUCCESS status code.",
+            ),
+            TestStep(
+                7,
                 "TH1 Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT.",
                 "Verify that the TransportStatus is set to !aTransportStatus in the TransportConfiguration corresponding to aConnectionID.",
             )
@@ -205,6 +211,16 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             "DUT responds with SUCCESS status code.")
 
         self.step(6)
+        cmd = pvcluster.Commands.SetTransportStatus(
+            connectionID=Nullable(),
+            transportStatus=not aTransportStatus
+        )
+        status = await self.psvt_set_transport_status(cmd)
+        asserts.assert_true(
+            status == Status.Success,
+            "DUT responds with SUCCESS status code.")
+
+        self.step(7)
         transportConfigs = await self.read_pavst_attribute_expect_success(
             endpoint, pvattr.CurrentConnections
         )
