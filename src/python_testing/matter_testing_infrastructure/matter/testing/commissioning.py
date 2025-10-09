@@ -144,7 +144,8 @@ async def commission_device(
 
     if commissioning_info.tc_version_to_simulate is not None and commissioning_info.tc_user_response_to_simulate is not None:
         LOGGER.debug(
-            f"Setting TC Acknowledgements to version {commissioning_info.tc_version_to_simulate} with user response {commissioning_info.tc_user_response_to_simulate}."
+            f"Setting TC Acknowledgements to version {commissioning_info.tc_version_to_simulate} with user response "
+            f"{commissioning_info.tc_user_response_to_simulate}."
         )
         dev_ctrl.SetTCAcknowledgements(commissioning_info.tc_version_to_simulate, commissioning_info.tc_user_response_to_simulate)
 
@@ -165,7 +166,7 @@ async def commission_device(
             # Type assertions to help mypy understand these are not None after the asserts
             assert commissioning_info.wifi_ssid is not None
             assert commissioning_info.wifi_passphrase is not None
-            await dev_ctrl.CommissionWiFi(
+            await dev_ctrl.CommissionBleWiFi(
                 info.filter_value,
                 info.passcode,
                 node_id,
@@ -183,12 +184,28 @@ async def commission_device(
                                        "Thread dataset must be provided for ble-thread commissioning")
             # Type assertion to help mypy understand this is not None after the assert
             assert commissioning_info.thread_operational_dataset is not None
-            await dev_ctrl.CommissionThread(
+            await dev_ctrl.CommissionBleThread(
                 info.filter_value,
                 info.passcode,
                 node_id,
                 commissioning_info.thread_operational_dataset,
                 isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
+            )
+            return PairingStatus()
+        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
+            LOGGER.error("Commissioning failed: %s" % e)
+            return PairingStatus(exception=e)
+    elif commissioning_info.commissioning_method == "nfc-thread":
+        try:
+            asserts.assert_is_not_none(commissioning_info.thread_operational_dataset,
+                                       "Thread dataset must be provided for nfc-thread commissioning")
+            # Type assertion to help mypy understand this is not None after the assert
+            assert commissioning_info.thread_operational_dataset is not None
+            await dev_ctrl.CommissionNfcThread(
+                info.filter_value,
+                info.passcode,
+                node_id,
+                commissioning_info.thread_operational_dataset,
             )
             return PairingStatus()
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it

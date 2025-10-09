@@ -29,6 +29,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <set>
 
 static constexpr uint16_t kMaxConnectionId = 65535; // This is also invalid connectionID
 static constexpr uint16_t kMaxEndpointId   = 65534;
@@ -646,17 +647,54 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     {
 
         auto & motionZonesList = transportOptions.triggerOptions.motionZones;
-        auto iter              = motionZonesList.Value().Value().begin();
+        auto iterDupCheck      = motionZonesList.Value().Value().begin();
         size_t zoneListSize    = 0;
         motionZonesList.Value().Value().ComputeSize(&zoneListSize);
 
-        // To Do: de-duplicate the entries, per issue https://github.com/project-chip/connectedhomeip/issues/41051
+        // If there are duplicate entries, reject the command
+        std::set<uint16_t> zoneIDsFound;
+        bool nullFound = false;
+
+        while (iterDupCheck.Next())
+        {
+            auto & transportZoneOption = iterDupCheck.GetValue();
+            if (!transportZoneOption.zone.IsNull())
+            {
+                uint16_t zoneID = transportZoneOption.zone.Value();
+                if (zoneIDsFound.count(zoneID) == 0)
+                {
+                    // Zone ID not found, add to set of IDs
+                    zoneIDsFound.emplace(zoneID);
+                }
+                else
+                {
+                    // This is a duplicate
+                    ChipLogError(
+                        Zcl, "Transport Options verification from command data[ep=%d]: Duplicate Zone ID (=%d) in Motion Zones. ",
+                        mEndpointId, zoneID);
+                    return Status::AlreadyExists;
+                }
+            }
+            else
+            {
+                if (nullFound)
+                {
+                    // This is the second null, therefore also a duplicate entry
+                    ChipLogError(
+                        Zcl, "Transport Options verification from command data[ep=%d]: Duplicate Null Zone ID in Motion Zones. ",
+                        mEndpointId);
+                    return Status::AlreadyExists;
+                }
+                nullFound = true;
+            }
+        }
 
         bool isValidZoneSize = mDelegate->ValidateMotionZoneListSize(zoneListSize);
         VerifyOrReturnValue(
             isValidZoneSize, Status::DynamicConstraintError,
             ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid Motion Zone Size ", mEndpointId));
 
+        auto iter = motionZonesList.Value().Value().begin();
         while (iter.Next())
         {
             auto & transportZoneOption = iter.GetValue();
@@ -760,8 +798,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         }
     }
 
-    bool isValidSegmentDuration =
-        mDelegate->ValidateSegmentDuration(transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration);
+    bool isValidSegmentDuration = mDelegate->ValidateSegmentDuration(
+        transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration, transportOptionsPtr->videoStreamID);
     if (isValidSegmentDuration == false)
     {
         auto segmentDurationStatus = to_underlying(StatusCodeEnum::kInvalidOptions);

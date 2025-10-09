@@ -170,12 +170,7 @@ constexpr osThreadAttr_t kMainTaskAttr = { .name       = "main",
                                            .cb_size    = 0U,
                                            .stack_mem  = NULL,
                                            .stack_size = kMainTaskStackSize,
-#ifdef SLI_SI91X_MCU_INTERFACE
-                                           .priority = osPriorityRealtime4
-#else
-                                           .priority = osPriorityRealtime5 // Must be above BLE Link Layer priority
-#endif // SLI_SI91X_MCU_INTERFACE
-};
+                                           .priority   = osPriorityRealtime7 };
 osThreadId_t sMainTaskHandle;
 static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
