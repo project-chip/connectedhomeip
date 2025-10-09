@@ -33,6 +33,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 
@@ -50,8 +51,36 @@ namespace Clusters {
 // TODO: canonical layout is for the cluster to live in the Clusters namespace, without the additional namespace. Remove the
 // namespace here and fix the pattern in other clusters
 namespace ZoneManagement {
-// TODO: find a more reasonable value, enforce / check on save
-constexpr size_t kMaxPersistedValueLengthSupported = 2048;
+
+constexpr size_t kTwoDCartesianVertexSize = TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)); // x,y
+
+constexpr size_t kMaxTwoDCartesianVertices = 12;
+
+constexpr size_t kMaxZoneNameSize = 32 * 4; // 32 characters, UTF-8 encoding at max 4 bytes per character
+
+constexpr size_t kColorSize = 9; // max 9 characters a,ll baseline ASCII
+
+constexpr size_t kTwoDCartesianZoneSize =
+    TLV::EstimateStructOverhead(kMaxZoneNameSize,                                                                     // name
+                                sizeof(ZoneUseEnum),                                                                  // use
+                                TLV::EstimateStructOverhead() + kMaxTwoDCartesianVertices * kTwoDCartesianVertexSize, // vertices
+                                kColorSize                                                                            // color
+    );
+
+constexpr size_t kZoneInformationStructSize = TLV::EstimateStructOverhead(sizeof(uint16_t),       // zoneID
+                                                                          sizeof(ZoneTypeEnum),   // zoneType
+                                                                          sizeof(ZoneSourceEnum), // zoneSource
+                                                                          kTwoDCartesianZoneSize);
+
+constexpr size_t kZoneTriggerControlStructSize     = TLV::EstimateStructOverhead(sizeof(uint16_t), // zoneID
+                                                                                 sizeof(uint32_t), // initialDuration
+                                                                                 sizeof(uint32_t), // augmentationDuration
+                                                                                 sizeof(uint32_t), // maxDuration
+                                                                                 sizeof(uint32_t), // blindDuration
+                                                                                 sizeof(uint8_t)   // sensitivity
+    );
+constexpr size_t kMaxPersistedValueLengthSupported = TLV::EstimateStructOverhead() +
+    CHIP_CONFIG_CAMERA_MAX_ZONES * std::max(kZoneInformationStructSize, kZoneTriggerControlStructSize);
 
 ZoneManagementCluster::ZoneManagementCluster(EndpointId endpointId, Delegate & aDelegate, const BitFlags<Feature> aFeatures,
                                              uint8_t aMaxUserDefinedZones, uint8_t aMaxZones, uint8_t aSensitivityMax,
@@ -1025,4 +1054,3 @@ Status ZoneManagementCluster::GenerateZoneStoppedEvent(uint16_t zoneID, ZoneEven
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-void MatterZoneManagementPluginServerInitCallback() {}

@@ -61,10 +61,10 @@ static constexpr uint32_t kKeyFrameIntervalMsec      = 4000;    // 4 sec; recomm
 static constexpr uint16_t kVideoSensorWidthPixels    = 1920;    // 1080p resolution
 static constexpr uint16_t kVideoSensorHeightPixels   = 1080;    // 1080p resolution
 static constexpr uint16_t kMinImageRotation          = 0;
-static constexpr uint16_t kMaxImageRotation          = 359; // Spec constraint
-static constexpr uint8_t kMaxZones                   = 10;  // Spec has min 1
-static constexpr uint8_t kMaxUserDefinedZones        = 10;  // Spec has min 5
-static constexpr uint8_t kSensitivityMax             = 10;  // Spec has 2 to 10
+static constexpr uint16_t kMaxImageRotation          = 359;                          // Spec constraint
+static constexpr uint8_t kMaxZones                   = CHIP_CONFIG_CAMERA_MAX_ZONES; // Spec has min 1
+static constexpr uint8_t kMaxUserDefinedZones        = CHIP_CONFIG_CAMERA_MAX_ZONES; // Spec has min 5
+static constexpr uint8_t kSensitivityMax             = 10;                           // Spec has 2 to 10
 
 #define INVALID_SPKR_LEVEL (0)
 

@@ -291,8 +291,8 @@ void CameraApp::ShutdownCameraDeviceClusters()
     ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera device clusters");
     mAVSettingsUserLevelMgmtServerPtr->Shutdown();
     mWebRTCTransportProviderPtr->Shutdown();
-    mZoneManagementServer.Cluster().Shutdown();
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mZoneManagementServer.Cluster());
+    mZoneManagementServer.Cluster().Shutdown();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "ZoneManagement unregister error: %" CHIP_ERROR_FORMAT, err.Format());
