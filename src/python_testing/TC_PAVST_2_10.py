@@ -165,5 +165,6 @@ class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                 endpoint, tlsEndPoint=tlsEndpointId, url=url, expiryTime=30)
             asserts.assert_equal(status, Status.InvalidURL, f"Push AV Transport should return InvalidURL for {desc}")
 
+
 if __name__ == "__main__":
     default_matter_test_main()
