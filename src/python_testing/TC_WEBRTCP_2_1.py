@@ -62,8 +62,8 @@ class TC_WebRTCProvider_2_1(MatterBaseTest, WEBRTCPTestBase):
             TestStep(2, "Send SolicitOffer with no Video or Audio StreamID => expect INVALID_COMMAND"),
             TestStep(3, "Send SolicitOffer with VideoStreamID that doesn't match AllocatedVideoStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
             TestStep(4, "Send SolicitOffer with AudioStreamID that doesn't match AllocatedAudioStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
-            TestStep(5, "Write SoftLivestreamPrivacyModeEnabled=true, send SolicitOffer => expect INVALID_IN_STATE"),
-            TestStep(6, "Write SoftLivestreamPrivacyModeEnabled=false, send SolicitOffer => expect DeferredOffer=TRUE"),
+            TestStep(5, "Write SoftLivestreamPrivacyModeEnabled=true, send SolicitOffer with StreamUsage = LiveView => expect INVALID_IN_STATE"),
+            TestStep(6, "Write SoftLivestreamPrivacyModeEnabled=false, send SolicitOffer with StreamUsage = LiveView => expect DeferredOffer=TRUE"),
             TestStep(7, "Read CurrentSessions attribute => expect 1 with valid session data"),
         ]
         return steps

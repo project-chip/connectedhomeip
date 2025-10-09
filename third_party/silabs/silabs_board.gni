@@ -48,6 +48,8 @@ declare_args() {
 
   wifi_soc = false
 
+  wifi_ncp_module = false
+
   #Disable MQTT by default
   enable_dic = false
 
