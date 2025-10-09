@@ -87,7 +87,8 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
     def fprint(self, text: str, background_color: str, padding: int = 0):
         double_space = "  " * padding
         padding_space = "\n" * (padding - 1)
-        print(f"{padding_space}{double_space}{self.BACKGROUND_COLORS.get(background_color, self.BACKGROUND_COLORS['reset'])}{text}{self.BACKGROUND_COLORS['reset']}{padding_space}")
+        print(f"{padding_space}{double_space}{self.BACKGROUND_COLORS.get(background_color,
+              self.BACKGROUND_COLORS['reset'])}{text}{self.BACKGROUND_COLORS['reset']}{padding_space}")
 
     def steps_TC_IDM_4_3(self):
         return [TestStep(1, "DUT and TH activate the subscription for an attribute. Do not change the value of the attribute which has been subscribed.",
@@ -161,8 +162,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         except KeyError:
             asserts.fail("[AttributeChangeCallback | Local] Attribute {expected_attribute} not found in returned report")
 
-
-
     def all_device_clusters(self) -> set:
         device_clusters = set()
         for endpoint in self.endpoints:
@@ -226,10 +225,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             return chosen_cluster, chosen_attribute, output if return_objects else output
         return
 
-
-
-
-
     current_report_data_time = 0
     previous_report_data_time = 0
     attr_update_report_data_time = 0
@@ -239,7 +234,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
     empty_report_time = None
     report_data_received = False
-    
+
     root_node_endpoint = 0
 
     @async_test_body
@@ -257,10 +252,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         self.device_clusters = self.all_device_clusters()
         self.all_supported_clusters = [cluster for cluster in Clusters.__dict__.values(
         ) if inspect.isclass(cluster) and issubclass(cluster, ClusterObjects.Cluster)]
-
-
-
-
 
         # Test setup
         # Mandatory writable attributes
@@ -359,9 +350,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # according to negotiated MRP parameters.
         # self.step(3)
 
-
-
-
         # *** Step 1 ***
         # DUT and TH activate the subscription for an attribute. Do not change the value of the
         # attribute which has been subscribed. Verify that there is an empty report data message
@@ -408,7 +396,8 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # after the MinInterval time and no later than the MaxInterval time plus an
         # additional duration equal to the total retransmission time according to
         # negotiated MRP parameters
-        asserts.assert_greater(sub_report_data_elapsed_time, self.min_interval_floor_sec, "Empty report not received after the MinInterval time")
+        asserts.assert_greater(sub_report_data_elapsed_time, self.min_interval_floor_sec,
+                               "Empty report not received after the MinInterval time")
         asserts.assert_less(sub_report_data_elapsed_time, sub_timeout_sec, "Empty report not received before the MaxInterval time")
 
         sub_th_step1.Shutdown()
@@ -440,10 +429,11 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                 keepSubscriptions=False,
                 fabricFiltered=False
             )
-            
+
             # Verify the subscription was successfully activated and a priming
             # data report was sent
-            asserts.assert_is_not_none(sub_th_step2.subscriptionId, "Subscription activation to attribute of type 'bool' was unsuccessful")
+            asserts.assert_is_not_none(sub_th_step2.subscriptionId,
+                                       "Subscription activation to attribute of type 'bool' was unsuccessful")
             logging.info("Subscription activation to attribute of type 'bool' successful")
 
             sub_th_step2.Shutdown()
