@@ -1070,7 +1070,6 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
         return std::nullopt;
     }
 
-
     if (mDelegate->GetTransportBusyStatus(connectionID) == PushAvStreamTransportStatusEnum::kBusy)
     {
         ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Connection is Busy", mEndpointId);
@@ -1199,7 +1198,8 @@ Status PushAvStreamTransportServerLogic::CheckPrivacyModes(StreamUsageEnum strea
     CHIP_ERROR err             = mDelegate->IsHardPrivacyModeActive(hardPrivacyModeActive);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "PushAvStreamTransport:CheckPrivacyModes: Failed to check Hard Privacy mode: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "PushAvStreamTransport:CheckPrivacyModes: Failed to check Hard Privacy mode: %" CHIP_ERROR_FORMAT,
+                     err.Format());
         return Status::Failure;
     }
 
@@ -1213,13 +1213,16 @@ Status PushAvStreamTransportServerLogic::CheckPrivacyModes(StreamUsageEnum strea
     err                                  = mDelegate->IsSoftLivestreamPrivacyModeActive(softLivestreamPrivacyModeActive);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "PushAvStreamTransport:CheckPrivacyModes: Failed to check Soft LivestreamPrivacy mode: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl,
+                     "PushAvStreamTransport:CheckPrivacyModes: Failed to check Soft LivestreamPrivacy mode: %" CHIP_ERROR_FORMAT,
+                     err.Format());
         return Status::Failure;
     }
 
     if (softLivestreamPrivacyModeActive && streamUsage == StreamUsageEnum::kLiveView)
     {
-        ChipLogError(Zcl, "PushAvStreamTransport:CheckPrivacyModes: Soft LivestreamPrivacy mode is enabled and StreamUsage is LiveView");
+        ChipLogError(Zcl,
+                     "PushAvStreamTransport:CheckPrivacyModes: Soft LivestreamPrivacy mode is enabled and StreamUsage is LiveView");
         return Status::InvalidInState;
     }
 
@@ -1227,13 +1230,17 @@ Status PushAvStreamTransportServerLogic::CheckPrivacyModes(StreamUsageEnum strea
     err                                 = mDelegate->IsSoftRecordingPrivacyModeActive(softRecordingPrivacyModeActive);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "PushAvStreamTransport:CheckPrivacyModes: Failed to check SoftRecordingPrivacyModeActive: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl,
+                     "PushAvStreamTransport:CheckPrivacyModes: Failed to check SoftRecordingPrivacyModeActive: %" CHIP_ERROR_FORMAT,
+                     err.Format());
         return Status::Failure;
     }
 
     if (softRecordingPrivacyModeActive && (streamUsage == StreamUsageEnum::kRecording || streamUsage == StreamUsageEnum::kAnalysis))
     {
-        ChipLogError(Zcl, "PushAvStreamTransport:CheckPrivacyModes: Soft RecordingPrivacy mode is enabled and StreamUsage is Recording or Analysis");
+        ChipLogError(Zcl,
+                     "PushAvStreamTransport:CheckPrivacyModes: Soft RecordingPrivacy mode is enabled and StreamUsage is Recording "
+                     "or Analysis");
         return Status::InvalidInState;
     }
 

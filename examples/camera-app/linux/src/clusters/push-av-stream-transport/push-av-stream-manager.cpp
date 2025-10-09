@@ -215,7 +215,8 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportSt
 
         if (isActive)
         {
-            ChipLogError(Camera, "PushAvStreamTransportManager, Cannot set transport status to Active as a privacy mode is enabled.");
+            ChipLogError(Camera,
+                         "PushAvStreamTransportManager, Cannot set transport status to Active as a privacy mode is enabled.");
             return Status::InvalidInState;
         }
     }
@@ -669,7 +670,7 @@ CHIP_ERROR PushAvStreamTransportManager::IsHardPrivacyModeActive(bool & isActive
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    auto & avsmController                = mCameraDevice->GetCameraAVStreamMgmtController();
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
 
     return avsmController.IsHardPrivacyModeActive(isActive);
 }
@@ -682,7 +683,7 @@ CHIP_ERROR PushAvStreamTransportManager::IsSoftRecordingPrivacyModeActive(bool &
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    auto & avsmController                = mCameraDevice->GetCameraAVStreamMgmtController();
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
 
     return avsmController.IsSoftRecordingPrivacyModeActive(isActive);
 }
@@ -695,7 +696,7 @@ CHIP_ERROR PushAvStreamTransportManager::IsSoftLivestreamPrivacyModeActive(bool 
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    auto & avsmController                = mCameraDevice->GetCameraAVStreamMgmtController();
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
 
     return avsmController.IsSoftRecordingPrivacyModeActive(isActive);
 }
