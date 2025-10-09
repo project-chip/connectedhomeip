@@ -78,14 +78,15 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         # Write SoftRecordingPrivacyModeEnabled=true and test INVALID_IN_STATE
         await self.write_single_attribute(
             attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftRecordingPrivacyModeEnabled(True),
-                endpoint_id=endpoint,
-            )
+            endpoint_id=endpoint,
+        )
         cmd = Clusters.PushAvStreamTransportuster.Commands.SetTransportStatus(
             connectionID=aConnectionID,
             transportStatus=not aTransportStatus
         )
         status = await self.psvt_set_transport_status(cmd, expected_status=Status.InvalidInState)
-        asserts.assert_true(status == Status.InvalidInState, f"Unexpected response {status} received on SetTransportStatus with privacy mode enabled")
+        asserts.assert_true(status == Status.InvalidInState, f"Unexpected response {
+                            status} received on SetTransportStatus with privacy mode enabled")
         await self.write_single_attribute(
             attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftRecordingPrivacyModeEnabled(False),
             endpoint_id=endpoint,
@@ -252,7 +253,7 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         if aTransportStatus:
             # We're setting Inactive -> Active, verify this fails if privacy (any) is set
             if privacySupported:
-                self.privacy_setting_test(endpoint, aConnectionID, aTransportStatus)            
+                self.privacy_setting_test(endpoint, aConnectionID, aTransportStatus)
 
         self.step(8)
         cmd = pvcluster.Commands.SetTransportStatus(
