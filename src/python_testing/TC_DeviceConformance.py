@@ -87,12 +87,19 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
                                 * Time Synchronization
                                 * TLS Certificate Management
                                 * TLS Client Management
-                         """, "No root-node-restricted clusters appear on non-root endpoints")]
+                         """, "No root-node-restricted clusters appear on non-root endpoints"),
+                TestStep(2, "Ensure the complex device type composition and conformance rules related to closure device types are met",
+                         "Closure cluster device type rules are met"),
+                TestStep(3, "If any of the above test steps failed, fail the test")
+                ]
 
     def test_TC_IDM_14_1(self):
         self.step(0)  # wildcard read - done in setup
         self.step(1)
         problems = self.check_root_node_restricted_clusters()
+        self.step(2)
+        problems.extend(self.check_closure_restricted_clusters())
+        self.step(3)
         if problems:
             self.problems.extend(problems)
             self.fail_current_test("One or more root-node-restricted clusters appear on non-root-node endpoints")
