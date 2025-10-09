@@ -51,10 +51,12 @@ WebrtcTransport::~WebrtcTransport()
 }
 
 void WebrtcTransport::SetCallbacks(OnTransportLocalDescriptionCallback onLocalDescription,
-                                   OnTransportConnectionStateCallback onConnectionState)
+                                   OnTransportConnectionStateCallback onConnectionState,
+                                   OnTransportICECandidateCallback onICECandidate)
 {
     mOnLocalDescription = onLocalDescription;
     mOnConnectionState  = onConnectionState;
+    mOnICECandidate     = onICECandidate;
 }
 
 void WebrtcTransport::SetRequestArgs(const RequestArgs & args)
@@ -126,6 +128,14 @@ const char * WebrtcTransport::GetStateStr() const
 
 void WebrtcTransport::MoveToState(const State targetState)
 {
+    // When transitioning from SendingICECandidates to Idle for the first time, enable trickle ICE mode
+    // (subsequent transitions will be for trickle ICE updates, so we only set the flag once)
+    if (mState == State::SendingICECandidates && targetState == State::Idle && !mHasSentInitialICECandidates)
+    {
+        mHasSentInitialICECandidates = true;
+        ChipLogProgress(Camera, "Initial ICE candidates batch sent for sessionID: %u, trickle ICE enabled", mRequestArgs.sessionId);
+    }
+
     mState = targetState;
     ChipLogProgress(Camera, "WebrtcTransport moving to [ %s ]", GetStateStr());
 }
@@ -214,6 +224,14 @@ void WebrtcTransport::OnICECandidate(const std::string & candidate)
     mLocalCandidates.push_back(candidate);
     ChipLogProgress(Camera, "Local Candidate:");
     ChipLogProgress(Camera, "%s", candidate.c_str());
+
+    // If we've already sent the initial batch of ICE candidates and we're back in Idle state,
+    // send this candidate immediately (trickle ICE)
+    if (mHasSentInitialICECandidates && mState == State::Idle && mOnICECandidate)
+    {
+        ChipLogProgress(Camera, "Sending trickle ICE candidate immediately for sessionID: %u", mRequestArgs.sessionId);
+        mOnICECandidate(mRequestArgs.sessionId);
+    }
 }
 
 void WebrtcTransport::OnConnectionStateChanged(bool connected)

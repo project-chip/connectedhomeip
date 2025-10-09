@@ -27,6 +27,7 @@
 
 using OnTransportLocalDescriptionCallback = std::function<void(const std::string & sdp, SDPType type, const int16_t sessionId)>;
 using OnTransportConnectionStateCallback  = std::function<void(bool connected, const int16_t sessionId)>;
+using OnTransportICECandidateCallback     = std::function<void(const int16_t sessionId)>;
 
 // Derived class for WebRTC transport
 class WebrtcTransport : public Transport
@@ -65,7 +66,8 @@ public:
 
     ~WebrtcTransport();
 
-    void SetCallbacks(OnTransportLocalDescriptionCallback onLocalDescription, OnTransportConnectionStateCallback onConnectionState);
+    void SetCallbacks(OnTransportLocalDescriptionCallback onLocalDescription, OnTransportConnectionStateCallback onConnectionState,
+                      OnTransportICECandidateCallback onICECandidate = nullptr);
 
     void MoveToState(const State targetState);
     const char * GetStateStr() const;
@@ -126,6 +128,9 @@ public:
     void SetRequestArgs(const RequestArgs & args);
     RequestArgs & GetRequestArgs();
 
+    bool HasSentInitialICECandidates() const { return mHasSentInitialICECandidates; }
+    void SetHasSentInitialICECandidates(bool sent) { mHasSentInitialICECandidates = sent; }
+
 private:
     CommandType mCommandType = CommandType::kUndefined;
     State mState             = State::Idle;
@@ -143,4 +148,7 @@ private:
     RequestArgs mRequestArgs;
     OnTransportLocalDescriptionCallback mOnLocalDescription = nullptr;
     OnTransportConnectionStateCallback mOnConnectionState   = nullptr;
+    OnTransportICECandidateCallback mOnICECandidate         = nullptr;
+
+    bool mHasSentInitialICECandidates = false;
 };

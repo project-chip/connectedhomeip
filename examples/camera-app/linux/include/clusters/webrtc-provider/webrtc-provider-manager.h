@@ -129,6 +129,7 @@ private:
     // WebRTC Callbacks
     void OnLocalDescription(const std::string & sdp, SDPType type, const uint16_t sessionId);
     void OnConnectionStateChanged(bool connected, const uint16_t sessionId);
+    void OnTrickleICECandidate(const uint16_t sessionId);
 
     WebrtcTransport * GetTransport(uint16_t sessionId);
 
