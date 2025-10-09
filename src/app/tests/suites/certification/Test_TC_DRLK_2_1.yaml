@@ -300,7 +300,7 @@ tests:
               maxValue: 4294967294
 
     - label: "Step 5a: TH reads DoorOpenEvents attribute from DUT"
-      PICS: DRLK.S.F05 && !DRLK.S.A0004
+      PICS: !DRLK.S.A0004
       command: "readAttribute"
       attribute: "DoorOpenEvents"
       response:
