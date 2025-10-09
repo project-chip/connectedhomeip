@@ -241,7 +241,7 @@ CHIP_ERROR JCMCommissionee::ReadAdminFabrics(OnCompletionFunc onComplete)
         }
         onComplete(CHIP_NO_ERROR);
     };
-    auto onError = [this, onComplete](const ConcreteAttributePath *, CHIP_ERROR err) {
+    auto onError = [onComplete](const ConcreteAttributePath *, CHIP_ERROR err) {
         ChipLogError(JointFabric, "JCM: Failed to read commissioner's Fabrics list: %" CHIP_ERROR_FORMAT, err.Format());
         onComplete(err);
     };
@@ -264,7 +264,7 @@ void JCMCommissionee::FetchCommissionerInfo(OnCompletionFunc onComplete)
                 return;
             }
 
-            CHIP_ERROR nocReadErr = ReadAdminNOCs([this, onComplete](CHIP_ERROR nocResultErr) { onComplete(nocResultErr); });
+            CHIP_ERROR nocReadErr = ReadAdminNOCs([onComplete](CHIP_ERROR nocResultErr) { onComplete(nocResultErr); });
             if (nocReadErr != CHIP_NO_ERROR)
             {
                 onComplete(nocReadErr);
@@ -357,7 +357,7 @@ CHIP_ERROR JCMCommissionee::ReadAdminCerts(OnCompletionFunc onComplete)
         onComplete(CHIP_NO_ERROR);
     };
 
-    auto onError = [this, onComplete](const ConcreteAttributePath *, CHIP_ERROR err) {
+    auto onError = [onComplete](const ConcreteAttributePath *, CHIP_ERROR err) {
         ChipLogError(JointFabric, "JCM: Failed to read commissioner RCAC: %" CHIP_ERROR_FORMAT, err.Format());
         onComplete(err);
     };
@@ -418,7 +418,7 @@ CHIP_ERROR JCMCommissionee::ReadAdminNOCs(OnCompletionFunc onComplete)
         onComplete(CHIP_NO_ERROR);
     };
 
-    auto onError = [this, onComplete](const ConcreteAttributePath *, CHIP_ERROR err) {
+    auto onError = [onComplete](const ConcreteAttributePath *, CHIP_ERROR err) {
         ChipLogError(JointFabric, "JCM: Failed to read commissioner NOCs: %" CHIP_ERROR_FORMAT, err.Format());
         onComplete(err);
     };
@@ -440,8 +440,8 @@ TrustVerificationError JCMCommissionee::ValidateAdministratorIdsMatch(FabricId a
     if (accessingKeyLen != Crypto::kP256_PublicKey_Length || commissionerKeyLen != Crypto::kP256_PublicKey_Length)
     {
         ChipLogError(JointFabric,
-                     "JCM: RootPublicKey length mismatch: Accessing RootPublicKey length is %ld, but RootPublicKey read from "
-                     "commissioner is %ld",
+                     "JCM: RootPublicKey length mismatch: Accessing RootPublicKey length is %zu, but RootPublicKey read from "
+                     "commissioner is %zu",
                      accessingKeyLen, commissionerKeyLen);
         return TrustVerificationError::kInternalError;
     }
