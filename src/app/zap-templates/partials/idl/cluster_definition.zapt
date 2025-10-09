@@ -1,5 +1,5 @@
 /** {{description}} */
-{{#if apiMaturity}}{{apiMaturity}} {{/if}}
+{{#if apiMaturity}}{{apiMaturity}} {{/if~}}
 cluster {{asUpperCamelCase name}} = {{!}}
      {{~#if manufacturerCode}}
         {{~asMEI manufacturerCode code~}}
@@ -71,3 +71,4 @@ cluster {{asUpperCamelCase name}} = {{!}}
     {{~>idl_command_request_response}}{{~new_line 1~}}
   {{/zcl_commands_source_client}}
 }
+{{new_line 1}}   {{! keep one blank line after the closing brace }}
