@@ -611,7 +611,7 @@ template("efr32_sdk") {
         ]
       }
 
-      if (ncp_module) {
+      if (wifi_ncp_module) {
         defines += [
           "USE_BYPASS_CLOCK=1",
           "SL_SI91X_ACX_MODULE=1",

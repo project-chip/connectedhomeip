@@ -134,7 +134,7 @@ if [ "$#" == "0" ]; then
             Enable the Alarm Based Wakeup for 917 SoC when sleep is enabled (Default false)
         si91x_alarm_periodic_time
             Periodic time at which the 917 SoC should wakeup (Default: 30sec)
-        ncp_module
+        wifi_ncp_module
             Build SiWx917_ncp example for NCP module board (Default false)
         Presets
         --icd
