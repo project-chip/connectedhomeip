@@ -865,7 +865,7 @@ def python_tests(
         if os.path.basename(file) in excluded_patterns:
             continue
         test_scripts.append(file)
-    test_scripts.append("src/controller/python/test/test_scripts/mobile-device-test.py")
+    test_scripts.append("src/controller/python/tests/scripts/mobile-device-test.py")
     test_scripts.sort()  # order consistent
 
     execution_times = []
@@ -1142,7 +1142,7 @@ def chip_tool_tests(
     # This likely should be run in docker to not allow breaking things
     # run as:
     #
-    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:150
+    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:168
     runner = __RUNNERS__[runner]
 
     # make sure we are fully aware if running with or without coverage

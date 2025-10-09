@@ -210,6 +210,58 @@
     } while (false)
 
 /**
+ *  @def LogAndReturnOnFailure(expr)
+ *
+ *  @brief
+ *    If expr returns something than CHIP_NO_ERROR, log a chip message for the specified module
+ *    in the 'Error' category and return.
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    LogAndReturnOnFailure(channel->SendMsg(msg), Module, "Failure message: %s", param);
+ *  @endcode
+ *
+ *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ */
+#define LogAndReturnOnFailure(expr, MOD, MSG, ...)                                                                                 \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CHIP_ERROR __err = (expr);                                                                                                 \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
+        {                                                                                                                          \
+            ChipLogError(MOD, MSG ": %" CHIP_ERROR_FORMAT, ##__VA_ARGS__, __err.Format());                                         \
+            return;                                                                                                                \
+        }                                                                                                                          \
+    } while (false)
+
+/**
+ *  @def LogAndReturnErrorOnFailure(expr)
+ *
+ *  @brief
+ *    If expr returns something than CHIP_NO_ERROR, lg a chip message for the specified module
+ *    in the 'Error' category and return the error.
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    LogAndReturnErrorOnFailure(channel->SendMsg(msg), Module, "Failure message: %s", param);
+ *  @endcode
+ *
+ *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ */
+#define LogAndReturnErrorOnFailure(expr, MOD, MSG, ...)                                                                            \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CHIP_ERROR __err = (expr);                                                                                                 \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
+        {                                                                                                                          \
+            ChipLogError(MOD, MSG ": %" CHIP_ERROR_FORMAT, ##__VA_ARGS__, __err.Format());                                         \
+            return _err;                                                                                                           \
+        }                                                                                                                          \
+    } while (false)
+
+/**
  *  @def ReturnOnFailure(expr)
  *
  *  @brief
@@ -223,13 +275,15 @@
  *  @endcode
  *
  *  @param[in]  expr        An expression to be tested.
+ *  @param[in]  ...         Statements to execute before returning. Optional.
  */
-#define ReturnOnFailure(expr)                                                                                                      \
+#define ReturnOnFailure(expr, ...)                                                                                                 \
     do                                                                                                                             \
     {                                                                                                                              \
         auto __err = (expr);                                                                                                       \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
+            __VA_ARGS__;                                                                                                           \
             return;                                                                                                                \
         }                                                                                                                          \
     } while (false)
@@ -257,6 +311,7 @@
         auto __err = (expr);                                                                                                       \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
+            __VA_ARGS__;                                                                                                           \
             return value;                                                                                                          \
         }                                                                                                                          \
     } while (false)

@@ -157,6 +157,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PanMax
+namespace MovementState {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum;
+    using DecodableType    = chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum;
+    using DecodableArgType = chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MovementState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MovementState
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -205,6 +217,8 @@ struct TypeInfo
         Attributes::TiltMax::TypeInfo::DecodableType tiltMax = static_cast<int16_t>(0);
         Attributes::PanMin::TypeInfo::DecodableType panMin   = static_cast<int16_t>(0);
         Attributes::PanMax::TypeInfo::DecodableType panMax   = static_cast<int16_t>(0);
+        Attributes::MovementState::TypeInfo::DecodableType movementState =
+            static_cast<chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

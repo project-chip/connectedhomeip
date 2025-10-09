@@ -3008,6 +3008,7 @@
           "define": "COMMODITY_TARIFF_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "GetTariffComponentResponse",
@@ -3312,7 +3313,8 @@
           "mfgCode": null,
           "define": "COMMODITY_METERING_CLUSTER",
           "side": "client",
-          "enabled": 1
+          "enabled": 1,
+          "apiMaturity": "provisional"
         },
         {
           "name": "Unit Testing",

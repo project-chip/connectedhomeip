@@ -168,17 +168,17 @@
 #define CONFIG_DEFAULT_ZAP 1
 #endif
 
-// You must modidy chip_main.cmake : ZAP_FILE ${matter_example_path}/data_model/light-switch-app-1_to_2.zap
+// You must modidy chip_main.cmake : ZAP_FILE ${matter_example_path}/../data_model/light-switch-app-1_to_2.zap
 #ifndef CONFIG_1_TO_2_ZAP
 #define CONFIG_1_TO_2_ZAP 0
 #endif
 
-// You must modidy chip_main.cmake : ZAP_FILE ${matter_example_path}/data_model/light-switch-app-1_to_8.zap
+// You must modidy chip_main.cmake : ZAP_FILE ${matter_example_path}/../data_model/light-switch-app-1_to_8.zap
 #ifndef CONFIG_1_TO_8_ZAP
 #define CONFIG_1_TO_8_ZAP 0
 #endif
 
-// You must modidy chip_main.cmake : ZAP_FILE ${matter_example_path}/data_model/light-switch-app-1_to_12.zap
+// You must modidy chip_main.cmake : ZAP_FILE ${matter_example_path}/../data_model/light-switch-app-1_to_11.zap
 #ifndef CONFIG_1_TO_11_ZAP
 #define CONFIG_1_TO_11_ZAP 0
 #define MATTER_BINDING_TABLE_SIZE 20

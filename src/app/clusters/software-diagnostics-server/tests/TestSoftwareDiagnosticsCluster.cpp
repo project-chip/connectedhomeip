@@ -35,6 +35,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
+using namespace chip::app::Clusters::SoftwareDiagnostics::Attributes;
 
 template <class T>
 class ScopedDiagnosticsProvider
@@ -65,15 +66,8 @@ struct TestSoftwareDiagnosticsCluster : public ::testing::Test
 
 TEST_F(TestSoftwareDiagnosticsCluster, CompileTest)
 {
-    const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
-        .enableThreadMetrics     = false,
-        .enableCurrentHeapFree   = false,
-        .enableCurrentHeapUsed   = false,
-        .enableCurrentWatermarks = false,
-    };
-
     // The cluster should compile for any logic
-    SoftwareDiagnosticsServerCluster cluster(enabledAttributes);
+    SoftwareDiagnosticsServerCluster cluster({});
 
     // Essentially say "code executes"
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, SoftwareDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
@@ -86,14 +80,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
         class NullProvider : public DeviceLayer::DiagnosticDataProvider
         {
         };
-        const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
-            .enableThreadMetrics     = false,
-            .enableCurrentHeapFree   = false,
-            .enableCurrentHeapUsed   = false,
-            .enableCurrentWatermarks = false,
-        };
         ScopedDiagnosticsProvider<NullProvider> nullProvider;
-        SoftwareDiagnosticsLogic diag(enabledAttributes);
+        SoftwareDiagnosticsLogic diag({});
 
         // without watermarks, no commands are accepted
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
@@ -117,15 +105,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
             bool SupportsWatermarks() override { return true; }
         };
 
-        const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
-            .enableThreadMetrics     = false,
-            .enableCurrentHeapFree   = false,
-            .enableCurrentHeapUsed   = false,
-            .enableCurrentWatermarks = true,
-        };
-
         ScopedDiagnosticsProvider<WatermarksProvider> watermarksProvider;
-        SoftwareDiagnosticsLogic diag(enabledAttributes);
+        SoftwareDiagnosticsLogic diag(SoftwareDiagnosticsLogic::OptionalAttributeSet().Set<CurrentHeapHighWatermark::Id>());
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
         ASSERT_EQ(diag.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);
@@ -174,15 +155,12 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
             }
         };
 
-        const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
-            .enableThreadMetrics     = true,
-            .enableCurrentHeapFree   = true,
-            .enableCurrentHeapUsed   = true,
-            .enableCurrentWatermarks = true,
-        };
-
         ScopedDiagnosticsProvider<AllProvider> allProvider;
-        SoftwareDiagnosticsLogic diag(enabledAttributes);
+        SoftwareDiagnosticsLogic diag(SoftwareDiagnosticsLogic::OptionalAttributeSet()
+                                          .Set<ThreadMetrics::Id>()
+                                          .Set<CurrentHeapFree::Id>()
+                                          .Set<CurrentHeapUsed::Id>()
+                                          .Set<CurrentHeapHighWatermark::Id>());
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
         ASSERT_EQ(diag.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);

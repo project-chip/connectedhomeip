@@ -16,12 +16,18 @@ import("//build_overrides/chip.gni")
 
 source_set("persistence") {
   sources = [
+    "AttributePersistence.cpp",
+    "AttributePersistence.h",
     "AttributePersistenceProvider.h",
     "PascalString.h",
+    "String.cpp",
+    "String.h",
   ]
 
   public_deps = [
+    "${chip_root}/src/app:attribute-access",
     "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/lib/support:span",
   ]
 }

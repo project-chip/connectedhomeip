@@ -44,11 +44,12 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EWATERHTRBase import EWATERHTRBase
+
+import matter.clusters as Clusters
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -198,7 +199,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
         self.step("5a")
         heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
         asserts.assert_greater(heatDemand, 0)
-        asserts.assert_equal(heatDemand & (~heaterTypes), 0, "heatDemand should only be from declared supported types"),
+        asserts.assert_equal(heatDemand & (~heaterTypes), 0, "heatDemand should only be from declared supported types")
 
         self.step("5b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
@@ -222,7 +223,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
         self.step("7a")
         heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
         asserts.assert_greater(heatDemand, 0)
-        asserts.assert_equal(heatDemand & (~heaterTypes), 0, "heatDemand should only be from declared supported types"),
+        asserts.assert_equal(heatDemand & (~heaterTypes), 0, "heatDemand should only be from declared supported types")
 
         self.step("7b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
@@ -255,7 +256,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
         self.step("9a")
         heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
         asserts.assert_greater(heatDemand, 0)
-        asserts.assert_equal(heatDemand & (~heaterTypes), 0, "heatDemand should only be from declared supported types"),
+        asserts.assert_equal(heatDemand & (~heaterTypes), 0, "heatDemand should only be from declared supported types")
 
         self.step("9b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
@@ -293,7 +294,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
         self.step("12a")
         heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
         asserts.assert_greater(heatDemand, 0)
-        asserts.assert_equal(heatDemand & (~heaterTypes), 0, "heatDemand should only be from declared supported types"),
+        asserts.assert_equal(heatDemand & (~heaterTypes), 0, "heatDemand should only be from declared supported types")
 
         self.step("12b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)

@@ -19,7 +19,8 @@
 #include <vector>
 
 #include "WebRTCTransportRequestorManager.h"
-#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h>
+#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h>
+#include <controller/webrtc/access_control/WebRTCAccessControl.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -42,10 +43,25 @@ using namespace chip::python;
 
 void WebRTCTransportRequestorManager::Init()
 {
-#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
-    dynamic_server::InitAccessControl();
-#endif
-    mWebRTCRequestorServer.Init();
+    Controller::AccessControl::InitAccessControl(kWebRTCRequesterDynamicEndpointId);
+
+    mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, *this);
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCRegisteredServerCluster.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to register WebRTCTransportRequestor on endpoint %u: %" CHIP_ERROR_FORMAT,
+                     kWebRTCRequesterDynamicEndpointId, err.Format());
+    }
+}
+
+void WebRTCTransportRequestorManager::Shutdown()
+{
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mWebRTCRegisteredServerCluster.Cluster());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "WebRTCTransportRequestor unregister error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    mWebRTCRegisteredServerCluster.Destroy();
 }
 
 void WebRTCTransportRequestorManager::InitCallbacks(OnOfferCallback onOnOfferCallback, OnAnswerCallback onAnswerCallback,
@@ -74,11 +90,10 @@ CHIP_ERROR WebRTCTransportRequestorManager::HandleAnswer(uint16_t sessionId, con
 CHIP_ERROR WebRTCTransportRequestorManager::HandleICECandidates(uint16_t sessionId,
                                                                 const std::vector<ICECandidateStruct> & candidates)
 {
-
-    std::vector<std::string> remoteCandidates;
-    remoteCandidates.clear();
-    std::vector<const char *> cStrings;
-    cStrings.clear();
+    std::vector<OwnedIceCandidate> remoteCandidates;
+    remoteCandidates.reserve(candidates.size());
+    std::vector<IceCandidate> cStrings;
+    cStrings.reserve(candidates.size());
 
     if (candidates.empty())
     {
@@ -88,12 +103,21 @@ CHIP_ERROR WebRTCTransportRequestorManager::HandleICECandidates(uint16_t session
 
     for (const auto & candidate : candidates)
     {
-        remoteCandidates.push_back(std::string(candidate.candidate.begin(), candidate.candidate.end()));
+        OwnedIceCandidate aIceCandidate;
+        aIceCandidate.candidate     = std::make_unique<std::string>(candidate.candidate.begin(), candidate.candidate.end());
+        bool isSdpMidNull           = candidate.SDPMid.IsNull();
+        aIceCandidate.sdpMid        = isSdpMidNull
+                   ? nullptr
+                   : std::make_unique<std::string>(candidate.SDPMid.Value().begin(), candidate.SDPMid.Value().end());
+        aIceCandidate.sdpMLineIndex = candidate.SDPMLineIndex.IsNull() ? -1 : static_cast<int>(candidate.SDPMLineIndex.Value());
+        aIceCandidate.view = IceCandidate{ aIceCandidate.candidate->c_str(), isSdpMidNull ? nullptr : aIceCandidate.sdpMid->c_str(),
+                                           aIceCandidate.sdpMLineIndex };
+        remoteCandidates.push_back(std::move(aIceCandidate));
     }
 
-    for (const std::string & candidate : remoteCandidates)
+    for (const auto & candidate : remoteCandidates)
     {
-        cStrings.push_back(candidate.c_str());
+        cStrings.push_back(candidate.view);
     }
 
     int err = gOnICECandidatesCallback(sessionId, cStrings.data(), static_cast<int>(cStrings.size()));
@@ -109,5 +133,5 @@ CHIP_ERROR WebRTCTransportRequestorManager::HandleEnd(uint16_t sessionId, WebRTC
 void WebRTCTransportRequestorManager::UpsertSession(
     const chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type & session)
 {
-    mWebRTCRequestorServer.UpsertSession(session);
+    mWebRTCRegisteredServerCluster.Cluster().UpsertSession(session);
 }

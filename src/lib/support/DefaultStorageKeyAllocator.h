@@ -299,17 +299,16 @@ public:
     }
 
     // Stores the client cert payload for the given fabric & endpoint
-    // (excepting intermediate cert, see TlsClientCertEntityIntermediateKey)
     static StorageKeyName TlsClientCertEntityKey(FabricIndex fabric, EndpointId endpoint, uint16_t idx)
     {
         return StorageKeyName::Formatted("f/%x/e/%x/tlsc/%x", fabric, endpoint, idx);
     }
 
-    // Stores an intermediate cert payload for a client cert for the given fabric & endpoint
-    static StorageKeyName TlsClientCertEntityIntermediateKey(FabricIndex fabric, EndpointId endpoint, uint16_t entity_idx,
-                                                             uint8_t intermediate_idx)
+    // Stores global data about certificates for the given endpoint, across all fabrics, used by CertificateTableImpl
+    // Applications can also create their own implementation extending CertificateTable
+    static StorageKeyName TlsEndpointGlobalDataKey(EndpointId endpoint)
     {
-        return StorageKeyName::Formatted("f/%x/e/%x/tlsc/%x/%x", fabric, endpoint, entity_idx, intermediate_idx);
+        return StorageKeyName::Formatted("g/tlsr/g/%x", endpoint);
     }
 };
 

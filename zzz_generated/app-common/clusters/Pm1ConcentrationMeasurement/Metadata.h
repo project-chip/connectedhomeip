@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace Pm1ConcentrationMeasurement {
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+
 namespace MeasuredValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -64,6 +66,10 @@ namespace LevelValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(LevelValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace LevelValue
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    MeasurementMedium::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 

@@ -39,6 +39,7 @@
 #include "rvc-operational-state-delegate-impl.h"
 #include "tcc-mode.h"
 #include "thermostat-delegate-impl.h"
+#include "tls-client-management-instance.h"
 
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -72,7 +73,6 @@ using namespace chip::app;
 using namespace chip::DeviceLayer;
 
 using chip::Protocols::InteractionModel::Status;
-
 namespace {
 
 LowPowerManager sLowPowerManager;
@@ -198,6 +198,8 @@ void ApplicationInit()
                     Clusters::UnitLocalization::TempUnitEnum::kFahrenheit) == CHIP_NO_ERROR);
 
     Clusters::PushAvStreamTransport::SetDelegate(chip::EndpointId(1), &gPushAvStreamTransportManager);
+    Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(chip::EndpointId(1),
+                                                                    &Clusters::TlsClientManagementCommandDelegate::GetInstance());
 
     SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));

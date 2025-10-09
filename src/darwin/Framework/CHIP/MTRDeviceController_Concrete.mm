@@ -23,9 +23,11 @@
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommissionableBrowser.h"
 #import "MTRCommissionableBrowserResult_Internal.h"
+#import "MTRCommissioningOperation_Internal.h"
 #import "MTRCommissioningParameters.h"
 #import "MTRCommissioningParameters_Internal.h"
 #import "MTRConversion.h"
+#import "MTRDeviceConnectivityMonitor.h"
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
@@ -50,6 +52,7 @@
 #import "MTRUtilities.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
+
 #import <setup_payload/ManualSetupPayloadGenerator.h>
 #import <setup_payload/SetupPayload.h>
 #import <zap-generated/MTRBaseClusters.h>
@@ -112,7 +115,15 @@ using namespace chip::Tracing::DarwinFramework;
 // Whether we should be advertising our operational identity when we are not suspended.
 @property (nonatomic, readonly) BOOL shouldAdvertiseOperational;
 
+@property (atomic, readwrite, nullable, weak) MTRCommissioningOperation * currentCommissioning;
+
+// Make sure MTRCommissioningOperation we create internally stay alive until
+// they are stopped.
+@property (atomic, readwrite, nullable) MTRCommissioningOperation * currentInternalCommissioning;
+
 @end
+
+typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
 
 @implementation MTRDeviceController_Concrete {
     std::atomic<chip::FabricIndex> _storedFabricIndex;
@@ -126,6 +137,15 @@ using namespace chip::Tracing::DarwinFramework;
     NSUInteger _keepRunningAssertionCounter;
     BOOL _shutdownPending;
     os_unfair_lock _assertionLock;
+
+    // Queue for our commissioning bits, so our MTRCommissioningOperation can
+    // run on a queue that's not the Matter queue, and safely use APIs that
+    // involve sync dispatch to the Matter queue.
+    dispatch_queue_t _commissioningQueue;
+
+    // Keep track of dns-sd resolution objects for shutdown-time cleanup.
+    os_unfair_lock _deviceConnectivityMonitorLock;
+    NSHashTable<MTRDeviceConnectivityMonitor *> * _weakSetOfDeviceConnectivityMonitors;
 }
 
 // TODO: Figure out whether the work queue storage lives here or in the superclass
@@ -182,6 +202,9 @@ using namespace chip::Tracing::DarwinFramework;
         _keepRunningAssertionCounter = 0;
         _shutdownPending = NO;
         _assertionLock = OS_UNFAIR_LOCK_INIT;
+        _currentCommissioning = nil;
+        _commissioningQueue = dispatch_queue_create("org.csa-iot.matter.framework.commissioning.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        _deviceConnectivityMonitorLock = OS_UNFAIR_LOCK_INIT;
 
         if (storageDelegate != nil) {
             if (storageDelegateQueue == nil) {
@@ -459,6 +482,16 @@ using namespace chip::Tracing::DarwinFramework;
     }];
 
     [self stopBrowseForCommissionables];
+
+    // Calling stopMonitoring breaks the retain cycle of the monitor handler holding
+    // the monitor object, allowing the monitor object to dealloc and clean up.
+    {
+        std::lock_guard lock(_deviceConnectivityMonitorLock);
+        for (MTRDeviceConnectivityMonitor * deviceConnectivityMonitor in _weakSetOfDeviceConnectivityMonitors) {
+            [deviceConnectivityMonitor stopMonitoring];
+        }
+        [_weakSetOfDeviceConnectivityMonitors removeAllObjects];
+    }
 
     [_factory controllerShuttingDown:self];
 }
@@ -749,11 +782,12 @@ using namespace chip::Tracing::DarwinFramework;
             self.fabricID = @(_cppCommissioner->GetFabricId());
         }
 
+        _weakSetOfDeviceConnectivityMonitors = [NSHashTable weakObjectsHashTable];
+
         commissionerInitialized = YES;
 
         // Set self as delegate, which fans out delegate callbacks to all added delegates
-        id<MTRDeviceControllerDelegate> selfDelegate = static_cast<id<MTRDeviceControllerDelegate>>(self);
-        self->_deviceControllerDelegateBridge->setDelegate(self, selfDelegate, _chipWorkQueue);
+        self->_deviceControllerDelegateBridge->setDelegate(self, self, _chipWorkQueue);
 
         MTR_LOG("%@ startup succeeded for nodeID 0x%016llX", self, self->_cppCommissioner->GetNodeId());
     });
@@ -832,6 +866,48 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioning);
     emitMetricForSetupPayload(payload);
 
+    // Try to get a QR code if possible (because it has a better
+    // discriminator, etc), then fall back to manual code if that fails.
+    NSString * pairingCode = [payload qrCodeString:nil];
+    if (pairingCode == nil) {
+        pairingCode = [payload manualEntryCode];
+    }
+    if (pairingCode == nil) {
+        CHIP_ERROR errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+        MATTER_LOG_METRIC_END(kMetricDeviceCommissioning, errorCode);
+        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorSetupCodeGen error:error];
+    }
+
+    // We can just use dummy parameters for now; when commissionWithNodeID is
+    // called we can update the MTRCommissioningOperation with the real
+    // parameters.
+    auto * parameters = [[MTRCommissioningParameters alloc] init];
+    auto * commissioning = [[MTRCommissioningOperation alloc] initWithParameters:parameters
+                                                                    setupPayload:pairingCode
+                                                                 commissioningID:newNodeID
+                                                             isInternallyCreated:YES
+                                                                        delegate:self
+                                                                           queue:_commissioningQueue];
+
+    // startWithController will manage our currentCommissioning state as needed.
+    [commissioning startWithController:self];
+
+    return YES;
+}
+
+- (CHIP_ERROR)startCommissioning:(MTRCommissioningOperation *)commissioning withCommissioningID:(NSNumber *)commissioningID
+{
+    // TODO: This can probably stop being sync and just notify failures async.
+
+    // MTRCommissioningOperation already checks whether we have an existing
+    // currentCommissioning.
+    MTR_LOG("%@ starting new commissioning %@", self, commissioning);
+    self.currentCommissioning = commissioning;
+
+    if (commissioning.isInternallyCreated) {
+        self.currentInternalCommissioning = commissioning;
+    }
+
     // Capture in a block variable to avoid losing granularity for metrics,
     // when translating CHIP_ERROR to NSError
     __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
@@ -840,36 +916,69 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         // Track work until end of scope
         MATTER_LOG_METRIC_SCOPE(kMetricSetupWithPayload, errorCode);
 
-        // Try to get a QR code if possible (because it has a better
-        // discriminator, etc), then fall back to manual code if that fails.
-        NSString * pairingCode = [payload qrCodeString:nil];
-        if (pairingCode == nil) {
-            pairingCode = [payload manualEntryCode];
-        }
-        if (pairingCode == nil) {
-            errorCode = CHIP_ERROR_INVALID_ARGUMENT;
-            return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorSetupCodeGen error:error];
-        }
-
-        chip::NodeId nodeId = [newNodeID unsignedLongLongValue];
-        self->_operationalCredentialsDelegate->SetDeviceID(nodeId);
+        unsigned long long deviceID = [commissioningID unsignedLongLongValue];
+        self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
 
         MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
-        errorCode = self->_cppCommissioner->EstablishPASEConnection(nodeId, [pairingCode UTF8String]);
+        errorCode = self->_cppCommissioner->EstablishPASEConnection(deviceID, commissioning.setupPayload.UTF8String);
         if (CHIP_NO_ERROR == errorCode) {
-            self->_deviceControllerDelegateBridge->SetDeviceNodeID(nodeId);
+            self->_deviceControllerDelegateBridge->SetDeviceNodeID(commissioningID.unsignedLongLongValue);
+            self->_deviceControllerDelegateBridge->setDelegate(self, commissioning, self->_commissioningQueue);
         } else {
             MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
         }
 
-        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorPairDevice error:error];
+        NSError * error;
+        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorPairDevice error:&error];
     };
 
-    auto success = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
-    if (!success) {
-        MATTER_LOG_METRIC_END(kMetricDeviceCommissioning, errorCode);
+    NSError * error;
+    BOOL success = [self syncRunOnWorkQueueWithBoolReturnValue:block error:&error];
+    if (!success && errorCode == CHIP_NO_ERROR) {
+        errorCode = [MTRError errorToCHIPErrorCode:error];
     }
-    return success;
+    return errorCode;
+}
+
+- (void)commissioningDone:(MTRCommissioningOperation *)commissioning
+{
+    if (commissioning.isInternallyCreated) {
+        // Do nothing; we will handle this when we get the actual
+        // succeeded/failed delegate notifications, which we are guaranteed to
+        // get for an internal commissioning. This avoids us nulling out
+        // self.currentCommissioning before we get those notifications and
+        // failing to propagate them to our delegates correctly.
+        return;
+    }
+
+    [self _commissioningDone:commissioning];
+}
+
+- (void)_commissioningDone:(MTRCommissioningOperation *)commissioning
+{
+    if (self.currentCommissioning == commissioning) {
+        MTR_LOG("%@ stopping commissioning %@", self, commissioning);
+        self.currentCommissioning = nil;
+
+        // Reset ourselves as the device controller delegate, so we can
+        // correctly handle the commissioning codepaths that don't use
+        // MTRCommissioningOperation yet.
+        auto block = ^{
+            self->_deviceControllerDelegateBridge->setDelegate(self, self, self->_chipWorkQueue);
+        };
+
+        // We don't care whether this fails.  If it fails, we are shut down
+        // already, and then we don't need to worry about the device controller
+        // delegate.
+        [self syncRunOnWorkQueue:block error:nil];
+    }
+
+    // Generally, we would expect self.currentInternalCommissioning to be equal
+    // to commissioning if and only if self.currentCommissioning is equal to
+    // it.  But just in case, have this as a separate check.
+    if (self.currentInternalCommissioning == commissioning) {
+        self.currentInternalCommissioning = nil;
+    }
 }
 
 - (BOOL)setupCommissioningSessionWithDiscoveredDevice:(MTRCommissionableBrowserResult *)discoveredDevice
@@ -877,6 +986,19 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                                             newNodeID:(NSNumber *)newNodeID
                                                 error:(NSError * __autoreleasing *)error
 {
+    auto * existingCommissioning = self.currentCommissioning;
+    if (existingCommissioning) {
+        MTR_LOG_ERROR("%@ Can't set up commissioning session with discovered device: commissioning %@ in progress",
+            self, existingCommissioning);
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+        return NO;
+    }
+
+    // TODO: should we set up a fake self.currentCommissioning here, even though
+    // we are not using MTRCommissioningOperation to implement this?
+
     MTR_LOG("%@ Setting up commissioning session for already-discovered device %@ and device ID 0x%016llX with setup payload %@", self, discoveredDevice, newNodeID.unsignedLongLongValue, payload);
 
     [[MTRMetricsCollector sharedInstance] resetMetrics];
@@ -953,6 +1075,51 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
          commissioningParams:(MTRCommissioningParameters *)commissioningParams
                        error:(NSError * __autoreleasing *)error
 {
+    auto * currentCommissioning = self.currentCommissioning;
+    if (currentCommissioning && !currentCommissioning.isInternallyCreated) {
+        MTR_LOG_ERROR("Trying to commissionNodeWithID: when using MTRCommissioningOperation; call ignored");
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+        return NO;
+    }
+
+    MTRCommissioningParameters * params = [commissioningParams copy];
+
+    // Backwards compat: this API did not do any network scanning, and should
+    // keep behaving that way.
+    params.preventNetworkScans = YES;
+
+    BOOL ok = [self _commissionNodeWithID:(NSNumber *) nodeID
+                      commissioningParams:params
+                                    error:error];
+    if (ok) {
+        currentCommissioning.isWaitingAfterPASEEstablished = NO;
+    }
+    return ok;
+}
+
+- (BOOL)commission:(MTRCommissioningOperation *)commissioning
+    withCommissioningID:(NSNumber *)commissioningID
+    commissioningParams:(MTRCommissioningParameters *)commissioningParams
+                  error:(NSError * __autoreleasing *)error
+{
+    auto * currentCommissioning = self.currentCommissioning;
+    if (commissioning != currentCommissioning) {
+        MTR_LOG_ERROR("%@ trying to start commissioning %@ but current commissioning is %@", self, commissioning, currentCommissioning);
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+        return NO;
+    }
+
+    return [self _commissionNodeWithID:commissioningID commissioningParams:commissioningParams error:error];
+}
+
+- (BOOL)_commissionNodeWithID:(NSNumber *)nodeID
+          commissioningParams:(MTRCommissioningParameters *)commissioningParams
+                        error:(NSError * __autoreleasing *)error
+{
     MTR_LOG("%@ trying to commission node with ID 0x%016llX parameters %@", self, nodeID.unsignedLongLongValue, commissioningParams);
 
     if (self.suspended) {
@@ -990,17 +1157,23 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         }
         if (commissioningParams.threadOperationalDataset) {
             params.SetThreadOperationalDataset(AsByteSpan(commissioningParams.threadOperationalDataset));
+        } else if (!commissioningParams.preventNetworkScans && commissioningParams.forceThreadScan) {
+            params.SetAttemptThreadNetworkScan(true);
         }
         if (commissioningParams.acceptedTermsAndConditions && commissioningParams.acceptedTermsAndConditionsVersion) {
             if (!chip::CanCastTo<uint16_t>([commissioningParams.acceptedTermsAndConditions unsignedIntValue])) {
                 MTR_LOG_ERROR("%@ Error: acceptedTermsAndConditions value should be between 0 and 65535", self);
-                *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+                if (error) {
+                    *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+                }
                 return NO;
             }
 
             if (!chip::CanCastTo<uint16_t>([commissioningParams.acceptedTermsAndConditionsVersion unsignedIntValue])) {
                 MTR_LOG_ERROR("%@ Error: acceptedTermsAndConditionsVersion value should be between 0 and 65535", self);
-                *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+                if (error) {
+                    *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+                }
                 return NO;
             }
 
@@ -1019,7 +1192,10 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             }
             chip::Controller::WiFiCredentials wifiCreds(ssid, credentials);
             params.SetWiFiCredentials(wifiCreds);
+        } else if (!commissioningParams.preventNetworkScans && commissioningParams.forceWiFiScan) {
+            params.SetAttemptWiFiNetworkScan(true);
         }
+
         if (commissioningParams.deviceAttestationDelegate) {
             [self clearDeviceAttestationDelegateBridge];
 
@@ -1104,6 +1280,40 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
            ignoreAttestationFailure:(BOOL)ignoreAttestationFailure
                               error:(NSError * __autoreleasing *)error
 {
+    auto * currentCommissioning = self.currentCommissioning;
+    if (currentCommissioning && !currentCommissioning.isInternallyCreated) {
+        MTR_LOG_ERROR("Trying to continueCommissioningDevice: when using MTRCommissioningOperation; call ignored");
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+        return NO;
+    }
+
+    return [self _continueCommissioningDevice:device
+                     ignoreAttestationFailure:ignoreAttestationFailure
+                                        error:error];
+}
+
+- (BOOL)continueCommissioningAfterAttestation:(MTRCommissioningOperation *)commissioning
+                              forOpaqueHandle:(void *)handle
+                                        error:(NSError * __autoreleasing *)error
+{
+    auto * currentCommissioning = self.currentCommissioning;
+    if (commissioning != currentCommissioning) {
+        MTR_LOG_ERROR("%@ commissioning %@ has already stopped and been replaced by %@", self, commissioning, currentCommissioning);
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+        return NO;
+    }
+
+    return [self _continueCommissioningDevice:handle ignoreAttestationFailure:YES error:error];
+}
+
+- (BOOL)_continueCommissioningDevice:(void *)device
+            ignoreAttestationFailure:(BOOL)ignoreAttestationFailure
+                               error:(NSError * __autoreleasing *)error
+{
     auto block = ^BOOL {
         auto lastAttestationResult = self->_deviceAttestationDelegateBridge
             ? self->_deviceAttestationDelegateBridge->attestationVerificationResult()
@@ -1122,15 +1332,57 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (BOOL)cancelCommissioningForNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
+    auto * currentCommissioning = self.currentCommissioning;
+    if (currentCommissioning && !currentCommissioning.isInternallyCreated) {
+        MTR_LOG_ERROR("Trying to cancelCommissioningForNodeID 0x%016llX (%@) when using MTRCommissioningOperation; call ignored",
+            nodeID.unsignedLongLongValue, nodeID);
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+        return NO;
+    }
+
+    return [self _cancelCommissioning:currentCommissioning forNodeID:nodeID error:error];
+}
+
+- (BOOL)stopCommissioning:(MTRCommissioningOperation *)commissioning forCommissioningID:(NSNumber *)commissioningID
+{
+    auto * currentCommissioning = self.currentCommissioning;
+    if (commissioning != currentCommissioning) {
+        MTR_LOG_ERROR("%@ commissioning %@ has already stopped and been replaced by %@", self, commissioning, currentCommissioning);
+        return NO;
+    }
+
+    return [self _cancelCommissioning:currentCommissioning forNodeID:commissioningID error:nil];
+}
+
+- (BOOL)_cancelCommissioning:(MTRCommissioningOperation *)commissioning forNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
+{
+    BOOL isWaitingAfterPASEEstablished = commissioning.isWaitingAfterPASEEstablished;
     auto block = ^BOOL {
         self->_operationalCredentialsDelegate->ResetDeviceID();
         auto errorCode = self->_cppCommissioner->StopPairing([nodeID unsignedLongLongValue]);
         // Emit metric on status of cancel
         MATTER_LOG_METRIC(kMetricCancelCommissioning, errorCode);
-        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorStopPairing error:error];
+        BOOL ok = ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorStopPairing error:error];
+        if (ok && isWaitingAfterPASEEstablished) {
+            // If we are not actually in the middle of either PASE establishment
+            // or active commissioning on the C++ side, there will be no
+            // notifications when we StopPairing.  Provide the
+            // OnCommissioningComplete notification ourselves.
+            MTR_LOG("%@ Notifying commissioning complete manually because %@ is being canceled while waiting after PASE establishment",
+                self, commissioning);
+            self->_deviceControllerDelegateBridge->OnCommissioningComplete(nodeID.unsignedLongLongValue,
+                CHIP_ERROR_CANCELLED);
+        }
+        return ok;
     };
 
-    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+    BOOL ok = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+    if (ok && isWaitingAfterPASEEstablished) {
+        commissioning.isWaitingAfterPASEEstablished = NO;
+    }
+    return ok;
 }
 
 - (BOOL)startBrowseForCommissionables:(id<MTRCommissionableBrowserDelegate>)delegate queue:(dispatch_queue_t)queue
@@ -1471,6 +1723,21 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
+    [self getSessionForNode:nodeID parameters:0 completion:completion];
+}
+
+- (void)getSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters)parameters completion:(MTRInternalDeviceConnectionCallback)completion
+{
+    {
+        NSError * error;
+        if (![self checkIsRunning:&error]) {
+            if (completion != nil) {
+                completion(nil, chip::NullOptional, error, nil);
+            }
+            return;
+        }
+    }
+
     // TODO: Figure out whether the synchronization here makes sense.  What
     // happens if this call happens mid-suspend or mid-resume?
     if (self.suspended) {
@@ -1483,23 +1750,51 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // In the case that this device is known to use thread, queue this with subscription attempts as well, to
     // help with throttling Thread traffic.
     if ([self definitelyUsesThreadForDevice:nodeID]) {
-        MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+        __block MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull workItemCompletion) {
             MTRInternalDeviceConnectionCallback completionWrapper = ^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
                 const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
                 completion(exchangeManager, session, error, retryDelay);
                 workItemCompletion(MTRAsyncWorkComplete);
             };
-            [self directlyGetSessionForNode:nodeID completion:completionWrapper];
+            [self directlyGetSessionForNode:nodeID parameters:parameters completion:completionWrapper];
         }];
 
-        [_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX", nodeID];
+        // The monitor would call the handler when resolve returns a usable address. The monitor
+        // handler block retains the monitor object itself, forming a retain cycle. The cycle is
+        // broken when stopMonitoring is called.
+        MTRDeviceConnectivityMonitor * deviceConnectivityMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithCompressedFabricID:self.compressedFabricID nodeID:@(nodeID)];
+        BOOL monitorStarted = [deviceConnectivityMonitor startMonitoringWithHandler:^{
+            // Ensure the work item is queued only once, since this handler could be called multiple times in a row
+            if (workItem) {
+                [self->_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX", nodeID];
+                workItem = nil;
+                [deviceConnectivityMonitor stopMonitoring];
+            }
+        } queue:_chipWorkQueue];
+
+        if (monitorStarted) {
+            // Add the monitor object to the weak set, so that the above retain cycle can be broken
+            // when the controller shuts down.
+            std::lock_guard lock(_deviceConnectivityMonitorLock);
+            [_weakSetOfDeviceConnectivityMonitors addObject:deviceConnectivityMonitor];
+        } else {
+            // DNS-SD monitoring failed to start - proceed with immediate connection attempt
+            // (This is unlikely, but needed so that the workItem block always executes.)
+            MTR_LOG("%@ DNS-SD monitoring unavailable for node 0x%016llX, proceeding with connection attempt", self, nodeID);
+            [self->_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX (no DNS-SD)", nodeID];
+        }
     } else {
-        [self directlyGetSessionForNode:nodeID completion:completion];
+        [self directlyGetSessionForNode:nodeID parameters:parameters completion:completion];
     }
 }
 
 - (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
+{
+    [self directlyGetSessionForNode:nodeID parameters:0 completion:completion];
+}
+
+- (void)directlyGetSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters)parameters completion:(MTRInternalDeviceConnectionCallback)completion
 {
     // TODO: Figure out whether the synchronization here makes sense.  What
     // happens if this call happens mid-suspend or mid-resume?
@@ -1514,9 +1809,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         asyncGetCommissionerOnMatterQueue:^(chip::Controller::DeviceCommissioner * commissioner) {
             auto connectionBridge = new MTRDeviceConnectionBridge(completion);
 
-            // MTRDeviceConnectionBridge always delivers errors async via
-            // completion.
-            connectionBridge->connect(commissioner, nodeID);
+            // MTRDeviceConnectionBridge always delivers errors via completion.
+            connectionBridge->Connect(commissioner, nodeID, parameters);
         }
         errorHandler:^(NSError * error) {
             completion(nullptr, chip::NullOptional, error, nil);
@@ -1781,6 +2075,190 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return self.controllerDataStore.nodesWithStoredData;
 }
 
+- (BOOL)continueCommissioning:(MTRCommissioningOperation *)commissioning
+                 withWiFiSSID:(NSData *)ssid
+                  credentials:(nullable NSData *)credentials
+                        error:(NSError * __autoreleasing *)error;
+{
+    auto * currentCommissioning = self.currentCommissioning;
+    if (commissioning != currentCommissioning) {
+        MTR_LOG_ERROR("%@ commissioning %@ has already stopped and been replaced by %@", self, commissioning, currentCommissioning);
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+        return NO;
+    }
+
+    auto block = ^BOOL {
+        chip::Controller::CommissioningParameters params = self->_cppCommissioner->GetCommissioningParameters();
+        chip::ByteSpan ssidSpan = AsByteSpan(ssid);
+        chip::ByteSpan credentialsSpan;
+        if (credentials != nil) {
+            credentialsSpan = AsByteSpan(credentials);
+        }
+        chip::Controller::WiFiCredentials wifiCreds(ssidSpan, credentialsSpan);
+        params.SetWiFiCredentials(wifiCreds);
+
+        CHIP_ERROR err = self->_cppCommissioner->UpdateCommissioningParameters(params);
+        if (err == CHIP_NO_ERROR) {
+            err = self->_cppCommissioner->NetworkCredentialsReady();
+        }
+        return ![MTRDeviceController_Concrete checkForError:err logMsg:kDeviceControllerErrorUpdateNetworkCredentials error:error];
+    };
+
+    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+}
+
+- (BOOL)continueCommissioning:(MTRCommissioningOperation *)commissioning
+       withOperationalDataset:(NSData *)operationalDataset
+                        error:(NSError * __autoreleasing *)error
+{
+    auto * currentCommissioning = self.currentCommissioning;
+    if (commissioning != currentCommissioning) {
+        MTR_LOG_ERROR("%@ commissioning %@ has already stopped and been replaced by %@", self, commissioning, currentCommissioning);
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+        return NO;
+    }
+
+    auto block = ^BOOL {
+        chip::Controller::CommissioningParameters params = self->_cppCommissioner->GetCommissioningParameters();
+        params.SetThreadOperationalDataset(AsByteSpan(operationalDataset));
+
+        CHIP_ERROR err = self->_cppCommissioner->UpdateCommissioningParameters(params);
+        if (err == CHIP_NO_ERROR) {
+            err = self->_cppCommissioner->NetworkCredentialsReady();
+        }
+        return ![MTRDeviceController_Concrete checkForError:err logMsg:kDeviceControllerErrorUpdateNetworkCredentials error:error];
+    };
+
+    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+}
+
+#pragma mark - MTRCommissioningDelegate implementation
+
+- (void)commissioning:(MTRCommissioningOperation *)commissioning
+    readCommissioneeInfo:(MTRCommissioneeInfo *)info
+{
+    auto * currentCommissioning = self.currentCommissioning;
+    if (commissioning != currentCommissioning) {
+        MTR_LOG_ERROR("readCommissioneeInfo: notification for %@ but current commissioning is %@",
+            commissioning, currentCommissioning);
+        return;
+    }
+
+    [self controller:self readCommissioneeInfo:info];
+}
+
+- (void)commissioning:(MTRCommissioningOperation *)commissioning
+    completedDeviceAttestation:(MTRDeviceAttestationDeviceInfo *)attestationDeviceInfo
+                         error:(nullable NSError *)error
+                    completion:(dispatch_block_t)completion
+{
+    // This is never called, because we only set up ourselves as the delegate on
+    // internal MTRCommissioningOperation instances, but in that case the
+    // MTRCommissioningParameters we use does not have the
+    // MTRCommissioningOperation as the attestation delegate.
+    MTR_ABSTRACT_METHOD();
+}
+
+// We never trigger network scans for commissioning that comes through the old
+// APIs, and in general don't really support not providing credentials as part
+// of MTRCommissioningParameters, so don't need
+// needsWiFiCredentialsWithScanResults/needsThreadCredentialsWithScanResults bits.
+
+- (void)commissioning:(MTRCommissioningOperation *)commissioning
+    succeededForNodeID:(NSNumber *)nodeID
+               metrics:(MTRMetrics *)metrics
+{
+    auto * currentCommissioning = self.currentCommissioning;
+    if (commissioning != currentCommissioning) {
+        MTR_LOG_ERROR("commissioning:succeededForNodeID: notification for %@ but current commissioning is %@",
+            commissioning, currentCommissioning);
+        return;
+    }
+
+    if (commissioning.isInternallyCreated) {
+        // Make sure we do _commissioningDone for this commissioning (which we
+        // skipped doing in commissioningDone), before we notify our delegates.
+        //
+        // Note that doing this after the currentCommissioning check is OK,
+        // since _commissioningDone is a no-op if the commissioning is not the
+        // current one.
+        [self _commissioningDone:commissioning];
+    }
+
+    [self controller:self commissioningComplete:nil nodeID:nodeID metrics:metrics];
+}
+
+#pragma mark - MTRCommissioningDelegate_Internal implementation
+
+- (void)commissioning:(MTRCommissioningOperation *)commissioning
+    paseSessionEstablishmentComplete:(NSError * _Nullable)error
+{
+    auto * currentCommissioning = self.currentCommissioning;
+    if (commissioning != currentCommissioning) {
+        MTR_LOG_ERROR("commissioning:paseSessionEstablishmentComplete: notification for %@ but current commissioning is %@",
+            commissioning, currentCommissioning);
+        return;
+    }
+
+    [self controller:self commissioningSessionEstablishmentDone:error];
+
+    // Just wait for commissionNodeWithID: to be called on us.
+}
+
+- (void)commissioning:(MTRCommissioningOperation *)commissioning
+         statusUpdate:(MTRCommissioningStatus)status
+{
+    auto * currentCommissioning = self.currentCommissioning;
+    if (commissioning != currentCommissioning) {
+        MTR_LOG_ERROR("commissioning:statusUpdate: notification for %@ but current commissioning is %@",
+            commissioning, currentCommissioning);
+        return;
+    }
+
+    [self controller:self statusUpdate:status];
+}
+
+- (void)commissioning:(MTRCommissioningOperation *)commissioning provisionedNetworkCredentialsForDeviceID:(NSNumber *)deviceID
+{
+    auto * currentCommissioning = self.currentCommissioning;
+    if (commissioning != currentCommissioning) {
+        MTR_LOG_ERROR("commissioningProvisionedNetworkCredentials: notification for %@ but current commissioning is %@",
+            commissioning, currentCommissioning);
+        return;
+    }
+
+    [self controller:self commissioneeHasReceivedNetworkCredentials:deviceID];
+}
+
+- (void)commissioning:(MTRCommissioningOperation *)commissioning
+      failedWithError:(NSError *)error
+          forDeviceID:(NSNumber *)deviceID
+              metrics:(MTRMetrics *)metrics
+{
+    // Don't check whether commissioning matches self.currentCommissioning.
+    //
+    // That's because we can land here if someone tries to start a new
+    // commissioning (e.g. via setupPayloadWithOnboardingPayload) while we have
+    // an ongoing commissioning.  That will create a new
+    // MTRCommissioningOperation with us as the delegate, and then immediately
+    // trigger an error on it when it tries to start.  Just propagate the error
+    // on through.  The node ID will let API consumers who happen do call
+    // setupPayloadWithOnboardingPayload twice disambiguate which one failed, if
+    // they care to do that.
+
+    if (commissioning.isInternallyCreated) {
+        // Make sure we do _commissioningDone for this commissioning (which we
+        // skipped doing in commissioningDone), before we notify our delegates.
+        [self _commissioningDone:commissioning];
+    }
+
+    [self controller:self commissioningComplete:error nodeID:deviceID metrics:metrics];
+}
+
 @end
 
 /**
@@ -1837,45 +2315,11 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
 {
-    [[MTRMetricsCollector sharedInstance] resetMetrics];
+    auto * setupPayload = [[MTRSetupPayload alloc] initWithSetupPasscode:@(setupPINCode) discriminator:@(discriminator)];
 
-    // Track overall commissioning
-    MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioning);
-
-    // Capture in a block variable to avoid losing granularity for metrics,
-    // when translating CHIP_ERROR to NSError
-    __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
-
-    auto block = ^BOOL {
-        // Track work until end of scope
-        MATTER_LOG_METRIC_SCOPE(kMetricPairDevice, errorCode);
-
-        std::string manualPairingCode;
-        chip::SetupPayload payload;
-        payload.discriminator.SetLongValue(discriminator);
-        payload.setUpPINCode = setupPINCode;
-
-        errorCode = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);
-        VerifyOrReturnValue(![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorSetupCodeGen error:error], NO);
-
-        self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
-
-        MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
-        errorCode = self->_cppCommissioner->EstablishPASEConnection(deviceID, manualPairingCode.c_str());
-        if (CHIP_NO_ERROR == errorCode) {
-            self->_deviceControllerDelegateBridge->SetDeviceNodeID(deviceID);
-        } else {
-            MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
-        }
-
-        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorPairDevice error:error];
-    };
-
-    auto success = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
-    if (!success) {
-        MATTER_LOG_METRIC_END(kMetricDeviceCommissioning, errorCode);
-    }
-    return success;
+    return [self setupCommissioningSessionWithPayload:setupPayload
+                                            newNodeID:@(deviceID)
+                                                error:error];
 }
 
 - (BOOL)pairDevice:(uint64_t)deviceID
@@ -1884,6 +2328,19 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
 {
+    auto * existingCommissioning = self.currentCommissioning;
+    if (existingCommissioning) {
+        MTR_LOG_ERROR("%@ Can't set up commissioning session with address/port: commissioning %@ in progress",
+            self, existingCommissioning);
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+        return NO;
+    }
+
+    // TODO: should we set up a fake self.currentCommissioning here, even though
+    // we are not using MTRCommissioningOperation to implement this?
+
     [[MTRMetricsCollector sharedInstance] resetMetrics];
 
     // Track overall commissioning
@@ -1925,38 +2382,15 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error
 {
-    [[MTRMetricsCollector sharedInstance] resetMetrics];
-
-    // Track overall commissioning
-    MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioning);
-    emitMetricForSetupPayload([MTRSetupPayload setupPayloadWithOnboardingPayload:onboardingPayload error:nil]);
-
-    // Capture in a block variable to avoid losing granularity for metrics,
-    // when translating CHIP_ERROR to NSError
-    __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
-
-    auto block = ^BOOL {
-        // Track work until end of scope
-        MATTER_LOG_METRIC_SCOPE(kMetricPairDevice, errorCode);
-
-        self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
-
-        MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
-        errorCode = self->_cppCommissioner->EstablishPASEConnection(deviceID, [onboardingPayload UTF8String]);
-        if (CHIP_NO_ERROR == errorCode) {
-            self->_deviceControllerDelegateBridge->SetDeviceNodeID(deviceID);
-        } else {
-            MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
+    auto * setupPayload = [[MTRSetupPayload alloc] initWithPayload:onboardingPayload];
+    if (!setupPayload) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
         }
-
-        return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorPairDevice error:error];
-    };
-
-    auto success = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
-    if (!success) {
-        MATTER_LOG_METRIC_END(kMetricDeviceCommissioning, errorCode);
+        return NO;
     }
-    return success;
+
+    return [self setupCommissioningSessionWithPayload:setupPayload newNodeID:@(deviceID) error:error];
 }
 
 - (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error

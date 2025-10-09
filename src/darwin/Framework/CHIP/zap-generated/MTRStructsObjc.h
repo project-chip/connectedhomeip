@@ -88,6 +88,14 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDataTypeSemanticTagStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nullable mfgCode MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull namespaceID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull tag MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable label MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRDataTypeTestGlobalStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull name MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable myBitmap MTR_PROVISIONALLY_AVAILABLE;
@@ -110,7 +118,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull streamUsage MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable videoStreamID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable audioStreamID MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable metadataEnabled MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull metadataEnabled MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 @end
 
@@ -124,14 +132,6 @@ MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 MTR_DEPRECATED("Please use MTRDescriptorClusterDeviceTypeStruct", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRDescriptorClusterDeviceType : MTRDescriptorClusterDeviceTypeStruct
 @property (nonatomic, copy) NSNumber * _Nonnull revision MTR_DEPRECATED("Please use MTRDescriptorClusterDeviceTypeStruct", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-@end
-
-MTR_PROVISIONALLY_AVAILABLE
-@interface MTRDescriptorClusterSemanticTagStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nullable mfgCode MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull namespaceID MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull tag MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable label MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -1173,6 +1173,16 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull currentGroup MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull sceneValid MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull remainingCapacity MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRGroupcastClusterMembershipStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull endpoints MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull keyID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull hasAuxiliaryACL MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable expiringKeyID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 @end
 
@@ -2332,8 +2342,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nonnull maxResolution MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull minBitRate MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull maxBitRate MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull minKeyFrameInterval MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull maxKeyFrameInterval MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull keyFrameInterval MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable watermarkEnabled MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable osdEnabled MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull referenceCount MTR_PROVISIONALLY_AVAILABLE;
@@ -2419,6 +2428,13 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRWebRTCTransportProviderClusterSFrameStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull cipherSuite MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nonnull baseKey MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nonnull kid MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRPushAVStreamTransportClusterTransportMotionTriggerTimeControlStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull initialDuration MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull augmentationDuration MTR_PROVISIONALLY_AVAILABLE;
@@ -2443,10 +2459,14 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRPushAVStreamTransportClusterCMAFContainerOptionsStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull cmafInterface MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull segmentDuration MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull chunkDuration MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull sessionGroup MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull trackName MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSData * _Nullable cencKey MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable metadataEnabled MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSData * _Nullable cencKeyID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable metadataEnabled MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -2742,7 +2762,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull port MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull caid MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable ccdid MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull referenceCount MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 @end
 

@@ -39,6 +39,10 @@
 #include <ble/Ble.h>
 #endif // CONFIG_NETWORK_BLE
 
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#include <nfc/NFC.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+
 #include <controller/DeviceDiscoveryDelegate.h>
 
 #include <deque>
@@ -89,6 +93,10 @@ enum class DiscoveryType : uint8_t
 };
 
 class DLL_EXPORT SetUpCodePairer : public DevicePairingDelegate
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    ,
+                                   public Nfc::NFCReaderTransportDelegate
+#endif
 {
 public:
     SetUpCodePairer(DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
@@ -115,9 +123,16 @@ public:
 private:
     // DevicePairingDelegate implementation.
     void OnStatusUpdate(DevicePairingDelegate::Status status) override;
-    void OnPairingComplete(CHIP_ERROR error) override;
+    void OnPairingComplete(CHIP_ERROR error, const std::optional<RendezvousParameters> & rendezvousParameters,
+                           const std::optional<SetupPayload> & setupPayload) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    // Nfc::NFCReaderTransportDelegate implementation
+    void OnTagDiscovered(const chip::Nfc::NFCTag::Identifier & identifer) override;
+    void OnTagDiscoveryFailed(CHIP_ERROR error) override;
+#endif
 
     CHIP_ERROR Connect();
     CHIP_ERROR StartDiscoveryOverBLE();
@@ -126,6 +141,8 @@ private:
     CHIP_ERROR StopDiscoveryOverDNSSD();
     CHIP_ERROR StartDiscoveryOverWiFiPAF();
     CHIP_ERROR StopDiscoveryOverWiFiPAF();
+    CHIP_ERROR StartDiscoveryOverNFC();
+    CHIP_ERROR StopDiscoveryOverNFC();
 
     // Returns whether we have kicked off a new connection attempt.
     bool ConnectToDiscoveredDevice();
@@ -169,6 +186,9 @@ private:
         kBLETransport = 0,
         kIPTransport,
         kWiFiPAFTransport,
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+        kNFCTransport,
+#endif
         kTransportTypeCount,
     };
 
@@ -209,6 +229,10 @@ private:
     DiscoveryType mDiscoveryType             = DiscoveryType::kAll;
     std::vector<SetupPayload> mSetupPayloads;
 
+    // The payload we are using for our current PASE connection attempt.  Only
+    // set while we are attempting PASE.
+    std::optional<SetupPayload> mCurrentPASEPayload;
+
     // While we are trying to pair, we intercept the DevicePairingDelegate
     // notifications from mCommissioner.  We want to make sure we send them on
     // to the original pairing delegate, if any.
@@ -225,7 +249,7 @@ private:
 
     // Current thing we are trying to connect to over UDP. If a PASE connection fails with
     // a CHIP_ERROR_TIMEOUT, the discovered parameters will be used to ask the
-    // mdns daemon to invalidate the
+    // mdns daemon to invalidate its caches.
     Optional<SetUpCodePairerParameters> mCurrentPASEParameters;
 
     // mWaitingForPASE is true if we have called either

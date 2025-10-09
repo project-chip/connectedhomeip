@@ -245,8 +245,8 @@ enum ThreeLevelAutoEnum : enum8 {
 }
 
 enum WebRTCEndReasonEnum : enum8 {
-  kIceFailed = 0;
-  kIceTimeout = 1;
+  kICEFailed = 0;
+  kICETimeout = 1;
   kUserHangup = 2;
   kUserBusy = 3;
   kReplaced = 4;
@@ -256,7 +256,8 @@ enum WebRTCEndReasonEnum : enum8 {
   kOutOfResources = 8;
   kMediaTimeout = 9;
   kLowPower = 10;
-  kUnknownReason = 11;
+  kPrivacyMode = 11;
+  kUnknownReason = 12;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {
@@ -323,6 +324,13 @@ struct PowerThresholdStruct {
   nullable PowerThresholdSourceEnum powerThresholdSource = 2;
 }
 
+struct SemanticTagStruct {
+  nullable vendor_id mfgCode = 0;
+  enum8 namespaceID = 1;
+  enum8 tag = 2;
+  optional nullable char_string<64> label = 3;
+}
+
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -343,13 +351,13 @@ fabric_scoped struct WebRTCSessionStruct {
   StreamUsageEnum streamUsage = 3;
   nullable int16u videoStreamID = 4;
   nullable int16u audioStreamID = 5;
-  optional boolean metadataEnabled = 6;
+  boolean metadataEnabled = 6;
   fabric_idx fabricIndex = 254;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
-  revision 5;
+  revision 6;
 
   enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
@@ -407,13 +415,6 @@ cluster Descriptor = 29 {
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
-  }
-
-  struct SemanticTagStruct {
-    nullable vendor_id mfgCode = 0;
-    enum8 namespaceID = 1;
-    enum8 tag = 2;
-    optional nullable char_string<64> label = 3;
   }
 
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
@@ -1256,7 +1257,7 @@ cluster GeneralDiagnostics = 51 {
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum CommissioningWindowStatusEnum : enum8 {
     kWindowNotOpen = 0;
@@ -1285,7 +1286,7 @@ cluster AdministratorCommissioning = 60 {
 
   request struct OpenCommissioningWindowRequest {
     int16u commissioningTimeout = 0;
-    octet_string PAKEPasscodeVerifier = 1;
+    octet_string<97> PAKEPasscodeVerifier = 1;
     int16u discriminator = 2;
     int32u iterations = 3;
     octet_string<32> salt = 4;
@@ -1295,11 +1296,11 @@ cluster AdministratorCommissioning = 60 {
     int16u commissioningTimeout = 0;
   }
 
-  /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method. */
+  /** This command is used by a current Administrator to instruct a Node to go into commissioning mode. */
   timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using basic commissioning method, if the node supports it. */
+  /** This command MAY be used by a current Administrator to instruct a Node to go into commissioning mode, if the node supports the Basic Commissioning Method. */
   timed command access(invoke: administer) OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
-  /** This command is used by a current Administrator to instruct a Node to revoke any active Open Commissioning Window or Open Basic Commissioning Window command. */
+  /** This command is used by a current Administrator to instruct a Node to revoke any active OpenCommissioningWindow or OpenBasicCommissioningWindow command. */
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
@@ -1453,7 +1454,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
@@ -1631,7 +1632,7 @@ provisional cluster ElectricalGridConditions = 160 {
 }
 
 /** The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises. */
-cluster CommodityTariff = 1792 {
+provisional cluster CommodityTariff = 1792 {
   revision 1;
 
   enum AuxiliaryLoadSettingEnum : enum8 {
@@ -1710,7 +1711,7 @@ cluster CommodityTariff = 1792 {
     optional AuxiliaryLoadSwitchSettingsStruct auxiliaryLoad = 3;
     optional PeakPeriodStruct peakPeriod = 4;
     optional PowerThresholdStruct powerThreshold = 5;
-    nullable int32u threshold = 6;
+    nullable int64s threshold = 6;
     optional nullable char_string<128> label = 7;
     optional boolean predicted = 8;
   }
@@ -1859,7 +1860,7 @@ provisional cluster CommodityMetering = 2823 {
 
   readonly attribute nullable MeteredQuantityStruct meteredQuantity[] = 0;
   readonly attribute nullable epoch_s meteredQuantityTimestamp = 1;
-  readonly attribute nullable MeasurementTypeEnum measurementType = 2;
+  readonly attribute nullable TariffUnitEnum tariffUnit = 2;
   readonly attribute nullable int16u maximumMeteredQuantities = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1904,7 +1905,7 @@ endpoint 0 {
     callback attribute vendorID;
     callback attribute productName;
     callback attribute productID;
-    ram      attribute nodeLabel;
+    callback attribute nodeLabel;
     callback attribute location;
     callback attribute hardwareVersion;
     callback attribute hardwareVersionString;
@@ -1915,12 +1916,12 @@ endpoint 0 {
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
-    callback attribute configurationVersion default = 1;
+    callback attribute configurationVersion;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
@@ -1959,7 +1960,7 @@ endpoint 0 {
   }
 
   server cluster GeneralCommissioning {
-    ram      attribute breadcrumb default = 0x0000000000000000;
+    callback attribute breadcrumb;
     callback attribute basicCommissioningInfo;
     callback attribute regulatoryConfig;
     callback attribute locationCapability;
@@ -1967,8 +1968,8 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 2;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
@@ -2034,8 +2035,8 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AttestationRequest;
     handle command AttestationResponse;
@@ -2084,7 +2085,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -2156,11 +2157,11 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 63;
     ram      attribute clusterRevision default = 1;
 
-    handle command GetTariffComponentResponse;
     handle command GetTariffComponent;
+    handle command GetTariffComponentResponse;
     handle command GetDayEntry;
     handle command GetDayEntryResponse;
   }
@@ -2181,7 +2182,7 @@ endpoint 1 {
   server cluster CommodityMetering {
     callback attribute meteredQuantity;
     callback attribute meteredQuantityTimestamp;
-    callback attribute measurementType;
+    callback attribute tariffUnit;
     callback attribute maximumMeteredQuantities;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;

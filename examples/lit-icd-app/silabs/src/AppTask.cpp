@@ -45,6 +45,10 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+// TODO: Ideally we should not depend on the codegen integration
+// It would be best if we could use generic cluster API instead
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
+
 /**********************************************************
  * Defines and Constants
  *********************************************************/
@@ -115,25 +119,14 @@ void AppTask::ApplicationEventHandler(AppEvent * aEvent)
     VerifyOrReturn(aEvent->Type == AppEvent::kEventType_Button);
     VerifyOrReturn(aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed));
 
-    // Simple Application logic that toggles the BoleanState StateValue attribute.
+    // Simple Application logic that toggles the BooleanState StateValue attribute.
     // DO NOT COPY for product logic. LIT ICD app is a test app with very simple application logic to enable testing.
     // The goal of the app is just to enable testing of LIT ICD features without impacting product sample apps.
     PlatformMgr().ScheduleWork([](intptr_t) {
-        bool state = true;
-
-        Protocols::InteractionModel::Status status = chip::app::Clusters::BooleanState::Attributes::StateValue::Get(1, &state);
-        if (status != Protocols::InteractionModel::Status::Success)
-        {
-            // Failed to read StateValue. Default to true (open state)
-            state = true;
-            ChipLogError(NotSpecified, "ERR: reading boolean status value %x", to_underlying(status));
-        }
-
-        status = chip::app::Clusters::BooleanState::Attributes::StateValue::Set(1, !state);
-        if (status != Protocols::InteractionModel::Status::Success)
-        {
-            ChipLogError(NotSpecified, "ERR: updating boolean status value %x", to_underlying(status));
-        }
+        auto booleanState = chip::app::Clusters::BooleanState::FindClusterOnEndpoint(1);
+        VerifyOrReturn(booleanState != nullptr);
+        auto state = booleanState->GetStateValue();
+        booleanState->SetStateValue(!state);
     });
 }
 

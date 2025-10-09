@@ -39,9 +39,10 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
 
 
 # Takes an OpState or RvcOpState state enum and returns a string representation
@@ -72,7 +73,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
 
     async def send_go_home_cmd(self) -> Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcOperationalState.Commands.GoHome(), endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse),
+        asserts.assert_true(matchers.is_type(ret, Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse),
                             "Unexpected return type for GoHome")
         return ret
 

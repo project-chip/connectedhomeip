@@ -17,9 +17,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import Globals
+from matter.interaction_model import InteractionModelError, Status
 
 logger = logging.getLogger(__name__)
 
@@ -56,9 +58,12 @@ class WEBRTCPTestBase:
         logger.info(f"Rx'd StreamUsagePriorities : {aStreamUsagePriorities}")
         asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
 
+        if (Globals.Enums.StreamUsageEnum.kLiveView not in aStreamUsagePriorities):
+            asserts.fail("Camera doesn't support live view")
+
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
-                streamUsage=aStreamUsagePriorities[0],
+                streamUsage=Globals.Enums.StreamUsageEnum.kLiveView,
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
                 sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
@@ -101,14 +106,19 @@ class WEBRTCPTestBase:
             endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
         logger.info(f"Rx'd StreamUsagePriorities: {aStreamUsagePriorities}")
+        asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
+
+        if (Globals.Enums.StreamUsageEnum.kLiveView not in aStreamUsagePriorities):
+            asserts.fail("Camera doesn't support live view")
+
         aRateDistortionTradeOffPoints = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
         )
         logger.info(f"Rx'd RateDistortionTradeOffPoints: {aRateDistortionTradeOffPoints}")
-        aMinViewport = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.MinViewport
+        aMinViewportRes = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution
         )
-        logger.info(f"Rx'd MinViewport: {aMinViewport}")
+        logger.info(f"Rx'd MinViewportResolution: {aMinViewportRes}")
         aVideoSensorParams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.VideoSensorParams
         )
@@ -126,18 +136,17 @@ class WEBRTCPTestBase:
             asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
             asserts.assert_greater(len(aRateDistortionTradeOffPoints), 0, "RateDistortionTradeOffPoints is empty")
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
-                streamUsage=aStreamUsagePriorities[0],
+                streamUsage=Globals.Enums.StreamUsageEnum.kLiveView,
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
                 minFrameRate=30,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
-                minResolution=aMinViewport,
+                minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
                     width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
                 ),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minKeyFrameInterval=4000,
-                maxKeyFrameInterval=4000,
+                keyFrameInterval=4000,
                 watermarkEnabled=watermark,
                 OSDEnabled=osd
             )

@@ -17,12 +17,13 @@
 
 import logging
 
-import chip.clusters as Clusters
 import test_plan_support
-from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing import matter_asserts
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +42,9 @@ class TC_CNET_4_1(MatterBaseTest):
 
     def desc_TC_CNET_4_1(self) -> str:
         return "[TC-CNET-4.1] [Wi-Fi] Verification for attributes check [DUT-Server]"
+
+    def pics_TC_CNET_4_1(self):
+        return ['CNET.S.F00']
 
     def steps_TC_CNET_4_1(self) -> list[TestStep]:
         steps = [
