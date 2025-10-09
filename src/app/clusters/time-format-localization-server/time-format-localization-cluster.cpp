@@ -27,9 +27,6 @@ namespace app {
 namespace Clusters {
 
 namespace {
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
-    TimeFormatLocalization::Attributes::HourFormat::kMetadataEntry,
-};
 class AutoReleaseIterator
 {
 public:
@@ -103,8 +100,8 @@ TimeFormatLocalizationCluster::TimeFormatLocalizationCluster(EndpointId endpoint
                                                              BitFlags<TimeFormatLocalization::Feature> features,
                                                              TimeFormatLocalization::HourFormatEnum defaultHourFormat,
                                                              TimeFormatLocalization::CalendarTypeEnum defaultCalendarType) :
-    DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }),
-    mFeatures(features), mHourFormat(defaultHourFormat), mCalendarType(defaultCalendarType)
+    DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }), mFeatures(features), mHourFormat(defaultHourFormat),
+    mCalendarType(defaultCalendarType)
 {
     TimeFormatLocalization::CalendarTypeEnum validCalendar = defaultCalendarType;
 
@@ -225,7 +222,8 @@ CHIP_ERROR TimeFormatLocalizationCluster::Attributes(const ConcreteClusterPath &
         optionalAttributeSet.Set<TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id>();
     }
 
-    return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributes), optionalAttributeSet);
+    return listBuilder.Append(Span(TimeFormatLocalization::Attributes::kMandatoryMetadata), Span(optionalAttributes),
+                              optionalAttributeSet);
 }
 
 } // namespace Clusters
