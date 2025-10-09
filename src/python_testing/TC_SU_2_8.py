@@ -106,7 +106,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
                      "If the Location field is present, verify that the value is same as Basic Information Cluster Location Attribute of the DUT."),
             TestStep(2, "Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P. DUT sends QueryImage command to TH2/OTA-P.",
                      "TH1/OTA-P does not respond with QueryImage response command. StateTransition goes from idle to querying, then a download error happens and finally it goes back to idle."
-                     "Subscribe to events for OtaSoftwareUpdateRequestor cluster and verify StateTransition reaches downloading state. Also check if the targetSoftwareVersion is 2."),
+                     "Subscribe to events for OtaSoftwareUpdateRequestor cluster and verify StateTransition reaches downloading state. Also check if the targetSoftwareVersion is 3."),
         ]
         return steps
 
