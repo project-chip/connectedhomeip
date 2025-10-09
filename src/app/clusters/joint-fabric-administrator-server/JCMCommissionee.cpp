@@ -182,9 +182,7 @@ TrustVerificationError JCMCommissionee::StoreEndpointId()
 
 TrustVerificationError JCMCommissionee::ReadCommissionerAdminFabricIndex()
 {
-    using Attr = chip::app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::TypeInfo;
-
-    auto onSuccess = [this](const ConcreteAttributePath & path, const Attr::DecodableType & val) {
+    auto onSuccess = [this](const ConcreteAttributePath & path, const FabricIndexAttr::DecodableType & val) {
         if (val.IsNull())
         {
             ChipLogError(JointFabric, "JCM: Failed to read commissioner's AdministratorFabricIndex: received null");
@@ -224,8 +222,6 @@ TrustVerificationError JCMCommissionee::ReadCommissionerAdminFabricIndex()
 
 CHIP_ERROR JCMCommissionee::ReadAdminFabrics(OnCompletionFunc onComplete)
 {
-    using FabricsAttr = chip::app::Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo;
-
     auto onReadSuccess = [this, onComplete](const ConcreteAttributePath &, const FabricsAttr::DecodableType & fabrics) {
         // Get the root public key from the fabric corresponding to the Administrator Fabric Index (mInfo.adminFabricIndex)
         auto iter = fabrics.begin();
@@ -254,21 +250,21 @@ CHIP_ERROR JCMCommissionee::ReadAdminFabrics(OnCompletionFunc onComplete)
 
 void JCMCommissionee::FetchCommissionerInfo(OnCompletionFunc onComplete)
 {
-    CHIP_ERROR fabricReadErr = ReadAdminFabrics([this, onComplete](CHIP_ERROR err) {
-        if (err != CHIP_NO_ERROR)
+    CHIP_ERROR fabricReadErr = ReadAdminFabrics([this, onComplete](CHIP_ERROR fabricsResultErr) {
+        if (fabricsResultErr != CHIP_NO_ERROR)
         {
-            onComplete(err);
+            onComplete(fabricsResultErr);
             return;
         }
 
-        CHIP_ERROR certReadErr = ReadAdminCerts([this, onComplete](CHIP_ERROR err) {
-            if (err != CHIP_NO_ERROR)
+        CHIP_ERROR certReadErr = ReadAdminCerts([this, onComplete](CHIP_ERROR certsResultErr) {
+            if (certsResultErr != CHIP_NO_ERROR)
             {
-                onComplete(err);
+                onComplete(certsResultErr);
                 return;
             }
 
-            CHIP_ERROR nocReadErr = ReadAdminNOCs([this, onComplete](CHIP_ERROR err) { onComplete(err); });
+            CHIP_ERROR nocReadErr = ReadAdminNOCs([this, onComplete](CHIP_ERROR nocResultErr) { onComplete(nocResultErr); });
             if (nocReadErr != CHIP_NO_ERROR)
             {
                 onComplete(nocReadErr);
@@ -361,8 +357,6 @@ TrustVerificationError JCMCommissionee::CrossCheckAdministratorIds()
 
 CHIP_ERROR JCMCommissionee::ReadAdminCerts(OnCompletionFunc onComplete)
 {
-    using CertsAttr = chip::app::Clusters::OperationalCredentials::Attributes::TrustedRootCertificates::TypeInfo;
-
     auto onSuccess = [this, onComplete](const ConcreteAttributePath &, const CertsAttr::DecodableType & roots) {
         // Find the RCAC
         auto iter = roots.begin();
@@ -398,8 +392,6 @@ CHIP_ERROR JCMCommissionee::ReadAdminCerts(OnCompletionFunc onComplete)
 
 CHIP_ERROR JCMCommissionee::ReadAdminNOCs(OnCompletionFunc onComplete)
 {
-    using NOCsAttr = chip::app::Clusters::OperationalCredentials::Attributes::NOCs::TypeInfo;
-
     auto onSuccess = [this, onComplete](const ConcreteAttributePath &, const NOCsAttr::DecodableType & nocs) {
         auto iter = nocs.begin();
 
