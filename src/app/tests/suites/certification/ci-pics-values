@@ -3024,6 +3024,17 @@ THNETDIR.S=1
 WIFINM.S=1
 
 # Camera AV Stream Management Cluster
+# Server
+AVSM.S=1
+
+# Features
+AVSM.S.F00=1    # Audio Data Output feature
+AVSM.S.F01=1    # Video Data Output feature
+AVSM.S.F02=1    # Audio Data Input feature
+AVSM.S.F03=1    # Video Data Input feature
+AVSM.S.F04=1    # Speaker feature
+
+# Attributes
 AVSM.S.A0000=1
 AVSM.S.A0001=1
 AVSM.S.A0002=1
