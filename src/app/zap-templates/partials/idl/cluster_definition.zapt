@@ -1,5 +1,5 @@
 /** {{description}} */
-{{#if apiMaturity}}{{apiMaturity}} {{/if~}}
+{{#if apiMaturity}}{{apiMaturity}} {{/if}}
 cluster {{asUpperCamelCase name}} = {{!}}
      {{~#if manufacturerCode}}
         {{~asMEI manufacturerCode code~}}
