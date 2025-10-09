@@ -21,6 +21,7 @@
 #include <clusters/Descriptor/ClusterId.h>
 #include <clusters/Descriptor/Metadata.h>
 #include <clusters/Descriptor/Structs.h>
+#include <clusters/shared/Structs.h>
 #include <lib/core/DataModelTypes.h>
 
 using namespace chip;
@@ -62,7 +63,7 @@ bool IsDescendantOf(const DataModel::EndpointEntry * __restrict__ childEndpoint,
     }
 }
 
-CHIP_ERROR ReadTagListAttribute(Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type> semanticTagsList,
+CHIP_ERROR ReadTagListAttribute(Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> semanticTagsList,
                                 EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([&semanticTagsList](const auto & encoder) -> CHIP_ERROR {
