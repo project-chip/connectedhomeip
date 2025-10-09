@@ -300,7 +300,7 @@ tests:
               maxValue: 4294967294
 
     - label: "Step 5a: TH reads DoorOpenEvents attribute from DUT"
-      PICS: !DRLK.S.A0004
+      PICS: "!DRLK.S.A0004"
       command: "readAttribute"
       attribute: "DoorOpenEvents"
       response:
@@ -322,42 +322,12 @@ tests:
       response:
           error: UNSUPPORTED_ATTRIBUTE
 
-    #- label: "Step 5c: TH reads DoorOpenEvents attribute from DUT"
-    #  PICS: DRLK.S.A0004.Write
-    #  command: "readAttribute"
-    #  attribute: "DoorOpenEvents"
-    #  response:
-    #      value: 10
-
-    #Test plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/2863
     - label: "Step 5c: TH reads DoorOpenEvents attribute from DUT"
-      PICS: DRLK.S.A0004 && PICS_USER_PROMPT
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock read door-open-events 1 1
-
-          Via the TH (chip-tool), verify that the DoorOpenEvents attribute value is 0.
-
-          [1654675019.286903][3337:3342] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1654675019.286939][3337:3342] CHIP:DMG:                                },
-          [1654675019.286974][3337:3342] CHIP:DMG:
-          [1654675019.287003][3337:3342] CHIP:DMG:                        },
-          [1654675019.287039][3337:3342] CHIP:DMG:
-          [1654675019.287067][3337:3342] CHIP:DMG:                },
-          [1654675019.287100][3337:3342] CHIP:DMG:
-          [1654675019.287125][3337:3342] CHIP:DMG:        ],
-          [1654675019.287156][3337:3342] CHIP:DMG:
-          [1654675019.287182][3337:3342] CHIP:DMG:        SuppressResponse = true,
-          [1654675019.287209][3337:3342] CHIP:DMG:        InteractionModelRevision = 1
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: DRLK.S.A0004
+      command: "readAttribute"
+      attribute: "DoorOpenEvents"
+      response:
+          value: 0
 
     - label: "Step 6a: TH reads DoorClosedEvents attribute from DUT"
       PICS: DRLK.S.F05 && DRLK.S.A0005
@@ -392,44 +362,12 @@ tests:
       response:
           error: UNSUPPORTED_ATTRIBUTE
 
-    #- label: "Step 6c: TH reads DoorClosedEvents attribute from DUT"
-    #  PICS: DRLK.S.A0005.Write
-    #  command: "readAttribute"
-    #  attribute: "DoorClosedEvents"
-    #  response:
-    #      value: 11
-
-    #Test plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/2863
     - label: "Step 6c: TH reads DoorClosedEvents attribute from DUT"
-      PICS: DRLK.S.A0005 && PICS_USER_PROMPT
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock read door-closed-events 1 1
-
-          Via the TH (chip-tool), verify that the DoorClosedEvents attribute value is 0.
-
-          [1654675103.637778][3346:3351] CHIP:DMG:                                StatusIB =
-          [1654675103.637816][3346:3351] CHIP:DMG:                                {
-          [1654675103.637853][3346:3351] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1654675103.637886][3346:3351] CHIP:DMG:                                },
-          [1654675103.637923][3346:3351] CHIP:DMG:
-          [1654675103.637956][3346:3351] CHIP:DMG:                        },
-          [1654675103.637994][3346:3351] CHIP:DMG:
-          [1654675103.638021][3346:3351] CHIP:DMG:                },
-          [1654675103.638054][3346:3351] CHIP:DMG:
-          [1654675103.638078][3346:3351] CHIP:DMG:        ],
-          [1654675103.638109][3346:3351] CHIP:DMG:
-          [1654675103.638133][3346:3351] CHIP:DMG:        SuppressResponse = true,
-          [1654675103.638159][3346:3351] CHIP:DMG:        InteractionModelRevision = 1
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: DRLK.S.A0005
+      command: "readAttribute"
+      attribute: "DoorClosedEvents"
+      response:
+          value: 0
 
     - label: "Step 7a: TH reads OpenPeriod attribute from DUT"
       PICS: DRLK.S.F05 && DRLK.S.A0006
