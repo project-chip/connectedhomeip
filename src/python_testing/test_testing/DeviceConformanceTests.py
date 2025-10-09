@@ -489,12 +489,9 @@ class DeviceConformanceTests(BasicCompositionTests):
         one_five_device_types, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
         # TODO: change this once https://github.com/project-chip/matter-test-scripts/issues/689 is implemented
 
-        def get_device_type_id(name: str) -> uint:
-            return [id for id, xml in one_five_device_types.items() if xml.name.lower() == name.lower()][0]
-
-        window_covering_id = get_device_type_id('Window Covering')
-        closure_id = get_device_type_id('Closure')
-        closure_panel_id = get_device_type_id('Closure Panel')
+        window_covering_id = self._get_device_type_id('Window Covering')
+        closure_id = self._get_device_type_id('Closure')
+        closure_panel_id = self._get_device_type_id('Closure Panel')
         restricted_device_type_ids = [window_covering_id, closure_id, closure_panel_id]
 
         problems = []

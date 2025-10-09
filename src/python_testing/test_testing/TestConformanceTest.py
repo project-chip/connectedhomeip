@@ -454,7 +454,6 @@ class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
             asserts.assert_equal(len(problems), 1, "Did not find expected problem with closure")
 
             # Above 1.5 rev with both - OK (though this won't pass the revision test)
-            # Below 1.5 rev with both - not OK
             create_endpoint(one_five_revision+1, [Clusters.ClosureControl, Clusters.WindowCovering])
             problems = self.check_closure_restricted_clusters()
             asserts.assert_equal(len(problems), 0, "Unexpected problem with closures above 1.5 revision")
