@@ -43,6 +43,8 @@ import time
 from datetime import datetime
 from enum import IntFlag
 
+from mobly import asserts, signals
+
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters import ClusterObjects as ClusterObjects
@@ -51,9 +53,8 @@ from matter.clusters.enum import MatterIntEnum
 from matter.exceptions import ChipStackError
 from matter.interaction_model import Status
 from matter.testing.basic_composition import BasicCompositionTests
-from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
-from matter.testing.event_attribute_reporting import EventSubscriptionHandler, AttributeSubscriptionHandler
-from mobly import asserts, signals
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 '''
 Category:
