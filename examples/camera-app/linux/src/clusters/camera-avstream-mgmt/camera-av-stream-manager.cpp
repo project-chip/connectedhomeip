@@ -254,6 +254,8 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
     // Try to reuse an allocated stream
     for (auto & stream : GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams())
     {
+        // Note: If this call returns true, then stream.IsCompatible(allocateArgs) should also return true because
+        // the matching allocated stream had first passed the compatibility check during allocation.
         if (GetCameraAVStreamMgmtServer()->IsAllocatedVideoStreamReusable(stream, allocateArgs))
         {
             // Found a stream that can be reused
@@ -451,6 +453,8 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
     // Try to reuse an allocated stream.
     for (auto & stream : GetCameraAVStreamMgmtServer()->GetAllocatedSnapshotStreams())
     {
+        // Note: If this call returns true, then stream.IsCompatible(allocateArgs) should also return true because
+        // the matching allocated stream had first passed the compatibility check during allocation.
         if (GetCameraAVStreamMgmtServer()->IsAllocatedSnapshotStreamReusable(stream, allocateArgs))
         {
             // Found a stream that can be reused

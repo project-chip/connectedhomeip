@@ -2433,19 +2433,21 @@ bool CameraAVStreamMgmtServer::ValidateSnapshotStreamForModifyOrDeallocate(const
 
 bool CameraAVStreamMgmtServer::IsResourceAvailableForStreamAllocation(uint32_t candidateEncodedPixelRate, bool encoderRequired)
 {
-    uint32_t totalEncodedPixelRate = candidateEncodedPixelRate;
+    uint64_t totalEncodedPixelRate = candidateEncodedPixelRate;
     uint16_t totalEncodersRequired = encoderRequired ? 1 : 0;
 
     for (const VideoStreamStruct & stream : mAllocatedVideoStreams)
     {
-        totalEncodedPixelRate += (stream.maxFrameRate * stream.maxResolution.height * stream.maxResolution.width);
+        totalEncodedPixelRate +=
+            (static_cast<uint64_t>(stream.maxFrameRate) * stream.maxResolution.height * stream.maxResolution.width);
     }
 
     for (const SnapshotStreamStruct & stream : mAllocatedSnapshotStreams)
     {
         if (stream.encodedPixels)
         {
-            totalEncodedPixelRate += (stream.frameRate * stream.maxResolution.height * stream.maxResolution.width);
+            totalEncodedPixelRate +=
+                (static_cast<uint64_t>(stream.frameRate) * stream.maxResolution.height * stream.maxResolution.width);
             if (stream.hardwareEncoder)
             {
                 totalEncodersRequired++;

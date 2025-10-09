@@ -561,6 +561,19 @@ public:
 
     CHIP_ERROR SetStreamUsagePriorities(const std::vector<Globals::StreamUsageEnum> & newPriorities);
 
+    /**
+     * Called during the processing of an AllocateVideoStream request. The
+     * handler of the request iterates through the currently allocated video
+     * streams to check if the allocation request parameters fall within the
+     * ranges of an allocated stream so that the latter can be reused.
+     * If the function returns false for all existing allocated streams, the
+     * handler must proceed towards allocating a completely new stream, provided
+     * it has the resources to do so.
+     *
+     * @param allocatedStream  an allocated stream from  mAllocatedVideoStreams
+     * @param requestedArgs    parameters in the allocation request
+     *
+     */
     bool IsAllocatedVideoStreamReusable(const VideoStreamStruct & allocatedStream, const VideoStreamStruct & requestedArgs);
 
     CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
@@ -574,6 +587,19 @@ public:
 
     CHIP_ERROR RemoveAudioStream(uint16_t audioStreamId);
 
+    /**
+     * Called during the processing of an AllocateSnapshotStream request. The
+     * handler of the request iterates through the currently allocated snapshot
+     * streams to check if the allocation request parameters fall within the
+     * ranges of an allocated stream so that the latter can be reused.
+     * If the function returns false for all existing allocated streams, the
+     * handler must proceed towards allocating a completely new stream, provided
+     * it has the resources to do so.
+     *
+     * @param allocatedStream  an allocated stream from  mAllocatedSnapshotStreams
+     * @param requestedArgs    parameters in the allocation request
+     *
+     */
     bool IsAllocatedSnapshotStreamReusable(const SnapshotStreamStruct & allocatedStream,
                                            const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs);
 
