@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/unit-localization-server/unit-localization-cluster.h>
+#include <app/clusters/unit-localization-server/unit-localization-server.h>
 #include <app/static-cluster-config/UnitLocalization.h>
 #include <app/util/attribute-metadata.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>

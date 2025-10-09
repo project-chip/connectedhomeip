@@ -25,5 +25,5 @@ TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
     "${CLUSTER_DIR}/unit-localization-server.cpp"
-    "${CLUSTER_DIR}/unit-format-localization-server.h"
+    "${CLUSTER_DIR}/unit-localization-server.h"
 )
