@@ -204,27 +204,16 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportSt
 
     if (transportStatus == TransportStatusEnum::kActive)
     {
-        auto & avsmController        = mCameraDevice->GetCameraAVStreamMgmtController();
-        bool isHardPrivacyModeActive = false;
-        CHIP_ERROR status            = avsmController.IsHardPrivacyModeActive(isHardPrivacyModeActive);
+        bool isActive;
+        CHIP_ERROR status = IsPrivacyModeActive(isActive);
         if (status != CHIP_NO_ERROR)
         {
             ChipLogError(Camera,
-                         "PushAvStreamTransportManager, Failed to retrieve Hard Privacy Mode Status from AVStreamMgmtController.");
+                         "PushAvStreamTransportManager, Failed to retrieve Privacy Mode Status from AVStreamMgmtController.");
             return Status::Failure;
         }
 
-        bool isSoftRecordingPrivacyModeActive = false;
-        status                                = avsmController.IsSoftRecordingPrivacyModeActive(isSoftRecordingPrivacyModeActive);
-        if (status != CHIP_NO_ERROR)
-        {
-            ChipLogError(
-                Camera,
-                "PushAvStreamTransportManager, Failed to retrieve Soft Recording Privacy Mode Status from AVStreamMgmtController.");
-            return Status::Failure;
-        }
-
-        if (isHardPrivacyModeActive || isSoftRecordingPrivacyModeActive)
+        if (isActive)
         {
             ChipLogError(Camera, "PushAvStreamTransportManager, Cannot set transport status to Active as privacy mode is enabled.");
             return Status::InvalidInState;
@@ -357,14 +346,53 @@ PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage
 
 bool PushAvStreamTransportManager::ValidateStreamUsage(StreamUsageEnum streamUsage)
 {
-    // TODO: if StreamUsage is present in the StreamUsagePriorities list, return true, false otherwise
+    std::vector<StreamUsageEnum> supportedStreamUsages = mCameraDevice->GetCameraHALInterface().GetSupportedStreamUsages();
+    auto it = std::find(supportedStreamUsages.begin(), supportedStreamUsages.end(), streamUsage);
+    if (it == supportedStreamUsages.end())
+    {
+        ChipLogError(Camera, "Requested stream usage not found in supported stream usages");
+        return false;
+    }
     return true;
 }
 
-bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDuration)
+bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDuration,
+                                                           const Optional<DataModel::Nullable<uint16_t>> & videoStreamId)
 {
-    // TODO: if Segment Duration is multiple of KeyFrameInterval, return true, false otherwise
-    return true;
+    // If the video stream ID is missing or null, error log and return false
+    if (!videoStreamId.HasValue())
+    {
+        ChipLogError(Camera, "Segment validation requested with no provided stream") return false;
+    }
+    else
+    {
+        if (videoStreamId.Value().IsNull())
+        {
+            ChipLogError(Camera, "Segment validation requested against a Null stream") return false;
+        }
+    }
+
+    auto & videoStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedVideoStreams();
+
+    if (videoStreams.empty())
+    {
+        return false;
+    }
+
+    for (const VideoStreamStruct & stream : videoStreams)
+    {
+        if (stream.videoStreamID == videoStreamId.Value().Value())
+        {
+            // Segment duration must be an exact multiple of the key frame interval
+            if ((segmentDuration % stream.keyFrameInterval) == 0)
+            {
+                return true;
+            }
+            break;
+        }
+    }
+
+    return false;
 }
 
 bool PushAvStreamTransportManager::ValidateUrl(const std::string & url)
@@ -393,19 +421,19 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SelectVideoStr
         ChipLogError(Camera, "CameraDeviceInterface not initialized");
         return Status::Failure;
     }
-    auto & allocatedVideoStreams = mCameraDevice->GetCameraHALInterface().GetAvailableVideoStreams();
+    auto & allocatedVideoStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedVideoStreams();
 
     if (allocatedVideoStreams.empty())
     {
-        return Status::Failure;
+        ChipLogError(Camera, "Attempt to select a video stream when none are allocated.");
+        return Status::InvalidInState;
     }
-    for (VideoStream & stream : allocatedVideoStreams)
+    for (const VideoStreamStruct & stream : allocatedVideoStreams)
     {
-        VideoStreamStruct & videoStreamParams = stream.videoStreamParams;
-        if (videoStreamParams.streamUsage == streamUsage)
+        if (stream.streamUsage == streamUsage)
         {
-            videoStreamId      = videoStreamParams.videoStreamID;
-            mVideoStreamParams = videoStreamParams;
+            videoStreamId      = stream.videoStreamID;
+            mVideoStreamParams = stream;
             return Status::Success;
         }
     }
@@ -422,18 +450,18 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SelectAudioStr
         return Status::Failure;
     }
 
-    auto & allocatedAudioStreams = mCameraDevice->GetCameraHALInterface().GetAvailableAudioStreams();
+    auto & allocatedAudioStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedAudioStreams();
     if (allocatedAudioStreams.empty())
     {
-        return Status::Failure;
+        ChipLogError(Camera, "Attempt to select an audio stream when none are allocated.");
+        return Status::InvalidInState;
     }
-    for (AudioStream & stream : allocatedAudioStreams)
+    for (const AudioStreamStruct & stream : allocatedAudioStreams)
     {
-        AudioStreamStruct & audioStreamParams = stream.audioStreamParams;
-        if (audioStreamParams.streamUsage == streamUsage)
+        if (stream.streamUsage == streamUsage)
         {
-            audioStreamId      = audioStreamParams.audioStreamID;
-            mAudioStreamParams = audioStreamParams;
+            audioStreamId      = stream.audioStreamID;
+            mAudioStreamParams = stream;
             return Status::Success;
         }
     }
@@ -624,4 +652,30 @@ void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedCl
     }
 
     mBufferClientCertKey.assign(keypairDer.data(), keypairDer.data() + keypairDer.size());
+}
+
+void PushAvStreamTransportManager::RecordingStreamPrivacyModeChanged(bool privacyModeEnabled)
+{
+    // To Do:
+    // Depending on the change delegate should set transport status for each known connection to either active or inactive, plus
+    // any other needed work.
+}
+
+CHIP_ERROR PushAvStreamTransportManager::IsPrivacyModeActive(bool & isActive)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+    bool isHardPrivacyModeActive = false;
+    bool isSoftRecordingPrivacyModeActve = false;
+
+    CHIP_ERROR status = avsmController.IsHardPrivacyModeActive(isHardPrivacyModeActive);
+    status = avsmController.IsSoftRecordingPrivacyModeActive(isSoftRecordingPrivacyModeActve);
+
+    isActive = isHardPrivacyModeActive || isSoftRecordingPrivacyModeActve;
+    return CHIP_NO_ERROR;
 }

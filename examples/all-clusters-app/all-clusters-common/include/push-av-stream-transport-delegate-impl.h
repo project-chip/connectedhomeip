@@ -66,7 +66,7 @@ public:
 
     bool ValidateStreamUsage(StreamUsageEnum streamUsage) override;
 
-    bool ValidateSegmentDuration(uint16_t segmentDuration) override;
+    bool ValidateSegmentDuration(uint16_t segmentDuration, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override;
 
     Protocols::InteractionModel::Status SelectAudioStream(StreamUsageEnum streamUsage, uint16_t & audioStreamId) override;
 
@@ -91,6 +91,9 @@ public:
     {
         // Handle TLS certificates if needed for implementation
     }
+
+    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override;
+
     void SetPushAvStreamTransportServer(PushAvStreamTransportServer * serverLogic) override
     {
         // Store pointer to server logic if needed for implementation
