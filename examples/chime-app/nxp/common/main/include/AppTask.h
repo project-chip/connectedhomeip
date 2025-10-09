@@ -26,12 +26,7 @@
 #include "AppTaskZephyr.h"
 #endif
 
-#include "SmokeCoAlarmManager.h"
-#include "FreeRTOS.h"
-#include "timers.h"
-#include <platform/CHIPDeviceLayer.h>
-
-namespace SmokeCOAlarmApp{
+namespace ChimeApp {
 #if CONFIG_APP_FREERTOS_OS
 class AppTask : public chip::NXP::App::AppTaskFreeRTOS
 #else
@@ -42,17 +37,13 @@ public:
     ~AppTask() override{};
     void PostInitMatterStack(void) override;
     void PreInitMatterStack(void) override;
-    void PostInitMatterServerInstance(void) override;
     // This returns an instance of this class.
     static AppTask & GetDefaultInstance();
-    void AppMatter_RegisterCustomCliCommands(void) override;
-	
-	static void AlarmSelfTestHandler(void);
 
 private:
     static AppTask sAppTask;
 };
-} // namespace SmokeCOAlarmApp
+} // namespace ChimeApp
 
 /**
  * Returns the application-specific implementation of the AppTaskBase object.

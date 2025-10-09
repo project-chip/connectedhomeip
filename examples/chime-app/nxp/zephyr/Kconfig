@@ -13,17 +13,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+mainmenu "Matter NXP Thermostat Example Application"
 
-# This file is used to set configs or override default configurations for
-# the Thermostat application.
-
-CONFIG_CHIP=y
-CONFIG_CHIP_LIB_SHELL=y
-CONFIG_BT_DEVICE_NAME="\"NXPSmokeCO\""
-CONFIG_CHIP_DEVICE_PRODUCT_NAME="SmokeCOAlarm"
-CONFIG_CHIP_DEVICE_TYPE=118
-CONFIG_CHIP_CUSTOM_BLE_ADV_DATA=n
-CONFIG_CHIP_REGISTER_SIMPLE_TEST_EVENT_TRIGGER_DELEGATE=y
-
-# SDK configs
-CONFIG_MCUX_PRJSEG_module.board.boardfile=n
+rsource "../../../../config/nxp/chip-module/Kconfig.features"
+rsource "../../../../config/nxp/chip-module/Kconfig.defaults"
+source "Kconfig.zephyr"
