@@ -16,7 +16,7 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodeGenIntegration.cpp"
 )
 
 
@@ -24,6 +24,6 @@ TARGET_SOURCES(
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/unit-localization-cluster.cpp"
-    "${CLUSTER_DIR}/unit-format-localization-cluster.h"
+    "${CLUSTER_DIR}/unit-localization-server.cpp"
+    "${CLUSTER_DIR}/unit-format-localization-server.h"
 )

@@ -17,8 +17,8 @@ import("//build_overrides/chip.gni")
 
 source_set("unit-localization-server") {
   sources = [
-    "unit-localization-cluster.cpp",
-    "unit-localization-cluster.h",
+    "unit-localization-server.cpp",
+    "unit-localization-server.h",
   ]
 
   public_deps = [
