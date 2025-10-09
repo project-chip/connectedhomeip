@@ -23,18 +23,18 @@
 #include <clusters/Descriptor/ClusterId.h>
 #include <clusters/Descriptor/Structs.h>
 #include <lib/support/Span.h>
-
-#include <initializer_list>
+#include <lib/support/BitFlags.h>
 
 namespace chip::app::Clusters {
 
 class DescriptorCluster : public DefaultServerCluster
 {
 public:
+    using SemanticTag = Descriptor::Structs::SemanticTagStruct::Type;
     using OptionalAttributesSet = OptionalAttributeSet<Descriptor::Attributes::EndpointUniqueID::Id>;
 
     DescriptorCluster(EndpointId endpointId, OptionalAttributesSet optionalAttributeSet, BitFlags<Descriptor::Feature> featureMap,
-                      Span<const Descriptor::Structs::SemanticTagStruct::Type> semanticTags) :
+                      Span<const SemanticTag> semanticTags) :
         DefaultServerCluster({ endpointId, Descriptor::Id }),
         mEnabledOptionalAttributes(optionalAttributeSet), mFeatures(featureMap), mSemanticTags(semanticTags)
     {}
