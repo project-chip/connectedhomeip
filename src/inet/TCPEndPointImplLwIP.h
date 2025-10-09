@@ -81,8 +81,10 @@ private:
 
     uint16_t mUnackedLength; // Amount sent but awaiting ACK. Used as a form of reference count
                              // to hang-on to backing packet buffers until they are no longer needed.
-    bool mProcessingConnection = false;
-    tcp_pcb * mTCP; // LwIP Transmission control protocol (TCP) control block.
+    tcp_pcb * mTCP;          // LwIP Transmission control protocol (TCP) control block.
+    // For TCP Listen endpoint, we will pre-allocate a connection endpoint to assign the incoming connection to it.
+    // when there is a new TCP connection established.
+    TCPEndPointHandle mPreAllocatedConnectEP;
 
     uint16_t RemainingToSend();
     BufferOffset FindStartOfUnsent();
