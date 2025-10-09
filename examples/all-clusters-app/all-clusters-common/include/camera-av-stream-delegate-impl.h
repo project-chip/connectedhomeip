@@ -106,6 +106,10 @@ public:
 
     CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
 
+    const std::vector<chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct> & GetAllocatedVideoStreams() const override;
+
+    const std::vector<chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct> & GetAllocatedAudioStreams() const override;
+
     void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                 const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, uint32_t & outBandwidthbps) override;
     void Init();
@@ -116,9 +120,11 @@ public:
     // static inline CameraAVStreamManager & GetInstance() { return sCameraAVStreamMgrInstance; }
 
 private:
-    std::vector<VideoStream> videoStreams;       // Vector to hold available video streams
-    std::vector<AudioStream> audioStreams;       // Vector to hold available audio streams
-    std::vector<SnapshotStream> snapshotStreams; // Vector to hold available snapshot streams
+    std::vector<VideoStream> videoStreams;             // Vector to hold available video streams
+    std::vector<AudioStream> audioStreams;             // Vector to hold available audio streams
+    std::vector<SnapshotStream> snapshotStreams;       // Vector to hold available snapshot streams
+    std::vector<VideoStreamStruct> videoStreamStructs; // Vector to hold allocated video streams
+    std::vector<AudioStreamStruct> audioStreamStructs; // Vector to hold allocated audio streams
     void InitializeAvailableVideoStreams();
     void InitializeAvailableAudioStreams();
     void InitializeAvailableSnapshotStreams();

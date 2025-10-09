@@ -729,6 +729,7 @@ void PushAVClipRecorder::CleanupOutput()
     {
         avcodec_free_context(&mAudioEncoderContext);
     }
+    FinalizeCurrentClip(0);
     mVideoStream = nullptr;
     mAudioStream = nullptr;
     mMetadataSet = false;
