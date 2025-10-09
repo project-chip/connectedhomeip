@@ -186,7 +186,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                     "streamUsage": Globals.Enums.StreamUsageEnum.kRecording,
                     "videoStreamID": NullValue,
                     "audioStreamID": NullValue,
-                    "endpointID": tlsEndpointId,
+                    "TLSEndpointID": tlsEndpointId,
                     "url": f"https://{host_ip}:1234/streams/1",
                     "triggerOptions": {"triggerType": 2},
                     "ingestMethod": 0,
