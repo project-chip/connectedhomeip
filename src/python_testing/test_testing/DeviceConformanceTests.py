@@ -27,7 +27,8 @@ from matter.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType
                                                  device_type_id_type, is_valid_device_type_id)
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                             ProblemNotice, ProblemSeverity)
-from matter.testing.spec_parsing import build_xml_device_types, build_xml_namespaces, CommandType, PrebuiltDataModelDirectory, XmlDeviceType, XmlDeviceTypeClusterRequirements
+from matter.testing.spec_parsing import (CommandType, PrebuiltDataModelDirectory, XmlDeviceType, XmlDeviceTypeClusterRequirements,
+                                         build_xml_device_types, build_xml_namespaces)
 from matter.tlv import uint
 
 
@@ -158,8 +159,8 @@ class DeviceConformanceTests(BasicCompositionTests):
 
                 feature_map = cluster[GlobalAttributeIds.FEATURE_MAP_ID]
                 attribute_list = cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
-                all_command_list = cluster[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] + \
-                    cluster[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID]
+                all_command_list = cluster[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] +
+                cluster[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID]
 
                 # Feature conformance checking
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
