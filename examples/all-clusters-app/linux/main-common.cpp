@@ -221,7 +221,6 @@ void ApplicationInit()
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster3.Registration()) == CHIP_NO_ERROR);
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster4.Registration()) == CHIP_NO_ERROR);
 
-
     SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
     SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
