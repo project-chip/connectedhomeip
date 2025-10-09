@@ -17,6 +17,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/icd-management-server/icd-management-cluster.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/IcdManagement.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <zap-generated/gen_config.h>
@@ -32,10 +33,6 @@ static_assert((IcdManagement::StaticApplicationConfig::kFixedClusterConfig.size(
               IcdManagement::StaticApplicationConfig::kFixedClusterConfig.size() == 0);
 
 LazyRegisteredServerCluster<ICDManagementCluster> gServer;
-
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-static IcdManagementFabricDelegate gFabricDelegate;
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 constexpr chip::BitMask<OptionalCommands> kEnabledCommands()
 {
@@ -103,25 +100,10 @@ void MatterIcdManagementClusterInitCallback(EndpointId endpointId)
             .fetchOptionalAttributes   = true,
         },
         integrationDelegate);
-
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-    PersistentStorageDelegate & storage           = Server::GetInstance().GetPersistentStorage();
-    Crypto::SymmetricKeystore * symmetricKeystore = Server::GetInstance().GetSessionKeystore();
-    FabricTable & fabricTable                     = Server::GetInstance().GetFabricTable();
-    ICDConfigurationData & icdConfigurationData   = ICDConfigurationData::GetInstance().GetInstance();
-    // Configure and register Fabric delegate
-    gFabricDelegate.Init(storage, symmetricKeystore, icdConfigurationData);
-    fabricTable.AddFabricDelegate(&gFabricDelegate);
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 }
 
 void MatterIcdManagementClusterShutdownCallback(EndpointId endpointId)
 {
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-    FabricTable & fabricTable = Server::GetInstance().GetFabricTable();
-    fabricTable.RemoveFabricDelegate(&gFabricDelegate);
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
-
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::UnregisterServer(
         {

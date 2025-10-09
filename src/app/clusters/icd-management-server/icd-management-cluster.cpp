@@ -17,8 +17,14 @@
 
 #include <app/clusters/icd-management-server/icd-management-cluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/IcdManagement/ClusterId.h>
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-#include <app/icd/server/ICDNotifier.h> // nogncheck
+#include <access/AccessControl.h>
+#include <app/icd/server/ICDMonitoringTable.h> // nogncheck
+#include <app/icd/server/ICDNotifier.h>        // nogncheck
+#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/server/Server.h> // nogncheck
 #endif
 
 using namespace chip;
@@ -30,7 +36,85 @@ using namespace chip::Access;
 
 using chip::Protocols::InteractionModel::Status;
 
+namespace {
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+CHIP_ERROR CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, bool & isClientAdmin)
+{
+    RequestPath requestPath{ .cluster     = commandPath.mClusterId,
+                             .endpoint    = commandPath.mEndpointId,
+                             .requestType = RequestType::kCommandInvokeRequest,
+                             .entityId    = commandPath.mCommandId };
+    CHIP_ERROR err = GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, Privilege::kAdminister);
+    if (CHIP_NO_ERROR == err)
+    {
+        isClientAdmin = true;
+    }
+    else if (CHIP_ERROR_ACCESS_DENIED == err)
+    {
+        isClientAdmin = false;
+        err           = CHIP_NO_ERROR;
+    }
+    return err;
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+} // anonymous namespace
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+void IcdManagementFabricDelegate::Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore,
+                                       ICDConfigurationData & icdConfigurationData)
+{
+    mStorage              = &storage;
+    mSymmetricKeystore    = symmetricKeystore;
+    mICDConfigurationData = &icdConfigurationData;
+}
+
+void IcdManagementFabricDelegate::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    uint16_t supported_clients = mICDConfigurationData->GetClientsSupportedPerFabric();
+    ICDMonitoringTable table(*mStorage, fabricIndex, supported_clients, mSymmetricKeystore);
+    table.RemoveAll();
+    ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
 namespace chip::app::Clusters {
+
+ICDManagementCluster::ICDManagementCluster(EndpointId endpointId, PersistentStorageDelegate & storage,
+                                           Crypto::SymmetricKeystore & symmetricKeystore, FabricTable & fabricTable,
+                                           ICDConfigurationData & icdConfigurationData, OptionalAttributeSet optionalAttributeSet,
+                                           BitMask<IcdManagement::OptionalCommands> aEnabledCommands,
+                                           BitMask<IcdManagement::UserActiveModeTriggerBitmap> aUserActiveModeTriggerBitmap,
+                                           CharSpan aUserActiveModeTriggerInstruction) :
+    DefaultServerCluster({ endpointId, IcdManagement::Id })
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    ,
+    mStorage(storage), mSymmetricKeystore(symmetricKeystore), mFabricTable(fabricTable)
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+    ,
+    mICDConfigurationData(icdConfigurationData), mOptionalAttributeSet(optionalAttributeSet), mEnabledCommands(aEnabledCommands),
+    mUserActiveModeTriggerBitmap(aUserActiveModeTriggerBitmap)
+{
+    MutableCharSpan buffer(mUserActiveModeTriggerInstruction);
+    CopyCharSpanToMutableCharSpanWithTruncation(aUserActiveModeTriggerInstruction, buffer);
+}
+
+CHIP_ERROR ICDManagementCluster::Startup(ServerClusterContext & context)
+{
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    // Initialize and register Fabric delegate
+    mFabricDelegate.Init(mStorage, &mSymmetricKeystore, mICDConfigurationData);
+    mFabricTable.AddFabricDelegate(&mFabricDelegate);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+    return CHIP_NO_ERROR;
+}
+
+void ICDManagementCluster::Shutdown()
+{
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    // Unregister Fabric delegate
+    mFabricTable.RemoveFabricDelegate(&mFabricDelegate);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+}
 
 DataModel::ActionReturnStatus ICDManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                   AttributeValueEncoder & aEncoder)
@@ -248,25 +332,6 @@ CHIP_ERROR ICDManagementCluster::ReadRegisteredClients(AttributeValueEncoder & e
  *                           If an error occurs, isClientAdmin is not changed
  * @return CHIP_ERROR
  */
-CHIP_ERROR ICDManagementCluster::CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                            bool & isClientAdmin)
-{
-    RequestPath requestPath{ .cluster     = commandPath.mClusterId,
-                             .endpoint    = commandPath.mEndpointId,
-                             .requestType = RequestType::kCommandInvokeRequest,
-                             .entityId    = commandPath.mCommandId };
-    CHIP_ERROR err = GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, Privilege::kAdminister);
-    if (CHIP_NO_ERROR == err)
-    {
-        isClientAdmin = true;
-    }
-    else if (CHIP_ERROR_ACCESS_DENIED == err)
-    {
-        isClientAdmin = false;
-        err           = CHIP_NO_ERROR;
-    }
-    return err;
-}
 
 Status ICDManagementCluster::RegisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                             const Commands::RegisterClient::DecodableType & commandData, uint32_t & icdCounter)

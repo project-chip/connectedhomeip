@@ -21,7 +21,6 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/util/basic-types.h>
-#include <clusters/IcdManagement/ClusterId.h>
 #include <clusters/IcdManagement/Commands.h>
 #include <clusters/IcdManagement/Metadata.h>
 #include <crypto/SessionKeystore.h>
@@ -29,10 +28,9 @@
 #include <lib/support/Span.h>
 
 #include <app/icd/server/ICDServerConfig.h>
-#include <app/server/Server.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-#include <app/icd/server/ICDMonitoringTable.h> // nogncheck
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
@@ -60,20 +58,9 @@ class IcdManagementFabricDelegate : public FabricTable::Delegate
 {
 public:
     void Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore,
-              ICDConfigurationData & icdConfigurationData)
-    {
-        mStorage              = &storage;
-        mSymmetricKeystore    = symmetricKeystore;
-        mICDConfigurationData = &icdConfigurationData;
-    }
+              ICDConfigurationData & icdConfigurationData);
 
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
-    {
-        uint16_t supported_clients = mICDConfigurationData->GetClientsSupportedPerFabric();
-        ICDMonitoringTable table(*mStorage, fabricIndex, supported_clients, mSymmetricKeystore);
-        table.RemoveAll();
-        ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
-    }
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
 private:
     PersistentStorageDelegate * mStorage           = nullptr;
@@ -91,19 +78,11 @@ public:
                          FabricTable & fabricTable, ICDConfigurationData & icdConfigurationData,
                          OptionalAttributeSet optionalAttributeSet, BitMask<IcdManagement::OptionalCommands> aEnabledCommands,
                          BitMask<IcdManagement::UserActiveModeTriggerBitmap> aUserActiveModeTriggerBitmap,
-                         CharSpan aUserActiveModeTriggerInstruction) :
-        DefaultServerCluster({ endpointId, IcdManagement::Id })
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-        ,
-        mStorage(storage), mSymmetricKeystore(symmetricKeystore), mFabricTable(fabricTable)
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
-        ,
-        mICDConfigurationData(icdConfigurationData), mOptionalAttributeSet(optionalAttributeSet),
-        mEnabledCommands(aEnabledCommands), mUserActiveModeTriggerBitmap(aUserActiveModeTriggerBitmap)
-    {
-        MutableCharSpan buffer(mUserActiveModeTriggerInstruction);
-        CopyCharSpanToMutableCharSpanWithTruncation(aUserActiveModeTriggerInstruction, buffer);
-    }
+                         CharSpan aUserActiveModeTriggerInstruction);
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+
+    void Shutdown() override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & aEncoder) override;
@@ -154,9 +133,8 @@ private:
     chip::PersistentStorageDelegate & mStorage;
     Crypto::SymmetricKeystore & mSymmetricKeystore;
     chip::FabricTable & mFabricTable;
+    IcdManagementFabricDelegate mFabricDelegate;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
-
-    CHIP_ERROR CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, bool & isClientAdmin);
 
     chip::ICDConfigurationData & mICDConfigurationData;
     const OptionalAttributeSet mOptionalAttributeSet;
