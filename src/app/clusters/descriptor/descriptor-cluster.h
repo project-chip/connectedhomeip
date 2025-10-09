@@ -22,17 +22,16 @@
 #include <clusters/Descriptor/AttributeIds.h>
 #include <clusters/Descriptor/ClusterId.h>
 #include <clusters/Descriptor/Structs.h>
+#include <lib/support/Span.h>
 
 #include <initializer_list>
 
 namespace chip::app::Clusters {
 
-/// Exposes mandatory attributes for the descriptor clusters (it does NOT implement
-/// optional bits through optional attribute set, currently using ifdef to maintain previous functionality.)
 class DescriptorCluster : public DefaultServerCluster
 {
 public:
-    using OptionalAttributesSet = chip::app::OptionalAttributeSet<Descriptor::Attributes::EndpointUniqueID::Id>;
+    using OptionalAttributesSet = OptionalAttributeSet<Descriptor::Attributes::EndpointUniqueID::Id>;
 
     DescriptorCluster(EndpointId endpointId, OptionalAttributesSet optionalAttributeSet, BitFlags<Descriptor::Feature> featureMap,
                       Span<const Descriptor::Structs::SemanticTagStruct::Type> semanticTags) :

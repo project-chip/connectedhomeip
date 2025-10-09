@@ -187,9 +187,8 @@ DataModel::ActionReturnStatus DescriptorCluster::ReadAttribute(const DataModel::
 {
     switch (request.path.mAttributeId)
     {
-    case FeatureMap::Id: {
+    case FeatureMap::Id: 
         return encoder.Encode(mFeatures);
-    }
     case ClusterRevision::Id:
         return encoder.Encode(Descriptor::kRevision);
     case DeviceTypeList::Id:
