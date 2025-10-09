@@ -356,7 +356,6 @@ fabric_scoped struct WebRTCSessionStruct {
 }
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
-
 cluster OnOff = 6 {
   revision 6;
 
@@ -426,8 +425,9 @@ cluster OnOff = 6 {
   /** This command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently turned off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
-/** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
 
+   
+/** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
 cluster LevelControl = 8 {
   revision 6;
 
@@ -549,8 +549,9 @@ cluster LevelControl = 8 {
   /** This command will cause the device to change the current frequency to the requested value. */
   command MoveToClosestFrequency(MoveToClosestFrequencyRequest): DefaultSuccess = 8;
 }
-/** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 
+   
+/** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 cluster Descriptor = 29 {
   revision 3;
 
@@ -575,8 +576,9 @@ cluster Descriptor = 29 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
-/** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 
+   
+/** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 cluster Binding = 30 {
   revision 1;
 
@@ -595,8 +597,9 @@ cluster Binding = 30 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
-/** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 
+   
+/** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 cluster Binding = 30 {
   revision 1;
 
@@ -615,11 +618,12 @@ cluster Binding = 30 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
+   
 /** The Access Control Cluster exposes a data model view of a
       Node's Access Control List (ACL), which codifies the rules used to manage
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
-
 cluster AccessControl = 31 {
   revision 2;
 
@@ -739,10 +743,11 @@ cluster AccessControl = 31 {
   /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
   fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
+
+   
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
-
 cluster BasicInformation = 40 {
   revision 5;
 
@@ -836,8 +841,9 @@ cluster BasicInformation = 40 {
 
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
-/** Provides an interface for providing OTA software updates */
 
+   
+/** Provides an interface for providing OTA software updates */
 cluster OtaSoftwareUpdateProvider = 41 {
   revision 1; // NOTE: Default/not specifically set
 
@@ -911,11 +917,12 @@ cluster OtaSoftwareUpdateProvider = 41 {
   /** Notify OTA Provider that an update was applied */
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
+
+   
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
       may have differing common languages, units of measurements, and numerical formatting
       standards. As such, Nodes that visually or audibly convey information need a mechanism by which
       they can be configured to use a user’s preferred language, units, etc */
-
 cluster LocalizationConfiguration = 43 {
   revision 1;
 
@@ -927,11 +934,12 @@ cluster LocalizationConfiguration = 43 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
+   
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
       may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
       or audibly convey time information need a mechanism by which they can be configured to use a
       user’s preferred format. */
-
 cluster TimeFormatLocalization = 44 {
   revision 1;
 
@@ -970,11 +978,12 @@ cluster TimeFormatLocalization = 44 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
+   
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
       may have differing preferences for the units in which values are conveyed in communication to a
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
       mechanism by which they can be configured to use a user’s preferred unit. */
-
 cluster UnitLocalization = 45 {
   revision 2;
 
@@ -996,8 +1005,9 @@ cluster UnitLocalization = 45 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
-/** This cluster is used to manage global aspects of the Commissioning flow. */
 
+   
+/** This cluster is used to manage global aspects of the Commissioning flow. */
 cluster GeneralCommissioning = 48 {
   revision 2;
 
@@ -1097,8 +1107,9 @@ cluster GeneralCommissioning = 48 {
   /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms & Conditions into the node. */
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
-/** This cluster is used to manage global aspects of the Commissioning flow. */
 
+   
+/** This cluster is used to manage global aspects of the Commissioning flow. */
 cluster GeneralCommissioning = 48 {
   revision 2;
 
@@ -1198,8 +1209,9 @@ cluster GeneralCommissioning = 48 {
   /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms & Conditions into the node. */
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
+
+   
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
-
 cluster NetworkCommissioning = 49 {
   revision 2;
 
@@ -1377,8 +1389,9 @@ cluster NetworkCommissioning = 49 {
   /** Retrieve details about and optionally proof of possession of a network client identity. */
   command access(invoke: administer) QueryIdentity(QueryIdentityRequest): QueryIdentityResponse = 9;
 }
-/** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 
+   
+/** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 cluster NetworkCommissioning = 49 {
   revision 2;
 
@@ -1556,8 +1569,9 @@ cluster NetworkCommissioning = 49 {
   /** Retrieve details about and optionally proof of possession of a network client identity. */
   command access(invoke: administer) QueryIdentity(QueryIdentityRequest): QueryIdentityResponse = 9;
 }
+
+   
 /** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
-
 cluster DiagnosticLogs = 50 {
   revision 1;
 
@@ -1602,8 +1616,9 @@ cluster DiagnosticLogs = 50 {
   /** Reception of this command starts the process of retrieving diagnostic logs from a Node. */
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
 }
-/** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 
+   
+/** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster GeneralDiagnostics = 51 {
   revision 2;
 
@@ -1732,8 +1747,9 @@ cluster GeneralDiagnostics = 51 {
   /** Request a variable length payload response. */
   command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
-/** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 
+   
+/** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster SoftwareDiagnostics = 52 {
   revision 1;
 
@@ -1768,8 +1784,9 @@ cluster SoftwareDiagnostics = 52 {
   /** This command is used to reset the high watermarks for heap and stack memory. */
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
 }
-/** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 
+   
+/** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 cluster ThreadNetworkDiagnostics = 53 {
   revision 3;
 
@@ -1935,8 +1952,9 @@ cluster ThreadNetworkDiagnostics = 53 {
   /** Reception of this command SHALL reset the following attributes to 0: */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
-/** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 
+   
+/** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster WiFiNetworkDiagnostics = 54 {
   revision 1;
 
@@ -2011,8 +2029,9 @@ cluster WiFiNetworkDiagnostics = 54 {
   /** This command is used to reset the count attributes. */
   command ResetCounts(): DefaultSuccess = 0;
 }
-/** The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 
+   
+/** The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster EthernetNetworkDiagnostics = 55 {
   revision 1;
 
@@ -2052,8 +2071,9 @@ cluster EthernetNetworkDiagnostics = 55 {
   /** This command is used to reset the count attributes. */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
-/** Commands to trigger a Node to allow a new Administrator to commission it. */
 
+   
+/** Commands to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1;
 
@@ -2101,8 +2121,9 @@ cluster AdministratorCommissioning = 60 {
   /** This command is used by a current Administrator to instruct a Node to revoke any active OpenCommissioningWindow or OpenBasicCommissioningWindow command. */
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
-/** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 
+   
+/** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
   revision 2;
 
@@ -2249,8 +2270,9 @@ cluster OperationalCredentials = 62 {
   /** This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given. */
   command access(invoke: administer) SignVIDVerificationRequest(SignVIDVerificationRequestRequest): SignVIDVerificationResponse = 13;
 }
-/** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 
+   
+/** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
   revision 2;
 
@@ -2397,8 +2419,9 @@ cluster OperationalCredentials = 62 {
   /** This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given. */
   command access(invoke: administer) SignVIDVerificationRequest(SignVIDVerificationRequestRequest): SignVIDVerificationResponse = 13;
 }
+
+   
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
-
 cluster GroupKeyManagement = 63 {
   revision 2;
 
@@ -2474,8 +2497,9 @@ cluster GroupKeyManagement = 63 {
   /** Return the list of Group Key Sets associated with the accessing fabric */
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
-/** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
 
+   
+/** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
 cluster UserLabel = 65 {
   revision 1; // NOTE: Default/not specifically set
 
@@ -2491,9 +2515,10 @@ cluster UserLabel = 65 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
+
+   
 /** This cluster provides an interface for passing messages to be presented by a device. */
-provisional 
-cluster Messages = 151 {
+provisional cluster Messages = 151 {
   revision 3;
 
   enum FutureMessagePreferenceEnum : enum8 {
@@ -2583,8 +2608,9 @@ cluster Messages = 151 {
   /** Command for cancelling message present requests */
   fabric command CancelMessagesRequest(CancelMessagesRequestRequest): DefaultSuccess = 1;
 }
-/** Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements. */
 
+   
+/** Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements. */
 cluster RelativeHumidityMeasurement = 1029 {
   revision 3;
 
@@ -2598,8 +2624,9 @@ cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
-/** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 
+   
+/** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 cluster WakeOnLan = 1283 {
   revision 1;
 
@@ -2611,8 +2638,9 @@ cluster WakeOnLan = 1283 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
-/** This cluster provides an interface for controlling the current Channel on a device. */
 
+   
+/** This cluster provides an interface for controlling the current Channel on a device. */
 cluster Channel = 1284 {
   revision 2;
 
@@ -2785,8 +2813,9 @@ cluster Channel = 1284 {
   /** Cancel recording for a specific program or series. */
   command CancelRecordProgram(CancelRecordProgramRequest): DefaultSuccess = 7;
 }
-/** This cluster provides an interface for UX navigation within a set of targets on a device or endpoint. */
 
+   
+/** This cluster provides an interface for UX navigation within a set of targets on a device or endpoint. */
 cluster TargetNavigator = 1285 {
   revision 2;
 
@@ -2828,8 +2857,9 @@ cluster TargetNavigator = 1285 {
   /** Upon receipt, this SHALL navigation the UX to the target identified. */
   command NavigateTarget(NavigateTargetRequest): NavigateTargetResponse = 0;
 }
-/** This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker. */
 
+   
+/** This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker. */
 cluster MediaPlayback = 1286 {
   revision 2;
 
@@ -2985,8 +3015,9 @@ cluster MediaPlayback = 1286 {
   /** If a Text Track is active (i.e. being displayed), upon receipt of this command, the server SHALL stop displaying it. */
   command DeactivateTextTrack(): DefaultSuccess = 14;
 }
-/** This cluster provides an interface for controlling the Input Selector on a media device such as a TV. */
 
+   
+/** This cluster provides an interface for controlling the Input Selector on a media device such as a TV. */
 cluster MediaInput = 1287 {
   revision 1;
 
@@ -3042,8 +3073,9 @@ cluster MediaInput = 1287 {
   /** Upon receipt, this command SHALL rename the input at a specific index in the Input List. */
   command access(invoke: manage) RenameInput(RenameInputRequest): DefaultSuccess = 3;
 }
-/** This cluster provides an interface for managing low power mode on a device. */
 
+   
+/** This cluster provides an interface for managing low power mode on a device. */
 cluster LowPower = 1288 {
   revision 1;
 
@@ -3056,8 +3088,9 @@ cluster LowPower = 1288 {
   /** This command SHALL put the device into low power mode. */
   command Sleep(): DefaultSuccess = 0;
 }
-/** This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT. */
 
+   
+/** This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT. */
 cluster KeypadInput = 1289 {
   revision 1;
 
@@ -3179,8 +3212,9 @@ cluster KeypadInput = 1289 {
   /** Upon receipt, this SHALL process a keycode as input to the media endpoint. */
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
 }
-/** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 
+   
+/** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ContentLauncher = 1290 {
   revision 1;
 
@@ -3331,8 +3365,9 @@ cluster ContentLauncher = 1290 {
   /** Upon receipt, this SHALL launch content from the specified URL. */
   command LaunchURL(LaunchURLRequest): LauncherResponse = 1;
 }
-/** This cluster provides an interface for controlling the Output on a media device such as a TV. */
 
+   
+/** This cluster provides an interface for controlling the Output on a media device such as a TV. */
 cluster AudioOutput = 1291 {
   revision 1;
 
@@ -3377,8 +3412,9 @@ cluster AudioOutput = 1291 {
   /** Upon receipt, this SHALL rename the output at a specific index in the Output List. */
   command access(invoke: manage) RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
 }
-/** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 
+   
+/** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ApplicationLauncher = 1292 {
   revision 1; // NOTE: Default/not specifically set
 
@@ -3438,8 +3474,9 @@ cluster ApplicationLauncher = 1292 {
   /** Upon receipt on a Video Player endpoint this SHALL hide the specified application if it is running and visible. */
   command HideApp(HideAppRequest): LauncherResponse = 2;
 }
-/** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
 
+   
+/** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
 cluster ApplicationBasic = 1293 {
   revision 1; // NOTE: Default/not specifically set
 
@@ -3469,8 +3506,9 @@ cluster ApplicationBasic = 1293 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
-/** This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client. */
 
+   
+/** This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client. */
 cluster AccountLogin = 1294 {
   revision 2;
 
@@ -3510,9 +3548,10 @@ cluster AccountLogin = 1294 {
   /** The purpose of this command is to instruct the Content App to clear the current user account. */
   fabric timed command Logout(LogoutRequest): DefaultSuccess = 3;
 }
+
+   
 /** This cluster is used for managing the content control (including "parental control") settings on a media device such as a TV, or Set-top Box. */
-provisional 
-cluster ContentControl = 1295 {
+provisional cluster ContentControl = 1295 {
   revision 1; // NOTE: Default/not specifically set
 
   bitmap Feature : bitmap32 {
@@ -3592,9 +3631,10 @@ cluster ContentControl = 1295 {
   /** The purpose of this command is to set ScheduledContentRatingThreshold attribute. On receipt of the SetScheduledContentRatingThreshold command, the media device SHALL check if the Rating field is one of values present in the ScheduledContentRatings attribute. If not, then a response with InvalidRating error status SHALL be returned. */
   command SetScheduledContentRatingThreshold(SetScheduledContentRatingThresholdRequest): DefaultSuccess = 10;
 }
+
+   
 /** This cluster provides an interface for sending targeted commands to an Observer of a Content App on a Video Player device such as a Streaming Media Player, Smart TV or Smart Screen. The cluster server for Content App Observer is implemented by an endpoint that communicates with a Content App, such as a Casting Video Client. The cluster client for Content App Observer is implemented by a Content App endpoint. A Content App is informed of the NodeId of an Observer when a binding is set on the Content App. The Content App can then send the ContentAppMessage to the Observer (server cluster), and the Observer responds with a ContentAppMessageResponse. */
-provisional 
-cluster ContentAppObserver = 1296 {
+provisional cluster ContentAppObserver = 1296 {
   revision 1; // NOTE: Default/not specifically set
 
   enum StatusEnum : enum8 {
@@ -3622,6 +3662,8 @@ cluster ContentAppObserver = 1296 {
   /** Upon receipt, the data field MAY be parsed and interpreted. Message encoding is specific to the Content App. A Content App MAY when possible read attributes from the Basic Information Cluster on the Observer and use this to determine the Message encoding. */
   command ContentAppMessage(ContentAppMessageRequest): ContentAppMessageResponse = 0;
 }
+
+   
 endpoint 0 {
   device type ma_rootdevice = 22, version 3;
 
