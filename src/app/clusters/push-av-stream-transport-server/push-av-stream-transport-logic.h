@@ -158,6 +158,8 @@ private:
 
     void RemoveTimerAppState(const uint16_t connectionID);
 
+    Protocols::InteractionModel::Status CheckPrivacyModes(Globals::StreamUsageEnum streamUsage);
+
     /**
      * @brief Schedule deallocate with a given timeout
      *

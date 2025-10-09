@@ -92,7 +92,11 @@ public:
         // Handle TLS certificates if needed for implementation
     }
 
-    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override;
+    CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override;
 
     void SetPushAvStreamTransportServer(PushAvStreamTransportServer * serverLogic) override
     {

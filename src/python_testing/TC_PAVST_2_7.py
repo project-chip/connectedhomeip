@@ -350,18 +350,37 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
         privacySupported = aFeatureMap & Clusters.CameraAvStreamManagement.Bitmaps.Feature.kPrivacy
         if privacySupported:
-            # Write SoftLivestreamPrivacyModeEnabled=true and test INVALID_IN_STATE
-            await self.write_single_attribute(
-                attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftRecordingPrivacyModeEnabled(True),
-                endpoint_id=endpoint,
+            # The stream usage will be the first item in supported stream usages. Set the privacy appropriate to the usage
+            aStreamUsagePriorities = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=Clusters.CameraAvStreamManagement, attribute=Clusters.CameraAvStreamManagement.Attributes.StreamUsagePriorities
             )
 
+            streamUsage = aStreamUsagePriorities[0]
+
+            if (streamUsage == Globals.Enums.StreamUsageEnum.kRecording) or (streamUsage == Global.Enums.StreamUsageEnum.kAnalysis):
+                # Write SoftRecordingPrivacyModeEnabled=true and test INVALID_IN_STATE
+                await self.write_single_attribute(
+                    attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftRecordingPrivacyModeEnabled(True),
+                    endpoint_id=endpoint,
+                )
+            else:
+                # Livestream
+                # Write SoftLivestreamPrivacyModeEnabled=true and test INVALID_IN_STATE
+                await self.write_single_attribute(
+                    attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled(True),
+                    endpoint_id=endpoint,
+                )               
+
             status = await self.psvt_manually_trigger_transport(cmd, expected_status=Status.InvalidInState)
-            asserts.assert_true(status == Status.InvalidInState, f"Unexpected response {
-                                status} received on Manually Triggered push with privacy mode enabled")
+            asserts.assert_true(status == Status.InvalidInState, f"Unexpected response {status} received on Manually Triggered push with privacy mode enabled")
 
             await self.write_single_attribute(
                 attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftRecordingPrivacyModeEnabled(False),
+                endpoint_id=endpoint,
+            )
+
+            await self.write_single_attribute(
+                attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled(False),
                 endpoint_id=endpoint,
             )
 
