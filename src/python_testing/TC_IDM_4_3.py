@@ -43,16 +43,16 @@ import time
 from datetime import datetime
 from enum import IntFlag
 
-import chip.clusters as Clusters
-from chip.ChipDeviceCtrl import ChipDeviceController
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import AsyncReadTransaction, AttributePath, SubscriptionTransaction, TypedAttributePath
-from chip.clusters.enum import MatterIntEnum
-from chip.exceptions import ChipStackError
-from chip.interaction_model import Status
-from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.matter_testing import (AttributeChangeCallback, EventChangeCallback, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
+import matter.clusters as Clusters
+from matter.ChipDeviceCtrl import ChipDeviceController
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.clusters.Attribute import AsyncReadTransaction, AttributePath, SubscriptionTransaction, TypedAttributePath
+from matter.clusters.enum import MatterIntEnum
+from matter.exceptions import ChipStackError
+from matter.interaction_model import Status
+from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler, AttributeSubscriptionHandler
 from mobly import asserts, signals
 
 '''
