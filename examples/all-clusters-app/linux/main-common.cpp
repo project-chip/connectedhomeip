@@ -165,6 +165,21 @@ RegisteredServerCluster<Clusters::IdentifyCluster>
                           .WithIdentifyType(Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
                           .WithDelegate(&sIdentifyDelegate));
 
+RegisteredServerCluster<Clusters::IdentifyCluster>
+    gIdentifyCluster2(Clusters::IdentifyCluster::Config(2, sTimerDelegate)
+                          .WithIdentifyType(Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
+                          .WithDelegate(&sIdentifyDelegate));
+
+RegisteredServerCluster<Clusters::IdentifyCluster>
+    gIdentifyCluster3(Clusters::IdentifyCluster::Config(3, sTimerDelegate)
+                          .WithIdentifyType(Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
+                          .WithDelegate(&sIdentifyDelegate));
+
+RegisteredServerCluster<Clusters::IdentifyCluster>
+    gIdentifyCluster4(Clusters::IdentifyCluster::Config(4, sTimerDelegate)
+                          .WithIdentifyType(Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
+                          .WithDelegate(&sIdentifyDelegate));
+
 } // namespace
 
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
@@ -202,6 +217,10 @@ void ApplicationInit()
                                                                     &Clusters::TlsClientManagementCommandDelegate::GetInstance());
 
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster1.Registration()) == CHIP_NO_ERROR);
+    VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster2.Registration()) == CHIP_NO_ERROR);
+    VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster3.Registration()) == CHIP_NO_ERROR);
+    VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster4.Registration()) == CHIP_NO_ERROR);
+
 
     SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));

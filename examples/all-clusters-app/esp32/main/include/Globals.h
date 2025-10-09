@@ -32,5 +32,7 @@ extern WiFiWidget wifiLED;
 extern const chip::NodeId kLocalNodeId;
 extern WiFiWidget pairingWindowLED;
 
-extern chip::app::RegisteredServerCluster<chip::app::Clusters::IdentifyCluster> gIdentifyCluster0;
 extern chip::app::RegisteredServerCluster<chip::app::Clusters::IdentifyCluster> gIdentifyCluster1;
+extern chip::app::RegisteredServerCluster<chip::app::Clusters::IdentifyCluster> gIdentifyCluster2;
+extern chip::app::RegisteredServerCluster<chip::app::Clusters::IdentifyCluster> gIdentifyCluster3;
+extern chip::app::RegisteredServerCluster<chip::app::Clusters::IdentifyCluster> gIdentifyCluster4;

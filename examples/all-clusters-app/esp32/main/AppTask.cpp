@@ -176,9 +176,13 @@ CHIP_ERROR AppTask::Init()
 #endif
 
     // Initialize and register clusters
-    VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster0.Registration()) ==
-                CHIP_NO_ERROR);
     VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster1.Registration()) ==
+                CHIP_NO_ERROR);
+    VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster2.Registration()) ==
+                CHIP_NO_ERROR);
+    VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster3.Registration()) ==
+                CHIP_NO_ERROR);
+    VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster4.Registration()) ==
                 CHIP_NO_ERROR);
 
     return CHIP_NO_ERROR;
