@@ -404,7 +404,6 @@ cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
-   
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
   revision 4;
@@ -481,7 +480,6 @@ cluster Groups = 4 {
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
-   
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 cluster Descriptor = 29 {
   revision 3;
@@ -508,7 +506,6 @@ cluster Descriptor = 29 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 cluster Binding = 30 {
   revision 1;
@@ -529,7 +526,6 @@ cluster Binding = 30 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** The Access Control Cluster exposes a data model view of a
       Node's Access Control List (ACL), which codifies the rules used to manage
       and enforce Access Control for the Node's endpoints and their associated
@@ -654,7 +650,6 @@ cluster AccessControl = 31 {
   fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
 
-   
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
@@ -752,7 +747,6 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
-   
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
       may have differing preferences for the units in which values are conveyed in communication to a
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
@@ -779,7 +773,6 @@ cluster UnitLocalization = 45 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 cluster GeneralCommissioning = 48 {
   revision 2;
@@ -881,7 +874,6 @@ cluster GeneralCommissioning = 48 {
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 
-   
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 cluster NetworkCommissioning = 49 {
   revision 2;
@@ -1061,7 +1053,6 @@ cluster NetworkCommissioning = 49 {
   command access(invoke: administer) QueryIdentity(QueryIdentityRequest): QueryIdentityResponse = 9;
 }
 
-   
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster GeneralDiagnostics = 51 {
   revision 2;
@@ -1192,7 +1183,6 @@ cluster GeneralDiagnostics = 51 {
   command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
-   
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster WiFiNetworkDiagnostics = 54 {
   revision 1;
@@ -1269,7 +1259,6 @@ cluster WiFiNetworkDiagnostics = 54 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
-   
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1;
@@ -1319,7 +1308,6 @@ cluster AdministratorCommissioning = 60 {
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
-   
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
   revision 2;
@@ -1468,7 +1456,6 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) SignVIDVerificationRequest(SignVIDVerificationRequestRequest): SignVIDVerificationResponse = 13;
 }
 
-   
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
   revision 2;
@@ -1546,7 +1533,6 @@ cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
-   
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
 cluster OperationalState = 96 {
   revision 1;
@@ -1612,7 +1598,6 @@ cluster OperationalState = 96 {
   command Resume(): OperationalCommandResponse = 3;
 }
 
-   
 endpoint 0 {
   device type ma_rootdevice = 22, version 3;
 

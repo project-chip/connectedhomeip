@@ -479,7 +479,6 @@ cluster AccessControl = 31 {
   fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
 
-   
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 cluster GeneralCommissioning = 48 {
   revision 2;
@@ -581,7 +580,6 @@ cluster GeneralCommissioning = 48 {
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 
-   
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 cluster NetworkCommissioning = 49 {
   revision 2;
@@ -761,7 +759,6 @@ cluster NetworkCommissioning = 49 {
   command access(invoke: administer) QueryIdentity(QueryIdentityRequest): QueryIdentityResponse = 9;
 }
 
-   
 /** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
 cluster DiagnosticLogs = 50 {
   revision 1;
@@ -808,7 +805,6 @@ cluster DiagnosticLogs = 50 {
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
 }
 
-   
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
   revision 2;
@@ -957,7 +953,6 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) SignVIDVerificationRequest(SignVIDVerificationRequestRequest): SignVIDVerificationResponse = 13;
 }
 
-   
 endpoint 0 {
   device type ma_all_clusters_app = 4293984259, version 1;
 

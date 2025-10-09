@@ -404,7 +404,6 @@ cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
-   
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 cluster Descriptor = 29 {
   revision 3;
@@ -431,7 +430,6 @@ cluster Descriptor = 29 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 cluster Binding = 30 {
   revision 1;
@@ -452,7 +450,6 @@ cluster Binding = 30 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** The Access Control Cluster exposes a data model view of a
       Node's Access Control List (ACL), which codifies the rules used to manage
       and enforce Access Control for the Node's endpoints and their associated
@@ -577,7 +574,6 @@ cluster AccessControl = 31 {
   fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
 
-   
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
@@ -675,7 +671,6 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
-   
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 cluster PowerSource = 47 {
   revision 3;
@@ -934,7 +929,6 @@ cluster PowerSource = 47 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 cluster GeneralCommissioning = 48 {
   revision 2;
@@ -1036,7 +1030,6 @@ cluster GeneralCommissioning = 48 {
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 
-   
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 cluster NetworkCommissioning = 49 {
   revision 2;
@@ -1216,7 +1209,6 @@ cluster NetworkCommissioning = 49 {
   command access(invoke: administer) QueryIdentity(QueryIdentityRequest): QueryIdentityResponse = 9;
 }
 
-   
 /** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
 cluster DiagnosticLogs = 50 {
   revision 1;
@@ -1263,7 +1255,6 @@ cluster DiagnosticLogs = 50 {
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
 }
 
-   
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster GeneralDiagnostics = 51 {
   revision 2;
@@ -1394,7 +1385,6 @@ cluster GeneralDiagnostics = 51 {
   command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
-   
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster SoftwareDiagnostics = 52 {
   revision 1;
@@ -1431,7 +1421,6 @@ cluster SoftwareDiagnostics = 52 {
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
 }
 
-   
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1;
@@ -1481,7 +1470,6 @@ cluster AdministratorCommissioning = 60 {
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
-   
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
   revision 2;
@@ -1630,7 +1618,6 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) SignVIDVerificationRequest(SignVIDVerificationRequestRequest): SignVIDVerificationResponse = 13;
 }
 
-   
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
   revision 2;
@@ -1708,7 +1695,6 @@ cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
-   
 /** This cluster provides an interface to a boolean state called StateValue. */
 cluster BooleanState = 69 {
   revision 1;
@@ -1725,7 +1711,6 @@ cluster BooleanState = 69 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** Attributes for reporting air quality classification */
 cluster AirQuality = 91 {
   revision 1;
@@ -1755,7 +1740,6 @@ cluster AirQuality = 91 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements. */
 cluster IlluminanceMeasurement = 1024 {
   revision 3;
@@ -1777,7 +1761,6 @@ cluster IlluminanceMeasurement = 1024 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
 cluster TemperatureMeasurement = 1026 {
   revision 4;
@@ -1793,7 +1776,6 @@ cluster TemperatureMeasurement = 1026 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements. */
 cluster PressureMeasurement = 1027 {
   revision 3;
@@ -1818,7 +1800,6 @@ cluster PressureMeasurement = 1027 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
 cluster FlowMeasurement = 1028 {
   revision 3;
@@ -1834,7 +1815,6 @@ cluster FlowMeasurement = 1028 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements. */
 cluster RelativeHumidityMeasurement = 1029 {
   revision 3;
@@ -1850,7 +1830,6 @@ cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status. */
 cluster OccupancySensing = 1030 {
   revision 5;
@@ -1914,7 +1893,6 @@ cluster OccupancySensing = 1030 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** Attributes for reporting carbon monoxide concentration measurements */
 cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   revision 3;
@@ -1971,7 +1949,6 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** Attributes for reporting carbon dioxide concentration measurements */
 cluster CarbonDioxideConcentrationMeasurement = 1037 {
   revision 3;
@@ -2028,7 +2005,6 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** Attributes for reporting nitrogen dioxide concentration measurements */
 cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   revision 3;
@@ -2085,7 +2061,6 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** Attributes for reporting ozone concentration measurements */
 cluster OzoneConcentrationMeasurement = 1045 {
   revision 3;
@@ -2142,7 +2117,6 @@ cluster OzoneConcentrationMeasurement = 1045 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** Attributes for reporting PM2.5 concentration measurements */
 cluster Pm25ConcentrationMeasurement = 1066 {
   revision 3;
@@ -2199,7 +2173,6 @@ cluster Pm25ConcentrationMeasurement = 1066 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** Attributes for reporting formaldehyde concentration measurements */
 cluster FormaldehydeConcentrationMeasurement = 1067 {
   revision 3;
@@ -2256,7 +2229,6 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** Attributes for reporting PM1 concentration measurements */
 cluster Pm1ConcentrationMeasurement = 1068 {
   revision 3;
@@ -2313,7 +2285,6 @@ cluster Pm1ConcentrationMeasurement = 1068 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** Attributes for reporting PM10 concentration measurements */
 cluster Pm10ConcentrationMeasurement = 1069 {
   revision 3;
@@ -2370,7 +2341,6 @@ cluster Pm10ConcentrationMeasurement = 1069 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** Attributes for reporting total volatile organic compounds concentration measurements */
 cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   revision 3;
@@ -2427,7 +2397,6 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 /** Attributes for reporting radon concentration measurements */
 cluster RadonConcentrationMeasurement = 1071 {
   revision 3;
@@ -2484,7 +2453,6 @@ cluster RadonConcentrationMeasurement = 1071 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-   
 endpoint 0 {
   device type ma_rootdevice = 22, version 3;
 
