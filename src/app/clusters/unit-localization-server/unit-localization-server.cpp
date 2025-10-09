@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/unit-localization-server/unit-localization-cluster.h>
+#include <app/clusters/unit-localization-server/unit-localization-server.h>
 #include <app/persistence/AttributePersistence.h>
 
 #include <app/server-cluster/AttributeListBuilder.h>
