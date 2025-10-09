@@ -223,7 +223,7 @@ static NSUInteger HashPath(NSNumber * _Nullable endpoint, NSNumber * _Nullable c
         return endpointValue ^ (clusterValue << 8) ^ (entityValue << 20);
     } else {
         // sizeof(NSUInteger) >= 8.  Give endpoint 10 bits, 27 bits each to the others.
-        return endpointValue ^ (clusterValue << 10) ^ (((NSUInteger)entityValue) << 37);
+        return endpointValue ^ (clusterValue << 10) ^ (((NSUInteger) entityValue) << 37);
     }
 }
 
