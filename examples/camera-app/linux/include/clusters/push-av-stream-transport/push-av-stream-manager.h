@@ -80,7 +80,7 @@ public:
 
     bool ValidateStreamUsage(StreamUsageEnum streamUsage) override;
 
-    bool ValidateSegmentDuration(uint16_t segmentDuration) override;
+    bool ValidateSegmentDuration(uint16_t segmentDuration, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override;
 
     Protocols::InteractionModel::Status
     ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
@@ -106,7 +106,11 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
+    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override;
+
     void OnZoneTriggeredEvent(uint16_t zoneId);
+
+    void RecordingStreamPrivacyModeChanged(bool privacyModeEnabled);
 
 private:
     std::vector<PushAvStream> pushavStreams;

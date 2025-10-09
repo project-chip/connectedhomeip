@@ -11633,6 +11633,8 @@
           # In-progress for Joint Fabric feature
           - JointFabricDatastore
           - JointFabricAdministrator
+          # In-progress for new groups setup
+          - Groupcast
       attributes:
           BasicInformation:
               # In-progress for maybe Matter 1.5
@@ -11697,6 +11699,8 @@
               - ICEServerStruct
               - ViewportStruct
               - WebRTCSessionStruct
+              # Waiting to see whether any compat issues arise from making this global
+              - SemanticTagStruct
       struct fields:
           ElectricalEnergyMeasurement:
               EnergyMeasurementStruct:

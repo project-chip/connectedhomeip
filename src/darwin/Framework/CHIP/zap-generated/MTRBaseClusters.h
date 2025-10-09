@@ -351,25 +351,25 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command MoveToLevel
  *
- * Command description for MoveToLevel
+ * This command will move the device to the specified level.
  */
 - (void)moveToLevelWithParams:(MTRLevelControlClusterMoveToLevelParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command Move
  *
- * Command description for Move
+ * This command will move the device using the specified values.
  */
 - (void)moveWithParams:(MTRLevelControlClusterMoveParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command Step
  *
- * Command description for Step
+ * This command will do a relative step change of the device using the specified values.
  */
 - (void)stepWithParams:(MTRLevelControlClusterStepParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command Stop
  *
- * Command description for Stop
+ * This command will stop the actions of various other commands that are still in progress.
  */
 - (void)stopWithParams:(MTRLevelControlClusterStopParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
@@ -399,8 +399,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command MoveToClosestFrequency
  *
- * Change the currrent frequency to the provided one, or a close
-        approximation if the exact provided one is not possible.
+ * This command will cause the device to change the current frequency to the requested value.
  */
 - (void)moveToClosestFrequencyWithParams:(MTRLevelControlClusterMoveToClosestFrequencyParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
@@ -3665,19 +3664,19 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command OpenCommissioningWindow
  *
- * This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method.
+ * This command is used by a current Administrator to instruct a Node to go into commissioning mode.
  */
 - (void)openCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenCommissioningWindowParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command OpenBasicCommissioningWindow
  *
- * This command is used by a current Administrator to instruct a Node to go into commissioning mode using basic commissioning method, if the node supports it.
+ * This command MAY be used by a current Administrator to instruct a Node to go into commissioning mode, if the node supports the Basic Commissioning Method.
  */
 - (void)openBasicCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command RevokeCommissioning
  *
- * This command is used by a current Administrator to instruct a Node to revoke any active Open Commissioning Window or Open Basic Commissioning Window command.
+ * This command is used by a current Administrator to instruct a Node to revoke any active OpenCommissioningWindow or OpenBasicCommissioningWindow command.
  */
 - (void)revokeCommissioningWithParams:(MTRAdministratorCommissioningClusterRevokeCommissioningParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)revokeCommissioningWithCompletion:(MTRStatusCompletion)completion
@@ -6282,7 +6281,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command UpdateGroupKey
  *
- * This command SHALL allow a fabric maintainer to update the group operational key for an existing group ID that the server is a member of.
+ * This command SHALL allow a fabric maintainer to update the OperationalGroupKey for an existing group ID that the server is a member of.
  */
 - (void)updateGroupKeyWithParams:(MTRGroupcastClusterUpdateGroupKeyParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -13684,7 +13683,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command Sleep
  *
- * This command shall put the device into low power mode.
+ * This command SHALL put the device into low power mode.
  */
 - (void)sleepWithParams:(MTRLowPowerClusterSleepParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)sleepWithCompletion:(MTRStatusCompletion)completion
@@ -13748,7 +13747,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command SendKey
  *
- * Upon receipt, this SHALL process a keycode as input to the media device.
+ * Upon receipt, this SHALL process a keycode as input to the media endpoint.
  */
 - (void)sendKeyWithParams:(MTRKeypadInputClusterSendKeyParams *)params completion:(void (^)(MTRKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
