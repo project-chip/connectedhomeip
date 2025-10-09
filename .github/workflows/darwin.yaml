@@ -110,12 +110,12 @@ jobs:
                   mkdir -p /tmp/darwin/framework-tests
 
                   export TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1
-
+                  echo "Quiet work in progress - artifacts `darwin-tests.log` and `darwin-tests-err.log` will be output."
                   xcodebuild test -target "Matter" -scheme "Matter Framework Tests" \
-                    -resultBundlePath /tmp/darwin/framework-tests/TestResults.xcresult \
-                    -sdk macosx ${{ matrix.options.arguments }} \
-                    GCC_PREPROCESSOR_DEFINITIONS='${inherited} ${{ matrix.options.defines }}' \
-                    > >(tee /tmp/darwin/framework-tests/darwin-tests.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-err.log >&2)
+                  -resultBundlePath /tmp/darwin/framework-tests/TestResults.xcresult \
+                  -sdk macosx ${{ matrix.options.arguments }} \
+                  GCC_PREPROCESSOR_DEFINITIONS='${inherited} ${{ matrix.options.defines }}' \
+                  > /tmp/darwin/framework-tests/darwin-tests.log 2> /tmp/darwin/framework-tests/darwin-tests-err.log
             - name: Generate Summary
               if: always()
               working-directory: /tmp
