@@ -24,50 +24,20 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <lib/support/ScopedBuffer.h>
+
+#include "CommodityTariffConsts.h"
 
 namespace chip {
 namespace app {
 namespace CommodityTariffContainers {
 
-template <typename T>
+template<typename T, size_t Capacity>
 class CTC_ContainerClassBase
 {
     static_assert(std::is_trivially_destructible<T>::value, "T must be trivially destructible");
 
 protected:
-    CTC_ContainerClassBase(size_t aCapacity = 0, bool aResizeIsEn = false) : mCapacity(aCapacity)
-    {
-        if (mCapacity == 0)
-        {
-            aResizeIsEn = true;
-        }
-        mResizeIsEn = aResizeIsEn;
-        createBuffer();
-    }
-
-    CTC_ContainerClassBase(CTC_ContainerClassBase && other) noexcept :
-        mCapacity(other.mCapacity), mCount(other.mCount), mBuffer(std::move(other.mBuffer))
-    {
-        other.mResizeIsEn = 0;
-        other.mCapacity   = 0;
-        other.mCount      = 0;
-    }
-
-    CTC_ContainerClassBase & operator=(CTC_ContainerClassBase && other) noexcept
-    {
-        if (this != &other)
-        {
-            mResizeIsEn     = other.mResizeIsEn;
-            mCapacity       = other.mCapacity;
-            mCount          = other.mCount;
-            mBuffer         = std::move(other.mBuffer);
-            other.mCapacity = 0;
-            other.mCount    = 0;
-        }
-        return *this;
-    }
-
+    CTC_ContainerClassBase()  = default;
 public:
     virtual ~CTC_ContainerClassBase() = default;
 
@@ -90,7 +60,7 @@ public:
     virtual const T * find(const T & item) const = 0;
 
     size_t size() const { return mCount; }
-    size_t capacity() const { return mCapacity; }
+    constexpr size_t  capacity() const { return Capacity; }
     bool empty() const { return (mCount == 0); }
 
     // Array-style access
@@ -99,6 +69,7 @@ public:
         VerifyOrDie(index < mCount);
         return mBuffer[index];
     }
+
     const T & operator[](size_t index) const
     {
         VerifyOrDie(index < mCount);
@@ -106,85 +77,19 @@ public:
     }
 
     // Iterator support
-    T * begin() { return mBuffer.Get(); }
-    T * end() { return mBuffer.Get() + mCount; }
-    const T * begin() const { return mBuffer.Get(); }
-    const T * end() const { return mBuffer.Get() + mCount; }
+    T * begin() { return mBuffer; }
+    T * end() { return mBuffer + mCount; }
+    const T * begin() const { return mBuffer; }
+    const T * end() const { return mBuffer + mCount; }
 
 protected:
-    bool mResizeIsEn = false;
-    size_t mCapacity = 0;
-    size_t mCount    = 0;
-    Platform::ScopedMemoryBuffer<T> mBuffer;
-
-    RetCode createBuffer()
-    {
-        if (mCapacity == 0)
-        {
-            return RetCode::kNoInit;
-        }
-
-        if (!mBuffer.Calloc(mCapacity))
-        {
-            return RetCode::kNoMem;
-        }
-
-        mCount = 0;
-        return RetCode::kSuccess;
-    }
-
-    RetCode resize(size_t newCapacity)
-    {
-        if (newCapacity == mCapacity)
-        {
-            return RetCode::kSuccess;
-        }
-
-        if (newCapacity < mCount)
-        {
-            return RetCode::kInUse;
-        }
-
-        Platform::ScopedMemoryBuffer<T> newBuffer;
-        if (!newBuffer.Calloc(newCapacity))
-        {
-            return RetCode::kNoMem;
-        }
-
-        // Use std::move for efficient transfer
-        if (mBuffer.Get() && mCount > 0)
-        {
-            std::move(mBuffer.Get(), mBuffer.Get() + mCount, newBuffer.Get());
-        }
-
-        mBuffer   = std::move(newBuffer);
-        mCapacity = newCapacity;
-        return RetCode::kSuccess;
-    }
-
-    RetCode ensureCapacity(size_t requiredCapacity)
-    {
-        if (requiredCapacity <= mCapacity)
-        {
-            return RetCode::kSuccess;
-        }
-
-        if ((requiredCapacity > mCapacity) && !mResizeIsEn)
-        {
-            return RetCode::kNoMem;
-        }
-
-        size_t newCapacity = std::max(requiredCapacity, mCapacity * 2);
-        return resize(newCapacity);
-    }
+    T mBuffer[Capacity];
+    size_t mCount = 0;
 
     RetCode insertAtEnd(const T & item)
     {
-        // Check if we need to resize
-        RetCode ret = ensureCapacity(mCount + 1);
-        if (ret != RetCode::kSuccess)
-        {
-            return ret;
+        if (mCount >= Capacity) {
+            return RetCode::kNoMem;
         }
 
         // Append to the end
@@ -194,14 +99,12 @@ protected:
     }
 };
 
-template <typename ItemType>
-class CTC_UnorderedSet : public CTC_ContainerClassBase<ItemType>
+template <typename ItemType, size_t Capacity>
+class CTC_UnorderedSet : public CTC_ContainerClassBase<ItemType, Capacity>
 {
 public:
-    using Base = CTC_ContainerClassBase<ItemType>;
+    using Base = CTC_ContainerClassBase<ItemType, Capacity>;
     using Base::Base;
-
-    CTC_UnorderedSet(size_t aCapacity = 0, bool aResizeIsEn = false) : Base(aCapacity, aResizeIsEn) {}
 
     CTC_UnorderedSet(CTC_UnorderedSet && other) noexcept             = default;
     CTC_UnorderedSet & operator=(CTC_UnorderedSet && other) noexcept = default;
@@ -257,11 +160,26 @@ public:
      * @note Automatically resizes if needed (if ensureCapacity is implemented)
      * @note Duplicate items from 'other' are skipped
      */
-    void merge(CTC_UnorderedSet & other)
+    template<typename InputIterator>
+    void mergeIt(InputIterator first, InputIterator last)
     {
+        for (auto it = first; it != last; ++it) {
+            if (!this->contains(*it)) {
+                auto ret = this->insertAtEnd(*it);
+                VerifyOrDie(ret == Base::RetCode::kSuccess);
+            }
+        }
+    }
+
+    /**
+     * @brief Merge from any container (std::vector, std::array, etc.)
+     */
+    template<typename Container>
+    void merge(const Container& container) {
+                auto ret = Base::RetCode::kSuccess;
         // Calculate required capacity including only non-duplicates
         size_t nonDuplicateCount = 0;
-        for (const auto & item : other)
+        for (const auto & item : container)
         {
             if (!this->contains(item))
             {
@@ -270,29 +188,17 @@ public:
         }
 
         size_t requiredCapacity = this->mCount + nonDuplicateCount;
+        if (requiredCapacity > Capacity) {
+            ret = Base::RetCode::kNoMem;
+        }
 
-        // Try to ensure capacity (if implemented)
-        auto ret = this->ensureCapacity(requiredCapacity);
         VerifyOrDie(ret == Base::RetCode::kSuccess);
 
-        // Process all items in other set
-        while (other.mCount > 0)
-        {
-            // Always take the last element (for efficient removal)
-            ItemType item = std::move(other.mBuffer[other.mCount - 1]);
-            other.mCount--;
-
-            // Add to this set if not duplicate
-            if (!this->contains(item))
-            {
-                ret = this->insertAtEnd(std::move(item));
-                VerifyOrDie(ret == Base::RetCode::kSuccess);
-            }
-        }
+        mergeIt(container.begin(), container.end());
     }
 };
 
-template <typename KeyType, typename ValueType>
+template <typename KeyType, typename ValueType, size_t Capacity>
 class CTC_UnorderedMap
 {
 public:
@@ -302,10 +208,10 @@ public:
 
 private:
     // Custom set that only compares keys for uniqueness
-    class PairSet : public CTC_UnorderedSet<PairType>
+    class PairSet : public CTC_UnorderedSet<PairType, Capacity>
     {
     public:
-        using Base = CTC_UnorderedSet<PairType>;
+        using Base = CTC_UnorderedSet<PairType, Capacity>;
         using Base::Base;
 
         PairType * insertUnchecked(const PairType & pair)
@@ -357,7 +263,7 @@ private:
     PairSet mPairStorage;
 
 public:
-    CTC_UnorderedMap(size_t aCapacity = 0, bool aResizeIsEn = false) : mPairStorage(aCapacity, aResizeIsEn) {}
+    CTC_UnorderedMap() = default;
 
     bool insert(const KeyType & key, const ValueType & value) { return mPairStorage.insert(std::make_pair(key, value)); }
 
@@ -444,25 +350,25 @@ struct TariffUpdateCtx
      * @brief Master set of all valid DayEntry IDs
      * @details Contains all DayEntry IDs that exist in the tariff definition
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t> DayEntryKeyIDs;
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength> DayEntryKeyIDs;
 
     /**
      * @brief DayEntry IDs referenced by DayPattern items
      * @details Collected separately for reference validation
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t> DayPatternsDayEntryIDs;
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength> DayPatternsDayEntryIDs;
 
     /**
      * @brief DayEntry IDs referenced by IndividualDays items
      * @details Collected separately for reference validation
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t> IndividualDaysDayEntryIDs;
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength> IndividualDaysDayEntryIDs;
 
     /**
      * @brief DayEntry IDs referenced by TariffPeriod items
      * @details Collected separately for reference validation
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t> TariffPeriodsDayEntryIDs;
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength> TariffPeriodsDayEntryIDs;
 
     /// @}
 
@@ -472,13 +378,13 @@ struct TariffUpdateCtx
      * @brief Master set of all valid TariffComponent IDs
      * @details Contains all TariffComponent IDs that exist in the tariff definition
      */
-    CommodityTariffContainers::CTC_UnorderedMap<uint32_t, uint32_t> TariffComponentKeyIDsFeatureMap;
+    CommodityTariffContainers::CTC_UnorderedMap<uint32_t, uint32_t, CommodityTariffConsts::kTariffComponentMaxLabelLength> TariffComponentKeyIDsFeatureMap;
 
     /**
      * @brief TariffComponent IDs referenced by TariffPeriod items
      * @details Collected for validating period->component references
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t> TariffPeriodsTariffComponentIDs;
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kTariffComponentMaxLabelLength> TariffPeriodsTariffComponentIDs;
     /// @}
 
     /// @name DayPattern ID Tracking
@@ -487,13 +393,13 @@ struct TariffUpdateCtx
      * @brief Master set of all valid DayPattern IDs
      * @details Contains all DayPattern IDs that exist in the tariff definition
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t> DayPatternKeyIDs;
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayPatternsAttrMaxLength> DayPatternKeyIDs;
 
     /**
      * @brief DayPattern IDs referenced by CalendarPeriod items
      * @details Collected for validating calendar->pattern references
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t> CalendarPeriodsDayPatternIDs;
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayPatternsAttrMaxLength> CalendarPeriodsDayPatternIDs;
     /// @}
 
     /**

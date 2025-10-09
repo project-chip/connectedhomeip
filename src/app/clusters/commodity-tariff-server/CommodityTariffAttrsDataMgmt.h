@@ -17,8 +17,8 @@
  */
 
 #pragma once
-#include "CommodityTariffConsts.h"
 #include "CommodityTariffContainers.h"
+#include <cstddef>
 #include <platform/LockTracker.h>
 
 #include <atomic>
@@ -297,8 +297,8 @@ struct StrToSpan
     }
 };
 
-template <typename T, auto X>
-void ListToMap(const DataModel::List<T> & aList, CommodityTariffContainers::CTC_UnorderedMap<uint32_t, const T *> & aMap)
+template <typename T, auto X, size_t Capacity>
+void ListToMap(const DataModel::List<T> & aList, CommodityTariffContainers::CTC_UnorderedMap<uint32_t, const T *, Capacity> & aMap)
 {
     for (const auto & item : aList)
     {

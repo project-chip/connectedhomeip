@@ -71,8 +71,9 @@ static void CleanUpIDs(DataModel::List<const uint32_t> & IDs)
     }
 }
 
+template<size_t Capacity>
 static bool HasDuplicateIDs(const DataModel::List<const uint32_t> & IDs,
-                            chip::app::CommodityTariffContainers::CTC_UnorderedSet<uint32_t> & seen)
+                            chip::app::CommodityTariffContainers::CTC_UnorderedSet<uint32_t, Capacity> & seen)
 {
     for (auto id : IDs)
     {
@@ -495,7 +496,7 @@ CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, 
 CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewValue, void * aCtx)
 {
     auto * ctx = static_cast<TariffUpdateCtx *>(aCtx);
-    CTC_UnorderedSet<uint32_t> entryTcIDs;
+    CTC_UnorderedSet<uint32_t, kTariffPeriodItemMaxIDs> entryTcIDs;
 
     if (!entryNewValue.label.IsNull())
     {
@@ -864,7 +865,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodS
 
     TariffUpdateCtx * ctx = static_cast<TariffUpdateCtx *>(mAuxData);
 
-    CTC_UnorderedSet<uint32_t> & CalendarPeriodsDayPatternIDs = ctx->CalendarPeriodsDayPatternIDs;
+    auto & CalendarPeriodsDayPatternIDs = ctx->CalendarPeriodsDayPatternIDs;
 
     auto & tariffStartDate = ctx->TariffStartTimestamp;
 

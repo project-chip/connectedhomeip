@@ -63,34 +63,17 @@ protected:
 TEST_F(TestCommodityTariffContainers, CreateEmptyInitAndDestroy)
 {
     {
-        CTC_UnorderedSet<int> sample(10);
+        CTC_UnorderedSet<int, 10> sample;
         EXPECT_EQ(sample.capacity(), 10u);
         EXPECT_EQ(sample.size(), 0u);
         EXPECT_TRUE(sample.empty());
     }
 }
 
-TEST_F(TestCommodityTariffContainers, CreateEmptyNotInitAndDestroy)
-{
-    {
-        CTC_UnorderedSet<uint32_t> sample;
-        EXPECT_EQ(sample.capacity(), 0u);
-        EXPECT_EQ(sample.size(), 0u);
-        EXPECT_TRUE(sample.empty());
-
-        EXPECT_TRUE(sample.insert(0xAA550000));
-        EXPECT_EQ(sample.size(), 1u);
-
-        EXPECT_TRUE(sample.insert(0xAA550001));
-        EXPECT_TRUE(sample.insert(0xAA550002));
-        EXPECT_EQ(sample.size(), 3u);
-    }
-}
-
 TEST_F(TestCommodityTariffContainers, CreateAndPutItems)
 {
     {
-        CTC_UnorderedSet<uint32_t> sample(10);
+        CTC_UnorderedSet<uint32_t, 10> sample;
         EXPECT_EQ(sample.capacity(), 10u);
         EXPECT_EQ(sample.size(), 0u);
         EXPECT_TRUE(sample.empty());
@@ -134,7 +117,7 @@ TEST_F(TestCommodityTariffContainers, CreateAndPutItems)
 
 TEST_F(TestCommodityTariffContainers, UnorderedSet_BasicInsertAndContains)
 {
-    CTC_UnorderedSet<uint32_t> sample(12);
+    CTC_UnorderedSet<uint32_t, 12> sample;
 
     for (size_t i = 0; i <= sample.capacity() - 3; i++)
     {
@@ -164,7 +147,7 @@ TEST_F(TestCommodityTariffContainers, UnorderedSet_BasicInsertAndContains)
 
 TEST_F(TestCommodityTariffContainers, UnorderedSet_DuplicatePrevention)
 {
-    CTC_UnorderedSet<int> set(10);
+    CTC_UnorderedSet<int, 10> set;
 
     EXPECT_TRUE(set.insert(100));
     EXPECT_TRUE(set.insert(200));
@@ -177,7 +160,7 @@ TEST_F(TestCommodityTariffContainers, UnorderedSet_DuplicatePrevention)
 
 TEST_F(TestCommodityTariffContainers, UnorderedSet_RemoveEntry)
 {
-    CTC_UnorderedSet<int> set(10);
+    CTC_UnorderedSet<int, 10> set;
 
     EXPECT_TRUE(set.insert(100));
     EXPECT_TRUE(set.insert(200));
@@ -205,7 +188,7 @@ TEST_F(TestCommodityTariffContainers, UnorderedSet_RemoveEntry)
 
 TEST_F(TestCommodityTariffContainers, UnorderedSet_Iteration)
 {
-    CTC_UnorderedSet<int> set(5);
+    CTC_UnorderedSet<int, 5> set;
     std::array<int, 3> expected = { 10, 20, 30 };
 
     for (int value : expected)
@@ -231,7 +214,7 @@ TEST_F(TestCommodityTariffContainers, UnorderedSet_Iteration)
 
 TEST_F(TestCommodityTariffContainers, UnorderedSet_CapacityLimits)
 {
-    CTC_UnorderedSet<int> set(3);
+    CTC_UnorderedSet<int, 3> set;
 
     EXPECT_TRUE(set.insert(1));
     EXPECT_TRUE(set.insert(2));
@@ -244,7 +227,7 @@ TEST_F(TestCommodityTariffContainers, UnorderedSet_CapacityLimits)
 
 TEST_F(TestCommodityTariffContainers, UnorderedMap_BasicOperations)
 {
-    CTC_UnorderedMap<uint8_t, uint32_t> map(10);
+    CTC_UnorderedMap<uint8_t, uint32_t, 10> map;
 
     EXPECT_TRUE(map.insert(1, 0x11));
     EXPECT_TRUE(map.insert(2, 0x12));
@@ -277,6 +260,33 @@ TEST_F(TestCommodityTariffContainers, UnorderedMap_BasicOperations)
     EXPECT_EQ(map.size(), 4u);
 
     EXPECT_FALSE(map.insert(1, 100)); // Duplicate key
+}
+
+TEST_F(TestCommodityTariffContainers, UnorderedMap_OperatorBracket) {
+    CTC_UnorderedMap<uint8_t, uint32_t, 3> map;
+    
+    map.insert(1, 10);  
+    
+    // Access existing element  
+    EXPECT_EQ(map[1], 10u);  
+    map[1] = 11; // Modify existing  
+    EXPECT_EQ(map[1], 11u);  
+    EXPECT_EQ(map.size(), 1u);  
+    
+    // Create new element  
+    map[2] = 20;  
+    EXPECT_EQ(map.size(), 2u);  
+    EXPECT_EQ(map[2], 20u);  
+    
+    // Create another new element up to capacity  
+    map[3] = 30;  
+    EXPECT_EQ(map.size(), 3u);  
+    EXPECT_EQ(map[3], 30u);  
+
+    // Check all values  
+    EXPECT_EQ(map[1], 11u);  
+    EXPECT_EQ(map[2], 20u);  
+    EXPECT_EQ(map[3], 30u);  
 }
 
 } // namespace app
