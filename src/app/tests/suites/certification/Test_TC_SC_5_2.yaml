@@ -124,8 +124,8 @@ tests:
       command: "RemoveAllGroups"
 
     - label:
-          "Step 5: TH sends AddGroup Command to DUT with the following
-          settings 1)GroupID: 0x0103 2)GroupName: 'Test Group 0103'"
+          "Step 5: TH sends AddGroup Command to DUT with the following settings
+          1)GroupID: 0x0103 2)GroupName: 'Test Group 0103'"
       PICS: G.S.C00.Rsp
       command: "AddGroup"
       arguments:
