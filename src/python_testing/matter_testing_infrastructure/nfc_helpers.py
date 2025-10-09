@@ -25,10 +25,12 @@ import asyncio
 import logging
 import time
 
+
 class TagEventObserver(smartcard.CardMonitoring.CardObserver):
     """
     Observer class to handle tag (NFC) events.
     """
+
     def __init__(self, reader_helper):
         self.reader_helper = reader_helper
         self.last_ndef = None  # Store last NDEF bytes read
@@ -47,10 +49,12 @@ class TagEventObserver(smartcard.CardMonitoring.CardObserver):
         for tag in removed_tags:
             logging.debug("Tag removed.")
 
+
 class TagMonitorManager:
     """
     Class to activate/deactivate NFC monitoring in background.
     """
+
     def __init__(self, reader_helper):
         self.reader_helper = reader_helper
         self.tag_monitor = None
@@ -89,10 +93,12 @@ class TagMonitorManager:
     def deactivate(self):
         self._stop_event.set()
 
+
 class NFCReaderHelper:
     """
     Helper class for NFC reader operations and tag parsing.
     """
+
     def __init__(self, reader=None):
         """
         If reader is None, automatically connect to the first available reader.
@@ -147,11 +153,11 @@ class NFCReaderHelper:
             for idx, record in enumerate(ndef.message_decoder(ndef_bytes), 1):
                 lines.append(f"NDEF Record {idx}: {record}")
                 # Following has limited added value but is kept commented for reference
-                #for attr in ['tnf', 'type', 'id', 'uri', 'text', 'data']:
+                # for attr in ['tnf', 'type', 'id', 'uri', 'text', 'data']:
                 #    if hasattr(record, attr):
                 #        value = getattr(record, attr)
                 #        lines.append(f"  {attr}: {value}")
-                #lines.append("")  # Blank line between records
+                # lines.append("")  # Blank line between records
         except Exception as e:
             lines.append(f"Error decoding NDEF: {e}")
 
@@ -212,7 +218,6 @@ class NFCReaderHelper:
         logging.debug(self.ndef_content_to_string(bytes(ndef_data)))
         return bytes(ndef_data)
 
-    
     def is_onboarding_data(self, ndef_bytes):
         """
         Checks if the NDEF message contains a URI record starting with 'MT:' (case-insensitive).
@@ -282,7 +287,7 @@ class NFCReaderHelper:
         logging.info(f"Successfully wrote URI '{uri}' to NFC tag.")
         return True
 
-    
+
 class NFCConnectionManager:
     def __init__(self, reader_helper: NFCReaderHelper):
         self.reader_helper = reader_helper
@@ -300,15 +305,18 @@ class NFCConnectionManager:
         except Exception as e:
             logging.warning(f"Failed to disconnect NFC connection: {e}")
         return False
-    
-########### Main function to set up monitoring and handle tag events
+
+# Main function to set up monitoring and handle tag events
 # it allows testing basic operation without a test.
+
+
 def main():
     reader = NFCReaderHelper.get_connected_reader()
     if reader is None:
         sys.exit(1)
     helper = NFCReaderHelper(reader)
     # Example usage: helper.read_t4t_ndef(), etc.
+
 
 if __name__ == "__main__":
     main()

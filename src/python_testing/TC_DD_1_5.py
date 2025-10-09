@@ -50,11 +50,11 @@ class TC_DD_1_5(MatterBaseTest):
                      "Keep the DUT in packaging, if needed, activate tag detection in TH NFC reader, then bring in TH NFC reader at contact over all sides of the DUT packaging.",
                      "Onboarding Payload is not readable from the tag: Either the tag is not detected, or the content read is not Onboarding Payload.",
                      is_commissioning=False
-                    ),
+                     ),
             TestStep("2a",
                      "Unpack DUT from its packaging, locate NFC tag, and, if needed, follow instructions to activate the NFC tag.",
                      "NFC tag is ready (will be verified in next step)"
-                    ),
+                     ),
             TestStep("2b",
                      "If needed, activate tag detection in TH NFC reader, then bring in TH NFC reader close to the DUT’s NFC tag.",
                      "NFC tag is detected and read, it contains a Record of type URI whose data starts with \"MT:\""
@@ -62,7 +62,7 @@ class TC_DD_1_5(MatterBaseTest):
             TestStep("3",
                      "Try to write a new NDEF in the tag",
                      "Writing NFC tag failed, the content of the tag is unmodified."
-                    )
+                     )
         ]
 
     @async_test_body
@@ -110,6 +110,7 @@ class TC_DD_1_5(MatterBaseTest):
         loop = asyncio.get_running_loop()
         # Run the blocking function in a thread pool executor
         return await loop.run_in_executor(None, self.wait_for_user_input, *args, **kwargs)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
