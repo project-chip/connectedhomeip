@@ -17,19 +17,22 @@
  */
 
 #include "webrtc-abstract.h"
+#include <arpa/inet.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <rtc/rtc.hpp>
 
 namespace {
 
 // Constants
-constexpr int kVideoH264PayloadType = 96;
-constexpr int kVideoBitRate         = 3000;
-constexpr int kSSRC                 = 42;
-constexpr int kMaxFragmentSize      = 1188; // 1200 (max packet size) - 12 (RTP header size)
-constexpr int kAudioBitRate         = 64000;
-constexpr int kOpusPayloadType      = 111;
-constexpr int kAudioSSRC            = 43;
+constexpr int kVideoH264PayloadType    = 96;
+constexpr int kVideoBitRate            = 3000;
+constexpr int kSSRC                    = 42;
+constexpr int kMaxFragmentSize         = 1188; // 1200 (max packet size) - 12 (RTP header size)
+constexpr int kAudioBitRate            = 64000;
+constexpr int kOpusPayloadType         = 111;
+constexpr int kAudioSSRC               = 43;
+constexpr int kAudioPlaybackDestPort   = 6001;
+const char * kAudioPlaybackDestAddress = "127.0.0.1"; // Always localhost
 
 rtc::Description::Type SDPTypeToRtcType(SDPType type)
 {
@@ -145,10 +148,31 @@ public:
         mOpusPacketizer = std::make_shared<rtc::OpusRtpPacketizer>(mRtpCfgAudio);
         mOpusSr         = std::make_shared<rtc::RtcpSrReporter>(mRtpCfgAudio);
         mOpusNack       = std::make_shared<rtc::RtcpNackResponder>();
+        // Receiving Session to recv audio from remote peer
+        mOpusPacketizer->addToChain(std::make_shared<rtc::RtcpReceivingSession>());
+
         mOpusPacketizer->addToChain(mOpusSr);
         mOpusPacketizer->addToChain(mOpusNack);
 
         mTrack->setMediaHandler(mOpusPacketizer);
+
+        // UDP socket to push audio data
+        mAudioRTPSocket = socket(AF_INET, SOCK_DGRAM, 0);
+        if (mAudioRTPSocket == -1)
+        {
+            ChipLogError(Camera, "Failed to create RTP Audio socket, Cannot play remote audio: %s", strerror(errno));
+            return;
+        }
+        sockaddr_in audioAddr     = {};
+        audioAddr.sin_family      = AF_INET;
+        audioAddr.sin_addr.s_addr = inet_addr(kAudioPlaybackDestAddress);
+        audioAddr.sin_port        = htons(kAudioPlaybackDestPort);
+        mTrack->onMessage(
+            [this, audioAddr](const rtc::binary data) {
+                sendto(mAudioRTPSocket, reinterpret_cast<const char *>(data.data()), static_cast<size_t>(data.size()), 0,
+                       reinterpret_cast<const struct sockaddr *>(&audioAddr), sizeof(audioAddr));
+            },
+            nullptr);
     }
 
     void SendData(const char * data, size_t size) override
@@ -222,6 +246,7 @@ private:
 
     std::shared_ptr<rtc::Track> mTrack;
     int mPayloadType;
+    int mAudioRTPSocket = -1;
 
     // For Video
     std::shared_ptr<rtc::RtpPacketizationConfig> mRtpCfg;
