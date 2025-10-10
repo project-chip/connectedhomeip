@@ -308,7 +308,6 @@ bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
                      host.c_str());
         return false;
     }
-
     return true;
 }
 
