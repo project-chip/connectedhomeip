@@ -37,6 +37,9 @@
 #include <thread>
 #include <vector>
 
+static constexpr int kInvalidZoneId      = -1;
+static constexpr int kDefaultSensitivity = 5;
+
 class PushAVTransport : public Transport
 {
 public:
@@ -69,8 +72,8 @@ public:
     // Set Transport status
     void SetTransportStatus(chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum status);
 
-    void TriggerTransport(chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum activationReason, int zoneId = -1,
-                          int sensitivity = 5);
+    void TriggerTransport(chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum activationReason,
+                          int zoneId = kInvalidZoneId, int sensitivity = kDefaultSensitivity);
     // Get Transport status
     bool GetTransportStatus()
     {
@@ -100,12 +103,12 @@ public:
         mZoneSensitivityList = zoneSensitivityList;
     }
 
-    void SetCurrentlyUsedBandwidthMbps(double currentlyUsedBandwidthMbps)
+    void SetCurrentlyUsedBandwidthbps(uint32_t currentlyUsedBandwidthbps)
     {
-        mCurrentlyUsedBandwidthMbps = currentlyUsedBandwidthMbps;
+        mCurrentlyUsedBandwidthbps = currentlyUsedBandwidthbps;
     }
 
-    double GetCurrentlyUsedBandwidthMbps() { return mCurrentlyUsedBandwidthMbps; }
+    uint32_t GetCurrentlyUsedBandwidthbps() const { return mCurrentlyUsedBandwidthbps; }
 
     // Set the cluster server reference for direct API calls
     void SetPushAvStreamTransportServer(chip::app::Clusters::PushAvStreamTransportServer * server)
@@ -145,5 +148,5 @@ private:
     chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum mTransportStatus;
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTransportTriggerType;
     uint16_t mConnectionID;
-    double mCurrentlyUsedBandwidthMbps = 0.0;
+    uint32_t mCurrentlyUsedBandwidthbps = 0;
 };
