@@ -70,13 +70,47 @@ class TC_SC_4_1(MatterBaseTest):
 
     def steps_TC_SC_4_1(self):
         return [TestStep(1, "DUT is commissioned.", is_commissioning=True),
-                TestStep(2, """left""", """right"""),
-                TestStep(3, """left""", """right"""),
-                TestStep(4, """left""", """right"""),
-                TestStep(5, """left""", """right"""),
-                TestStep(6, """left""", """right"""),
-                TestStep(7, """left""", """right"""),
-                TestStep(8, """left""", """right"""),
+
+                TestStep(2, """Check if the ICD Management cluster is present""",
+                         """TH reads from the DUT the ServerList attribute from the Descriptor cluster on EP0
+                                - If the ICD Management cluster ID (70,0x46) is present in the list, set supports_icd to True, otherwise set supports_icd to False
+                                - If supports_icd is true
+                                    - TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold_ms"""),
+
+                TestStep(3, """Check if the LITS (Long Idle Time Support) feature is supported""",
+                         """If supports_icd is True:
+                                - TH reads the FeatureMap attribute from the ICD Management cluster on EP0
+                                    - If the LITS feature is set:
+                                        - Set supports_lit to True, otherwise, set supports_lit to False"""),
+
+                TestStep(4, """Check if the DUT supports TCP""",
+                         """If TCP is supported:
+                                - Set supports_tcp to True, otherwise, set supports_tcp to False"""),
+
+                TestStep(5, """Check if DUT supports Open Basic Commissioning Window""",
+                         """If supported:
+                                - Set supports_obcw to True, otherwise, set supports_obcw to False"""),
+
+                TestStep(6, """If the DUT supports the Open Basic Commissioning Window feature, put DUT
+                               in Commissioning Mode using Open Basic Commissioning Window command""",
+                         """DUT starts advertising Commissionable Node Discovery service through DNS-SD
+                                - TH performs a browse for the Commissionable Service PTR record of type _matterc._udp.local.
+                                    - Verify PTR record is returned
+                                - Using the PTR record’s service name:
+                                    - Verify DUT Commissionable Node Discovery service advertisements, expected CM=1
+                                - Close commissioning window"""),
+
+                TestStep(7, """DUT is put in Commissioning Mode using Open Commissioning Window command""",
+                         """DUT starts advertising Commissionable Node Discovery service through DNS-SD
+                                - TH performs a browse for the Commissionable Service PTR record of type _matterc._udp.local.
+                                    - Verify PTR record is returned
+                                - Using the PTR record’s service name:
+                                    - Verify DUT Commissionable Node Discovery service advertisements, expected CM=1
+                                - Close commissioning window"""),
+
+                TestStep(8, """Check if DUT is in Extended Discovery mode""",
+                         """TH performs a browse for the Commissionable Service PTR record of type _matterc._udp.local., if returned:
+                                - Use the PTR record’s service name to verify DUT Commissionable Node Discovery service advertisements, expected CM=0, or its equivalent, omitted CM key"""),
                 ]
 
     async def read_attribute(self, attribute: Any) -> Any:
