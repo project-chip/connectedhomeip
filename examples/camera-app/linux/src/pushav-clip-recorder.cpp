@@ -246,13 +246,12 @@ void PushAVClipRecorder::Stop()
 
             uint16_t connectionID = mConnectionID;
             auto triggerType      = mTriggerType;
-            auto reasonType       = mReasonType;
             auto * server         = mPushAvStreamTransportServer;
 
-            std::thread([server, connectionID, triggerType, reasonType]() {
+            std::thread([server, connectionID, triggerType]() {
                 ChipLogProgress(Camera, "Async thread: Calling NotifyTransportStopped for connection %u", connectionID);
                 chip::DeviceLayer::PlatformMgr().LockChipStack();
-                server->NotifyTransportStopped(connectionID, triggerType, reasonType);
+                server->NotifyTransportStopped(connectionID, triggerType);
                 chip::DeviceLayer::PlatformMgr().UnlockChipStack();
                 ChipLogProgress(Camera, "Async thread: NotifyTransportStopped completed for connection %u", connectionID);
             }).detach();
