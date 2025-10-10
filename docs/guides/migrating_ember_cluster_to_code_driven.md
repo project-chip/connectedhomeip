@@ -46,8 +46,8 @@ cluster to a code-driven implementation.
             guide for more details.
 
 -   [ ] **1.3: Create the File Structure:**
-    -   [ ] Create a new directory for the cluster at
-            `src/app/clusters/<name>/`.
+    -   [ ] Use an existing directory for the cluster or create a new one if
+            missing at `src/app/clusters/<name>/`.
         -   **Note:** If the cluster was a pure Ember implementation, this
             directory may not exist. After creating it, you must add a mapping
             to `src/app/zap_cluster_list.json` under the `ServerDirectories`
