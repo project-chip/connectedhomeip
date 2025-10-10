@@ -551,22 +551,6 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     });
 
-    // Ensure that Privacy is not active
-    bool privacyModeActive = false;
-    if (mDelegate->IsPrivacyModeActive(privacyModeActive) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "HandleAllocatePushTransport: Cannot determine privacy mode state");
-        handler.AddStatus(commandPath, Status::InvalidInState);
-        return std::nullopt;
-    }
-
-    if (privacyModeActive)
-    {
-        ChipLogError(Zcl, "HandleAllocatePushTransport: Privacy mode is enabled");
-        handler.AddStatus(commandPath, Status::InvalidInState);
-        return std::nullopt;
-    }
-
     // Validate the TLS Endpoint
     TlsClientManagementDelegate::EndpointStructType TLSEndpoint;
     if (mTLSClientManagementDelegate != nullptr)
@@ -1076,22 +1060,6 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
         });
     }
 
-    // Ensure that Privacy is not active
-    bool privacyModeActive = false;
-    if (mDelegate->IsPrivacyModeActive(privacyModeActive) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "HandleManuallyTriggerTransport: Cannot determine privacy mode state");
-        handler.AddStatus(commandPath, Status::InvalidInState);
-        return std::nullopt;
-    }
-
-    if (privacyModeActive)
-    {
-        ChipLogError(Zcl, "HandleManuallyTriggerTransport: Privacy mode is enabled");
-        handler.AddStatus(commandPath, Status::InvalidInState);
-        return std::nullopt;
-    }
-
     FabricIndex fabricIndex                                = handler.GetAccessingFabricIndex();
     TransportConfigurationStorage * transportConfiguration = FindStreamTransportConnectionWithinFabric(connectionID, fabricIndex);
 
@@ -1119,6 +1087,13 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
 
     if (transportConfiguration->transportOptions.HasValue())
     {
+        status = CheckPrivacyModes(transportConfiguration->transportOptions.Value().streamUsage);
+        if (status != Status::Success)
+        {
+            handler.AddStatus(commandPath, status);
+            return std::nullopt;
+        }
+
         if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kContinuous)
         {
             auto clusterStatus = to_underlying(StatusCodeEnum::kInvalidTriggerType);
@@ -1215,6 +1190,62 @@ PushAvStreamTransportServerLogic::HandleFindTransport(CommandHandler & handler, 
     handler.AddResponse(commandPath, response);
 
     return std::nullopt;
+}
+
+Status PushAvStreamTransportServerLogic::CheckPrivacyModes(StreamUsageEnum streamUsage)
+{
+    bool hardPrivacyModeActive = false;
+
+    CHIP_ERROR err = mDelegate->IsHardPrivacyModeActive(hardPrivacyModeActive);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "PushAvStreamTransport:CheckPrivacyModes: Failed to check Hard Privacy mode: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+        return Status::Failure;
+    }
+
+    if (hardPrivacyModeActive)
+    {
+        ChipLogError(Zcl, "PushAvStreamTransport:CheckPrivacyModes: Hard Privacy mode is enabled");
+        return Status::InvalidInState;
+    }
+
+    bool softLivestreamPrivacyModeActive = false;
+    err                                  = mDelegate->IsSoftLivestreamPrivacyModeActive(softLivestreamPrivacyModeActive);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl,
+                     "PushAvStreamTransport:CheckPrivacyModes: Failed to check Soft LivestreamPrivacy mode: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+        return Status::Failure;
+    }
+
+    if (softLivestreamPrivacyModeActive && streamUsage == StreamUsageEnum::kLiveView)
+    {
+        ChipLogError(Zcl,
+                     "PushAvStreamTransport:CheckPrivacyModes: Soft LivestreamPrivacy mode is enabled and StreamUsage is LiveView");
+        return Status::InvalidInState;
+    }
+
+    bool softRecordingPrivacyModeActive = false;
+    err                                 = mDelegate->IsSoftRecordingPrivacyModeActive(softRecordingPrivacyModeActive);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl,
+                     "PushAvStreamTransport:CheckPrivacyModes: Failed to check SoftRecordingPrivacyModeActive: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+        return Status::Failure;
+    }
+
+    if (softRecordingPrivacyModeActive && (streamUsage == StreamUsageEnum::kRecording || streamUsage == StreamUsageEnum::kAnalysis))
+    {
+        ChipLogError(Zcl,
+                     "PushAvStreamTransport:CheckPrivacyModes: Soft RecordingPrivacy mode is enabled and StreamUsage is Recording "
+                     "or Analysis");
+        return Status::InvalidInState;
+    }
+
+    return Status::Success;
 }
 
 Status

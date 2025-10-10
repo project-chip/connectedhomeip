@@ -106,7 +106,11 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
-    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override;
+    CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override;
 
     void OnZoneTriggeredEvent(uint16_t zoneId);
 
@@ -129,6 +133,8 @@ private:
     std::vector<uint8_t> mBufferClientCert;
     std::vector<uint8_t> mBufferClientCertKey;
     std::vector<std::vector<uint8_t>> mBufferIntermediateCerts;
+
+    CHIP_ERROR IsAnyPrivacyModeActive(bool & isActive);
 
     /**
      * @brief Calculates the total bandwidth in Mbps for the given video and audio stream IDs.

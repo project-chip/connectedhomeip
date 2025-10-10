@@ -355,7 +355,19 @@ public:
         return PushAvStreamTransportStatusEnum::kUnknown;
     }
 
-    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override
+    CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override
+    {
+        isActive = false;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override
+    {
+        isActive = false;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override
     {
         isActive = false;
         return CHIP_NO_ERROR;
