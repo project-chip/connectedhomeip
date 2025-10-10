@@ -189,14 +189,14 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                               "maxPreRollLen": 4000,
                               "motionZones": zoneList,
                               "motionTimeControl": {"initialDuration": 20, "augmentationDuration": 1, "maxDuration": 25, "blindDuration": 1}}
-            status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, 
+            status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions,
                                                               tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
             asserts.assert_equal(status, Status.Success,
                                  "DUT must responds with Status Code Success.")
         except InteractionModelError as e:
             asserts.assert_equal(e.clusterStatus, Status.Success,
                                  "DUT must responds with Status Code Success.")
-  
+
         self.step(4)
         transportConfigs = await self.read_pavst_attribute_expect_success(endpoint,
                                                                           pvattr.CurrentConnections,
@@ -229,6 +229,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             status == Status.Success,
             "DUT responds with Success status code.",
         )
+
 
 if __name__ == "__main__":
     default_matter_test_main()
