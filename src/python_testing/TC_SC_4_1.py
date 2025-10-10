@@ -84,15 +84,14 @@ class TC_SC_4_1(MatterBaseTest):
                                         - Set supports_lit to True, otherwise, set supports_lit to False"""),
 
                 TestStep(4, """Check if the DUT supports TCP""",
-                         """If TCP is supported:
+                         """If supported:
                                 - Set supports_tcp to True, otherwise, set supports_tcp to False"""),
 
                 TestStep(5, """Check if DUT supports Open Basic Commissioning Window""",
                          """If supported:
                                 - Set supports_obcw to True, otherwise, set supports_obcw to False"""),
 
-                TestStep(6, """If the DUT supports the Open Basic Commissioning Window feature, put DUT
-                               in Commissioning Mode using Open Basic Commissioning Window command""",
+                TestStep(6, """If supports_obcw is True, DUT is put in Commissioning Mode using Open Basic Commissioning Window command""",
                          """DUT starts advertising Commissionable Node Discovery service through DNS-SD
                                 - TH performs a browse for the Commissionable Service PTR record of type _matterc._udp.local.
                                     - Verify PTR record is returned
