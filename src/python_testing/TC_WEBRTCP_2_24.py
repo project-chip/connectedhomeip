@@ -75,7 +75,11 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
     def pics_TC_WEBRTCP_2_24(self) -> list[str]:
         pics = [
             "WEBRTCP.S",
+            "WEBRTCP.S.F02",       # SFrame End-to-End Encryption feature
+            "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
             "AVSM.S",
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
         ]
         return pics
 
@@ -89,7 +93,6 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
 
         # SFrame cipher suite constants (from SFrame RFC)
         CIPHER_SUITE_AES_128_GCM = 0x0001
-        CIPHER_SUITE_AES_256_GCM = 0x0002
         CIPHER_SUITE_UNSUPPORTED = 0x9999  # Invalid cipher suite for testing
 
         self.step(1)

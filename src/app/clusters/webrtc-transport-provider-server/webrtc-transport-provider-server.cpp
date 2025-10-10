@@ -70,8 +70,7 @@ NodeId GetNodeIdFromCtx(const CommandHandler & commandHandler)
  *
  * @return true if all spec constraints are satisfied, false otherwise.
  */
-bool SFrameFollowsSpecConstraints(
-    const Clusters::WebRTCTransportProvider::Structs::SFrameStruct::DecodableType & sframeConfig)
+bool SFrameFollowsSpecConstraints(const Clusters::WebRTCTransportProvider::Structs::SFrameStruct::DecodableType & sframeConfig)
 {
     // Spec constraint: CipherSuite >= 1
     if (sframeConfig.cipherSuite < 1)
@@ -339,7 +338,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
 
     if (req.SFrameConfig.HasValue())
     {
-        if (!ValidateSFrameSpecConstraints(req.SFrameConfig.Value()))
+        if (!SFrameFollowsSpecConstraints(req.SFrameConfig.Value()))
         {
             ChipLogError(Zcl, "HandleSolicitOffer: SFrame spec constraint validation failed");
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
@@ -584,7 +583,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
 
     if (req.SFrameConfig.HasValue())
     {
-        if (!ValidateSFrameSpecConstraints(req.SFrameConfig.Value()))
+        if (!SFrameFollowsSpecConstraints(req.SFrameConfig.Value()))
         {
             ChipLogError(Zcl, "HandleProvideOffer: SFrame spec constraint validation failed");
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);

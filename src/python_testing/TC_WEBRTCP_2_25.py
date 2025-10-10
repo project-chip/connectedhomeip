@@ -76,8 +76,11 @@ class TC_WEBRTCP_2_25(MatterBaseTest, WEBRTCPTestBase):
     def pics_TC_WEBRTCP_2_25(self) -> list[str]:
         pics = [
             "WEBRTCP.S",
-            "WEBRTCP.S.F02",  # SFrame End-to-End Encryption feature
+            "WEBRTCP.S.F02",       # SFrame End-to-End Encryption feature
+            "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
             "AVSM.S",
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
         ]
         return pics
 
