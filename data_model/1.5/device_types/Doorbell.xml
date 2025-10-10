@@ -57,38 +57,25 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0018" name="Battery Storage" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0148" name="Doorbell" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial revision"/>
-    <revision revision="2" summary="Added mandate of two Power Source and Electrical Sensor composed devices types"/>
+    <revision revision="1" summary="Initial release"/>
   </revisionHistory>
-  <classification class="simple" scope="endpoint"/>
+  <classification superset="Generic Switch" class="simple" scope="endpoint"/>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
-      <optionalConform/>
+      <mandatoryConform/>
+    </cluster>
+    <cluster id="0x003B" name="Switch" side="server">
+      <mandatoryConform/>
+      <features>
+        <feature code="MS">
+          <mandatoryConform/>
+        </feature>
+      </features>
+    </cluster>
+    <cluster id="0x0556" name="Chime" side="client">
+      <mandatoryConform/>
     </cluster>
   </clusters>
-  <composedDeviceTypes>
-    <deviceType deviceTypeId="0x0510" deviceTypeName="Electrical Sensor">
-      <clusterRequirements>
-        <cluster id="0x0090" name="Electrical Power Measurement">
-          <mandatoryConform/>
-        </cluster>
-        <cluster id="0x0090" name="Electrical Power Measurement">
-          <mandatoryConform/>
-        </cluster>
-        <cluster id="0x0091" name="Electrical Energy Measurement">
-          <mandatoryConform/>
-        </cluster>
-        <cluster id="0x0091" name="Electrical Energy Measurement">
-          <mandatoryConform/>
-        </cluster>
-      </clusterRequirements>
-    </deviceType>
-  </composedDeviceTypes>
-  <composedDeviceTypes>
-    <cluster id="0x0003" name="Identify" side="server">
-      <optionalConform/>
-    </cluster>
-  </composedDeviceTypes>
 </deviceType>
