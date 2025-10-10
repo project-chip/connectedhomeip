@@ -560,6 +560,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                     check_tags_on_endpoint(device_type_id=closure_id, allowed_namespace=closure_namespace_id,
                                            max_num_tags_allowed_namespace=1, disallowed_namespace=closure_panel_namespace_id)
                 elif dt.deviceType == closure_panel_id:
-                    check_tags_on_endpoint(closure_panel_id, closure_panel_namespace_id, 1, closure_namespace_id)
+                    check_tags_on_endpoint(device_type_id=closure_panel_id, allowed_namespace=closure_panel_namespace_id,
+                                           max_num_tags_allowed_namespace=1, disallowed_namespace=closure_namespace_id)
 
         return problems
