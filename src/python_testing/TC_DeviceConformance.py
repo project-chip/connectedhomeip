@@ -105,7 +105,7 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
 
         if problems:
             self.problems.extend(problems)
-            self.fail_current_test("One or more root-node-restricted clusters appear on non-root-node endpoints")
+            self.fail_current_test("One or more device conformance violations were found")
 
     def steps_TC_DESC_2_3(self):
         return [TestStep(0, "TH performs a wildcard read of all attributes on all endpoints on the device"),
