@@ -193,7 +193,6 @@ class TC_DefaultChecker(MatterBaseTest, DefaultChecker):
 
     def test_TC_IDM_13_1(self):
         print(self.user_params)
-        self.step(0)
         self.step(1)
         self.step(2)
         self.check_default_product_name()
