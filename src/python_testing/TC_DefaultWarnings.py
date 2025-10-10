@@ -167,8 +167,7 @@ class TC_DefaultChecker(MatterBaseTest, DefaultChecker):
         self.success = True
 
     def steps_TC_IDM_13_1(self):
-        steps = [TestStep(0, "Commissioning, already done", is_commissioning=True),
-                 TestStep(1, "TH performs a wildcard read of all attributes"),
+        steps = [TestStep(1, "TH performs a wildcard read of all attributes"),
                  TestStep(2, f"If the {FLAG_PRODUCT_NAME} flag is not set, check for \"Test\" in the product name",
                           "\"Test\" does not appear in the product name"),
                  TestStep(3, f"If the {FLAG_VENDOR_NAME} flag is not set, check for \"Test\" in the vendor name",
