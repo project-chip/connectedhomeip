@@ -62,8 +62,8 @@ public:
      * @param outBandwidthbps Output parameter for the calculated total bandwidth in bps.
      */
     virtual void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                    const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
-                                    uint32_t & outBandwidthbps) = 0;
+                                        const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
+                                        uint32_t & outBandwidthbps) = 0;
 };
 
 } // namespace CameraAvStreamManagement
