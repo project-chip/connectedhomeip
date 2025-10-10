@@ -517,7 +517,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         self.step(20)
         if not self.check_pics("PICS_SDK_CI_ONLY"):
             skipped = self.user_verify_push_av_stream(
-                                prompt_msg="Verify the video stream is being transmitted by playing the live video and viewing the uploaded contents."
+                prompt_msg="Verify the video stream is being transmitted by playing the live video and viewing the uploaded contents."
             )
             if skipped:
                 # For when running in CLI
