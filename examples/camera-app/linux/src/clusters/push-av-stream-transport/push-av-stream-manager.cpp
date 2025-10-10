@@ -273,7 +273,6 @@ void PushAvStreamTransportManager::GetBandwidthForStreams(const Optional<DataMod
     return;
 }
 
-
 Protocols::InteractionModel::Status
 PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage,
                                                      const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
