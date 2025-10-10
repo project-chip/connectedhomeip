@@ -240,7 +240,6 @@ tests:
           "Step 11: TH removes the Group key set that was added by sending a
           KeySetRemove command to the GroupKeyManagement cluster with the
           GroupKeySetID field set to 0x01a3"
-      PICS: GRPKEY.S.C03.Rsp
       cluster: "Group Key Management"
       endpoint: 0
       command: "KeySetRemove"
