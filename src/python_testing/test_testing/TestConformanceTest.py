@@ -609,7 +609,7 @@ class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
         problems = self.check_closure_restricted_sem_tags()
         asserts.assert_equal(len(problems), 3, "Did not find expected problem with Closure Panel tags")
 
-        # Other tag from unrelated namespace and no Closure Panel tag
+        # Other tag from unrelated namespace and no Closure Panel tag - not ok
         tags = [Clusters.Globals.Structs.SemanticTagStruct(
             namespaceID=0x11, tag=0x31)]
         create_endpoint(closure_panel_id, one_five_revision, tags)
