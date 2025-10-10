@@ -770,7 +770,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         else
         {
             auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-                mDelegate->ValidateVideoStream(transportOptions.videoStreamID.Value().Value()));
+                mDelegate->SetVideoStream(transportOptions.videoStreamID.Value().Value()));
 
             if (!delegateStatus.IsSuccess())
             {
@@ -802,7 +802,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         else
         {
             auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-                mDelegate->ValidateAudioStream(transportOptions.audioStreamID.Value().Value()));
+                mDelegate->SetAudioStream(transportOptions.audioStreamID.Value().Value()));
 
             if (!delegateStatus.IsSuccess())
             {

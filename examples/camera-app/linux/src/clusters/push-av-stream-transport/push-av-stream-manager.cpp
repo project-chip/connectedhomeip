@@ -503,7 +503,7 @@ bool PushAvStreamTransportManager::ValidateMotionZoneListSize(size_t zoneListSiz
     return true;
 }
 
-Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateVideoStream(uint16_t videoStreamId)
+Protocols::InteractionModel::Status PushAvStreamTransportManager::SetVideoStream(uint16_t videoStreamId)
 {
     if (mCameraDevice == nullptr)
     {
@@ -511,15 +511,21 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateVideoS
         return Status::Failure;
     }
 
-    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
-    if (CHIP_NO_ERROR == avsmController.ValidateVideoStreamID(videoStreamId))
+    auto & allocatedVideoStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedVideoStreams();
+    for (const auto & stream : allocatedVideoStreams)
     {
-        return Status::Success;
+        if (videoStreamId == stream.videoStreamID)
+        {
+            ChipLogProgress(Camera, "Selecting validated video stream ID %u", videoStreamId);
+            mVideoStreamParams = stream;
+            return Status::Success;
+        }
     }
+
     return Status::Failure;
 }
 
-Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateAudioStream(uint16_t audioStreamId)
+Protocols::InteractionModel::Status PushAvStreamTransportManager::SetAudioStream(uint16_t audioStreamId)
 {
     if (mCameraDevice == nullptr)
     {
@@ -527,11 +533,15 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateAudioS
         return Status::Failure;
     }
 
-    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
-
-    if (CHIP_NO_ERROR == avsmController.ValidateAudioStreamID(audioStreamId))
+    auto & allocatedAudioStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedAudioStreams();
+    for (const auto & stream : allocatedAudioStreams)
     {
-        return Status::Success;
+        if (audioStreamId == stream.audioStreamID)
+        {
+            ChipLogProgress(Camera, "Selecting validated audio stream ID %u", audioStreamId);
+            mAudioStreamParams = stream;
+            return Status::Success;
+        }
     }
     return Status::Failure;
 }
