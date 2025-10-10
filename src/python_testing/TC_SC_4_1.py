@@ -221,7 +221,7 @@ class TC_SC_4_1(MatterBaseTest):
             # Verify that the 'Long Discriminator' subtype PTR record's
             # 'service_name' is the same as the SRV record 'service_name'
             asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
-                                "Long Discriminator subtype PTR record service name must be equal to the SRV record service name.")
+                                 "Long Discriminator subtype PTR record service name must be equal to the SRV record service name.")
 
         # *** SHORT DISCRIMINATOR SUBTYPE ***
         # Validate that the 'Short Discriminator' subtype is a 4-bit variable
@@ -246,7 +246,7 @@ class TC_SC_4_1(MatterBaseTest):
             # Verify that the 'Short Discriminator' subtype PTR record's
             # 'service_name' is the same as the SRV record's 'service_name'
             asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
-                                "Short Discriminator subtype PTR record service name must be equal to the SRV record service name.")
+                                 "Short Discriminator subtype PTR record service name must be equal to the SRV record service name.")
 
         # *** IN COMMISSIONING MODE SUBTYPE ***
         # Verify presence of the _CM subtype
