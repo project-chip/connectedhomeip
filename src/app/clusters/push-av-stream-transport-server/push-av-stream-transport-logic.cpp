@@ -274,7 +274,7 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         transportOptions.videoStreamID.HasValue() || transportOptions.audioStreamID.HasValue(), Status::InvalidCommand,
         ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Missing videoStreamID and audioStreamID",
                      mEndpointId));
-    VerifyOrReturnValue(transportOptions.endpointID <= kMaxEndpointId, Status::ConstraintError,
+    VerifyOrReturnValue(transportOptions.TLSEndpointID <= kMaxEndpointId, Status::ConstraintError,
                         ChipLogError(Zcl,
                                      "Transport Options verification from command data[ep=%d]: EndpointID field Constraint Error",
                                      mEndpointId));
@@ -556,7 +556,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     if (mTLSClientManagementDelegate != nullptr)
     {
         Status tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
-            commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.endpointID, TLSEndpoint);
+            commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.TLSEndpointID, TLSEndpoint);
 
         VerifyOrDo(tlsEndpointValidityStatus == Status::Success, {
             ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLSEndpointID of command data is not valid/Provisioned",
@@ -1270,16 +1270,12 @@ PushAvStreamTransportServerLogic::GeneratePushTransportBeginEvent(const uint16_t
     return Status::Success;
 }
 
-Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uint16_t connectionID,
-                                                                       const TransportTriggerTypeEnum triggerType,
-                                                                       const Optional<TriggerActivationReasonEnum> activationReason)
+Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uint16_t connectionID)
 {
     Events::PushTransportEnd::Type event;
     EventNumber eventNumber;
 
-    event.connectionID     = connectionID;
-    event.triggerType      = triggerType;
-    event.activationReason = activationReason;
+    event.connectionID = connectionID;
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
@@ -1309,8 +1305,7 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStarted(uint16_t connect
     return GeneratePushTransportBeginEvent(connectionID, triggerType, activationReason);
 }
 
-Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connectionID, TransportTriggerTypeEnum triggerType,
-                                                                Optional<TriggerActivationReasonEnum> activationReason)
+Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connectionID, TransportTriggerTypeEnum triggerType)
 {
     ChipLogProgress(Zcl, "NotifyTransportStopped called for connectionID %u with triggerType %u", connectionID,
                     to_underlying(triggerType));
@@ -1324,7 +1319,7 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connect
     }
 
     // Generate the PushTransportEnd event
-    return GeneratePushTransportEndEvent(connectionID, triggerType, activationReason);
+    return GeneratePushTransportEndEvent(connectionID);
 }
 
 } // namespace Clusters
