@@ -643,10 +643,6 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     config.discriminators.extend(args.discriminators)
     config.setup_passcodes.extend(args.passcodes)
 
-    if args.qr_code != [] and args.manual_code != []:
-        print("error: Cannot have both --qr-code and --manual-code present!")
-        return False
-
     if len(config.discriminators) != len(config.setup_passcodes):
         print("error: supplied number of discriminators does not match number of passcodes")
         return False
@@ -865,7 +861,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
 
     commission_group.add_argument('--tc-user-response-to-simulate', type=int, help="Terms and conditions acknowledgements")
 
-    code_group = parser.add_mutually_exclusive_group(required=False)
+    code_group = parser.add_argument_group(title="Setup codes")
 
     code_group.add_argument('-q', '--qr-code', type=str,
                             metavar="QR_CODE", default=[], help="QR setup code content (overrides passcode and discriminator)", nargs="+")
