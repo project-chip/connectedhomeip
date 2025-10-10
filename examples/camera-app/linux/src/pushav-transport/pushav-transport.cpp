@@ -168,9 +168,13 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
 
     if (audioCodec == 0)
     {
+        if (audioStreamParams.sampleRate == 0)
+        {
+            audioStreamParams.sampleRate = 48000; // Fallback value for invalid sample rate
+        }
         mAudioInfo.mAudioCodecId       = AV_CODEC_ID_OPUS;
-        mAudioInfo.mAudioTimeBase      = { 1, 48000 };
-        mAudioInfo.mAudioFrameDuration = 19200;
+        mAudioInfo.mAudioTimeBase      = { 1, static_cast<int>(audioStreamParams.sampleRate) };
+        mAudioInfo.mAudioFrameDuration = 20000; // Default OPUS frame duration
     }
     else if (audioCodec == 2)
     {
@@ -222,8 +226,8 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
     mVideoInfo.mHeight = videoStreamParams.maxResolution.height;
     if (videoStreamParams.minFrameRate == 0)
     {
-        ChipLogError(Camera, "Invalid frame rate: 0. Using fallback 15 fps.");
-        videoStreamParams.minFrameRate = 15;
+        ChipLogError(Camera, "Invalid frame rate: 0. Using fallback 30 fps.");
+        videoStreamParams.minFrameRate = 30;
     }
     mVideoInfo.mFrameRate = videoStreamParams.minFrameRate;
 
