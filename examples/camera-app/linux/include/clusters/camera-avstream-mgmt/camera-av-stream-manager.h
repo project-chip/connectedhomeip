@@ -82,6 +82,9 @@ public:
 
     CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override;
 
+    CHIP_ERROR
+    IsPrivacyModeActive(bool & isActive, AttributeId privacyModeAttributeId) override;
+
     bool HasAllocatedVideoStreams() override;
 
     bool HasAllocatedAudioStreams() override;

@@ -46,6 +46,8 @@ public:
 
     virtual CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) = 0;
 
+    virtual CHIP_ERROR IsPrivacyModeActive(bool & isActive, AttributeId privacyModeAttributeId) = 0;
+
     virtual CHIP_ERROR SetHardPrivacyModeOn(bool hardPrivacyMode) = 0;
 
     virtual bool HasAllocatedVideoStreams() = 0;
