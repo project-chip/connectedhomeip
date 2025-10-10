@@ -390,7 +390,7 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
 
     // we assume NO open endpoints
     gUDP.ForEachEndPoint([](const UDPEndPointHandle & ep) {
-        ADD_FAILURE("Unexpected UDP endpoint in use")
+        EXPECT_TRUE(ep.IsNull()); // Expect no endpoints
         return Loop::Continue;
     });
 
@@ -422,7 +422,7 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // we assume NO open endpoints
     gTCP.ForEachEndPoint([](const TCPEndPointHandle & ep) {
-        ADD_FAILURE("Unexpected TCP endpoint in use")
+        EXPECT_TRUE(ep.IsNull()); // Expect no endpoints
         return Loop::Continue;
     });
 
