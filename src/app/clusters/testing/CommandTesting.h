@@ -41,7 +41,8 @@ namespace app {
                 const Protocols::InteractionModel::ClusterStatusCode & aStatus,
                 const char * context = nullptr) override;
 
-            void AddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::ClusterStatusCode & aStatus,
+            void AddStatus(const ConcreteCommandPath & aRequestCommandPath,
+                const Protocols::InteractionModel::ClusterStatusCode & aStatus,
                 const char * context = nullptr) override;
 
             FabricIndex GetAccessingFabricIndex() const override { return 1; }
