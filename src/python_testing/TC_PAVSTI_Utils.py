@@ -130,7 +130,7 @@ class PushAvServerProcess(Subprocess):
         response = self._post_json("/streams")
         return response["stream_id"]
 
-    def update_track_name(self, stream_id: str, trackName: str) -> str:
+    def update_track_name(self, stream_id: str, trackName: str) -> None:
         """
             Request the server to add a track name associated with stream_id.
             This is required to validate trackName of the segments that are uploaded.
