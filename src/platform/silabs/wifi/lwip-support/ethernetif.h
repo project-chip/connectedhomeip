@@ -20,10 +20,8 @@
 #include "lwip/err.h"
 #include "lwip/netif.h"
 
-#ifdef WF200_WIFI
 #include "sl_wfx_api.h"
 #include "sl_wfx_constants.h"
-#endif // WF200_WIFI
 
 #ifdef __cplusplus
 extern "C" {

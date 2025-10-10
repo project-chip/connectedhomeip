@@ -25,10 +25,7 @@
 #include "lwip/ethip6.h"
 #include "lwip/timeouts.h"
 #include "netif/etharp.h"
-
-#ifdef WF200_WIFI
 #include "sl_wfx.h"
-#endif
 
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/silabs/wifi/WifiInterface.h>
@@ -174,7 +171,6 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
  * @return
  *    ERR_OK if successful
  ******************************************************************************/
-#ifdef WF200_WIFI
 static err_t low_level_output(struct netif * netif, struct pbuf * p)
 {
     struct pbuf * q;
@@ -294,37 +290,6 @@ void sl_wfx_host_received_frame_callback(sl_wfx_received_ind_t * rx_buffer)
     }
 }
 
-#elif (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-/*****************************************************************************
- *  @fn  void sl_si91x_host_process_data_frame(uint8_t *buf, int len)
- *  @brief
- *    host received frame cb
- *
- * @param[in] buf: buffer
- *
- * @param[in] len: length
- *
- * @return
- *    None
- ******************************************************************************/
-sl_status_t sl_si91x_host_process_data_frame(sl_wifi_interface_t interface, sl_wifi_buffer_t * buffer)
-{
-    void * packet;
-    struct netif * ifp;
-    sl_si91x_packet_t * rsi_pkt;
-    packet  = sl_si91x_host_get_buffer_data(buffer, 0, NULL);
-    rsi_pkt = (sl_si91x_packet_t *) packet;
-    /* get the network interface for STATION interface,
-     * and forward the received frame buffer to LWIP
-     */
-    if ((ifp = GetNetworkInterface(SL_WFX_STA_INTERFACE)) != (struct netif *) 0)
-    {
-        low_level_input(ifp, rsi_pkt->data, rsi_pkt->length);
-    }
-    return SL_STATUS_OK;
-}
-#endif // WF200_WIFI
-
 /*****************************************************************************
  *  @fn  err_t sta_ethernetif_init(struct netif *netif)
  *  @brief
@@ -353,10 +318,6 @@ err_t sta_ethernetif_init(struct netif * netif)
 
     /* initialize the hardware */
     low_level_init(netif);
-#ifndef WF200_WIFI
-    /* Need single output only */
-    ethout_sem = xSemaphoreCreateBinaryStatic(&xEthernetIfSemaBuffer);
-    xSemaphoreGive(ethout_sem);
-#endif
+
     return ERR_OK;
 }
