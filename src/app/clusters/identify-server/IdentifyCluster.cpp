@@ -127,7 +127,7 @@ DataModel::ActionReturnStatus IdentifyCluster::SetIdentifyTime(IdentifyTimeChang
 
     if (mIdentifyTime > 0)
     {
-        mTimerDelegate.StartTimer(this, System::Clock::Seconds16(1));
+        ReturnErrorOnFailure(mTimerDelegate.StartTimer(this, System::Clock::Seconds16(1)));
     }
     else
     {
@@ -153,9 +153,8 @@ IdentifyCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TL
         Identify::Commands::Identify::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments));
         MATTER_TRACE_SCOPE("IdentifyCommand", "Identify");
-        NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
+        return NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
                                         SetIdentifyTime(IdentifyTimeChangeSource::kClient, data.identifyTime));
-        return Protocols::InteractionModel::Status::Success;
     }
     case Identify::Commands::TriggerEffect::Id: {
         Identify::Commands::TriggerEffect::DecodableType data;
@@ -167,36 +166,38 @@ IdentifyCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TL
         ChipLogProgress(Zcl, "RX identify:trigger effect identifier 0x%X variant 0x%X", to_underlying(mEffectIdentifier),
                         to_underlying(mEffectVariant));
 
-        if (mIdentifyDelegate)
+        // No callbacks, nothing to do.
+        if (!mIdentifyDelegate)
         {
-            if (mIdentifyTime > 0)
-            {
-                if (mEffectIdentifier == Identify::EffectIdentifierEnum::kFinishEffect)
-                {
-                    NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
-                                                    SetIdentifyTime(IdentifyTimeChangeSource::kClient, 1));
-                }
-                else if (mEffectIdentifier == Identify::EffectIdentifierEnum::kStopEffect)
-                {
-                    NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
-                                                    SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0));
-                }
-                else
-                {
-                    // Other effects: cancel and trigger new effect.
-                    NotifyAttributeChangedIfSuccess(
-                        Attributes::IdentifyTime::Id,
-                        SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0)); // This will call onIdentifyStop.
-                    mIdentifyDelegate->OnTriggerEffect(*this);
-                }
-            }
-            else
-            {
-                mIdentifyDelegate->OnTriggerEffect(*this);
-            }
+            return Protocols::InteractionModel::Status::Success;
         }
 
-        return Protocols::InteractionModel::Status::Success;
+        // Not identifying, trigger effect immediately.
+        if(mIdentifyTime == 0)
+        {
+            mIdentifyDelegate->OnTriggerEffect(*this);
+            return Protocols::InteractionModel::Status::Success;
+        }
+
+        // Currently identifying: handle stop/finish effects, otherwise cancel Identify process and trigger new effect.
+        if (mEffectIdentifier == Identify::EffectIdentifierEnum::kFinishEffect)
+        {
+            return NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
+                                                   SetIdentifyTime(IdentifyTimeChangeSource::kClient, 1));
+        }
+
+        if (mEffectIdentifier == Identify::EffectIdentifierEnum::kStopEffect)
+        {
+            return NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
+                                                   SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0));
+        }
+
+        // Other effects: cancel and trigger new effect.
+        auto err = NotifyAttributeChangedIfSuccess(
+            Attributes::IdentifyTime::Id,
+            SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0)); // This will call onIdentifyStop.
+        mIdentifyDelegate->OnTriggerEffect(*this);
+        return err;
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
