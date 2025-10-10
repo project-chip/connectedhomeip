@@ -30,6 +30,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          # Clone more than one commit because we need HEAD^..HEAD diff
+          fetch-depth: 2
       - name: Run checks
         run: |
           python3 scripts/tests/matter_yaml_linter.py
