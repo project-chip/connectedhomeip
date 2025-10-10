@@ -219,7 +219,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
         await software_version_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
-                                                  fabric_filtered=False, min_interval_sec=1, max_interval_sec=5)
+                                                  fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
         await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
@@ -232,7 +232,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60)
 
         update_state_match = AttributeMatcher.from_callable(
-            "Update state is kDelayedOnApply",
+            "Update state is Applying",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60*5)
 
@@ -246,7 +246,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         end_time = time()
         total_wait_time = end_time - start_time
         asserts.assert_greater_equal(
-            total_wait_time, 60*3, f"Software Udpate occured before the defined time of: {total_wait_time}")
+            total_wait_time, delayed_apply_action_time, f"Software Udpate occured before the defined time of: {total_wait_time}")
         logger.info(f"Time taken after the update was done applied {total_wait_time} seconds.")
 
         update_state_after = await self.read_single_attribute_check_success(
