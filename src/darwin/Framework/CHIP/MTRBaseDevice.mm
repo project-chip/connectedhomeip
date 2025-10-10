@@ -202,6 +202,31 @@ static bool CheckMemberOfType(NSDictionary<NSString *, id> * responseValue, NSSt
 static void LogStringAndReturnError(NSString * errorStr, CHIP_ERROR errorCode, NSError * __autoreleasing * error);
 static void LogStringAndReturnError(NSString * errorStr, MTRErrorCode errorCode, NSError * __autoreleasing * error);
 
+// entity could be an attribute, command, or event.
+static NSUInteger HashPath(NSNumber * _Nullable endpoint, NSNumber * _Nullable cluster, NSNumber * _Nullable entity)
+{
+    static_assert(sizeof(NSUInteger) == 4 || sizeof(NSUInteger) >= 8, "Unexpected NSUInteger size");
+
+    // Endpoint could be 16 bits, but is typically 8 bits.
+    // Cluster could be 32 bits, but is typically 12-16 bits, sometimes even 8.
+    // Entity could be 32 bits, but is typically 12-16 bits, sometimes even 8.
+
+    // The only time cluster or entity is > 16 bits is when vendor prefixes are
+    // used, and typically those would not both have vendor prefixes.
+
+    unsigned short endpointValue = endpoint.unsignedShortValue;
+    unsigned long clusterValue = cluster.unsignedLongValue;
+    unsigned long entityValue = entity.unsignedLongValue;
+
+    if constexpr (sizeof(NSUInteger) == 4) {
+        // Give endpoint its own 8 bits.  Then give 12 bits to each of the others.
+        return endpointValue ^ (clusterValue << 8) ^ (entityValue << 20);
+    } else {
+        // sizeof(NSUInteger) >= 8.  Give endpoint 10 bits, 27 bits each to the others.
+        return endpointValue ^ (clusterValue << 10) ^ (((NSUInteger) entityValue) << 37);
+    }
+}
+
 @implementation MTRReadClientContainer
 - (void)cleanup
 {
@@ -2467,7 +2492,7 @@ static NSString * FormatPossiblyWildcardClusterElement(NSNumber * _Nullable poss
 
 - (NSUInteger)hash
 {
-    return _endpoint.unsignedShortValue ^ (_cluster.unsignedLongValue << 8) ^ (_attribute.unsignedLongValue << 16);
+    return HashPath(_endpoint, _cluster, _attribute);
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -2594,7 +2619,7 @@ static NSString * const sAttributeIDKey = @"attributeIDKey";
 
 - (NSUInteger)hash
 {
-    return _endpoint.unsignedShortValue ^ (_cluster.unsignedLongValue << 8) ^ (_event.unsignedLongValue << 16);
+    return HashPath(_endpoint, _cluster, _event);
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -2715,7 +2740,7 @@ static NSString * const sEventAttributeIDKey = @"attributeIDKey";
 
 - (NSUInteger)hash
 {
-    return _endpoint.unsignedShortValue ^ (_cluster.unsignedLongValue << 8);
+    return HashPath(_endpoint, _cluster, nil);
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -2805,7 +2830,7 @@ static NSString * const sClusterKey = @"clusterKey";
 
 - (NSUInteger)hash
 {
-    return self.endpoint.unsignedShortValue ^ (self.cluster.unsignedLongValue << 8) ^ (_attribute.unsignedLongValue << 16);
+    return HashPath(self.endpoint, self.cluster, _attribute);
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -2901,7 +2926,7 @@ static NSString * const sAttributeKey = @"attributeKey";
 
 - (NSUInteger)hash
 {
-    return self.endpoint.unsignedShortValue ^ (self.cluster.unsignedLongValue << 8) ^ (_event.unsignedLongValue << 16);
+    return HashPath(self.endpoint, self.cluster, _event);
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -2992,7 +3017,7 @@ static NSString * const sEventKey = @"eventKey";
 
 - (NSUInteger)hash
 {
-    return self.endpoint.unsignedShortValue ^ (self.cluster.unsignedLongValue << 8) ^ (_command.unsignedLongValue << 16);
+    return HashPath(self.endpoint, self.cluster, _command);
 }
 
 - (id)copyWithZone:(NSZone *)zone
