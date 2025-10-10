@@ -26,7 +26,8 @@ namespace webrtc {
 
 // Forward declaration of utils used to extract information from sdp
 std::string ExtractMidFromSdp(const std::string & sdp, const std::string & mediaType);
-int ExtractDynamicPayloadType(const std::string & sdp, const std::string & type, const std::string & codec);
+int ExtractDynamicPayloadType(const std::string & sdp, const std::string & type, const std::string & mediaType,
+                              const std::string & codec);
 const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state);
 
 WebRTCClient::WebRTCClient()
@@ -218,11 +219,13 @@ void WebRTCClient::SetRemoteDescription(const std::string & sdp, const std::stri
     {
         // Controller is the answerer. Extract values from offer SDP and add tracks accordingly
         std::string videoMid = ExtractMidFromSdp(sdp, "video");
-        int videoPayloadType = ExtractDynamicPayloadType(sdp, type, "H264");
+        int videoPayloadType = ExtractDynamicPayloadType(sdp, type, "video", "H264");
+        videoPayloadType     = videoPayloadType == -1 ? kVideoH264PayloadType : videoPayloadType;
         addVideoTrack(videoMid, videoPayloadType);
 
         std::string audioMid = ExtractMidFromSdp(sdp, "audio");
-        int audioPayloadType = ExtractDynamicPayloadType(sdp, type, "opus");
+        int audioPayloadType = ExtractDynamicPayloadType(sdp, type, "audio", "opus");
+        audioPayloadType     = audioPayloadType == -1 ? kOpusPayloadType : audioPayloadType;
         addAudioTrack(audioMid, audioPayloadType);
     }
 
@@ -388,7 +391,8 @@ std::string ExtractMidFromSdp(const std::string & sdp, const std::string & media
     return "";
 }
 
-int ExtractDynamicPayloadType(const std::string & sdp, const std::string & type, const std::string & codec)
+int ExtractDynamicPayloadType(const std::string & sdp, const std::string & type, const std::string & mediaType,
+                              const std::string & codec)
 {
     rtc::Description desc(sdp, type);
     for (int mid = 0; mid < desc.mediaCount(); mid++)
@@ -402,6 +406,10 @@ int ExtractDynamicPayloadType(const std::string & sdp, const std::string & type,
         if (mediaDesc == nullptr)
         {
             ChipLogError(Camera, "Media Description is null at index=%d", mid);
+            continue;
+        }
+        if (mediaDesc->type() != mediaType)
+        {
             continue;
         }
 
@@ -421,15 +429,6 @@ int ExtractDynamicPayloadType(const std::string & sdp, const std::string & type,
         }
     }
     ChipLogError(Camera, "Payload type for codec %s not found", codec.c_str());
-    // Return default values for the supported codec
-    if (codec == "H264")
-    {
-        return kVideoH264PayloadType;
-    }
-    else if (codec == "opus")
-    {
-        return kOpusPayloadType;
-    }
     return -1;
 }
 
