@@ -839,6 +839,15 @@ void WebRTCTransportProviderServer::HandleProvideICECandidates(HandlerContext & 
     {
         // Get current candidate.
         const ICECandidateStruct & candidate = iter.GetValue();
+
+        // Validate SDPMid constraint: if present, must have min length 1
+        if (!candidate.SDPMid.IsNull() && candidate.SDPMid.Value().empty())
+        {
+            ChipLogError(Zcl, "HandleProvideICECandidates: SDPMid must have minimum length of 1 when present");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            return;
+        }
+
         candidates.push_back(candidate);
     }
 

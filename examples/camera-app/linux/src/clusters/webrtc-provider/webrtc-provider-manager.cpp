@@ -81,15 +81,13 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     // Resolve or allocate a VIDEO stream
     if (args.videoStreamId.HasValue())
     {
-        if (args.videoStreamId.Value().IsNull())
+        // Stream has been validated and potentially selected by ValidateStreamUsage()
+        // in the cluster server before invoking this delegate method
+        const auto & videoStreamIdNullable = args.videoStreamId.Value();
+        outSession.videoStreamID           = videoStreamIdNullable;
+        if (!videoStreamIdNullable.IsNull())
         {
-            // TODO: Automatically select the closest matching video stream for the StreamUsage requested by looking at the and the
-            // server MAY allocate a new video stream if there are available resources.
-        }
-        else
-        {
-            outSession.videoStreamID = args.videoStreamId.Value();
-            videoStreamID            = args.videoStreamId.Value().Value();
+            videoStreamID = videoStreamIdNullable.Value();
         }
     }
     else
@@ -100,15 +98,13 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     // Resolve or allocate an AUDIO stream
     if (args.audioStreamId.HasValue())
     {
-        if (args.audioStreamId.Value().IsNull())
+        // Stream has been validated and potentially selected by ValidateStreamUsage()
+        // in the cluster server before invoking this delegate method
+        const auto & audioStreamIdNullable = args.audioStreamId.Value();
+        outSession.audioStreamID           = audioStreamIdNullable;
+        if (!audioStreamIdNullable.IsNull())
         {
-            // TODO: Automatically select the closest matching audio stream for the StreamUsage requested and the server MAY
-            // allocate a new audio stream if there are available resources.
-        }
-        else
-        {
-            outSession.audioStreamID = args.audioStreamId.Value();
-            audioStreamID            = args.audioStreamId.Value().Value();
+            audioStreamID = audioStreamIdNullable.Value();
         }
     }
     else
@@ -257,14 +253,13 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     // Resolve or allocate a VIDEO stream
     if (args.videoStreamId.HasValue())
     {
-        if (args.videoStreamId.Value().IsNull())
+        // Stream has been validated and potentially selected by ValidateStreamUsage()
+        // in the cluster server before invoking this delegate method
+        const auto & videoStreamIdNullable = args.videoStreamId.Value();
+        outSession.videoStreamID           = videoStreamIdNullable;
+        if (!videoStreamIdNullable.IsNull())
         {
-            // TODO: Automatically select the closest matching video stream for the StreamUsage requested.
-        }
-        else
-        {
-            outSession.videoStreamID = args.videoStreamId.Value();
-            videoStreamID            = args.videoStreamId.Value().Value();
+            videoStreamID = videoStreamIdNullable.Value();
         }
     }
     else
@@ -275,14 +270,13 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     // Resolve or allocate an AUDIO stream
     if (args.audioStreamId.HasValue())
     {
-        if (args.audioStreamId.Value().IsNull())
+        // Stream has been validated and potentially selected by ValidateStreamUsage()
+        // in the cluster server before invoking this delegate method
+        const auto & audioStreamIdNullable = args.audioStreamId.Value();
+        outSession.audioStreamID           = audioStreamIdNullable;
+        if (!audioStreamIdNullable.IsNull())
         {
-            // TODO: Automatically select the closest matching audio stream for the StreamUsage requested
-        }
-        else
-        {
-            outSession.audioStreamID = args.audioStreamId.Value();
-            audioStreamID            = args.audioStreamId.Value().Value();
+            audioStreamID = audioStreamIdNullable.Value();
         }
     }
     else
