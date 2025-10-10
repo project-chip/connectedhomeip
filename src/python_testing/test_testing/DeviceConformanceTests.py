@@ -500,20 +500,15 @@ class DeviceConformanceTests(BasicCompositionTests):
         problems = []
         for endpoint_id, endpoint in self.endpoints.items():
             device_types = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
-            have_restricted_device_type = False
-            for dt in device_types:
-                if dt.deviceType in restricted_device_type_ids and dt.revision <= one_five_device_types[dt.deviceType].revision:
-                    have_restricted_device_type = True
-                    device_type_id = dt.deviceType
-            if not have_restricted_device_type:
-                continue
-
             have_closure = Clusters.ClosureControl in endpoint.keys() or Clusters.ClosureDimension in endpoint.keys()
             have_window_covering = Clusters.WindowCovering in endpoint.keys()
 
             if have_closure and have_window_covering:
-                problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
-                                              problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has both window covering and closure clusters"))
+                for dt in device_types:
+                    device_type_id = dt.deviceType
+                    if device_type_id in restricted_device_type_ids and dt.revision <= one_five_device_types[device_type_id].revision:
+                        problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
+                                                      problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has both window covering and closure clusters"))
         return problems
 
     def check_closure_restricted_sem_tags(self) -> list[ProblemNotice]:
