@@ -95,8 +95,25 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
         return Status::NotFound;
     }
 
-    mMediaController->RegisterTransport(mTransportMap[connectionID].get(), transportOptions.videoStreamID.Value().Value(),
-                                        transportOptions.audioStreamID.Value().Value());
+    /*
+    Initialize video, audio stream ids with default invalid value (UINT16_MAX = 65535)
+    This is necessary because the MediaController API expects these values to be set.
+    If any of video/audio stream id is absent in the transport options,UINT16_MAX max is used as default value.
+    */
+    uint16_t videoStreamID = -1;
+    uint16_t audioStreamID = -1;
+
+    if (transportOptions.videoStreamID.HasValue() && !transportOptions.videoStreamID.Value().IsNull())
+    {
+       videoStreamID = transportOptions.videoStreamID.Value().Value();
+    }
+
+    if (transportOptions.audioStreamID.HasValue() && !transportOptions.audioStreamID.Value().IsNull())
+    {
+       audioStreamID = transportOptions.audioStreamID.Value().Value();
+    }
+    ChipLogProgress(Camera, "PushAvStreamTransportManager, RegisterTransport for connectionID: [%u], videoStreamID: [%u], audioStreamID: [%u]", connectionID, videoStreamID, audioStreamID);
+    mMediaController->RegisterTransport(mTransportMap[connectionID].get(), videoStreamID, audioStreamID);
     mMediaController->SetPreRollLength(mTransportMap[connectionID].get(), mTransportMap[connectionID].get()->GetPreRollLength());
 
     uint32_t newTransportBandwidthbps = 0;
