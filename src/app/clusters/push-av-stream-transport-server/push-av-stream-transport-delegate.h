@@ -150,9 +150,11 @@ public:
      * @brief Validates the provided Segment Duration.
      *
      * @param segmentDuration The Segment Duration to validate
-     * @return true if Segment Duration is multiple of KeyFrameInterval, false otherwise
+     * @param videoStreamId   The video stream to eb validated against
+     * @return true if Segment Duration is multiple of KeyFrameInterval for the provided videoStreamId, false otherwise
      */
-    virtual bool ValidateSegmentDuration(uint16_t segmentDuration) = 0;
+    virtual bool ValidateSegmentDuration(uint16_t segmentDuration,
+                                         const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) = 0;
 
     /**
      * @brief Validates bandwidth requirements against camera's resource management.
@@ -269,6 +271,14 @@ public:
 
     virtual void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
                              Tls::CertificateTable::BufferedRootCert & rootCertEntry) = 0;
+
+    /**
+     * @brief Verifies whether Soft or Hard privacy mode is active on the device as set against the stream management instance
+     *
+     * @param isActive boolean that is set by the delgate indicating privacy status, True is active
+     * @return CHIP_ERROR indicating success or failure
+     */
+    virtual CHIP_ERROR IsPrivacyModeActive(bool & isActive) = 0;
 
     /**
      * @brief Sets the PushAvStreamTransportServerLogic instance for the delegate.
