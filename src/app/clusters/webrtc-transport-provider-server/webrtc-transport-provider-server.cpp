@@ -91,11 +91,16 @@ CHIP_ERROR WebRTCTransportProviderServer::Read(const ConcreteReadAttributePath &
     // which is a list[WebRTCSessionStruct].
     if (aPath.mClusterId == Id && aPath.mAttributeId == Attributes::CurrentSessions::Id)
     {
-        // We encode mCurrentSessions as a list of WebRTCSessionStruct
-        return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        // CurrentSessions is a fabric-scoped attribute that must only return sessions belonging to the accessing fabric.
+        FabricIndex accessingFabricIndex = aEncoder.AccessingFabricIndex();
+        return aEncoder.EncodeList([this, accessingFabricIndex](const auto & encoder) -> CHIP_ERROR {
             for (auto & session : mCurrentSessions)
             {
-                ReturnErrorOnFailure(encoder.Encode(session));
+                // Only encode sessions that belong to the accessing fabric
+                if (session.GetFabricIndex() == accessingFabricIndex)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(session));
+                }
             }
             return CHIP_NO_ERROR;
         });

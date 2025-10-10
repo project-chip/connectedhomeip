@@ -67,13 +67,21 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorServer::ReadAttribute(cons
     switch (request.path.mAttributeId)
     {
     case CurrentSessions::Id:
-        return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
-            for (auto & session : mCurrentSessions)
-            {
-                ReturnErrorOnFailure(listEncoder.Encode(session));
-            }
-            return CHIP_NO_ERROR;
-        });
+        // CurrentSessions is a fabric-scoped attribute that must only return sessions belonging to the accessing fabric.
+        {
+            FabricIndex accessingFabricIndex = encoder.AccessingFabricIndex();
+            return encoder.EncodeList([this, accessingFabricIndex](const auto & listEncoder) -> CHIP_ERROR {
+                for (auto & session : mCurrentSessions)
+                {
+                    // Only encode sessions that belong to the accessing fabric
+                    if (session.GetFabricIndex() == accessingFabricIndex)
+                    {
+                        ReturnErrorOnFailure(listEncoder.Encode(session));
+                    }
+                }
+                return CHIP_NO_ERROR;
+            });
+        }
     case ClusterRevision::Id:
         return encoder.Encode(kRevision);
     case FeatureMap::Id:
