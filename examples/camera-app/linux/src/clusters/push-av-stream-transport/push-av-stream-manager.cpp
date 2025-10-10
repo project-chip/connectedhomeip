@@ -241,7 +241,7 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
     auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
     bool isActive;
 
-    CHIP_ERROR status = avsmController.IsPrivacyModeActive(isActive, CameraAvStreamManagement::Attributes::HardPrivacyModeOn::Id);
+    CHIP_ERROR status = avsmController.IsHardPrivacyModeActive(isActive);
     VerifyOrReturnError(status == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(Camera, "PushAvStreamTransportManager, failed to retrieve Hard Privacy Mode status."));
     VerifyOrReturnError(
@@ -264,8 +264,7 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
     auto streamUsage = mTransportOptionsMap[connectionID].streamUsage;
     if (streamUsage == StreamUsageEnum::kRecording || streamUsage == StreamUsageEnum::kAnalysis)
     {
-        CHIP_ERROR status =
-            avsmController.IsPrivacyModeActive(isActive, CameraAvStreamManagement::Attributes::SoftRecordingPrivacyModeEnabled::Id);
+        CHIP_ERROR status = avsmController.IsSoftRecordingPrivacyModeActive(isActive);
         VerifyOrReturnError(
             status == CHIP_NO_ERROR, Status::Failure,
             ChipLogError(Camera, "PushAvStreamTransportManager, failed to retrieve Soft Recording Privacy Mode status."));
@@ -277,8 +276,7 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
 
     if (streamUsage == StreamUsageEnum::kLiveView)
     {
-        CHIP_ERROR status = avsmController.IsPrivacyModeActive(
-            isActive, CameraAvStreamManagement::Attributes::SoftLivestreamPrivacyModeEnabled::Id);
+        CHIP_ERROR status = avsmController.IsSoftLivestreamPrivacyModeActive(isActive);
         VerifyOrReturnError(
             status == CHIP_NO_ERROR, Status::Failure,
             ChipLogError(Camera, "PushAvStreamTransportManager, failed to retrieve Soft Livestream Privacy Mode status."));

@@ -251,26 +251,6 @@ CHIP_ERROR CameraAVStreamManager::IsSoftLivestreamPrivacyModeActive(bool & isAct
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAVStreamManager::IsPrivacyModeActive(bool & isActive, AttributeId privacyModeAttributeId)
-{
-    switch (privacyModeAttributeId)
-    {
-    case CameraAvStreamManagement::Attributes::HardPrivacyModeOn::Id:
-        isActive = GetCameraAVStreamMgmtServer()->GetHardPrivacyModeOn();
-        break;
-    case CameraAvStreamManagement::Attributes::SoftRecordingPrivacyModeEnabled::Id:
-        isActive = GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled();
-        break;
-    case CameraAvStreamManagement::Attributes::SoftLivestreamPrivacyModeEnabled::Id:
-        isActive = GetCameraAVStreamMgmtServer()->GetSoftLivestreamPrivacyModeEnabled();
-        break;
-    default:
-        ChipLogError(Camera, "Attribute ID: %u isn't a privacy mode attribute", privacyModeAttributeId);
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR CameraAVStreamManager::SetHardPrivacyModeOn(bool hardPrivacyMode)
 {
     return GetCameraAVStreamMgmtServer()->SetHardPrivacyModeOn(hardPrivacyMode);
