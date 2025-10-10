@@ -44,7 +44,7 @@ from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
 from TC_PAVSTTestBase import PAVSTTestBase
 
 import matter.clusters as Clusters
-from matter.interaction_model import Status
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
                                            run_if_endpoint_matches)
 
@@ -205,7 +205,6 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             len(transportConfigs), 1, "TransportConfigurations must not be empty!"
         )
         aConnectionID = transportConfigs[0].connectionID
-        aTransportStatus = transportConfigs[0].transportStatus
 
         self.step(5)
         cmd = pvcluster.Commands.SetTransportStatus(
