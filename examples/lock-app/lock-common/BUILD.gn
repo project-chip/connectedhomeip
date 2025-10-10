@@ -32,9 +32,9 @@ source_set("lock-cluster-service") {
   ]
   public_configs = [ ":config" ]
   sources = [
+    "include/Identify.h",
     "include/LockEndpoint.h",
     "include/LockManager.h",
-    "include/Identify.h",
     "src/Identify.cpp",
     "src/LockEndpoint.cpp",
     "src/LockManager.cpp",
