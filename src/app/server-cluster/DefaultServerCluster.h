@@ -39,8 +39,6 @@ namespace app {
 class DefaultServerCluster : public ServerClusterInterface
 {
 public:
-    DefaultServerCluster(const ConcreteClusterPath & path) : mPath(path) {}
-
     constexpr DefaultServerCluster(ConcreteClusterPath && path) :
         mPath(std::move(path)),
         mDataVersion(0) // data version will be initialized in startup, however constexpr requires initialization
