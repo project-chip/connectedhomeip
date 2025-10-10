@@ -45,7 +45,7 @@ from matter.testing.apps import AppServerSubprocess
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCR_2_1(MatterBaseTest):
+class TC_WebRTCRequestor_2_1(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
 
@@ -86,11 +86,11 @@ class TC_WebRTCR_2_1(MatterBaseTest):
             self.storage.cleanup()
         super().teardown_class()
 
-    def desc_TC_WebRTCR_2_1(self) -> str:
+    def desc_TC_WebRTCRequestor_2_1(self) -> str:
         """Returns a description of this test"""
         return "[TC-{picsCode}-2.1] Validate Offer command with invalid session id"
 
-    def steps_TC_WebRTCR_2_1(self) -> list[TestStep]:
+    def steps_TC_WebRTCRequestor_2_1(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
@@ -103,16 +103,6 @@ class TC_WebRTCR_2_1(MatterBaseTest):
         ]
         return steps
 
-    def pics_TC_WebRTCR_2_1(self) -> list[str]:
-        """
-        Return the list of PICS applicable to this test case.
-        """
-        pics = [
-            "WEBRTCR.S",           # WebRTC Transport Requestor Server
-            "WEBRTCR.S.C00.Rsp",   # Offer command
-        ]
-        return pics
-
     # This test has some manual steps and one sleep for up to 30 seconds. Test typically
     # runs under 1 mins, so 3 minutes is more than enough.
     @property
@@ -120,7 +110,7 @@ class TC_WebRTCR_2_1(MatterBaseTest):
         return 3 * 60
 
     @async_test_body
-    async def test_TC_WebRTCR_2_1(self):
+    async def test_TC_WebRTCRequestor_2_1(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """

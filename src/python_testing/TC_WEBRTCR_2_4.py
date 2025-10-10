@@ -47,7 +47,7 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_b
 SERVER_URI = "ws://localhost:9002"
 
 
-class TC_WebRTCR_2_4(MatterBaseTest):
+class TC_WebRTCRequestor_2_4(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
 
@@ -89,11 +89,11 @@ class TC_WebRTCR_2_4(MatterBaseTest):
             self.storage.cleanup()
         super().teardown_class()
 
-    def desc_TC_WebRTCR_2_4(self) -> str:
+    def desc_TC_WebRTCRequestor_2_4(self) -> str:
         """Returns a description of this test"""
         return "[TC-{picsCode}-2.4] Validate Answer command with valid session id"
 
-    def steps_TC_WebRTCR_2_4(self) -> list[TestStep]:
+    def steps_TC_WebRTCRequestor_2_4(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
@@ -102,16 +102,6 @@ class TC_WebRTCR_2_4(MatterBaseTest):
             TestStep(2, "Trigger {TH_Server} to send an Answer to DUT"),
         ]
         return steps
-
-    def pics_TC_WebRTCR_2_4(self) -> list[str]:
-        """
-        Return the list of PICS applicable to this test case.
-        """
-        pics = [
-            "WEBRTCR.S",           # WebRTC Transport Requestor Server
-            "WEBRTCR.S.C01.Rsp",   # Answer command
-        ]
-        return pics
 
     # This test has some manual steps and one sleep for up to 30 seconds. Test typically
     # runs under 1 mins, so 3 minutes is more than enough.
@@ -132,7 +122,7 @@ class TC_WebRTCR_2_4(MatterBaseTest):
             logging.info("Received command response")
 
     @async_test_body
-    async def test_TC_WebRTCR_2_4(self):
+    async def test_TC_WebRTCRequestor_2_4(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """

@@ -76,11 +76,7 @@ class TC_WEBRTCP_2_23(MatterBaseTest, WEBRTCPTestBase):
     def pics_TC_WEBRTCP_2_23(self) -> list[str]:
         pics = [
             "WEBRTCP.S",
-            "WEBRTCP.S.A0000",     # CurrentSessions attribute
-            "WEBRTCP.S.C06.Rsp",   # EndSession command
             "AVSM.S",
-            "AVSM.S.F00",          # Audio Data Output feature
-            "AVSM.S.F01",          # Video Data Output feature
         ]
         return pics
 
