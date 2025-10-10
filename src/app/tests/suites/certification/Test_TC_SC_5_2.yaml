@@ -80,7 +80,6 @@ tests:
           d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
           18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
           8)EpochStartTime2: 18446744073709551614"
-      PICS: GRPKEY.S.C00.Rsp
       cluster: "Group Key Management"
       endpoint: 0
       command: "KeySetWrite"
