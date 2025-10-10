@@ -280,22 +280,22 @@ DataModel::Nullable<uint16_t> CameraAVStreamMgmtServer::GetReusableVideoStreamId
         }
 
         // 2. Framerate check (request must be within allocated stream's current range)
-        if (!(requestedArgs.minFrameRate >= stream.minFrameRate && requestedArgs.maxFrameRate <= stream.maxFrameRate))
+        if (requestedArgs.minFrameRate < stream.minFrameRate || requestedArgs.maxFrameRate > stream.maxFrameRate)
         {
             continue;
         }
 
         // 3. Resolution check
-        if (!(requestedArgs.minResolution.width >= stream.minResolution.width &&
-              requestedArgs.minResolution.height >= stream.minResolution.height &&
-              requestedArgs.maxResolution.width <= stream.maxResolution.width &&
-              requestedArgs.maxResolution.height <= stream.maxResolution.height))
+        if (requestedArgs.minResolution.width < stream.minResolution.width ||
+            requestedArgs.minResolution.height < stream.minResolution.height ||
+            requestedArgs.maxResolution.width > stream.maxResolution.width ||
+            requestedArgs.maxResolution.height > stream.maxResolution.height)
         {
             continue;
         }
 
         // 4. Bitrate check
-        if (!(requestedArgs.minBitRate >= stream.minBitRate && requestedArgs.maxBitRate <= stream.maxBitRate))
+        if (requestedArgs.minBitRate < stream.minBitRate || requestedArgs.maxBitRate > stream.maxBitRate)
         {
             continue;
         }
@@ -414,16 +414,16 @@ DataModel::Nullable<uint16_t> CameraAVStreamMgmtServer::GetReusableSnapshotStrea
         }
 
         // 3. Framerate check (request must be within allocated stream's current range)
-        if (!(requestedArgs.maxFrameRate >= stream.frameRate))
+        if (requestedArgs.maxFrameRate < stream.frameRate)
         {
             continue;
         }
 
         // 4. Resolution check
-        if (!(requestedArgs.minResolution.width >= stream.minResolution.width &&
-              requestedArgs.minResolution.height >= stream.minResolution.height &&
-              requestedArgs.maxResolution.width <= stream.maxResolution.width &&
-              requestedArgs.maxResolution.height <= stream.maxResolution.height))
+        if (requestedArgs.minResolution.width < stream.minResolution.width ||
+            requestedArgs.minResolution.height < stream.minResolution.height ||
+            requestedArgs.maxResolution.width > stream.maxResolution.width ||
+            requestedArgs.maxResolution.height > stream.maxResolution.height)
         {
             continue;
         }
