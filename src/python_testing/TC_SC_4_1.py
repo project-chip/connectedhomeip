@@ -51,6 +51,7 @@ from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 '''
@@ -610,12 +611,15 @@ class TC_SC_4_1(MatterBaseTest):
         self.step(6)
         if supports_obcw:
             logging.info("\n\n\t ** Open Basic Commissioning Window supported\n")
-            await self.default_controller.SendCommand(
+            result = await self.default_controller.SendCommand(
                 nodeid=self.dut_node_id,
                 endpoint=0,
                 payload=obcw_cmd,
                 timedRequestTimeoutMs=6000
             )
+
+            # Verify DUT responds w/ status SUCCESS(0x00)
+            asserts.assert_equal(result.status, Status.Success, "Open Basic Commissioning Window command failed.")
 
             # TH performs a browse for the 'Commissionable Service' PTR record of type '_matterc._udp.local.'
             commissionable_service_ptr = await self.get_commissionable_service_ptr_record()
