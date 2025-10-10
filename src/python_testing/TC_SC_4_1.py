@@ -96,7 +96,7 @@ class TC_SC_4_1(MatterBaseTest):
                          """DUT starts advertising Commissionable Node Discovery service through DNS-SD
                                 - TH performs a browse for the Commissionable Service PTR record of type _matterc._udp.local.
                                     - Verify PTR record is returned
-                                - Using the PTR record’s service name:
+                                - Using the PTR record's service name:
                                     - Verify DUT Commissionable Node Discovery service advertisements, expected CM=1
                                 - Close commissioning window"""),
 
@@ -104,13 +104,13 @@ class TC_SC_4_1(MatterBaseTest):
                          """DUT starts advertising Commissionable Node Discovery service through DNS-SD
                                 - TH performs a browse for the Commissionable Service PTR record of type _matterc._udp.local.
                                     - Verify PTR record is returned
-                                - Using the PTR record’s service name:
+                                - Using the PTR record's service name:
                                     - Verify DUT Commissionable Node Discovery service advertisements, expected CM=1
                                 - Close commissioning window"""),
 
                 TestStep(8, """Check if DUT is in Extended Discovery mode""",
                          """TH performs a browse for the Commissionable Service PTR record of type _matterc._udp.local., if returned:
-                                - Use the PTR record’s service name to verify DUT Commissionable Node Discovery service advertisements, expected CM=0, or its equivalent, omitted CM key"""),
+                                - Use the PTR record's service name to verify DUT Commissionable Node Discovery service advertisements, expected CM=0, or its equivalent, omitted CM key"""),
                 ]
 
     async def read_attribute(self, attribute: Any) -> Any:
