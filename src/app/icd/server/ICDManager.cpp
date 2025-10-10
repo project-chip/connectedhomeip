@@ -178,7 +178,7 @@ void ICDManager::SendCheckInMsgs(Optional<Access::SubjectDescriptor> specificSub
             {
                 continue;
             }
-            
+
             if (!specificSubject.HasValue() && !ShouldCheckInMsgsBeSentAtActiveModeFunction(entry.fabricIndex, entry.monitoredSubject))
             {
                 continue;
