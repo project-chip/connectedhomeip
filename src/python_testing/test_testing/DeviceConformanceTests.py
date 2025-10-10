@@ -543,7 +543,7 @@ class DeviceConformanceTests(BasicCompositionTests):
             if allowed_tag_count == 0:
                 problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
                                               problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} is missing a {one_five_namespaces[allowed_namespace].name} namespace tag"))
-            elif allowed_tag_count > 1:
+            elif allowed_tag_count > max_num_tags_allowed_namespace:
                 problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
                                               problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has multiple {one_five_namespaces[allowed_namespace].name} namespace tags"))
 
@@ -557,7 +557,8 @@ class DeviceConformanceTests(BasicCompositionTests):
 
             for dt in device_types:
                 if dt.deviceType == closure_id:
-                    check_tags_on_endpoint(closure_id, closure_namespace_id, 1, closure_panel_namespace_id)
+                    check_tags_on_endpoint(device_type_id=closure_id, allowed_namespace=closure_namespace_id,
+                                           max_num_tags_allowed_namespace=1, disallowed_namespace=closure_panel_namespace_id)
                 elif dt.deviceType == closure_panel_id:
                     check_tags_on_endpoint(closure_panel_id, closure_panel_namespace_id, 1, closure_namespace_id)
 
