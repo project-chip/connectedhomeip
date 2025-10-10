@@ -38,7 +38,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import time
 
 from mobly import asserts
 from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
@@ -111,7 +110,7 @@ class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(
             endpoint=endpoint, server=self.server, host_ip=host_ip)
 
-        # Ensure no existing connections
+        # Reads CurrentConnections attribute (step 1)
         self.step(1)
         transport_configs = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections)
@@ -128,6 +127,7 @@ class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step(2)
         aSupportedFormats = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats)
+        logger.info(f"aSupportedFormats={aSupportedFormats}")
 
         # Read allocated video streams (step 3)
         self.step(3)
