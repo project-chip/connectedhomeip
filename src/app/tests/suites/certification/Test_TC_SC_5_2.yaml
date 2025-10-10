@@ -251,7 +251,6 @@ tests:
     - label:
           "Step 12: TH cleans up the groups by sending the RemoveAllGroups
           command to the DUT on PIXIT.G.ENDPOINT"
-      PICS: G.S.C04.Rsp
       command: "RemoveAllGroups"
 
     - label:
