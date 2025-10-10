@@ -156,22 +156,9 @@ public:
         // Encode request into TLV
         TLV::TLVWriter writer;
         writer.Init(mTlvBuffer);
-        TLV::TLVType outerContainer;
-
-        CHIP_ERROR err = writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainer);
-        if (err != CHIP_NO_ERROR)
-        {
-            return std::make_optional(DataModel::ActionReturnStatus(err));
-        }
 
         // Encode the request fields into the structure
-        err = request.Encode(writer, TLV::AnonymousTag());
-        if (err != CHIP_NO_ERROR)
-        {
-            return std::make_optional(DataModel::ActionReturnStatus(err));
-        }
-
-        err = writer.EndContainer(outerContainer);
+        CHIP_ERROR err = request.Encode(writer, TLV::AnonymousTag());
         if (err != CHIP_NO_ERROR)
         {
             return std::make_optional(DataModel::ActionReturnStatus(err));
