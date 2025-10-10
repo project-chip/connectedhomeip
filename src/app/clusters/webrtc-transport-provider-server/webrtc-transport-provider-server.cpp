@@ -72,7 +72,8 @@ WebRTCTransportProviderServer::WebRTCTransportProviderServer(Delegate & delegate
 
 WebRTCTransportProviderServer::~WebRTCTransportProviderServer()
 {
-    Shutdown();
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 CHIP_ERROR WebRTCTransportProviderServer::Init()
@@ -81,12 +82,6 @@ CHIP_ERROR WebRTCTransportProviderServer::Init()
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
 
     return CHIP_NO_ERROR;
-}
-
-void WebRTCTransportProviderServer::Shutdown()
-{
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 // AttributeAccessInterface
@@ -224,38 +219,87 @@ WebRTCSessionStruct * WebRTCTransportProviderServer::CheckForMatchingSession(Han
     return session;
 }
 
-uint16_t WebRTCTransportProviderServer::GenerateSessionId()
+CHIP_ERROR WebRTCTransportProviderServer::GenerateSessionId(uint16_t & outSessionId)
 {
-    static uint16_t lastSessionId = 1;
+    static uint16_t nextSessionId = 0;
+    uint16_t candidateId          = 0;
 
-    do
+    // Try at most kMaxSessionId+1 attempts to find a free ID
+    // This ensures we never loop infinitely even if all IDs are somehow in use
+    for (uint16_t attempts = 0; attempts <= kMaxSessionId; attempts++)
     {
-        uint16_t candidateId = lastSessionId++;
+        candidateId = nextSessionId++;
 
         // Handle wrap-around per spec
-        if (lastSessionId > kMaxSessionId)
+        if (nextSessionId > kMaxSessionId)
         {
-            lastSessionId = 1;
+            nextSessionId = 0;
         }
 
         if (FindSession(candidateId) == nullptr)
         {
-            return candidateId;
+            outSessionId = candidateId;
+            return CHIP_NO_ERROR;
         }
-    } while (true);
+    }
+
+    // All session IDs are in use
+    ChipLogError(Zcl, "All session IDs are in use! Cannot generate new session ID.");
+    return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+}
+
+Status WebRTCTransportProviderServer::CheckPrivacyModes(const char * commandName, StreamUsageEnum streamUsage)
+{
+    bool hardPrivacyModeActive = false;
+    CHIP_ERROR err             = mDelegate.IsHardPrivacyModeActive(hardPrivacyModeActive);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "%s: Failed to check Hard Privacy mode: %" CHIP_ERROR_FORMAT, commandName, err.Format());
+        return Status::Failure;
+    }
+
+    if (hardPrivacyModeActive)
+    {
+        ChipLogError(Zcl, "%s: Hard Privacy mode is enabled", commandName);
+        return Status::InvalidInState;
+    }
+
+    bool softLivestreamPrivacyModeActive = false;
+    err                                  = mDelegate.IsSoftLivestreamPrivacyModeActive(softLivestreamPrivacyModeActive);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "%s: Failed to check Soft LivestreamPrivacy mode: %" CHIP_ERROR_FORMAT, commandName, err.Format());
+        return Status::Failure;
+    }
+
+    if (softLivestreamPrivacyModeActive && streamUsage == StreamUsageEnum::kLiveView)
+    {
+        ChipLogError(Zcl, "%s: Soft LivestreamPrivacy mode is enabled and StreamUsage is LiveView", commandName);
+        return Status::InvalidInState;
+    }
+
+    bool softRecordingPrivacyModeActive = false;
+    err                                 = mDelegate.IsSoftRecordingPrivacyModeActive(softRecordingPrivacyModeActive);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "%s: Failed to check SoftRecordingPrivacyModeActive: %" CHIP_ERROR_FORMAT, commandName, err.Format());
+        return Status::Failure;
+    }
+
+    if (softRecordingPrivacyModeActive && (streamUsage == StreamUsageEnum::kRecording || streamUsage == StreamUsageEnum::kAnalysis))
+    {
+        ChipLogError(Zcl, "%s: Soft RecordingPrivacy mode is enabled and StreamUsage is Recording or Analysis", commandName);
+        return Status::InvalidInState;
+    }
+
+    return Status::Success;
 }
 
 // Command Handlers
 void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, const Commands::SolicitOffer::DecodableType & req)
 {
-    // TODO: Respond with INVALID_COMMAND after https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/11333
-    // If both the VideoStreamID and AudioStreamID are not present: Respond with CONSTRAINT_ERROR
-    if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
-    {
-        ChipLogError(Zcl, "HandleSolicitOffer: Both video and audio streams missing");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-        return;
-    }
+    auto videoStreamID = req.videoStreamID;
+    auto audioStreamID = req.audioStreamID;
 
     // Validate the streamUsage field against the allowed enum values.
     if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
@@ -265,22 +309,101 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         return;
     }
 
-    // Validate the StreamUsageEnum for this session per resource management and stream priorities.
-    CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, req.videoStreamID, req.audioStreamID);
+    Status status = CheckPrivacyModes("HandleSolicitOffer", req.streamUsage);
+    if (status != Status::Success)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
+
+    // At least one of Video Stream ID and Audio Stream ID has to be present
+    if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
+    {
+        ChipLogError(Zcl, "HandleSolicitOffer: one of VideoStreamID or AudioStreamID must be present");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        return;
+    }
+
+    // Validate VideoStreamID against AllocatedVideoStreams.
+    // If present and null then a stream has to have been allocated.
+    // If present and not null, then the stream ID has to exist
+    if (req.videoStreamID.HasValue())
+    {
+        if (req.videoStreamID.Value().IsNull())
+        {
+            // Is there an allocated stream, delegate handles matching against an allocated stream in the HandleSolicitOffer method
+            if (!mDelegate.HasAllocatedVideoStreams())
+            {
+                ChipLogError(Zcl, "HandleSolicitOffer: video requested when there are no AllocatedVideoStreams");
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
+                return;
+            }
+        }
+        else
+        {
+            // Delegate should validate against AllocatedVideoStreams
+            if (mDelegate.ValidateVideoStreamID(req.videoStreamID.Value().Value()) != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "HandleSolicitOffer: VideoStreamID %u does not match AllocatedVideoStreams",
+                             req.videoStreamID.Value().Value());
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+                return;
+            }
+        }
+    }
+
+    // Validate AudioStreamID against AllocatedAudioStreams if present
+    // If present and null then a stream has to have been allocated.
+    // If present and not null, then the stream ID has to exist
+    if (req.audioStreamID.HasValue())
+    {
+        if (req.audioStreamID.Value().IsNull())
+        {
+            // Is there an allocated stream, delegate handles matching against an allocated stream in the HandleSolicitOffer method
+            if (!mDelegate.HasAllocatedAudioStreams())
+            {
+                ChipLogError(Zcl, "HandleSolicitOffer: audio requested when there are no AllocatedAudioStreams");
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
+                return;
+            }
+        }
+        else
+        {
+            // Delegate should validate against AllocatedVideoStreams
+            if (mDelegate.ValidateAudioStreamID(req.audioStreamID.Value().Value()) != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "HandleSolicitOffer: AudioStreamID %u does not match AllocatedAudioStreams",
+                             req.audioStreamID.Value().Value());
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+                return;
+            }
+        }
+    }
+
+    // Check resource management and stream priorities. If the IDs are null the delegate will populate with
+    // a stream that matches the stream usage
+    CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID);
     if (err != CHIP_NO_ERROR)
     {
-        // TODO: https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/11341
-        ChipLogError(Zcl, "HandleSolicitOffer: Invalid stream usage");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
+        ChipLogError(Zcl, "HandleSolicitOffer: Cannot provide the stream usage requested");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
         return;
     }
 
     // Prepare the arguments for the delegate.
     Delegate::OfferRequestArgs args;
-    args.sessionId             = GenerateSessionId();
+    uint16_t sessionId;
+    err = GenerateSessionId(sessionId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleSolicitOffer: Cannot generate session ID: %" CHIP_ERROR_FORMAT, err.Format());
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::ClusterStatusCode(err));
+        return;
+    }
+    args.sessionId             = sessionId;
     args.streamUsage           = req.streamUsage;
-    args.videoStreamId         = req.videoStreamID;
-    args.audioStreamId         = req.audioStreamID;
+    args.videoStreamId         = videoStreamID;
+    args.audioStreamId         = audioStreamID;
     args.peerNodeId            = GetNodeIdFromCtx(ctx.mCommandHandler);
     args.fabricIndex           = ctx.mCommandHandler.GetAccessingFabricIndex();
     args.originatingEndpointId = req.originatingEndpointID;
@@ -323,10 +446,11 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     WebRTCSessionStruct outSession;
     bool deferredOffer = false;
 
-    auto status = Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleSolicitOffer(args, outSession, deferredOffer));
-    if (!status.IsSuccess())
+    auto delegateStatus =
+        Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleSolicitOffer(args, outSession, deferredOffer));
+    if (!delegateStatus.IsSuccess())
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
         return;
     }
 
@@ -366,17 +490,13 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
     auto videoStreamID   = req.videoStreamID;
     auto audioStreamID   = req.audioStreamID;
 
-    NodeId peerNodeId = GetNodeIdFromCtx(ctx.mCommandHandler);
+    NodeId peerNodeId           = GetNodeIdFromCtx(ctx.mCommandHandler);
+    FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
 
     WebRTCSessionStruct outSession;
 
-    // TODO: Respond with INVALID_COMMAND after https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/11333
-    // If both video and audio stream IDs are missing, return CONSTRAINT_ERROR.
-    if (!videoStreamID.HasValue() && !audioStreamID.HasValue())
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-        return;
-    }
+    // Prepare delegate arguments for the session
+    Delegate::ProvideOfferRequestArgs args;
 
     // Validate the streamUsage field against the allowed enum values.
     if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
@@ -386,76 +506,9 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         return;
     }
 
-    // New session request: webRTCSessionID is null.
-    if (webRTCSessionID.IsNull())
+    // If WebRTCSessionID is not null and does not match a value in CurrentSessions: Respond with NOT_FOUND.
+    if (!webRTCSessionID.IsNull())
     {
-        // Validate the stream usage according to resource management and stream priorities.
-        CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, req.videoStreamID, req.audioStreamID);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "HandleProvideOffer: Invalid stream usage");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
-            return;
-        }
-
-        FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
-
-        // Prepare delegate arguments.
-        Delegate::ProvideOfferRequestArgs args;
-        args.sessionId             = GenerateSessionId();
-        args.streamUsage           = req.streamUsage;
-        args.videoStreamId         = videoStreamID;
-        args.audioStreamId         = audioStreamID;
-        args.peerNodeId            = peerNodeId;
-        args.fabricIndex           = peerFabricIndex;
-        args.sdp                   = std::string(req.sdp.data(), req.sdp.size());
-        args.originatingEndpointId = req.originatingEndpointID;
-
-        // Convert ICE servers list from DecodableList to vector.
-        if (req.ICEServers.HasValue())
-        {
-            std::vector<ICEServerDecodableStruct> localIceServers;
-
-            auto iter = req.ICEServers.Value().begin();
-            while (iter.Next())
-            {
-                // Just move the decodable struct as-is, only valid during this method call.
-                localIceServers.push_back(std::move(iter.GetValue()));
-            }
-
-            // Check the validity of the list.
-            CHIP_ERROR listErr = iter.GetStatus();
-            if (listErr != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl, "HandleSolicitOffer: ICECandidates list error: %" CHIP_ERROR_FORMAT, listErr.Format());
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-                return;
-            }
-
-            args.iceServers.SetValue(std::move(localIceServers));
-        }
-
-        // Convert ICETransportPolicy from CharSpan to std::string.
-        if (req.ICETransportPolicy.HasValue())
-        {
-            args.iceTransportPolicy.SetValue(
-                std::string(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size()));
-        }
-
-        // Delegate processing: process the SDP offer, gather ICE candidates, create SDP answer, etc.
-        auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleProvideOffer(args, outSession));
-        if (!delegateStatus.IsSuccess())
-        {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
-            return;
-        }
-
-        // Store the new WebRTCSessionStruct in CurrentSessions.
-        UpsertSession(outSession);
-    }
-    else
-    {
-        // Re-offer: webRTCSessionID is not null.
         uint16_t sessionId                    = webRTCSessionID.Value();
         WebRTCSessionStruct * existingSession = CheckForMatchingSession(ctx, sessionId);
         if (existingSession == nullptr)
@@ -464,9 +517,148 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
             return;
         }
 
-        // Use the existing session for further processing.
+        // Use the existing session for further processing (re-offer case).
         outSession = *existingSession;
+
+        // re-use the same session id for offer processing in delegate
+        args.sessionId = sessionId;
     }
+    else
+    {
+        // WebRTCSessionID is null - new session request
+
+        Status status = CheckPrivacyModes("HandleProvideOffer", req.streamUsage);
+        if (status != Status::Success)
+        {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+            return;
+        }
+
+        // At least one of Video Stream ID and Audio Stream ID has to be present
+        if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: one of VideoStreamID or AudioStreamID must be present");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+            return;
+        }
+
+        // Validate VideoStreamID against AllocatedVideoStreams.
+        // If present and null then a stream has to have been allocated.
+        // If present and not null, then the stream ID has to exist
+        if (videoStreamID.HasValue() && !videoStreamID.Value().IsNull())
+        {
+            if (mDelegate.ValidateVideoStreamID(videoStreamID.Value().Value()) != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "HandleProvideOffer: VideoStreamID %u does not match AllocatedVideoStreams",
+                             videoStreamID.Value().Value());
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+                return;
+            }
+        }
+        else if (videoStreamID.HasValue() && videoStreamID.Value().IsNull())
+        {
+            // VideoStreamID is present and is null - need to automatically select
+            // First check if there are any video streams allocated
+            if (!mDelegate.HasAllocatedVideoStreams())
+            {
+                ChipLogError(Zcl, "HandleProvideOffer: No video streams currently allocated");
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
+                return;
+            }
+            // Automatic selection will be handled by the delegate in HandleProvideOffer.
+        }
+
+        // Validate AudioStreamID if present and not null.
+        if (audioStreamID.HasValue() && !audioStreamID.Value().IsNull())
+        {
+            if (mDelegate.ValidateAudioStreamID(audioStreamID.Value().Value()) != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "HandleProvideOffer: AudioStreamID %u does not match AllocatedAudioStreams",
+                             audioStreamID.Value().Value());
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+                return;
+            }
+        }
+        else if (audioStreamID.HasValue() && audioStreamID.Value().IsNull())
+        {
+            // AudioStreamID is present and is null - need to automatically select
+            // First check if there are any audio streams allocated
+            if (!mDelegate.HasAllocatedAudioStreams())
+            {
+                ChipLogError(Zcl, "HandleProvideOffer: No audio streams currently allocated");
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
+                return;
+            }
+            // Automatic selection will be handled by the delegate in HandleProvideOffer.
+        }
+
+        // Check resource management and stream priorities
+        CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: Cannot provide stream usage requested");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+            return;
+        }
+
+        // Generate new session id
+        uint16_t sessionId;
+        err = GenerateSessionId(sessionId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: Cannot generate session ID: %" CHIP_ERROR_FORMAT, err.Format());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::ClusterStatusCode(err));
+            return;
+        }
+        args.sessionId = sessionId;
+    }
+
+    args.streamUsage           = req.streamUsage;
+    args.videoStreamId         = videoStreamID;
+    args.audioStreamId         = audioStreamID;
+    args.peerNodeId            = peerNodeId;
+    args.fabricIndex           = peerFabricIndex;
+    args.sdp                   = std::string(req.sdp.data(), req.sdp.size());
+    args.originatingEndpointId = req.originatingEndpointID;
+
+    // Convert ICE servers list from DecodableList to vector.
+    if (req.ICEServers.HasValue())
+    {
+        std::vector<ICEServerDecodableStruct> localIceServers;
+
+        auto iter = req.ICEServers.Value().begin();
+        while (iter.Next())
+        {
+            localIceServers.push_back(std::move(iter.GetValue()));
+        }
+
+        CHIP_ERROR listErr = iter.GetStatus();
+        if (listErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: ICEServers list error: %" CHIP_ERROR_FORMAT, listErr.Format());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+            return;
+        }
+
+        args.iceServers.SetValue(std::move(localIceServers));
+    }
+
+    // Convert ICETransportPolicy from CharSpan to std::string.
+    if (req.ICETransportPolicy.HasValue())
+    {
+        args.iceTransportPolicy.SetValue(std::string(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size()));
+    }
+
+    // Delegate processing: process the SDP offer, create session, increment reference counts.
+    auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleProvideOffer(args, outSession));
+    if (!delegateStatus.IsSuccess())
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
+        return;
+    }
+
+    // Update/Insert the WebRTCSessionStruct in CurrentSessions.
+    UpsertSession(outSession);
 
     // Build and send the ProvideOfferResponse.
     Commands::ProvideOfferResponse::Type resp;
@@ -517,6 +709,15 @@ void WebRTCTransportProviderServer::HandleProvideICECandidates(HandlerContext & 
     {
         // Get current candidate.
         const ICECandidateStruct & candidate = iter.GetValue();
+
+        // Validate SDPMid constraint: if present, must have min length 1
+        if (!candidate.SDPMid.IsNull() && candidate.SDPMid.Value().empty())
+        {
+            ChipLogError(Zcl, "HandleProvideICECandidates: SDPMid must have minimum length of 1 when present");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            return;
+        }
+
         candidates.push_back(candidate);
     }
 

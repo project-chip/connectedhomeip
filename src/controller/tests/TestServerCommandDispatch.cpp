@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/UnitTesting/Metadata.h>
 #include <controller/InvokeInteraction.h>
 #include <controller/ReadInteraction.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -69,7 +70,8 @@ public:
 
 private:
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext) final;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) final;
+    CHIP_ERROR RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) final;
 
     bool mOverrideAcceptedCommands = false;
     bool mClaimNoCommands          = false;
@@ -104,8 +106,8 @@ void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterface
         });
 }
 
-CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                                                CommandHandlerInterface::CommandIdCallback callback, void * context)
+CHIP_ERROR TestClusterCommandHandler::RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     if (!mOverrideAcceptedCommands)
     {
@@ -118,7 +120,8 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
     }
 
     // We just have one command id.
-    callback(Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id, context);
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
+    ReturnErrorOnFailure(builder.Append(Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::kMetadataEntry));
     return CHIP_NO_ERROR;
 }
 

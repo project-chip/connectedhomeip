@@ -26,7 +26,7 @@ import typing
 class LogPipe(threading.Thread):
     """Create PTY-based PIPE for IPC.
 
-    Python provides a built-in mechanism for creating comunication PIPEs for
+    Python provides a built-in mechanism for creating communication PIPEs for
     subprocesses spawned with Popen(). However, created PIPEs will most likely
     enable IO buffering in the spawned process. In order to trick such process
     to flush its streams immediately, we are going to create a PIPE based on
@@ -157,8 +157,8 @@ class Runner:
                 break
             # dependencies MUST NOT be done
             s.kill()
-            raise Exception("Unexpected return %d for %r" %
-                            (process.returncode, userdata))
+            raise Exception("Unexpected return %d for %r/%r" %
+                            (process.returncode, process, userdata))
 
         if s.returncode != 0:
             if wait.timed_out:

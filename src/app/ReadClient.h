@@ -382,6 +382,8 @@ public:
 
     FabricIndex GetFabricIndex() const { return mPeer.GetFabricIndex(); }
     NodeId GetPeerNodeId() const { return mPeer.GetNodeId(); }
+    ScopedNodeId GetPeerScopedId() const { return mPeer; }
+
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
 

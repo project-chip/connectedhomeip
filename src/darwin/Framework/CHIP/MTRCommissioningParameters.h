@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022-2024 Project CHIP Authors
+ *    Copyright (c) 2022-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -112,6 +113,43 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * The version of the terms and conditions that the user has accepted.
  */
 @property (nonatomic, copy, nullable) NSNumber * acceptedTermsAndConditionsVersion MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * List of attribute paths to read from the commissionee (in addition to
+ * whatever attributes are already read to handle readEndpointInformation being
+ * YES, or to handle other commissioning tasks).
+ *
+ * The FeatureMap attribute of all Network Commissioning clusters on the commissionee
+ * will always be read and does not need to be included in this list.
+ */
+@property (nonatomic, copy, nullable) NSArray<MTRAttributeRequestPath *> * extraAttributesToRead MTR_AVAILABLE(ios(26.2), macos(26.2), watchos(26.2), tvos(26.2));
+
+/**
+ * Whether to force a network scan before requesting Wi-Fi credentials.
+ * The default is NO.
+ *
+ * Even if this value is NO a scan may still be performed.
+ *
+ * This value will be ignored if Wi-Fi credentials are provided or not needed.
+ *
+ * NOTE: Not all APIs that take MTRCommissioningParameters pay attention to this
+ * flag.
+ */
+@property (nonatomic, assign) BOOL forceWiFiScan MTR_AVAILABLE(ios(26.2), macos(26.2), watchos(26.2), tvos(26.2));
+
+/**
+ * Whether to force a network scan before requesting Thread credentials.
+ * The default is NO.
+ *
+ * Even if this value is NO a scan may still be performed.
+ *
+ * This value will be ignored if a Thread operational dataset is provided or not
+ * needed.
+ *
+ * NOTE: Not all APIs that take MTRCommissioningParameters pay attention to this
+ * flag.
+ */
+@property (nonatomic, assign) BOOL forceThreadScan MTR_AVAILABLE(ios(26.2), macos(26.2), watchos(26.2), tvos(26.2));
 
 @end
 

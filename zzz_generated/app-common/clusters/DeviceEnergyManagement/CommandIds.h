@@ -11,6 +11,13 @@ namespace app {
 namespace Clusters {
 namespace DeviceEnergyManagement {
 namespace Commands {
+
+// Total number of client to server commands supported by the cluster
+inline constexpr uint32_t kAcceptedCommandsCount = 8;
+
+// Total number of server to client commands supported by the cluster (response commands)
+inline constexpr uint32_t kGeneratedCommandsCount = 0;
+
 namespace PowerAdjustRequest {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace PowerAdjustRequest

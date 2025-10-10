@@ -57,6 +57,9 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#include <transport/raw/NFC.h>
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #include <transport/raw/WiFiPAF.h>
@@ -79,6 +82,9 @@ using chip::Transport::PeerAddress;
 using chip::Transport::UdpListenParameters;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 using chip::Transport::TcpListenParameters;
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+using chip::Transport::NfcListenParameters;
 #endif
 
 namespace {
@@ -244,6 +250,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                            Transport::WiFiPAFListenParameters(static_cast<Transport::WiFiPAFBase *>(
                                DeviceLayer::ConnectivityMgr().GetWiFiPAF()->mWiFiPAFTransport))
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+                               ,
+                           NfcListenParameters(nullptr)
+#endif
     );
 
     SuccessOrExit(err);
@@ -352,17 +362,14 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
 #endif
     }
-    else
+    else if (initParams.advertiseCommissionableIfNoFabrics)
     {
-#if CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
         SuccessOrExit(err = mCommissioningWindowManager.OpenBasicCommissioningWindow(initParams.discoveryTimeout));
-#endif
     }
 
     // TODO @bzbarsky-apple @cecille Move to examples
-    // ESP32 and Mbed OS examples have a custom logic for enabling DNS-SD
-#if !CHIP_DEVICE_LAYER_TARGET_ESP32 && !CHIP_DEVICE_LAYER_TARGET_MBED &&                                                           \
-    (!CHIP_DEVICE_LAYER_TARGET_AMEBA || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE)
+    // ESP32 examples have a custom logic for enabling DNS-SD
+#if !CHIP_DEVICE_LAYER_TARGET_ESP32 && (!CHIP_DEVICE_LAYER_TARGET_AMEBA || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE)
     // StartServer only enables commissioning mode if device has not been commissioned
     app::DnssdServer::Instance().StartServer();
 #endif

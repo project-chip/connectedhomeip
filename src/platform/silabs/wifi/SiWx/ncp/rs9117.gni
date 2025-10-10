@@ -35,13 +35,14 @@ rs9117_src_sapi = [
   # sl_si91x_wireless component
   "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c",
   "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c",
-  "${wifi_sdk_root}/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c",
   "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.c",
   "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_callback_framework.c",
   "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.c",
-  "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.c",
+  "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sli_net_si91x_utility.c",
   "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ncp_interface/spi/sl_si91x_spi.c",
   "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ncp_interface/sl_si91x_ncp_driver.c",
+  "${wifi_sdk_root}/components/sli_si91x_wifi_event_handler/src/sli_si91x_wifi_event_handler.c",
+  "${wifi_sdk_root}/components/sli_wifi_command_engine/src/sli_wifi_command_engine.c",
 
   # wifi component
   "${wifi_sdk_root}/components/protocol/wifi/src/sl_wifi_basic_credentials.c",
@@ -62,4 +63,5 @@ rs9117_src_sapi = [
   # network_manager component
   "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_certificate_store.c",
   "${wifi_sdk_root}/components/service/network_manager/src/sl_net.c",
+  "${wifi_sdk_root}/components/service/network_manager/src/sli_net_common_utility.c",
 ]

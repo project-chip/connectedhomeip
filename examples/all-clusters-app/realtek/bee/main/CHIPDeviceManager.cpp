@@ -25,11 +25,17 @@
 #include <stdlib.h>
 
 #include "CHIPDeviceManager.h"
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/util/af-types.h>
 #include <core/ErrorStr.h>
+#include <dac_provider/CommonDACProvider.h>
 #include <platform/realtek/BEE/FactoryDataProvider.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+
+#if CHIP_ENABLE_OPENTHREAD
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif // CHIP_ENABLE_OPENTHREAD
 
 using namespace ::chip;
 
@@ -40,6 +46,11 @@ namespace DeviceManager {
 using namespace ::chip::DeviceLayer;
 
 chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
+
+#if CHIP_ENABLE_OPENTHREAD
+app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(0 /*endpointId*/);
+#endif // CHIP_ENABLE_OPENTHREAD
 
 void CHIPDeviceManager::CommonDeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
@@ -53,7 +64,8 @@ void CHIPDeviceManager::CommonDeviceEventHandler(const ChipDeviceEvent * event, 
 CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 {
     CHIP_ERROR err;
-    mCB = cb;
+    mCB         = cb;
+    mIsInitDone = false;
 
     ChipLogProgress(DeviceLayer, "Start to init MemoryInit");
     err = Platform::MemoryInit();
@@ -67,7 +79,7 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     err = mFactoryDataProvider.Init();
     SuccessOrExit(err);
     SetCommissionableDataProvider(&mFactoryDataProvider);
-    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(GetDACProvider());
     SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -102,11 +114,15 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 #endif // CHIP_DEVICE_CONFIG_THREAD_FTD
     SuccessOrExit(err);
 
+    sThreadNetworkDriver.Init();
+
     ChipLogProgress(DeviceLayer, "Start OpenThread task");
     err = ThreadStackMgrImpl().StartThreadTask();
     SuccessOrExit(err);
     ChipLogProgress(DeviceLayer, "Start OpenThread task done!!");
 #endif // CHIP_ENABLE_OPENTHREAD
+
+    mIsInitDone = true;
 
 exit:
     return err;

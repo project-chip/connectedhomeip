@@ -262,7 +262,7 @@ void OTAImageProcessorImpl::HandleStatus(CHIP_ERROR status)
     }
     else
     {
-        ChipLogError(SoftwareUpdate, "Image update canceled. Failed to process OTA block: %s", ErrorStr(status));
+        ChipLogError(SoftwareUpdate, "Image update canceled. Failed to process OTA block: %" CHIP_ERROR_FORMAT, status.Format());
         GetRequestorInstance()->CancelImageUpdate();
     }
 }

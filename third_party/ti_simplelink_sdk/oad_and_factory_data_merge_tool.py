@@ -27,11 +27,11 @@ import sys
 import intelhex
 
 oad_bin_file = sys.argv[1]
-bim_hex_file = sys.argv[2]
+mcuboot_hex_file = sys.argv[2]
 factory_data = sys.argv[3]
 combined_hex = sys.argv[4]
 
-# merge binary executable with bim hex file and factory hex file
+# merge binary executable with mcuboot hex file and factory hex file
 ota_image = intelhex.IntelHex()
 if (oad_bin_file.endswith('hex')):
     ota_image.fromfile(oad_bin_file, format='hex')
@@ -39,13 +39,13 @@ if (oad_bin_file.endswith('hex')):
 else:
     ota_image.fromfile(oad_bin_file, format='bin')
 
-bim_hex = intelhex.IntelHex()
-bim_hex.fromfile(bim_hex_file, format='hex')
+mcuboot_hex = intelhex.IntelHex()
+mcuboot_hex.fromfile(mcuboot_hex_file, format='hex')
 
 factory_data_hex = intelhex.IntelHex()
 factory_data_hex.fromfile(factory_data, format='hex')
 
-ota_image.merge(bim_hex, overlap='error')
+ota_image.merge(mcuboot_hex, overlap='ignore')
 ota_image.merge(factory_data_hex, overlap='replace')
 
 ota_image.tofile(combined_hex, format='hex')

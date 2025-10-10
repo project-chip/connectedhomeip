@@ -130,6 +130,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, globalEnum);
     case Attributes::GlobalStruct::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, globalStruct);
+    case Attributes::UnsupportedAttributeRequiringAdminPrivilege::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, unsupportedAttributeRequiringAdminPrivilege);
     case Attributes::Unsupported::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, unsupported);
     case Attributes::ReadFailureCode::TypeInfo::GetAttributeId():

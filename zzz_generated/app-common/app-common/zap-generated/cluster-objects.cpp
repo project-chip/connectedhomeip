@@ -239,6 +239,10 @@
 #include <clusters/GroupKeyManagement/Commands.ipp>
 #include <clusters/GroupKeyManagement/Events.ipp>
 #include <clusters/GroupKeyManagement/Structs.ipp>
+#include <clusters/Groupcast/Attributes.ipp>
+#include <clusters/Groupcast/Commands.ipp>
+#include <clusters/Groupcast/Events.ipp>
+#include <clusters/Groupcast/Structs.ipp>
 #include <clusters/Groups/Attributes.ipp>
 #include <clusters/Groups/Commands.ipp>
 #include <clusters/Groups/Events.ipp>
@@ -638,6 +642,36 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::ClosureControl::Id: {
+        switch (aCommand)
+        {
+        case Clusters::ClosureControl::Commands::MoveTo::Id:
+        case Clusters::ClosureControl::Commands::Calibrate::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::ClosureDimension::Id: {
+        switch (aCommand)
+        {
+        case Clusters::ClosureDimension::Commands::SetTarget::Id:
+        case Clusters::ClosureDimension::Commands::Step::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::ThreadBorderRouterManagement::Id: {
+        switch (aCommand)
+        {
+        case Clusters::ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id:
+        case Clusters::ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
     case Clusters::ThreadNetworkDirectory::Id: {
         switch (aCommand)
         {
@@ -663,6 +697,7 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
         switch (aCommand)
         {
         case Clusters::UnitTesting::Commands::TimedInvokeRequest::Id:
+        case Clusters::UnitTesting::Commands::TestCheckCommandFlags::Id:
             return true;
         default:
             return false;
@@ -1001,6 +1036,25 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         case Clusters::ScenesManagement::Commands::GetSceneMembership::Id:
             return true;
         case Clusters::ScenesManagement::Commands::CopyScene::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::Groupcast::Id: {
+        switch (aCommand)
+        {
+        case Clusters::Groupcast::Commands::JoinGroup::Id:
+            return true;
+        case Clusters::Groupcast::Commands::LeaveGroup::Id:
+            return true;
+        case Clusters::Groupcast::Commands::LeaveGroupResponse::Id:
+            return true;
+        case Clusters::Groupcast::Commands::UpdateGroupKey::Id:
+            return true;
+        case Clusters::Groupcast::Commands::ExpireGracePeriod::Id:
+            return true;
+        case Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Id:
             return true;
         default:
             return false;
@@ -1369,19 +1423,15 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::TlsCertificateManagement::Commands::FindRootCertificate::Id:
             return true;
-        case Clusters::TlsCertificateManagement::Commands::FindRootCertificateResponse::Id:
-            return true;
         case Clusters::TlsCertificateManagement::Commands::LookupRootCertificate::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id:
             return true;
-        case Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id:
+        case Clusters::TlsCertificateManagement::Commands::ClientCSR::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Id:
-            return true;
-        case Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::LookupClientCertificate::Id:
             return true;
@@ -1407,6 +1457,8 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     case Clusters::UnitTesting::Id: {
         switch (aCommand)
         {
+        case Clusters::UnitTesting::Commands::TestCheckCommandFlags::Id:
+            return true;
         default:
             return false;
         }
@@ -1561,12 +1613,12 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
         return true;
     }
     if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
-        (aCommand == Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id))
+        (aCommand == Clusters::TlsCertificateManagement::Commands::ClientCSR::Id))
     {
         return true;
     }
     if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
-        (aCommand == Clusters::TlsCertificateManagement::Commands::TLSClientCSRResponse::Id))
+        (aCommand == Clusters::TlsCertificateManagement::Commands::ClientCSRResponse::Id))
     {
         return true;
     }
@@ -1621,6 +1673,10 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
     }
     if ((aCluster == Clusters::TlsClientManagement::Id) &&
         (aCommand == Clusters::TlsClientManagement::Commands::RemoveEndpoint::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::UnitTesting::Id) && (aCommand == Clusters::UnitTesting::Commands::TestCheckCommandFlags::Id))
     {
         return true;
     }

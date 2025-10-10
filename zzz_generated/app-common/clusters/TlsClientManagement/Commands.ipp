@@ -138,7 +138,7 @@ namespace FindEndpointResponse {
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kEndpoints), endpoints);
+    encoder.EncodeResponseCommandFabricScopedStructField(to_underlying(Fields::kEndpoint), aWriter.mAccessingFabricIndex, endpoint);
     return encoder.Finalize();
 }
 
@@ -152,9 +152,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kEndpoints))
+        if (__context_tag == to_underlying(Fields::kEndpoint))
         {
-            err = DataModel::Decode(reader, endpoints);
+            err = DataModel::Decode(reader, endpoint);
         }
 
         ReturnErrorOnFailure(err);

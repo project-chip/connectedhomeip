@@ -39,6 +39,7 @@ executable("jfa-app") {
     "JFAManager.cpp",
     "include/CHIPProjectAppConfig.h",
     "include/JFAManager.h",
+    "include/JFARpc.h",
     "main.cpp",
   ]
 

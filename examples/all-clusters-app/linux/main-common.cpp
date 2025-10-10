@@ -23,25 +23,23 @@
 #include "air-quality-instance.h"
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "camera-av-settings-user-level-management-instance.h"
-#include "device-energy-management-modes.h"
 #include "dishwasher-mode.h"
-#include "energy-evse-modes.h"
 #include "include/diagnostic-logs-provider-delegate-impl.h"
 #include "include/tv-callbacks.h"
 #include "laundry-dryer-controls-delegate-impl.h"
 #include "laundry-washer-controls-delegate-impl.h"
 #include "laundry-washer-mode.h"
-#include "meter-identification-instance.h"
 #include "microwave-oven-mode.h"
 #include "operational-state-delegate-impl.h"
 #include "oven-modes.h"
 #include "oven-operational-state-delegate.h"
+#include "push-av-stream-transport-delegate-impl.h"
 #include "resource-monitoring-delegates.h"
 #include "rvc-modes.h"
 #include "rvc-operational-state-delegate-impl.h"
 #include "tcc-mode.h"
 #include "thermostat-delegate-impl.h"
-#include "water-heater-mode.h"
+#include "tls-client-management-instance.h"
 
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -51,6 +49,7 @@
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 #include <app/clusters/thermostat-server/thermostat-server.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
@@ -69,17 +68,13 @@
 
 #include <string>
 
-#include <WhmMain.h>
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::DeviceLayer;
 
 using chip::Protocols::InteractionModel::Status;
-
 namespace {
 
-constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_all_clusters_fifo_";
 LowPowerManager sLowPowerManager;
 NamedPipeCommands sChipNamedPipeCommands;
 AllClustersCommandDelegate sAllClustersCommandDelegate;
@@ -89,6 +84,7 @@ Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupporte
 Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 Clusters::ValveConfigurationAndControl::ValveControlDelegate sValveDelegate;
 Clusters::TimeSynchronization::ExtendedTimeSyncDelegate sTimeSyncDelegate;
+Clusters::PushAvStreamTransport::PushAvStreamTransportManager gPushAvStreamTransportManager;
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
 constexpr const uint8_t kNamespaceCommon   = 7;
@@ -177,9 +173,8 @@ static Identify gIdentify1 = {
 
 void ApplicationInit()
 {
-    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
-
-    if (sChipNamedPipeCommands.Start(path, &sAllClustersCommandDelegate) != CHIP_NO_ERROR)
+    std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
+    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sAllClustersCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();
@@ -202,7 +197,9 @@ void ApplicationInit()
     VerifyOrDie(Clusters::UnitLocalization::UnitLocalizationServer::Instance().SetTemperatureUnit(
                     Clusters::UnitLocalization::TempUnitEnum::kFahrenheit) == CHIP_NO_ERROR);
 
-    Clusters::WaterHeaterManagement::WhmApplicationInit(chip::EndpointId(1));
+    Clusters::PushAvStreamTransport::SetDelegate(chip::EndpointId(1), &gPushAvStreamTransportManager);
+    Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(chip::EndpointId(1),
+                                                                    &Clusters::TlsClientManagementCommandDelegate::GetInstance());
 
     SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
@@ -228,13 +225,6 @@ void ApplicationShutdown()
     Clusters::RvcOperationalState::Shutdown();
     Clusters::OvenMode::Shutdown();
     Clusters::OvenCavityOperationalState::Shutdown();
-
-    Clusters::MeterIdentification::Shutdown();
-    Clusters::DeviceEnergyManagementMode::Shutdown();
-    Clusters::EnergyEvseMode::Shutdown();
-    Clusters::WaterHeaterMode::Shutdown();
-
-    Clusters::WaterHeaterManagement::WhmApplicationShutdown();
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {

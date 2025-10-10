@@ -153,7 +153,12 @@ static int OnWebSocketCallback(lws * wsi, lws_callback_reasons reason, void * us
     }
     else if (LWS_CALLBACK_WSI_DESTROY == reason)
     {
+        std::lock_guard<std::mutex> lock(gMutex);
+        // Nullify the instance first under lock to prevent new Send() operations
+        // from successfully queueing messages for this dying instance.
         gWebSocketInstance = nullptr;
+        // Then clear any messages that might have been queued before this point.
+        gMessageQueue.clear();
     }
     else if (LWS_CALLBACK_PROTOCOL_INIT == reason)
     {

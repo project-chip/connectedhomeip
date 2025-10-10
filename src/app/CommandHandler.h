@@ -108,6 +108,8 @@ public:
          */
         CommandHandler * Get();
 
+        bool IsValid() const { return mpHandler != nullptr; }
+
         void Release();
 
         void Invalidate() { mpHandler = nullptr; }

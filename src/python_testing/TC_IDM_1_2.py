@@ -39,13 +39,14 @@ import logging
 import random
 from dataclasses import dataclass
 
-import chip.clusters as Clusters
-import chip.discovery as Discovery
-from chip import ChipUtility
-from chip.exceptions import ChipStackError
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+import matter.discovery as Discovery
+from matter import ChipUtility
+from matter.exceptions import ChipStackError
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
 
 
 def get_all_cmds_for_cluster_id(cid: int) -> list[Clusters.ClusterObjects.ClusterCommand]:
@@ -223,7 +224,7 @@ class TC_IDM_1_2(MatterBaseTest):
                 await TH2.EstablishPASESessionIP(ipaddr=a, setupPinCode=params.setupPinCode,
                                                  nodeid=self.dut_node_id+1, port=device.port)
                 break
-            except ChipStackError:
+            except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Some device IPs may fail, it tries all addresses until one works
                 continue
 
         try:
@@ -245,7 +246,7 @@ class TC_IDM_1_2(MatterBaseTest):
         # ArmFailSafe sends a data response
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=1)
         ret = await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
-        asserts.assert_true(type_matches(ret, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
+        asserts.assert_true(matchers.is_type(ret, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
                             "Unexpected response type from ArmFailSafe")
 
         self.print_step(7, "Send a command with suppress Response")
@@ -258,7 +259,7 @@ class TC_IDM_1_2(MatterBaseTest):
         try:
             await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, suppressResponse=True)
             # TODO: Once the above issue is resolved, this needs a check to ensure that (always) no response was received.
-        except ChipStackError:
+        except ChipStackError:  # chipstack-ok: Using try/except to validate DUT behavior without failing the test on expected errors, assert_raises would fail the test
             logging.info("DUT correctly supressed the response")
 
         # Verify that the command had the correct side effect even if a response was sent

@@ -43,18 +43,30 @@ namespace Clusters {
 namespace ZoneManagement {
 namespace Attributes {
 
-namespace SupportedZoneSources {
+namespace MaxUserDefinedZones {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::app::Clusters::ZoneManagement::ZoneSourceEnum>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::ZoneManagement::ZoneSourceEnum>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::ZoneManagement::ZoneSourceEnum> &;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedZoneSources::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxUserDefinedZones::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace SupportedZoneSources
+} // namespace MaxUserDefinedZones
+namespace MaxZones {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxZones::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxZones
 namespace Zones {
 struct TypeInfo
 {
@@ -83,6 +95,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Triggers
+namespace SensitivityMax {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SensitivityMax::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SensitivityMax
 namespace Sensitivity {
 struct TypeInfo
 {
@@ -95,6 +119,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Sensitivity
+namespace TwoDCartesianMax {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ZoneManagement::Structs::TwoDCartesianVertexStruct::Type;
+    using DecodableType    = chip::app::Clusters::ZoneManagement::Structs::TwoDCartesianVertexStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::ZoneManagement::Structs::TwoDCartesianVertexStruct::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TwoDCartesianMax::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TwoDCartesianMax
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -134,10 +170,13 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::SupportedZoneSources::TypeInfo::DecodableType supportedZoneSources;
+        Attributes::MaxUserDefinedZones::TypeInfo::DecodableType maxUserDefinedZones = static_cast<uint8_t>(0);
+        Attributes::MaxZones::TypeInfo::DecodableType maxZones                       = static_cast<uint8_t>(0);
         Attributes::Zones::TypeInfo::DecodableType zones;
         Attributes::Triggers::TypeInfo::DecodableType triggers;
-        Attributes::Sensitivity::TypeInfo::DecodableType sensitivity = static_cast<uint8_t>(0);
+        Attributes::SensitivityMax::TypeInfo::DecodableType sensitivityMax = static_cast<uint8_t>(0);
+        Attributes::Sensitivity::TypeInfo::DecodableType sensitivity       = static_cast<uint8_t>(0);
+        Attributes::TwoDCartesianMax::TypeInfo::DecodableType twoDCartesianMax;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

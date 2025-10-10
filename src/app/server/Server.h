@@ -71,6 +71,9 @@
 #include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <transport/raw/UDP.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#include <transport/raw/NFC.h>
+#endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDManager.h> // nogncheck
@@ -82,8 +85,9 @@
 #endif                                                       // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-#include <app/server/JointFabricDatastore.h> //nogncheck
-#endif                                       // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+#include <app/server/JointFabricAdministrator.h> //nogncheck
+#include <app/server/JointFabricDatastore.h>     //nogncheck
+#endif                                           // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
 namespace chip {
 
@@ -115,6 +119,10 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
                                               ,
                                               chip::Transport::WiFiPAFBase
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+                                              ,
+                                              chip::Transport::NFC
 #endif
                                               >;
 
@@ -199,6 +207,8 @@ struct ServerInitParams
     // data model it wants to use. Backwards-compatibility can use `CodegenDataModelProviderInstance`
     // for ember/zap-generated models.
     chip::app::DataModel::Provider * dataModelProvider = nullptr;
+
+    bool advertiseCommissionableIfNoFabrics = CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART;
 };
 
 /**
@@ -424,6 +434,7 @@ public:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     app::JointFabricDatastore & GetJointFabricDatastore() { return mJointFabricDatastore; }
+    app::JointFabricAdministrator & GetJointFabricAdministrator() { return mJointFabricAdministrator; }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -707,6 +718,7 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     app::JointFabricDatastore mJointFabricDatastore;
+    app::JointFabricAdministrator mJointFabricAdministrator;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     TestEventTriggerDelegate * mTestEventTriggerDelegate;

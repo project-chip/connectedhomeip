@@ -17,9 +17,9 @@
 #pragma once
 
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
-
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/SoftwareDiagnostics/ClusterId.h>
 #include <clusters/SoftwareDiagnostics/Commands.h>
 #include <clusters/SoftwareDiagnostics/Events.h>
@@ -27,6 +27,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
+
 #include <sys/types.h>
 
 namespace chip {
@@ -38,22 +39,18 @@ namespace Clusters {
 /// Translates between matter calls and Software Diagnostics logic
 ///
 /// This cluster is expected to only ever exist on endpoint 0 as it is a singleton cluster.
-template <typename LOGIC>
-class SoftwareDiagnosticsServerCluster : public DefaultServerCluster,
-                                         public SoftwareDiagnostics::SoftwareFaultListener,
-                                         private LOGIC
+class SoftwareDiagnosticsServerCluster : public DefaultServerCluster, public SoftwareDiagnostics::SoftwareFaultListener
 {
 public:
-    template <typename... Args>
-    SoftwareDiagnosticsServerCluster(Args &&... args) :
-        DefaultServerCluster({ kRootEndpointId, SoftwareDiagnostics::Id }), LOGIC(std::forward<Args>(args)...)
+    SoftwareDiagnosticsServerCluster(const SoftwareDiagnosticsLogic::OptionalAttributeSet & optionalAttributeSet) :
+        DefaultServerCluster({ kRootEndpointId, SoftwareDiagnostics::Id }), mLogic(optionalAttributeSet)
     {}
 
     // software fault listener
     void OnSoftwareFaultDetect(const SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault) override
     {
         VerifyOrReturn(mContext != nullptr);
-        (void) mContext->interactionContext->eventsGenerator->GenerateEvent(softwareFault, kRootEndpointId);
+        (void) mContext->interactionContext.eventsGenerator.GenerateEvent(softwareFault, kRootEndpointId);
     }
 
     CHIP_ERROR Startup(ServerClusterContext & context) override
@@ -85,23 +82,23 @@ public:
         {
         case SoftwareDiagnostics::Attributes::CurrentHeapFree::Id: {
             uint64_t value;
-            CHIP_ERROR err = LOGIC::GetCurrentHeapFree(value);
+            CHIP_ERROR err = mLogic.GetCurrentHeapFree(value);
             return EncodeValue(value, err, encoder);
         }
         case SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id: {
             uint64_t value;
-            CHIP_ERROR err = LOGIC::GetCurrentHeapUsed(value);
+            CHIP_ERROR err = mLogic.GetCurrentHeapUsed(value);
             return EncodeValue(value, err, encoder);
         }
         case SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id: {
             uint64_t value;
-            CHIP_ERROR err = LOGIC::GetCurrentHighWatermark(value);
+            CHIP_ERROR err = mLogic.GetCurrentHighWatermark(value);
             return EncodeValue(value, err, encoder);
         }
         case SoftwareDiagnostics::Attributes::ThreadMetrics::Id:
-            return LOGIC::ReadThreadMetrics(encoder);
+            return mLogic.ReadThreadMetrics(encoder);
         case Globals::Attributes::FeatureMap::Id:
-            return encoder.Encode(LOGIC::GetFeatureMap());
+            return encoder.Encode(mLogic.GetFeatureMap());
         case Globals::Attributes::ClusterRevision::Id:
             return encoder.Encode(SoftwareDiagnostics::kRevision);
         default:
@@ -115,7 +112,7 @@ public:
         switch (request.path.mCommandId)
         {
         case SoftwareDiagnostics::Commands::ResetWatermarks::Id:
-            return LOGIC::ResetWatermarks();
+            return mLogic.ResetWatermarks();
         default:
             return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
@@ -124,18 +121,18 @@ public:
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
     {
-        return LOGIC::AcceptedCommands(builder);
+        return mLogic.AcceptedCommands(builder);
     }
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
     {
-        return LOGIC::Attributes(builder);
+        return mLogic.Attributes(builder);
     }
 
 private:
-    // Encodes the `value` in `encoder`, while handling a potential `readError` that occured
+    // Encodes the `value` in `encoder`, while handling a potential `readError` that occurred
     // when the input `value` was read:
-    //   - CHIP_ERROR_NOT_IMPLEMENTED results in a 0 being encoded
+    //   - CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE results in a 0 being encoded
     //   - any other read error is just forwarded
     CHIP_ERROR EncodeValue(uint64_t value, CHIP_ERROR readError, AttributeValueEncoder & encoder)
     {
@@ -149,6 +146,8 @@ private:
         }
         return encoder.Encode(value);
     }
+
+    SoftwareDiagnosticsLogic mLogic;
 };
 
 } // namespace Clusters

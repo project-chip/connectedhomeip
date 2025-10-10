@@ -72,12 +72,7 @@ Span<const DataModel::AttributeEntry> DefaultServerCluster::GlobalAttributes()
     return { kGlobalAttributeEntries.data(), kGlobalAttributeEntries.size() };
 }
 
-DefaultServerCluster::DefaultServerCluster(const ConcreteClusterPath & path) : mPath(path)
-{
-    // SPEC - 7.10.3. Cluster Data Version
-    //   A cluster data version SHALL be initialized randomly when it is first published.
-    mDataVersion = Crypto::GetRandU32();
-}
+DefaultServerCluster::DefaultServerCluster(const ConcreteClusterPath & path) : mPath(path) {}
 
 CHIP_ERROR DefaultServerCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<AttributeEntry> & builder)
 {
@@ -88,7 +83,13 @@ CHIP_ERROR DefaultServerCluster::Attributes(const ConcreteClusterPath & path, Re
 CHIP_ERROR DefaultServerCluster::Startup(ServerClusterContext & context)
 {
     VerifyOrReturnError(mContext == nullptr, CHIP_ERROR_ALREADY_INITIALIZED);
+
     mContext = &context;
+
+    // SPEC - 7.10.3. Cluster Data Version
+    //   A cluster data version SHALL be initialized randomly when it is first published.
+    mDataVersion = Crypto::GetRandU32();
+
     return CHIP_NO_ERROR;
 }
 
@@ -102,7 +103,7 @@ void DefaultServerCluster::NotifyAttributeChanged(AttributeId attributeId)
     IncreaseDataVersion();
 
     VerifyOrReturn(mContext != nullptr);
-    mContext->interactionContext->dataModelChangeListener->MarkDirty({ mPath.mEndpointId, mPath.mClusterId, attributeId });
+    mContext->interactionContext.dataModelChangeListener.MarkDirty({ mPath.mEndpointId, mPath.mClusterId, attributeId });
 }
 
 BitFlags<ClusterQualityFlags> DefaultServerCluster::GetClusterFlags(const ConcreteClusterPath &) const
@@ -130,6 +131,16 @@ CHIP_ERROR DefaultServerCluster::AcceptedCommands(const ConcreteClusterPath & pa
 CHIP_ERROR DefaultServerCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
     return CHIP_NO_ERROR;
+}
+
+DataModel::ActionReturnStatus DefaultServerCluster::NotifyAttributeChangedIfSuccess(AttributeId attributeId,
+                                                                                    DataModel::ActionReturnStatus status)
+{
+    if (status.IsSuccess() && !status.IsNoOpSuccess())
+    {
+        NotifyAttributeChanged(attributeId);
+    }
+    return status;
 }
 
 } // namespace app

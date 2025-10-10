@@ -17,6 +17,10 @@ import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/inet/inet.gni")
 import("${chip_root}/src/platform/device.gni")
 
+source_set("nfc-application-delegate") {
+  sources = [ "NfcApplicationDelegate.h" ]
+}
+
 static_library("raw") {
   output_name = "libRawTransport"
 
@@ -24,6 +28,7 @@ static_library("raw") {
     "Base.h",
     "MessageHeader.cpp",
     "MessageHeader.h",
+    "PeerAddress.cpp",
     "PeerAddress.h",
     "Tuple.h",
     "UDP.cpp",
@@ -49,6 +54,14 @@ static_library("raw") {
     sources += [
       "WiFiPAF.cpp",
       "WiFiPAF.h",
+    ]
+  }
+
+  if (chip_enable_nfc_based_commissioning) {
+    sources += [
+      "NFC.cpp",
+      "NFC.h",
+      "NfcApplicationDelegate.h",
     ]
   }
 

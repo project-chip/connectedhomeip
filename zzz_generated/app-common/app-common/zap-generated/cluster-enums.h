@@ -76,6 +76,7 @@
 #include <clusters/GeneralCommissioning/Enums.h>
 #include <clusters/GeneralDiagnostics/Enums.h>
 #include <clusters/GroupKeyManagement/Enums.h>
+#include <clusters/Groupcast/Enums.h>
 #include <clusters/Groups/Enums.h>
 #include <clusters/HepaFilterMonitoring/Enums.h>
 #include <clusters/IcdManagement/Enums.h>
@@ -164,4 +165,6 @@
 #include <clusters/ZoneManagement/Enums.h>
 
 // Included at the end, so all our definitions above are available.
+#define CHIP_INCLUDING_FROM_CLUSTER_ENUMS
 #include <app/common/CompatEnumNames.h>
+#undef CHIP_INCLUDING_FROM_CLUSTER_ENUMS

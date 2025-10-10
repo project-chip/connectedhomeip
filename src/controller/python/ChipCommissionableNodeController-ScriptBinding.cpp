@@ -24,7 +24,7 @@
  */
 
 #include <controller/CHIPCommissionableNodeController.h>
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/native/PyChipError.h>
 #include <inet/IPAddress.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/logging/CHIPLogging.h>

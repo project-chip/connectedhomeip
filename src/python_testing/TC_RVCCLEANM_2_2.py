@@ -22,14 +22,14 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CHIP_RVC_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvccleanm_2_2_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
-#       --app-pipe_prefix /tmp/chip_rvc_fifo_
+#       --app-pipe /tmp/rvccleanm_2_2_fifo
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -39,9 +39,10 @@
 
 import enum
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
 
 
 class RvcStatusEnum(enum.IntEnum):
@@ -173,7 +174,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
 
         self.print_step("7b", "Send ChangeToMode command")
         response = await self.send_clean_change_to_mode_cmd(self.new_clean_mode_th)
-        asserts.assert_true(type_matches(response, Clusters.RvcCleanMode.Commands.ChangeToModeResponse),
+        asserts.assert_true(matchers.is_type(response, Clusters.RvcCleanMode.Commands.ChangeToModeResponse),
                             "The response should ChangeToModeResponse command")
         if directmode_enabled:
             asserts.assert_equal(response.status, RvcStatusEnum.Success,

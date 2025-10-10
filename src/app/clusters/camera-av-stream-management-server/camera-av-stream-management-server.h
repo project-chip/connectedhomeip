@@ -42,15 +42,15 @@ using AudioCapabilitiesStruct      = Structs::AudioCapabilitiesStruct::Type;
 using VideoSensorParamsStruct      = Structs::VideoSensorParamsStruct::Type;
 using SnapshotCapabilitiesStruct   = Structs::SnapshotCapabilitiesStruct::Type;
 using VideoResolutionStruct        = Structs::VideoResolutionStruct::Type;
-using ViewportStruct               = Structs::ViewportStruct::Type;
 using RateDistortionTradeOffStruct = Structs::RateDistortionTradeOffPointsStruct::Type;
+using StreamUsageEnum              = Globals::StreamUsageEnum;
 
-constexpr uint8_t kMaxSpeakerLevel          = 254;
-constexpr uint8_t kMaxMicrophoneLevel       = 254;
-constexpr uint16_t kMaxImageRotationDegrees = 359;
-constexpr uint8_t kMaxChannelCount          = 8;
-constexpr uint8_t kMaxImageQualityMetric    = 100;
-constexpr uint16_t kMaxFragmentLenMaxValue  = 65500;
+constexpr uint8_t kMaxSpeakerLevel              = 254;
+constexpr uint8_t kMaxMicrophoneLevel           = 254;
+constexpr uint16_t kMaxImageRotationDegrees     = 359;
+constexpr uint8_t kMaxChannelCount              = 8;
+constexpr uint8_t kMaxImageQualityMetric        = 100;
+constexpr uint16_t kMaxKeyFrameIntervalMaxValue = 65500;
 // Conservative room for other fields (resolution + codec) in
 // capture snapshot response. TODO: Make a tighter bound.
 constexpr size_t kMaxSnapshotImageSize = kMaxLargeSecureSduLengthBytes - 100;
@@ -68,7 +68,21 @@ constexpr size_t kStreamUsageTlvSize = sizeof(Globals::StreamUsageEnum) + 1;
 // 1 control byte + end-of-array marker
 constexpr size_t kArrayTlvOverhead = 2;
 
-constexpr size_t kRankedVideoStreamPrioritiesTlvSize = kArrayTlvOverhead + kStreamUsageTlvSize * kNumOfStreamUsageTypes;
+constexpr size_t kStreamUsagePrioritiesTlvSize = kArrayTlvOverhead + kStreamUsageTlvSize * kNumOfStreamUsageTypes;
+
+enum class StreamAllocationAction
+{
+    kNewAllocation, // Fresh stream allocation - always start
+    kModification,  // Existing stream with parameter changes - restart if active
+    kReuse          // Reusing existing stream without changes - no action needed
+};
+
+enum class StreamType
+{
+    kAudio,
+    kVideo,
+    kSnapshot
+};
 
 class CameraAVStreamMgmtServer;
 
@@ -106,6 +120,15 @@ public:
      */
     virtual Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
                                                                     uint16_t & outStreamID) = 0;
+
+    /**
+     *   @brief Called after the server has finalized video stream allocation and narrowed parameters.
+     *          This is where the actual video stream should be started using the final allocated parameters.
+     *
+     *   @param allocatedStream   The finalized video stream with narrowed parameters from the server.
+     *   @param action           Action indicating how to handle the stream: new allocation, modification, or reuse.
+     */
+    virtual void OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, StreamAllocationAction action) = 0;
 
     /**
      *   @brief Handle Command Delegate for Video stream modification.
@@ -160,6 +183,19 @@ public:
      */
     virtual Protocols::InteractionModel::Status AudioStreamDeallocate(const uint16_t streamID) = 0;
 
+    struct SnapshotStreamAllocateArgs
+    {
+        ImageCodecEnum imageCodec;
+        uint16_t maxFrameRate;
+        Structs::VideoResolutionStruct::Type minResolution;
+        Structs::VideoResolutionStruct::Type maxResolution;
+        uint8_t quality;
+        bool encodedPixels;
+        bool hardwareEncoder;
+        Optional<bool> watermarkEnabled;
+        Optional<bool> OSDEnabled;
+    };
+
     /**
      *   @brief Handle Command Delegate for Snapshot stream allocation.
      *
@@ -174,7 +210,7 @@ public:
      *   produced; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
+    virtual Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
                                                                        uint16_t & outStreamID) = 0;
 
     /**
@@ -207,7 +243,7 @@ public:
      *   @brief Command Delegate for notifying change in StreamPriorities.
      *
      */
-    virtual void OnRankedStreamPrioritiesChanged() = 0;
+    virtual void OnStreamUsagePrioritiesChanged() = 0;
 
     /**
      *   @brief Delegate callback for notifying change in an attribute.
@@ -251,6 +287,38 @@ public:
      */
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
 
+    /**
+     * @brief Called by transports when they start using the corresponding audio and video streams.
+     *
+     */
+    virtual CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) = 0;
+
+    /**
+     * @brief Called by transports when they release the corresponding audio and video streams.
+     *
+     */
+    virtual CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) = 0;
+
+    /**
+     * @brief Provides read-only access to the list of currently allocated video streams.
+     * This allows other components (like PushAVStreamTransportManager) to query
+     * allocated stream parameters (e.g., for bandwidth calculation) without directly
+     * accessing the CameraAVStreamMgmtServer instance.
+     *
+     * @return A const reference to the vector of allocated video stream structures.
+     */
+    virtual const std::vector<VideoStreamStruct> & GetAllocatedVideoStreams() const = 0;
+
+    /**
+     * @brief Provides read-only access to the list of currently allocated audio streams.
+     * This allows other components (like PushAVStreamTransportManager) to query
+     * allocated stream parameters (e.g., for bandwidth calculation) without directly
+     * accessing the CameraAVStreamMgmtServer instance.
+     *
+     * @return A const reference to the vector of allocated audio stream structures.
+     */
+    virtual const std::vector<AudioStreamStruct> & GetAllocatedAudioStreams() const = 0;
+
 private:
     friend class CameraAVStreamMgmtServer;
 
@@ -275,14 +343,13 @@ protected:
 enum class OptionalAttribute : uint32_t
 {
     kHardPrivacyModeOn     = 0x0001,
-    kNightVision           = 0x0002,
-    kNightVisionIllum      = 0x0004,
-    kMicrophoneAGCEnabled  = 0x0008,
-    kImageRotation         = 0x0010,
-    kImageFlipHorizontal   = 0x0020,
-    kImageFlipVertical     = 0x0040,
-    kStatusLightEnabled    = 0x0080,
-    kStatusLightBrightness = 0x0100,
+    kNightVisionIllum      = 0x0002,
+    kMicrophoneAGCEnabled  = 0x0004,
+    kImageRotation         = 0x0008,
+    kImageFlipHorizontal   = 0x0010,
+    kImageFlipVertical     = 0x0020,
+    kStatusLightEnabled    = 0x0040,
+    kStatusLightBrightness = 0x0080,
 };
 
 class CameraAVStreamMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
@@ -319,7 +386,7 @@ public:
      *                                          codec, the resolution and the maximum frame rate.
      * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth (in mbps) that the device would consume
      * @param aSupportedStreamUsages            Indicates the possible stream types available
-     * @param aRankedStreamPriorities           Indicates the priority ranking of the available streams
+     * @param aStreamUsagePriorities            Indicates the priority ranking of the available streams
      * for the transmission of its media streams.
      *
      */
@@ -332,7 +399,7 @@ public:
                              const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
                              const std::vector<SnapshotCapabilitiesStruct> & aSnapshotCapabilities, uint32_t aMaxNetworkBandwidth,
                              const std::vector<Globals::StreamUsageEnum> & aSupportedStreamUsages,
-                             const std::vector<Globals::StreamUsageEnum> & aRankedStreamPriorities);
+                             const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities);
 
     ~CameraAVStreamMgmtServer() override;
 
@@ -368,7 +435,7 @@ public:
 
     CHIP_ERROR SetNightVisionIllum(TriStateAutoEnum aNightVisionIllum);
 
-    CHIP_ERROR SetViewport(const ViewportStruct & aViewport);
+    CHIP_ERROR SetViewport(const Globals::Structs::ViewportStruct::Type & aViewport);
 
     CHIP_ERROR SetSpeakerMuted(bool aSpeakerMuted);
 
@@ -411,7 +478,7 @@ public:
 
     bool GetNightVisionUsesInfrared() const { return mNightVisionUsesInfrared; }
 
-    const VideoResolutionStruct & GetMinViewport() const { return mMinViewPort; }
+    const VideoResolutionStruct & GetMinViewportResolution() const { return mMinViewPortResolution; }
 
     const std::vector<RateDistortionTradeOffStruct> & GetRateDistortionTradeOffPoints() const
     {
@@ -442,7 +509,7 @@ public:
 
     const std::vector<SnapshotStreamStruct> & GetAllocatedSnapshotStreams() const { return mAllocatedSnapshotStreams; }
 
-    const std::vector<Globals::StreamUsageEnum> & GetRankedVideoStreamPriorities() const { return mRankedVideoStreamPriorities; }
+    const std::vector<Globals::StreamUsageEnum> & GetStreamUsagePriorities() const { return mStreamUsagePriorities; }
 
     bool GetSoftRecordingPrivacyModeEnabled() const { return mSoftRecordingPrivacyModeEnabled; }
 
@@ -454,7 +521,7 @@ public:
 
     TriStateAutoEnum GetNightVisionIllum() const { return mNightVisionIllum; }
 
-    const ViewportStruct & GetViewport() const { return mViewport; }
+    const Globals::Structs::ViewportStruct::Type & GetViewport() const { return mViewport; }
 
     bool GetSpeakerMuted() const { return mSpeakerMuted; }
 
@@ -492,9 +559,14 @@ public:
 
     // Add/Remove Management functions for streams
 
-    CHIP_ERROR SetRankedVideoStreamPriorities(const std::vector<Globals::StreamUsageEnum> & newPriorities);
+    CHIP_ERROR SetStreamUsagePriorities(const std::vector<Globals::StreamUsageEnum> & newPriorities);
+
+    bool IsAllocatedVideoStreamReusable(const VideoStreamStruct & allocatedStream, const VideoStreamStruct & requestedArgs);
 
     CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
+
+    CHIP_ERROR UpdateVideoStreamRangeParams(VideoStreamStruct & videoStreamToUpdate, const VideoStreamStruct & videoStream,
+                                            bool & wasModified);
 
     CHIP_ERROR RemoveVideoStream(uint16_t videoStreamId);
 
@@ -502,9 +574,38 @@ public:
 
     CHIP_ERROR RemoveAudioStream(uint16_t audioStreamId);
 
+    bool IsAllocatedSnapshotStreamReusable(const SnapshotStreamStruct & allocatedStream,
+                                           const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs);
+
     CHIP_ERROR AddSnapshotStream(const SnapshotStreamStruct & snapshotStream);
 
+    CHIP_ERROR UpdateSnapshotStreamRangeParams(SnapshotStreamStruct & snapshotStreamToUpdate,
+                                               const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & snapshotStream);
+
     CHIP_ERROR RemoveSnapshotStream(uint16_t snapshotStreamId);
+
+    CHIP_ERROR UpdateVideoStreamRefCount(uint16_t videoStreamId, bool shouldIncrement);
+
+    CHIP_ERROR UpdateAudioStreamRefCount(uint16_t audioStreamId, bool shouldIncrement);
+
+    CHIP_ERROR UpdateSnapshotStreamRefCount(uint16_t snapshotStreamId, bool shouldIncrement);
+
+    constexpr const char * StreamTypeToString(StreamType type)
+    {
+        switch (type)
+        {
+        case StreamType::kVideo:
+            return "Video";
+        case StreamType::kAudio:
+            return "Audio";
+        case StreamType::kSnapshot:
+            return "Snapshot";
+        default:
+            return "Unknown";
+        }
+    };
+
+    bool IsResourceAvailableForStreamAllocation(uint32_t candidateEncodedPixelRate, bool encoderRequired);
 
 private:
     CameraAVStreamMgmtDelegate & mDelegate;
@@ -517,7 +618,7 @@ private:
     const uint32_t mMaxEncodedPixelRate;
     const VideoSensorParamsStruct mVideoSensorParams;
     const bool mNightVisionUsesInfrared;
-    const VideoResolutionStruct mMinViewPort;
+    const VideoResolutionStruct mMinViewPortResolution;
     const std::vector<RateDistortionTradeOffStruct> mRateDistortionTradeOffPointsList;
     const uint32_t mMaxContentBufferSize;
     const AudioCapabilitiesStruct mMicrophoneCapabilities;
@@ -526,36 +627,36 @@ private:
     const std::vector<SnapshotCapabilitiesStruct> mSnapshotCapabilitiesList;
     const uint32_t mMaxNetworkBandwidth;
 
-    uint16_t mCurrentFrameRate             = 0;
-    bool mHDRModeEnabled                   = false;
-    bool mSoftRecordingPrivacyModeEnabled  = false;
-    bool mSoftLivestreamPrivacyModeEnabled = false;
-    bool mHardPrivacyModeOn                = false;
-    TriStateAutoEnum mNightVision          = TriStateAutoEnum::kOn;
-    TriStateAutoEnum mNightVisionIllum     = TriStateAutoEnum::kOn;
-    ViewportStruct mViewport               = { 0, 0, 0, 0 };
-    bool mSpeakerMuted                     = false;
-    uint8_t mSpeakerVolumeLevel            = 0;
-    uint8_t mSpeakerMaxLevel               = kMaxSpeakerLevel;
-    uint8_t mSpeakerMinLevel               = 0;
-    bool mMicrophoneMuted                  = false;
-    uint8_t mMicrophoneVolumeLevel         = 0;
-    uint8_t mMicrophoneMaxLevel            = kMaxMicrophoneLevel;
-    uint8_t mMicrophoneMinLevel            = 0;
-    bool mMicrophoneAGCEnabled             = false;
-    uint16_t mImageRotation                = 0;
-    bool mImageFlipHorizontal              = false;
-    bool mImageFlipVertical                = false;
-    bool mLocalVideoRecordingEnabled       = false;
-    bool mLocalSnapshotRecordingEnabled    = false;
-    bool mStatusLightEnabled               = false;
+    uint16_t mCurrentFrameRate                       = 0;
+    bool mHDRModeEnabled                             = false;
+    bool mSoftRecordingPrivacyModeEnabled            = false;
+    bool mSoftLivestreamPrivacyModeEnabled           = false;
+    bool mHardPrivacyModeOn                          = false;
+    TriStateAutoEnum mNightVision                    = TriStateAutoEnum::kOn;
+    TriStateAutoEnum mNightVisionIllum               = TriStateAutoEnum::kOn;
+    Globals::Structs::ViewportStruct::Type mViewport = { 0, 0, 0, 0 };
+    bool mSpeakerMuted                               = false;
+    uint8_t mSpeakerVolumeLevel                      = 0;
+    uint8_t mSpeakerMaxLevel                         = kMaxSpeakerLevel;
+    uint8_t mSpeakerMinLevel                         = 0;
+    bool mMicrophoneMuted                            = false;
+    uint8_t mMicrophoneVolumeLevel                   = 0;
+    uint8_t mMicrophoneMaxLevel                      = kMaxMicrophoneLevel;
+    uint8_t mMicrophoneMinLevel                      = 0;
+    bool mMicrophoneAGCEnabled                       = false;
+    uint16_t mImageRotation                          = 0;
+    bool mImageFlipHorizontal                        = false;
+    bool mImageFlipVertical                          = false;
+    bool mLocalVideoRecordingEnabled                 = false;
+    bool mLocalSnapshotRecordingEnabled              = false;
+    bool mStatusLightEnabled                         = false;
 
     Globals::ThreeLevelAutoEnum mStatusLightBrightness = Globals::ThreeLevelAutoEnum::kMedium;
 
     // Managed lists
     std::vector<Globals::StreamUsageEnum> mSupportedStreamUsages;
 
-    std::vector<Globals::StreamUsageEnum> mRankedVideoStreamPriorities;
+    std::vector<Globals::StreamUsageEnum> mStreamUsagePriorities;
     std::vector<VideoStreamStruct> mAllocatedVideoStreams;
     std::vector<AudioStreamStruct> mAllocatedAudioStreams;
     std::vector<SnapshotStreamStruct> mAllocatedSnapshotStreams;
@@ -576,6 +677,78 @@ private:
             MatterReportingAttributeChangeCallback(path);
         }
         return CHIP_NO_ERROR;
+    }
+
+    template <typename StreamContainer, typename IdGetter>
+    bool ValidateStreamForModifyOrDeallocateImpl(StreamContainer & streams, uint16_t streamID, HandlerContext & ctx,
+                                                 StreamType streamType, IdGetter id_getter, bool isDeallocate)
+    {
+        auto it = std::find_if(streams.begin(), streams.end(), [&](const auto & stream) { return id_getter(stream) == streamID; });
+
+        if (it == streams.end())
+        {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u not found", mEndpointId,
+                         StreamTypeToString(streamType), streamID);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::NotFound);
+            return false;
+        }
+
+        if (isDeallocate && it->referenceCount > 0)
+        {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u still in use", mEndpointId,
+                         StreamTypeToString(streamType), streamID);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
+            return false;
+        }
+
+        using StreamValueType = typename StreamContainer::value_type;
+        if constexpr (std::is_same_v<StreamValueType, VideoStreamStruct> || std::is_same_v<StreamValueType, AudioStreamStruct>)
+        {
+            if (it->streamUsage == Globals::StreamUsageEnum::kInternal)
+            {
+                ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u is Internal", mEndpointId,
+                             StreamTypeToString(streamType), streamID);
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::DynamicConstraintError);
+                return false;
+            }
+        }
+
+        // For SnapshotStreamModify, check against the corresponding
+        // SnapshotStreamStruct for requiresHardwareEncoder.
+        if constexpr (std::is_same_v<StreamValueType, SnapshotStreamStruct>)
+        {
+            if (!isDeallocate)
+            {
+                auto snCapabIt =
+                    std::find_if(mSnapshotCapabilitiesList.begin(), mSnapshotCapabilitiesList.end(), [&](const auto & capability) {
+                        return capability.imageCodec == it->imageCodec && capability.maxFrameRate >= it->frameRate &&
+                            capability.resolution.width >= it->minResolution.width &&
+                            capability.resolution.height >= it->minResolution.height &&
+                            capability.resolution.width <= it->maxResolution.width &&
+                            capability.resolution.height <= it->maxResolution.height;
+                    });
+                if (snCapabIt != mSnapshotCapabilitiesList.end())
+                {
+                    if (snCapabIt->requiresHardwareEncoder.HasValue() && !snCapabIt->requiresHardwareEncoder.Value())
+                    {
+                        ChipLogError(
+                            Zcl,
+                            "CameraAVStreamMgmt[ep=%d]: Snapshot stream with ID: %u based off an underlying video stream and "
+                            "not modifiable",
+                            mEndpointId, streamID);
+                        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
+                        return false;
+                    }
+                }
+                else
+                {
+                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     bool IsBitDepthValid(uint8_t bitDepth) { return (bitDepth == 8 || bitDepth == 16 || bitDepth == 24 || bitDepth == 32); }
@@ -607,17 +780,19 @@ private:
     CHIP_ERROR ReadAndEncodeAllocatedAudioStreams(const AttributeValueEncoder::ListEncodeHelper & encoder);
     CHIP_ERROR ReadAndEncodeAllocatedSnapshotStreams(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
-    CHIP_ERROR ReadAndEncodeRankedVideoStreamPrioritiesList(const AttributeValueEncoder::ListEncodeHelper & encoder);
+    CHIP_ERROR ReadAndEncodeStreamUsagePriorities(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
-    CHIP_ERROR StoreViewport(const ViewportStruct & viewport);
-    CHIP_ERROR LoadViewport(ViewportStruct & viewport);
+    CHIP_ERROR StoreViewport(const Globals::Structs::ViewportStruct::Type & viewport);
+    CHIP_ERROR LoadViewport(Globals::Structs::ViewportStruct::Type & viewport);
 
-    CHIP_ERROR StoreRankedVideoStreamPriorities();
-    CHIP_ERROR LoadRankedVideoStreamPriorities();
+    CHIP_ERROR StoreStreamUsagePriorities();
+    CHIP_ERROR LoadStreamUsagePriorities();
 
     void ModifyVideoStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled, const Optional<bool> osdEnabled);
 
     void ModifySnapshotStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled, const Optional<bool> osdEnabled);
+
+    bool StreamPrioritiesHasDuplicates(const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities);
 
     /**
      * @brief Inherited from CommandHandlerInterface
@@ -643,6 +818,16 @@ private:
     void HandleSetStreamPriorities(HandlerContext & ctx, const Commands::SetStreamPriorities::DecodableType & req);
 
     void HandleCaptureSnapshot(HandlerContext & ctx, const Commands::CaptureSnapshot::DecodableType & req);
+
+    bool CheckSnapshotStreamsAvailability(HandlerContext & ctx);
+
+    bool ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID, HandlerContext & ctx);
+
+    bool ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID, HandlerContext & ctx, bool isDeallocate);
+
+    bool ValidateAudioStreamForDeallocate(const uint16_t audioStreamID, HandlerContext & ctx);
+
+    bool ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID, HandlerContext & ctx, bool isDeallocate);
 };
 
 } // namespace CameraAvStreamManagement

@@ -19,7 +19,7 @@ This is a contact sensor application implemented for an `mcxw71` device.
 
 The following board was used when testing this Matter reference app for an
 `mcxw71` device:
-![FRDM-MCXW71](../../../platform/nxp/mcxw71_k32w1/doc/images/frdm-mcxw71.jpg)
+![FRDM-MCXW71](../../../platform/nxp/mcxw71/doc/images/frdm-mcxw71.jpg)
 
 ## Device UI
 
@@ -151,7 +151,7 @@ One option for debugging would be to use MCUXpresso IDE.
 -   Drag-and-drop the zip file containing the NXP SDK in the "Installed SDKs"
     tab:
 
-![Installed SDKs](../../../platform/nxp/mcxw71_k32w1/doc/images/mcxw71_installed_sdks.jpg)
+![Installed SDKs](../../../platform/nxp/mcxw71/doc/images/mcxw71_installed_sdks.jpg)
 
 -   Import any demo application from the installed SDK:
 
@@ -159,7 +159,7 @@ One option for debugging would be to use MCUXpresso IDE.
 Import SDK example(s).. -> choose a demo app (demo_apps -> hello_world) -> Finish
 ```
 
-![Import demo](../../../platform/nxp/mcxw71_k32w1/doc/images/import_demo.jpg)
+![Import demo](../../../platform/nxp/mcxw71/doc/images/import_demo.jpg)
 
 -   Flash the previously imported demo application on the board:
 
@@ -178,7 +178,7 @@ application resulted after ot-nxp compilation.
 File -> Import -> C/C++ -> Existing Code as Makefile Project
 ```
 
-![New Project](../../../platform/nxp/mcxw71_k32w1/doc/images/new_project.jpg)
+![New Project](../../../platform/nxp/mcxw71/doc/images/new_project.jpg)
 
 -   Replace the path of the existing demo application with the path of the
     `MCXW71` application:
@@ -187,7 +187,7 @@ File -> Import -> C/C++ -> Existing Code as Makefile Project
 Run -> Debug Configurations... -> C/C++ Application
 ```
 
-![](../../../platform/nxp/mcxw71_k32w1/doc/images/mcxw71_debug.jpg)
+![](../../../platform/nxp/mcxw71/doc/images/mcxw71_debug.jpg)
 
 ## OTA
 

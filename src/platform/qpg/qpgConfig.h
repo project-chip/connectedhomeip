@@ -54,10 +54,10 @@ class QPGConfig
 {
 public:
     // Category ids used by the CHIP Device Layer
-    static constexpr uint8_t kFileId_ChipFactory = CATEGORY_BASE;    /**< Category containing persistent config values set at
-                                                                      * manufacturing    time. Retained during factory reset. */
-    static constexpr uint8_t kFileId_ChipConfig = CATEGORY_BASE + 1; /**< Catyegory containing dynamic config values set at runtime.
-                                                                      *   Cleared during factory reset. */
+    static constexpr uint8_t kFileId_ChipFactory = CATEGORY_BASE;     /**< Category containing persistent config values set at
+                                                                       * manufacturing    time. Retained during factory reset. */
+    static constexpr uint8_t kFileId_ChipConfig = CATEGORY_BASE + 1;  /**< Category containing dynamic config values set at runtime.
+                                                                       *   Cleared during factory reset. */
     static constexpr uint8_t kFileId_ChipCounter = CATEGORY_BASE + 2; /**< Category containing dynamic counter values set at
                                                                        * runtime. Retained during factory reset. */
 
