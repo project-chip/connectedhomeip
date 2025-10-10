@@ -141,7 +141,6 @@ tests:
           "Step 6: TH sends a AddGroup Command to the Groups cluster with the
           GroupID field set to 0x0101 and the GroupName set to an 'Test Group
           0101'. The command is sent as a group command using GroupID 0x0103"
-      PICS: G.S.C00.Rsp
       command: "AddGroup"
       arguments:
           values:
