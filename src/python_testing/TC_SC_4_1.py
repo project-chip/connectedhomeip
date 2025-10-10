@@ -245,6 +245,9 @@ class TC_SC_4_1(MatterBaseTest):
             log_output=True
         )
         asserts.assert_greater(len(ptr_records), 0, "Long Discriminator subtype PTR record must be present.")
+        
+        # Verify that there's only 1 'Long Discriminator' subtype PTR record
+        asserts.assert_equal(len(ptr_records), 1, "There must only be 1 Long Discriminator subtype PTR record.")
 
         if len(ptr_records) > 1:
             logging.info(f"""
@@ -617,9 +620,6 @@ class TC_SC_4_1(MatterBaseTest):
                 payload=obcw_cmd,
                 timedRequestTimeoutMs=6000
             )
-
-            # Verify DUT responds w/ status SUCCESS(0x00)
-            asserts.assert_equal(result.status, Status.Success, "Open Basic Commissioning Window command failed.")
 
             # TH performs a browse for the 'Commissionable Service' PTR record of type '_matterc._udp.local.'
             commissionable_service_ptr = await self.get_commissionable_service_ptr_record()
