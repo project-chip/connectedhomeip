@@ -96,17 +96,21 @@ TEST_F(TestIcdManagementCluster, TestAttributes)
                                                    IcdManagement::Attributes::MaximumCheckInBackOff::kMetadataEntry }),
                   CHIP_NO_ERROR);
     }
+
     if (hasUAT)
     {
+        ASSERT_EQ(expectedBuilder.EnsureAppendCapacity(1), CHIP_NO_ERROR);
         ASSERT_EQ(expectedBuilder.Append(IcdManagement::Attributes::UserActiveModeTriggerHint::kMetadataEntry), CHIP_NO_ERROR);
     }
     if (hasUserActiveModeTriggerInstruction)
     {
+        ASSERT_EQ(expectedBuilder.EnsureAppendCapacity(1), CHIP_NO_ERROR);
         ASSERT_EQ(expectedBuilder.Append(IcdManagement::Attributes::UserActiveModeTriggerInstruction::kMetadataEntry),
                   CHIP_NO_ERROR);
     }
     if (hasLIT)
     {
+        ASSERT_EQ(expectedBuilder.EnsureAppendCapacity(1), CHIP_NO_ERROR);
         ASSERT_EQ(expectedBuilder.Append(IcdManagement::Attributes::OperatingMode::kMetadataEntry), CHIP_NO_ERROR);
     }
 
