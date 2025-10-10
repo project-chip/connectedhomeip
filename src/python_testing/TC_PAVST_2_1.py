@@ -86,10 +86,10 @@ class TC_PAVST_2_1(MatterBaseTest):
             endpoint=endpoint, cluster=cluster, attribute=attr.CurrentConnections
         )
         for config in transport_configs:
-            isValidTransportStatus = (config.TransportStatus == cluster.TransportStatusEnum.kActive |
-                                      config.TransportStatus == cluster.TransportStatusEnum.kInactive)
+            isValidTransportStatus = ((config.TransportStatus == cluster.TransportStatusEnum.kActive) |
+                                      (config.TransportStatus == cluster.TransportStatusEnum.kInactive))
             isValidConnectionId = config.ConnectionId >= 0
-            isValidData = isValidTransportStatus & isValidConnectionId
+            isValidData = isValidTransportStatus and isValidConnectionId
             asserts.assert_true(isValidData, "TransportStatus must be a defined value!")
 
 

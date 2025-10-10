@@ -168,9 +168,7 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         aConnectionID = transportConfigs[0].connectionID
         aTransportStatus = transportConfigs[0].transportStatus
         aTransportOptions = transportConfigs[0].transportOptions
-        aModifiedTransportOptions = aTransportOptions.expiryTime
-        aModifiedTransportOptions = aModifiedTransportOptions + 3
-        aTransportOptions.expiryTime = aModifiedTransportOptions
+        aTransportOptions.expiryTime = aTransportOptions.expiryTime + 3
 
         # TH1 sends command
         self.step(3)
@@ -214,6 +212,7 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             connectionID=aConnectionID,
             transportOptions=aTransportOptions,
         )
+        # Transport Status is now active, if upload started and its in progress then ModifyPushTransport would check for Busy Transport Status
         status1 = await self.psvt_modify_push_transport(cmd)
         asserts.assert_true(
             status1 == Status.Success,
