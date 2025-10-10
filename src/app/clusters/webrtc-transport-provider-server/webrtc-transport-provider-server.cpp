@@ -93,6 +93,99 @@ bool SFrameFollowsSpecConstraints(const Clusters::WebRTCTransportProvider::Struc
     return true;
 }
 
+/**
+ * @brief Checks if a URL has a turns or stuns scheme.
+ *
+ * @param[in] url The URL to check
+ *
+ * @return true if the URL starts with "turns:" or "stuns:", false otherwise.
+ */
+bool HasTurnsOrStunsScheme(const chip::CharSpan & url)
+{
+    // Convert CharSpan to string for easier comparison
+    std::string urlStr(url.data(), url.size());
+
+    // Check for "turns:" or "stuns:" prefix (case-sensitive per URL spec)
+    return (urlStr.size() >= 6 && urlStr.substr(0, 6) == "turns:") || (urlStr.size() >= 6 && urlStr.substr(0, 6) == "stuns:");
+}
+
+/**
+ * @brief Validates ICEServers list constraints (data model constraints).
+ *
+ * Checks that ICEServers list meets the data model requirements:
+ * - URLs list: max 10 items
+ * - Username: optional, max 508 bytes
+ * - Credential: optional, max 512 bytes
+ * - CAID: optional, range 0-65534
+ *
+ * @param[in] iceServers The ICEServers list to validate
+ * @param[in] commandName Name of the command (for logging)
+ *
+ * @return true if all constraints are satisfied, false otherwise.
+ */
+bool ICEServersFollowsSpecConstraints(
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType> & iceServers,
+    const char * commandName)
+{
+    auto iter = iceServers.begin();
+    while (iter.Next())
+    {
+        const auto & iceServer = iter.GetValue();
+
+        // Validate URLs list: max 10 items
+        size_t urlCount = 0;
+        auto urlIter    = iceServer.URLs.begin();
+        while (urlIter.Next())
+        {
+            urlCount++;
+            if (urlCount > 10)
+            {
+                ChipLogError(Zcl, "%s: ICEServer URLs list exceeds maximum of 10", commandName);
+                return false;
+            }
+        }
+
+        // Check URLs list validity
+        CHIP_ERROR urlListErr = urlIter.GetStatus();
+        if (urlListErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "%s: ICEServer URLs list error: %" CHIP_ERROR_FORMAT, commandName, urlListErr.Format());
+            return false;
+        }
+
+        // Username field: optional, max 508 bytes
+        if (iceServer.username.HasValue() && iceServer.username.Value().size() > 508)
+        {
+            ChipLogError(Zcl, "%s: ICEServer Username exceeds maximum length of 508", commandName);
+            return false;
+        }
+
+        // Credential field: optional, max 512 bytes
+        if (iceServer.credential.HasValue() && iceServer.credential.Value().size() > 512)
+        {
+            ChipLogError(Zcl, "%s: ICEServer Credential exceeds maximum length of 512", commandName);
+            return false;
+        }
+
+        // CAID field: optional, range 0-65534
+        if (iceServer.caid.HasValue() && iceServer.caid.Value() > 65534)
+        {
+            ChipLogError(Zcl, "%s: ICEServer CAID exceeds maximum value of 65534", commandName);
+            return false;
+        }
+    }
+
+    // Check the validity of the ICEServers list structure.
+    CHIP_ERROR listErr = iter.GetStatus();
+    if (listErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "%s: ICEServers list error: %" CHIP_ERROR_FORMAT, commandName, listErr.Format());
+        return false;
+    }
+
+    return true;
+}
+
 } // anonymous namespace
 
 namespace chip {
@@ -336,6 +429,24 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     auto videoStreamID = req.videoStreamID;
     auto audioStreamID = req.audioStreamID;
 
+    // ===== Validate all conformance and constraint checks (data model validation) =====
+
+    // Validate the streamUsage field against the allowed enum values.
+    if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
+    {
+        ChipLogError(Zcl, "HandleSolicitOffer: Invalid streamUsage value %u.", to_underlying(req.streamUsage));
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        return;
+    }
+
+    // At least one of Video Stream ID and Audio Stream ID has to be present
+    if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
+    {
+        ChipLogError(Zcl, "HandleSolicitOffer: one of VideoStreamID or AudioStreamID must be present");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        return;
+    }
+
     if (req.SFrameConfig.HasValue())
     {
         if (!SFrameFollowsSpecConstraints(req.SFrameConfig.Value()))
@@ -346,13 +457,32 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         }
     }
 
-    // Validate the streamUsage field against the allowed enum values.
-    if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
+    // ICEServers field SHALL be a list of ICEServerStruct containing ICE servers and credentials.
+    // Validate ICEServers list constraints (max 10 items, URLs max 10, Username max 508, Credential max 512, CAID 0-65534)
+    if (req.ICEServers.HasValue())
     {
-        ChipLogError(Zcl, "HandleSolicitOffer: Invalid streamUsage value %u.", to_underlying(req.streamUsage));
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-        return;
+        if (!ICEServersFollowsSpecConstraints(req.ICEServers.Value(), "HandleSolicitOffer"))
+        {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            return;
+        }
     }
+
+    // ICETransportPolicy field SHALL contain either 'all' or 'relay' per W3C RTCIceTransportPolicy enum.
+    if (req.ICETransportPolicy.HasValue())
+    {
+        std::string policy(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size());
+
+        // Validate the policy is either 'all' or 'relay'
+        if (policy != "all" && policy != "relay")
+        {
+            ChipLogError(Zcl, "HandleSolicitOffer: ICETransportPolicy must be 'all' or 'relay', got '%s'", policy.c_str());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            return;
+        }
+    }
+
+    // ===== Cluster logic starts here =====
 
     Status status = CheckPrivacyModes("HandleSolicitOffer", req.streamUsage);
     if (status != Status::Success)
@@ -361,11 +491,13 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         return;
     }
 
-    // At least one of Video Stream ID and Audio Stream ID has to be present
-    if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
+    // Check resource management and stream priorities. If the IDs are null the delegate will populate with
+    // a stream that matches the stream usage
+    CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "HandleSolicitOffer: one of VideoStreamID or AudioStreamID must be present");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        ChipLogError(Zcl, "HandleSolicitOffer: Cannot provide the stream usage requested");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
         return;
     }
 
@@ -425,14 +557,60 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         }
     }
 
-    // Check resource management and stream priorities. If the IDs are null the delegate will populate with
-    // a stream that matches the stream usage
-    CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID);
-    if (err != CHIP_NO_ERROR)
+    if (req.SFrameConfig.HasValue())
     {
-        ChipLogError(Zcl, "HandleSolicitOffer: Cannot provide the stream usage requested");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
-        return;
+        const auto & sframeConfig = req.SFrameConfig.Value();
+        err                       = mDelegate.ValidateSFrameConfig(sframeConfig.cipherSuite, sframeConfig.baseKey.size());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleSolicitOffer: SFrame configuration validation failed: %" CHIP_ERROR_FORMAT, err.Format());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+            return;
+        }
+    }
+
+    // For each URL in the URLs field of each ICEServerStruct, if the URL scheme is
+    // 'turns' or 'stuns', verify that Time Synchronization cluster's UTCTime attribute is not null.
+    if (req.ICEServers.HasValue())
+    {
+        bool hasTurnsOrStuns = false;
+        auto iter            = req.ICEServers.Value().begin();
+        while (iter.Next())
+        {
+            const auto & iceServer = iter.GetValue();
+            auto urlIter           = iceServer.URLs.begin();
+            while (urlIter.Next())
+            {
+                if (HasTurnsOrStunsScheme(urlIter.GetValue()))
+                {
+                    hasTurnsOrStuns = true;
+                    break;
+                }
+            }
+            if (hasTurnsOrStuns)
+            {
+                break;
+            }
+        }
+
+        if (hasTurnsOrStuns)
+        {
+            bool isUTCTimeNull = false;
+            err                = mDelegate.IsUTCTimeNull(isUTCTimeNull);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "HandleSolicitOffer: Failed to check UTCTime: %" CHIP_ERROR_FORMAT, err.Format());
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+                return;
+            }
+
+            if (isUTCTimeNull)
+            {
+                ChipLogError(Zcl, "HandleSolicitOffer: turns/stuns URLs require non-null UTCTime");
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
+                return;
+            }
+        }
     }
 
     // Prepare the arguments for the delegate.
@@ -453,7 +631,12 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     args.fabricIndex           = ctx.mCommandHandler.GetAccessingFabricIndex();
     args.originatingEndpointId = req.originatingEndpointID;
 
-    // ICEServers field SHALL be a list of ICEServerStruct containing ICE servers and credentials.
+    if (req.SFrameConfig.HasValue())
+    {
+        args.sFrameConfig.SetValue(req.SFrameConfig.Value());
+    }
+
+    // ICEServers: copy the validated list
     if (req.ICEServers.HasValue())
     {
         std::vector<ICEServerDecodableStruct> localIceServers;
@@ -461,62 +644,18 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         auto iter = req.ICEServers.Value().begin();
         while (iter.Next())
         {
-            const auto & iceServer = iter.GetValue();
-
-            // Validate that URLs list is not empty
-            auto urlIter = iceServer.URLs.begin();
-            if (!urlIter.Next())
-            {
-                ChipLogError(Zcl, "HandleSolicitOffer: ICEServer URLs list cannot be empty");
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-                return;
-            }
-
             // Just move the decodable struct as-is, only valid during this method call
             localIceServers.push_back(std::move(iter.GetValue()));
-        }
-
-        // Check the validity of the list structure.
-        CHIP_ERROR listErr = iter.GetStatus();
-        if (listErr != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "HandleSolicitOffer: ICEServers list error: %" CHIP_ERROR_FORMAT, listErr.Format());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-            return;
         }
 
         args.iceServers.SetValue(std::move(localIceServers));
     }
 
-    // ICETransportPolicy field SHALL contain either 'all' or 'relay' per W3C RTCIceTransportPolicy enum.
+    // ICETransportPolicy: copy the validated policy
     if (req.ICETransportPolicy.HasValue())
     {
         std::string policy(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size());
-
-        // Validate the policy is either 'all' or 'relay'
-        if (policy != "all" && policy != "relay")
-        {
-            ChipLogError(Zcl, "HandleSolicitOffer: ICETransportPolicy must be 'all' or 'relay', got '%s'", policy.c_str());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-            return;
-        }
-
         args.iceTransportPolicy.SetValue(policy);
-    }
-
-    if (req.SFrameConfig.HasValue())
-    {
-        const auto & sframeConfig = req.SFrameConfig.Value();
-        err                       = mDelegate.ValidateSFrameConfig(sframeConfig.cipherSuite, sframeConfig.baseKey.size());
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "HandleSolicitOffer: SFrame configuration validation failed: %" CHIP_ERROR_FORMAT, err.Format());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
-            return;
-        }
-
-        // Validation passed, assign to args
-        args.sFrameConfig.SetValue(sframeConfig);
     }
 
     // Delegate processing:
@@ -581,6 +720,24 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
     // Prepare delegate arguments for the session
     Delegate::ProvideOfferRequestArgs args;
 
+    // ===== Validate all conformance and constraint checks (data model validation) =====
+
+    // Validate the streamUsage field against the allowed enum values.
+    if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
+    {
+        ChipLogError(Zcl, "HandleProvideOffer: Invalid streamUsage value %u.", to_underlying(req.streamUsage));
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        return;
+    }
+
+    // At least one of Video Stream ID and Audio Stream ID must be present
+    if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
+    {
+        ChipLogError(Zcl, "HandleProvideOffer: one of VideoStreamID or AudioStreamID must be present");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        return;
+    }
+
     if (req.SFrameConfig.HasValue())
     {
         if (!SFrameFollowsSpecConstraints(req.SFrameConfig.Value()))
@@ -591,13 +748,32 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         }
     }
 
-    // Validate the streamUsage field against the allowed enum values.
-    if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
+    // ICEServers field SHALL be a list of ICEServerStruct containing ICE servers and credentials.
+    // Validate ICEServers list constraints (max 10 items, URLs max 10, Username max 508, Credential max 512, CAID 0-65534)
+    if (req.ICEServers.HasValue())
     {
-        ChipLogError(Zcl, "HandleProvideOffer: Invalid streamUsage value %u.", to_underlying(req.streamUsage));
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-        return;
+        if (!ICEServersFollowsSpecConstraints(req.ICEServers.Value(), "HandleProvideOffer"))
+        {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            return;
+        }
     }
+
+    // ICETransportPolicy field SHALL contain either 'all' or 'relay' per W3C RTCIceTransportPolicy enum.
+    if (req.ICETransportPolicy.HasValue())
+    {
+        std::string policy(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size());
+
+        // Validate the policy is either 'all' or 'relay'
+        if (policy != "all" && policy != "relay")
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: ICETransportPolicy must be 'all' or 'relay', got '%s'", policy.c_str());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            return;
+        }
+    }
+
+    // ===== Cluster logic starts here =====
 
     // If WebRTCSessionID is not null and does not match a value in CurrentSessions: Respond with NOT_FOUND.
     if (!webRTCSessionID.IsNull())
@@ -624,14 +800,6 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         if (status != Status::Success)
         {
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-            return;
-        }
-
-        // At least one of Video Stream ID and Audio Stream ID has to be present
-        if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
-        {
-            ChipLogError(Zcl, "HandleProvideOffer: one of VideoStreamID or AudioStreamID must be present");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
             return;
         }
 
@@ -706,63 +874,6 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         args.sessionId = sessionId;
     }
 
-    args.streamUsage           = req.streamUsage;
-    args.videoStreamId         = videoStreamID;
-    args.audioStreamId         = audioStreamID;
-    args.peerNodeId            = peerNodeId;
-    args.fabricIndex           = peerFabricIndex;
-    args.sdp                   = std::string(req.sdp.data(), req.sdp.size());
-    args.originatingEndpointId = req.originatingEndpointID;
-
-    // ICEServers field SHALL be a list of ICEServerStruct containing ICE servers and credentials.
-    if (req.ICEServers.HasValue())
-    {
-        std::vector<ICEServerDecodableStruct> localIceServers;
-
-        auto iter = req.ICEServers.Value().begin();
-        while (iter.Next())
-        {
-            const auto & iceServer = iter.GetValue();
-
-            // Validate that URLs list is not empty
-            auto urlIter = iceServer.URLs.begin();
-            if (!urlIter.Next())
-            {
-                ChipLogError(Zcl, "HandleProvideOffer: ICEServer URLs list cannot be empty");
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-                return;
-            }
-
-            localIceServers.push_back(std::move(iter.GetValue()));
-        }
-
-        CHIP_ERROR listErr = iter.GetStatus();
-        if (listErr != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "HandleProvideOffer: ICEServers list error: %" CHIP_ERROR_FORMAT, listErr.Format());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-            return;
-        }
-
-        args.iceServers.SetValue(std::move(localIceServers));
-    }
-
-    // ICETransportPolicy field SHALL contain either 'all' or 'relay' per W3C RTCIceTransportPolicy enum.
-    if (req.ICETransportPolicy.HasValue())
-    {
-        std::string policy(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size());
-
-        // Validate the policy is either 'all' or 'relay'
-        if (policy != "all" && policy != "relay")
-        {
-            ChipLogError(Zcl, "HandleProvideOffer: ICETransportPolicy must be 'all' or 'relay', got '%s'", policy.c_str());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-            return;
-        }
-
-        args.iceTransportPolicy.SetValue(policy);
-    }
-
     if (req.SFrameConfig.HasValue())
     {
         const auto & sframeConfig = req.SFrameConfig.Value();
@@ -776,6 +887,79 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
 
         // Validation passed, assign to args
         args.sFrameConfig.SetValue(sframeConfig);
+    }
+
+    // For each URL in the URLs field of each ICEServerStruct, if the URL scheme is
+    // 'turns' or 'stuns', verify that Time Synchronization cluster's UTCTime attribute is not null.
+    if (req.ICEServers.HasValue())
+    {
+        bool hasTurnsOrStuns = false;
+        auto iter            = req.ICEServers.Value().begin();
+        while (iter.Next())
+        {
+            const auto & iceServer = iter.GetValue();
+            auto urlIter           = iceServer.URLs.begin();
+            while (urlIter.Next())
+            {
+                if (HasTurnsOrStunsScheme(urlIter.GetValue()))
+                {
+                    hasTurnsOrStuns = true;
+                    break;
+                }
+            }
+            if (hasTurnsOrStuns)
+            {
+                break;
+            }
+        }
+
+        if (hasTurnsOrStuns)
+        {
+            bool isUTCTimeNull = false;
+            CHIP_ERROR err     = mDelegate.IsUTCTimeNull(isUTCTimeNull);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "HandleProvideOffer: Failed to check UTCTime: %" CHIP_ERROR_FORMAT, err.Format());
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+                return;
+            }
+
+            if (isUTCTimeNull)
+            {
+                ChipLogError(Zcl, "HandleProvideOffer: turns/stuns URLs require non-null UTCTime");
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
+                return;
+            }
+        }
+    }
+
+    args.streamUsage           = req.streamUsage;
+    args.videoStreamId         = videoStreamID;
+    args.audioStreamId         = audioStreamID;
+    args.peerNodeId            = peerNodeId;
+    args.fabricIndex           = peerFabricIndex;
+    args.sdp                   = std::string(req.sdp.data(), req.sdp.size());
+    args.originatingEndpointId = req.originatingEndpointID;
+
+    // ICEServers: copy the validated list
+    if (req.ICEServers.HasValue())
+    {
+        std::vector<ICEServerDecodableStruct> localIceServers;
+
+        auto iter = req.ICEServers.Value().begin();
+        while (iter.Next())
+        {
+            localIceServers.push_back(std::move(iter.GetValue()));
+        }
+
+        args.iceServers.SetValue(std::move(localIceServers));
+    }
+
+    // ICETransportPolicy: copy the validated policy
+    if (req.ICETransportPolicy.HasValue())
+    {
+        std::string policy(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size());
+        args.iceTransportPolicy.SetValue(policy);
     }
 
     // Delegate processing: process the SDP offer, create session, increment reference counts.

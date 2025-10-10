@@ -92,6 +92,8 @@ public:
 
     CHIP_ERROR ValidateSFrameConfig(uint16_t cipherSuite, size_t baseKeyLength) override;
 
+    CHIP_ERROR IsUTCTimeNull(bool & isNull) override;
+
     void LiveStreamPrivacyModeChanged(bool privacyModeEnabled);
 
 private:

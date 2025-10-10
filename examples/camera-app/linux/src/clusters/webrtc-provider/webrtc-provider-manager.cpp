@@ -602,6 +602,15 @@ CHIP_ERROR WebRTCProviderManager::ValidateSFrameConfig(uint16_t cipherSuite, siz
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR WebRTCProviderManager::IsUTCTimeNull(bool & isNull)
+{
+    // TODO: The implementation SHALL:
+    //  - Read the UTCTime attribute from the Time Synchronization cluster (0x0038)
+    //  - Return whether the attribute is null or has a valid value
+
+    return CHIP_NO_ERROR;
+}
+
 void WebRTCProviderManager::ScheduleOfferSend(uint16_t sessionId)
 {
     ChipLogProgress(Camera, "ScheduleOfferSend called.");

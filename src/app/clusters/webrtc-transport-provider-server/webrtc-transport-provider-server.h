@@ -308,6 +308,26 @@ public:
      * @return CHIP_ERROR CHIP_NO_ERROR if the SFrame configuration is valid; an appropriate error code otherwise.
      */
     virtual CHIP_ERROR ValidateSFrameConfig(uint16_t cipherSuite, size_t baseKeyLength) = 0;
+
+    /**
+     * @brief Checks if the Time Synchronization cluster's UTCTime attribute is null.
+     *
+     * Per the Matter spec, when ICEServer URLs with scheme 'turns' or 'stuns' are provided,
+     * the Time Synchronization cluster's UTCTime attribute must not be null. This method
+     * allows the WebRTC Transport Provider cluster to perform this cross-cluster validation.
+     *
+     * The implementation SHALL:
+     *  - Read the UTCTime attribute from the Time Synchronization cluster (0x0038)
+     *  - Return whether the attribute is null or has a valid value
+     *
+     * @param[out] isNull  Set to true if UTCTime is null, false if it has a valid value.
+     *
+     * @return CHIP_ERROR
+     *   - CHIP_NO_ERROR on success (isNull indicates the state)
+     *   - CHIP_ERROR_NOT_FOUND if Time Synchronization cluster is not present
+     *   - Other appropriate error codes for read failures
+     */
+    virtual CHIP_ERROR IsUTCTimeNull(bool & isNull) = 0;
 };
 
 class WebRTCTransportProviderServer : public AttributeAccessInterface, public CommandHandlerInterface
