@@ -6,10 +6,10 @@ from ..native import GetLibraryHandle, HandleFlags, NativeLibraryHandleMethodArg
 
 # Only ChipFaults (defined in src/lib/support/CHIPFaultInjection.h) are supported in this module, Implement others as needed
 class FaultType(IntEnum):
-    Unspecified = 0,
-    SystemFault = 1,
-    InetFault = 2,
-    ChipFault = 3,
+    Unspecified = 0
+    SystemFault = 1
+    InetFault = 2
+    ChipFault = 3
 
 
 # IMPORTANT: CHIPFaultId enum must be kept in sync with the 'Id' enum in src/lib/support/CHIPFaultInjection.h

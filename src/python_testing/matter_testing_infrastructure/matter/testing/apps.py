@@ -12,11 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import os
+import re
 import signal
 import tempfile
 from dataclasses import dataclass
-from typing import Optional, Union
+from sys import stderr, stdout
+from typing import BinaryIO, Optional, Union
 
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
@@ -79,7 +82,7 @@ class AppServerSubprocess(Subprocess):
 
             # Start the server application
             super().__init__(*command,  # Pass the constructed command list
-                             output_cb=lambda line, is_stderr: self.PREFIX + line)
+                             output_cb=lambda line, is_stderr: self.PREFIX + line, f_stdout=f_stdout, f_stderr=f_stderr)
         except Exception:
             # Do not leak KVS file descriptor on failure
             if self.kvs_fd is not None:

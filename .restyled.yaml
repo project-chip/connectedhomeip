@@ -224,7 +224,7 @@ restylers:
           - "**/*.sh"
           - "**/*.bash"
     - name: autopep8
-      image: restyled/restyler-autopep8:v2.0.0
+      image: restyled/restyler-autopep8:v2.3.0
       command:
           - autopep8
           - "--in-place"
