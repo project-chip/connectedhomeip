@@ -50,6 +50,8 @@ class AppServerSubprocess(Subprocess):
 
     # Prefix for log messages from the application server.
     PREFIX = b"[SERVER]"
+    log_file = ""
+    err_log_file = ""
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: Optional[str] = None, f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
@@ -150,9 +152,6 @@ class OTAProviderSubprocess(AppServerSubprocess):
     """Wrapper class for starting an OTA Provider application server in a subprocess."""
 
     DEFAULT_ADMIN_NODE_ID = 112233
-    log_file = ""
-    err_log_file = ""
-
     # Prefix for log messages from the OTA provider application.
     PREFIX = b"[OTA-PROVIDER]"
 
@@ -233,3 +232,13 @@ class OTAProviderSubprocess(AppServerSubprocess):
                 found_lines.append(match)
 
         return found_lines
+
+
+class OTARequestorSubProcess(AppServerSubprocess):
+    PREFIX = b"[OTA-REQUESTOR]"
+
+    def __init__(self, app: str, storage_dir: str, discriminator: int,
+                 passcode: int, port: int = 5542, extra_args: list[str] = [],
+                 kvs_path: Optional[str] = None):
+        super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator,
+                         passcode=passcode, port=port, extra_args=extra_args, kvs_path=kvs_path)

@@ -26,7 +26,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
-from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
+from matter.testing.apps import OtaImagePath, OTAProviderSubprocess, OTARequestorSubProcess
 from matter.testing.matter_testing import MatterBaseTest
 
 logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
     """This is the base test class for SoftwareUpdate Test Cases"""
 
     current_provider_app_proc: Union[OTAProviderSubprocess, None] = None
-    current_requestor_app_proc: Union[OTAProviderSubprocess, None] = None
+    current_requestor_app_proc: Union[OTARequestorSubProcess, None] = None
 
     def start_provider(self,
                        version: int = 2,
@@ -97,6 +97,60 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         self.current_provider_app_proc = proc
         logger.info(f"Provider started with PID:  {self.current_provider_app_proc.get_pid()}")
+
+    def start_requestor(self,
+                        setup_pincode: int = 20202021,
+                        discriminator: int = 123,
+                        port: int = 5540,
+                        storage_dir='/tmp',
+                        extra_args: list = [],
+                        kvs_path: Optional[str] = None,
+                        log_file: Optional[str] = None, expected_output: str = "Status: Satisfied",
+                        timeout: int = 10):
+        """Start the provider process using the provided configuration.
+
+        Args:
+            version (int, optional): Provider app version to load. Defaults to 2.
+            setup_pincode (int, optional): Setup pincode for the provider process. Defaults to 20202021.
+            discriminator (int, optional): Discriminator for the provider process. Defaults to 1234.
+            port (int, optional): Port for the provider process. Defaults to 5541.
+            storage_dir (str, optional): Storage dir for the provider proccess. Defaults to '/tmp'.
+            extra_args (list, optional): Extra args to send to the provider process. Defaults to [].
+            kvs_path(str): Str of the path for the kvs path, if not will use temp file.
+            log_file (Optional[str], optional): Destination for the app process logs. Defaults to None.
+            expected_output (str): Expected string to see after a default timeout. Defaults to "Status: Satisfied".
+            timeout (int): Timeout to wait for the expected output. Defaults to 10 seconds
+        """
+        logger.info("Launching Requestor Process")
+        # Image to launch
+        ota_app = ""
+        if environ.get("OTA_REQUESTOR_APP") is not None:
+            ota_app = environ.get("OTA_REQUESTOR_APP")
+        else:
+            ota_app = f"{getcwd()}/out/debug/chip-ota-requestor-app"
+
+        if log_file is None:
+            now = datetime.now()
+            ts = int(now.timestamp())
+            log_file = f'/tmp/provider_{ts}.log'
+        logger.info(f"Writing Provider logs at : {log_file}")
+        # Launch the Provider subprocess using the Wrapper
+        proc = OTARequestorSubProcess(
+            ota_app,
+            storage_dir=storage_dir,
+            port=port,
+            discriminator=discriminator,
+            passcode=setup_pincode,
+            extra_args=extra_args,
+            kvs_path=kvs_path,
+            log_file=log_file,
+            err_log_file=log_file)
+        proc.start(
+            expected_output=expected_output,
+            timeout=timeout)
+
+        self.current_requestor_app_proc = proc
+        logger.info(f"Requestor started with PID:  {self.current_requestor_app_proc.get_pid()}")
 
     def get_ota_image_path(self, version: int = 2) -> str:
         """Get the path ota image used for the provider.

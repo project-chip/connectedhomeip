@@ -6,7 +6,6 @@ from typing import Any, BinaryIO, List, Optional, Union
 
 from matter.testing.tasks import Subprocess
 
-
 @dataclass
 class OtaImagePath:
     path: str
@@ -23,6 +22,8 @@ class ImageListPath:
 
 class AppServerSubprocess(Subprocess):
     PREFIX: bytes
+    log_file = ""
+    err_log_file = ""
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, port: int = 5540, extra_args: List[str] = ...) -> None: ...
 
@@ -43,8 +44,6 @@ class JFControllerSubprocess(Subprocess):
 class OTAProviderSubprocess(AppServerSubprocess):
     DEFAULT_ADMIN_NODE_ID: int
     PREFIX: bytes
-    log_file = ""
-    err_log_file = ""
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
@@ -56,3 +55,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
     def get_pid(self) -> int: ...
 
     def read_from_logs(self, pattern: str, regex: bool = True, before: int = 4, after: int = 4) -> list[dict]: ...
+
+
+class OTARequestorSubProcess(AppServerSubprocess):
+    PREFIX: bytes
