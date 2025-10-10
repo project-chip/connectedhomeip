@@ -94,9 +94,9 @@ public:
 
     Protocols::InteractionModel::Status SelectAudioStream(StreamUsageEnum streamUsage, uint16_t & audioStreamId) override;
 
-    Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId) override;
+    Protocols::InteractionModel::Status SetVideoStream(uint16_t videoStreamId) override;
 
-    Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) override;
+    Protocols::InteractionModel::Status SetAudioStream(uint16_t audioStreamId) override;
 
     PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) override;
 

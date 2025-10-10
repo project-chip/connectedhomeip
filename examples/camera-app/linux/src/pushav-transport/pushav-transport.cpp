@@ -153,8 +153,13 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
     mClipInfo.mOutputPath = "/tmp/"; // CAUTION: If path is not accessible to executable, the program may fail to write and crash.
     mClipInfo.mInputTimeBase = { 1, 1000000 };
 
-    uint8_t audioCodec   = static_cast<uint8_t>(audioStreamParams.audioCodec);
-    mAudioInfo.mChannels = (audioStreamParams.channelCount == 0) ? 1 : audioStreamParams.channelCount;
+    uint8_t audioCodec = static_cast<uint8_t>(audioStreamParams.audioCodec);
+    if (audioStreamParams.channelCount == 0)
+    {
+        ChipLogError(Camera, "Invalid channel count: 0. Using fallback 1 channel.");
+        audioStreamParams.channelCount = 1;
+    }
+    mAudioInfo.mChannels = audioStreamParams.channelCount;
 
     if (audioCodec == 0)
     {
@@ -173,11 +178,13 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
 
     if (audioStreamParams.sampleRate == 0)
     {
+        ChipLogError(Camera, "Invalid sample rate: 0. Using fallback 48000 Hz.");
         audioStreamParams.sampleRate = 48000; // Fallback value for invalid sample rate
     }
     mAudioInfo.mSampleRate = audioStreamParams.sampleRate;
     if (audioStreamParams.bitRate == 0)
     {
+        ChipLogError(Camera, "Invalid audio bit rate: 0. Using fallback 96000 bps.");
         audioStreamParams.bitRate = 96000;
     }
     mAudioInfo.mBitRate          = audioStreamParams.bitRate;

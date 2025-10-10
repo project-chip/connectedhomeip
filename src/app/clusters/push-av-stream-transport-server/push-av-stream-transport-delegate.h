@@ -195,22 +195,24 @@ public:
                                                                   uint16_t & audioStreamId) = 0;
 
     /**
-     * @brief Validates that the video stream corresponding to videoStreamID is allocated.
+     * @brief Sets the video stream for Push AV usage corresponding to videoStreamID,
+     * if it is valid and is allocated.
      *
      * @param videoStreamId Identifier for the requested video stream
-     * @return Status::Success if allocated video stream exists;
+     * @return Status::Success if allocated video stream exists and is set for PushAV usage;
      *         Status::InvalidStream if no allocated video stream with videoStreamID exists
      */
-    virtual Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId) = 0;
+    virtual Protocols::InteractionModel::Status SetVideoStream(uint16_t videoStreamId) = 0;
 
     /**
-     * @brief Validates that the audio stream corresponding to audioStreamID is allocated.
+     * @brief Sets the audio stream for Push AV usage corresponding to audioStreamID,
+     * if it is valid and is allocated.
      *
      * @param audioStreamId Identifier for the requested audio stream
-     * @return Status::Success if allocated audio stream exists;
+     * @return Status::Success if allocated audio stream exists and is set for PushAV usage;
      *         Status::InvalidStream if no allocated audio stream with audioStreamID exists
      */
-    virtual Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) = 0;
+    virtual Protocols::InteractionModel::Status SetAudioStream(uint16_t audioStreamId) = 0;
 
     /**
      * @brief Validates that the zone corresponding to zoneId exists.
