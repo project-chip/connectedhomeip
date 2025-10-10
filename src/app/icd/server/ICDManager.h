@@ -51,6 +51,7 @@ namespace app {
 // Used in unit tests
 class TestICDManager_TestShouldCheckInMsgsBeSentAtActiveModeFunction_Test;
 
+class ReadHandler;
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
  */
@@ -260,6 +261,7 @@ private:
     // TODO : Once <gtest/gtest_prod.h> can be included, use FRIEND_TEST for the friend class.
     friend class TestICDManager_TestShouldCheckInMsgsBeSentAtActiveModeFunction_Test;
 
+    friend class ReadHandler;
     /**
      * @brief UpdateICDMode evaluates in which mode the ICD can be in; SIT or LIT mode.
      *        If the current operating mode does not match the evaluated operating mode, function updates the ICDMode and triggers
@@ -341,7 +343,8 @@ private:
      *       ShouldCheckInMsgsBeSentAtActiveModeFunction. If we should, we allocate an ICDCheckInSender which tries to send a
      *       Check-In message to the registered client.
      */
-    void SendCheckInMsgs();
+    void SendCheckInMsgs(Optional<Access::SubjectDescriptor> specificSubject = Optional<Access::SubjectDescriptor>());
+    bool ShouldSendCheckInMessageForSpecificSubject(const ICDMonitoringEntry & entry, const Access::SubjectDescriptor & specificSubject);
 
     /**
      * @brief See function implementation in .cpp for details on this function.

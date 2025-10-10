@@ -136,6 +136,7 @@ public:
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     void SetICDManager(ICDManager * manager) { mICDManager = manager; };
+    ICDManager * GetICDManager() { return mICDManager; };
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; }
