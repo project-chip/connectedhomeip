@@ -103,7 +103,7 @@ void DefaultServerCluster::NotifyAttributeChanged(AttributeId attributeId)
     IncreaseDataVersion();
 
     VerifyOrReturn(mContext != nullptr);
-    mContext->interactionContext->dataModelChangeListener->MarkDirty({ mPath.mEndpointId, mPath.mClusterId, attributeId });
+    mContext->interactionContext.dataModelChangeListener.MarkDirty({ mPath.mEndpointId, mPath.mClusterId, attributeId });
 }
 
 BitFlags<ClusterQualityFlags> DefaultServerCluster::GetClusterFlags(const ConcreteClusterPath &) const
@@ -131,6 +131,16 @@ CHIP_ERROR DefaultServerCluster::AcceptedCommands(const ConcreteClusterPath & pa
 CHIP_ERROR DefaultServerCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
     return CHIP_NO_ERROR;
+}
+
+DataModel::ActionReturnStatus DefaultServerCluster::NotifyAttributeChangedIfSuccess(AttributeId attributeId,
+                                                                                    DataModel::ActionReturnStatus status)
+{
+    if (status.IsSuccess() && !status.IsNoOpSuccess())
+    {
+        NotifyAttributeChanged(attributeId);
+    }
+    return status;
 }
 
 } // namespace app

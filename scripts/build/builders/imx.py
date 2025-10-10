@@ -70,11 +70,13 @@ class IMXBuilder(GnBuilder):
                  root,
                  runner,
                  app: IMXApp,
-                 release: bool = False):
+                 release: bool = False,
+                 trusty: bool = False):
         super(IMXBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
         self.release = release
+        self.trusty = trusty
         self.app = app
 
     def GnBuildArgs(self):
@@ -172,6 +174,9 @@ class IMXBuilder(GnBuilder):
             args.append('is_debug=false')
         else:
             args.append('optimize_debug=true')
+
+        if self.trusty:
+            args.append('chip_with_trusty_os=true')
 
         return args
 

@@ -50,12 +50,11 @@ static constexpr uint16_t kMaxScenesPerFabric = (kMaxScenesPerEndpoint - 1) / 2;
  * on the device.
  */
 using SceneTableBase = SceneTable<scenes::ExtensionFieldSetsImpl>;
-class DefaultSceneTableImpl
-    : public SceneTableBase,
-      public app::Storage::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData, kIteratorsMax>
+class DefaultSceneTableImpl : public SceneTableBase,
+                              public app::Storage::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData>
 {
 public:
-    using Super = app::Storage::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData, kIteratorsMax>;
+    using Super = app::Storage::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData>;
 
     DefaultSceneTableImpl() : Super(kMaxScenesPerFabric, kMaxScenesPerEndpoint) {}
     ~DefaultSceneTableImpl() { Finish(); };

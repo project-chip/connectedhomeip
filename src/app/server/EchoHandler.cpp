@@ -59,7 +59,7 @@ CHIP_ERROR InitEchoHandler(chip::Messaging::ExchangeManager * exchangeMgr)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "EchoServer failed, err:%s\n", chip::ErrorStr(err));
+        ChipLogError(AppServer, "EchoServer failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err;

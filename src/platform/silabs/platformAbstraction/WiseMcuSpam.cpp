@@ -22,21 +22,17 @@
 #include <task.h>
 
 #include <app/icd/server/ICDServerConfig.h>
-#include <lib/support/CodeUtils.h>
 
 #include <lib/support/CodeUtils.h>
 #if SILABS_LOG_ENABLED
 #include "silabs_utils.h"
-
 #endif // SILABS_LOG_ENABLED
 
 // TODO add includes ?
 extern "C" {
-#include "em_core.h"
 #if defined(SL_SI91X_BOARD_INIT)
 #include "rsi_board.h"
 #endif // SL_SI91X_BOARD_INIT
-#include "sl_event_handler.h"
 
 #include "sl_si91x_hal_soc_soft_reset.h"
 
@@ -84,9 +80,9 @@ namespace {
 uint8_t sButtonStates[SL_SI91x_BUTTON_COUNT] = { 0 };
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && defined(SL_CATALOG_SIMPLE_BUTTON_PRESENT)
 bool btn0_pressed = false;
-#endif /* SL_ICD_ENABLED */
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && defined(SL_CATALOG_SIMPLE_BUTTON_PRESENT)
 } // namespace
 
 SilabsPlatform SilabsPlatform::sSilabsPlatformAbstractionManager;
@@ -94,8 +90,7 @@ SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 
 CHIP_ERROR SilabsPlatform::Init(void)
 {
-    // TODO: Setting the highest priority for SVCall_IRQn to avoid the HardFault issue
-    NVIC_SetPriority(SVCall_IRQn, CORE_INTERRUPT_HIGHEST_PRIORITY);
+    mButtonCallback = nullptr;
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
     // Configuration the clock rate
@@ -155,6 +150,12 @@ CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
     return CHIP_NO_ERROR;
 }
 #endif // ENABLE_WSTK_LEDS
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
+void SilabsPlatform::StartScheduler()
+{
+    vTaskStartScheduler();
+}
+#endif // SL_CATALOG_CUSTOM_MAIN_PRESENT
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 bool SilabsPlatform::GetRGBLedState(uint8_t led)
@@ -174,11 +175,6 @@ CHIP_ERROR SilabsPlatform::GetLedColor(uint8_t led, uint16_t & r, uint16_t & g, 
     return CHIP_NO_ERROR;
 }
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
-
-void SilabsPlatform::StartScheduler()
-{
-    vTaskStartScheduler();
-}
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 extern "C" void sl_button_on_change(uint8_t btn, uint8_t btnAction)

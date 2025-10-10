@@ -22,7 +22,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/general-commissioning-server/general-commissioning-server.h>
+#include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
 #include <app/clusters/network-commissioning/ThreadScanResponse.h>
 #include <app/clusters/network-commissioning/WifiScanResponse.h>
 #include <app/data-model/Nullable.h>
@@ -336,7 +336,7 @@ void FillDebugTextAndNetworkIndex(Commands::NetworkConfigResponse::Type & respon
     }
 }
 
-std::optional<ActionReturnStatus> CheckFailSafeArmed(FabricIndex fabricIndex)
+std::optional<ActionReturnStatus> EnsureFailsafeIsArmed(FabricIndex fabricIndex)
 {
     auto & failSafeContext = chip::Server::GetInstance().GetFailSafeContext();
 
@@ -348,8 +348,12 @@ std::optional<ActionReturnStatus> CheckFailSafeArmed(FabricIndex fabricIndex)
     return std::nullopt;
 }
 
-#define CHECK_FAILSAFE_ARMED(fabricIndex)                                                                                          \
-    if (std::optional<ActionReturnStatus> status = CheckFailSafeArmed(fabricIndex); status.has_value())                            \
+/// Returns with an error status (FailsafeRequired) if the failsafe
+/// is not armed for the given fabric index.
+///
+/// This just wraps EnsureFailsafeIsArmed with a one-liner for check & return.
+#define RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(fabricIndex)                                                                     \
+    if (std::optional<ActionReturnStatus> status = EnsureFailsafeIsArmed(fabricIndex); status.has_value())                         \
     {                                                                                                                              \
         return status;                                                                                                             \
     }                                                                                                                              \
@@ -364,7 +368,7 @@ NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetwork(CommandHandler & handler
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     MATTER_TRACE_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
 
-    CHECK_FAILSAFE_ARMED(handler.GetAccessingFabricIndex());
+    RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(handler.GetAccessingFabricIndex());
 
     if (req.ssid.empty() || req.ssid.size() > DeviceLayer::Internal::kMaxWiFiSSIDLength)
     {
@@ -553,7 +557,7 @@ NetworkCommissioningLogic::HandleAddOrUpdateThreadNetwork(CommandHandler & handl
 
     MATTER_TRACE_SCOPE("HandleAddOrUpdateThreadNetwork", "NetworkCommissioning");
 
-    CHECK_FAILSAFE_ARMED(handler.GetAccessingFabricIndex());
+    RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(handler.GetAccessingFabricIndex());
 
     Commands::NetworkConfigResponse::Type response;
     DebugTextStorage debugTextBuffer;
@@ -577,7 +581,7 @@ NetworkCommissioningLogic::HandleAddOrUpdateThreadNetwork(CommandHandler & handl
 void NetworkCommissioningLogic::UpdateBreadcrumb(const Optional<uint64_t> & breadcrumb)
 {
     VerifyOrReturn(breadcrumb.HasValue());
-    GeneralCommissioning::SetBreadcrumb(breadcrumb.Value());
+    GeneralCommissioningCluster::Instance().SetBreadCrumb(breadcrumb.Value());
 }
 
 void NetworkCommissioningLogic::CommitSavedBreadcrumb()
@@ -594,7 +598,7 @@ std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleRemoveNetwork
 {
     MATTER_TRACE_SCOPE("HandleRemoveNetwork", "NetworkCommissioning");
 
-    CHECK_FAILSAFE_ARMED(handler.GetAccessingFabricIndex());
+    RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(handler.GetAccessingFabricIndex());
 
     Commands::NetworkConfigResponse::Type response;
     DebugTextStorage debugTextBuffer;
@@ -629,7 +633,7 @@ NetworkCommissioningLogic::HandleConnectNetwork(CommandHandler & handler, const 
         return Protocols::InteractionModel::Status::ConstraintError;
     }
 
-    CHECK_FAILSAFE_ARMED(handler.GetAccessingFabricIndex());
+    RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(handler.GetAccessingFabricIndex());
 
     mConnectingNetworkIDLen = static_cast<uint8_t>(req.networkID.size());
     memcpy(mConnectingNetworkID, req.networkID.data(), mConnectingNetworkIDLen);
@@ -662,8 +666,8 @@ NetworkCommissioningLogic::HandleConnectNetwork(CommandHandler & handler, const 
 std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleNonConcurrentConnectNetwork()
 {
     ByteSpan nonConcurrentNetworkID = ByteSpan(mConnectingNetworkID, mConnectingNetworkIDLen);
-    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Network SSID=%.*s", mConnectingNetworkIDLen,
-                    mConnectingNetworkID);
+    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Network SSID=%s",
+                    NullTerminated(mConnectingNetworkID, mConnectingNetworkIDLen).c_str());
     mpWirelessDriver->ConnectNetwork(nonConcurrentNetworkID, this);
     return std::nullopt;
 }
@@ -767,6 +771,10 @@ exit:
         ChipLogError(Zcl, "QueryIdentity failed: %" CHIP_ERROR_FORMAT, err.Format());
         return Protocols::InteractionModel::Status::Failure;
     }
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        return status;
+    }
     // response was sent if error is CHIP_NO_ERROR
     return std::nullopt;
 }
@@ -857,7 +865,7 @@ void NetworkCommissioningLogic::OnFinished(Status status, CharSpan debugText, Th
     auto commandHandle    = commandHandleRef.Get();
     if (commandHandle == nullptr)
     {
-        // When the platform shut down, interaction model engine will invalidate all commandHandle to avoid dangling references.
+        // When the platform shuts down, interaction model engine will invalidate all commandHandle to avoid dangling references.
         // We may receive the callback after it and should make it noop.
         return;
     }
@@ -883,7 +891,7 @@ void NetworkCommissioningLogic::OnFinished(Status status, CharSpan debugText, Wi
     auto commandHandle    = commandHandleRef.Get();
     if (commandHandle == nullptr)
     {
-        // When the platform shut down, interaction model engine will invalidate all commandHandle to avoid dangling references.
+        // When the platform shuts down, interaction model engine will invalidate all commandHandle to avoid dangling references.
         // We may receive the callback after it and should make it noop.
         return;
     }

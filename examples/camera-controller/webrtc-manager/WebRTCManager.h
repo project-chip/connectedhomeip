@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <functional>
 #include <platform/CHIPDeviceLayer.h>
 #include <rtc/rtc.hpp>
@@ -59,8 +60,8 @@ public:
                             chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
                             chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
 
-    CHIP_ERROR SolicitOffer(StreamUsageEnum streamUsage);
-
+    CHIP_ERROR SolicitOffer(StreamUsageEnum streamUsage, chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
+                            chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
     CHIP_ERROR ProvideAnswer(uint16_t sessionId, const std::string & sdp);
 
     CHIP_ERROR ProvideICECandidates(uint16_t sessionId);
@@ -75,7 +76,8 @@ private:
     WebRTCManager();
     ~WebRTCManager();
 
-    chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer mWebRTCRequestorServer;
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer>
+        mWebRTCRegisteredServerCluster;
 
     WebRTCProviderClient mWebRTCProviderClient;
     WebRTCRequestorDelegate mWebRTCRequestorDelegate;
@@ -89,6 +91,7 @@ private:
     std::vector<std::string> mLocalCandidates;
 
     std::shared_ptr<rtc::Track> mTrack;
+    std::shared_ptr<rtc::Track> audioTrack;
 
     // Callback to notify when session is established
     SessionEstablishedCallback mSessionEstablishedCallback;
@@ -97,7 +100,8 @@ private:
     uint16_t mCurrentVideoStreamId = 0;
 
     // UDP socket for RTP forwarding
-    int mRTPSocket = -1;
+    int mRTPSocket      = -1;
+    int mAudioRTPSocket = -1;
 
     // Close and reset the RTP socket
     void CloseRTPSocket();

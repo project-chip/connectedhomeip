@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -18,9 +19,16 @@ namespace AccountLogin {
 
 inline constexpr uint32_t kRevision = 2;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
+
+};
+
+} // namespace Attributes
 
 namespace Commands {
+
 namespace GetSetupPIN {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
     GetSetupPIN::Id,
@@ -41,6 +49,13 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
 } // namespace Logout
 
 } // namespace Commands
+
+namespace Events {
+namespace LoggedOut {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kAdminister };
+} // namespace LoggedOut
+
+} // namespace Events
 } // namespace AccountLogin
 } // namespace Clusters
 } // namespace app

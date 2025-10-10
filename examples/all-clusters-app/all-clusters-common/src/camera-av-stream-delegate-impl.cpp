@@ -147,7 +147,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
+Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
                                                                                   uint16_t & outStreamID)
 {
     outStreamID = kInvalidStreamID;
@@ -206,6 +206,11 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDealloc
     }
 
     return Status::Success;
+}
+
+void CameraAVStreamManager::OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, StreamAllocationAction action)
+{
+    ChipLogProgress(Zcl, "Video stream has been allocated");
 }
 
 void CameraAVStreamManager::OnStreamUsagePrioritiesChanged()
@@ -276,42 +281,6 @@ CameraAVStreamManager::LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamSt
 }
 
 CHIP_ERROR
-CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                           const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                           const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
-{
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-CameraAVStreamManager::ValidateVideoStreamID(uint16_t videoStreamId)
-{
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-CameraAVStreamManager::ValidateAudioStreamID(uint16_t audioStreamId)
-{
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-CameraAVStreamManager::IsPrivacyModeActive(bool & isActive)
-{
-    return CHIP_NO_ERROR;
-}
-
-bool CameraAVStreamManager::HasAllocatedVideoStreams()
-{
-    return false;
-}
-
-bool CameraAVStreamManager::HasAllocatedAudioStreams()
-{
-    return false;
-}
-
-CHIP_ERROR
 CameraAVStreamManager::PersistentAttributesLoadedCallback()
 {
     ChipLogDetail(Zcl, "Persistent attributes loaded");
@@ -333,6 +302,16 @@ CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamI
     ChipLogDetail(Zcl, "Transport released audio/video streams");
 
     return CHIP_NO_ERROR;
+}
+
+const std::vector<VideoStreamStruct> & CameraAVStreamManager::GetAllocatedVideoStreams() const
+{
+    return videoStreamStructs;
+}
+
+const std::vector<AudioStreamStruct> & CameraAVStreamManager::GetAllocatedAudioStreams() const
+{
+    return audioStreamStructs;
 }
 
 void CameraAVStreamManager::InitializeAvailableVideoStreams()

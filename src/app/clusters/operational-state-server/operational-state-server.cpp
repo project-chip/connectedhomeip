@@ -29,6 +29,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/OperationalState/Metadata.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -330,7 +331,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    ChipLogError(Zcl, "OperationalState: Reading");
+    ChipLogDetail(Zcl, "OperationalState: Reading");
     switch (aPath.mAttributeId)
     {
     case OperationalState::Attributes::OperationalStateList::Id: {
@@ -400,6 +401,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(aEncoder.Encode(mDelegate->GetCountdownTime()));
         break;
     }
+    case OperationalState::Attributes::ClusterRevision::Id:
+        return aEncoder.Encode(OperationalState::kRevision);
     }
     return CHIP_NO_ERROR;
 }

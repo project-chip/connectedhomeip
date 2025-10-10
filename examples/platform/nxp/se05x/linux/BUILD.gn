@@ -16,8 +16,10 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/app/icd/icd.gni")
+import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/platform/nxp/crypto/se05x/args.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
 if (current_os != "nuttx") {
@@ -40,8 +42,10 @@ declare_args() {
 
 config("app-main-config") {
   include_dirs = [
+    "${chip_root}",
     "../",
     "../../../linux",
+    "${chip_root}/src/platform/nxp/crypto/se05x",
   ]
 }
 
@@ -99,7 +103,12 @@ source_set("app-main") {
   defines = [
     "ENABLE_TRACING=${matter_enable_tracing_support}",
     "ENABLE_CAMERA_SERVER=${matter_enable_camera_server}",
+    "CHIP_ATTESTATION_TRUSTY_OS=${chip_with_trusty_os}",
   ]
+
+  if (chip_se05x_device_attestation) {
+    defines += [ "ENABLE_SE05X_DEVICE_ATTESTATION=1" ]
+  }
 
   sources = [
     "../../../linux/AppMain.h",
@@ -191,6 +200,7 @@ source_set("app-main") {
     "CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER=${chip_enable_device_energy_management_trigger}",
   ]
 
+  deps += [ "${chip_root}/third_party/simw-top-mini:se05x" ]
   public_configs = [ ":app-main-config" ]
 }
 

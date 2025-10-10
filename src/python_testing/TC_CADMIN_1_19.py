@@ -31,19 +31,22 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
-                                         async_test_body, default_matter_test_main)
+
 from mobly import asserts
-from support_modules.cadmin_support import CADMINSupport
+from support_modules.cadmin_support import CADMINBaseTest
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.exceptions import ChipStackError
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import AttributeValue, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_CADMIN_1_19(MatterBaseTest):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.support = CADMINSupport(self)
+class TC_CADMIN_1_19(CADMINBaseTest):
+    # This test can take a long time to run especially in highly congested lab networks since it creates a lot of fabrics and commissions those to the DUT so we need to increase the timeout to run this test.
+    @property
+    def default_timeout(self) -> int:
+        return 600
 
     def steps_TC_CADMIN_1_19(self) -> list[TestStep]:
         return [
@@ -95,7 +98,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
         self.max_window_duration = duration.maxCumulativeFailsafeSeconds
 
         self.step(3)
-        fabrics = await self.support.get_fabrics(th=self.th1)
+        fabrics = await self.get_fabrics(th=self.th1, fabric_filtered=False)
         initial_number_of_fabrics = len(fabrics)
 
         self.step(4)
@@ -114,9 +117,11 @@ class TC_CADMIN_1_19(MatterBaseTest):
             params = await self.open_commissioning_window(dev_ctrl=self.th1, timeout=self.max_window_duration, node_id=self.dut_node_id)
 
             self.step("5b")
-            fids_ca = self.certificate_authority_manager.NewCertificateAuthority(caIndex=fid)
-            fids_fa = fids_ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=fid + 1)
-            fids = fids_fa.NewController(nodeId=fid + 1)
+            # Use a unique fabric ID that won't conflict with existing fabrics
+            new_fabric_idx = fid + initial_number_of_fabrics + 1
+            fids_ca = self.certificate_authority_manager.NewCertificateAuthority()
+            fids_fa = fids_ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=new_fabric_idx)
+            fids = fids_fa.NewController(nodeId=new_fabric_idx)
 
             await fids.CommissionOnNetwork(
                 nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
@@ -165,7 +170,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
         asserts.assert_equal(current_fabrics, initial_number_of_fabrics, "Expected number of fabrics not correct")
 
         self.step(11)
-        attribute_reports = ClusterAttributeChangeAccumulator(
+        attribute_reports = AttributeSubscriptionHandler(
             expected_cluster=Clusters.AdministratorCommissioning, expected_attribute=Clusters.AdministratorCommissioning.Attributes.WindowStatus)
         await attribute_reports.start(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=0)
 

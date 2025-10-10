@@ -20,7 +20,6 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connect
 get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
-get_filename_component(ENERGY_MANAGEMENT_COMMON_DIR ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/ REALPATH)
 
 include(${TELINK_COMMON}/common.cmake)
 include(${CHIP_ROOT}/config/telink/app/enable-gnu-std.cmake)
@@ -31,10 +30,6 @@ project(chip-telink-all-clusters-app-example)
 target_include_directories(app PRIVATE
                            include
                            ${ALL_CLUSTERS_COMMON_DIR}/include
-                           ${ENERGY_MANAGEMENT_COMMON_DIR}/common/include
-                           ${ENERGY_MANAGEMENT_COMMON_DIR}/device-energy-management/include
-                           ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/include
-                           ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-reporting/include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/all-clusters-app
                            ${TELINK_COMMON}/common/include
@@ -52,18 +47,7 @@ target_sources(app PRIVATE
                ${ALL_CLUSTERS_COMMON_DIR}/src/chime-instance.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/device-energy-management-stub.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/energy-evse-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/common/src/EnergyTimeUtils.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/device-energy-management/src/DeviceEnergyManagementManager.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/ChargingTargetsMemMgr.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/EVSEManufacturerImpl.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/EnergyEvseDelegateImpl.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/EnergyEvseManager.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/EnergyEvseTargetsStore.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDManager.cpp

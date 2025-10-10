@@ -82,15 +82,16 @@ import queue
 import time
 from datetime import datetime, timedelta
 
-import chip.clusters as Clusters
 import test_plan_support
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import EventReadResult
-from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest,
-                                         TestStep, await_sequence_of_reports, default_matter_test_main, has_feature,
-                                         run_if_endpoint_matches)
-from chip.tlv import uint
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.clusters.Attribute import EventReadResult
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep, default_matter_test_main, has_feature,
+                                           run_if_endpoint_matches)
+from matter.tlv import uint
 
 logger = logging.getLogger(__name__)
 
@@ -280,7 +281,7 @@ class TC_SwitchTests(MatterBaseTest):
 
         logging.info(f"Successfully waited for no further events on {expected_cluster} for {elapsed:.1f} seconds")
 
-    def _received_event(self, event_listener: EventChangeCallback, target_event: ClusterObjects.ClusterEvent, timeout_s: int) -> bool:
+    def _received_event(self, event_listener: EventSubscriptionHandler, target_event: ClusterObjects.ClusterEvent, timeout_s: int) -> bool:
         """
             Returns true if this event was received, false otherwise
         """
@@ -324,9 +325,9 @@ class TC_SwitchTests(MatterBaseTest):
 
         # Step 2: Set up subscription to all events of Switch cluster on the endpoint.
         self.step(2)
-        event_listener = EventChangeCallback(cluster)
+        event_listener = EventSubscriptionHandler(expected_cluster=cluster)
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
-        attrib_listener = ClusterAttributeChangeAccumulator(cluster)
+        attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
         await attrib_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
 
         # Pre-get number of positions for step 7 later.
@@ -437,7 +438,7 @@ class TC_SwitchTests(MatterBaseTest):
         endpoint_id = self.get_endpoint()
 
         self.step(2)
-        event_listener = EventChangeCallback(cluster)
+        event_listener = EventSubscriptionHandler(expected_cluster=cluster)
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
 
         self.step(3)
@@ -528,9 +529,9 @@ class TC_SwitchTests(MatterBaseTest):
 
         # Step 2: Set up subscription to all events and attributes of Switch cluster on the endpoint
         self.step(2)
-        event_listener = EventChangeCallback(cluster)
+        event_listener = EventSubscriptionHandler(expected_cluster=cluster)
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
-        attrib_listener = ClusterAttributeChangeAccumulator(cluster)
+        attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
         await attrib_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
 
         # Step 3: Operator does not operate switch on the DUT
@@ -551,8 +552,8 @@ class TC_SwitchTests(MatterBaseTest):
         # - TH expects report of CurrentPosition 1, followed by a report of Current Position 0.
         logging.info(
             f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for CurrentPosition to go {switch_pressed_position}, then 0.")
-        await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.CurrentPosition, sequence=[
-                                  switch_pressed_position, 0], timeout_sec=post_prompt_settle_delay_seconds)
+        attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.CurrentPosition, sequence=[
+                                                  switch_pressed_position, 0], timeout_sec=post_prompt_settle_delay_seconds)
 
         # - TH expects at least InitialPress with NewPosition = 1
         logging.info(f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for InitialPress event.")
@@ -691,7 +692,7 @@ class TC_SwitchTests(MatterBaseTest):
         pressed_position = self._default_pressed_position
 
         self.step(2)
-        event_listener = EventChangeCallback(cluster)
+        event_listener = EventSubscriptionHandler(expected_cluster=cluster)
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
 
         self.step(3)
@@ -869,7 +870,7 @@ class TC_SwitchTests(MatterBaseTest):
         pressed_position = self._default_pressed_position
 
         self.step(2)
-        event_listener = EventChangeCallback(cluster)
+        event_listener = EventSubscriptionHandler(expected_cluster=cluster)
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
 
         self.step(3)

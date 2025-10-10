@@ -189,6 +189,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NetworkRecoveryReason
+namespace IsCommissioningWithoutPower {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::IsCommissioningWithoutPower::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace IsCommissioningWithoutPower
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -242,6 +254,7 @@ struct TypeInfo
         Attributes::TCUpdateDeadline::TypeInfo::DecodableType TCUpdateDeadline;
         Attributes::RecoveryIdentifier::TypeInfo::DecodableType recoveryIdentifier;
         Attributes::NetworkRecoveryReason::TypeInfo::DecodableType networkRecoveryReason;
+        Attributes::IsCommissioningWithoutPower::TypeInfo::DecodableType isCommissioningWithoutPower = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

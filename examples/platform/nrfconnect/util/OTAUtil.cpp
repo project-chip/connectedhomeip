@@ -24,6 +24,7 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/nrfconnect/ExternalFlashManager.h>
 #include <platform/nrfconnect/OTAImageProcessorImpl.h>
 #include <zephyr/dfu/mcuboot.h>
 #endif

@@ -170,5 +170,7 @@
 #endif // CHIP_DEVICE_CONFIG_CERTIFICATION_DECLARATION
 #endif // CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
 
+#define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
+
 // Include default nxp platform configurations
 #include "platform/nxp/common/CHIPDeviceNXPPlatformDefaultConfig.h"

@@ -35,13 +35,14 @@ import logging
 import random
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.ChipDeviceCtrl import CommissioningParameters
-from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mdns_discovery.mdns_discovery import MdnsDiscovery
+from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.ChipDeviceCtrl import CommissioningParameters
+from matter.exceptions import ChipStackError
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_CADMIN_1_15(MatterBaseTest):
@@ -80,6 +81,11 @@ class TC_CADMIN_1_15(MatterBaseTest):
         await th.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
+
+    def get_instance_name(self, compressed_fabric_id) -> str:
+        node_id = self.dut_node_id
+        instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
+        return instance_name
 
     def steps_TC_CADMIN_1_15(self) -> list[TestStep]:
         return [
@@ -177,12 +183,14 @@ class TC_CADMIN_1_15(MatterBaseTest):
         }
 
         op_services = []
+        services = await mdns.get_operational_services(log_output=True)
         for th, compressed_id in compressed_fabric_ids.items():
-            service = await MdnsDiscovery.get_operational_service(
-                mdns,
-                node_id=self.dut_node_id,
-                compressed_fabric_id=compressed_id,
-                log_output=True
+            instance_name = self.get_instance_name(compressed_id)
+            operational_service_name = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
+
+            service = next(
+                (s for s in services if s.service_name == operational_service_name),
+                None
             )
             op_services.append(service.instance_name)
 

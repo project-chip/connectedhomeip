@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace AccessControl {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace Acl {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(Acl::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -55,10 +57,18 @@ inline constexpr DataModel::AttributeEntry
     kMetadataEntry(Arl::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace Arl
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
+    Acl::kMetadataEntry,
+    SubjectsPerAccessControlEntry::kMetadataEntry,
+    TargetsPerAccessControlEntry::kMetadataEntry,
+    AccessControlEntriesPerFabric::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ReviewFabricRestrictions {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(ReviewFabricRestrictions::Id,
@@ -67,6 +77,19 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace ReviewFabricRestrictions
 
 } // namespace Commands
+
+namespace Events {
+namespace AccessControlEntryChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kAdminister };
+} // namespace AccessControlEntryChanged
+namespace AccessControlExtensionChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kAdminister };
+} // namespace AccessControlExtensionChanged
+namespace FabricRestrictionReviewUpdate {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kAdminister };
+} // namespace FabricRestrictionReviewUpdate
+
+} // namespace Events
 } // namespace AccessControl
 } // namespace Clusters
 } // namespace app

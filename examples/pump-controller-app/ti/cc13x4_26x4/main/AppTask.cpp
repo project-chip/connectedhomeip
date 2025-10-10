@@ -39,6 +39,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <data-model-providers/codegen/Instance.h>
+#include <inet/EndPointStateOpenThread.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -46,7 +47,9 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+
 #include <src/platform/ti/cc13xx_26xx/DefaultTestEventTriggerDelegate.h>
 
 #include <ti/drivers/apps/Button.h>
@@ -85,6 +88,8 @@ static LED_Handle sAppGreenHandle;
 #endif
 static Button_Handle sAppLeftHandle;
 static Button_Handle sAppRightHandle;
+
+Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0 /*endpointId*/);
 
 AppTask AppTask::sAppTask;
 
@@ -278,6 +283,7 @@ int AppTask::Init()
             ;
     }
 
+    sThreadNetworkDriver.Init();
     ret = ThreadStackMgrImpl().StartThreadTask();
     if (ret != CHIP_NO_ERROR)
     {
@@ -307,6 +313,13 @@ int AppTask::Init()
 
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = [] { ThreadStackMgr().LockThreadStack(); };
+    nativeParams.unlockCb              = [] { ThreadStackMgr().UnlockThreadStack(); };
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+
     chip::Server::GetInstance().Init(initParams);
 
     ret = PlatformMgr().StartEventLoopTask();

@@ -31,7 +31,11 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <platform/Zephyr/DiagnosticDataProviderImpl.h>
-#include <platform/internal/GenericPlatformManagerImpl_Zephyr.ipp>
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#include <platform/internal/GenericPlatformManagerImpl_ZephyrSelect.ipp>
+#else
+#include <platform/internal/GenericPlatformManagerImpl_ZephyrNoSelect.ipp>
+#endif
 
 #include <malloc.h>
 #include <zephyr/drivers/entropy.h>

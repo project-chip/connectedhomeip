@@ -37,10 +37,11 @@
 import logging
 import time
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_PS_2_3(MatterBaseTest):
@@ -61,7 +62,7 @@ class TC_PS_2_3(MatterBaseTest):
 
         self.step(2)
         ps = Clusters.PowerSource
-        sub_handler = ClusterAttributeChangeAccumulator(ps)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=ps)
         await sub_handler.start(self.default_controller, self.dut_node_id, self.get_endpoint())
 
         self.step(3)

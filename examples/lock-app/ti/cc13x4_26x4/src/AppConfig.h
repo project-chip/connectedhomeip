@@ -23,9 +23,18 @@
 extern "C" {
 #endif
 
+#ifdef ti_log_Log_ENABLE
+#include "ti_drivers_config.h"
+#include "ti_log_config.h"
+#endif
+
 int cc13xx_26xxLogInit(void);
 void cc13xx_26xxLog(const char * aFormat, ...);
+#ifndef ti_log_Log_ENABLE
 #define PLAT_LOG(...) cc13xx_26xxLog(__VA_ARGS__);
+#else // SILK Logging
+#define PLAT_LOG(...) Log_printf(LogModule_App1, Log_DEBUG, __VA_ARGS__);
+#endif
 
 #define ACTUATOR_MOVEMENT_PERIOD_MS 1000
 

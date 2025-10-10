@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace DeviceEnergyManagement {
 inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
+
 namespace ESAType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ESAType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -52,10 +54,16 @@ namespace OptOutState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(OptOutState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace OptOutState
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
+    ESAType::kMetadataEntry,     ESACanGenerate::kMetadataEntry, ESAState::kMetadataEntry,
+    AbsMinPower::kMetadataEntry, AbsMaxPower::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace PowerAdjustRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(PowerAdjustRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
@@ -90,6 +98,22 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(CancelRequest::I
 } // namespace CancelRequest
 
 } // namespace Commands
+
+namespace Events {
+namespace PowerAdjustStart {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace PowerAdjustStart
+namespace PowerAdjustEnd {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace PowerAdjustEnd
+namespace Paused {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace Paused
+namespace Resumed {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace Resumed
+
+} // namespace Events
 } // namespace DeviceEnergyManagement
 } // namespace Clusters
 } // namespace app

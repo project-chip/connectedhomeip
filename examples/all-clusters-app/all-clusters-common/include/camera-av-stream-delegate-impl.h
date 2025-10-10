@@ -60,62 +60,55 @@ struct SnapshotStream
 class CameraAVStreamManager : public CameraAVStreamMgmtDelegate
 {
 public:
-    Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs, uint16_t & outStreamID);
+    Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
+                                                            uint16_t & outStreamID) override;
 
     Protocols::InteractionModel::Status VideoStreamModify(const uint16_t streamID, const chip::Optional<bool> waterMarkEnabled,
-                                                          const chip::Optional<bool> osdEnabled);
+                                                          const chip::Optional<bool> osdEnabled) override;
 
-    Protocols::InteractionModel::Status VideoStreamDeallocate(const uint16_t streamID);
+    Protocols::InteractionModel::Status VideoStreamDeallocate(const uint16_t streamID) override;
 
-    Protocols::InteractionModel::Status AudioStreamAllocate(const AudioStreamStruct & allocateArgs, uint16_t & outStreamID);
+    Protocols::InteractionModel::Status AudioStreamAllocate(const AudioStreamStruct & allocateArgs,
+                                                            uint16_t & outStreamID) override;
 
-    Protocols::InteractionModel::Status AudioStreamDeallocate(const uint16_t streamID);
+    Protocols::InteractionModel::Status AudioStreamDeallocate(const uint16_t streamID) override;
 
-    Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs, uint16_t & outStreamID);
+    Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
+                                                               uint16_t & outStreamID) override;
 
     Protocols::InteractionModel::Status SnapshotStreamModify(const uint16_t streamID, const chip::Optional<bool> waterMarkEnabled,
-                                                             const chip::Optional<bool> osdEnabled);
+                                                             const chip::Optional<bool> osdEnabled) override;
 
-    Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID);
+    Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID) override;
 
-    void OnStreamUsagePrioritiesChanged();
+    void OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, StreamAllocationAction action) override;
 
-    void OnAttributeChanged(AttributeId attributeId);
+    void OnStreamUsagePrioritiesChanged() override;
+
+    void OnAttributeChanged(AttributeId attributeId) override;
 
     Protocols::InteractionModel::Status CaptureSnapshot(const DataModel::Nullable<uint16_t> streamID,
-                                                        const VideoResolutionStruct & resolution, ImageSnapshot & outImageSnapshot);
+                                                        const VideoResolutionStruct & resolution,
+                                                        ImageSnapshot & outImageSnapshot) override;
 
     CHIP_ERROR
-    LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams);
+    LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams) override;
 
     CHIP_ERROR
-    LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams);
+    LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams) override;
 
     CHIP_ERROR
-    LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams);
+    LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams) override;
 
-    CHIP_ERROR
-    ValidateStreamUsage(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                        const Optional<DataModel::Nullable<uint16_t>> & audioStreamId);
+    CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
-    CHIP_ERROR
-    ValidateVideoStreamID(uint16_t videoStreamId);
+    CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
 
-    CHIP_ERROR
-    ValidateAudioStreamID(uint16_t audioStreamId);
+    CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
 
-    CHIP_ERROR
-    IsPrivacyModeActive(bool & isActive);
+    const std::vector<chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct> & GetAllocatedVideoStreams() const override;
 
-    bool HasAllocatedVideoStreams();
-
-    bool HasAllocatedAudioStreams();
-
-    CHIP_ERROR PersistentAttributesLoadedCallback();
-
-    CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID);
-
-    CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID);
+    const std::vector<chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct> & GetAllocatedAudioStreams() const override;
 
     void Init();
 
@@ -125,10 +118,11 @@ public:
     // static inline CameraAVStreamManager & GetInstance() { return sCameraAVStreamMgrInstance; }
 
 private:
-    std::vector<VideoStream> videoStreams;       // Vector to hold available video streams
-    std::vector<AudioStream> audioStreams;       // Vector to hold available audio streams
-    std::vector<SnapshotStream> snapshotStreams; // Vector to hold available snapshot streams
-
+    std::vector<VideoStream> videoStreams;             // Vector to hold available video streams
+    std::vector<AudioStream> audioStreams;             // Vector to hold available audio streams
+    std::vector<SnapshotStream> snapshotStreams;       // Vector to hold available snapshot streams
+    std::vector<VideoStreamStruct> videoStreamStructs; // Vector to hold allocated video streams
+    std::vector<AudioStreamStruct> audioStreamStructs; // Vector to hold allocated audio streams
     void InitializeAvailableVideoStreams();
     void InitializeAvailableAudioStreams();
     void InitializeAvailableSnapshotStreams();

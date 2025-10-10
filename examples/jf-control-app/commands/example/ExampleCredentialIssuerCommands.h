@@ -60,6 +60,8 @@ public:
         return mOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, fabricId, cats, keypair.Pubkey(), rcac, icac, noc);
     }
 
+    CHIP_ERROR GenerateIcacCsr(chip::MutableByteSpan & generatedIcacCsr) { return mOpCredsIssuer.ObtainICACSR(generatedIcacCsr); }
+
     CHIP_ERROR AddAdditionalCDVerifyingCerts(const std::vector<std::vector<uint8_t>> & additionalCdCerts) override
     {
         VerifyOrReturnError(mDacVerifier != nullptr, CHIP_ERROR_INCORRECT_STATE);
