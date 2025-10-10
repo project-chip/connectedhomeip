@@ -155,8 +155,11 @@ private:
     std::unordered_map<uint16_t, std::unique_ptr<PushAVTransport>> mTransportMap; // map for the transport objects
     std::unordered_map<uint16_t, TransportOptionsStruct> mTransportOptionsMap;    // map for the transport options
     std::unordered_map<uint32_t, SessionInfo> mSessionMap;                        // map for the session info
+<<<<<<< HEAD
     std::mutex mSessionMapMutex;
     uint32_t mTotalUsedBandwidthbps = 0; // Tracks the total bandwidth used by all active transports
+=======
+>>>>>>> 2c8c7048b0 (Build fix)
 
     std::vector<uint8_t> mBufferRootCert;
     std::vector<uint8_t> mBufferClientCert;
