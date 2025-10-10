@@ -269,43 +269,46 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetStreamUsagePriorities(const std::vector<
     return CHIP_NO_ERROR;
 }
 
-bool CameraAVStreamMgmtServer::IsAllocatedVideoStreamReusable(const VideoStreamStruct & allocatedStream,
-                                                              const VideoStreamStruct & requestedArgs)
+DataModel::Nullable<uint16_t> CameraAVStreamMgmtServer::GetReusableVideoStreamId(const VideoStreamStruct & requestedArgs) const
 {
-    // 1. Codec must match exactly (Allocated stream already has the codec)
-    if (requestedArgs.videoCodec != allocatedStream.videoCodec)
+    for (const auto & stream : mAllocatedVideoStreams)
     {
-        return false;
-    }
+        // 1. Codec must match exactly (Allocated stream already has the codec)
+        if (requestedArgs.videoCodec != stream.videoCodec)
+        {
+            continue;
+        }
 
-    // 2. Framerate check (request must be within allocated stream's current range)
-    if (!(requestedArgs.minFrameRate >= allocatedStream.minFrameRate && requestedArgs.maxFrameRate <= allocatedStream.maxFrameRate))
-    {
-        return false;
-    }
+        // 2. Framerate check (request must be within allocated stream's current range)
+        if (!(requestedArgs.minFrameRate >= stream.minFrameRate && requestedArgs.maxFrameRate <= stream.maxFrameRate))
+        {
+            continue;
+        }
 
-    // 3. Resolution check
-    if (!(requestedArgs.minResolution.width >= allocatedStream.minResolution.width &&
-          requestedArgs.minResolution.height >= allocatedStream.minResolution.height &&
-          requestedArgs.maxResolution.width <= allocatedStream.maxResolution.width &&
-          requestedArgs.maxResolution.height <= allocatedStream.maxResolution.height))
-    {
-        return false;
-    }
+        // 3. Resolution check
+        if (!(requestedArgs.minResolution.width >= stream.minResolution.width &&
+              requestedArgs.minResolution.height >= stream.minResolution.height &&
+              requestedArgs.maxResolution.width <= stream.maxResolution.width &&
+              requestedArgs.maxResolution.height <= stream.maxResolution.height))
+        {
+            continue;
+        }
 
-    // 4. Bitrate check
-    if (!(requestedArgs.minBitRate >= allocatedStream.minBitRate && requestedArgs.maxBitRate <= allocatedStream.maxBitRate))
-    {
-        return false;
-    }
+        // 4. Bitrate check
+        if (!(requestedArgs.minBitRate >= stream.minBitRate && requestedArgs.maxBitRate <= stream.maxBitRate))
+        {
+            continue;
+        }
 
-    // 5. KeyFrameInterval check
-    if (requestedArgs.keyFrameInterval != allocatedStream.keyFrameInterval)
-    {
-        return false;
-    }
+        // 5. KeyFrameInterval check
+        if (requestedArgs.keyFrameInterval != stream.keyFrameInterval)
+        {
+            continue;
+        }
 
-    return true;
+        return DataModel::Nullable<uint16_t>(stream.videoStreamID);
+    }
+    return DataModel::Nullable<uint16_t>();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::AddVideoStream(const VideoStreamStruct & videoStream)
@@ -393,37 +396,41 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveAudioStream(uint16_t audioStreamId)
     return CHIP_NO_ERROR;
 }
 
-bool CameraAVStreamMgmtServer::IsAllocatedSnapshotStreamReusable(
-    const SnapshotStreamStruct & allocatedStream, const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs)
+DataModel::Nullable<uint16_t> CameraAVStreamMgmtServer::GetReusableSnapshotStreamId(
+    const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs) const
 {
-    // 1. Codec must match allocated stream's codec.
-    if (requestedArgs.imageCodec != allocatedStream.imageCodec)
+    for (const auto & stream : mAllocatedSnapshotStreams)
     {
-        return false;
-    }
+        // 1. Codec must match allocated stream's codec.
+        if (requestedArgs.imageCodec != stream.imageCodec)
+        {
+            continue;
+        }
 
-    // 2. Quality must match allocated stream's quality.
-    if (requestedArgs.quality != allocatedStream.quality)
-    {
-        return false;
-    }
+        // 2. Quality must match allocated stream's quality.
+        if (requestedArgs.quality != stream.quality)
+        {
+            continue;
+        }
 
-    // 3. Framerate check (request must be within allocated stream's current range)
-    if (!(requestedArgs.maxFrameRate >= allocatedStream.frameRate))
-    {
-        return false;
-    }
+        // 3. Framerate check (request must be within allocated stream's current range)
+        if (!(requestedArgs.maxFrameRate >= stream.frameRate))
+        {
+            continue;
+        }
 
-    // 4. Resolution check
-    if (!(requestedArgs.minResolution.width >= allocatedStream.minResolution.width &&
-          requestedArgs.minResolution.height >= allocatedStream.minResolution.height &&
-          requestedArgs.maxResolution.width <= allocatedStream.maxResolution.width &&
-          requestedArgs.maxResolution.height <= allocatedStream.maxResolution.height))
-    {
-        return false;
-    }
+        // 4. Resolution check
+        if (!(requestedArgs.minResolution.width >= stream.minResolution.width &&
+              requestedArgs.minResolution.height >= stream.minResolution.height &&
+              requestedArgs.maxResolution.width <= stream.maxResolution.width &&
+              requestedArgs.maxResolution.height <= stream.maxResolution.height))
+        {
+            continue;
+        }
 
-    return true;
+        return DataModel::Nullable<uint16_t>(stream.snapshotStreamID);
+    }
+    return DataModel::Nullable<uint16_t>();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::AddSnapshotStream(const SnapshotStreamStruct & snapshotStream)

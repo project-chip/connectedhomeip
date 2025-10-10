@@ -252,17 +252,14 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
     }
 
     // Try to reuse an allocated stream
-    for (auto & stream : GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams())
+    DataModel::Nullable<uint16_t> reusableStreamId = GetCameraAVStreamMgmtServer()->GetReusableVideoStreamId(allocateArgs);
+
+    if (!reusableStreamId.IsNull())
     {
-        // Note: If this call returns true, then stream.IsCompatible(allocateArgs) should also return true because
-        // the matching allocated stream had first passed the compatibility check during allocation.
-        if (GetCameraAVStreamMgmtServer()->IsAllocatedVideoStreamReusable(stream, allocateArgs))
-        {
-            // Found a stream that can be reused
-            outStreamID = stream.videoStreamID;
-            ChipLogProgress(Camera, "Matching pre-allocated stream with ID: %d exists", outStreamID);
-            return Status::Success;
-        }
+        // Found a stream that can be reused
+        outStreamID = reusableStreamId.Value();
+        ChipLogProgress(Camera, "Matching pre-allocated stream with ID: %d exists", outStreamID);
+        return Status::Success;
     }
 
     // Try to find an unused compatible available stream
@@ -451,17 +448,14 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
     }
 
     // Try to reuse an allocated stream.
-    for (auto & stream : GetCameraAVStreamMgmtServer()->GetAllocatedSnapshotStreams())
+    DataModel::Nullable<uint16_t> reusableStreamId = GetCameraAVStreamMgmtServer()->GetReusableSnapshotStreamId(allocateArgs);
+
+    if (!reusableStreamId.IsNull())
     {
-        // Note: If this call returns true, then stream.IsCompatible(allocateArgs) should also return true because
-        // the matching allocated stream had first passed the compatibility check during allocation.
-        if (GetCameraAVStreamMgmtServer()->IsAllocatedSnapshotStreamReusable(stream, allocateArgs))
-        {
-            // Found a stream that can be reused
-            outStreamID = stream.snapshotStreamID;
-            ChipLogProgress(Camera, "Matching pre-allocated stream with ID: %d exists", outStreamID);
-            return Status::Success;
-        }
+        // Found a stream that can be reused
+        outStreamID = reusableStreamId.Value();
+        ChipLogProgress(Camera, "Matching pre-allocated stream with ID: %d exists", outStreamID);
+        return Status::Success;
     }
 
     uint32_t candidateEncodedPixelRate = 0;

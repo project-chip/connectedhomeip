@@ -566,15 +566,13 @@ public:
      * handler of the request iterates through the currently allocated video
      * streams to check if the allocation request parameters fall within the
      * ranges of an allocated stream so that the latter can be reused.
-     * If the function returns false for all existing allocated streams, the
-     * handler must proceed towards allocating a completely new stream, provided
-     * it has the resources to do so.
+     * If a match is found, the function returns the StreamID of the reusable
+     * stream.
      *
-     * @param allocatedStream  an allocated stream from  mAllocatedVideoStreams
      * @param requestedArgs    parameters in the allocation request
      *
      */
-    bool IsAllocatedVideoStreamReusable(const VideoStreamStruct & allocatedStream, const VideoStreamStruct & requestedArgs);
+    DataModel::Nullable<uint16_t> GetReusableVideoStreamId(const VideoStreamStruct & requestedArgs) const;
 
     CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
 
@@ -592,16 +590,14 @@ public:
      * handler of the request iterates through the currently allocated snapshot
      * streams to check if the allocation request parameters fall within the
      * ranges of an allocated stream so that the latter can be reused.
-     * If the function returns false for all existing allocated streams, the
-     * handler must proceed towards allocating a completely new stream, provided
-     * it has the resources to do so.
+     * If a match is found, the function returns the StreamID of the reusable
+     * stream.
      *
-     * @param allocatedStream  an allocated stream from  mAllocatedSnapshotStreams
      * @param requestedArgs    parameters in the allocation request
      *
      */
-    bool IsAllocatedSnapshotStreamReusable(const SnapshotStreamStruct & allocatedStream,
-                                           const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs);
+    DataModel::Nullable<uint16_t>
+    GetReusableSnapshotStreamId(const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs) const;
 
     CHIP_ERROR AddSnapshotStream(const SnapshotStreamStruct & snapshotStream);
 
