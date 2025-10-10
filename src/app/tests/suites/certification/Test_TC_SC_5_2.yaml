@@ -221,7 +221,7 @@ tests:
 
     - label:
           "Step 10: TH sends a ViewGroup Command to the Groups cluster
-          Endpoint PIXIT.G.ENDPOINT over CASE with the GroupID set to 0x0101 to
+          over CASE with the GroupID set to 0x0101 to
           confirm that the RemoveGroup command from step 9 was successful"
       PICS: G.S.C01.Rsp
       command: "ViewGroup"
