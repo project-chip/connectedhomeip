@@ -36,6 +36,13 @@ namespace Testing {
 class MockCommandHandler : public CommandHandler
 {
 public:
+    struct ResponseRecord
+    {
+        ConcreteCommandPath path;
+        CommandId commandId;
+        chip::System::PacketBufferHandle encodedData;
+    };
+
     ~MockCommandHandler() override = default;
 
     CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath,
@@ -45,7 +52,7 @@ public:
     void AddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::ClusterStatusCode & aStatus,
                    const char * context = nullptr) override;
 
-    FabricIndex GetAccessingFabricIndex() const override { return 1; }
+    FabricIndex GetAccessingFabricIndex() const override { return mFabricIndex; }
 
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                const DataModel::EncodableToTLV & aEncodable) override;
@@ -59,24 +66,28 @@ public:
     Messaging::ExchangeContext * GetExchangeContext() const override { return nullptr; }
 
     // Helper methods to extract response data
-    bool HasResponse() const { return !mEncodedData.IsNull(); }
-    CommandId GetResponseCommandId() const { return mResponseCommandId; }
+    bool HasResponse() const { return !mResponse.encodedData.IsNull(); }
+    CommandId GetResponseCommandId() const { return mResponse.commandId; }
+    const ResponseRecord & GetResponse() const { return mResponse; }
 
     // Get a TLV reader positioned at the response data fields
-    CHIP_ERROR GetResponseReader(TLV::TLVReader & reader);
+    CHIP_ERROR GetResponseReader(TLV::TLVReader & reader) const;
 
     // Decode response into a specific DecodableType
     template <typename ResponseType>
-    CHIP_ERROR DecodeResponse(ResponseType & response)
+    CHIP_ERROR DecodeResponse(ResponseType & response) const
     {
         TLV::TLVReader reader;
         ReturnErrorOnFailure(GetResponseReader(reader));
         return response.Decode(reader);
     }
 
+    // Configuration methods
+    void SetFabricIndex(FabricIndex index) { mFabricIndex = index; }
+
 private:
-    CommandId mResponseCommandId = 0;
-    chip::System::PacketBufferHandle mEncodedData;
+    ResponseRecord mResponse;
+    FabricIndex mFabricIndex = 1; // Default to 1 to maintain backward compatibility
 };
 
 // Helper class for invoking commands in tests.

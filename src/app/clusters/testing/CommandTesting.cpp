@@ -48,7 +48,7 @@ CHIP_ERROR MockCommandHandler::AddResponseData(const ConcreteCommandPath & aRequ
 
     TLV::TLVWriter baseWriter;
     baseWriter.Init(handle->Start(), handle->MaxDataLength());
-    DataModel::FabricAwareTLVWriter writer(baseWriter, /*fabricIndex*/ 1);
+    DataModel::FabricAwareTLVWriter writer(baseWriter, mFabricIndex);
     TLV::TLVType ct;
 
     ReturnErrorOnFailure(static_cast<TLV::TLVWriter &>(writer).StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, ct));
@@ -56,8 +56,9 @@ CHIP_ERROR MockCommandHandler::AddResponseData(const ConcreteCommandPath & aRequ
     ReturnErrorOnFailure(static_cast<TLV::TLVWriter &>(writer).EndContainer(ct));
     handle->SetDataLength(static_cast<TLV::TLVWriter &>(writer).GetLengthWritten());
 
-    mResponseCommandId = aResponseCommandId;
-    mEncodedData       = std::move(handle);
+    mResponse.path        = aRequestCommandPath;
+    mResponse.commandId   = aResponseCommandId;
+    mResponse.encodedData = std::move(handle);
     return CHIP_NO_ERROR;
 }
 
@@ -67,11 +68,11 @@ void MockCommandHandler::AddResponse(const ConcreteCommandPath & aRequestCommand
     (void) AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable);
 }
 
-CHIP_ERROR MockCommandHandler::GetResponseReader(TLV::TLVReader & reader)
+CHIP_ERROR MockCommandHandler::GetResponseReader(TLV::TLVReader & reader) const
 {
-    VerifyOrReturnError(!mEncodedData.IsNull(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mResponse.encodedData.IsNull(), CHIP_ERROR_INCORRECT_STATE);
 
-    reader.Init(mEncodedData->Start(), mEncodedData->DataLength());
+    reader.Init(mResponse.encodedData->Start(), mResponse.encodedData->DataLength());
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
 
     TLV::TLVType outerContainer;

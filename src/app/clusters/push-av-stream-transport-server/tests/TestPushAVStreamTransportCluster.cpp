@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+#include <app/clusters/testing/CommandTesting.h>
 #include <app/clusters/tls-client-management-server/tls-client-management-server.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/Optional.h>
@@ -40,31 +41,24 @@
 namespace chip {
 namespace app {
 
-class MockCommandHandler : public CommandHandler
+class MockCommandHandler : public Testing::MockCommandHandler
 {
 public:
-    ~MockCommandHandler() override {}
-
-    struct ResponseRecord
+    struct MockStatusRecord
     {
         ConcreteCommandPath path;
-        CommandId commandId;
-        chip::System::PacketBufferHandle encodedData;
+        Protocols::InteractionModel::ClusterStatusCode status;
     };
+
+    ~MockCommandHandler() override {}
 
     CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath,
                                  const Protocols::InteractionModel::ClusterStatusCode & aStatus,
                                  const char * context = nullptr) override
     {
-        mStatuses.push_back({ aRequestCommandPath, aStatus });
-        return CHIP_NO_ERROR;
-    }
-
-    void AddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::ClusterStatusCode & aStatus,
-                   const char * context = nullptr) override
-    {
-        CHIP_ERROR err = FallibleAddStatus(aRequestCommandPath, aStatus, context);
-        VerifyOrDie(err == CHIP_NO_ERROR);
+        MockStatusRecord record{ aRequestCommandPath, aStatus };
+        mStatuses.push_back(std::move(record));
+        return Testing::MockCommandHandler::FallibleAddStatus(aRequestCommandPath, aStatus, context);
     }
 
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus) override
@@ -79,39 +73,23 @@ public:
                                  Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(aClusterStatus));
     }
 
-    FabricIndex GetAccessingFabricIndex() const override { return mFabricIndex; }
-
-    const std::vector<ResponseRecord> & GetResponses() const { return mResponses; }
-
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                const DataModel::EncodableToTLV & aEncodable) override
     {
-        chip::System::PacketBufferHandle handle = chip::MessagePacketBuffer::New(1024);
-        VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
+        CHIP_ERROR err = Testing::MockCommandHandler::AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable);
+        if (err == CHIP_NO_ERROR)
+        {
+            // Create a copy of the encoded data for our local tracking
+            chip::System::PacketBufferHandle encodedDataCopy;
+            if (!GetResponse().encodedData.IsNull())
+            {
+                encodedDataCopy = GetResponse().encodedData.CloneData();
+            }
 
-        TLV::TLVWriter baseWriter;
-        baseWriter.Init(handle->Start(), handle->MaxDataLength());
-
-        FabricIndex fabricIndex = 1;
-
-        DataModel::FabricAwareTLVWriter writer(baseWriter, fabricIndex);
-
-        TLV::TLVType containerType;
-        ReturnErrorOnFailure(
-            static_cast<TLV::TLVWriter &>(writer).StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-        ReturnErrorOnFailure(aEncodable.EncodeTo(writer, TLV::ContextTag(chip::app::CommandDataIB::Tag::kFields)));
-        ReturnErrorOnFailure(static_cast<TLV::TLVWriter &>(writer).EndContainer(containerType));
-
-        handle->SetDataLength(static_cast<TLV::TLVWriter &>(writer).GetLengthWritten());
-
-        mResponses.push_back({ aRequestCommandPath, aResponseCommandId, std::move(handle) });
-        return CHIP_NO_ERROR;
-    }
-
-    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                     const DataModel::EncodableToTLV & aEncodable) override
-    {
-        AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable);
+            ResponseRecord record{ aRequestCommandPath, aResponseCommandId, std::move(encodedDataCopy) };
+            mResponses.push_back(std::move(record));
+        }
+        return err;
     }
 
     bool IsTimedInvoke() const override { return mIsTimedInvoke; }
@@ -122,22 +100,18 @@ public:
 
     Messaging::ExchangeContext * GetExchangeContext() const override { return mExchangeContext; }
 
+    // Specialized methods for this test
+    const std::vector<ResponseRecord> & GetResponses() const { return mResponses; }
+    const std::vector<MockStatusRecord> & GetStatuses() const { return mStatuses; }
+
     // Optional for test configuration
-    void SetFabricIndex(FabricIndex index) { mFabricIndex = index; }
     void SetTimedInvoke(bool isTimed) { mIsTimedInvoke = isTimed; }
     void SetExchangeContext(Messaging::ExchangeContext * context) { mExchangeContext = context; }
 
 private:
-    struct StatusRecord
-    {
-        ConcreteCommandPath path;
-        Protocols::InteractionModel::ClusterStatusCode status;
-    };
-
     std::vector<ResponseRecord> mResponses;
-    std::vector<StatusRecord> mStatuses;
+    std::vector<MockStatusRecord> mStatuses;
 
-    FabricIndex mFabricIndex                      = 0;
     bool mIsTimedInvoke                           = false;
     bool mAcksFlushed                             = false;
     Messaging::ExchangeContext * mExchangeContext = nullptr;
