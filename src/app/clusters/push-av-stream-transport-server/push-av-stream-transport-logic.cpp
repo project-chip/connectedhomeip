@@ -1196,7 +1196,7 @@ Status PushAvStreamTransportServerLogic::CheckPrivacyModes(StreamUsageEnum strea
 {
     bool hardPrivacyModeActive = false;
 
-    CHIP_ERROR err             = mDelegate->IsHardPrivacyModeActive(hardPrivacyModeActive);
+    CHIP_ERROR err = mDelegate->IsHardPrivacyModeActive(hardPrivacyModeActive);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "PushAvStreamTransport:CheckPrivacyModes: Failed to check Hard Privacy mode: %" CHIP_ERROR_FORMAT,
