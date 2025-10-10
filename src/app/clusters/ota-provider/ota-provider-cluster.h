@@ -65,7 +65,7 @@ private:
 class OtaProviderServer : public DefaultServerCluster, private OtaProviderLogic
 {
 public:
-    OtaProviderServer(EndpointId endpointId) : DefaultServerCluster({ endpointId, OtaSoftwareUpdateProvider::Id }) {}
+    constexpr OtaProviderServer(EndpointId endpointId) : DefaultServerCluster({ endpointId, OtaSoftwareUpdateProvider::Id, false }) {}
 
     using OtaProviderLogic::SetDelegate;
 
