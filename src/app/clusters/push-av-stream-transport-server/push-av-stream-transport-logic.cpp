@@ -1195,6 +1195,7 @@ PushAvStreamTransportServerLogic::HandleFindTransport(CommandHandler & handler, 
 Status PushAvStreamTransportServerLogic::CheckPrivacyModes(StreamUsageEnum streamUsage)
 {
     bool hardPrivacyModeActive = false;
+
     CHIP_ERROR err             = mDelegate->IsHardPrivacyModeActive(hardPrivacyModeActive);
     if (err != CHIP_NO_ERROR)
     {

@@ -698,7 +698,7 @@ CHIP_ERROR PushAvStreamTransportManager::IsSoftLivestreamPrivacyModeActive(bool 
 
     auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
 
-    return avsmController.IsSoftRecordingPrivacyModeActive(isActive);
+    return avsmController.IsSoftLivestreamPrivacyModeActive(isActive);
 }
 
 CHIP_ERROR PushAvStreamTransportManager::IsAnyPrivacyModeActive(bool & isActive)
