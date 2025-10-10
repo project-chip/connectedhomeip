@@ -1,5 +1,6 @@
 # Python requirements for scripts in this location
 alive_progress
+bluezoo>=1.0.2; sys_platform == "linux"
 click
 colorama
 coloredlogs

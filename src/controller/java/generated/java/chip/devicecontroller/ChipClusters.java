@@ -24979,11 +24979,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void joinGroup(DefaultClusterCallback callback, Integer groupID, ArrayList<Integer> endpoints, byte[] key, Long keyID, Optional<Long> gracePeriod, Optional<Boolean> useAuxiliaryACL) {
-      joinGroup(callback, groupID, endpoints, key, keyID, gracePeriod, useAuxiliaryACL, 0);
+    public void joinGroup(DefaultClusterCallback callback, Integer groupID, ArrayList<Integer> endpoints, Long keyID, Optional<byte[]> key, Optional<Long> gracePeriod, Optional<Boolean> useAuxiliaryACL) {
+      joinGroup(callback, groupID, endpoints, keyID, key, gracePeriod, useAuxiliaryACL, 0);
     }
 
-    public void joinGroup(DefaultClusterCallback callback, Integer groupID, ArrayList<Integer> endpoints, byte[] key, Long keyID, Optional<Long> gracePeriod, Optional<Boolean> useAuxiliaryACL, int timedInvokeTimeoutMs) {
+    public void joinGroup(DefaultClusterCallback callback, Integer groupID, ArrayList<Integer> endpoints, Long keyID, Optional<byte[]> key, Optional<Long> gracePeriod, Optional<Boolean> useAuxiliaryACL, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -24995,13 +24995,13 @@ public class ChipClusters {
       BaseTLVType endpointstlvValue = ArrayType.generateArrayType(endpoints, (elementendpoints) -> new UIntType(elementendpoints));
       elements.add(new StructElement(endpointsFieldID, endpointstlvValue));
 
-      final long keyFieldID = 2L;
-      BaseTLVType keytlvValue = new ByteArrayType(key);
-      elements.add(new StructElement(keyFieldID, keytlvValue));
-
-      final long keyIDFieldID = 3L;
+      final long keyIDFieldID = 2L;
       BaseTLVType keyIDtlvValue = new UIntType(keyID);
       elements.add(new StructElement(keyIDFieldID, keyIDtlvValue));
+
+      final long keyFieldID = 3L;
+      BaseTLVType keytlvValue = key.<BaseTLVType>map((nonOptionalkey) -> new ByteArrayType(nonOptionalkey)).orElse(new EmptyType());
+      elements.add(new StructElement(keyFieldID, keytlvValue));
 
       final long gracePeriodFieldID = 4L;
       BaseTLVType gracePeriodtlvValue = gracePeriod.<BaseTLVType>map((nonOptionalgracePeriod) -> new UIntType(nonOptionalgracePeriod)).orElse(new EmptyType());
@@ -25067,11 +25067,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void updateGroupKey(DefaultClusterCallback callback, Integer groupID, byte[] key, Long keyID, Optional<Long> gracePeriod) {
-      updateGroupKey(callback, groupID, key, keyID, gracePeriod, 0);
+    public void updateGroupKey(DefaultClusterCallback callback, Integer groupID, Long keyID, Optional<byte[]> key, Optional<Long> gracePeriod) {
+      updateGroupKey(callback, groupID, keyID, key, gracePeriod, 0);
     }
 
-    public void updateGroupKey(DefaultClusterCallback callback, Integer groupID, byte[] key, Long keyID, Optional<Long> gracePeriod, int timedInvokeTimeoutMs) {
+    public void updateGroupKey(DefaultClusterCallback callback, Integer groupID, Long keyID, Optional<byte[]> key, Optional<Long> gracePeriod, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -25079,13 +25079,13 @@ public class ChipClusters {
       BaseTLVType groupIDtlvValue = new UIntType(groupID);
       elements.add(new StructElement(groupIDFieldID, groupIDtlvValue));
 
-      final long keyFieldID = 1L;
-      BaseTLVType keytlvValue = new ByteArrayType(key);
-      elements.add(new StructElement(keyFieldID, keytlvValue));
-
-      final long keyIDFieldID = 2L;
+      final long keyIDFieldID = 1L;
       BaseTLVType keyIDtlvValue = new UIntType(keyID);
       elements.add(new StructElement(keyIDFieldID, keyIDtlvValue));
+
+      final long keyFieldID = 2L;
+      BaseTLVType keytlvValue = key.<BaseTLVType>map((nonOptionalkey) -> new ByteArrayType(nonOptionalkey)).orElse(new EmptyType());
+      elements.add(new StructElement(keyFieldID, keytlvValue));
 
       final long gracePeriodFieldID = 3L;
       BaseTLVType gracePeriodtlvValue = gracePeriod.<BaseTLVType>map((nonOptionalgracePeriod) -> new UIntType(nonOptionalgracePeriod)).orElse(new EmptyType());

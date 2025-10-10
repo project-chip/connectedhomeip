@@ -32,6 +32,13 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 
+namespace {
+
+// Constants
+constexpr uint16_t kMaxConcurrentWebRTCSessions = 5;
+
+} // namespace
+
 void WebRTCProviderManager::SetCameraDevice(CameraDeviceInterface * aCameraDevice)
 {
     mCameraDevice = aCameraDevice;
@@ -134,6 +141,23 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     }
 
     transport->SetRequestArgs(requestArgs);
+
+    // Check resource availability before proceeding
+    // If we cannot allocate resources, send End command with OutOfResources reason
+    if (mWebrtcTransportMap.size() > kMaxConcurrentWebRTCSessions)
+    {
+        ChipLogProgress(Camera, "Resource exhaustion detected: maximum WebRTC sessions (%u)", kMaxConcurrentWebRTCSessions);
+
+        transport->SetCommandType(WebrtcTransport::CommandType::kEnd);
+        transport->MoveToState(WebrtcTransport::State::SendingEnd);
+
+        // The resource exhaustion happens internally in the DUT, but it still creates a session
+        // and then sends an End command with OutOfResources reason.
+        ScheduleEndSend(args.sessionId);
+
+        return CHIP_NO_ERROR;
+    }
+
     transport->Start();
     transport->AddAudioTrack();
     transport->AddVideoTrack();
@@ -280,6 +304,15 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
                 this->OnLocalDescription(sdp, type, sessionId);
             },
             [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); });
+    }
+
+    // Check resource availability before proceeding
+    // If we cannot allocate resources, respond with a response status of RESOURCE_EXHAUSTED
+    if (mWebrtcTransportMap.size() > kMaxConcurrentWebRTCSessions)
+    {
+        ChipLogProgress(Camera, "Resource exhaustion detected in ProvideOffer: maximum WebRTC sessions (%u)",
+                        kMaxConcurrentWebRTCSessions);
+        return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
     }
 
     transport->SetRequestArgs(requestArgs);
@@ -457,7 +490,7 @@ CHIP_ERROR WebRTCProviderManager::ValidateAudioStreamID(uint16_t audioStreamId)
     return avsmController.ValidateAudioStreamID(audioStreamId);
 }
 
-CHIP_ERROR WebRTCProviderManager::IsPrivacyModeActive(bool & isActive)
+CHIP_ERROR WebRTCProviderManager::IsHardPrivacyModeActive(bool & isActive)
 {
     if (mCameraDevice == nullptr)
     {
@@ -467,7 +500,33 @@ CHIP_ERROR WebRTCProviderManager::IsPrivacyModeActive(bool & isActive)
 
     auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
 
-    return avsmController.IsPrivacyModeActive(isActive);
+    return avsmController.IsHardPrivacyModeActive(isActive);
+}
+
+CHIP_ERROR WebRTCProviderManager::IsSoftRecordingPrivacyModeActive(bool & isActive)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.IsSoftRecordingPrivacyModeActive(isActive);
+}
+
+CHIP_ERROR WebRTCProviderManager::IsSoftLivestreamPrivacyModeActive(bool & isActive)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.IsSoftLivestreamPrivacyModeActive(isActive);
 }
 
 bool WebRTCProviderManager::HasAllocatedVideoStreams()
