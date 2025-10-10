@@ -104,7 +104,6 @@ tests:
           writing the GroupKeyMap attribute with 2 entries as follows: List item
           1: 1)GroupId: 0x0103 2)GroupKeySetId: 0x01a3 List item 2: 1)GroupId:
           0x0101 2)GroupKeySetId: 0x01a3"
-      PICS: GRPKEY.S.A0000
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
