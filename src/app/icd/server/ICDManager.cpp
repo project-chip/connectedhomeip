@@ -179,7 +179,8 @@ void ICDManager::SendCheckInMsgs(Optional<Access::SubjectDescriptor> specificSub
                 continue;
             }
 
-            if (!specificSubject.HasValue() && !ShouldCheckInMsgsBeSentAtActiveModeFunction(entry.fabricIndex, entry.monitoredSubject))
+            if (!specificSubject.HasValue() &&
+                !ShouldCheckInMsgsBeSentAtActiveModeFunction(entry.fabricIndex, entry.monitoredSubject))
             {
                 continue;
             }
@@ -215,7 +216,8 @@ void ICDManager::SendCheckInMsgs(Optional<Access::SubjectDescriptor> specificSub
 #endif // !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
 }
 
-bool ICDManager::ShouldSendCheckInMessageForSpecificSubject(const ICDMonitoringEntry & entry, const Access::SubjectDescriptor & specificSubject)
+bool ICDManager::ShouldSendCheckInMessageForSpecificSubject(const ICDMonitoringEntry & entry,
+                                                            const Access::SubjectDescriptor & specificSubject)
 {
     if (specificSubject.fabricIndex != entry.fabricIndex)
     {

@@ -344,7 +344,8 @@ private:
      *       Check-In message to the registered client.
      */
     void SendCheckInMsgs(Optional<Access::SubjectDescriptor> specificSubject = Optional<Access::SubjectDescriptor>());
-    bool ShouldSendCheckInMessageForSpecificSubject(const ICDMonitoringEntry & entry, const Access::SubjectDescriptor & specificSubject);
+    bool ShouldSendCheckInMessageForSpecificSubject(const ICDMonitoringEntry & entry,
+                                                    const Access::SubjectDescriptor & specificSubject);
 
     /**
      * @brief See function implementation in .cpp for details on this function.
