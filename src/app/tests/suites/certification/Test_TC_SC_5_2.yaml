@@ -120,7 +120,6 @@ tests:
     - label:
           "Step 4: TH cleans up the groups by sending the RemoveAllGroups
           command to the DUT"
-      PICS: G.S.C04.Rsp
       command: "RemoveAllGroups"
 
     - label:
