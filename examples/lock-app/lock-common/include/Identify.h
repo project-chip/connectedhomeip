@@ -20,8 +20,8 @@
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
 
-using chip::app::Clusters::IdentifyDelegate;
 using chip::app::Clusters::IdentifyCluster;
+using chip::app::Clusters::IdentifyDelegate;
 
 class IdentifyDelegateImpl : public IdentifyDelegate
 {
