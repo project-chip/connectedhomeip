@@ -683,7 +683,9 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
         print("error: Missing --passcode when no --qr-code/--manual-code present!")
         return False
 
-    if config.commissioning_method == "ble-wifi" or config.in_test_commissioning_method == "ble-wifi":
+    wifi_args = ['ble-wifi']
+    thread_args = ['ble-thread', 'nfc-thread']
+    if config.commissioning_method in wifi_args or config.in_test_commissioning_method in wifi_args:
         if args.wifi_ssid is None:
             print("error: missing --wifi-ssid <SSID> for --commissioning-method ble-wifi!")
             return False
