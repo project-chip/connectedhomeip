@@ -238,16 +238,6 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
     const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
     const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl)
 {
-    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
-    bool isActive;
-
-    CHIP_ERROR status = avsmController.IsHardPrivacyModeActive(isActive);
-    VerifyOrReturnError(status == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(Camera, "PushAvStreamTransportManager, failed to retrieve Hard Privacy Mode status."));
-    VerifyOrReturnError(
-        isActive == false, Status::InvalidInState,
-        ChipLogError(Camera, "PushAvStreamTransportManager, cannot process manual trigger as Hard Privacy Mode is active."));
-
     if (activationReason == TriggerActivationReasonEnum::kUnknownEnumValue)
     {
         ChipLogError(Camera, "PushAvStreamTransportManager, Manual Trigger failed for connection [%u], reason: [%u]", connectionID,
@@ -259,31 +249,6 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
     {
         ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
         return Status::NotFound;
-    }
-
-    auto streamUsage = mTransportOptionsMap[connectionID].streamUsage;
-    if (streamUsage == StreamUsageEnum::kRecording || streamUsage == StreamUsageEnum::kAnalysis)
-    {
-        CHIP_ERROR status = avsmController.IsSoftRecordingPrivacyModeActive(isActive);
-        VerifyOrReturnError(
-            status == CHIP_NO_ERROR, Status::Failure,
-            ChipLogError(Camera, "PushAvStreamTransportManager, failed to retrieve Soft Recording Privacy Mode status."));
-        VerifyOrReturnError(
-            isActive == false, Status::InvalidInState,
-            ChipLogError(Camera,
-                         "PushAvStreamTransportManager, cannot process manual trigger as Soft Recording Privacy Mode is active."));
-    }
-
-    if (streamUsage == StreamUsageEnum::kLiveView)
-    {
-        CHIP_ERROR status = avsmController.IsSoftLivestreamPrivacyModeActive(isActive);
-        VerifyOrReturnError(
-            status == CHIP_NO_ERROR, Status::Failure,
-            ChipLogError(Camera, "PushAvStreamTransportManager, failed to retrieve Soft Livestream Privacy Mode status."));
-        VerifyOrReturnError(
-            isActive == false, Status::InvalidInState,
-            ChipLogError(Camera,
-                         "PushAvStreamTransportManager, cannot process manual trigger as Soft Livestream Privacy Mode is active."));
     }
 
     ChipLogProgress(Camera, "PushAvStreamTransportManager, Trigger PushAV Transport for Connection: [%u]", connectionID);
