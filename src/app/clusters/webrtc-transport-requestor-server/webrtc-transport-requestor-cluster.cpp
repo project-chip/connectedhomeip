@@ -39,10 +39,6 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Commands::End::kMetadataEntry,
 };
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
-    CurrentSessions::kMetadataEntry,
-};
-
 NodeId GetNodeIdFromCtx(const CommandHandler & commandHandler)
 {
     auto descriptor = commandHandler.GetSubjectDescriptor();
@@ -143,7 +139,7 @@ CHIP_ERROR WebRTCTransportRequestorServer::Attributes(const ConcreteClusterPath 
                                                       ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(kMandatoryAttributes), {}, {});
+    return listBuilder.Append(Span(kMandatoryMetadata), {}, {});
 }
 
 uint16_t WebRTCTransportRequestorServer::GenerateSessionId()

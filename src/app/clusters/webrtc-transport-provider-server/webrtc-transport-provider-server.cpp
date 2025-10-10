@@ -248,6 +248,53 @@ CHIP_ERROR WebRTCTransportProviderServer::GenerateSessionId(uint16_t & outSessio
     return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
 }
 
+Status WebRTCTransportProviderServer::CheckPrivacyModes(const char * commandName, StreamUsageEnum streamUsage)
+{
+    bool hardPrivacyModeActive = false;
+    CHIP_ERROR err             = mDelegate.IsHardPrivacyModeActive(hardPrivacyModeActive);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "%s: Failed to check Hard Privacy mode: %" CHIP_ERROR_FORMAT, commandName, err.Format());
+        return Status::Failure;
+    }
+
+    if (hardPrivacyModeActive)
+    {
+        ChipLogError(Zcl, "%s: Hard Privacy mode is enabled", commandName);
+        return Status::InvalidInState;
+    }
+
+    bool softLivestreamPrivacyModeActive = false;
+    err                                  = mDelegate.IsSoftLivestreamPrivacyModeActive(softLivestreamPrivacyModeActive);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "%s: Failed to check Soft LivestreamPrivacy mode: %" CHIP_ERROR_FORMAT, commandName, err.Format());
+        return Status::Failure;
+    }
+
+    if (softLivestreamPrivacyModeActive && streamUsage == StreamUsageEnum::kLiveView)
+    {
+        ChipLogError(Zcl, "%s: Soft LivestreamPrivacy mode is enabled and StreamUsage is LiveView", commandName);
+        return Status::InvalidInState;
+    }
+
+    bool softRecordingPrivacyModeActive = false;
+    err                                 = mDelegate.IsSoftRecordingPrivacyModeActive(softRecordingPrivacyModeActive);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "%s: Failed to check SoftRecordingPrivacyModeActive: %" CHIP_ERROR_FORMAT, commandName, err.Format());
+        return Status::Failure;
+    }
+
+    if (softRecordingPrivacyModeActive && (streamUsage == StreamUsageEnum::kRecording || streamUsage == StreamUsageEnum::kAnalysis))
+    {
+        ChipLogError(Zcl, "%s: Soft RecordingPrivacy mode is enabled and StreamUsage is Recording or Analysis", commandName);
+        return Status::InvalidInState;
+    }
+
+    return Status::Success;
+}
+
 // Command Handlers
 void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, const Commands::SolicitOffer::DecodableType & req)
 {
@@ -262,18 +309,10 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         return;
     }
 
-    bool privacyModeActive = false;
-    if (mDelegate.IsPrivacyModeActive(privacyModeActive) != CHIP_NO_ERROR)
+    Status status = CheckPrivacyModes("HandleSolicitOffer", req.streamUsage);
+    if (status != Status::Success)
     {
-        ChipLogError(Zcl, "HandleSolicitOffer: Cannot determine privacy mode state");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
-        return;
-    }
-
-    if (privacyModeActive)
-    {
-        ChipLogError(Zcl, "HandleSolicitOffer: Privacy mode is enabled");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
 
@@ -330,7 +369,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         }
         else
         {
-            // Delegate should validate against AllocatedAudioStreams
+            // Delegate should validate against AllocatedVideoStreams
             if (mDelegate.ValidateAudioStreamID(req.audioStreamID.Value().Value()) != CHIP_NO_ERROR)
             {
                 ChipLogError(Zcl, "HandleSolicitOffer: AudioStreamID %u does not match AllocatedAudioStreams",
@@ -407,10 +446,11 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     WebRTCSessionStruct outSession;
     bool deferredOffer = false;
 
-    auto status = Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleSolicitOffer(args, outSession, deferredOffer));
-    if (!status.IsSuccess())
+    auto delegateStatus =
+        Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleSolicitOffer(args, outSession, deferredOffer));
+    if (!delegateStatus.IsSuccess())
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
         return;
     }
 
@@ -487,19 +527,10 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
     {
         // WebRTCSessionID is null - new session request
 
-        // Check privacy mode settings - if either is true, fail with INVALID_IN_STATE
-        bool privacyModeActive = false;
-        if (mDelegate.IsPrivacyModeActive(privacyModeActive) != CHIP_NO_ERROR)
+        Status status = CheckPrivacyModes("HandleProvideOffer", req.streamUsage);
+        if (status != Status::Success)
         {
-            ChipLogError(Zcl, "HandleProvideOffer: Cannot determine privacy mode state");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
-            return;
-        }
-
-        if (privacyModeActive)
-        {
-            ChipLogError(Zcl, "HandleProvideOffer: Privacy mode is enabled");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
             return;
         }
 
