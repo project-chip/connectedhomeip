@@ -70,6 +70,7 @@ class TC_SC_4_1(MatterBaseTest):
 
     def steps_TC_SC_4_1(self):
         return [TestStep(1, "DUT is commissioned.", is_commissioning=True),
+                TestStep(2, """left""", """right"""),
                 TestStep(3, """left""", """right"""),
                 TestStep(4, """left""", """right"""),
                 TestStep(5, """left""", """right"""),
@@ -368,13 +369,13 @@ class TC_SC_4_1(MatterBaseTest):
             # If the 'SAT' key is present:
             if 'SAT' in txt_record.txt:
                 sat_key = txt_record.txt['SAT']
-                
+
                 # Verify that it is non-empty
                 asserts.assert_true(sat_key, "'SAT' key is present but has no value.")
 
                 # Verify that it is an unsigned integer with units of milliseconds encoded as
                 # a variable length decimal number in ASCII text, omitting any leading zeros,
-                # and shall be less than or equal to 65535                    
+                # and shall be less than or equal to 65535
                 assert_valid_sat_key(sat_key)
 
                 # If the 'SAT' key is present and supports_icd is true, verify
@@ -430,7 +431,7 @@ class TC_SC_4_1(MatterBaseTest):
                 # When the 'CM' key is not present, or present and equal to '0', the DUT is in Extended Discovery mode
                 # Verify that the expected 'CM' value is '0' (Extended Discovery mode)
                 asserts.assert_equal(expected_cm, "0",
-                                     f"Expected 'CM' key value must be '0' when 'CM' key is not present in the TXT record.")
+                                     "Expected 'CM' key value must be '0' when 'CM' key is not present in the TXT record.")
 
             # *** DT KEY ***
             # If the DT key is present
@@ -563,7 +564,7 @@ class TC_SC_4_1(MatterBaseTest):
         supports_obcw = await self.feature_guard(
             endpoint=ROOT_NODE_ENDPOINT_ID,
             cluster=Clusters.AdministratorCommissioning,
-            feature_int=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic)        
+            feature_int=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic)
 
         # *** STEP 6 ***
         # If DUT supports Open Basic Commissioning Window, put it in Commissioning Mode using
