@@ -285,7 +285,10 @@ public:
 
     bool ValidateStreamUsage(StreamUsageEnum streamUsage) override { return true; }
 
-    bool ValidateSegmentDuration(uint16_t segmentDuration) override { return true; }
+    bool ValidateSegmentDuration(uint16_t segmentDuration, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override
+    {
+        return true;
+    }
 
     Protocols::InteractionModel::Status
     ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
@@ -352,6 +355,12 @@ public:
         return PushAvStreamTransportStatusEnum::kUnknown;
     }
 
+    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override
+    {
+        isActive = false;
+        return CHIP_NO_ERROR;
+    }
+
     void OnAttributeChanged(AttributeId attributeId) override
     {
         ChipLogProgress(Zcl, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
@@ -411,10 +420,10 @@ public:
         return Status::Success;
     }
 
-    Protocols::InteractionModel::ClusterStatusCode RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                                 uint16_t endpointID) override
+    Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                      uint16_t endpointID) override
     {
-        return ClusterStatusCode(Status::Success);
+        return Status::Success;
     }
 
     CHIP_ERROR RootCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) override
@@ -426,6 +435,8 @@ public:
     {
         return CHIP_NO_ERROR;
     }
+
+    void RemoveFabric(FabricIndex fabric) override {}
 };
 
 class TestPushAVStreamTransportServerLogic : public ::testing::Test

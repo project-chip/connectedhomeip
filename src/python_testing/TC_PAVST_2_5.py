@@ -204,7 +204,7 @@ class TC_PAVST_2_5(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             endpoint, pvattr.CurrentConnections
         )
         asserts.assert_equal(
-            len(transportConfigs), 0, "TransportConfigurations must not be empty!"
+            len(transportConfigs), 0, "TransportConfigurations must be empty!"
         )
 
 
