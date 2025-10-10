@@ -197,7 +197,7 @@ public:
 
     /**
      * @brief Sets the video stream for Push AV usage corresponding to videoStreamID,
-     * if it valid and is allocated.
+     * if it is valid and is allocated.
      *
      * @param videoStreamId Identifier for the requested video stream
      * @return Status::Success if allocated video stream exists and is set for PushAV usage;
@@ -210,7 +210,7 @@ public:
      * if it is valid and is allocated.
      *
      * @param audioStreamId Identifier for the requested audio stream
-     * @return Status::Success if allocated audio stream exists & is set for PushAV usage;
+     * @return Status::Success if allocated audio stream exists and is set for PushAV usage;
      *         Status::InvalidStream if no allocated audio stream with audioStreamID exists
      */
     virtual Protocols::InteractionModel::Status SetAudioStream(uint16_t audioStreamId) = 0;
