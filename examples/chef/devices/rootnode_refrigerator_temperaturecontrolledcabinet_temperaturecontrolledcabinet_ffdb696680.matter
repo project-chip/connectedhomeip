@@ -1580,8 +1580,8 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster GeneralCommissioning {

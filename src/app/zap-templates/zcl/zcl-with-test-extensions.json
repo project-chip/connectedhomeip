@@ -823,7 +823,11 @@
             "ClusterRevision",
             "FeatureMap"
         ],
-        "Unit Localization": ["TemperatureUnit"],
+        "Unit Localization": [
+            "ClusterRevision",
+            "FeatureMap",
+            "TemperatureUnit"
+        ],
         "TLS Certificate Management": [
             "ClusterRevision",
             "MaxRootCertificates",

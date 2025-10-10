@@ -751,9 +751,11 @@
         /* Endpoint: 0, Cluster: Unit Localization (server) */                                                                     \
         { ZAP_MIN_MAX_DEFAULTS_INDEX(0), 0x00000000, 1, ZAP_TYPE(ENUM8),                                                           \
           ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE) |                      \
-              ZAP_ATTRIBUTE_MASK(READABLE) },                                                         /* TemperatureUnit */        \
-        { ZAP_SIMPLE_DEFAULT(0x1), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */             \
-        { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) },     /* ClusterRevision */        \
+              ZAP_ATTRIBUTE_MASK(READABLE) }, /* TemperatureUnit */                                                                \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */                                  \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */                             \
                                                                                                                                    \
         /* Endpoint: 0, Cluster: Power Source Configuration (server) */                                                            \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 0, ZAP_TYPE(ARRAY),                                                                     \
@@ -3633,7 +3635,7 @@
       .clusterId = 0x0000002D, \
       .attributes = ZAP_ATTRIBUTE_INDEX(59), \
       .attributeCount = 3, \
-      .clusterSize = 6, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr, \
@@ -4950,7 +4952,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 28, 197 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(0), 28, 191 },                                                                                         \
         { ZAP_CLUSTER_INDEX(28), 73, 3428 },                                                                                       \
         { ZAP_CLUSTER_INDEX(101), 7, 108 },                                                                                        \
         { ZAP_CLUSTER_INDEX(108), 2, 0 },                                                                                          \
@@ -4965,7 +4967,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (3733)
+#define ATTRIBUTE_MAX_SIZE (3727)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (4)
