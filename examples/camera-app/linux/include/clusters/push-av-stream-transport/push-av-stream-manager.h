@@ -123,7 +123,7 @@ private:
     std::unordered_map<uint16_t, std::unique_ptr<PushAVTransport>> mTransportMap; // map for the transport objects
     std::unordered_map<uint16_t, TransportOptionsStruct> mTransportOptionsMap;    // map for the transport options
 
-    uint32_t mTotalUsedBandwidthbps = 0.0; // Tracks the total bandwidth used by all active transports
+    uint32_t mTotalUsedBandwidthbps = 0; // Tracks the total bandwidth used by all active transports
 
     std::vector<uint8_t> mBufferRootCert;
     std::vector<uint8_t> mBufferClientCert;

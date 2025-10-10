@@ -108,7 +108,7 @@ public:
         mCurrentlyUsedBandwidthbps = currentlyUsedBandwidthbps;
     }
 
-    uint32_t GetCurrentlyUsedBandwidthbps() { return mCurrentlyUsedBandwidthbps; }
+    uint32_t GetCurrentlyUsedBandwidthbps() const { return mCurrentlyUsedBandwidthbps; }
 
     // Set the cluster server reference for direct API calls
     void SetPushAvStreamTransportServer(chip::app::Clusters::PushAvStreamTransportServer * server)
@@ -148,5 +148,5 @@ private:
     chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum mTransportStatus;
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTransportTriggerType;
     uint16_t mConnectionID;
-    uint32_t mCurrentlyUsedBandwidthbps = 0.0;
+    uint32_t mCurrentlyUsedBandwidthbps = 0;
 };

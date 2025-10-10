@@ -165,8 +165,8 @@ void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nul
     if (videoStreamId.HasValue() && !videoStreamId.Value().IsNull())
     {
         uint16_t vStreamId           = videoStreamId.Value().Value();
-        auto & availableVideoStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
-        for (const chip::app::Clusters::CameraAvStreamManagement::Structs::VideoStreamStruct::Type & stream : availableVideoStreams)
+        auto & allocatedVideoStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
+        for (const chip::app::Clusters::CameraAvStreamManagement::Structs::VideoStreamStruct::Type & stream : allocatedVideoStreams)
         {
             if (stream.videoStreamID == vStreamId)
             {
@@ -179,8 +179,8 @@ void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nul
     if (audioStreamId.HasValue() && !audioStreamId.Value().IsNull())
     {
         uint16_t aStreamId           = audioStreamId.Value().Value();
-        auto & availableAudioStreams = GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
-        for (const chip::app::Clusters::CameraAvStreamManagement::Structs::AudioStreamStruct::Type & stream : availableAudioStreams)
+        auto & allocatedAudioStreams = GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
+        for (const chip::app::Clusters::CameraAvStreamManagement::Structs::AudioStreamStruct::Type & stream : allocatedAudioStreams)
         {
             if (stream.audioStreamID == aStreamId)
             {

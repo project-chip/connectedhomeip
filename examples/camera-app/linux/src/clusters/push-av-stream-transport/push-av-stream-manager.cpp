@@ -264,7 +264,7 @@ void PushAvStreamTransportManager::GetBandwidthForStreams(const Optional<DataMod
                                                           const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
                                                           uint32_t & outBandwidthbps)
 {
-    mCameraDevice->GetCameraAVStreamMgmtDelegate().GetBandwidthForStreams(videoStreamId, audioStreamId, outBandwidthbps);
+    mCameraDevice->GetCameraAVStreamMgmtController().GetBandwidthForStreams(videoStreamId, audioStreamId, outBandwidthbps);
     return;
 }
 
