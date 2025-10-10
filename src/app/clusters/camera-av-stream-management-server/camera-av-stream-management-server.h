@@ -27,6 +27,7 @@
 #include <app/SafeAttributePersistenceProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TypeTraits.h>
+#include <optional>
 #include <protocols/interaction_model/StatusCode.h>
 #include <vector>
 
@@ -572,7 +573,7 @@ public:
      * @param requestedArgs    parameters in the allocation request
      *
      */
-    DataModel::Nullable<uint16_t> GetReusableVideoStreamId(const VideoStreamStruct & requestedArgs) const;
+    std::optional<uint16_t> GetReusableVideoStreamId(const VideoStreamStruct & requestedArgs) const;
 
     CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
 
@@ -596,7 +597,7 @@ public:
      * @param requestedArgs    parameters in the allocation request
      *
      */
-    DataModel::Nullable<uint16_t>
+    std::optional<uint16_t>
     GetReusableSnapshotStreamId(const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs) const;
 
     CHIP_ERROR AddSnapshotStream(const SnapshotStreamStruct & snapshotStream);

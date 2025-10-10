@@ -252,12 +252,12 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
     }
 
     // Try to reuse an allocated stream
-    DataModel::Nullable<uint16_t> reusableStreamId = GetCameraAVStreamMgmtServer()->GetReusableVideoStreamId(allocateArgs);
+    std::optional<uint16_t> reusableStreamId = GetCameraAVStreamMgmtServer()->GetReusableVideoStreamId(allocateArgs);
 
-    if (!reusableStreamId.IsNull())
+    if (reusableStreamId.has_value())
     {
         // Found a stream that can be reused
-        outStreamID = reusableStreamId.Value();
+        outStreamID = reusableStreamId.value();
         ChipLogProgress(Camera, "Matching pre-allocated stream with ID: %d exists", outStreamID);
         return Status::Success;
     }
@@ -448,12 +448,12 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
     }
 
     // Try to reuse an allocated stream.
-    DataModel::Nullable<uint16_t> reusableStreamId = GetCameraAVStreamMgmtServer()->GetReusableSnapshotStreamId(allocateArgs);
+    std::optional<uint16_t> reusableStreamId = GetCameraAVStreamMgmtServer()->GetReusableSnapshotStreamId(allocateArgs);
 
-    if (!reusableStreamId.IsNull())
+    if (reusableStreamId.has_value())
     {
         // Found a stream that can be reused
-        outStreamID = reusableStreamId.Value();
+        outStreamID = reusableStreamId.value();
         ChipLogProgress(Camera, "Matching pre-allocated stream with ID: %d exists", outStreamID);
         return Status::Success;
     }

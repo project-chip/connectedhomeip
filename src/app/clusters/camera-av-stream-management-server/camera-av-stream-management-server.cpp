@@ -30,6 +30,7 @@
 
 #include <cmath>
 #include <cstring>
+#include <optional>
 #include <set>
 
 using namespace chip;
@@ -269,7 +270,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetStreamUsagePriorities(const std::vector<
     return CHIP_NO_ERROR;
 }
 
-DataModel::Nullable<uint16_t> CameraAVStreamMgmtServer::GetReusableVideoStreamId(const VideoStreamStruct & requestedArgs) const
+std::optional<uint16_t> CameraAVStreamMgmtServer::GetReusableVideoStreamId(const VideoStreamStruct & requestedArgs) const
 {
     for (const auto & stream : mAllocatedVideoStreams)
     {
@@ -306,9 +307,9 @@ DataModel::Nullable<uint16_t> CameraAVStreamMgmtServer::GetReusableVideoStreamId
             continue;
         }
 
-        return DataModel::Nullable<uint16_t>(stream.videoStreamID);
+        return stream.videoStreamID;
     }
-    return DataModel::Nullable<uint16_t>();
+    return std::nullopt;
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::AddVideoStream(const VideoStreamStruct & videoStream)
@@ -396,7 +397,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveAudioStream(uint16_t audioStreamId)
     return CHIP_NO_ERROR;
 }
 
-DataModel::Nullable<uint16_t> CameraAVStreamMgmtServer::GetReusableSnapshotStreamId(
+std::optional<uint16_t> CameraAVStreamMgmtServer::GetReusableSnapshotStreamId(
     const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs) const
 {
     for (const auto & stream : mAllocatedSnapshotStreams)
@@ -414,7 +415,7 @@ DataModel::Nullable<uint16_t> CameraAVStreamMgmtServer::GetReusableSnapshotStrea
         }
 
         // 3. Framerate check (request must be within allocated stream's current range)
-        if (requestedArgs.maxFrameRate < stream.frameRate)
+        if (requestedArgs.maxFrameRate > stream.frameRate)
         {
             continue;
         }
@@ -428,9 +429,9 @@ DataModel::Nullable<uint16_t> CameraAVStreamMgmtServer::GetReusableSnapshotStrea
             continue;
         }
 
-        return DataModel::Nullable<uint16_t>(stream.snapshotStreamID);
+        return stream.snapshotStreamID;
     }
-    return DataModel::Nullable<uint16_t>();
+    return std::nullopt;
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::AddSnapshotStream(const SnapshotStreamStruct & snapshotStream)
