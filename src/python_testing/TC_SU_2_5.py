@@ -238,17 +238,19 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
         start_time = time()
         update_sw_vesion = AttributeMatcher.from_callable(
-            f"Sofware version was updated to {self.expected_software_version}",
+            f"Waiting Sofware version update to {self.expected_software_version}",
             lambda report: report.value > current_sw_version)
         software_version_attr_handler.await_all_expected_report_matches(
             [update_sw_vesion], timeout_sec=(delayed_apply_action_time+10))
-        logger.info(str(update_sw_vesion))
         end_time = time()
         total_wait_time = end_time - start_time
         asserts.assert_greater_equal(
             total_wait_time, delayed_apply_action_time, f"Software Udpate occured before the defined time of: {total_wait_time}")
         logger.info(f"Time taken after the update was done applied {total_wait_time} seconds.")
-
+        update_state_attr_handler.flush_reports()
+        await update_state_attr_handler.cancel()
+        software_version_attr_handler.flush_reports()
+        await software_version_attr_handler.cancel()
         update_state_after = await self.read_single_attribute_check_success(
             Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, self.controller, self.requestor_node_id)
         logger.info("UpdateState after update" + str(update_state_after))
@@ -257,10 +259,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
                              "UpdateState is not Idle")
         await self.verify_version_applied_basic_information(
             controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
-        update_state_attr_handler.flush_reports()
-        await update_state_attr_handler.cancel()
-        software_version_attr_handler.flush_reports()
-        await software_version_attr_handler.cancel()
         # Terminate the provider
         self.current_provider_app_proc.terminate()
 
@@ -278,17 +276,23 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             log_file=self.provider_log,
             extra_args=extra_arguments,
         )
-        # Get current version
-        current_sw_version = await self.read_single_attribute_check_success(
+        start_software_version = await self.read_single_attribute_check_success(
             dev_ctrl=self.controller,
             cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.SoftwareVersion,
             node_id=self.requestor_node_id)
-
+        # Software Version Attr Handler
+        software_version_attr_handler = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.BasicInformation,
+            expected_attribute=Clusters.BasicInformation.Attributes.SoftwareVersion
+        )
+        # StateUpdate Attr Handler
         update_state_attr_handler = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
+        await software_version_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
+                                                  fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
         await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
         await self.announce_ota_provider(self.controller, self.provider_data['node_id'], self.requestor_node_id)
@@ -320,23 +324,35 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         logger.info(f"Update State Stack secuence: {update_state_states_stack}")
         update_state_attr_handler.reset()
         await update_state_attr_handler.cancel()
-        # Wait 119 seconds or 1 minute and 59 seconds
-        logger.info(f"Wait {(spec_wait_time/60)} minutes and then check for the version")
-        await asyncio.sleep(spec_wait_time - 1)
-        logger.info(f"Waited {(spec_wait_time/60)} minutes")
-        # Verify cluster in the following second
-        await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=current_sw_version)
 
-        # Should change to Applying in the next Second
-        event_state_transition = EventSubscriptionHandler(expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-                                                          expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id)
-        await event_state_transition.start(self.controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60)
-        event_report = event_state_transition.wait_for_event_report(
-            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=1)
-        logger.info(f"Event report for Applying : {event_report}")
-        asserts.assert_equal(event_report.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
-        event_state_transition.flush_events()
-        await event_state_transition.cancel()
+        # Delayed on apply and software version is still the same
+        current_sw_version = await self.read_single_attribute_check_success(
+            dev_ctrl=self.controller,
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.SoftwareVersion,
+            node_id=self.requestor_node_id)
+        asserts.assert_equal(start_software_version, current_sw_version, f"Sofware versions are different")
+
+        start_time = time()
+        # Waiting for Software Version to change in the range for spec wait time then verify it did took more than 120 seconds to change the version
+        update_sw_version = AttributeMatcher.from_callable(
+            f"Sofware version was updated to {self.expected_software_version}",
+            lambda report: report.value > start_software_version)
+        software_version_attr_handler.await_all_expected_report_matches(
+            [update_sw_version], timeout_sec=(spec_wait_time+10))
+        end_time = time()
+        total_wait_time = end_time - start_time
+        asserts.assert_greater_equal(
+            total_wait_time, delayed_apply_action_time, f"Software Udpate occurred before the defined time of: {spec_wait_time}")
+
+        # Cancel handlers
+        update_state_attr_handler.reset()
+        await update_state_attr_handler.cancel()
+        software_version_attr_handler.reset()
+        await software_version_attr_handler.cancel()
+
+        # Now software version should be in the expected software version
+        await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
         self.current_provider_app_proc.terminate()
 
         self.step(4)
@@ -352,17 +368,25 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             log_file=self.provider_log,
             extra_args=extra_arguments,
         )
-        current_sw_version = await self.read_single_attribute_check_success(
+        start_software_version = await self.read_single_attribute_check_success(
             dev_ctrl=self.controller,
             cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.SoftwareVersion,
             node_id=self.requestor_node_id)
+        # Software Version attr handler
+        software_version_attr_handler = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.BasicInformation,
+            expected_attribute=Clusters.BasicInformation.Attributes.SoftwareVersion
+        )
+        #  UpdateState attr handler
         update_state_attr_handler = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
         await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+        await software_version_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
+                                                  fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
         await self.announce_ota_provider(self.controller, self.provider_data['node_id'], self.requestor_node_id)
 
         update_state_states_seen = set()
@@ -389,32 +413,25 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             matcher=collect_update_state_data
         )
         update_state_attr_handler.await_all_expected_report_matches([callable_collect_update_state_data], timeout_sec=60*6)
+        start_time = time()
         logger.info(f"Update State Stack secuence: {update_state_states_stack}")
         update_state_attr_handler.reset()
         await update_state_attr_handler.cancel()
-        # Wait the defined delay of 180 seconds
-        logger.info(f"Wait {(delayed_apply_action_time/60)} minutes and check for ApplyEvent")
-        await asyncio.sleep(delayed_apply_action_time-1)
-        logger.info(f"Waited {(delayed_apply_action_time/60)} minutes without events")
-
+        # Waiting for Software Version to change in the range for spec wait time then verify it did took more than 120 seconds to change the version
+        update_sw_version = AttributeMatcher.from_callable(
+            f"Sofware version was updated to {self.expected_software_version}",
+            lambda report: report.value > start_software_version)
+        software_version_attr_handler.await_all_expected_report_matches(
+            [update_sw_version], timeout_sec=(delayed_apply_action_time+10))
+        end_time = time()
+        total_wait_time = end_time - start_time
+        asserts.assert_greater_equal(
+            total_wait_time, delayed_apply_action_time, f"Software Udpate occurred before the defined time of: {delayed_apply_action_time}")
+        software_version_attr_handler.flush_events()
+        await software_version_attr_handler.cancel()
         # Verify the version is the same
-        await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=current_sw_version)
-
-        # Should change to Applying in the next Second
-        event_state_transition = EventSubscriptionHandler(expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-                                                          expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id)
-        await event_state_transition.start(self.controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60)
-        event_report = event_state_transition.wait_for_event_report(
-            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=1)
-        logger.info(f"Event report for Applying : {event_report}")
-        asserts.assert_equal(event_report.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
-
-        event_state_transition.flush_events()
-        await event_state_transition.cancel()
-
-        # Wait device to shutdown and startup and then verify the SW Version
-        await asyncio.sleep(5)
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
+
         self.current_provider_app_proc.terminate()
 
         self.step(5)
