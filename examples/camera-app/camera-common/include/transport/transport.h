@@ -37,7 +37,7 @@ public:
     virtual void SendAudio(const chip::ByteSpan & data, int64_t timestamp, uint16_t audioStreamID) = 0;
 
     // Send synchronixed audio/video data for given audio and video stream IDs
-    virtual void SendAudioVideo(const chip::ByteSpan & data, uint16_t videoSTreamID, uint16_t audioStreamID) = 0;
+    virtual void SendAudioVideo(const chip::ByteSpan & data, uint16_t videoStreamID, uint16_t audioStreamID) = 0;
 
     // Indicates that the transport is ready to send video data
     virtual bool CanSendVideo() = 0;
