@@ -417,7 +417,7 @@ public:
     CHIP_ERROR FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
                                            LoadedEndpointCallback callback) override
     {
-        return CHIP_ERROR_NOT_FOUND;
+        return CHIP_NO_ERROR;
     }
 
     Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
