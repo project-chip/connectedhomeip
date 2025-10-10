@@ -344,30 +344,24 @@ public:
     virtual CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) = 0;
 
     /**
-     * @brief Calculates the total bandwidth in Mbps for the given video and audio stream IDs.
-     * It iterates through the allocated video and audio streams, and if a matching stream ID is found,
-     * its bit rate (maxBitRate for video, bitRate for audio) is added to the total bandwidth.
+     * @brief Provides read-only access to the list of currently allocated video streams.
+     * This allows other components (like PushAVStreamTransportManager) to query
+     * allocated stream parameters (e.g., for bandwidth calculation) without directly
+     * accessing the CameraAVStreamMgmtServer instance.
      *
-     * @param videoStreamId Optional nullable ID of the video stream.
-     * @param audioStreamId Optional nullable ID of the audio stream.
-     * @param outBandwidthMbps Output parameter for the calculated total bandwidth in Mbps.
+     * @return A const reference to the vector of allocated video stream structures.
      */
-    virtual void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                        const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
-                                        double & outBandwidthMbps) = 0;
+    virtual const std::vector<VideoStreamStruct> & GetAllocatedVideoStreams() const = 0;
 
     /**
-     * @brief Calculates the total bandwidth in bps for the given video and audio stream IDs.
-     * It iterates through the allocated video and audio streams, and if a matching stream ID is found,
-     * its bit rate (maxBitRate for video, bitRate for audio) is added to the total bandwidth.
+     * @brief Provides read-only access to the list of currently allocated audio streams.
+     * This allows other components (like PushAVStreamTransportManager) to query
+     * allocated stream parameters (e.g., for bandwidth calculation) without directly
+     * accessing the CameraAVStreamMgmtServer instance.
      *
-     * @param videoStreamId Optional nullable ID of the video stream.
-     * @param audioStreamId Optional nullable ID of the audio stream.
-     * @param outBandwidthbps Output parameter for the calculated total bandwidth in bps.
+     * @return A const reference to the vector of allocated audio stream structures.
      */
-    virtual void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                        const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
-                                        uint32_t & outBandwidthbps) = 0;
+    virtual const std::vector<AudioStreamStruct> & GetAllocatedAudioStreams() const = 0;
 
     /**
      * @brief Calculates the total bandwidth in bps for the given video and audio stream IDs.

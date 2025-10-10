@@ -280,18 +280,14 @@ CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamI
     return CHIP_NO_ERROR;
 }
 
-void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                                   const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
-                                                   double & outBandwidthMbps)
+const std::vector<VideoStreamStruct> & CameraAVStreamManager::GetAllocatedVideoStreams() const
 {
-    ChipLogDetail(Zcl, "Get bandwidth for streams called");
+    return videoStreamStructs;
 }
 
-void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                                   const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
-                                                   uint32_t & outBandwidthbps)
+const std::vector<AudioStreamStruct> & CameraAVStreamManager::GetAllocatedAudioStreams() const
 {
-    ChipLogDetail(Zcl, "Get bandwidth for streams called");
+    return audioStreamStructs;
 }
 
 void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,

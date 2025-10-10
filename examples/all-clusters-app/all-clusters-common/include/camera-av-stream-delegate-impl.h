@@ -104,10 +104,6 @@ public:
     void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                 const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, uint32_t & outBandwidthbps) override;
 
-    Protocols::InteractionModel::Status GetVideoStreamIdForStreams(StreamUsageEnum streamUsage, uint16_t & videoStreamId) override;
-
-    Protocols::InteractionModel::Status GetAudioStreamIdForStreams(StreamUsageEnum streamUsage, uint16_t & audioStreamId) override;
-
     void Init();
 
     CameraAVStreamManager()  = default;
@@ -116,9 +112,11 @@ public:
     // static inline CameraAVStreamManager & GetInstance() { return sCameraAVStreamMgrInstance; }
 
 private:
-    std::vector<VideoStream> videoStreams;       // Vector to hold available video streams
-    std::vector<AudioStream> audioStreams;       // Vector to hold available audio streams
-    std::vector<SnapshotStream> snapshotStreams; // Vector to hold available snapshot streams
+    std::vector<VideoStream> videoStreams;             // Vector to hold available video streams
+    std::vector<AudioStream> audioStreams;             // Vector to hold available audio streams
+    std::vector<SnapshotStream> snapshotStreams;       // Vector to hold available snapshot streams
+    std::vector<VideoStreamStruct> videoStreamStructs; // Vector to hold allocated video streams
+    std::vector<AudioStreamStruct> audioStreamStructs; // Vector to hold allocated audio streams
     void InitializeAvailableVideoStreams();
     void InitializeAvailableAudioStreams();
     void InitializeAvailableSnapshotStreams();

@@ -878,11 +878,6 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
             }
         }
     }
-    Optional<DataModel::Nullable<uint16_t>> videoStID = transportOptions.videoStreamID;
-    if (transportOptions.videoStreamID.HasValue() && transportOptions.videoStreamID.Value().IsNull())
-    {
-        videoStID = transportOptionsPtr->videoStreamID;
-    }
 
     bool isValidSegmentDuration = mDelegate->ValidateSegmentDuration(
         transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration, transportOptionsPtr->videoStreamID);

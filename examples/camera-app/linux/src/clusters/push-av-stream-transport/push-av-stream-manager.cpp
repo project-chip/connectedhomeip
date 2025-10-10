@@ -273,27 +273,6 @@ void PushAvStreamTransportManager::GetBandwidthForStreams(const Optional<DataMod
     return;
 }
 
-Protocols::InteractionModel::Status PushAvStreamTransportManager::GetVideoStreamIdForStreams(StreamUsageEnum streamUsage,
-                                                                                             uint16_t & videoStreamId)
-{
-    if (mCameraDevice == nullptr)
-    {
-        ChipLogError(Camera, "CameraDeviceInterface not initialized for GetVideoStreamIdForStreams");
-        return Status::Failure;
-    }
-    return mCameraDevice->GetCameraAVStreamMgmtDelegate().GetVideoStreamIdForStreams(streamUsage, videoStreamId);
-}
-
-Protocols::InteractionModel::Status PushAvStreamTransportManager::GetAudioStreamIdForStreams(StreamUsageEnum streamUsage,
-                                                                                             uint16_t & audioStreamId)
-{
-    if (mCameraDevice == nullptr)
-    {
-        ChipLogError(Camera, "CameraDeviceInterface not initialized for GetAudioStreamIdForStreams");
-        return Status::Failure;
-    }
-    return mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAudioStreamIdForStreams(streamUsage, audioStreamId);
-}
 
 Protocols::InteractionModel::Status
 PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage,
@@ -540,6 +519,26 @@ PushAvStreamTransportStatusEnum PushAvStreamTransportManager::GetTransportBusySt
     }
 }
 
+void PushAvStreamTransportManager::OnAttributeChanged(AttributeId attributeId)
+{
+    ChipLogProgress(Zcl, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
+}
+
+CHIP_ERROR PushAvStreamTransportManager::LoadCurrentConnections(std::vector<TransportConfigurationStorage> & currentConnections)
+{
+    ChipLogProgress(Zcl, "Push AV Current Connections loaded");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
+{
+    ChipLogProgress(Zcl, "Push AV Stream Transport Persistent attributes loaded");
+
+    return CHIP_NO_ERROR;
+}
+
 void PushAvStreamTransportManager::HandleZoneTrigger(uint16_t zoneId)
 {
     for (auto & pavst : mTransportMap)
@@ -769,23 +768,4 @@ void PushAvStreamTransportManager::SessionMonitor()
 
         std::this_thread::sleep_for(std::chrono::seconds(kSessionMonitorInterval));
     }
-}
-
-void PushAvStreamTransportManager::OnAttributeChanged(AttributeId attributeId)
-{
-    ChipLogProgress(Zcl, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-}
-
-CHIP_ERROR PushAvStreamTransportManager::LoadCurrentConnections(std::vector<TransportConfigurationStorage> & currentConnections)
-{
-    ChipLogProgress(Zcl, "Push AV Current Connections loaded");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
-{
-    ChipLogProgress(Zcl, "Push AV Stream Transport Persistent attributes loaded");
-    return CHIP_NO_ERROR;
 }

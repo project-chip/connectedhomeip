@@ -430,6 +430,73 @@ void PushAVClipRecorder::PushPacket(const uint8_t * data, size_t size, bool isVi
     mCondition.notify_one();
 }
 
+int PushAVClipRecorder::SetupOutput(const std::string & outputPrefix, const std::string & initSegPattern,
+                                    const std::string & mediaSegPattern)
+{
+    const std::string mpdFilename = outputPrefix + ".mpd";
+    if (avformat_alloc_output_context2(&mFormatContext, nullptr, nullptr, mpdFilename.c_str()) < 0)
+    {
+        ChipLogError(Camera, "ERROR: Failed to allocate output context");
+        Stop();
+        return -1;
+    }
+    if (!mFormatContext)
+    {
+        ChipLogError(Camera, "ERROR: Output context is null");
+    }
+    double segSeconds = static_cast<double>(mClipInfo.mSegmentDuration) / 1000.0;
+    // Set DASH/CMAF options
+    av_opt_set(mFormatContext->priv_data, "increment_tc", "1", 0);
+    av_opt_set(mFormatContext->priv_data, "use_timeline", "1", 0);
+
+    if (mClipInfo.mChunkDuration == 0)
+    {
+        av_opt_set(mFormatContext->priv_data, "movflags", "+cmaf+dash+delay_moov+skip_sidx+skip_trailer", 0);
+    }
+    else
+    {
+        av_opt_set(mFormatContext->priv_data, "movflags", "+cmaf+dash+delay_moov+skip_sidx+skip_trailer+frag_custom", 0);
+        av_opt_set(mFormatContext->priv_data, "frag_duration", std::to_string(mClipInfo.mChunkDuration).c_str(), 0);
+    }
+
+    av_opt_set(mFormatContext->priv_data, "seg_duration", std::to_string(segSeconds).c_str(), 0);
+    av_opt_set(mFormatContext->priv_data, "init_seg_name", initSegPattern.c_str(), 0);
+    av_opt_set(mFormatContext->priv_data, "media_seg_name", mediaSegPattern.c_str(), 0);
+    av_opt_set_int(mFormatContext->priv_data, "use_template", 1, 0);
+    av_dict_set_int(&options, "dash_segment_type", 1, 0);
+    av_dict_set_int(&options, "use_timeline", 1, 0);
+    av_dict_set(&options, "strict", "experimental", 0);
+    av_dict_set(&options, "start_number", "1000", 0);
+    if (mClipInfo.mHasVideo && (AddStreamToOutput(AVMEDIA_TYPE_VIDEO) < 0))
+    {
+        ChipLogError(Camera, "ERROR: adding video stream to output");
+        return -1;
+    }
+    if (mClipInfo.mHasAudio && (AddStreamToOutput(AVMEDIA_TYPE_AUDIO) < 0))
+    {
+        ChipLogError(Camera, "ERROR: adding video stream to output");
+        return -1;
+    }
+
+    if (!(mFormatContext->oformat->flags & AVFMT_NOFILE))
+    {
+        if (avio_open(&mFormatContext->pb, mpdFilename.c_str(), AVIO_FLAG_WRITE) < 0)
+        {
+            ChipLogError(Camera, "ERROR: Failed to open output file: %s", mpdFilename.c_str());
+            Stop();
+            return -1;
+        }
+    }
+
+    if (avformat_write_header(mFormatContext, &options) < 0)
+    {
+        ChipLogError(Camera, "Error: writing output header");
+        Stop();
+        return -1;
+    }
+    return 0;
+}
+
 int PushAVClipRecorder::StartClipRecording()
 {
     if (!mClipInfo.mHasVideo)
@@ -529,73 +596,6 @@ int PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
         {
             mAudioEncoderContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
         }
-    }
-    return 0;
-}
-
-int PushAVClipRecorder::SetupOutput(const std::string & outputPrefix, const std::string & initSegPattern,
-                                    const std::string & mediaSegPattern)
-{
-    const std::string mpdFilename = outputPrefix + ".mpd";
-    if (avformat_alloc_output_context2(&mFormatContext, nullptr, nullptr, mpdFilename.c_str()) < 0)
-    {
-        ChipLogError(Camera, "ERROR: Failed to allocate output context");
-        Stop();
-        return -1;
-    }
-    if (!mFormatContext)
-    {
-        ChipLogError(Camera, "ERROR: Output context is null");
-    }
-    double segSeconds = static_cast<double>(mClipInfo.mSegmentDuration) / 1000.0;
-    // Set DASH/CMAF options
-    av_opt_set(mFormatContext->priv_data, "increment_tc", "1", 0);
-    av_opt_set(mFormatContext->priv_data, "use_timeline", "1", 0);
-
-    if (mClipInfo.mChunkDuration == 0)
-    {
-        av_opt_set(mFormatContext->priv_data, "movflags", "+cmaf+dash+delay_moov+skip_sidx+skip_trailer", 0);
-    }
-    else
-    {
-        av_opt_set(mFormatContext->priv_data, "movflags", "+cmaf+dash+delay_moov+skip_sidx+skip_trailer+frag_custom", 0);
-        av_opt_set(mFormatContext->priv_data, "frag_duration", std::to_string(mClipInfo.mChunkDuration).c_str(), 0);
-    }
-
-    av_opt_set(mFormatContext->priv_data, "seg_duration", std::to_string(segSeconds).c_str(), 0);
-    av_opt_set(mFormatContext->priv_data, "init_seg_name", initSegPattern.c_str(), 0);
-    av_opt_set(mFormatContext->priv_data, "media_seg_name", mediaSegPattern.c_str(), 0);
-    av_opt_set_int(mFormatContext->priv_data, "use_template", 1, 0);
-    av_dict_set_int(&options, "dash_segment_type", 1, 0);
-    av_dict_set_int(&options, "use_timeline", 1, 0);
-    av_dict_set(&options, "strict", "experimental", 0);
-    av_dict_set(&options, "start_number", "1000", 0);
-    if (mClipInfo.mHasVideo && (AddStreamToOutput(AVMEDIA_TYPE_VIDEO) < 0))
-    {
-        ChipLogError(Camera, "ERROR: adding video stream to output");
-        return -1;
-    }
-    if (mClipInfo.mHasAudio && (AddStreamToOutput(AVMEDIA_TYPE_AUDIO) < 0))
-    {
-        ChipLogError(Camera, "ERROR: adding video stream to output");
-        return -1;
-    }
-
-    if (!(mFormatContext->oformat->flags & AVFMT_NOFILE))
-    {
-        if (avio_open(&mFormatContext->pb, mpdFilename.c_str(), AVIO_FLAG_WRITE) < 0)
-        {
-            ChipLogError(Camera, "ERROR: Failed to open output file: %s", mpdFilename.c_str());
-            Stop();
-            return -1;
-        }
-    }
-
-    if (avformat_write_header(mFormatContext, &options) < 0)
-    {
-        ChipLogError(Camera, "Error: writing output header");
-        Stop();
-        return -1;
     }
     return 0;
 }
