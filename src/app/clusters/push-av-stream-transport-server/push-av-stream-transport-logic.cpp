@@ -274,7 +274,7 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         transportOptions.videoStreamID.HasValue() || transportOptions.audioStreamID.HasValue(), Status::InvalidCommand,
         ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Missing videoStreamID and audioStreamID",
                      mEndpointId));
-    VerifyOrReturnValue(transportOptions.endpointID <= kMaxEndpointId, Status::ConstraintError,
+    VerifyOrReturnValue(transportOptions.TLSEndpointID <= kMaxEndpointId, Status::ConstraintError,
                         ChipLogError(Zcl,
                                      "Transport Options verification from command data[ep=%d]: EndpointID field Constraint Error",
                                      mEndpointId));
@@ -551,12 +551,28 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     });
 
+    // Ensure that Privacy is not active
+    bool privacyModeActive = false;
+    if (mDelegate->IsPrivacyModeActive(privacyModeActive) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleAllocatePushTransport: Cannot determine privacy mode state");
+        handler.AddStatus(commandPath, Status::InvalidInState);
+        return std::nullopt;
+    }
+
+    if (privacyModeActive)
+    {
+        ChipLogError(Zcl, "HandleAllocatePushTransport: Privacy mode is enabled");
+        handler.AddStatus(commandPath, Status::InvalidInState);
+        return std::nullopt;
+    }
+
     // Validate the TLS Endpoint
     TlsClientManagementDelegate::EndpointStructType TLSEndpoint;
     if (mTLSClientManagementDelegate != nullptr)
     {
         Status tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
-            commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.endpointID, TLSEndpoint);
+            commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.TLSEndpointID, TLSEndpoint);
 
         VerifyOrDo(tlsEndpointValidityStatus == Status::Success, {
             ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLSEndpointID of command data is not valid/Provisioned",
@@ -798,8 +814,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         }
     }
 
-    bool isValidSegmentDuration =
-        mDelegate->ValidateSegmentDuration(transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration);
+    bool isValidSegmentDuration = mDelegate->ValidateSegmentDuration(
+        transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration, transportOptionsPtr->videoStreamID);
     if (isValidSegmentDuration == false)
     {
         auto segmentDurationStatus = to_underlying(StatusCodeEnum::kInvalidOptions);
@@ -867,6 +883,13 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
     {
         ChipLogError(Zcl, "HandleDeallocatePushTransport[ep=%d]: ConnectionID Not Found.", mEndpointId);
         handler.AddStatus(commandPath, Status::NotFound);
+        return std::nullopt;
+    }
+
+    if (mDelegate->GetTransportBusyStatus(connectionID) == PushAvStreamTransportStatusEnum::kBusy)
+    {
+        ChipLogError(Zcl, "HandleDeallocatePushTransport[ep=%d]: Connection is Busy", mEndpointId);
+        handler.AddStatus(commandPath, Status::Busy);
         return std::nullopt;
     }
 
@@ -1053,6 +1076,22 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
         });
     }
 
+    // Ensure that Privacy is not active
+    bool privacyModeActive = false;
+    if (mDelegate->IsPrivacyModeActive(privacyModeActive) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleManuallyTriggerTransport: Cannot determine privacy mode state");
+        handler.AddStatus(commandPath, Status::InvalidInState);
+        return std::nullopt;
+    }
+
+    if (privacyModeActive)
+    {
+        ChipLogError(Zcl, "HandleManuallyTriggerTransport: Privacy mode is enabled");
+        handler.AddStatus(commandPath, Status::InvalidInState);
+        return std::nullopt;
+    }
+
     FabricIndex fabricIndex                                = handler.GetAccessingFabricIndex();
     TransportConfigurationStorage * transportConfiguration = FindStreamTransportConnectionWithinFabric(connectionID, fabricIndex);
 
@@ -1200,16 +1239,12 @@ PushAvStreamTransportServerLogic::GeneratePushTransportBeginEvent(const uint16_t
     return Status::Success;
 }
 
-Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uint16_t connectionID,
-                                                                       const TransportTriggerTypeEnum triggerType,
-                                                                       const Optional<TriggerActivationReasonEnum> activationReason)
+Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uint16_t connectionID)
 {
     Events::PushTransportEnd::Type event;
     EventNumber eventNumber;
 
-    event.connectionID     = connectionID;
-    event.triggerType      = triggerType;
-    event.activationReason = activationReason;
+    event.connectionID = connectionID;
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
@@ -1239,8 +1274,7 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStarted(uint16_t connect
     return GeneratePushTransportBeginEvent(connectionID, triggerType, activationReason);
 }
 
-Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connectionID, TransportTriggerTypeEnum triggerType,
-                                                                Optional<TriggerActivationReasonEnum> activationReason)
+Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connectionID, TransportTriggerTypeEnum triggerType)
 {
     ChipLogProgress(Zcl, "NotifyTransportStopped called for connectionID %u with triggerType %u", connectionID,
                     to_underlying(triggerType));
@@ -1254,7 +1288,7 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connect
     }
 
     // Generate the PushTransportEnd event
-    return GeneratePushTransportEndEvent(connectionID, triggerType, activationReason);
+    return GeneratePushTransportEndEvent(connectionID);
 }
 
 } // namespace Clusters
