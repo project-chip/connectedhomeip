@@ -133,7 +133,17 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             ),
             TestStep(
                 12,
-                "TH1 sends the ManuallyTriggerTransport command with ConnectionID = aConnectionID.",
+                "TH1 sends the ManuallyTriggerTransport command with ConnectionID = aConnectionID and TimeControl field is omitted.",
+                "DUT responds with DYNAMIC_CONSTRAINT_ERROR status code.",
+            ),
+            TestStep(
+                13,
+                "If privacy is supported, TH1 sets SoftPrivacy to True then sends the ManuallyTriggerTransport command with ConnectionID = aConnectionID.",
+                "DUT responds with INVALID_IN_STATE status code.",
+            ),
+            TestStep(
+                14,
+                "If privacy is supported and was set, it is reverted to False. Then TH1 sends the ManuallyTriggerTransport command with ConnectionID = aConnectionID.",
                 "DUT responds with SUCCESS status code.",
             ),
         ]
@@ -316,12 +326,46 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             "DUT responds with SUCCESS status code.")
 
         self.step(12)
+        cmd = pvcluster.Commands.ManuallyTriggerTransport(
+            connectionID=aConnectionID,
+            activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kUserInitiated,
+        )
+        status = await self.psvt_manually_trigger_transport(cmd, expected_status=Status.DynamicConstraintError)
+        asserts.assert_true(
+            status == Status.DynamicConstraintError,
+            "DUT responds with DynamicConstraintError status code.",
+        )
+
+        self.step(13)
         timeControl = {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}
         cmd = pvcluster.Commands.ManuallyTriggerTransport(
             connectionID=aConnectionID,
             activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kUserInitiated,
             timeControl=timeControl
         )
+
+        # Check if privacy feature is supported before testing privacy mode
+        aFeatureMap = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.CameraAvStreamManagement, attribute=Clusters.CameraAvStreamManagement.Attributes.FeatureMap
+        )
+        privacySupported = aFeatureMap & Clusters.CameraAvStreamManagement.Bitmaps.Feature.kPrivacy
+        if privacySupported:
+            # Write SoftLivestreamPrivacyModeEnabled=true and test INVALID_IN_STATE
+            await self.write_single_attribute(
+                attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftRecordingPrivacyModeEnabled(True),
+                endpoint_id=endpoint,
+            )
+
+            status = await self.psvt_manually_trigger_transport(cmd, expected_status=Status.InvalidInState)
+            asserts.assert_true(status == Status.InvalidInState, f"Unexpected response {
+                                status} received on Manually Triggered push with privacy mode enabled")
+
+            await self.write_single_attribute(
+                attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftRecordingPrivacyModeEnabled(False),
+                endpoint_id=endpoint,
+            )
+
+        self.step(14)
         status = await self.psvt_manually_trigger_transport(cmd)
         asserts.assert_true(
             status == Status.Success,
