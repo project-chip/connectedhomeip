@@ -22,8 +22,8 @@
 #include <app/clusters/tls-client-management-server/tls-client-management-server.h>
 #include <app/storage/FabricTableImpl.ipp>
 #include <clusters/TlsClientManagement/Commands.h>
+#include <lib/support/CHIPMem.h>
 #include <tls-client-management-instance.h>
-#include <vector>
 
 using namespace chip;
 using namespace chip::app;
@@ -33,6 +33,7 @@ using namespace chip::app::Clusters::Tls;
 using namespace chip::app::Clusters::TlsClientManagement;
 using namespace chip::app::Storage;
 using namespace chip::app::Storage::Data;
+using namespace chip::Platform;
 using namespace chip::TLV;
 using namespace Protocols::InteractionModel;
 
@@ -252,11 +253,12 @@ CHIP_ERROR TlsClientManagementCommandDelegate::ForEachEndpoint(EndpointId matter
 
 CHIP_ERROR TlsClientManagementCommandDelegate::GetEndpointId(FabricIndex fabric, uint16_t & id)
 {
-    GlobalEndpointData globalData(EndpointId(1));
-    ReturnErrorOnFailure(globalData.Load(mStorage));
-    ReturnErrorOnFailure(globalData.GetNextId(fabric, id));
+    UniquePtr<GlobalEndpointData> globalData(New<GlobalEndpointData>(EndpointId(1)));
+    VerifyOrReturnError(globalData, CHIP_ERROR_NO_MEMORY);
+    ReturnErrorOnFailure(globalData->Load(mStorage));
+    ReturnErrorOnFailure(globalData->GetNextId(fabric, id));
 
-    return globalData.Save(mStorage);
+    return globalData->Save(mStorage);
 }
 
 ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
@@ -291,7 +293,7 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
     {
         VerifyOrReturnError(numInFabric < mTlsClientManagementServer->GetMaxProvisioned(),
                             ClusterStatusCode(Status::ResourceExhausted));
-
+        EndpointSerializer::Clear(endpoint.mEndpoint);
         auto & endpointStruct = endpoint.mEndpoint;
 
         uint16_t nextId;
@@ -347,9 +349,10 @@ Status TlsClientManagementCommandDelegate::RemoveProvisionedEndpointByID(Endpoin
     VerifyOrReturnValue(result == CHIP_NO_ERROR, Status::Failure);
     VerifyOrReturnValue(endpoint.mEndpoint.referenceCount == 0, Status::InvalidInState);
 
-    GlobalEndpointData globalData(matterEndpoint);
-    ReturnValueOnFailure(globalData.Load(mStorage), Status::Failure);
-    result = globalData.Remove(*mStorage, mProvisioned, fabric, endpointID);
+    UniquePtr<GlobalEndpointData> globalData(New<GlobalEndpointData>(matterEndpoint));
+    VerifyOrReturnError(globalData, Status::ResourceExhausted);
+    ReturnValueOnFailure(globalData->Load(mStorage), Status::Failure);
+    result = globalData->Remove(*mStorage, mProvisioned, fabric, endpointID);
     VerifyOrReturnValue(result != CHIP_ERROR_NOT_FOUND, Status::NotFound);
     VerifyOrReturnValue(result == CHIP_NO_ERROR, Status::Failure);
 
@@ -387,11 +390,12 @@ void TlsClientManagementCommandDelegate::RemoveFabric(FabricIndex fabric)
 {
     VerifyOrReturn(mStorage != nullptr);
 
-    ReturnOnFailure(mProvisioned.RemoveFabric(fabric));
+    LogAndReturnOnFailure(mProvisioned.RemoveFabric(fabric), AppServer, "Failure clearing TLS endpoints for fabric");
 
-    GlobalEndpointData globalData(EndpointId(1));
-    ReturnOnFailure(globalData.Load(mStorage));
-    globalData.RemoveAll(*mStorage, fabric);
+    UniquePtr<GlobalEndpointData> globalData(New<GlobalEndpointData>(EndpointId(1)));
+    VerifyOrReturn(globalData);
+    ReturnOnFailure(globalData->Load(mStorage));
+    LogAndReturnOnFailure(globalData->RemoveAll(*mStorage, fabric), AppServer, "Failure clearing TLS endpoint data for fabric");
 }
 
 CHIP_ERROR TlsClientManagementCommandDelegate::MutateEndpointReferenceCount(EndpointId matterEndpoint, FabricIndex fabric,
