@@ -206,3 +206,9 @@ PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
 
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR PushAvStreamTransportManager::IsPrivacyModeActive(bool & isActive)
+{
+    isActive = false;
+    return CHIP_NO_ERROR;
+}
