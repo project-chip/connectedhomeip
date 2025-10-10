@@ -14494,7 +14494,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command RemoveZone
  *
- * This command SHALL remove the Zone mapped to the passed in ZoneID.
+ * This command SHALL remove the user-defined Zone indicated by ZoneID.
  */
 - (void)removeZoneWithParams:(MTRZoneManagementClusterRemoveZoneParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -14506,7 +14506,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command RemoveTrigger
  *
- * This command SHALL remove the Trigger mapped to the provided ZoneID.
+ * This command SHALL remove the Trigger for the provided ZoneID.
  */
 - (void)removeTriggerWithParams:(MTRZoneManagementClusterRemoveTriggerParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
@@ -21851,6 +21851,11 @@ typedef NS_ENUM(uint8_t, MTRContentAppObserverStatus) {
     MTRContentAppObserverStatusUnexpectedData MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x01,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
+typedef NS_ENUM(uint8_t, MTRZoneManagementStatusCode) {
+    MTRZoneManagementStatusCodeZoneNotFound MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRZoneManagementStatusCodeZoneInUse MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRZoneManagementZoneEventStoppedReason) {
     MTRZoneManagementZoneEventStoppedReasonActionStopped MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRZoneManagementZoneEventStoppedReasonTimeout MTR_PROVISIONALLY_AVAILABLE = 0x01,
@@ -21965,6 +21970,7 @@ typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportStatusCode) {
     MTRPushAVStreamTransportStatusCodeInvalidTransportStatus MTR_PROVISIONALLY_AVAILABLE = 0x08,
     MTRPushAVStreamTransportStatusCodeInvalidOptions MTR_PROVISIONALLY_AVAILABLE = 0x09,
     MTRPushAVStreamTransportStatusCodeInvalidStreamUsage MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRPushAVStreamTransportStatusCodeInvalidTime MTR_PROVISIONALLY_AVAILABLE = 0x0B,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportTransportStatus) {

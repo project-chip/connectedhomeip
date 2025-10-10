@@ -6562,10 +6562,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("EndpointID", indent + 1, value.endpointID);
+        CHIP_ERROR err = LogValue("TLSEndpointID", indent + 1, value.TLSEndpointID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EndpointID'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TLSEndpointID'");
             return err;
         }
     }
@@ -11061,22 +11061,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ConnectionID'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("TriggerType", indent + 1, value.triggerType);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'TriggerType'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = DataModelLogger::LogValue("ActivationReason", indent + 1, value.activationReason);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ActivationReason'");
             return err;
         }
     }
