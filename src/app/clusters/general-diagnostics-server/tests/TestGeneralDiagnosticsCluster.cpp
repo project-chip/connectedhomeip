@@ -20,6 +20,7 @@
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
+#include <app/clusters/testing/CommandTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/GeneralDiagnostics/Enums.h>
@@ -64,129 +65,26 @@ class NullProvider : public DeviceLayer::DiagnosticDataProvider
 {
 };
 
-// Mock CommandHandler for testing command invocations
-class MockCommandHandler : public CommandHandler
-{
-public:
-    ~MockCommandHandler() override {}
-
-    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath,
-                                 const Protocols::InteractionModel::ClusterStatusCode & aStatus,
-                                 const char * context = nullptr) override
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    void AddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::ClusterStatusCode & aStatus,
-                   const char * context = nullptr) override
-    {
-        CHIP_ERROR err = FallibleAddStatus(aRequestCommandPath, aStatus, context);
-        VerifyOrDie(err == CHIP_NO_ERROR);
-    }
-
-    FabricIndex GetAccessingFabricIndex() const override { return 1; }
-
-    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                               const DataModel::EncodableToTLV & aEncodable) override
-    {
-        chip::System::PacketBufferHandle handle = chip::MessagePacketBuffer::New(1024);
-        VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
-        TLV::TLVWriter baseWriter;
-        baseWriter.Init(handle->Start(), handle->MaxDataLength());
-        DataModel::FabricAwareTLVWriter writer(baseWriter, /*fabricIndex*/ 1);
-        TLV::TLVType ct;
-        ReturnErrorOnFailure(
-            static_cast<TLV::TLVWriter &>(writer).StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, ct));
-        ReturnErrorOnFailure(aEncodable.EncodeTo(writer, TLV::ContextTag(app::CommandDataIB::Tag::kFields)));
-        ReturnErrorOnFailure(static_cast<TLV::TLVWriter &>(writer).EndContainer(ct));
-        handle->SetDataLength(static_cast<TLV::TLVWriter &>(writer).GetLengthWritten());
-
-        mResponseCommandId = aResponseCommandId;
-        mEncodedData       = std::move(handle);
-        return CHIP_NO_ERROR;
-    }
-
-    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                     const DataModel::EncodableToTLV & aEncodable) override
-    {
-        (void) AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable);
-    }
-
-    bool IsTimedInvoke() const override { return false; }
-    void FlushAcksRightAwayOnSlowCommand() override {}
-    Access::SubjectDescriptor GetSubjectDescriptor() const override { return Access::SubjectDescriptor{}; }
-    Messaging::ExchangeContext * GetExchangeContext() const override { return nullptr; }
-
-    // Helper methods to extract response data
-    bool HasResponse() const { return !mEncodedData.IsNull(); }
-
-    CHIP_ERROR DecodeTimeSnapshotResponse(GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType & response)
-    {
-        VerifyOrReturnError(!mEncodedData.IsNull(), CHIP_ERROR_INCORRECT_STATE);
-
-        TLV::TLVReader reader;
-        reader.Init(mEncodedData->Start(), mEncodedData->DataLength());
-        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-
-        TLV::TLVType outerContainer;
-        ReturnErrorOnFailure(reader.EnterContainer(outerContainer));
-        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(app::CommandDataIB::Tag::kFields)));
-
-        return response.Decode(reader);
-    }
-
-    CommandId GetResponseCommandId() const { return mResponseCommandId; }
-
-private:
-    CommandId mResponseCommandId = 0;
-    chip::System::PacketBufferHandle mEncodedData;
-};
-
 struct TestGeneralDiagnosticsCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
-
-    // Small buffer size sufficient for encoding an empty TLV structure
-    static constexpr size_t kEmptyCommandTLVBufferSize = 32;
-
-    // Helper method to setup a TLV reader with an empty structure for TimeSnapshot command
-    static void SetupEmptyCommandTLV(uint8_t (&buffer)[kEmptyCommandTLVBufferSize], TLV::TLVReader & reader)
-    {
-        // Create a TLV writer and initialize it with the buffer
-        TLV::TLVWriter writer;
-        writer.Init(buffer);
-        TLV::TLVType outerContainer;
-
-        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainer), CHIP_NO_ERROR);
-        ASSERT_EQ(writer.EndContainer(outerContainer), CHIP_NO_ERROR);
-        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
-
-        // Initialize the reader with the buffer and the length of the written data
-        reader.Init(buffer, writer.GetLengthWritten());
-        ASSERT_EQ(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()), CHIP_NO_ERROR);
-    }
 
     // Helper method to invoke TimeSnapshot command and decode response
     template <typename ClusterType>
     static void InvokeTimeSnapshotAndGetResponse(ClusterType & cluster,
                                                  GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType & response)
     {
-        MockCommandHandler handler;
-        ConcreteCommandPath commandPath(kRootEndpointId, GeneralDiagnostics::Id, GeneralDiagnostics::Commands::TimeSnapshot::Id);
-        DataModel::InvokeRequest invokeRequest;
-        invokeRequest.path = commandPath;
-
-        uint8_t tlvBuffer[kEmptyCommandTLVBufferSize];
-        TLV::TLVReader reader;
-        SetupEmptyCommandTLV(tlvBuffer, reader);
-
-        auto result = cluster.InvokeCommand(invokeRequest, reader, &handler);
+        chip::app::Testing::InvokeOperation invoker(kRootEndpointId, GeneralDiagnostics::Id,
+                                                    GeneralDiagnostics::Commands::TimeSnapshot::Id);
+        auto result = invoker.InvokeEmpty(cluster);
         EXPECT_FALSE(result.has_value());
+
+        auto & handler = invoker.GetHandler();
         EXPECT_TRUE(handler.HasResponse());
         EXPECT_EQ(handler.GetResponseCommandId(), GeneralDiagnostics::Commands::TimeSnapshotResponse::Id);
 
-        ASSERT_EQ(handler.DecodeTimeSnapshotResponse(response), CHIP_NO_ERROR);
+        ASSERT_EQ(invoker.DecodeResponse(response), CHIP_NO_ERROR);
     }
 };
 
@@ -253,7 +151,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
                   }),
                   CHIP_NO_ERROR);
 
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
     }
 
     {
@@ -346,7 +244,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
                   }),
                   CHIP_NO_ERROR);
 
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 
         // Check proper read/write of values and returns
         uint16_t rebootCount                               = 0;
