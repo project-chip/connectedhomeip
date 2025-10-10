@@ -21,7 +21,10 @@ following sequence of PRs:
 
 -   [ ] **PR 1: File Renames Only.**
     -   If your migration involves renaming files, submit a PR containing *only*
-        the renames.
+        the renames. A typical rename is from `<name>-server.cpp` to
+        `<Name>Cluster.cpp`.
+    -   **Note:** For backward compatibility with code generation, it is often
+        best to **not** rename the header file.
     -   **Why:** This prevents `git diff` from becoming confused and showing the
         entire file as deleted and recreated, making the actual code changes
         impossible to review.
