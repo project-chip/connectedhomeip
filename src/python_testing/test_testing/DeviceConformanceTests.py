@@ -79,7 +79,7 @@ class DeviceConformanceTests(BasicCompositionTests):
     def _get_device_type_id(self, device_type_name: str) -> int:
         id = [id for id, dt in self.xml_device_types.items() if dt.name.lower() == device_type_name.lower()]
         if len(id) != 1:
-            self.fail_current_test(f"Unable to find {device_type_name} device type")
+            raise KeyError(f"Unable to find {device_type_name} device type")
         return id[0]
 
     def _has_device_type_supporting_macl(self):
@@ -325,6 +325,14 @@ class DeviceConformanceTests(BasicCompositionTests):
         success = True
         problems = []
 
+        # This is a specific problem in the 1.5 specification for water heater. For now this requirement is being removed as it is
+        # disallowed to overwrite a mandatory cluster requirement to disallowed in the device type
+        try:
+            water_heater_id = self._get_device_type_id('Water Heater')
+        except KeyError:
+            # water heater isn't in the spec, so just set it to an unused ID for checks
+            water_heater_id = 0
+
         def record_problem(location, problem, severity):
             problems.append(ProblemNotice("IDM-10.5", location, severity, problem, ""))
 
@@ -402,6 +410,10 @@ class DeviceConformanceTests(BasicCompositionTests):
                                 record_error(
                                     location=location, problem=f"Attribute {id} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the attribute list")
                             if not conformance_allowed(conformance_decision_with_choice, allow_provisional) and id in attribute_list:
+                                if device_type_id == water_heater_id and cluster_id == Clusters.Thermostat.id and id == Clusters.Thermostat.Attributes.SystemMode.attribute_id:
+                                    # This is a specific problem in the water heater device type where it is specifically disallowing a thing that shouldn't be disallowed
+                                    # For now, ignore this requirement until the spec is fixed
+                                    continue
                                 record_error(
                                     location=location, problem=f"Attribute {id} in cluster {cluster_requirement.name} is disallowed by element override for device type {xml_device.name}, but is present in the attribute list")
 
