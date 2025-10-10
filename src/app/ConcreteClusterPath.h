@@ -23,47 +23,41 @@
 namespace chip {
 namespace app {
 
-    /**
-     * A representation of a concrete cluster path.  This identifies a specific
-     * cluster instance.
-     */
-    struct ConcreteClusterPath {
-        ConcreteClusterPath(EndpointId aEndpointId, ClusterId aClusterId)
-            : mEndpointId(aEndpointId)
-            , mClusterId(aClusterId)
-        {
-        }
-        constexpr ConcreteClusterPath(EndpointId aEndpointId, ClusterId aClusterId, bool expanded)
-            : mEndpointId(aEndpointId)
-            , mExpanded(expanded)
-            , mClusterId(aClusterId)
-        {
-        }
+/**
+ * A representation of a concrete cluster path.  This identifies a specific
+ * cluster instance.
+ */
+struct ConcreteClusterPath
+{
+    ConcreteClusterPath(EndpointId aEndpointId, ClusterId aClusterId) : mEndpointId(aEndpointId), mClusterId(aClusterId) {}
+    constexpr ConcreteClusterPath(EndpointId aEndpointId, ClusterId aClusterId, bool expanded) :
+        mEndpointId(aEndpointId), mExpanded(expanded), mClusterId(aClusterId)
+    {}
 
-        ConcreteClusterPath() = default;
+    ConcreteClusterPath() = default;
 
-        ConcreteClusterPath(const ConcreteClusterPath & aOther) = default;
-        ConcreteClusterPath & operator=(const ConcreteClusterPath & aOther) = default;
+    ConcreteClusterPath(const ConcreteClusterPath & aOther)             = default;
+    ConcreteClusterPath & operator=(const ConcreteClusterPath & aOther) = default;
 
-        bool IsValidConcreteClusterPath() const { return !(mEndpointId == kInvalidEndpointId || mClusterId == kInvalidClusterId); }
+    bool IsValidConcreteClusterPath() const { return !(mEndpointId == kInvalidEndpointId || mClusterId == kInvalidClusterId); }
 
-        bool HasValidIds() const { return IsValidEndpointId(mEndpointId) && IsValidClusterId(mClusterId); }
+    bool HasValidIds() const { return IsValidEndpointId(mEndpointId) && IsValidClusterId(mClusterId); }
 
-        bool operator==(const ConcreteClusterPath & aOther) const
-        {
-            return mEndpointId == aOther.mEndpointId && mClusterId == aOther.mClusterId;
-        }
+    bool operator==(const ConcreteClusterPath & aOther) const
+    {
+        return mEndpointId == aOther.mEndpointId && mClusterId == aOther.mClusterId;
+    }
 
-        bool operator!=(const ConcreteClusterPath & aOther) const { return !(*this == aOther); }
+    bool operator!=(const ConcreteClusterPath & aOther) const { return !(*this == aOther); }
 
-        EndpointId mEndpointId = 0;
-        // Note: not all subclasses of ConcreteClusterPath need mExpanded, but due
-        // to alignment requirements it's "free" in the sense of not needing more
-        // memory to put it here.  But we don't initialize it, because that
-        // increases codesize for the non-consumers.
-        bool mExpanded; // NOTE: in between larger members, NOT initialized (see above)
-        ClusterId mClusterId = 0;
-    };
+    EndpointId mEndpointId = 0;
+    // Note: not all subclasses of ConcreteClusterPath need mExpanded, but due
+    // to alignment requirements it's "free" in the sense of not needing more
+    // memory to put it here.  But we don't initialize it, because that
+    // increases codesize for the non-consumers.
+    bool mExpanded; // NOTE: in between larger members, NOT initialized (see above)
+    ClusterId mClusterId = 0;
+};
 
 } // namespace app
 } // namespace chip

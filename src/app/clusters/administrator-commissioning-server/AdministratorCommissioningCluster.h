@@ -28,7 +28,8 @@ namespace Clusters {
 class AdministratorCommissioningCluster : public DefaultServerCluster
 {
 public:
-    constexpr AdministratorCommissioningCluster(EndpointId endpointId, BitFlags<AdministratorCommissioning::Feature> _unused_features) :
+    constexpr AdministratorCommissioningCluster(EndpointId endpointId,
+                                                BitFlags<AdministratorCommissioning::Feature> _unused_features) :
         DefaultServerCluster({ endpointId, AdministratorCommissioning::Id, false })
     {}
 

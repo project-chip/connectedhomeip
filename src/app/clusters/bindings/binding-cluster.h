@@ -22,31 +22,29 @@
 
 namespace chip {
 namespace app {
-    namespace Clusters {
+namespace Clusters {
 
-        class BindingCluster : public DefaultServerCluster {
-        public:
-            constexpr BindingCluster(EndpointId endpointId)
-                : DefaultServerCluster({ endpointId, Binding::Id, false })
-            {
-            }
+class BindingCluster : public DefaultServerCluster
+{
+public:
+    constexpr BindingCluster(EndpointId endpointId) : DefaultServerCluster({ endpointId, Binding::Id, false }) {}
 
-            DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                AttributeValueEncoder & encoder) override;
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
 
-            DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                AttributeValueDecoder & decoder) override;
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
 
-            void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType) override;
+    void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType) override;
 
-            CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-        private:
-            CHIP_ERROR NotifyBindingsChanged();
+private:
+    CHIP_ERROR NotifyBindingsChanged();
 
-            FabricIndex mAccessingFabricIndex = 0;
-        };
+    FabricIndex mAccessingFabricIndex = 0;
+};
 
-    } // namespace Clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip
