@@ -79,13 +79,6 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0102" name="Window Covering" side="server">
       <mandatoryConform/>
-      <features>
-        <feature code="ABS">
-          <mandatoryConform>
-            <condition name="Zigbee"/>
-          </mandatoryConform>
-        </feature>
-      </features>
     </cluster>
   </clusters>
 </deviceType>

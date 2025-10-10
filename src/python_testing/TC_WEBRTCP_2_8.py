@@ -45,7 +45,7 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCProvider_2_8(MatterBaseTest, WEBRTCPTestBase):
+class TC_WebRTCP_2_8(MatterBaseTest, WEBRTCPTestBase):
 
     def desc_TC_WEBRTCP_2_8(self) -> str:
         """Returns a description of this test"""
@@ -68,7 +68,11 @@ class TC_WebRTCProvider_2_8(MatterBaseTest, WEBRTCPTestBase):
     def pics_TC_WEBRTCP_2_8(self) -> list[str]:
         pics = [
             "WEBRTCP.S",
+            "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
             "AVSM.S",
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
+            "AVSM.S.A0013",        # SoftRecordingPrivacyModeEnabled attribute
         ]
         return pics
 
