@@ -166,21 +166,20 @@ struct TestBasicInformationReadWrite : public ::testing::Test
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
         DeviceLayer::SetDeviceInstanceInfoProvider(&gMockDeviceInstanceInfoProvider);
+        DeviceLayer::SetConfigurationMgr(&gMockConfigurationManager);
     }
 
     static void TearDownTestSuite()
     {
-        DeviceLayer::SetDeviceInstanceInfoProvider(nullptr);
+        // For the DeviceInstanceInfoProvider there is no default instance.
+        // No need setting it to nullptr, as it won't do anything. It returns immediately if the input is nullptr.
+        DeviceLayer::SetConfigurationMgr(&DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
         chip::Platform::MemoryShutdown();
     }
 
     TestBasicInformationReadWrite() : testContext(), context(testContext.Create()) {}
 
-    void SetUp() override
-    {
-        DeviceLayer::SetConfigurationMgr(&gMockConfigurationManager);
-        ASSERT_EQ(basicInformationClusterInstance.Startup(context), CHIP_NO_ERROR);
-    }
+    void SetUp() override { ASSERT_EQ(basicInformationClusterInstance.Startup(context), CHIP_NO_ERROR); }
 
     void TearDown() override { basicInformationClusterInstance.Shutdown(); }
 
@@ -197,7 +196,6 @@ struct TestBasicInformationReadWrite : public ::testing::Test
         return chip::Test::WriteClusterAttribute(basicInformationClusterInstance,
                                                  ConcreteAttributePath(kRootEndpointId, BasicInformation::Id, attr), val);
     }
-
     chip::Test::TestServerClusterContext testContext;
     ServerClusterContext context;
     static BasicInformationCluster & basicInformationClusterInstance;
@@ -208,15 +206,15 @@ BasicInformationCluster & TestBasicInformationReadWrite::basicInformationCluster
 TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 {
     // 1. GIVEN: A mock storage with a pre-existing "Old Label".
-    const char * oldLabel = "Old Label";
-    CharSpan oldLabelSpan = CharSpan::fromCharString(oldLabel);
+    CharSpan oldLabelSpan = "Old Label"_span;
 
     // Initialize AttributePersistence with the provider from *this test's* context
     AttributePersistence persistence(context.attributeStorage);
 
     Storage::String<32> labelStorage;
-    labelStorage.SetContent(oldLabelSpan);
-    persistence.StoreString({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, labelStorage);
+    ASSERT_EQ(labelStorage.SetContent(oldLabelSpan), true); // ensure it fits
+    ASSERT_EQ(persistence.StoreString({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, labelStorage),
+              CHIP_NO_ERROR);
 
     // 2. WHEN: The BasicInformationCluster starts up.
     // We must shut down the one from SetUp and re-start it to force a load.
@@ -231,8 +229,7 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
     EXPECT_TRUE(readSpan.data_equal(oldLabelSpan));
 
     // 4. WHEN: A "New Label" is written to the attribute.
-    const char * newLabel = "New Label";
-    CharSpan newLabelSpan = CharSpan::fromCharString(newLabel);
+    CharSpan newLabelSpan = "New Label"_span;
 
     // Write NodeLabel via macro
     ASSERT_EQ(WriteInformationClusterAttribute(Attributes::NodeLabel::Id, newLabelSpan), CHIP_NO_ERROR);
@@ -316,7 +313,7 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
         char buf[32];
         CharSpan val(buf);
         ASSERT_EQ(ReadInformationClusterAttribute(Attributes::ManufacturingDate::Id, val), CHIP_NO_ERROR);
-        EXPECT_TRUE(val.data_equal(CharSpan::fromCharString("20230615")));
+        EXPECT_TRUE(val.data_equal("20230615"_span));
     }
 
     // UniqueID (Mandatory in Rev 4+, so if it fails, cluster rev must be < 4)
@@ -353,8 +350,7 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
 TEST_F(TestBasicInformationReadWrite, TestWriteNodeLabel)
 {
     // 1. ARRANGE: Define a new valid label
-    const char * newLabelStr = "My Awesome Hub";
-    CharSpan newLabel        = CharSpan::fromCharString(newLabelStr);
+    CharSpan newLabel = "My Awesome Hub"_span;
     char readBuffer[32];
     CharSpan readSpan(readBuffer);
 
@@ -370,8 +366,7 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
 {
     // --- Test Case 1: Write a valid 2-character location ---
     {
-        const char * validLocationStr = "US";
-        CharSpan validLocation        = CharSpan::fromCharString(validLocationStr);
+        CharSpan validLocation = "US"_span;
         char readBuffer[8];
         CharSpan readSpan(readBuffer);
         ASSERT_EQ(WriteInformationClusterAttribute(Attributes::Location::Id, validLocation), CHIP_NO_ERROR);
