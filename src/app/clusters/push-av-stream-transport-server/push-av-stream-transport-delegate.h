@@ -32,7 +32,6 @@ namespace app {
 namespace Clusters {
 
 // Forward declarations
-class PushAvStreamTransportServerLogic;
 class PushAvStreamTransportServer;
 
 /**
@@ -297,7 +296,7 @@ public:
     virtual CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) = 0;
 
     /**
-     * @brief Sets the PushAvStreamTransportServerLogic instance for the delegate.
+     * @brief Sets the PushAvStreamTransportServer instance for the delegate.
      *
      * This method is called by the PushAvStreamTransportServer to provide
      * the delegate with a pointer to the server instance. This allows the

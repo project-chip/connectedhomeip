@@ -125,8 +125,8 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
     }
     else
     {
-        mClipInfo.mHasAudio    = true;
-        mClipInfo.mHasVideo    = true;
+        mClipInfo.mHasAudio    = transportOptions.audioStreamID.HasValue();
+        mClipInfo.mHasVideo    = transportOptions.videoStreamID.HasValue();
         mClipInfo.mUrl         = std::string(transportOptions.url.data(), transportOptions.url.size());
         mClipInfo.mTriggerType = static_cast<int>(transportOptions.triggerOptions.triggerType);
         if (transportOptions.triggerOptions.maxPreRollLen.HasValue())
@@ -266,7 +266,8 @@ bool PushAVTransport::HandleTriggerDetected()
     int64_t elapsed = 0;
     auto now        = std::chrono::steady_clock::now();
 
-    if (InBlindPeriod(mBlindStartTime, mRecorder->mClipInfo.mBlindDuration))
+    if (mTransportTriggerType != TransportTriggerTypeEnum::kCommand ||
+        InBlindPeriod(mBlindStartTime, mRecorder->mClipInfo.mBlindDuration))
     {
         return false;
     }

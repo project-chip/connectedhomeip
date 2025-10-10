@@ -95,15 +95,15 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
                                         transportOptions.audioStreamID.Value().Value());
     mMediaController->SetPreRollLength(mTransportMap[connectionID].get(), mTransportMap[connectionID].get()->GetPreRollLength());
 
-    double newTransportBandwidthMbps = 0.0;
-    GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthMbps);
+    uint32_t newTransportBandwidthbps = 0;
+    GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthbps);
 
-    mTransportMap[connectionID].get()->SetCurrentlyUsedBandwidthMbps(newTransportBandwidthMbps);
-    mTotalUsedBandwidthMbps += newTransportBandwidthMbps;
+    mTransportMap[connectionID].get()->SetCurrentlyUsedBandwidthbps(newTransportBandwidthbps);
+    mTotalUsedBandwidthbps += newTransportBandwidthbps;
     ChipLogDetail(Camera,
                   "AllocatePushTransport: Transport for connection %u allocated successfully. "
-                  "New transport bandwidth: %.2f Mbps. Total used bandwidth: %.2f Mbps.",
-                  connectionID, newTransportBandwidthMbps, mTotalUsedBandwidthMbps);
+                  "New transport bandwidth: %u bps. Total used bandwidth: %u bps.",
+                  connectionID, newTransportBandwidthbps, mTotalUsedBandwidthbps);
 
     if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion &&
         transportOptions.triggerOptions.motionZones.HasValue())
@@ -149,7 +149,7 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::DeallocatePush
         ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
         return Status::NotFound;
     }
-    mTotalUsedBandwidthMbps -= mTransportMap[connectionID].get()->GetCurrentlyUsedBandwidthMbps();
+    mTotalUsedBandwidthbps -= mTransportMap[connectionID].get()->GetCurrentlyUsedBandwidthbps();
     mMediaController->UnregisterTransport(mTransportMap[connectionID].get());
     mTransportMap.erase(connectionID);
     mTransportOptionsMap.erase(connectionID);
@@ -166,18 +166,18 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
         return Status::NotFound;
     }
 
-    double newTransportBandwidthMbps = 0.0;
-    GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthMbps);
+    uint32_t newTransportBandwidthbps = 0;
+    GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthbps);
 
-    mTotalUsedBandwidthMbps -= mTransportMap[connectionID].get()->GetCurrentlyUsedBandwidthMbps();
+    mTotalUsedBandwidthbps -= mTransportMap[connectionID].get()->GetCurrentlyUsedBandwidthbps();
 
-    mTransportMap[connectionID].get()->SetCurrentlyUsedBandwidthMbps(newTransportBandwidthMbps);
-    mTotalUsedBandwidthMbps += newTransportBandwidthMbps;
+    mTransportMap[connectionID].get()->SetCurrentlyUsedBandwidthbps(newTransportBandwidthbps);
+    mTotalUsedBandwidthbps += newTransportBandwidthbps;
 
     ChipLogDetail(Camera,
                   "ModifyPushTransport: Transport for connection %u allocated successfully. "
-                  "New transport bandwidth: %.2f Mbps. Total used bandwidth: %.2f Mbps.",
-                  connectionID, newTransportBandwidthMbps, mTotalUsedBandwidthMbps);
+                  "New transport bandwidth: %u bps. Total used bandwidth: %u bps.",
+                  connectionID, newTransportBandwidthbps, mTotalUsedBandwidthbps);
 
     mTransportOptionsMap[connectionID] = transportOptions;
     mTransportMap[connectionID].get()->ModifyPushTransport(transportOptions);
@@ -263,44 +263,9 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
 
 void PushAvStreamTransportManager::GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                                           const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
-                                                          double & outBandwidthMbps)
+                                                          uint32_t & outBandwidthbps)
 {
-    outBandwidthMbps = 0.0;
-
-    if (videoStreamId.HasValue() && !videoStreamId.Value().IsNull())
-    {
-        uint16_t vStreamId = videoStreamId.Value().Value();
-
-        auto & availableVideoStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedVideoStreams();
-        for (const chip::app::Clusters::CameraAvStreamManagement::Structs::VideoStreamStruct::Type & stream : availableVideoStreams)
-        {
-            if (stream.videoStreamID == vStreamId)
-            {
-                outBandwidthMbps += (stream.maxBitRate / 1000000.0);
-                ChipLogProgress(Camera, "GetBandwidthForStreams: VideoStream %u maxBitRate: %u bps (%.2f Mbps)", vStreamId,
-                                stream.maxBitRate, (stream.maxBitRate / 1000000.0));
-                break;
-            }
-        }
-    }
-
-    if (audioStreamId.HasValue() && !audioStreamId.Value().IsNull())
-    {
-        uint16_t aStreamId = audioStreamId.Value().Value();
-
-        auto & availableAudioStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedAudioStreams();
-        for (const chip::app::Clusters::CameraAvStreamManagement::Structs::AudioStreamStruct::Type & stream : availableAudioStreams)
-        {
-            if (stream.audioStreamID == aStreamId)
-            {
-                outBandwidthMbps += (stream.bitRate / 1000000.0);
-                ChipLogProgress(Camera, "GetBandwidthForStreams: AudioStream %u bitRate: %u bps (%.2f Mbps)", aStreamId,
-                                stream.bitRate, (stream.bitRate / 1000000.0));
-                break;
-            }
-        }
-    }
-
+    mCameraDevice->GetCameraAVStreamMgmtController().GetBandwidthForStreams(videoStreamId, audioStreamId, outBandwidthbps);
     return;
 }
 
@@ -315,26 +280,26 @@ PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage
         return Status::Failure;
     }
 
-    double newStreamBandwidthMbps = 0.0;
-    GetBandwidthForStreams(videoStreamId, audioStreamId, newStreamBandwidthMbps);
-    uint32_t maxNetworkBandwidthMbps = mCameraDevice->GetCameraHALInterface().GetMaxNetworkBandwidth();
+    uint32_t newStreamBandwidthbps = 0;
+    GetBandwidthForStreams(videoStreamId, audioStreamId, newStreamBandwidthbps);
+    uint32_t maxNetworkBandwidthbps = mCameraDevice->GetCameraHALInterface().GetMaxNetworkBandwidth();
 
-    double projectedTotalBandwidthMbps = mTotalUsedBandwidthMbps + newStreamBandwidthMbps;
+    uint32_t projectedTotalBandwidthbps = mTotalUsedBandwidthbps + newStreamBandwidthbps;
 
     ChipLogProgress(Camera,
-                    "ValidateBandwidthLimit: For streamUsage %u. New stream bandwidth: %.2f Mbps. "
-                    "Currently used bandwidth: %.2f Mbps. Projected total: %.2f Mbps. Max allowed: %u Mbps.",
-                    static_cast<uint16_t>(streamUsage), newStreamBandwidthMbps, mTotalUsedBandwidthMbps,
-                    projectedTotalBandwidthMbps, maxNetworkBandwidthMbps);
+                    "ValidateBandwidthLimit: For streamUsage %u. New stream bandwidth: %u bps. "
+                    "Currently used bandwidth: %u bps. Projected total: %u bps. Max allowed: %u bps.",
+                    static_cast<uint16_t>(streamUsage), newStreamBandwidthbps, mTotalUsedBandwidthbps, projectedTotalBandwidthbps,
+                    maxNetworkBandwidthbps);
 
-    if (projectedTotalBandwidthMbps > maxNetworkBandwidthMbps)
+    if (projectedTotalBandwidthbps > maxNetworkBandwidthbps)
     {
         ChipLogError(Camera,
                      "ValidateBandwidthLimit: ResourceExhausted for streamUsage %u. "
-                     "Projected total bandwidth (%.2f Mbps) would exceed maximum network bandwidth (%u Mbps). "
-                     "New stream requires %.2f Mbps, currently %.2f Mbps is in use.",
-                     static_cast<uint16_t>(streamUsage), projectedTotalBandwidthMbps, maxNetworkBandwidthMbps,
-                     newStreamBandwidthMbps, mTotalUsedBandwidthMbps);
+                     "Projected total bandwidth (%u bps) would exceed maximum network bandwidth (%u bps). "
+                     "New stream requires %u bps, currently %u bps is in use.",
+                     static_cast<uint16_t>(streamUsage), projectedTotalBandwidthbps, maxNetworkBandwidthbps, newStreamBandwidthbps,
+                     mTotalUsedBandwidthbps);
         return Status::ResourceExhausted;
     }
 
@@ -576,7 +541,7 @@ PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
     return CHIP_NO_ERROR;
 }
 
-void PushAvStreamTransportManager::OnZoneTriggeredEvent(uint16_t zoneId)
+void PushAvStreamTransportManager::HandleZoneTrigger(uint16_t zoneId)
 {
     for (auto & pavst : mTransportMap)
     {
