@@ -431,8 +431,8 @@ def main() -> int:
                     f"{device_name} in CICD config but not {_DEVICE_FOLDER}!")
                 exit(1)
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
-            command = f"./chef.py -cbr -d {
-                device_name} -t {options.build_target}"
+            command = f"./chef.py - cbr - d {
+                device_name} - t {options.build_target}"
             flush_print(f"Building {command}", with_border=True)
             shell.run_cmd(command)
             bundle(options.build_target, device_name)
@@ -477,7 +477,7 @@ def main() -> int:
                     if options.dry_run:
                         flush_print(archive_name)
                         continue
-                    command = f"./chef.py -cbr -d {device_name} -t {platform} "
+                    command = f"./chef.py -br -d {device_name} -t {platform} "
                     command += " ".join(args)
                     flush_print(f"Building {command}", with_border=True)
                     shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
@@ -717,7 +717,7 @@ def main() -> int:
             if len(sw_ver_string) >= 64:
                 truncated_sw_ver_string = f"""{branch[:22]}:{commit_id}"""
                 flush_print(
-                    f"Truncate the software version string from \"{
+                    f"Truncate the software version string from "{
                         sw_ver_string}\" to "
                     f"\"{truncated_sw_ver_string}\" due to 64 bytes limitation")
                 sw_ver_string = truncated_sw_ver_string
@@ -763,14 +763,14 @@ def main() -> int:
             shell.run_cmd("idf.py build")
             shell.run_cmd("idf.py build flashing_script")
             shell.run_cmd(
-                f"(cd build/ && tar cJvf $(git rev-parse HEAD)-{
+                f"(cd build / & & tar cJvf $(git rev-parse HEAD)-{
                     options.sample_device_type_name}.tar.xz "
                 f"--files-from=chip-shell.flashbundle.txt)")
             shell.run_cmd(
                 f"cp build/$(git rev-parse HEAD)-{options.sample_device_type_name}.tar.xz {_CHEF_SCRIPT_PATH}")
         elif options.build_target == "nrfconnect":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/nrfconnect")
-            nrf_build_cmds = ["west build -b nrf52840dk/nrf52840"]
+            nrf_build_cmds=["west build -b nrf52840dk/nrf52840"]
             if options.do_clean:
                 nrf_build_cmds.append("-p always")
             nrf_build_cmds.append("--sysbuild")
@@ -816,7 +816,7 @@ def main() -> int:
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/silabs")
             if options.do_clean:
                 shell.run_cmd(f"rm -rf out/{options.sample_device_type_name}")
-            efr32_cmd_args = []
+            efr32_cmd_args=[]
             efr32_cmd_args.append(
                 f'{_REPO_BASE_PATH}/scripts/examples/gn_silabs_example.sh')
             efr32_cmd_args.append('./')
@@ -850,7 +850,7 @@ def main() -> int:
                 shell.run_cmd(
                     f"cd {config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE")
                 shell.run_cmd("rm -f project_include.mk")
-                cmd = f"{config['ameba']['AMEBA_SDK']
+                cmd=f"{config['ameba']['AMEBA_SDK']
                          }/project/realtek_amebaz2_v0_example/GCC-RELEASE/project_include.mk"
                 with open(cmd, "w") as f:
                     f.write(textwrap.dedent(f"""\
@@ -867,7 +867,7 @@ def main() -> int:
                 shell.run_cmd("make is")
         elif options.build_target == "telink":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/telink")
-            telink_build_cmds = ["west build -b tlsr9518adk80d"]
+            telink_build_cmds=["west build -b tlsr9518adk80d"]
             if options.do_clean:
                 telink_build_cmds.append("-p always")
             if options.do_rpc:
@@ -877,7 +877,7 @@ def main() -> int:
         elif options.build_target == "linux":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/linux")
 
-            linux_args = []
+            linux_args=[]
             if options.do_rpc:
                 linux_args.append('import("//with_pw_rpc.gni")')
             linux_args.extend([
@@ -900,7 +900,7 @@ def main() -> int:
                 'chip_app_data_model_target = "//:chef-data-model"',
             ])
 
-            uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
+            uname_resp=shell.run_cmd("uname -m", return_cmd_output=True)
             if "aarch" not in uname_resp and "arm" not in uname_resp:
                 if options.cpu_type == "arm64":
                     if "SYSROOT_AARCH64" not in shell.env:
@@ -908,7 +908,7 @@ def main() -> int:
                             "SYSROOT_AARCH64 env variable not set. "
                             "AARCH64 toolchain needed for cross-compiling for arm64.")
                         exit(1)
-                    shell.env["PKG_CONFIG_PATH"] = (
+                    shell.env["PKG_CONFIG_PATH"]=(
                         f'{shell.env["SYSROOT_AARCH64"]}/lib/aarch64-linux-gnu/pkgconfig')
                     linux_args.append('target_cpu="arm64"')
                     linux_args.append('is_clang=true')
@@ -922,7 +922,7 @@ def main() -> int:
                             "SYSROOT_ARMHF env variable not set. "
                             "ARMHF toolchain needed for cross-compiling for arm.")
                         exit(1)
-                    shell.env["PKG_CONFIG_PATH"] = (
+                    shell.env["PKG_CONFIG_PATH"]=(
                         f'{shell.env["SYSROOT_ARMHF"]}/lib/arm-linux-gnueabihf/pkgconfig')
                     linux_args.append('target_cpu="arm"')
                     linux_args.append('is_clang=true')
@@ -931,7 +931,7 @@ def main() -> int:
                         f'sysroot="{shell.env["SYSROOT_ARMHF"]}"')
 
             if options.cpu_type == "x64":
-                uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
+                uname_resp=shell.run_cmd("uname -m", return_cmd_output=True)
                 if "x64" not in uname_resp and "x86_64" not in uname_resp:
                     flush_print(
                         f"Unable to cross compile for x64 on {uname_resp}")
@@ -947,7 +947,7 @@ def main() -> int:
                 linux_args.append("chip_enable_icd_lit = true")
                 linux_args.append("chip_enable_icd_dsls = true")
                 if options.icd_subscription_resumption:
-                    options.icd_persist_subscription = True
+                    options.icd_persist_subscription=True
                     linux_args.append(
                         "chip_subscription_timeout_resumption = true")
                 if options.icd_persist_subscription:
