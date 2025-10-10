@@ -114,6 +114,15 @@ class LibDataChannelTrack : public WebRTCTrack
 {
 public:
     LibDataChannelTrack(std::shared_ptr<rtc::Track> track, int payloadType = -1) : mTrack(track), mPayloadType(payloadType) {}
+
+    ~LibDataChannelTrack()
+    {
+        if (mAudioRTPSocket != -1)
+        {
+            close(mAudioRTPSocket);
+        }
+    }
+
     // Initialize libdatachannel's RTP packetizer for H.264
     void InitH264Packetizer()
     {

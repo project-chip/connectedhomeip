@@ -383,7 +383,7 @@ private:
     std::vector<StreamUsageEnum> mStreamUsagePriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 
     // Audio playback pipeline specific members
-    static GstElement * mAudioPlaybackPipeline;
+    GstElement * mAudioPlaybackPipeline = nullptr;
 };
 
 } // namespace Camera

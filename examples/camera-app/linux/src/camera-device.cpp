@@ -363,9 +363,6 @@ GstElement * CreateSnapshotPipelineLibcamerasrc(const SnapshotPipelineConfig & c
 
 } // namespace GstreamerPipepline
 
-// static members for audio playback pipeline
-GstElement * CameraDevice::mAudioPlaybackPipeline = nullptr;
-
 CameraDevice::CameraDevice()
 {
     // Set the CameraHALInterface in CameraAVStreamManager and CameraAVsettingsUserLevelManager.
@@ -1063,16 +1060,14 @@ CameraError CameraDevice::StopAudioPlaybackStream()
 
     ChipLogProgress(Camera, "Stopping audio playback pipeline");
     GstStateChangeReturn result = gst_element_set_state(mAudioPlaybackPipeline, GST_STATE_NULL);
+    gst_object_unref(mAudioPlaybackPipeline);
+    mAudioPlaybackPipeline = nullptr;
+
     if (result == GST_STATE_CHANGE_FAILURE)
     {
         ChipLogError(Camera, "Failed to stop audio playback pipeline.");
-        gst_object_unref(mAudioPlaybackPipeline);
-        mAudioPlaybackPipeline = nullptr;
         return CameraError::ERROR_AUDIO_STREAM_STOP_FAILED;
     }
-
-    gst_object_unref(mAudioPlaybackPipeline);
-    mAudioPlaybackPipeline = nullptr;
 
     ChipLogProgress(Camera, "Audio playback pipeline stopped.");
     return CameraError::SUCCESS;
