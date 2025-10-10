@@ -243,13 +243,13 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoin
         if (listenUdp || unicastQueryUdp)
         {
             // If allocation fails, the rref will not be consumed, so that the endpoint will also be freed correctly
-            mEndpoints.CreateObject(interfaceId, addressType, listenUdp, unicastQueryUdp);
+            mEndpoints.CreateObject(interfaceId, addressType, std::move(listenUdp), std::move(unicastQueryUdp));
         }
 #else
         if (listenUdp)
         {
             // If allocation fails, the rref will not be consumed, so that the endpoint will also be freed correctly
-            mEndpoints.CreateObject(interfaceId, addressType, listenUdp);
+            mEndpoints.CreateObject(interfaceId, addressType, std::move(listenUdp));
         }
 #endif
 

@@ -60,13 +60,13 @@ public:
     public:
 #if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
         EndpointInfo(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType,
-                     chip::Inet::UDPEndPointHandle listenUdp, chip::Inet::UDPEndPointHandle unicastQueryUdp) :
+                     chip::Inet::UDPEndPointHandle && listenUdp, chip::Inet::UDPEndPointHandle && unicastQueryUdp) :
             mInterfaceId(interfaceId),
             mAddressType(addressType), mListenUdp(listenUdp), mUnicastQueryUdp(unicastQueryUdp)
         {}
 #else
         EndpointInfo(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType,
-                     chip::Inet::UDPEndPointHandle listenUdp) :
+                     chip::Inet::UDPEndPointHandle && listenUdp) :
             mInterfaceId(interfaceId),
             mAddressType(addressType), mListenUdp(listenUdp)
         {}
