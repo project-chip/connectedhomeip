@@ -15,12 +15,13 @@ cluster to a code-driven implementation.
 ### Part 0: Optimizing for an Easier Review
 
 Before you begin the migration, consider structuring your changes into multiple,
-smaller pull requests. This approach significantly simplifies the review process,
-allowing reviewers to approve preliminary changes quickly. We recommend the
-following sequence of PRs:
+smaller pull requests. This approach significantly simplifies the review
+process, allowing reviewers to approve preliminary changes quickly. We recommend
+the following sequence of PRs:
 
 -   [ ] **PR 1: File Renames Only.**
-    -   If your migration involves renaming files, submit a PR containing *only*
+
+    -   If your migration involves renaming files, submit a PR containing _only_
         the renames. A typical rename is from `<name>-server.cpp` to
         `<Name>Cluster.cpp`.
     -   **Note:** For backward compatibility with code generation, it is often
@@ -28,24 +29,25 @@ following sequence of PRs:
     -   **Why:** This prevents `git diff` from becoming confused and showing the
         entire file as deleted and recreated, making the actual code changes
         impossible to review.
-    -   *This type of PR can be reviewed and merged very quickly.*
+    -   _This type of PR can be reviewed and merged very quickly._
 
 -   [ ] **PR 2: Code Movement Only.**
+
     -   If you plan to reorder functions or move code blocks (e.g., moving
-        helper functions to an anonymous namespace), submit a PR with *only*
+        helper functions to an anonymous namespace), submit a PR with _only_
         these movements. Do not change any logic.
     -   **Why:** Reviewers can use tools like `git diff --color-moved` to verify
         that code has only been moved, not altered. This allows for a rapid
         review of structural changes.
-    -   *This type of PR can also be fast-tracked.*
+    -   _This type of PR can also be fast-tracked._
 
 -   [ ] **PR 3: The Core Logic Changes.**
     -   This PR should contain the actual migration logic: implementing the new
         cluster class, moving attribute storage, and converting command
         handlers.
-    -   **Why:** With renames and code movements already handled, this PR will be
-        much smaller and focused, allowing the reviewer to concentrate solely on
-        the correctness of the migration logic.
+    -   **Why:** With renames and code movements already handled, this PR will
+        be much smaller and focused, allowing the reviewer to concentrate solely
+        on the correctness of the migration logic.
 
 This structure respects the reviewer's time and helps get your changes merged
 faster. You can ask for an expedited review of the preliminary PRs in the
