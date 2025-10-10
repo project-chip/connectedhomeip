@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:include schemaLocation="reference.xsd" />
+
+    <xs:complexType name="TagLimitType">
+        <xs:attribute name="name" type="xs:string" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="TagsConstraintType">
+        <xs:sequence>
+            <xs:element name="tag" type="TagLimitType" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+
+    <xs:group name="LimitGroup">
+        <xs:choice>
+            <xs:element name="tag" type="TagLimitType" />
+            <xs:element name="value" type="xs:string" />
+            <xs:element name="maxOf" type="MinMaxOfLimitType" />
+            <xs:element name="minOf" type="MinMaxOfLimitType" />
+            <xs:element name="compute" type="ComputeLimitType" />
+            <xs:element name="status" type="StatusLimitType" />
+            <xs:element name="constant" type="ConstantLimitType" />
+            <xs:group ref="ReferenceGroup"></xs:group>
+        </xs:choice>
+    </xs:group>
+
+    <xs:complexType name="ComputeLimitType">
+        <xs:sequence>
+            <xs:element name="operation" type="xs:string" />
+            <xs:element name="left" type="LimitType" minOccurs="1" maxOccurs="1" />
+            <xs:element name="right" type="LimitType" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="StatusLimitType">
+        <xs:attribute name="name" type="xs:string" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="ConstantLimitType">
+        <xs:attribute name="name" type="xs:string" use="required" />
+        <xs:attribute name="value" type="xs:integer" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="MinMaxOfLimitType">
+        <xs:sequence>
+            <xs:group ref="LimitGroup" minOccurs="0" maxOccurs="unbounded"></xs:group>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="LimitType">
+        <xs:sequence>
+            <xs:group ref="LimitGroup" minOccurs="0" maxOccurs="1"></xs:group>
+        </xs:sequence>
+        <xs:attribute name="value" type="xs:string" use="optional" />
+    </xs:complexType>
+
+    <xs:complexType name="MaxConstraintType">
+        <xs:sequence>
+            <xs:group ref="LimitGroup" minOccurs="0" maxOccurs="1"></xs:group>
+        </xs:sequence>
+        <xs:attribute name="value" type="xs:string" use="optional" />
+    </xs:complexType>
+
+    <xs:complexType name="MinConstraintType">
+        <xs:sequence>
+            <xs:group ref="LimitGroup" minOccurs="0" maxOccurs="1"></xs:group>
+        </xs:sequence>
+        <xs:attribute name="value" type="xs:string" use="optional" />
+    </xs:complexType>
+
+    <xs:complexType name="RangeConstraintType">
+        <xs:sequence>
+            <xs:element name="from" type="LimitType" minOccurs="1" maxOccurs="1" />
+            <xs:element name="to" type="LimitType" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="AllowedConstraintType">
+        <xs:group ref="LimitGroup" minOccurs="0" maxOccurs="1" />
+        <xs:attribute name="value" type="xs:string" use="optional" />
+    </xs:complexType>
+
+    <xs:group name="ConstraintGroup">
+        <xs:choice>
+            <xs:element name="allowed" type="AllowedConstraintType" />
+            <xs:element name="countBetween" type="RangeConstraintType" />
+            <xs:element name="lengthBetween" type="RangeConstraintType" />
+            <xs:element name="between" type="RangeConstraintType" />
+            <xs:element name="min" type="MinConstraintType" />
+            <xs:element name="minCount" type="MinConstraintType" />
+            <xs:element name="minLength" type="MinConstraintType" />
+            <xs:element name="max" type="MaxConstraintType" />
+            <xs:element name="maxCount" type="MaxConstraintType" />
+            <xs:element name="maxLength" type="MaxConstraintType" />
+            <xs:element name="maxCodePoints" type="MaxConstraintType" />
+            <xs:element name="desc" />
+        </xs:choice>
+    </xs:group>
+
+    <xs:complexType name="ConstraintType">
+        <xs:group ref="ConstraintGroup" minOccurs="1" maxOccurs="1" />
+    </xs:complexType>
+
+</xs:schema>

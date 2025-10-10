@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:include schemaLocation="types.xsd"/>
+
+  <xs:element name="deviceType" type="deviceTypeType"/>
+
+  <xs:complexType name="deviceTypeType">
+    <xs:sequence>
+      <xs:element name="revisionHistory" type="revisionHistoryType" minOccurs="0"/>
+      <xs:element name="classification" type="classificationType"/>
+      <xs:element name="conditions" type="conditionsType" minOccurs="0"/>
+      <xs:element name="clusters" type="clustersType"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="revision" type="xs:positiveInteger" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="classificationType">
+    <xs:attribute name="class" type="xs:string" use="required"/>
+    <xs:attribute name="scope" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="conditionsType">
+    <xs:sequence>
+      <xs:element name="condition" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required"/>
+          <xs:attribute name="summary" type="xs:string"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="clustersType">
+    <xs:sequence>
+      <xs:element name="cluster" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:choice minOccurs="0">
+              <xs:element name="mandatoryConform" type="conformType"/>
+              <xs:element name="optionalConform" type="conformType"/>
+            </xs:choice>
+          </xs:sequence>
+          <xs:attribute name="id" type="xs:string" use="required"/>
+          <xs:attribute name="name" type="xs:string" use="required"/>
+          <xs:attribute name="side" type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

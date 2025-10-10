@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:include schemaLocation="conformance.xsd" />
+
+    <xs:complexType name="FeatureType">
+        <xs:group ref="ConformanceSetGroup" minOccurs="0" maxOccurs="1" />
+        <xs:attribute name="bit" type="xs:string" use="required" />
+        <xs:attribute name="code" type="xs:string" use="required" />
+        <xs:attribute name="name" type="xs:string" use="required" />
+        <xs:attribute name="summary" type="xs:string" />
+    </xs:complexType>
+
+    <xs:complexType name="FeaturesType">
+        <xs:sequence>
+            <xs:element name="feature" type="FeatureType" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:include schemaLocation="conformance.xsd" />
+  <xs:include schemaLocation="features.xsd" />
+  <xs:include schemaLocation="command.xsd" />
+  <xs:include schemaLocation="event.xsd" />
+  <xs:include schemaLocation="quality.xsd" />
+  <xs:include schemaLocation="types.xsd" />
+
+
+  <xs:complexType name="ClassificationType">
+    <xs:sequence>
+      <xs:element type="QualityType" name="quality" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="hierarchy" type="xs:string" use="required" />
+    <xs:attribute name="role" type="xs:string" use="required" />
+    <xs:attribute name="picsCode" type="xs:string" use="required" />
+    <xs:attribute name="scope" type="xs:string" use="required" />
+    <xs:attribute name="baseCluster" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <xs:group name="DataTypesGroup">
+    <xs:choice>
+      <xs:element name="enum" type="EnumType"></xs:element>
+      <xs:element name="bitmap" type="BitmapType"></xs:element>
+      <xs:element name="struct" type="StructType"></xs:element>
+      <xs:element name="number" type="NumberType"></xs:element>
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="DataTypesType">
+    <xs:sequence>
+      <xs:element type="QualityType" name="quality" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="AttributesType">
+    <xs:sequence>
+      <xs:element name="attribute" type="FieldType" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+    <xs:complexType name="CommandsType">
+    <xs:sequence>
+      <xs:element name="command" type="CommandType" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+    <xs:complexType name="EventsType">
+    <xs:sequence>
+      <xs:element name="event" type="EventType" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ClusterType">
+    <xs:all>
+      <xs:element name="revisionHistory" type="RevisionHistoryType" />
+      <xs:element name="clusterIds" type="ClusterIdsType" minOccurs="1" />
+      <xs:element name="classification" type="ClassificationType" minOccurs="1" />
+      <xs:element name="features" type="FeaturesType" minOccurs="0" />
+      <xs:element name="dataTypes" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:group ref="DataTypesGroup" minOccurs="1" maxOccurs="unbounded" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="attributes" type="AttributesType" minOccurs="0"/>
+      <xs:element name="commands" type="CommandsType" minOccurs="0"/>
+      <xs:element name="events" type="EventsType" minOccurs="0"/>
+    </xs:all>
+    <xs:attribute name="id" type="xs:string" />
+    <xs:attribute name="name" type="xs:string" use="required" />
+    <xs:attribute name="revision" type="xs:positiveInteger" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="ClusterIdType">
+    <xs:group ref="ConformanceGroup" minOccurs="0" maxOccurs="1" />
+    <xs:attribute name="id" type="xs:string" />
+    <xs:attribute name="name" type="xs:string" use="required" />
+    <xs:attribute name="picsCode" type="xs:string" />
+  </xs:complexType>
+
+
+  <xs:complexType name="ClusterIdsType">
+    <xs:sequence>
+      <xs:element type="ClusterIdType" name="clusterId" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+
+  <xs:element name="cluster" type="ClusterType" />
+
+
+</xs:schema>

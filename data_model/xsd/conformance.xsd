@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xs:include schemaLocation="reference.xsd" />
+
+    <xs:complexType name="LiteralType">
+        <xs:attribute name="value" type="xs:string" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="ValueType">
+        <xs:attribute name="name" type="xs:string" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="StatusType">
+        <xs:attribute name="name" type="xs:string" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="LogicalTermType">
+        <xs:group ref="ExpressionGroup" minOccurs="1" maxOccurs="unbounded" />
+    </xs:complexType>
+
+    <xs:complexType name="ComparisonTermType">
+        <xs:group ref="ExpressionGroup" minOccurs="1" maxOccurs="2" />
+    </xs:complexType>
+
+    <xs:group name="LogicalExpressionGroup">
+        <xs:choice>
+            <xs:element name="andTerm" type="LogicalTermType"/>
+            <xs:element name="notTerm" type="LogicalTermType"/>
+            <xs:element name="orTerm" type="LogicalTermType"/>
+            <xs:element name="equalTerm" type="ComparisonTermType"/>
+            <xs:element name="notEqualTerm" type="ComparisonTermType"/>
+            <xs:element name="greaterTerm" type="ComparisonTermType"/>
+            <xs:element name="greaterOrEqualTerm" type="ComparisonTermType"/>
+            <xs:element name="lessTerm" type="ComparisonTermType"/>
+            <xs:element name="lessOrEqualTerm" type="ComparisonTermType"/>
+        </xs:choice>
+    </xs:group>
+
+
+    <xs:group name="ExpressionGroup">
+        <xs:choice>
+            <xs:group ref="LogicalExpressionGroup" minOccurs="1" maxOccurs="1" />
+            <xs:group ref="ReferenceGroup" minOccurs="1" maxOccurs="1" />
+            <xs:element name="literal" type="LiteralType"></xs:element>
+            <xs:element name="value" type="ValueType"></xs:element>
+            <xs:element name="status" type="StatusType"></xs:element>
+        </xs:choice>
+    </xs:group>
+
+
+    <xs:complexType name="MandatoryConformType">
+        <xs:group ref="ExpressionGroup" minOccurs="0" maxOccurs="1" />
+    </xs:complexType>
+
+    <xs:complexType name="OptionalConformType">
+        <xs:group ref="ExpressionGroup" minOccurs="0" maxOccurs="1" />
+        <xs:attribute name="choice" type="xs:string" />
+        <xs:attribute name="more" type="xs:boolean" />
+        <xs:attribute name="min" type="xs:integer" />
+        <xs:attribute name="max" type="xs:integer" />
+    </xs:complexType>
+
+    <xs:group name="ConformanceGroup">
+        <xs:choice>
+            <xs:element name="optionalConform" type="OptionalConformType" />
+            <xs:element name="mandatoryConform" type="MandatoryConformType" />
+            <xs:element name="provisionalConform" />
+            <xs:element name="describedConform" />
+            <xs:element name="deprecateConform" />
+            <xs:element name="disallowConform" />
+        </xs:choice>
+    </xs:group>
+
+
+    <xs:complexType name="OtherwiseConformType">
+        <xs:sequence>
+            <xs:group ref="ConformanceGroup" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+
+    <xs:group name="ConformanceSetGroup">
+        <xs:choice>
+            <xs:element name="otherwiseConform" type="OtherwiseConformType" />
+            <xs:group ref="ConformanceGroup" minOccurs="1" maxOccurs="1" />
+        </xs:choice>
+    </xs:group>
+
+</xs:schema>
