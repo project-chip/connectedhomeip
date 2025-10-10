@@ -23,8 +23,7 @@ using namespace chip::app::Clusters::PushAvStreamTransport;
 
 PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
                                  AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams) :
-    mAudioStreamParams(audioStreamParams),
-    mVideoStreamParams(videoStreamParams)
+    mAudioStreamParams(audioStreamParams), mVideoStreamParams(videoStreamParams)
 {
     ConfigureRecorderSettings(transportOptions, audioStreamParams, videoStreamParams);
     mConnectionID    = connectionID;
@@ -127,9 +126,9 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
     }
     if (transportOptions.containerOptions.CMAFContainerOptions.HasValue())
     {
-        mClipInfo.mSessionGroup  = transportOptions.containerOptions.CMAFContainerOptions.Value().sessionGroup;
-        mClipInfo.mTrackName     = std::string(transportOptions.containerOptions.CMAFContainerOptions.Value().trackName.data());
-        mClipInfo.mChunkDuration = transportOptions.containerOptions.CMAFContainerOptions.Value().chunkDuration;
+        mClipInfo.mSessionGroup    = transportOptions.containerOptions.CMAFContainerOptions.Value().sessionGroup;
+        mClipInfo.mTrackName       = std::string(transportOptions.containerOptions.CMAFContainerOptions.Value().trackName.data());
+        mClipInfo.mChunkDuration   = transportOptions.containerOptions.CMAFContainerOptions.Value().chunkDuration;
         mClipInfo.mSegmentDuration = transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration;
     }
 

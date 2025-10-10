@@ -209,7 +209,7 @@ private:
     int64_t mFoundFirstIFramePts = -1;
     int64_t currentPts           = AV_NOPTS_VALUE;
     bool mMetadataSet            = false;
-    bool mUploadedInitSegment    = false;
+    bool mUploadedInitSegment    = true;
     bool mUploadMPD              = false;
 
     PushAVUploader * mUploader;
