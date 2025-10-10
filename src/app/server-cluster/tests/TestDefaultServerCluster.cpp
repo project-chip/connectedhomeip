@@ -33,7 +33,6 @@
 #include <lib/support/ReadOnlyBuffer.h>
 
 #include <cstdlib>
-#include <optional>
 
 using namespace chip;
 using namespace chip::Test;
@@ -48,7 +47,7 @@ namespace {
 class FakeDefaultServerCluster : public DefaultServerCluster
 {
 public:
-    FakeDefaultServerCluster(ConcreteClusterPath path) : DefaultServerCluster(path) {}
+    constexpr FakeDefaultServerCluster(ConcreteClusterPath && path) : DefaultServerCluster(std::move(path)) {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override

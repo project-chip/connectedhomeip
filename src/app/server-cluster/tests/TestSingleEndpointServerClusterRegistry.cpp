@@ -49,8 +49,10 @@ constexpr chip::ClusterId kCluster3 = 3;
 class FakeServerClusterInterface : public DefaultServerCluster
 {
 public:
-    FakeServerClusterInterface(const ConcreteClusterPath & path) : DefaultServerCluster(path) {}
-    FakeServerClusterInterface(EndpointId endpoint, ClusterId cluster) : DefaultServerCluster({ endpoint, cluster }) {}
+    constexpr FakeServerClusterInterface(ConcreteClusterPath && path) : DefaultServerCluster(std::move(path)) {}
+    constexpr FakeServerClusterInterface(EndpointId endpoint, ClusterId cluster) :
+        DefaultServerCluster({ endpoint, cluster, false })
+    {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
