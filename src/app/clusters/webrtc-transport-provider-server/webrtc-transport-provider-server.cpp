@@ -70,7 +70,7 @@ NodeId GetNodeIdFromCtx(const CommandHandler & commandHandler)
  *
  * @return true if all spec constraints are satisfied, false otherwise.
  */
-bool ValidateSFrameSpecConstraints(
+bool SFrameFollowsSpecConstraints(
     const Clusters::WebRTCTransportProvider::Structs::SFrameStruct::DecodableType & sframeConfig)
 {
     // Spec constraint: CipherSuite >= 1
