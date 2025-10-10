@@ -12,24 +12,25 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
-import("//build_overrides/build.gni") import("//build_overrides/chip.gni") import("//build_overrides/pigweed.gni")
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-    import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-        chip_test_suite("tests")
-{
-    output_name = "libTestDiagnosticLogsCluster"
+chip_test_suite("tests") {
+  output_name = "libTestDiagnosticLogsCluster"
 
-        test_sources = ["TestDiagnosticLogsCluster.cpp"]
+  test_sources = [ "TestDiagnosticLogsCluster.cpp" ]
 
-        sources = []
+  sources = []
 
-        cflags = ["-Wconversion"]
+  cflags = [ "-Wconversion" ]
 
-        public_deps = [
-            "${chip_root}/src/app/clusters/diagnostic-logs-server",
-            "${chip_root}/src/app/clusters/testing:testing",
-            "${chip_root}/src/lib/support",
-            "${chip_root}/src/protocols/bdx",
-        ]
+  public_deps = [
+    "${chip_root}/src/app/clusters/diagnostic-logs-server",
+    "${chip_root}/src/app/clusters/testing:testing",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/protocols/bdx",
+  ]
 }

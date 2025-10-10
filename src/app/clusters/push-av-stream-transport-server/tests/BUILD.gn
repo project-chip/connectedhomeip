@@ -12,30 +12,30 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
-import("//build_overrides/build.gni") import("//build_overrides/chip.gni") import("//build_overrides/pigweed.gni")
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-    import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-        chip_test_suite("tests")
-{
-    output_name = "libTestPushAVStreamTransport"
+chip_test_suite("tests") {
+  output_name = "libTestPushAVStreamTransport"
 
-        test_sources =
-            [
-                "TestPushAVStreamTransportCluster.cpp",
-                "TestPushAVStreamTransportStorage.cpp",
-            ]
+  test_sources = [
+    "TestPushAVStreamTransportCluster.cpp",
+    "TestPushAVStreamTransportStorage.cpp",
+  ]
 
-        sources = []
+  sources = []
 
-        cflags = ["-Wconversion"]
+  cflags = [ "-Wconversion" ]
 
-        public_deps = [
-            "${chip_root}/src/app/clusters/push-av-stream-transport-server",
-            "${chip_root}/src/app/clusters/testing:testing",
-            "${chip_root}/src/app/clusters/tls-client-management-server",
-            "${chip_root}/src/app/tests:helpers",
-            "${chip_root}/src/lib/core:string-builder-adapters",
-            "${chip_root}/src/lib/support",
-        ]
+  public_deps = [
+    "${chip_root}/src/app/clusters/push-av-stream-transport-server",
+    "${chip_root}/src/app/clusters/testing:testing",
+    "${chip_root}/src/app/clusters/tls-client-management-server",
+    "${chip_root}/src/app/tests:helpers",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support",
+  ]
 }
