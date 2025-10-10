@@ -47,7 +47,7 @@ from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_
                                           assert_valid_hostname, assert_valid_icd_key, assert_valid_long_discriminator_subtype,
                                           assert_valid_ph_key, assert_valid_pi_key, assert_valid_ri_key, assert_valid_sai_key,
                                           assert_valid_sat_key, assert_valid_short_discriminator_subtype, assert_valid_sii_key,
-                                          assert_valid_t_key, assert_valid_vendor_subtype, assert_valid_vp_key)
+                                          assert_valid_t_key, assert_valid_vendor_subtype, assert_valid_vp_key, assert_valid_ipv6_addresses)
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -543,6 +543,10 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Verify that at least 1 AAAA record is returned for each IPv6 a address
         asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{srv_record.hostname}'")
+
+        # Verify the AAAA records contain a valid IPv6 address
+        ipv6_addresses = [f"{r.address}%{r.interface}" for r in quada_records]
+        assert_valid_ipv6_addresses(ipv6_addresses)
 
     def desc_TC_TC_SC_4_1(self) -> str:
         return "[TC-SC-4.1] Commissionable Node Discovery with DUT as Commissionee"
