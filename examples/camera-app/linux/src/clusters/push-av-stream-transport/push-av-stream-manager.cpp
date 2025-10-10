@@ -105,14 +105,16 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
 
     if (transportOptions.videoStreamID.HasValue() && !transportOptions.videoStreamID.Value().IsNull())
     {
-       videoStreamID = transportOptions.videoStreamID.Value().Value();
+        videoStreamID = transportOptions.videoStreamID.Value().Value();
     }
 
     if (transportOptions.audioStreamID.HasValue() && !transportOptions.audioStreamID.Value().IsNull())
     {
-       audioStreamID = transportOptions.audioStreamID.Value().Value();
+        audioStreamID = transportOptions.audioStreamID.Value().Value();
     }
-    ChipLogProgress(Camera, "PushAvStreamTransportManager, RegisterTransport for connectionID: [%u], videoStreamID: [%u], audioStreamID: [%u]", connectionID, videoStreamID, audioStreamID);
+    ChipLogProgress(
+        Camera, "PushAvStreamTransportManager, RegisterTransport for connectionID: [%u], videoStreamID: [%u], audioStreamID: [%u]",
+        connectionID, videoStreamID, audioStreamID);
     mMediaController->RegisterTransport(mTransportMap[connectionID].get(), videoStreamID, audioStreamID);
     mMediaController->SetPreRollLength(mTransportMap[connectionID].get(), mTransportMap[connectionID].get()->GetPreRollLength());
 
