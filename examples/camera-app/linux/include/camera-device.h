@@ -36,7 +36,7 @@
 // Camera Constraints set to typical values.
 // TODO: Look into ways to fetch from hardware, if required/possible.
 static constexpr uint32_t kMaxContentBufferSizeBytes = 4096;
-static constexpr uint32_t kMaxNetworkBandwidthMbps   = 128;
+static constexpr uint32_t kMaxNetworkBandwidthbps    = 128000000; // 128 Mbps
 static constexpr uint8_t kMaxConcurrentEncoders      = 1;
 static constexpr uint8_t kSpeakerMinLevel            = 1;
 static constexpr uint8_t kSpeakerMaxLevel            = 254;       // Spec constraint
@@ -92,6 +92,8 @@ public:
     chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
 
     MediaController & GetMediaController() override;
+
+    void HandlePushAvZoneTrigger(uint16_t zoneId) override;
 
     CameraDevice();
     ~CameraDevice();

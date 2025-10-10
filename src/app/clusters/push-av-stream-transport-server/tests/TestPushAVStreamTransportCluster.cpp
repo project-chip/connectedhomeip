@@ -315,14 +315,14 @@ public:
         return Status::Success;
     }
 
-    Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId) override
+    Protocols::InteractionModel::Status SetVideoStream(uint16_t videoStreamId) override
     {
         // TODO: Validate videoStreamID from the allocated videoStreams
         // Returning Status::Success to pass through checks in the Server Implementation.
         return Status::Success;
     }
 
-    Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) override
+    Protocols::InteractionModel::Status SetAudioStream(uint16_t audioStreamId) override
     {
         // TODO: Validate audioStreamID from the allocated audioStreams
         // Returning Status::Success to pass through checks in the Server Implementation.
@@ -355,7 +355,19 @@ public:
         return PushAvStreamTransportStatusEnum::kUnknown;
     }
 
-    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override
+    CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override
+    {
+        isActive = false;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override
+    {
+        isActive = false;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override
     {
         isActive = false;
         return CHIP_NO_ERROR;
