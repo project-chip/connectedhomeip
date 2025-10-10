@@ -109,49 +109,28 @@ void PushAVTransport::ConfigureRecorderTimeSetting(
 void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & transportOptions,
                                                 AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams)
 {
-    bool debug = false; // Set this to true for debug purposes
-
-    if (debug)
+    mClipInfo.mHasAudio    = transportOptions.audioStreamID.HasValue();
+    mClipInfo.mHasVideo    = transportOptions.videoStreamID.HasValue();
+    mClipInfo.mUrl         = std::string(transportOptions.url.data(), transportOptions.url.size());
+    mClipInfo.mTriggerType = static_cast<int>(transportOptions.triggerOptions.triggerType);
+    if (transportOptions.triggerOptions.maxPreRollLen.HasValue())
     {
-        mClipInfo.mElapsedTime          = 0;
-        mClipInfo.mSessionGroup         = 1;
-        mClipInfo.mSessionNumber        = 1;
-        mClipInfo.mInitialDuration      = 20;
-        mClipInfo.mAugmentationDuration = 10;
-        mClipInfo.mBlindDuration        = 5;
-        mClipInfo.mMaxClipDuration      = 30;
-        mClipInfo.mChunkDuration        = 1000;
-        mClipInfo.mSegmentDuration      = 4000;
-        mClipInfo.mTriggerType          = 0;
-        mClipInfo.mPreRollLength        = 0;
-        mClipInfo.mTrackName            = "test_track";
-        mClipInfo.mUrl                  = "https://localhost:1234/streams/1/";
+        mClipInfo.mPreRollLength = transportOptions.triggerOptions.maxPreRollLen.Value();
     }
     else
     {
-        mClipInfo.mHasAudio    = transportOptions.audioStreamID.HasValue();
-        mClipInfo.mHasVideo    = transportOptions.videoStreamID.HasValue();
-        mClipInfo.mUrl         = std::string(transportOptions.url.data(), transportOptions.url.size());
-        mClipInfo.mTriggerType = static_cast<int>(transportOptions.triggerOptions.triggerType);
-        if (transportOptions.triggerOptions.maxPreRollLen.HasValue())
-        {
-            mClipInfo.mPreRollLength = transportOptions.triggerOptions.maxPreRollLen.Value();
-        }
-        else
-        {
-            mClipInfo.mPreRollLength = 0; // Default pre roll length is zero
-        }
-        if (transportOptions.triggerOptions.motionTimeControl.HasValue())
-        {
-            ConfigureRecorderTimeSetting(transportOptions.triggerOptions.motionTimeControl.Value());
-        }
-        if (transportOptions.containerOptions.CMAFContainerOptions.HasValue())
-        {
-            mClipInfo.mSessionGroup  = transportOptions.containerOptions.CMAFContainerOptions.Value().sessionGroup;
-            mClipInfo.mTrackName     = std::string(transportOptions.containerOptions.CMAFContainerOptions.Value().trackName.data());
-            mClipInfo.mChunkDuration = transportOptions.containerOptions.CMAFContainerOptions.Value().chunkDuration;
-            mClipInfo.mSegmentDuration = transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration;
-        }
+        mClipInfo.mPreRollLength = 0; // Default pre roll length is zero
+    }
+    if (transportOptions.triggerOptions.motionTimeControl.HasValue())
+    {
+        ConfigureRecorderTimeSetting(transportOptions.triggerOptions.motionTimeControl.Value());
+    }
+    if (transportOptions.containerOptions.CMAFContainerOptions.HasValue())
+    {
+        mClipInfo.mSessionGroup  = transportOptions.containerOptions.CMAFContainerOptions.Value().sessionGroup;
+        mClipInfo.mTrackName     = std::string(transportOptions.containerOptions.CMAFContainerOptions.Value().trackName.data());
+        mClipInfo.mChunkDuration = transportOptions.containerOptions.CMAFContainerOptions.Value().chunkDuration;
+        mClipInfo.mSegmentDuration = transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration;
     }
 
     mTransportTriggerType = transportOptions.triggerOptions.triggerType;
