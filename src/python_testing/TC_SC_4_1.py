@@ -70,25 +70,12 @@ class TC_SC_4_1(MatterBaseTest):
 
     def steps_TC_SC_4_1(self):
         return [TestStep(1, "DUT is commissioned.", is_commissioning=True),
-                TestStep(2, "TH reads ServerList attribute from the Descriptor cluster on EP0. ", """
-                                - If the ICD Management cluster ID (70,0x46) is present in the list, set supports_icd to true, otherwise set supports_icd to false.
-                                - If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold.                         
-                                """),
-                TestStep(3, "If DUT supports Open Basic Commissioning Window, put it in Commissioning Mode using Open Basic Commissioning Window command.", """
-                                - DUT starts advertising Commissionable Node Discovery service through DNS-SD
-                                - Verify DUT Commissionable Node Discovery service advertisements
-                                - Close commissioning window
-                                """),
-                TestStep(4, "DUT is put in Commissioning Mode using Open Commissioning Window command.", """
-                                - DUT starts advertising Commissionable Node Discovery service through DNS-SD
-                                - Verify DUT Commissionable Node Discovery service advertisements
-                                - Close commissioning window
-                                """),
-                TestStep(5, "Check if DUT is in Extended Discovery mode.", """
-                                - Check if DUT is advertising Commissionable Node Discovery services through DNS-SD
-                                - If so:
-                                    - Verify DUT Commissionable Node Discovery service advertisements
-                                    """),
+                TestStep(3, """left""", """right"""),
+                TestStep(4, """left""", """right"""),
+                TestStep(5, """left""", """right"""),
+                TestStep(6, """left""", """right"""),
+                TestStep(7, """left""", """right"""),
+                TestStep(8, """left""", """right"""),
                 ]
 
     async def read_attribute(self, attribute: Any) -> Any:
@@ -224,10 +211,16 @@ class TC_SC_4_1(MatterBaseTest):
         )
         asserts.assert_greater(len(ptr_records), 0, "Long Discriminator subtype PTR record must be present.")
 
-        # Verify that the 'Long Discriminator' subtype PTR record's
-        # 'service_name' is the same as the SRV record 'service_name'
-        asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
-                             "Long Discriminator subtype PTR record service name must be equal to the SRV record service name.")
+        if len(ptr_records) > 1:
+            logging.info(f"""
+                        Found more than one ({len(ptr_records)}) PTR records for Long Discriminator subtype '{long_discriminator_subtype}'.
+                        This is not a DUT issue, but it means that more than 1 device is responding to the same discriminator.
+                        """)
+        else:
+            # Verify that the 'Long Discriminator' subtype PTR record's
+            # 'service_name' is the same as the SRV record 'service_name'
+            asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
+                                "Long Discriminator subtype PTR record service name must be equal to the SRV record service name.")
 
         # *** SHORT DISCRIMINATOR SUBTYPE ***
         # Validate that the 'Short Discriminator' subtype is a 4-bit variable
@@ -243,10 +236,16 @@ class TC_SC_4_1(MatterBaseTest):
         )
         asserts.assert_greater(len(ptr_records), 0, "Short Discriminator subtype PTR record must be present.")
 
-        # Verify that the 'Short Discriminator' subtype PTR record's
-        # 'service_name' is the same as the SRV record's 'service_name'
-        asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
-                             "Short Discriminator subtype PTR record service name must be equal to the SRV record service name.")
+        if len(ptr_records) > 1:
+            logging.info(f"""
+                        Found more than one ({len(ptr_records)}) PTR records for Short Discriminator subtype '{short_discriminator_subtype}'.
+                        This is not a DUT issue, but it means that more than 1 device is responding to the same discriminator.
+                        """)
+        else:
+            # Verify that the 'Short Discriminator' subtype PTR record's
+            # 'service_name' is the same as the SRV record's 'service_name'
+            asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
+                                "Short Discriminator subtype PTR record service name must be equal to the SRV record service name.")
 
         # *** IN COMMISSIONING MODE SUBTYPE ***
         # Verify presence of the _CM subtype
@@ -504,8 +503,8 @@ class TC_SC_4_1(MatterBaseTest):
 
         # *** AAAA RECORD CHECKS ***
         # **************************
-        # TH performs a query for the AAAA record against the target
-        # hostname listed in the Commissionable Service SRV record.
+        # TH performs a AAAA record query against the target 'hostname'
+        # listed in the Commissionable Service SRV record
         quada_records = await MdnsDiscovery().get_quada_records(hostname=srv_record.hostname, log_output=True)
 
         # Verify that at least 1 AAAA record is returned for each IPv6 a address
@@ -519,7 +518,6 @@ class TC_SC_4_1(MatterBaseTest):
         self.endpoint = self.get_endpoint(default=1)
         self.supports_icd = False
         self.supports_lit = False
-        self.supports_tcp = self.check_pics(TCP_PICS_STR)
         obcw_cmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
 
         # *** STEP 1 ***
@@ -543,7 +541,7 @@ class TC_SC_4_1(MatterBaseTest):
             self.active_mode_threshold_ms = await self.get_active_mode_threshhold_ms()
             logging.info(f"\n\n\t** active_mode_threshold_ms: {self.active_mode_threshold_ms}\n")
 
-        # *** STEP 4 ***
+        # *** STEP 3 ***
         # Check if the LITS feature is supported
         # If 'supports_icd' is True, TH reads the 'FeatureMap' attribute from the ICD Management cluster on EP0
         # If the LITS feature is set, set 'supports_lit' to True, otherwise, set 'supports_lit' to False
@@ -554,17 +552,24 @@ class TC_SC_4_1(MatterBaseTest):
             self.supports_lit = bool(feature_map & LITS == LITS)
             logging.info(f"\n\n\t** supports_lit: {self.supports_lit}\n")
 
-        # *** STEP 3 ***
-        # If DUT supports Open Basic Commissioning Window, put it in Commissioning Mode using
-        # Open Basic Commissioning Window command.
-        #   - DUT starts advertising Commissionable Node Discovery service through DNS-SD.
-        # self.step(3)
+        # *** STEP 4 ***
+        # Check if the DUT supports TCP
+        self.step(4)
+        self.supports_tcp = self.check_pics(TCP_PICS_STR)
+
+        # *** STEP 5 ***
         # Check if DUT supports Open Basic Commissioning Window
+        self.step(5)
         supports_obcw = await self.feature_guard(
             endpoint=ROOT_NODE_ENDPOINT_ID,
             cluster=Clusters.AdministratorCommissioning,
             feature_int=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic)        
 
+        # *** STEP 6 ***
+        # If DUT supports Open Basic Commissioning Window, put it in Commissioning Mode using
+        # Open Basic Commissioning Window command.
+        #   - DUT starts advertising Commissionable Node Discovery service through DNS-SD.
+        self.step(6)
         if supports_obcw:
             logging.info("\n\n\t ** Open Basic Commissioning Window supported\n")
             await self.default_controller.SendCommand(
@@ -588,10 +593,10 @@ class TC_SC_4_1(MatterBaseTest):
         else:
             logging.info("\n\n\t ** Open Basic Commissioning Window unsupported, skipping step.\n")
 
-        # *** STEP 4 ***
+        # *** STEP 7 ***
         # DUT is put in Commissioning Mode using Open Commissioning Window command and
         # starts advertising Commissionable Node Discovery service through DNS-SD
-        self.step(4)
+        self.step(7)
         await self.default_controller.OpenCommissioningWindow(
             nodeid=self.dut_node_id,
             timeout=180,
@@ -612,9 +617,9 @@ class TC_SC_4_1(MatterBaseTest):
         # Close commissioning window
         await self.close_commissioning_window()
 
-        # *** STEP 5 ***
+        # *** STEP 8 ***
         # Check if DUT Extended Discovery mode is active
-        self.step(5)
+        self.step(8)
         # TH performs a browse for the 'Commissionable Service' PTR record of type '_matterc._udp.local.'
         commissionable_service_ptr = await self.get_commissionable_service_ptr_record()
 
