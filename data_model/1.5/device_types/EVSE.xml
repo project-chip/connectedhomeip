@@ -77,4 +77,30 @@ Davis, CA 95616, USA
       <optionalConform/>
     </cluster>
   </clusters>
+  <composedDeviceTypes>
+    <deviceType deviceTypeId="0x0510" deviceTypeName="Electrical Sensor">
+      <clusterRequirements>
+        <cluster id="0x0090" name="Electrical Power Measurement">
+          <mandatoryConform/>
+        </cluster>
+        <cluster id="0x0091" name="Electrical Energy Measurement">
+          <mandatoryConform/>
+        </cluster>
+      </clusterRequirements>
+    </deviceType>
+  </composedDeviceTypes>
+  <composedDeviceTypes>
+    <cluster id="0x0003" name="Identify" side="server">
+      <optionalConform/>
+    </cluster>
+    <cluster id="0x0099" name="Energy EVSE" side="server">
+      <mandatoryConform/>
+    </cluster>
+    <cluster id="0x009D" name="Energy EVSE Mode" side="server">
+      <mandatoryConform/>
+    </cluster>
+    <cluster id="0x0402" name="Temperature Measurement" side="server">
+      <optionalConform/>
+    </cluster>
+  </composedDeviceTypes>
 </deviceType>

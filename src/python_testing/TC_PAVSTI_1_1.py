@@ -232,7 +232,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                     "streamUsage": Globals.Enums.StreamUsageEnum.kRecording,
                     "videoStreamID": videoStreamId,
                     "audioStreamID": audioStreamId,
-                    "endpointID": tlsEndpointId,
+                    "TLSEndpointID": tlsEndpointId,
                     "url": f"https://{self.host_ip}:1234/streams/{uploadStreamId}",
                     "triggerOptions": {"triggerType": pushavCluster.Enums.TransportTriggerTypeEnum.kCommand, "maxPreRollLen": 10},
                     "ingestMethod": pushavCluster.Enums.IngestMethodsEnum.kCMAFIngest,
