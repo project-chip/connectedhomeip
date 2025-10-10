@@ -651,6 +651,23 @@ class Globals:
             powerThresholdSource: 'typing.Union[Nullable, Globals.Enums.PowerThresholdSourceEnum]' = NullValue
 
         @dataclass
+        class SemanticTagStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="namespaceID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="tag", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="label", Tag=3, Type=typing.Union[None, Nullable, str]),
+                    ])
+
+            mfgCode: 'typing.Union[Nullable, uint]' = NullValue
+            namespaceID: 'uint' = 0
+            tag: 'uint' = 0
+            label: 'typing.Union[None, Nullable, str]' = None
+
+        @dataclass
         class TestGlobalStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -2237,7 +2254,7 @@ class Descriptor(Cluster):
                 ClusterObjectFieldDescriptor(Label="serverList", Tag=0x00000001, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="clientList", Tag=0x00000002, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="partsList", Tag=0x00000003, Type=typing.List[uint]),
-                ClusterObjectFieldDescriptor(Label="tagList", Tag=0x00000004, Type=typing.Optional[typing.List[Descriptor.Structs.SemanticTagStruct]]),
+                ClusterObjectFieldDescriptor(Label="tagList", Tag=0x00000004, Type=typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]]),
                 ClusterObjectFieldDescriptor(Label="endpointUniqueID", Tag=0x00000005, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -2250,7 +2267,7 @@ class Descriptor(Cluster):
     serverList: typing.List[uint] = field(default_factory=lambda: [])
     clientList: typing.List[uint] = field(default_factory=lambda: [])
     partsList: typing.List[uint] = field(default_factory=lambda: [])
-    tagList: typing.Optional[typing.List[Descriptor.Structs.SemanticTagStruct]] = None
+    tagList: typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]] = None
     endpointUniqueID: typing.Optional[str] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -2275,23 +2292,6 @@ class Descriptor(Cluster):
 
             deviceType: 'uint' = 0
             revision: 'uint' = 0
-
-        @dataclass
-        class SemanticTagStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="namespaceID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="tag", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="label", Tag=3, Type=typing.Union[None, Nullable, str]),
-                    ])
-
-            mfgCode: 'typing.Union[Nullable, uint]' = NullValue
-            namespaceID: 'uint' = 0
-            tag: 'uint' = 0
-            label: 'typing.Union[None, Nullable, str]' = None
 
     class Attributes:
         @dataclass
@@ -2370,9 +2370,9 @@ class Descriptor(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[Descriptor.Structs.SemanticTagStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]])
 
-            value: typing.Optional[typing.List[Descriptor.Structs.SemanticTagStruct]] = None
+            value: typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]] = None
 
         @dataclass
         class EndpointUniqueID(ClusterAttributeDescriptor):
@@ -20563,16 +20563,16 @@ class Groupcast(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="endpoints", Tag=1, Type=typing.List[uint]),
-                        ClusterObjectFieldDescriptor(Label="key", Tag=2, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="keyID", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="keyID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="key", Tag=3, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="gracePeriod", Tag=4, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="useAuxiliaryACL", Tag=5, Type=typing.Optional[bool]),
                     ])
 
             groupID: uint = 0
             endpoints: typing.List[uint] = field(default_factory=lambda: [])
-            key: bytes = b""
             keyID: uint = 0
+            key: typing.Optional[bytes] = None
             gracePeriod: typing.Optional[uint] = None
             useAuxiliaryACL: typing.Optional[bool] = None
 
@@ -20626,14 +20626,14 @@ class Groupcast(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="key", Tag=1, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="keyID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="keyID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="key", Tag=2, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="gracePeriod", Tag=3, Type=typing.Optional[uint]),
                     ])
 
             groupID: uint = 0
-            key: bytes = b""
             keyID: uint = 0
+            key: typing.Optional[bytes] = None
             gracePeriod: typing.Optional[uint] = None
 
         @dataclass
@@ -46296,6 +46296,15 @@ class ZoneManagement(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
+        class StatusCodeEnum(MatterIntEnum):
+            kZoneNotFound = 0x02
+            kZoneInUse = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 0
+
         class ZoneEventStoppedReasonEnum(MatterIntEnum):
             kActionStopped = 0x00
             kTimeout = 0x01
@@ -49148,6 +49157,7 @@ class PushAvStreamTransport(Cluster):
             kInvalidTransportStatus = 0x08
             kInvalidOptions = 0x09
             kInvalidStreamUsage = 0x0A
+            kInvalidTime = 0x0B
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
@@ -49285,7 +49295,7 @@ class PushAvStreamTransport(Cluster):
                         ClusterObjectFieldDescriptor(Label="streamUsage", Tag=0, Type=Globals.Enums.StreamUsageEnum),
                         ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=1, Type=typing.Union[None, Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=2, Type=typing.Union[None, Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="endpointID", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="TLSEndpointID", Tag=3, Type=uint),
                         ClusterObjectFieldDescriptor(Label="url", Tag=4, Type=str),
                         ClusterObjectFieldDescriptor(Label="triggerOptions", Tag=5, Type=PushAvStreamTransport.Structs.TransportTriggerOptionsStruct),
                         ClusterObjectFieldDescriptor(Label="ingestMethod", Tag=6, Type=PushAvStreamTransport.Enums.IngestMethodsEnum),
@@ -49296,7 +49306,7 @@ class PushAvStreamTransport(Cluster):
             streamUsage: 'Globals.Enums.StreamUsageEnum' = 0
             videoStreamID: 'typing.Union[None, Nullable, uint]' = None
             audioStreamID: 'typing.Union[None, Nullable, uint]' = None
-            endpointID: 'uint' = 0
+            TLSEndpointID: 'uint' = 0
             url: 'str' = ""
             triggerOptions: 'PushAvStreamTransport.Structs.TransportTriggerOptionsStruct' = field(default_factory=lambda: PushAvStreamTransport.Structs.TransportTriggerOptionsStruct())
             ingestMethod: 'PushAvStreamTransport.Enums.IngestMethodsEnum' = 0
@@ -49624,13 +49634,9 @@ class PushAvStreamTransport(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="triggerType", Tag=1, Type=PushAvStreamTransport.Enums.TransportTriggerTypeEnum),
-                        ClusterObjectFieldDescriptor(Label="activationReason", Tag=2, Type=typing.Optional[PushAvStreamTransport.Enums.TriggerActivationReasonEnum]),
                     ])
 
             connectionID: uint = 0
-            triggerType: PushAvStreamTransport.Enums.TransportTriggerTypeEnum = 0
-            activationReason: typing.Optional[PushAvStreamTransport.Enums.TriggerActivationReasonEnum] = None
 
 
 @dataclass
@@ -52784,20 +52790,12 @@ class TlsClientManagement(Cluster):
             kRootCertificateNotFound = 0x03
             kClientCertificateNotFound = 0x04
             kEndpointInUse = 0x05
+            kInvalidTime = 0x06
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 0
-
-        class TLSEndpointStatusEnum(MatterIntEnum):
-            kProvisioned = 0x00
-            kInUse = 0x01
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2
 
     class Structs:
         @dataclass
@@ -52811,7 +52809,7 @@ class TlsClientManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="port", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="caid", Tag=3, Type=uint),
                         ClusterObjectFieldDescriptor(Label="ccdid", Tag=4, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="status", Tag=5, Type=TlsClientManagement.Enums.TLSEndpointStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="referenceCount", Tag=5, Type=uint),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
@@ -52820,7 +52818,7 @@ class TlsClientManagement(Cluster):
             port: 'uint' = 0
             caid: 'uint' = 0
             ccdid: 'typing.Union[Nullable, uint]' = NullValue
-            status: 'TlsClientManagement.Enums.TLSEndpointStatusEnum' = 0
+            referenceCount: 'uint' = 0
             fabricIndex: 'uint' = 0
 
     class Commands:

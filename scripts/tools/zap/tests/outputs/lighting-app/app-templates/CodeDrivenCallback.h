@@ -23,9 +23,25 @@
 
 #include <app/util/basic-types.h>
 
+void MatterAccessControlClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterAccessControlClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterBasicInformationClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBasicInformationClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterTimeFormatLocalizationClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterTimeFormatLocalizationClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterGeneralCommissioningClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterGeneralCommissioningClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterDiagnosticLogsClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterDiagnosticLogsClusterShutdownCallback(chip::EndpointId endpointId);
 
 void MatterGeneralDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
@@ -47,6 +63,14 @@ void MatterAdministratorCommissioningClusterInitCallback(chip::EndpointId endpoi
 
 void MatterAdministratorCommissioningClusterShutdownCallback(chip::EndpointId endpointId);
 
+void MatterOperationalCredentialsClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterOperationalCredentialsClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterGroupKeyManagementClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterGroupKeyManagementClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterFixedLabelClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterFixedLabelClusterShutdownCallback(chip::EndpointId endpointId);

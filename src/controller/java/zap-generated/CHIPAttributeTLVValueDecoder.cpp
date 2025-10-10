@@ -44493,16 +44493,16 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             newElement_0_transportOptionsInsideOptional_audioStreamIDInsideOptional,
                             newElement_0_transportOptionsInsideOptional_audioStreamID);
                     }
-                    jobject newElement_0_transportOptionsInsideOptional_endpointID;
-                    std::string newElement_0_transportOptionsInsideOptional_endpointIDClassName     = "java/lang/Integer";
-                    std::string newElement_0_transportOptionsInsideOptional_endpointIDCtorSignature = "(I)V";
-                    jint jninewElement_0_transportOptionsInsideOptional_endpointID =
-                        static_cast<jint>(entry_0.transportOptions.Value().endpointID);
+                    jobject newElement_0_transportOptionsInsideOptional_TLSEndpointID;
+                    std::string newElement_0_transportOptionsInsideOptional_TLSEndpointIDClassName     = "java/lang/Integer";
+                    std::string newElement_0_transportOptionsInsideOptional_TLSEndpointIDCtorSignature = "(I)V";
+                    jint jninewElement_0_transportOptionsInsideOptional_TLSEndpointID =
+                        static_cast<jint>(entry_0.transportOptions.Value().TLSEndpointID);
                     chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                        newElement_0_transportOptionsInsideOptional_endpointIDClassName.c_str(),
-                        newElement_0_transportOptionsInsideOptional_endpointIDCtorSignature.c_str(),
-                        jninewElement_0_transportOptionsInsideOptional_endpointID,
-                        newElement_0_transportOptionsInsideOptional_endpointID);
+                        newElement_0_transportOptionsInsideOptional_TLSEndpointIDClassName.c_str(),
+                        newElement_0_transportOptionsInsideOptional_TLSEndpointIDCtorSignature.c_str(),
+                        jninewElement_0_transportOptionsInsideOptional_TLSEndpointID,
+                        newElement_0_transportOptionsInsideOptional_TLSEndpointID);
                     jobject newElement_0_transportOptionsInsideOptional_url;
                     LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
                         entry_0.transportOptions.Value().url, newElement_0_transportOptionsInsideOptional_url));
@@ -45184,16 +45184,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             return nullptr;
                         }
 
-                        newElement_0_transportOptionsInsideOptional = env->NewObject(
-                            transportOptionsStructStructClass_3, transportOptionsStructStructCtor_3,
-                            newElement_0_transportOptionsInsideOptional_streamUsage,
-                            newElement_0_transportOptionsInsideOptional_videoStreamID,
-                            newElement_0_transportOptionsInsideOptional_audioStreamID,
-                            newElement_0_transportOptionsInsideOptional_endpointID, newElement_0_transportOptionsInsideOptional_url,
-                            newElement_0_transportOptionsInsideOptional_triggerOptions,
-                            newElement_0_transportOptionsInsideOptional_ingestMethod,
-                            newElement_0_transportOptionsInsideOptional_containerOptions,
-                            newElement_0_transportOptionsInsideOptional_expiryTime);
+                        newElement_0_transportOptionsInsideOptional =
+                            env->NewObject(transportOptionsStructStructClass_3, transportOptionsStructStructCtor_3,
+                                           newElement_0_transportOptionsInsideOptional_streamUsage,
+                                           newElement_0_transportOptionsInsideOptional_videoStreamID,
+                                           newElement_0_transportOptionsInsideOptional_audioStreamID,
+                                           newElement_0_transportOptionsInsideOptional_TLSEndpointID,
+                                           newElement_0_transportOptionsInsideOptional_url,
+                                           newElement_0_transportOptionsInsideOptional_triggerOptions,
+                                           newElement_0_transportOptionsInsideOptional_ingestMethod,
+                                           newElement_0_transportOptionsInsideOptional_containerOptions,
+                                           newElement_0_transportOptionsInsideOptional_expiryTime);
                     }
                     chip::JniReferences::GetInstance().CreateOptional(newElement_0_transportOptionsInsideOptional,
                                                                       newElement_0_transportOptions);
@@ -50795,13 +50796,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                newElement_0_ccdidCtorSignature.c_str(),
                                                                                jninewElement_0_ccdid, newElement_0_ccdid);
                 }
-                jobject newElement_0_status;
-                std::string newElement_0_statusClassName     = "java/lang/Integer";
-                std::string newElement_0_statusCtorSignature = "(I)V";
-                jint jninewElement_0_status                  = static_cast<jint>(entry_0.status);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_statusClassName.c_str(),
-                                                                           newElement_0_statusCtorSignature.c_str(),
-                                                                           jninewElement_0_status, newElement_0_status);
+                jobject newElement_0_referenceCount;
+                std::string newElement_0_referenceCountClassName     = "java/lang/Integer";
+                std::string newElement_0_referenceCountCtorSignature = "(I)V";
+                jint jninewElement_0_referenceCount                  = static_cast<jint>(entry_0.referenceCount);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_referenceCountClassName.c_str(), newElement_0_referenceCountCtorSignature.c_str(),
+                    jninewElement_0_referenceCount, newElement_0_referenceCount);
                 jobject newElement_0_fabricIndex;
                 std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
                 std::string newElement_0_fabricIndexCtorSignature = "(I)V";
@@ -50836,7 +50837,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     newElement_0 =
                         env->NewObject(TLSEndpointStructStructClass_1, TLSEndpointStructStructCtor_1, newElement_0_endpointID,
                                        newElement_0_hostname, newElement_0_port, newElement_0_caid, newElement_0_ccdid,
-                                       newElement_0_status, newElement_0_fabricIndex);
+                                       newElement_0_referenceCount, newElement_0_fabricIndex);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

@@ -47,13 +47,13 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
+class TC_WebRTCP_2_5(MatterBaseTest, WEBRTCPTestBase):
 
-    def desc_TC_WebRTCProvider_2_5(self) -> str:
+    def desc_TC_WebRTCP_2_5(self) -> str:
         """Returns a description of this test"""
         return "[TC-{picsCode}-2.5] Validate interaction of SolicitOffer and stream allocation with {DUT_Server}"
 
-    def steps_TC_WebRTCProvider_2_5(self) -> list[TestStep]:
+    def steps_TC_WebRTCP_2_5(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
@@ -76,8 +76,24 @@ class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
         ]
         return steps
 
+    def pics_TC_WebRTCP_2_5(self) -> list[str]:
+        """
+        Return the list of PICS applicable to this test case.
+        """
+        pics = [
+            "WEBRTCP.S",           # WebRTC Transport Provider Server
+            "WEBRTCP.S.A0000",     # CurrentSessions attribute
+            "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
+            "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
+            "WEBRTCP.S.C06.Rsp",   # EndSession command
+            "AVSM.S",              # CameraAVStreamManagement Server
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
+        ]
+        return pics
+
     @async_test_body
-    async def test_TC_WebRTCProvider_2_5(self):
+    async def test_TC_WebRTCP_2_5(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """
@@ -169,7 +185,7 @@ class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
             # Send SolicitOffer with stream usage that isn't supported. Valid audio stream ID, valid video stream ID
             self.step(9)
             notSupportedStreamUsage = next((e for e in Globals.Enums.StreamUsageEnum if e not in aStreamUsagePriorities),
-                                           Globals.Enums.StreamUsageEnum.kUnknownEnumValue,)
+                                           Globals.Enums.StreamUsageEnum.kUnknownEnumValue)
 
             cmd = cluster.Commands.SolicitOffer(
                 streamUsage=notSupportedStreamUsage, originatingEndpointID=endpoint, videoStreamID=videoStreamID, audioStreamID=audioStreamID)

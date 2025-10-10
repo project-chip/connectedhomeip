@@ -156,6 +156,43 @@ CameraAVStreamManager::GetAllocatedAudioStreams() const
     return GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
 }
 
+void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                                   const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
+                                                   uint32_t & outBandwidthbps)
+{
+
+    outBandwidthbps = 0;
+    if (videoStreamId.HasValue() && !videoStreamId.Value().IsNull())
+    {
+        uint16_t vStreamId           = videoStreamId.Value().Value();
+        auto & allocatedVideoStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
+        for (const chip::app::Clusters::CameraAvStreamManagement::Structs::VideoStreamStruct::Type & stream : allocatedVideoStreams)
+        {
+            if (stream.videoStreamID == vStreamId)
+            {
+                outBandwidthbps += stream.maxBitRate;
+                ChipLogProgress(Camera, "GetBandwidthForStreams: VideoStream %u maxBitRate: %u bps", vStreamId, stream.maxBitRate);
+                break;
+            }
+        }
+    }
+    if (audioStreamId.HasValue() && !audioStreamId.Value().IsNull())
+    {
+        uint16_t aStreamId           = audioStreamId.Value().Value();
+        auto & allocatedAudioStreams = GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
+        for (const chip::app::Clusters::CameraAvStreamManagement::Structs::AudioStreamStruct::Type & stream : allocatedAudioStreams)
+        {
+            if (stream.audioStreamID == aStreamId)
+            {
+                outBandwidthbps += stream.bitRate;
+                ChipLogProgress(Camera, "GetBandwidthForStreams: AudioStream %u bitRate: %u bps", aStreamId, stream.bitRate);
+                break;
+            }
+        }
+    }
+    return;
+}
+
 CHIP_ERROR CameraAVStreamManager::ValidateVideoStreamID(uint16_t videoStreamId)
 {
     const std::vector<VideoStreamStruct> & allocatedVideoStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
@@ -192,14 +229,24 @@ CHIP_ERROR CameraAVStreamManager::ValidateAudioStreamID(uint16_t audioStreamId)
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
-CHIP_ERROR CameraAVStreamManager::IsPrivacyModeActive(bool & isActive)
+CHIP_ERROR CameraAVStreamManager::IsHardPrivacyModeActive(bool & isActive)
 {
     // Check privacy mode attributes
-    bool hardPrivacyMode           = GetCameraAVStreamMgmtServer()->GetHardPrivacyModeOn();
-    bool softRecordingPrivacyMode  = GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled();
-    bool softLivestreamPrivacyMode = GetCameraAVStreamMgmtServer()->GetSoftLivestreamPrivacyModeEnabled();
+    isActive = GetCameraAVStreamMgmtServer()->GetHardPrivacyModeOn();
+    return CHIP_NO_ERROR;
+}
 
-    isActive = hardPrivacyMode || softRecordingPrivacyMode || softLivestreamPrivacyMode;
+CHIP_ERROR CameraAVStreamManager::IsSoftRecordingPrivacyModeActive(bool & isActive)
+{
+    // Check privacy mode attributes
+    isActive = GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAVStreamManager::IsSoftLivestreamPrivacyModeActive(bool & isActive)
+{
+    // Check privacy mode attributes
+    isActive = GetCameraAVStreamMgmtServer()->GetSoftLivestreamPrivacyModeEnabled();
     return CHIP_NO_ERROR;
 }
 

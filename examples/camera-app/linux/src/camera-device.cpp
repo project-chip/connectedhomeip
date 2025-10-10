@@ -1160,7 +1160,7 @@ CameraError CameraDevice::SetNightVision(TriStateAutoEnum nightVision)
 
 uint32_t CameraDevice::GetMaxNetworkBandwidth()
 {
-    return kMaxNetworkBandwidthMbps;
+    return kMaxNetworkBandwidthbps;
 }
 
 uint16_t CameraDevice::GetCurrentFrameRate()
@@ -1215,6 +1215,9 @@ CameraError CameraDevice::SetViewport(VideoStream & stream,
 CameraError CameraDevice::SetSoftRecordingPrivacyModeEnabled(bool softRecordingPrivacyMode)
 {
     mSoftRecordingPrivacyModeEnabled = softRecordingPrivacyMode;
+
+    // Notify the PushAVManager about change
+    mPushAVTransportManager.RecordingStreamPrivacyModeChanged(softRecordingPrivacyMode);
 
     return CameraError::SUCCESS;
 }
@@ -1398,7 +1401,6 @@ CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneID)
 void CameraDevice::HandleSimulatedZoneTriggeredEvent(uint16_t zoneID)
 {
     mZoneManager.OnZoneTriggeredEvent(zoneID, ZoneEventTriggeredReasonEnum::kMotion);
-    mPushAVTransportManager.OnZoneTriggeredEvent(zoneID);
 }
 
 void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneID)
@@ -1600,6 +1602,11 @@ ZoneManagement::Delegate & CameraDevice::GetZoneManagementDelegate()
 MediaController & CameraDevice::GetMediaController()
 {
     return mMediaController;
+}
+
+void CameraDevice::HandlePushAvZoneTrigger(uint16_t zoneId)
+{
+    mPushAVTransportManager.HandleZoneTrigger(zoneId);
 }
 
 size_t CameraDevice::GetPreRollBufferSize()

@@ -43,15 +43,12 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
-    changed_paths:
-      uses: ./.github/workflows/analyze-changed-paths.yaml
-
     test_suites_linux:
         name: Test Suites - Linux
-        needs: changed_paths
+
         strategy:
             matrix:
-                build_variant: [no-ble-no-shell-tsan-clang]
+                build_variant: [no-shell-tsan-clang]
                 chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
@@ -61,11 +58,11 @@ jobs:
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
-        if: github.actor != 'restyled-io[bot]' && needs.changed_paths.outputs.non_md_changes == 'true'
+        if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:167
+            image: ghcr.io/project-chip/chip-build:169
             options: >-
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -361,6 +358,25 @@ jobs:
                      --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                   "
 
+            - name: Run BLE-WiFi commissioning test
+              env:
+                # Disable TSAN bug reporting, as it reports tons of (hopefully) false positives.
+                # The reason for that is BlueZ and WPA supplicant integration which involves GIO
+                # globals (glib internals) that TSAN does not understand...
+                TSAN_OPTIONS: report_bugs=0
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                  "./scripts/tests/run_test_suite.py \
+                     --runner chip_tool_python \
+                     --target TestOperationalState \
+                     --chip-tool ./out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     run \
+                     --iterations 1 \
+                     --test-timeout-seconds 120 \
+                     --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --ble-wifi \
+                  "
+
             - name: Run Tests using matter-repl (skip slow)
               if: github.event_name == 'pull_request'
               run: |
@@ -436,19 +452,24 @@ jobs:
 
     test_suites_darwin:
         name: Test Suites - Darwin
-        needs: changed_paths
+
         strategy:
             matrix:
-                build_variant: [no-ble-no-shell-asan-clang, no-ble-no-shell-tsan-clang]
-                chip_tool: [""]
+                include:
+                    - os: macos-14
+                      arch: arm64     # observed, not configured
+                      build_variant: no-ble-no-shell-asan-clang
+                    - os: macos-14
+                      arch: arm64     # observed, not configured
+                      build_variant: no-ble-no-shell-tsan-clang
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
             TSAN_OPTIONS: "halt_on_error=1"
             LSAN_OPTIONS: detect_leaks=1 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
 
-        if: github.actor != 'restyled-io[bot]' && needs.changed_paths.outputs.non_md_changes == 'true'
-        runs-on: macos-13
+        if: github.actor != 'restyled-io[bot]'
+        runs-on: ${{ matrix.os }}
 
         steps:
             - name: Checkout
@@ -472,45 +493,46 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target darwin-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
-                        --target darwin-x64-all-clusters-${BUILD_VARIANT} \
-                        --target darwin-x64-lock-${BUILD_VARIANT} \
-                        --target darwin-x64-ota-provider-${BUILD_VARIANT} \
-                        --target darwin-x64-ota-requestor-${BUILD_VARIANT} \
-                        --target darwin-x64-tv-app-${BUILD_VARIANT} \
-                        --target darwin-x64-bridge-${BUILD_VARIANT} \
-                        --target darwin-x64-lit-icd-${BUILD_VARIANT} \
-                        --target darwin-x64-microwave-oven-${BUILD_VARIANT} \
-                        --target darwin-x64-rvc-${BUILD_VARIANT} \
-                        --target darwin-x64-network-manager-${BUILD_VARIANT} \
-                        --target darwin-x64-energy-gateway-${BUILD_VARIANT} \
-                        --target darwin-x64-energy-management-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-lock-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
 
             - name: Run Tests using the python parser sending commands to chip-tool
+              # tests that failed macOS 15/26 last check: TestGroupMessaging,Test_TC_ACE_1_6,Test_TC_G_*,Test_TC_GRPKEY_*,Test_TC_S_*
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
                      --runner chip_tool_python \
-                     --chip-tool ./out/darwin-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --chip-tool ./out/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      --target-skip-glob '{Test_TC_DGTHREAD_2_1,Test_TC_DGTHREAD_2_2,Test_TC_DGTHREAD_2_3,Test_TC_DGTHREAD_2_4}' \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
-                     --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --lock-app ./out/darwin-x64-lock-${BUILD_VARIANT}/chip-lock-app \
-                     --ota-provider-app ./out/darwin-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
-                     --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-                     --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --bridge-app ./out/darwin-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
-                     --lit-icd-app ./out/darwin-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --microwave-oven-app ./out/darwin-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
-                     --rvc-app ./out/darwin-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
-                     --network-manager-app ./out/darwin-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-                     --energy-gateway-app ./out/darwin-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-                     --energy-management-app ./out/darwin-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
+                     --all-clusters-app ./out/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --lock-app ./out/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}/chip-lock-app \
+                     --ota-provider-app ./out/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-requestor-app ./out/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --tv-app ./out/darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --bridge-app ./out/darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                     --lit-icd-app ./out/darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT}/lit-icd-app \
+                     --microwave-oven-app ./out/darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
+                     --rvc-app ./out/darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}/chip-rvc-app \
+                     --network-manager-app ./out/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --energy-gateway-app ./out/darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --energy-management-app ./out/darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
@@ -519,13 +541,13 @@ jobs:
                   "./scripts/tests/run_test_suite.py \
                      --runner chip_tool_python \
                      --include-tags PURPOSEFUL_FAILURE \
-                     --chip-tool ./out/darwin-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --chip-tool ./out/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      run \
                      --iterations 1 \
                      --expected-failures 3 \
                      --keep-going \
                      --test-timeout-seconds 120 \
-                     --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --all-clusters-app ./out/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                   "
 
             - name: Uploading core files
@@ -553,8 +575,8 @@ jobs:
 
     repl_tests_linux:
         name: REPL Tests - Linux
-        needs: changed_paths
-        if: github.actor != 'restyled-io[bot]' && needs.changed_paths.outputs.non_md_changes == 'true'
+
+        if: github.actor != 'restyled-io[bot]'
 
         strategy:
             matrix:
@@ -567,7 +589,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:167
+            image: ghcr.io/project-chip/chip-build:169
             options: >-
                 --privileged
                 --sysctl net.ipv6.conf.all.disable_ipv6=0
@@ -849,17 +871,18 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1_min_pics.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_SC_7_1.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDecorators.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestChoiceConformanceSupport.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestConformanceSupport.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestConformanceTest.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestDefaultWarnings.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestIdChecks.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestMatterTestingSupport.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestPics.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingDeviceType.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingNamespace.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingSelection.py'
-                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/TestSpecParsingSupport.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestChoiceConformanceSupport.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestConformanceSupport.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestConformanceTest.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDefaultWarnings.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestIdChecks.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestMatterTestingSupport.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestPics.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingDataType.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingDeviceType.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingNamespace.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingSelection.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingSupport.py'
                   scripts/run_in_python_env.sh out/venv 'PYTHONPATH=src/python_testing:$PYTHONPATH python3 -m unittest discover -s src/python_testing/mdns_discovery/tests -p "test_*.py"'
 
             - name: Run Tests
@@ -913,16 +936,25 @@ jobs:
 
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
-        needs: changed_paths
+
         strategy:
             matrix:
-                build_variant: [no-ble-no-wifi-tsan-clang]
+                include:
+                - os: macos-14
+                  arch: arm64   # observed, not configured
+                  build_variant: no-ble-no-wifi-tsan-clang
+                # - os: macos-15-intel
+                #   arch: x64   # observed, not configured
+                #   build_variant: no-ble-no-wifi-tsan-clang`
+                # - os: macos-15
+                #   arch: arm64   # observed, not configured
+                #   build_variant: no-ble-no-wifi-tsan-clang`
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"
 
-        if: github.actor != 'restyled-io[bot]' && needs.changed_paths.outputs.non_md_changes == 'true'
-        runs-on: macos-13
+        if: github.actor != 'restyled-io[bot]'
+        runs-on: ${{ matrix.os }}
 
         steps:
             - name: Checkout
@@ -947,14 +979,14 @@ jobs:
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
                   ./scripts/run_in_build_env.sh \
                    "./scripts/build/build_examples.py \
-                      --target darwin-x64-all-clusters-${BUILD_VARIANT}-test \
+                      --target darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}-test \
                       build \
                       --copy-artifacts-to objdir-clone \
                    "
             - name: Run Tests
               if: false # disable darwin test runs for now as they were very flaky in the past
               run: |
-                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/darwin-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factory-reset --quiet --app-args "--discriminator 3840 --interface-id -1" --script-args "-t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/darwin-${{matrix.arch}}-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factory-reset --quiet --app-args "--discriminator 3840 --interface-id -1" --script-args "-t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
             - name: Uploading core files
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}

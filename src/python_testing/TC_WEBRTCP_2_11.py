@@ -76,7 +76,15 @@ class TC_WEBRTCP_2_11(MatterBaseTest, WebRTCTestHelper):
         return steps
 
     def pics_TC_WEBRTCP_2_11(self) -> list[str]:
-        return ["WEBRTCP.S", "AVSM.S"]
+        pics = [
+            "WEBRTCP.S",
+            "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
+            "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
+            "AVSM.S",
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
+        ]
+        return pics
 
     @property
     def default_timeout(self) -> int:
