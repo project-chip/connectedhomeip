@@ -299,8 +299,6 @@ public:
         return Status::Success;
     }
 
-    bool ValidateUrl(const std::string & url) override { return true; }
-
     Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId) override
     {
         // TODO: Select and Assign videoStreamID from the allocated videoStreams
