@@ -10,7 +10,7 @@ Please refer to the [Falsh ESP32-C6](https://github.com/espressif/esp-hosted-mcu
 
 ## Build Matter firmare for Host MCU
 
-The [all-clusters-app](../../../examples/all-clusters-app/esp32/README.md) example can be used as the Matter firmare for ESP32-P4. After flashing the slave co-processor, set the target, build and flash the firmware as shown below:
+The [all-clusters-app](../../../examples/all-clusters-app/esp32/README.md) example can be used as the Matter firmware for ESP32-P4. After flashing the slave co-processor, set the target, build and flash the firmware as shown below:
 
 ```
 idf.py set-target esp32p4
