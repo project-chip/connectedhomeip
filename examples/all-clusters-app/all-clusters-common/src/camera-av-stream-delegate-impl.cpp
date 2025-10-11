@@ -257,30 +257,6 @@ Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const
 }
 
 CHIP_ERROR
-CameraAVStreamManager::LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams)
-{
-    allocatedVideoStreams.clear();
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-CameraAVStreamManager::LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams)
-{
-    allocatedAudioStreams.clear();
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-CameraAVStreamManager::LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams)
-{
-    allocatedSnapshotStreams.clear();
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
 CameraAVStreamManager::PersistentAttributesLoadedCallback()
 {
     ChipLogDetail(Zcl, "Persistent attributes loaded");

@@ -621,6 +621,70 @@ GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int c
     return pipeline;
 }
 
+// Helper function to create a GStreamer pipeline for audio playback
+GstElement * CameraDevice::CreateAudioPlaybackPipeline(CameraError & error)
+{
+    GstElement * pipeline        = gst_pipeline_new("audio-playback-pipeline");
+    GstElement * udpsrc          = gst_element_factory_make("udpsrc", "audio_udpsrc");
+    GstElement * rtpjitterbuffer = gst_element_factory_make("rtpjitterbuffer", "rtp_jitter_buffer");
+    GstElement * rtpopusdepay    = gst_element_factory_make("rtpopusdepay", "rtp_opus_depay");
+    GstElement * opusdec         = gst_element_factory_make("opusdec", "opus_dec");
+    GstElement * audioconvert    = gst_element_factory_make("audioconvert", "audio_convert");
+    GstElement * audioresample   = gst_element_factory_make("audioresample", "audio_resample");
+    GstElement * capsfilter      = gst_element_factory_make("capsfilter", "audio_caps");
+    GstElement * queue           = gst_element_factory_make("queue", "audio_queue");
+    GstElement * autoaudiosink   = gst_element_factory_make("autoaudiosink", "audio_sink");
+
+    const std::vector<std::pair<GstElement *, const char *>> elements = {
+        { pipeline, "pipeline" },           { udpsrc, "udpsrc" },         { rtpjitterbuffer, "rtpjitterbuffer" },
+        { rtpopusdepay, "rtpopusdepay" },   { opusdec, "opusdec" },       { audioconvert, "audioconvert" },
+        { audioresample, "audioresample" }, { capsfilter, "capsfilter" }, { queue, "queue" },
+        { autoaudiosink, "autoaudiosink" }
+    };
+
+    if (GstreamerPipepline::isGstElementsNull(elements))
+    {
+        ChipLogError(Camera, "Not all audio playback pipeline elements could be created.");
+        GstreamerPipepline::unrefGstElements(pipeline, udpsrc, rtpjitterbuffer, rtpopusdepay, opusdec, audioconvert, audioresample,
+                                             capsfilter, queue, autoaudiosink);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    g_object_set(udpsrc, "port", 6001, nullptr);
+    GstCaps * udpsrc_caps =
+        gst_caps_new_simple("application/x-rtp", "media", G_TYPE_STRING, "audio", "encoding-name", G_TYPE_STRING, "OPUS", "payload",
+                            G_TYPE_INT, 111, "clock-rate", G_TYPE_INT, 48000, "channel", G_TYPE_INT, 1, nullptr);
+    g_object_set(udpsrc, "caps", udpsrc_caps, nullptr);
+    gst_caps_unref(udpsrc_caps);
+
+    // Configure rtpjitterbuffer
+    // latency is set high (2.5s) because too much underflow, clock-skew issues are observed with the piepline is receiving audio
+    // stream from libdatachannel.
+    g_object_set(rtpjitterbuffer, "latency", 2500, nullptr);
+
+    // Configure capsfilter for autoaudiosink
+    GstCaps * sink_caps = gst_caps_new_simple("audio/x-raw", "format", G_TYPE_STRING, "S16LE", "layout", G_TYPE_STRING,
+                                              "interleaved", "channels", G_TYPE_INT, 1, "rate", G_TYPE_INT, 48000, nullptr);
+    g_object_set(capsfilter, "caps", sink_caps, nullptr);
+    gst_caps_unref(sink_caps);
+    g_object_set(autoaudiosink, "sync", FALSE, nullptr);
+
+    gst_bin_add_many(GST_BIN(pipeline), udpsrc, rtpjitterbuffer, rtpopusdepay, opusdec, audioconvert, audioresample, capsfilter,
+                     queue, autoaudiosink, nullptr);
+
+    if (!gst_element_link_many(udpsrc, rtpjitterbuffer, rtpopusdepay, opusdec, audioconvert, audioresample, capsfilter, queue,
+                               autoaudiosink, nullptr))
+    {
+        ChipLogError(Camera, "Audio playback pipeline elements could not be linked.");
+        gst_object_unref(pipeline);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    return pipeline;
+}
+
 // Helper function to set V4L2 control
 CameraError CameraDevice::SetV4l2Control(uint32_t controlId, int value)
 {
@@ -905,6 +969,17 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
     // Store in stream context
     it->audioContext = audioPipeline;
 
+    // Start the audio playback pipeline
+    if (LinuxDeviceOptions::GetInstance().cameraAudioPlayback)
+    {
+        CameraError playbackError = StartAudioPlaybackStream();
+        if (playbackError != CameraError::SUCCESS)
+        {
+            ChipLogError(Camera, "Failed to start audio playback pipeline for stream ID: %u. Error: %d", streamID,
+                         static_cast<int>(playbackError));
+        }
+    }
+
     return CameraError::SUCCESS;
 }
 
@@ -931,6 +1006,70 @@ CameraError CameraDevice::StopAudioStream(uint16_t streamID)
         it->audioContext = nullptr;
     }
 
+    // Stop the audio playback pipeline
+    if (LinuxDeviceOptions::GetInstance().cameraAudioPlayback)
+    {
+        CameraError playbackError = StopAudioPlaybackStream();
+        if (playbackError != CameraError::SUCCESS)
+        {
+            ChipLogError(Camera, "Failed to stop audio playback pipeline for stream ID: %u. Error: %d", streamID,
+                         static_cast<int>(playbackError));
+        }
+    }
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::StartAudioPlaybackStream()
+{
+
+    if (mAudioPlaybackPipeline != nullptr)
+    {
+        ChipLogError(Camera, "Audio playback pipeline already exists. Stop it before starting a new one.");
+        return CameraError::ERROR_AUDIO_STREAM_START_FAILED;
+    }
+
+    CameraError error      = CameraError::SUCCESS;
+    mAudioPlaybackPipeline = CreateAudioPlaybackPipeline(error);
+    if (mAudioPlaybackPipeline == nullptr)
+    {
+        ChipLogError(Camera, "Failed to create audio playback pipeline.");
+        return error;
+    }
+
+    GstStateChangeReturn result = gst_element_set_state(mAudioPlaybackPipeline, GST_STATE_PLAYING);
+    if (result == GST_STATE_CHANGE_FAILURE)
+    {
+        ChipLogError(Camera, "Failed to start audio playback pipeline.");
+        gst_object_unref(mAudioPlaybackPipeline);
+        mAudioPlaybackPipeline = nullptr;
+        return CameraError::ERROR_AUDIO_STREAM_START_FAILED;
+    }
+
+    ChipLogProgress(Camera, "Audio playback pipeline started");
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::StopAudioPlaybackStream()
+{
+    if (mAudioPlaybackPipeline == nullptr)
+    {
+        ChipLogDetail(Camera, "Audio playback pipeline is not running or already stopped.");
+        return CameraError::SUCCESS;
+    }
+
+    ChipLogProgress(Camera, "Stopping audio playback pipeline");
+    GstStateChangeReturn result = gst_element_set_state(mAudioPlaybackPipeline, GST_STATE_NULL);
+    gst_object_unref(mAudioPlaybackPipeline);
+    mAudioPlaybackPipeline = nullptr;
+
+    if (result == GST_STATE_CHANGE_FAILURE)
+    {
+        ChipLogError(Camera, "Failed to stop audio playback pipeline.");
+        return CameraError::ERROR_AUDIO_STREAM_STOP_FAILED;
+    }
+
+    ChipLogProgress(Camera, "Audio playback pipeline stopped.");
     return CameraError::SUCCESS;
 }
 
@@ -1500,7 +1639,7 @@ void CameraDevice::InitializeAudioStreams()
 void CameraDevice::InitializeSnapshotStreams()
 {
     // Create single snapshot stream with typical supported parameters
-    uint16_t streamId;
+    uint16_t streamId = kInvalidStreamID;
     AddSnapshotStream({ ImageCodecEnum::kJpeg,
                         kSnapshotStreamFrameRate /* FrameRate */,
                         { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution*/,
@@ -1521,34 +1660,60 @@ bool CameraDevice::AddSnapshotStream(const CameraAVStreamMgmtDelegate::SnapshotS
     }
 
     uint16_t streamId = 0;
-    for (const auto & s : mSnapshotStreams)
+    // Fetch a new stream ID if the passed ID is kInvalidStreamID, otherwise use
+    // the ID that was passed in. A valid streamID would be passed in when the
+    // stream list is being constructed from the persisted list of allocated
+    // streams that was loaded at Init()
+    if (outStreamID == kInvalidStreamID)
     {
-        // Find the highest existing stream ID.
-        if (s.snapshotStreamParams.snapshotStreamID > streamId)
+        for (const auto & s : mSnapshotStreams)
         {
-            streamId = s.snapshotStreamParams.snapshotStreamID;
+            // Find the highest existing stream ID.
+            if (s.snapshotStreamParams.snapshotStreamID > streamId)
+            {
+                streamId = s.snapshotStreamParams.snapshotStreamID;
+            }
         }
-    }
 
-    // Find a unique stream id, starting from the last used one above, incrementing and wrapping at 65535.
-    for (uint16_t attempts = 0; attempts < kMaxSnapshotStreams; ++attempts)
+        // Find a unique stream id, starting from the last used one above, incrementing and wrapping at 65535.
+        for (uint16_t attempts = 0; attempts < kMaxSnapshotStreams; ++attempts)
+        {
+            auto found = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
+                return s.snapshotStreamParams.snapshotStreamID == streamId;
+            });
+            if (found == mSnapshotStreams.end())
+            {
+                break;
+            }
+            if (attempts == kMaxSnapshotStreams - 1)
+            {
+                ChipLogError(Camera, "No available slot for stream allocation");
+                return false;
+            }
+            streamId = static_cast<uint16_t>((streamId + 1) % kMaxSnapshotStreams); // Wraps to 0 after max-1
+        }
+
+        outStreamID = streamId;
+    }
+    else
     {
-        auto found = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
-            return s.snapshotStreamParams.snapshotStreamID == streamId;
+        // Have a sanity check that the passed streamID does not already exist
+        // in the list
+        auto found = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [outStreamID](const SnapshotStream & s) {
+            return s.snapshotStreamParams.snapshotStreamID == outStreamID;
         });
+
         if (found == mSnapshotStreams.end())
         {
-            break;
+            streamId = outStreamID;
         }
-        if (attempts == kMaxSnapshotStreams - 1)
+        else
         {
-            ChipLogError(Camera, "No available slot for stream allocation");
+            ChipLogError(Camera, "StreamID %d already exists in the available snapshot stream list", outStreamID);
             return false;
         }
-        streamId = static_cast<uint16_t>((streamId + 1) % kMaxSnapshotStreams); // Wraps to 0 after max-1
     }
 
-    outStreamID                   = streamId;
     SnapshotStream snapshotStream = { { streamId, snapshotStreamAllocateArgs.imageCodec, snapshotStreamAllocateArgs.maxFrameRate,
                                         snapshotStreamAllocateArgs.minResolution, snapshotStreamAllocateArgs.maxResolution,
                                         snapshotStreamAllocateArgs.quality, 0 /* RefCount */ },
