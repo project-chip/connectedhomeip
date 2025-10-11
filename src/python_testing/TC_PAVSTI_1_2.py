@@ -326,6 +326,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                 "Error when trying to write SoftLivestreamPrivacyModeEnabled",
             )
         else:
+            self.skip_step(6)
             self.skip_step(7)
             self.skip_step(8)
             self.skip_step(9)
