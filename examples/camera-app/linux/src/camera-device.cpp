@@ -91,7 +91,7 @@ GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_da
     if (gst_buffer_map(buffer, &map, GST_MAP_READ))
     {
         // Forward H.264 RTP data to media controller with the correct videoStreamID
-        self->GetMediaController().DistributeVideo(reinterpret_cast<const char *>(map.data), map.size, videoStreamID);
+        self->GetMediaController().DistributeVideo(reinterpret_cast<const uint8_t *>(map.data), map.size, videoStreamID);
         gst_buffer_unmap(buffer, &map);
     }
 
@@ -133,7 +133,7 @@ static GstFlowReturn OnNewAudioSampleFromAppSink(GstAppSink * appsink, gpointer 
     if (gst_buffer_map(buffer, &map, GST_MAP_READ))
     {
         // Send raw Opus frames to the media controller
-        self->GetMediaController().DistributeAudio(reinterpret_cast<const char *>(map.data), map.size, audioStreamID);
+        self->GetMediaController().DistributeAudio(reinterpret_cast<const uint8_t *>(map.data), map.size, audioStreamID);
         gst_buffer_unmap(buffer, &map);
     }
 
