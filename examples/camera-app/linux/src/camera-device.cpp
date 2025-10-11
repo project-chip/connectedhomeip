@@ -1639,7 +1639,7 @@ void CameraDevice::InitializeAudioStreams()
 void CameraDevice::InitializeSnapshotStreams()
 {
     // Create single snapshot stream with typical supported parameters
-    uint16_t streamId;
+    uint16_t streamId = kInvalidStreamID;
     AddSnapshotStream({ ImageCodecEnum::kJpeg,
                         kSnapshotStreamFrameRate /* FrameRate */,
                         { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution*/,
@@ -1660,34 +1660,60 @@ bool CameraDevice::AddSnapshotStream(const CameraAVStreamMgmtDelegate::SnapshotS
     }
 
     uint16_t streamId = 0;
-    for (const auto & s : mSnapshotStreams)
+    // Fetch a new stream ID if the passed ID is kInvalidStreamID, otherwise use
+    // the ID that was passed in. A valid streamID would be passed in when the
+    // stream list is being constructed from the persisted list of allocated
+    // streams that was loaded at Init()
+    if (outStreamID == kInvalidStreamID)
     {
-        // Find the highest existing stream ID.
-        if (s.snapshotStreamParams.snapshotStreamID > streamId)
+        for (const auto & s : mSnapshotStreams)
         {
-            streamId = s.snapshotStreamParams.snapshotStreamID;
+            // Find the highest existing stream ID.
+            if (s.snapshotStreamParams.snapshotStreamID > streamId)
+            {
+                streamId = s.snapshotStreamParams.snapshotStreamID;
+            }
         }
-    }
 
-    // Find a unique stream id, starting from the last used one above, incrementing and wrapping at 65535.
-    for (uint16_t attempts = 0; attempts < kMaxSnapshotStreams; ++attempts)
+        // Find a unique stream id, starting from the last used one above, incrementing and wrapping at 65535.
+        for (uint16_t attempts = 0; attempts < kMaxSnapshotStreams; ++attempts)
+        {
+            auto found = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
+                return s.snapshotStreamParams.snapshotStreamID == streamId;
+            });
+            if (found == mSnapshotStreams.end())
+            {
+                break;
+            }
+            if (attempts == kMaxSnapshotStreams - 1)
+            {
+                ChipLogError(Camera, "No available slot for stream allocation");
+                return false;
+            }
+            streamId = static_cast<uint16_t>((streamId + 1) % kMaxSnapshotStreams); // Wraps to 0 after max-1
+        }
+
+        outStreamID = streamId;
+    }
+    else
     {
-        auto found = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
-            return s.snapshotStreamParams.snapshotStreamID == streamId;
+        // Have a sanity check that the passed streamID does not already exist
+        // in the list
+        auto found = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [outStreamID](const SnapshotStream & s) {
+            return s.snapshotStreamParams.snapshotStreamID == outStreamID;
         });
+
         if (found == mSnapshotStreams.end())
         {
-            break;
+            streamId = outStreamID;
         }
-        if (attempts == kMaxSnapshotStreams - 1)
+        else
         {
-            ChipLogError(Camera, "No available slot for stream allocation");
+            ChipLogError(Camera, "StreamID %d already exists in the available snapshot stream list", outStreamID);
             return false;
         }
-        streamId = static_cast<uint16_t>((streamId + 1) % kMaxSnapshotStreams); // Wraps to 0 after max-1
     }
 
-    outStreamID                   = streamId;
     SnapshotStream snapshotStream = { { streamId, snapshotStreamAllocateArgs.imageCodec, snapshotStreamAllocateArgs.maxFrameRate,
                                         snapshotStreamAllocateArgs.minResolution, snapshotStreamAllocateArgs.maxResolution,
                                         snapshotStreamAllocateArgs.quality, 0 /* RefCount */ },
