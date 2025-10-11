@@ -96,7 +96,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             timeout=timeout)
 
         self.current_provider_app_proc = proc
-        logger.info(f"Provider started with PID:  {self.current_provider_app_proc.get_pid()}")
+        logger.info(f"Provider started with PID:  {self.current_provider_app_proc.p.pid()}")
 
     def start_requestor(self,
                         setup_pincode: int = 20202021,
@@ -150,7 +150,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             timeout=timeout)
 
         self.current_requestor_app_proc = proc
-        logger.info(f"Requestor started with PID:  {self.current_requestor_app_proc.get_pid()}")
+        logger.info(f"Requestor started with PID:  {self.current_requestor_app_proc.p.pid}")
 
     def get_ota_image_path(self, version: int = 2) -> str:
         """Get the path ota image used for the provider.
