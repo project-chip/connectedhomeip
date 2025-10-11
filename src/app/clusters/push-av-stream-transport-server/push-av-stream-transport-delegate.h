@@ -32,7 +32,6 @@ namespace app {
 namespace Clusters {
 
 // Forward declarations
-class PushAvStreamTransportServerLogic;
 class PushAvStreamTransportServer;
 
 /**
@@ -150,9 +149,11 @@ public:
      * @brief Validates the provided Segment Duration.
      *
      * @param segmentDuration The Segment Duration to validate
-     * @return true if Segment Duration is multiple of KeyFrameInterval, false otherwise
+     * @param videoStreamId   The video stream to eb validated against
+     * @return true if Segment Duration is multiple of KeyFrameInterval for the provided videoStreamId, false otherwise
      */
-    virtual bool ValidateSegmentDuration(uint16_t segmentDuration) = 0;
+    virtual bool ValidateSegmentDuration(uint16_t segmentDuration,
+                                         const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) = 0;
 
     /**
      * @brief Validates bandwidth requirements against camera's resource management.
@@ -194,22 +195,24 @@ public:
                                                                   uint16_t & audioStreamId) = 0;
 
     /**
-     * @brief Validates that the video stream corresponding to videoStreamID is allocated.
+     * @brief Sets the video stream for Push AV usage corresponding to videoStreamID,
+     * if it is valid and is allocated.
      *
      * @param videoStreamId Identifier for the requested video stream
-     * @return Status::Success if allocated video stream exists;
+     * @return Status::Success if allocated video stream exists and is set for PushAV usage;
      *         Status::InvalidStream if no allocated video stream with videoStreamID exists
      */
-    virtual Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId) = 0;
+    virtual Protocols::InteractionModel::Status SetVideoStream(uint16_t videoStreamId) = 0;
 
     /**
-     * @brief Validates that the audio stream corresponding to audioStreamID is allocated.
+     * @brief Sets the audio stream for Push AV usage corresponding to audioStreamID,
+     * if it is valid and is allocated.
      *
      * @param audioStreamId Identifier for the requested audio stream
-     * @return Status::Success if allocated audio stream exists;
+     * @return Status::Success if allocated audio stream exists and is set for PushAV usage;
      *         Status::InvalidStream if no allocated audio stream with audioStreamID exists
      */
-    virtual Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) = 0;
+    virtual Protocols::InteractionModel::Status SetAudioStream(uint16_t audioStreamId) = 0;
 
     /**
      * @brief Validates that the zone corresponding to zoneId exists.
@@ -271,7 +274,31 @@ public:
                              Tls::CertificateTable::BufferedRootCert & rootCertEntry) = 0;
 
     /**
-     * @brief Sets the PushAvStreamTransportServerLogic instance for the delegate.
+     * @brief Verifies whether Hard privacy mode is active on the device as set against the stream management instance
+     *
+     * @param isActive boolean that is set by the delgate indicating privacy status, True is active
+     * @return CHIP_ERROR indicating success or failure
+     */
+    virtual CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) = 0;
+
+    /**
+     * @brief Verifies whether Soft Recording privacy mode is active on the device as set against the stream management instance
+     *
+     * @param isActive boolean that is set by the delgate indicating privacy status, True is active
+     * @return CHIP_ERROR indicating success or failure
+     */
+    virtual CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) = 0;
+
+    /**
+     * @brief Verifies whether Soft Livestream privacy mode is active on the device as set against the stream management instance
+     *
+     * @param isActive boolean that is set by the delgate indicating privacy status, True is active
+     * @return CHIP_ERROR indicating success or failure
+     */
+    virtual CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) = 0;
+
+    /**
+     * @brief Sets the PushAvStreamTransportServer instance for the delegate.
      *
      * This method is called by the PushAvStreamTransportServer to provide
      * the delegate with a pointer to the server instance. This allows the

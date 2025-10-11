@@ -69,7 +69,11 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
     def pics_TC_WEBRTCP_2_16(self) -> list[str]:
         pics = [
             "WEBRTCP.S",
+            "WEBRTCP.S.C02.Rsp",   # ProvideOffer command
+            "WEBRTCP.S.C03.Tx",    # ProvideOfferResponse command
             "AVSM.S",
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
         ]
         return pics
 
