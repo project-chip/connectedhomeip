@@ -145,7 +145,8 @@ class WebSocketRunner(TestRunner):
             try:
                 instance.wait(_WEBSOCKET_SERVER_TERMINATE_TIMEOUT)
             except subprocess.TimeoutExpired:
-                LOGGER.debug('Subprocess did not terminate on SIGTERM, killing it now')
+                LOGGER.debug(
+                    'Subprocess did not terminate on SIGTERM, killing it now')
                 instance.kill()
 
     def _make_server_connection_url(self, address: str, port: int):
