@@ -139,7 +139,7 @@ public:
      * @param size Data size in bytes
      * @param isVideo True for video data, false for audio
      */
-    void PushPacket(const char * data, size_t size, bool isVideo);
+    void PushPacket(const uint8_t * data, size_t size, bool isVideo);
 
     void SetOnStopCallback(std::function<void()> cb) { mOnStopCallback = std::move(cb); }
 
@@ -206,8 +206,19 @@ private:
     /// @name Internal Methods
     /// @{
     bool FileExists(const std::string & path);
+
+    bool IsOutputDirectoryValid(const std::string & path);
+
+    /**
+     * @brief Removes files from previous recordings in the specified directory.
+     * @param path The directory path to clean.
+     */
+    void RemovePreviousRecordingFiles(const std::string & path);
+
     bool CheckAndUploadFile(std::string path);
+
     bool IsH264IFrame(const uint8_t * data, unsigned int length);
+
     AVPacket * CreatePacket(const uint8_t * data, int size, bool isVideo);
 
     /**

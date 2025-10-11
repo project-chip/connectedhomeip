@@ -357,7 +357,7 @@ fabric_scoped struct WebRTCSessionStruct {
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
-  revision 5;
+  revision 6;
 
   enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
@@ -2675,7 +2675,7 @@ cluster Switch = 59 {
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum CommissioningWindowStatusEnum : enum8 {
     kWindowNotOpen = 0;
@@ -2704,7 +2704,7 @@ cluster AdministratorCommissioning = 60 {
 
   request struct OpenCommissioningWindowRequest {
     int16u commissioningTimeout = 0;
-    octet_string PAKEPasscodeVerifier = 1;
+    octet_string<97> PAKEPasscodeVerifier = 1;
     int16u discriminator = 2;
     int32u iterations = 3;
     octet_string<32> salt = 4;
@@ -2714,11 +2714,11 @@ cluster AdministratorCommissioning = 60 {
     int16u commissioningTimeout = 0;
   }
 
-  /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method. */
+  /** This command is used by a current Administrator to instruct a Node to go into commissioning mode. */
   timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using basic commissioning method, if the node supports it. */
+  /** This command MAY be used by a current Administrator to instruct a Node to go into commissioning mode, if the node supports the Basic Commissioning Method. */
   timed command access(invoke: administer) OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
-  /** This command is used by a current Administrator to instruct a Node to revoke any active Open Commissioning Window or Open Basic Commissioning Window command. */
+  /** This command is used by a current Administrator to instruct a Node to revoke any active OpenCommissioningWindow or OpenBasicCommissioningWindow command. */
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
@@ -4865,43 +4865,43 @@ cluster Thermostat = 513 {
     nullable temperature coolSetpoint = 2;
   }
 
-  info event SystemModeChange = 0 {
+  provisional info event SystemModeChange = 0 {
     optional SystemModeEnum previousSystemMode = 0;
     SystemModeEnum currentSystemMode = 1;
   }
 
-  info event LocalTemperatureChange = 1 {
+  provisional info event LocalTemperatureChange = 1 {
     nullable temperature currentLocalTemperature = 0;
   }
 
-  info event OccupancyChange = 2 {
+  provisional info event OccupancyChange = 2 {
     optional OccupancyBitmap previousOccupancy = 0;
     OccupancyBitmap currentOccupancy = 1;
   }
 
-  info event SetpointChange = 3 {
+  provisional info event SetpointChange = 3 {
     SystemModeEnum systemMode = 0;
     optional OccupancyBitmap occupancy = 1;
     optional temperature previousSetpoint = 2;
     temperature currentSetpoint = 3;
   }
 
-  info event RunningStateChange = 4 {
+  provisional info event RunningStateChange = 4 {
     optional RelayStateBitmap previousRunningState = 0;
     RelayStateBitmap currentRunningState = 1;
   }
 
-  info event RunningModeChange = 5 {
+  provisional info event RunningModeChange = 5 {
     optional ThermostatRunningModeEnum previousRunningMode = 0;
     ThermostatRunningModeEnum currentRunningMode = 1;
   }
 
-  info event ActiveScheduleChange = 6 {
+  provisional info event ActiveScheduleChange = 6 {
     optional nullable octet_string previousScheduleHandle = 0;
     nullable octet_string currentScheduleHandle = 1;
   }
 
-  info event ActivePresetChange = 7 {
+  provisional info event ActivePresetChange = 7 {
     optional nullable octet_string previousPresetHandle = 0;
     nullable octet_string currentPresetHandle = 1;
   }
@@ -6268,7 +6268,7 @@ cluster WakeOnLan = 1283 {
 
 /** This cluster provides an interface for managing low power mode on a device. */
 cluster LowPower = 1288 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6276,7 +6276,7 @@ cluster LowPower = 1288 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** This command shall put the device into low power mode. */
+  /** This command SHALL put the device into low power mode. */
   command Sleep(): DefaultSuccess = 0;
 }
 
@@ -6684,6 +6684,7 @@ provisional cluster PushAvStreamTransport = 1365 {
     kInvalidTransportStatus = 8;
     kInvalidOptions = 9;
     kInvalidStreamUsage = 10;
+    kInvalidTime = 11;
   }
 
   enum TransportStatusEnum : enum8 {
@@ -6748,7 +6749,7 @@ provisional cluster PushAvStreamTransport = 1365 {
     StreamUsageEnum streamUsage = 0;
     optional nullable int16u videoStreamID = 1;
     optional nullable int16u audioStreamID = 2;
-    int16u endpointID = 3;
+    int16u TLSEndpointID = 3;
     long_char_string<2000> url = 4;
     TransportTriggerOptionsStruct triggerOptions = 5;
     IngestMethodsEnum ingestMethod = 6;
@@ -6776,8 +6777,6 @@ provisional cluster PushAvStreamTransport = 1365 {
 
   info event PushTransportEnd = 1 {
     int16u connectionID = 0;
-    TransportTriggerTypeEnum triggerType = 1;
-    optional TriggerActivationReasonEnum activationReason = 2;
   }
 
   readonly attribute SupportedFormatStruct supportedFormats[] = 0;
@@ -8100,7 +8099,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -8269,7 +8268,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command Stop;
     handle command Start;
@@ -8496,7 +8495,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
 
     handle command Pause;
     handle command Stop;
@@ -8518,7 +8517,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command Pause;
     handle command Resume;
@@ -9446,7 +9445,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -9568,7 +9567,7 @@ endpoint 3 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -9610,7 +9609,7 @@ endpoint 4 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
   }
 
   server cluster Descriptor {

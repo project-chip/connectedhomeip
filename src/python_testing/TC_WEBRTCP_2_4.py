@@ -46,13 +46,13 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCProvider_2_4(MatterBaseTest, WEBRTCPTestBase):
+class TC_WebRTCP_2_4(MatterBaseTest, WEBRTCPTestBase):
 
-    def desc_TC_WebRTCProvider_2_4(self) -> str:
+    def desc_TC_WebRTCP_2_4(self) -> str:
         """Returns a description of this test"""
         return "[TC-{picsCode}-2.4] Validate setting an SDP Offer for an existing session with {DUT_Server}"
 
-    def steps_TC_WebRTCProvider_2_4(self) -> list[TestStep]:
+    def steps_TC_WebRTCP_2_4(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
@@ -67,8 +67,23 @@ class TC_WebRTCProvider_2_4(MatterBaseTest, WEBRTCPTestBase):
         ]
         return steps
 
+    def pics_TC_WebRTCP_2_4(self) -> list[str]:
+        """
+        Return the list of PICS applicable to this test case.
+        """
+        pics = [
+            "WEBRTCP.S",           # WebRTC Transport Provider Server
+            "WEBRTCP.S.A0000",     # CurrentSessions attribute
+            "WEBRTCP.S.C02.Rsp",   # ProvideOffer command
+            "WEBRTCP.S.C03.Tx",    # ProvideOfferResponse command
+            "AVSM.S",              # CameraAVStreamManagement Server
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
+        ]
+        return pics
+
     @async_test_body
-    async def test_TC_WebRTCProvider_2_4(self):
+    async def test_TC_WebRTCP_2_4(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """

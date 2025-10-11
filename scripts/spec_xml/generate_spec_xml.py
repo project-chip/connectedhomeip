@@ -54,7 +54,6 @@ CURRENT_IN_PROGRESS_DEFINES = [
     "metering",
     "nfcCommissioning",
     "q-phase-2",
-    "q-phase-3",
     "rvc-direct-mode",
     "rvc-go-home",
     "soil-sensor",
@@ -181,7 +180,7 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
     if (dry_run):
         logging.info(cmd)
         return
-    subprocess.run(cmd)
+    subprocess.run(cmd, check=True)
     # Remove all the files that weren't compiled into the spec
     clusters_output_dir = os.path.join(output_dir, 'clusters')
     device_types_output_dir = os.path.abspath(os.path.join(output_dir, 'device_types'))
@@ -413,11 +412,15 @@ def dump_ids_from_data_model_dirs():
 
         def device_type_support_str(d):
             logging.info(f"checking device type for {d.name} for {dir}")
-            dt_mandatory = [id for id, requirement in d.server_clusters.items() if requirement.conformance(
+            dt_server_mandatory = [id for id, requirement in d.server_clusters.items() if requirement.conformance(
                 [], 0, 0).decision == ConformanceDecision.MANDATORY]
-            provisional = [clusters[c].name for c in dt_mandatory if clusters[c].is_provisional]
-            if provisional:
-                logging.info(f"Found provisional mandatory clusters {provisional} in device type {d.name} for revision {dir}")
+            server_provisional = [clusters[c].name for c in dt_server_mandatory if clusters[c].is_provisional]
+            dt_client_mandatory = [id for id, requirement in d.client_clusters.items(
+            ) if requirement.conformance([], 0, 0).decision == ConformanceDecision.MANDATORY]
+            client_provisional = [clusters[c].name for c in dt_client_mandatory if clusters[c].is_provisional]
+            if server_provisional or client_provisional:
+                logging.info(
+                    f"Found provisional mandatory clusters server:{server_provisional} client: {client_provisional} in device type {d.name} for revision {dir}")
                 return "P"
             return "C"
 
