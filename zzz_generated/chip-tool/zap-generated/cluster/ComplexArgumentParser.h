@@ -67,6 +67,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Struct
 
 static void Finalize(chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::SemanticTagStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Globals::Structs::SemanticTagStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::TestGlobalStruct::Type & request,
                         Json::Value & value);
 
@@ -125,11 +130,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Descriptor::Str
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Binding::Structs::TargetStruct::Type & request,
                         Json::Value & value);
@@ -351,6 +351,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ScenesManagemen
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Groupcast::Structs::MembershipStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Groupcast::Structs::MembershipStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::Type & request,
@@ -788,6 +793,11 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type & request);
 
 static CHIP_ERROR
 Setup(const char * label,

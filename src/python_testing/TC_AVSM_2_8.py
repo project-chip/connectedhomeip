@@ -69,11 +69,21 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 3,
+                "TH sends the VideoStreamModify command with VideoStreamID set to aStreamID. No WaterMarkEnabled or OSDEnabled provided.",
+                "DUT responds with an INVALID_COMMAND status code.",
+            ),
+            TestStep(
+                4,
+                "TH sends the VideoStreamModify command with VideoStreamID set to aStreamID + 1.",
+                "DUT responds with an NOT_FOUND status code.",
+            ),
+            TestStep(
+                5,
                 "TH sends the VideoStreamModify command with VideoStreamID set to aStreamID. If WMARK is supported, set WaterMarkEnabled to !aWmark and if OSD is supported, set OSDEnabled to !aOSD in the command.",
                 "DUT responds with a SUCCESS status code.",
             ),
             TestStep(
-                4,
+                6,
                 "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the following: If WMARK is supported, verify WaterMarkEnabled == !aWmark. If OSD is supported, verify OSDEnabled == !aOSD.",
             ),
@@ -118,6 +128,32 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
         try:
             videoStreamModifyCmd = commands.VideoStreamModify(
                 videoStreamID=aStreamID,
+                watermarkEnabled=None,
+                OSDEnabled=None,
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamModifyCmd)
+            asserts.fail("Unexpected success when expecting INVALID_COMMAND due to absence of WatermarkEnabled and OSDEnabled")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.InvalidCommand, "Unexpected error when expecting INVALID_COMMAND")
+            pass
+
+        self.step(4)
+        try:
+            videoStreamModifyCmd = commands.VideoStreamModify(
+                videoStreamID=aStreamID + 1,
+                watermarkEnabled=None if aWmark is None else not aWmark,
+                OSDEnabled=None if aOSD is None else not aOSD,
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamModifyCmd)
+            asserts.fail("Unexpected success when expecting NOT_FOUND due to wrong streamID")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.NotFound, "Unexpected error when expecting NOT_FOUND")
+            pass
+
+        self.step(5)
+        try:
+            videoStreamModifyCmd = commands.VideoStreamModify(
+                videoStreamID=aStreamID,
                 watermarkEnabled=None if aWmark is None else not aWmark,
                 OSDEnabled=None if aOSD is None else not aOSD,
             )
@@ -126,7 +162,7 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
 
-        self.step(4)
+        self.step(6)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
@@ -135,6 +171,17 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
             asserts.assert_equal(aAllocatedVideoStreams[0].watermarkEnabled, not aWmark, "WaterMarkEnabled is not !aWmark")
         if osdSupport:
             asserts.assert_equal(aAllocatedVideoStreams[0].OSDEnabled, not aOSD, "OSDEnabled is not !aOSD")
+
+        # Clear all allocated streams
+        aAllocatedVideoStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
+        )
+
+        for stream in aAllocatedVideoStreams:
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=(stream.videoStreamID)))
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
 
 if __name__ == "__main__":

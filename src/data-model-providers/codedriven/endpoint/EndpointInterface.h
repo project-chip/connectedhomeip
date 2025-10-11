@@ -18,7 +18,7 @@
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/ServerClusterInterface.h>
-#include <clusters/Descriptor/Structs.h>
+#include <clusters/shared/Structs.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
@@ -39,24 +39,13 @@ class EndpointInterface
 public:
     virtual ~EndpointInterface() = default;
 
-    using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
-
-    virtual const DataModel::EndpointEntry & GetEndpointEntry() const = 0;
+    using SemanticTag = Clusters::Globals::Structs::SemanticTagStruct::Type;
 
     virtual CHIP_ERROR SemanticTags(ReadOnlyBufferBuilder<SemanticTag> & out) const = 0;
 
     virtual CHIP_ERROR DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const = 0;
 
     virtual CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const = 0;
-
-    /**
-     * @brief Retrieves a pointer to the ServerClusterInterface for the given cluster ID.
-     * The returned pointer shall be valid as long as the EndpointInterface instance is valid.
-     *
-     * @param clusterId The ID of the server cluster to retrieve.
-     * @return A pointer to the ServerClusterInterface if found, otherwise nullptr.
-     */
-    virtual ServerClusterInterface * GetServerCluster(ClusterId clusterId) const = 0;
 
     /**
      * @brief Populates the provided buffer with pointers to all ServerClusterInterface instances
@@ -66,7 +55,6 @@ public:
      * @param[out] out The buffer to fill with ServerClusterInterface pointers.
      * @return CHIP_NO_ERROR on success or CHIP_ERROR_NO_MEMORY if the buffer is too small.
      */
-    virtual CHIP_ERROR ServerClusters(ReadOnlyBufferBuilder<ServerClusterInterface *> & out) const = 0;
 };
 
 } // namespace app

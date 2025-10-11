@@ -153,7 +153,13 @@ extern uint32_t SystemCoreClock;
 #define configUSE_TICKLESS_IDLE 0
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
 
+// Set the FreeRTOS tick rate depending on the MCU interface.
+#ifdef SLI_SI91X_MCU_INTERFACE
+// For Si91x SoCs, a 1000Hz tick rate provides an exact 1ms systick period
+#define configTICK_RATE_HZ (1000)
+#else // EFR32 platforms
 #define configTICK_RATE_HZ (1024)
+#endif // SLI_SI91X_MCU_INTERFACE
 
 /* Definition used by Keil to replace default system clock source. */
 #define configOVERRIDE_DEFAULT_TICK_CONFIGURATION 1
@@ -268,7 +274,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define INCLUDE_vTaskDelete (1)
 #define INCLUDE_vTaskSuspend (1)
 #define INCLUDE_xResumeFromISR (1)
-#define INCLUDE_vTaskDelayUntil (1)
+#define INCLUDE_xTaskDelayUntil (1)
 #define INCLUDE_vTaskDelay (1)
 #define INCLUDE_xTaskGetSchedulerState (1)
 #define INCLUDE_xTaskGetCurrentTaskHandle (1)

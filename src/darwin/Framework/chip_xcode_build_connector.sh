@@ -110,6 +110,7 @@ declare -a args=(
     'chip_build_tools=false'
     'chip_build_tests=false'
     'chip_enable_wifi=false'
+    'chip_enable_nfc_based_commissioning=true'
     'chip_enable_python_modules=false'
     'chip_device_config_enable_dynamic_mrp_config=true'
     'chip_log_message_max_size=4096' # might as well allow nice long log messages
@@ -219,7 +220,7 @@ find_in_ancestors() {
     fi
 
     # there are environments where these bits are unwanted, unnecessary, or impossible
-    [[ -n $CHIP_NO_SUBMODULES ]] || scripts/checkout_submodules.py --shallow --platform darwin
+    [[ -n $CHIP_NO_SUBMODULES ]] || scripts/checkout_submodules.py --shallow --jobs 4 --platform darwin
     if [[ -z $CHIP_NO_ACTIVATE ]]; then
         # first run bootstrap/activate in an external env to build everything
         env -i PW_ENVSETUP_NO_BANNER=1 PW_ENVSETUP_QUIET=1 bash -c '. scripts/activate.sh'

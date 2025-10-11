@@ -35,6 +35,10 @@ if (matter_enable_factory_data)
 list(APPEND CHIP_CFLAGS -DCONFIG_FACTORY_DATA=1)
 endif (matter_enable_factory_data)
 
+if (matter_enable_dlps)
+list(APPEND CHIP_CFLAGS -DDLPS_EN=1)
+endif (matter_enable_dlps)
+
 list(
     APPEND CHIP_CXXFLAGS
 
@@ -135,7 +139,7 @@ if (matter_enable_rpc)
 string(APPEND CHIP_GN_ARGS "chip_build_pw_rpc_lib = true\n")
 string(APPEND CHIP_GN_ARGS "pw_log_BACKEND = \"//third_party/pigweed/repo/pw_log_basic\"\n")
 string(APPEND CHIP_GN_ARGS "pw_assert_BACKEND = \"//third_party/pigweed/repo/pw_assert_log:check_backend\"\n")
-string(APPEND CHIP_GN_ARGS "pw_sys_io_BACKEND = \"//examples/platform/realtek/bee/pw_sys_io:pw_sys_io_bee\"\n")
+string(APPEND CHIP_GN_ARGS "pw_sys_io_BACKEND = \"//examples/platform/realtek/pw_sys_io:pw_sys_io_bee\"\n")
 string(APPEND CHIP_GN_ARGS "dir_pw_third_party_nanopb = \"//third_party/nanopb/repo\"\n")
 string(APPEND CHIP_GN_ARGS "pw_build_LINK_DEPS = [\"//third_party/pigweed/repo/pw_assert:impl\", \"//third_party/pigweed/repo/pw_log:impl\"]\n")
 string(APPEND CHIP_GN_ARGS "pw_rpc_CONFIG = \"//third_party/pigweed/repo/pw_rpc:disable_global_mutex\"")

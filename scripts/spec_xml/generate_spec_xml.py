@@ -21,6 +21,7 @@ import os
 import subprocess
 import sys
 import textwrap
+import typing
 from pathlib import Path
 
 import click
@@ -29,6 +30,8 @@ from lxml import etree
 
 from matter.testing.conformance import ConformanceDecision
 from matter.testing.spec_parsing import build_xml_clusters, build_xml_device_types
+
+logging.basicConfig(level=logging.DEBUG, format="[%(levelname)s] %(message)s")
 
 # Replace hardcoded paths with dynamic paths using paths.py functions
 DEFAULT_CHIP_ROOT = paths.get_chip_root()
@@ -40,28 +43,22 @@ except ModuleNotFoundError:
 
 
 CURRENT_IN_PROGRESS_DEFINES = [
+    "access-closure",
     "cameras",
     "closures",
-    "device-location",
-    "endpointuniqueid",
-    "energy-drlc",
+    "electrical-grid-conditions",
     "energy-mtrid",
     "energy-price",
     "energy-tariff",
-    "hrap-2",
-    "hrap-tbrd",
-    "hvac-preset-suggestions",
-    "hvac-thermostat-events",
     "irrigation-system",
-    "metering network-recovery",
+    "metering",
     "nfcCommissioning",
-    "paftp",
+    "q-phase-2",
     "rvc-direct-mode",
-    "rvc-moreopstates",
-    "rvc-vacthenmop",
+    "rvc-go-home",
     "soil-sensor",
-    "thermostat-controller",
-    "tls",
+    "temperature-sensor-with-screen",
+    "tls"
 ]
 
 
@@ -89,7 +86,7 @@ def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run:
 @click.command()
 @click.option(
     '--scraper',
-    required=True,
+    required=False,  # Required when --skip-scrape is not set. Checked in main().
     type=str,
     help='Path to the location of the scraper tool')
 @click.option(
@@ -148,6 +145,9 @@ def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scra
     the data_model folder.
     '''
     if not skip_scrape:
+        if not scraper:
+            logging.error('Missing --scraper option. It is required when --skip-scrape is not used.')
+            return
         scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress)
         if not dry_run:
             dump_versions(scraper, spec_root, output_dir)
@@ -169,7 +169,7 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
     namespace_files = make_asciidoc('pdf-standardnamespaces-book', include_in_progress, spec_root, dry_run)
 
     cluster_files = main_out + cluster_out
-    cmd = [scraper, 'dm', '--dmRoot', output_dir, '--specRoot', spec_root]
+    cmd = [scraper, 'dm', '--dmRoot', output_dir, '--specRoot', spec_root, '--force']
     if include_in_progress == 'All':
         cmd.extend(['-a', 'in-progress'])
     elif include_in_progress == 'Current':
@@ -180,7 +180,7 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
     if (dry_run):
         logging.info(cmd)
         return
-    subprocess.run(cmd)
+    subprocess.run(cmd, check=True)
     # Remove all the files that weren't compiled into the spec
     clusters_output_dir = os.path.join(output_dir, 'clusters')
     device_types_output_dir = os.path.abspath(os.path.join(output_dir, 'device_types'))
@@ -373,6 +373,7 @@ def dump_json_ids(output_dir):
 
 
 IdToNameDict = dict[int, str]
+IdToPICSCodeDict = dict[int, str]
 IdToSupportedDict = dict[int, str]
 
 
@@ -382,6 +383,9 @@ def dump_ids_from_data_model_dirs():
 
     version_clusters: dict[str, IdToSupportedDict] = {}
     version_device_types: dict[str, IdToSupportedDict] = {}
+
+    pics_code_clusters: IdToPICSCodeDict = {}
+
     data_model_path = paths.get_data_model_path()
     data_model_dirs = [d for d in os.listdir(data_model_path) if os.path.isdir(os.path.join(data_model_path, d))]
     # Don't include master right now - it's in progress, not official
@@ -394,17 +398,29 @@ def dump_ids_from_data_model_dirs():
             return "P" if c.is_provisional else "C"
 
         version_clusters[dir] = {id: cluster_support_str(c) for id, c in clusters.items()}
+
+        # Update the PICS Codes
+        for id, c in clusters.items():
+            if id not in pics_code_clusters:
+                pics_code_clusters[id] = c.pics
+            elif pics_code_clusters[id] != c.pics:
+                logging.warning(f"PICS Code is inconsistent among different versions of the spec for cluster ID #{id}!")
+
         # Device types don't currently have provisional markings in the spec
         # But a device type can't be certified if it has mandatory clusters that are provisional
         # TODO: create provisional
 
         def device_type_support_str(d):
             logging.info(f"checking device type for {d.name} for {dir}")
-            dt_mandatory = [id for id, requirement in d.server_clusters.items() if requirement.conformance(
+            dt_server_mandatory = [id for id, requirement in d.server_clusters.items() if requirement.conformance(
                 [], 0, 0).decision == ConformanceDecision.MANDATORY]
-            provisional = [clusters[c].name for c in dt_mandatory if clusters[c].is_provisional]
-            if provisional:
-                logging.info(f"Found provisional mandatory clusters {provisional} in device type {d.name} for revision {dir}")
+            server_provisional = [clusters[c].name for c in dt_server_mandatory if clusters[c].is_provisional]
+            dt_client_mandatory = [id for id, requirement in d.client_clusters.items(
+            ) if requirement.conformance([], 0, 0).decision == ConformanceDecision.MANDATORY]
+            client_provisional = [clusters[c].name for c in dt_client_mandatory if clusters[c].is_provisional]
+            if server_provisional or client_provisional:
+                logging.info(
+                    f"Found provisional mandatory clusters server:{server_provisional} client: {client_provisional} in device type {d.name} for revision {dir}")
                 return "P"
             return "C"
 
@@ -413,7 +429,11 @@ def dump_ids_from_data_model_dirs():
         all_clusters.update({id: c.name for id, c in clusters.items()})
         all_device_types.update({id: d.name for id, d in device_types.items()})
 
-    def print_out_ids(filename: Path, spec_section: str, id_to_name: IdToNameDict, supported: dict[str, IdToSupportedDict]):
+    def print_out_ids(filename: Path,
+                      spec_section: str,
+                      id_to_name: IdToNameDict,
+                      supported: dict[str, IdToSupportedDict],
+                      pics_codes: typing.Optional[IdToPICSCodeDict] = None):
         header = f'# List of currently defined spec {spec_section}\n'
         header += 'This file was **AUTOMATICALLY** generated by `python scripts/generate_spec_xml.py`. DO NOT EDIT BY HAND!\n\n'
         table = '''
@@ -427,17 +447,34 @@ def dump_ids_from_data_model_dirs():
                   '''
         header = header + textwrap.dedent(table)
 
+        # Name Column
         all_name_lens = [len(n) for n in id_to_name.values()]
         name_len = max(all_name_lens)
-        title_id_decimal = ' ID (Decimal) '
-        title_id_hex = ' ID (hex) '
         title_name_raw = ' Name '
         title_name = f'{title_name_raw:<{name_len}}'
+
+        # ID Columns
+        title_id_decimal = ' ID (Decimal) '
         dec_len = len(title_id_decimal)
+        title_id_hex = ' ID (hex) '
         hex_len = len(title_id_hex)
+
+        # Create title and hashes
         title = f'|{title_id_decimal}|{title_id_hex}|{title_name}|'
-        version_len: dict[str, int] = {}
         hashes = f'|{"-" * dec_len}|{"-" * hex_len}|{"-" * name_len}|'
+
+        # PICS code column (only for clusters)
+        if pics_codes is not None:
+            all_pics_code_lens = [len(p) for p in pics_code_clusters.values()]
+            pics_code_len = max(all_pics_code_lens)
+            title_pics_code_raw = ' PICS Code '
+            title_pics_code = f'{title_pics_code_raw:<{pics_code_len}}'
+
+            # Update title and hashes
+            title += f'{title_pics_code}|'
+            hashes += f'{"-" * pics_code_len}|'
+
+        version_len: dict[str, int] = {}
         for dir in supported.keys():
             tag_path = os.path.join(paths.get_data_model_path(), dir, 'spec_tag')
             try:
@@ -454,6 +491,11 @@ def dump_ids_from_data_model_dirs():
         for id, name in sorted(id_to_name.items()):
             hex_id = f'0x{id:04X}'
             line = f'|{id:<{dec_len}}|{hex_id:<{hex_len}}|{name:<{name_len}}|'
+
+            # Add PICS code (only for clusters)
+            if pics_codes is not None:
+                line += f'{pics_codes[id]:<{pics_code_len}}|'
+
             for dir in supported.keys():
                 try:
                     line += f'{supported[dir][id]:<{version_len[dir]}}|'
@@ -467,7 +509,7 @@ def dump_ids_from_data_model_dirs():
             fout.write("\n".join(lines))
             fout.write("\n")
 
-    print_out_ids(paths.get_cluster_documentation_file_path(), "clusters",  all_clusters, version_clusters)
+    print_out_ids(paths.get_cluster_documentation_file_path(), "clusters",  all_clusters, version_clusters, pics_code_clusters)
     print_out_ids(paths.get_device_types_documentation_file_path(), "device types", all_device_types, version_device_types)
 
 

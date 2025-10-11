@@ -48,6 +48,7 @@ from cluster_objects import ClusterObjectTests
 from network_commissioning import NetworkCommissioningTests
 
 import matter.logging
+from matter.setup_payload import SetupPayload
 from matter.tracing import TracingContext
 
 # The thread network dataset tlv for testing, splitted into T-L-V.
@@ -76,23 +77,18 @@ TEST_DEVICE_NODE_ID = 1
 ALL_TESTS = ['network_commissioning', 'datamodel']
 
 
-async def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: int, address_override: str, device_nodeid: int):
+async def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: int, device_nodeid: int):
     logger.info("Testing discovery")
     device = await test.TestDiscovery(discriminator=discriminator)
     FailIfNot(device, "Failed to discover any devices.")
 
-    address = device.addresses[0]
-
     # FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
     #           "Failed to finish network commissioning")
 
-    if address_override:
-        address = address_override
+    qr = SetupPayload().GenerateQrCode(passcode=setup_pin, discriminator=discriminator)
 
     logger.info("Testing commissioning")
-    FailIfNot(await test.TestCommissioning(ip=address,
-                                           setuppin=setup_pin,
-                                           nodeid=device_nodeid),
+    FailIfNot(await test.TestCommissioningWithSetupPayload(setupPayload=qr, nodeid=device_nodeid),
               "Failed to finish key exchange")
 
     logger.info("Testing multi-controller setup on the same fabric")
@@ -101,9 +97,7 @@ async def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup
     logger.info("Testing CATs used on controllers")
     FailIfNot(await test.TestControllerCATValues(nodeid=device_nodeid), "Failed the controller CAT test")
 
-    ok = await test.TestMultiFabric(ip=address,
-                                    setuppin=20202021,
-                                    nodeid=1)
+    ok = await test.TestMultiFabric(setup_code=qr, nodeid=1)
     FailIfNot(ok, "Failed to commission multi-fabric")
 
     FailIfNot(await test.TestAddUpdateRemoveFabric(nodeid=device_nodeid),
@@ -173,7 +167,7 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
     asyncio.run(test.TestFabricSensitive(nodeid=device_nodeid))
 
 
-def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, paa_trust_store_path):
+def do_tests(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin, paa_trust_store_path):
     timeoutTicker = TestTimeout(timeout)
     timeoutTicker.start()
 
@@ -182,8 +176,7 @@ def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, 
 
     matter.logging.RedirectToPythonLogging()
 
-    asyncio.run(ethernet_commissioning(test, discriminator, setup_pin, address,
-                                       device_nodeid))
+    asyncio.run(ethernet_commissioning(test, discriminator, setup_pin, device_nodeid))
 
     logger.info("Testing resolve")
     FailIfNot(test.TestResolve(nodeid=device_nodeid),
@@ -216,10 +209,6 @@ def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, 
               default=TEST_DEVICE_NODE_ID,
               type=int,
               help="NodeId of the device.")
-@click.option("--address", "-a",
-              default='',
-              type=str,
-              help="Skip commissionee discovery, commission the device with the IP directly.")
 @click.option("--timeout", "-t",
               default=240,
               type=int,
@@ -270,7 +259,7 @@ def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, 
 @click.option('--fail-on-skipped',
               is_flag=True,
               help="Fail the test if any test cases are skipped")
-def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, enable_test, disable_test, log_level,
+def run(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin, enable_test, disable_test, log_level,
         log_format, print_test_list, paa_trust_store_path, trace_to, app_pid, fail_on_skipped):
     coloredlogs.install(level=log_level, fmt=log_format, logger=logger)
 
@@ -284,8 +273,8 @@ def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup
         return
 
     logger.info("Test Parameters:")
-    logger.info(f"\tController NodeId: {controller_nodeid}")
-    logger.info(f"\tDevice NodeId:     {device_nodeid}")
+    logger.info(f"\tController NodeId: 0x{controller_nodeid:016X}")
+    logger.info(f"\tDevice NodeId:     0x{device_nodeid:016X}")
     logger.info(f"\tTest Timeout:      {timeout}s")
     logger.info(f"\tDiscriminator:     {discriminator}")
     logger.info(f"\tEnabled Tests:     {enable_test}")
@@ -295,7 +284,7 @@ def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup
         for destination in trace_to:
             tracing_ctx.StartFromString(destination)
 
-        do_tests(controller_nodeid, device_nodeid, address, timeout,
+        do_tests(controller_nodeid, device_nodeid, timeout,
                  discriminator, setup_pin, paa_trust_store_path)
 
 

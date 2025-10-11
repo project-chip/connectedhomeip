@@ -25,6 +25,8 @@ import websockets
 from .hooks import WebSocketRunnerHooks
 from .runner import TestRunner
 
+LOGGER = logging.getLogger(__name__)
+
 _KEEP_ALIVE_TIMEOUT_IN_SECONDS = 120
 _MAX_MESSAGE_SIZE_IN_BYTES = 10485760  # 10 MB
 _CONNECT_MAX_RETRIES_DEFAULT = 4
@@ -36,7 +38,7 @@ _WEBSOCKET_SERVER_TERMINATE_TIMEOUT = 10  # seconds
 @dataclass
 class WebSocketRunnerConfig:
     server_address: str = 'localhost'
-    server_port: int = '9002'
+    server_port: int = 9002
     server_path: str = None
     server_arguments: str = None
     hooks: WebSocketRunnerHooks = WebSocketRunnerHooks()
@@ -143,8 +145,7 @@ class WebSocketRunner(TestRunner):
             try:
                 instance.wait(_WEBSOCKET_SERVER_TERMINATE_TIMEOUT)
             except subprocess.TimeoutExpired:
-                logging.debug(
-                    'Subprocess did not terminate on SIGTERM, killing it now')
+                LOGGER.debug('Subprocess did not terminate on SIGTERM, killing it now')
                 instance.kill()
 
     def _make_server_connection_url(self, address: str, port: int):

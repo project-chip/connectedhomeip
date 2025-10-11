@@ -147,7 +147,15 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
 
     CMAFContainerOptionsStorage & operator=(const Structs::CMAFContainerOptionsStruct::Type & aCMAFContainerOptions)
     {
-        chunkDuration = aCMAFContainerOptions.chunkDuration;
+        CMAFInterface   = aCMAFContainerOptions.CMAFInterface;
+        segmentDuration = aCMAFContainerOptions.segmentDuration;
+        chunkDuration   = aCMAFContainerOptions.chunkDuration;
+        sessionGroup    = aCMAFContainerOptions.sessionGroup;
+
+        MutableCharSpan trackNameBuffer(mTrackNameBuffer);
+        // ValidateIncomingTransportOptions() function already checked the trackName length
+        CopyCharSpanToMutableCharSpanWithTruncation(aCMAFContainerOptions.trackName, trackNameBuffer);
+        trackName = trackNameBuffer;
 
         CENCKey = aCMAFContainerOptions.CENCKey;
 
@@ -188,6 +196,7 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
     }
 
 private:
+    char mTrackNameBuffer[kMaxTrackNameLength];
     uint8_t mCENCKeyBuffer[kMaxCENCKeyLength];
     uint8_t mCENCKeyIDBuffer[kMaxCENCKeyIDLength];
 };
@@ -258,7 +267,7 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         streamUsage   = aTransportOptionsStorage.streamUsage;
         videoStreamID = aTransportOptionsStorage.videoStreamID;
         audioStreamID = aTransportOptionsStorage.audioStreamID;
-        endpointID    = aTransportOptionsStorage.endpointID;
+        TLSEndpointID = aTransportOptionsStorage.TLSEndpointID;
 
         // Deep copy the URL buffer
         std::memcpy(mUrlBuffer, aTransportOptionsStorage.mUrlBuffer, kMaxUrlLength);
@@ -283,7 +292,7 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         streamUsage   = transportOptions.streamUsage;
         videoStreamID = transportOptions.videoStreamID;
         audioStreamID = transportOptions.audioStreamID;
-        endpointID    = transportOptions.endpointID;
+        TLSEndpointID = transportOptions.TLSEndpointID;
 
         MutableCharSpan urlBuffer(mUrlBuffer);
         // ValidateIncomingTransportOptions() function already checked the url length
