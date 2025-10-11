@@ -1070,6 +1070,14 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
         return std::nullopt;
     }
 
+    // Note, we will always have Transport Options as they're mandatory in the initial allocate
+    status = CheckPrivacyModes(transportConfiguration->transportOptions.Value().streamUsage);
+    if (status != Status::Success)
+    {
+        handler.AddStatus(commandPath, status);
+        return std::nullopt;
+    }
+
     if (mDelegate->GetTransportBusyStatus(connectionID) == PushAvStreamTransportStatusEnum::kBusy)
     {
         ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Connection is Busy", mEndpointId);
@@ -1085,30 +1093,20 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
         return std::nullopt;
     }
 
-    if (transportConfiguration->transportOptions.HasValue())
+    if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kContinuous)
     {
-        status = CheckPrivacyModes(transportConfiguration->transportOptions.Value().streamUsage);
-        if (status != Status::Success)
-        {
-            handler.AddStatus(commandPath, status);
-            return std::nullopt;
-        }
+        auto clusterStatus = to_underlying(StatusCodeEnum::kInvalidTriggerType);
+        ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Invalid Trigger type", mEndpointId);
+        handler.AddClusterSpecificFailure(commandPath, clusterStatus);
+        return std::nullopt;
+    }
 
-        if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kContinuous)
-        {
-            auto clusterStatus = to_underlying(StatusCodeEnum::kInvalidTriggerType);
-            ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Invalid Trigger type", mEndpointId);
-            handler.AddClusterSpecificFailure(commandPath, clusterStatus);
-            return std::nullopt;
-        }
-
-        if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kCommand &&
-            !timeControl.HasValue())
-        {
-            ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Time control field not present", mEndpointId);
-            handler.AddStatus(commandPath, Status::DynamicConstraintError);
-            return std::nullopt;
-        }
+    if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kCommand &&
+        !timeControl.HasValue())
+    {
+        ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Time control field not present", mEndpointId);
+        handler.AddStatus(commandPath, Status::DynamicConstraintError);
+        return std::nullopt;
     }
 
     // When trigger type is motion in the allocated transport but triggering it manually
