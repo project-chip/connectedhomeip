@@ -66,23 +66,6 @@ class TC_CADMIN_1_11(CADMINBaseTest):
             asserts.assert_true(errcode.sdk_code == expectedErrCode,
                                 'Unexpected error code returned from CommissioningComplete')
 
-    async def OpenBasicCommissioningWindow(self, th: ChipDeviceCtrl, expectedErrCode: Optional[Clusters.AdministratorCommissioning.Enums.StatusCode] = None) -> CommissioningParameters:
-        if not expectedErrCode:
-            params = await th.OpenBasicCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=self.timeout)
-            return params
-
-        else:
-            ctx = asserts.assert_raises(ChipStackError)
-            with ctx:
-                await th.OpenBasicCommissioningWindow(
-                    nodeid=self.dut_node_id, timeout=self.timeout)
-            errcode = ctx.exception.chip_error
-            logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
-            asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
-            asserts.assert_true(errcode.sdk_code == expectedErrCode,
-                                'Unexpected error code returned from CommissioningComplete')
-
     def steps_TC_CADMIN_1_11(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
