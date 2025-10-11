@@ -198,7 +198,7 @@ CHIP_ERROR RTKDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpan & m
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
 #if CONFIG_FACTORY_DATA
-#if FEATURE_TRUSTZONE_ENABLE
+#if FEATURE_TRUSTZONE_ENABLE && CONFIG_DAC_KEY_ENC
     ChipLogError(DeviceLayer, "TrustZone build: Device attestation is NOT implemented. Attestation will fail.");
     ReturnErrorOnFailure(CHIP_ERROR_NOT_IMPLEMENTED);
 #else
