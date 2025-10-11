@@ -148,10 +148,10 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.step(1)
         basicinformation_handler = EventSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation, expected_event_id=Clusters.BasicInformation.Events.ShutDown.event_id)
-        await basicinformation_handler.start(self.controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=6000)
+        await basicinformation_handler.start(self.controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*8)
         event_state_transition = EventSubscriptionHandler(expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
                                                           expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id)
-        await event_state_transition.start(self.controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=6000)
+        await event_state_transition.start(self.controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*7)
         await self.announce_ota_provider(self.controller, self.provider_data['node_id'], self.requestor_node_id)
 
         # Wait for Download event this means updating has started
@@ -427,7 +427,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         total_wait_time = end_time - start_time
         asserts.assert_greater_equal(
             total_wait_time, delayed_apply_action_time, f"Software Udpate occurred before the defined time of: {delayed_apply_action_time}")
-        software_version_attr_handler.flush_events()
+        software_version_attr_handler.reset()
         await software_version_attr_handler.cancel()
         # Verify the version is the same
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
