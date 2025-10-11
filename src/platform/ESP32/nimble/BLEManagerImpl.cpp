@@ -946,13 +946,13 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     // init bt controller
     if (ESP_OK != esp_hosted_bt_controller_init())
     {
-        ESP_LOGW("INFO", "failed to init bt controller");
+        ESP_LOGW(TAG, "failed to init bt controller");
     }
 
     // enable bt controller
     if (ESP_OK != esp_hosted_bt_controller_enable())
     {
-        ESP_LOGW("INFO", "failed to enable bt controller");
+        ESP_LOGW(TAG, "failed to enable bt controller");
     }
 #endif
 

@@ -8,7 +8,7 @@ The following guide describes how to setup esp-hosted and configure the slave co
 
 Please refer to the [Flash ESP32-C6](https://github.com/espressif/esp-hosted-mcu/blob/main/docs/esp32_p4_function_ev_board.md#5-flashing-esp32-c6) section for detailed instructions on flashing the slave co-processor firmware to the ESP32-C6 on the ESP32-P4 Function_EV_Board.
 
-## Build Matter firmare for Host MCU
+## Build Matter firmware for Host MCU
 
 The [all-clusters-app](../../../examples/all-clusters-app/esp32/README.md) example can be used as the Matter firmware for ESP32-P4. After flashing the slave co-processor, set the target, build and flash the firmware as shown below:
 
