@@ -361,7 +361,7 @@ void PushAVClipRecorder::Stop()
     ChipLogProgress(Camera, "Recording stopped for ID: %s", mClipInfo.mRecorderId.c_str());
 }
 
-void PushAVClipRecorder::PushPacket(const char * data, size_t size, bool isVideo)
+void PushAVClipRecorder::PushPacket(const uint8_t * data, size_t size, bool isVideo)
 {
     if (!GetRecorderStatus())
     {
@@ -369,7 +369,7 @@ void PushAVClipRecorder::PushPacket(const char * data, size_t size, bool isVideo
         return;
     }
 
-    AVPacket * packet = CreatePacket((const uint8_t *) data, static_cast<int>(size), isVideo);
+    AVPacket * packet = CreatePacket(data, static_cast<int>(size), isVideo);
     if (!packet)
     {
         ChipLogError(Camera, "ERROR: PACKET DROPPED!");
