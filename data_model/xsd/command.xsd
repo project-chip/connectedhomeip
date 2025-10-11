@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-  <xs:include schemaLocation="types.xsd" />
-  <xs:include schemaLocation="conformance.xsd" />
+    <xs:include schemaLocation="types.xsd" />
+    <xs:include schemaLocation="conformance.xsd" />
 
-  <xs:complexType name="CommandType">
-    <xs:sequence>
-      <xs:element type="QualityType" name="quality" minOccurs="0" maxOccurs="1" />
-      <xs:element name="access" type="AccessType" minOccurs="0" maxOccurs="1"></xs:element>
-      <xs:group ref="ConformanceSetGroup" minOccurs="0" maxOccurs="1" />
-      <xs:element name="field" type="FieldType" minOccurs="0" maxOccurs="unbounded" />
-    </xs:sequence>
-    <xs:attribute name="name" type="xs:string" use="required" />
-    <xs:attribute name="id" type="xs:string" use="required" />
-    <xs:attribute name="direction" type="xs:string" use="required" />
-    <xs:attribute name="response" type="xs:string" use="optional" />
-
-  </xs:complexType>
+    <xs:complexType name="CommandType">
+        <xs:sequence>
+            <xs:element type="QualityType" name="quality" minOccurs="0" maxOccurs="1" />
+            <xs:element name="access" type="AccessType" minOccurs="0" maxOccurs="1"></xs:element>
+            <xs:group ref="ConformanceSetGroup" minOccurs="0" maxOccurs="1" />
+            <xs:element name="field" type="FieldType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required" />
+        <xs:attribute name="id" type="xs:string" use="required" />
+        <xs:attribute name="direction" type="xs:string" use="required" />
+        <xs:attribute name="response" type="xs:string" use="optional" />
+    </xs:complexType>
 
 </xs:schema>

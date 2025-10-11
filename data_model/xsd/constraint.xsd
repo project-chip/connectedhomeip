@@ -13,7 +13,6 @@
         </xs:sequence>
     </xs:complexType>
 
-
     <xs:group name="LimitGroup">
         <xs:choice>
             <xs:element name="tag" type="TagLimitType" />

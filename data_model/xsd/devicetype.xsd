@@ -1,54 +1,167 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-  <xs:include schemaLocation="types.xsd"/>
+  <xs:include schemaLocation="types.xsd" />
+  <xs:include schemaLocation="constraint.xsd" />
+  <xs:include schemaLocation="conformance.xsd" />
 
-  <xs:element name="deviceType" type="deviceTypeType"/>
+  <xs:element name="deviceType" type="DeviceTypeType" />
 
-  <xs:complexType name="deviceTypeType">
-    <xs:sequence>
-      <xs:element name="revisionHistory" type="revisionHistoryType" minOccurs="0"/>
-      <xs:element name="classification" type="classificationType"/>
-      <xs:element name="conditions" type="conditionsType" minOccurs="0"/>
-      <xs:element name="clusters" type="clustersType"/>
-    </xs:sequence>
-    <xs:attribute name="id" type="xs:string" use="required"/>
-    <xs:attribute name="name" type="xs:string" use="required"/>
-    <xs:attribute name="revision" type="xs:positiveInteger" use="required"/>
+  <xs:complexType name="ConditionType">
+    <xs:attribute name="name" type="xs:string" use="required" />
+    <xs:attribute name="summary" type="xs:string" />
   </xs:complexType>
 
-  <xs:complexType name="classificationType">
-    <xs:attribute name="class" type="xs:string" use="required"/>
-    <xs:attribute name="scope" type="xs:string" use="required"/>
-  </xs:complexType>
-
-  <xs:complexType name="conditionsType">
+  <xs:complexType name="ConditionsType">
     <xs:sequence>
-      <xs:element name="condition" maxOccurs="unbounded">
-        <xs:complexType>
-          <xs:attribute name="name" type="xs:string" use="required"/>
-          <xs:attribute name="summary" type="xs:string"/>
-        </xs:complexType>
-      </xs:element>
+      <xs:element name="condition" type="ConditionType" minOccurs="1" maxOccurs="unbounded" />
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="clustersType">
+  <xs:complexType name="FeatureRequirementType">
     <xs:sequence>
-      <xs:element name="cluster" maxOccurs="unbounded">
+      <xs:element name="quality" type="QualityType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="constraint" type="ConstraintType" minOccurs="0" maxOccurs="1" />
+      <xs:group ref="ConformanceSetGroup" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="code" type="xs:string" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="FeaturesRequirementType">
+    <xs:sequence>
+      <xs:element name="feature" type="FeatureRequirementType" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="AttributeRequirementType">
+    <xs:sequence>
+      <xs:element name="quality" type="QualityType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="constraint" type="ConstraintType" minOccurs="0" maxOccurs="1" />
+      <xs:group ref="ConformanceSetGroup" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="code" type="xs:string" use="required" />
+    <xs:attribute name="name" type="xs:string" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="AttributesRequirementType">
+    <xs:sequence>
+      <xs:element name="attribute" type="AttributeRequirementType" minOccurs="1"
+        maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="CommandRequirementType">
+    <xs:sequence>
+      <xs:element name="quality" type="QualityType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="constraint" type="ConstraintType" minOccurs="0" maxOccurs="1" />
+      <xs:group ref="ConformanceSetGroup" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="name" type="xs:string" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="CommandsRequirementType">
+    <xs:sequence>
+      <xs:element name="command" type="CommandRequirementType" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="EventRequirementType">
+    <xs:sequence>
+      <xs:element name="quality" type="QualityType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="constraint" type="ConstraintType" minOccurs="0" maxOccurs="1" />
+      <xs:group ref="ConformanceSetGroup" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="name" type="xs:string" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="EventsRequirementType">
+    <xs:sequence>
+      <xs:element name="event" type="EventRequirementType" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ClusterRequirementType">
+    <xs:sequence>
+      <xs:element name="quality" type="QualityType" minOccurs="0" maxOccurs="1" />
+      <xs:group ref="ConformanceSetGroup" minOccurs="0" maxOccurs="1" />
+      <xs:element name="features" type="FeaturesRequirementType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="attributes" type="AttributesRequirementType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="commands" type="CommandsRequirementType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="events" type="EventsRequirementType" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="name" type="xs:string" use="required" />
+    <xs:attribute name="side" type="xs:string" use="optional" />
+
+  </xs:complexType>
+
+  <xs:complexType name="ClusterRequirementsType">
+    <xs:sequence>
+      <xs:element name="cluster" type="ClusterRequirementType" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ConditionRequirementType">
+    <xs:group ref="ConformanceSetGroup" minOccurs="0" maxOccurs="1" />
+    <xs:attribute name="name" type="xs:string" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="ConditionRequirementsType">
+    <xs:sequence>
+      <xs:element name="deviceType" minOccurs="1" maxOccurs="unbounded">
         <xs:complexType>
           <xs:sequence>
-            <xs:choice minOccurs="0">
-              <xs:element name="mandatoryConform" type="conformType"/>
-              <xs:element name="optionalConform" type="conformType"/>
-            </xs:choice>
+            <xs:element name="conditionRequirement" type="ConditionRequirementType" minOccurs="1"
+              maxOccurs="unbounded" />
           </xs:sequence>
-          <xs:attribute name="id" type="xs:string" use="required"/>
-          <xs:attribute name="name" type="xs:string" use="required"/>
-          <xs:attribute name="side" type="xs:string" use="required"/>
+          <xs:attribute name="id" type="xs:string" use="required" />
+          <xs:attribute name="name" type="xs:string" use="required" />
         </xs:complexType>
       </xs:element>
     </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ComposedDeviceTypesType">
+    <xs:sequence>
+      <xs:element name="deviceType" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:group ref="ConformanceSetGroup" minOccurs="0" maxOccurs="1" />
+            <xs:element name="clusterRequirements" type="ClusterRequirementsType" minOccurs="0"
+              maxOccurs="1" />
+          </xs:sequence>
+          <xs:attribute name="deviceTypeId" type="xs:string" use="required" />
+          <xs:attribute name="deviceTypeName" type="xs:string" use="required" />
+
+
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="cluster" type="ClusterRequirementType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DeviceTypeType">
+    <xs:sequence>
+      <xs:element name="revisionHistory" type="RevisionHistoryType" minOccurs="1" maxOccurs="1" />
+      <xs:element name="classification" type="ClassificationType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="conditions" type="ConditionsType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="conditionRequirements" type="ConditionRequirementsType" minOccurs="0"
+        maxOccurs="1" />
+      <xs:element name="clusters" type="ClusterRequirementsType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="composedDeviceTypes" type="ComposedDeviceTypesType" minOccurs="0"
+        maxOccurs="2" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="optional" />
+    <xs:attribute name="name" type="xs:string" use="required" />
+    <xs:attribute name="revision" type="xs:positiveInteger" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="ClassificationType">
+    <xs:attribute name="class" type="xs:string" use="required" />
+    <xs:attribute name="scope" type="xs:string" use="required" />
+    <xs:attribute name="superset" type="xs:string" use="optional" />
   </xs:complexType>
 
 </xs:schema>

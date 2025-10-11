@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:include schemaLocation="conformance.xsd" />
+
+    <xs:complexType name="EnumValueType">
+        <xs:group ref="ConformanceSetGroup" minOccurs="0" maxOccurs="1" />
+        <xs:attribute name="value" type="xs:string" use="required" />
+        <xs:attribute name="name" type="xs:string" use="required" />
+        <xs:attribute name="summary" type="xs:string" use="optional" />
+
+    </xs:complexType>
+
+    <xs:complexType name="EnumType">
+        <xs:sequence>
+            <xs:element name="item" type="EnumValueType" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required" />
+    </xs:complexType>
+
+</xs:schema>

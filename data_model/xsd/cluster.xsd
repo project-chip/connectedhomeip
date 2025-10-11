@@ -41,13 +41,13 @@
     </xs:sequence>
   </xs:complexType>
 
-    <xs:complexType name="CommandsType">
+  <xs:complexType name="CommandsType">
     <xs:sequence>
       <xs:element name="command" type="CommandType" minOccurs="1" maxOccurs="unbounded" />
     </xs:sequence>
   </xs:complexType>
 
-    <xs:complexType name="EventsType">
+  <xs:complexType name="EventsType">
     <xs:sequence>
       <xs:element name="event" type="EventType" minOccurs="1" maxOccurs="unbounded" />
     </xs:sequence>
@@ -66,9 +66,9 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="attributes" type="AttributesType" minOccurs="0"/>
-      <xs:element name="commands" type="CommandsType" minOccurs="0"/>
-      <xs:element name="events" type="EventsType" minOccurs="0"/>
+      <xs:element name="attributes" type="AttributesType" minOccurs="0" />
+      <xs:element name="commands" type="CommandsType" minOccurs="0" />
+      <xs:element name="events" type="EventsType" minOccurs="0" />
     </xs:all>
     <xs:attribute name="id" type="xs:string" />
     <xs:attribute name="name" type="xs:string" use="required" />

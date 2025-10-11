@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-<xs:include schemaLocation="reference.xsd" />
+    <xs:include schemaLocation="reference.xsd" />
 
     <xs:complexType name="LiteralType">
         <xs:attribute name="value" type="xs:string" use="required" />
@@ -25,18 +25,17 @@
 
     <xs:group name="LogicalExpressionGroup">
         <xs:choice>
-            <xs:element name="andTerm" type="LogicalTermType"/>
-            <xs:element name="notTerm" type="LogicalTermType"/>
-            <xs:element name="orTerm" type="LogicalTermType"/>
-            <xs:element name="equalTerm" type="ComparisonTermType"/>
-            <xs:element name="notEqualTerm" type="ComparisonTermType"/>
-            <xs:element name="greaterTerm" type="ComparisonTermType"/>
-            <xs:element name="greaterOrEqualTerm" type="ComparisonTermType"/>
-            <xs:element name="lessTerm" type="ComparisonTermType"/>
-            <xs:element name="lessOrEqualTerm" type="ComparisonTermType"/>
+            <xs:element name="andTerm" type="LogicalTermType" />
+            <xs:element name="notTerm" type="LogicalTermType" />
+            <xs:element name="orTerm" type="LogicalTermType" />
+            <xs:element name="equalTerm" type="ComparisonTermType" />
+            <xs:element name="notEqualTerm" type="ComparisonTermType" />
+            <xs:element name="greaterTerm" type="ComparisonTermType" />
+            <xs:element name="greaterOrEqualTerm" type="ComparisonTermType" />
+            <xs:element name="lessTerm" type="ComparisonTermType" />
+            <xs:element name="lessOrEqualTerm" type="ComparisonTermType" />
         </xs:choice>
     </xs:group>
-
 
     <xs:group name="ExpressionGroup">
         <xs:choice>
@@ -47,7 +46,6 @@
             <xs:element name="status" type="StatusType"></xs:element>
         </xs:choice>
     </xs:group>
-
 
     <xs:complexType name="MandatoryConformType">
         <xs:group ref="ExpressionGroup" minOccurs="0" maxOccurs="1" />
@@ -72,13 +70,11 @@
         </xs:choice>
     </xs:group>
 
-
     <xs:complexType name="OtherwiseConformType">
         <xs:sequence>
             <xs:group ref="ConformanceGroup" minOccurs="1" maxOccurs="unbounded" />
         </xs:sequence>
     </xs:complexType>
-
 
     <xs:group name="ConformanceSetGroup">
         <xs:choice>
