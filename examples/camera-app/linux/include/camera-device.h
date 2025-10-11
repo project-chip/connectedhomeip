@@ -314,6 +314,10 @@ public:
 
     void HandleSimulatedZoneStoppedEvent(uint16_t zoneID);
 
+    // Audio playback pipeline methods
+    CameraError StartAudioPlaybackStream();
+    CameraError StopAudioPlaybackStream();
+
 private:
     int videoDeviceFd            = -1;
     std::string mVideoDevicePath = kDefaultVideoDevicePath;
@@ -331,6 +335,8 @@ private:
 
     GstElement * CreateVideoPipeline(const std::string & device, int width, int height, int framerate, CameraError & error);
     GstElement * CreateAudioPipeline(const std::string & device, int channels, int sampleRate, int bitRate, CameraError & error);
+    GstElement * CreateAudioPlaybackPipeline(CameraError & error);
+
     GstElement * CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int frameRate,
                                         const std::string & filename, CameraError & error);
     CameraError SetV4l2Control(uint32_t controlId, int value);
@@ -377,6 +383,9 @@ private:
     uint8_t mDetectionSensitivity          = (1 + kSensitivityMax) / 2; // Average over the range
 
     std::vector<StreamUsageEnum> mStreamUsagePriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+
+    // Audio playback pipeline specific members
+    GstElement * mAudioPlaybackPipeline = nullptr;
 };
 
 } // namespace Camera
