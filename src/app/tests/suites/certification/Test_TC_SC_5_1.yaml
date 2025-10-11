@@ -17,16 +17,12 @@ name:
     Member
 
 PICS:
-    - GRPKEY.S
     - G.S
 
 config:
     nodeId: 0x12344321
     cluster: "Groups"
-    endpoint: 0
-
-    # Users should set endpoint value on the command line to PIXIT.G.ENDPOINT
-    Groups.Endpoint: 1
+    endpoint: 1
 
 tests:
     - label: "Step 0: Wait for the commissioned device to be retrieved"
@@ -47,6 +43,7 @@ tests:
 
     - label: "Read FabricIndex value"
       cluster: "Operational Credentials"
+      endpoint: 0
       command: "readAttribute"
       attribute: "CurrentFabricIndex"
       response:
@@ -62,6 +59,7 @@ tests:
           b)AuthMode: Group (3) c)Subjects: group 0x0103 ([0x0103]) d)Targets:
           all (null)"
       cluster: "Access Control"
+      endpoint: 0
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
@@ -94,6 +92,7 @@ tests:
           00000000000000000000000000000003 8)EpochStartTime2: 333"
       PICS: GRPKEY.S.C00.Rsp
       cluster: "Group Key Management"
+      endpoint: 0
       command: "KeySetWrite"
       arguments:
           values:
@@ -121,6 +120,7 @@ tests:
           8)EpochStartTime2: 18446744073709551614"
       PICS: GRPKEY.S.C00.Rsp
       cluster: "Group Key Management"
+      endpoint: 0
       command: "KeySetWrite"
       arguments:
           values:
@@ -144,6 +144,7 @@ tests:
           1)GroupId: 0x0103 2)GroupKeySetId: 0x01a3"
       PICS: GRPKEY.S.A0000
       cluster: "Group Key Management"
+      endpoint: 0
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
@@ -153,14 +154,12 @@ tests:
           "Step 4: TH sends RemoveAllGroups command to the DUT on
           PIXIT.G.ENDPOINT "
       PICS: G.S.C04.Rsp
-      endpoint: Groups.Endpoint
       command: "RemoveAllGroups"
 
     - label:
           "Step 5: TH sends AddGroup Command to DUT on PIXIT.G.ENDPOINT with the
           the following settings 1)GroupID: 0x0103 2)GroupName: 'Test Group'"
       PICS: G.S.C00.Rsp
-      endpoint: Groups.Endpoint
       command: "AddGroup"
       arguments:
           values:
@@ -173,7 +172,6 @@ tests:
           "Step 6a: TH sends ViewGroup command with the GroupID to the Group
           cluster on the DUT on PIXIT.G.ENDPOINT"
       PICS: G.S.F00 && G.S.C01.Rsp
-      endpoint: Groups.Endpoint
       command: "ViewGroup"
       arguments:
           values:
@@ -192,7 +190,6 @@ tests:
           "Step 6b: TH sends ViewGroup command with the GroupID to the Group
           cluster on the DUT on PIXIT.G.ENDPOINT"
       PICS: " !G.S.F00 && G.S.C01.Rsp "
-      endpoint: Groups.Endpoint
       command: "ViewGroup"
       arguments:
           values:
@@ -212,6 +209,7 @@ tests:
           with GroupKeySetID as 0x01a3"
       PICS: GRPKEY.S.C01.Rsp
       cluster: "Group Key Management"
+      endpoint: 0
       command: "KeySetRead"
       arguments:
           values:
@@ -237,6 +235,7 @@ tests:
           cluster from DUT"
       PICS: GRPKEY.S.A0000
       cluster: "Group Key Management"
+      endpoint: 0
       command: "readAttribute"
       attribute: "GroupKeyMap"
       response:
@@ -252,8 +251,9 @@ tests:
     - label:
           "Step 9a: TH reads GroupTable attribute from GroupKeyManagement
           cluster on DUT using a fabric-filtered read."
-      cluster: "Group Key Management"
       PICS: G.S.F00 && GRPKEY.S.A0001
+      cluster: "Group Key Management"
+      endpoint: 0
       command: "readAttribute"
       attribute: "GroupTable"
       response:
@@ -261,7 +261,7 @@ tests:
               [
                   {
                       GroupId: 0x0103,
-                      Endpoints: [Groups.Endpoint],
+                      Endpoints: [endpoint],
                       GroupName: "Test Group",
                   },
               ]
@@ -269,13 +269,14 @@ tests:
     - label:
           "Step 9b: TH reads GroupTable attribute from GroupKeyManagement
           cluster on DUT using a fabric-filtered read"
+      PICS: " !G.S.F00 && GRPKEY.S.A0001 "
       cluster: "Group Key Management"
-      PICS: G.S.F00 && GRPKEY.S.A0001
+      endpoint: 0
       command: "readAttribute"
       attribute: "GroupTable"
       response:
           value:
-              [{ GroupId: 0x0103, Endpoints: [Groups.Endpoint], GroupName: "" }]
+              [{ GroupId: 0x0103, Endpoints: [endpoint], GroupName: "" , FabricIndex: CurrentFabricIndexValue}]
 
     - label:
           "Step 10: TH removes the Group key set that was added by sending a
@@ -283,6 +284,7 @@ tests:
           GroupKeySetID field set to 0x01a3"
       PICS: GRPKEY.S.C03.Rsp
       cluster: "Group Key Management"
+      endpoint: 0
       command: "KeySetRemove"
       arguments:
           values:
@@ -296,6 +298,7 @@ tests:
           fabric-filtered read."
       PICS: GRPKEY.S.A0000
       cluster: "Group Key Management"
+      endpoint: 0
       command: "readAttribute"
       attribute: "GroupKeyMap"
       response:
@@ -305,7 +308,6 @@ tests:
           "Step 12: TH cleans up groups using RemoveAllGroups command to the DUT
           on PIXIT.G.ENDPOINT"
       PICS: G.S.C04.Rsp
-      endpoint: Groups.Endpoint
       command: "RemoveAllGroups"
 
     - label:
@@ -314,6 +316,7 @@ tests:
           fabric-filtered read."
       PICS: GRPKEY.S.A0001
       cluster: "Group Key Management"
+      endpoint: 0
       command: "readAttribute"
       attribute: "GroupTable"
       response:
@@ -327,6 +330,7 @@ tests:
           (5) 2)AuthMode: CASE (2) 3)Subjects: TH node id ([N1]) 4)Targets: all
           (null)"
       cluster: "Access Control"
+      endpoint: 0
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
