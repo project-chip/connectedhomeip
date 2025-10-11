@@ -9,7 +9,7 @@
 
   <xs:complexType name="ConditionType">
     <xs:attribute name="name" type="xs:string" use="required" />
-    <xs:attribute name="summary" type="xs:string" />
+    <xs:attribute name="summary" type="xs:string" use="optional" />
   </xs:complexType>
 
   <xs:complexType name="ConditionsType">
@@ -145,7 +145,7 @@
   <xs:complexType name="DeviceTypeType">
     <xs:sequence>
       <xs:element name="revisionHistory" type="RevisionHistoryType" minOccurs="1" maxOccurs="1" />
-      <xs:element name="classification" type="ClassificationType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="classification" type="DeviceTypeClassificationType" minOccurs="0" maxOccurs="1" />
       <xs:element name="conditions" type="ConditionsType" minOccurs="0" maxOccurs="1" />
       <xs:element name="conditionRequirements" type="ConditionRequirementsType" minOccurs="0"
         maxOccurs="1" />
@@ -158,7 +158,7 @@
     <xs:attribute name="revision" type="xs:positiveInteger" use="required" />
   </xs:complexType>
 
-  <xs:complexType name="ClassificationType">
+  <xs:complexType name="DeviceTypeClassificationType">
     <xs:attribute name="class" type="xs:string" use="required" />
     <xs:attribute name="scope" type="xs:string" use="required" />
     <xs:attribute name="superset" type="xs:string" use="optional" />

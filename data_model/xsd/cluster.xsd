@@ -9,7 +9,7 @@
   <xs:include schemaLocation="types.xsd" />
 
 
-  <xs:complexType name="ClassificationType">
+  <xs:complexType name="ClusterClassificationType">
     <xs:sequence>
       <xs:element type="QualityType" name="quality" minOccurs="0" maxOccurs="1" />
     </xs:sequence>
@@ -57,7 +57,7 @@
     <xs:all>
       <xs:element name="revisionHistory" type="RevisionHistoryType" />
       <xs:element name="clusterIds" type="ClusterIdsType" minOccurs="1" />
-      <xs:element name="classification" type="ClassificationType" minOccurs="1" />
+      <xs:element name="classification" type="ClusterClassificationType" minOccurs="1" />
       <xs:element name="features" type="FeaturesType" minOccurs="0" />
       <xs:element name="dataTypes" minOccurs="0">
         <xs:complexType>
