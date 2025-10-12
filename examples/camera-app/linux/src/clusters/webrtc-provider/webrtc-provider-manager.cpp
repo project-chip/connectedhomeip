@@ -369,6 +369,10 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
     transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
     ScheduleICECandidatesSend(sessionId);
 
+    // Set the flag after successfully handling the answer and scheduling ICE candidates
+    transport->SetHasSentInitialICECandidates(true);
+    ChipLogProgress(Camera, "Initial ICE candidates batch will be sent for sessionID: %u, trickle ICE enabled", sessionId);
+
     return CHIP_NO_ERROR;
 }
 
@@ -408,6 +412,13 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId,
     // Schedule sending Ice Candidates when remote candidates are received. This keeps the exchange simple
     transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
     ScheduleICECandidatesSend(sessionId);
+
+    if (!transport->GetHasSentInitialICECandidates())
+    {
+        // Set the flag after successfully handling ICE candidates
+        transport->SetHasSentInitialICECandidates(true);
+        ChipLogProgress(Camera, "Initial ICE candidates batch will be sent for sessionID: %u, trickle ICE enabled", sessionId);
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -712,6 +723,10 @@ void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::Exchang
         }
 
         err = self->SendEndCommand(exchangeMgr, sessionHandle, sessionId, endReason);
+
+        // Unset the flag when session closes
+        transport->SetHasSentInitialICECandidates(false);
+
         // Release the Video and Audio Streams from the CameraAVStreamManagement
         // cluster and update the reference counts.
         self->ReleaseAudioVideoStreams(sessionId);

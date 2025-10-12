@@ -128,14 +128,6 @@ const char * WebrtcTransport::GetStateStr() const
 
 void WebrtcTransport::MoveToState(const State targetState)
 {
-    // When transitioning from SendingICECandidates to Idle for the first time, enable trickle ICE mode
-    // (subsequent transitions will be for trickle ICE updates, so we only set the flag once)
-    if (mState == State::SendingICECandidates && targetState == State::Idle && !mHasSentInitialICECandidates)
-    {
-        mHasSentInitialICECandidates = true;
-        ChipLogProgress(Camera, "Initial ICE candidates batch sent for sessionID: %u, trickle ICE enabled", mRequestArgs.sessionId);
-    }
-
     mState = targetState;
     ChipLogProgress(Camera, "WebrtcTransport moving to [ %s ]", GetStateStr());
 }
