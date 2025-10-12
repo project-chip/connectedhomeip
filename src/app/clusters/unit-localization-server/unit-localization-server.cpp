@@ -58,9 +58,10 @@ CHIP_ERROR UnitLocalizationCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
+#ifndef CHIP_SKIP_PERSISTENCE_MIGRATION
     AttributeId attributesToUpdate[] = { TemperatureUnit::Id };
-
     MigrateFromSafeAttributePersistenceProvider(mPath, Span(attributesToUpdate), context.storage);
+#endif
 
     AttributePersistence attrPersistence{ context.attributeStorage };
 
