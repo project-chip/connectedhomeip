@@ -35,7 +35,7 @@ using namespace chip::app::Clusters::UnitLocalization;
 using namespace chip::app::Clusters::UnitLocalization::Attributes;
 
 UnitLocalizationCluster::UnitLocalizationCluster(EndpointId endpointId, BitFlags<UnitLocalization::Feature> feature) :
-    DefaultServerCluster({ endpointId, TimeFormatLocalization::Id }), mFeatures{ feature }
+    DefaultServerCluster({ endpointId, UnitLocalization::Id }), mFeatures{ feature }
 {}
 
 CHIP_ERROR UnitLocalizationCluster::SetSupportedTemperatureUnits(DataModel::List<TempUnitEnum> & units)
