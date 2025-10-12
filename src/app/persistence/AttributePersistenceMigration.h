@@ -28,7 +28,7 @@ namespace chip::app {
  *
  * @param safeProvider A SafeAttributePersistenceProvider implementation to migrate from.
  * @param normProvider A standard AttributePersistenceProvider implementation to migrate to.
- * @param path         The concrete cluster path
+ * @param cluster      The concrete cluster path
  * @param attributes   The attributes that need to be migrated
  * @param buffer       An internal buffer used for temporary storage between the providers
  *
@@ -42,7 +42,7 @@ namespace chip::app {
  */
 CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceProvider & safeProvider,
                                                        AttributePersistenceProvider & normProvider,
-                                                       const ConcreteClusterPath & path, Span<AttributeId> attributes,
+                                                       const ConcreteClusterPath & cluster, Span<AttributeId> attributes,
                                                        MutableByteSpan & buffer);
 
 /**
@@ -52,7 +52,7 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
  *
  *
  * @param attributeBufferSize  The size of the buffer to use to as swap memory between providers
- * @param path                 The concrete cluster path
+ * @param cluster              The concrete cluster path
  * @param attributes           The attributes that need to be migrated
  * @param storageDelegate      The
  *
@@ -65,7 +65,7 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
  *         and return last error encountered
  */
 template <int attributeBufferSize = 255>
-CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(const ConcreteClusterPath & path, Span<AttributeId> attributes,
+CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(const ConcreteClusterPath & cluster, Span<AttributeId> attributes,
                                                        PersistentStorageDelegate & storageDelegate)
 {
     DefaultSafeAttributePersistenceProvider safeProvider;
@@ -73,10 +73,10 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(const ConcreteClusterPath
     DefaultAttributePersistenceProvider normProvider;
     normProvider.Init(&storageDelegate);
 
-    unsigned char attributeBuffer[attributeBufferSize] = {};
+    uint8_t attributeBuffer[attributeBufferSize] = {};
     MutableByteSpan buffer(attributeBuffer);
 
-    return MigrateFromSafeAttributePersistenceProvider(safeProvider, normProvider, path, attributes, buffer);
+    return MigrateFromSafeAttributePersistenceProvider(safeProvider, normProvider, cluster, attributes, buffer);
 };
 
 } // namespace chip::app
