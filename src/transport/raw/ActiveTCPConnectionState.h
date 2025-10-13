@@ -123,6 +123,10 @@ private:
 
     void Init(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddr, ReleaseFnType releaseConnection)
     {
+        if (endPoint)
+        {
+            endPoint->Retain();
+        }
         mEndPoint          = endPoint;
         mPeerAddr          = peerAddr;
         mReceived          = nullptr;
@@ -134,7 +138,7 @@ private:
     {
         if (mEndPoint)
         {
-            mEndPoint->Free();
+            mEndPoint->Release();
         }
         mPeerAddr          = PeerAddress::Uninitialized();
         mEndPoint          = nullptr;

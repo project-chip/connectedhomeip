@@ -153,7 +153,13 @@ extern uint32_t SystemCoreClock;
 #define configUSE_TICKLESS_IDLE 0
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
 
+// Set the FreeRTOS tick rate depending on the MCU interface.
+#ifdef SLI_SI91X_MCU_INTERFACE
+// For Si91x SoCs, a 1000Hz tick rate provides an exact 1ms systick period
+#define configTICK_RATE_HZ (1000)
+#else // EFR32 platforms
 #define configTICK_RATE_HZ (1024)
+#endif // SLI_SI91X_MCU_INTERFACE
 
 /* Definition used by Keil to replace default system clock source. */
 #define configOVERRIDE_DEFAULT_TICK_CONFIGURATION 1
@@ -244,15 +250,15 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 
 #ifndef configTOTAL_HEAP_SIZE
 #ifdef SL_WIFI
-#ifdef DIC_ENABLE
+#ifdef SL_MATTER_ENABLE_AWS
 #ifdef SLI_SI91X_MCU_INTERFACE
-#define configTOTAL_HEAP_SIZE ((size_t) ((75 + EXTRA_HEAP_k) * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t) ((65 + EXTRA_HEAP_k) * 1024))
 #else
 #define configTOTAL_HEAP_SIZE ((size_t) ((68 + EXTRA_HEAP_k) * 1024))
 #endif // SLI_SI91X_MCU_INTERFACE
 #else
 #define configTOTAL_HEAP_SIZE ((size_t) ((42 + EXTRA_HEAP_k) * 1024))
-#endif // DIC
+#endif // SL_MATTER_ENABLE_AWS
 #else  // SL_WIFI
 #if SL_CONFIG_OPENTHREAD_LIB == 1
 #define configTOTAL_HEAP_SIZE ((size_t) ((40 + EXTRA_HEAP_k) * 1024))

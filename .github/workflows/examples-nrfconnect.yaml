@@ -40,7 +40,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:167
+            image: ghcr.io/project-chip/chip-build-nrf-platform:169
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -125,7 +125,7 @@ jobs:
                     examples/light-switch-app/nrfconnect/build/nrfconnect/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Shell on nRF52840 DK
-              if: github.event_name == 'push' || steps.changed_paths.outputs.shell == 'true'
+              if: github.event_name == 'push' || steps.changed_paths.outputs.shell == 'true' || steps.changed_paths.outputs.nrfconnect == 'true'
               run: |
                   scripts/examples/nrfconnect_example.sh shell nrf52840dk/nrf52840
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \

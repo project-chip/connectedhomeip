@@ -45,6 +45,7 @@ from matter import ChipDeviceCtrl
 from matter.ChipStack import ChipStack
 from matter.crypto import p256keypair
 from matter.exceptions import ChipStackException
+from matter.setup_payload import SetupPayload
 from matter.storage import PersistentStorageJSON
 from matter.utils import CommissioningBuildingBlocks
 
@@ -317,17 +318,6 @@ class BaseTestHelper:
         await self.devCtrl.Commission(nodeid)
         return self.devCtrl.CheckTestCommissionerCallbacks() and self.devCtrl.CheckTestCommissionerPaseConnection(nodeid)
 
-    async def TestCommissioning(self, ip: str, setuppin: int, nodeid: int):
-        self.logger.info("Commissioning device {}".format(ip))
-        try:
-            await self.devCtrl.CommissionIP(ip, setuppin, nodeid)
-        except ChipStackException:
-            self.logger.exception(
-                "Failed to finish commissioning device {}".format(ip))
-            return False
-        self.logger.info("Commissioning finished.")
-        return True
-
     async def TestCommissioningWithSetupPayload(self, setupPayload: str, nodeid: int, discoveryType: int = 2):
         self.logger.info("Commissioning device with setup payload {}".format(setupPayload))
         try:
@@ -339,17 +329,17 @@ class BaseTestHelper:
         self.logger.info("Commissioning finished.")
         return True
 
-    async def TestOnNetworkCommissioning(self, discriminator: int, setuppin: int, nodeid: int, ip_override: str = None):
+    async def TestOnNetworkCommissioning(self, discriminator: int, setuppin: int, nodeid: int):
         self.logger.info("Testing discovery")
         device = await self.TestDiscovery(discriminator=discriminator)
+
+        qr = SetupPayload().GenerateQrCode(passcode=setuppin, discriminator=discriminator)
+
         if not device:
             self.logger.info("Failed to discover any devices.")
             return False
-        address = device.addresses[0]
-        if ip_override:
-            address = ip_override
         self.logger.info("Testing commissioning")
-        if not await self.TestCommissioning(address, setuppin, nodeid):
+        if not await self.TestCommissioningWithSetupPayload(qr, nodeid):
             self.logger.info("Failed to finish commissioning")
             return False
         return True
@@ -778,7 +768,7 @@ class BaseTestHelper:
 
         return True
 
-    async def TestMultiFabric(self, ip: str, setuppin: int, nodeid: int):
+    async def TestMultiFabric(self, setup_code: str, nodeid: int):
         self.logger.info("Opening Commissioning Window")
 
         await self.devCtrl.SendCommand(
@@ -796,10 +786,9 @@ class BaseTestHelper:
             self.controllerNodeId, self.paaTrustStorePath)
 
         try:
-            await self.devCtrl2.CommissionIP(ip, setuppin, nodeid)
+            await self.devCtrl2.CommissionWithCode(setupPayload=setup_code, nodeid=nodeid)
         except ChipStackException:
-            self.logger.exception(
-                "Failed to finish key exchange with device {}".format(ip))
+            self.logger.exception("Failed to finish key exchange with device")
             return False
 
         #

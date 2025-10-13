@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:167
+            image: ghcr.io/project-chip/chip-build:169
 
         steps:
             - name: Checkout
@@ -85,7 +85,6 @@ jobs:
                      --skip-dir platform/FreeRTOS \
                      --skip-dir platform/Infineon \
                      --skip-dir platform/Linux \
-                     --skip-dir platform/mbed \
                      --skip-dir platform/mt793x \
                      --skip-dir platform/nxp \
                      --skip-dir platform/OpenThread \

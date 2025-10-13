@@ -39,13 +39,13 @@ LOGGER = logging.getLogger(__name__)
 
 
 class _ActionStatus(Enum):
-    SUCCESS = 'success',
+    SUCCESS = 'success'
     ERROR = 'error'
 
 
 class _TestFabricId(IntEnum):
-    ALPHA = 1,
-    BETA = 2,
+    ALPHA = 1
+    BETA = 2
     GAMMA = 3
 
 
