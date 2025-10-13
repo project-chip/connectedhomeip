@@ -142,99 +142,8 @@ class TC_SC_4_1(MatterBaseTest):
             attribute=Clusters.IcdManagement.Attributes.FeatureMap
         )
 
-    @staticmethod
-    async def get_commissionable_service_ptr_record() -> Optional[PtrRecord]:
-        mdns = MdnsDiscovery()
-
-        # Browse for DUT's 'Commissionable Service'
-        await mdns.discover(
-            service_types=[MdnsServiceType.COMMISSIONABLE.value],
-            log_output=True
-        )
-
-        # Check for the presence of DUT's comissionable service PTR record
-        ptr_records = next(iter(mdns._discovered_services.values()), [])
-        ptr_records_discovered = len(ptr_records) > 0
-
-        if ptr_records_discovered:
-            return ptr_records[0]
-
-        return None
-
-    async def close_commissioning_window(self) -> None:
-        revoke_cmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.default_controller.SendCommand(nodeid=self.dut_node_id,
-                                                  endpoint=0,
-                                                  payload=revoke_cmd,
-                                                  timedRequestTimeoutMs=6000)
-        sleep(1)  # Give some time for failsafe cleanup scheduling
-
-    def verify_t_key(self, txt_record) -> None:
-        # If 'supports_tcp' is False and T key is not present, nothing to check
-        if (not self.supports_tcp) and ('T' not in txt_record.txt):
-            return
-
-        # Verify that if 'supports_tcp' is True, the 'T' key is present
-        if self.supports_tcp:
-            asserts.assert_in('T', txt_record.txt, "'T' key must be present.")
-
-        # Verify that the 'T' key is non-empty
-        t_key = txt_record.txt.get('T')
-        asserts.assert_true(t_key, "'T' key is present but has no value.")
-
-        # Verify that the 'T' key is a decimal number encoded as ASCII
-        # text without any leading zeros, and less than or equal to 6
-        assert_valid_t_key(t_key, enforce_provisional=False)
-
-        # Convert to bitmap
-        T_int = int(t_key)
-
-        # Verify that bit 0 is clear
-        asserts.assert_true((T_int & 0x01) == 0, f"T key ({t_key}) bit 0 must be clear.")
-
-        # Verify that TCP bit (0x04) matches the PICS exactly if 'supports_tcp' is True
-        tcp_bit_set = (T_int & 0x04) != 0
-        asserts.assert_true(tcp_bit_set == self.supports_tcp,
-                            "TCP bit (0x04) must be set if MCORE.SC.TCP PICS is set.")
-
-        # Verify that the value encodes TCP capability per PICS:
-        #   - If 'supports_tcp' is True, T key allowed values are (4, 6)
-        #   - If 'supports_tcp' is False, T key allowed values are (0)
-        allowed = {4, 6} if self.supports_tcp else {0}
-        asserts.assert_true(T_int in allowed,
-                            f"T value ({t_key}) is not in allowed set {sorted(allowed)}.")
-
-    async def _get_verify_srv_record(self, long_discriminator_ptr_instance_name: str) -> str:
-        # TH performs a SRV record query against the 'Commissionable Service' service name
-        srv_record = await MdnsDiscovery().get_srv_record(
-            service_name=f"{long_discriminator_ptr_instance_name}.{MdnsServiceType.COMMISSIONABLE.value}",
-            service_type=MdnsServiceType.COMMISSIONABLE.value,
-            log_output=True
-        )
-
-        # TODO: update to desc
-        # Verify SRV record is returned
-        asserts.assert_true(srv_record is not None, "SRV record was not returned")
-
-        # Verify that the SRV record's instance name is equal to the
-        # 'Long Discriminator Subtype' PTR record's instance name.
-        asserts.assert_equal(srv_record.instance_name, long_discriminator_ptr_instance_name,
-                            "SRV record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
-
-        # Verify DUT's 'Commissionable Service' DNS-SD instance name is a 64-bit randomly
-        # selected ID expressed as a sixteen-char hex string with capital letters
-        assert_valid_commissionable_instance_name(srv_record.instance_name)
-
-        # Verify DUT's 'Commissionable Service' service type is '_matterc._udp' and service domain '.local.'
-        assert_is_commissionable_type(srv_record.service_type)
-
-        # Verify target hostname is derived from the 48bit or 64bit MAC address
-        # expressed as a twelve or sixteen capital letter hex string
-        assert_valid_hostname(srv_record.hostname)
-
-        return srv_record.hostname
-
-    async def _get_verify_long_discriminator_subtype_ptr_instance_name(self) -> str:
+    # TODO: update in test plan
+    async def _get_verify_long_discriminator_subtype_ptr_instance_name(self, must_be_present: bool = True) -> Optional[str]:
         # TODO: Placeholder for programatically
         # TODO: getting the discriminator to
         # TODO: construct the _L subtype
@@ -252,12 +161,47 @@ class TC_SC_4_1(MatterBaseTest):
             log_output=True
         )
 
-        # Verify that there is one, and only one, 'Long Discriminator Subtype' PTR record
-        asserts.assert_equal(len(ptr_records), 1,
-                             f"There must only be one 'Long Discriminator Subtype' ({long_discriminator_subtype}) PTR record, found {len(ptr_records)}.")
+        if must_be_present:
+            # Verify that there is one, and only one, 'Long Discriminator Subtype' PTR record
+            asserts.assert_equal(len(ptr_records), 1,
+                                f"There must only be one 'Long Discriminator Subtype' ({long_discriminator_subtype}) PTR record, found {len(ptr_records)}.")
 
-        return ptr_records[0].instance_name
+            return ptr_records[0].instance_name
 
+        return None
+
+    # TODO: update in test plan
+    async def _get_verify_srv_record(self, long_discriminator_ptr_instance_name: str) -> str:
+        # TH performs a SRV record query against the 'Long Discriminator Subtype' PTR record's instance name
+        srv_record = await MdnsDiscovery().get_srv_record(
+            service_name=f"{long_discriminator_ptr_instance_name}.{MdnsServiceType.COMMISSIONABLE.value}",
+            service_type=MdnsServiceType.COMMISSIONABLE.value,
+            log_output=True
+        )
+
+        # Verify SRV record is returned
+        asserts.assert_true(srv_record is not None, "SRV record was not returned")
+
+        # Verify that the SRV record's instance name is equal to the
+        # 'Long Discriminator Subtype' PTR record's instance name.
+        asserts.assert_equal(srv_record.instance_name, long_discriminator_ptr_instance_name,
+                            "SRV record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
+
+        # Verify that the DUT's 'Commissionable Service' SRV record's instance name is a 64-bit
+        # randomly selected ID expressed as a sixteen-char hex string with capital letters
+        assert_valid_commissionable_instance_name(srv_record.instance_name)
+
+        # Verify DUT's 'Commissionable Service' SRV record's service
+        # type is '_matterc._udp' and service domain '.local.'
+        assert_is_commissionable_type(srv_record.service_type)
+
+        # Verify target hostname is derived from the 48bit or 64bit MAC address
+        # expressed as a twelve or sixteen capital letter hex string
+        assert_valid_hostname(srv_record.hostname)
+
+        return srv_record.hostname
+
+    # TODO: update in test plan
     async def _verify_commissionable_subtypes(self, long_discriminator_ptr_instance_name: str) -> None:
         # TH performs a browse for the rest of the 'Commissionable Service' subtypes
         subtypes = await MdnsDiscovery().get_commissionable_subtypes(log_output=True)
@@ -360,8 +304,9 @@ class TC_SC_4_1(MatterBaseTest):
                 asserts.assert_equal(devtype_subtype_ptr.instance_name, long_discriminator_ptr_instance_name,
                                     "'Devtype Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
+    # TODO: update in test plan
     async def _verify_txt_record_keys(self, long_discriminator_ptr_instance_name: str, expected_cm: str) -> None:
-        # TH performs a TXT record query against the 'Commissionable Service' service name
+        # TH performs a TXT record query against the 'Long Discriminator Subtype' PTR record's instance name
         # The device may omit the TXT record if there are no mandatory TXT keys
         txt_record = await MdnsDiscovery().get_txt_record(
             service_name=f"{long_discriminator_ptr_instance_name}.{MdnsServiceType.COMMISSIONABLE.value}",
@@ -558,6 +503,41 @@ class TC_SC_4_1(MatterBaseTest):
         else:
             logging.info("TXT record NOT required.")
 
+    def verify_t_key(self, txt_record) -> None:
+        # If 'supports_tcp' is False and T key is not present, nothing to check
+        if (not self.supports_tcp) and ('T' not in txt_record.txt):
+            return
+
+        # Verify that if 'supports_tcp' is True, the 'T' key is present
+        if self.supports_tcp:
+            asserts.assert_in('T', txt_record.txt, "'T' key must be present.")
+
+        # Verify that the 'T' key is non-empty
+        t_key = txt_record.txt.get('T')
+        asserts.assert_true(t_key, "'T' key is present but has no value.")
+
+        # Verify that the 'T' key is a decimal number encoded as ASCII
+        # text without any leading zeros, and less than or equal to 6
+        assert_valid_t_key(t_key, enforce_provisional=False)
+
+        # Convert to bitmap
+        T_int = int(t_key)
+
+        # Verify that bit 0 is clear
+        asserts.assert_true((T_int & 0x01) == 0, f"T key ({t_key}) bit 0 must be clear.")
+
+        # Verify that TCP bit (0x04) matches the PICS exactly if 'supports_tcp' is True
+        tcp_bit_set = (T_int & 0x04) != 0
+        asserts.assert_true(tcp_bit_set == self.supports_tcp,
+                            "TCP bit (0x04) must be set if MCORE.SC.TCP PICS is set.")
+
+        # Verify that the value encodes TCP capability per PICS:
+        #   - If 'supports_tcp' is True, T key allowed values are (4, 6)
+        #   - If 'supports_tcp' is False, T key allowed values are (0)
+        allowed = {4, 6} if self.supports_tcp else {0}
+        asserts.assert_true(T_int in allowed,
+                            f"T value ({t_key}) is not in allowed set {sorted(allowed)}.")
+
     @staticmethod
     async def _verify_aaaa_records(srv_hostname: str) -> None:
         # TH performs a AAAA record query against the target 'hostname'
@@ -570,6 +550,14 @@ class TC_SC_4_1(MatterBaseTest):
         # Verify the AAAA records contain a valid IPv6 address
         ipv6_addresses = [f"{r.address}%{r.interface}" for r in quada_records]
         assert_valid_ipv6_addresses(ipv6_addresses)        
+
+    async def close_commissioning_window(self) -> None:
+        revoke_cmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
+        await self.default_controller.SendCommand(nodeid=self.dut_node_id,
+                                                  endpoint=0,
+                                                  payload=revoke_cmd,
+                                                  timedRequestTimeoutMs=6000)
+        sleep(1)  # Give some time for failsafe cleanup scheduling
 
     def desc_TC_TC_SC_4_1(self) -> str:
         return "[TC-SC-4.1] Commissionable Node Discovery with DUT as Commissionee"
@@ -693,17 +681,14 @@ class TC_SC_4_1(MatterBaseTest):
         # *** STEP 8 ***
         # Check if DUT Extended Discovery mode is active
         self.step(8)
-        # TH performs a browse for the 'Commissionable Service' PTR record of type '_matterc._udp.local.'
-        commissionable_service_ptr = await self.get_commissionable_service_ptr_record()
+        # Get the 'Long Discriminator Subtype' PTR record's instance name
+        long_discriminator_ptr_instance_name = await self._get_verify_long_discriminator_subtype_ptr_instance_name(must_be_present=False)
 
-        # If DUT's 'Commissionable Service' is present, Extended Discovery mode is active'
-        extended_discovery_mode = commissionable_service_ptr is not None
+        # If the DUT's 'Long Discriminator Subtype' PTR record's instance name is present, Extended Discovery mode is active
+        extended_discovery_mode = long_discriminator_ptr_instance_name is not None
         logging.info(f"DUT Extended Discovery mode active: {extended_discovery_mode}")
 
         if extended_discovery_mode:
-            # Get the 'Long Discriminator Subtype' PTR record's instance name
-            long_discriminator_ptr_instance_name = await self._get_verify_long_discriminator_subtype_ptr_instance_name()
-
             # Verify commissionable subtype advertisements
             await self._verify_commissionable_subtypes(long_discriminator_ptr_instance_name)
 
