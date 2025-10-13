@@ -195,8 +195,8 @@ InteractionModelEngine * InteractionModelEngine::GetInstance()
     //   3. `CheckCommandFlags` validates timed / fabric-scoped / payload-size constraints that were also computed by the provider
     //   so any change to generated metadata automatically applies to both validation and dispatch.
     //
-    // Should any other code want to modify the command validation policy, it must do so via the provider or these helper functions so that pre-dispatch
-    // validation and the eventual dispatch path remain in lock-step.
+    // Should any other code want to modify the command validation policy, it must do so via the provider or these helper functions
+    // so that pre-dispatch validation and the eventual dispatch path remain in lock-step.
 }
 
 CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
