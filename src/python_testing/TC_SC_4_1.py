@@ -51,9 +51,8 @@ from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.testing.commissioning import get_setup_payload_info_config
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 '''
 Purpose
@@ -164,7 +163,7 @@ class TC_SC_4_1(MatterBaseTest):
         if must_be_present:
             # Verify that there is one, and only one, 'Long Discriminator Subtype' PTR record
             asserts.assert_equal(len(ptr_records), 1,
-                                f"There must only be one 'Long Discriminator Subtype' ({long_discriminator_subtype}) PTR record, found {len(ptr_records)}.")
+                                 f"There must only be one 'Long Discriminator Subtype' ({long_discriminator_subtype}) PTR record, found {len(ptr_records)}.")
 
             return ptr_records[0].instance_name
 
@@ -185,7 +184,7 @@ class TC_SC_4_1(MatterBaseTest):
         # Verify that the SRV record's instance name is equal to the
         # 'Long Discriminator Subtype' PTR record's instance name.
         asserts.assert_equal(srv_record.instance_name, long_discriminator_ptr_instance_name,
-                            "SRV record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
+                             "SRV record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
         # Verify that the DUT's 'Commissionable Service' SRV record's instance name is a 64-bit
         # randomly selected ID expressed as a sixteen-char hex string with capital letters
@@ -275,7 +274,7 @@ class TC_SC_4_1(MatterBaseTest):
                 # is equal to the 'Long Discriminator Subtype' PTR record's instance name.
                 vendor_subtype_ptr = ptr_records[0]
                 asserts.assert_equal(vendor_subtype_ptr.instance_name, long_discriminator_ptr_instance_name,
-                                    "'Vendor Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
+                                     "'Vendor Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
         # *** DEVTYPE SUBTYPE ***
         # Check for the presence of the 'Devtype Subtype'
@@ -302,7 +301,7 @@ class TC_SC_4_1(MatterBaseTest):
                 # is equal to the 'Long Discriminator Subtype' PTR record's instance name.
                 devtype_subtype_ptr = ptr_records[0]
                 asserts.assert_equal(devtype_subtype_ptr.instance_name, long_discriminator_ptr_instance_name,
-                                    "'Devtype Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
+                                     "'Devtype Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
     # TODO: update in test plan
     async def _verify_txt_record_keys(self, long_discriminator_ptr_instance_name: str, expected_cm: str) -> None:
