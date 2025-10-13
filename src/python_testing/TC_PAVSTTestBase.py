@@ -250,7 +250,7 @@ class PAVSTTestBase:
                         "streamUsage": streamUsage,
                         "videoStreamID": videoStreamID,
                         "audioStreamID": audioStreamID,
-                        "endpointID": tlsEndPoint,
+                        "TLSEndpointID": tlsEndPoint,
                         "url": url,
                         "triggerOptions": triggerOptions,
                         "ingestMethod": ingestMethod,
@@ -332,7 +332,7 @@ class PAVSTTestBase:
             return e.status
         pass
 
-    async def psvt_set_transport_status(self, cmd, devCtrl=None):
+    async def psvt_set_transport_status(self, cmd, expected_status=None, devCtrl=None):
         endpoint = self.get_endpoint(default=1)
         dev_ctrl = self.default_controller
         if (devCtrl is not None):
@@ -341,9 +341,10 @@ class PAVSTTestBase:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, dev_ctrl=dev_ctrl)
             return Status.Success
         except InteractionModelError as e:
-            asserts.assert_true(
-                e.status == Status.NotFound, "Unexpected error returned"
-            )
+            if (expected_status is not None):
+                asserts.assert_true(e.status, expected_status, "Unexpected error returned")
+            else:
+                asserts.assert_true(e.status == Status.NotFound, "Unexpected error returned")
             return e.status
         pass
 
