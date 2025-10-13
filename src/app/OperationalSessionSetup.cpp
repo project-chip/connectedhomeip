@@ -296,7 +296,18 @@ void OperationalSessionSetup::UpdateDeviceData(const ResolveResult & result)
 
 CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & result)
 {
-    auto & config = result.mrpRemoteConfig;
+    auto config = result.mrpRemoteConfig;
+
+    if (result.isICDOperatingAsLIT)
+    {
+        // When ICD is operating as LIT, we need to adjust the MRP idle retransmission timeout
+        // to accommodate the potentially long sleep periods.
+        // Set the idle retransmission timeout to be the sum of the active threshold time
+        // and the configured slow poll limit.
+        // This ensures that retransmissions for first message are spaced out enough to
+        // avoid unnecessary retries and potential message congestion.
+        config.mIdleRetransTimeout = config.mActiveThresholdTime + CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT;
+    }
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload)
     {
