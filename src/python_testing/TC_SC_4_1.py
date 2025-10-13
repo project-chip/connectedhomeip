@@ -38,8 +38,6 @@ import logging
 from time import sleep
 from typing import Any, Optional
 
-from mdns_discovery.data_classes.mdns_service_info import MdnsServiceInfo
-from mdns_discovery.data_classes.ptr_record import PtrRecord
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_valid_cm_key,
                                           assert_valid_commissionable_instance_name, assert_valid_d_key,
@@ -143,6 +141,8 @@ class TC_SC_4_1(MatterBaseTest):
 
     # TODO: update in test plan
     async def _get_verify_long_discriminator_subtype_ptr_instance_name(self, must_be_present: bool = True) -> Optional[str]:
+        # TH constructs the 'Long Discriminator Subtype'
+        # using the DUT's 'Long Discriminator'
         # TODO: Placeholder for programatically
         # TODO: getting the discriminator to
         # TODO: construct the _L subtype
@@ -153,6 +153,10 @@ class TC_SC_4_1(MatterBaseTest):
         long_discriminator = "3840"  # get long discriminator logic
         long_discriminator_subtype = f"_L{long_discriminator}._sub.{MdnsServiceType.COMMISSIONABLE.value}"
         # TODO: ###############################
+
+        # Verify that it's a 12-bit variable length decimal
+        # number in ASCII text, omitting any leading zeros
+        assert_valid_long_discriminator_subtype(long_discriminator_subtype)
 
         # TH performs a PTR record query against the 'Long Discriminator Subtype' _L
         ptr_records = await MdnsDiscovery().get_ptr_records(
