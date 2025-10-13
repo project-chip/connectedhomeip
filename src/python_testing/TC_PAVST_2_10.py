@@ -161,7 +161,7 @@ class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             self.step(idx)
             status = await self.allocate_one_pushav_transport(
                 endpoint, tlsEndPoint=tlsEndpointId, url=url, expiryTime=30)
-            asserts.assert_equal(status, Status.InvalidURL, f"Push AV Transport should return InvalidURL for {desc}")
+            asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.InvalidURL, f"Push AV Transport should return InvalidURL for {desc}")
 
 
 if __name__ == "__main__":
