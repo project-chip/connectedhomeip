@@ -29,13 +29,13 @@ void PreRollBuffer::SetMaxTotalBytes(size_t size)
     mMaxTotalBytes = size;
     TrimBuffer();
 }
-void PreRollBuffer::PushFrameToBuffer(const std::string & streamKey, const char * data, size_t size)
+void PreRollBuffer::PushFrameToBuffer(const std::string & streamKey, const uint8_t * data, size_t size)
 {
     TrimBuffer();
     std::lock_guard<std::mutex> lock(mBufferMutex);
     auto frame       = std::make_shared<PreRollFrame>();
     frame->streamKey = streamKey;
-    frame->data      = std::make_unique<char[]>(size);
+    frame->data      = std::make_unique<uint8_t[]>(size);
     memcpy(frame->data.get(), data, size);
     frame->size  = size;
     frame->ptsMs = NowMs();
@@ -88,15 +88,14 @@ void PreRollBuffer::PushBufferToTransport()
                 else
                 {
                     //  Frame is not older than the requested prebuffer length and hasn't been delivered to this sink yet
+                    chip::ByteSpan data(frame->data.get(), frame->size);
                     if (streamKey[0] == 'a' && sink->transport->CanSendAudio())
                     {
-                        sink->transport->SendAudio(frame->data.get(), frame->size,
-                                                   static_cast<uint16_t>(std::stoi(streamKey.substr(1))));
+                        sink->transport->SendAudio(data, frame->ptsMs, static_cast<uint16_t>(std::stoi(streamKey.substr(1))));
                     }
                     else if (streamKey[0] == 'v' && sink->transport->CanSendVideo())
                     {
-                        sink->transport->SendVideo(frame->data.get(), frame->size,
-                                                   static_cast<uint16_t>(std::stoi(streamKey.substr(1))));
+                        sink->transport->SendVideo(data, frame->ptsMs, static_cast<uint16_t>(std::stoi(streamKey.substr(1))));
                     }
                     else
                     {

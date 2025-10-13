@@ -7983,6 +7983,117 @@ public class ClusterInfoMapping {
     }
   }
 
+
+  public static class DelegatedGroupcastClusterLeaveGroupResponseCallback implements ChipClusters.GroupcastCluster.LeaveGroupResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer groupID, Optional<ArrayList<Integer>> endpoints, Optional<Boolean> listTooLarge) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo groupIDResponseValue = new CommandResponseInfo("groupID", "Integer");
+      responseValues.put(groupIDResponseValue, groupID);
+      // endpoints: endpoint_no
+      // Conversion from this type to Java is not properly implemented yet
+
+      CommandResponseInfo listTooLargeResponseValue = new CommandResponseInfo("listTooLarge", "Optional<Boolean>");
+      responseValues.put(listTooLargeResponseValue, listTooLarge);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedGroupcastClusterMembershipAttributeCallback implements ChipClusters.GroupcastCluster.MembershipAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.GroupcastClusterMembershipStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.GroupcastClusterMembershipStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedGroupcastClusterGeneratedCommandListAttributeCallback implements ChipClusters.GroupcastCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedGroupcastClusterAcceptedCommandListAttributeCallback implements ChipClusters.GroupcastCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedGroupcastClusterAttributeListAttributeCallback implements ChipClusters.GroupcastCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedHepaFilterMonitoringClusterLastChangedTimeAttributeCallback implements ChipClusters.HepaFilterMonitoringCluster.LastChangedTimeAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -22764,6 +22875,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.ScenesManagementCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("scenesManagement", scenesManagementClusterInfo);
 
+    ClusterInfo groupcastClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.GroupcastCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("groupcast", groupcastClusterInfo);
+
     ClusterInfo hepaFilterMonitoringClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.HepaFilterMonitoringCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("hepaFilterMonitoring", hepaFilterMonitoringClusterInfo);
@@ -23151,6 +23266,7 @@ public class ClusterInfoMapping {
     destination.get("operationalState").combineCommands(source.get("operationalState"));
     destination.get("rvcOperationalState").combineCommands(source.get("rvcOperationalState"));
     destination.get("scenesManagement").combineCommands(source.get("scenesManagement"));
+    destination.get("groupcast").combineCommands(source.get("groupcast"));
     destination.get("hepaFilterMonitoring").combineCommands(source.get("hepaFilterMonitoring"));
     destination.get("activatedCarbonFilterMonitoring").combineCommands(source.get("activatedCarbonFilterMonitoring"));
     destination.get("booleanStateConfiguration").combineCommands(source.get("booleanStateConfiguration"));
@@ -26061,6 +26177,147 @@ public class ClusterInfoMapping {
     scenesManagementClusterInteractionInfoMap.put("copyScene", scenesManagementcopySceneInteractionInfo);
 
     commandMap.put("scenesManagement", scenesManagementClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> groupcastClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> groupcastjoinGroupCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo groupcastjoinGroupgroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    groupcastjoinGroupCommandParams.put("groupID",groupcastjoinGroupgroupIDCommandParameterInfo);
+
+    CommandParameterInfo groupcastjoinGroupendpointsCommandParameterInfo = new CommandParameterInfo("endpoints", ArrayList.class, ArrayList.class);
+    groupcastjoinGroupCommandParams.put("endpoints",groupcastjoinGroupendpointsCommandParameterInfo);
+
+    CommandParameterInfo groupcastjoinGroupkeyIDCommandParameterInfo = new CommandParameterInfo("keyID", Long.class, Long.class);
+    groupcastjoinGroupCommandParams.put("keyID",groupcastjoinGroupkeyIDCommandParameterInfo);
+
+    CommandParameterInfo groupcastjoinGroupkeyCommandParameterInfo = new CommandParameterInfo("key", Optional.class, byte[].class);
+    groupcastjoinGroupCommandParams.put("key",groupcastjoinGroupkeyCommandParameterInfo);
+
+    CommandParameterInfo groupcastjoinGroupgracePeriodCommandParameterInfo = new CommandParameterInfo("gracePeriod", Optional.class, Long.class);
+    groupcastjoinGroupCommandParams.put("gracePeriod",groupcastjoinGroupgracePeriodCommandParameterInfo);
+
+    CommandParameterInfo groupcastjoinGroupuseAuxiliaryACLCommandParameterInfo = new CommandParameterInfo("useAuxiliaryACL", Optional.class, Boolean.class);
+    groupcastjoinGroupCommandParams.put("useAuxiliaryACL",groupcastjoinGroupuseAuxiliaryACLCommandParameterInfo);
+    InteractionInfo groupcastjoinGroupInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.GroupcastCluster) cluster)
+        .joinGroup((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("groupID")
+        , (ArrayList<Integer>)
+        commandArguments.get("endpoints")
+        , (Long)
+        commandArguments.get("keyID")
+        , (Optional<byte[]>)
+        commandArguments.get("key")
+        , (Optional<Long>)
+        commandArguments.get("gracePeriod")
+        , (Optional<Boolean>)
+        commandArguments.get("useAuxiliaryACL")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        groupcastjoinGroupCommandParams
+    );
+    groupcastClusterInteractionInfoMap.put("joinGroup", groupcastjoinGroupInteractionInfo);
+
+    Map<String, CommandParameterInfo> groupcastleaveGroupCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo groupcastleaveGroupgroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    groupcastleaveGroupCommandParams.put("groupID",groupcastleaveGroupgroupIDCommandParameterInfo);
+
+    CommandParameterInfo groupcastleaveGroupendpointsCommandParameterInfo = new CommandParameterInfo("endpoints", Optional.class, ArrayList.class);
+    groupcastleaveGroupCommandParams.put("endpoints",groupcastleaveGroupendpointsCommandParameterInfo);
+    InteractionInfo groupcastleaveGroupInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.GroupcastCluster) cluster)
+          .leaveGroup((ChipClusters.GroupcastCluster.LeaveGroupResponseCallback) callback
+           , (Integer)
+             commandArguments.get("groupID")
+
+           , (Optional<ArrayList<Integer>>)
+             commandArguments.get("endpoints")
+
+            );
+        },
+        () -> new DelegatedGroupcastClusterLeaveGroupResponseCallback(),
+        groupcastleaveGroupCommandParams
+      );
+    groupcastClusterInteractionInfoMap.put("leaveGroup", groupcastleaveGroupInteractionInfo);
+
+    Map<String, CommandParameterInfo> groupcastupdateGroupKeyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo groupcastupdateGroupKeygroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    groupcastupdateGroupKeyCommandParams.put("groupID",groupcastupdateGroupKeygroupIDCommandParameterInfo);
+
+    CommandParameterInfo groupcastupdateGroupKeykeyIDCommandParameterInfo = new CommandParameterInfo("keyID", Long.class, Long.class);
+    groupcastupdateGroupKeyCommandParams.put("keyID",groupcastupdateGroupKeykeyIDCommandParameterInfo);
+
+    CommandParameterInfo groupcastupdateGroupKeykeyCommandParameterInfo = new CommandParameterInfo("key", Optional.class, byte[].class);
+    groupcastupdateGroupKeyCommandParams.put("key",groupcastupdateGroupKeykeyCommandParameterInfo);
+
+    CommandParameterInfo groupcastupdateGroupKeygracePeriodCommandParameterInfo = new CommandParameterInfo("gracePeriod", Optional.class, Long.class);
+    groupcastupdateGroupKeyCommandParams.put("gracePeriod",groupcastupdateGroupKeygracePeriodCommandParameterInfo);
+    InteractionInfo groupcastupdateGroupKeyInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.GroupcastCluster) cluster)
+        .updateGroupKey((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("groupID")
+        , (Long)
+        commandArguments.get("keyID")
+        , (Optional<byte[]>)
+        commandArguments.get("key")
+        , (Optional<Long>)
+        commandArguments.get("gracePeriod")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        groupcastupdateGroupKeyCommandParams
+    );
+    groupcastClusterInteractionInfoMap.put("updateGroupKey", groupcastupdateGroupKeyInteractionInfo);
+
+    Map<String, CommandParameterInfo> groupcastexpireGracePeriodCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo groupcastexpireGracePeriodgroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    groupcastexpireGracePeriodCommandParams.put("groupID",groupcastexpireGracePeriodgroupIDCommandParameterInfo);
+    InteractionInfo groupcastexpireGracePeriodInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.GroupcastCluster) cluster)
+        .expireGracePeriod((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("groupID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        groupcastexpireGracePeriodCommandParams
+    );
+    groupcastClusterInteractionInfoMap.put("expireGracePeriod", groupcastexpireGracePeriodInteractionInfo);
+
+    Map<String, CommandParameterInfo> groupcastconfigureAuxiliaryACLCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo groupcastconfigureAuxiliaryACLgroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    groupcastconfigureAuxiliaryACLCommandParams.put("groupID",groupcastconfigureAuxiliaryACLgroupIDCommandParameterInfo);
+
+    CommandParameterInfo groupcastconfigureAuxiliaryACLuseAuxiliaryACLCommandParameterInfo = new CommandParameterInfo("useAuxiliaryACL", Boolean.class, Boolean.class);
+    groupcastconfigureAuxiliaryACLCommandParams.put("useAuxiliaryACL",groupcastconfigureAuxiliaryACLuseAuxiliaryACLCommandParameterInfo);
+    InteractionInfo groupcastconfigureAuxiliaryACLInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.GroupcastCluster) cluster)
+        .configureAuxiliaryACL((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("groupID")
+        , (Boolean)
+        commandArguments.get("useAuxiliaryACL")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        groupcastconfigureAuxiliaryACLCommandParams
+    );
+    groupcastClusterInteractionInfoMap.put("configureAuxiliaryACL", groupcastconfigureAuxiliaryACLInteractionInfo);
+
+    commandMap.put("groupcast", groupcastClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> hepaFilterMonitoringClusterInteractionInfoMap = new LinkedHashMap<>();
 

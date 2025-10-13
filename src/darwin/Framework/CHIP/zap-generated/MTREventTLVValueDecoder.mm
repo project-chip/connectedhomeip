@@ -2441,6 +2441,19 @@ static id _Nullable DecodeEventPayloadForScenesManagementCluster(EventId aEventI
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForGroupcastCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::Groupcast;
+    switch (aEventId) {
+    default: {
+        // Not a known Groupcast event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForHEPAFilterMonitoringCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::HepaFilterMonitoring;
@@ -5191,20 +5204,6 @@ static id _Nullable DecodeEventPayloadForPushAVStreamTransportCluster(EventId aE
             memberValue = [NSNumber numberWithUnsignedShort:cppValue.connectionID];
             value.connectionID = memberValue;
         } while (0);
-        do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.triggerType)];
-            value.triggerType = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.activationReason.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.activationReason.Value())];
-            } else {
-                memberValue = nil;
-            }
-            value.activationReason = memberValue;
-        } while (0);
 
         return value;
     }
@@ -5740,6 +5739,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ScenesManagement::Id: {
         return DecodeEventPayloadForScenesManagementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::Groupcast::Id: {
+        return DecodeEventPayloadForGroupcastCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return DecodeEventPayloadForHEPAFilterMonitoringCluster(aPath.mEventId, aReader, aError);

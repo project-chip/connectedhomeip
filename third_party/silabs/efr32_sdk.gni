@@ -91,6 +91,8 @@ declare_args() {
 
   # Enable TestEventTrigger in GeneralDiagnostics cluster
   sl_enable_test_event_trigger = false
+
+  sl_verbose_mode = false
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
@@ -443,7 +445,7 @@ template("efr32_sdk") {
       _include_dirs += [ "${efr32_sdk_root}/platform/driver/button/inc" ]
     }
 
-    if (invoker.enable_dic) {
+    if (invoker.enable_matter_aws) {
       _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
     }
 
@@ -568,12 +570,12 @@ template("efr32_sdk") {
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
-      if (enable_dic) {
+      if (enable_matter_aws) {
         assert(chip_enable_wifi_ipv4, "enable chip_enable_wifi_ipv4")
-        defines += [ "DIC_ENABLE=1" ]
+        defines += [ "SL_MATTER_ENABLE_AWS=1" ]
       }
       if (aws_sdk_ota) {
-        defines += [ "ENABLE_AWS_OTA_FEAT=1" ]
+        defines += [ "SL_MATTER_ENABLE_AWS_OTA_FEAT=1" ]
       }
       if (chip_enable_wifi_ipv4) {
         defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
@@ -606,6 +608,13 @@ template("efr32_sdk") {
           "SL_WIFI=1",
           "SL_WFX_USE_SPI",
           "SL_WFX_DEBUG_MASK=0x0003",
+        ]
+      }
+
+      if (wifi_ncp_module) {
+        defines += [
+          "USE_BYPASS_CLOCK=1",
+          "SL_SI91X_ACX_MODULE=1",
         ]
       }
 
@@ -666,6 +675,10 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emdrv/uartdrv/config",
         "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
       ]
+    }
+
+    if (sl_verbose_mode) {
+      defines += [ "VERBOSE_MODE=1" ]
     }
 
     if (sl_use_subscription_syncing) {
@@ -881,7 +894,7 @@ template("efr32_sdk") {
       }
     }
 
-    if (enable_dic) {
+    if (enable_matter_aws) {
       sources += [
         "${chip_root}/third_party/silabs/mqtt/stack/mqtt.c",
         "${efr32_sdk_root}/util/third_party/mbedtls/library/ctr_drbg.c",

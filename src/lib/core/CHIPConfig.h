@@ -1123,6 +1123,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC
+ *
+ * @brief Defines the number of binding entries per fabric.
+ */
+#ifndef CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC
+#define CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC 4
+#endif
+
+/**
  * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
  *
  * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.
@@ -1993,6 +2002,33 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
 #define CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE 5
 #endif // CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
+ *
+ * @brief The maximum number of video streams per device
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS
+ *
+ * @brief The maximum number of audio streams per device
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
+ *
+ * @brief The maximum number of snapshot streams per device
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
 /**
  * @}
  */

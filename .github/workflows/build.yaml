@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:167
+            image: ghcr.io/project-chip/chip-build:169
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -153,7 +153,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:167
+            image: ghcr.io/project-chip/chip-build:169
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -234,7 +234,7 @@ jobs:
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/sanitizers"
             - name: Find changed files
               id: changed-files
-              uses: tj-actions/changed-files@v46
+              uses: tj-actions/changed-files@v47
               with:
                 # Exclude all files under "third_party/"
                 files-ignore: |
@@ -331,7 +331,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:167
+            image: ghcr.io/project-chip/chip-build:169
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -394,7 +394,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:167
+            image: ghcr.io/project-chip/chip-build:169
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -423,7 +423,7 @@ jobs:
 
     build_darwin:
         name: Build on Darwin (clang, simulated)
-        runs-on: macos-13
+        runs-on: macos-14
         if: github.actor != 'restyled-io[bot]'  && inputs.run-codeql != true
 
         steps:
@@ -471,7 +471,7 @@ jobs:
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/default"
             - name: Find changed files
               id: changed-files
-              uses: tj-actions/changed-files@v46
+              uses: tj-actions/changed-files@v47
             - name: Clang-tidy validation
               # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
               #       See https://github.com/llvm/llvm-project/issues/97426
@@ -518,7 +518,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:167
+            image: ghcr.io/project-chip/chip-build:169
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 

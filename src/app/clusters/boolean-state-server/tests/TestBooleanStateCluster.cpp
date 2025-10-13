@@ -20,6 +20,8 @@
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestEventGenerator.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/BooleanState/Attributes.h>
 #include <clusters/BooleanState/Metadata.h>
 
@@ -104,6 +106,9 @@ TEST_F(TestBooleanStateCluster, ReadAttributeTest)
     for (EndpointId endpoint = 0; endpoint < kBooleanStateFixedClusterCount; ++endpoint)
     {
         BooleanStateClusterTest(endpoint).Check([&](BooleanStateCluster & booleanState) {
+            chip::Test::TestServerClusterContext context;
+            EXPECT_EQ(booleanState.Startup(context.Get()), CHIP_NO_ERROR);
+
             DataModel::ReadAttributeRequest request;
             request.path.mEndpointId  = endpoint;
             request.path.mClusterId   = BooleanState::Id;
@@ -133,20 +138,105 @@ TEST_F(TestBooleanStateCluster, StateValue)
     for (EndpointId endpoint = 0; endpoint < kBooleanStateFixedClusterCount; ++endpoint)
     {
         BooleanStateClusterTest(endpoint).Check([](BooleanStateCluster & booleanState) {
-            bool stateValue = false;
-            booleanState.SetStateValue(stateValue);
-            auto stateVal = booleanState.GetStateValue();
-            EXPECT_EQ(stateVal, stateValue);
+            chip::Test::TestServerClusterContext context;
+            EXPECT_EQ(booleanState.Startup(context.Get()), CHIP_NO_ERROR);
 
-            stateValue = true;
-            booleanState.SetStateValue(stateValue);
-            stateVal = booleanState.GetStateValue();
+            bool stateValue  = false;
+            auto eventNumber = booleanState.SetStateValue(stateValue);
+            auto stateVal    = booleanState.GetStateValue();
             EXPECT_EQ(stateVal, stateValue);
+            EXPECT_FALSE(eventNumber.has_value());
 
-            stateValue = false;
-            booleanState.SetStateValue(stateValue);
-            stateVal = booleanState.GetStateValue();
+            stateValue  = true;
+            eventNumber = booleanState.SetStateValue(stateValue);
+            stateVal    = booleanState.GetStateValue();
             EXPECT_EQ(stateVal, stateValue);
+            EXPECT_TRUE(eventNumber.has_value());
+
+            stateValue  = true;
+            eventNumber = booleanState.SetStateValue(stateValue);
+            stateVal    = booleanState.GetStateValue();
+            EXPECT_EQ(stateVal, stateValue);
+            EXPECT_FALSE(eventNumber.has_value());
+
+            stateValue  = false;
+            eventNumber = booleanState.SetStateValue(stateValue);
+            stateVal    = booleanState.GetStateValue();
+            EXPECT_EQ(stateVal, stateValue);
+            EXPECT_TRUE(eventNumber.has_value());
+        });
+    }
+}
+
+TEST_F(TestBooleanStateCluster, EventGeneratedOnStateChange)
+{
+    for (EndpointId endpoint = 0; endpoint < kBooleanStateFixedClusterCount; ++endpoint)
+    {
+        BooleanStateClusterTest(endpoint).Check([&](BooleanStateCluster & booleanState) {
+            chip::Test::TestServerClusterContext context;
+            EXPECT_EQ(booleanState.Startup(context.Get()), CHIP_NO_ERROR);
+
+            // Ensure initial value is false, then change to true and expect an event
+            EXPECT_EQ(booleanState.GetStateValue(), false);
+            auto eventNumber = booleanState.SetStateValue(true);
+
+            auto & logOnlyEvents = context.EventsGenerator();
+            using EventType      = chip::app::Clusters::BooleanState::Events::StateChange::Type;
+
+            // Lambda to verify the last emitted event metadata and payload
+            auto verifyLastEvent = [&](bool expectedStateValue) {
+                ASSERT_TRUE(eventNumber.has_value());
+                EXPECT_EQ(eventNumber.value(), logOnlyEvents.CurrentEventNumber());
+                EXPECT_EQ(logOnlyEvents.LastOptions().mPath,
+                          ConcreteEventPath(endpoint, EventType::GetClusterId(), EventType::GetEventId()));
+                chip::app::Clusters::BooleanState::Events::StateChange::DecodableType decodedEvent;
+                ASSERT_EQ(logOnlyEvents.DecodeLastEvent(decodedEvent), CHIP_NO_ERROR);
+                EXPECT_EQ(decodedEvent.stateValue, expectedStateValue);
+            };
+
+            // Verify event with expected true value
+            verifyLastEvent(true);
+
+            // Now, change from true to false and expect an event
+            eventNumber = booleanState.SetStateValue(false);
+
+            // Verify event with expected false value
+            verifyLastEvent(false);
+        });
+    }
+}
+
+TEST_F(TestBooleanStateCluster, NoEventWhenValueUnchanged)
+{
+    for (EndpointId endpoint = 0; endpoint < kBooleanStateFixedClusterCount; ++endpoint)
+    {
+        BooleanStateClusterTest(endpoint).Check([&](BooleanStateCluster & booleanState) {
+            chip::Test::TestServerClusterContext context;
+            EXPECT_EQ(booleanState.Startup(context.Get()), CHIP_NO_ERROR);
+
+            // Ensure initial value is false, then try to set false again and confirm no event occurs
+            EXPECT_EQ(booleanState.GetStateValue(), false);
+
+            // Get initial event count before attempting to set the same value
+            auto & logOnlyEvents     = context.EventsGenerator();
+            EventNumber initialCount = logOnlyEvents.CurrentEventNumber();
+
+            // Re-set to the same value (false) and confirm no new event is generated
+            auto firstEvent = booleanState.SetStateValue(false);
+            EXPECT_FALSE(firstEvent.has_value());
+            EXPECT_EQ(logOnlyEvents.CurrentEventNumber(), initialCount);
+
+            // Change from false -> true and confirm an event occurs
+            auto secondEvent = booleanState.SetStateValue(true);
+            EXPECT_TRUE(secondEvent.has_value());
+            EXPECT_EQ(logOnlyEvents.CurrentEventNumber(), initialCount + 1);
+
+            // Re-set to the same value (true) and confirm no new event is generated
+            EventNumber eventCountAfterChange = logOnlyEvents.CurrentEventNumber();
+
+            auto thirdEvent = booleanState.SetStateValue(true);
+            EXPECT_FALSE(thirdEvent.has_value());
+            EXPECT_EQ(logOnlyEvents.CurrentEventNumber(), eventCountAfterChange);
         });
     }
 }

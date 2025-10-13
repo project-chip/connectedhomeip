@@ -67,11 +67,6 @@ Davis, CA 95616, USA
     <condition name="ObserverClient" summary="The node is a client for ContentAppObservers."/>
   </conditions>
   <clusters>
-    <cluster id="0x001E" name="Binding" side="server">
-      <mandatoryConform>
-        <condition name="ObserverClient"/>
-      </mandatoryConform>
-    </cluster>
     <cluster id="0x0504" name="Channel" side="server">
       <optionalConform/>
     </cluster>

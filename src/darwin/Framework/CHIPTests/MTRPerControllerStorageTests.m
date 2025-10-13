@@ -2955,9 +2955,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         os_unfair_lock_unlock(&counterLock);
     }];
 
-    // Make the wait time depend on pool size and device count (can expand number of devices in the future)
+    // Make the wait time depend on device count
     NSArray * expectationsToWait = [subscriptionExpectations.allValues arrayByAddingObject:baseDeviceReadExpectation];
-    [self waitForExpectations:expectationsToWait timeout:(kSubscriptionPoolBaseTimeoutInSeconds * orderedDeviceIDs.count / subscriptionPoolSize)];
+    [self waitForExpectations:expectationsToWait timeout:(kSubscriptionPoolBaseTimeoutInSeconds * orderedDeviceIDs.count)];
 
     XCTAssertEqual(subscriptionDequeueCount, orderedDeviceIDs.count);
 
