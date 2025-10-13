@@ -375,7 +375,7 @@ CHIP_ERROR UnicastBindCommandHandler(int argc, char ** argv)
     VerifyOrReturnError(argc == 4, CHIP_ERROR_INVALID_ARGUMENT);
 
     Binding::TableEntry * entry = Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, atoi(argv[2]),
-                                                                     std::make_optional<ClusterId>(atoi(argv[2])));
+                                                                     std::make_optional<ClusterId>(atoi(argv[3])));
     DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::BindingWorkerHandler, reinterpret_cast<intptr_t>(entry));
     return CHIP_NO_ERROR;
 }
