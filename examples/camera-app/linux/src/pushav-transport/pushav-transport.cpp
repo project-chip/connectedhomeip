@@ -455,7 +455,7 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
                 }
             }
         }
-        else if(mTransportTriggerType == TransportTriggerTypeEnum::kMotion)
+        else if (mTransportTriggerType == TransportTriggerTypeEnum::kMotion)
         {
             // Check if activationTime is set (non-default)
             if (mClipInfo.activationTime == std::chrono::steady_clock::time_point())
@@ -476,7 +476,7 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
                 else
                 {
                     // Calculate remaining duration safely
-                        mRecorder->mClipInfo.mElapsedTimeS = static_cast<uint16_t>(elapsedSeconds);
+                    mRecorder->mClipInfo.mElapsedTimeS = static_cast<uint16_t>(elapsedSeconds);
                     ChipLogProgress(Camera, "Active trigger is present. Recording will start for [%d seconds]",
                                     mRecorder->mClipInfo.mInitialDurationS);
                 }
@@ -623,7 +623,7 @@ void PushAVTransport::StartNewSession(uint64_t newSessionID)
     mRecorder.reset();
 
     InitializeRecorder();
-    auto now            = std::chrono::steady_clock::now();
+    auto now = std::chrono::steady_clock::now();
     if (mTransportTriggerType == TransportTriggerTypeEnum::kMotion)
     {
         auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(now - mRecorder->mClipInfo.activationTime).count();
