@@ -238,11 +238,14 @@ class TC_SC_4_1(MatterBaseTest):
         # TODO: Placeholder for programatically
         # TODO: getting the discriminator to
         # TODO: construct the _L subtype
-        long_discriminator = "3840"  # get_long_discriminator fn
+        pic = get_setup_payload_info_config(self.matter_test_config)
+        print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+        print(f"\t\t\t\t\t\t matter_test_config: {pic}")
+        print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+        long_discriminator = "3840"  # get long discriminator logic
         long_discriminator_subtype = f"_L{long_discriminator}._sub.{MdnsServiceType.COMMISSIONABLE.value}"
         # TODO: ###############################
 
-        # *** LONG DISCRIMINATOR SUBTYPE ***
         # TH performs a PTR record query against the 'Long Discriminator Subtype' _L
         ptr_records = await MdnsDiscovery().get_ptr_records(
             service_types=[long_discriminator_subtype],
@@ -622,13 +625,6 @@ class TC_SC_4_1(MatterBaseTest):
             endpoint=ROOT_NODE_ENDPOINT_ID,
             cluster=Clusters.AdministratorCommissioning,
             feature_int=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic)
-
-
-        pic = get_setup_payload_info_config(self.matter_test_config)
-        print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-        print(f"\t\t\t\t\t\t {pic}")
-        print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-
 
         # *** STEP 6 ***
         # If DUT supports Open Basic Commissioning Window, put it in Commissioning Mode using
