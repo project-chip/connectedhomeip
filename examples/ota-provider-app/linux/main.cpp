@@ -407,9 +407,31 @@ void ApplicationInit()
 
 void ApplicationShutdown() {}
 
+namespace {
+class OtaProviderAppMainLoopImplementation : public AppMainLoopImplementation
+{
+public:
+    void RunMainLoop() override { chip::DeviceLayer::PlatformMgr().RunEventLoop(); }
+    void SignalSafeStopMainLoop() override
+    {
+        chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) {
+            ChipLogDetail(SoftwareUpdate, "Scheduling BdxOtaSender to ABORT TRANSFER");
+
+            gOtaProvider.GetBdxOtaSender()->AbortTransfer();
+
+            chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        });
+
+        chip::Server::GetInstance().GenerateShutDownEvent();
+    }
+};
+} // namespace
+
 int main(int argc, char * argv[])
 {
+    OtaProviderAppMainLoopImplementation ml_impl{};
+
     VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions) == 0);
-    ChipLinuxAppMainLoop();
+    ChipLinuxAppMainLoop(&ml_impl);
     return 0;
 }
