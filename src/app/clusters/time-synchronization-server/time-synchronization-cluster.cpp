@@ -14,7 +14,6 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/time-synchronization-server/CodegenIntegration.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-delegate.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -84,9 +83,9 @@ bool emitDSTStatusEvent(EndpointId ep, bool dstOffsetActive, DataModel::EventsGe
     return true;
 }
 
-bool emitTimeZoneStatusEvent(EndpointId ep, DataModel::EventsGenerator * eventsGenerator)
+bool emitTimeZoneStatusEvent(TimeSynchronizationCluster * timeSynchronization, EndpointId ep,
+                             DataModel::EventsGenerator * eventsGenerator)
 {
-    auto timeSynchronization = GetClusterInstance();
     VerifyOrReturnValue(timeSynchronization != nullptr, false);
 
     const auto & tzList = timeSynchronization->GetTimeZone();
@@ -212,12 +211,10 @@ TimeSynchronization::Delegate * TimeSynchronizationCluster::mDelegate = nullptr;
 
 TimeSynchronizationCluster::TimeSynchronizationCluster(
     EndpointId endpoint, const TimeSynchronizationCluster::OptionalAttributeSet & optionalAttributeSet,
-    const BitFlags<TimeSynchronization::Feature> features,
-    TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type supportsDNSResolve, TimeZoneDatabaseEnum timeZoneDatabase,
-    TimeSynchronization::TimeSourceEnum timeSource) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mOptionalAttributeSet(optionalAttributeSet), mFeatures(features), mSupportsDNSResolve(supportsDNSResolve),
-    mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
+    const BitFlags<Feature> features, SupportsDNSResolve::TypeInfo::Type supportsDNSResolve, TimeZoneDatabaseEnum timeZoneDatabase,
+    TimeSourceEnum timeSource) :
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mOptionalAttributeSet(optionalAttributeSet), mFeatures(features),
+    mSupportsDNSResolve(supportsDNSResolve), mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -246,17 +243,17 @@ CHIP_ERROR TimeSynchronizationCluster::Attributes(const ConcreteClusterPath & pa
 
     // Full attribute set, to combine real "optional" attributes but also
     // attributes controlled by feature flags.
-    app::OptionalAttributeSet<TimeSynchronization::Attributes::TrustedTimeSource::Id,    //
-                              TimeSynchronization::Attributes::DefaultNTP::Id,           //
-                              TimeSynchronization::Attributes::TimeZone::Id,             //
-                              TimeSynchronization::Attributes::DSTOffset::Id,            //
-                              TimeSynchronization::Attributes::LocalTime::Id,            //
-                              TimeSynchronization::Attributes::TimeZoneDatabase::Id,     //
-                              TimeSynchronization::Attributes::NTPServerAvailable::Id,   //
-                              TimeSynchronization::Attributes::TimeZoneListMaxSize::Id,  //
-                              TimeSynchronization::Attributes::DSTOffsetListMaxSize::Id, //
-                              TimeSynchronization::Attributes::SupportsDNSResolve::Id,   //
-                              TimeSynchronization::Attributes::TimeSource::Id            //
+    app::OptionalAttributeSet<TrustedTimeSource::Id,    //
+                              DefaultNTP::Id,           //
+                              TimeZone::Id,             //
+                              DSTOffset::Id,            //
+                              LocalTime::Id,            //
+                              TimeZoneDatabase::Id,     //
+                              NTPServerAvailable::Id,   //
+                              TimeZoneListMaxSize::Id,  //
+                              DSTOffsetListMaxSize::Id, //
+                              SupportsDNSResolve::Id,   //
+                              TimeSource::Id            //
                               >
         optionalAttributeSet(mOptionalAttributeSet);
 
@@ -285,6 +282,7 @@ CHIP_ERROR TimeSynchronizationCluster::Attributes(const ConcreteClusterPath & pa
         optionalAttributeSet.Set<TimeZoneListMaxSize::Id>();
         optionalAttributeSet.Set<DSTOffsetListMaxSize::Id>();
     }
+
     return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet);
 }
 
@@ -311,7 +309,7 @@ DataModel::ActionReturnStatus TimeSynchronizationCluster::ReadAttribute(const Da
     case TrustedTimeSource::Id:
         return encoder.Encode(GetTrustedTimeSource());
     case DefaultNTP::Id: {
-        char buffer[TimeSynchronization::Attributes::DefaultNTP::TypeInfo::MaxLength()];
+        char buffer[DefaultNTP::TypeInfo::MaxLength()];
         MutableCharSpan dntp(buffer);
         CHIP_ERROR err = GetDefaultNtp(dntp);
         // no storage is ok and gets translated to null. Anything else is a real error
@@ -905,7 +903,7 @@ CHIP_ERROR TimeSynchronizationCluster::GetLocalTime(EndpointId ep, DataModel::Nu
     VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
     if (TimeState::kChanged == UpdateTimeZoneState())
     {
-        emitTimeZoneStatusEvent(ep, GetEventsGenerator());
+        emitTimeZoneStatusEvent(this, ep, GetEventsGenerator());
     }
     VerifyOrReturnError(GetTimeZone().size() != 0, CHIP_ERROR_INVALID_TIME);
     const auto & tzStore = GetTimeZone()[0];
@@ -1183,7 +1181,7 @@ TimeSynchronizationCluster::HandleSetTimeZone(CommandHandler * commandObj, const
     if (to_underlying(mEventFlag) & to_underlying(TimeSyncEventFlag::kTimeZoneStatus))
     {
         ClearEventFlag(TimeSyncEventFlag::kTimeZoneStatus);
-        emitTimeZoneStatusEvent(commandPath.mEndpointId, GetEventsGenerator());
+        emitTimeZoneStatusEvent(this, commandPath.mEndpointId, GetEventsGenerator());
     }
     GetDelegate()->TimeZoneListChanged(GetTimeZone());
 
