@@ -38,6 +38,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import time
 
 from mobly import asserts
 from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
@@ -106,16 +107,18 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                 "Verify that the DUT responds with a Success status code, Verify that the new ZoneTrigger is added to the Triggers list"),
             TestStep(7, "Trigger the DUT to generate ZoneTriggered event",
                      "Verify that the TH receives the ZoneTriggered event and the ZoneID matches one created in step 2"),
+            TestStep(
+                8,
+                "Check for any upload in queue",
+                "Busy status",
+            ),
         ]
 
     async def _trigger_motion_event(self, zone_id, prompt_msg=None):
         # CI: Use app pipe to trigger zone event.
         # Manual: User should trigger a motion event from the defined zone.
-        # if self.is_pics_sdk_ci_only:
-        if 1:
-            print("\n Sambhavi call before write to app")
-            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zone_id}, "/tmp/app_pipe_zonemgmt")
-            print("\n Sambhavi write to app done")
+        if self.is_pics_sdk_ci_only:
+            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zone_id})
         else:
             if prompt_msg is None:
                 prompt_msg = f"Press enter and immediately start motion activity in zone {zone_id}."
@@ -222,6 +225,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             len(transportConfigs), 1, "TransportConfigurations must not be empty!"
         )
         aConnectionID = transportConfigs[0].connectionID
+        aTransportOptions = transportConfigs[0].transportOptions
 
         self.step(5)
         cmd = pvcluster.Commands.SetTransportStatus(
@@ -312,8 +316,20 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_equal(type(event), Clusters.ZoneManagement.Events.ZoneTriggered,
                              "Incorrect event type")
         asserts.assert_equal(event.zone, zoneID1, "Unexpected zoneID on ZoneTriggered")
-        asserts.assert_equal(event.reason, Clusters.ZoneManagement.Enums.ZoneEventTriggeredReasonEnum.kMotion,
-                             "Unexpected reason on ZoneTriggered")
+        asserts.assert_equal(event.reason, enums.ZoneEventTriggeredReasonEnum.kMotion, "Unexpected reason on ZoneTriggered")
+        
+        self.step(8)
+        time.sleep(1)
+        cmd = pvcluster.Commands.ModifyPushTransport(
+            connectionID=aConnectionID,
+            transportOptions=aTransportOptions,
+        )
+        # Transport Status is now active, if upload started and its in progress then ModifyPushTransport would check for Busy Transport Status
+        status = await self.psvt_modify_push_transport(cmd)
+        asserts.assert_true(
+            status == Status.Success,
+            "DUT responds with SUCCESS status code.")
+        
 
 
 if __name__ == "__main__":
