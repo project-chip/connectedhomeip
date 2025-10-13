@@ -522,7 +522,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step(34)
         status = await self.allocate_one_pushav_transport(endpoint, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidStreamUsage,
                                                           stream_Usage=Clusters.Globals.Enums.StreamUsageEnum.kInternal,
-                                                          tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
+                                                          tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidStreamUsage,
                              "DUT must  responds with Status code InvalidStreamUsage")
 
