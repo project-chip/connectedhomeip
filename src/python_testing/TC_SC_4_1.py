@@ -330,7 +330,7 @@ class TC_SC_4_1(MatterBaseTest):
             # Verify that the TXT record's instance name is equal to the
             # 'Long Discriminator Subtype' PTR record's instance name.
             asserts.assert_equal(txt_record.instance_name, long_discriminator_ptr_instance_name,
-                                "TXT record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
+                                 "TXT record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
             # *** ICD KEY ***
             icd_key: str | None = None
