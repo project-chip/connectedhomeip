@@ -27,7 +27,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
   val streamUsage: UByte,
   val videoStreamID: Optional<UShort>?,
   val audioStreamID: Optional<UShort>?,
-  val endpointID: UShort,
+  val TLSEndpointID: UShort,
   val url: String,
   val triggerOptions: PushAvStreamTransportClusterTransportTriggerOptionsStruct,
   val ingestMethod: UByte,
@@ -39,7 +39,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
     append("\tstreamUsage : $streamUsage\n")
     append("\tvideoStreamID : $videoStreamID\n")
     append("\taudioStreamID : $audioStreamID\n")
-    append("\tendpointID : $endpointID\n")
+    append("\tTLSEndpointID : $TLSEndpointID\n")
     append("\turl : $url\n")
     append("\ttriggerOptions : $triggerOptions\n")
     append("\tingestMethod : $ingestMethod\n")
@@ -68,7 +68,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
       } else {
         putNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
       }
-      put(ContextSpecificTag(TAG_ENDPOINT_ID), endpointID)
+      put(ContextSpecificTag(TAG_TLS_ENDPOINT_ID), TLSEndpointID)
       put(ContextSpecificTag(TAG_URL), url)
       triggerOptions.toTlv(ContextSpecificTag(TAG_TRIGGER_OPTIONS), this)
       put(ContextSpecificTag(TAG_INGEST_METHOD), ingestMethod)
@@ -85,7 +85,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
     private const val TAG_STREAM_USAGE = 0
     private const val TAG_VIDEO_STREAM_ID = 1
     private const val TAG_AUDIO_STREAM_ID = 2
-    private const val TAG_ENDPOINT_ID = 3
+    private const val TAG_TLS_ENDPOINT_ID = 3
     private const val TAG_URL = 4
     private const val TAG_TRIGGER_OPTIONS = 5
     private const val TAG_INGEST_METHOD = 6
@@ -120,7 +120,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
           null
         }
-      val endpointID = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT_ID))
+      val TLSEndpointID = tlvReader.getUShort(ContextSpecificTag(TAG_TLS_ENDPOINT_ID))
       val url = tlvReader.getString(ContextSpecificTag(TAG_URL))
       val triggerOptions =
         PushAvStreamTransportClusterTransportTriggerOptionsStruct.fromTlv(
@@ -146,7 +146,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
         streamUsage,
         videoStreamID,
         audioStreamID,
-        endpointID,
+        TLSEndpointID,
         url,
         triggerOptions,
         ingestMethod,

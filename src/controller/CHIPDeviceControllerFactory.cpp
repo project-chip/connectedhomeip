@@ -194,9 +194,16 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                                             ,
                                                         tcpListenParams
+#if INET_CONFIG_ENABLE_IPV4
+                                                        ,
+                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
+                                                            .SetAddressType(Inet::IPAddressType::kIPv4)
+                                                            .SetListenPort(params.listenPort)
+                                                            .SetServerListenEnabled(false)
+#endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-                                                        ,
+                                                            ,
                                                         Transport::WiFiPAFListenParameters()
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING

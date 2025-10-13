@@ -102,7 +102,7 @@ class IsolatedNetworkNamespace:
         "ip link set dev {app_link_name}-switch up",
         # Force IPv6 to use ULAs that we control.
         "ip netns exec app ip -6 addr flush {app_link_name}",
-        "ip netns exec app ip -6 a add fd00:0:1:1::3/64 dev {app_link_name}",
+        "ip netns exec app ip -6 a add fd00:0:1:1::1/64 dev {app_link_name}",
 
     ]
 
@@ -244,7 +244,19 @@ class BluetoothMock(subprocess.Popen):
 
 
 class WpaSupplicantMock(threading.Thread):
-    """Mock server for WpaSupplicant D-Bus API."""
+    """Mock server for WpaSupplicant D-Bus API.
+
+    This mock runs on its own thread and exposes a minimal subset of the
+    WpaSupplicant D-Bus API to allow Matter devices to interact with it.
+    It allows to create only one interface with one mocked network on it.
+
+    Network SSID and password need to be provided when creating the mock.
+    However, as for now, the password is not actually used for anything, so
+    any password will work and allow to perform AP association. During the
+    association process, between the "associated" and "completed" states,
+    the provided IsolatedNetworkNamespace instance is used to bring up the
+    link to simulate network connectivity.
+    """
 
     class Wpa(sdbus.DbusInterfaceCommonAsync,
               interface_name="fi.w1.wpa_supplicant1"):
