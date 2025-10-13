@@ -133,14 +133,9 @@ public:
      * @brief Validates the provided StreamUsage.
      *
      * @param streamUsage The StreamUsage to validate
-     * @param videoStreamId Optional identifier for the requested video stream
-     * @param audioStreamId Optional identifier for the requested audio stream
-     * @return true if StreamUsage is present in the
-     * StreamUsagePriorities list, false otherwise
+     * @return true if StreamUsage is present in the StreamUsagePriorities list, false otherwise
      */
-    virtual bool ValidateStreamUsage(PushAvStreamTransport::StreamUsageEnum streamUsage,
-                                     const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                     const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
+    virtual bool ValidateStreamUsage(PushAvStreamTransport::StreamUsageEnum streamUsage) = 0;
 
     /**
      * @brief Validates the provided Segment Duration.
@@ -312,12 +307,12 @@ public:
     virtual void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) = 0;
 
     /**
-     * @brief Sets the FabricIndex for the delegate.
+     * @brief Sets the FabricIndex for a specific connection.
      *
-     * @param peerFabricIndex The FabricIndex to set
      * @param connectionID The connectionID to set the FabricIndex for
+     * @param peerFabricIndex The FabricIndex to set
      */
-    virtual void SetFabricIndex(FabricIndex peerFabricIndex, uint16_t connectionID) = 0;
+    virtual void SetFabricIndexForConnection(uint16_t connectionID, FabricIndex peerFabricIndex) = 0;
 };
 } // namespace Clusters
 } // namespace app

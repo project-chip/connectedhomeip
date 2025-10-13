@@ -333,9 +333,7 @@ PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage
     return Status::Success;
 }
 
-bool PushAvStreamTransportManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                                       const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                                       const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
+bool PushAvStreamTransportManager::ValidateStreamUsage(StreamUsageEnum streamUsage)
 {
     std::vector<StreamUsageEnum> supportedStreamUsages = mCameraDevice->GetCameraHALInterface().GetSupportedStreamUsages();
     auto it = std::find(supportedStreamUsages.begin(), supportedStreamUsages.end(), streamUsage);
@@ -731,7 +729,7 @@ void PushAvStreamTransportManager::OnTriggerDeactivated(uint8_t fabricIdx, uint8
     sessionInfo.activeConnectionIDs.erase(connectionID);
 }
 
-void PushAvStreamTransportManager::SetFabricIndex(FabricIndex peerFabricIndex, uint16_t connectionID)
+void PushAvStreamTransportManager::SetFabricIndexForConnection(uint16_t connectionID, FabricIndex peerFabricIndex)
 {
     mTransportMap[connectionID].get()->SetFabricIndex(peerFabricIndex);
 }

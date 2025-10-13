@@ -283,8 +283,7 @@ public:
         return Status::Success;
     }
 
-    bool ValidateStreamUsage(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                             const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override
+    bool ValidateStreamUsage(StreamUsageEnum streamUsage) override
     {
         return true;
     }
@@ -405,7 +404,7 @@ public:
         // No-op implementation for tests
     }
 
-    void SetFabricIndex(FabricIndex peerFabricIndex, uint16_t connectionID) override
+    void SetFabricIndexForConnection(uint16_t connectionID, FabricIndex peerFabricIndex) override
     {
         // No-op implementation for tests
     }

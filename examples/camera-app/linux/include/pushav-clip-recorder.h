@@ -80,14 +80,14 @@ public:
         bool mHasAudio;                                       ///< Audio recording enabled flag
         uint64_t mSessionNumber;                              ///< Session number for unique clip identification
         uint8_t mSessionGroup;                                ///< Session group for grouping multiple transports
-        uint32_t mMaxClipDuration;                            ///< Maximum clip duration in seconds
-        uint16_t mInitialDuration;                            ///< Initial clip duration in seconds
-        uint16_t mAugmentationDuration;                       ///< Duration increment on motion detect
-        uint16_t mChunkDuration;                              ///< Chunk duration  milliseconds
-        uint16_t mSegmentDuration;                            ///< Segment duration in milliseconds
-        uint16_t mBlindDuration;                              ///< Duration without recording after motion stop
-        uint16_t mPreRollLength;                              ///< Pre-roll length in seconds
-        uint16_t mElapsedTime;                                ///< Elapsed time since recording start in seconds
+        uint32_t mMaxClipDurationS;                           ///< Maximum clip duration in seconds
+        uint16_t mInitialDurationS;                           ///< Initial clip duration in seconds
+        uint16_t mAugmentationDurationS;                      ///< Duration increment on motion detect
+        uint16_t mChunkDurationMs;                            ///< Chunk duration  milliseconds
+        uint16_t mSegmentDurationMs;                          ///< Segment duration in milliseconds
+        uint16_t mBlindDurationS;                             ///< Duration without recording after motion stop
+        uint16_t mPreRollLengthMs;                            ///< Pre-roll length in milliseconds
+        uint16_t mElapsedTimeS;                               ///< Elapsed time since recording start in seconds
         std::string mOutputPath;                              ///< Base output directory path
         std::string mTrackName;                               ///< Track name for segmented files
         AVRational mInputTimeBase;                            ///< Input time base
@@ -203,8 +203,7 @@ private:
     std::queue<AVPacket *> mAudioQueue;
     std::queue<AVPacket *> mVideoQueue;
 
-    int mAudioFragment;
-    int mVideoFragment;
+    int mUploadSegmentID;
     int64_t mCurrentClipStartPts = AV_NOPTS_VALUE;
     int64_t mFoundFirstIFramePts = -1;
     int64_t currentPts           = AV_NOPTS_VALUE;

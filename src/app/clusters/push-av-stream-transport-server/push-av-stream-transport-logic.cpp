@@ -710,8 +710,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    bool isValidStreamUsage = mDelegate->ValidateStreamUsage(transportOptions.streamUsage, transportOptions.videoStreamID,
-                                                             transportOptions.audioStreamID);
+    bool isValidStreamUsage = mDelegate->ValidateStreamUsage(transportOptions.streamUsage);
     if (isValidStreamUsage == false)
     {
         auto status = to_underlying(StatusCodeEnum::kInvalidStreamUsage);
@@ -916,6 +915,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         UpsertStreamTransportConnection(outTransportConfiguration);
 
         response.transportConfiguration = outTransportConfiguration;
+
+        mDelegate->SetFabricIndexForConnection(connectionID, peerFabricIndex);
 
         // ExpiryTime Handling
         if (transportOptions.expiryTime.HasValue())

@@ -62,8 +62,7 @@ public:
 
     Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId) override;
 
-    bool ValidateStreamUsage(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                             const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;
+    bool ValidateStreamUsage(StreamUsageEnum streamUsage) override;
 
     bool ValidateSegmentDuration(uint16_t segmentDuration, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override;
 
@@ -102,7 +101,7 @@ public:
         // Store pointer to server logic if needed for implementation
     }
 
-    void SetFabricIndex(FabricIndex peerFabricIndex, uint16_t connectionID) override
+    void SetFabricIndexForConnection(uint16_t connectionID, FabricIndex peerFabricIndex) override
     {
         // Store fabric index if needed for implementation
     }

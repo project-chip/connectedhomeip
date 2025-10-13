@@ -376,7 +376,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": streamUsage,
                  "TLSEndpointID": endpoint,
-                 "url": "https://{host_ip}:1234/streams/1/",
+                 "url": "https://{host_ip}:1234/streams/1",
                  "triggerOptions": {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kContinuous},
                  "ingestMethod": pvcluster.Enums.IngestMethodsEnum.kCMAFIngest,
                  "containerOptions": containerOptions,
