@@ -107,13 +107,14 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             TestStep(7, "Trigger the DUT to generate ZoneTriggered event",
                      "Verify that the TH receives the ZoneTriggered event and the ZoneID matches one created in step 2"),
         ]
+
     async def _trigger_motion_event(self, zone_id, prompt_msg=None):
         # CI: Use app pipe to trigger zone event.
         # Manual: User should trigger a motion event from the defined zone.
         # if self.is_pics_sdk_ci_only:
         if 1:
             print("\n Sambhavi call before write to app")
-            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zone_id},"/tmp/app_pipe_zonemgmt")
+            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zone_id}, "/tmp/app_pipe_zonemgmt")
             print("\n Sambhavi write to app done")
         else:
             if prompt_msg is None:
@@ -244,7 +245,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         #     status == Status.Success,
         #     "DUT responds with Success status code.",
         # )
-        
+
         self.step(6)
         triggersBeforeCreate = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=Clusters.ZoneManagement, attribute=Clusters.ZoneManagement.Attributes.Triggers
@@ -295,7 +296,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         if self.perZoneSenseSupported:
             asserts.assert_equal(matchingTrigger.sensitivity, sensitivity,
                                  "Sensitivity of created Trigger does not match")
-            
+
         self.step(7)
 
         node_id = self.dut_node_id
@@ -303,7 +304,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         event_listener = EventSubscriptionHandler(expected_cluster=Clusters.ZoneManagement)
         await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
         event_delay_seconds = 15.0
-        
+
         await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1} and stop any motion after {initDuration} seconds of pressing enter.")
 
         event = event_listener.wait_for_event_report(
