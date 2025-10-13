@@ -495,7 +495,7 @@ int PushAVClipRecorder::StartClipRecording()
 {
     if (!mClipInfo.mHasVideo && !mClipInfo.mHasAudio)
     {
-        ChipLogError(Camera, "ERROR: No video and video stream available. Stopping recording");
+        ChipLogError(Camera, "ERROR: No video or audio stream available. Not starting recording");
         return -1;
     }
 
@@ -789,8 +789,8 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
 {
     int64_t clipLengthInPTS = currentPts - mCurrentClipStartPts;
     // Final duration has to be (clipDuration + preRollLen) seconds
-    const int64_t clipDuration =
-        (mClipInfo.mInitialDurationS - mClipInfo.mElapsedTimeS + (mClipInfo.mPreRollLengthMs / 1000)) * AV_TIME_BASE_Q.den;
+    const int64_t remainingDuration = mClipInfo.mInitialDurationS - mClipInfo.mElapsedTimeS + (mClipInfo.mPreRollLengthMs / 1000);
+    const int64_t clipDuration = (remainingDuration > 0) ? remainingDuration * AV_TIME_BASE_Q.den : 0;
     // Pre-calculate common path components
     const std::string basePath =
         mClipInfo.mOutputPath + "session_" + std::to_string(mClipInfo.mSessionNumber) + "/" + mClipInfo.mTrackName;

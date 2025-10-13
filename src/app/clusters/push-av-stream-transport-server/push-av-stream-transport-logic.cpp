@@ -308,6 +308,7 @@ bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
                      host.c_str());
         return false;
     }
+
     return true;
 }
 
@@ -877,16 +878,20 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         }
     }
 
-    if (transportOptions.videoStreamID.HasValue() and !transportOptions.videoStreamID.Value().IsNull())
+    if (transportOptions.containerOptions.containerType == ContainerFormatEnum::kCmaf &&
+        transportOptions.containerOptions.CMAFContainerOptions.HasValue())
     {
-        bool isValidSegmentDuration = mDelegate->ValidateSegmentDuration(
-            transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration, transportOptionsPtr->videoStreamID);
-        if (isValidSegmentDuration == false)
+        if (transportOptions.videoStreamID.HasValue() and !transportOptions.videoStreamID.Value().IsNull())
         {
-            auto segmentDurationStatus = to_underlying(StatusCodeEnum::kInvalidOptions);
-            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Segment Duration not within allowed range", mEndpointId);
-            handler.AddClusterSpecificFailure(commandPath, segmentDurationStatus);
-            return std::nullopt;
+            bool isValidSegmentDuration = mDelegate->ValidateSegmentDuration(
+                transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration, transportOptionsPtr->videoStreamID);
+            if (isValidSegmentDuration == false)
+            {
+                auto segmentDurationStatus = to_underlying(StatusCodeEnum::kInvalidOptions);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Segment Duration not within allowed range", mEndpointId);
+                handler.AddClusterSpecificFailure(commandPath, segmentDurationStatus);
+                return std::nullopt;
+            }
         }
     }
 
