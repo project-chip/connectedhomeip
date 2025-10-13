@@ -18,7 +18,6 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/persistence/AttributePersistence.h>
-#include <app/persistence/AttributePersistenceMigration.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/PascalString.h>
 #include <app/server-cluster/AttributeListBuilder.h>
