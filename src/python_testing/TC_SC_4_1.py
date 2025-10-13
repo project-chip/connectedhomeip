@@ -143,16 +143,15 @@ class TC_SC_4_1(MatterBaseTest):
     async def _get_verify_long_discriminator_subtype_ptr_instance_name(self, must_be_present: bool = True) -> Optional[str]:
         # TH constructs the 'Long Discriminator Subtype'
         # using the DUT's 'Long Discriminator'
-        # TODO: Placeholder for programatically
-        # TODO: getting the discriminator to
-        # TODO: construct the _L subtype
-        pic = get_setup_payload_info_config(self.matter_test_config)
-        print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-        print(f"\t\t\t\t\t\t matter_test_config: {pic}")
-        print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-        long_discriminator = "3840"  # get long discriminator logic
-        long_discriminator_subtype = f"_L{long_discriminator}._sub.{MdnsServiceType.COMMISSIONABLE.value}"
-        # TODO: ###############################
+        long_discriminator: str | None = None
+        long_discriminator_subtype: str | None = None
+        setup_payload_info = get_setup_payload_info_config(self.matter_test_config)
+        if setup_payload_info:
+            long_discriminator = setup_payload_info[0].filter_value
+            long_discriminator_subtype = f"_L{long_discriminator}._sub.{MdnsServiceType.COMMISSIONABLE.value}"
+            logging.info(f"\n\n\t** long_discriminator: {long_discriminator}\n")
+        else:
+            asserts.fail("Failed to get the 'Long Discriminator' value from the setup payload info.")
 
         # Verify that it contains a valid 12-bit variable length decimal number
         # in ASCII text, omitting any leading zeros 'Long Discriminator' value
