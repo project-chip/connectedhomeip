@@ -160,13 +160,7 @@ public:
 
     bool AllowsMRP() const override { return (GetPeerAddress().GetTransportType() == Transport::Type::kUdp); }
 
-    bool AllowsLargePayload() const override {
-#if CHIP_SYSTEM_CONFIG_ALLOW_LARGE_PAYLOAD_ON_UDP
-        return GetPeerAddress().GetTransportType() == Transport::Type::kTcp || GetPeerAddress().GetTransportType() == Transport::Type::kUdp;
-#else
-        return GetPeerAddress().GetTransportType() == Transport::Type::kTcp;
-#endif
-    }
+    bool AllowsLargePayload() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kTcp; }
 
     System::Clock::Milliseconds32 GetAckTimeout(bool isFirstMessageOnExchange) const override
     {
