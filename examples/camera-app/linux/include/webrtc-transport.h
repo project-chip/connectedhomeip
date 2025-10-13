@@ -73,13 +73,13 @@ public:
     State GetState() { return mState; }
 
     // Send video data for a given stream ID
-    void SendVideo(const char * data, size_t size, int64_t timestamp, uint16_t videoStreamID) override;
+    void SendVideo(const chip::ByteSpan & data, int64_t timestamp, uint16_t videoStreamID) override;
 
     // Send audio data for a given stream ID
-    void SendAudio(const char * data, size_t size, int64_t timestamp, uint16_t audioStreamID) override;
+    void SendAudio(const chip::ByteSpan & data, int64_t timestamp, uint16_t audioStreamID) override;
 
     // Send synchronized audio/video data for given audio and video stream IDs
-    void SendAudioVideo(const char * data, size_t size, uint16_t videoStreamID, uint16_t audioStreamID) override;
+    void SendAudioVideo(const chip::ByteSpan & data, uint16_t videoStreamID, uint16_t audioStreamID) override;
 
     // Indicates that the transport is ready to send video data
     bool CanSendVideo() override;

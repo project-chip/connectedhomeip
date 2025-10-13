@@ -76,8 +76,6 @@ public:
     void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
                      Tls::CertificateTable::BufferedRootCert & rootCertEntry) override;
 
-    bool ValidateUrl(const std::string & url) override;
-
     bool ValidateStreamUsage(StreamUsageEnum streamUsage) override;
 
     bool ValidateSegmentDuration(uint16_t segmentDuration, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override;
@@ -94,9 +92,9 @@ public:
 
     Protocols::InteractionModel::Status SelectAudioStream(StreamUsageEnum streamUsage, uint16_t & audioStreamId) override;
 
-    Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId) override;
+    Protocols::InteractionModel::Status SetVideoStream(uint16_t videoStreamId) override;
 
-    Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) override;
+    Protocols::InteractionModel::Status SetAudioStream(uint16_t audioStreamId) override;
 
     PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) override;
 
@@ -106,9 +104,13 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
-    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override;
+    CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override;
 
-    void OnZoneTriggeredEvent(uint16_t zoneId);
+    CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override;
+
+    void HandleZoneTrigger(uint16_t zoneId);
 
     void RecordingStreamPrivacyModeChanged(bool privacyModeEnabled);
 
@@ -123,12 +125,14 @@ private:
     std::unordered_map<uint16_t, std::unique_ptr<PushAVTransport>> mTransportMap; // map for the transport objects
     std::unordered_map<uint16_t, TransportOptionsStruct> mTransportOptionsMap;    // map for the transport options
 
-    double mTotalUsedBandwidthMbps = 0.0; // Tracks the total bandwidth used by all active transports
+    uint32_t mTotalUsedBandwidthbps = 0; // Tracks the total bandwidth used by all active transports
 
     std::vector<uint8_t> mBufferRootCert;
     std::vector<uint8_t> mBufferClientCert;
     std::vector<uint8_t> mBufferClientCertKey;
     std::vector<std::vector<uint8_t>> mBufferIntermediateCerts;
+
+    CHIP_ERROR IsAnyPrivacyModeActive(bool & isActive);
 
     /**
      * @brief Calculates the total bandwidth in Mbps for the given video and audio stream IDs.
@@ -137,7 +141,7 @@ private:
      * @param outBandwidthMbps Output parameter for the calculated bandwidth in Mbps.
      */
     void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, double & outBandwidthMbps);
+                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, uint32_t & outBandwidthMbps);
 };
 
 } // namespace PushAvStreamTransport
