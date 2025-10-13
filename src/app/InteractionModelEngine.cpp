@@ -168,6 +168,23 @@ class AutoReleaseSubscriptionInfoIterator
 {
 public:
     AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) : mIterator(iterator){};
+    ~AutoReleaseSubscriptionInfoIterator() { mIterator->Release(); }
+
+    SubscriptionResumptionStorage::SubscriptionInfoIterator * operator->() const { return mIterator; }
+
+private:
+    SubscriptionResumptionStorage::SubscriptionInfoIterator * mIterator;
+};
+
+using Protocols::InteractionModel::Status;
+
+Global<InteractionModelEngine> sInteractionModelEngine;
+
+InteractionModelEngine::InteractionModelEngine() : mReportingEngine(this) {}
+
+InteractionModelEngine * InteractionModelEngine::GetInstance()
+{
+    return &sInteractionModelEngine.get();
     // Validation happens before we decode or dispatch command payloads. The flow intentionally mirrors the logic used by the generated data-model provider so that we only ever resolve command metadata once:
     //   1. `CheckCommandExistence` asks the active data-model provider for an `AcceptedCommandEntry`.  `CodegenDataModelProvider` caches the most recent lookup and returns the same entry that `InvokeCommand` will later reuse for dispatch.  This avoids duplicate registry/metadata traversals and keeps privilege data consistent.
     //   2. `CheckCommandAccess` enforces ACL/privilege requirements derived from that entry.  By relying on the provider’s metadata we ensure the privilege used here matches what the generated handler expects.
