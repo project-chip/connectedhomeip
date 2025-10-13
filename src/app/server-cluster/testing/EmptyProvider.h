@@ -48,8 +48,8 @@ public:
     CHIP_ERROR GeneratedCommands(const app::ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
     CHIP_ERROR AcceptedCommands(const app::ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> & builder) override;
-    void ListAttributeWriteNotification(const app::ConcreteAttributePath & aPath,
-                                        app::DataModel::ListWriteOperation opType, FabricIndex accessingFabric) override
+    void ListAttributeWriteNotification(const app::ConcreteAttributePath & aPath, app::DataModel::ListWriteOperation opType,
+                                        FabricIndex accessingFabric) override
     {}
 
     void Temporary_ReportAttributeChanged(const app::AttributePathParams & path) override;

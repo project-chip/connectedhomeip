@@ -132,7 +132,7 @@ TEST(TestBindingTable, TestPersistentStorage)
 {
     chip::TestPersistentStorageDelegate testStorage;
     Binding::Table table;
-    chip::Optional<chip::ClusterId> cluster = chip::MakeOptional<chip::ClusterId>(static_cast<chip::ClusterId>(UINT16_MAX + 6));
+    chip::Optional<chip::ClusterId> cluster   = chip::MakeOptional<chip::ClusterId>(static_cast<chip::ClusterId>(UINT16_MAX + 6));
     std::vector<Binding::TableEntry> expected = {
         Binding::TableEntry(0, 0, 0, 0, std::nullopt),
         Binding::TableEntry(1, 1, 0, 0, cluster.std_optional()),

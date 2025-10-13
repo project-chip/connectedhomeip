@@ -59,7 +59,8 @@ class MockServerCluster : public DefaultServerCluster
 public:
     MockServerCluster(std::initializer_list<ConcreteClusterPath> paths, DataVersion dataVersion,
                       BitFlags<DataModel::ClusterQualityFlags> flags) :
-        DefaultServerCluster({ 0, 0 }), mPaths(paths), mDataVersion(dataVersion), mFlags(flags),
+        DefaultServerCluster({ 0, 0 }),
+        mPaths(paths), mDataVersion(dataVersion), mFlags(flags),
         mAttributeEntry(1, BitMask<DataModel::AttributeQualityFlags>(), std::nullopt, std::nullopt)
     {}
 
@@ -177,8 +178,8 @@ public:
     void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType,
                                         FabricIndex accessingFabric) override
     {
-        mLastListWriteOpPath = path;
-        mLastListWriteOpType = opType;
+        mLastListWriteOpPath            = path;
+        mLastListWriteOpType            = opType;
         mLastListWriteOpAccessingFabric = accessingFabric;
     }
 

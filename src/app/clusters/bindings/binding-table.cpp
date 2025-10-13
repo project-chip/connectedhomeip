@@ -91,7 +91,7 @@ const TableEntry & Table::GetAt(uint8_t index)
 
 CHIP_ERROR Table::SaveEntryToStorage(uint8_t index, uint8_t nextIndex)
 {
-    TableEntry & entry    = mBindingTable[index];
+    TableEntry & entry                = mBindingTable[index];
     uint8_t buffer[kEntryStorageSize] = { 0 };
     TLV::TLVWriter writer;
     writer.Init(buffer);

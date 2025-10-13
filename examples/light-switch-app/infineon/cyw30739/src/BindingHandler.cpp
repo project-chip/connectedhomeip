@@ -45,7 +45,7 @@ void BindingHandler::OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERR
         *data                              = aBindingData;
         // Establish new CASE session and retrasmit command that was not applied.
         error = Binding::Manager::GetInstance().NotifyBoundClusterChanged(aBindingData.EndpointId, aBindingData.ClusterId,
-                                                                              static_cast<void *>(data));
+                                                                          static_cast<void *>(data));
 
         if (CHIP_NO_ERROR != error)
         {

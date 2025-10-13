@@ -56,14 +56,14 @@ struct TableEntry
 {
     TableEntry(FabricIndex fabric, NodeId node, EndpointId localEndpoint, EndpointId remoteEndpoint,
                std::optional<ClusterId> cluster) :
-        type(MATTER_UNICAST_BINDING), fabricIndex(fabric), local(localEndpoint), clusterId(cluster), remote(remoteEndpoint),
-        nodeId(node)
+        type(MATTER_UNICAST_BINDING),
+        fabricIndex(fabric), local(localEndpoint), clusterId(cluster), remote(remoteEndpoint), nodeId(node)
     {}
 
     TableEntry(chip::FabricIndex fabric, chip::GroupId group, chip::EndpointId localEndpoint,
-                      std::optional<chip::ClusterId> cluster) :
-        type(MATTER_MULTICAST_BINDING), fabricIndex(fabric), local(localEndpoint), clusterId(cluster), remote(kInvalidEndpointId),
-        groupId(group)
+               std::optional<chip::ClusterId> cluster) :
+        type(MATTER_MULTICAST_BINDING),
+        fabricIndex(fabric), local(localEndpoint), clusterId(cluster), remote(kInvalidEndpointId), groupId(group)
     {}
 
     TableEntry() = default;
