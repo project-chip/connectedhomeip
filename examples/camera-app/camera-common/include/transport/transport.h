@@ -21,7 +21,7 @@
 #include <cstdint>
 #include <cstring>
 #include <lib/core/Optional.h>
-
+#include <lib/support/Span.h>
 #pragma once
 // Base class for media transports(WebRTC, PushAV)
 // Media Transports would implement this interface for the Media controller to
@@ -33,13 +33,13 @@ class Transport
 {
 public:
     // Send video data for a given stream ID
-    virtual void SendVideo(const char * data, size_t size, int64_t timestamp, uint16_t videoStreamID) = 0;
+    virtual void SendVideo(const chip::ByteSpan & data, int64_t timestamp, uint16_t videoStreamID) = 0;
 
     // Send audio data for a given stream ID
-    virtual void SendAudio(const char * data, size_t size, int64_t timestamp, uint16_t audioStreamID) = 0;
+    virtual void SendAudio(const chip::ByteSpan & data, int64_t timestamp, uint16_t audioStreamID) = 0;
 
     // Send synchronixed audio/video data for given audio and video stream IDs
-    virtual void SendAudioVideo(const char * data, size_t size, uint16_t videoSTreamID, uint16_t audioStreamID) = 0;
+    virtual void SendAudioVideo(const chip::ByteSpan & data, uint16_t videoStreamID, uint16_t audioStreamID) = 0;
 
     // Indicates that the transport is ready to send video data
     virtual bool CanSendVideo() = 0;

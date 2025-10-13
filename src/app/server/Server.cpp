@@ -244,9 +244,15 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                ,
                            tcpListenParams
+#if INET_CONFIG_ENABLE_IPV4
+                           ,
+                           TcpListenParameters(DeviceLayer::TCPEndPointManager())
+                               .SetAddressType(IPAddressType::kIPv4)
+                               .SetListenPort(mOperationalServicePort)
+#endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-                           ,
+                               ,
                            Transport::WiFiPAFListenParameters(static_cast<Transport::WiFiPAFBase *>(
                                DeviceLayer::ConnectivityMgr().GetWiFiPAF()->mWiFiPAFTransport))
 #endif

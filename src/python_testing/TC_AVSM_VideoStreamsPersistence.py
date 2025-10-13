@@ -46,19 +46,17 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matt
 logger = logging.getLogger(__name__)
 
 
-class TC_AVSM_2_13(MatterBaseTest):
-    def desc_TC_AVSM_2_13(self) -> str:
-        return "[TC-AVSM-2.13] Validate Video Stream Allocation reuse with Server as DUT"
+class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
+    def desc_TC_AVSM_VideoStreamsPersistence(self) -> str:
+        return "[TC-AVSM-VideoStreamsPersistence] Validate Video Streams Persistence functionality with Server as DUT"
 
-    def pics_TC_AVSM_2_13(self):
+    def pics_TC_AVSM_VideoStreamsPersistence(self):
         return ["AVSM.S"]
 
-    def steps_TC_AVSM_2_13(self) -> list[TestStep]:
+    def steps_TC_AVSM_VideoStreamsPersistence(self) -> list[TestStep]:
         return [
             TestStep("precondition", "Commissioning, already done", is_commissioning=True),
-            TestStep(
-                1, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT", "Verify VDO is supported."
-            ),
+            TestStep(1, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT", "Verify VDO is supported."),
             TestStep(
                 2,
                 "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
@@ -77,7 +75,7 @@ class TC_AVSM_2_13(MatterBaseTest):
             TestStep(
                 5,
                 "TH reads MinViewportResolution attribute from CameraAVStreamManagement Cluster on DUT.",
-                "Store this value in aMinViewportResolution.",
+                "Store this value in aMinViewportRes.",
             ),
             TestStep(
                 6,
@@ -91,32 +89,47 @@ class TC_AVSM_2_13(MatterBaseTest):
             ),
             TestStep(
                 8,
-                "TH sets StreamUsage from aStreamUsagePriorities. TH sets VideoCodec, MinResolution, MaxResolution, MinBitRate, MaxBitRate conforming with aRateDistortionTradeOffPoints. TH sets MinFrameRate, MaxFrameRate conforming with aVideoSensorParams. TH sets the KeyFrameInterval = 4000. TH sends the VideoStreamAllocate command with these arguments.",
-                "DUT responds with VideoStreamAllocateResponse command with a valid VideoStreamID.",
-                "Store as `aVideoStreamID`",
+                "If the watermark feature is supported, set aWatermark to True, otherwise set this to Null.",
             ),
             TestStep(
                 9,
-                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
-                "Verify the number of allocated video streams in the list is 1.",
+                "If the OSD feature is supported, set aOSD to True, otherwise set this to Null.",
             ),
             TestStep(
                 10,
-                "TH sends the VideoStreamAllocate command with the same arguments as step 8.",
-                "DUT responds with `VideoStreamAllocateResponse` command with a valid `VideoStreamID`",
-                "Verify that this VideoStreamID is the same as `aVideoStreamID`",
+                "TH sets StreamUsage from aStreamUsagePriorities. TH sets VideoCodec, MinResolution, MaxResolution, MinBitRate, MaxBitRate conforming with aRateDistortionTradeOffPoints. TH sets MinFrameRate, MaxFrameRate conforming with aVideoSensorParams. TH sets the KeyFrameInterval = 4000. TH sets WatermarkEnabled to aWatermark, TH also sets OSDEnabled to aOSD. TH sends the VideoStreamAllocate command with these arguments.",
+                "DUT responds with VideoStreamAllocateResponse command with a valid VideoStreamID.",
             ),
             TestStep(
                 11,
                 "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated video streams in the list is 1.",
             ),
+            TestStep(
+                12,
+                "TH injects kFault_ClearInMemoryAllocatedVideoStreams on DUT.",
+            ),
+            TestStep(
+                13,
+                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
+                "Verify the number of allocated video streams in the list is 0.",
+            ),
+            TestStep(
+                14,
+                "TH injects kFault_LoadPersistentCameraAVSMAttributes on DUT.",
+            ),
+            TestStep(
+                15,
+                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
+                "Verify the number of allocated video streams in the list is 1.",
+                "Verify the individual fields of allocated video stream is as was allocated in step 10.",
+            ),
         ]
 
     @run_if_endpoint_matches(
         has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kVideo)
     )
-    async def test_TC_AVSM_2_13(self):
+    async def test_TC_AVSM_VideoStreamsPersistence(self):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
@@ -142,21 +155,19 @@ class TC_AVSM_2_13(MatterBaseTest):
         aStreamUsagePriorities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
         logger.info(f"Rx'd StreamUsagePriorities: {aStreamUsagePriorities}")
 
         self.step(4)
         aRateDistortionTradeOffPoints = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
         )
-        asserts.assert_greater(len(aRateDistortionTradeOffPoints), 0, "RateDistortionTradeOffPoints is empty")
         logger.info(f"Rx'd RateDistortionTradeOffPoints: {aRateDistortionTradeOffPoints}")
 
         self.step(5)
-        aMinViewportResolution = await self.read_single_attribute_check_success(
+        aMinViewportRes = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution
         )
-        logger.info(f"Rx'd MinViewportResolution: {aMinViewportResolution}")
+        logger.info(f"Rx'd MinViewportResolution: {aMinViewportRes}")
 
         self.step(6)
         aVideoSensorParams = await self.read_single_attribute_check_success(
@@ -170,59 +181,23 @@ class TC_AVSM_2_13(MatterBaseTest):
         )
         logger.info(f"Rx'd MaxEncodedPixelRate: {aMaxEncodedPixelRate}")
 
-        # Basic sanity check on stream's expected pixel rate
-        streamPixelRate = (aVideoSensorParams.sensorWidth * aVideoSensorParams.sensorHeight
-                           * aVideoSensorParams.maxFPS)
-        asserts.assert_greater_equal(aMaxEncodedPixelRate, streamPixelRate, "Stream Pixel rate exceeds camera maxEncodedPixelRate")
-
+        # Check for watermark and OSD features
         self.step(8)
-        logger.info("Fetch feature map to check if WMark and OSD are supported")
-        aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
-        try:
-            watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
-            osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
-
-            videoStreamAllocateCmd = commands.VideoStreamAllocate(
-                streamUsage=aStreamUsagePriorities[0],
-                videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=30,  # An acceptable value for min frame rate
-                maxFrameRate=aVideoSensorParams.maxFPS,
-                minResolution=aMinViewportResolution,
-                maxResolution=cluster.Structs.VideoResolutionStruct(
-                    width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
-                ),
-                minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                keyFrameInterval=4000,
-                watermarkEnabled=watermark,
-                OSDEnabled=osd
-            )
-            videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            logger.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
-            asserts.assert_is_not_none(
-                videoStreamAllocateResponse.videoStreamID, "VideoStreamAllocateResponse does not contain StreamID"
-            )
-            aVideoStreamID = videoStreamAllocateResponse.videoStreamID
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
+        watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
 
         self.step(9)
-        aAllocatedVideoStreams = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
-        )
-        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
-        asserts.assert_equal(len(aAllocatedVideoStreams), 1, "The number of allocated video streams in the list is not 1")
+        osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
 
         self.step(10)
         try:
+            asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
+            asserts.assert_greater(len(aRateDistortionTradeOffPoints), 0, "RateDistortionTradeOffPoints is empty")
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
                 minFrameRate=30,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
-                minResolution=aMinViewportResolution,
+                minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
                     width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
                 ),
@@ -230,18 +205,15 @@ class TC_AVSM_2_13(MatterBaseTest):
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 keyFrameInterval=4000,
                 watermarkEnabled=watermark,
-                OSDEnabled=osd
+                OSDEnabled=osd,
             )
             videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             logger.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
             asserts.assert_is_not_none(
                 videoStreamAllocateResponse.videoStreamID, "VideoStreamAllocateResponse does not contain StreamID"
             )
-            asserts.assert_equal(videoStreamAllocateResponse.videoStreamID,
-                                 aVideoStreamID, "The previous video stream is not reused")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(11)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
@@ -249,6 +221,84 @@ class TC_AVSM_2_13(MatterBaseTest):
         )
         logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         asserts.assert_equal(len(aAllocatedVideoStreams), 1, "The number of allocated video streams in the list is not 1")
+
+        self.step(12)
+        logging.info("Injecting kFault_ClearInMemoryAllocatedVideoStreams on DUT")
+
+        # --- Fault‑Injection cluster (mfg‑specific 0xFFF1_FC06) ---
+        # Use FailAtFault to activate the chip‑layer fault exactly once
+        #
+        #  • faultType = kChipFault (0x03)  – always used for CHIP faults
+        #  • id        = FaultInjection.Id.kFault_ClearInMemoryAllocatedVideoStreams
+        #  • numCallsToSkip = 0  – trigger on the very next call
+        #  • numCallsToFail = 1  – inject once, then auto‑clear
+        #  • takeMutex      = False  – single‑threaded app, no lock needed
+        #
+        command = Clusters.FaultInjection.Commands.FailAtFault(
+            type=Clusters.FaultInjection.Enums.FaultType.kChipFault,
+            id=34,  # kFault_ClearInMemoryAllocatedVideoStreams
+            numCallsToFail=1,
+            takeMutex=False,
+        )
+        await self.default_controller.SendCommand(
+            nodeid=self.dut_node_id,
+            endpoint=0,  # Fault‑Injection cluster lives on EP0
+            payload=command,
+        )
+
+        self.step(13)
+        aAllocatedVideoStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
+        )
+        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        asserts.assert_equal(len(aAllocatedVideoStreams), 0, "Allocated video streams is not empty")
+
+        self.step(14)
+        logging.info("Injecting kFault_LoadPersistentCameraAVSMAttributes on DUT")
+        # --- Fault‑Injection cluster (mfg‑specific 0xFFF1_FC06) ---
+        # Use FailAtFault to activate the chip‑layer fault exactly once
+        #
+        #  • faultType = kChipFault (0x03)  – always used for CHIP faults
+        #  • id        = FaultInjection.Id.kFault_LoadPersistentCameraAVSMAttributes
+        #  • numCallsToSkip = 0  – trigger on the very next call
+        #  • numCallsToFail = 1  – inject once, then auto‑clear
+        #  • takeMutex      = False  – single‑threaded app, no lock needed
+        #
+        command = Clusters.FaultInjection.Commands.FailAtFault(
+            type=Clusters.FaultInjection.Enums.FaultType.kChipFault,
+            id=37,  # kFault_LoadPersistentCameraAVSMAttributes
+            numCallsToFail=1,
+            takeMutex=False,
+        )
+        await self.default_controller.SendCommand(
+            nodeid=self.dut_node_id,
+            endpoint=0,  # Fault‑Injection cluster lives on EP0
+            payload=command,
+        )
+
+        self.step(15)
+        aAllocatedVideoStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
+        )
+        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        asserts.assert_equal(len(aAllocatedVideoStreams), 1, "Allocated video streams is not empty")
+
+        ##### Validate fields in Video Stream that was stored #####
+        asserts.assert_equal(aAllocatedVideoStreams[0].streamUsage, aStreamUsagePriorities[0], "Stream Usage does not match")
+        asserts.assert_equal(aAllocatedVideoStreams[0].videoCodec,
+                             aRateDistortionTradeOffPoints[0].codec, "Video codec does not match")
+        asserts.assert_equal(aAllocatedVideoStreams[0].minFrameRate, 30, "MinFrameRate does not match")
+        asserts.assert_equal(aAllocatedVideoStreams[0].maxFrameRate, aVideoSensorParams.maxFPS, "MaxFrameRate does not match")
+        asserts.assert_equal(aAllocatedVideoStreams[0].minResolution, aMinViewportRes, "MinResolution does not match")
+        asserts.assert_equal(aAllocatedVideoStreams[0].maxResolution.width,
+                             aVideoSensorParams.sensorWidth, "MaxResolution does not match")
+        asserts.assert_equal(aAllocatedVideoStreams[0].maxResolution.height,
+                             aVideoSensorParams.sensorHeight, "MaxResolution does not match")
+        asserts.assert_equal(aAllocatedVideoStreams[0].minBitRate,
+                             aRateDistortionTradeOffPoints[0].minBitRate, "MinBitRate does not match")
+        asserts.assert_equal(aAllocatedVideoStreams[0].maxBitRate,
+                             aRateDistortionTradeOffPoints[0].minBitRate, "MaxBitRate does not match")
+        asserts.assert_equal(aAllocatedVideoStreams[0].keyFrameInterval, 4000, "KeyFrameInterval does not match")
 
         # Clear all allocated streams
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
