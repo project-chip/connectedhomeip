@@ -244,9 +244,15 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                ,
                            tcpListenParams
+#if INET_CONFIG_ENABLE_IPV4
+                           ,
+                           TcpListenParameters(DeviceLayer::TCPEndPointManager())
+                               .SetAddressType(IPAddressType::kIPv4)
+                               .SetListenPort(mOperationalServicePort)
+#endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-                           ,
+                               ,
                            Transport::WiFiPAFListenParameters(static_cast<Transport::WiFiPAFBase *>(
                                DeviceLayer::ConnectivityMgr().GetWiFiPAF()->mWiFiPAFTransport))
 #endif
@@ -363,11 +369,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
 #endif
     }
-    else
+    else if (initParams.advertiseCommissionableIfNoFabrics)
     {
-#if CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
         SuccessOrExit(err = mCommissioningWindowManager.OpenBasicCommissioningWindow(initParams.discoveryTimeout));
-#endif
     }
 
     // TODO @bzbarsky-apple @cecille Move to examples

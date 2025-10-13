@@ -45,7 +45,7 @@ from matter.testing.apps import AppServerSubprocess
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCRequestor_2_7(MatterBaseTest):
+class TC_WebRTCR_2_7(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
 
@@ -87,11 +87,11 @@ class TC_WebRTCRequestor_2_7(MatterBaseTest):
             self.storage.cleanup()
         super().teardown_class()
 
-    def desc_TC_WebRTCRequestor_2_7(self) -> str:
+    def desc_TC_WebRTCR_2_7(self) -> str:
         """Returns a description of this test"""
         return "[TC-{picsCode}-2.7] Validate ICECandidates command with empty candidate list"
 
-    def steps_TC_WebRTCRequestor_2_7(self) -> list[TestStep]:
+    def steps_TC_WebRTCR_2_7(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
@@ -104,6 +104,16 @@ class TC_WebRTCRequestor_2_7(MatterBaseTest):
         ]
         return steps
 
+    def pics_TC_WebRTCR_2_7(self) -> list[str]:
+        """
+        Return the list of PICS applicable to this test case.
+        """
+        pics = [
+            "WEBRTCR.S",           # WebRTC Transport Requestor Server
+            "WEBRTCR.S.C02.Rsp",   # ICECandidates command
+        ]
+        return pics
+
     # This test has some manual steps and one sleep for up to 30 seconds. Test typically
     # runs under 1 mins, so 3 minutes is more than enough.
     @property
@@ -111,7 +121,7 @@ class TC_WebRTCRequestor_2_7(MatterBaseTest):
         return 3 * 60
 
     @async_test_body
-    async def test_TC_WebRTCRequestor_2_7(self):
+    async def test_TC_WebRTCR_2_7(self):
         """
         Executes the test steps for the WebRTC ICECandidates with empty candidate list scenario.
         """
