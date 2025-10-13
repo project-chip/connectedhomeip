@@ -944,15 +944,19 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     esp_hosted_connect_to_slave();
 
     // init bt controller
-    if (ESP_OK != esp_hosted_bt_controller_init())
+    err = MapBLEError(esp_hosted_bt_controller_init());
+    if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGW(TAG, "failed to init bt controller");
+        ChipLogError(Ble, "esp_hosted_bt_controller_init() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ExitNow();
     }
 
     // enable bt controller
-    if (ESP_OK != esp_hosted_bt_controller_enable())
+    err = MapBLEError(esp_hosted_bt_controller_enable());
+    if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGW(TAG, "failed to enable bt controller");
+        ChipLogError(Ble, "esp_hosted_bt_controller_enable() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ExitNow();
     }
 #endif
 
