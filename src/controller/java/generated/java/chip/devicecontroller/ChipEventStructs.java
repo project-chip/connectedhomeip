@@ -7010,27 +7010,17 @@ public static class PushAvStreamTransportClusterPushTransportBeginEvent {
 }
 public static class PushAvStreamTransportClusterPushTransportEndEvent {
   public Integer connectionID;
-  public Integer triggerType;
-  public Optional<Integer> activationReason;
   private static final long CONNECTION_ID_ID = 0L;
-  private static final long TRIGGER_TYPE_ID = 1L;
-  private static final long ACTIVATION_REASON_ID = 2L;
 
   public PushAvStreamTransportClusterPushTransportEndEvent(
-    Integer connectionID,
-    Integer triggerType,
-    Optional<Integer> activationReason
+    Integer connectionID
   ) {
     this.connectionID = connectionID;
-    this.triggerType = triggerType;
-    this.activationReason = activationReason;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CONNECTION_ID_ID, new UIntType(connectionID)));
-    values.add(new StructElement(TRIGGER_TYPE_ID, new UIntType(triggerType)));
-    values.add(new StructElement(ACTIVATION_REASON_ID, activationReason.<BaseTLVType>map((nonOptionalactivationReason) -> new UIntType(nonOptionalactivationReason)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -7040,30 +7030,16 @@ public static class PushAvStreamTransportClusterPushTransportEndEvent {
       return null;
     }
     Integer connectionID = null;
-    Integer triggerType = null;
-    Optional<Integer> activationReason = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CONNECTION_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           connectionID = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == TRIGGER_TYPE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          triggerType = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == ACTIVATION_REASON_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          activationReason = Optional.of(castingValue.value(Integer.class));
-        }
       }
     }
     return new PushAvStreamTransportClusterPushTransportEndEvent(
-      connectionID,
-      triggerType,
-      activationReason
+      connectionID
     );
   }
 
@@ -7073,12 +7049,6 @@ public static class PushAvStreamTransportClusterPushTransportEndEvent {
     output.append("PushAvStreamTransportClusterPushTransportEndEvent {\n");
     output.append("\tconnectionID: ");
     output.append(connectionID);
-    output.append("\n");
-    output.append("\ttriggerType: ");
-    output.append(triggerType);
-    output.append("\n");
-    output.append("\tactivationReason: ");
-    output.append(activationReason);
     output.append("\n");
     output.append("}\n");
     return output.toString();

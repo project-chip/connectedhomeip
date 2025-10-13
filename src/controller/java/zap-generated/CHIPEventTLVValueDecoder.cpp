@@ -9336,32 +9336,6 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        value_connectionIDCtorSignature.c_str(),
                                                                        jnivalue_connectionID, value_connectionID);
 
-            jobject value_triggerType;
-            std::string value_triggerTypeClassName     = "java/lang/Integer";
-            std::string value_triggerTypeCtorSignature = "(I)V";
-            jint jnivalue_triggerType                  = static_cast<jint>(cppValue.triggerType);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_triggerTypeClassName.c_str(),
-                                                                       value_triggerTypeCtorSignature.c_str(), jnivalue_triggerType,
-                                                                       value_triggerType);
-
-            jobject value_activationReason;
-            if (!cppValue.activationReason.HasValue())
-            {
-                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_activationReason);
-            }
-            else
-            {
-                jobject value_activationReasonInsideOptional;
-                std::string value_activationReasonInsideOptionalClassName     = "java/lang/Integer";
-                std::string value_activationReasonInsideOptionalCtorSignature = "(I)V";
-                jint jnivalue_activationReasonInsideOptional = static_cast<jint>(cppValue.activationReason.Value());
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    value_activationReasonInsideOptionalClassName.c_str(),
-                    value_activationReasonInsideOptionalCtorSignature.c_str(), jnivalue_activationReasonInsideOptional,
-                    value_activationReasonInsideOptional);
-                chip::JniReferences::GetInstance().CreateOptional(value_activationReasonInsideOptional, value_activationReason);
-            }
-
             jclass pushTransportEndStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PushAvStreamTransportClusterPushTransportEndEvent",
@@ -9374,16 +9348,14 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jmethodID pushTransportEndStructCtor;
             err = chip::JniReferences::GetInstance().FindMethod(env, pushTransportEndStructClass, "<init>",
-                                                                "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;)V",
-                                                                &pushTransportEndStructCtor);
+                                                                "(Ljava/lang/Integer;)V", &pushTransportEndStructCtor);
             if (err != CHIP_NO_ERROR || pushTransportEndStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$PushAvStreamTransportClusterPushTransportEndEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(pushTransportEndStructClass, pushTransportEndStructCtor, value_connectionID,
-                                           value_triggerType, value_activationReason);
+            jobject value = env->NewObject(pushTransportEndStructClass, pushTransportEndStructCtor, value_connectionID);
 
             return value;
         }

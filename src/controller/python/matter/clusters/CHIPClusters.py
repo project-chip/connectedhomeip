@@ -5504,8 +5504,8 @@ class ChipClusters:
                 "args": {
                     "groupID": "int",
                     "endpoints": "int",
-                    "key": "bytes",
                     "keyID": "int",
+                    "key": "bytes",
                     "gracePeriod": "int",
                     "useAuxiliaryACL": "bool",
                 },
@@ -5523,8 +5523,8 @@ class ChipClusters:
                 "commandName": "UpdateGroupKey",
                 "args": {
                     "groupID": "int",
-                    "key": "bytes",
                     "keyID": "int",
+                    "key": "bytes",
                     "gracePeriod": "int",
                 },
             },

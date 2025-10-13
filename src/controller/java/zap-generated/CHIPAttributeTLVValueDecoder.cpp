@@ -44766,16 +44766,16 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             newElement_0_transportOptionsInsideOptional_audioStreamIDInsideOptional,
                             newElement_0_transportOptionsInsideOptional_audioStreamID);
                     }
-                    jobject newElement_0_transportOptionsInsideOptional_endpointID;
-                    std::string newElement_0_transportOptionsInsideOptional_endpointIDClassName     = "java/lang/Integer";
-                    std::string newElement_0_transportOptionsInsideOptional_endpointIDCtorSignature = "(I)V";
-                    jint jninewElement_0_transportOptionsInsideOptional_endpointID =
-                        static_cast<jint>(entry_0.transportOptions.Value().endpointID);
+                    jobject newElement_0_transportOptionsInsideOptional_TLSEndpointID;
+                    std::string newElement_0_transportOptionsInsideOptional_TLSEndpointIDClassName     = "java/lang/Integer";
+                    std::string newElement_0_transportOptionsInsideOptional_TLSEndpointIDCtorSignature = "(I)V";
+                    jint jninewElement_0_transportOptionsInsideOptional_TLSEndpointID =
+                        static_cast<jint>(entry_0.transportOptions.Value().TLSEndpointID);
                     chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                        newElement_0_transportOptionsInsideOptional_endpointIDClassName.c_str(),
-                        newElement_0_transportOptionsInsideOptional_endpointIDCtorSignature.c_str(),
-                        jninewElement_0_transportOptionsInsideOptional_endpointID,
-                        newElement_0_transportOptionsInsideOptional_endpointID);
+                        newElement_0_transportOptionsInsideOptional_TLSEndpointIDClassName.c_str(),
+                        newElement_0_transportOptionsInsideOptional_TLSEndpointIDCtorSignature.c_str(),
+                        jninewElement_0_transportOptionsInsideOptional_TLSEndpointID,
+                        newElement_0_transportOptionsInsideOptional_TLSEndpointID);
                     jobject newElement_0_transportOptionsInsideOptional_url;
                     LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
                         entry_0.transportOptions.Value().url, newElement_0_transportOptionsInsideOptional_url));
@@ -45457,16 +45457,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             return nullptr;
                         }
 
-                        newElement_0_transportOptionsInsideOptional = env->NewObject(
-                            transportOptionsStructStructClass_3, transportOptionsStructStructCtor_3,
-                            newElement_0_transportOptionsInsideOptional_streamUsage,
-                            newElement_0_transportOptionsInsideOptional_videoStreamID,
-                            newElement_0_transportOptionsInsideOptional_audioStreamID,
-                            newElement_0_transportOptionsInsideOptional_endpointID, newElement_0_transportOptionsInsideOptional_url,
-                            newElement_0_transportOptionsInsideOptional_triggerOptions,
-                            newElement_0_transportOptionsInsideOptional_ingestMethod,
-                            newElement_0_transportOptionsInsideOptional_containerOptions,
-                            newElement_0_transportOptionsInsideOptional_expiryTime);
+                        newElement_0_transportOptionsInsideOptional =
+                            env->NewObject(transportOptionsStructStructClass_3, transportOptionsStructStructCtor_3,
+                                           newElement_0_transportOptionsInsideOptional_streamUsage,
+                                           newElement_0_transportOptionsInsideOptional_videoStreamID,
+                                           newElement_0_transportOptionsInsideOptional_audioStreamID,
+                                           newElement_0_transportOptionsInsideOptional_TLSEndpointID,
+                                           newElement_0_transportOptionsInsideOptional_url,
+                                           newElement_0_transportOptionsInsideOptional_triggerOptions,
+                                           newElement_0_transportOptionsInsideOptional_ingestMethod,
+                                           newElement_0_transportOptionsInsideOptional_containerOptions,
+                                           newElement_0_transportOptionsInsideOptional_expiryTime);
                     }
                     chip::JniReferences::GetInstance().CreateOptional(newElement_0_transportOptionsInsideOptional,
                                                                       newElement_0_transportOptions);

@@ -7230,6 +7230,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Chime";
     case 0x00000147:
         return "Camera Controller";
+    case 0x00000148:
+        return "Doorbell";
     case 0x00000202:
         return "Window Covering";
     case 0x00000203:
