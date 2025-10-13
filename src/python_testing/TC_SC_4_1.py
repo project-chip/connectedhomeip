@@ -140,21 +140,14 @@ class TC_SC_4_1(MatterBaseTest):
             attribute=Clusters.IcdManagement.Attributes.FeatureMap
         )
 
-    async def _get_verify_long_discriminator_subtype_ptr_instance_name(self, must_be_present: bool = True) -> Optional[str]:
-
-        # Temp
-        print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-        await MdnsDiscovery().get_commissionable_subtypes(log_output=True)
-        print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-
+    async def _get_verify_long_discriminator_subtype_ptr_instance_name(self, must_be_present: bool = True) -> Optional[tuple[str, str]]:
         # TH constructs the 'Long Discriminator Subtype'
         # using the DUT's 'Long Discriminator'
         long_discriminator: str | None = None
         long_discriminator_subtype: str | None = None
         setup_payload_info = get_setup_payload_info_config(self.matter_test_config)
         if setup_payload_info:
-            # long_discriminator = setup_payload_info[0].filter_value
-            long_discriminator = "3840"
+            long_discriminator = setup_payload_info[0].filter_value
             long_discriminator_subtype = f"_L{long_discriminator}._sub.{MdnsServiceType.COMMISSIONABLE.value}"
             logging.info(f"\n\n\t** long_discriminator: {long_discriminator}\n")
         else:
@@ -175,7 +168,7 @@ class TC_SC_4_1(MatterBaseTest):
             asserts.assert_equal(len(ptr_records), 1,
                                  f"There must only be one 'Long Discriminator Subtype' ({long_discriminator_subtype}) PTR record, found {len(ptr_records)}.")
 
-            return ptr_records[0].instance_name
+            return ptr_records[0].instance_name, long_discriminator
 
         return None
 
@@ -567,6 +560,7 @@ class TC_SC_4_1(MatterBaseTest):
         self.endpoint = self.get_endpoint(default=1)
         self.supports_icd = False
         self.supports_lit = False
+        long_discriminator = None
         obcw_cmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
 
         # *** STEP 1 ***
@@ -629,7 +623,7 @@ class TC_SC_4_1(MatterBaseTest):
             )
 
             # Get the 'Long Discriminator Subtype' PTR record's instance name
-            long_discriminator_ptr_instance_name = await self._get_verify_long_discriminator_subtype_ptr_instance_name()
+            long_discriminator_ptr_instance_name, long_discriminator = await self._get_verify_long_discriminator_subtype_ptr_instance_name()
 
             # Verify commissionable subtype advertisements
             await self._verify_commissionable_subtypes(long_discriminator_ptr_instance_name)
@@ -656,12 +650,12 @@ class TC_SC_4_1(MatterBaseTest):
             nodeid=self.dut_node_id,
             timeout=180,
             iteration=10000,
-            discriminator=3840,
+            discriminator=long_discriminator,
             option=1
         )
 
         # Get the 'Long Discriminator Subtype' PTR record's instance name
-        long_discriminator_ptr_instance_name = await self._get_verify_long_discriminator_subtype_ptr_instance_name()
+        long_discriminator_ptr_instance_name, _ = await self._get_verify_long_discriminator_subtype_ptr_instance_name()
 
         # Verify commissionable subtype advertisements
         await self._verify_commissionable_subtypes(long_discriminator_ptr_instance_name)
@@ -682,13 +676,15 @@ class TC_SC_4_1(MatterBaseTest):
         # Check if DUT Extended Discovery mode is active
         self.step(8)
         # Get the 'Long Discriminator Subtype' PTR record's instance name
-        long_discriminator_ptr_instance_name = await self._get_verify_long_discriminator_subtype_ptr_instance_name(must_be_present=False)
+        response = await self._get_verify_long_discriminator_subtype_ptr_instance_name(must_be_present=False)
 
         # If the DUT's 'Long Discriminator Subtype' PTR record's instance name is present, Extended Discovery mode is active
-        extended_discovery_mode = long_discriminator_ptr_instance_name is not None
+        extended_discovery_mode = False if response is None else True
         logging.info(f"DUT Extended Discovery mode active: {extended_discovery_mode}")
 
         if extended_discovery_mode:
+            long_discriminator_ptr_instance_name, _ = response
+
             # Verify commissionable subtype advertisements
             await self._verify_commissionable_subtypes(long_discriminator_ptr_instance_name)
 
