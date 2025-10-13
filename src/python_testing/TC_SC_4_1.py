@@ -53,6 +53,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.commissioning import get_setup_payload_info_config
 
 '''
 Purpose
@@ -529,18 +530,8 @@ class TC_SC_4_1(MatterBaseTest):
         else:
             logging.info("TXT record NOT required.")
 
-    async def verify_commissionable_node_advertisements(self, service_name: str, expected_cm: str) -> None:
-        # Verify SRV record advertisements
-        srv_record = await self._get_verify_srv_record(service_name)
-
-        # Verify commissionable subtype advertisements
-        await self._verify_commissionable_subtypes(srv_record.service_name)
-
-        # Verify TXT record keys advertisements
-        await self._verify_txt_record_keys(service_name, expected_cm)
-
-        # *** AAAA RECORD CHECKS ***
-        # **************************
+    @staticmethod
+    async def _verify_aaaa_records(srv_record) -> None:
         # TH performs a AAAA record query against the target 'hostname'
         # listed in the Commissionable Service SRV record
         quada_records = await MdnsDiscovery().get_quada_records(hostname=srv_record.hostname, log_output=True)
@@ -550,7 +541,7 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Verify the AAAA records contain a valid IPv6 address
         ipv6_addresses = [f"{r.address}%{r.interface}" for r in quada_records]
-        assert_valid_ipv6_addresses(ipv6_addresses)
+        assert_valid_ipv6_addresses(ipv6_addresses)        
 
     def desc_TC_TC_SC_4_1(self) -> str:
         return "[TC-SC-4.1] Commissionable Node Discovery with DUT as Commissionee"
@@ -607,6 +598,13 @@ class TC_SC_4_1(MatterBaseTest):
             cluster=Clusters.AdministratorCommissioning,
             feature_int=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic)
 
+
+        pic = get_setup_payload_info_config(self.matter_test_config)
+        print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+        print(f"\t\t\t\t\t\t {pic}")
+        print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+
+
         # *** STEP 6 ***
         # If DUT supports Open Basic Commissioning Window, put it in Commissioning Mode using
         # Open Basic Commissioning Window command.
@@ -614,7 +612,7 @@ class TC_SC_4_1(MatterBaseTest):
         self.step(6)
         if supports_obcw:
             logging.info("\n\n\t ** Open Basic Commissioning Window supported\n")
-            result = await self.default_controller.SendCommand(
+            await self.default_controller.SendCommand(
                 nodeid=self.dut_node_id,
                 endpoint=0,
                 payload=obcw_cmd,
@@ -627,8 +625,17 @@ class TC_SC_4_1(MatterBaseTest):
             # Verify PTR record is returned
             asserts.assert_is_not_none(commissionable_service_ptr, "DUT's 'Commissionable Service' must be present.")
 
-            # Verify DUT Commissionable Node Discovery service advertisements
-            await self.verify_commissionable_node_advertisements(service_name=commissionable_service_ptr.service_name, expected_cm="1")
+            # Verify SRV record advertisements
+            srv_record = await self._get_verify_srv_record(commissionable_service_ptr.service_name)
+
+            # Verify commissionable subtype advertisements
+            await self._verify_commissionable_subtypes(srv_record.service_name)
+
+            # Verify TXT record keys advertisements
+            await self._verify_txt_record_keys(commissionable_service_ptr.service_name, expected_cm="1")
+
+            # Verify AAAA records
+            await self._verify_aaaa_records(srv_record)
 
             # Close commissioning window
             await self.close_commissioning_window()
@@ -653,8 +660,17 @@ class TC_SC_4_1(MatterBaseTest):
         # Verify PTR record is returned
         asserts.assert_is_not_none(commissionable_service_ptr, "DUT's commissionable node services not present")
 
-        # Verify DUT Commissionable Node Discovery service advertisements
-        await self.verify_commissionable_node_advertisements(service_name=commissionable_service_ptr.service_name, expected_cm="2")
+        # Verify SRV record advertisements
+        srv_record = await self._get_verify_srv_record(commissionable_service_ptr.service_name)
+
+        # Verify commissionable subtype advertisements
+        await self._verify_commissionable_subtypes(srv_record.service_name)
+
+        # Verify TXT record keys advertisements
+        await self._verify_txt_record_keys(commissionable_service_ptr.service_name, expected_cm="2")
+
+        # Verify AAAA records
+        await self._verify_aaaa_records(srv_record)
 
         # Close commissioning window
         await self.close_commissioning_window()
@@ -670,8 +686,17 @@ class TC_SC_4_1(MatterBaseTest):
         logging.info(f"DUT Extended Discovery mode active: {extended_discovery_mode}")
 
         if extended_discovery_mode:
-            # Verify DUT Commissionable Node Discovery service advertisements
-            await self.verify_commissionable_node_advertisements(service_name=commissionable_service_ptr.service_name, expected_cm="0")
+            # Verify SRV record advertisements
+            srv_record = await self._get_verify_srv_record(commissionable_service_ptr.service_name)
+
+            # Verify commissionable subtype advertisements
+            await self._verify_commissionable_subtypes(srv_record.service_name)
+
+            # Verify TXT record keys advertisements
+            await self._verify_txt_record_keys(commissionable_service_ptr.service_name, expected_cm="0")
+
+            # Verify AAAA records
+            await self._verify_aaaa_records(srv_record)
 
 
 if __name__ == "__main__":
