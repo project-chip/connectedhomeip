@@ -414,8 +414,6 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
         if (IsType(InteractionType::Subscribe) && !IsPriming())
         {
             // Trigger check-in message when a non-priming subscription report times out.
-            // Additionally, avoid triggering a check-in during subscription setup failures;
-            // handling such cases is the client's responsibility.
             ChipLogError(DataManagement, "Trigger check-in message when non-priming subscription report times out");
             Optional<Access::SubjectDescriptor> subjectDescriptor;
             subjectDescriptor.SetValue(GetSubjectDescriptor());
