@@ -51,7 +51,7 @@ declare_args() {
   wifi_ncp_module = false
 
   #Disable MQTT by default
-  enable_dic = false
+  enable_matter_aws = false
 
   # Disable AWS SDK OTA by default
   aws_sdk_ota = false

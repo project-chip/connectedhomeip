@@ -66,6 +66,9 @@ static constexpr uint8_t kMaxZones                   = 10;  // Spec has min 1
 static constexpr uint8_t kMaxUserDefinedZones        = 10;  // Spec has min 5
 static constexpr uint8_t kSensitivityMax             = 10;  // Spec has 2 to 10
 
+// StreamIDs typically start from 0 and monotonically increase. Setting
+// Invalid value to a large and practically unused value.
+static constexpr uint16_t kInvalidStreamID = 65500;
 #define INVALID_SPKR_LEVEL (0)
 
 namespace Camera {
@@ -314,6 +317,10 @@ public:
 
     void HandleSimulatedZoneStoppedEvent(uint16_t zoneID);
 
+    // Audio playback pipeline methods
+    CameraError StartAudioPlaybackStream();
+    CameraError StopAudioPlaybackStream();
+
 private:
     int videoDeviceFd            = -1;
     std::string mVideoDevicePath = kDefaultVideoDevicePath;
@@ -331,6 +338,8 @@ private:
 
     GstElement * CreateVideoPipeline(const std::string & device, int width, int height, int framerate, CameraError & error);
     GstElement * CreateAudioPipeline(const std::string & device, int channels, int sampleRate, int bitRate, CameraError & error);
+    GstElement * CreateAudioPlaybackPipeline(CameraError & error);
+
     GstElement * CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int frameRate,
                                         const std::string & filename, CameraError & error);
     CameraError SetV4l2Control(uint32_t controlId, int value);
@@ -377,6 +386,9 @@ private:
     uint8_t mDetectionSensitivity          = (1 + kSensitivityMax) / 2; // Average over the range
 
     std::vector<StreamUsageEnum> mStreamUsagePriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+
+    // Audio playback pipeline specific members
+    GstElement * mAudioPlaybackPipeline = nullptr;
 };
 
 } // namespace Camera

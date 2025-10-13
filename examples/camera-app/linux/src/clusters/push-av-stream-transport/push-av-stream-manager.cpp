@@ -361,24 +361,6 @@ bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDurat
     return false;
 }
 
-bool PushAvStreamTransportManager::ValidateUrl(const std::string & url)
-{
-    const std::string https = "https://";
-
-    // Check minimum length and https prefix
-    if (url.size() <= https.size() || url.substr(0, https.size()) != https)
-    {
-        return false;
-    }
-
-    // Check for non-empty host
-    size_t hostStart = https.size();
-    size_t hostEnd   = url.find('/', hostStart);
-    std::string host = (hostEnd == std::string::npos) ? url.substr(hostStart) : url.substr(hostStart, hostEnd - hostStart);
-
-    return !host.empty();
-}
-
 Protocols::InteractionModel::Status PushAvStreamTransportManager::SelectVideoStream(StreamUsageEnum streamUsage,
                                                                                     uint16_t & videoStreamId)
 {
