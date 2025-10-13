@@ -14,24 +14,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/testing/AttributeTesting.h>
-// #include <app/clusters/testing/TestReadWriteAttribute.h>
+#include <pw_unit_test/framework.h>
+
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
-#include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/TimeSynchronization/Attributes.h>
 #include <clusters/TimeSynchronization/Enums.h>
 #include <clusters/TimeSynchronization/Metadata.h>
 #include <clusters/TimeSynchronization/Structs.h>
-#include <lib/core/CHIPError.h>
-#include <lib/core/CHIPVendorIdentifiers.hpp>
-#include <lib/support/CHIPMemString.h>
-#include <lib/support/TestPersistentStorageDelegate.h>
-#include <platform/ConfigurationManager.h>
-#include <platform/DeviceInstanceInfoProvider.h>
-#include <pw_unit_test/framework.h>
 
 namespace {
 
