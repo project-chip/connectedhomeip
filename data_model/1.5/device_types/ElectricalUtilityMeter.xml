@@ -62,10 +62,14 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
   <classification superset="Meter Reference Point" class="simple" scope="endpoint"/>
+  <conditionRequirements>
+    <deviceType id="0x0016" name="Root Node">
+      <conditionRequirement name="TimeSyncCond">
+        <mandatoryConform/>
+      </conditionRequirement>
+    </deviceType>
+  </conditionRequirements>
   <clusters>
-    <cluster id="0x0038" name="Time Synchronization" side="server">
-      <mandatoryConform/>
-    </cluster>
     <cluster id="0x0B06" name="Meter Identification" side="server">
       <mandatoryConform/>
     </cluster>

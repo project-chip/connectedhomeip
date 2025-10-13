@@ -16378,7 +16378,7 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
   public Integer streamUsage;
   public @Nullable Optional<Integer> videoStreamID;
   public @Nullable Optional<Integer> audioStreamID;
-  public Integer endpointID;
+  public Integer TLSEndpointID;
   public String url;
   public ChipStructs.PushAvStreamTransportClusterTransportTriggerOptionsStruct triggerOptions;
   public Integer ingestMethod;
@@ -16387,7 +16387,7 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
   private static final long STREAM_USAGE_ID = 0L;
   private static final long VIDEO_STREAM_ID_ID = 1L;
   private static final long AUDIO_STREAM_ID_ID = 2L;
-  private static final long ENDPOINT_ID_ID = 3L;
+  private static final long TLS_ENDPOINT_ID_ID = 3L;
   private static final long URL_ID = 4L;
   private static final long TRIGGER_OPTIONS_ID = 5L;
   private static final long INGEST_METHOD_ID = 6L;
@@ -16398,7 +16398,7 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     Integer streamUsage,
     @Nullable Optional<Integer> videoStreamID,
     @Nullable Optional<Integer> audioStreamID,
-    Integer endpointID,
+    Integer TLSEndpointID,
     String url,
     ChipStructs.PushAvStreamTransportClusterTransportTriggerOptionsStruct triggerOptions,
     Integer ingestMethod,
@@ -16408,7 +16408,7 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     this.streamUsage = streamUsage;
     this.videoStreamID = videoStreamID;
     this.audioStreamID = audioStreamID;
-    this.endpointID = endpointID;
+    this.TLSEndpointID = TLSEndpointID;
     this.url = url;
     this.triggerOptions = triggerOptions;
     this.ingestMethod = ingestMethod;
@@ -16421,7 +16421,7 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     values.add(new StructElement(STREAM_USAGE_ID, new UIntType(streamUsage)));
     values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? videoStreamID.<BaseTLVType>map((nonOptionalvideoStreamID) -> new UIntType(nonOptionalvideoStreamID)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? audioStreamID.<BaseTLVType>map((nonOptionalaudioStreamID) -> new UIntType(nonOptionalaudioStreamID)).orElse(new EmptyType()) : new NullType()));
-    values.add(new StructElement(ENDPOINT_ID_ID, new UIntType(endpointID)));
+    values.add(new StructElement(TLS_ENDPOINT_ID_ID, new UIntType(TLSEndpointID)));
     values.add(new StructElement(URL_ID, new StringType(url)));
     values.add(new StructElement(TRIGGER_OPTIONS_ID, triggerOptions.encodeTlv()));
     values.add(new StructElement(INGEST_METHOD_ID, new UIntType(ingestMethod)));
@@ -16438,7 +16438,7 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     Integer streamUsage = null;
     @Nullable Optional<Integer> videoStreamID = null;
     @Nullable Optional<Integer> audioStreamID = null;
-    Integer endpointID = null;
+    Integer TLSEndpointID = null;
     String url = null;
     ChipStructs.PushAvStreamTransportClusterTransportTriggerOptionsStruct triggerOptions = null;
     Integer ingestMethod = null;
@@ -16460,10 +16460,10 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
           UIntType castingValue = element.value(UIntType.class);
           audioStreamID = Optional.of(castingValue.value(Integer.class));
         }
-      } else if (element.contextTagNum() == ENDPOINT_ID_ID) {
+      } else if (element.contextTagNum() == TLS_ENDPOINT_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          endpointID = castingValue.value(Integer.class);
+          TLSEndpointID = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == URL_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
@@ -16496,7 +16496,7 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
       streamUsage,
       videoStreamID,
       audioStreamID,
-      endpointID,
+      TLSEndpointID,
       url,
       triggerOptions,
       ingestMethod,
@@ -16518,8 +16518,8 @@ public static class PushAvStreamTransportClusterTransportOptionsStruct {
     output.append("\taudioStreamID: ");
     output.append(audioStreamID);
     output.append("\n");
-    output.append("\tendpointID: ");
-    output.append(endpointID);
+    output.append("\tTLSEndpointID: ");
+    output.append(TLSEndpointID);
     output.append("\n");
     output.append("\turl: ");
     output.append(url);

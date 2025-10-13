@@ -10452,7 +10452,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _audioStreamID = nil;
 
-        _endpointID = @(0);
+        _tlsEndpointID = @(0);
 
         _url = @"";
 
@@ -10474,7 +10474,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.streamUsage = self.streamUsage;
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
-    other.endpointID = self.endpointID;
+    other.tlsEndpointID = self.tlsEndpointID;
     other.url = self.url;
     other.triggerOptions = self.triggerOptions;
     other.ingestMethod = self.ingestMethod;
@@ -10486,7 +10486,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; endpointID:%@; url:%@; triggerOptions:%@; ingestMethod:%@; containerOptions:%@; expiryTime:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _endpointID, _url, _triggerOptions, _ingestMethod, _containerOptions, _expiryTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; tlsEndpointID:%@; url:%@; triggerOptions:%@; ingestMethod:%@; containerOptions:%@; expiryTime:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _tlsEndpointID, _url, _triggerOptions, _ingestMethod, _containerOptions, _expiryTime];
     return descriptionString;
 }
 
@@ -10597,10 +10597,6 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _connectionID = @(0);
-
-        _triggerType = @(0);
-
-        _activationReason = nil;
     }
     return self;
 }
@@ -10610,15 +10606,13 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRPushAVStreamTransportClusterPushTransportEndEvent alloc] init];
 
     other.connectionID = self.connectionID;
-    other.triggerType = self.triggerType;
-    other.activationReason = self.activationReason;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; triggerType:%@; activationReason:%@; >", NSStringFromClass([self class]), _connectionID, _triggerType, _activationReason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; >", NSStringFromClass([self class]), _connectionID];
     return descriptionString;
 }
 

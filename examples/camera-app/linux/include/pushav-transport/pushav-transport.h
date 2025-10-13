@@ -37,6 +37,9 @@
 #include <thread>
 #include <vector>
 
+static constexpr int kInvalidZoneId      = -1;
+static constexpr int kDefaultSensitivity = 5;
+
 class PushAVTransport : public Transport
 {
 public:
@@ -45,13 +48,13 @@ public:
     ~PushAVTransport() override;
 
     // Send video data for a given stream ID
-    void SendVideo(const char * data, size_t size, int64_t timestamp, uint16_t videoStreamID) override;
+    void SendVideo(const chip::ByteSpan & data, int64_t timestamp, uint16_t videoStreamID) override;
 
     // Send audio data for a given stream ID
-    void SendAudio(const char * data, size_t size, int64_t timestamp, uint16_t audioStreamID) override;
+    void SendAudio(const chip::ByteSpan & data, int64_t timestamp, uint16_t audioStreamID) override;
 
     // Send synchronized audio/video data for given audio and video stream IDs
-    void SendAudioVideo(const char * data, size_t size, uint16_t videoStreamID, uint16_t audioStreamID) override;
+    void SendAudioVideo(const chip::ByteSpan & data, uint16_t videoStreamID, uint16_t audioStreamID) override;
 
     // Indicates that the transport is ready to send video data
     bool CanSendVideo() override;
@@ -69,8 +72,8 @@ public:
     // Set Transport status
     void SetTransportStatus(chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum status);
 
-    void TriggerTransport(chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum activationReason, int zoneId = -1,
-                          int sensitivity = 5);
+    void TriggerTransport(chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum activationReason,
+                          int zoneId = kInvalidZoneId, int sensitivity = kDefaultSensitivity);
     // Get Transport status
     bool GetTransportStatus()
     {
@@ -100,12 +103,12 @@ public:
         mZoneSensitivityList = zoneSensitivityList;
     }
 
-    void SetCurrentlyUsedBandwidthMbps(double currentlyUsedBandwidthMbps)
+    void SetCurrentlyUsedBandwidthbps(uint32_t currentlyUsedBandwidthbps)
     {
-        mCurrentlyUsedBandwidthMbps = currentlyUsedBandwidthMbps;
+        mCurrentlyUsedBandwidthbps = currentlyUsedBandwidthbps;
     }
 
-    double GetCurrentlyUsedBandwidthMbps() { return mCurrentlyUsedBandwidthMbps; }
+    uint32_t GetCurrentlyUsedBandwidthbps() const { return mCurrentlyUsedBandwidthbps; }
 
     // Set the cluster server reference for direct API calls
     void SetPushAvStreamTransportServer(chip::app::Clusters::PushAvStreamTransportServer * server)
@@ -145,5 +148,5 @@ private:
     chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum mTransportStatus;
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTransportTriggerType;
     uint16_t mConnectionID;
-    double mCurrentlyUsedBandwidthMbps = 0.0;
+    uint32_t mCurrentlyUsedBandwidthbps = 0;
 };
