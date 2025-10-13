@@ -204,17 +204,22 @@ class TC_SC_4_1(MatterBaseTest):
         asserts.assert_true(T_int in allowed,
                             f"T value ({t_key}) is not in allowed set {sorted(allowed)}.")
 
-    async def _get_verify_srv_record(self, service_name: str) -> MdnsServiceInfo:
+    async def _get_verify_srv_record(self, long_discriminator_ptr_instance_name: str) -> str:
         # TH performs a SRV record query against the 'Commissionable Service' service name
         srv_record = await MdnsDiscovery().get_srv_record(
-            service_name=service_name,
+            service_name=f"{long_discriminator_ptr_instance_name}.{MdnsServiceType.COMMISSIONABLE.value}",
             service_type=MdnsServiceType.COMMISSIONABLE.value,
             log_output=True
         )
 
+        # TODO: update to desc
         # Verify SRV record is returned
-        srv_record_returned = srv_record is not None and srv_record.service_name == service_name
-        asserts.assert_true(srv_record_returned, "SRV record was not returned")
+        asserts.assert_true(srv_record is not None, "SRV record was not returned")
+
+        # Verify that the SRV record's instance name is equal to the
+        # 'Long Discriminator Subtype' PTR record's instance name.
+        asserts.assert_equal(srv_record.instance_name, long_discriminator_ptr_instance_name,
+                            "SRV record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
         # Verify DUT's 'Commissionable Service' DNS-SD instance name is a 64-bit randomly
         # selected ID expressed as a sixteen-char hex string with capital letters
@@ -227,121 +232,136 @@ class TC_SC_4_1(MatterBaseTest):
         # expressed as a twelve or sixteen capital letter hex string
         assert_valid_hostname(srv_record.hostname)
 
-        return srv_record
+        return srv_record.hostname
 
-    async def _verify_commissionable_subtypes(self, srv_service_name: str) -> None:
-        # TH performs a browse for the 'Commissionable Service' subtypes
-        subtypes = await MdnsDiscovery().get_commissionable_subtypes(log_output=True)
+    async def _get_verify_long_discriminator_subtype_ptr_instance_name(self) -> str:
+        # TODO: Placeholder for programatically
+        # TODO: getting the discriminator to
+        # TODO: construct the _L subtype
+        long_discriminator = "3840"  # get_long_discriminator fn
+        long_discriminator_subtype = f"_L{long_discriminator}._sub.{MdnsServiceType.COMMISSIONABLE.value}"
+        # TODO: ###############################
 
         # *** LONG DISCRIMINATOR SUBTYPE ***
-        # Validate that the 'Long Discriminator' subtype is a 12-bit variable
-        # length decimal number in ASCII text, omitting any leading zeros
-        long_discriminator_subtype = next((s for s in subtypes if s.startswith('_L')), None)
-        asserts.assert_is_not_none(long_discriminator_subtype, "Long discriminator must be present.")
-        assert_valid_long_discriminator_subtype(long_discriminator_subtype)
-
-        # Verify that the 'Long Discriminator' subtype PTR record is present
+        # TH performs a PTR record query against the 'Long Discriminator Subtype' _L
         ptr_records = await MdnsDiscovery().get_ptr_records(
             service_types=[long_discriminator_subtype],
             log_output=True
         )
-        asserts.assert_greater(len(ptr_records), 0, "Long Discriminator subtype PTR record must be present.")
-        
-        # Verify that there's only 1 'Long Discriminator' subtype PTR record
-        asserts.assert_equal(len(ptr_records), 1, "There must only be 1 Long Discriminator subtype PTR record.")
 
-        if len(ptr_records) > 1:
-            logging.info(f"""
-                        Found more than one ({len(ptr_records)}) PTR records for Long Discriminator subtype '{long_discriminator_subtype}'.
-                        This is not a DUT issue, but it means that more than 1 device is responding to the same discriminator.
-                        """)
-        else:
-            # Verify that the 'Long Discriminator' subtype PTR record's
-            # 'service_name' is the same as the SRV record 'service_name'
-            asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
-                                 "Long Discriminator subtype PTR record service name must be equal to the SRV record service name.")
+        # Verify that there is one, and only one, 'Long Discriminator Subtype' PTR record
+        asserts.assert_equal(len(ptr_records), 1,
+                             f"There must only be one 'Long Discriminator Subtype' ({long_discriminator_subtype}) PTR record, found {len(ptr_records)}.")
+
+        return ptr_records[0].instance_name
+
+    async def _verify_commissionable_subtypes(self, long_discriminator_ptr_instance_name: str) -> None:
+        # TH performs a browse for the rest of the 'Commissionable Service' subtypes
+        subtypes = await MdnsDiscovery().get_commissionable_subtypes(log_output=True)
 
         # *** SHORT DISCRIMINATOR SUBTYPE ***
-        # Validate that the 'Short Discriminator' subtype is a 4-bit variable
-        # length decimal number in ASCII text, omitting any leading zeros
+        # Verify that the 'Short Discriminator Subtype' _S is present
         short_discriminator_subtype = next((s for s in subtypes if s.startswith('_S')), None)
-        asserts.assert_is_not_none(short_discriminator_subtype, "Short discriminator must be present.")
+        asserts.assert_is_not_none(short_discriminator_subtype, "'Short Discriminator Subtype' must be present.")
+
+        # Validate that the 'Short Discriminator Subtype' contains the 4-bit variable
+        # length decimal number in ASCII text, omitting any leading zeros Short Discriminator value
         assert_valid_short_discriminator_subtype(short_discriminator_subtype)
 
-        # Verify that the 'Short Discriminator' subtype PTR record is present
+        # TH performs a PTR record query against the 'Short Discriminator Subtype'
         ptr_records = await MdnsDiscovery().get_ptr_records(
             service_types=[short_discriminator_subtype],
             log_output=True
         )
-        asserts.assert_greater(len(ptr_records), 0, "Short Discriminator subtype PTR record must be present.")
 
-        if len(ptr_records) > 1:
-            logging.info(f"""
-                        Found more than one ({len(ptr_records)}) PTR records for Short Discriminator subtype '{short_discriminator_subtype}'.
-                        This is not a DUT issue, but it means that more than 1 device is responding to the same discriminator.
-                        """)
-        else:
-            # Verify that the 'Short Discriminator' subtype PTR record's
-            # 'service_name' is the same as the SRV record's 'service_name'
-            asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
-                                 "Short Discriminator subtype PTR record service name must be equal to the SRV record service name.")
+        # Verify that there is one, and only one, 'Short Discriminator Subtype' PTR record
+        asserts.assert_equal(len(ptr_records), 1, "There must only be one 'Short Discriminator Subtype' PTR record.")
+        short_discriminator_ptr = ptr_records[0]
+
+        # Verify that the 'Short Discriminator Subtype' PTR record's instance name
+        # is equal to the 'Long Discriminator Subtype' PTR record's instance name.
+        asserts.assert_equal(short_discriminator_ptr.instance_name, long_discriminator_ptr_instance_name,
+                             "'Short Discriminator Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
         # *** IN COMMISSIONING MODE SUBTYPE ***
-        # Verify presence of the _CM subtype
+        # Verify that the 'In Commissioning Mode Subtype' _CM is present
         cm_subtype = f"_CM._sub.{MdnsServiceType.COMMISSIONABLE.value}"
-        asserts.assert_in(cm_subtype, subtypes, f"'{cm_subtype}' subtype must be present.")
+        asserts.assert_in(cm_subtype, subtypes, f"In Commissioning Mode Subtype '{cm_subtype}' must be present.")
 
-        # Verify that the 'In Commissioning Mode' _CM subtype PTR record is present
+        # TH performs a PTR record query against the 'In Commissioning Mode Subtype'
         ptr_records = await MdnsDiscovery().get_ptr_records(
             service_types=[cm_subtype],
             log_output=True
         )
-        asserts.assert_greater(len(ptr_records), 0, "'In Commissioning Mode' subtype PTR record must be present.")
 
-        # Verify that the 'In Commissioning Mode' _CM subtype PTR record's
-        # 'service_name' is the same as the SRV record's 'service_name'
-        asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
-                             "'In Commissioning Mode' subtype PTR record service name must be equal to the SRV record service name.")
+        # Verify that there is one, and only one, 'In Commissioning Mode Subtype' PTR record
+        asserts.assert_equal(len(ptr_records), 1, "There must only be one 'In Commissioning Mode Subtype' subtype PTR record.")
+        cm_ptr = ptr_records[0]
+
+        # Verify that the 'In Commissioning Mode Subtype' PTR record's instance name
+        # is equal to the 'Long Discriminator Subtype' PTR record's instance name.
+        asserts.assert_equal(cm_ptr.instance_name, long_discriminator_ptr_instance_name,
+                             "'In Commissioning Mode Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
         # *** VENDOR SUBTYPE ***
-        # If the Vendor subtype is present, validate it's a 16-bit variable
-        # length decimal number in ASCII text, omitting any leading zeros
+        # Check for the presence of the 'Vendor Subtype'
         vendor_subtype = next((s for s in subtypes if s.startswith('_V')), None)
+
+        # If present:
         if vendor_subtype:
+            # Verify that it's a 16-bit variable length decimal
+            # number in ASCII text, omitting any leading zeros
             assert_valid_vendor_subtype(vendor_subtype)
 
-            # If the Vendor subtype PTR record is present, verify that its
+            # If the 'Vendor Subtype' PTR record is present, verify that its
             # 'service_name' is the same as the SRV record's 'service_name'
+
+            # TH performs a PTR record query against the 'Vendor Subtype'
             ptr_records = await MdnsDiscovery().get_ptr_records(
                 service_types=[vendor_subtype],
                 log_output=True
             )
+
+            # If present:
             if len(ptr_records) > 0:
-                asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
-                                     "Vendor subtype PTR record service name must be equal to the SRV record service name.")
+                # Verify that the 'Vendor Subtype' PTR record's instance name
+                # is equal to the 'Long Discriminator Subtype' PTR record's instance name.
+                vendor_subtype_ptr = ptr_records[0]
+                asserts.assert_equal(vendor_subtype_ptr.instance_name, long_discriminator_ptr_instance_name,
+                                    "'Vendor Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
         # *** DEVTYPE SUBTYPE ***
-        # If the Devtype subtype is present, validate it's a 32-bit variable
-        # length decimal number in ASCII text, omitting any leading zeros
+        # Check for the presence of the 'Devtype Subtype'
         devtype_subtype = next((s for s in subtypes if s.startswith('_T')), None)
+
+        # If present:
         if devtype_subtype:
+            # Verify that it's a 32-bit variable length decimal
+            # number in ASCII text, omitting any leading zeros
             assert_valid_devtype_subtype(devtype_subtype)
 
-            # If the Devtype subtype PTR record is present, verify that the its
+            # If the 'Devtype Subtype' PTR record is present, verify that its
             # 'service_name' is the same as the SRV record's 'service_name'
+
+            # TH performs a PTR record query against the 'Devtype Subtype'
             ptr_records = await MdnsDiscovery().get_ptr_records(
                 service_types=[devtype_subtype],
                 log_output=True
             )
-            if len(ptr_records) > 0:
-                asserts.assert_equal(ptr_records[0].service_name, srv_service_name,
-                                     "Devtype subtype PTR record service name must be equal to the SRV record service name.")
 
-    async def _verify_txt_record_keys(self, service_name: str, expected_cm: str) -> None:
+            # If present:
+            if len(ptr_records) > 0:
+                # Verify that the 'Devtype Subtype' PTR record's instance name
+                # is equal to the 'Long Discriminator Subtype' PTR record's instance name.
+                devtype_subtype_ptr = ptr_records[0]
+                asserts.assert_equal(devtype_subtype_ptr.instance_name, long_discriminator_ptr_instance_name,
+                                    "'Devtype Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
+
+    async def _verify_txt_record_keys(self, long_discriminator_ptr_instance_name: str, expected_cm: str) -> None:
         # TH performs a TXT record query against the 'Commissionable Service' service name
         # The device may omit the TXT record if there are no mandatory TXT keys
         txt_record = await MdnsDiscovery().get_txt_record(
-            service_name=service_name,
+            service_name=f"{long_discriminator_ptr_instance_name}.{MdnsServiceType.COMMISSIONABLE.value}",
             service_type=MdnsServiceType.COMMISSIONABLE.value,
             log_output=True
         )
@@ -354,6 +374,11 @@ class TC_SC_4_1(MatterBaseTest):
 
         # If the TXT record is returned, verify the TXT keys
         if txt_record_returned:
+
+            # Verify that the TXT record's instance name is equal to the
+            # 'Long Discriminator Subtype' PTR record's instance name.
+            asserts.assert_equal(txt_record.instance_name, long_discriminator_ptr_instance_name,
+                                "TXT record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
             # *** ICD KEY ***
             icd_key: str | None = None
@@ -531,13 +556,13 @@ class TC_SC_4_1(MatterBaseTest):
             logging.info("TXT record NOT required.")
 
     @staticmethod
-    async def _verify_aaaa_records(srv_record) -> None:
+    async def _verify_aaaa_records(srv_hostname: str) -> None:
         # TH performs a AAAA record query against the target 'hostname'
         # listed in the Commissionable Service SRV record
-        quada_records = await MdnsDiscovery().get_quada_records(hostname=srv_record.hostname, log_output=True)
+        quada_records = await MdnsDiscovery().get_quada_records(hostname=srv_hostname, log_output=True)
 
         # Verify that at least 1 AAAA record is returned for each IPv6 a address
-        asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{srv_record.hostname}'")
+        asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{srv_hostname}'")
 
         # Verify the AAAA records contain a valid IPv6 address
         ipv6_addresses = [f"{r.address}%{r.interface}" for r in quada_records]
@@ -619,23 +644,20 @@ class TC_SC_4_1(MatterBaseTest):
                 timedRequestTimeoutMs=6000
             )
 
-            # TH performs a browse for the 'Commissionable Service' PTR record of type '_matterc._udp.local.'
-            commissionable_service_ptr = await self.get_commissionable_service_ptr_record()
-
-            # Verify PTR record is returned
-            asserts.assert_is_not_none(commissionable_service_ptr, "DUT's 'Commissionable Service' must be present.")
-
-            # Verify SRV record advertisements
-            srv_record = await self._get_verify_srv_record(commissionable_service_ptr.service_name)
+            # Get the 'Long Discriminator Subtype' PTR record's instance name
+            long_discriminator_ptr_instance_name = await self._get_verify_long_discriminator_subtype_ptr_instance_name()
 
             # Verify commissionable subtype advertisements
-            await self._verify_commissionable_subtypes(srv_record.service_name)
+            await self._verify_commissionable_subtypes(long_discriminator_ptr_instance_name)
+
+            # Verify SRV record advertisements
+            srv_hostname = await self._get_verify_srv_record(long_discriminator_ptr_instance_name)
 
             # Verify TXT record keys advertisements
-            await self._verify_txt_record_keys(commissionable_service_ptr.service_name, expected_cm="1")
+            await self._verify_txt_record_keys(long_discriminator_ptr_instance_name, expected_cm="1")
 
             # Verify AAAA records
-            await self._verify_aaaa_records(srv_record)
+            await self._verify_aaaa_records(srv_hostname)
 
             # Close commissioning window
             await self.close_commissioning_window()
@@ -654,23 +676,20 @@ class TC_SC_4_1(MatterBaseTest):
             option=1
         )
 
-        # TH performs a browse for the 'Commissionable Service' PTR record of type '_matterc._udp.local.'
-        commissionable_service_ptr = await self.get_commissionable_service_ptr_record()
-
-        # Verify PTR record is returned
-        asserts.assert_is_not_none(commissionable_service_ptr, "DUT's commissionable node services not present")
-
-        # Verify SRV record advertisements
-        srv_record = await self._get_verify_srv_record(commissionable_service_ptr.service_name)
+        # Get the 'Long Discriminator Subtype' PTR record's instance name
+        long_discriminator_ptr_instance_name = await self._get_verify_long_discriminator_subtype_ptr_instance_name()
 
         # Verify commissionable subtype advertisements
-        await self._verify_commissionable_subtypes(srv_record.service_name)
+        await self._verify_commissionable_subtypes(long_discriminator_ptr_instance_name)
+
+        # Verify SRV record advertisements
+        srv_hostname = await self._get_verify_srv_record(long_discriminator_ptr_instance_name)
 
         # Verify TXT record keys advertisements
-        await self._verify_txt_record_keys(commissionable_service_ptr.service_name, expected_cm="2")
+        await self._verify_txt_record_keys(long_discriminator_ptr_instance_name, expected_cm="2")
 
         # Verify AAAA records
-        await self._verify_aaaa_records(srv_record)
+        await self._verify_aaaa_records(srv_hostname)
 
         # Close commissioning window
         await self.close_commissioning_window()
@@ -686,17 +705,20 @@ class TC_SC_4_1(MatterBaseTest):
         logging.info(f"DUT Extended Discovery mode active: {extended_discovery_mode}")
 
         if extended_discovery_mode:
-            # Verify SRV record advertisements
-            srv_record = await self._get_verify_srv_record(commissionable_service_ptr.service_name)
+            # Get the 'Long Discriminator Subtype' PTR record's instance name
+            long_discriminator_ptr_instance_name = await self._get_verify_long_discriminator_subtype_ptr_instance_name()
 
             # Verify commissionable subtype advertisements
-            await self._verify_commissionable_subtypes(srv_record.service_name)
+            await self._verify_commissionable_subtypes(long_discriminator_ptr_instance_name)
+
+            # Verify SRV record advertisements
+            srv_hostname = await self._get_verify_srv_record(long_discriminator_ptr_instance_name)
 
             # Verify TXT record keys advertisements
-            await self._verify_txt_record_keys(commissionable_service_ptr.service_name, expected_cm="0")
+            await self._verify_txt_record_keys(long_discriminator_ptr_instance_name, expected_cm="0")
 
             # Verify AAAA records
-            await self._verify_aaaa_records(srv_record)
+            await self._verify_aaaa_records(srv_hostname)
 
 
 if __name__ == "__main__":
