@@ -42,10 +42,11 @@ from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_valid_cm_key,
                                           assert_valid_commissionable_instance_name, assert_valid_d_key,
                                           assert_valid_devtype_subtype, assert_valid_dn_key, assert_valid_dt_key,
-                                          assert_valid_hostname, assert_valid_icd_key, assert_valid_long_discriminator_subtype,
-                                          assert_valid_ph_key, assert_valid_pi_key, assert_valid_ri_key, assert_valid_sai_key,
-                                          assert_valid_sat_key, assert_valid_short_discriminator_subtype, assert_valid_sii_key,
-                                          assert_valid_t_key, assert_valid_vendor_subtype, assert_valid_vp_key, assert_valid_ipv6_addresses)
+                                          assert_valid_hostname, assert_valid_icd_key, assert_valid_ipv6_addresses,
+                                          assert_valid_long_discriminator_subtype, assert_valid_ph_key, assert_valid_pi_key,
+                                          assert_valid_ri_key, assert_valid_sai_key, assert_valid_sat_key,
+                                          assert_valid_short_discriminator_subtype, assert_valid_sii_key, assert_valid_t_key,
+                                          assert_valid_vendor_subtype, assert_valid_vp_key)
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -552,7 +553,7 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Verify the AAAA records contain a valid IPv6 address
         ipv6_addresses = [f"{r.address}%{r.interface}" for r in quada_records]
-        assert_valid_ipv6_addresses(ipv6_addresses)        
+        assert_valid_ipv6_addresses(ipv6_addresses)
 
     async def close_commissioning_window(self) -> None:
         revoke_cmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
