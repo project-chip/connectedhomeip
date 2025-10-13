@@ -317,7 +317,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                              "Incorrect event type")
         asserts.assert_equal(event.zone, zoneID1, "Unexpected zoneID on ZoneTriggered")
         asserts.assert_equal(event.reason, enums.ZoneEventTriggeredReasonEnum.kMotion, "Unexpected reason on ZoneTriggered")
-        
+
         self.step(8)
         time.sleep(1)
         cmd = pvcluster.Commands.ModifyPushTransport(
@@ -329,7 +329,6 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_true(
             status == Status.Success,
             "DUT responds with SUCCESS status code.")
-        
 
 
 if __name__ == "__main__":
