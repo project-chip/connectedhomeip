@@ -140,7 +140,6 @@ public:
     void OnTriggerDeactivated(uint8_t fabricIdx, uint8_t sessionGroup, uint16_t connectionID);
 
 private:
-
     MediaController * mMediaController                         = nullptr;
     CameraDeviceInterface * mCameraDevice                      = nullptr;
     PushAvStreamTransportServer * mPushAvStreamTransportServer = nullptr;
