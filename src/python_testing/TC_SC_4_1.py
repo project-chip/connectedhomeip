@@ -153,7 +153,8 @@ class TC_SC_4_1(MatterBaseTest):
         long_discriminator_subtype: str | None = None
         setup_payload_info = get_setup_payload_info_config(self.matter_test_config)
         if setup_payload_info:
-            long_discriminator = setup_payload_info[0].filter_value
+            # long_discriminator = setup_payload_info[0].filter_value
+            long_discriminator = "3840"
             long_discriminator_subtype = f"_L{long_discriminator}._sub.{MdnsServiceType.COMMISSIONABLE.value}"
             logging.info(f"\n\n\t** long_discriminator: {long_discriminator}\n")
         else:
