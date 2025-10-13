@@ -69,117 +69,118 @@ ROOT_NODE_ENDPOINT_ID = 0
 class TC_SC_4_1(MatterBaseTest):
 
     def steps_TC_SC_4_1(self):
-        return [# DUT DETAILS
-                # 
-                TestStep(1, "DUT is commissioned.", is_commissioning=True),
+        return [
+            # DUT DETAILS
+            # 
+            TestStep(1, "DUT is commissioned.", is_commissioning=True),
 
-                TestStep(2, """Check if the ICD Management cluster is present""",
-                         """TH reads from the DUT the ServerList attribute from the Descriptor cluster on EP0
-                                - If the ICD Management cluster ID (70,0x46) is present in the list, set supports_icd to True, otherwise set supports_icd to False
-                                - If supports_icd is true
-                                    - TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold_ms"""),
+            TestStep(2, """Check if the ICD Management cluster is present""",
+                        """TH reads from the DUT the ServerList attribute from the Descriptor cluster on EP0
+                            - If the ICD Management cluster ID (70,0x46) is present in the list, set supports_icd to True, otherwise set supports_icd to False
+                            - If supports_icd is true
+                                - TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold_ms"""),
 
-                TestStep(3, """Check if the LITS (Long Idle Time Support) feature is supported""",
-                         """If supports_icd is True:
-                                - TH reads the FeatureMap attribute from the ICD Management cluster on EP0
-                                    - If the LITS feature is set:
-                                        - Set supports_lit to True, otherwise, set supports_lit to False"""),
+            TestStep(3, """Check if the LITS (Long Idle Time Support) feature is supported""",
+                        """If supports_icd is True:
+                            - TH reads the FeatureMap attribute from the ICD Management cluster on EP0
+                                - If the LITS feature is set:
+                                    - Set supports_lit to True, otherwise, set supports_lit to False"""),
 
-                TestStep(4, """Check if the DUT supports TCP""",
-                         """If supported:
-                                - Set supports_tcp to True, otherwise, set supports_tcp to False"""),
+            TestStep(4, """Check if the DUT supports TCP""",
+                        """If supported:
+                            - Set supports_tcp to True, otherwise, set supports_tcp to False"""),
 
-                TestStep(5, """Check if DUT supports Open Basic Commissioning Window""",
-                         """If supported:
-                                - Set supports_obcw to True, otherwise, set supports_obcw to False"""),
+            TestStep(5, """Check if DUT supports Open Basic Commissioning Window""",
+                        """If supported:
+                            - Set supports_obcw to True, otherwise, set supports_obcw to False"""),
 
-                # OPEN BASIC COMMISSIONING WINDOW
-                # 
-                TestStep(6, """If supports_obcw is True, DUT is put in Commissioning Mode using Open Basic Commissioning Window command""",
-                         """DUT starts advertising Commissionable Node Discovery service through DNS-SD"""),
+            # OPEN BASIC COMMISSIONING WINDOW
+            # 
+            TestStep(6, """If supports_obcw is True, DUT is put in Commissioning Mode using Open Basic Commissioning Window command""",
+                        """DUT starts advertising Commissionable Node Discovery service through DNS-SD"""),
 
-                TestStep(7, """Get the 'Long Discriminator Subtype' PTR record's instance name""",
-                         """TH constructs the 'Long Discriminator Subtype' using the DUT's 'Long Discriminator'
-                                - Verify that it contains a valid 12-bit variable length decimal number in ASCII text, omitting any leading zeros 'Long Discriminator' value
-                            TH performs a PTR record query against the 'Long Discriminator Subtype' _L
-                                - Verify that there is one, and only one, 'Long Discriminator Subtype' PTR record
-                                - Save the 'Long Discriminator Subtype' PTR record's instance name as 'long_discriminator_subtype_ptr_instance_name'"""),
+            TestStep(7, """Get the 'Long Discriminator Subtype' PTR record's instance name""",
+                        """TH constructs the 'Long Discriminator Subtype' using the DUT's 'Long Discriminator'
+                            - Verify that it contains a valid 12-bit variable length decimal number in ASCII text, omitting any leading zeros 'Long Discriminator' value
+                        TH performs a PTR record query against the 'Long Discriminator Subtype' _L
+                            - Verify that there is one, and only one, 'Long Discriminator Subtype' PTR record
+                            - Save the 'Long Discriminator Subtype' PTR record's instance name as 'long_discriminator_subtype_ptr_instance_name'"""),
 
-                TestStep(8, """Verify commissionable subtype advertisements""",
-                         """See the 'Commissionable Subtypes Verifications' table in the Notes/Testing considerations
-                         section of the Test Plan for the list of verifications to be performed"""),
+            TestStep(8, """Verify commissionable subtype advertisements""",
+                        """See the 'Commissionable Subtypes Verifications' table in the Notes/Testing considerations
+                        section of the Test Plan for the list of verifications to be performed"""),
 
-                TestStep(9, """VVerify SRV record advertisements""",
-                         """See the 'SRV Record Verifications' table in the Notes/Testing considerations
-                         section of the Test Plan for the list of verifications to be performed"""),
+            TestStep(9, """VVerify SRV record advertisements""",
+                        """See the 'SRV Record Verifications' table in the Notes/Testing considerations
+                        section of the Test Plan for the list of verifications to be performed"""),
 
-                TestStep(10, """Verify TXT record advertisements""",
-                         """See the 'TXT Record Verifications' table in the Notes/Testing considerations
-                         section of the Test Plan for the list of verifications to be performed. Expected CM TXT key value = 1"""),
+            TestStep(10, """Verify TXT record advertisements""",
+                        """See the 'TXT Record Verifications' table in the Notes/Testing considerations
+                        section of the Test Plan for the list of verifications to be performed. Expected CM TXT key value = 1"""),
 
-                TestStep(11, """Verify AAAA records""",
-                         """See the 'AAAA Record Verifications' table in the Notes/Testing considerations
-                         section of the Test Plan for the list of verifications to be performed"""),
+            TestStep(11, """Verify AAAA records""",
+                        """See the 'AAAA Record Verifications' table in the Notes/Testing considerations
+                        section of the Test Plan for the list of verifications to be performed"""),
 
-                TestStep(12, """Close commissioning window""",
-                         """DUT stops advertising Commissionable Node Discovery services"""),
+            TestStep(12, """Close commissioning window""",
+                        """DUT stops advertising Commissionable Node Discovery services"""),
 
-                # OPEN COMISSIONING WINDOW
-                # 
-                TestStep(13, """DUT is put in Commissioning Mode using Open Commissioning Window command""",
-                         """DUT starts advertising Commissionable Node Discovery service through DNS-SD"""),
+            # OPEN COMISSIONING WINDOW
+            # 
+            TestStep(13, """DUT is put in Commissioning Mode using Open Commissioning Window command""",
+                        """DUT starts advertising Commissionable Node Discovery service through DNS-SD"""),
 
-                TestStep(14, """Get the 'Long Discriminator Subtype' PTR record's instance name""",
-                         """TH constructs the 'Long Discriminator Subtype' using the DUT's 'Long Discriminator'
-                                - Verify that it contains a valid 12-bit variable length decimal number in ASCII text, omitting any leading zeros 'Long Discriminator' value
-                            TH performs a PTR record query against the 'Long Discriminator Subtype' _L
-                                - Verify that there is one, and only one, 'Long Discriminator Subtype' PTR record
-                                - Save the 'Long Discriminator Subtype' PTR record's instance name as 'long_discriminator_subtype_ptr_instance_name'"""),
+            TestStep(14, """Get the 'Long Discriminator Subtype' PTR record's instance name""",
+                        """TH constructs the 'Long Discriminator Subtype' using the DUT's 'Long Discriminator'
+                            - Verify that it contains a valid 12-bit variable length decimal number in ASCII text, omitting any leading zeros 'Long Discriminator' value
+                        TH performs a PTR record query against the 'Long Discriminator Subtype' _L
+                            - Verify that there is one, and only one, 'Long Discriminator Subtype' PTR record
+                            - Save the 'Long Discriminator Subtype' PTR record's instance name as 'long_discriminator_subtype_ptr_instance_name'"""),
 
-                TestStep(15, """Verify commissionable subtype advertisements""",
-                         """See the 'Commissionable Subtypes Verifications' table in the Notes/Testing considerations
-                         section of the Test Plan for the list of verifications to be performed"""),
+            TestStep(15, """Verify commissionable subtype advertisements""",
+                        """See the 'Commissionable Subtypes Verifications' table in the Notes/Testing considerations
+                        section of the Test Plan for the list of verifications to be performed"""),
 
-                TestStep(16, """VVerify SRV record advertisements""",
-                         """See the 'SRV Record Verifications' table in the Notes/Testing considerations
-                         section of the Test Plan for the list of verifications to be performed"""),
+            TestStep(16, """VVerify SRV record advertisements""",
+                        """See the 'SRV Record Verifications' table in the Notes/Testing considerations
+                        section of the Test Plan for the list of verifications to be performed"""),
 
-                TestStep(17, """Verify TXT record advertisements""",
-                         """See the 'TXT Record Verifications' table in the Notes/Testing considerations
-                         section of the Test Plan for the list of verifications to be performed. Expected CM TXT key value = 2"""),
+            TestStep(17, """Verify TXT record advertisements""",
+                        """See the 'TXT Record Verifications' table in the Notes/Testing considerations
+                        section of the Test Plan for the list of verifications to be performed. Expected CM TXT key value = 2"""),
 
-                TestStep(18, """Verify AAAA records""",
-                         """See the 'AAAA Record Verifications' table in the Notes/Testing considerations
-                         section of the Test Plan for the list of verifications to be performed"""),
+            TestStep(18, """Verify AAAA records""",
+                        """See the 'AAAA Record Verifications' table in the Notes/Testing considerations
+                        section of the Test Plan for the list of verifications to be performed"""),
 
-                TestStep(19, """Close commissioning window""",
-                         """DUT stops advertising Commissionable Node Discovery services"""),
+            TestStep(19, """Close commissioning window""",
+                        """DUT stops advertising Commissionable Node Discovery services"""),
 
-                # EXTENDED DISCOVERY MODE
-                # 
-                TestStep(20, """Check if DUT Extended Discovery mode is active""",
-                         """Get the 'Long Discriminator Subtype' PTR record's instance name
-                                - If the DUT's 'Long Discriminator Subtype' PTR record's instance name is present,
-                                Extended Discovery mode is active, if so, save the 'Long Discriminator Subtype'
-                                PTR record's instance name as 'long_discriminator_subtype_ptr_instance_name'"""),
+            # EXTENDED DISCOVERY MODE
+            # 
+            TestStep(20, """Check if DUT Extended Discovery mode is active""",
+                        """Get the 'Long Discriminator Subtype' PTR record's instance name
+                            - If the DUT's 'Long Discriminator Subtype' PTR record's instance name is present,
+                            Extended Discovery mode is active, if so, save the 'Long Discriminator Subtype'
+                            PTR record's instance name as 'long_discriminator_subtype_ptr_instance_name'"""),
 
-                TestStep(21, """Verify commissionable subtype advertisements""",
-                         """See the 'Commissionable Subtypes Verifications' table in the Notes/Testing considerations
-                         section of the Test Plan for the list of verifications to be performed"""),
+            TestStep(21, """Verify commissionable subtype advertisements""",
+                        """See the 'Commissionable Subtypes Verifications' table in the Notes/Testing considerations
+                        section of the Test Plan for the list of verifications to be performed"""),
 
-                TestStep(22, """VVerify SRV record advertisements""",
-                         """See the 'SRV Record Verifications' table in the Notes/Testing considerations
-                         section of the Test Plan for the list of verifications to be performed"""),
+            TestStep(22, """VVerify SRV record advertisements""",
+                        """See the 'SRV Record Verifications' table in the Notes/Testing considerations
+                        section of the Test Plan for the list of verifications to be performed"""),
 
-                TestStep(23, """Verify TXT record advertisements""",
-                         """See the 'TXT Record Verifications' table in the Notes/Testing considerations
-                         section of the Test Plan for the list of verifications to be performed. Expected
-                         CM TXT key value = 0 or omitted key"""),
+            TestStep(23, """Verify TXT record advertisements""",
+                        """See the 'TXT Record Verifications' table in the Notes/Testing considerations
+                        section of the Test Plan for the list of verifications to be performed. Expected
+                        CM TXT key value = 0 or omitted key"""),
 
-                TestStep(24, """Verify AAAA records""",
-                         """See the 'AAAA Record Verifications' table in the Notes/Testing considerations
-                         section of the Test Plan for the list of verifications to be performed"""),
-                ]
+            TestStep(24, """Verify AAAA records""",
+                        """See the 'AAAA Record Verifications' table in the Notes/Testing considerations
+                        section of the Test Plan for the list of verifications to be performed"""),
+        ]
 
     async def read_attribute(self, attribute: Any) -> Any:
         cluster = Clusters.Objects.IcdManagement
