@@ -95,7 +95,7 @@ void PushAVTransport::ConfigureRecorderTimeSetting(
     mClipInfo.mInitialDurationS      = timeControl.initialDuration;
     mClipInfo.mAugmentationDurationS = timeControl.augmentationDuration;
     mClipInfo.mMaxClipDurationS      = timeControl.maxDuration;
-    mClipInfo.mBlindDurationS        = timeControl.blindDuration; 
+    mClipInfo.mBlindDurationS        = timeControl.blindDuration;
 
     ChipLogDetail(Camera, "PushAVTransport ConfigureRecorderTimeSetting done");
     ChipLogDetail(Camera, "Initial Duration: %d sec", mClipInfo.mInitialDurationS);
