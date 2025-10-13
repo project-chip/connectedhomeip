@@ -617,16 +617,17 @@ void TCPBase::HandleIncomingConnection(const Inet::TCPEndPointHandle & listenEnd
                                        const Inet::IPAddress & peerAddress, uint16_t peerPort)
 {
     TCPBase * tcp = reinterpret_cast<TCPBase *>(listenEndPoint->mAppState);
+    // To handle errors around endpoint in the calls to HandleAcceptError, we must initialize mAppState
+    endPoint->mAppState = tcp;
 
     PeerAddress addr;
     CHIP_ERROR err = GetPeerAddress(*endPoint, addr);
-    VerifyOrReturn(err == CHIP_NO_ERROR, listenEndPoint->OnAcceptError(endPoint, err));
+    VerifyOrReturn(err == CHIP_NO_ERROR, HandleAcceptError(endPoint, err));
     ActiveTCPConnectionState * activeConnection = tcp->AllocateConnection(endPoint, addr);
     if (activeConnection != nullptr)
     {
         auto connectionCleanup = ScopeExit([&]() { activeConnection->Free(); });
 
-        endPoint->mAppState          = listenEndPoint->mAppState;
         endPoint->OnDataReceived     = HandleTCPEndPointDataReceived;
         endPoint->OnDataSent         = nullptr;
         endPoint->OnConnectionClosed = HandleTCPEndPointConnectionClosed;
@@ -652,7 +653,7 @@ void TCPBase::HandleIncomingConnection(const Inet::TCPEndPointHandle & listenEnd
     else
     {
         ChipLogError(Inet, "Insufficient connection space to accept new connections.");
-        listenEndPoint->OnAcceptError(endPoint, CHIP_ERROR_TOO_MANY_CONNECTIONS);
+        HandleAcceptError(endPoint, CHIP_ERROR_TOO_MANY_CONNECTIONS);
     }
 }
 
