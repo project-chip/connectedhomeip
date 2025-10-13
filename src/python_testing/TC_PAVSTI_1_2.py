@@ -243,7 +243,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                     "videoStreamID": videoStreamId,
                     "audioStreamID": audioStreamId,
                     "TLSEndpointID": tlsEndpointId,
-                    "url": f"https://{self.host_ip}:1234/streams/{uploadStreamId}",
+                    "url": f"https://{self.host_ip}:1234/streams/{uploadStreamId}/",
                     "triggerOptions": {"triggerType": pushavCluster.Enums.TransportTriggerTypeEnum.kContinuous},
                     "ingestMethod": pushavCluster.Enums.IngestMethodsEnum.kCMAFIngest,
                     "containerFormat": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
