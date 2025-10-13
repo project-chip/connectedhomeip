@@ -798,6 +798,8 @@ class TC_SC_4_1(MatterBaseTest):
             # Verify AAAA records
             self.step(24)
             await self._verify_aaaa_records(srv_hostname)
+        else:
+            self.mark_step_range_skipped(21, 24)
 
 
 if __name__ == "__main__":
