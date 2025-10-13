@@ -164,7 +164,7 @@ class TC_SC_4_1(MatterBaseTest):
             log_output=True
         )
 
-        if must_be_present:
+        if must_be_present or ptr_records:
             # Verify that there is one, and only one, 'Long Discriminator Subtype' PTR record
             asserts.assert_equal(len(ptr_records), 1,
                                  f"There must only be one 'Long Discriminator Subtype' ({long_discriminator_subtype}) PTR record, found {len(ptr_records)}.")
@@ -269,9 +269,9 @@ class TC_SC_4_1(MatterBaseTest):
                 asserts.assert_equal(devtype_subtype_ptr.instance_name, long_discriminator_ptr_instance_name,
                                      "'Devtype Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
-    # TODO: update in test plan
     async def _get_verify_srv_record(self, long_discriminator_ptr_instance_name: str) -> str:
-        # TH performs a SRV record query against the 'Long Discriminator Subtype' PTR record's instance name
+        # TH performs a 'Commissionable Service' SRV record query
+        # against 'long_discriminator_subtype_ptr_instance_name'
         srv_record = await MdnsDiscovery().get_srv_record(
             service_name=f"{long_discriminator_ptr_instance_name}.{MdnsServiceType.COMMISSIONABLE.value}",
             service_type=MdnsServiceType.COMMISSIONABLE.value,
@@ -281,28 +281,27 @@ class TC_SC_4_1(MatterBaseTest):
         # Verify SRV record is returned
         asserts.assert_true(srv_record is not None, "SRV record was not returned")
 
-        # Verify that the SRV record's instance name is equal to the
-        # 'Long Discriminator Subtype' PTR record's instance name.
+        # Verify that the SRV record's instance name is equal
+        # to 'long_discriminator_subtype_ptr_instance_name'
         asserts.assert_equal(srv_record.instance_name, long_discriminator_ptr_instance_name,
                              "SRV record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
-        # Verify that the DUT's 'Commissionable Service' SRV record's instance name is a 64-bit
-        # randomly selected ID expressed as a sixteen-char hex string with capital letters
+        # Verify that the DUT's SRV record's instance name is a 64-bit randomly
+        # selected ID expressed as a sixteen-char hex string with capital letters
         assert_valid_commissionable_instance_name(srv_record.instance_name)
 
-        # Verify DUT's 'Commissionable Service' SRV record's service
-        # type is '_matterc._udp' and service domain '.local.'
+        # Verify that the DUT's SRV record's service type
+        # is '_matterc._udp' and service domain '.local.'
         assert_is_commissionable_type(srv_record.service_type)
 
-        # Verify target hostname is derived from the 48bit or 64bit MAC address
-        # expressed as a twelve or sixteen capital letter hex string
+        # Verify that the target hostname is derived from the 48bit or 64bit MAC
+        # address expressed as a twelve or sixteen capital letter hex string
         assert_valid_hostname(srv_record.hostname)
 
         return srv_record.hostname
 
-    # TODO: update in test plan
     async def _verify_txt_record_keys(self, long_discriminator_ptr_instance_name: str, expected_cm: str) -> None:
-        # TH performs a TXT record query against the 'Long Discriminator Subtype' PTR record's instance name
+        # TH performs a 'Commissionable Service' TXT record query against 'long_discriminator_subtype_ptr_instance_name'
         # The device may omit the TXT record if there are no mandatory TXT keys
         txt_record = await MdnsDiscovery().get_txt_record(
             service_name=f"{long_discriminator_ptr_instance_name}.{MdnsServiceType.COMMISSIONABLE.value}",
@@ -316,11 +315,10 @@ class TC_SC_4_1(MatterBaseTest):
         asserts.assert_true((not txt_record_required) or txt_record_returned,
                             "TXT record is required and was not returned or contains no values")
 
-        # If the TXT record is returned, verify the TXT keys
+        # If the TXT record is returned, verify its TXT keys
         if txt_record_returned:
 
-            # Verify that the TXT record's instance name is equal to the
-            # 'Long Discriminator Subtype' PTR record's instance name.
+            # Verify that the TXT record's instance name is equal to 'long_discriminator_subtype_ptr_instance_name'
             asserts.assert_equal(txt_record.instance_name, long_discriminator_ptr_instance_name,
                                  "TXT record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
@@ -537,13 +535,13 @@ class TC_SC_4_1(MatterBaseTest):
     @staticmethod
     async def _verify_aaaa_records(srv_hostname: str) -> None:
         # TH performs a AAAA record query against the target 'hostname'
-        # listed in the Commissionable Service SRV record
+        # listed in the 'Commissionable Service' SRV record
         quada_records = await MdnsDiscovery().get_quada_records(hostname=srv_hostname, log_output=True)
 
         # Verify that at least 1 AAAA record is returned for each IPv6 a address
         asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{srv_hostname}'")
 
-        # Verify the AAAA records contain a valid IPv6 address
+        # Verify that each AAAA record contains a valid IPv6 address
         ipv6_addresses = [f"{r.address}%{r.interface}" for r in quada_records]
         assert_valid_ipv6_addresses(ipv6_addresses)
 
@@ -613,7 +611,7 @@ class TC_SC_4_1(MatterBaseTest):
         # *** STEP 6 ***
         # If 'supports_obcw' is True DUT is put in Commissioning
         # Mode using **Open Basic Commissioning Window** command
-        #   - DUT starts advertising Commissionable Node Discovery service through DNS-SD
+        #   - DUT starts advertising Commissionable Node Discovery services
         self.step(6)
         if supports_obcw:
             logging.info("\n\n\t ** Open Basic Commissioning Window supported\n")
@@ -627,13 +625,13 @@ class TC_SC_4_1(MatterBaseTest):
             # Get the 'Long Discriminator Subtype' PTR record's instance name
             long_discriminator_ptr_instance_name = await self._get_verify_long_discriminator_subtype_ptr_instance_name()
 
-            # Verify commissionable subtype advertisements  
+            # Verify commissionable subtype advertisements
             await self._verify_commissionable_subtypes(long_discriminator_ptr_instance_name)
 
             # Verify SRV record advertisements
             srv_hostname = await self._get_verify_srv_record(long_discriminator_ptr_instance_name)
 
-            # Verify TXT record keys advertisements
+            # Verify TXT record advertisements
             await self._verify_txt_record_keys(long_discriminator_ptr_instance_name, expected_cm="1")
 
             # Verify AAAA records
@@ -645,8 +643,8 @@ class TC_SC_4_1(MatterBaseTest):
             logging.info("\n\n\t ** Open Basic Commissioning Window unsupported, skipping step.\n")
 
         # *** STEP 7 ***
-        # DUT is put in Commissioning Mode using Open Commissioning Window command and
-        # starts advertising Commissionable Node Discovery service through DNS-SD
+        # DUT is put in Commissioning Mode using Open Commissioning Window command
+        #   - DUT starts advertising Commissionable Node Discovery services
         self.step(7)
         await self.default_controller.OpenCommissioningWindow(
             nodeid=self.dut_node_id,
