@@ -312,7 +312,8 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_equal(type(event), Clusters.ZoneManagement.Events.ZoneTriggered,
                              "Incorrect event type")
         asserts.assert_equal(event.zone, zoneID1, "Unexpected zoneID on ZoneTriggered")
-        asserts.assert_equal(event.reason, Clusters.ZoneManagement.Enums.ZoneEventTriggeredReasonEnum.kMotion, "Unexpected reason on ZoneTriggered")
+        asserts.assert_equal(event.reason, Clusters.ZoneManagement.Enums.ZoneEventTriggeredReasonEnum.kMotion,
+                             "Unexpected reason on ZoneTriggered")
 
 
 if __name__ == "__main__":
