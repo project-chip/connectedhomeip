@@ -185,12 +185,18 @@ InteractionModelEngine::InteractionModelEngine() : mReportingEngine(this) {}
 InteractionModelEngine * InteractionModelEngine::GetInstance()
 {
     return &sInteractionModelEngine.get();
-    // Validation happens before we decode or dispatch command payloads. The flow intentionally mirrors the logic used by the generated data-model provider so that we only ever resolve command metadata once:
-    //   1. `CheckCommandExistence` asks the active data-model provider for an `AcceptedCommandEntry`.  `CodegenDataModelProvider` caches the most recent lookup and returns the same entry that `InvokeCommand` will later reuse for dispatch.  This avoids duplicate registry/metadata traversals and keeps privilege data consistent.
-    //   2. `CheckCommandAccess` enforces ACL/privilege requirements derived from that entry.  By relying on the provider’s metadata we ensure the privilege used here matches what the generated handler expects.
-    //   3. `CheckCommandFlags` validates timed / fabric-scoped / payload-size constraints that were also computed by the provider so any change to generated metadata automatically applies to both validation and dispatch.
+    // Validation happens before we decode or dispatch command payloads. The flow intentionally mirrors the logic used by the
+    // generated data-model provider so that we only ever resolve command metadata once:
+    //   1. `CheckCommandExistence` asks the active data-model provider for an `AcceptedCommandEntry`.  `CodegenDataModelProvider`
+    //   caches the most recent lookup and returns the same entry that `InvokeCommand` will later reuse for dispatch.  This avoids
+    //   duplicate registry/metadata traversals and keeps privilege data consistent.
+    //   2. `CheckCommandAccess` enforces ACL/privilege requirements derived from that entry.  By relying on the provider’s metadata
+    //   we ensure the privilege used here matches what the generated handler expects.
+    //   3. `CheckCommandFlags` validates timed / fabric-scoped / payload-size constraints that were also computed by the provider
+    //   so any change to generated metadata automatically applies to both validation and dispatch.
     //
-    // Should any other code want to modify the command validation policy, it must do so via the provider or these helper functions so that pre-dispatch validation and the eventual dispatch path remain in lock-step.
+    // Should any other code want to modify the command validation policy, it must do so via the provider or these helper functions so that pre-dispatch
+    // validation and the eventual dispatch path remain in lock-step.
 }
 
 CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
