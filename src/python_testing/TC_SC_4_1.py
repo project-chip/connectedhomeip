@@ -143,9 +143,9 @@ class TC_SC_4_1(MatterBaseTest):
     async def _get_verify_long_discriminator_subtype_ptr_instance_name(self, must_be_present: bool = True) -> Optional[str]:
 
         # Temp
-        print(f"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+        print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
         await MdnsDiscovery().get_commissionable_subtypes(log_output=True)
-        print(f"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+        print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 
         # TH constructs the 'Long Discriminator Subtype'
         # using the DUT's 'Long Discriminator'
