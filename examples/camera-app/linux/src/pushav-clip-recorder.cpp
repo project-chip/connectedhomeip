@@ -19,10 +19,15 @@
 #include "pushav-clip-recorder.h"
 #include <cstring>
 #include <dirent.h>
+#include <fstream>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <push-av-stream-manager.h>
+#include <regex>
 #include <sys/stat.h>
+
+constexpr int kSegmentIdOffset       = 1000;
+constexpr int kMPDDefaultStartNumber = 1001;
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -62,12 +67,17 @@ PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStru
     mDeinitializeRecorder = false;
     mUploadedInitSegment  = true;
     mUploadMPD            = false;
-    mUploadSegmentID      = 1001;
+    mUploadSegmentID      = 0001;
     mCurrentClipStartPts  = AV_NOPTS_VALUE;
     mFoundFirstIFramePts  = -1;
     currentPts            = AV_NOPTS_VALUE;
+
+    mVideoInfo.mVideoStreamIndex = -1;
+    mAudioInfo.mAudioStreamIndex = -1;
+
     if (mClipInfo.mHasAudio && mClipInfo.mHasVideo)
     {
+        ChipLogDetail(Camera, "Both audio and video streams are active. Only one stream at a time is supported currently.");
         mClipInfo.mHasAudio = false;
     }
     if (mClipInfo.mHasVideo)
@@ -76,7 +86,7 @@ PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStru
     }
     if (mClipInfo.mHasAudio)
     {
-        mAudioInfo.mAudioStreamIndex = streamIndex;
+        mAudioInfo.mAudioStreamIndex = streamIndex++;
     }
     SetRecorderStatus(false); // Start off as not running
     ChipLogProgress(Camera, "PushAVClipRecorder initialized with sessionID: %lu Track name: %s, output path: %s",
@@ -398,12 +408,6 @@ void PushAVClipRecorder::PushPacket(const uint8_t * data, size_t size, bool isVi
         return;
     }
 
-    if ((!mClipInfo.mHasAudio && !isVideo) || (!mClipInfo.mHasVideo && isVideo))
-    {
-        // Drop packet as we are not interested in this stream
-        return;
-    }
-
     AVPacket * packet = CreatePacket(data, static_cast<int>(size), isVideo);
     if (!packet)
     {
@@ -651,7 +655,7 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
         }
 
         std::string initSegName  = mClipInfo.mTrackName + "/" + mClipInfo.mTrackName + ".init";
-        std::string mediaSegName = mClipInfo.mTrackName + "/segment_1$Number%03d$.m4s";
+        std::string mediaSegName = mClipInfo.mTrackName + "/segment_$Number%04d$.m4s";
         std::string mpdPrefix    = "session_" + std::to_string(mClipInfo.mSessionNumber) + "/" + mClipInfo.mTrackName;
 
         mInputFormatContext          = avformat_alloc_context();
@@ -779,6 +783,86 @@ void PushAVClipRecorder::CleanupOutput()
     ChipLogProgress(Camera, "Cleanup completed");
 }
 
+std::string RenameSegmentFile(const std::string & originalPath)
+{
+    std::regex segment_regex(R"((.*/segment_)(\d+)(\.m4s))");
+    std::smatch match;
+
+    if (std::regex_match(originalPath, match, segment_regex) && match.size() == 4)
+    {
+        std::string pathPrefix = match[1].str();
+        std::string numberStr  = match[2].str();
+        std::string pathSuffix = match[3].str();
+
+        char * endPtr;
+        long originalNumber = std::strtol(numberStr.c_str(), &endPtr, 10);
+
+        // Check for conversion errors: no digits were converted, or extra characters remain.
+        if (endPtr == numberStr.c_str() || *endPtr != '\0' || originalNumber > INT_MAX || originalNumber < INT_MIN)
+        {
+            ChipLogDetail(Camera, "Invalid segment number format in path %s, not renaming.", originalPath.c_str());
+            return originalPath;
+        }
+
+        int newNumber = static_cast<int>(originalNumber) + kSegmentIdOffset;
+
+        if (newNumber > 9999)
+        {
+            ChipLogDetail(Camera, "Segment %s (new number %d) exceeds 9999, stopping clip recording", originalPath.c_str(),
+                          newNumber);
+            return originalPath;
+        }
+
+        char newPathBuffer[1024];
+        snprintf(newPathBuffer, sizeof(newPathBuffer), "%s%04d%s", pathPrefix.c_str(), newNumber, pathSuffix.c_str());
+        std::string newPath = newPathBuffer;
+
+        if (rename(originalPath.c_str(), newPath.c_str()) == 0)
+        {
+            ChipLogDetail(Camera, "Renamed segment %s to %s", originalPath.c_str(), newPath.c_str());
+            return newPath;
+        }
+        else
+        {
+            ChipLogDetail(Camera, "Failed to rename segment %s to %s: %s", originalPath.c_str(), newPath.c_str(), strerror(errno));
+            return originalPath;
+        }
+    }
+
+    ChipLogDetail(Camera, "Path %s does not match expected segment format, not renaming.", originalPath.c_str());
+    return originalPath;
+}
+
+void UpdateMPDStartNumber(const std::string & mpdPath)
+{
+    std::ifstream file(mpdPath);
+    if (!file)
+    {
+        ChipLogError(Camera, "ERROR: Failed to open MPD file for reading: %s", mpdPath.c_str());
+        return;
+    }
+
+    std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    file.close();
+
+    // Replace startNumber="<digits>" with startNumber="kMPDDefaultStartNumber"
+    std::regex startNumberRegex(R"(startNumber="\d+")");
+    int newStartNumber      = kMPDDefaultStartNumber;
+    std::string replacement = "startNumber=\"" + std::to_string(newStartNumber) + "\"";
+    std::string newContent  = std::regex_replace(content, startNumberRegex, replacement);
+
+    std::ofstream outFile(mpdPath);
+    if (!outFile)
+    {
+        ChipLogError(Camera, "ERROR: Failed to open MPD file for writing: %s", mpdPath.c_str());
+        return;
+    }
+    outFile << newContent;
+    outFile.close();
+
+    ChipLogProgress(Camera, "Successfully updated startNumber to 1001 in MPD file: %s", mpdPath.c_str());
+}
+
 /**
  * @brief Finalizes the current clip and starts a new one.
  *
@@ -797,10 +881,11 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
 
     if (reason || ((clipLengthInPTS >= clipDuration) && (mClipInfo.mTriggerType != 2)))
     {
-        ChipLogDetail(Camera, "Clip record completed, finalizing clip for sessionID: %lu Track name: %s", mClipInfo.mSessionNumber,
-                      mClipInfo.mTrackName.c_str());
+        ChipLogDetail(Camera, "Clip record completed, finalizing clip for sessionID: %lu Track name: %s, Reason: %s",
+                      mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str(),
+                      (reason == 0) ? "End of clip reached" : "Error occurred");
         Stop();
-        mCurrentClipStartPts = currentPts;
+        mCurrentClipStartPts = AV_NOPTS_VALUE;
     }
 
     // Helper function for safe path formatting
@@ -821,8 +906,9 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     std::string segment_path   = make_path(formatTemplate.c_str(), mUploadSegmentID);
     while (FileExists(segment_path) && !FileExists(segment_path + ".tmp"))
     {
-        mUploadMPD = true;
-        CheckAndUploadFile(segment_path);
+        mUploadMPD                       = true;
+        std::string renamed_segment_path = RenameSegmentFile(segment_path);
+        CheckAndUploadFile(renamed_segment_path);
         mUploadSegmentID++;
         segment_path = make_path(formatTemplate.c_str(), mUploadSegmentID);
     }
@@ -834,6 +920,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         if (FileExists(mpd_path) && !FileExists(mpd_path + ".tmp"))
         {
             mUploader->setMPDPath(std::make_pair(mpd_path, mClipInfo.mUrl));
+            UpdateMPDStartNumber(mpd_path);
             CheckAndUploadFile(mpd_path);
             mUploadMPD = false; // Reset flag after successful upload
         }

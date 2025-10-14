@@ -96,6 +96,7 @@ void PushAVTransport::ConfigureRecorderTimeSetting(
     mClipInfo.mAugmentationDurationS = timeControl.augmentationDuration;
     mClipInfo.mMaxClipDurationS      = timeControl.maxDuration;
     mClipInfo.mBlindDurationS        = timeControl.blindDuration;
+    mClipInfo.mElapsedTimeS          = 0;
 
     ChipLogDetail(Camera, "PushAVTransport ConfigureRecorderTimeSetting done");
     ChipLogDetail(Camera, "Initial Duration: %d sec", mClipInfo.mInitialDurationS);
@@ -111,8 +112,12 @@ void PushAVTransport::ConfigureRecorderTimeSetting(
 void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & transportOptions,
                                                 AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams)
 {
-    mClipInfo.mHasAudio    = transportOptions.audioStreamID.HasValue();
-    mClipInfo.mHasVideo    = transportOptions.videoStreamID.HasValue();
+    mClipInfo.mHasAudio = transportOptions.audioStreamID.HasValue();
+    mClipInfo.mHasVideo = transportOptions.videoStreamID.HasValue();
+    if (mClipInfo.mHasAudio && mClipInfo.mHasVideo)
+    {
+        mClipInfo.mHasAudio = false;
+    }
     mClipInfo.mUrl         = std::string(transportOptions.url.data(), transportOptions.url.size());
     mClipInfo.mTriggerType = static_cast<int>(transportOptions.triggerOptions.triggerType);
     if (transportOptions.triggerOptions.maxPreRollLen.HasValue())
@@ -434,6 +439,7 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
         mUploader->Start();
         InitializeRecorder();
 
+        mRecorder->mClipInfo.mElapsedTimeS = 0;
         if (mTransportTriggerType == TransportTriggerTypeEnum::kContinuous)
         {
             mRecorder->mClipInfo.mSessionNumber =
@@ -623,12 +629,9 @@ void PushAVTransport::StartNewSession(uint64_t newSessionID)
     mRecorder.reset();
 
     InitializeRecorder();
-    auto now = std::chrono::steady_clock::now();
-    if (mTransportTriggerType == TransportTriggerTypeEnum::kMotion)
-    {
-        auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(now - mRecorder->mClipInfo.activationTime).count();
-        mRecorder->mClipInfo.mElapsedTimeS = static_cast<uint16_t>(elapsedSeconds);
-    }
+    auto now            = std::chrono::steady_clock::now();
+    auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(now - mRecorder->mClipInfo.activationTime).count();
+    mRecorder->mClipInfo.mElapsedTimeS = static_cast<uint16_t>(elapsedSeconds);
 
     mRecorder->Start();
     mStreaming = true;
