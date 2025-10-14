@@ -67,9 +67,9 @@ TEST(TestBindingTable, TestAdd)
     EXPECT_EQ(table.Add(unusedEntry), CHIP_ERROR_INVALID_ARGUMENT);
     for (uint8_t i = 0; i < Binding::Table::kMaxBindingEntries; i++)
     {
-        EXPECT_EQ(table.Add(Binding::TableEntry(0, i, 0, 0, std::nullopt)), CHIP_NO_ERROR);
+        EXPECT_EQ(table.Add(Binding::TableEntry::ForNode(0, i, 0, 0, std::nullopt)), CHIP_NO_ERROR);
     }
-    EXPECT_EQ(table.Add(Binding::TableEntry(0, 0, 0, 0, std::nullopt)), CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(table.Add(Binding::TableEntry::ForNode(0, 0, 0, 0, std::nullopt)), CHIP_ERROR_NO_MEMORY);
     EXPECT_EQ(table.Size(), Binding::Table::kMaxBindingEntries);
 
     auto iter = table.begin();
@@ -88,7 +88,7 @@ TEST(TestBindingTable, TestRemoveThenAdd)
     Binding::Table table;
     chip::TestPersistentStorageDelegate testStorage;
     table.SetPersistentStorage(&testStorage);
-    EXPECT_EQ(table.Add(Binding::TableEntry(0, 0, 0, 0, std::nullopt)), CHIP_NO_ERROR);
+    EXPECT_EQ(table.Add(Binding::TableEntry::ForNode(0, 0, 0, 0, std::nullopt)), CHIP_NO_ERROR);
     auto iter = table.begin();
     EXPECT_EQ(table.RemoveAt(iter), CHIP_NO_ERROR);
     EXPECT_EQ(iter, table.end());
@@ -96,7 +96,7 @@ TEST(TestBindingTable, TestRemoveThenAdd)
     EXPECT_EQ(table.begin(), table.end());
     for (uint8_t i = 0; i < Binding::Table::kMaxBindingEntries; i++)
     {
-        EXPECT_EQ(table.Add(Binding::TableEntry(0, i, 0, 0, std::nullopt)), CHIP_NO_ERROR);
+        EXPECT_EQ(table.Add(Binding::TableEntry::ForNode(0, i, 0, 0, std::nullopt)), CHIP_NO_ERROR);
     }
     iter = table.begin();
     ++iter;
@@ -108,7 +108,7 @@ TEST(TestBindingTable, TestRemoveThenAdd)
     ++iterCheck;
     EXPECT_EQ(iter, iterCheck);
 
-    EXPECT_EQ(table.Add(Binding::TableEntry(0, 1, 0, 0, std::nullopt)), CHIP_NO_ERROR);
+    EXPECT_EQ(table.Add(Binding::TableEntry::ForNode(0, 1, 0, 0, std::nullopt)), CHIP_NO_ERROR);
     EXPECT_EQ(table.Size(), Binding::Table::kMaxBindingEntries);
     iter = table.begin();
     for (uint8_t i = 0; i < Binding::Table::kMaxBindingEntries - 1; i++)
@@ -134,10 +134,10 @@ TEST(TestBindingTable, TestPersistentStorage)
     Binding::Table table;
     chip::Optional<chip::ClusterId> cluster   = chip::MakeOptional<chip::ClusterId>(static_cast<chip::ClusterId>(UINT16_MAX + 6));
     std::vector<Binding::TableEntry> expected = {
-        Binding::TableEntry(0, 0, 0, 0, std::nullopt),
-        Binding::TableEntry(1, 1, 0, 0, cluster.std_optional()),
-        Binding::TableEntry(2, 2, 0, std::nullopt),
-        Binding::TableEntry(3, 3, 0, cluster.std_optional()),
+        Binding::TableEntry::ForNode(0, 0, 0, 0, std::nullopt),
+        Binding::TableEntry::ForNode(1, 1, 0, 0, cluster.std_optional()),
+        Binding::TableEntry::ForGroup(2, 2, 0, std::nullopt),
+        Binding::TableEntry::ForGroup(3, 3, 0, cluster.std_optional()),
     };
     table.SetPersistentStorage(&testStorage);
     EXPECT_EQ(table.Add(expected[0]), CHIP_NO_ERROR);
@@ -148,7 +148,7 @@ TEST(TestBindingTable, TestPersistentStorage)
 
     // Verify storage untouched if add fails
     testStorage.AddPoisonKey(chip::DefaultStorageKeyAllocator::BindingTableEntry(4).KeyName());
-    EXPECT_NE(table.Add(Binding::TableEntry(4, 4, 0, 0, std::nullopt)), CHIP_NO_ERROR);
+    EXPECT_NE(table.Add(Binding::TableEntry::ForNode(4, 4, 0, 0, std::nullopt)), CHIP_NO_ERROR);
     VerifyRestored(testStorage, expected);
     testStorage.ClearPoisonKeys();
 
