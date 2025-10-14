@@ -74,6 +74,24 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             self.server.terminate()
         super().teardown_class()
 
+    async def privacy_setting_test(self, endpoint, aConnectionID, aTransportStatus):
+        # Write SoftRecordingPrivacyModeEnabled=true and test INVALID_IN_STATE
+        await self.write_single_attribute(
+            attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftRecordingPrivacyModeEnabled(True),
+            endpoint_id=endpoint,
+        )
+        cmd = Clusters.PushAvStreamTransportuster.Commands.SetTransportStatus(
+            connectionID=aConnectionID,
+            transportStatus=not aTransportStatus
+        )
+        status = await self.psvt_set_transport_status(cmd, expected_status=Status.InvalidInState)
+        asserts.assert_true(status == Status.InvalidInState, f"Unexpected response {
+                            status} received on SetTransportStatus with privacy mode enabled")
+        await self.write_single_attribute(
+            attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftRecordingPrivacyModeEnabled(False),
+            endpoint_id=endpoint,
+        )
+
     def steps_TC_PAVST_2_6(self) -> list[TestStep]:
         return [
             TestStep("precondition", "Commissioning, already done", is_commissioning=True),
@@ -99,16 +117,26 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             ),
             TestStep(
                 5,
-                "TH1 sends the SetTransportStatus  command with ConnectionID = aConnectionID.",
-                "DUT responds with SUCCESS status code.",
+                "If privacy is supported and we're setting a status of Active, TH1 sets SoftRecordingPrivacy to True. Then TH1 sends the SetTransportStatus  command with ConnectionID = aConnectionID.",
+                "DUT responds with INVALID_IN_STATE status code.",
             ),
             TestStep(
                 6,
-                "TH1 sends the SetTransportStatus  command with ConnectionID = Null.",
+                "Ensure SoftRecordingPrivacy is False, then TH1 sends the SetTransportStatus  command with ConnectionID = aConnectionID.",
                 "DUT responds with SUCCESS status code.",
             ),
             TestStep(
                 7,
+                "If privacy is supported and we're setting a status of Active, TH1 sets SoftRecordingPrivacy to True. TH1 sends the SetTransportStatus  command with ConnectionID = Null.",
+                "DUT responds with INVALID_IN_STATE status code.",
+            ),
+            TestStep(
+                8,
+                "Ensure SoftRecordingPrivacy is False, then TH1 sends the SetTransportStatus  command with ConnectionID = Null.",
+                "DUT responds with SUCCESS status code.",
+            ),
+            TestStep(
+                9,
                 "TH1 Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT.",
                 "Verify that the TransportStatus is set to !aTransportStatus in the TransportConfiguration corresponding to aConnectionID.",
             )
@@ -153,7 +181,7 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             "AllocatedAudioStreams must not be empty",
         )
 
-        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
+        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )
@@ -167,6 +195,8 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
         aConnectionID = transportConfigs[0].connectionID
         aTransportStatus = transportConfigs[0].transportStatus
+        aTransportOptions = transportConfigs[0].transportOptions
+        aTransportOptions.expiryTime = aTransportOptions.expiryTime + 3
 
         # TH1 sends command
         self.step(3)
@@ -201,26 +231,60 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk, "Expected removal of TH2's fabric to succeed")
 
         self.step(5)
+        aFeatureMap = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.CameraAvStreamManagement, attribute=Clusters.CameraAvStreamManagement.Attributes.FeatureMap
+        )
+        privacySupported = aFeatureMap & Clusters.CameraAvStreamManagement.Bitmaps.Feature.kPrivacy
+
+        if aTransportStatus:
+            # We're setting Inactive -> Active, verify this fails if privacy (any) is set
+            if privacySupported:
+                self.privacy_setting_test(endpoint, aConnectionID, aTransportStatus)
+
+        self.step(6)
         cmd = pvcluster.Commands.SetTransportStatus(
             connectionID=aConnectionID,
             transportStatus=not aTransportStatus
         )
         status = await self.psvt_set_transport_status(cmd)
-        asserts.assert_true(
-            status == Status.Success,
-            "DUT responds with SUCCESS status code.")
-
-        self.step(6)
-        cmd = pvcluster.Commands.SetTransportStatus(
-            connectionID=Nullable(),
-            transportStatus=not aTransportStatus
+        cmd = pvcluster.Commands.ModifyPushTransport(
+            connectionID=aConnectionID,
+            transportOptions=aTransportOptions,
         )
-        status = await self.psvt_set_transport_status(cmd)
+        # Transport Status is now active, if upload started and its in progress then ModifyPushTransport would check for Busy Transport Status
+        status1 = await self.psvt_modify_push_transport(cmd)
+        asserts.assert_true(
+            status1 == Status.Success,
+            "DUT responds with SUCCESS status code.")
         asserts.assert_true(
             status == Status.Success,
             "DUT responds with SUCCESS status code.")
 
         self.step(7)
+        if aTransportStatus:
+            # We're setting Inactive -> Active, verify this fails if privacy (any) is set
+            if privacySupported:
+                self.privacy_setting_test(endpoint, aConnectionID, aTransportStatus)
+
+        self.step(8)
+        cmd = pvcluster.Commands.SetTransportStatus(
+            connectionID=Nullable(),
+            transportStatus=Clusters.PushAvStreamTransport.Enums.TransportStatusEnum.kInactive
+        )
+        status = await self.psvt_set_transport_status(cmd)
+        cmd = pvcluster.Commands.ModifyPushTransport(
+            connectionID=aConnectionID,
+            transportOptions=aTransportOptions,
+        )
+        status1 = await self.psvt_modify_push_transport(cmd)
+        asserts.assert_true(
+            status1 == Status.Success,
+            "DUT responds with SUCCESS status code.")
+        asserts.assert_true(
+            status == Status.Success,
+            "DUT responds with SUCCESS status code.")
+
+        self.step(9)
         transportConfigs = await self.read_pavst_attribute_expect_success(
             endpoint, pvattr.CurrentConnections
         )
@@ -229,7 +293,7 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
         asserts.assert_true(
             transportConfigs[0].transportStatus
-            == (not aTransportStatus),
+            == (Clusters.PushAvStreamTransport.Enums.TransportStatusEnum.kInactive),
             "Transport Status must be same the modified one",
         )
 
