@@ -194,13 +194,13 @@ uint16_t emberAfFixedEndpointCount();
 
 /**
  * Get semantic tag list associated with the provided endpoint.
- * Returns CHIP_ERROR_NOT_FOUND if the endpoint is invalid.
+ * Result is as an empty Span if the endpoint is invalid.
  * @param endpoint The target endpoint.
  * @param semanticTags The Span of SemanticTagStructs that will point to the tag list.
  */
-CHIP_ERROR
+void
 GetSemanticTagsForEndpoint(chip::EndpointId endpoint,
-                           chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> semanticTags);
+                           chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> & semanticTags);
 
 /**
  * Get the semantic tags of the endpoint.
