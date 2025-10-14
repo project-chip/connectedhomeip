@@ -123,7 +123,7 @@ int soc_pll_config(void)
 
     RSI_CLK_QspiClkConfig(M4CLK, QSPI_INTFPLLCLK, 0, 0, 1);
 #endif /* SWITCH_QSPI_TO_SOC_PLL */
-    return 0;
+    return status;
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 } // namespace
