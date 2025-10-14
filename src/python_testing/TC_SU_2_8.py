@@ -44,7 +44,6 @@
 import asyncio
 import logging
 import re
-from subprocess import run
 
 from mobly import asserts
 from TC_SUTestBase import SoftwareUpdateBaseTest
