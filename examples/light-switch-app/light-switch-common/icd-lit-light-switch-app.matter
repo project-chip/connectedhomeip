@@ -3260,7 +3260,7 @@ endpoint 0 {
     callback attribute operatingMode;
     callback attribute maximumCheckInBackOff;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    callback attribute clusterRevision default = 3;
 
     handle command RegisterClient;
     handle command RegisterClientResponse;
