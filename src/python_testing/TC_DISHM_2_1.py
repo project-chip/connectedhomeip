@@ -161,17 +161,19 @@ class TC_DISHM_2_1(MatterBaseTest):
         # Manually put the device in a state from which it will FAIL to transition to PIXIT.DISHM.MODE_CHANGE_FAIL
         self.step(5)
 
+        # This step prepares the DUT for a negative transition scenario.
+        # The goal is to place the DUT in a state where a subsequent ChangeToMode(newMode=MODE_CHANGE_FAIL)
+        # would fail (e.g. device is busy/incompatible state). On real devices this can be done
+        # manually, in CI the example app does not expose a way to synthesize the internal condition.
+        # Therefore, in CI we do not switch the DUT to mode_fail.
+
         can_test_mode_failure = self.check_pics("DISHM.S.M.CAN_TEST_MODE_FAILURE")
         can_manually_control = self.check_pics("DISHM.S.M.CAN_MANUALLY_CONTROLLED")
         if can_test_mode_failure and can_manually_control:
             asserts.assert_true(self.mode_fail in modes,
                                 f"The MODE_CHANGE_FAIL PIXIT value {self.mode_fail} is not a supported mode")
             if self.is_ci:
-                logging.info(f"Change to DISH Mode to {self.mode_fail}")
-                cmd = cluster.Commands.ChangeToMode(newMode=self.mode_fail)
-                ret = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
-                asserts.assert_true(matchers.is_type(ret, cluster.Commands.ChangeToModeResponse),
-                                    "Unexpected return type for ChangeToMode")
+                logging.info(f"CI: Skipping manual precondition.")
             else:
                 self.wait_for_user_input(
                     prompt_msg=f"Manually put the device in a state from which it will FAIL to transition to mode {self.mode_fail}, and press Enter when ready.")
@@ -186,7 +188,9 @@ class TC_DISHM_2_1(MatterBaseTest):
         # TH sends a ChangeToMode command to the DUT with NewMode set to PIXIT.DISHM.MODE_CHANGE_FAIL
         # NOTE: Skip this step as SDK is not enabled with this failure response
 
-        if True:
+        supports_negative_response = False  # set True if DUT implements it
+
+        if not (can_test_mode_failure and supports_negative_response):
             self.skip_step(7)
         else:
             self.step(7)
