@@ -19,7 +19,7 @@ chip_data_model("lit-icd-common") {
   zap_file = "lit-icd-server-app.zap"
   is_server = true
 
-  deps = [ ":identify_delegate_impl" ]
+  public_deps = [ ":identify_delegate_impl" ]
 }
 
 source_set("identify_delegate_impl") {
