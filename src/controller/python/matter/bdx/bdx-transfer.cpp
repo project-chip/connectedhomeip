@@ -212,8 +212,8 @@ CHIP_ERROR BdxTransfer::OnMessageReceived(chip::Messaging::ExchangeContext * exc
             flags = TransferControlFlags::kReceiverDrive;
             role  = TransferRole::kSender;
         }
-        ReturnLogErrorOnFailure(Responder::PrepareForTransfer(
-            mSystemLayer, role, flags, gMaxBdxBlockSize, kBdxTimeout, kBdxPollInterval));
+        ReturnLogErrorOnFailure(
+            Responder::PrepareForTransfer(mSystemLayer, role, flags, gMaxBdxBlockSize, kBdxTimeout, kBdxPollInterval));
         gMaxBdxBlockSize = kMaxBdxBlockSize; // consume the one-shot override
     }
 
