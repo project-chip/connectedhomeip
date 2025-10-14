@@ -33,6 +33,26 @@ using namespace chip::app::Clusters::Descriptor;
 
 namespace {
 
+class EmberDescriptorCluster : public DescriptorCluster
+{
+public:
+    EmberDescriptorCluster(EndpointId endpointId, DescriptorCluster::OptionalAttributesSet optionalAttributeSet,
+                      Span<const SemanticTag> semanticTags) :
+        DescriptorCluster(endpointId, optionalAttributeSet, semanticTags)
+    {}
+
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override {
+        GetSemanticTagsForEndpoint(path.mEndpointId, mSemanticTags);
+        return DescriptorCluster::Attributes(path, builder);
+    }
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override {
+        GetSemanticTagsForEndpoint(request.path.mEndpointId, mSemanticTags);
+        return DescriptorCluster::ReadAttribute(request, encoder);
+    }
+};
+
 #if CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
 static constexpr size_t kDescriptorFixedClusterCount = 0;
 #else
@@ -40,7 +60,7 @@ static constexpr size_t kDescriptorFixedClusterCount = Descriptor::StaticApplica
 #endif
 static constexpr size_t kDescriptorMaxClusterCount = kDescriptorFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-LazyRegisteredServerCluster<DescriptorCluster> gServers[kDescriptorMaxClusterCount];
+LazyRegisteredServerCluster<EmberDescriptorCluster> gServers[kDescriptorMaxClusterCount];
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -48,16 +68,8 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        BitFlags<Descriptor::Feature> features(featureMap);
-        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList;
-        GetSemanticTagsForEndpoint(endpointId, tagList);
-        if (!tagList.empty())
-        {
-            features.Set(Descriptor::Feature::kTagList);
-        }
-
-        gServers[clusterInstanceIndex].Create(endpointId, DescriptorCluster::OptionalAttributesSet(optionalAttributeBits), features,
-                                              tagList);
+        gServers[clusterInstanceIndex].Create(endpointId, DescriptorCluster::OptionalAttributesSet(optionalAttributeBits),
+                                              Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>());
         return gServers[clusterInstanceIndex].Registration();
     }
 

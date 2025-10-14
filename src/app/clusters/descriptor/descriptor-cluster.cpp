@@ -176,7 +176,7 @@ CHIP_ERROR DescriptorCluster::Attributes(const ConcreteClusterPath & path,
     AttributeListBuilder listBuilder(builder);
 
     AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
-        { mFeatures.Has(Descriptor::Feature::kTagList), TagList::kMetadataEntry },
+        { !mSemanticTags.empty(), TagList::kMetadataEntry },
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
         { mEnabledOptionalAttributes.IsSet(EndpointUniqueID::Id), EndpointUniqueID::kMetadataEntry },
 #endif
@@ -190,8 +190,14 @@ DataModel::ActionReturnStatus DescriptorCluster::ReadAttribute(const DataModel::
 {
     switch (request.path.mAttributeId)
     {
-    case FeatureMap::Id:
-        return encoder.Encode(mFeatures);
+    case FeatureMap::Id: {
+        BitFlags<Descriptor::Feature> features;
+        if (!mSemanticTags.empty())
+        {
+            features.Set(Descriptor::Feature::kTagList);
+        }
+        return encoder.Encode(features);
+    }
     case ClusterRevision::Id:
         return encoder.Encode(Descriptor::kRevision);
     case DeviceTypeList::Id:

@@ -45,14 +45,14 @@ struct TestDescriptorCluster : public ::testing::Test
 
 TEST_F(TestDescriptorCluster, CompileTest)
 {
-    DescriptorCluster cluster(1, DescriptorCluster::OptionalAttributesSet(0), BitFlags<Descriptor::Feature>(0), {});
+    DescriptorCluster cluster(1, DescriptorCluster::OptionalAttributesSet(0), {});
     ASSERT_EQ(cluster.GetClusterFlags({ 1, Descriptor::Id }), BitFlags<ClusterQualityFlags>());
 }
 
 TEST_F(TestDescriptorCluster, AttributesTest)
 {
     // Cluster configuration with only mandatory attributes
-    DescriptorCluster cluster(1, DescriptorCluster::OptionalAttributesSet(0), BitFlags<Descriptor::Feature>(0), {});
+    DescriptorCluster cluster(1, DescriptorCluster::OptionalAttributesSet(0), {});
     ConcreteClusterPath descriptorPath = ConcreteClusterPath(1, Descriptor::Id);
 
     chip::Test::TestServerClusterContext context;

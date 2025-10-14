@@ -1115,6 +1115,7 @@ void GetSemanticTagsForEndpoint(EndpointId endpoint,
     if (endpointIndex == 0xFFFF)
     {
         semanticTags = Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>();
+        return;
     }
     semanticTags = emAfEndpoints[endpointIndex].tagList;
 }

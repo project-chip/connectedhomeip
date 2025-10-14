@@ -33,19 +33,18 @@ public:
     using SemanticTag           = Globals::Structs::SemanticTagStruct::Type;
     using OptionalAttributesSet = OptionalAttributeSet<Descriptor::Attributes::EndpointUniqueID::Id>;
 
-    DescriptorCluster(EndpointId endpointId, OptionalAttributesSet optionalAttributeSet, BitFlags<Descriptor::Feature> featureMap,
+    DescriptorCluster(EndpointId endpointId, OptionalAttributesSet optionalAttributeSet,
                       Span<const SemanticTag> semanticTags) :
         DefaultServerCluster({ endpointId, Descriptor::Id }),
-        mEnabledOptionalAttributes(optionalAttributeSet), mFeatures(featureMap), mSemanticTags(semanticTags)
+        mEnabledOptionalAttributes(optionalAttributeSet), mSemanticTags(semanticTags)
     {}
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
 
-private:
+protected:
     OptionalAttributesSet mEnabledOptionalAttributes;
-    BitFlags<Descriptor::Feature> mFeatures;
     Span<const SemanticTag> mSemanticTags;
 };
 
