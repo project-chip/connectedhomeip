@@ -429,7 +429,7 @@ template("efr32_sdk") {
       _include_dirs += [ "${efr32_sdk_root}/platform/driver/button/inc" ]
     }
 
-    if (invoker.enable_dic) {
+    if (invoker.enable_matter_aws) {
       _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
     }
 
@@ -554,12 +554,12 @@ template("efr32_sdk") {
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
-      if (enable_dic) {
+      if (enable_matter_aws) {
         assert(chip_enable_wifi_ipv4, "enable chip_enable_wifi_ipv4")
-        defines += [ "DIC_ENABLE=1" ]
+        defines += [ "SL_MATTER_ENABLE_AWS=1" ]
       }
       if (aws_sdk_ota) {
-        defines += [ "ENABLE_AWS_OTA_FEAT=1" ]
+        defines += [ "SL_MATTER_ENABLE_AWS_OTA_FEAT=1" ]
       }
       if (chip_enable_wifi_ipv4) {
         defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
@@ -871,7 +871,7 @@ template("efr32_sdk") {
       }
     }
 
-    if (enable_dic) {
+    if (enable_matter_aws) {
       sources += [
         "${chip_root}/third_party/silabs/mqtt/stack/mqtt.c",
         "${efr32_sdk_root}/util/third_party/mbedtls/library/ctr_drbg.c",

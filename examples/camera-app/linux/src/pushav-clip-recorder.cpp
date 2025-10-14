@@ -18,6 +18,7 @@
 
 #include "pushav-clip-recorder.h"
 #include <cstring>
+#include <dirent.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <sys/stat.h>
@@ -29,6 +30,7 @@ extern "C" {
 #include <libavutil/error.h>
 #include <libavutil/opt.h>
 #include <libavutil/timestamp.h>
+#include <unistd.h>
 }
 
 #ifndef LIBAVCODEC_VERSION_INT
@@ -90,6 +92,77 @@ PushAVClipRecorder::~PushAVClipRecorder()
     {
         mWorkerThread.join();
     }
+}
+
+void PushAVClipRecorder::RemovePreviousRecordingFiles(const std::string & path)
+{
+    DIR * dir = opendir(path.c_str());
+    if (!dir)
+    {
+        ChipLogError(Camera, "Failed to open directory for cleaning: %s", path.c_str());
+        return;
+    }
+
+    struct dirent * entry;
+    while ((entry = readdir(dir)) != nullptr)
+    {
+        // Skip current and parent directory entries
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+        {
+            continue;
+        }
+
+        // Check if file has one of the recording-related extensions
+        std::string filename(entry->d_name);
+        if (filename.length() > 4 &&
+            (filename.substr(filename.length() - 4) == ".mpd" || filename.substr(filename.length() - 5) == ".fmp4" ||
+             filename.substr(filename.length() - 4) == ".m4s"))
+        {
+            std::string filepath = path + filename;
+            if (unlink(filepath.c_str()) == 0)
+            {
+                ChipLogDetail(Camera, "Removed previous recording file: %s", filepath.c_str());
+            }
+            else
+            {
+                ChipLogError(Camera, "Failed to remove previous recording file: %s", filepath.c_str());
+            }
+        }
+    }
+
+    closedir(dir);
+}
+
+bool PushAVClipRecorder::IsOutputDirectoryValid(const std::string & path)
+{
+    struct stat info;
+    if (stat(path.c_str(), &info) != 0)
+    {
+        // Path doesn't exist, try to create directory
+        // 0755 = owner: rwx, group: rx, others: rx
+        if (mkdir(path.c_str(), 0755) != 0)
+        {
+            ChipLogError(Camera, "Failed to create output directory: %s", path.c_str());
+            return false;
+        }
+        ChipLogProgress(Camera, "Created output directory: %s", path.c_str());
+    }
+    else if (!(info.st_mode & S_IFDIR))
+    {
+        ChipLogProgress(Camera, "Output path is not a directory %s", path.c_str());
+        return false;
+    }
+
+    if (access(path.c_str(), W_OK) != 0)
+    {
+        ChipLogError(Camera, "Output path is not writable: %s", path.c_str());
+        return false;
+    }
+
+    // Remove files from previous recordings
+    RemovePreviousRecordingFiles(path);
+
+    return true;
 }
 
 namespace {
@@ -229,6 +302,12 @@ void PushAVClipRecorder::Start()
         ChipLogError(Camera, "ERROR: Recording is already running. Stop before starting again");
         return;
     }
+
+    if (!IsOutputDirectoryValid(mClipInfo.mOutputPath))
+    {
+        Stop();
+    }
+
     SetRecorderStatus(true);
     mWorkerThread = std::thread(&PushAVClipRecorder::StartClipRecording, this);
     ChipLogProgress(Camera, "Recording started for ID: %s", mClipInfo.mRecorderId.c_str());
@@ -282,7 +361,7 @@ void PushAVClipRecorder::Stop()
     ChipLogProgress(Camera, "Recording stopped for ID: %s", mClipInfo.mRecorderId.c_str());
 }
 
-void PushAVClipRecorder::PushPacket(const char * data, size_t size, bool isVideo)
+void PushAVClipRecorder::PushPacket(const uint8_t * data, size_t size, bool isVideo)
 {
     if (!GetRecorderStatus())
     {
@@ -290,7 +369,7 @@ void PushAVClipRecorder::PushPacket(const char * data, size_t size, bool isVideo
         return;
     }
 
-    AVPacket * packet = CreatePacket((const uint8_t *) data, static_cast<int>(size), isVideo);
+    AVPacket * packet = CreatePacket(data, static_cast<int>(size), isVideo);
     if (!packet)
     {
         ChipLogError(Camera, "ERROR: PACKET DROPPED!");
@@ -332,9 +411,18 @@ int PushAVClipRecorder::SetupOutput(const std::string & outputPrefix, const std:
     // Set DASH/CMAF options
     av_opt_set(mFormatContext->priv_data, "increment_tc", "1", 0);
     av_opt_set(mFormatContext->priv_data, "use_timeline", "1", 0);
-    av_opt_set(mFormatContext->priv_data, "movflags", "+cmaf+dash+delay_moov+skip_sidx+skip_trailer+frag_custom", 0);
+
+    if (mClipInfo.mChunkDuration == 0)
+    {
+        av_opt_set(mFormatContext->priv_data, "movflags", "+cmaf+dash+delay_moov+skip_sidx+skip_trailer", 0);
+    }
+    else
+    {
+        av_opt_set(mFormatContext->priv_data, "movflags", "+cmaf+dash+delay_moov+skip_sidx+skip_trailer+frag_custom", 0);
+        av_opt_set(mFormatContext->priv_data, "frag_duration", std::to_string(mClipInfo.mChunkDuration).c_str(), 0);
+    }
+
     av_opt_set(mFormatContext->priv_data, "seg_duration", std::to_string(segSeconds).c_str(), 0);
-    av_opt_set(mFormatContext->priv_data, "frag_duration", std::to_string(mClipInfo.mChunkDuration).c_str(), 0);
     av_opt_set(mFormatContext->priv_data, "init_seg_name", initSegPattern.c_str(), 0);
     av_opt_set(mFormatContext->priv_data, "media_seg_name", mediaSegPattern.c_str(), 0);
     av_opt_set_int(mFormatContext->priv_data, "use_template", 1, 0);
@@ -531,7 +619,7 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
         }
         std::string prefix           = mClipInfo.mRecorderId + "_clip_" + std::to_string(mClipInfo.mClipId);
         std::string initSegName      = prefix + "_init-stream$RepresentationID$.fmp4";
-        std::string mediaSegName     = prefix + "_chunk-stream$RepresentationID$-$Number%05d$.cmfv";
+        std::string mediaSegName     = prefix + "_chunk-stream$RepresentationID$-$Number%05d$.m4s";
         mInputFormatContext          = avformat_alloc_context();
         int avioCtxBufferSize        = 1048576; // 1MB
         uint8_t * mAvioContextBuffer = static_cast<uint8_t *>(av_malloc(static_cast<size_t>(avioCtxBufferSize)));
@@ -640,6 +728,7 @@ void PushAVClipRecorder::CleanupOutput()
     {
         avcodec_free_context(&mAudioEncoderContext);
     }
+    FinalizeCurrentClip(0);
     mVideoStream = nullptr;
     mAudioStream = nullptr;
     mMetadataSet = false;
@@ -699,29 +788,29 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     }
 
     // 2. Handle video fragments
-    std::string video_cmfv = make_path("%s_chunk-stream0-%05d.cmfv", mVideoFragment);
-    while (FileExists(video_cmfv) && !FileExists(video_cmfv + ".tmp"))
+    std::string video_m4s = make_path("%s_chunk-stream0-%05d.m4s", mVideoFragment);
+    while (FileExists(video_m4s) && !FileExists(video_m4s + ".tmp"))
     {
         if (mVideoFragment == 1)
         {
             mUploadedInitSegment = true;
         }
         mUploadMPD = true;
-        CheckAndUploadFile(video_cmfv);
+        CheckAndUploadFile(video_m4s);
         mVideoFragment++;
-        video_cmfv = make_path("%s_chunk-stream0-%05d.cmfv", mVideoFragment);
+        video_m4s = make_path("%s_chunk-stream0-%05d.m4s", mVideoFragment);
     }
 
     // 3. Handle audio fragments
     if (mClipInfo.mHasAudio)
     {
-        std::string audio_cmfv = make_path("%s_chunk-stream1-%05d.cmfv", mAudioFragment);
-        while (FileExists(audio_cmfv) && !FileExists(audio_cmfv + ".tmp"))
+        std::string audio_m4s = make_path("%s_chunk-stream1-%05d.m4s", mAudioFragment);
+        while (FileExists(audio_m4s) && !FileExists(audio_m4s + ".tmp"))
         {
             mUploadMPD = true;
-            CheckAndUploadFile(audio_cmfv);
+            CheckAndUploadFile(audio_m4s);
             mAudioFragment++;
-            audio_cmfv = make_path("%s_chunk-stream1-%05d.cmfv", mAudioFragment);
+            audio_m4s = make_path("%s_chunk-stream1-%05d.m4s", mAudioFragment);
         }
     }
 
