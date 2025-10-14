@@ -175,17 +175,18 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
 
                 sys.exit(1)
 
+    cpp_files = []
     for file in storage.generated_paths:
         _, ext = os.path.splitext(file)
         if ext in ['.h', '.cpp', '.c', '.hpp']:
-            try:
-                logging.info("Formatting %s file:", file)
-                for name in file:
-                    logging.info("    %s" % name)
+            cpp_files.append(file)
+    if cpp_files:
+        try:
+            logging.debug("Formatting files: %s", cpp_files)
 
-                subprocess.check_call([getClangFormatBinary(), "-i"] + file)
-            except Exception:
-                traceback.print_exc()
+            subprocess.check_call([getClangFormatBinary(), "-i"] + cpp_files)
+        except Exception:
+            traceback.print_exc()
 
     logging.info("Done")
 
