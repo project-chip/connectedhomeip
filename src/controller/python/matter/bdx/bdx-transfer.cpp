@@ -28,16 +28,14 @@ constexpr System::Clock::Timeout kBdxPollInterval = System::Clock::Milliseconds3
 constexpr System::Clock::Timeout kBdxTimeout      = System::Clock::Seconds16(5 * 60);
 
 // Max block size for the next transfer; set from bdx.cpp when Python passes a value.
-// Resets to 0 (no override) after PrepareForTransfer is called.
-static uint16_t gMaxBdxBlockSize = 0;
+// Resets to default kMaxBdxBlockSize after PrepareForTransfer is called.
+static uint16_t gMaxBdxBlockSize = kMaxBdxBlockSize;
 
 } // namespace
 
 void SetControllerBdxMaxBlockSize(uint16_t maxBlockSize)
 {
-    // 0 means "no override" — leave default in place.
-    if (maxBlockSize != 0)
-        gMaxBdxBlockSize = maxBlockSize;
+    gMaxBdxBlockSize = maxBlockSize;
 }
 
 void BdxTransfer::SetDelegate(BdxTransfer::Delegate * delegate)
@@ -214,12 +212,9 @@ CHIP_ERROR BdxTransfer::OnMessageReceived(chip::Messaging::ExchangeContext * exc
             flags = TransferControlFlags::kReceiverDrive;
             role  = TransferRole::kSender;
         }
-        ReturnLogErrorOnFailure(
-            Responder::PrepareForTransfer(
-                mSystemLayer, role, flags,
-                gMaxBdxBlockSize ? gMaxBdxBlockSize : kMaxBdxBlockSize,
-                kBdxTimeout, kBdxPollInterval));
-        gMaxBdxBlockSize = 0; // consume the one-shot override
+        ReturnLogErrorOnFailure(Responder::PrepareForTransfer(
+            mSystemLayer, role, flags, gMaxBdxBlockSize, kBdxTimeout, kBdxPollInterval));
+        gMaxBdxBlockSize = kMaxBdxBlockSize; // consume the one-shot override
     }
 
     return Responder::OnMessageReceived(exchangeContext, payloadHeader, std::move(payload));
