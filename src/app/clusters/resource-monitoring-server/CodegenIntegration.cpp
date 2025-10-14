@@ -168,7 +168,7 @@ void MatterActivatedCarbonFilterMonitoringClusterInitCallback(EndpointId endpoin
     }
 }
 
-void MatterActivatedCarbonMonitoringClusterShutdownCallback(EndpointId endpointId)
+void MatterActivatedCarbonFilterMonitoringClusterShutdownCallback(EndpointId endpointId)
 {
     gActiveClusters = removeActiveClusterFromList(gActiveClusters, ActivatedCarbonFilterMonitoring::Id);
 }

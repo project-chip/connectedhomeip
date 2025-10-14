@@ -102,3 +102,11 @@ void MatterUserLabelClusterShutdownCallback(chip::EndpointId endpointId);
 void MatterBooleanStateClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBooleanStateClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterHepaFilterMonitoringClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterActivatedCarbonFilterMonitoringClusterShutdownCallback(chip::EndpointId endpointId);
