@@ -251,8 +251,7 @@ class TC_WebRTCR_2_5(MatterBaseTest):
         asserts.assert_equal(
             session_read_success,
             True,
-            f"CurrentSessions attribute read {
-                'succeeded with session info' if session_read_success else 'failed or returned incorrect data'}"
+            f"CurrentSessions attribute read {'succeeded with session info' if session_read_success else 'failed or returned incorrect data'}"
         )
 
         # Ensure we have a valid session ID before proceeding
@@ -304,8 +303,7 @@ class TC_WebRTCR_2_5(MatterBaseTest):
         asserts.assert_equal(
             final_read_success,
             True,
-            f"Final CurrentSessions attribute read {
-                'succeeded with empty list' if final_read_success else 'failed or returned non-empty list'}"
+            f"Final CurrentSessions attribute read {'succeeded with empty list' if final_read_success else 'failed or returned non-empty list'}"
         )
 
 
