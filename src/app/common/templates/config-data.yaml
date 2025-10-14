@@ -152,8 +152,8 @@ CodeDrivenClusters:
     - General Commissioning
     - General Diagnostics
     - Group Key Management
-    - Identify
     - Groupcast
+    - Identify
     - Localization Configuration
     - OTA Software Update Provider
     - Operational Credentials
