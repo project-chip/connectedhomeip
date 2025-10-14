@@ -138,7 +138,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * The individual constituent payloads, if the receiver represents a concatenated payload.
  * @see concatenated
  */
-@property (nonatomic, strong) NSArray<MTRSetupPayload *> * subPayloads;
+@property (nonatomic, strong) NSArray<MTRSetupPayload *> * subPayloads MTR_AVAILABLE(ios(18.5), macos(15.5), watchos(11.5), tvos(18.5));
 
 @property (nonatomic, copy) NSNumber * version;
 @property (nonatomic, copy) NSNumber * vendorID;
