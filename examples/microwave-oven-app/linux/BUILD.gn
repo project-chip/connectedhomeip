@@ -24,8 +24,8 @@ config("includes") {
 
 executable("chip-microwave-oven-app") {
   sources = [
-    "${chip_root}/examples/microwave-oven-app/microwave-oven-common/src/microwave-oven-device.cpp",
     "${chip_root}/examples/microwave-oven-app/microwave-oven-common/src/Identify.cpp",
+    "${chip_root}/examples/microwave-oven-app/microwave-oven-common/src/microwave-oven-device.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]

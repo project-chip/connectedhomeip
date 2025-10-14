@@ -19,19 +19,17 @@ chip_data_model("lit-icd-common") {
   zap_file = "lit-icd-server-app.zap"
   is_server = true
 
-  deps = [
-    ":identify_delegate_impl",
-  ]
+  deps = [ ":identify_delegate_impl" ]
 }
 
 source_set("identify_delegate_impl") {
   sources = [
-    "Identify.h",
     "Identify.cpp",
+    "Identify.h",
   ]
   deps = [
-    "${chip_root}/src/data-model-providers/codegen:headers",
-    "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app",
+    "${chip_root}/src/app/clusters/identify-server",
+    "${chip_root}/src/data-model-providers/codegen:headers",
   ]
 }
