@@ -65,8 +65,7 @@ void PrintTransportSettings(PushAVClipRecorder::ClipInfoStruct clipInfo, PushAVC
     ChipLogProgress(Camera, "Chunk Duration: %d ms", clipInfo.mChunkDurationMs);
     ChipLogProgress(Camera, "Segment Duration: %d ms", clipInfo.mSegmentDurationMs);
     ChipLogProgress(Camera, "Blind Duration: %d sec", clipInfo.mBlindDurationS);
-    ChipLogProgress(Camera, "PreRoll Length: %d ", clipInfo.mPreRollLengthMs);
-    ChipLogProgress(Camera, "PreRoll Length: %d ", clipInfo.mPreRollLengthMs);
+    ChipLogProgress(Camera, "PreRoll Length: %d ms", clipInfo.mPreRollLengthMs);
     ChipLogProgress(Camera, "URL: %s", clipInfo.mUrl.c_str());
     ChipLogProgress(Camera, "Trigger Type: %d", clipInfo.mTriggerType);
     ChipLogProgress(Camera, "Output Path: %s", clipInfo.mOutputPath.c_str());
