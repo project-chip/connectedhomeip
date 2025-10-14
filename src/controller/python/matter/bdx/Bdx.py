@@ -113,7 +113,7 @@ def _OnTransferCompletedCallback(transaction: AsyncTransferCompletedTransaction,
     transaction.handleResult(result)
 
 
-def _PrepareForBdxTransfer(future: Future, data: Optional[bytes], max_block_size: Optional[int]) -> PyChipError:
+def _PrepareForBdxTransfer(future: Future, data: Optional[bytes], max_block_size: Optional[int] = None) -> PyChipError:
     ''' Prepares the BDX system for a BDX transfer. The BDX transfer is set as the future's result. This must be called
     before the BDX transfer is initiated.
 
