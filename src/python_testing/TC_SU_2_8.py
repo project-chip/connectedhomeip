@@ -154,7 +154,6 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         idle = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
         querying = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
         downloading = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
-        applying = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying
 
         target_version = 3
 
