@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CAMERA_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/zonemgmt_2_4_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --string-arg th_server_app_path:${PUSH_AV_SERVER}
@@ -33,6 +33,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
+#       --app-pipe /tmp/zonemgmt_2_4_fifo
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -307,7 +308,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         dev_ctrl = self.default_controller
         event_listener = EventSubscriptionHandler(expected_cluster=Clusters.ZoneManagement)
         await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
-        event_delay_seconds = 15.0
+        event_delay_seconds = 5.0
 
         await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1} and stop any motion after {initDuration} seconds of pressing enter.")
 
