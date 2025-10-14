@@ -154,13 +154,23 @@ private:
 
     void RemoveTimerAppState(const uint16_t connectionID);
 
+    Protocols::InteractionModel::Status CheckPrivacyModes(Globals::StreamUsageEnum streamUsage);
+
     /**
      * @brief Schedule deallocate with a given timeout
      *
-     * @param endpointId    endpoint where DoorLockServer is running
+     * @param endpointId    endpoint where PushAvStreamTransportServer is running
      * @param timeoutSec    timeout in seconds
      */
     CHIP_ERROR ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec);
+
+    /**
+     * @brief Validates the provided URL.
+     *
+     * @param url The URL to validate
+     * @return true if URL is valid, false otherwise
+     */
+    bool ValidateUrl(const std::string & url);
 };
 
 } // namespace Clusters
