@@ -7875,6 +7875,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 + (void)readAttributeActiveEndpointsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
+- (void)readAttributeElectricalCircuitNodesWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeElectricalCircuitNodesWithValue:(NSArray * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeElectricalCircuitNodesWithValue:(NSArray * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeElectricalCircuitNodesWithParams:(MTRSubscribeParams *)params
+                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                             reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeElectricalCircuitNodesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -19748,6 +19756,7 @@ typedef NS_OPTIONS(uint32_t, MTRPowerTopologyFeature) {
     MTRPowerTopologyFeatureTreeTopology MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x2,
     MTRPowerTopologyFeatureSetTopology MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x4,
     MTRPowerTopologyFeatureDynamicPowerFlow MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x8,
+    MTRPowerTopologyFeatureElectricalCircuit MTR_PROVISIONALLY_AVAILABLE = 0x10,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 typedef NS_ENUM(uint16_t, MTREnergyEVSEModeModeTag) {
