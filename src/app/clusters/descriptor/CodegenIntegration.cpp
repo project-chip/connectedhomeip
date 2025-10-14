@@ -50,8 +50,7 @@ public:
     {
         BitFlags<Descriptor::Feature> features(featureMap);
         Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList;
-        GetSemanticTagsForEndpoint(endpointId, tagList)
-        if (!tagList.empty())
+        GetSemanticTagsForEndpoint(endpointId, tagList) if (!tagList.empty())
         {
             features.Set(Descriptor::Feature::kTagList);
         }

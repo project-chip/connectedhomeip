@@ -198,9 +198,8 @@ uint16_t emberAfFixedEndpointCount();
  * @param endpoint The target endpoint.
  * @param semanticTags The Span of SemanticTagStructs that will point to the tag list.
  */
-void
-GetSemanticTagsForEndpoint(chip::EndpointId endpoint,
-                           chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> & semanticTags);
+void GetSemanticTagsForEndpoint(chip::EndpointId endpoint,
+                                chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> & semanticTags);
 
 /**
  * Get the semantic tags of the endpoint.
