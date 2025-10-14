@@ -261,7 +261,7 @@ TEST_F(TestCertificateTableImpl, TestClientCertificateIteration)
               CHIP_NO_ERROR);
     EXPECT_EQ(GetTestCert(signedCertSpan, *certBuffer2, csr), CHIP_NO_ERROR);
     EXPECT_EQ(
-        sCertificateTable.UpdateClientCertificateEntry(kFabric1, clientId2.Value(), certBuffer2->buffer, certBuffer1->GetCert()),
+        sCertificateTable.UpdateClientCertificateEntry(kFabric1, clientId2.Value(), certBuffer2->buffer, certBuffer2->GetCert()),
         CHIP_NO_ERROR);
     EXPECT_NE(clientId1, clientId2);
 
