@@ -164,17 +164,14 @@ source_set("siwx917-common") {
     }
   }
 
-  # DIC
-  if (enable_dic) {
-    public_deps +=
-        [ "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-dic" ]
+  # MATTER_AWS
+  if (enable_matter_aws) {
+    public_deps += [ "${silabs_common_plat_dir}/matter_aws/matter_aws_interface:silabs-matter-aws" ]
   }
 
   # AWS SDK OTA
   if (aws_sdk_ota) {
-    public_deps += [
-      "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-aws-sdk-ota",
-    ]
+    public_deps += [ "${silabs_common_plat_dir}/matter_aws/matter_aws_interface:silabs-matter-aws-sdk-ota" ]
   }
 
   public_deps += [

@@ -18,7 +18,6 @@ import json
 import logging
 import os
 import subprocess
-import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator, Set
@@ -30,13 +29,8 @@ __all__ = [
     "TestTarget",
     "TestDefinition",
     "ApplicationPaths",
-    "linux",
     "runner",
 ]
-
-# If running on Linux platform load the Linux specific code.
-if sys.platform == "linux":
-    from . import linux
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))

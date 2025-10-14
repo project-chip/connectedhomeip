@@ -35,6 +35,11 @@ if (matter_enable_factory_data)
 list(APPEND CHIP_CFLAGS -DCONFIG_FACTORY_DATA=1)
 endif (matter_enable_factory_data)
 
+
+if (matter_dac_key_encryption)
+list(APPEND CHIP_CFLAGS -DCONFIG_DAC_KEY_ENC=1)
+endif (matter_dac_key_encryption)
+
 if (matter_enable_dlps)
 list(APPEND CHIP_CFLAGS -DDLPS_EN=1)
 endif (matter_enable_dlps)
