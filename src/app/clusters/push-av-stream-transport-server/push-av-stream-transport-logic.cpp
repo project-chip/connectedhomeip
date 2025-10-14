@@ -29,6 +29,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <set>
 
 static constexpr uint16_t kMaxConnectionId = 65535; // This is also invalid connectionID
 static constexpr uint16_t kMaxEndpointId   = 65534;
@@ -231,6 +232,86 @@ void PushAvStreamTransportServerLogic::PushAVStreamTransportDeallocateCallback(S
     }
 }
 
+bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
+{
+    const std::string https = "https://";
+
+    // Check minimum length and https prefix
+    if (url.size() <= https.size() || url.substr(0, https.size()) != https)
+    {
+        return false;
+    }
+
+    // Check that URL does not contain fragment character '#'
+    if (url.find('#') != std::string::npos)
+    {
+        ChipLogError(Camera, "URL contains fragment character '#'");
+        return false;
+    }
+
+    // Check that URL does not contain query character '?'
+    if (url.find('?') != std::string::npos)
+    {
+        ChipLogError(Camera, "URL contains query character '?'");
+        return false;
+    }
+
+    // Check that URL ends with a forward slash '/'
+    if (url.back() != '/')
+    {
+        ChipLogError(Camera, "URL does not end with '/'");
+        return false;
+    }
+
+    // Extract host part
+    size_t hostStart = https.size();
+    size_t hostEnd   = url.find('/', hostStart);
+    // If no '/' is found after the scheme, the rest of the URL is the host.
+    // If a '/' is found, the host is the part between the scheme and the first '/'.
+    std::string host;
+    if (hostEnd == std::string::npos)
+    {
+        // This case handles URLs like "https://example.com" or "https://localhost"
+        // The host is the entire string after "https://"
+        host = url.substr(hostStart);
+    }
+    else
+    {
+        // This case handles URLs like "https://example.com/" or "https://example.com/path"
+        // The host is the part between "https://" and the first '/'
+        host = url.substr(hostStart, hostEnd - hostStart);
+    }
+    // Check for non-empty host. This check is now more robust.
+    if (host.empty())
+    {
+        ChipLogError(Camera, "URL does not contain a valid host.");
+        return false;
+    }
+    // Allow 'localhost' and 'localhost:<port>'
+    if (host == "localhost" || (host.length() > 10 && host.substr(0, 10) == "localhost:"))
+    {
+        // Additional check to ensure there's something after the colon for port
+        if (host == "localhost:" || (host.length() > 10 && host[10] == '\0'))
+        {
+            // This would be "localhost:" with nothing after, which is invalid
+            ChipLogError(Camera, "URL host '%s' is not valid. 'localhost:' must be followed by a port number.", host.c_str());
+            return false;
+        }
+        return true;
+    }
+    // Simplified host validation:
+    // A valid host should typically contain a dot (e.g., 'example.com').
+    // This is a basic check and not a comprehensive host/IP validation.
+    if (host.find('.') == std::string::npos)
+    {
+        ChipLogError(Camera, "URL host '%s' is not valid. Must be 'localhost', 'localhost:<port>', or contain a dot.",
+                     host.c_str());
+        return false;
+    }
+
+    return true;
+}
+
 CHIP_ERROR PushAvStreamTransportServerLogic::ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec)
 {
     uint32_t timeoutMs = timeoutSec * MILLISECOND_TICKS_PER_SECOND;
@@ -273,7 +354,7 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         transportOptions.videoStreamID.HasValue() || transportOptions.audioStreamID.HasValue(), Status::InvalidCommand,
         ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Missing videoStreamID and audioStreamID",
                      mEndpointId));
-    VerifyOrReturnValue(transportOptions.endpointID <= kMaxEndpointId, Status::ConstraintError,
+    VerifyOrReturnValue(transportOptions.TLSEndpointID <= kMaxEndpointId, Status::ConstraintError,
                         ChipLogError(Zcl,
                                      "Transport Options verification from command data[ep=%d]: EndpointID field Constraint Error",
                                      mEndpointId));
@@ -555,7 +636,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     if (mTLSClientManagementDelegate != nullptr)
     {
         Status tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
-            commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.endpointID, TLSEndpoint);
+            commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.TLSEndpointID, TLSEndpoint);
 
         VerifyOrDo(tlsEndpointValidityStatus == Status::Success, {
             ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLSEndpointID of command data is not valid/Provisioned",
@@ -620,7 +701,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    bool isValidUrl = mDelegate->ValidateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
+    bool isValidUrl = ValidateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
 
     if (isValidUrl == false)
     {
@@ -646,17 +727,54 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     {
 
         auto & motionZonesList = transportOptions.triggerOptions.motionZones;
-        auto iter              = motionZonesList.Value().Value().begin();
+        auto iterDupCheck      = motionZonesList.Value().Value().begin();
         size_t zoneListSize    = 0;
         motionZonesList.Value().Value().ComputeSize(&zoneListSize);
 
-        // To Do: de-duplicate the entries, per issue https://github.com/project-chip/connectedhomeip/issues/41051
+        // If there are duplicate entries, reject the command
+        std::set<uint16_t> zoneIDsFound;
+        bool nullFound = false;
+
+        while (iterDupCheck.Next())
+        {
+            auto & transportZoneOption = iterDupCheck.GetValue();
+            if (!transportZoneOption.zone.IsNull())
+            {
+                uint16_t zoneID = transportZoneOption.zone.Value();
+                if (zoneIDsFound.count(zoneID) == 0)
+                {
+                    // Zone ID not found, add to set of IDs
+                    zoneIDsFound.emplace(zoneID);
+                }
+                else
+                {
+                    // This is a duplicate
+                    ChipLogError(
+                        Zcl, "Transport Options verification from command data[ep=%d]: Duplicate Zone ID (=%d) in Motion Zones. ",
+                        mEndpointId, zoneID);
+                    return Status::AlreadyExists;
+                }
+            }
+            else
+            {
+                if (nullFound)
+                {
+                    // This is the second null, therefore also a duplicate entry
+                    ChipLogError(
+                        Zcl, "Transport Options verification from command data[ep=%d]: Duplicate Null Zone ID in Motion Zones. ",
+                        mEndpointId);
+                    return Status::AlreadyExists;
+                }
+                nullFound = true;
+            }
+        }
 
         bool isValidZoneSize = mDelegate->ValidateMotionZoneListSize(zoneListSize);
         VerifyOrReturnValue(
             isValidZoneSize, Status::DynamicConstraintError,
             ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid Motion Zone Size ", mEndpointId));
 
+        auto iter = motionZonesList.Value().Value().begin();
         while (iter.Next())
         {
             auto & transportZoneOption = iter.GetValue();
@@ -716,7 +834,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         else
         {
             auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-                mDelegate->ValidateVideoStream(transportOptions.videoStreamID.Value().Value()));
+                mDelegate->SetVideoStream(transportOptions.videoStreamID.Value().Value()));
 
             if (!delegateStatus.IsSuccess())
             {
@@ -748,7 +866,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         else
         {
             auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-                mDelegate->ValidateAudioStream(transportOptions.audioStreamID.Value().Value()));
+                mDelegate->SetAudioStream(transportOptions.audioStreamID.Value().Value()));
 
             if (!delegateStatus.IsSuccess())
             {
@@ -760,8 +878,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         }
     }
 
-    bool isValidSegmentDuration =
-        mDelegate->ValidateSegmentDuration(transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration);
+    bool isValidSegmentDuration = mDelegate->ValidateSegmentDuration(
+        transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration, transportOptionsPtr->videoStreamID);
     if (isValidSegmentDuration == false)
     {
         auto segmentDurationStatus = to_underlying(StatusCodeEnum::kInvalidOptions);
@@ -829,6 +947,13 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
     {
         ChipLogError(Zcl, "HandleDeallocatePushTransport[ep=%d]: ConnectionID Not Found.", mEndpointId);
         handler.AddStatus(commandPath, Status::NotFound);
+        return std::nullopt;
+    }
+
+    if (mDelegate->GetTransportBusyStatus(connectionID) == PushAvStreamTransportStatusEnum::kBusy)
+    {
+        ChipLogError(Zcl, "HandleDeallocatePushTransport[ep=%d]: Connection is Busy", mEndpointId);
+        handler.AddStatus(commandPath, Status::Busy);
         return std::nullopt;
     }
 
@@ -1025,6 +1150,14 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
         return std::nullopt;
     }
 
+    // Note, we will always have Transport Options as they're mandatory in the initial allocate
+    status = CheckPrivacyModes(transportConfiguration->transportOptions.Value().streamUsage);
+    if (status != Status::Success)
+    {
+        handler.AddStatus(commandPath, status);
+        return std::nullopt;
+    }
+
     if (mDelegate->GetTransportBusyStatus(connectionID) == PushAvStreamTransportStatusEnum::kBusy)
     {
         ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Connection is Busy", mEndpointId);
@@ -1040,23 +1173,20 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
         return std::nullopt;
     }
 
-    if (transportConfiguration->transportOptions.HasValue())
+    if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kContinuous)
     {
-        if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kContinuous)
-        {
-            auto clusterStatus = to_underlying(StatusCodeEnum::kInvalidTriggerType);
-            ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Invalid Trigger type", mEndpointId);
-            handler.AddClusterSpecificFailure(commandPath, clusterStatus);
-            return std::nullopt;
-        }
+        auto clusterStatus = to_underlying(StatusCodeEnum::kInvalidTriggerType);
+        ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Invalid Trigger type", mEndpointId);
+        handler.AddClusterSpecificFailure(commandPath, clusterStatus);
+        return std::nullopt;
+    }
 
-        if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kCommand &&
-            !timeControl.HasValue())
-        {
-            ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Time control field not present", mEndpointId);
-            handler.AddStatus(commandPath, Status::DynamicConstraintError);
-            return std::nullopt;
-        }
+    if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kCommand &&
+        !timeControl.HasValue())
+    {
+        ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Time control field not present", mEndpointId);
+        handler.AddStatus(commandPath, Status::DynamicConstraintError);
+        return std::nullopt;
     }
 
     // When trigger type is motion in the allocated transport but triggering it manually
@@ -1140,6 +1270,62 @@ PushAvStreamTransportServerLogic::HandleFindTransport(CommandHandler & handler, 
     return std::nullopt;
 }
 
+Status PushAvStreamTransportServerLogic::CheckPrivacyModes(StreamUsageEnum streamUsage)
+{
+    bool hardPrivacyModeActive = false;
+
+    CHIP_ERROR err = mDelegate->IsHardPrivacyModeActive(hardPrivacyModeActive);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "PushAvStreamTransport:CheckPrivacyModes: Failed to check Hard Privacy mode: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+        return Status::Failure;
+    }
+
+    if (hardPrivacyModeActive)
+    {
+        ChipLogError(Zcl, "PushAvStreamTransport:CheckPrivacyModes: Hard Privacy mode is enabled");
+        return Status::InvalidInState;
+    }
+
+    bool softLivestreamPrivacyModeActive = false;
+    err                                  = mDelegate->IsSoftLivestreamPrivacyModeActive(softLivestreamPrivacyModeActive);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl,
+                     "PushAvStreamTransport:CheckPrivacyModes: Failed to check Soft LivestreamPrivacy mode: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+        return Status::Failure;
+    }
+
+    if (softLivestreamPrivacyModeActive && streamUsage == StreamUsageEnum::kLiveView)
+    {
+        ChipLogError(Zcl,
+                     "PushAvStreamTransport:CheckPrivacyModes: Soft LivestreamPrivacy mode is enabled and StreamUsage is LiveView");
+        return Status::InvalidInState;
+    }
+
+    bool softRecordingPrivacyModeActive = false;
+    err                                 = mDelegate->IsSoftRecordingPrivacyModeActive(softRecordingPrivacyModeActive);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl,
+                     "PushAvStreamTransport:CheckPrivacyModes: Failed to check SoftRecordingPrivacyModeActive: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+        return Status::Failure;
+    }
+
+    if (softRecordingPrivacyModeActive && (streamUsage == StreamUsageEnum::kRecording || streamUsage == StreamUsageEnum::kAnalysis))
+    {
+        ChipLogError(Zcl,
+                     "PushAvStreamTransport:CheckPrivacyModes: Soft RecordingPrivacy mode is enabled and StreamUsage is Recording "
+                     "or Analysis");
+        return Status::InvalidInState;
+    }
+
+    return Status::Success;
+}
+
 Status
 PushAvStreamTransportServerLogic::GeneratePushTransportBeginEvent(const uint16_t connectionID,
                                                                   const TransportTriggerTypeEnum triggerType,
@@ -1162,16 +1348,12 @@ PushAvStreamTransportServerLogic::GeneratePushTransportBeginEvent(const uint16_t
     return Status::Success;
 }
 
-Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uint16_t connectionID,
-                                                                       const TransportTriggerTypeEnum triggerType,
-                                                                       const Optional<TriggerActivationReasonEnum> activationReason)
+Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uint16_t connectionID)
 {
     Events::PushTransportEnd::Type event;
     EventNumber eventNumber;
 
-    event.connectionID     = connectionID;
-    event.triggerType      = triggerType;
-    event.activationReason = activationReason;
+    event.connectionID = connectionID;
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
@@ -1201,8 +1383,7 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStarted(uint16_t connect
     return GeneratePushTransportBeginEvent(connectionID, triggerType, activationReason);
 }
 
-Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connectionID, TransportTriggerTypeEnum triggerType,
-                                                                Optional<TriggerActivationReasonEnum> activationReason)
+Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connectionID, TransportTriggerTypeEnum triggerType)
 {
     ChipLogProgress(Zcl, "NotifyTransportStopped called for connectionID %u with triggerType %u", connectionID,
                     to_underlying(triggerType));
@@ -1216,7 +1397,7 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connect
     }
 
     // Generate the PushTransportEnd event
-    return GeneratePushTransportEndEvent(connectionID, triggerType, activationReason);
+    return GeneratePushTransportEndEvent(connectionID);
 }
 
 } // namespace Clusters

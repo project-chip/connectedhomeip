@@ -118,6 +118,8 @@
 #include <clusters/GeneralDiagnostics/MetadataProvider.h>
 #include <clusters/GroupKeyManagement/Ids.h>
 #include <clusters/GroupKeyManagement/MetadataProvider.h>
+#include <clusters/Groupcast/Ids.h>
+#include <clusters/Groupcast/MetadataProvider.h>
 #include <clusters/Groups/Ids.h>
 #include <clusters/Groups/MetadataProvider.h>
 #include <clusters/HepaFilterMonitoring/Ids.h>
@@ -573,6 +575,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == GeneralDiagnostics::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, GeneralDiagnostics::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Groupcast::Id) || ...))
+    {
+        if (id == Groupcast::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Groupcast::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == GroupKeyManagement::Id) || ...))
     {

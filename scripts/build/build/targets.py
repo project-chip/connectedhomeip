@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2024 Project CHIP Authors
+# Copyright (c) 2021-2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ from builders.genio import GenioApp, GenioBuilder
 from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary, HostFuzzingType
 from builders.imx import IMXApp, IMXBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
-from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
 from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpLogLevel, NxpOsUsed
@@ -405,36 +404,6 @@ def BuildAndroidTarget():
     return target
 
 
-def BuildMbedTarget():
-    target = BuildTarget('mbed', MbedBuilder)
-
-    # board
-    target.AppendFixedTargets([
-        TargetPart('CY8CPROTO_062_4343W', board=MbedBoard.CY8CPROTO_062_4343W),
-    ])
-
-    # apps
-    target.AppendFixedTargets([
-        TargetPart('lock', app=MbedApp.LOCK),
-        TargetPart('light', app=MbedApp.LIGHT),
-        TargetPart('all-clusters', app=MbedApp.ALL_CLUSTERS),
-        TargetPart('all-clusters-minimal', app=MbedApp.ALL_CLUSTERS_MINIMAL),
-        TargetPart('pigweed', app=MbedApp.PIGWEED),
-        TargetPart('ota-requestor', app=MbedApp.OTA_REQUESTOR),
-        TargetPart('shell', app=MbedApp.SHELL),
-    ])
-
-    # Modifiers
-    target.AppendModifier('release', profile=MbedProfile.RELEASE).ExceptIfRe(
-        '-(develop|debug)')
-    target.AppendModifier('develop', profile=MbedProfile.DEVELOP).ExceptIfRe(
-        '-(release|debug)')
-    target.AppendModifier('debug', profile=MbedProfile.DEBUG).ExceptIfRe(
-        '-(release|develop)')
-
-    return target
-
-
 def BuildInfineonTarget():
     target = BuildTarget('infineon', InfineonBuilder)
 
@@ -541,7 +510,8 @@ def BuildNxpTarget():
         TargetPart('lock-app', app=NxpApp.LOCK_APP).OnlyIfRe('mcxw71|mcxw72'),
         TargetPart('all-clusters', app=NxpApp.ALLCLUSTERS).OnlyIfRe('rt1060|rt1170|rw61x'),
         TargetPart('laundry-washer', app=NxpApp.LAUNDRYWASHER).OnlyIfRe('rt1060|rt1170|rw61x'),
-        TargetPart('thermostat', app=NxpApp.THERMOSTAT).OnlyIfRe('rt1060|rt1170|rw61x')
+        TargetPart('thermostat', app=NxpApp.THERMOSTAT).OnlyIfRe('rt1060|rt1170|rw61x'),
+        TargetPart('unit-test', app=NxpApp.UNIT_TEST)
     ])
 
     target.AppendModifier(name="factory", enable_factory_data=True)
@@ -557,9 +527,9 @@ def BuildNxpTarget():
     target.AppendModifier(name="thread", enable_thread=True).ExceptIfRe('zephyr')
     target.AppendModifier(name="matter-shell", enable_shell=True)
     target.AppendModifier(name="factory-build", enable_factory_data_build=True).OnlyIfRe('rt1060|rt1170|rw61x')
-    target.AppendModifier(name="frdm", board_variant=NxpBoardVariant.FRDM).OnlyIfRe('rw61x|mcxw71')
+    target.AppendModifier(name="frdm", board_variant=NxpBoardVariant.FRDM).OnlyIfRe('rw61x|mcxw71|mcxw72')
     target.AppendModifier(name="cmake", build_system=NxpBuildSystem.CMAKE).ExceptIfRe(
-        'laundry-washer').OnlyIfRe('rt1060|rt1170|rw61x|mcxw71')
+        'laundry-washer').OnlyIfRe('rt1060|rt1170|rw61x|mcxw71|mcxw72')
     target.AppendModifier(name="evkc", board_variant=NxpBoardVariant.EVKC).OnlyIfRe('rt1060')
     target.AppendModifier(name="iw416", iw416_transceiver=True).OnlyIfRe('rt1060')
     target.AppendModifier(name="w8801", w8801_transceiver=True).OnlyIfRe('rt1060')
@@ -870,7 +840,6 @@ BUILD_TARGETS = [
     BuildIMXTarget(),
     BuildInfineonTarget(),
     BuildNxpTarget(),
-    BuildMbedTarget(),
     BuildNrfTarget(),
     BuildNrfNativeTarget(),
     BuildNuttXTarget(),

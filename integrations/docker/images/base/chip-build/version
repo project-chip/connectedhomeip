@@ -1,1 +1,1 @@
-167 : [Realtek] Add docker image for Zephyr examples
+171 : [silabs] Updated docker image to remove wiseconnect_wifi_bt sdk

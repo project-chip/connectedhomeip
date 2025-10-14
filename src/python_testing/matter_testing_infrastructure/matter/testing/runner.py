@@ -69,6 +69,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from matter.testing.matter_test_config import MatterTestConfig
 
+LOGGER = logging.getLogger(__name__)
+
 
 def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib.Path]:
     """Attempt to find a PAA trust store following SDK convention at `root_path`
@@ -124,7 +126,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         Args:
             count: The number of tests in the set.
         """
-        logging.info(f'Starting test set, running {count} tests')
+        LOGGER.info(f'Starting test set, running {count} tests')
 
     def stop(self, duration: int):
         """
@@ -133,7 +135,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         Args:
             duration: The duration of the test set in milliseconds.
         """
-        logging.info(f'Finished test set, ran for {duration}ms')
+        LOGGER.info(f'Finished test set, ran for {duration}ms')
 
     def test_start(
             self,
@@ -150,7 +152,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             count: Number of steps in the test
             steps: List of step descriptions
         """
-        logging.info(f'Starting test from {filename}: {name} - {count} steps')
+        LOGGER.info(f'Starting test from {filename}: {name} - {count} steps')
 
     def test_stop(self, exception: Exception, duration: int):
         """
@@ -160,7 +162,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             exception: Exception raised during test execution, or None if successful
             duration: Test execution duration in milliseconds
         """
-        logging.info(f'Finished test in {duration}ms')
+        LOGGER.info(f'Finished test in {duration}ms')
 
     def step_skipped(self, name: str, expression: str):
         """
@@ -172,7 +174,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         # TODO: Do we really need the expression as a string? We can evaluate
         # this in code very easily
-        logging.info(f'\t\t**** Skipping: {name}')
+        LOGGER.info(f'\t\t**** Skipping: {name}')
 
     def step_start(self, name: str):
         """
@@ -183,7 +185,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         # The way I'm calling this, the name is already includes the step
         # number, but it seems like it might be good to separate these
-        logging.info(f'\t\t***** Test Step {name}')
+        LOGGER.info(f'\t\t***** Test Step {name}')
 
     def step_success(self, logger, logs, duration: int, request):
         """
@@ -208,11 +210,11 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             request: The original test request
             received: The actual response received
         """
-        logging.info('\t\t***** Test Failure : ')
+        LOGGER.info('\t\t***** Test Failure : ')
         if received is not None:
-            logging.info(f'\t\t      Received: {received}')
+            LOGGER.info(f'\t\t      Received: {received}')
         if request is not None:
-            logging.info(f'\t\t      Expected: {request}')
+            LOGGER.info(f'\t\t      Expected: {request}')
 
     def step_unknown(self):
         """
@@ -242,7 +244,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
             filename: Source file containing the test
             name: Name of the test
         """
-        logging.info(f"Skipping test from {filename}: {name}")
+        LOGGER.info(f"Skipping test from {filename}: {name}")
 
 
 @dataclass
@@ -483,8 +485,8 @@ def run_tests_no_exit(
             except signals.TestAbortAll:
                 ok = False
             except Exception:
-                logging.exception('Exception when executing %s.',
-                                  test_config.testbed_name)
+                LOGGER.exception('Exception when executing %s.',
+                                 test_config.testbed_name)
                 ok = False
 
     if hooks:
@@ -501,9 +503,9 @@ def run_tests_no_exit(
         event_loop.run_until_complete(shutdown())
 
     if ok:
-        logging.info("Final result: PASS !")
+        LOGGER.info("Final result: PASS !")
     else:
-        logging.error("Final result: FAIL !")
+        LOGGER.error("Final result: FAIL !")
     return ok
 
 
@@ -641,10 +643,6 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     config.discriminators.extend(args.discriminators)
     config.setup_passcodes.extend(args.passcodes)
 
-    if args.qr_code != [] and args.manual_code != []:
-        print("error: Cannot have both --qr-code and --manual-code present!")
-        return False
-
     if len(config.discriminators) != len(config.setup_passcodes):
         print("error: supplied number of discriminators does not match number of passcodes")
         return False
@@ -654,7 +652,8 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     if not config.dut_node_ids:
         config.dut_node_ids = [TestingDefaults.DUT_NODE_ID]
 
-    if args.commissioning_method is None:
+    commissioning_method = args.in_test_commissioning_method or args.commissioning_method
+    if not commissioning_method:
         return True
 
     if len(config.dut_node_ids) > len(device_descriptors):
@@ -684,7 +683,9 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
         print("error: Missing --passcode when no --qr-code/--manual-code present!")
         return False
 
-    if config.commissioning_method == "ble-wifi":
+    wifi_args = ['ble-wifi']
+    thread_args = ['ble-thread', 'nfc-thread']
+    if commissioning_method in wifi_args:
         if args.wifi_ssid is None:
             print("error: missing --wifi-ssid <SSID> for --commissioning-method ble-wifi!")
             return False
@@ -695,9 +696,9 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
 
         config.wifi_ssid = args.wifi_ssid
         config.wifi_passphrase = args.wifi_passphrase
-    elif config.commissioning_method == "ble-thread":
+    elif commissioning_method in thread_args:
         if args.thread_dataset_hex is None:
-            print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method ble-thread!")
+            print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method ble-thread or nfc-thread!")
             return False
         config.thread_operational_dataset = args.thread_dataset_hex
     elif config.commissioning_method == "on-network-ip":
@@ -744,7 +745,7 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     if config.pipe_name is not None and not os.path.exists(config.pipe_name):
         # Named pipes are unique, so we MUST have consistent paths
         # Verify from start the named pipe exists.
-        logging.error("Named pipe %r does NOT exist" % config.pipe_name)
+        LOGGER.error("Named pipe %r does NOT exist" % config.pipe_name)
         raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name)
 
     config.fail_on_skipped_tests = args.fail_on_skipped
@@ -818,11 +819,11 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
 
     commission_group.add_argument('-m', '--commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread"],
                                   help='Name of commissioning method to use')
     commission_group.add_argument('--in-test-commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread"],
                                   help='Name of commissioning method to use, for commissioning tests')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
                                   metavar='LONG_DISCRIMINATOR',
@@ -860,7 +861,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
 
     commission_group.add_argument('--tc-user-response-to-simulate', type=int, help="Terms and conditions acknowledgements")
 
-    code_group = parser.add_mutually_exclusive_group(required=False)
+    code_group = parser.add_argument_group(title="Setup codes")
 
     code_group.add_argument('-q', '--qr-code', type=str,
                             metavar="QR_CODE", default=[], help="QR setup code content (overrides passcode and discriminator)", nargs="+")
@@ -899,7 +900,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
     if not argv:
         argv = sys.argv[1:]
 
-    return convert_args_to_matter_config(parser.parse_known_args(argv)[0])
+    return convert_args_to_matter_config(parser.parse_args(argv))
 
 
 def int_decimal_or_hex(s: str) -> int:
