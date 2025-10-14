@@ -93,15 +93,12 @@ public:
      *
      * @param connectionID The connection ID of the transport that stopped
      * @param triggerType The type of trigger that started the transport
-     * @param activationReason Optional reason for the deactivation
      * @return Status::Success if event was generated successfully, failure otherwise
      */
-    Protocols::InteractionModel::Status
-    NotifyTransportStopped(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
-                           Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason =
-                               Optional<PushAvStreamTransport::TriggerActivationReasonEnum>())
+    Protocols::InteractionModel::Status NotifyTransportStopped(uint16_t connectionID,
+                                                               PushAvStreamTransport::TransportTriggerTypeEnum triggerType)
     {
-        return mLogic.NotifyTransportStopped(connectionID, triggerType, activationReason);
+        return mLogic.NotifyTransportStopped(connectionID, triggerType);
     }
 
     CHIP_ERROR Init() { return mLogic.Init(); }

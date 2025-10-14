@@ -36,6 +36,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::BasicInformation::Id:
         MatterBasicInformationClusterInitCallback(endpoint);
         break;
+    case app::Clusters::LocalizationConfiguration::Id:
+        MatterLocalizationConfigurationClusterInitCallback(endpoint);
+        break;
     case app::Clusters::TimeFormatLocalization::Id:
         MatterTimeFormatLocalizationClusterInitCallback(endpoint);
         break;
@@ -66,6 +69,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::GroupKeyManagement::Id:
         MatterGroupKeyManagementClusterInitCallback(endpoint);
         break;
+    case app::Clusters::FixedLabel::Id:
+        MatterFixedLabelClusterInitCallback(endpoint);
+        break;
     case app::Clusters::BooleanState::Id:
         MatterBooleanStateClusterInitCallback(endpoint);
         break;
@@ -84,6 +90,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::BasicInformation::Id:
         MatterBasicInformationClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::LocalizationConfiguration::Id:
+        MatterLocalizationConfigurationClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::TimeFormatLocalization::Id:
         MatterTimeFormatLocalizationClusterShutdownCallback(endpoint);
@@ -114,6 +123,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::GroupKeyManagement::Id:
         MatterGroupKeyManagementClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::FixedLabel::Id:
+        MatterFixedLabelClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::BooleanState::Id:
         MatterBooleanStateClusterShutdownCallback(endpoint);
