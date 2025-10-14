@@ -38,6 +38,8 @@ constexpr uint8_t kJFAdminShift     = 1;
 constexpr uint8_t kJFAnchorShift    = 2;
 constexpr uint8_t kJFDatastoreShift = 3;
 
+constexpr chip::EndpointId kJointFabricAdminEndpointId = 1;
+
 JFAManager JFAManager::sJFA;
 
 CHIP_ERROR JFAManager::Init(Server & server)
@@ -97,7 +99,8 @@ void JFAManager::HandleCommissioningCompleteEvent()
             /* When JFA is commissioned, it has to be issued a NOC with Anchor CAT and Administrator CAT */
             if (cats.ContainsIdentifier(kAdminCATIdentifier) && cats.ContainsIdentifier(kAnchorCATIdentifier))
             {
-                (void) app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::Set(1, fabricIndex);
+                (void) app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::Set(
+                    kJointFabricAdminEndpointId, fabricIndex);
 
                 jfFabricIndex = fabricIndex;
             }
@@ -225,9 +228,7 @@ CHIP_ERROR JFAManager::AnnounceJointFabricAdministrator()
     }
 
     ChipLogProgress(JointFabric, "AnnounceJointFabricAdministrator: invoke cluster command.");
-    // TODO: This admin's endpoint ID should be made into a constant and used where applicable, like
-    // JFAManager::HandleCommissioningCompleteEvent.
-    request.endpointID = 1;
+    request.endpointID = kJointFabricAdminEndpointId;
 
     Controller::ClusterBase cluster(*mExchangeMgr, mSessionHolder.Get().Value(), peerAdminJFAdminClusterEndpointId);
     return cluster.InvokeCommand(request, this, OnAnnounceJointFabricAdministratorResponse,
