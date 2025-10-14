@@ -91,7 +91,6 @@ ClustersWithInitFunctions:
     - Color Control
     - Groups
     - Level Control
-    - Localization Configuration
     - Mode Select
     - Occupancy Sensing
     - On/Off
@@ -130,7 +129,6 @@ ClustersWithPreAttributeChangeFunctions:
     - Fan Control
     - Laundry Dryer Controls
     - Laundry Washer Controls
-    - Localization Configuration
     - Mode Select
     - Pump Configuration and Control
     - Thermostat
@@ -154,6 +152,7 @@ CodeDrivenClusters:
     - General Diagnostics
     - Group Key Management
     - Identify
+    - Localization Configuration
     - OTA Software Update Provider
     - Operational Credentials
     - Push AV Stream Transport

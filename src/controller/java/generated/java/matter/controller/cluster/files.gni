@@ -155,6 +155,7 @@ matter_structs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/PowerSourceClusterBatChargeFaultChangeType.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/PowerSourceClusterBatFaultChangeType.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/PowerSourceClusterWiredFaultChangeType.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/PowerTopologyClusterCircuitNodeStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/PushAvStreamTransportClusterCMAFContainerOptionsStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/PushAvStreamTransportClusterContainerOptionsStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/PushAvStreamTransportClusterSupportedFormatStruct.kt",

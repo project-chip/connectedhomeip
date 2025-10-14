@@ -198,7 +198,7 @@ CHIP_ERROR RTKDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpan & m
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
 #if CONFIG_FACTORY_DATA
-#if FEATURE_TRUSTZONE_ENABLE
+#if FEATURE_TRUSTZONE_ENABLE && CONFIG_DAC_KEY_ENC
     ChipLogError(DeviceLayer, "TrustZone build: Device attestation is NOT implemented. Attestation will fail.");
     ReturnErrorOnFailure(CHIP_ERROR_NOT_IMPLEMENTED);
 #else
@@ -214,7 +214,7 @@ CHIP_ERROR RTKDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpan & m
         ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length())));
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
     err = CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
-#endif // FEATURE_TRUSTZONE_ENABLE
+#endif // FEATURE_TRUSTZONE_ENABLE && CONFIG_DAC_KEY_ENC.
 #else
     const uint8_t kDacPublicKey[65] = {
         0x04, 0x46, 0x3a, 0xc6, 0x93, 0x42, 0x91, 0x0a, 0x0e, 0x55, 0x88, 0xfc, 0x6f, 0xf5, 0x6b, 0xb6, 0x3e,
