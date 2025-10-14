@@ -37,17 +37,19 @@ class EmberDescriptorCluster : public DescriptorCluster
 {
 public:
     EmberDescriptorCluster(EndpointId endpointId, DescriptorCluster::OptionalAttributesSet optionalAttributeSet,
-                      Span<const SemanticTag> semanticTags) :
+                           Span<const SemanticTag> semanticTags) :
         DescriptorCluster(endpointId, optionalAttributeSet, semanticTags)
     {}
 
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override {
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
+    {
         GetSemanticTagsForEndpoint(path.mEndpointId, mSemanticTags);
         return DescriptorCluster::Attributes(path, builder);
     }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder) override {
+                                                AttributeValueEncoder & encoder) override
+    {
         GetSemanticTagsForEndpoint(request.path.mEndpointId, mSemanticTags);
         return DescriptorCluster::ReadAttribute(request, encoder);
     }
