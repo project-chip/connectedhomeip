@@ -18,6 +18,7 @@
 
 #include "LightingAppCommandDelegate.h"
 #include "LightingManager.h"
+#include "Identify.h"
 #include <AppMain.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -84,6 +85,7 @@ void ApplicationInit()
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();
     }
+    IdentifyInit();
 }
 
 void ApplicationShutdown()
