@@ -3204,6 +3204,9 @@ static BOOL AttributeIsSpecifiedInPowerTopologyCluster(AttributeId aAttributeId)
     case Attributes::ActiveEndpoints::Id: {
         return YES;
     }
+    case Attributes::ElectricalCircuitNodes::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
