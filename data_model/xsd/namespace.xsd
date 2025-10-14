@@ -12,7 +12,6 @@
     <xs:complexType name="TagsType">
         <xs:sequence>
             <xs:element name="tag" type="TagType" minOccurs="0" maxOccurs="unbounded" />
-
         </xs:sequence>
     </xs:complexType>
 

@@ -8,7 +8,6 @@
   <xs:include schemaLocation="quality.xsd" />
   <xs:include schemaLocation="types.xsd" />
 
-
   <xs:complexType name="ClusterClassificationType">
     <xs:sequence>
       <xs:element type="QualityType" name="quality" minOccurs="0" maxOccurs="1" />
@@ -82,15 +81,12 @@
     <xs:attribute name="picsCode" type="xs:string" />
   </xs:complexType>
 
-
   <xs:complexType name="ClusterIdsType">
     <xs:sequence>
       <xs:element type="ClusterIdType" name="clusterId" minOccurs="1" maxOccurs="unbounded" />
     </xs:sequence>
   </xs:complexType>
 
-
   <xs:element name="cluster" type="ClusterType" />
-
 
 </xs:schema>

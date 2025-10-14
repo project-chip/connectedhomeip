@@ -14,7 +14,6 @@
     <xs:attribute name="name" type="xs:string" use="required" />
     <xs:attribute name="id" type="xs:string" use="required" />
     <xs:attribute name="priority" type="xs:string" use="required" />
-
   </xs:complexType>
 
 </xs:schema>

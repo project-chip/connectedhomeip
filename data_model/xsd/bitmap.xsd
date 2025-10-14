@@ -11,7 +11,6 @@
         <xs:attribute name="to" type="xs:string" use="optional" />
         <xs:attribute name="name" type="xs:string" use="required" />
         <xs:attribute name="summary" type="xs:string" use="optional" />
-
     </xs:complexType>
 
     <xs:complexType name="BitmapType">

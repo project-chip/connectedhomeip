@@ -94,7 +94,6 @@
     <xs:attribute name="id" type="xs:string" use="required" />
     <xs:attribute name="name" type="xs:string" use="required" />
     <xs:attribute name="side" type="xs:string" use="optional" />
-
   </xs:complexType>
 
   <xs:complexType name="ClusterRequirementsType">
@@ -134,8 +133,6 @@
           </xs:sequence>
           <xs:attribute name="deviceTypeId" type="xs:string" use="required" />
           <xs:attribute name="deviceTypeName" type="xs:string" use="required" />
-
-
         </xs:complexType>
       </xs:element>
       <xs:element name="cluster" type="ClusterRequirementType" minOccurs="0" maxOccurs="unbounded" />
