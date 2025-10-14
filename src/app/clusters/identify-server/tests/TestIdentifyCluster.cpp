@@ -300,7 +300,7 @@ TEST_F(TestIdentifyCluster, InvokeIdentifyCommandTest)
 
         auto result = InvokeCommand(cluster, Commands::Identify::Id, data);
         ASSERT_TRUE(result.has_value());
-        EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success); // NOLINT(bugprone-unchecked-optional-access)
 
         uint16_t identifyTime;
         EXPECT_EQ(ReadAttribute(cluster, { kTestEndpointId, Identify::Id, IdentifyTime::Id }, identifyTime), CHIP_NO_ERROR);
@@ -323,7 +323,7 @@ TEST_F(TestIdentifyCluster, InvokeTriggerEffectCommandTest)
         onEffectIdentifierCalled = false;
         auto result              = InvokeCommand(cluster, Commands::TriggerEffect::Id, data);
         ASSERT_TRUE(result.has_value());
-        EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success); // NOLINT(bugprone-unchecked-optional-access)
         EXPECT_TRUE(onEffectIdentifierCalled);
     }
 }
@@ -347,7 +347,7 @@ TEST_F(TestIdentifyCluster, InvokeTriggerEffectCommandAllEffectsTest)
         onEffectIdentifierCalled = false;
         auto result              = InvokeCommand(cluster, Commands::TriggerEffect::Id, data);
         ASSERT_TRUE(result.has_value());
-        EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success); // NOLINT(bugprone-unchecked-optional-access)
         EXPECT_TRUE(onEffectIdentifierCalled);
     }
 }
@@ -366,7 +366,7 @@ TEST_F(TestIdentifyCluster, InvokeTriggerEffectCommandInvalidVariantTest)
     onEffectIdentifierCalled = false;
     auto result              = InvokeCommand(cluster, Commands::TriggerEffect::Id, data);
     ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_TRUE(onEffectIdentifierCalled);
 }
 
@@ -387,7 +387,7 @@ TEST_F(TestIdentifyCluster, TriggerEffectWhileIdentifyingTest)
     onEffectIdentifierCalled = false;
     auto result              = InvokeCommand(cluster, Commands::TriggerEffect::Id, data);
     ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_TRUE(onEffectIdentifierCalled);
 
     uint16_t identifyTime;
@@ -411,7 +411,7 @@ TEST_F(TestIdentifyCluster, TriggerEffectFinishEffectTest)
 
     auto result = InvokeCommand(cluster, Commands::TriggerEffect::Id, data);
     ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success); // NOLINT(bugprone-unchecked-optional-access)
 
     uint16_t identifyTime;
     EXPECT_EQ(ReadAttribute(cluster, identifyTimePath, identifyTime), CHIP_NO_ERROR);
@@ -434,7 +434,7 @@ TEST_F(TestIdentifyCluster, TriggerEffectStopEffectTest)
 
     auto result = InvokeCommand(cluster, Commands::TriggerEffect::Id, data);
     ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success); // NOLINT(bugprone-unchecked-optional-access)
 
     uint16_t identifyTime;
     EXPECT_EQ(ReadAttribute(cluster, identifyTimePath, identifyTime), CHIP_NO_ERROR);
@@ -496,7 +496,7 @@ TEST_F(TestIdentifyCluster, IdentifyTimeAttributeReportingTest)
     data.identifyTime = 15;
     auto result       = InvokeCommand(cluster, Commands::Identify::Id, data);
     ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(changeListener.DirtyList().size(), 1u);
     EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, identifyTimePath.mEndpointId);
     EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, identifyTimePath.mClusterId);

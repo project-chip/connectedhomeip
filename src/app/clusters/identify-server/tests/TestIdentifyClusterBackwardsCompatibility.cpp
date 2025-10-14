@@ -73,7 +73,7 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestLegacyCallbacks)
                              onEffectIdentifier, EffectIdentifierEnum::kBlink, EffectVariantEnum::kDefault, &mTestTimerDelegate);
     EXPECT_EQ(identify.mCluster.Cluster().Startup(mContext.Get()), CHIP_NO_ERROR);
 
-    const auto identifyTimePath = ConcreteDataAttributePath(1, Identify::Id, IdentifyTime::Id);
+    const auto identifyTimePath = ConcreteDataAttributePath(1, chip::app::Clusters::Identify::Id, IdentifyTime::Id);
 
     // Test onIdentifyStart callback by writing to IdentifyTime.
     EXPECT_EQ(WriteAttribute(identify.mCluster.Cluster(), identifyTimePath, 10u), CHIP_NO_ERROR);
@@ -89,7 +89,7 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestLegacyCallbacks)
     data.effectVariant    = EffectVariantEnum::kDefault;
     auto result           = InvokeCommand(identify.mCluster.Cluster(), Commands::TriggerEffect::Id, data);
     ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(result.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_TRUE(onEffectIdentifierCalled);
 }
 
@@ -109,7 +109,7 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestCurrentEffectIdentifierUpd
     dataBlink.effectVariant    = EffectVariantEnum::kDefault;
     auto resultBlink           = InvokeCommand(identify.mCluster.Cluster(), Commands::TriggerEffect::Id, dataBlink);
     ASSERT_TRUE(resultBlink.has_value());
-    EXPECT_EQ(resultBlink.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(resultBlink.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(identify.mCurrentEffectIdentifier, EffectIdentifierEnum::kBlink);
 
     // Invoke the TriggerEffect command with kFinishEffect
@@ -118,7 +118,7 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestCurrentEffectIdentifierUpd
     dataFinish.effectVariant    = EffectVariantEnum::kDefault;
     auto resultFinish           = InvokeCommand(identify.mCluster.Cluster(), Commands::TriggerEffect::Id, dataFinish);
     ASSERT_TRUE(resultFinish.has_value());
-    EXPECT_EQ(resultFinish.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(resultFinish.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(identify.mCurrentEffectIdentifier, EffectIdentifierEnum::kFinishEffect);
 }
 
@@ -143,7 +143,7 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestMActive)
                              EffectIdentifierEnum::kBlink, EffectVariantEnum::kDefault, &mTestTimerDelegate);
     EXPECT_EQ(identify.mCluster.Cluster().Startup(mContext.Get()), CHIP_NO_ERROR);
 
-    const auto identifyTimePath = ConcreteDataAttributePath(1, Identify::Id, IdentifyTime::Id);
+    const auto identifyTimePath = ConcreteDataAttributePath(1, chip::app::Clusters::Identify::Id, IdentifyTime::Id);
 
     // Test that mActive is false initially.
     EXPECT_FALSE(identify.mActive);
