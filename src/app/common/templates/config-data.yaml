@@ -155,10 +155,10 @@ CodeDrivenClusters:
     - Fixed Label
     - General Commissioning
     - General Diagnostics
-    - HEPA Filter Monitoring
     - Group Key Management
     - Groupcast
     - Identify
+    - HEPA Filter Monitoring
     - Localization Configuration
     - OTA Software Update Provider
     - Operational Credentials
