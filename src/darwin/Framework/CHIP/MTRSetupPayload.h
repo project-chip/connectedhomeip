@@ -132,7 +132,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *   act as if the payload was not in fact concatenated, and return the relevant value associated
  *   with the first sub-payload. Mutating such a property will discard the additional sub-payloads.
  */
-@property (nonatomic, readonly, assign, getter=isConcatenated) BOOL concatenated;
+@property (nonatomic, readonly, assign, getter=isConcatenated) BOOL concatenated MTR_AVAILABLE(ios(18.5), macos(15.5), watchos(11.5), tvos(18.5));
 
 /**
  * The individual constituent payloads, if the receiver represents a concatenated payload.
