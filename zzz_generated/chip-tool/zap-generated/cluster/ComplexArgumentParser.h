@@ -67,6 +67,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Struct
 
 static void Finalize(chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::SemanticTagStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Globals::Structs::SemanticTagStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::TestGlobalStruct::Type & request,
                         Json::Value & value);
 
@@ -125,11 +130,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Descriptor::Str
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Binding::Structs::TargetStruct::Type & request,
                         Json::Value & value);
@@ -471,6 +471,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyPreferenc
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::PowerTopology::Structs::CircuitNodeStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PowerTopology::Structs::CircuitNodeStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::ElectricalGridConditions::Structs::ElectricalGridConditionsStruct::Type & request,

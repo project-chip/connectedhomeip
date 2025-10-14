@@ -18,7 +18,7 @@
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/ServerClusterInterface.h>
-#include <clusters/Descriptor/Structs.h>
+#include <clusters/shared/Structs.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
@@ -39,7 +39,7 @@ class EndpointInterface
 public:
     virtual ~EndpointInterface() = default;
 
-    using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
+    using SemanticTag = Clusters::Globals::Structs::SemanticTagStruct::Type;
 
     virtual CHIP_ERROR SemanticTags(ReadOnlyBufferBuilder<SemanticTag> & out) const = 0;
 

@@ -22,11 +22,11 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
-using chip::BindingTable;
+using namespace chip::app::Clusters;
 
 namespace {
 
-void VerifyTableSame(BindingTable & table, const std::vector<EmberBindingTableEntry> & expected)
+void VerifyTableSame(Binding::Table & table, const std::vector<Binding::TableEntry> & expected)
 {
     ASSERT_EQ(table.Size(), expected.size());
     auto iter1 = table.begin();
@@ -40,9 +40,9 @@ void VerifyTableSame(BindingTable & table, const std::vector<EmberBindingTableEn
     EXPECT_EQ(iter1, table.end());
 }
 
-void VerifyRestored(chip::TestPersistentStorageDelegate & storage, const std::vector<EmberBindingTableEntry> & expected)
+void VerifyRestored(chip::TestPersistentStorageDelegate & storage, const std::vector<Binding::TableEntry> & expected)
 {
-    BindingTable restoredTable;
+    Binding::Table restoredTable;
     restoredTable.SetPersistentStorage(&storage);
     EXPECT_EQ(restoredTable.LoadFromStorage(), CHIP_NO_ERROR);
     VerifyTableSame(restoredTable, expected);
@@ -50,7 +50,7 @@ void VerifyRestored(chip::TestPersistentStorageDelegate & storage, const std::ve
 
 TEST(TestBindingTable, TestEmptyBindingTable)
 {
-    BindingTable table;
+    Binding::Table table;
     chip::TestPersistentStorageDelegate testStorage;
     table.SetPersistentStorage(&testStorage);
     EXPECT_EQ(table.Size(), 0u);
@@ -59,21 +59,21 @@ TEST(TestBindingTable, TestEmptyBindingTable)
 
 TEST(TestBindingTable, TestAdd)
 {
-    BindingTable table;
+    Binding::Table table;
     chip::TestPersistentStorageDelegate testStorage;
     table.SetPersistentStorage(&testStorage);
-    EmberBindingTableEntry unusedEntry;
-    unusedEntry.type = MATTER_UNUSED_BINDING;
+    Binding::TableEntry unusedEntry;
+    unusedEntry.type = Binding::MATTER_UNUSED_BINDING;
     EXPECT_EQ(table.Add(unusedEntry), CHIP_ERROR_INVALID_ARGUMENT);
-    for (uint8_t i = 0; i < BindingTable::kMaxBindingEntries; i++)
+    for (uint8_t i = 0; i < Binding::Table::kMaxBindingEntries; i++)
     {
-        EXPECT_EQ(table.Add(EmberBindingTableEntry::ForNode(0, i, 0, 0, std::nullopt)), CHIP_NO_ERROR);
+        EXPECT_EQ(table.Add(Binding::TableEntry::ForNode(0, i, 0, 0, std::nullopt)), CHIP_NO_ERROR);
     }
-    EXPECT_EQ(table.Add(EmberBindingTableEntry::ForNode(0, 0, 0, 0, std::nullopt)), CHIP_ERROR_NO_MEMORY);
-    EXPECT_EQ(table.Size(), BindingTable::kMaxBindingEntries);
+    EXPECT_EQ(table.Add(Binding::TableEntry::ForNode(0, 0, 0, 0, std::nullopt)), CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(table.Size(), Binding::Table::kMaxBindingEntries);
 
     auto iter = table.begin();
-    for (uint8_t i = 0; i < BindingTable::kMaxBindingEntries; i++)
+    for (uint8_t i = 0; i < Binding::Table::kMaxBindingEntries; i++)
     {
         EXPECT_NE(iter, table.end());
         EXPECT_EQ(iter->nodeId, i);
@@ -85,33 +85,33 @@ TEST(TestBindingTable, TestAdd)
 
 TEST(TestBindingTable, TestRemoveThenAdd)
 {
-    BindingTable table;
+    Binding::Table table;
     chip::TestPersistentStorageDelegate testStorage;
     table.SetPersistentStorage(&testStorage);
-    EXPECT_EQ(table.Add(EmberBindingTableEntry::ForNode(0, 0, 0, 0, std::nullopt)), CHIP_NO_ERROR);
+    EXPECT_EQ(table.Add(Binding::TableEntry::ForNode(0, 0, 0, 0, std::nullopt)), CHIP_NO_ERROR);
     auto iter = table.begin();
     EXPECT_EQ(table.RemoveAt(iter), CHIP_NO_ERROR);
     EXPECT_EQ(iter, table.end());
     EXPECT_EQ(table.Size(), 0u);
     EXPECT_EQ(table.begin(), table.end());
-    for (uint8_t i = 0; i < BindingTable::kMaxBindingEntries; i++)
+    for (uint8_t i = 0; i < Binding::Table::kMaxBindingEntries; i++)
     {
-        EXPECT_EQ(table.Add(EmberBindingTableEntry::ForNode(0, i, 0, 0, std::nullopt)), CHIP_NO_ERROR);
+        EXPECT_EQ(table.Add(Binding::TableEntry::ForNode(0, i, 0, 0, std::nullopt)), CHIP_NO_ERROR);
     }
     iter = table.begin();
     ++iter;
     EXPECT_EQ(table.RemoveAt(iter), CHIP_NO_ERROR);
-    EXPECT_EQ(table.Size(), BindingTable::kMaxBindingEntries - 1);
+    EXPECT_EQ(table.Size(), Binding::Table::kMaxBindingEntries - 1);
     EXPECT_EQ(iter->nodeId, 2u);
     EXPECT_EQ(iter.GetIndex(), 2u);
     auto iterCheck = table.begin();
     ++iterCheck;
     EXPECT_EQ(iter, iterCheck);
 
-    EXPECT_EQ(table.Add(EmberBindingTableEntry::ForNode(0, 1, 0, 0, std::nullopt)), CHIP_NO_ERROR);
-    EXPECT_EQ(table.Size(), BindingTable::kMaxBindingEntries);
+    EXPECT_EQ(table.Add(Binding::TableEntry::ForNode(0, 1, 0, 0, std::nullopt)), CHIP_NO_ERROR);
+    EXPECT_EQ(table.Size(), Binding::Table::kMaxBindingEntries);
     iter = table.begin();
-    for (uint8_t i = 0; i < BindingTable::kMaxBindingEntries - 1; i++)
+    for (uint8_t i = 0; i < Binding::Table::kMaxBindingEntries - 1; i++)
     {
         ++iter;
     }
@@ -121,23 +121,23 @@ TEST(TestBindingTable, TestRemoveThenAdd)
     EXPECT_EQ(iter, table.end());
     iter = table.begin();
     EXPECT_EQ(table.RemoveAt(iter), CHIP_NO_ERROR);
-    EXPECT_EQ(table.Size(), BindingTable::kMaxBindingEntries - 1);
+    EXPECT_EQ(table.Size(), Binding::Table::kMaxBindingEntries - 1);
     EXPECT_EQ(iter, table.begin());
     EXPECT_EQ(iter.GetIndex(), 2u);
     EXPECT_EQ(iter->nodeId, 2u);
-    EXPECT_EQ(table.GetAt(0).type, MATTER_UNUSED_BINDING);
+    EXPECT_EQ(table.GetAt(0).type, Binding::MATTER_UNUSED_BINDING);
 }
 
 TEST(TestBindingTable, TestPersistentStorage)
 {
     chip::TestPersistentStorageDelegate testStorage;
-    BindingTable table;
-    chip::Optional<chip::ClusterId> cluster = chip::MakeOptional<chip::ClusterId>(static_cast<chip::ClusterId>(UINT16_MAX + 6));
-    std::vector<EmberBindingTableEntry> expected = {
-        EmberBindingTableEntry::ForNode(0, 0, 0, 0, std::nullopt),
-        EmberBindingTableEntry::ForNode(1, 1, 0, 0, cluster.std_optional()),
-        EmberBindingTableEntry::ForGroup(2, 2, 0, std::nullopt),
-        EmberBindingTableEntry::ForGroup(3, 3, 0, cluster.std_optional()),
+    Binding::Table table;
+    chip::Optional<chip::ClusterId> cluster   = chip::MakeOptional<chip::ClusterId>(static_cast<chip::ClusterId>(UINT16_MAX + 6));
+    std::vector<Binding::TableEntry> expected = {
+        Binding::TableEntry::ForNode(0, 0, 0, 0, std::nullopt),
+        Binding::TableEntry::ForNode(1, 1, 0, 0, cluster.std_optional()),
+        Binding::TableEntry::ForGroup(2, 2, 0, std::nullopt),
+        Binding::TableEntry::ForGroup(3, 3, 0, cluster.std_optional()),
     };
     table.SetPersistentStorage(&testStorage);
     EXPECT_EQ(table.Add(expected[0]), CHIP_NO_ERROR);
@@ -148,7 +148,7 @@ TEST(TestBindingTable, TestPersistentStorage)
 
     // Verify storage untouched if add fails
     testStorage.AddPoisonKey(chip::DefaultStorageKeyAllocator::BindingTableEntry(4).KeyName());
-    EXPECT_NE(table.Add(EmberBindingTableEntry::ForNode(4, 4, 0, 0, std::nullopt)), CHIP_NO_ERROR);
+    EXPECT_NE(table.Add(Binding::TableEntry::ForNode(4, 4, 0, 0, std::nullopt)), CHIP_NO_ERROR);
     VerifyRestored(testStorage, expected);
     testStorage.ClearPoisonKeys();
 

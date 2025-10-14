@@ -106,6 +106,8 @@ public:
     CHIP_ERROR RemoveClientCertificate(FabricIndex fabric, TLSCCDID id) override;
     CHIP_ERROR GetClientCertificateCount(FabricIndex fabric, uint8_t & outCount) override;
 
+    CHIP_ERROR RemoveFabric(FabricIndex fabric) override;
+
 private:
     CHIP_ERROR FindRootCertificateEntry(TLSCAID id, FabricIndex out_fabric);
     CHIP_ERROR FindClientCertificateEntry(TLSCCDID id, FabricIndex out_fabric);

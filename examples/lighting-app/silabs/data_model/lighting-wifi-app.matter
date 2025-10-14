@@ -324,6 +324,13 @@ struct PowerThresholdStruct {
   nullable PowerThresholdSourceEnum powerThresholdSource = 2;
 }
 
+struct SemanticTagStruct {
+  nullable vendor_id mfgCode = 0;
+  enum8 namespaceID = 1;
+  enum8 tag = 2;
+  optional nullable char_string<64> label = 3;
+}
+
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -350,7 +357,7 @@ fabric_scoped struct WebRTCSessionStruct {
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
-  revision 5;
+  revision 6;
 
   enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
@@ -647,13 +654,13 @@ cluster LevelControl = 8 {
     int16u frequency = 0;
   }
 
-  /** Command description for MoveToLevel */
+  /** This command will move the device to the specified level. */
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
-  /** Command description for Move */
+  /** This command will move the device using the specified values. */
   command Move(MoveRequest): DefaultSuccess = 1;
-  /** Command description for Step */
+  /** This command will do a relative step change of the device using the specified values. */
   command Step(StepRequest): DefaultSuccess = 2;
-  /** Command description for Stop */
+  /** This command will stop the actions of various other commands that are still in progress. */
   command Stop(StopRequest): DefaultSuccess = 3;
   /** Command description for MoveToLevelWithOnOff */
   command MoveToLevelWithOnOff(MoveToLevelWithOnOffRequest): DefaultSuccess = 4;
@@ -663,8 +670,7 @@ cluster LevelControl = 8 {
   command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
   /** Command description for StopWithOnOff */
   command StopWithOnOff(StopWithOnOffRequest): DefaultSuccess = 7;
-  /** Change the currrent frequency to the provided one, or a close
-        approximation if the exact provided one is not possible. */
+  /** This command will cause the device to change the current frequency to the requested value. */
   command MoveToClosestFrequency(MoveToClosestFrequencyRequest): DefaultSuccess = 8;
 }
 
@@ -679,13 +685,6 @@ cluster Descriptor = 29 {
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
-  }
-
-  struct SemanticTagStruct {
-    nullable vendor_id mfgCode = 0;
-    enum8 namespaceID = 1;
-    enum8 tag = 2;
-    optional nullable char_string<64> label = 3;
   }
 
   readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
@@ -1076,7 +1075,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 cluster PowerSource = 47 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 3;
 
   enum BatApprovedChemistryEnum : enum16 {
     kUnspecified = 0;
@@ -1902,7 +1901,7 @@ cluster WiFiNetworkDiagnostics = 54 {
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum CommissioningWindowStatusEnum : enum8 {
     kWindowNotOpen = 0;
@@ -1931,7 +1930,7 @@ cluster AdministratorCommissioning = 60 {
 
   request struct OpenCommissioningWindowRequest {
     int16u commissioningTimeout = 0;
-    octet_string PAKEPasscodeVerifier = 1;
+    octet_string<97> PAKEPasscodeVerifier = 1;
     int16u discriminator = 2;
     int32u iterations = 3;
     octet_string<32> salt = 4;
@@ -1941,11 +1940,11 @@ cluster AdministratorCommissioning = 60 {
     int16u commissioningTimeout = 0;
   }
 
-  /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method. */
+  /** This command is used by a current Administrator to instruct a Node to go into commissioning mode. */
   timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using basic commissioning method, if the node supports it. */
+  /** This command MAY be used by a current Administrator to instruct a Node to go into commissioning mode, if the node supports the Basic Commissioning Method. */
   timed command access(invoke: administer) OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
-  /** This command is used by a current Administrator to instruct a Node to revoke any active Open Commissioning Window or Open Basic Commissioning Window command. */
+  /** This command is used by a current Administrator to instruct a Node to revoke any active OpenCommissioningWindow or OpenBasicCommissioningWindow command. */
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
@@ -2099,7 +2098,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
@@ -2674,6 +2673,7 @@ cluster ColorControl = 768 {
 
 endpoint 0 {
   device type ma_rootdevice = 22, version 3;
+  device type ma_otarequestor = 18, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2682,17 +2682,21 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
   server cluster AccessControl {
     emits event AccessControlEntryChanged;
-    emits event AccessControlExtensionChanged;
     callback attribute acl;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -2721,6 +2725,9 @@ endpoint 0 {
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
     callback attribute configurationVersion;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -2730,6 +2737,9 @@ endpoint 0 {
     ram      attribute updatePossible default = 1;
     ram      attribute updateState default = 0;
     ram      attribute updateStateProgress default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
@@ -2737,13 +2747,16 @@ endpoint 0 {
   }
 
   server cluster GeneralCommissioning {
-    ram      attribute breadcrumb default = 0x0000000000000000;
+    callback attribute breadcrumb;
     callback attribute basicCommissioningInfo;
     callback attribute regulatoryConfig;
     callback attribute locationCapability;
     callback attribute supportsConcurrentConnection;
-    ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 2;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
@@ -2763,6 +2776,9 @@ endpoint 0 {
     callback attribute lastNetworkID;
     callback attribute lastConnectErrorValue;
     callback attribute supportedWiFiBands;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2792,6 +2808,9 @@ endpoint 0 {
     callback attribute totalOperationalHours;
     callback attribute bootReason;
     callback attribute testEventTriggersEnabled default = false;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2836,6 +2855,9 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision;
 
@@ -2850,8 +2872,11 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AttestationRequest;
     handle command AttestationResponse;
@@ -2875,6 +2900,9 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2904,7 +2932,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command Identify;
     handle command TriggerEffect;
@@ -3009,7 +3037,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
   }
 
   server cluster ScenesManagement {

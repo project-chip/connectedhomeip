@@ -603,8 +603,8 @@ static id _Nullable DecodeAttributeValueForDescriptorCluster(AttributeId aAttrib
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRDescriptorClusterSemanticTagStruct * newElement_0;
-                newElement_0 = [MTRDescriptorClusterSemanticTagStruct new];
+                MTRDataTypeSemanticTagStruct * newElement_0;
+                newElement_0 = [MTRDataTypeSemanticTagStruct new];
                 if (entry_0.mfgCode.IsNull()) {
                     newElement_0.mfgCode = nil;
                 } else {
@@ -9724,6 +9724,49 @@ static id _Nullable DecodeAttributeValueForPowerTopologyCluster(AttributeId aAtt
         }
         return value;
     }
+    case Attributes::ElectricalCircuitNodes::Id: {
+        using TypeInfo = Attributes::ElectricalCircuitNodes::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRPowerTopologyClusterCircuitNodeStruct * newElement_0;
+                newElement_0 = [MTRPowerTopologyClusterCircuitNodeStruct new];
+                newElement_0.node = [NSNumber numberWithUnsignedLongLong:entry_0.node];
+                if (entry_0.endpoint.HasValue()) {
+                    newElement_0.endpoint = [NSNumber numberWithUnsignedShort:entry_0.endpoint.Value()];
+                } else {
+                    newElement_0.endpoint = nil;
+                }
+                if (entry_0.label.HasValue()) {
+                    newElement_0.label = AsString(entry_0.label.Value());
+                    if (newElement_0.label == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
+                } else {
+                    newElement_0.label = nil;
+                }
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
     default: {
         // Not a known PowerTopology attribute.
         break;
@@ -18793,7 +18836,7 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
                     } else {
                         newElement_0.transportOptions.audioStreamID = nil;
                     }
-                    newElement_0.transportOptions.endpointID = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().endpointID];
+                    newElement_0.transportOptions.tlsEndpointID = [NSNumber numberWithUnsignedShort:entry_0.transportOptions.Value().TLSEndpointID];
                     newElement_0.transportOptions.url = AsString(entry_0.transportOptions.Value().url);
                     if (newElement_0.transportOptions.url == nil) {
                         CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
@@ -20748,7 +20791,7 @@ static id _Nullable DecodeAttributeValueForTLSClientManagementCluster(AttributeI
                 } else {
                     newElement_0.ccdid = [NSNumber numberWithUnsignedShort:entry_0.ccdid.Value()];
                 }
-                newElement_0.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.status)];
+                newElement_0.referenceCount = [NSNumber numberWithUnsignedChar:entry_0.referenceCount];
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }

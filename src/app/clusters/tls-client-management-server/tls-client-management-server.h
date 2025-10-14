@@ -34,7 +34,9 @@ namespace Clusters {
 
 class TlsClientManagementDelegate;
 
-class TlsClientManagementServer : private AttributeAccessInterface, private CommandHandlerInterface
+class TlsClientManagementServer : private AttributeAccessInterface,
+                                  private CommandHandlerInterface,
+                                  private chip::FabricTable::Delegate
 {
 public:
     /**
@@ -93,12 +95,14 @@ private:
     // Encodes all provisioned endpoints
     CHIP_ERROR EncodeProvisionedEndpoints(EndpointId matterEndpoint, FabricIndex fabric,
                                           const AttributeValueEncoder::ListEncodeHelper & encoder);
+
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 };
 
 /** @brief
  *  Defines methods for implementing application-specific logic for the TLSClientManagement Cluster.
  */
-class TlsClientManagementDelegate
+class TlsClientManagementDelegate : public Tls::CertificateDependencyChecker
 {
 public:
     struct EndpointStructType : TlsClientManagement::Structs::TLSEndpointStruct::DecodableType
@@ -153,7 +157,7 @@ public:
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] endpointID The EndpoitnID to find.
      * @param[out] outEndpoint The endpoint at the given index in the list.
-     * @return NOT_FOUND if no mapping is found.
+     * @return Success if found, a failure Status otherwise.
      */
     virtual Protocols::InteractionModel::Status FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
                                                                             uint16_t endpointID,
@@ -169,8 +173,7 @@ public:
      * @param[in] provisionReq The request data specifying the endpoint to be provisioned
      * @param[out] endpointID a reference to the uint16_t variable that is to contain the ID of the provisioned endpoint.
      *
-     * @return CHIP_NO_ERROR if the endpoint was appended to the list successfully.
-     * @return CHIP_ERROR if there was an error adding the endpoint to the list.
+     * @return Success if the endpoint was appended to the list successfully, a failure code otherwise.
      */
     virtual Protocols::InteractionModel::ClusterStatusCode
     ProvisionEndpoint(EndpointId matterEndpoint, FabricIndex fabric,
@@ -183,10 +186,15 @@ public:
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric to query against
      * @param[in] endpointID The ID of the endpoint to remove.
-     * @return NOT_FOUND if no mapping is found.
+     * @return Success if the endpoint was removed, a failure Status otherwise.
      */
-    virtual Protocols::InteractionModel::ClusterStatusCode
-    RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID) = 0;
+    virtual Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                              uint16_t endpointID) = 0;
+
+    /**
+     * @brief Removes all associated endpoints for the given fabricIndex.
+     */
+    virtual void RemoveFabric(FabricIndex fabricIndex) = 0;
 
 protected:
     friend class TlsClientManagementServer;

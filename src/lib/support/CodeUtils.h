@@ -32,6 +32,7 @@
 #include <lib/support/ObjectDump.h>
 #include <lib/support/VerificationMacrosNoLogging.h>
 #include <lib/support/logging/TextOnlyLogging.h>
+#include <memory>
 
 /**
  * Base-level abnormal termination.
@@ -210,7 +211,7 @@
     } while (false)
 
 /**
- *  @def LogAndReturnOnFailure(expr)
+ *  @def ReturnAndLogOnFailure(expr)
  *
  *  @brief
  *    If expr returns something than CHIP_NO_ERROR, log a chip message for the specified module
@@ -219,12 +220,12 @@
  *  Example usage:
  *
  *  @code
- *    LogAndReturnOnFailure(channel->SendMsg(msg), Module, "Failure message: %s", param);
+ *    ReturnAndLogOnFailure(channel->SendMsg(msg), Module, "Failure message: %s", param);
  *  @endcode
  *
  *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
  */
-#define LogAndReturnOnFailure(expr, MOD, MSG, ...)                                                                                 \
+#define ReturnAndLogOnFailure(expr, MOD, MSG, ...)                                                                                 \
     do                                                                                                                             \
     {                                                                                                                              \
         CHIP_ERROR __err = (expr);                                                                                                 \
@@ -236,28 +237,28 @@
     } while (false)
 
 /**
- *  @def LogAndReturnErrorOnFailure(expr)
+ *  @def ReturnErrorAndLogOnFailure(expr)
  *
  *  @brief
- *    If expr returns something than CHIP_NO_ERROR, lg a chip message for the specified module
+ *    If expr returns something than CHIP_NO_ERROR, log a chip message for the specified module
  *    in the 'Error' category and return the error.
  *
  *  Example usage:
  *
  *  @code
- *    LogAndReturnErrorOnFailure(channel->SendMsg(msg), Module, "Failure message: %s", param);
+ *    ReturnErrorAndLogOnFailure(channel->SendMsg(msg), Module, "Failure message: %s", param);
  *  @endcode
  *
  *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
  */
-#define LogAndReturnErrorOnFailure(expr, MOD, MSG, ...)                                                                            \
+#define ReturnErrorAndLogOnFailure(expr, MOD, MSG, ...)                                                                            \
     do                                                                                                                             \
     {                                                                                                                              \
         CHIP_ERROR __err = (expr);                                                                                                 \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
             ChipLogError(MOD, MSG ": %" CHIP_ERROR_FORMAT, ##__VA_ARGS__, __err.Format());                                         \
-            return _err;                                                                                                           \
+            return __err;                                                                                                          \
         }                                                                                                                          \
     } while (false)
 
@@ -275,13 +276,15 @@
  *  @endcode
  *
  *  @param[in]  expr        An expression to be tested.
+ *  @param[in]  ...         Statements to execute before returning. Optional.
  */
-#define ReturnOnFailure(expr)                                                                                                      \
+#define ReturnOnFailure(expr, ...)                                                                                                 \
     do                                                                                                                             \
     {                                                                                                                              \
         auto __err = (expr);                                                                                                       \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
+            __VA_ARGS__;                                                                                                           \
             return;                                                                                                                \
         }                                                                                                                          \
     } while (false)
@@ -309,6 +312,7 @@
         auto __err = (expr);                                                                                                       \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
+            __VA_ARGS__;                                                                                                           \
             return value;                                                                                                          \
         }                                                                                                                          \
     } while (false)
@@ -864,6 +868,32 @@ template <typename T, size_t N>
 constexpr bool ArrayIsSorted(const T (&aArray)[N])
 {
     return ArrayIsSorted(aArray, N);
+}
+
+/**
+ *  @def ScopeExit(fn)
+ *
+ *  @brief
+ *    RAII to automatically release resources on scope exit (instead of depending on goto exit)
+ *    See https://en.cppreference.com/w/cpp/experimental/scope_exit.html
+ *    Use with ReturnOnFailure, ReturnLogErrorOnFailure, ReturnAndLogOnFailure and other such methods
+ *    to return an error code result from a method call without needing to store in a local var
+ *
+ *  Example usage:
+ *
+ *  @code
+ *  Resource * resource = GetResource();
+ *  auto resourceHolder = ScopeExit([&] { resource->Release() });
+ *  // If the call below fails, logs, returns the error code, and calls resourceHolder
+ *  ReturnAndLogOnFailure(ProcessAndSaveResource(resource), Module, "Failure message: %s", param);
+ *  resourceHolder->release(); // Cancel clean-up at end of successful method
+ *  @endcode
+ */
+template <class F>
+__attribute__((always_inline)) inline auto ScopeExit(F && fn)
+{
+    auto deleter = [f = std::forward<F>(fn)](void *) mutable { f(); };
+    return std::unique_ptr<void, decltype(deleter)>(reinterpret_cast<void *>(1), std::move(deleter));
 }
 
 } // namespace chip

@@ -8542,7 +8542,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum JoinGroupCommandField {GroupID(0),Endpoints(1),Key(2),KeyID(3),GracePeriod(4),UseAuxiliaryACL(5),;
+        }public enum JoinGroupCommandField {GroupID(0),Endpoints(1),KeyID(2),Key(3),GracePeriod(4),UseAuxiliaryACL(5),;
                     private final int id;
                     JoinGroupCommandField(int id) {
                         this.id = id;
@@ -8576,7 +8576,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum UpdateGroupKeyCommandField {GroupID(0),Key(1),KeyID(2),GracePeriod(3),;
+                }public enum UpdateGroupKeyCommandField {GroupID(0),KeyID(1),Key(2),GracePeriod(3),;
                     private final int id;
                     UpdateGroupKeyCommandField(int id) {
                         this.id = id;
@@ -10280,6 +10280,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             AvailableEndpoints(0L),
             ActiveEndpoints(1L),
+            ElectricalCircuitNodes(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),

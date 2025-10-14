@@ -30,11 +30,20 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::Binding::Id:
         MatterBindingClusterInitCallback(endpoint);
         break;
+    case app::Clusters::AccessControl::Id:
+        MatterAccessControlClusterInitCallback(endpoint);
+        break;
     case app::Clusters::BasicInformation::Id:
         MatterBasicInformationClusterInitCallback(endpoint);
         break;
+    case app::Clusters::LocalizationConfiguration::Id:
+        MatterLocalizationConfigurationClusterInitCallback(endpoint);
+        break;
     case app::Clusters::TimeFormatLocalization::Id:
         MatterTimeFormatLocalizationClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::GeneralCommissioning::Id:
+        MatterGeneralCommissioningClusterInitCallback(endpoint);
         break;
     case app::Clusters::DiagnosticLogs::Id:
         MatterDiagnosticLogsClusterInitCallback(endpoint);
@@ -54,8 +63,14 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::AdministratorCommissioning::Id:
         MatterAdministratorCommissioningClusterInitCallback(endpoint);
         break;
+    case app::Clusters::OperationalCredentials::Id:
+        MatterOperationalCredentialsClusterInitCallback(endpoint);
+        break;
     case app::Clusters::GroupKeyManagement::Id:
         MatterGroupKeyManagementClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::FixedLabel::Id:
+        MatterFixedLabelClusterInitCallback(endpoint);
         break;
     case app::Clusters::BooleanState::Id:
         MatterBooleanStateClusterInitCallback(endpoint);
@@ -70,11 +85,20 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::Binding::Id:
         MatterBindingClusterShutdownCallback(endpoint);
         break;
+    case app::Clusters::AccessControl::Id:
+        MatterAccessControlClusterShutdownCallback(endpoint);
+        break;
     case app::Clusters::BasicInformation::Id:
         MatterBasicInformationClusterShutdownCallback(endpoint);
         break;
+    case app::Clusters::LocalizationConfiguration::Id:
+        MatterLocalizationConfigurationClusterShutdownCallback(endpoint);
+        break;
     case app::Clusters::TimeFormatLocalization::Id:
         MatterTimeFormatLocalizationClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::GeneralCommissioning::Id:
+        MatterGeneralCommissioningClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::DiagnosticLogs::Id:
         MatterDiagnosticLogsClusterShutdownCallback(endpoint);
@@ -94,8 +118,14 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::AdministratorCommissioning::Id:
         MatterAdministratorCommissioningClusterShutdownCallback(endpoint);
         break;
+    case app::Clusters::OperationalCredentials::Id:
+        MatterOperationalCredentialsClusterShutdownCallback(endpoint);
+        break;
     case app::Clusters::GroupKeyManagement::Id:
         MatterGroupKeyManagementClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::FixedLabel::Id:
+        MatterFixedLabelClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::BooleanState::Id:
         MatterBooleanStateClusterShutdownCallback(endpoint);

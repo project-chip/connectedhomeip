@@ -123,11 +123,11 @@ DataModel::ActionReturnStatus CodeDrivenDataModelProvider::WriteAttribute(const 
 }
 
 void CodeDrivenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttributePath & path,
-                                                                 DataModel::ListWriteOperation opType)
+                                                                 DataModel::ListWriteOperation opType, FabricIndex accessingFabric)
 {
     ServerClusterInterface * serverCluster = GetServerClusterInterface(path);
     VerifyOrReturn(serverCluster != nullptr);
-    serverCluster->ListAttributeWriteNotification(path, opType);
+    serverCluster->ListAttributeWriteNotification(path, opType, accessingFabric);
 }
 
 std::optional<DataModel::ActionReturnStatus> CodeDrivenDataModelProvider::InvokeCommand(const DataModel::InvokeRequest & request,
@@ -158,8 +158,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::Endpoints(ReadOnlyBufferBuilder<DataMode
 }
 
 CHIP_ERROR
-CodeDrivenDataModelProvider::SemanticTags(EndpointId endpointId,
-                                          ReadOnlyBufferBuilder<Clusters::Descriptor::Structs::SemanticTagStruct::Type> & out)
+CodeDrivenDataModelProvider::SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & out)
 {
     EndpointInterface * endpoint = GetEndpointInterface(endpointId);
     VerifyOrReturnError(endpoint != nullptr, CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));

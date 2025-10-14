@@ -39,7 +39,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Testing;
-using SemanticTag = chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type;
+using SemanticTag = chip::app::Clusters::Globals::Structs::SemanticTagStruct::Type;
 
 class TestProviderChangeListener : public DataModel::ProviderChangeListener
 {
@@ -175,10 +175,12 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType) override
+    void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType,
+                                        FabricIndex accessingFabric) override
     {
-        mLastListWriteOpPath = path;
-        mLastListWriteOpType = opType;
+        mLastListWriteOpPath            = path;
+        mLastListWriteOpType            = opType;
+        mLastListWriteOpAccessingFabric = accessingFabric;
     }
 
     CHIP_ERROR Startup(ServerClusterContext & context) override
@@ -209,6 +211,7 @@ public:
     DataModel::EventEntry mEventEntry;
     std::optional<ConcreteAttributePath> mLastListWriteOpPath;
     std::optional<DataModel::ListWriteOperation> mLastListWriteOpType;
+    std::optional<FabricIndex> mLastListWriteOpAccessingFabric;
 };
 
 class TestCodeDrivenDataModelProvider : public ::testing::Test
@@ -830,7 +833,7 @@ TEST_F(TestCodeDrivenDataModelProvider, ListAttributeWriteNotification)
     mProvider.AddEndpoint(*mOwnedRegistrations.back());
 
     ConcreteAttributePath path(1, 10, 1);
-    mProvider.ListAttributeWriteNotification(path, DataModel::ListWriteOperation::kListWriteSuccess);
+    mProvider.ListAttributeWriteNotification(path, DataModel::ListWriteOperation::kListWriteSuccess, 1);
     ASSERT_TRUE(testCluster.mLastListWriteOpPath.has_value());
     if (testCluster.mLastListWriteOpPath)
     {
@@ -840,6 +843,11 @@ TEST_F(TestCodeDrivenDataModelProvider, ListAttributeWriteNotification)
     if (testCluster.mLastListWriteOpType)
     {
         EXPECT_EQ(testCluster.mLastListWriteOpType.value(), DataModel::ListWriteOperation::kListWriteSuccess);
+    }
+    ASSERT_TRUE(testCluster.mLastListWriteOpAccessingFabric.has_value());
+    if (testCluster.mLastListWriteOpAccessingFabric)
+    {
+        EXPECT_EQ(testCluster.mLastListWriteOpAccessingFabric.value(), 1);
     }
 }
 
