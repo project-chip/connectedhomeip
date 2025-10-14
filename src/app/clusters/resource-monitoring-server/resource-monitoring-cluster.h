@@ -16,27 +16,26 @@
  */
 #pragma once
 
-#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
-#include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/clusters/resource-monitoring-server/replacement-product-list-manager.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <app/data-model/Nullable.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/util/basic-types.h>
+#include <clusters/HepaFilterMonitoring/Enums.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <clusters/HepaFilterMonitoring/Enums.h>
 #include <stdint.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
-
 
 // forward declarations
 class ResourceMonitoringDelegate;
@@ -45,12 +44,11 @@ class ResourceMonitoringCluster : public DefaultServerCluster
 {
 
 public:
-
     using OptionalAttributeSet = chip::app::OptionalAttributeSet<
         ResourceMonitoring::Attributes::Condition::Id, ResourceMonitoring::Attributes::DegradationDirection::Id,
         ResourceMonitoring::Attributes::InPlaceIndicator::Id, ResourceMonitoring::Attributes::LastChangedTime::Id>;
 
-     /**
+    /**
      * Creates a resource monitoring cluster object. The Init() method needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
      *
@@ -58,16 +56,13 @@ public:
      * @param aClusterId                        The ID of the ResourceMonitoring aliased cluster to be instantiated.
      * @param aFeatureMap                       The feature map of the cluster.
      * @param aDegradationDirection             The degradation direction of the cluster.
-     * @param aResetConditionCommandSupported   Whether the ResetCondition command is supported by the cluster.                    
+     * @param aResetConditionCommandSupported   Whether the ResetCondition command is supported by the cluster.
      */
-    ResourceMonitoringCluster(
-        EndpointId aEndpointId,
-        ClusterId aClusterId,
-        const BitFlags<ResourceMonitoring::Feature> enabledFeatures,
-        OptionalAttributeSet optionalAttributeSet,
-        ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
-        bool aResetConditionCommandSupported
-    );
+    ResourceMonitoringCluster(EndpointId aEndpointId, ClusterId aClusterId,
+                              const BitFlags<ResourceMonitoring::Feature> enabledFeatures,
+                              OptionalAttributeSet optionalAttributeSet,
+                              ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
+                              bool aResetConditionCommandSupported);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
@@ -111,7 +106,7 @@ public:
      * @param aDelegate A pointer to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CHIP_ERROR SetDelegate(ResourceMonitoringDelegate* aDelegate);
+    CHIP_ERROR SetDelegate(ResourceMonitoringDelegate * aDelegate);
 
     // Attribute getters
     uint8_t GetCondition() const;
@@ -125,26 +120,25 @@ public:
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler) override;    
+                                                               CommandHandler * handler) override;
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & cluster,
-                                        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;       
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
 private:
     ResourceMonitoringDelegate * mDelegate;
 
-    void LoadPersistentAttributes();    
+    void LoadPersistentAttributes();
 
     ResourceMonitoring::ReplacementProductListManager * GetReplacementProductListManagerInstance();
-    
+
     CHIP_ERROR ReadReplaceableProductList(AttributeValueEncoder & encoder);
 
-    DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request,
-                                           AttributeValueDecoder & decoder);
+    DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
 
-    std::optional<DataModel::ActionReturnStatus> ResetCondition(const ConcreteCommandPath & commandPath,
-                                                                 const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData,
-                                                                 CommandHandler * handler);
+    std::optional<DataModel::ActionReturnStatus>
+    ResetCondition(const ConcreteCommandPath & commandPath,
+                   const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData, CommandHandler * handler);
 
     chip::Percent mCondition                       = 100;
     DegradationDirectionEnum mDegradationDirection = DegradationDirectionEnum::kDown;
@@ -152,8 +146,8 @@ private:
     bool mInPlaceIndicator                         = true;
     DataModel::Nullable<uint32_t> mLastChangedTime;
     ReplacementProductListManager * mReplacementProductListManager = nullptr;
-    
-    bool mResetConditionCommandSupported{false};
+
+    bool mResetConditionCommandSupported{ false };
 
     const BitFlags<ResourceMonitoring::Feature> mEnabledFeatures;
     const OptionalAttributeSet mOptionalAttributeSet;
@@ -164,7 +158,6 @@ class ResourceMonitoringDelegate
     friend class ResourceMonitoringCluster;
 
 private:
-
     ResourceMonitoringCluster * mInstance = nullptr;
     /**
      * This method is used by the SDK to set the instance pointer. This is done during the instantiation of an Instance object.
@@ -175,11 +168,9 @@ private:
     friend class ResourceMonitoringCluster;
 
 protected:
-
     ResourceMonitoringCluster * GetInstance() { return mInstance; }
 
 public:
-
     ResourceMonitoringDelegate()          = default;
     virtual ~ResourceMonitoringDelegate() = default;
 

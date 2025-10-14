@@ -26,41 +26,31 @@ namespace ResourceMonitoring {
 template <ClusterId DISCRIMINATOR>
 class ResourceMonitoringClusterProxy : public ResourceMonitoringCluster
 {
-    public:
-    
-    ResourceMonitoringClusterProxy(const ResourceMonitoringClusterProxy &) = delete;
+public:
+    ResourceMonitoringClusterProxy(const ResourceMonitoringClusterProxy &)             = delete;
     ResourceMonitoringClusterProxy & operator=(const ResourceMonitoringClusterProxy &) = delete;
 
-    ResourceMonitoringClusterProxy(ResourceMonitoringClusterProxy &&) = delete;
+    ResourceMonitoringClusterProxy(ResourceMonitoringClusterProxy &&)             = delete;
     ResourceMonitoringClusterProxy & operator=(ResourceMonitoringClusterProxy &&) = delete;
 
     ResourceMonitoringClusterProxy() = delete;
 
-    ResourceMonitoringClusterProxy(
-        EndpointId aEndpointId,
-        ClusterId aClusterId,
-        const BitFlags<ResourceMonitoring::Feature> enabledFeatures,
-        ResourceMonitoringCluster::OptionalAttributeSet optionalAttributeSet,
-        ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
-        bool aResetConditionCommandSupported
-    ): ResourceMonitoringCluster(
-        aEndpointId,
-        aClusterId,
-        enabledFeatures,
-        optionalAttributeSet,
-        aDegradationDirection,
-        aResetConditionCommandSupported
-    )
+    ResourceMonitoringClusterProxy(EndpointId aEndpointId, ClusterId aClusterId,
+                                   const BitFlags<ResourceMonitoring::Feature> enabledFeatures,
+                                   ResourceMonitoringCluster::OptionalAttributeSet optionalAttributeSet,
+                                   ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
+                                   bool aResetConditionCommandSupported) :
+        ResourceMonitoringCluster(aEndpointId, aClusterId, enabledFeatures, optionalAttributeSet, aDegradationDirection,
+                                  aResetConditionCommandSupported)
     {
-        static_assert(DISCRIMINATOR == HepaFilterMonitoring::Id || DISCRIMINATOR == ActivatedCarbonFilterMonitoring::Id,
-                      "ResourceMonitoringClusterProxy can only be instantiated for HepaFilterMonitoring or ActivatedCarbonFilterMonitoring");
+        static_assert(
+            DISCRIMINATOR == HepaFilterMonitoring::Id || DISCRIMINATOR == ActivatedCarbonFilterMonitoring::Id,
+            "ResourceMonitoringClusterProxy can only be instantiated for HepaFilterMonitoring or ActivatedCarbonFilterMonitoring");
     }
 };
 
-using HepaFilterMonitoringCluster =
-    ResourceMonitoringClusterProxy<HepaFilterMonitoring::Id>;
-using ActivatedCarbonFilterMonitoringCluster =
-    ResourceMonitoringClusterProxy<ActivatedCarbonFilterMonitoring::Id>;
+using HepaFilterMonitoringCluster            = ResourceMonitoringClusterProxy<HepaFilterMonitoring::Id>;
+using ActivatedCarbonFilterMonitoringCluster = ResourceMonitoringClusterProxy<ActivatedCarbonFilterMonitoring::Id>;
 
 } // namespace ResourceMonitoring
 } // namespace Clusters
