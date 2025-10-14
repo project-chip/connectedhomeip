@@ -47,8 +47,8 @@ class ResourceMonitoringCluster : public DefaultServerCluster
 public:
 
     using OptionalAttributeSet = chip::app::OptionalAttributeSet<
-        EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id, EthernetNetworkDiagnostics::Attributes::FullDuplex::Id,
-        EthernetNetworkDiagnostics::Attributes::PHYRate::Id, EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id>;
+        ResourceMonitoring::Attributes::Condition::Id, ResourceMonitoring::Attributes::DegradationDirection::Id,
+        ResourceMonitoring::Attributes::InPlaceIndicator::Id, ResourceMonitoring::Attributes::LastChangedTime::Id>;
 
      /**
      * Creates a resource monitoring cluster object. The Init() method needs to be called for this instance to be registered and
