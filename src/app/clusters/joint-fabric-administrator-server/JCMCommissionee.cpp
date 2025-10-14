@@ -224,7 +224,8 @@ CHIP_ERROR JCMCommissionee::ReadAdminFabrics(OnCompletionFunc onComplete)
 {
     auto onReadSuccess = [this, onComplete](const ConcreteAttributePath &, const FabricsAttr::DecodableType & fabrics) {
         // Get the root public key from the fabric corresponding to the Administrator Fabric Index (mInfo.adminFabricIndex)
-        auto iter = fabrics.begin();
+        auto iter  = fabrics.begin();
+        bool found = false;
         while (iter.Next())
         {
             const auto & fabricDescriptor = iter.GetValue();
@@ -236,10 +237,18 @@ CHIP_ERROR JCMCommissionee::ReadAdminFabrics(OnCompletionFunc onComplete)
                 ChipLogProgress(
                     JointFabric,
                     "JCM: Copied rootPublicKey, fabricID, and vendorID from fabric indicated by Administrator Fabric Index");
+                found = true;
                 break;
             }
         }
-        onComplete(CHIP_NO_ERROR);
+
+        CHIP_ERROR err = iter.GetStatus();
+        if (err == CHIP_NO_ERROR && !found)
+        {
+            ChipLogError(JointFabric, "JCM: Administrator fabric not found in Fabrics list");
+            err = CHIP_ERROR_NOT_FOUND;
+        }
+        onComplete(err);
     };
     auto onError = [onComplete](const ConcreteAttributePath *, CHIP_ERROR err) {
         ChipLogError(JointFabric, "JCM: Failed to read commissioner's Fabrics list: %" CHIP_ERROR_FORMAT, err.Format());
@@ -366,7 +375,8 @@ CHIP_ERROR JCMCommissionee::ReadAdminCerts(OnCompletionFunc onComplete)
 CHIP_ERROR JCMCommissionee::ReadAdminNOCs(OnCompletionFunc onComplete)
 {
     auto onSuccess = [this, onComplete](const ConcreteAttributePath &, const NOCsAttr::DecodableType & nocs) {
-        auto iter = nocs.begin();
+        auto iter  = nocs.begin();
+        bool found = false;
 
         while (iter.Next())
         {
@@ -403,12 +413,21 @@ CHIP_ERROR JCMCommissionee::ReadAdminNOCs(OnCompletionFunc onComplete)
                 onComplete(CHIP_ERROR_INTERNAL);
                 return;
             }
+            found = true;
+            break;
         }
         CHIP_ERROR err = iter.GetStatus();
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(JointFabric, "JCM: Error decoding NOCs. iter status: %" CHIP_ERROR_FORMAT, err.Format());
             onComplete(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (!found)
+        {
+            ChipLogError(JointFabric, "JCM: Administrator NOC not found in NOCs list");
+            onComplete(CHIP_ERROR_NOT_FOUND);
             return;
         }
 
