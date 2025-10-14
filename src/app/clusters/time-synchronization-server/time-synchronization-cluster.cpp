@@ -212,10 +212,10 @@ TimeSynchronization::Delegate * TimeSynchronizationCluster::mDelegate = nullptr;
 TimeSynchronizationCluster::TimeSynchronizationCluster(
     EndpointId endpoint, const TimeSynchronizationCluster::OptionalAttributeSet & optionalAttributeSet,
     const BitFlags<Feature> features, SupportsDNSResolve::TypeInfo::Type supportsDNSResolve, TimeZoneDatabaseEnum timeZoneDatabase,
-    TimeSourceEnum timeSource) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mOptionalAttributeSet(optionalAttributeSet), mFeatures(features), mSupportsDNSResolve(supportsDNSResolve),
-    mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
+    TimeSourceEnum timeSource, NTPServerAvailable::TypeInfo::Type ntpServerAvailable) :
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mOptionalAttributeSet(optionalAttributeSet), mFeatures(features),
+    mSupportsDNSResolve(supportsDNSResolve), mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
+    mNTPServerAvailable(ntpServerAvailable),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -368,6 +368,8 @@ DataModel::ActionReturnStatus TimeSynchronizationCluster::ReadAttribute(const Da
         return encoder.Encode(mTimeZoneDatabase);
     case TimeSource::Id:
         return encoder.Encode(mTimeSource);
+    case NTPServerAvailable::Id:
+        return encoder.Encode(mNTPServerAvailable);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -1190,8 +1192,7 @@ TimeSynchronizationCluster::HandleSetTimeZone(CommandHandler * commandObj, const
     response.DSTOffsetRequired = true;
     UpdateTimeZoneState();
     const auto & tzList = GetTimeZone();
-    if (mFeatures.Has(TimeSynchronization::Feature::kTimeZone) && mTimeZoneDatabase != TimeZoneDatabaseEnum::kNone &&
-        tzList.size() != 0)
+    if (mFeatures.Has(Feature::kTimeZone) && mTimeZoneDatabase != TimeZoneDatabaseEnum::kNone && tzList.size() != 0)
     {
         auto & tz = tzList[0].timeZone;
         if (tz.name.HasValue() && GetDelegate()->HandleUpdateDSTOffset(tz.name.Value()))

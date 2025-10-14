@@ -72,7 +72,8 @@ public:
                                const BitFlags<TimeSynchronization::Feature> features,
                                TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type supportsDNSResolve,
                                TimeSynchronization::TimeZoneDatabaseEnum timeZoneDatabase,
-                               TimeSynchronization::TimeSourceEnum timeSource);
+                               TimeSynchronization::TimeSourceEnum timeSource,
+                               TimeSynchronization::Attributes::NTPServerAvailable::TypeInfo::Type ntpServerAvailable);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown() override;
@@ -171,6 +172,7 @@ private:
     TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type mSupportsDNSResolve;
     TimeSynchronization::TimeZoneDatabaseEnum mTimeZoneDatabase;
     TimeSynchronization::TimeSourceEnum mTimeSource;
+    TimeSynchronization::Attributes::NTPServerAvailable::TypeInfo::Type mNTPServerAvailable;
 
     TimeSyncDataProvider mTimeSyncDataProvider;
     TimeSynchronization::TimeSyncEventFlag mEventFlag = TimeSynchronization::TimeSyncEventFlag::kNone;

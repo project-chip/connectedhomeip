@@ -48,28 +48,35 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t rawFeatureMap) override
     {
-        const BitFlags<TimeSynchronization::Feature> featureMap(rawFeatureMap);
+        const BitFlags<Feature> featureMap(rawFeatureMap);
 
-        TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type supportsDNSResolve = false;
+        SupportsDNSResolve::TypeInfo::Type supportsDNSResolve = false;
         if (featureMap.Has(Feature::kNTPClient))
         {
             SupportsDNSResolve::Get(endpointId, &supportsDNSResolve);
         }
 
-        TimeSynchronization::TimeZoneDatabaseEnum timeZoneDatabase = TimeZoneDatabaseEnum::kNone;
+        TimeZoneDatabaseEnum timeZoneDatabase = TimeZoneDatabaseEnum::kNone;
         if (featureMap.Has(Feature::kTimeZone))
         {
             TimeZoneDatabase::Get(endpointId, &timeZoneDatabase);
         }
 
         TimeSynchronizationCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
-        TimeSynchronization::TimeSourceEnum timeSource = TimeSourceEnum::kNone;
+        TimeSourceEnum timeSource = TimeSourceEnum::kNone;
         if (optionalAttributeSet.IsSet(TimeSource::Id))
         {
             TimeSource::Get(endpointId, &timeSource);
         }
 
-        gServer.Create(endpointId, optionalAttributeSet, featureMap, supportsDNSResolve, timeZoneDatabase, timeSource);
+        NTPServerAvailable::TypeInfo::Type ntpServerAvailable = false;
+        if (featureMap.Has(Feature::kNTPServer))
+        {
+            SupportsDNSResolve::Get(endpointId, &ntpServerAvailable);
+        }
+
+        gServer.Create(endpointId, optionalAttributeSet, featureMap, supportsDNSResolve, timeZoneDatabase, timeSource,
+                       ntpServerAvailable);
         return gServer.Registration();
     }
 
