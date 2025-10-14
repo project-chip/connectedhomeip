@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,6 +58,7 @@ TEST_F(TestAutoRelease, TestDestruction)
 TEST_F(TestAutoRelease, TestOperators)
 {
     TestCounterRelease releasable;
+    TestCounterRelease releasable2;
 
     AutoRelease<TestCounterRelease> releaser(&releasable);
     EXPECT_EQ(releasable.Counter(), 1);
@@ -65,13 +66,26 @@ TEST_F(TestAutoRelease, TestOperators)
     EXPECT_EQ(&*releaser, &releasable);
     EXPECT_FALSE(releaser.IsNull());
 
-    releaser.Release();
+    AutoRelease<TestCounterRelease> other(&releasable);
+    EXPECT_EQ(releasable.Counter(), 1);
+    other.Set(&releasable);
+    EXPECT_EQ(releasable.Counter(), 1);
+    other.Set(&releasable2);
+    EXPECT_NE(&*other, &releasable);
+    EXPECT_EQ(&*other, &releasable2);
     EXPECT_EQ(releasable.Counter(), 0);
+
+    releaser.Release();
+    EXPECT_EQ(releasable.Counter(), -1);
     EXPECT_TRUE(releaser.IsNull());
 
     // Make sure additional release is no-op
     releaser.Release();
-    EXPECT_EQ(releasable.Counter(), 0);
+    EXPECT_EQ(releasable.Counter(), -1);
+
+    other.Set(nullptr);
+    EXPECT_EQ(releasable2.Counter(), 0);
+    EXPECT_TRUE(other.IsNull());
 }
 
 } // namespace
