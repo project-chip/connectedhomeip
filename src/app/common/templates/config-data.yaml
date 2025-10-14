@@ -152,8 +152,8 @@ CodeDrivenClusters:
     - Fixed Label
     - General Commissioning
     - General Diagnostics
-    - Groupcast
     - Group Key Management
+    - Groupcast
     - Localization Configuration
     - OTA Software Update Provider
     - Operational Credentials
