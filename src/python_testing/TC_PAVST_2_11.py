@@ -39,7 +39,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import time
 
 from mobly import asserts
 from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
@@ -226,7 +225,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             len(transportConfigs), 1, "TransportConfigurations must not be empty!"
         )
         aConnectionID = transportConfigs[0].connectionID
-        aTransportOptions = transportConfigs[0].transportOptions
+        # aTransportOptions = transportConfigs[0].transportOptions
 
         self.step(5)
         cmd = pvcluster.Commands.SetTransportStatus(
