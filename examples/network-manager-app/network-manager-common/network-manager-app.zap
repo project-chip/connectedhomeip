@@ -429,13 +429,6 @@
               "included": 1
             },
             {
-              "name": "AccessControlExtensionChanged",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
               "name": "FabricRestrictionReviewUpdate",
               "code": 2,
               "mfgCode": null,
