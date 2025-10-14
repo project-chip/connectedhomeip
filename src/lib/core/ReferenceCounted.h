@@ -52,6 +52,11 @@ class ReferenceCountedPtr;
 /**
  * Like ReferenceCounted but with protected visibility of reference count management.
  * Use ReferenceCountedPtr<T> to automatically increment/decrement the ref count.
+ *
+ * NOTE: The default kInitRefCount here is 0, unlike ReferenceCounted where it's 1
+ * The reason for this is that the expectation is that the owner of this object will
+ * immediately wrap it in a `ReferenceCountedPtr` before exposing it to callers, which
+ * will increment the count to 1.
  */
 template <class Subclass, class Deletor, int kInitRefCount = 0, typename CounterType = uint32_t>
 class ReferenceCountedProtected
