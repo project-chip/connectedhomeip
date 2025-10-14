@@ -15,7 +15,8 @@
  */
 #pragma once
 
-#include <platform/silabs/wifi/wiseconnect-interface/WiseconnectWifiInterface.h>
+#include <platform/silabs/wifi/WifiInterface.h>
+#include <sl_status.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -25,9 +26,22 @@ namespace Silabs {
  * @brief WifiInterface implementation for the SiWx platform
  *
  */
-class WifiInterfaceImpl final : public WiseconnectWifiInterface
+class WifiInterfaceImpl final : public WifiInterface
 {
 public:
+    enum class WifiPlatformEvent : uint8_t
+    {
+        kStationConnect     = 0,
+        kStationDisconnect  = 1,
+        kAPStart            = 2,
+        kAPStop             = 3,
+        kScan               = 4, /* This combines the scan start and scan result events  */
+        kStationStartJoin   = 5,
+        kConnectionComplete = 6, /* This combines the DHCP and Notify for SiWx917 */
+        kStationDhcpDone    = 7,
+        kStationDhcpPoll    = 8,
+    };
+
     static WifiInterfaceImpl & GetInstance() { return mInstance; }
 
     WifiInterfaceImpl(const WifiInterfaceImpl &)             = delete;
@@ -36,6 +50,23 @@ public:
     /*
      * WifiInterface impl
      */
+
+    CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, chip::MutableByteSpan & addr) override;
+    CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback) override;
+    CHIP_ERROR StartWifiTask() override;
+    void ConfigureStationMode() override;
+    bool IsStationConnected() override;
+    bool IsStationModeEnabled() override;
+    bool IsStationReady() override;
+    CHIP_ERROR TriggerDisconnection() override;
+    void ClearWifiCredentials() override;
+    void SetWifiCredentials(const WifiCredentials & credentials) override;
+    CHIP_ERROR GetWifiCredentials(WifiCredentials & credentials) override;
+    CHIP_ERROR ConnectToAccessPoint(void) override;
+    bool HasAnIPv4Address() override;
+    bool HasAnIPv6Address() override;
+    void CancelScanNetworks() override;
+    bool IsWifiProvisioned() override;
 
     CHIP_ERROR InitWiFiStack(void) override;
     CHIP_ERROR GetAccessPointInfo(wfx_wifi_scan_result_t & info) override;
@@ -50,20 +81,42 @@ public:
     /**
      * @brief Processes the wifi platform events for the SiWx platform
      *
-     * TODO: Current inheritance structure with the task creation in the parent forces this function to be public when it shouldn't
-     *       be. This isn't the best practice and we should try to move this to protected.
-     *
      * @param event
      */
-    void ProcessEvent(WiseconnectWifiInterface::WifiPlatformEvent event);
+    void ProcessEvent(WifiPlatformEvent event);
 
 protected:
-    /*
-     * WiseconnectWifiInterface impl
+    /**
+     * @brief Function calls the underlying platforms disconnection API.
+     *
+     * @return sl_status_t SL_STATUS_OK, the Wi-Fi disconnection was succesfully triggered
+     *                     SL_STATUS_FAILURE, otherwise
      */
+    sl_status_t TriggerPlatformWifiDisconnection();
+    /**
+     * @brief Posts an event to the Wi-Fi task
+     *
+     * @param[in] event Event to process.
+     */
+    void PostWifiPlatformEvent(WifiPlatformEvent event);
+    /**
+     * @brief Main worker function for the Matter Wi-Fi task responsible of processing Wi-Fi platform events.
+     *        Function is used in the StartWifiTask.
+     *
+     * @param[in] arg context pointer
+     */
+    static void MatterWifiTask(void * arg);
 
-    sl_status_t TriggerPlatformWifiDisconnection() override;
-    void PostWifiPlatformEvent(WifiPlatformEvent event) override;
+    /**
+     * @brief Notify the application about the connectivity status if it has not been notified yet.
+     */
+    void NotifyConnectivity(void);
+
+    /**
+     * @brief Function resets the IP and connectiity flags and triggers the DHCP operation
+     *
+     */
+    void ResetConnectivityNotificationFlags();
 
 private:
     WifiInterfaceImpl()  = default;
@@ -101,6 +154,8 @@ private:
      *
      */
     void NotifySuccessfulConnection();
+
+    bool mHasNotifiedWifiConnectivity = false;
 
     static WifiInterfaceImpl mInstance;
 };
