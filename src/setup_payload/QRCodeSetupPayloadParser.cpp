@@ -381,8 +381,6 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayloadFromBase38Data(std::string p
 
 CHIP_ERROR QRCodeSetupPayloadParser::populatePayloads(std::vector<SetupPayload> & outPayloads) const
 {
-    constexpr char kPayloadDelimiter = '*';
-
     std::string payload = ExtractPayload(mBase38Representation);
     VerifyOrReturnError(payload.length() != 0, CHIP_ERROR_INVALID_ARGUMENT);
 
