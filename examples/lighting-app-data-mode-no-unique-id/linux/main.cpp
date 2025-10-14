@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
+#include "Identify.h"
 #include "LightingAppCommandDelegate.h"
 #include "LightingManager.h"
-#include "Identify.h"
 #include <AppMain.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
