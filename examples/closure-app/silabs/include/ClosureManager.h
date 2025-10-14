@@ -157,6 +157,21 @@ public:
     const Action_t & GetCurrentAction() const { return mCurrentAction; }
 
     /**
+     * @brief Retrieves the complete current state of the closure control endpoint.
+     *
+     * @param currentState Reference to store the retrieved current state.
+     * @return CHIP_ERROR Returns CHIP_NO_ERROR on success, or an error code if retrieval fails.
+     */
+    CHIP_ERROR GetClosureControlCurrentState(chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::GenericOverallCurrentState> & currentState);
+
+    /**
+     * @brief Checks if a MoveTo action is currently in progress.
+     *
+     * @return true if a MoveTo action is in progress, false otherwise.
+     */
+    bool IsClosureControlMotionInProgress() const;
+
+    /**
      * @brief Sets the initial state for the ClosureControlEndpoint.
      *
      * This method initializes the closure control instance with default values and configurations.

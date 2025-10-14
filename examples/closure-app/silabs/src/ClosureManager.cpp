@@ -1284,3 +1284,13 @@ bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & cu
     }
     return true;
 }
+
+CHIP_ERROR ClosureManager::GetClosureControlCurrentState(DataModel::Nullable<GenericOverallCurrentState> & currentState)
+{
+    return mClosureEndpoint1.GetLogic().GetOverallCurrentState(currentState);
+}
+
+bool ClosureManager::IsClosureControlMotionInProgress() const
+{
+    return isMoveToInProgress;
+}
