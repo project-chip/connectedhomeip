@@ -303,7 +303,10 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                                  "Sensitivity of created Trigger does not match")
 
         self.step(7)
-
+        event_callback = EventSubscriptionHandler(expected_cluster=pvcluster)
+        await event_callback.start(self.default_controller,
+                                   self.dut_node_id,
+                                   self.get_endpoint(1))
         node_id = self.dut_node_id
         dev_ctrl = self.default_controller
         event_listener = EventSubscriptionHandler(expected_cluster=Clusters.ZoneManagement)
@@ -321,16 +324,19 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                              "Unexpected reason on ZoneTriggered")
 
         self.step(8)
-        time.sleep(1)
-        cmd = pvcluster.Commands.ModifyPushTransport(
-            connectionID=aConnectionID,
-            transportOptions=aTransportOptions,
-        )
-        # Transport Status is now active, if upload started and its in progress then ModifyPushTransport would check for Busy Transport Status
-        status = await self.psvt_modify_push_transport(cmd)
-        asserts.assert_true(
-            status == Status.Success,
-            "DUT responds with SUCCESS status code.")
+        event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)
+        logger.info(f"Event data {event_data}")
+        asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
+        # time.sleep(1)
+        # cmd = pvcluster.Commands.ModifyPushTransport(
+        #     connectionID=aConnectionID,
+        #     transportOptions=aTransportOptions,
+        # )
+        # # Transport Status is now active, if upload started and its in progress then ModifyPushTransport would check for Busy Transport Status
+        # status = await self.psvt_modify_push_transport(cmd)
+        # asserts.assert_true(
+        #     status == Status.Success,
+        #     "DUT responds with SUCCESS status code.")
 
 
 if __name__ == "__main__":
