@@ -88,7 +88,7 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_true(status == Status.InvalidInState,
                             (f"Unexpected response {status} received on SetTransportStatus "
                              "with privacy mode enabled")
-                           )
+                            )
         await self.write_single_attribute(
             attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftRecordingPrivacyModeEnabled(False),
             endpoint_id=endpoint,
