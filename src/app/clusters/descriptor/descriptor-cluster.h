@@ -34,8 +34,8 @@ public:
     using OptionalAttributesSet = OptionalAttributeSet<Descriptor::Attributes::EndpointUniqueID::Id>;
 
     /*
-     * The caller who provides the Span of semantic tags MUST ensure that the underlying data remains 
-     * valid for the lifetime of the DescriptorCluster instance. This is a non-owning view of the 
+     * The caller who provides the Span of semantic tags MUST ensure that the underlying data remains
+     * valid for the lifetime of the DescriptorCluster instance. This is a non-owning view of the
      * semantic tag data.
     */
     DescriptorCluster(EndpointId endpointId, OptionalAttributesSet optionalAttributeSet, Span<const SemanticTag> semanticTags) :
