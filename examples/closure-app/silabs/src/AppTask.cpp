@@ -174,11 +174,11 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
         {
             // Fetch the complete current state of closure with proper locking
             chip::DeviceLayer::PlatformMgr().LockChipStack();
-            
+
             chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::GenericOverallCurrentState> currentState;
             CHIP_ERROR err = ClosureManager::GetInstance().GetClosureControlCurrentState(currentState);
-            
-            if (err != CHIP_NO_ERROR || currentState.IsNull() || 
+
+            if (err != CHIP_NO_ERROR || currentState.IsNull() ||
                 !currentState.Value().position.HasValue() || currentState.Value().position.Value().IsNull())
             {
                 chip::DeviceLayer::PlatformMgr().UnlockChipStack();
@@ -188,7 +188,7 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
 
             // Get current position and determine target position (toggle)
             auto currentPosition = currentState.Value().position.Value().Value();
-            chip::app::Clusters::ClosureControl::TargetPositionEnum targetPosition = 
+            chip::app::Clusters::ClosureControl::TargetPositionEnum targetPosition =
                 (currentPosition == chip::app::Clusters::ClosureControl::CurrentPositionEnum::kFullyOpened)
                     ? chip::app::Clusters::ClosureControl::TargetPositionEnum::kMoveToFullyClosed
                     : chip::app::Clusters::ClosureControl::TargetPositionEnum::kMoveToFullyOpen;
@@ -207,7 +207,7 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
             }
 
             chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-            
+
             // Move to the target position with preserved latch and speed values
             auto status = ClosureManager::GetInstance().OnMoveToCommand(chip::MakeOptional(targetPosition), latch, speed);
             if (status != chip::Protocols::InteractionModel::Status::Success)
