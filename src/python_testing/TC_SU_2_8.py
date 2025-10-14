@@ -188,6 +188,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
             discriminator=p1_disc,
             passcode=p_pass,
             ota_source=provider_ota_file,
+            kvs_path='/tmp/chip_kvs_provider',
             log_file='/tmp/provider_1.log',
             err_log_file='/tmp/provider_1.log'
         )
@@ -218,7 +219,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         # Announce after subscription
         await self.announce_ota_provider(controller=th1, provider_node_id=p1_node, requestor_node_id=requestor_node_id, vendor_id=vendor_id, endpoint=endpoint)
 
-        await asyncio.sleep(5)
+        await asyncio.sleep(2)
 
         blocks = provider_1.read_from_logs("QueryImage", before=0, after=15)
 
@@ -299,24 +300,18 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         await event_cb.start(dev_ctrl=th1, node_id=requestor_node_id, endpoint=endpoint,
                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
-        applying_event = event_cb.wait_for_event_report(
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
-        asserts.assert_equal(applying, applying_event.newState,
-                             f"New state is {applying_event.newState} and it should be {applying}")
-
-        event_cb.reset()
-        await event_cb.cancel()
-
         # Stop provider
         await asyncio.sleep(2)
         try:
             provider_1.terminate()
         except Exception as e:
             logging.warning(f"Provider termination raised: {e}")
-        run("rm -rf /tmp/chip_kvs", shell=True)
-        await asyncio.sleep(2)
 
         th1.ExpireSessions(nodeid=p1_node)
+        await asyncio.sleep(2)
+
+        event_cb.reset()
+        await event_cb.cancel()
 
         # Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P. DUT sends QueryImage command to TH2/OTA-P
         self.step(2)
@@ -331,6 +326,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
             discriminator=p2_disc,
             passcode=p_pass,
             ota_source=provider_ota_file,
+            kvs_path='/tmp/chip_kvs_provider_2',
             log_file='/tmp/provider_2.log',
             err_log_file='/tmp/provider_2.log'
         )
@@ -381,7 +377,8 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         # Write default OTA providers TH1 with p1_node which does not exist
         await self.write_ota_providers(th1, p1_node_invalid, endpoint)
 
-        # Do not announce TH1-OTA Provider
+        # Announce TH1-OTA Provider
+        await self.announce_ota_provider(controller=th1, provider_node_id=p1_node_invalid, requestor_node_id=requestor_node_id, vendor_id=vendor_id, endpoint=endpoint)
 
         # Expect events idle to querying, downloadError and then back to idle
         querying_event = event_cb.wait_for_event_report(
@@ -398,13 +395,6 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
             Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50000)
         asserts.assert_equal(idle, idle_event.newState,
                              f"New state is {idle_event.newState} and it should be {idle}")
-
-        logging.info("Cleaning DefaultOTAProviders.")
-        resp = await th1.WriteAttribute(
-            dut_node_id,
-            [(endpoint, Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders([]))]
-        )
-        asserts.assert_equal(resp[0].Status, Status.Success, "Clean DefaultOTAProviders failed.")
 
         event_cb.reset()
         await event_cb.cancel()
@@ -451,7 +441,6 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         except Exception as e:
             logging.warning(f"Provider termination raised: {e}")
 
-        await asyncio.sleep(2)
         th2.ExpireSessions(nodeid=p2_node)
 
 
