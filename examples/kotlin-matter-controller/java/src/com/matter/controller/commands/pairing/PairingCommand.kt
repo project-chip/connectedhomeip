@@ -162,6 +162,10 @@ abstract class PairingCommand(
     logger.log(Level.INFO, "onCommissioningStatusUpdate")
   }
 
+  override fun onCommissioningStageStart(nodeId: Long, stage: String?) {
+    logger.log(Level.INFO, "onCommissioningStageStart")
+  }
+
   override fun onNotifyChipConnectionClosed() {
     logger.log(Level.INFO, "onNotifyChipConnectionClosed")
   }
