@@ -329,6 +329,29 @@ tests:
       response:
           value: 0
 
+    - label: "Step 5d: TH writes DoorOpenEvents attribute as 1"
+      PICS: DRLK.S.A0004
+      command: "writeAttribute"
+      attribute: "DoorOpenEvents"
+      arguments:
+          value: 1
+
+    - label: "Step 5d: TH writes DoorOpenEvents attribute as 1"
+      PICS: "!DRLK.S.A0004"
+      command: "writeAttribute"
+      attribute: "DoorOpenEvents"
+      arguments:
+          value: 1
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label: "Step 5e: TH reads DoorOpenEvents attribute from DUT"
+      PICS: DRLK.S.A0004
+      command: "readAttribute"
+      attribute: "DoorOpenEvents"
+      response:
+          value: 1
+
     - label: "Step 6a: TH reads DoorClosedEvents attribute from DUT"
       PICS: DRLK.S.F05 && DRLK.S.A0005
       command: "readAttribute"
@@ -368,6 +391,29 @@ tests:
       attribute: "DoorClosedEvents"
       response:
           value: 0
+
+    - label: "Step 6d: TH writes DoorClosedEvents attribute as 1"
+      PICS: DRLK.S.A0005
+      command: "writeAttribute"
+      attribute: "DoorClosedEvents"
+      arguments:
+          value: 1
+
+    - label: "Step 6d: TH writes DoorClosedEvents attribute as 1"
+      PICS: "!DRLK.S.A0005"
+      command: "writeAttribute"
+      attribute: "DoorClosedEvents"
+      arguments:
+          value: 1
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label: "Step 6e: TH reads DoorClosedEvents attribute from DUT"
+      PICS: DRLK.S.A0005
+      command: "readAttribute"
+      attribute: "DoorClosedEvents"
+      response:
+          value: 1
 
     - label: "Step 7a: TH reads OpenPeriod attribute from DUT"
       PICS: DRLK.S.F05 && DRLK.S.A0006
