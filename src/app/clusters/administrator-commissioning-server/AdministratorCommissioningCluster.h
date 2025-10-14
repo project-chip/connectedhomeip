@@ -30,7 +30,7 @@ class AdministratorCommissioningCluster : public DefaultServerCluster
 public:
     constexpr AdministratorCommissioningCluster(EndpointId endpointId,
                                                 BitFlags<AdministratorCommissioning::Feature> _unused_features) :
-        DefaultServerCluster({ endpointId, AdministratorCommissioning::Id, false })
+        DefaultServerCluster(ConcreteClusterPath::ConstExpr(endpointId, AdministratorCommissioning::Id))
     {}
 
     // Server cluster implementation

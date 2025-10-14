@@ -37,7 +37,7 @@ class AccessControlCluster : public DefaultServerCluster,
 #endif
 {
 public:
-    constexpr AccessControlCluster() : DefaultServerCluster({ kRootEndpointId, AccessControl::Id, false }) {}
+    constexpr AccessControlCluster() : DefaultServerCluster(ConcreteClusterPath::ConstExpr(kRootEndpointId, AccessControl::Id)) {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 

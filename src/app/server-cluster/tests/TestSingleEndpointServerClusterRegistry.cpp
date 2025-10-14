@@ -51,7 +51,7 @@ class FakeServerClusterInterface : public DefaultServerCluster
 public:
     constexpr FakeServerClusterInterface(ConcreteClusterPath && path) : DefaultServerCluster(std::move(path)) {}
     constexpr FakeServerClusterInterface(EndpointId endpoint, ClusterId cluster) :
-        DefaultServerCluster({ endpoint, cluster, false })
+        DefaultServerCluster(ConcreteClusterPath::ConstExpr(endpoint, cluster))
     {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
