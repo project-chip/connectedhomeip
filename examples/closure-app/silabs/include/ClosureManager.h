@@ -162,7 +162,8 @@ public:
      * @param currentState Reference to store the retrieved current state.
      * @return CHIP_ERROR Returns CHIP_NO_ERROR on success, or an error code if retrieval fails.
      */
-    CHIP_ERROR GetClosureControlCurrentState(chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::GenericOverallCurrentState> & currentState);
+    CHIP_ERROR GetClosureControlCurrentState(
+        chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::GenericOverallCurrentState> & currentState);
 
     /**
      * @brief Checks if a MoveTo action is currently in progress.
