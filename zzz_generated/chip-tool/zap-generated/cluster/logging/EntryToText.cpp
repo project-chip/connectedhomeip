@@ -3179,6 +3179,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Sleep";
         case chip::app::Clusters::Humidistat::Attributes::Optimal::Id:
             return "Optimal";
+        case chip::app::Clusters::Humidistat::Attributes::CondPumpEnabled::Id:
+            return "CondPumpEnabled";
+        case chip::app::Clusters::Humidistat::Attributes::CondRunCount::Id:
+            return "CondRunCount";
         case chip::app::Clusters::Humidistat::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::Humidistat::Attributes::AcceptedCommandList::Id:

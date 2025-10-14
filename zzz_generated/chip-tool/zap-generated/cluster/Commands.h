@@ -10215,6 +10215,8 @@ private:
 | * Continuous                                                        | 0x0009 |
 | * Sleep                                                             | 0x000A |
 | * Optimal                                                           | 0x000B |
+| * CondPumpEnabled                                                   | 0x000C |
+| * CondRunCount                                                      | 0x000D |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -26952,6 +26954,8 @@ void registerClusterHumidistat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "continuous", Attributes::Continuous::Id, credsIssuerConfig),                       //
         make_unique<ReadAttribute>(Id, "sleep", Attributes::Sleep::Id, credsIssuerConfig),                                 //
         make_unique<ReadAttribute>(Id, "optimal", Attributes::Optimal::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "cond-pump-enabled", Attributes::CondPumpEnabled::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "cond-run-count", Attributes::CondRunCount::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -26981,6 +26985,10 @@ void registerClusterHumidistat(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<bool>>(Id, "sleep", 0, 1, Attributes::Sleep::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "optimal", 0, 1, Attributes::Optimal::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "cond-pump-enabled", 0, 1, Attributes::CondPumpEnabled::Id, WriteCommandType::kWrite,
+                                          credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cond-run-count", 0, UINT16_MAX, Attributes::CondRunCount::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -27005,6 +27013,8 @@ void registerClusterHumidistat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "continuous", Attributes::Continuous::Id, credsIssuerConfig),                       //
         make_unique<SubscribeAttribute>(Id, "sleep", Attributes::Sleep::Id, credsIssuerConfig),                                 //
         make_unique<SubscribeAttribute>(Id, "optimal", Attributes::Optimal::Id, credsIssuerConfig),                             //
+        make_unique<SubscribeAttribute>(Id, "cond-pump-enabled", Attributes::CondPumpEnabled::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "cond-run-count", Attributes::CondRunCount::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //

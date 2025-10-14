@@ -13151,6 +13151,28 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
         value = [NSNumber numberWithBool:cppValue];
         return value;
     }
+    case Attributes::CondPumpEnabled::Id: {
+        using TypeInfo = Attributes::CondPumpEnabled::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::CondRunCount::Id: {
+        using TypeInfo = Attributes::CondRunCount::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
     default: {
         // Not a known Humidistat attribute.
         break;

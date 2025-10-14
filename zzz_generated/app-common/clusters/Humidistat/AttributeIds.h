@@ -14,7 +14,7 @@ namespace Humidistat {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 17;
+inline constexpr uint32_t kAttributesCount = 19;
 
 namespace SupportedModes {
 inline constexpr AttributeId Id = 0x00000000;
@@ -63,6 +63,14 @@ inline constexpr AttributeId Id = 0x0000000A;
 namespace Optimal {
 inline constexpr AttributeId Id = 0x0000000B;
 } // namespace Optimal
+
+namespace CondPumpEnabled {
+inline constexpr AttributeId Id = 0x0000000C;
+} // namespace CondPumpEnabled
+
+namespace CondRunCount {
+inline constexpr AttributeId Id = 0x0000000D;
+} // namespace CondRunCount
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

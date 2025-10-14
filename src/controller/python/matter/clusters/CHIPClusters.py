@@ -9153,6 +9153,19 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
+            0x0000000C: {
+                "attributeName": "CondPumpEnabled",
+                "attributeId": 0x0000000C,
+                "type": "bool",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000000D: {
+                "attributeName": "CondRunCount",
+                "attributeId": 0x0000000D,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,

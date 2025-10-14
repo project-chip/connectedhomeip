@@ -12663,6 +12663,8 @@ public class ClusterIDMapping {
             Continuous(9L),
             Sleep(10L),
             Optimal(11L),
+            CondPumpEnabled(12L),
+            CondRunCount(13L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),

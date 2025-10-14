@@ -12470,6 +12470,28 @@ public class ClusterReadMapping {
           readHumidistatOptimalCommandParams
         );
         result.put("readOptimalAttribute", readHumidistatOptimalAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readHumidistatCondPumpEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readHumidistatCondPumpEnabledAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.HumidistatCluster) cluster).readCondPumpEnabledAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readHumidistatCondPumpEnabledCommandParams
+        );
+        result.put("readCondPumpEnabledAttribute", readHumidistatCondPumpEnabledAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readHumidistatCondRunCountCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readHumidistatCondRunCountAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.HumidistatCluster) cluster).readCondRunCountAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readHumidistatCondRunCountCommandParams
+        );
+        result.put("readCondRunCountAttribute", readHumidistatCondRunCountAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readHumidistatGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readHumidistatGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

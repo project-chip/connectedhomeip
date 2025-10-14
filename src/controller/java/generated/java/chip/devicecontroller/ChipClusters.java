@@ -41248,6 +41248,8 @@ public class ChipClusters {
     private static final long CONTINUOUS_ATTRIBUTE_ID = 9L;
     private static final long SLEEP_ATTRIBUTE_ID = 10L;
     private static final long OPTIMAL_ATTRIBUTE_ID = 11L;
+    private static final long COND_PUMP_ENABLED_ATTRIBUTE_ID = 12L;
+    private static final long COND_RUN_COUNT_ATTRIBUTE_ID = 13L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -41648,6 +41650,67 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, OPTIMAL_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readCondPumpEnabledAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COND_PUMP_ENABLED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, COND_PUMP_ENABLED_ATTRIBUTE_ID, true);
+    }
+
+    public void writeCondPumpEnabledAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeCondPumpEnabledAttribute(callback, value, 0);
+    }
+
+    public void writeCondPumpEnabledAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new BooleanType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), COND_PUMP_ENABLED_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeCondPumpEnabledAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COND_PUMP_ENABLED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, COND_PUMP_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readCondRunCountAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COND_RUN_COUNT_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, COND_RUN_COUNT_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeCondRunCountAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COND_RUN_COUNT_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, COND_RUN_COUNT_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

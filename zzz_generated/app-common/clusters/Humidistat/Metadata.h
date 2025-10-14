@@ -70,6 +70,14 @@ namespace Optimal {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Optimal::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace Optimal
+namespace CondPumpEnabled {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CondPumpEnabled::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
+} // namespace CondPumpEnabled
+namespace CondRunCount {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CondRunCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace CondRunCount
 constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     SupportedModes::kMetadataEntry,
     Mode::kMetadataEntry,

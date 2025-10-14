@@ -5911,6 +5911,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"Optimal";
             break;
 
+        case MTRAttributeIDTypeClusterHumidistatAttributeCondPumpEnabledID:
+            result = @"CondPumpEnabled";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeCondRunCountID:
+            result = @"CondRunCount";
+            break;
+
         case MTRAttributeIDTypeClusterHumidistatAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;

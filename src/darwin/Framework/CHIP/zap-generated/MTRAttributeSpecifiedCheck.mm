@@ -4196,6 +4196,12 @@ static BOOL AttributeIsSpecifiedInHumidistatCluster(AttributeId aAttributeId)
     case Attributes::Optimal::Id: {
         return YES;
     }
+    case Attributes::CondPumpEnabled::Id: {
+        return YES;
+    }
+    case Attributes::CondRunCount::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

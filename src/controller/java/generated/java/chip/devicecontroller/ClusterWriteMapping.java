@@ -2465,6 +2465,28 @@ public class ClusterWriteMapping {
       writeHumidistatOptimalCommandParams
     );
     writeHumidistatInteractionInfo.put("writeOptimalAttribute", writeHumidistatOptimalAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeHumidistatCondPumpEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo humidistatcondPumpEnabledCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeHumidistatCondPumpEnabledCommandParams.put(
+        "value",
+        humidistatcondPumpEnabledCommandParameterInfo
+    );
+    InteractionInfo writeHumidistatCondPumpEnabledAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.HumidistatCluster) cluster).writeCondPumpEnabledAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeHumidistatCondPumpEnabledCommandParams
+    );
+    writeHumidistatInteractionInfo.put("writeCondPumpEnabledAttribute", writeHumidistatCondPumpEnabledAttributeInteractionInfo);
     writeAttributeMap.put("humidistat", writeHumidistatInteractionInfo);
     Map<String, InteractionInfo> writeColorControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeColorControlOptionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
