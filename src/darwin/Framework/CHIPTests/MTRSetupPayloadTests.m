@@ -88,7 +88,7 @@
     XCTAssertTrue(payload.concatenated);
     XCTAssertEqual(payload.subPayloads.count, 2);
 
-    NSArray<NSString *> *parts = [concatenatedQRCode componentsSeparatedByString:@"*"];
+    NSArray<NSString *> * parts = [concatenatedQRCode componentsSeparatedByString:@"*"];
     XCTAssertEqualObjects(payload.subPayloads[0], [[MTRSetupPayload alloc] initWithPayload:parts[0]]);
     XCTAssertEqualObjects(payload.subPayloads[1], [[MTRSetupPayload alloc] initWithPayload:[@"MT:" stringByAppendingString:parts[1]]]);
 }
@@ -503,8 +503,8 @@
     // The copy is concatenated and all sub-payloads were also copied
     XCTAssertEqual(copy.concatenated, payload.concatenated);
     XCTAssertEqual(copy.subPayloads.count, payload.subPayloads.count);
-    [payload.subPayloads enumerateObjectsUsingBlock:^(MTRSetupPayload *subPayload, NSUInteger idx, BOOL *stop) {
-        MTRSetupPayload *subCopy = copy.subPayloads[idx];
+    [payload.subPayloads enumerateObjectsUsingBlock:^(MTRSetupPayload * subPayload, NSUInteger idx, BOOL * stop) {
+        MTRSetupPayload * subCopy = copy.subPayloads[idx];
         XCTAssertNotIdentical(subPayload, subCopy);
         XCTAssertTrue([subPayload isEqual:subCopy]);
         XCTAssertTrue([subCopy isEqual:subPayload]);

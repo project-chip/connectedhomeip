@@ -259,7 +259,7 @@ MTR_DIRECT_MEMBERS
 
     _payload = payloads[0];
     if (payloads.size() > 1) {
-        NSMutableArray<MTRSetupPayload *> *subPayloads = [[NSMutableArray alloc] initWithCapacity:payloads.size()];
+        NSMutableArray<MTRSetupPayload *> * subPayloads = [[NSMutableArray alloc] initWithCapacity:payloads.size()];
         for (auto & payload : payloads) {
             [subPayloads addObject:[[MTRSetupPayload alloc] initWithSetupPayload:payload]];
         }
@@ -555,9 +555,9 @@ typedef NS_OPTIONS(NSUInteger, QRCodeOptions) {
 - (nullable NSString *)qrCodeStringWithOptions:(QRCodeOptions)options
 {
     if (_subPayloads) {
-        NSMutableString *result;
-        for (MTRSetupPayload *subPayload in _subPayloads) {
-            NSString *component = [subPayload qrCodeStringWithOptions:options];
+        NSMutableString * result;
+        for (MTRSetupPayload * subPayload in _subPayloads) {
+            NSString * component = [subPayload qrCodeStringWithOptions:options];
             VerifyOrReturnValue(component != nil, nil);
             if (!result) {
                 result = [component mutableCopy];
