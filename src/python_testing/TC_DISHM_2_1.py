@@ -141,6 +141,7 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         # CurrentMode attribute value is an integer value
         is_valid_int_value(old_current_mode_dut)
+        asserts.assert_in(old_current_mode_dut, modes, "Current mode is not in the supported modes")
 
         invalid_mode_th = max(modes) + 1
         asserts.assert_true(invalid_mode_th not in modes,
