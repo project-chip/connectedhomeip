@@ -14,13 +14,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-proxy.h>
+#include <app/clusters/resource-monitoring-server/resource-monitoring-cluster.h>
 #include <app/static-cluster-config/HepaFilterMonitoring.h>
 #include <app/static-cluster-config/ActivatedCarbonFilterMonitoring.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
-
 
 #include <array>
 #include <cstdint>
@@ -111,7 +110,7 @@ void MatterHepaFilterMonitoringClusterInitCallback(EndpointId endpointId)
         BitFlags<ResourceMonitoring::Feature>{featureMap}, 
         optionalAttributeSet, 
         chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown, 
-        true
+        true // reset condition command supported
     };
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(current->registration);

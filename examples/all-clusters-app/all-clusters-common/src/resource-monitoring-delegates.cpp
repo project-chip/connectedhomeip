@@ -34,11 +34,10 @@ constexpr BitFlags<ResourceMonitoring::Feature> gHepaFilterEnabledFeatures{
     ResourceMonitoring::Feature::kReplacementProductList
 };
 
-constexpr uint32_t gOptionalBits = 
-    ResourceMonitoring::Attributes::Condition::Id | 
-    ResourceMonitoring::Attributes::DegradationDirection::Id | 
-    ResourceMonitoring::Attributes::InPlaceIndicator::Id | 
-    ResourceMonitoring::Attributes::LastChangedTime::Id;
+const ResourceMonitoringCluster::OptionalAttributeSet gOptionalBits{ResourceMonitoring::Attributes::Condition::Id |
+    ResourceMonitoring::Attributes::DegradationDirection::Id |
+    ResourceMonitoring::Attributes::InPlaceIndicator::Id |
+    ResourceMonitoring::Attributes::LastChangedTime::Id};
 
 constexpr BitFlags<ResourceMonitoring::Feature> gActivatedCarbonEnabledFeatures{
     ResourceMonitoring::Feature::kCondition,
@@ -47,10 +46,10 @@ constexpr BitFlags<ResourceMonitoring::Feature> gActivatedCarbonEnabledFeatures{
 };
 
 static ActivatedCarbonFilterMonitoringDelegate * gActivatedCarbonFilterDelegate = nullptr;
-static ResourceMonitoring::ActivatedCarbonFilterMonitoringCluster * gActivatedCarbonFilterInstance = nullptr;
+static ResourceMonitoring::ResourceMonitoringCluster * gActivatedCarbonFilterInstance = nullptr;
 
 static HepaFilterMonitoringDelegate * gHepaFilterDelegate = nullptr;
-static ResourceMonitoring::HepaFilterMonitoringCluster * gHepaFilterInstance = nullptr;
+static ResourceMonitoring::ResourceMonitoringCluster * gHepaFilterInstance = nullptr;
 
 static ImmutableReplacementProductListManager sReplacementProductListManager;
 
@@ -126,12 +125,7 @@ void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId 
 {
     VerifyOrDie(gActivatedCarbonFilterInstance == nullptr && gActivatedCarbonFilterDelegate == nullptr);
     gActivatedCarbonFilterDelegate = new ActivatedCarbonFilterMonitoringDelegate;
-    gActivatedCarbonFilterInstance = new ResourceMonitoring::ActivatedCarbonFilterMonitoringCluster(
-<<<<<<< HEAD
-        endpoint, ActivatedCarbonFilterMonitoring::Id,
-        static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()), ResourceMonitoring::DegradationDirectionEnum::kDown, true);
-    TEMPORARY_RETURN_IGNORED gActivatedCarbonFilterInstance->Init();
-=======
+    gActivatedCarbonFilterInstance = new ResourceMonitoring::ResourceMonitoringCluster(
         endpoint,
         ActivatedCarbonFilterMonitoring::Id,
         gActivatedCarbonEnabledFeatures,
@@ -141,7 +135,6 @@ void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId 
     );
 
     gActivatedCarbonFilterInstance->SetDelegate(gActivatedCarbonFilterDelegate);
->>>>>>> 62ecba2486 (better handling for enabled features and other PR reviews addressed.)
 }
 
 void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
@@ -150,7 +143,7 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 
     gHepaFilterDelegate = new HepaFilterMonitoringDelegate;
 
-    gHepaFilterInstance = new ResourceMonitoring::HepaFilterMonitoringCluster(
+    gHepaFilterInstance = new ResourceMonitoring::ResourceMonitoringCluster(
         endpoint, 
         HepaFilterMonitoring::Id,
         gHepaFilterEnabledFeatures,

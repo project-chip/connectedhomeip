@@ -16,7 +16,7 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-proxy.h>
+#include <app/clusters/resource-monitoring-server/resource-monitoring-cluster.h>
 
 #include <app/clusters/testing/AttributeTesting.h>
 
@@ -92,16 +92,7 @@ using namespace HepaFilterMonitoring::Attributes;
 
 TEST_F(TestResourceMonitoringCluster, AttributeTest)
 {
-    uint32_t optionalBits = Condition::Id | DegradationDirection::Id | InPlaceIndicator::Id | LastChangedTime::Id;    
 
-    auto hepa_cluster = ResourceMonitoring::ResourceMonitoringClusterProxy<HepaFilterMonitoring::Id>(
-        EndpointId{kEndpointWitResourceMonitoring},
-        HepaFilterMonitoring::Id,
-        BitFlags<ResourceMonitoring::Feature>{ 0 },
-        OptionalAttributeSet{ optionalBits },
-        ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type::kUp,
-        true
-    );
 }
 
 } // namespace
