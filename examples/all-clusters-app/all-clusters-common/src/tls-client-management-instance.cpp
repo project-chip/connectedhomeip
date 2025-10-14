@@ -390,12 +390,12 @@ void TlsClientManagementCommandDelegate::RemoveFabric(FabricIndex fabric)
 {
     VerifyOrReturn(mStorage != nullptr);
 
-    LogAndReturnOnFailure(mProvisioned.RemoveFabric(fabric), AppServer, "Failure clearing TLS endpoints for fabric");
+    ReturnAndLogOnFailure(mProvisioned.RemoveFabric(fabric), AppServer, "Failure clearing TLS endpoints for fabric");
 
     UniquePtr<GlobalEndpointData> globalData(New<GlobalEndpointData>(EndpointId(1)));
     VerifyOrReturn(globalData);
     ReturnOnFailure(globalData->Load(mStorage));
-    LogAndReturnOnFailure(globalData->RemoveAll(*mStorage, fabric), AppServer, "Failure clearing TLS endpoint data for fabric");
+    ReturnAndLogOnFailure(globalData->RemoveAll(*mStorage, fabric), AppServer, "Failure clearing TLS endpoint data for fabric");
 }
 
 CHIP_ERROR TlsClientManagementCommandDelegate::MutateEndpointReferenceCount(EndpointId matterEndpoint, FabricIndex fabric,
