@@ -100,7 +100,7 @@ bool SFrameFollowsSpecConstraints(const Clusters::WebRTCTransportProvider::Struc
  *
  * @return true if the URL starts with "turns:" or "stuns:", false otherwise.
  */
-bool HasTurnsOrStunsScheme(const chip::CharSpan & url)
+bool HasTurnsOrStunsScheme(const CharSpan & url)
 {
     // Convert CharSpan to string for easier comparison
     std::string urlStr(url.data(), url.size());
@@ -113,7 +113,8 @@ bool HasTurnsOrStunsScheme(const chip::CharSpan & url)
  * @brief Validates ICEServers list constraints (data model constraints).
  *
  * Checks that ICEServers list meets the data model requirements:
- * - URLs list: max 10 items
+ * - ICEServers list: max 10 entries
+ * - URLs list per ICEServerStruct: max 10 items, each URL max 2000 characters
  * - Username: optional, max 508 bytes
  * - Credential: optional, max 512 bytes
  * - CAID: optional, range 0-65534
@@ -121,18 +122,28 @@ bool HasTurnsOrStunsScheme(const chip::CharSpan & url)
  * @param[in] iceServers The ICEServers list to validate
  * @param[in] commandName Name of the command (for logging)
  *
- * @return true if all constraints are satisfied, false otherwise.
+ * @return Status::Success if all constraints are satisfied
+ *         Status::ConstraintError if a constraint is violated
+ *         Status::InvalidCommand if the list structure is invalid
  */
-bool ICEServersFollowsSpecConstraints(
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType> & iceServers,
+Status ICEServersFollowsSpecConstraints(
+    const DataModel::DecodableList<Clusters::Globals::Structs::ICEServerStruct::DecodableType> & iceServers,
     const char * commandName)
 {
-    auto iter = iceServers.begin();
+    size_t iceServerCount = 0;
+    auto iter             = iceServers.begin();
     while (iter.Next())
     {
+        iceServerCount++;
+        if (iceServerCount > 10)
+        {
+            ChipLogError(Zcl, "%s: ICEServers list exceeds maximum of 10 entries", commandName);
+            return Status::ConstraintError;
+        }
+
         const auto & iceServer = iter.GetValue();
 
-        // Validate URLs list: max 10 items
+        // Validate URLs list: max 10 items, each URL max 2000 characters
         size_t urlCount = 0;
         auto urlIter    = iceServer.URLs.begin();
         while (urlIter.Next())
@@ -141,7 +152,15 @@ bool ICEServersFollowsSpecConstraints(
             if (urlCount > 10)
             {
                 ChipLogError(Zcl, "%s: ICEServer URLs list exceeds maximum of 10", commandName);
-                return false;
+                return Status::ConstraintError;
+            }
+
+            // Check URL length: max 2000 characters
+            const auto & url = urlIter.GetValue();
+            if (url.size() > 2000)
+            {
+                ChipLogError(Zcl, "%s: ICEServer URL exceeds maximum length of 2000 characters", commandName);
+                return Status::ConstraintError;
             }
         }
 
@@ -150,28 +169,28 @@ bool ICEServersFollowsSpecConstraints(
         if (urlListErr != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "%s: ICEServer URLs list error: %" CHIP_ERROR_FORMAT, commandName, urlListErr.Format());
-            return false;
+            return Status::InvalidCommand;
         }
 
         // Username field: optional, max 508 bytes
         if (iceServer.username.HasValue() && iceServer.username.Value().size() > 508)
         {
             ChipLogError(Zcl, "%s: ICEServer Username exceeds maximum length of 508", commandName);
-            return false;
+            return Status::ConstraintError;
         }
 
         // Credential field: optional, max 512 bytes
         if (iceServer.credential.HasValue() && iceServer.credential.Value().size() > 512)
         {
             ChipLogError(Zcl, "%s: ICEServer Credential exceeds maximum length of 512", commandName);
-            return false;
+            return Status::ConstraintError;
         }
 
         // CAID field: optional, range 0-65534
         if (iceServer.caid.HasValue() && iceServer.caid.Value() > 65534)
         {
             ChipLogError(Zcl, "%s: ICEServer CAID exceeds maximum value of 65534", commandName);
-            return false;
+            return Status::ConstraintError;
         }
     }
 
@@ -180,10 +199,10 @@ bool ICEServersFollowsSpecConstraints(
     if (listErr != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "%s: ICEServers list error: %" CHIP_ERROR_FORMAT, commandName, listErr.Format());
-        return false;
+        return Status::InvalidCommand;
     }
 
-    return true;
+    return Status::Success;
 }
 
 } // anonymous namespace
@@ -423,6 +442,56 @@ Status WebRTCTransportProviderServer::CheckPrivacyModes(const char * commandName
     return Status::Success;
 }
 
+Status WebRTCTransportProviderServer::CheckTurnsOrStunsRequiresUTCTime(
+    const char * commandName, const Optional<DataModel::DecodableList<ICEServerDecodableStruct>> & iceServers)
+{
+    if (!iceServers.HasValue())
+    {
+        return Status::Success;
+    }
+
+    // Check if any URL uses turns or stuns scheme
+    bool hasTurnsOrStuns = false;
+    auto iter            = iceServers.Value().begin();
+    while (iter.Next())
+    {
+        const auto & iceServer = iter.GetValue();
+        auto urlIter           = iceServer.URLs.begin();
+        while (urlIter.Next())
+        {
+            if (HasTurnsOrStunsScheme(urlIter.GetValue()))
+            {
+                hasTurnsOrStuns = true;
+                break;
+            }
+        }
+        if (hasTurnsOrStuns)
+        {
+            break;
+        }
+    }
+
+    // If turns/stuns URLs are present, verify UTCTime is not null
+    if (hasTurnsOrStuns)
+    {
+        bool isUTCTimeNull = false;
+        CHIP_ERROR err     = mDelegate.IsUTCTimeNull(isUTCTimeNull);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "%s: Failed to check UTCTime: %" CHIP_ERROR_FORMAT, commandName, err.Format());
+            return Status::Failure;
+        }
+
+        if (isUTCTimeNull)
+        {
+            ChipLogError(Zcl, "%s: turns/stuns URLs require non-null UTCTime", commandName);
+            return Status::InvalidInState;
+        }
+    }
+
+    return Status::Success;
+}
+
 // Command Handlers
 void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, const Commands::SolicitOffer::DecodableType & req)
 {
@@ -458,25 +527,24 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     }
 
     // ICEServers field SHALL be a list of ICEServerStruct containing ICE servers and credentials.
-    // Validate ICEServers list constraints (max 10 items, URLs max 10, Username max 508, Credential max 512, CAID 0-65534)
+    // Validate ICEServers list constraints (max 10 entries, each with max 10 URLs max 2000 chars, Username max 508, Credential max
+    // 512, CAID 0-65534)
     if (req.ICEServers.HasValue())
     {
-        if (!ICEServersFollowsSpecConstraints(req.ICEServers.Value(), "HandleSolicitOffer"))
+        Status validationStatus = ICEServersFollowsSpecConstraints(req.ICEServers.Value(), "HandleSolicitOffer");
+        if (validationStatus != Status::Success)
         {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, validationStatus);
             return;
         }
     }
 
-    // ICETransportPolicy field SHALL contain either 'all' or 'relay' per W3C RTCIceTransportPolicy enum.
+    // ICETransportPolicy: constraint is max 16 characters
     if (req.ICETransportPolicy.HasValue())
     {
-        std::string policy(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size());
-
-        // Validate the policy is either 'all' or 'relay'
-        if (policy != "all" && policy != "relay")
+        if (req.ICETransportPolicy.Value().size() > 16)
         {
-            ChipLogError(Zcl, "HandleSolicitOffer: ICETransportPolicy must be 'all' or 'relay', got '%s'", policy.c_str());
+            ChipLogError(Zcl, "HandleSolicitOffer: ICETransportPolicy exceeds maximum length of 16");
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
             return;
         }
@@ -491,15 +559,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         return;
     }
 
-    // Check resource management and stream priorities. If the IDs are null the delegate will populate with
-    // a stream that matches the stream usage
-    CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "HandleSolicitOffer: Cannot provide the stream usage requested");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
-        return;
-    }
+    // TODO: If the passed in StreamUsage is not found in the StreamUsagePriorities, return DYNAMIC_CONSTRAINT_ERROR
 
     // Validate VideoStreamID against AllocatedVideoStreams.
     // If present and null then a stream has to have been allocated.
@@ -560,7 +620,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     if (req.SFrameConfig.HasValue())
     {
         const auto & sframeConfig = req.SFrameConfig.Value();
-        err                       = mDelegate.ValidateSFrameConfig(sframeConfig.cipherSuite, sframeConfig.baseKey.size());
+        CHIP_ERROR err            = mDelegate.ValidateSFrameConfig(sframeConfig.cipherSuite, sframeConfig.baseKey.size());
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleSolicitOffer: SFrame configuration validation failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -571,46 +631,21 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
 
     // For each URL in the URLs field of each ICEServerStruct, if the URL scheme is
     // 'turns' or 'stuns', verify that Time Synchronization cluster's UTCTime attribute is not null.
-    if (req.ICEServers.HasValue())
+    status = CheckTurnsOrStunsRequiresUTCTime("HandleSolicitOffer", req.ICEServers);
+    if (status != Status::Success)
     {
-        bool hasTurnsOrStuns = false;
-        auto iter            = req.ICEServers.Value().begin();
-        while (iter.Next())
-        {
-            const auto & iceServer = iter.GetValue();
-            auto urlIter           = iceServer.URLs.begin();
-            while (urlIter.Next())
-            {
-                if (HasTurnsOrStunsScheme(urlIter.GetValue()))
-                {
-                    hasTurnsOrStuns = true;
-                    break;
-                }
-            }
-            if (hasTurnsOrStuns)
-            {
-                break;
-            }
-        }
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
 
-        if (hasTurnsOrStuns)
-        {
-            bool isUTCTimeNull = false;
-            err                = mDelegate.IsUTCTimeNull(isUTCTimeNull);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl, "HandleSolicitOffer: Failed to check UTCTime: %" CHIP_ERROR_FORMAT, err.Format());
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
-                return;
-            }
-
-            if (isUTCTimeNull)
-            {
-                ChipLogError(Zcl, "HandleSolicitOffer: turns/stuns URLs require non-null UTCTime");
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
-                return;
-            }
-        }
+    // Check resource management and stream priorities. If the IDs are null the delegate will populate with
+    // a stream that matches the stream usage
+    CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleSolicitOffer: Cannot provide the stream usage requested");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+        return;
     }
 
     // Prepare the arguments for the delegate.
@@ -749,25 +784,24 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
     }
 
     // ICEServers field SHALL be a list of ICEServerStruct containing ICE servers and credentials.
-    // Validate ICEServers list constraints (max 10 items, URLs max 10, Username max 508, Credential max 512, CAID 0-65534)
+    // Validate ICEServers list constraints (max 10 entries, each with max 10 URLs max 2000 chars, Username max 508, Credential max
+    // 512, CAID 0-65534)
     if (req.ICEServers.HasValue())
     {
-        if (!ICEServersFollowsSpecConstraints(req.ICEServers.Value(), "HandleProvideOffer"))
+        Status validationStatus = ICEServersFollowsSpecConstraints(req.ICEServers.Value(), "HandleProvideOffer");
+        if (validationStatus != Status::Success)
         {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, validationStatus);
             return;
         }
     }
 
-    // ICETransportPolicy field SHALL contain either 'all' or 'relay' per W3C RTCIceTransportPolicy enum.
+    // ICETransportPolicy: constraint is max 16 characters (data model constraint)
     if (req.ICETransportPolicy.HasValue())
     {
-        std::string policy(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size());
-
-        // Validate the policy is either 'all' or 'relay'
-        if (policy != "all" && policy != "relay")
+        if (req.ICETransportPolicy.Value().size() > 16)
         {
-            ChipLogError(Zcl, "HandleProvideOffer: ICETransportPolicy must be 'all' or 'relay', got '%s'", policy.c_str());
+            ChipLogError(Zcl, "HandleProvideOffer: ICETransportPolicy exceeds maximum length of 16");
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
             return;
         }
@@ -796,6 +830,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
     {
         // WebRTCSessionID is null - new session request
 
+        // Check privacy modes (per spec: only for new sessions)
         Status status = CheckPrivacyModes("HandleProvideOffer", req.streamUsage);
         if (status != Status::Success)
         {
@@ -803,9 +838,10 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
             return;
         }
 
-        // Validate VideoStreamID against AllocatedVideoStreams.
-        // If present and null then a stream has to have been allocated.
-        // If present and not null, then the stream ID has to exist
+        // TODO: If the passed in StreamUsage is not found in the StreamUsagePriorities, return DYNAMIC_CONSTRAINT_ERROR
+
+        // If VideoStreamID is present and is not null and does not match a value in AllocatedVideoStreams:
+        // Fail the command with the status code DYNAMIC_CONSTRAINT_ERROR
         if (videoStreamID.HasValue() && !videoStreamID.Value().IsNull())
         {
             if (mDelegate.ValidateVideoStreamID(videoStreamID.Value().Value()) != CHIP_NO_ERROR)
@@ -816,20 +852,23 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
                 return;
             }
         }
-        else if (videoStreamID.HasValue() && videoStreamID.Value().IsNull())
+
+        // If VideoStreamID is present and is null:
+        // If AllocatedVideoStreams is empty: Fail the command with the status code INVALID_IN_STATE
+        // Automatically select an existing video stream per the Resource Management and Stream Priorities.
+        if (videoStreamID.HasValue() && videoStreamID.Value().IsNull())
         {
-            // VideoStreamID is present and is null - need to automatically select
-            // First check if there are any video streams allocated
             if (!mDelegate.HasAllocatedVideoStreams())
             {
-                ChipLogError(Zcl, "HandleProvideOffer: No video streams currently allocated");
+                ChipLogError(Zcl, "HandleProvideOffer: AllocatedVideoStreams is empty");
                 ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
                 return;
             }
             // Automatic selection will be handled by the delegate in HandleProvideOffer.
         }
 
-        // Validate AudioStreamID if present and not null.
+        // If AudioStreamID is present and is not null and does not match a value in AllocatedAudioStreams:
+        // Fail the command with the status code DYNAMIC_CONSTRAINT_ERROR
         if (audioStreamID.HasValue() && !audioStreamID.Value().IsNull())
         {
             if (mDelegate.ValidateAudioStreamID(audioStreamID.Value().Value()) != CHIP_NO_ERROR)
@@ -840,25 +879,55 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
                 return;
             }
         }
-        else if (audioStreamID.HasValue() && audioStreamID.Value().IsNull())
+
+        // If AudioStreamID is present and is null:
+        // If AllocatedAudioStreams is empty: Fail the command with the status code INVALID_IN_STATE
+        // Automatically select an existing audio stream per the Resource Management and Stream Priorities.
+        if (audioStreamID.HasValue() && audioStreamID.Value().IsNull())
         {
-            // AudioStreamID is present and is null - need to automatically select
-            // First check if there are any audio streams allocated
             if (!mDelegate.HasAllocatedAudioStreams())
             {
-                ChipLogError(Zcl, "HandleProvideOffer: No audio streams currently allocated");
+                ChipLogError(Zcl, "HandleProvideOffer: AllocatedAudioStreams is empty");
                 ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
                 return;
             }
             // Automatic selection will be handled by the delegate in HandleProvideOffer.
         }
 
-        // Check resource management and stream priorities
+        // If not able to meet the Resource Management and Stream Priorities conditions or unable to provide another WebRTC session:
+        // Respond with a response status of RESOURCE_EXHAUSTED
         CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleProvideOffer: Cannot provide stream usage requested");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
+            return;
+        }
+
+        // If SFrameConfig is present:
+        // If the CipherSuite field of the passed in SFrameConfig is not a supported value:
+        // Fail the command with the status code DYNAMIC_CONSTRAINT_ERROR
+        // If the length of the BaseKey field of the passed in SFrameConfig does not match the expected length for a key using the
+        // CipherSuite: Fail the command with the status code DYNAMIC_CONSTRAINT_ERROR
+        if (req.SFrameConfig.HasValue())
+        {
+            const auto & sframeConfig = req.SFrameConfig.Value();
+            err                       = mDelegate.ValidateSFrameConfig(sframeConfig.cipherSuite, sframeConfig.baseKey.size());
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "HandleProvideOffer: SFrame configuration validation failed: %" CHIP_ERROR_FORMAT, err.Format());
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+                return;
+            }
+        }
+
+        // For each URL in the URLs field of each ICEServerStruct in the passed in ICEServers:
+        // If the URL scheme is turns or stuns, and the UTCTime attribute of the Time Synchronization cluster is null:
+        // Fail the command with the status code INVALID_IN_STATE
+        status = CheckTurnsOrStunsRequiresUTCTime("HandleProvideOffer", req.ICEServers);
+        if (status != Status::Success)
+        {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
             return;
         }
 
@@ -874,65 +943,6 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         args.sessionId = sessionId;
     }
 
-    if (req.SFrameConfig.HasValue())
-    {
-        const auto & sframeConfig = req.SFrameConfig.Value();
-        CHIP_ERROR err            = mDelegate.ValidateSFrameConfig(sframeConfig.cipherSuite, sframeConfig.baseKey.size());
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "HandleProvideOffer: SFrame configuration validation failed: %" CHIP_ERROR_FORMAT, err.Format());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
-            return;
-        }
-
-        // Validation passed, assign to args
-        args.sFrameConfig.SetValue(sframeConfig);
-    }
-
-    // For each URL in the URLs field of each ICEServerStruct, if the URL scheme is
-    // 'turns' or 'stuns', verify that Time Synchronization cluster's UTCTime attribute is not null.
-    if (req.ICEServers.HasValue())
-    {
-        bool hasTurnsOrStuns = false;
-        auto iter            = req.ICEServers.Value().begin();
-        while (iter.Next())
-        {
-            const auto & iceServer = iter.GetValue();
-            auto urlIter           = iceServer.URLs.begin();
-            while (urlIter.Next())
-            {
-                if (HasTurnsOrStunsScheme(urlIter.GetValue()))
-                {
-                    hasTurnsOrStuns = true;
-                    break;
-                }
-            }
-            if (hasTurnsOrStuns)
-            {
-                break;
-            }
-        }
-
-        if (hasTurnsOrStuns)
-        {
-            bool isUTCTimeNull = false;
-            CHIP_ERROR err     = mDelegate.IsUTCTimeNull(isUTCTimeNull);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl, "HandleProvideOffer: Failed to check UTCTime: %" CHIP_ERROR_FORMAT, err.Format());
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
-                return;
-            }
-
-            if (isUTCTimeNull)
-            {
-                ChipLogError(Zcl, "HandleProvideOffer: turns/stuns URLs require non-null UTCTime");
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
-                return;
-            }
-        }
-    }
-
     args.streamUsage           = req.streamUsage;
     args.videoStreamId         = videoStreamID;
     args.audioStreamId         = audioStreamID;
@@ -940,6 +950,11 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
     args.fabricIndex           = peerFabricIndex;
     args.sdp                   = std::string(req.sdp.data(), req.sdp.size());
     args.originatingEndpointId = req.originatingEndpointID;
+
+    if (req.SFrameConfig.HasValue())
+    {
+        args.sFrameConfig.SetValue(req.SFrameConfig.Value());
+    }
 
     // ICEServers: copy the validated list
     if (req.ICEServers.HasValue())

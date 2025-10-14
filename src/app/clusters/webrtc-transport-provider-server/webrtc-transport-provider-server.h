@@ -397,6 +397,9 @@ private:
     UpsertResultEnum UpsertSession(const WebRTCSessionStruct & session);
     CHIP_ERROR GenerateSessionId(uint16_t & outSessionId);
     Protocols::InteractionModel::Status CheckPrivacyModes(const char * commandName, StreamUsageEnum streamUsage);
+    Protocols::InteractionModel::Status
+    CheckTurnsOrStunsRequiresUTCTime(const char * commandName,
+                                     const Optional<DataModel::DecodableList<ICEServerDecodableStruct>> & iceServers);
 
     // Command Handlers
     void HandleSolicitOffer(HandlerContext & ctx, const Commands::SolicitOffer::DecodableType & req);
