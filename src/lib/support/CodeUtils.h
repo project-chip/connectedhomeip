@@ -407,8 +407,9 @@
     {                                                                                                                              \
         if (!(expr))                                                                                                               \
         {                                                                                                                          \
-            ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(code), __FILE__, __LINE__);                                         \
-            return code;                                                                                                           \
+            auto __code = (code);                                                                                                  \
+            ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(__code), __FILE__, __LINE__);                                       \
+            return __code;                                                                                                         \
         }                                                                                                                          \
     } while (false)
 #else // CHIP_CONFIG_ERROR_SOURCE
@@ -417,8 +418,9 @@
     {                                                                                                                              \
         if (!(expr))                                                                                                               \
         {                                                                                                                          \
-            ChipLogError(NotSpecified, "%s:%d false: %" CHIP_ERROR_FORMAT, #expr, __LINE__, code.Format());                        \
-            return code;                                                                                                           \
+            auto __code = (code);                                                                                                  \
+            ChipLogError(NotSpecified, "%s:%d false: %" CHIP_ERROR_FORMAT, #expr, __LINE__, __code.Format());                      \
+            return __code;                                                                                                         \
         }                                                                                                                          \
     } while (false)
 #endif // CHIP_CONFIG_ERROR_SOURCE
@@ -637,12 +639,21 @@ inline void chipDie(void)
  */
 #if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE && CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND
 #define SuccessOrDie(error)                                                                                                        \
-    nlABORT_ACTION(::chip::ChipError::IsSuccess((error)),                                                                          \
-                   ChipLogError(Support, "SuccessOrDie failure %s at %s:%d", ErrorStr((error)), __FILE__, __LINE__))
+    do                                                                                                                             \
+    {                                                                                                                              \
+        auto __err = (error);                                                                                                      \
+        nlABORT_ACTION(::chip::ChipError::IsSuccess(__err),                                                                        \
+                       ChipLogError(Support, "SuccessOrDie failure %s at %s:%d", ErrorStr(__err), __FILE__, __LINE__));            \
+    } while (false)
 #elif CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define SuccessOrDie(error)                                                                                                        \
-    nlABORT_ACTION(::chip::ChipError::IsSuccess((error)),                                                                          \
-                   ChipLogError(Support, "SuccessOrDie failure %s at %s:%d: %s", ErrorStr((error)), __FILE__, __LINE__, #error))
+    do                                                                                                                             \
+    {                                                                                                                              \
+        auto __err = (error);                                                                                                      \
+        nlABORT_ACTION(                                                                                                            \
+            ::chip::ChipError::IsSuccess(__err),                                                                                   \
+            ChipLogError(Support, "SuccessOrDie failure %s at %s:%d: %s", ErrorStr(__err), __FILE__, __LINE__, #error));           \
+    } while (false)
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define SuccessOrDie(error) VerifyOrDieWithoutLogging(::chip::ChipError::IsSuccess((error)))
 #endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
