@@ -3250,31 +3250,31 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 /**
  * Command SetUTCTime
  *
- * This command MAY be issued by Administrator to set the time.
+ * This command is used to set the UTC time of the node.
  */
 - (void)setUTCTimeWithParams:(MTRTimeSynchronizationClusterSetUTCTimeParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 /**
  * Command SetTrustedTimeSource
  *
- * This command SHALL set TrustedTimeSource.
+ * This command is used to set the TrustedTimeSource attribute.
  */
 - (void)setTrustedTimeSourceWithParams:(MTRTimeSynchronizationClusterSetTrustedTimeSourceParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 /**
  * Command SetTimeZone
  *
- * This command SHALL set TimeZone.
+ * This command is used to set the time zone of the node.
  */
 - (void)setTimeZoneWithParams:(MTRTimeSynchronizationClusterSetTimeZoneParams *)params completion:(void (^)(MTRTimeSynchronizationClusterSetTimeZoneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 /**
  * Command SetDSTOffset
  *
- * This command SHALL set DSTOffset.
+ * This command is used to set the DST offsets for a node.
  */
 - (void)setDSTOffsetWithParams:(MTRTimeSynchronizationClusterSetDSTOffsetParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 /**
  * Command SetDefaultNTP
  *
- * This command is used to set DefaultNTP.
+ * This command is used to set the DefaultNTP attribute.
  */
 - (void)setDefaultNTPWithParams:(MTRTimeSynchronizationClusterSetDefaultNTPParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
