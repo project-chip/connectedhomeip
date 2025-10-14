@@ -210,7 +210,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                               "motionZones": zoneList,
                               "motionTimeControl": {"initialDuration": 20, "augmentationDuration": 1, "maxDuration": 25, "blindDuration": 1}}
             status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions,
-                                                              tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
+                                                              tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
             asserts.assert_equal(status, Status.Success,
                                  "DUT must responds with Status Code Success.")
         except InteractionModelError as e:
