@@ -149,9 +149,8 @@ public:
 namespace Attributes {
 
 namespace Condition {
-static constexpr AttributeId Id = 0x00000000;
-static constexpr DataModel::AttributeEntry kMetadataEntry =
-    ActivatedCarbonFilterMonitoring::Attributes::Condition::kMetadataEntry;
+static constexpr AttributeId Id                           = 0x00000000;
+static constexpr DataModel::AttributeEntry kMetadataEntry = ActivatedCarbonFilterMonitoring::Attributes::Condition::kMetadataEntry;
 
 struct TypeInfo
 {
@@ -233,7 +232,7 @@ static constexpr AttributeId Id = 0x00000005;
 static constexpr DataModel::AttributeEntry kMetadataEntry =
     ActivatedCarbonFilterMonitoring::Attributes::ReplacementProductList::kMetadataEntry;
 
-}
+} // namespace ReplacementProductList
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

@@ -14,12 +14,12 @@
  *    limitations under the License.
  */
 
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <app/SafeAttributePersistenceProvider.h>
-#include <clusters/HepaFilterMonitoring/Metadata.h>
 #include <clusters/ActivatedCarbonFilterMonitoring/Metadata.h>
+#include <clusters/HepaFilterMonitoring/Metadata.h>
 #include <platform/DeviceInfoProvider.h>
 #include <tracing/macros.h>
 
@@ -30,7 +30,7 @@ using namespace chip::app::Clusters::ResourceMonitoring::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
 namespace {
-    
+
 constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
     ResourceMonitoring::Attributes::Condition::kMetadataEntry,
     ResourceMonitoring::Attributes::DegradationDirection::kMetadataEntry,
@@ -46,39 +46,32 @@ namespace Clusters {
 namespace ResourceMonitoring {
 
 ResourceMonitoringCluster::ResourceMonitoringCluster(
-    EndpointId aEndpointId,
-    ClusterId aClusterId,
-    const BitFlags<ResourceMonitoring::Feature> enabledFeatures,
+    EndpointId aEndpointId, ClusterId aClusterId, const BitFlags<ResourceMonitoring::Feature> enabledFeatures,
     OptionalAttributeSet optionalAttributeSet,
     ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
-    bool aResetConditionCommandSupported
-) :    
+    bool aResetConditionCommandSupported) :
     DefaultServerCluster(ConcreteClusterPath(aEndpointId, aClusterId)),
-    mDegradationDirection(aDegradationDirection),
-    mResetConditionCommandSupported(aResetConditionCommandSupported),
-    mEnabledFeatures(enabledFeatures),
-    mOptionalAttributeSet(optionalAttributeSet)
+    mDegradationDirection(aDegradationDirection), mResetConditionCommandSupported(aResetConditionCommandSupported),
+    mEnabledFeatures(enabledFeatures), mOptionalAttributeSet(optionalAttributeSet)
 {}
 
-
-CHIP_ERROR ResourceMonitoringCluster::SetDelegate(ResourceMonitoringDelegate* aDelegate)
+CHIP_ERROR ResourceMonitoringCluster::SetDelegate(ResourceMonitoringDelegate * aDelegate)
 {
     VerifyOrReturnError(aDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    
+
     mDelegate = aDelegate;
     mDelegate->SetInstance(this);
     return mDelegate->Init();
 }
 
-
 DataModel::ActionReturnStatus ResourceMonitoringCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                            AttributeValueDecoder & decoder)
+                                                                        AttributeValueDecoder & decoder)
 {
     return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
 }
 
 DataModel::ActionReturnStatus ResourceMonitoringCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,
-                                                                       AttributeValueDecoder & decoder)
+                                                                   AttributeValueDecoder & decoder)
 {
     AttributePersistence persistence{ mContext->attributeStorage };
 
@@ -96,50 +89,50 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::WriteImpl(const DataMod
 }
 
 // Implements the read functionality for non-standard attributes.
-DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
+DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                       AttributeValueEncoder & encoder)
 {
-     switch (request.path.mAttributeId)
+    switch (request.path.mAttributeId)
     {
-        case ResourceMonitoring::Attributes::Condition::Id:
-            return encoder.Encode(mCondition);
+    case ResourceMonitoring::Attributes::Condition::Id:
+        return encoder.Encode(mCondition);
 
-        case ResourceMonitoring::Attributes::FeatureMap::Id:
-            return encoder.Encode(mEnabledFeatures);
-        
-        case ResourceMonitoring::Attributes::DegradationDirection::Id:
-            return encoder.Encode(mDegradationDirection);
+    case ResourceMonitoring::Attributes::FeatureMap::Id:
+        return encoder.Encode(mEnabledFeatures);
 
-        case ResourceMonitoring::Attributes::ChangeIndication::Id:
-            return encoder.Encode(mChangeIndication);
+    case ResourceMonitoring::Attributes::DegradationDirection::Id:
+        return encoder.Encode(mDegradationDirection);
 
-        case ResourceMonitoring::Attributes::InPlaceIndicator::Id:
-            return encoder.Encode(mInPlaceIndicator);
+    case ResourceMonitoring::Attributes::ChangeIndication::Id:
+        return encoder.Encode(mChangeIndication);
 
-        case ResourceMonitoring::Attributes::LastChangedTime::Id:
-            return encoder.Encode(mLastChangedTime);
+    case ResourceMonitoring::Attributes::InPlaceIndicator::Id:
+        return encoder.Encode(mInPlaceIndicator);
 
-        case ResourceMonitoring::Attributes::ReplacementProductList::Id:
-            return DataModel::ActionReturnStatus{ReadReplaceableProductList(encoder)};
+    case ResourceMonitoring::Attributes::LastChangedTime::Id:
+        return encoder.Encode(mLastChangedTime);
 
-        case ResourceMonitoring::Attributes::ClusterRevision::Id:
-            return encoder.Encode(HepaFilterMonitoring::kRevision);
+    case ResourceMonitoring::Attributes::ReplacementProductList::Id:
+        return DataModel::ActionReturnStatus{ ReadReplaceableProductList(encoder) };
 
-        default:
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    case ResourceMonitoring::Attributes::ClusterRevision::Id:
+        return encoder.Encode(HepaFilterMonitoring::kRevision);
+
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
-
 }
 
 CHIP_ERROR ResourceMonitoringCluster::Attributes(const ConcreteClusterPath & path,
-                                                     ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+                                                 ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
 
     const bool haveCondition = mEnabledFeatures.Has(Feature::kCondition);
 
     AttributeListBuilder::OptionalAttributeEntry optionalAttributesEntries[] = {
-        { haveCondition , Condition::kMetadataEntry },
-        { haveCondition , DegradationDirection::kMetadataEntry },
+        { haveCondition, Condition::kMetadataEntry },
+        { haveCondition, DegradationDirection::kMetadataEntry },
         { mOptionalAttributeSet.IsSet(InPlaceIndicator::Id), InPlaceIndicator::kMetadataEntry },
         { mOptionalAttributeSet.IsSet(LastChangedTime::Id), LastChangedTime::kMetadataEntry },
     };
@@ -174,33 +167,37 @@ CHIP_ERROR ResourceMonitoringCluster::ReadReplaceableProductList(AttributeValueE
     });
 }
 
-ResourceMonitoring::ReplacementProductListManager * ResourceMonitoringCluster::GetReplacementProductListManagerInstance() {
+ResourceMonitoring::ReplacementProductListManager * ResourceMonitoringCluster::GetReplacementProductListManagerInstance()
+{
     return mReplacementProductListManager;
 }
 
-void ResourceMonitoringCluster::SetReplacementProductListManagerInstance(ResourceMonitoring::ReplacementProductListManager * replacementProductListManager)
+void ResourceMonitoringCluster::SetReplacementProductListManagerInstance(
+    ResourceMonitoring::ReplacementProductListManager * replacementProductListManager)
 {
     mReplacementProductListManager = replacementProductListManager;
 }
 
-
 void ResourceMonitoringCluster::UpdateCondition(uint8_t newCondition)
 {
     auto oldConditionattr = mCondition;
-    mCondition    = newCondition;
+    mCondition            = newCondition;
     if (mCondition != oldConditionattr)
     {
-        if (mPath.mClusterId == HepaFilterMonitoring::Id) {
+        if (mPath.mClusterId == HepaFilterMonitoring::Id)
+        {
             NotifyAttributeChanged(HepaFilterMonitoring::Attributes::Condition::Id);
-        } 
+        }
 
-        if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id) {
+        if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id)
+        {
             NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::Condition::Id);
         }
     }
 }
 
-void ResourceMonitoringCluster::UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum aNewChangeIndication)
+void ResourceMonitoringCluster::UpdateChangeIndication(
+    chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum aNewChangeIndication)
 {
     if (aNewChangeIndication == chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum::kWarning)
     {
@@ -213,9 +210,8 @@ void ResourceMonitoringCluster::UpdateChangeIndication(chip::app::Clusters::Reso
     mChangeIndication        = aNewChangeIndication;
     if (mChangeIndication != oldChangeIndication)
     {
-        NotifyAttributeChanged(ResourceMonitoring::Attributes::ChangeIndication::Id);        
+        NotifyAttributeChanged(ResourceMonitoring::Attributes::ChangeIndication::Id);
     }
-
 }
 
 void ResourceMonitoringCluster::UpdateInPlaceIndicator(bool newInPlaceIndicator)
@@ -224,12 +220,14 @@ void ResourceMonitoringCluster::UpdateInPlaceIndicator(bool newInPlaceIndicator)
     mInPlaceIndicator        = newInPlaceIndicator;
     if (mInPlaceIndicator != oldInPlaceIndicator)
     {
-        if (mPath.mClusterId == HepaFilterMonitoring::Id) {
-            NotifyAttributeChanged(HepaFilterMonitoring::Attributes::InPlaceIndicator::Id);   
+        if (mPath.mClusterId == HepaFilterMonitoring::Id)
+        {
+            NotifyAttributeChanged(HepaFilterMonitoring::Attributes::InPlaceIndicator::Id);
         }
-        
-        if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id) {
-            NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::Id);   
+
+        if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id)
+        {
+            NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::Id);
         }
     }
 }
@@ -240,35 +238,43 @@ void ResourceMonitoringCluster::UpdateLastChangedTime(DataModel::Nullable<uint32
     mLastChangedTime        = aNewLastChangedTime;
     if (mLastChangedTime != oldLastchangedTime)
     {
-        if (mPath.mClusterId == HepaFilterMonitoring::Id) {
+        if (mPath.mClusterId == HepaFilterMonitoring::Id)
+        {
             chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
-                ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, HepaFilterMonitoring::Attributes::LastChangedTime::Id), mLastChangedTime);
+                ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, HepaFilterMonitoring::Attributes::LastChangedTime::Id),
+                mLastChangedTime);
             NotifyAttributeChanged(HepaFilterMonitoring::Attributes::LastChangedTime::Id);
         }
 
-        if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id) {
+        if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id)
+        {
             chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
-                ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id), mLastChangedTime);
+                ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId,
+                                      ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id),
+                mLastChangedTime);
             NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id);
         }
     }
 }
 
-
 void ResourceMonitoringCluster::LoadPersistentAttributes()
 {
     CHIP_ERROR err;
 
-    if (mPath.mClusterId == HepaFilterMonitoring::Id) {
+    if (mPath.mClusterId == HepaFilterMonitoring::Id)
+    {
         err = chip::app::GetSafeAttributePersistenceProvider()->ReadScalarValue(
-            ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, HepaFilterMonitoring::Attributes::LastChangedTime::Id), mLastChangedTime);
-    } 
-    else if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id) {
+            ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, HepaFilterMonitoring::Attributes::LastChangedTime::Id),
+            mLastChangedTime);
+    }
+    else if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id)
+    {
         err = chip::app::GetSafeAttributePersistenceProvider()->ReadScalarValue(
-            ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id), mLastChangedTime);
+            ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId,
+                                  ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id),
+            mLastChangedTime);
     }
 
-    
     if (err == CHIP_NO_ERROR)
     {
         if (mLastChangedTime.IsNull())
@@ -289,9 +295,6 @@ void ResourceMonitoringCluster::LoadPersistentAttributes()
     }
 }
 
-
-
-
 CHIP_ERROR ResourceMonitoringCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
@@ -301,9 +304,9 @@ CHIP_ERROR ResourceMonitoringCluster::Startup(ServerClusterContext & context)
 }
 
 // This method is called by the interaction model engine when a command destined for this instance is received.
- std::optional<DataModel::ActionReturnStatus> ResourceMonitoringCluster::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               chip::TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus> ResourceMonitoringCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                      chip::TLV::TLVReader & input_arguments,
+                                                                                      CommandHandler * handler)
 {
     switch (request.path.mCommandId)
     {
@@ -319,9 +322,10 @@ CHIP_ERROR ResourceMonitoringCluster::Startup(ServerClusterContext & context)
     return Status::UnsupportedCommand;
 }
 
-std::optional<DataModel::ActionReturnStatus> ResourceMonitoringCluster::ResetCondition(const ConcreteCommandPath & commandPath,
-                                                                 const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData,
-                                                                 CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus>
+ResourceMonitoringCluster::ResetCondition(const ConcreteCommandPath & commandPath,
+                                          const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData,
+                                          CommandHandler * handler)
 {
     Status resetConditionStatus = mDelegate->OnResetCondition();
 
@@ -331,7 +335,7 @@ std::optional<DataModel::ActionReturnStatus> ResourceMonitoringCluster::ResetCon
 }
 
 CHIP_ERROR ResourceMonitoringCluster::AcceptedCommands(const ConcreteClusterPath & cluster,
-                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+                                                       ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
     if (mResetConditionCommandSupported)
@@ -371,10 +375,10 @@ bool ResourceMonitoringCluster::HasFeature(ResourceMonitoring::Feature aFeature)
     return mEnabledFeatures.Has(aFeature);
 }
 
-bool ResourceMonitoringCluster::HasOptionalAttribute(AttributeId aAttribute) const {
+bool ResourceMonitoringCluster::HasOptionalAttribute(AttributeId aAttribute) const
+{
     return mOptionalAttributeSet.IsSet(aAttribute);
 }
-
 
 Protocols::InteractionModel::Status ResourceMonitoringDelegate::OnResetCondition()
 {
@@ -428,7 +432,7 @@ Protocols::InteractionModel::Status ResourceMonitoringDelegate::PostResetConditi
     return Protocols::InteractionModel::Status::Success;
 }
 
-}
-}
-}
-}
+} // namespace ResourceMonitoring
+} // namespace Clusters
+} // namespace app
+} // namespace chip

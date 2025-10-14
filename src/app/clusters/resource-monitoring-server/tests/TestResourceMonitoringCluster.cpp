@@ -20,11 +20,9 @@
 
 #include <app/clusters/testing/AttributeTesting.h>
 
-#include <optional>
 #include <functional>
+#include <optional>
 #include <type_traits>
-
-
 
 using namespace chip;
 using namespace chip::app;
@@ -34,18 +32,18 @@ using namespace chip::app::Clusters::SoilMeasurement::Attributes;
 
 namespace {
 
-
 template <typename OPT, typename... ARGS>
 auto dispatch_to_optional_fn(OPT const & opt, ARGS &&... args) -> decltype(std::invoke(*opt, std::forward<ARGS>(args)...))
 {
     using ReturnType = decltype(std::invoke(*opt, std::forward<ARGS>(args)...));
 
-    if constexpr (std::is_invocable_v<std::decay_t<decltype(*opt)>, ARGS...>) {
+    if constexpr (std::is_invocable_v<std::decay_t<decltype(*opt)>, ARGS...>)
+    {
 
-        if (opt.has_value()) {
-            
+        if (opt.has_value())
+        {
+
             return std::invoke(*opt, std::forward<ARGS>(args)...);
-        
         }
     }
 
@@ -54,21 +52,13 @@ auto dispatch_to_optional_fn(OPT const & opt, ARGS &&... args) -> decltype(std::
 
 struct MockDelegate : public ResourceMonitoring::ResourceMonitoringDelegate
 {
-    CHIP_ERROR Init() { 
-        return dispatch_to_optional_fn(mInit);
-    };
+    CHIP_ERROR Init() { return dispatch_to_optional_fn(mInit); };
 
-    Protocols::InteractionModel::Status OnResetCondition(){
-        return dispatch_to_optional_fn(mOnResetCondition);
-    };
+    Protocols::InteractionModel::Status OnResetCondition() { return dispatch_to_optional_fn(mOnResetCondition); };
 
-    Protocols::InteractionModel::Status PreResetCondition(){
-        return dispatch_to_optional_fn(mPreResetCondition);
-    };
+    Protocols::InteractionModel::Status PreResetCondition() { return dispatch_to_optional_fn(mPreResetCondition); };
 
-    Protocols::InteractionModel::Status PostResetCondition(){
-        return dispatch_to_optional_fn(mPostResetCondition);
-    };
+    Protocols::InteractionModel::Status PostResetCondition() { return dispatch_to_optional_fn(mPostResetCondition); };
 
     std::optional<std::function<CHIP_ERROR()>> mInit;
     std::optional<std::function<Protocols::InteractionModel::Status()>> mOnResetCondition;
@@ -86,13 +76,8 @@ struct TestResourceMonitoringCluster : public ::testing::Test
 
 constexpr EndpointId kEndpointWitResourceMonitoring = 1;
 
-
 using namespace HepaFilterMonitoring::Attributes;
 
-
-TEST_F(TestResourceMonitoringCluster, AttributeTest)
-{
-
-}
+TEST_F(TestResourceMonitoringCluster, AttributeTest) {}
 
 } // namespace
