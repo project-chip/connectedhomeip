@@ -692,7 +692,7 @@ static NSString * const MTRSetupPayloadCodingKeyQRCode = @"qr";
     if (!self.concatenated) {
         self.hasShortDiscriminator = ([coder decodeIntegerForKey:MTRSetupPayloadCodingKeyHasShortDiscriminator] != 0);
         self.discriminator = [coder decodeObjectOfClass:NSNumber.class forKey:MTRSetupPayloadCodingKeyDiscriminator];
-        // For compatibility reasons, keep decoding rendevouzInformation instead of discoveryCapabilities
+        // For compatibility reasons, keep decoding rendezvouzInformation instead of discoveryCapabilities
         self.rendezvousInformation = [coder decodeObjectOfClass:NSNumber.class forKey:MTRSetupPayloadCodingKeyRendevouzInformation];
     }
 
