@@ -62,14 +62,6 @@ config("nxp_platform_config") {
     "../common/ota",
   ]
 
-  # Needed for sources that use mbedtls
-  if (nxp_external_sdk) {
-    include_dirs += [
-      "${nxp_sdk_root}/middleware/mbedtls/include",
-      "${nxp_sdk_root}/middleware/mbedtls/port/sssapi",
-    ]
-  }
-
   defines = [ "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/${nxp_platform}/BLEManagerImpl.h\"" ]
 }
 
