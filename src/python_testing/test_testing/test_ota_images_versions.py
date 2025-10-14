@@ -59,7 +59,7 @@ def run_single_test(software_version: int = 2) -> int:
     script_args = [
         "--commissioning-method on-network",
         "--passcode 20202021",
-        "--discriminator 1234"
+        "--discriminator 1234",
         f"--int-arg SOFTWAREVERSION:{software_version}",
         "--storage-path admin_storage.json"
     ]
