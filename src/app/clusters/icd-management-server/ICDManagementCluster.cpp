@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "IcdManagementCluster.h"
+#include "ICDManagementCluster.h"
 
 #include <access/AccessControl.h>
 #include <access/Privilege.h>
