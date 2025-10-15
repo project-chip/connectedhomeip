@@ -97,7 +97,9 @@ public:
     ///
     /// Precondition:
     ///   - `path` endpoint+cluster part MUST match one of the paths returned by GetPaths.
-    virtual void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType) {}
+    virtual void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType,
+                                                FabricIndex accessingFabric)
+    {}
 
     /// Reads the value of an existing attribute.
     ///
