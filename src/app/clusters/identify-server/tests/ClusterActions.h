@@ -17,15 +17,14 @@
 
 #pragma once
 
-#include <type_traits>
-#include <cassert>
-#include <app/reporting/ReportScheduler.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
+#include <app/reporting/ReportScheduler.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
-
+#include <cassert>
+#include <type_traits>
 
 // Helper function to write a value to an attribute.
 template <typename T>
