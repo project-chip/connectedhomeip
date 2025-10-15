@@ -48,7 +48,6 @@ namespace chip::app::Clusters {
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 PersistentStorageDelegate * ICDManagementServer::mStorage           = nullptr;
 Crypto::SymmetricKeystore * ICDManagementServer::mSymmetricKeystore = nullptr;
-IcdManagementFabricDelegate gFabricDelegate;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 ICDConfigurationData * ICDManagementServer::mICDConfigurationData = nullptr;
@@ -58,6 +57,7 @@ ICDConfigurationData * ICDManagementServer::mICDConfigurationData = nullptr;
 namespace {
 IcdManagementAttributeAccess gAttribute;
 #if CHIP_CONFIG_ENABLE_ICD_CIP
+IcdManagementFabricDelegate gFabricDelegate;
 
 /**
  * @brief Function checks if the client has admin permissions to the cluster in the commandPath
