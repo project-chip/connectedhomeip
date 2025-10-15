@@ -33,7 +33,6 @@
 #include <lib/support/ReadOnlyBuffer.h>
 
 #include <cstdlib>
-#include <optional>
 
 using namespace chip;
 using namespace chip::Test;
@@ -48,7 +47,7 @@ namespace {
 class FakeDefaultServerCluster : public DefaultServerCluster
 {
 public:
-    FakeDefaultServerCluster(ConcreteClusterPath path) : DefaultServerCluster(path) {}
+    constexpr FakeDefaultServerCluster(ConcreteClusterPath && path) : DefaultServerCluster(std::move(path)) {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
@@ -93,8 +92,8 @@ TEST(TestDefaultServerCluster, ListWriteNotification)
     FakeDefaultServerCluster cluster({ 1, 2 });
 
     // this does not test anything really, except we get 100% coverage and we see that we do not crash
-    cluster.ListAttributeWriteNotification({ 1, 2, 3 }, DataModel::ListWriteOperation::kListWriteBegin);
-    cluster.ListAttributeWriteNotification({ 1, 2, 3 }, DataModel::ListWriteOperation::kListWriteFailure);
+    cluster.ListAttributeWriteNotification({ 1, 2, 3 }, DataModel::ListWriteOperation::kListWriteBegin, 1);
+    cluster.ListAttributeWriteNotification({ 1, 2, 3 }, DataModel::ListWriteOperation::kListWriteFailure, 1);
 }
 
 TEST(TestDefaultServerCluster, AttributesDefault)
@@ -131,9 +130,9 @@ TEST(TestDefaultServerCluster, ListWriteIsANoop)
 
     // this is really for coverage, we are not calling anything useful
     cluster.ListAttributeWriteNotification({ 1 /* endpoint */, 2 /* cluster */, 3 /* attribute */ },
-                                           DataModel::ListWriteOperation::kListWriteBegin);
+                                           DataModel::ListWriteOperation::kListWriteBegin, 1);
     cluster.ListAttributeWriteNotification({ 1 /* endpoint */, 2 /* cluster */, 3 /* attribute */ },
-                                           DataModel::ListWriteOperation::kListWriteSuccess);
+                                           DataModel::ListWriteOperation::kListWriteSuccess, 1);
 }
 
 TEST(TestDefaultServerCluster, CommandsDefault)

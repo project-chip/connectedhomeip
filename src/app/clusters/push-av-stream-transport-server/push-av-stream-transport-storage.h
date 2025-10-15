@@ -267,7 +267,7 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         streamUsage   = aTransportOptionsStorage.streamUsage;
         videoStreamID = aTransportOptionsStorage.videoStreamID;
         audioStreamID = aTransportOptionsStorage.audioStreamID;
-        endpointID    = aTransportOptionsStorage.endpointID;
+        TLSEndpointID = aTransportOptionsStorage.TLSEndpointID;
 
         // Deep copy the URL buffer
         std::memcpy(mUrlBuffer, aTransportOptionsStorage.mUrlBuffer, kMaxUrlLength);
@@ -292,7 +292,7 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         streamUsage   = transportOptions.streamUsage;
         videoStreamID = transportOptions.videoStreamID;
         audioStreamID = transportOptions.audioStreamID;
-        endpointID    = transportOptions.endpointID;
+        TLSEndpointID = transportOptions.TLSEndpointID;
 
         MutableCharSpan urlBuffer(mUrlBuffer);
         // ValidateIncomingTransportOptions() function already checked the url length
