@@ -1,5 +1,6 @@
 /*
  *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,17 +14,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/user-label-server/user-label-cluster.h>
-
 #include <app/clusters/testing/AttributeTesting.h>
+#include <app/clusters/testing/TestReadWriteAttribute.h>
+#include <app/clusters/user-label-server/user-label-cluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/UserLabel/Attributes.h>
+#include <clusters/UserLabel/Enums.h>
 #include <clusters/UserLabel/Metadata.h>
+#include <clusters/UserLabel/Structs.h>
+
+namespace {
 
 using namespace chip;
 using namespace chip::app;
@@ -31,156 +34,50 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UserLabel;
 using namespace chip::app::Clusters::UserLabel::Attributes;
 
-namespace {
-
 struct TestUserLabelCluster : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
-};
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
 
-constexpr size_t kUserLabelFixedClusterCount = 2;
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-class UserLabelClusterTest
-{
+    void SetUp() override { ASSERT_EQ(userLabel.Startup(context), CHIP_NO_ERROR); }
+
+    void TearDown() override { userLabel.Shutdown(); }
+
+    TestUserLabelCluster() : testContext(), context(testContext.Create()), userLabel(kRootEndpointId) {}
+
+    chip::Test::TestServerClusterContext testContext;
+    ServerClusterContext context;
     UserLabelCluster userLabel;
-
-public:
-    template <typename... Args>
-    UserLabelClusterTest(Args &&... args) : userLabel(std::forward<Args>(args)...)
-    {}
-
-    template <typename F>
-    void Check(F check)
-    {
-        check(userLabel);
-    }
 };
 
-class ReadAttribute
+template <typename ClusterT, typename T>
+inline CHIP_ERROR ReadClusterAttribute(ClusterT & cluster, AttributeId attr, T & val)
 {
-    UserLabelCluster & mCluster;
-    DataModel::ActionReturnStatus mStatus;
-
-public:
-    ReadAttribute(UserLabelCluster & cluster) : mCluster(cluster), mStatus(CHIP_NO_ERROR) {}
-
-    DataModel::ActionReturnStatus GetStatus() const { return mStatus; }
-
-    void operator()(DataModel::ReadAttributeRequest & request)
-    {
-        Platform::ScopedMemoryBufferWithSize<uint8_t> buffer;
-        ASSERT_NE(buffer.Alloc(1024).Get(), nullptr);
-
-        AttributeReportIBs::Builder attributeReportIBsBuilder;
-        TLV::TLVWriter reportWriter;
-        reportWriter.Init(buffer.Get(), buffer.AllocatedSize());
-        ASSERT_EQ(attributeReportIBsBuilder.Init(&reportWriter), CHIP_NO_ERROR);
-
-        AttributeValueEncoder encoder(attributeReportIBsBuilder, Access::SubjectDescriptor{}, request.path, 0 /* dataVersion */);
-
-        mStatus = mCluster.ReadAttribute(request, encoder);
-    }
-};
-
-class WriteAttribute
-{
-    UserLabelCluster & mCluster;
-    DataModel::ActionReturnStatus mStatus;
-
-public:
-    WriteAttribute(UserLabelCluster & cluster) : mCluster(cluster), mStatus(CHIP_NO_ERROR) {}
-
-    DataModel::ActionReturnStatus GetStatus() const { return mStatus; }
-
-    void operator()(DataModel::WriteAttributeRequest & request)
-    {
-        Platform::ScopedMemoryBufferWithSize<uint8_t> buffer;
-        ASSERT_NE(buffer.Alloc(1024).Get(), nullptr);
-
-        TLV::TLVReader reportReader;
-        reportReader.Init(buffer.Get(), buffer.AllocatedSize());
-
-        AttributeValueDecoder decoder(reportReader, Access::SubjectDescriptor{});
-
-        mStatus = mCluster.WriteAttribute(request, decoder);
-    }
-};
+    return chip::Test::ReadClusterAttribute(cluster, ConcreteAttributePath(kRootEndpointId, UserLabel::Id, attr), val);
+}
 
 } // namespace
 
 TEST_F(TestUserLabelCluster, AttributeTest)
 {
-    for (EndpointId endpoint = 0; endpoint < kUserLabelFixedClusterCount; ++endpoint)
-    {
-        UserLabelClusterTest(endpoint).Check([&](UserLabelCluster & userLabel) {
-            ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-            ASSERT_EQ(userLabel.Attributes(ConcreteClusterPath(endpoint, UserLabel::Id), attributes), CHIP_NO_ERROR);
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
+    ASSERT_EQ(userLabel.Attributes(ConcreteClusterPath(kRootEndpointId, UserLabel::Id), attributes), CHIP_NO_ERROR);
 
-            ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-            AttributeListBuilder listBuilder(expected);
-            ASSERT_EQ(listBuilder.Append(Span(UserLabel::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
-            ASSERT_TRUE(Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-        });
-    }
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
+    AttributeListBuilder listBuilder(expected);
+    ASSERT_EQ(listBuilder.Append(Span(UserLabel::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
+    ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
 }
 
 TEST_F(TestUserLabelCluster, ReadAttributeTest)
 {
-    for (EndpointId endpoint = 0; endpoint < kUserLabelFixedClusterCount; ++endpoint)
-    {
-        UserLabelClusterTest(endpoint).Check([&](UserLabelCluster & userLabel) {
-            chip::Test::TestServerClusterContext context;
-            EXPECT_EQ(userLabel.Startup(context.Get()), CHIP_NO_ERROR);
+    uint16_t revision{};
+    ASSERT_EQ(ReadClusterAttribute(userLabel, Globals::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
 
-            DataModel::ReadAttributeRequest request;
-            request.path.mEndpointId  = endpoint;
-            request.path.mClusterId   = UserLabel::Id;
-            request.path.mAttributeId = Globals::Attributes::ClusterRevision::Id;
+    uint32_t features{};
+    ASSERT_EQ(ReadClusterAttribute(userLabel, FeatureMap::Id, features), CHIP_NO_ERROR);
 
-            ReadAttribute readAttribute(userLabel);
-            readAttribute(request);
-            EXPECT_TRUE(readAttribute.GetStatus().IsSuccess());
-
-            request.path.mAttributeId = FeatureMap::Id;
-            readAttribute(request);
-            EXPECT_TRUE(readAttribute.GetStatus().IsSuccess());
-
-            request.path.mAttributeId = LabelList::Id;
-            readAttribute(request);
-            EXPECT_TRUE(readAttribute.GetStatus().IsSuccess());
-
-            request.path.mAttributeId = 0xFFFF;
-            readAttribute(request);
-            EXPECT_TRUE(readAttribute.GetStatus().IsError());
-        });
-    }
-}
-
-TEST_F(TestUserLabelCluster, WriteAttributeTest)
-{
-    for (EndpointId endpoint = 0; endpoint < kUserLabelFixedClusterCount; ++endpoint)
-    {
-        UserLabelClusterTest(endpoint).Check([&](UserLabelCluster & userLabel) {
-            chip::Test::TestServerClusterContext context;
-            EXPECT_EQ(userLabel.Startup(context.Get()), CHIP_NO_ERROR);
-
-            DataModel::WriteAttributeRequest request;
-            request.path.mEndpointId  = endpoint;
-            request.path.mClusterId   = UserLabel::Id;
-            request.path.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-
-            WriteAttribute writeAttribute(userLabel);
-            writeAttribute(request);
-            EXPECT_TRUE(writeAttribute.GetStatus().IsError());
-
-            request.path.mAttributeId = FeatureMap::Id;
-            writeAttribute(request);
-            EXPECT_TRUE(writeAttribute.GetStatus().IsError());
-
-            request.path.mAttributeId = 0xFFFF;
-            writeAttribute(request);
-            EXPECT_TRUE(writeAttribute.GetStatus().IsError());
-        });
-    }
+    DataModel::DecodableList<Structs::LabelStruct::Type> labelList;
+    ASSERT_EQ(ReadClusterAttribute(userLabel, LabelList::Id, labelList), CHIP_NO_ERROR);
 }
