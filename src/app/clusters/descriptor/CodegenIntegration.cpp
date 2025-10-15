@@ -50,7 +50,8 @@ public:
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
     {
-        if(!mFetchedSemanticTags) {
+        if (!mFetchedSemanticTags)
+        {
             GetSemanticTagsForEndpoint(path.mEndpointId, mSemanticTags);
             mFetchedSemanticTags = true;
         }
@@ -60,7 +61,8 @@ public:
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
     {
-        if(!mFetchedSemanticTags) {
+        if (!mFetchedSemanticTags)
+        {
             GetSemanticTagsForEndpoint(request.path.mEndpointId, mSemanticTags);
             mFetchedSemanticTags = true;
         }
