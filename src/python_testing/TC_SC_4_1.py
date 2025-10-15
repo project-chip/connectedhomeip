@@ -95,9 +95,9 @@ class TC_SC_4_1(MatterBaseTest):
                             - Set supports_obcw to True, otherwise, set supports_obcw to False"""),
 
             TestStep(6, """Get the 'Long Discriminator Subtype'""",
-                        """TH gets the 'Long Discriminator' from the DUT's and constructs the 'Long Discriminator Subtype'
-                            - Verify that the 'Long Discriminator Subtype' is a valid 12-bit variable length decimal number in
-                            ASCII text, omitting any leading zeros value. Save it as 'long_discriminator_subtype'
+                        """TH gets the 'Long Discriminator' from the DUT and constructs the 'Long Discriminator Subtype'
+                            - Verify that the 'Long Discriminator Subtype' discriminator value is a valid 12-bit variable length decimal
+                            number in ASCII text, omitting any leading zeros. Save as 'long_discriminator_subtype'
                             - Save the 'Long Discriminator' value as 'long_discriminator'"""),
 
             # OPEN BASIC COMMISSIONING WINDOW
@@ -245,7 +245,7 @@ class TC_SC_4_1(MatterBaseTest):
             # Verify that there is one, and only one, 'Long Discriminator Subtype' PTR record
             asserts.assert_equal(len(ptr_records), 1,
                                  f"There must only be one 'Long Discriminator Subtype' ({long_discriminator_subtype}) PTR record, found {len(ptr_records)}.")
-            
+
             return ptr_records[0].instance_name
 
         return None
