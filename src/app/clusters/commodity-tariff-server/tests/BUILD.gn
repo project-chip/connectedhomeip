@@ -34,5 +34,21 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/clusters/commodity-tariff-server",
     "${chip_root}/src/app/clusters/testing",
     "${chip_root}/src/lib/support",
+    "//third_party/pigweed/repo/pw_containers",
+    "//third_party/pigweed/repo/pw_toolchain",
+    "//third_party/pigweed/repo/pw_unit_test",
+  ]
+
+  public_configs = [ ":test_include" ]
+}
+
+# Test config
+config("test_include") {
+  include_dirs = [
+    ".",
+    "tests",
+    "//third_party/pigweed/repo/pw_containers/public",
+    "//third_party/pigweed/repo/pw_toolchain/public",
+    "//third_party/pigweed/repo/pw_unit_test/public",
   ]
 }

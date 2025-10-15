@@ -16,12 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements a unit test suite for the CommodityTariffContainers helper classes.
- *
- */
-
 #include "pw_unit_test/framework.h"
 #include <app/clusters/commodity-tariff-server/CommodityTariffContainers.h>
 

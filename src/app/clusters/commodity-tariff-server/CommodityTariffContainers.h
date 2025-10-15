@@ -18,301 +18,292 @@
 
 #pragma once
 
-#include <algorithm>
-#include <cstddef>
-#include <utility>
-
-#include <app-common/zap-generated/cluster-enums.h>
-#include <app-common/zap-generated/cluster-objects.h>
-
-#include "CommodityTariffConsts.h"
+#include <pw_containers/flat_map.h>
+#include <pw_containers/vector.h>
+#include <pw_containers/algorithm.h>
+#include "lib/core/CHIPError.h"
 
 namespace chip {
 namespace app {
 namespace CommodityTariffContainers {
 
-template <typename T, size_t Capacity>
-class CTC_ContainerClassBase
-{
-    static_assert(std::is_trivially_destructible<T>::value, "T must be trivially destructible");
-
-protected:
-    CTC_ContainerClassBase() = default;
-
+template<typename T, size_t kMaxSize>
+class CTC_UnorderedSet {
 public:
-    virtual ~CTC_ContainerClassBase() = default;
+    using ValueType = T;
+    using Iterator = typename pw::Vector<T, kMaxSize>::iterator;
+    using ConstIterator = typename pw::Vector<T, kMaxSize>::const_iterator;
 
-    enum class RetCode : uint8_t
-    {
-        kSuccess,
-        kNoInit,
-        kInUse,
-        kNoMem,
-        kGenericFail,
-        kNotFound,
-        kDuplicate,
-    };
+    PwUnorderedSet() = default;
 
-    virtual bool insert(const T & item) = 0;
-    virtual void remove(const T & item) = 0;
-    virtual void clear() { mCount = 0; };
-    virtual bool contains(const T & item) const  = 0;
-    virtual T * find(const T & item)             = 0;
-    virtual const T * find(const T & item) const = 0;
+    // Capacity
+    constexpr size_t capacity() const { return kMaxSize; }
+    size_t size() const { return data_.size(); }
+    bool empty() const { return data_.empty(); }
+    bool full() const { return data_.size() >= kMaxSize; }
 
-    size_t size() const { return mCount; }
-    constexpr size_t capacity() const { return Capacity; }
-    bool empty() const { return (mCount == 0); }
-
-    // Array-style access
-    T & operator[](size_t index)
-    {
-        VerifyOrDie(index < mCount);
-        return mBuffer[index];
-    }
-
-    const T & operator[](size_t index) const
-    {
-        VerifyOrDie(index < mCount);
-        return mBuffer[index];
-    }
-
-    // Iterator support
-    T * begin() { return mBuffer; }
-    T * end() { return mBuffer + mCount; }
-    const T * begin() const { return mBuffer; }
-    const T * end() const { return mBuffer + mCount; }
-
-protected:
-    T mBuffer[Capacity];
-    size_t mCount = 0;
-
-    RetCode insertAtEnd(const T & item)
-    {
-        if (mCount >= Capacity)
-        {
-            return RetCode::kNoMem;
+    // Modifiers
+    CHIP_ERROR insert(const T& value) {
+        if (contains(value)) {
+            return CHIP_ERROR_DUPLICATE_KEY_ID;
         }
-
-        // Append to the end
-        mBuffer[mCount] = item;
-        ++mCount;
-        return RetCode::kSuccess;
-    }
-};
-
-template <typename ItemType, size_t Capacity>
-class CTC_UnorderedSet : public CTC_ContainerClassBase<ItemType, Capacity>
-{
-public:
-    using Base = CTC_ContainerClassBase<ItemType, Capacity>;
-    using Base::Base;
-
-    CTC_UnorderedSet(CTC_UnorderedSet && other) noexcept             = default;
-    CTC_UnorderedSet & operator=(CTC_UnorderedSet && other) noexcept = default;
-
-    bool insert(const ItemType & item) override
-    {
-        // Check for duplicate using std::find
-        if (this->find(item) != nullptr)
-        {
-            return false; // Duplicate
+        if (full()) {
+            return CHIP_ERROR_NO_MEMORY;
         }
-
-        // Append to the end (unordered)
-        return (this->insertAtEnd(item) == Base::RetCode::kSuccess);
+        return data_.push_back(value) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
     }
 
-    void remove(const ItemType & item) override
-    {
-        auto * found = this->find(item);
-        if (found)
-        {
-            // Swap with the last element for O(1) removal (after finding).
-            auto * last = &this->mBuffer[this->mCount - 1];
-            if (found != last)
-            {
-                *found = std::move(*last);
-            }
-            --this->mCount;
+    CHIP_ERROR insert(T&& value) {
+        if (contains(value)) {
+            return CHIP_ERROR_DUPLICATE_KEY_ID;
         }
+        if (full()) {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+        return data_.push_back(std::move(value)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
     }
 
-    bool contains(const ItemType & item) const override { return this->find(item) != nullptr; }
-
-    ItemType * find(const ItemType & item) override
-    {
-        // Linear search using std::find
-        auto it = std::find(this->begin(), this->end(), item);
-        return (it != this->end()) ? it : nullptr;
+    CHIP_ERROR remove(const T& value) {
+        auto it = find(value);
+        if (it == end()) {
+            return CHIP_ERROR_KEY_NOT_FOUND;
+        }
+        
+        // Swap with last element and pop (O(1) removal)
+        if (it != data_.end() - 1) {
+            *it = std::move(data_.back());
+        }
+        data_.pop_back();
+        return CHIP_NO_ERROR;
     }
 
-    const ItemType * find(const ItemType & item) const override
-    {
-        // Const version of linear search
-        auto it = std::find(this->begin(), this->end(), item);
-        return (it != this->end()) ? it : nullptr;
+    void clear() {
+        data_.clear();
     }
 
-    /**
-     * @brief Merge another set into this set with automatic resizing
-     * @param other The set to merge into this one
-     * @return RetCode indicating success or failure
-     *
-     * @note Automatically resizes if needed (if ensureCapacity is implemented)
-     * @note Duplicate items from 'other' are skipped
-     */
-    template <typename InputIterator>
-    void mergeIt(InputIterator first, InputIterator last)
-    {
-        for (auto it = first; it != last; ++it)
-        {
-            if (!this->contains(*it))
-            {
-                auto ret = this->insertAtEnd(*it);
-                VerifyOrDie(ret == Base::RetCode::kSuccess);
+    // Lookup
+    bool contains(const T& value) const {
+        return find(value) != end();
+    }
+
+    Iterator find(const T& value) {
+        return pw::containers::Find(data_, value);
+    }
+
+    ConstIterator find(const T& value) const {
+        return pw::containers::Find(data_, value);
+    }
+
+    // Iterators
+    Iterator begin() { return data_.begin(); }
+    Iterator end() { return data_.end(); }
+    ConstIterator begin() const { return data_.begin(); }
+    ConstIterator end() const { return data_.end(); }
+    ConstIterator cbegin() const { return data_.cbegin(); }
+    ConstIterator cend() const { return data_.cend(); }
+
+    // Access
+    T& operator[](size_t index) { return data_[index]; }
+    const T& operator[](size_t index) const { return data_[index]; }
+
+    T* data() { return data_.data(); }
+    const T* data() const { return data_.data(); }
+
+    // Merge operations
+    template<size_t OtherMaxSize>
+    CHIP_ERROR merge(const PwUnorderedSet<T, OtherMaxSize>& other) {
+        for (const auto& item : other) {
+            CHIP_ERROR err = insert(item);
+            if (err != CHIP_NO_ERROR && err != CHIP_ERROR_DUPLICATE_KEY_ID) {
+                return err; // Return on memory error, continue on duplicate
             }
         }
+        return CHIP_NO_ERROR;
     }
 
-    /**
-     * @brief Merge from any container (std::vector, std::array, etc.)
-     */
-    template <typename Container>
-    void merge(const Container & container)
-    {
-        auto ret = Base::RetCode::kSuccess;
-        // Calculate required capacity including only non-duplicates
-        size_t nonDuplicateCount = 0;
-        for (const auto & item : container)
-        {
-            if (!this->contains(item))
-            {
-                nonDuplicateCount++;
+    template<typename InputIterator>
+    CHIP_ERROR merge(InputIterator first, InputIterator last) {
+        for (auto it = first; it != last; ++it) {
+            CHIP_ERROR err = insert(*it);
+            if (err != CHIP_NO_ERROR && err != CHIP_ERROR_DUPLICATE_KEY_ID) {
+                return err;
             }
         }
-
-        size_t requiredCapacity = this->mCount + nonDuplicateCount;
-        if (requiredCapacity > Capacity)
-        {
-            ret = Base::RetCode::kNoMem;
-        }
-
-        VerifyOrDie(ret == Base::RetCode::kSuccess);
-
-        mergeIt(container.begin(), container.end());
+        return CHIP_NO_ERROR;
     }
-};
+private:
+    pw::Vector<T, kMaxSize> data_;
+}
 
-template <typename KeyType, typename ValueType, size_t Capacity>
-class CTC_UnorderedMap
-{
+template<typename Key, typename Value, size_t kMaxSize>
+class CTC_UnorderedMap {
 public:
-    using PairType = std::pair<KeyType, ValueType>;
+    using PairType = std::pair<Key, Value>;
+    using Iterator = typename pw::Vector<PairType, kMaxSize>::iterator;
+    using ConstIterator = typename pw::Vector<PairType, kMaxSize>::const_iterator;
 
-    static_assert(std::is_trivially_destructible<PairType>::value, "KeyType and ValueType must be trivially destructible");
+    PwUnorderedMap() = default;
+
+    // Capacity
+    constexpr size_t capacity() const { return kMaxSize; }
+    size_t size() const { return data_.size(); }
+    bool empty() const { return data_.empty(); }
+    bool full() const { return data_.size() >= kMaxSize; }
+
+    // Modifiers
+    CHIP_ERROR insert(const Key& key, const Value& value) {
+        return insert(std::make_pair(key, value));
+    }
+
+    CHIP_ERROR insert(const PairType& pair) {
+        if (contains(pair.first)) {
+            return CHIP_ERROR_DUPLICATE_KEY_ID;
+        }
+        if (full()) {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+        return data_.push_back(pair) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+    }
+
+    CHIP_ERROR insert(PairType&& pair) {
+        if (contains(pair.first)) {
+            return CHIP_ERROR_DUPLICATE_KEY_ID;
+        }
+        if (full()) {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+        return data_.push_back(std::move(pair)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+    }
+
+    CHIP_ERROR remove(const Key& key) {
+        auto it = find(key);
+        if (it == end()) {
+            return CHIP_ERROR_KEY_NOT_FOUND;
+        }
+        
+        // Swap with last element and pop
+        if (it != data_.end() - 1) {
+            *it = std::move(data_.back());
+        }
+        data_.pop_back();
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR update(const Key& key, const Value& value) {
+        auto it = find(key);
+        if (it == end()) {
+            return CHIP_ERROR_KEY_NOT_FOUND;
+        }
+        it->second = value;
+        return CHIP_NO_ERROR;
+    }
+
+    void clear() {
+        data_.clear();
+    }
+
+    // Lookup
+    bool contains(const Key& key) const {
+        return find(key) != end();
+    }
+
+    Value* get_value(const Key& key) {
+        auto it = find(key);
+        return it != end() ? &it->second : nullptr;
+    }
+
+    const Value* get_value(const Key& key) const {
+        auto it = find(key);
+        return it != end() ? &it->second : nullptr;
+    }
+
+    Iterator find(const Key& key) {
+        return pw::containers::FindIf(data_, 
+            [&key](const PairType& pair) { return pair.first == key; });
+    }
+
+    ConstIterator find(const Key& key) const {
+        return pw::containers::FindIf(data_, 
+            [&key](const PairType& pair) { return pair.first == key; });
+    }
+
+    // Access
+    Value& operator[](const Key& key) {
+        auto* value = get_value(key);
+        if (!value) {
+            // Insert default value if key doesn't exist
+            insert(key, Value{});
+            value = get_value(key);
+        }
+        return *value;
+    }
+
+    // Iterators
+    Iterator begin() { return data_.begin(); }
+    Iterator end() { return data_.end(); }
+    ConstIterator begin() const { return data_.begin(); }
+    ConstIterator end() const { return data_.end(); }
+    ConstIterator cbegin() const { return data_.cbegin(); }
+    ConstIterator cend() const { return data_.cend(); }
+
+    pw::Vector<Key, kMaxSize> get_keys() const {
+        pw::Vector<Key, kMaxSize> keys;
+        for (const auto& pair : data_) {
+            keys.push_back(pair.first);
+        }
+        return keys;
+    }
+
+    pw::Vector<Value, kMaxSize> get_values() const {
+        pw::Vector<Value, kMaxSize> values;
+        for (const auto& pair : data_) {
+            values.push_back(pair.second);
+        }
+        return values;
+    }
+
+    // Merge operations
+    template<size_t OtherMaxSize>
+    CHIP_ERROR merge(const PwUnorderedMap<Key, Value, OtherMaxSize>& other, bool overwrite = false) {
+        for (const auto& pair : other) {
+            if (!contains(pair.first)) {
+                // New key
+                CHIP_ERROR err = insert(pair);
+                if (err != CHIP_NO_ERROR) {
+                    return err;
+                }
+            } else if (overwrite) {
+                // Existing key, overwrite
+                CHIP_ERROR err = update(pair.first, pair.second);
+                if (err != CHIP_NO_ERROR) {
+                    return err;
+                }
+            }
+            // else: keep existing (do nothing)
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    template<typename InputIterator>
+    CHIP_ERROR merge(InputIterator first, InputIterator last, bool overwrite = false) {
+        for (auto it = first; it != last; ++it) {
+            if (!contains(it->first)) {
+                CHIP_ERROR err = insert(*it);
+                if (err != CHIP_NO_ERROR) {
+                    return err;
+                }
+            } else if (overwrite) {
+                CHIP_ERROR err = update(it->first, it->second);
+                if (err != CHIP_NO_ERROR) {
+                    return err;
+                }
+            }
+        }
+        return CHIP_NO_ERROR;
+    }
 
 private:
-    // Custom set that only compares keys for uniqueness
-    class PairSet : public CTC_UnorderedSet<PairType, Capacity>
-    {
-    public:
-        using Base = CTC_UnorderedSet<PairType, Capacity>;
-        using Base::Base;
-
-        PairType * insertUnchecked(const PairType & pair)
-        {
-            if (this->insertAtEnd(pair) == Base::RetCode::kSuccess)
-            {
-                return &this->mBuffer[this->mCount - 1];
-            }
-            return nullptr;
-        }
-
-        // Override find to only compare keys
-        PairType * find(const PairType & pair) override { return findByKey(pair.first); }
-
-        const PairType * find(const PairType & pair) const override { return findByKey(pair.first); }
-
-        PairType * findByKey(const KeyType & key)
-        {
-            auto it = std::find_if(this->begin(), this->end(), [&key](const PairType & item) { return item.first == key; });
-            return (it != this->end()) ? it : nullptr;
-        }
-
-        const PairType * findByKey(const KeyType & key) const
-        {
-            auto it = std::find_if(this->begin(), this->end(), [&key](const PairType & item) { return item.first == key; });
-            return (it != this->end()) ? it : nullptr;
-        }
-
-        void removeByKey(const KeyType & key)
-        {
-            if (auto * found = findByKey(key))
-            {
-                // Swap with the last element for O(1) removal (after finding).
-                auto * last = &this->mBuffer[this->mCount - 1];
-                if (found != last)
-                {
-                    *found = std::move(*last);
-                }
-                --this->mCount;
-            }
-        }
-
-        // Override contains to only check key
-        bool contains(const PairType & pair) const override { return containsKey(pair.first); }
-
-        bool containsKey(const KeyType & key) const { return findByKey(key) != nullptr; }
-    };
-
-    PairSet mPairStorage;
-
-public:
-    CTC_UnorderedMap() = default;
-
-    bool insert(const KeyType & key, const ValueType & value) { return mPairStorage.insert(std::make_pair(key, value)); }
-
-    bool insert(const PairType & pair) { return mPairStorage.insert(pair); }
-
-    void remove(const KeyType & key) { mPairStorage.removeByKey(key); }
-
-    ValueType * find(const KeyType & key)
-    {
-        auto * pair = mPairStorage.findByKey(key);
-        return pair ? &pair->second : nullptr;
-    }
-
-    const ValueType * find(const KeyType & key) const
-    {
-        auto * pair = mPairStorage.findByKey(key);
-        return pair ? &pair->second : nullptr;
-    }
-
-    // In class CTC_UnorderedMap
-    ValueType & operator[](const KeyType & key)
-    {
-        auto * pair = mPairStorage.findByKey(key);
-        if (pair == nullptr)
-        {
-            // Use insertUnchecked since we already know the key is not present.
-            pair = mPairStorage.insertUnchecked(std::make_pair(key, ValueType{}));
-            VerifyOrDie(pair != nullptr);
-        }
-        return pair->second;
-    }
-
-    bool contains(const KeyType & key) const { return mPairStorage.containsKey(key); }
-
-    size_t size() const { return mPairStorage.size(); }
-    size_t capacity() const { return mPairStorage.capacity(); }
-    bool empty() const { return mPairStorage.empty(); }
-
-    // Iterator support
-    auto begin() { return mPairStorage.begin(); }
-    auto end() { return mPairStorage.end(); }
-    auto begin() const { return mPairStorage.begin(); }
-    auto end() const { return mPairStorage.end(); }
+    pw::Vector<PairType, kMaxSize> data_;
 };
 
 } // namespace CommodityTariffContainers
@@ -385,14 +376,14 @@ struct TariffUpdateCtx
      * @brief Master set of all valid TariffComponent IDs
      * @details Contains all TariffComponent IDs that exist in the tariff definition
      */
-    CommodityTariffContainers::CTC_UnorderedMap<uint32_t, uint32_t, CommodityTariffConsts::kTariffComponentMaxLabelLength>
+    CommodityTariffContainers::CTC_UnorderedMap<uint32_t, uint32_t, CommodityTariffConsts::kTariffComponentsAttrMaxLength>
         TariffComponentKeyIDsFeatureMap;
 
     /**
      * @brief TariffComponent IDs referenced by TariffPeriod items
      * @details Collected for validating period->component references
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kTariffComponentMaxLabelLength>
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kTariffComponentsAttrMaxLength>
         TariffPeriodsTariffComponentIDs;
     /// @}
 

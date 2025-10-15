@@ -13,6 +13,9 @@
 # limitations under the License.
 
 # This is the equivalent to app_config_dependent_sources.gni
+
+find_package(pigweed REQUIRED)
+
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE

@@ -530,7 +530,6 @@ CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewValue, voi
         return CHIP_ERROR_DUPLICATE_KEY_ID;
     }
 
-    // ctx->TariffPeriodsDayEntryIDs.merge(entryDeIDs);
     ctx->TariffPeriodsTariffComponentIDs.merge(entryTcIDs);
 
     return CHIP_NO_ERROR;

@@ -13,6 +13,7 @@
 # limitations under the License.
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
 source_set("commodity-tariff-server") {
   sources = [
@@ -21,6 +22,9 @@ source_set("commodity-tariff-server") {
     "CommodityTariffConsts.h",
   ]
 
-  public_deps =
-      [ "${chip_root}/zzz_generated/app-common/clusters/CommodityTariff" ]
+  public_deps = [
+    "${chip_root}/zzz_generated/app-common/clusters/CommodityTariff",
+    "//third_party/pigweed/repo/pw_containers",
+    "//third_party/pigweed/repo/pw_toolchain",
+  ]
 }
