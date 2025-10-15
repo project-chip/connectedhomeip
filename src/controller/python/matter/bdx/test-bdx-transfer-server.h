@@ -63,6 +63,10 @@ private:
     Messaging::ExchangeManager * mExchangeManager = nullptr;
     BdxTransfer::Delegate * mBdxTransferDelegate  = nullptr;
     size_t mExpectedTransfers                     = 0;
+
+    // Saved unsolicited handler for BDX SendInit that was registered before this server took over.
+    // This is typically the BDXTransferServer installed by CHIPDeviceControllerFactory.
+    Messaging::UnsolicitedMessageHandler * mPrevSendInitHandler = nullptr;
 };
 
 } // namespace bdx

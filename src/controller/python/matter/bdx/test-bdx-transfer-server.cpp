@@ -16,6 +16,7 @@
  */
 
 #include <controller/python/matter/bdx/test-bdx-transfer-server.h>
+#include <controller/CHIPDeviceControllerFactory.h>
 
 namespace chip {
 namespace bdx {
@@ -35,8 +36,16 @@ CHIP_ERROR TestBdxTransferServer::Init(System::Layer * systemLayer, Messaging::E
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mSystemLayer     = systemLayer;
     mExchangeManager = exchangeManager;
-    // This removes the BdxTransferServer registered as part of CHIPDeviceControllerFactory.
+
+    // Save and remove the BDX SendInit handler registered as part of CHIPDeviceControllerFactory.
+    // There is no direct getter for the current handler in ExchangeManager, so we rely on the
+    // controller factory system state which owns the default BDXTransferServer instance.
+    // If available, remember it so we can restore it on Shutdown.
+    chip::Controller::DeviceControllerFactory & factory = chip::Controller::DeviceControllerFactory::GetInstance();
+    if (factory.GetSystemState() != nullptr && factory.GetSystemState()->BDXTransferServer() != nullptr)
+        mPrevSendInitHandler = factory.GetSystemState()->BDXTransferServer();
     mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(MessageType::SendInit);
+
     return mExchangeManager->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, this);
 }
 
@@ -44,6 +53,15 @@ void TestBdxTransferServer::Shutdown()
 {
     VerifyOrReturn(mExchangeManager != nullptr);
     LogErrorOnFailure(mExchangeManager->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id));
+
+    // Re-register the BdxTransferServer that was registered as part of CHIPDeviceControllerFactory.
+    // Otherwise when BdxTransferServer::Shutdown() attempts to unregister this, it causes an error.
+    if (mPrevSendInitHandler != nullptr)
+    {
+        LogErrorOnFailure(mExchangeManager->RegisterUnsolicitedMessageHandlerForType(MessageType::SendInit, mPrevSendInitHandler));
+        mPrevSendInitHandler = nullptr;
+    }
+
     mExchangeManager = nullptr;
 }
 

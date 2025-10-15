@@ -215,6 +215,12 @@ void pychip_Bdx_InitCallbacks(OnTransferObtainedCallback onTransferObtainedCallb
     gBdxTransferServer.Init(systemLayer, factory.GetSystemState()->ExchangeMgr());
 }
 
+void pychip_Bdx_Shutdown()
+{
+    // Shut down and clean up resources associated with the TestBdxTransferServer instance.
+    gBdxTransferServer.Shutdown();
+}
+
 // Prepares the BDX system to expect a new transfer.
 PyChipError pychip_Bdx_ExpectBdxTransfer(PyObject transferObtainedContext)
 {
