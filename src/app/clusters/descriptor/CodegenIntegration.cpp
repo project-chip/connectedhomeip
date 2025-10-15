@@ -36,7 +36,7 @@ namespace {
 /**
  * This is a DescriptorCluster class made specifically to fetch the tag list through ember before
  * the Attributes() and ReadAttribute() functions that need this information. Tag lists are currently
- * populated through the SetTagList() ember call, only after the cluster has been created and gone through Startup(). 
+ * populated through the SetTagList() ember call, only after the cluster has been created and gone through Startup().
  * This means the tag list can NOT be fetched here and passed to the constructor through the regular DescriptorCluster.
  * The tag list is a fixed attribute, but to maintain backwards compatiblility we get that information within the functions here.
  */
