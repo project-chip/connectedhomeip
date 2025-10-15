@@ -276,7 +276,14 @@ tests:
       attribute: "GroupTable"
       response:
           value:
-              [{ GroupId: 0x0103, Endpoints: [endpoint], GroupName: "" , FabricIndex: CurrentFabricIndexValue}]
+              [
+                  {
+                      GroupId: 0x0103,
+                      Endpoints: [endpoint],
+                      GroupName: "Test Group" ,
+                      FabricIndex: CurrentFabricIndexValue
+                  },
+              ]
 
     - label:
           "Step 10: TH removes the Group key set that was added by sending a
