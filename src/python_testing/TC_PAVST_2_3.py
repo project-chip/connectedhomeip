@@ -459,6 +459,20 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                              "DUT must  responds with Status code ConstraintError")
 
         self.step(29)
+        # Get the current set of connections
+        current_connections_test = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=pvcluster, attribute=pvcluster.Attributes.CurrentConnections
+        )
+
+        # Ensure the ID we're removing is present
+        foundConnection = False
+        for connection in current_connections_test:
+            if connection.connectionID == aConnectionID:
+                foundConnection = True
+                break
+
+        asserts.assert_true(foundConnection, f"Failed to find connection ID: {aConnectionID} in current connections")
+
         cmd = pvcluster.Commands.DeallocatePushTransport(
             connectionID=aConnectionID
         )
