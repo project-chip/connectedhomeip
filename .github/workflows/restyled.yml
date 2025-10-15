@@ -18,6 +18,10 @@ jobs:
 
       - uses: restyled-io/actions/setup@v4.3.4
 
+      - name: Terrible hack
+        run: |
+          pip install autopep8==2.3.2
+
       - id: restyler
         uses: restyled-io/actions/run@v4.3.4
         with:
