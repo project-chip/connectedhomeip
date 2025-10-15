@@ -302,11 +302,10 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
     {
         // When ICD is operating as LIT, we need to adjust the MRP idle retransmission timeout
         // to accommodate the potentially long sleep periods.
-        // Set the idle retransmission timeout to be the sum of the active threshold time
-        // and the configured slow poll limit.
+        // Set the idle retransmission timeout to be the active threshold time
         // This ensures that retransmissions for first message are spaced out enough to
         // avoid unnecessary retries and potential message congestion.
-        config.mIdleRetransTimeout = config.mActiveThresholdTime + CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT;
+        config.mIdleRetransTimeout = config.mActiveThresholdTime;
     }
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload)
