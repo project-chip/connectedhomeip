@@ -223,7 +223,7 @@ PyChipError pychip_Bdx_ExpectBdxTransfer(PyObject transferObtainedContext, uint1
     VerifyOrReturnValue(transferInfo != nullptr, ToPyChipError(CHIP_ERROR_NO_MEMORY));
     transferInfo->OnTransferObtainedContext = transferObtainedContext;
     if (max_block_size != 0)
-        chip::bdx::SetControllerBdxMaxBlockSize(max_block_size);
+        chip::bdx::SetControllerBdxMaxBlockSizeForNextTransfer(max_block_size);
     gBdxTransferServer.ExpectATransfer();
     return ToPyChipError(CHIP_NO_ERROR);
 }

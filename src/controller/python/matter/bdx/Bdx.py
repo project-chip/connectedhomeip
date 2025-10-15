@@ -117,6 +117,8 @@ def _PrepareForBdxTransfer(future: Future, data: Optional[bytes], max_block_size
     ''' Prepares the BDX system for a BDX transfer. The BDX transfer is set as the future's result. This must be called
     before the BDX transfer is initiated.
 
+    If max_block_size is provided (1..65535), it overrides the controller's default cap.
+
     Returns the CHIP_ERROR result from the C++ side.
     '''
     handle = GetLibraryHandle()

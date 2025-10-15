@@ -23,7 +23,7 @@ namespace chip {
 namespace bdx {
 namespace {
 
-constexpr uint16_t kMaxBdxBlockSize               = 1024;
+constexpr uint16_t kMaxBdxBlockSize               = CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE;
 constexpr System::Clock::Timeout kBdxPollInterval = System::Clock::Milliseconds32(50);
 constexpr System::Clock::Timeout kBdxTimeout      = System::Clock::Seconds16(5 * 60);
 
@@ -33,7 +33,7 @@ static uint16_t gMaxBdxBlockSize = kMaxBdxBlockSize;
 
 } // namespace
 
-void SetControllerBdxMaxBlockSize(uint16_t maxBlockSize)
+void SetControllerBdxMaxBlockSizeForNextTransfer(uint16_t maxBlockSize)
 {
     gMaxBdxBlockSize = maxBlockSize;
 }
