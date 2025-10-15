@@ -28,6 +28,7 @@ sample app.
 -   [Flashing](#flashing)
     -   [Flasher Arguments](#flasher-arguments)
 -   [Standard Application Behavior](#standard-application-behavior)
+-   [Silabs CLI](#silabs-cli)
 
 ## Requirements
 
@@ -106,18 +107,6 @@ the BRD4187C DK is
 ./scripts/examples/gn_silabs_example.sh ./examples/lighting-app/silabs/ ./out/lighting-app BRD4187C
 ```
 
-To build the lighting app as an Wi-Fi MG24 + RS9116 NCP, the default build
-command for the BRD4187C is
-
-```shell
-./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/lighting-app_rs9116 BRD4187C use_external_flash=false chip_enable_ble_rs911x=true --wifi rs9116
-```
-
-> **Note**: The build argument `--wifi rs9116` is necessary to build the
-> BRD4187C image with the necessary code for the NCP combo.
-> `chip_enable_ble_rs911x=true` enables the RS9116 NCP bluetooth. The MG24 +
-> RS9116 NCP combo does not yet support external flash.
-
 To build the lighting app as an Wi-Fi MG24 + SiWx917 NCP, the default build
 command for the BRD4187C is
 
@@ -127,7 +116,7 @@ command for the BRD4187C is
 
 > **Note**: The build argument `--wifi SiWx917` is necessary to build BRD4187C
 > image with the necessary code for the NCP combo. `chip_enable_ble_rs911x=true`
-> enables the RS9116 NCP bluetooth. The MG24 + SiWx917 NCP combo does not yet
+> enables the SiWx917 NCP bluetooth. The MG24 + SiWx917 NCP combo does not yet
 > support external flash.
 
 To build the lighting app as an Wi-Fi MG24 + wf200 NCP, the default build
@@ -159,7 +148,7 @@ Here is a list of some the supported macros and their GN argument equivalent.
 
 |          Macro Name           | Description                                                                                            | GN equivalent                                                                                                                                              |
 | :---------------------------: | :----------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|            --wifi             | Configures an sample app as a Wi-Fi devices.<br /> This macro requires rs9116 or SiWx917 or wf200.     | --wifi rs9116 : use_rs9116=true<br /> --wifi SiWx917 : use_SiWx917=true<br /> --wifi wf200 : use_wf200=true<br />                                          |
+|            --wifi             | Configures an sample app as a Wi-Fi devices.<br /> This macro requires SiWx917 or wf200.               | --wifi SiWx917 : use_SiWx917=true<br /> --wifi wf200 : use_wf200=true<br />                                                                                |
 |             --icd             | Configures the device as an ICD                                                                        | chip_enable_icd_server=true chip_openthread_ftd=false                                                                                                      |
 |          --low-power          | Configures the most power efficient build.<br /> This is used in tandem with the `--icd` macro         | chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true                                                                  |
 |    --chip_enable_wifi_ipv4    | Enables IPv4 support on Wi-fi configured builds                                                        | chip_enable_wifi_ipv4=true chip_inet_config_enable_ipv4=true                                                                                               |

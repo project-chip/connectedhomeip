@@ -1739,7 +1739,6 @@ endpoint 0 {
 
   server cluster AccessControl {
     emits event AccessControlEntryChanged;
-    emits event AccessControlExtensionChanged;
     callback attribute acl;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
@@ -1792,7 +1791,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster UnitLocalization {

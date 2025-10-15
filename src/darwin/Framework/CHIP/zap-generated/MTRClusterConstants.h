@@ -2602,6 +2602,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     // Cluster PowerTopology attributes
     MTRAttributeIDTypeClusterPowerTopologyAttributeAvailableEndpointsID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
     MTRAttributeIDTypeClusterPowerTopologyAttributeActiveEndpointsID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000001,
+    MTRAttributeIDTypeClusterPowerTopologyAttributeElectricalCircuitNodesID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterPowerTopologyAttributeGeneratedCommandListID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterPowerTopologyAttributeAcceptedCommandListID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterPowerTopologyAttributeAttributeListID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,

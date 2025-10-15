@@ -3087,12 +3087,12 @@ cluster IcdManagement = 70 {
     int32u promisedActiveDuration = 0;
   }
 
-  /** Register a client to the end device */
+  /** This command allows a client to register itself with the ICD to be notified when the device is available for communication. */
   fabric command access(invoke: manage) RegisterClient(RegisterClientRequest): RegisterClientResponse = 0;
-  /** Unregister a client from an end device */
+  /** This command allows a client to unregister itself with the ICD. */
   fabric command access(invoke: manage) UnregisterClient(UnregisterClientRequest): DefaultSuccess = 2;
-  /** Request the end device to stay in Active Mode for an additional ActiveModeThreshold */
-  command access(invoke: manage) StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
+  /** This command allows a client to request that the server stays in active mode for at least a given time duration (in milliseconds) from when this command is received. */
+  command StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
 }
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven. */
@@ -5106,10 +5106,19 @@ cluster PowerTopology = 156 {
     kTreeTopology = 0x2;
     kSetTopology = 0x4;
     kDynamicPowerFlow = 0x8;
+    kElectricalCircuit = 0x10;
+  }
+
+  fabric_scoped struct CircuitNodeStruct {
+    node_id node = 1;
+    optional endpoint_no endpoint = 2;
+    optional char_string<128> label = 3;
+    fabric_idx fabricIndex = 254;
   }
 
   readonly attribute optional endpoint_no availableEndpoints[] = 0;
   readonly attribute optional endpoint_no activeEndpoints[] = 1;
+  attribute optional CircuitNodeStruct electricalCircuitNodes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -7877,13 +7886,13 @@ endpoint 0 {
   }
 
   server cluster LocalizationConfiguration {
-    persist  attribute activeLocale default = "en-US";
+    ram      attribute activeLocale default = "en-US";
     callback attribute supportedLocales;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision;
   }
 
   server cluster TimeFormatLocalization {
