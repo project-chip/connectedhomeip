@@ -171,9 +171,8 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 }
 
 void CodegenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttributePath & aPath,
-                                                              DataModel::ListWriteOperation opType)
+                                                              DataModel::ListWriteOperation opType, FabricIndex accessingFabric)
 {
-
     // NOTE: for backwards compatibility, we process AAI logic BEFORE Server Cluster Interface
     //       so that AttributeAccessInterface logic works if one was installed before Server Cluster Interface
     //       support was introduced in the SDK.
@@ -204,7 +203,7 @@ void CodegenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttr
 
     if (auto * cluster = mRegistry.Get(aPath); cluster != nullptr)
     {
-        cluster->ListAttributeWriteNotification(aPath, opType);
+        cluster->ListAttributeWriteNotification(aPath, opType, accessingFabric);
         return;
     }
 }

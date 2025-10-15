@@ -56,8 +56,6 @@ public:
         const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
         const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl) override;
 
-    bool ValidateUrl(const std::string & url) override;
-
     Protocols::InteractionModel::Status
     ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                            const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;

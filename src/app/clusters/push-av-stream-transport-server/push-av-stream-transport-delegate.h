@@ -130,14 +130,6 @@ public:
         const Optional<PushAvStreamTransport::Structs::TransportMotionTriggerTimeControlStruct::Type> & timeControl) = 0;
 
     /**
-     * @brief Validates the provided URL.
-     *
-     * @param url The URL to validate
-     * @return true if URL is valid, false otherwise
-     */
-    virtual bool ValidateUrl(const std::string & url) = 0;
-
-    /**
      * @brief Validates the provided StreamUsage.
      *
      * @param streamUsage The StreamUsage to validate

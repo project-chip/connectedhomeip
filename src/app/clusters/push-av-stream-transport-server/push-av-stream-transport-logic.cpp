@@ -232,6 +232,86 @@ void PushAvStreamTransportServerLogic::PushAVStreamTransportDeallocateCallback(S
     }
 }
 
+bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
+{
+    const std::string https = "https://";
+
+    // Check minimum length and https prefix
+    if (url.size() <= https.size() || url.substr(0, https.size()) != https)
+    {
+        return false;
+    }
+
+    // Check that URL does not contain fragment character '#'
+    if (url.find('#') != std::string::npos)
+    {
+        ChipLogError(Camera, "URL contains fragment character '#'");
+        return false;
+    }
+
+    // Check that URL does not contain query character '?'
+    if (url.find('?') != std::string::npos)
+    {
+        ChipLogError(Camera, "URL contains query character '?'");
+        return false;
+    }
+
+    // Check that URL ends with a forward slash '/'
+    if (url.back() != '/')
+    {
+        ChipLogError(Camera, "URL does not end with '/'");
+        return false;
+    }
+
+    // Extract host part
+    size_t hostStart = https.size();
+    size_t hostEnd   = url.find('/', hostStart);
+    // If no '/' is found after the scheme, the rest of the URL is the host.
+    // If a '/' is found, the host is the part between the scheme and the first '/'.
+    std::string host;
+    if (hostEnd == std::string::npos)
+    {
+        // This case handles URLs like "https://example.com" or "https://localhost"
+        // The host is the entire string after "https://"
+        host = url.substr(hostStart);
+    }
+    else
+    {
+        // This case handles URLs like "https://example.com/" or "https://example.com/path"
+        // The host is the part between "https://" and the first '/'
+        host = url.substr(hostStart, hostEnd - hostStart);
+    }
+    // Check for non-empty host. This check is now more robust.
+    if (host.empty())
+    {
+        ChipLogError(Camera, "URL does not contain a valid host.");
+        return false;
+    }
+    // Allow 'localhost' and 'localhost:<port>'
+    if (host == "localhost" || (host.length() > 10 && host.substr(0, 10) == "localhost:"))
+    {
+        // Additional check to ensure there's something after the colon for port
+        if (host == "localhost:" || (host.length() > 10 && host[10] == '\0'))
+        {
+            // This would be "localhost:" with nothing after, which is invalid
+            ChipLogError(Camera, "URL host '%s' is not valid. 'localhost:' must be followed by a port number.", host.c_str());
+            return false;
+        }
+        return true;
+    }
+    // Simplified host validation:
+    // A valid host should typically contain a dot (e.g., 'example.com').
+    // This is a basic check and not a comprehensive host/IP validation.
+    if (host.find('.') == std::string::npos)
+    {
+        ChipLogError(Camera, "URL host '%s' is not valid. Must be 'localhost', 'localhost:<port>', or contain a dot.",
+                     host.c_str());
+        return false;
+    }
+
+    return true;
+}
+
 CHIP_ERROR PushAvStreamTransportServerLogic::ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec)
 {
     uint32_t timeoutMs = timeoutSec * MILLISECOND_TICKS_PER_SECOND;
@@ -625,7 +705,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    bool isValidUrl = mDelegate->ValidateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
+    bool isValidUrl = ValidateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
 
     if (isValidUrl == false)
     {
@@ -1074,6 +1154,14 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
         return std::nullopt;
     }
 
+    // Note, we will always have Transport Options as they're mandatory in the initial allocate
+    status = CheckPrivacyModes(transportConfiguration->transportOptions.Value().streamUsage);
+    if (status != Status::Success)
+    {
+        handler.AddStatus(commandPath, status);
+        return std::nullopt;
+    }
+
     if (mDelegate->GetTransportBusyStatus(connectionID) == PushAvStreamTransportStatusEnum::kBusy)
     {
         ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Connection is Busy", mEndpointId);
@@ -1089,30 +1177,20 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
         return std::nullopt;
     }
 
-    if (transportConfiguration->transportOptions.HasValue())
+    if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kContinuous)
     {
-        status = CheckPrivacyModes(transportConfiguration->transportOptions.Value().streamUsage);
-        if (status != Status::Success)
-        {
-            handler.AddStatus(commandPath, status);
-            return std::nullopt;
-        }
+        auto clusterStatus = to_underlying(StatusCodeEnum::kInvalidTriggerType);
+        ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Invalid Trigger type", mEndpointId);
+        handler.AddClusterSpecificFailure(commandPath, clusterStatus);
+        return std::nullopt;
+    }
 
-        if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kContinuous)
-        {
-            auto clusterStatus = to_underlying(StatusCodeEnum::kInvalidTriggerType);
-            ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Invalid Trigger type", mEndpointId);
-            handler.AddClusterSpecificFailure(commandPath, clusterStatus);
-            return std::nullopt;
-        }
-
-        if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kCommand &&
-            !timeControl.HasValue())
-        {
-            ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Time control field not present", mEndpointId);
-            handler.AddStatus(commandPath, Status::DynamicConstraintError);
-            return std::nullopt;
-        }
+    if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kCommand &&
+        !timeControl.HasValue())
+    {
+        ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Time control field not present", mEndpointId);
+        handler.AddStatus(commandPath, Status::DynamicConstraintError);
+        return std::nullopt;
     }
 
     // When trigger type is motion in the allocated transport but triggering it manually

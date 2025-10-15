@@ -299,8 +299,6 @@ public:
         return Status::Success;
     }
 
-    bool ValidateUrl(const std::string & url) override { return true; }
-
     Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId) override
     {
         // TODO: Select and Assign videoStreamID from the allocated videoStreams
@@ -475,7 +473,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
     std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
-    std::string url = "rtsp://192.168.1.100:554/stream";
+    std::string url = "https://192.168.1.100:554/stream/";
     TransportOptionsDecodableStruct transportOptions;
 
     uint8_t tlvBuffer[512];
@@ -604,7 +602,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
-    std::string url = "rtsp://192.168.1.100:554/stream";
+    std::string url = "https://192.168.1.100:554/stream/";
     TransportOptionsDecodableStruct transportOptions;
 
     uint8_t tlvBuffer[512];
@@ -762,7 +760,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     EXPECT_EQ(respTransportOptions.audioStreamID, 2);
     EXPECT_EQ(respTransportOptions.TLSEndpointID, 1);
     std::string respUrlStr(respTransportOptions.url.data(), respTransportOptions.url.size());
-    EXPECT_EQ(respUrlStr, "rtsp://192.168.1.100:554/stream");
+    EXPECT_EQ(respUrlStr, "https://192.168.1.100:554/stream/");
 
     Structs::TransportTriggerOptionsStruct::DecodableType respTriggerOptions = respTransportOptions.triggerOptions;
     EXPECT_EQ(respTriggerOptions.triggerType, TransportTriggerTypeEnum::kMotion);
@@ -898,7 +896,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     EXPECT_EQ(readTransportOptions.TLSEndpointID, 1);
 
     std::string urlStr(readTransportOptions.url.data(), readTransportOptions.url.size());
-    EXPECT_EQ(urlStr, "rtsp://192.168.1.100:554/stream");
+    EXPECT_EQ(urlStr, "https://192.168.1.100:554/stream/");
 
     Structs::TransportTriggerOptionsStruct::DecodableType readTriggerOptions = readTransportOptions.triggerOptions;
     EXPECT_EQ(readTriggerOptions.triggerType, TransportTriggerTypeEnum::kMotion);
@@ -991,7 +989,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
-    std::string url = "rtsp://192.168.1.100:554/stream";
+    std::string url = "https://192.168.1.100:554/stream/";
     TransportOptionsDecodableStruct transportOptions;
 
     uint8_t tlvBuffer[512];
@@ -1168,7 +1166,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     transportOptions.videoStreamID.SetValue(11);
     transportOptions.audioStreamID.SetValue(22);
     transportOptions.TLSEndpointID    = 1;
-    url                               = "rtsp://192.168.1.100:554/modify-stream";
+    url                               = "https://192.168.1.100:554/modify-stream/";
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
     transportOptions.containerOptions = containerOptions;
@@ -1251,7 +1249,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     EXPECT_EQ(findTransportOptions.TLSEndpointID, 1);
 
     std::string findUrlStr(findTransportOptions.url.data(), findTransportOptions.url.size());
-    EXPECT_EQ(findUrlStr, "rtsp://192.168.1.100:554/modify-stream");
+    EXPECT_EQ(findUrlStr, "https://192.168.1.100:554/modify-stream/");
 
     Structs::TransportTriggerOptionsStruct::DecodableType findTriggerOptions = findTransportOptions.triggerOptions;
     EXPECT_EQ(findTriggerOptions.triggerType, TransportTriggerTypeEnum::kMotion);
@@ -1326,7 +1324,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
-    std::string url = "rtsp://192.168.1.100:554/stream";
+    std::string url = "https://192.168.1.100:554/stream/";
     TransportOptionsDecodableStruct transportOptions;
 
     uint8_t tlvBuffer[512];
