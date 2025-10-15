@@ -65,7 +65,7 @@ PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStru
     int streamIndex       = 0;
     mMetadataSet          = false;
     mDeinitializeRecorder = false;
-    mUploadedInitSegment  = true;
+    mUploadedInitSegment  = false;
     mUploadMPD            = false;
     mUploadSegmentID      = 0001;
     mCurrentClipStartPts  = AV_NOPTS_VALUE;
@@ -464,7 +464,7 @@ int PushAVClipRecorder::SetupOutput(const std::string & outputPrefix, const std:
     av_dict_set_int(&options, "dash_segment_type", 1, 0);
     av_dict_set_int(&options, "use_timeline", 1, 0);
     av_dict_set(&options, "strict", "experimental", 0);
-    av_dict_set(&options, "start_number", "1000", 0);
+    av_dict_set(&options, "start_number", std::to_string(kSegmentIdOffset).c_str(), 0);
     if (mClipInfo.mHasVideo && (AddStreamToOutput(AVMEDIA_TYPE_VIDEO) < 0))
     {
         ChipLogError(Camera, "ERROR: adding video stream to output");
@@ -659,7 +659,7 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
         std::string mpdPrefix    = "session_" + std::to_string(mClipInfo.mSessionNumber) + "/" + mClipInfo.mTrackName;
 
         mInputFormatContext          = avformat_alloc_context();
-        int avioCtxBufferSize        = 1048576; // 1MB
+        int64_t avioCtxBufferSize    = (static_cast<int64_t>(mVideoInfo.mBitRate) * mClipInfo.mSegmentDurationMs) / (8 * 1000);
         uint8_t * mAvioContextBuffer = static_cast<uint8_t *>(av_malloc(static_cast<size_t>(avioCtxBufferSize)));
         struct BufferData data       = { 0 };
         data.mPtr                    = static_cast<uint8_t *>(pkt->data);
@@ -926,7 +926,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         }
 
         // Handle init segment upload if needed
-        if (mUploadedInitSegment)
+        if (!mUploadedInitSegment)
         {
             std::string init_path = make_path(("%s/" + mClipInfo.mTrackName + ".init").c_str());
             ChipLogProgress(Camera, "Recorder:Init segment upload ready [%s]", init_path.c_str());
@@ -934,7 +934,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
             {
                 CheckAndUploadFile(init_path);
             }
-            mUploadedInitSegment = false; // Reset flag after processing
+            mUploadedInitSegment = true;
         }
     }
 }
