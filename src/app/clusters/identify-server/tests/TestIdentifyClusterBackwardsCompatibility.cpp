@@ -89,8 +89,8 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestLegacyCallbacks)
     data.effectVariant    = EffectVariantEnum::kDefault;
     auto result           = InvokeCommand(identify.mCluster.Cluster(), Commands::TriggerEffect::Id, data);
     ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value().GetStatusCode().GetStatus(),
-              Protocols::InteractionModel::Status::Success); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(result.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+              Protocols::InteractionModel::Status::Success);
     EXPECT_TRUE(onEffectIdentifierCalled);
 }
 
@@ -110,8 +110,8 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestCurrentEffectIdentifierUpd
     dataBlink.effectVariant    = EffectVariantEnum::kDefault;
     auto resultBlink           = InvokeCommand(identify.mCluster.Cluster(), Commands::TriggerEffect::Id, dataBlink);
     ASSERT_TRUE(resultBlink.has_value());
-    EXPECT_EQ(resultBlink.value().GetStatusCode().GetStatus(),
-              Protocols::InteractionModel::Status::Success); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(resultBlink.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+              Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(identify.mCurrentEffectIdentifier, EffectIdentifierEnum::kBlink);
 
     // Invoke the TriggerEffect command with kFinishEffect
@@ -120,8 +120,8 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestCurrentEffectIdentifierUpd
     dataFinish.effectVariant    = EffectVariantEnum::kDefault;
     auto resultFinish           = InvokeCommand(identify.mCluster.Cluster(), Commands::TriggerEffect::Id, dataFinish);
     ASSERT_TRUE(resultFinish.has_value());
-    EXPECT_EQ(resultFinish.value().GetStatusCode().GetStatus(),
-              Protocols::InteractionModel::Status::Success); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(resultFinish.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+              Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(identify.mCurrentEffectIdentifier, EffectIdentifierEnum::kFinishEffect);
 }
 
