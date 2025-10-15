@@ -266,49 +266,16 @@ bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
     // Extract host part
     size_t hostStart = https.size();
     size_t hostEnd   = url.find('/', hostStart);
-    // If no '/' is found after the scheme, the rest of the URL is the host.
-    // If a '/' is found, the host is the part between the scheme and the first '/'.
-    std::string host;
-    if (hostEnd == std::string::npos)
-    {
-        // This case handles URLs like "https://example.com" or "https://localhost"
-        // The host is the entire string after "https://"
-        host = url.substr(hostStart);
-    }
-    else
-    {
-        // This case handles URLs like "https://example.com/" or "https://example.com/path"
-        // The host is the part between "https://" and the first '/'
-        host = url.substr(hostStart, hostEnd - hostStart);
-    }
-    // Check for non-empty host. This check is now more robust.
+    std::string host = url.substr(hostStart, hostEnd - hostStart);
+
+    // Basic host validation: ensure non-empty
     if (host.empty())
     {
         ChipLogError(Camera, "URL does not contain a valid host.");
         return false;
     }
-    // Allow 'localhost' and 'localhost:<port>'
-    if (host == "localhost" || (host.length() > 10 && host.substr(0, 10) == "localhost:"))
-    {
-        // Additional check to ensure there's something after the colon for port
-        if (host == "localhost:" || (host.length() > 10 && host[10] == '\0'))
-        {
-            // This would be "localhost:" with nothing after, which is invalid
-            ChipLogError(Camera, "URL host '%s' is not valid. 'localhost:' must be followed by a port number.", host.c_str());
-            return false;
-        }
-        return true;
-    }
-    // Simplified host validation:
-    // A valid host should typically contain a dot (e.g., 'example.com').
-    // This is a basic check and not a comprehensive host/IP validation.
-    if (host.find('.') == std::string::npos)
-    {
-        ChipLogError(Camera, "URL host '%s' is not valid. Must be 'localhost', 'localhost:<port>', or contain a dot.",
-                     host.c_str());
-        return false;
-    }
 
+    // Accept any host as long as non-empty
     return true;
 }
 
