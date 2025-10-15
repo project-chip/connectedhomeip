@@ -213,9 +213,9 @@ TimeSynchronizationCluster::TimeSynchronizationCluster(
     EndpointId endpoint, const TimeSynchronizationCluster::OptionalAttributeSet & optionalAttributeSet,
     const BitFlags<Feature> features, SupportsDNSResolve::TypeInfo::Type supportsDNSResolve, TimeZoneDatabaseEnum timeZoneDatabase,
     TimeSourceEnum timeSource, NTPServerAvailable::TypeInfo::Type ntpServerAvailable) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mOptionalAttributeSet(optionalAttributeSet), mFeatures(features), mSupportsDNSResolve(supportsDNSResolve),
-    mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource), mNTPServerAvailable(ntpServerAvailable),
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mOptionalAttributeSet(optionalAttributeSet), mFeatures(features),
+    mSupportsDNSResolve(supportsDNSResolve), mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
+    mNTPServerAvailable(ntpServerAvailable),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -556,12 +556,8 @@ void TimeSynchronizationCluster::OnTimeSyncCompletionFn(TimeSourceEnum timeSourc
         }
         return;
     }
-    mGranularity  = granularity;
-    Status status = TimeSource::Set(kRootEndpointId, timeSource);
-    if (!(status == Status::Success || status == Status::UnsupportedAttribute))
-    {
-        ChipLogError(Zcl, "Writing TimeSource failed.");
-    }
+    mGranularity = granularity;
+    mTimeSource  = timeSource;
 }
 
 void TimeSynchronizationCluster::OnFallbackNTPCompletionFn(bool timeSyncSuccessful)
@@ -570,11 +566,7 @@ void TimeSynchronizationCluster::OnFallbackNTPCompletionFn(bool timeSyncSuccessf
     {
         mGranularity = GranularityEnum::kMillisecondsGranularity;
         // Non-matter SNTP because we know it's external and there's only one source
-        Status status = TimeSource::Set(kRootEndpointId, TimeSourceEnum::kNonMatterSNTP);
-        if (!(status == Status::Success || status == Status::UnsupportedAttribute))
-        {
-            ChipLogError(Zcl, "Writing TimeSource failed.");
-        }
+        mTimeSource = TimeSourceEnum::kNonMatterSNTP;
     }
     else
     {
@@ -881,13 +873,8 @@ CHIP_ERROR TimeSynchronizationCluster::SetUTCTime(EndpointId ep, uint64_t utcTim
         return err;
     }
     GetDelegate()->UTCTimeAvailabilityChanged(utcTime);
-    mGranularity  = granularity;
-    Status status = TimeSource::Set(ep, source);
-    if (!(status == Status::Success || status == Status::UnsupportedAttribute))
-    {
-        ChipLogError(Zcl, "Writing TimeSource failed.");
-        return CHIP_IM_GLOBAL_STATUS(Failure);
-    }
+    mGranularity = granularity;
+    mTimeSource  = source;
     return CHIP_NO_ERROR;
 }
 

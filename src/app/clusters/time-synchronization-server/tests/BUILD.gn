@@ -31,7 +31,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/clusters/testing",
     "${chip_root}/src/app/clusters/time-synchronization-server",
     "${chip_root}/src/app/server-cluster/testing:testing",
-    "${chip_root}/src/controller/data_model:data_model",
+#    "${chip_root}/src/controller/data_model:data_model",
     "${chip_root}/src/lib/support",
   ]
 }

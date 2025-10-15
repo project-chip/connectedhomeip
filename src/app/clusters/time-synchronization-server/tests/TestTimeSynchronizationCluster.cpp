@@ -303,6 +303,8 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
 
         DataModel::DecodableList<Structs::TimeZoneStruct::Type> val3;
         ASSERT_EQ(ReadClusterAttribute(timeSynchronization, TimeZone::Id, val3), CHIP_NO_ERROR);
+        // Expect the time zone list is not empty
+        EXPECT_TRUE(val3.begin().Next());
 
         DataModel::DecodableList<Structs::DSTOffsetStruct::Type> val4;
         ASSERT_EQ(ReadClusterAttribute(timeSynchronization, DSTOffset::Id, val4), CHIP_NO_ERROR);
