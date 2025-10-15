@@ -493,7 +493,8 @@ CHIP_ERROR ServerClusterShim::GeneratedCommands(const ConcreteClusterPath & path
     return builder.ReferenceExisting({ serverCluster->generatedCommandList, commandCount });
 }
 
-void ServerClusterShim::ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType)
+void ServerClusterShim::ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType,
+                                                       FabricIndex accessingFabric)
 {
     AttributeAccessInterface * aai = AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId);
 

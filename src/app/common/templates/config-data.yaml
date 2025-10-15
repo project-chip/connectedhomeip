@@ -50,6 +50,7 @@ CommandHandlerInterfaceOnlyClusters:
     - General Commissioning
     - General Diagnostics
     - Group Key Management
+    - Groupcast
     - HEPA Filter Monitoring
     - Joint Fabric Administrator
     - Laundry Washer Mode
@@ -153,6 +154,7 @@ CodeDrivenClusters:
     - General Commissioning
     - General Diagnostics
     - Group Key Management
+    - Groupcast
     - Localization Configuration
     - OTA Software Update Provider
     - Operational Credentials
