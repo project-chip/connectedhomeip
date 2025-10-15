@@ -1578,7 +1578,6 @@ endpoint 0 {
 
   server cluster AccessControl {
     emits event AccessControlEntryChanged;
-    emits event AccessControlExtensionChanged;
     emits event FabricRestrictionReviewUpdate;
     callback attribute acl;
     callback attribute subjectsPerAccessControlEntry;

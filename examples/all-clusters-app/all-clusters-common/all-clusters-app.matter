@@ -2606,15 +2606,15 @@ cluster TimeSynchronization = 56 {
     nullable char_string<128> defaultNTP = 0;
   }
 
-  /** This command MAY be issued by Administrator to set the time. */
+  /** This command is used to set the UTC time of the node. */
   command access(invoke: administer) SetUTCTime(SetUTCTimeRequest): DefaultSuccess = 0;
-  /** This command SHALL set TrustedTimeSource. */
+  /** This command is used to set the TrustedTimeSource attribute. */
   fabric command access(invoke: administer) SetTrustedTimeSource(SetTrustedTimeSourceRequest): DefaultSuccess = 1;
-  /** This command SHALL set TimeZone. */
+  /** This command is used to set the time zone of the node. */
   command access(invoke: manage) SetTimeZone(SetTimeZoneRequest): SetTimeZoneResponse = 2;
-  /** This command SHALL set DSTOffset. */
+  /** This command is used to set the DST offsets for a node. */
   command access(invoke: manage) SetDSTOffset(SetDSTOffsetRequest): DefaultSuccess = 4;
-  /** This command is used to set DefaultNTP. */
+  /** This command is used to set the DefaultNTP attribute. */
   command access(invoke: administer) SetDefaultNTP(SetDefaultNTPRequest): DefaultSuccess = 5;
 }
 
@@ -7700,13 +7700,13 @@ endpoint 0 {
   }
 
   server cluster LocalizationConfiguration {
-    persist  attribute activeLocale default = "en-US";
+    ram      attribute activeLocale default = "en-US";
     callback attribute supportedLocales;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision;
   }
 
   server cluster TimeFormatLocalization {

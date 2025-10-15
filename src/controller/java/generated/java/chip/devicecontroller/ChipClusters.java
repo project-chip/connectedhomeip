@@ -31023,6 +31023,7 @@ public class ChipClusters {
 
     private static final long AVAILABLE_ENDPOINTS_ATTRIBUTE_ID = 0L;
     private static final long ACTIVE_ENDPOINTS_ATTRIBUTE_ID = 1L;
+    private static final long ELECTRICAL_CIRCUIT_NODES_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -31045,6 +31046,10 @@ public class ChipClusters {
 
     public interface ActiveEndpointsAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Integer> value);
+    }
+
+    public interface ElectricalCircuitNodesAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.PowerTopologyClusterCircuitNodeStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -31109,6 +31114,46 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACTIVE_ENDPOINTS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readElectricalCircuitNodesAttribute(
+        ElectricalCircuitNodesAttributeCallback callback) {
+      readElectricalCircuitNodesAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readElectricalCircuitNodesAttributeWithFabricFilter(
+        ElectricalCircuitNodesAttributeCallback callback, boolean isFabricFiltered) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ELECTRICAL_CIRCUIT_NODES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.PowerTopologyClusterCircuitNodeStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ELECTRICAL_CIRCUIT_NODES_ATTRIBUTE_ID, isFabricFiltered);
+    }
+
+    public void writeElectricalCircuitNodesAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.PowerTopologyClusterCircuitNodeStruct> value) {
+      writeElectricalCircuitNodesAttribute(callback, value, 0);
+    }
+
+    public void writeElectricalCircuitNodesAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.PowerTopologyClusterCircuitNodeStruct> value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = ArrayType.generateArrayType(value, (elementvalue) -> elementvalue.encodeTlv());
+      writeAttribute(new WriteAttributesCallbackImpl(callback), ELECTRICAL_CIRCUIT_NODES_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeElectricalCircuitNodesAttribute(
+        ElectricalCircuitNodesAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ELECTRICAL_CIRCUIT_NODES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.PowerTopologyClusterCircuitNodeStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ELECTRICAL_CIRCUIT_NODES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
