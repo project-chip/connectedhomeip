@@ -54,8 +54,8 @@ struct ConcreteClusterPath
     bool mExpanded; // NOTE: in between larger members, NOT initialized (see above)
     ClusterId mClusterId = 0;
 
-    /// Creates a concrete cluster path as a constexpr. This is a workaround of requiring all members
-    /// to be initialized for constexpr functions.
+    /// Creates a concrete cluster path as a constexpr. This is a workaround for C++ before C++20 requiring all members
+    /// to be initialized for constexpr constructors.
     constexpr static ConcreteClusterPath ConstExpr(EndpointId aEndpointId, ClusterId aClusterId)
     {
         return { aEndpointId, aClusterId, false };
