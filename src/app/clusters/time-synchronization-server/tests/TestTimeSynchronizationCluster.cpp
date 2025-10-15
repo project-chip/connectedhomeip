@@ -203,11 +203,17 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
                                                        TimeZoneDatabaseEnum::kNone, TimeSourceEnum::kNone, false);
         ASSERT_EQ(timeSynchronization.Startup(context), CHIP_NO_ERROR);
 
-        GranularityEnum val{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, Granularity::Id, val), CHIP_NO_ERROR);
+        uint16_t revision{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, ClusterRevision::Id, revision), CHIP_NO_ERROR);
 
-        UTCTime::TypeInfo::Type val2{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, UTCTime::Id, val2), CHIP_NO_ERROR);
+        uint32_t featureMap{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+
+        GranularityEnum granularity{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, Granularity::Id, granularity), CHIP_NO_ERROR);
+
+        UTCTime::TypeInfo::Type utcTime{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, UTCTime::Id, utcTime), CHIP_NO_ERROR);
 
         timeSynchronization.Shutdown();
     }
@@ -220,14 +226,20 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
                                                        TimeZoneDatabaseEnum::kNone, TimeSourceEnum::kNone, false);
         ASSERT_EQ(timeSynchronization.Startup(context), CHIP_NO_ERROR);
 
-        GranularityEnum val{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, Granularity::Id, val), CHIP_NO_ERROR);
+        uint16_t revision{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, ClusterRevision::Id, revision), CHIP_NO_ERROR);
 
-        UTCTime::TypeInfo::Type val2{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, UTCTime::Id, val2), CHIP_NO_ERROR);
+        uint32_t featureMap{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, FeatureMap::Id, featureMap), CHIP_NO_ERROR);
 
-        TimeSourceEnum val3{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, TimeSource::Id, val3), CHIP_NO_ERROR);
+        GranularityEnum granularity{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, Granularity::Id, granularity), CHIP_NO_ERROR);
+
+        UTCTime::TypeInfo::Type utcTime{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, UTCTime::Id, utcTime), CHIP_NO_ERROR);
+
+        TimeSourceEnum timeSource{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, TimeSource::Id, timeSource), CHIP_NO_ERROR);
 
         timeSynchronization.Shutdown();
     }
@@ -238,14 +250,20 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
                                                        TimeZoneDatabaseEnum::kNone, TimeSourceEnum::kNone, false);
         ASSERT_EQ(timeSynchronization.Startup(context), CHIP_NO_ERROR);
 
-        GranularityEnum val{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, Granularity::Id, val), CHIP_NO_ERROR);
+        uint16_t revision{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, ClusterRevision::Id, revision), CHIP_NO_ERROR);
 
-        UTCTime::TypeInfo::Type val2{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, UTCTime::Id, val2), CHIP_NO_ERROR);
+        uint32_t featureMap{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, FeatureMap::Id, featureMap), CHIP_NO_ERROR);
 
-        TrustedTimeSource::TypeInfo::Type val3{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, TrustedTimeSource::Id, val3), CHIP_NO_ERROR);
+        GranularityEnum granularity{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, Granularity::Id, granularity), CHIP_NO_ERROR);
+
+        UTCTime::TypeInfo::Type utcTime{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, UTCTime::Id, utcTime), CHIP_NO_ERROR);
+
+        TrustedTimeSource::TypeInfo::Type trustedTimeSource{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, TrustedTimeSource::Id, trustedTimeSource), CHIP_NO_ERROR);
 
         timeSynchronization.Shutdown();
     }
@@ -256,17 +274,23 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
                                                        TimeZoneDatabaseEnum::kNone, TimeSourceEnum::kNone, false);
         ASSERT_EQ(timeSynchronization.Startup(context), CHIP_NO_ERROR);
 
-        GranularityEnum val{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, Granularity::Id, val), CHIP_NO_ERROR);
+        uint16_t revision{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, ClusterRevision::Id, revision), CHIP_NO_ERROR);
 
-        UTCTime::TypeInfo::Type val2{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, UTCTime::Id, val2), CHIP_NO_ERROR);
+        uint32_t featureMap{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, FeatureMap::Id, featureMap), CHIP_NO_ERROR);
 
-        DefaultNTP::TypeInfo::Type val3{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, DefaultNTP::Id, val3), CHIP_NO_ERROR);
+        GranularityEnum granularity{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, Granularity::Id, granularity), CHIP_NO_ERROR);
 
-        SupportsDNSResolve::TypeInfo::Type val4{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, SupportsDNSResolve::Id, val4), CHIP_NO_ERROR);
+        UTCTime::TypeInfo::Type utcTime{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, UTCTime::Id, utcTime), CHIP_NO_ERROR);
+
+        DefaultNTP::TypeInfo::Type defaultNTP{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, DefaultNTP::Id, defaultNTP), CHIP_NO_ERROR);
+
+        SupportsDNSResolve::TypeInfo::Type supportsDNSResolve{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, SupportsDNSResolve::Id, supportsDNSResolve), CHIP_NO_ERROR);
 
         timeSynchronization.Shutdown();
     }
@@ -277,14 +301,20 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
                                                        TimeZoneDatabaseEnum::kNone, TimeSourceEnum::kNone, false);
         ASSERT_EQ(timeSynchronization.Startup(context), CHIP_NO_ERROR);
 
-        GranularityEnum val{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, Granularity::Id, val), CHIP_NO_ERROR);
+        uint16_t revision{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, ClusterRevision::Id, revision), CHIP_NO_ERROR);
 
-        UTCTime::TypeInfo::Type val2{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, UTCTime::Id, val2), CHIP_NO_ERROR);
+        uint32_t featureMap{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, FeatureMap::Id, featureMap), CHIP_NO_ERROR);
 
-        NTPServerAvailable::TypeInfo::Type val3{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, NTPServerAvailable::Id, val3), CHIP_NO_ERROR);
+        GranularityEnum granularity{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, Granularity::Id, granularity), CHIP_NO_ERROR);
+
+        UTCTime::TypeInfo::Type utcTime{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, UTCTime::Id, utcTime), CHIP_NO_ERROR);
+
+        NTPServerAvailable::TypeInfo::Type ntpServerAvailable{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, NTPServerAvailable::Id, ntpServerAvailable), CHIP_NO_ERROR);
 
         timeSynchronization.Shutdown();
     }
@@ -295,31 +325,37 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
                                                        TimeZoneDatabaseEnum::kNone, TimeSourceEnum::kNone, false);
         ASSERT_EQ(timeSynchronization.Startup(context), CHIP_NO_ERROR);
 
-        GranularityEnum val{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, Granularity::Id, val), CHIP_NO_ERROR);
+        uint16_t revision{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, ClusterRevision::Id, revision), CHIP_NO_ERROR);
 
-        UTCTime::TypeInfo::Type val2{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, UTCTime::Id, val2), CHIP_NO_ERROR);
+        uint32_t featureMap{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, FeatureMap::Id, featureMap), CHIP_NO_ERROR);
 
-        DataModel::DecodableList<Structs::TimeZoneStruct::Type> val3;
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, TimeZone::Id, val3), CHIP_NO_ERROR);
+        GranularityEnum granularity{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, Granularity::Id, granularity), CHIP_NO_ERROR);
+
+        UTCTime::TypeInfo::Type utcTime{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, UTCTime::Id, utcTime), CHIP_NO_ERROR);
+
+        DataModel::DecodableList<Structs::TimeZoneStruct::Type> timeZoneList;
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, TimeZone::Id, timeZoneList), CHIP_NO_ERROR);
         // Expect the time zone list is not empty
-        EXPECT_TRUE(val3.begin().Next());
+        EXPECT_TRUE(timeZoneList.begin().Next());
 
-        DataModel::DecodableList<Structs::DSTOffsetStruct::Type> val4;
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, DSTOffset::Id, val4), CHIP_NO_ERROR);
+        DataModel::DecodableList<Structs::DSTOffsetStruct::Type> dstOffsetList;
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, DSTOffset::Id, dstOffsetList), CHIP_NO_ERROR);
 
-        LocalTime::TypeInfo::Type val5{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, LocalTime::Id, val5), CHIP_NO_ERROR);
+        LocalTime::TypeInfo::Type localTime{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, LocalTime::Id, localTime), CHIP_NO_ERROR);
 
-        TimeZoneDatabaseEnum val6{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, TimeZoneDatabase::Id, val6), CHIP_NO_ERROR);
+        TimeZoneDatabaseEnum timeZoneDatabase{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, TimeZoneDatabase::Id, timeZoneDatabase), CHIP_NO_ERROR);
 
-        TimeZoneListMaxSize::TypeInfo::Type val7{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, TimeZoneListMaxSize::Id, val7), CHIP_NO_ERROR);
+        TimeZoneListMaxSize::TypeInfo::Type timeZoneListMaxSize{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, TimeZoneListMaxSize::Id, timeZoneListMaxSize), CHIP_NO_ERROR);
 
-        DSTOffsetListMaxSize::TypeInfo::Type val8{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, DSTOffsetListMaxSize::Id, val8), CHIP_NO_ERROR);
+        DSTOffsetListMaxSize::TypeInfo::Type dstOffsetListMaxSize{};
+        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, DSTOffsetListMaxSize::Id, dstOffsetListMaxSize), CHIP_NO_ERROR);
 
         timeSynchronization.Shutdown();
     }
