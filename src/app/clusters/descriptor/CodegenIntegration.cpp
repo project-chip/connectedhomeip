@@ -34,11 +34,12 @@ using namespace chip::app::Clusters::Descriptor;
 namespace {
 
 /**
- * This is a DescriptorCluster class made specifically to fetch the tag list once through ember before
- * one of either the Attributes() or ReadAttribute() functions are called. Tag lists are currently populated
- * through the SetTagList() ember call, only after the cluster has been created and gone through Startup().
- * This means the tag list can NOT be fetched here and passed to the constructor through the regular DescriptorCluster.
- * The tag list is a fixed attribute, but to maintain backwards compatiblility we get that information within the functions here.
+ * This is a DescriptorCluster class made specifically to fetch the tag list once through ember before one of either the Attributes() 
+ * or ReadAttribute() functions are called. This can NOT be called before endpoint init and passed to the constructor of the regular 
+ * DescriptorCluster class. This is because for fixed endpoints, we define endpoints in emberAfEndpointConfigure() and init them in 
+ * emberAfInit() with back to back calls in InitDataModelHandler(). For dynamic endpoints, we init endpoints in 
+ * emberAfSetDynamicEndpointWithEpUniqueId() by calling emberAfEndpointEnableDisable(), which calls initializeEndpoint(). The tag list 
+ * is a fixed attribute, but to maintain backwards compatiblility we get that information within the functions here.
  */
 class EmberDescriptorCluster : public DescriptorCluster
 {
