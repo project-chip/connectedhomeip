@@ -27,6 +27,7 @@
 #include <app/SafeAttributePersistenceProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TypeTraits.h>
+#include <optional>
 #include <protocols/interaction_model/StatusCode.h>
 #include <vector>
 
@@ -617,7 +618,18 @@ public:
 
     CHIP_ERROR SetStreamUsagePriorities(const std::vector<Globals::StreamUsageEnum> & newPriorities);
 
-    bool IsAllocatedVideoStreamReusable(const VideoStreamStruct & allocatedStream, const VideoStreamStruct & requestedArgs);
+    /**
+     * Called during the processing of an AllocateVideoStream request. The
+     * handler of the request iterates through the currently allocated video
+     * streams to check if the allocation request parameters fall within the
+     * ranges of an allocated stream so that the latter can be reused.
+     * If a match is found, the function returns the StreamID of the reusable
+     * stream.
+     *
+     * @param requestedArgs    parameters in the allocation request
+     *
+     */
+    std::optional<uint16_t> GetReusableVideoStreamId(const VideoStreamStruct & requestedArgs) const;
 
     CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
 
@@ -630,8 +642,19 @@ public:
 
     CHIP_ERROR RemoveAudioStream(uint16_t audioStreamId);
 
-    bool IsAllocatedSnapshotStreamReusable(const SnapshotStreamStruct & allocatedStream,
-                                           const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs);
+    /**
+     * Called during the processing of an AllocateSnapshotStream request. The
+     * handler of the request iterates through the currently allocated snapshot
+     * streams to check if the allocation request parameters fall within the
+     * ranges of an allocated stream so that the latter can be reused.
+     * If a match is found, the function returns the StreamID of the reusable
+     * stream.
+     *
+     * @param requestedArgs    parameters in the allocation request
+     *
+     */
+    std::optional<uint16_t>
+    GetReusableSnapshotStreamId(const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs) const;
 
     CHIP_ERROR AddSnapshotStream(const SnapshotStreamStruct & snapshotStream);
 

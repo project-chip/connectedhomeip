@@ -192,7 +192,7 @@ public:
         }
     }
 
-    void SendData(const char * data, size_t size) override
+    void SendData(const chip::ByteSpan & data) override
     {
         if (mTrack && mTrack->isOpen())
         {
@@ -208,8 +208,8 @@ public:
                 mAudioInitDone = true;
             }
             // Feed RAW H.264 access unit. Packetizer does NAL split, FU-A/STAP-A, RTP headers, marker bit, SR/NACK.
-            rtc::binary frame(size);
-            std::memcpy(frame.data(), data, size);
+            rtc::binary frame(data.size());
+            std::memcpy(frame.data(), data.data(), data.size());
             mTrack->send(std::move(frame));
         }
         else
@@ -218,7 +218,7 @@ public:
         }
     }
 
-    void SendFrame(const char * data, size_t size, int64_t timestamp) override
+    void SendFrame(const chip::ByteSpan & data, int64_t timestamp) override
     {
         if (!IsReady())
         {
@@ -238,8 +238,8 @@ public:
             mAudioInitDone = true;
         }
         // Feed RAW H.264 access unit. Packetizer does NAL split, FU-A/STAP-A, RTP headers, marker bit, SR/NACK.
-        rtc::binary frame(size);
-        std::memcpy(frame.data(), data, size);
+        rtc::binary frame(data.size());
+        std::memcpy(frame.data(), data.data(), data.size());
         rtc::FrameInfo info(timestamp);
         mTrack->sendFrame(std::move(frame), info);
     }

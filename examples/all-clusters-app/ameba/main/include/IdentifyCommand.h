@@ -39,7 +39,7 @@ Engine sShellSwitchIdentifyReadSubCommands;
 Engine sShellSwitchGroupsIdentifySubCommands;
 #endif // defined(ENABLE_CHIP_SHELL)
 
-void ProcessIdentifyUnicastBindingRead(BindingCommandData * data, const EmberBindingTableEntry & binding,
+void ProcessIdentifyUnicastBindingRead(BindingCommandData * data, const Clusters::Binding::TableEntry & binding,
                                        OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
@@ -71,7 +71,7 @@ void ProcessIdentifyUnicastBindingRead(BindingCommandData * data, const EmberBin
     }
 }
 
-void ProcessIdentifyUnicastBindingCommand(BindingCommandData * data, const EmberBindingTableEntry & binding,
+void ProcessIdentifyUnicastBindingCommand(BindingCommandData * data, const Clusters::Binding::TableEntry & binding,
                                           OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
@@ -104,7 +104,7 @@ void ProcessIdentifyUnicastBindingCommand(BindingCommandData * data, const Ember
     }
 }
 
-void ProcessIdentifyGroupBindingCommand(BindingCommandData * data, const EmberBindingTableEntry & binding)
+void ProcessIdentifyGroupBindingCommand(BindingCommandData * data, const Clusters::Binding::TableEntry & binding)
 {
     Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
 

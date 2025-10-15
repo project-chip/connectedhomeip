@@ -9378,6 +9378,17 @@ public class ClusterReadMapping {
           readPowerTopologyActiveEndpointsCommandParams
         );
         result.put("readActiveEndpointsAttribute", readPowerTopologyActiveEndpointsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readPowerTopologyElectricalCircuitNodesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readPowerTopologyElectricalCircuitNodesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.PowerTopologyCluster) cluster).readElectricalCircuitNodesAttribute(
+              (ChipClusters.PowerTopologyCluster.ElectricalCircuitNodesAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedPowerTopologyClusterElectricalCircuitNodesAttributeCallback(),
+          readPowerTopologyElectricalCircuitNodesCommandParams
+        );
+        result.put("readElectricalCircuitNodesAttribute", readPowerTopologyElectricalCircuitNodesAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readPowerTopologyGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readPowerTopologyGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

@@ -33,6 +33,7 @@
 
 #include <cmath>
 #include <cstring>
+#include <optional>
 #include <set>
 
 using namespace chip;
@@ -281,43 +282,46 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetStreamUsagePriorities(const std::vector<
     return CHIP_NO_ERROR;
 }
 
-bool CameraAVStreamMgmtServer::IsAllocatedVideoStreamReusable(const VideoStreamStruct & allocatedStream,
-                                                              const VideoStreamStruct & requestedArgs)
+std::optional<uint16_t> CameraAVStreamMgmtServer::GetReusableVideoStreamId(const VideoStreamStruct & requestedArgs) const
 {
-    // 1. Codec must match exactly (Allocated stream already has the codec)
-    if (requestedArgs.videoCodec != allocatedStream.videoCodec)
+    for (const auto & stream : mAllocatedVideoStreams)
     {
-        return false;
-    }
+        // 1. Codec must match exactly (Allocated stream already has the codec)
+        if (requestedArgs.videoCodec != stream.videoCodec)
+        {
+            continue;
+        }
 
-    // 2. Framerate check (request must be within allocated stream's current range)
-    if (!(requestedArgs.minFrameRate >= allocatedStream.minFrameRate && requestedArgs.maxFrameRate <= allocatedStream.maxFrameRate))
-    {
-        return false;
-    }
+        // 2. Framerate check (request must be within allocated stream's current range)
+        if (requestedArgs.minFrameRate < stream.minFrameRate || requestedArgs.maxFrameRate > stream.maxFrameRate)
+        {
+            continue;
+        }
 
-    // 3. Resolution check
-    if (!(requestedArgs.minResolution.width >= allocatedStream.minResolution.width &&
-          requestedArgs.minResolution.height >= allocatedStream.minResolution.height &&
-          requestedArgs.maxResolution.width <= allocatedStream.maxResolution.width &&
-          requestedArgs.maxResolution.height <= allocatedStream.maxResolution.height))
-    {
-        return false;
-    }
+        // 3. Resolution check
+        if (requestedArgs.minResolution.width < stream.minResolution.width ||
+            requestedArgs.minResolution.height < stream.minResolution.height ||
+            requestedArgs.maxResolution.width > stream.maxResolution.width ||
+            requestedArgs.maxResolution.height > stream.maxResolution.height)
+        {
+            continue;
+        }
 
-    // 4. Bitrate check
-    if (!(requestedArgs.minBitRate >= allocatedStream.minBitRate && requestedArgs.maxBitRate <= allocatedStream.maxBitRate))
-    {
-        return false;
-    }
+        // 4. Bitrate check
+        if (requestedArgs.minBitRate < stream.minBitRate || requestedArgs.maxBitRate > stream.maxBitRate)
+        {
+            continue;
+        }
 
-    // 5. KeyFrameInterval check
-    if (requestedArgs.keyFrameInterval != allocatedStream.keyFrameInterval)
-    {
-        return false;
-    }
+        // 5. KeyFrameInterval check
+        if (requestedArgs.keyFrameInterval != stream.keyFrameInterval)
+        {
+            continue;
+        }
 
-    return true;
+        return stream.videoStreamID;
+    }
+    return std::nullopt;
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::AddVideoStream(const VideoStreamStruct & videoStream)
@@ -394,37 +398,41 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveAudioStream(uint16_t audioStreamId)
     return PersistAndNotify<Attributes::AllocatedAudioStreams::Id>();
 }
 
-bool CameraAVStreamMgmtServer::IsAllocatedSnapshotStreamReusable(
-    const SnapshotStreamStruct & allocatedStream, const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs)
+std::optional<uint16_t> CameraAVStreamMgmtServer::GetReusableSnapshotStreamId(
+    const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs) const
 {
-    // 1. Codec must match allocated stream's codec.
-    if (requestedArgs.imageCodec != allocatedStream.imageCodec)
+    for (const auto & stream : mAllocatedSnapshotStreams)
     {
-        return false;
-    }
+        // 1. Codec must match allocated stream's codec.
+        if (requestedArgs.imageCodec != stream.imageCodec)
+        {
+            continue;
+        }
 
-    // 2. Quality must match allocated stream's quality.
-    if (requestedArgs.quality != allocatedStream.quality)
-    {
-        return false;
-    }
+        // 2. Quality must match allocated stream's quality.
+        if (requestedArgs.quality != stream.quality)
+        {
+            continue;
+        }
 
-    // 3. Framerate check (request must be within allocated stream's current range)
-    if (!(requestedArgs.maxFrameRate >= allocatedStream.frameRate))
-    {
-        return false;
-    }
+        // 3. Framerate check (request must be within allocated stream's current range)
+        if (requestedArgs.maxFrameRate > stream.frameRate)
+        {
+            continue;
+        }
 
-    // 4. Resolution check
-    if (!(requestedArgs.minResolution.width >= allocatedStream.minResolution.width &&
-          requestedArgs.minResolution.height >= allocatedStream.minResolution.height &&
-          requestedArgs.maxResolution.width <= allocatedStream.maxResolution.width &&
-          requestedArgs.maxResolution.height <= allocatedStream.maxResolution.height))
-    {
-        return false;
-    }
+        // 4. Resolution check
+        if (requestedArgs.minResolution.width < stream.minResolution.width ||
+            requestedArgs.minResolution.height < stream.minResolution.height ||
+            requestedArgs.maxResolution.width > stream.maxResolution.width ||
+            requestedArgs.maxResolution.height > stream.maxResolution.height)
+        {
+            continue;
+        }
 
-    return true;
+        return stream.snapshotStreamID;
+    }
+    return std::nullopt;
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::AddSnapshotStream(const SnapshotStreamStruct & snapshotStream)
@@ -1684,7 +1692,7 @@ struct StreamTraits<Attributes::AllocatedSnapshotStreams::Id>
 template <AttributeId TAttributeId>
 CHIP_ERROR CameraAVStreamMgmtServer::PersistAndNotify()
 {
-    LogAndReturnErrorOnFailure(StoreAllocatedStreams<TAttributeId>(), Zcl,
+    ReturnErrorAndLogOnFailure(StoreAllocatedStreams<TAttributeId>(), Zcl,
                                "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated streams", mEndpointId);
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, TAttributeId);
@@ -2562,19 +2570,21 @@ bool CameraAVStreamMgmtServer::ValidateSnapshotStreamForModifyOrDeallocate(const
 
 bool CameraAVStreamMgmtServer::IsResourceAvailableForStreamAllocation(uint32_t candidateEncodedPixelRate, bool encoderRequired)
 {
-    uint32_t totalEncodedPixelRate = candidateEncodedPixelRate;
+    uint64_t totalEncodedPixelRate = candidateEncodedPixelRate;
     uint16_t totalEncodersRequired = encoderRequired ? 1 : 0;
 
     for (const VideoStreamStruct & stream : mAllocatedVideoStreams)
     {
-        totalEncodedPixelRate += (stream.maxFrameRate * stream.maxResolution.height * stream.maxResolution.width);
+        totalEncodedPixelRate +=
+            (static_cast<uint64_t>(stream.maxFrameRate) * stream.maxResolution.height * stream.maxResolution.width);
     }
 
     for (const SnapshotStreamStruct & stream : mAllocatedSnapshotStreams)
     {
         if (stream.encodedPixels)
         {
-            totalEncodedPixelRate += (stream.frameRate * stream.maxResolution.height * stream.maxResolution.width);
+            totalEncodedPixelRate +=
+                (static_cast<uint64_t>(stream.frameRate) * stream.maxResolution.height * stream.maxResolution.width);
             if (stream.hardwareEncoder)
             {
                 totalEncodersRequired++;
