@@ -606,14 +606,12 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                                                      attribute_id=manufacturer_value)
                     if suffix > attribute_standard_range_max and suffix < global_range_min:
                         self.record_error(self.get_test_name(), location=location,
-                                          problem=f"Manufacturer attribute in undefined range {
-                                              manufacturer_value} in cluster {cluster_id}",
+                                          problem=f"Manufacturer attribute in undefined range {manufacturer_value} in cluster {cluster_id}",
                                           spec_location=f"Cluster {cluster_id}")
                         success = False
                     elif suffix >= global_range_min:
                         self.record_error(self.get_test_name(), location=location,
-                                          problem=f"Manufacturer attribute in global range {
-                                              manufacturer_value} in cluster {cluster_id}",
+                                          problem=f"Manufacturer attribute in global range {manufacturer_value} in cluster {cluster_id}",
                                           spec_location=f"Cluster {cluster_id}")
                         success = False
 
@@ -937,8 +935,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             for ep, problem in problems.items():
                 location = AttributePathLocation(endpoint_id=ep, cluster_id=Clusters.Descriptor.id,
                                                  attribute_id=Clusters.Descriptor.Attributes.TagList.attribute_id)
-                msg = f'problem on ep {ep}: missing feature = {problem.missing_feature}, missing attribute = {
-                    problem.missing_attribute}, duplicates = {problem.duplicates}, same_tags = {problem.same_tag}'
+                msg = f'problem on ep {ep}: missing feature = {problem.missing_feature}, missing attribute = {problem.missing_attribute}, duplicates = {problem.duplicates}, same_tags = {problem.same_tag}'
                 self.record_error(self.get_test_name(), location=location, problem=msg, spec_location="Descriptor TagList")
 
         record_problems(problems)
@@ -1224,8 +1221,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                         self.record_error(
                             self.get_test_name(),
                             location=location,
-                            problem=f"EndpointUniqueId attribute length is {
-                                len(value)} bytes which exceeds the maximum allowed 32 bytes",
+                            problem=f"EndpointUniqueId attribute length is {len(value)} bytes which exceeds the maximum allowed 32 bytes",
                             spec_location="EndpointUniqueId attribute"
                         )
                         self.fail_current_test(
