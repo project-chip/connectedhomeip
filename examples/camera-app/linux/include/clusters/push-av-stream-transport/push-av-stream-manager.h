@@ -76,8 +76,6 @@ public:
     void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
                      Tls::CertificateTable::BufferedRootCert & rootCertEntry) override;
 
-    bool ValidateUrl(const std::string & url) override;
-
     bool ValidateStreamUsage(StreamUsageEnum streamUsage) override;
 
     bool ValidateSegmentDuration(uint16_t segmentDuration, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override;

@@ -4604,6 +4604,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"ActiveEndpoints";
             break;
 
+        case MTRAttributeIDTypeClusterPowerTopologyAttributeElectricalCircuitNodesID:
+            result = @"ElectricalCircuitNodes";
+            break;
+
         case MTRAttributeIDTypeClusterPowerTopologyAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
