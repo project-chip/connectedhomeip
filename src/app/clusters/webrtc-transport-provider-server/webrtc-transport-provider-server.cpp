@@ -809,7 +809,11 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
 
     // ===== Cluster logic starts here =====
 
-    // If WebRTCSessionID is not null and does not match a value in CurrentSessions: Respond with NOT_FOUND.
+    // If WebRTCSessionID is not null:
+    // - If it does not match a value in CurrentSessions: Respond with NOT_FOUND
+    // - If the accessing Peer Node ID and fabric do not match the PeerNodeID and associated fabric
+    //   for the WebRTCSessionID entry in CurrentSessions: Respond with NOT_FOUND
+    // Both checks are performed by CheckForMatchingSession()
     if (!webRTCSessionID.IsNull())
     {
         uint16_t sessionId                    = webRTCSessionID.Value();
