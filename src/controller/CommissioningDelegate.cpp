@@ -37,14 +37,8 @@ const char * StageToString(CommissioningStage stage)
     case kArmFailsafe:
         return "ArmFailSafe";
 
-    case kScanNetworks:
-        return "ScanNetworks";
-
     case kConfigRegulatory:
         return "ConfigRegulatory";
-
-    case kConfigureTCAcknowledgments:
-        return "ConfigureTCAcknowledgments";
 
     case kConfigureUTCTime:
         return "ConfigureUTCTime";
@@ -72,10 +66,10 @@ const char * StageToString(CommissioningStage stage)
 
     case kAttestationRevocationCheck:
         return "AttestationRevocationCheck";
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     case kJCMTrustVerification:
         return "JCMTrustVerification";
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     case kSendOpCertSigningRequest:
         return "SendOpCertSigningRequest";
 
@@ -127,14 +121,14 @@ const char * StageToString(CommissioningStage stage)
     case kFindOperationalForCommissioningComplete:
         return "FindOperationalForCommissioningComplete";
 
-    case kICDSendStayActive:
-        return "ICDSendStayActive";
-
     case kSendComplete:
         return "SendComplete";
 
-    case kCleanup:
-        return "Cleanup";
+    case kICDSendStayActive:
+        return "ICDSendStayActive";
+
+    case kScanNetworks:
+        return "ScanNetworks";
 
     case kNeedsNetworkCreds:
         return "NeedsNetworkCreds";
@@ -148,20 +142,25 @@ const char * StageToString(CommissioningStage stage)
     case kRemoveThreadNetworkConfig:
         return "RemoveThreadNetworkConfig";
 
+    case kConfigureTCAcknowledgments:
+        return "ConfigureTCAcknowledgments";
+
     case kRequestWiFiCredentials:
         return "RequestWiFiCredentials";
 
     case kRequestThreadCredentials:
         return "RequestThreadCredentials";
 
+    case kCleanup:
+        return "Cleanup";
+
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     case kUnpoweredPhaseComplete:
         return "UnpoweredPhaseComplete";
 #endif
-
-    default:
-        return "???";
     }
+
+    return "???";
 }
 
 #if MATTER_TRACING_ENABLED
@@ -180,9 +179,6 @@ const char * MetricKeyForCommissioningStage(CommissioningStage stage)
 
     case kArmFailsafe:
         return "core_commissioning_stage_arm_failsafe";
-
-    case kScanNetworks:
-        return "core_commissioning_stage_scan_networks";
 
     case kConfigRegulatory:
         return "core_commissioning_stage_config_regulatory";
@@ -210,6 +206,12 @@ const char * MetricKeyForCommissioningStage(CommissioningStage stage)
 
     case kAttestationVerification:
         return "core_commissioning_stage_attestation_verification";
+
+    case kAttestationRevocationCheck:
+        return "core_commissioning_stage_attestation_revocation_check";
+
+    case kJCMTrustVerification:
+        return "core_commissioning_stage_jcm_trust_verification";
 
     case kSendOpCertSigningRequest:
         return "core_commissioning_stage_opcert_signing_request";
@@ -262,26 +264,46 @@ const char * MetricKeyForCommissioningStage(CommissioningStage stage)
     case kFindOperationalForCommissioningComplete:
         return "core_commissioning_stage_find_operational_for_commissioning_complete";
 
-    case kICDSendStayActive:
-        return "core_commissioning_stage_icd_send_stay_active";
-
     case kSendComplete:
         return "core_commissioning_stage_send_complete";
 
-    case kCleanup:
-        return "core_commissioning_stage_cleanup";
+    case kICDSendStayActive:
+        return "core_commissioning_stage_icd_send_stay_active";
+
+    case kScanNetworks:
+        return "core_commissioning_stage_scan_networks";
 
     case kNeedsNetworkCreds:
         return "core_commissioning_stage_need_network_creds";
+
+    case kPrimaryOperationalNetworkFailed:
+        return "core_commissioning_stage_primary_operational_network_failed";
+
+    case kRemoveWiFiNetworkConfig:
+        return "core_commissioning_stage_remove_wifi_network_config";
+
+    case kRemoveThreadNetworkConfig:
+        return "core_commissioning_stage_remove_thread_network_config";
+
+    case kConfigureTCAcknowledgments:
+        return "core_commissioning_stage_configure_tc_acknowledgements";
+
+    case kRequestWiFiCredentials:
+        return "core_commissioning_stage_request_wifi_credentials";
+
+    case kRequestThreadCredentials:
+        return "core_commissioning_stage_request_thread_credentials";
+
+    case kCleanup:
+        return "core_commissioning_stage_cleanup";
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     case kUnpoweredPhaseComplete:
         return "core_commissioning_stage_unpowered_phase";
 #endif
-
-    default:
-        return "core_commissioning_stage_unknown";
     }
+
+    return "core_commissioning_stage_unknown";
 }
 #endif
 
