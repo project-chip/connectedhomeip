@@ -34,9 +34,9 @@ using namespace chip::app::Clusters::Descriptor;
 namespace {
 
 /**
- * This is a DescriptorCluster class made specifically to fetch the tag list through ember before
- * the Attributes() and ReadAttribute() functions that need this information. Tag lists are currently
- * populated through the SetTagList() ember call, only after the cluster has been created and gone through Startup().
+ * This is a DescriptorCluster class made specifically to fetch the tag list once through ember before
+ * one of either the Attributes() or ReadAttribute() functions are called. Tag lists are currently populated
+ * through the SetTagList() ember call, only after the cluster has been created and gone through Startup().
  * This means the tag list can NOT be fetched here and passed to the constructor through the regular DescriptorCluster.
  * The tag list is a fixed attribute, but to maintain backwards compatiblility we get that information within the functions here.
  */
@@ -50,16 +50,25 @@ public:
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
     {
-        GetSemanticTagsForEndpoint(path.mEndpointId, mSemanticTags);
+        if(!mFetchedSemanticTags) {
+            GetSemanticTagsForEndpoint(path.mEndpointId, mSemanticTags);
+            mFetchedSemanticTags = true;
+        }
         return DescriptorCluster::Attributes(path, builder);
     }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
     {
-        GetSemanticTagsForEndpoint(request.path.mEndpointId, mSemanticTags);
+        if(!mFetchedSemanticTags) {
+            GetSemanticTagsForEndpoint(request.path.mEndpointId, mSemanticTags);
+            mFetchedSemanticTags = true;
+        }
         return DescriptorCluster::ReadAttribute(request, encoder);
     }
+
+private:
+    bool mFetchedSemanticTags = false;
 };
 
 #if CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
