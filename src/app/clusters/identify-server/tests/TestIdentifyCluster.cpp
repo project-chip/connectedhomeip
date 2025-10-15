@@ -14,7 +14,8 @@
  *    limitations under the License.
  */
 
-#include "TestIdentifyClusterHelpers.h"
+#include "ClusterActions.h"
+#include "TestTimerDelegate.h"
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <pw_unit_test/framework.h>
 
@@ -141,22 +142,21 @@ TEST_F(TestIdentifyCluster, ReadAttributesTest)
 
     // Read and verify IdentifyType
     uint8_t identifyType;
-    EXPECT_EQ(ReadAttribute(cluster, { kTestEndpointId, Identify::Id, IdentifyType::Id }, identifyType), CHIP_NO_ERROR);
+    EXPECT_EQ(ReadNumericAttribute(cluster, IdentifyType::Id, identifyType), CHIP_NO_ERROR);
     EXPECT_EQ(identifyType, (uint8_t) IdentifyTypeEnum::kVisibleIndicator);
 
     // Read and verify FeatureMap
     uint32_t featureMap;
-    EXPECT_EQ(ReadAttribute(cluster, { kTestEndpointId, Identify::Id, FeatureMap::Id }, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(ReadNumericAttribute(cluster, FeatureMap::Id, featureMap), CHIP_NO_ERROR);
     EXPECT_EQ(featureMap, 0u);
 
     // Read and verify ClusterRevision
     uint16_t clusterRevision;
-    EXPECT_EQ(ReadAttribute(cluster, { kTestEndpointId, Identify::Id, Globals::Attributes::ClusterRevision::Id }, clusterRevision),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(ReadNumericAttribute(cluster, Globals::Attributes::ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
 
     // Read non-existent attribute
     uint32_t nonExistentAttribute;
-    EXPECT_NE(ReadAttribute(cluster, { kTestEndpointId, Identify::Id, 0xFFFF }, nonExistentAttribute), CHIP_NO_ERROR);
+    EXPECT_NE(ReadNumericAttribute(cluster, 0xFFFF, nonExistentAttribute), CHIP_NO_ERROR);
 }
 
 TEST_F(TestIdentifyCluster, WriteUnchangedIdentifyTimeDoesNotNotify)
@@ -165,20 +165,19 @@ TEST_F(TestIdentifyCluster, WriteUnchangedIdentifyTimeDoesNotNotify)
     IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    const auto identifyTimePath = ConcreteDataAttributePath(kTestEndpointId, Identify::Id, IdentifyTime::Id);
-    auto & changeListener       = context.ChangeListener();
+    auto & changeListener = context.ChangeListener();
 
     // Write a value to IdentifyTime and verify it was reported.
     changeListener.DirtyList().clear();
-    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(10)), CHIP_NO_ERROR);
+    EXPECT_EQ(WriteAttribute(cluster, IdentifyTime::Id, static_cast<uint16_t>(10)), CHIP_NO_ERROR);
     ASSERT_EQ(changeListener.DirtyList().size(), 1u);
-    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, identifyTimePath.mEndpointId);
-    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, identifyTimePath.mClusterId);
-    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, identifyTimePath.mAttributeId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, Identify::Id);
+    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, IdentifyTime::Id);
 
     // Write the same value again and verify that the attribute is not reported as changed.
     changeListener.DirtyList().clear();
-    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(10)), CHIP_NO_ERROR);
+    EXPECT_EQ(WriteAttribute(cluster, IdentifyTime::Id, static_cast<uint16_t>(10)), CHIP_NO_ERROR);
     EXPECT_EQ(changeListener.DirtyList().size(), 0u);
 }
 
@@ -189,17 +188,14 @@ TEST_F(TestIdentifyCluster, WriteReadOnlyAttributesReturnUnsupportedWriteTest)
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Attempt to write to the read-only IdentifyType attribute and verify it fails.
-    EXPECT_EQ(WriteAttribute(cluster, { kTestEndpointId, Identify::Id, IdentifyType::Id }, (uint8_t) 0),
-              CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+    EXPECT_EQ(WriteAttribute(cluster, IdentifyType::Id, (uint8_t) 0), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 
     // Attempt to write to the read-only ClusterRevision attribute and verify it fails.
-    EXPECT_EQ(WriteAttribute(cluster, { kTestEndpointId, Identify::Id, Globals::Attributes::ClusterRevision::Id },
-                             static_cast<uint16_t>(0)),
+    EXPECT_EQ(WriteAttribute(cluster, Globals::Attributes::ClusterRevision::Id, static_cast<uint16_t>(0)),
               CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 
     // Attempt to write to the read-only FeatureMap attribute and verify it fails.
-    EXPECT_EQ(WriteAttribute(cluster, { kTestEndpointId, Identify::Id, FeatureMap::Id }, static_cast<uint32_t>(0)),
-              CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+    EXPECT_EQ(WriteAttribute(cluster, FeatureMap::Id, static_cast<uint32_t>(0)), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 }
 
 TEST_F(TestIdentifyCluster, IdentifyTimeCountdownTest)
@@ -209,15 +205,13 @@ TEST_F(TestIdentifyCluster, IdentifyTimeCountdownTest)
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     uint16_t identifyTime;
-    const auto identifyTimePath = ConcreteDataAttributePath(kTestEndpointId, Identify::Id, IdentifyTime::Id);
-
-    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(5)), CHIP_NO_ERROR);
+    EXPECT_EQ(WriteAttribute(cluster, IdentifyTime::Id, static_cast<uint16_t>(5)), CHIP_NO_ERROR);
 
     // Advance the clock 1 second at a time and check the attribute value.
     for (uint16_t i = 0; i < 5; ++i)
     {
         mTestTimerDelegate.AdvanceClock(System::Clock::Seconds16(1));
-        EXPECT_EQ(ReadAttribute(cluster, identifyTimePath, identifyTime), CHIP_NO_ERROR);
+        EXPECT_EQ(ReadNumericAttribute(cluster, IdentifyTime::Id, identifyTime), CHIP_NO_ERROR);
         EXPECT_EQ(identifyTime, 4u - i);
     }
 
@@ -231,19 +225,17 @@ TEST_F(TestIdentifyCluster, OnIdentifyStartStopCallbackTest)
     IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    const auto identifyTimePath = ConcreteDataAttributePath(kTestEndpointId, Identify::Id, IdentifyTime::Id);
-
     // Test onIdentifyStart callback.
     onIdentifyStartCalled = false;
-    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(10)), CHIP_NO_ERROR);
+    EXPECT_EQ(WriteAttribute(cluster, IdentifyTime::Id, static_cast<uint16_t>(10)), CHIP_NO_ERROR);
     EXPECT_TRUE(onIdentifyStartCalled);
 
     // Test onIdentifyStop callback.
     onIdentifyStopCalled = false;
-    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(0)), CHIP_NO_ERROR);
+    EXPECT_EQ(WriteAttribute(cluster, IdentifyTime::Id, static_cast<uint16_t>(0)), CHIP_NO_ERROR);
     EXPECT_TRUE(onIdentifyStopCalled);
     // Test onIdentifyStop callback with timer.
-    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(2)), CHIP_NO_ERROR);
+    EXPECT_EQ(WriteAttribute(cluster, IdentifyTime::Id, static_cast<uint16_t>(2)), CHIP_NO_ERROR);
     onIdentifyStopCalled = false;
     mTestTimerDelegate.AdvanceClock(System::Clock::Seconds16(1));
     EXPECT_FALSE(onIdentifyStopCalled);
@@ -256,15 +248,13 @@ TEST_F(TestIdentifyCluster, OnStartNotCalledMultipleTimes)
     chip::Test::TestServerClusterContext context;
     IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-    const auto identifyTimePath = ConcreteDataAttributePath(kTestEndpointId, Identify::Id, IdentifyTime::Id);
-
     // Start identifying.
-    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(10)), CHIP_NO_ERROR);
+    EXPECT_EQ(WriteAttribute(cluster, IdentifyTime::Id, static_cast<uint16_t>(10)), CHIP_NO_ERROR);
     EXPECT_TRUE(onIdentifyStartCalled);
 
     // Reset the flag and write a non-zero value again.
     onIdentifyStartCalled = false;
-    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(5)), CHIP_NO_ERROR);
+    EXPECT_EQ(WriteAttribute(cluster, IdentifyTime::Id, static_cast<uint16_t>(5)), CHIP_NO_ERROR);
     EXPECT_FALSE(onIdentifyStartCalled);
 }
 
@@ -273,16 +263,14 @@ TEST_F(TestIdentifyCluster, OnStopNotCalledIfNotIdentifying)
     chip::Test::TestServerClusterContext context;
     IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-    const auto identifyTimePath = ConcreteDataAttributePath(kTestEndpointId, Identify::Id, IdentifyTime::Id);
-
     // Ensure we are not identifying.
     uint16_t identifyTime;
-    EXPECT_EQ(ReadAttribute(cluster, identifyTimePath, identifyTime), CHIP_NO_ERROR);
+    EXPECT_EQ(ReadNumericAttribute(cluster, IdentifyTime::Id, identifyTime), CHIP_NO_ERROR);
     EXPECT_EQ(identifyTime, 0u);
 
     // Write 0 and check that the stop callback is not called.
     onIdentifyStopCalled = false;
-    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(0)), CHIP_NO_ERROR);
+    EXPECT_EQ(WriteAttribute(cluster, IdentifyTime::Id, static_cast<uint16_t>(0)), CHIP_NO_ERROR);
     EXPECT_FALSE(onIdentifyStopCalled);
 }
 
@@ -304,7 +292,7 @@ TEST_F(TestIdentifyCluster, InvokeIdentifyCommandTest)
                   Protocols::InteractionModel::Status::Success);
 
         uint16_t identifyTime;
-        EXPECT_EQ(ReadAttribute(cluster, { kTestEndpointId, Identify::Id, IdentifyTime::Id }, identifyTime), CHIP_NO_ERROR);
+        EXPECT_EQ(ReadNumericAttribute(cluster, IdentifyTime::Id, identifyTime), CHIP_NO_ERROR);
         EXPECT_EQ(identifyTime, kIdentifyTime);
     }
 }
@@ -381,8 +369,7 @@ TEST_F(TestIdentifyCluster, TriggerEffectWhileIdentifyingTest)
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Start identifying.
-    const auto identifyTimePath = ConcreteDataAttributePath(kTestEndpointId, Identify::Id, IdentifyTime::Id);
-    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(10)), CHIP_NO_ERROR);
+    EXPECT_EQ(WriteAttribute(cluster, IdentifyTime::Id, static_cast<uint16_t>(10)), CHIP_NO_ERROR);
 
     Commands::TriggerEffect::Type data;
     data.effectIdentifier = EffectIdentifierEnum::kBlink;
@@ -396,7 +383,7 @@ TEST_F(TestIdentifyCluster, TriggerEffectWhileIdentifyingTest)
     EXPECT_TRUE(onEffectIdentifierCalled);
 
     uint16_t identifyTime;
-    EXPECT_EQ(ReadAttribute(cluster, identifyTimePath, identifyTime), CHIP_NO_ERROR);
+    EXPECT_EQ(ReadNumericAttribute(cluster, IdentifyTime::Id, identifyTime), CHIP_NO_ERROR);
     EXPECT_EQ(identifyTime, 0u);
 }
 
@@ -407,8 +394,7 @@ TEST_F(TestIdentifyCluster, TriggerEffectFinishEffectTest)
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Start identifying.
-    const auto identifyTimePath = ConcreteDataAttributePath(kTestEndpointId, Identify::Id, IdentifyTime::Id);
-    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(10)), CHIP_NO_ERROR);
+    EXPECT_EQ(WriteAttribute(cluster, IdentifyTime::Id, static_cast<uint16_t>(10)), CHIP_NO_ERROR);
 
     Commands::TriggerEffect::Type data;
     data.effectIdentifier = EffectIdentifierEnum::kFinishEffect;
@@ -420,7 +406,7 @@ TEST_F(TestIdentifyCluster, TriggerEffectFinishEffectTest)
               Protocols::InteractionModel::Status::Success);
 
     uint16_t identifyTime;
-    EXPECT_EQ(ReadAttribute(cluster, identifyTimePath, identifyTime), CHIP_NO_ERROR);
+    EXPECT_EQ(ReadNumericAttribute(cluster, IdentifyTime::Id, identifyTime), CHIP_NO_ERROR);
     EXPECT_EQ(identifyTime, 1u);
 }
 
@@ -431,8 +417,7 @@ TEST_F(TestIdentifyCluster, TriggerEffectStopEffectTest)
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Start identifying.
-    const auto identifyTimePath = ConcreteDataAttributePath(kTestEndpointId, Identify::Id, IdentifyTime::Id);
-    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(10)), CHIP_NO_ERROR);
+    EXPECT_EQ(WriteAttribute(cluster, IdentifyTime::Id, static_cast<uint16_t>(10)), CHIP_NO_ERROR);
 
     Commands::TriggerEffect::Type data;
     data.effectIdentifier = EffectIdentifierEnum::kStopEffect;
@@ -444,7 +429,7 @@ TEST_F(TestIdentifyCluster, TriggerEffectStopEffectTest)
               Protocols::InteractionModel::Status::Success);
 
     uint16_t identifyTime;
-    EXPECT_EQ(ReadAttribute(cluster, identifyTimePath, identifyTime), CHIP_NO_ERROR);
+    EXPECT_EQ(ReadNumericAttribute(cluster, IdentifyTime::Id, identifyTime), CHIP_NO_ERROR);
     EXPECT_EQ(identifyTime, 0u);
 }
 
@@ -454,22 +439,21 @@ TEST_F(TestIdentifyCluster, IdentifyTimeAttributeReportingTest)
     IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mTestTimerDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    auto & changeListener       = context.ChangeListener();
-    const auto identifyTimePath = ConcreteDataAttributePath(kTestEndpointId, Identify::Id, IdentifyTime::Id);
+    auto & changeListener = context.ChangeListener();
 
     // 1. Test client write from 0 to non-zero
     changeListener.DirtyList().clear();
-    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(10)), CHIP_NO_ERROR);
+    EXPECT_EQ(WriteAttribute(cluster, IdentifyTime::Id, static_cast<uint16_t>(10)), CHIP_NO_ERROR);
     EXPECT_EQ(changeListener.DirtyList().size(), 1u);
-    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, identifyTimePath.mEndpointId);
-    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, identifyTimePath.mClusterId);
-    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, identifyTimePath.mAttributeId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, Identify::Id);
+    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, IdentifyTime::Id);
 
     // 2. Test countdown does NOT report
     changeListener.DirtyList().clear();
     mTestTimerDelegate.AdvanceClock(System::Clock::Seconds16(1));
     uint16_t identifyTime;
-    EXPECT_EQ(ReadAttribute(cluster, identifyTimePath, identifyTime), CHIP_NO_ERROR);
+    EXPECT_EQ(ReadNumericAttribute(cluster, IdentifyTime::Id, identifyTime), CHIP_NO_ERROR);
     EXPECT_EQ(identifyTime, 9u);
     EXPECT_EQ(changeListener.DirtyList().size(), 0u);
 
@@ -480,22 +464,22 @@ TEST_F(TestIdentifyCluster, IdentifyTimeAttributeReportingTest)
     {
         mTestTimerDelegate.AdvanceClock(System::Clock::Seconds16(1));
     }
-    EXPECT_EQ(ReadAttribute(cluster, identifyTimePath, identifyTime), CHIP_NO_ERROR);
+    EXPECT_EQ(ReadNumericAttribute(cluster, IdentifyTime::Id, identifyTime), CHIP_NO_ERROR);
     EXPECT_EQ(identifyTime, 0u);
     EXPECT_EQ(changeListener.DirtyList().size(), 1u);
-    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, identifyTimePath.mEndpointId);
-    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, identifyTimePath.mClusterId);
-    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, identifyTimePath.mAttributeId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, Identify::Id);
+    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, IdentifyTime::Id);
 
     // 4. Test client write from non-zero to 0
-    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(5)),
+    EXPECT_EQ(WriteAttribute(cluster, IdentifyTime::Id, static_cast<uint16_t>(5)),
               CHIP_NO_ERROR); // Start again to have a non-zero value.
     changeListener.DirtyList().clear();
-    EXPECT_EQ(WriteAttribute(cluster, identifyTimePath, static_cast<uint16_t>(0)), CHIP_NO_ERROR);
+    EXPECT_EQ(WriteAttribute(cluster, IdentifyTime::Id, static_cast<uint16_t>(0)), CHIP_NO_ERROR);
     EXPECT_EQ(changeListener.DirtyList().size(), 1u);
-    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, identifyTimePath.mEndpointId);
-    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, identifyTimePath.mClusterId);
-    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, identifyTimePath.mAttributeId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, Identify::Id);
+    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, IdentifyTime::Id);
 
     // 5. Test Identify command reports
     changeListener.DirtyList().clear();
@@ -506,9 +490,9 @@ TEST_F(TestIdentifyCluster, IdentifyTimeAttributeReportingTest)
     EXPECT_EQ(result.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
               Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(changeListener.DirtyList().size(), 1u);
-    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, identifyTimePath.mEndpointId);
-    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, identifyTimePath.mClusterId);
-    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, identifyTimePath.mAttributeId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, Identify::Id);
+    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, IdentifyTime::Id);
 }
 
 TEST_F(TestIdentifyCluster, TestGetters)

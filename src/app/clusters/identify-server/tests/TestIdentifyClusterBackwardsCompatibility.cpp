@@ -15,7 +15,8 @@
  *    limitations under the License.
  */
 
-#include "TestIdentifyClusterHelpers.h"
+#include "ClusterActions.h"
+#include "TestTimerDelegate.h"
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <gtest/gtest.h>
@@ -73,14 +74,12 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestLegacyCallbacks)
                              onEffectIdentifier, EffectIdentifierEnum::kBlink, EffectVariantEnum::kDefault, &mTestTimerDelegate);
     EXPECT_EQ(identify.mCluster.Cluster().Startup(mContext.Get()), CHIP_NO_ERROR);
 
-    const auto identifyTimePath = ConcreteDataAttributePath(1, chip::app::Clusters::Identify::Id, IdentifyTime::Id);
-
     // Test onIdentifyStart callback by writing to IdentifyTime.
-    EXPECT_EQ(WriteAttribute(identify.mCluster.Cluster(), identifyTimePath, 10u), CHIP_NO_ERROR);
+    EXPECT_EQ(WriteAttribute(identify.mCluster.Cluster(), IdentifyTime::Id, 10u), CHIP_NO_ERROR);
     EXPECT_TRUE(onIdentifyStartCalled);
 
     // Test onIdentifyStop callback by writing to IdentifyTime.
-    EXPECT_EQ(WriteAttribute(identify.mCluster.Cluster(), identifyTimePath, 0u), CHIP_NO_ERROR);
+    EXPECT_EQ(WriteAttribute(identify.mCluster.Cluster(), IdentifyTime::Id, 0u), CHIP_NO_ERROR);
     EXPECT_TRUE(onIdentifyStopCalled);
 
     // Test onEffectIdentifier callback by invoking TriggerEffect command.
@@ -146,17 +145,15 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestMActive)
                              EffectIdentifierEnum::kBlink, EffectVariantEnum::kDefault, &mTestTimerDelegate);
     EXPECT_EQ(identify.mCluster.Cluster().Startup(mContext.Get()), CHIP_NO_ERROR);
 
-    const auto identifyTimePath = ConcreteDataAttributePath(1, chip::app::Clusters::Identify::Id, IdentifyTime::Id);
-
     // Test that mActive is false initially.
     EXPECT_FALSE(identify.mActive);
 
     // Test that mActive is true after writing a non-zero value to IdentifyTime.
-    EXPECT_EQ(WriteAttribute(identify.mCluster.Cluster(), identifyTimePath, 10u), CHIP_NO_ERROR);
+    EXPECT_EQ(WriteAttribute(identify.mCluster.Cluster(), IdentifyTime::Id, 10u), CHIP_NO_ERROR);
     EXPECT_TRUE(identify.mActive);
 
     // Test that mActive is false after writing 0 to IdentifyTime.
-    EXPECT_EQ(WriteAttribute(identify.mCluster.Cluster(), identifyTimePath, 0u), CHIP_NO_ERROR);
+    EXPECT_EQ(WriteAttribute(identify.mCluster.Cluster(), IdentifyTime::Id, 0u), CHIP_NO_ERROR);
     EXPECT_FALSE(identify.mActive);
 }
 
