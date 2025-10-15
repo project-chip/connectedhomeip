@@ -16,8 +16,8 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/IcdManagementCluste.cpp"
-    "${CLUSTER_DIR}/IcdManagementCluste.h"
+    "${CLUSTER_DIR}/IcdManagementCluster.cpp"
+    "${CLUSTER_DIR}/IcdManagementCluster.h"
 )
 
 # TODO(#32321): Remove after issue is resolved
