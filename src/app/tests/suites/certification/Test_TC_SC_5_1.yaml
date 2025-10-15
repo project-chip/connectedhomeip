@@ -280,8 +280,8 @@ tests:
                   {
                       GroupId: 0x0103,
                       Endpoints: [endpoint],
-                      GroupName: "Test Group" ,
-                      FabricIndex: CurrentFabricIndexValue
+                      GroupName: "Test Group",
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
