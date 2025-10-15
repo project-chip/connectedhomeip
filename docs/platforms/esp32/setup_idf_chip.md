@@ -13,8 +13,8 @@ step.
 
 ### Install Prerequisites
 
--   [Linux](https://docs.espressif.com/projects/esp-idf/en/v5.3/esp32/get-started/linux-macos-setup.html#for-linux-users)
--   [macOS](https://docs.espressif.com/projects/esp-idf/en/v5.3/esp32/get-started/linux-macos-setup.html#for-macos-users)
+-   [Linux](https://docs.espressif.com/projects/esp-idf/en/v5.5.1/esp32/get-started/linux-macos-setup.html#for-linux-users)
+-   [macOS](https://docs.espressif.com/projects/esp-idf/en/v5.5.1/esp32/get-started/linux-macos-setup.html#for-macos-users)
 
 ### Get ESP-IDF v5.5.1
 
