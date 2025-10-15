@@ -35,7 +35,6 @@
 import logging
 import random
 from time import sleep
-from typing import Optional
 
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
