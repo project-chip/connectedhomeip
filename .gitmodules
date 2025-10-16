@@ -326,3 +326,8 @@
 [submodule "third_party/libtrustymatter/repo"]
 	path = third_party/libtrustymatter/repo
 	url = https://github.com/nxp-imx/libtrustymatter
+[submodule "third_party/amazon-kinesis-video-streams-webrtc-sdk-c/repo"]
+	path = third_party/amazon-kinesis-video-streams-webrtc-sdk-c/repo
+	url = https://github.com/awslabs/amazon-kinesis-video-streams-webrtc-sdk-c
+	platforms = esp32
+	recursive = true
