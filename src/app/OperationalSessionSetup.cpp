@@ -48,6 +48,8 @@ using namespace chip::Tracing;
 
 namespace chip {
 
+System::Clock::Timeout sAdditionalLitBackoffInterval = CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL;
+
 void OperationalSessionSetup::MoveToState(State aTargetState)
 {
     if (mState != aTargetState)
@@ -294,6 +296,12 @@ void OperationalSessionSetup::UpdateDeviceData(const ResolveResult & result)
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
 
+void OperationalSessionSetup::SetAdditionalLitBackoffInterval(const Optional<System::Clock::Timeout> & additionalTime)
+{
+    sAdditionalLitBackoffInterval = additionalTime.ValueOr(CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL);
+}
+
+
 CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & result)
 {
     auto config = result.mrpRemoteConfig;
@@ -302,10 +310,11 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
     {
         // When ICD is operating as LIT, we need to adjust the MRP idle retransmission timeout
         // to accommodate the potentially long sleep periods.
-        // Set the idle retransmission timeout to be the active threshold time
+        // Set the idle retransmission timeout to be the SAI time
         // This ensures that retransmissions for first message are spaced out enough to
         // avoid unnecessary retries and potential message congestion.
-        config.mIdleRetransTimeout = config.mActiveThresholdTime;
+        // If not enough, we can consider increasing it further via sAdditionalLitBackoffInterval
+        config.mIdleRetransTimeout = config.mActiveRetransTimeout + sAdditionalLitBackoffInterval;
     }
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload)
