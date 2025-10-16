@@ -17,6 +17,7 @@
 
 import random
 import string
+from datetime import timedelta
 
 import test_plan_support
 # === BEGIN CI TEST ARGUMENTS ===
@@ -39,7 +40,6 @@ import test_plan_support
 from mobly import asserts
 from TC_TLS_Utils import TLSUtils
 
-from datetime import timedelta
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
