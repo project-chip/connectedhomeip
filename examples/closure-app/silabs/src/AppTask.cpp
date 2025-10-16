@@ -23,6 +23,7 @@
 #include "LEDWidget.h"
 
 #ifdef DISPLAY_ENABLED
+#include "ClosureUI.h"
 #include "lcd.h"
 #ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"
@@ -80,6 +81,7 @@ CHIP_ERROR AppTask::AppInit()
 
 #ifdef DISPLAY_ENABLED
     GetLCD().Init((uint8_t *) "Closure-App");
+    GetLCD().SetCustomUI(ClosureUI::DrawUI);
 #endif
 
     // Initialization of Closure Manager and endpoints of closure and closurepanel.
@@ -87,7 +89,7 @@ CHIP_ERROR AppTask::AppInit()
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED
-    GetLCD().WriteDemoUI(false);
+    UpdateClosureUI();
 #ifdef QR_CODE_ENABLED
 #ifdef SL_WIFI
     if (!ConnectivityMgr().IsWiFiStationProvisioned())
@@ -98,7 +100,7 @@ CHIP_ERROR AppTask::AppInit()
         GetLCD().ShowQRCode(true);
     }
 #endif // QR_CODE_ENABLED
-#endif
+#endif // DISPLAY_ENABLED
 
     return err;
 }
@@ -140,4 +142,107 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     button_event.ButtonEvent.Action = btnAction;
     button_event.Handler            = BaseApplication::ButtonHandler;
     AppTask::GetAppTask().PostEvent(&button_event);
+}
+
+void AppTask::UpdateClosureUI()
+{
+#ifdef DISPLAY_ENABLED
+    ClosureManager & closureManager = ClosureManager::GetInstance();
+    
+    // Lock ChipStack for thread-safe cluster data access
+    DeviceLayer::PlatformMgr().LockChipStack();
+    
+    // Get UI-specific data from ClosureManager
+    auto uiData = closureManager.GetClosureUIData();
+    
+    // Unlock ChipStack as UI updates don't need cluster access
+    DeviceLayer::PlatformMgr().UnlockChipStack();
+    
+    // Set main state in UI
+    ClosureUI::SetMainState(static_cast<uint8_t>(uiData.mainState));
+    
+    // Format position text
+    const char * positionText = "Position: Unknown";
+    if (!uiData.overallCurrentState.IsNull() && 
+        uiData.overallCurrentState.Value().position.HasValue() && 
+        !uiData.overallCurrentState.Value().position.Value().IsNull())
+    {
+        switch (uiData.overallCurrentState.Value().position.Value().Value())
+        {
+        case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kFullyClosed:
+            positionText = "Position: Closed";
+            break;
+        case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kFullyOpened:
+            positionText = "Position: Open";
+            break;
+        case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kPartiallyOpened:
+            positionText = "Position: Partial";
+            break;
+        case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kOpenedForPedestrian:
+            positionText = "Position: Pedestrian";
+            break;
+        case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kOpenedForVentilation:
+            positionText = "Position: Ventilation";
+            break;
+        default:
+            positionText = "Position: Unknown";
+            break;
+        }
+    }
+    
+    // Format latch text  
+    const char * latchText = "Latch: Unknown";
+    if (!uiData.overallCurrentState.IsNull() && 
+        uiData.overallCurrentState.Value().latch.HasValue() && 
+        !uiData.overallCurrentState.Value().latch.Value().IsNull())
+    {
+        latchText = uiData.overallCurrentState.Value().latch.Value().Value() ? "Latch: Engaged" : "Latch: Released";
+    }
+    
+    // Format secure state text
+    const char * secureText = "Secure: Unknown";
+    if (!uiData.overallCurrentState.IsNull() && 
+        !uiData.overallCurrentState.Value().secureState.IsNull())
+    {
+        secureText = uiData.overallCurrentState.Value().secureState.Value() ? "Secure: Yes" : "Secure: No";
+    }
+    
+    // Format speed text
+    const char * speedText = "Speed: Unknown";
+    if (!uiData.overallCurrentState.IsNull() && 
+        uiData.overallCurrentState.Value().speed.HasValue())
+    {
+        switch (uiData.overallCurrentState.Value().speed.Value())
+        {
+        case chip::app::Clusters::Globals::ThreeLevelAutoEnum::kLow:
+            speedText = "Speed: Low";
+            break;
+        case chip::app::Clusters::Globals::ThreeLevelAutoEnum::kMedium:
+            speedText = "Speed: Medium";
+            break;
+        case chip::app::Clusters::Globals::ThreeLevelAutoEnum::kHigh:
+            speedText = "Speed: High";
+            break;
+        case chip::app::Clusters::Globals::ThreeLevelAutoEnum::kAuto:
+            speedText = "Speed: Auto";
+            break;
+        default:
+            speedText = "Speed: Unknown";
+            break;
+        }
+    }
+    
+    ClosureUI::SetOverallCurrentState(positionText, latchText, secureText, speedText);
+
+#ifdef SL_WIFI
+    if (ConnectivityMgr().IsWiFiStationProvisioned())
+#else
+    if (ConnectivityMgr().IsThreadProvisioned())
+#endif /* !SL_WIFI */
+    {
+        AppTask::GetAppTask().GetLCD().WriteDemoUI(false); // State doesn't matter for custom UI
+    }
+#else
+    (void) 0;
+#endif // DISPLAY_ENABLED
 }

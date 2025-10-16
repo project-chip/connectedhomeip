@@ -147,6 +147,10 @@ silabs_executable("closure_app") {
     "src/DataModelCallbacks.cpp",
   ]
 
+  if (!disable_lcd) {
+    sources += [ "src/ClosureUI.cpp" ]
+  }
+
   deps = [ ":sdk" ]
 
   if (wifi_soc) {

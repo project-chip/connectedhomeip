@@ -78,6 +78,11 @@ public:
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
+    /**
+     * @brief Updates the closure UI with current closure state
+     */
+    static void UpdateClosureUI();
+
 private:
     static AppTask sAppTask;
 
