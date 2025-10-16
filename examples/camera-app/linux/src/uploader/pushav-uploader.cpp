@@ -292,7 +292,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
 
     // Determine content type based on file extension
     std::string contentType = "application/*"; // Default fallback
-    
+
     // Extract file extension from full path
     size_t dotPos = data.first.find_last_of('.');
     if (dotPos != std::string::npos) {
@@ -300,12 +300,12 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
         if (extension == ".mpd")
         {
             contentType = "application/dash+xml"; // Manifest file
-        } 
-        else if (extension == ".m4s") 
+        }
+        else if (extension == ".m4s")
         {
             contentType = "video/iso.segment"; // Media segment
-        } 
-        else if (extension == ".init") 
+        }
+        else if (extension == ".init")
         {
             contentType = "video/mp4"; // Initialization segment
         }
