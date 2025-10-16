@@ -18,10 +18,8 @@
 
 import asyncio
 import logging
-import os
 from typing import List
 
-from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -200,7 +198,7 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
 
         total_hrs_after_fr = await self._read_total_hrs(ctrl)
         logging.info(f"TotalOperationalHours post-factory-reset: {total_hrs_after_fr}")
-        assert total_hrs_after_fr in (0, 1), f"Expected TotalOperationalHours 0 or 1 post-FR (actual={total_hrs_after_fr})"
+        assert total_hrs_after_fr <= 1, f"Expected TotalOperationalHours ≤1 post-FR (actual={total_hrs_after_fr})"
 
 
 if __name__ == "__main__":
