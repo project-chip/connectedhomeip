@@ -10280,6 +10280,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             AvailableEndpoints(0L),
             ActiveEndpoints(1L),
+            ElectricalCircuitNodes(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),

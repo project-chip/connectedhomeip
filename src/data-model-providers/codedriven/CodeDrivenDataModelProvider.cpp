@@ -123,11 +123,11 @@ DataModel::ActionReturnStatus CodeDrivenDataModelProvider::WriteAttribute(const 
 }
 
 void CodeDrivenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttributePath & path,
-                                                                 DataModel::ListWriteOperation opType)
+                                                                 DataModel::ListWriteOperation opType, FabricIndex accessingFabric)
 {
     ServerClusterInterface * serverCluster = GetServerClusterInterface(path);
     VerifyOrReturn(serverCluster != nullptr);
-    serverCluster->ListAttributeWriteNotification(path, opType);
+    serverCluster->ListAttributeWriteNotification(path, opType, accessingFabric);
 }
 
 std::optional<DataModel::ActionReturnStatus> CodeDrivenDataModelProvider::InvokeCommand(const DataModel::InvokeRequest & request,
