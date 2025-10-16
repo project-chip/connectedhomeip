@@ -93,7 +93,7 @@ private:
 /**
  * @brief Implementation of Fabric Delegate for ICD Management cluster
  */
-class IcdManagementFabricDelegate : public FabricTable::Delegate
+class ICDManagementFabricDelegate : public FabricTable::Delegate
 {
 public:
     void Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore,
@@ -112,10 +112,10 @@ private:
 /**
  * @brief Implementation of attribute access for IcdManagement cluster
  */
-class IcdManagementAttributeAccess : public AttributeAccessInterface
+class ICDManagementAttributeAccess : public AttributeAccessInterface
 {
 public:
-    IcdManagementAttributeAccess();
+    ICDManagementAttributeAccess();
 
     void Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore, FabricTable & fabricTable,
               ICDConfigurationData & icdConfigurationData);
