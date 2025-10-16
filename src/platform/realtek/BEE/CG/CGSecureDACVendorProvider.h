@@ -40,7 +40,6 @@ public:
 
 private:
     bool IsInitSuccess() const { return initError == CHIP_NO_ERROR; }
-    cg_matter_data param;
     CHIP_ERROR initError = CHIP_NO_ERROR;
 };
 

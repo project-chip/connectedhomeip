@@ -36,6 +36,7 @@ namespace DeviceLayer {
 
 CGSecureDACVendorProvider::CGSecureDACVendorProvider()
 {
+    cg_matter_data param;
     memset(&param, 0, sizeof(cg_matter_data));
     ChipLogDetail(DeviceLayer, "secure_app_function_call InitModule start");
     secure_app_function_call(SECURE_APP_FUNCTION_INIT_MODULE, &param);
@@ -53,6 +54,7 @@ CGSecureDACVendorProvider::CGSecureDACVendorProvider()
 
 CGSecureDACVendorProvider::~CGSecureDACVendorProvider()
 {
+    cg_matter_data param;
     memset(&param, 0, sizeof(cg_matter_data));
     // Release Module
     ChipLogDetail(DeviceLayer, "secure_app_function_call ReleaseModule start");
@@ -73,6 +75,7 @@ CHIP_ERROR CGSecureDACVendorProvider::GetCertificationDeclaration(MutableByteSpa
     constexpr uint8_t kCdForAllExamples[] = CHIP_DEVICE_CONFIG_CERTIFICATION_DECLARATION;
     err                                   = CopySpanToMutableSpan(ByteSpan{ kCdForAllExamples }, outBuffer);
 #else
+    cg_matter_data param;
     memset(&param, 0, sizeof(cg_matter_data));
     param.return_length = sizeof(param.return_data);
 
@@ -110,6 +113,7 @@ CHIP_ERROR CGSecureDACVendorProvider::GetDeviceAttestationCert(MutableByteSpan &
 
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
+    cg_matter_data param;
     memset(&param, 0, sizeof(cg_matter_data));
     param.return_length = sizeof(param.return_data);
     /* DeviceAttestationCert */
@@ -137,6 +141,7 @@ CHIP_ERROR CGSecureDACVendorProvider::GetProductAttestationIntermediateCert(Muta
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    cg_matter_data param;
     memset(&param, 0, sizeof(cg_matter_data));
     param.return_length = sizeof(param.return_data);
     /* Product Attestation Intermediate Cert */
@@ -169,10 +174,12 @@ CHIP_ERROR CGSecureDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpa
     VerifyOrReturnError(IsSpanUsable(messageToSign), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
+    cg_matter_data param;
     memset(&param, 0, sizeof(cg_matter_data));
     param.return_length = sizeof(param.return_data);
     /* Sign With Device Attestation Key */
     ChipLogDetail(DeviceLayer, "secure_app_function_call Sign start");
+    VerifyOrReturnError(messageToSign.size() <= sizeof(param.input_data), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(param.input_data, messageToSign.data(), messageToSign.size());
     param.input_length = messageToSign.size();
     secure_app_function_call(SECURE_APP_FUNCTION_SIGN_WITH_DAKEY, &param);
