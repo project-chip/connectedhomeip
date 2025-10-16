@@ -216,7 +216,6 @@ class TC_WebRTCR_2_7(WEBRTCRTestBase):
                 resp = 'Y'
             except TimeoutError:
                 resp = 'N'
-            # Removed unconditional assignment to preserve try/except outcome
         else:
             resp = self.wait_for_user_input(prompt_msg)
 

@@ -15,17 +15,9 @@
 #  limitations under the License.
 #
 
-"""
-Common base class for WebRTC test cases.
-
-This module provides shared functionality for WebRTC Transport Requestor (WEBRTCR)
-and WebRTC Transport Provider (WEBRTCP) test cases, including WebSocket-based
-command sending functionality.
-"""
-
 import logging
-
 import websockets
+
 from matter.testing.matter_testing import MatterBaseTest
 
 # WebSocket server URI for sending commands to the DUT
