@@ -51,6 +51,7 @@ public:
      *
      * @param transportOptions The configuration options of the transport to be allocated
      * @param connectionID The connectionID to allocate
+     * @param peerFabricIndex The FabricIndex to set
      * @return Success if allocation is successful and a PushTransportConnectionID was produced;
      *         otherwise, the command is rejected with Failure
      *
@@ -63,7 +64,7 @@ public:
      */
     virtual Protocols::InteractionModel::Status
     AllocatePushTransport(const PushAvStreamTransport::Structs::TransportOptionsStruct::Type & transportOptions,
-                          const uint16_t connectionID) = 0;
+                          const uint16_t connectionID, FabricIndex peerFabricIndex) = 0;
 
     /**
      * @brief Handles stream transport deallocation for the provided connectionID.
@@ -305,14 +306,6 @@ public:
      * @param server A pointer to the PushAvStreamTransportServer instance.
      */
     virtual void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) = 0;
-
-    /**
-     * @brief Sets the FabricIndex for a specific connection.
-     *
-     * @param connectionID The connectionID to set the FabricIndex for
-     * @param peerFabricIndex The FabricIndex to set
-     */
-    virtual void SetFabricIndexForConnection(uint16_t connectionID, FabricIndex peerFabricIndex) = 0;
 };
 } // namespace Clusters
 } // namespace app

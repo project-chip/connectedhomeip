@@ -848,7 +848,9 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     if (transportOptions.containerOptions.containerType == ContainerFormatEnum::kCmaf &&
         transportOptions.containerOptions.CMAFContainerOptions.HasValue())
     {
-        if (transportOptions.videoStreamID.HasValue() and !transportOptions.videoStreamID.Value().IsNull())
+        // SegmentDuration validation is restricted to video streams because SegmentDuration must be a multiple of KeyFrameInterval.
+        // See spec issue: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/12322
+        if (transportOptionsPtr->videoStreamID.HasValue())
         {
             bool isValidSegmentDuration = mDelegate->ValidateSegmentDuration(
                 transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration, transportOptionsPtr->videoStreamID);
@@ -871,13 +873,13 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    status = mDelegate->AllocatePushTransport(*transportOptionsPtr, connectionID);
+    FabricIndex peerFabricIndex = handler.GetAccessingFabricIndex();
+
+    status = mDelegate->AllocatePushTransport(*transportOptionsPtr, connectionID, peerFabricIndex);
 
     if (status == Status::Success)
     {
         // add connection to CurrentConnections
-        FabricIndex peerFabricIndex = handler.GetAccessingFabricIndex();
-
         TransportConfigurationStorage outTransportConfiguration(connectionID, transportOptionsPtr);
 
         outTransportConfiguration.transportStatus = TransportStatusEnum::kInactive;
@@ -887,8 +889,6 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         UpsertStreamTransportConnection(outTransportConfiguration);
 
         response.transportConfiguration = outTransportConfiguration;
-
-        mDelegate->SetFabricIndexForConnection(connectionID, peerFabricIndex);
 
         // ExpiryTime Handling
         if (transportOptions.expiryTime.HasValue())

@@ -42,7 +42,7 @@ class PushAvStreamTransportManager : public PushAvStreamTransportDelegate
 {
 public:
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
-                                                              const uint16_t connectionID) override;
+                                                              const uint16_t connectionID, FabricIndex peerFabricIndex) override;
 
     Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID) override;
 
@@ -99,11 +99,6 @@ public:
     void SetPushAvStreamTransportServer(PushAvStreamTransportServer * serverLogic) override
     {
         // Store pointer to server logic if needed for implementation
-    }
-
-    void SetFabricIndexForConnection(uint16_t connectionID, FabricIndex peerFabricIndex) override
-    {
-        // Store fabric index if needed for implementation
     }
 
     void Init();

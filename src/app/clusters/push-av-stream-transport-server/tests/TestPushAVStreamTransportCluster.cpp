@@ -215,7 +215,7 @@ class TestPushAVStreamTransportDelegateImpl : public PushAvStreamTransportDelega
 {
 public:
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
-                                                              const uint16_t connectionID) override
+                                                              const uint16_t connectionID, FabricIndex peerFabricIndex) override
     {
         PushAvStream stream{ connectionID, transportOptions, TransportStatusEnum::kInactive,
                              PushAvStreamTransportStatusEnum::kIdle };
@@ -397,11 +397,6 @@ public:
     }
 
     void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) override
-    {
-        // No-op implementation for tests
-    }
-
-    void SetFabricIndexForConnection(uint16_t connectionID, FabricIndex peerFabricIndex) override
     {
         // No-op implementation for tests
     }

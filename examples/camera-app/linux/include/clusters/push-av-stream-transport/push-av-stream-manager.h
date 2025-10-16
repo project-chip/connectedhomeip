@@ -78,7 +78,7 @@ public:
 
     // Add missing override keywords and fix signatures
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
-                                                              const uint16_t connectionID) override;
+                                                              const uint16_t connectionID, FabricIndex peerFabricIndex) override;
 
     Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID) override;
 
@@ -132,8 +132,6 @@ public:
     void HandleZoneTrigger(uint16_t zoneId);
 
     void RecordingStreamPrivacyModeChanged(bool privacyModeEnabled);
-
-    void SetFabricIndexForConnection(uint16_t connectionID, FabricIndex peerFabricIndex) override;
 
     uint64_t OnTriggerActivated(uint8_t fabricIdx, uint8_t sessionGroup, uint16_t connectionID);
 

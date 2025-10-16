@@ -289,7 +289,30 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     upload.mSize                = static_cast<long>(size);
     upload.mBytesRead           = 0;
     struct curl_slist * headers = nullptr;
-    headers                     = curl_slist_append(headers, "Content-Type: application/*");
+
+    // Determine content type based on file extension
+    std::string contentType = "application/*"; // Default fallback
+    
+    // Extract file extension from full path
+    size_t dotPos = data.first.find_last_of('.');
+    if (dotPos != std::string::npos) {
+        std::string extension = data.first.substr(dotPos);
+        if (extension == ".mpd")
+        {
+            contentType = "application/dash+xml"; // Manifest file
+        } 
+        else if (extension == ".m4s") 
+        {
+            contentType = "video/iso.segment"; // Media segment
+        } 
+        else if (extension == ".init") 
+        {
+            contentType = "video/mp4"; // Initialization segment
+        }
+    }
+
+    std::string contentTypeHeader = "Content-Type: " + contentType;
+    headers = curl_slist_append(headers, contentTypeHeader.c_str());
 
     // Extract the filename from the full path
     std::string fullPath = data.first;

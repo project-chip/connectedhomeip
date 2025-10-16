@@ -72,7 +72,8 @@ void PushAvStreamTransportManager::SetPushAvStreamTransportServer(PushAvStreamTr
 }
 
 Protocols::InteractionModel::Status
-PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID)
+PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
+                                                    FabricIndex peerFabricIndex)
 {
     if (mCameraDevice == nullptr)
     {
@@ -87,6 +88,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
 
     mTransportMap[connectionID]->SetPushAvStreamTransportServer(mPushAvStreamTransportServer);
     mTransportMap[connectionID]->SetPushAvStreamTransportManager(this);
+    mTransportMap[connectionID]->SetFabricIndex(peerFabricIndex);
 
     if (mMediaController == nullptr)
     {
@@ -727,11 +729,6 @@ void PushAvStreamTransportManager::OnTriggerDeactivated(uint8_t fabricIdx, uint8
     auto sessionKey    = CreateSessionKey(fabricIdx, sessionGroup);
     auto & sessionInfo = mSessionMap[sessionKey];
     sessionInfo.activeConnectionIDs.erase(connectionID);
-}
-
-void PushAvStreamTransportManager::SetFabricIndexForConnection(uint16_t connectionID, FabricIndex peerFabricIndex)
-{
-    mTransportMap[connectionID].get()->SetFabricIndex(peerFabricIndex);
 }
 
 void PushAvStreamTransportManager::StartSessionMonitor()
