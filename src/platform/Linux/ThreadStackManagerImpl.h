@@ -165,6 +165,7 @@ private:
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 
     bool mAttached;
+    uint8_t mExtendedAddress[8];
 };
 
 inline void ThreadStackManagerImpl::_OnThreadAttachFinished(void)

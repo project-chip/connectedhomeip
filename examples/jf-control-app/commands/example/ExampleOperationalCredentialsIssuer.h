@@ -59,6 +59,12 @@ public:
                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
                                 Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion) override;
 
+    CHIP_ERROR SignICAC(const ByteSpan & icaCsr, FabricId anchorFabricId, MutableByteSpan & icac);
+
+    CHIP_ERROR SignNOC(const ByteSpan & icac, const ByteSpan & nocCsr, MutableByteSpan & noc);
+
+    CHIP_ERROR ObtainICACSR(MutableByteSpan & icaCsr);
+
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override
     {
         mNextRequestedNodeId = nodeId;

@@ -187,7 +187,7 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
         err = mChargingTargets.AllocAndCopy();
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(AppServer, "SetTargets: Failed to allocate memory during LoadTargets %s", chip::ErrorStr(err));
+            ChipLogError(AppServer, "SetTargets: Failed to allocate memory during LoadTargets: %" CHIP_ERROR_FORMAT, err.Format());
             return err;
         }
 
@@ -307,7 +307,8 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
                 CHIP_ERROR err = updatedChargingTargets.AllocAndCopy(newChargingTargetSchedule.chargingTargets);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(AppServer, "SetTargets: Failed to copy the new chargingTargets %s", chip::ErrorStr(err));
+                    ChipLogError(AppServer, "SetTargets: Failed to copy the new chargingTargets: %" CHIP_ERROR_FORMAT,
+                                 err.Format());
                     return err;
                 }
 
@@ -322,7 +323,8 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
                 CHIP_ERROR err = updatedChargingTargets.AllocAndCopy(currentChargingTargetSchedule.chargingTargets);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(AppServer, "SetTargets: Failed to copy the new chargingTargets %s", chip::ErrorStr(err));
+                    ChipLogError(AppServer, "SetTargets: Failed to copy the new chargingTargets: %" CHIP_ERROR_FORMAT,
+                                 err.Format());
                     return err;
                 }
             }
@@ -348,7 +350,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
             CHIP_ERROR err = updatedChargingTargets.AllocAndCopy(newChargingTargetSchedule.chargingTargets);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(AppServer, "SetTargets: Failed to copy the new chargingTargets %s", chip::ErrorStr(err));
+                ChipLogError(AppServer, "SetTargets: Failed to copy the new chargingTargets: %" CHIP_ERROR_FORMAT, err.Format());
                 return err;
             }
 
@@ -374,7 +376,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
         CHIP_ERROR err = SaveTargets(updatedChargingTargetSchedulesList);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(AppServer, "SetTargets: Failed to save Target to persistent storage %s", chip::ErrorStr(err));
+            ChipLogError(AppServer, "SetTargets: Failed to save Target to persistent storage: %" CHIP_ERROR_FORMAT, err.Format());
             return err;
         }
 
@@ -382,7 +384,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
         err = LoadTargets();
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(AppServer, "SetTargets: Failed to load Target from persistent storage %s", chip::ErrorStr(err));
+            ChipLogError(AppServer, "SetTargets: Failed to load Target from persistent storage: %" CHIP_ERROR_FORMAT, err.Format());
             return err;
         }
     }

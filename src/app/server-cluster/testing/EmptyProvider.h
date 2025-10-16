@@ -33,7 +33,6 @@ class EmptyProvider : public app::DataModel::Provider
 public:
     using ActionReturnStatus = app::DataModel::ActionReturnStatus;
 
-    CHIP_ERROR Shutdown() override;
     CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<app::DataModel::EndpointEntry> & builder) override;
 
     CHIP_ERROR SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder) override;
@@ -49,8 +48,8 @@ public:
     CHIP_ERROR GeneratedCommands(const app::ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
     CHIP_ERROR AcceptedCommands(const app::ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> & builder) override;
-    void ListAttributeWriteNotification(const app::ConcreteAttributePath & aPath,
-                                        app::DataModel::ListWriteOperation opType) override
+    void ListAttributeWriteNotification(const app::ConcreteAttributePath & aPath, app::DataModel::ListWriteOperation opType,
+                                        FabricIndex accessingFabric) override
     {}
 
     void Temporary_ReportAttributeChanged(const app::AttributePathParams & path) override;

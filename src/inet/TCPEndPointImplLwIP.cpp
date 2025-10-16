@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -94,7 +94,7 @@ CHIP_ERROR TCPEndPointImplLwIP::ListenImpl(uint16_t backlog)
         // - The Listen EndPoint receives a connection and the connection will use this endpoint. The endpoint will be release when
         // the connection is released.
         // - The Listen Endpoint is closed.
-        err = GetEndPointManager().NewEndPoint(&mPreAllocatedConnectEP);
+        err = GetEndPointManager().NewEndPoint(mPreAllocatedConnectEP);
     }
     if (err == CHIP_NO_ERROR)
     {
@@ -157,7 +157,6 @@ CHIP_ERROR TCPEndPointImplLwIP::ConnectImpl(const IPAddress & addr, uint16_t por
         if (res == CHIP_NO_ERROR)
         {
             mState = State::kConnecting;
-            Retain();
         }
     }
 
@@ -450,12 +449,7 @@ void TCPEndPointImplLwIP::DoCloseImpl(CHIP_ERROR err, State oldState)
         }
     }
 
-    if (mPreAllocatedConnectEP)
-    {
-        // If the Listen EndPoint has a pre-allocated connect EndPoint, release it for the Retain() in the constructor
-        mPreAllocatedConnectEP->Free();
-        mPreAllocatedConnectEP = nullptr;
-    }
+    mPreAllocatedConnectEP.Release();
     if (mState == State::kClosed)
     {
         mUnackedLength = 0;
@@ -638,9 +632,10 @@ void TCPEndPointImplLwIP::HandleDataSent(uint16_t lenSent)
         MarkActive();
 
         // If requested, call the app's OnDataSent callback.
+        TCPEndPointHandle handle(this);
         if (OnDataSent != nullptr)
         {
-            OnDataSent(this, lenSent);
+            OnDataSent(handle, lenSent);
         }
         // If unsent data exists, attempt to send it now...
         if (RemainingToSend() > 0)
@@ -698,7 +693,7 @@ void TCPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && buf)
             // Call the app's OnPeerClose.
             if (OnPeerClose != NULL)
             {
-                OnPeerClose(this);
+                OnPeerClose(*this);
             }
         }
 
@@ -707,7 +702,7 @@ void TCPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && buf)
     }
 }
 
-void TCPEndPointImplLwIP::HandleIncomingConnection(TCPEndPoint * conEP)
+void TCPEndPointImplLwIP::HandleIncomingConnection(const TCPEndPointHandle & conEP)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     IPAddress peerAddr;
@@ -726,24 +721,16 @@ void TCPEndPointImplLwIP::HandleIncomingConnection(TCPEndPoint * conEP)
             err = conEP->GetPeerInfo(&peerAddr, &peerPort);
         }
         // If successful, call the app's callback function.
+        TCPEndPointHandle handle(this);
         if (err == CHIP_NO_ERROR)
         {
-            OnConnectionReceived(this, conEP, peerAddr, peerPort);
+            OnConnectionReceived(handle, conEP, peerAddr, peerPort);
         }
         // Otherwise clean up and call the app's error callback.
         else if (OnAcceptError != nullptr)
         {
-            OnAcceptError(this, err);
+            OnAcceptError(handle, err);
         }
-    }
-    else
-    {
-        err = CHIP_ERROR_INCORRECT_STATE;
-    }
-    // If something failed above, abort and free the connection end point.
-    if (err != CHIP_NO_ERROR)
-    {
-        conEP->Free();
     }
 }
 
@@ -778,14 +765,14 @@ err_t TCPEndPointImplLwIP::LwIPHandleConnectComplete(void * arg, struct tcp_pcb 
         }
 
         // Post callback to HandleConnectComplete.
-        ep->Retain();
+        ep->Ref();
         CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, conErr = System::MapErrorLwIP(lwipErr)] {
             ep->HandleConnectComplete(conErr);
-            ep->Release();
+            ep->Unref();
         });
         if (err != CHIP_NO_ERROR)
         {
-            ep->Release();
+            ep->Unref();
             res = ERR_ABRT;
         }
     }
@@ -823,12 +810,15 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
         //
         if (err == CHIP_NO_ERROR)
         {
-            conEP = static_cast<TCPEndPointImplLwIP *>(listenEP->mPreAllocatedConnectEP);
-            if (conEP == nullptr)
+            if (listenEP->mPreAllocatedConnectEP.IsNull())
             {
                 // The listen endpoint received a new incoming connection before it had a chance to pre-allocate a new connection
                 // endpoint.
                 err = CHIP_ERROR_BUSY;
+            }
+            else
+            {
+                conEP = &static_cast<TCPEndPointImplLwIP &>(*listenEP->mPreAllocatedConnectEP);
             }
         }
 
@@ -849,7 +839,6 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
             conEP->mState            = State::kConnected;
             conEP->mTCP              = tpcb;
             conEP->mLwIPEndPointType = LwIPEndPointType::TCP;
-            conEP->Retain();
 
             // Setup LwIP callback functions for the new PCB.
             tcp_arg(tpcb, conEP);
@@ -858,43 +847,42 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
             tcp_err(tpcb, LwIPHandleError);
 
             // Post a callback to the HandleConnectionReceived() function, passing it the new end point.
-            listenEP->Retain();
-            conEP->Retain();
-            // Hand over the implied ref from constructing mPreAllocatedConnectEP to
-            // ongoing connection.
+            listenEP->Ref();
+            conEP->Ref();
             listenEP->mPreAllocatedConnectEP = nullptr;
 
             err = lSystemLayer.ScheduleLambda([listenEP, conEP] {
-                listenEP->HandleIncomingConnection(conEP);
+                TCPEndPointHandle conn(conEP);
+                listenEP->HandleIncomingConnection(conn);
                 // Pre-allocate another endpoint for next connection if current connection is established
-                CHIP_ERROR error = listenEP->GetEndPointManager().NewEndPoint(&listenEP->mPreAllocatedConnectEP);
+                CHIP_ERROR error = listenEP->GetEndPointManager().NewEndPoint(listenEP->mPreAllocatedConnectEP);
                 if (error != CHIP_NO_ERROR)
                 {
                     listenEP->HandleError(error);
                 }
-                conEP->Release();
-                listenEP->Release();
+                conEP->Unref();
+                listenEP->Unref();
             });
             if (err != CHIP_NO_ERROR)
             {
-                conEP->Release(); // for the Ref in ScheduleLambda
-                listenEP->Release();
+                // for the Ref before ScheduleLambda
+                conEP->Unref();
+                listenEP->Unref();
                 err = CHIP_ERROR_CONNECTION_ABORTED;
-                conEP->Release(); // for the Retain() above
             }
         }
 
         // Otherwise, there was an error accepting the connection, so post a callback to the HandleError function.
         else
         {
-            listenEP->Retain();
+            listenEP->Ref();
             err = lSystemLayer.ScheduleLambda([listenEP, err] {
                 listenEP->HandleError(err);
-                listenEP->Release();
+                listenEP->Unref();
             });
             if (err != CHIP_NO_ERROR)
             {
-                listenEP->Release();
+                listenEP->Unref();
             }
         }
     }
@@ -920,14 +908,14 @@ err_t TCPEndPointImplLwIP::LwIPHandleDataReceived(void * arg, struct tcp_pcb * t
         TCPEndPointImplLwIP * ep = static_cast<TCPEndPointImplLwIP *>(arg);
 
         // Post callback to HandleDataReceived.
-        ep->Retain();
+        ep->Ref();
         CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, p] {
             ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p));
-            ep->Release();
+            ep->Unref();
         });
         if (err != CHIP_NO_ERROR)
         {
-            ep->Release();
+            ep->Unref();
             res = ERR_ABRT;
         }
     }
@@ -957,14 +945,14 @@ err_t TCPEndPointImplLwIP::LwIPHandleDataSent(void * arg, struct tcp_pcb * tpcb,
         TCPEndPointImplLwIP * ep = static_cast<TCPEndPointImplLwIP *>(arg);
 
         // Post callback to HandleDataReceived.
-        ep->Retain();
+        ep->Ref();
         CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, len] {
             ep->HandleDataSent(len);
-            ep->Release();
+            ep->Unref();
         });
         if (err != CHIP_NO_ERROR)
         {
-            ep->Release();
+            ep->Unref();
             res = ERR_ABRT;
         }
     }
@@ -997,14 +985,14 @@ void TCPEndPointImplLwIP::LwIPHandleError(void * arg, err_t lwipErr)
         ep->mLwIPEndPointType = LwIPEndPointType::Unknown;
 
         // Post callback to HandleError.
-        ep->Retain();
+        ep->Ref();
         CHIP_ERROR err = lSystemLayer.ScheduleLambda([ep, conErr = System::MapErrorLwIP(lwipErr)] {
             ep->HandleError(conErr);
-            ep->Release();
+            ep->Unref();
         });
         if (err != CHIP_NO_ERROR)
         {
-            ep->Release();
+            ep->Unref();
         }
     }
 }

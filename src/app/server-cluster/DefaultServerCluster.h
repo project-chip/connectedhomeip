@@ -39,7 +39,13 @@ namespace app {
 class DefaultServerCluster : public ServerClusterInterface
 {
 public:
-    DefaultServerCluster(const ConcreteClusterPath & path);
+    DefaultServerCluster(const ConcreteClusterPath & path) : mPath(path) {}
+
+    constexpr DefaultServerCluster(ConcreteClusterPath && path) :
+        mPath(std::move(path)),
+        mDataVersion(0) // data version will be initialized in startup, however constexpr requires initialization
+    {}
+
     ~DefaultServerCluster() override = default;
 
     //////////////////////////// ServerClusterInterface implementation ////////////////////////////////////////
@@ -108,6 +114,11 @@ protected:
     /// This increases cluster data version and if a cluster context is available it will
     /// notify that the attribute has changed.
     void NotifyAttributeChanged(AttributeId attributeId);
+
+    /// Marks that a specific attribute has changed value, if `status` is success.
+    ///
+    /// Will return `status`
+    DataModel::ActionReturnStatus NotifyAttributeChangedIfSuccess(AttributeId attributeId, DataModel::ActionReturnStatus status);
 
 private:
     DataVersion mDataVersion; // will be random-initialized as per spec

@@ -253,20 +253,10 @@ bool ConnectivityManagerImpl::_IsWiFiStationConnected()
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
-    if (mWpaSupplicant.state != GDBusWpaSupplicant::WpaState::INTERFACE_CONNECTED)
-    {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: _IsWiFiStationConnected: interface not connected");
-        return false;
-    }
-
-    if (g_strcmp0(wpa_supplicant_1_interface_get_state(mWpaSupplicant.iface.get()), "completed") == 0)
-    {
-        mConnectivityFlag.Set(ConnectivityFlags::kHaveIPv4InternetConnectivity)
-            .Set(ConnectivityFlags::kHaveIPv6InternetConnectivity);
-        return true;
-    }
-
-    return false;
+    VerifyOrReturnValue(mWpaSupplicant.iface, false);
+    GAutoPtr<char> state(wpa_supplicant_1_interface_dup_state(mWpaSupplicant.iface.get()));
+    // The "completed" state indicates that we are associated with the access point.
+    return g_strcmp0(state.get(), "completed") == 0;
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled()
@@ -278,36 +268,35 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
-    if (mWpaSupplicant.state != GDBusWpaSupplicant::WpaState::INTERFACE_CONNECTED)
-    {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: _IsWiFiStationProvisioned: interface not connected");
-        return false;
-    }
+    VerifyOrReturnValue(mWpaSupplicant.iface, false);
 
-    const char * bss = wpa_supplicant_1_interface_get_current_bss(mWpaSupplicant.iface.get());
-    return g_str_match_string("BSSs", bss, true);
+    GAutoPtr<GError> err;
+    // WPA supplicant does not emit PropertiesChanged signal for the Networks property, so we can not use our
+    // proxy observer to get the property value. Instead, we need to get it directly using the D-Bus call.
+    const char * ifaceName = g_dbus_proxy_get_interface_name(reinterpret_cast<GDBusProxy *>(mWpaSupplicant.iface.get()));
+    GAutoPtr<GVariant> response(g_dbus_proxy_call_sync(
+        reinterpret_cast<GDBusProxy *>(mWpaSupplicant.iface.get()), "org.freedesktop.DBus.Properties.Get",
+        g_variant_new("(ss)", ifaceName, "Networks"), G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &err.GetReceiver()));
+    VerifyOrReturnValue(response, false,
+                        ChipLogError(DeviceLayer, "WPA supplicant: Failed to get Networks property: %s", err->message));
+
+    // Check whether we have at least one network provisioned.
+    GAutoPtr<GVariant> responseValue(g_variant_get_child_value(response.get(), 0));
+    GAutoPtr<GVariant> networks(g_variant_get_child_value(responseValue.get(), 0));
+    return g_variant_n_children(networks.get()) > 0;
 }
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision()
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
-    if (mWpaSupplicant.state != GDBusWpaSupplicant::WpaState::INTERFACE_CONNECTED)
-    {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: _ClearWiFiStationProvision: interface not connected");
-        return;
-    }
+    VerifyOrReturn(mWpaSupplicant.iface);
+    VerifyOrReturn(mWiFiStationMode != kWiFiStationMode_ApplicationControlled);
 
-    if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
+    GAutoPtr<GError> err;
+    if (!wpa_supplicant_1_interface_call_remove_all_networks_sync(mWpaSupplicant.iface.get(), nullptr, &err.GetReceiver()))
     {
-        GAutoPtr<GError> err;
-        wpa_supplicant_1_interface_call_remove_all_networks_sync(mWpaSupplicant.iface.get(), nullptr, &err.GetReceiver());
-
-        if (err != nullptr)
-        {
-            ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to remove all networks with error: %s",
-                            err ? err->message : "unknown error");
-        }
+        ChipLogProgress(DeviceLayer, "WPA supplicant: Failed to remove all networks: %s", err->message);
     }
 }
 
@@ -372,6 +361,12 @@ void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
 {
     mWiFiAPIdleTimeout = val;
     DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveAPState(); });
+}
+
+void ConnectivityManagerImpl::NotifyWiFiConnectivityChange(ConnectivityChange change)
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kWiFiConnectivityChange, .WiFiConnectivityChange = { .Result = change } };
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 void ConnectivityManagerImpl::UpdateNetworkStatus()
@@ -465,6 +460,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
         }
 
         DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });
+        NotifyWiFiConnectivityChange(kConnectivity_Lost);
 
         mAssociationStarted = false;
     }
@@ -490,6 +486,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
                 ConnectivityMgrImpl().PostNetworkConnect();
             });
         }
+        NotifyWiFiConnectivityChange(kConnectivity_Established);
         mAssociationStarted = false;
     }
 }
@@ -506,8 +503,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
     mWpaSupplicant.iface.reset(wpa_supplicant_1_interface_proxy_new_for_bus_finish(res, &err.GetReceiver()));
     if (mWpaSupplicant.iface && err == nullptr)
     {
-        mWpaSupplicant.state = GDBusWpaSupplicant::WpaState::INTERFACE_CONNECTED;
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant interface proxy");
+        ChipLogProgress(DeviceLayer, "WPA supplicant: connected to wpa_supplicant interface proxy");
 
         g_signal_connect(
             mWpaSupplicant.iface.get(), "g-properties-changed",
@@ -525,8 +521,6 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to create wpa_supplicant interface proxy %s: %s",
                         mWpaSupplicant.interfacePath.get(), err ? err->message : "unknown error");
-
-        mWpaSupplicant.state = GDBusWpaSupplicant::WpaState::NOT_CONNECTED;
     }
 
     // We need to stop auto scan or it will block our network scan.
@@ -534,30 +528,9 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
         CHIP_ERROR errInner = StopAutoScan();
         if (errInner != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "wpa_supplicant: Failed to stop auto scan: %s", ErrorStr(errInner));
+            ChipLogError(DeviceLayer, "wpa_supplicant: Failed to stop auto scan: %" CHIP_ERROR_FORMAT, errInner.Format());
         }
     });
-}
-
-void ConnectivityManagerImpl::_OnWpaBssProxyReady(GObject * sourceObject, GAsyncResult * res)
-{
-    // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
-    // all D-Bus signals will be delivered to the GLib global default main context.
-    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
-
-    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-
-    GAutoPtr<GError> err;
-    mWpaSupplicant.bss.reset(wpa_supplicant_1_bss_proxy_new_for_bus_finish(res, &err.GetReceiver()));
-    if (mWpaSupplicant.bss && err.get() == nullptr)
-    {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant bss proxy");
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to create wpa_supplicant bss proxy %s: %s",
-                        mWpaSupplicant.interfacePath.get(), err ? err->message : "unknown error");
-    }
 }
 
 void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res)
@@ -572,7 +545,6 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * sourceObject, GAsyn
     if (wpa_supplicant_1_call_get_interface_finish(mWpaSupplicant.proxy.get(), &mWpaSupplicant.interfacePath.GetReceiver(), res,
                                                    &err.GetReceiver()))
     {
-        mWpaSupplicant.state = GDBusWpaSupplicant::WpaState::GOT_INTERFACE_PATH;
         ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface: %s", mWpaSupplicant.interfacePath.get());
 
         wpa_supplicant_1_interface_proxy_new_for_bus(
@@ -580,14 +552,6 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * sourceObject, GAsyn
             reinterpret_cast<GAsyncReadyCallback>(
                 +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
                     return self->_OnWpaInterfaceProxyReady(sourceObject_, res_);
-                }),
-            this);
-
-        wpa_supplicant_1_bss_proxy_new_for_bus(
-            G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, mWpaSupplicant.interfacePath.get(), nullptr,
-            reinterpret_cast<GAsyncReadyCallback>(
-                +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
-                    return self->_OnWpaBssProxyReady(sourceObject_, res_);
                 }),
             this);
     }
@@ -609,7 +573,6 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * sourceObject, GAsyn
         if (wpa_supplicant_1_call_create_interface_sync(mWpaSupplicant.proxy.get(), args,
                                                         &mWpaSupplicant.interfacePath.GetReceiver(), nullptr, &err.GetReceiver()))
         {
-            mWpaSupplicant.state = GDBusWpaSupplicant::WpaState::GOT_INTERFACE_PATH;
             ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface: %s", mWpaSupplicant.interfacePath.get());
 
             Platform::CopyString(sWiFiIfName, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
@@ -621,20 +584,11 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * sourceObject, GAsyn
                         return self->_OnWpaInterfaceProxyReady(sourceObject_, res_);
                     }),
                 this);
-
-            wpa_supplicant_1_bss_proxy_new_for_bus(
-                G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, mWpaSupplicant.interfacePath.get(), nullptr,
-                reinterpret_cast<GAsyncReadyCallback>(
-                    +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
-                        return self->_OnWpaBssProxyReady(sourceObject_, res_);
-                    }),
-                this);
         }
         else
         {
             ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to create interface %s: %s",
                             CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, err ? err->message : "unknown error");
-            mWpaSupplicant.state = GDBusWpaSupplicant::WpaState::NO_INTERFACE_PATH;
             mWpaSupplicant.interfacePath.reset();
         }
     }
@@ -656,22 +610,12 @@ void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaSupplicant1 * proxy, const
     mWpaSupplicant.interfacePath.reset(g_strdup(path));
     if (mWpaSupplicant.interfacePath)
     {
-        mWpaSupplicant.state = GDBusWpaSupplicant::WpaState::GOT_INTERFACE_PATH;
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface added: %s", mWpaSupplicant.interfacePath.get());
-
+        ChipLogProgress(DeviceLayer, "WPA supplicant: WiFi interface added: %s", mWpaSupplicant.interfacePath.get());
         wpa_supplicant_1_interface_proxy_new_for_bus(
             G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, mWpaSupplicant.interfacePath.get(), nullptr,
             reinterpret_cast<GAsyncReadyCallback>(
                 +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
                     return self->_OnWpaInterfaceProxyReady(sourceObject_, res_);
-                }),
-            this);
-
-        wpa_supplicant_1_bss_proxy_new_for_bus(
-            G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, mWpaSupplicant.interfacePath.get(), nullptr,
-            reinterpret_cast<GAsyncReadyCallback>(
-                +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
-                    return self->_OnWpaBssProxyReady(sourceObject_, res_);
                 }),
             this);
     }
@@ -682,15 +626,9 @@ void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaSupplicant1 * proxy, con
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     if (g_strcmp0(mWpaSupplicant.interfacePath.get(), path) == 0)
     {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface removed: %s", StringOrNullMarker(path));
-
-        mWpaSupplicant.state = GDBusWpaSupplicant::WpaState::NO_INTERFACE_PATH;
-
+        ChipLogProgress(DeviceLayer, "WPA supplicant: WiFi interface removed: %s", StringOrNullMarker(path));
         mWpaSupplicant.interfacePath.reset();
         mWpaSupplicant.iface.reset();
-        mWpaSupplicant.bss.reset();
-
-        mWpaSupplicant.scanState = GDBusWpaSupplicant::WpaScanningState::IDLE;
     }
 }
 
@@ -706,7 +644,6 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * sourceObject, GAsyncRes
     mWpaSupplicant.proxy.reset(wpa_supplicant_1_proxy_new_for_bus_finish(res, &err.GetReceiver()));
     if (mWpaSupplicant.proxy && err.get() == nullptr)
     {
-        mWpaSupplicant.state = GDBusWpaSupplicant::WpaState::CONNECTED;
         ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant proxy");
 
         g_signal_connect(
@@ -732,7 +669,6 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * sourceObject, GAsyncRes
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to create wpa_supplicant proxy %s",
                         err ? err->message : "unknown error");
-        mWpaSupplicant.state = GDBusWpaSupplicant::WpaState::NOT_CONNECTED;
     }
 }
 
@@ -740,7 +676,6 @@ void ConnectivityManagerImpl::StartWiFiManagement()
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
-    mConnectivityFlag.ClearAll();
     mWpaSupplicant = GDBusWpaSupplicant{};
 
     CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
@@ -778,10 +713,7 @@ CHIP_ERROR ConnectivityManagerImpl::StartWiFiManagementSync()
 bool ConnectivityManagerImpl::IsWiFiManagementStarted()
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-
-    bool ret = mWpaSupplicant.state == GDBusWpaSupplicant::WpaState::INTERFACE_CONNECTED;
-
-    return ret;
+    return !!mWpaSupplicant.iface;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
@@ -893,7 +825,18 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelPublish(uint32_t PublishId)
 
     ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel publish_id: %d ! ", PublishId);
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-    wpa_supplicant_1_interface_call_nancancel_publish_sync(mWpaSupplicant.iface.get(), PublishId, nullptr, &err.GetReceiver());
+
+    VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "WiFi-PAF: Skip D-Bus 'cancel publish' call since wpa_supplicant is not ready"));
+
+    gboolean result =
+        wpa_supplicant_1_interface_call_nancancel_publish_sync(mWpaSupplicant.iface.get(), PublishId, nullptr, &err.GetReceiver());
+
+    // TODO #40814: make sure that the callers do check the return values. This doesn't seem to be happening now.
+    VerifyOrReturnError(
+        result, CHIP_ERROR_INTERNAL,
+        ChipLogError(DeviceLayer, "WiFi-PAF: Failed to Cancel Publish with Error: %s", err ? err->message : "unknown error"));
+
     return CHIP_NO_ERROR;
 }
 #endif
@@ -1015,7 +958,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         SetWiFiAPMode(kWiFiAPMode_Disabled);
-        ChipLogError(DeviceLayer, "Drive AP state failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Drive AP state failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -1146,6 +1089,9 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
         ChipLogError(DeviceLayer, "WPA supplicant: Failed to select network: %s", err->message);
         return CHIP_ERROR_INTERNAL;
     }
+
+    // Network was provisioned successfully - emit a connectivity change event so the application can update its state.
+    NotifyWiFiConnectivityChange(kConnectivity_NoChange);
 
     mpConnectCallback = apCallback;
     return CHIP_NO_ERROR;
@@ -1536,8 +1482,7 @@ void ConnectivityManagerImpl::OnNanSubscribeTerminated(guint subscribe_id, gchar
     /*
         Indicate the connection event
     */
-    ChipDeviceEvent event;
-    event.Type = DeviceEventType::kCHIPoWiFiPAFCancelConnect;
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoWiFiPAFCancelConnect };
     PlatformMgr().PostEventOrDie(&event);
 }
 
@@ -1723,7 +1668,7 @@ void ConnectivityManagerImpl::PostNetworkConnect()
 {
     // Iterate on the network interface to see if we already have beed assigned addresses.
     // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
-    // This should be removed or find a better place once we depercate the rendezvous session.
+    // This should be removed or find a better place once we deprecate the rendezvous session.
     for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
     {
         char ifName[Inet::InterfaceId::kMaxIfNameLength];
@@ -1779,28 +1724,20 @@ void ConnectivityManagerImpl::PostNetworkConnect()
 
 CHIP_ERROR ConnectivityManagerImpl::CommitConfig()
 {
-    gboolean result;
-    GAutoPtr<GError> err;
-
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
-    if (mWpaSupplicant.state != GDBusWpaSupplicant::WpaState::INTERFACE_CONNECTED)
+    VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(DeviceLayer, "WPA supplicant: Saving config");
+
+    GAutoPtr<GError> err;
+    if (!wpa_supplicant_1_interface_call_save_config_sync(mWpaSupplicant.iface.get(), nullptr, &err.GetReceiver()))
     {
-        ChipLogError(DeviceLayer, "wpa_supplicant: CommitConfig: interface proxy not connected");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    ChipLogProgress(DeviceLayer, "wpa_supplicant: save config");
-
-    result = wpa_supplicant_1_interface_call_save_config_sync(mWpaSupplicant.iface.get(), nullptr, &err.GetReceiver());
-
-    if (!result)
-    {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to save config: %s", err ? err->message : "unknown error");
+        ChipLogProgress(DeviceLayer, "WPA supplicant: Failed to save config: %s", err->message);
         return CHIP_ERROR_INTERNAL;
     }
 
-    ChipLogProgress(DeviceLayer, "wpa_supplicant: save config succeeded!");
+    ChipLogProgress(DeviceLayer, "WPA supplicant: Save config succeeded!");
     return CHIP_NO_ERROR;
 }
 
@@ -1849,18 +1786,12 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(MutableByteSpan & value)
 
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(SecurityTypeEnum & securityType)
 {
-    const gchar * mode = nullptr;
-
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
-    if (mWpaSupplicant.state != GDBusWpaSupplicant::WpaState::INTERFACE_CONNECTED)
-    {
-        ChipLogError(DeviceLayer, "wpa_supplicant: GetWiFiSecurityType: interface proxy not connected");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
 
-    mode = wpa_supplicant_1_interface_get_current_auth_mode(mWpaSupplicant.iface.get());
-    ChipLogProgress(DeviceLayer, "wpa_supplicant: current Wi-Fi security type: %s", StringOrNullMarker(mode));
+    const char * mode = wpa_supplicant_1_interface_get_current_auth_mode(mWpaSupplicant.iface.get());
+    ChipLogProgress(DeviceLayer, "WPA supplicant: Current Wi-Fi security type: %s", StringOrNullMarker(mode));
 
     if (strncmp(mode, "WPA-PSK", 7) == 0)
     {
@@ -1933,8 +1864,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::N
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    const gchar * networkPath = wpa_supplicant_1_interface_get_current_network(mWpaSupplicant.iface.get());
-
+    const char * networkPath = wpa_supplicant_1_interface_get_current_network(mWpaSupplicant.iface.get());
     // wpa_supplicant DBus API: if network path of current network is "/", means no networks is currently selected.
     if ((networkPath == nullptr) || (strcmp(networkPath, "/") == 0))
     {
@@ -1943,13 +1873,13 @@ CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::N
 
     GAutoPtr<WpaSupplicant1Network> networkInfo(wpa_supplicant_1_network_proxy_new_for_bus_sync(
         G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, networkPath, nullptr, &err.GetReceiver()));
-    if (networkInfo == nullptr)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
+    VerifyOrReturnError(networkInfo, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "WPA supplicant: Failed to create network proxy: %s", err->message));
 
     network.connected     = wpa_supplicant_1_network_get_enabled(networkInfo.get());
     GVariant * properties = wpa_supplicant_1_network_get_properties(networkInfo.get());
+    VerifyOrReturnError(properties != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
+
     GAutoPtr<GVariant> ssid(g_variant_lookup_value(properties, "ssid", nullptr));
     gsize length;
     const gchar * ssidStr = g_variant_get_string(ssid.get(), &length);
@@ -2143,16 +2073,13 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         return false;
     }
 
-    const guchar * ssidStr       = nullptr;
-    const guchar * bssidBuf      = nullptr;
-    char bssidStr[2 * 6 + 5 + 1] = { 0 };
     gsize ssidLen                = 0;
     gsize bssidLen               = 0;
-    gint16 signal                = wpa_supplicant_1_bss_get_signal(bss.get());
-    guint16 frequency            = wpa_supplicant_1_bss_get_frequency(bss.get());
-
-    ssidStr  = reinterpret_cast<const guchar *>(g_variant_get_fixed_array(ssid.get(), &ssidLen, sizeof(guchar)));
-    bssidBuf = reinterpret_cast<const guchar *>(g_variant_get_fixed_array(bssid.get(), &bssidLen, sizeof(guchar)));
+    char bssidStr[2 * 6 + 5 + 1] = { 0 };
+    auto ssidStr      = reinterpret_cast<const uint8_t *>(g_variant_get_fixed_array(ssid.get(), &ssidLen, sizeof(uint8_t)));
+    auto bssidBuf     = reinterpret_cast<const uint8_t *>(g_variant_get_fixed_array(bssid.get(), &bssidLen, sizeof(uint8_t)));
+    gint16 signal     = wpa_supplicant_1_bss_get_signal(bss.get());
+    guint16 frequency = wpa_supplicant_1_bss_get_frequency(bss.get());
 
     if (bssidLen == 6)
     {
@@ -2161,11 +2088,11 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     }
     else
     {
+        ChipLogError(DeviceLayer, "WPA supplicant: Got a network with incorrect BSSID len: %zd != 6", bssidLen);
         bssidLen = 0;
-        ChipLogError(DeviceLayer, "Got a network with bssid not equals to 6");
     }
-    ChipLogDetail(DeviceLayer, "Network Found: %.*s (%s) Signal:%d", int(ssidLen), StringOrNullMarker((const gchar *) ssidStr),
-                  bssidStr, signal);
+    ChipLogDetail(DeviceLayer, "Network Found: %s (%s) Signal:%d",
+                  NullTerminated(StringOrNullMarker((const gchar *) ssidStr), ssidLen).c_str(), bssidStr, signal);
 
     // A flag for enterprise encryption option to avoid returning open for these networks by mistake
     // TODO: The following code will mistakenly recognize WEP encryption as OPEN network, this should be fixed by reading
@@ -2285,8 +2212,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
 {
     ChipLogProgress(DeviceLayer, "wpa_supplicant: network scan done");
 
-    char ** bsss    = wpa_supplicant_1_interface_dup_bsss(iface);
-    char ** oldBsss = bsss;
+    const char * const * bsss = wpa_supplicant_1_interface_get_bsss(iface);
     if (bsss == nullptr)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: no network found");
@@ -2301,16 +2227,13 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
     }
 
     std::vector<WiFiScanResponse> * networkScanned = new std::vector<WiFiScanResponse>();
-    for (const gchar * bssPath = (bsss != nullptr ? *bsss : nullptr); bssPath != nullptr; bssPath = *(++bsss))
+    for (const char * bssPath = (bsss != nullptr ? *bsss : nullptr); bssPath != nullptr; bssPath = *(++bsss))
     {
         WiFiScanResponse network;
         if (_GetBssInfo(bssPath, network))
         {
-            if (sInterestedSSIDLen == 0)
-            {
-                networkScanned->push_back(network);
-            }
-            else if (network.ssidLen == sInterestedSSIDLen && memcmp(network.ssid, sInterestedSSID, sInterestedSSIDLen) == 0)
+            if (sInterestedSSIDLen == 0 ||
+                (network.ssidLen == sInterestedSSIDLen && memcmp(network.ssid, sInterestedSSID, sInterestedSSIDLen) == 0))
             {
                 networkScanned->push_back(network);
             }
@@ -2318,20 +2241,17 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
     }
 
     DeviceLayer::SystemLayer().ScheduleLambda([this, networkScanned]() {
-        // Note: We cannot post a event in ScheduleLambda since std::vector is not trivial copiable. This results in the use of
-        // const_cast but should be fine for almost all cases, since we actually handled the ownership of this element to this
-        // lambda.
+        // Note: We cannot post an event in ScheduleLambda since std::vector is not trivial copyable.
         if (mpScanCallback != nullptr)
         {
-            LinuxScanResponseIterator<WiFiScanResponse> iter(const_cast<std::vector<WiFiScanResponse> *>(networkScanned));
+            LinuxScanResponseIterator<WiFiScanResponse> iter(networkScanned);
             mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
             mpScanCallback = nullptr;
         }
 
-        delete const_cast<std::vector<WiFiScanResponse> *>(networkScanned);
+        delete networkScanned;
     });
 
-    g_strfreev(oldBsss);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     mPafChannelAvailable = true;
 #endif

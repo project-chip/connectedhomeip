@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@
 /**
  *    @file
  *         This file implements a class for managing client application
- *         user-editable settings on webOS platform.
+ *         user-editable settings on WebOS platform.
  *
  */
 
@@ -36,33 +36,34 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/webos/CHIPWebOSStorage.h>
+#include <platform/webos/CHIPWebOSStorageIni.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-ChipLinuxStorage::ChipLinuxStorage()
+ChipWebOSStorage::ChipWebOSStorage()
 {
     mDirty = false;
 }
 
-ChipLinuxStorage::~ChipLinuxStorage() {}
+ChipWebOSStorage::~ChipWebOSStorage() {}
 
-CHIP_ERROR ChipLinuxStorage::Init(const char * configFile)
+CHIP_ERROR ChipWebOSStorage::Init(const char * configFile)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    ChipLogDetail(DeviceLayer, "ChipLinuxStorage::Init: Using KVS config file: %s", StringOrNullMarker(configFile));
     if (mInitialized)
     {
-        ChipLogError(DeviceLayer, "ChipLinuxStorage::Init: Attempt to re-initialize with KVS config file: %s",
+        ChipLogError(DeviceLayer, "ChipWebOSStorage::Init: Attempt to re-initialize with KVS config file: %s, IGNORING.",
                      StringOrNullMarker(configFile));
         return CHIP_NO_ERROR;
     }
 
+    ChipLogDetail(DeviceLayer, "ChipWebOSStorage::Init: Using KVS config file: %s", StringOrNullMarker(configFile));
+
     mConfigPath.assign(configFile);
-    retval = ChipLinuxStorageIni::Init();
+    retval = ChipWebOSStorageIni::Init();
 
     if (retval == CHIP_NO_ERROR)
     {
@@ -81,7 +82,7 @@ CHIP_ERROR ChipLinuxStorage::Init(const char * configFile)
 
     if (retval == CHIP_NO_ERROR)
     {
-        retval = ChipLinuxStorageIni::AddConfig(mConfigPath);
+        retval = ChipWebOSStorageIni::AddConfig(mConfigPath);
     }
 
     mInitialized = true;
@@ -89,14 +90,14 @@ CHIP_ERROR ChipLinuxStorage::Init(const char * configFile)
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorage::ReadValue(const char * key, bool & val)
+CHIP_ERROR ChipWebOSStorage::ReadValue(const char * key, bool & val)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
     uint32_t result;
 
     mLock.lock();
 
-    retval = ChipLinuxStorageIni::GetUIntValue(key, result);
+    retval = ChipWebOSStorageIni::GetUIntValue(key, result);
     val    = (result != 0);
 
     mLock.unlock();
@@ -104,72 +105,72 @@ CHIP_ERROR ChipLinuxStorage::ReadValue(const char * key, bool & val)
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorage::ReadValue(const char * key, uint16_t & val)
+CHIP_ERROR ChipWebOSStorage::ReadValue(const char * key, uint16_t & val)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
     mLock.lock();
 
-    retval = ChipLinuxStorageIni::GetUInt16Value(key, val);
+    retval = ChipWebOSStorageIni::GetUInt16Value(key, val);
 
     mLock.unlock();
 
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorage::ReadValue(const char * key, uint32_t & val)
+CHIP_ERROR ChipWebOSStorage::ReadValue(const char * key, uint32_t & val)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
     mLock.lock();
 
-    retval = ChipLinuxStorageIni::GetUIntValue(key, val);
+    retval = ChipWebOSStorageIni::GetUIntValue(key, val);
 
     mLock.unlock();
 
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorage::ReadValue(const char * key, uint64_t & val)
+CHIP_ERROR ChipWebOSStorage::ReadValue(const char * key, uint64_t & val)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
     mLock.lock();
 
-    retval = ChipLinuxStorageIni::GetUInt64Value(key, val);
+    retval = ChipWebOSStorageIni::GetUInt64Value(key, val);
 
     mLock.unlock();
 
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorage::ReadValueStr(const char * key, char * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR ChipWebOSStorage::ReadValueStr(const char * key, char * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
     mLock.lock();
 
-    retval = ChipLinuxStorageIni::GetStringValue(key, buf, bufSize, outLen);
+    retval = ChipWebOSStorageIni::GetStringValue(key, buf, bufSize, outLen);
 
     mLock.unlock();
 
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorage::ReadValueBin(const char * key, uint8_t * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR ChipWebOSStorage::ReadValueBin(const char * key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
     mLock.lock();
 
-    retval = ChipLinuxStorageIni::GetBinaryBlobValue(key, buf, bufSize, outLen);
+    retval = ChipWebOSStorageIni::GetBinaryBlobValue(key, buf, bufSize, outLen);
 
     mLock.unlock();
 
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorage::WriteValue(const char * key, bool val)
+CHIP_ERROR ChipWebOSStorage::WriteValue(const char * key, bool val)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
@@ -185,7 +186,7 @@ CHIP_ERROR ChipLinuxStorage::WriteValue(const char * key, bool val)
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorage::WriteValue(const char * key, uint16_t val)
+CHIP_ERROR ChipWebOSStorage::WriteValue(const char * key, uint16_t val)
 {
     char buf[16];
 
@@ -194,7 +195,7 @@ CHIP_ERROR ChipLinuxStorage::WriteValue(const char * key, uint16_t val)
     return WriteValueStr(key, buf);
 }
 
-CHIP_ERROR ChipLinuxStorage::WriteValue(const char * key, uint32_t val)
+CHIP_ERROR ChipWebOSStorage::WriteValue(const char * key, uint32_t val)
 {
     char buf[32];
 
@@ -203,7 +204,7 @@ CHIP_ERROR ChipLinuxStorage::WriteValue(const char * key, uint32_t val)
     return WriteValueStr(key, buf);
 }
 
-CHIP_ERROR ChipLinuxStorage::WriteValue(const char * key, uint64_t val)
+CHIP_ERROR ChipWebOSStorage::WriteValue(const char * key, uint64_t val)
 {
     char buf[64];
 
@@ -212,13 +213,13 @@ CHIP_ERROR ChipLinuxStorage::WriteValue(const char * key, uint64_t val)
     return WriteValueStr(key, buf);
 }
 
-CHIP_ERROR ChipLinuxStorage::WriteValueStr(const char * key, const char * val)
+CHIP_ERROR ChipWebOSStorage::WriteValueStr(const char * key, const char * val)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
     mLock.lock();
 
-    retval = ChipLinuxStorageIni::AddEntry(key, val);
+    retval = ChipWebOSStorageIni::AddEntry(key, val);
 
     mDirty = true;
 
@@ -227,7 +228,7 @@ CHIP_ERROR ChipLinuxStorage::WriteValueStr(const char * key, const char * val)
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * data, size_t dataLen)
+CHIP_ERROR ChipWebOSStorage::WriteValueBin(const char * key, const uint8_t * data, size_t dataLen)
 {
     static const size_t kMaxBlobSize = 5 * 1024;
 
@@ -270,13 +271,13 @@ CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * dat
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorage::ClearValue(const char * key)
+CHIP_ERROR ChipWebOSStorage::ClearValue(const char * key)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
     mLock.lock();
 
-    retval = ChipLinuxStorageIni::RemoveEntry(key);
+    retval = ChipWebOSStorageIni::RemoveEntry(key);
 
     if (retval == CHIP_NO_ERROR)
     {
@@ -292,13 +293,13 @@ CHIP_ERROR ChipLinuxStorage::ClearValue(const char * key)
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorage::ClearAll()
+CHIP_ERROR ChipWebOSStorage::ClearAll()
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
     mLock.lock();
 
-    retval = ChipLinuxStorageIni::RemoveAll();
+    retval = ChipWebOSStorageIni::RemoveAll();
 
     mLock.unlock();
 
@@ -315,20 +316,20 @@ CHIP_ERROR ChipLinuxStorage::ClearAll()
     return retval;
 }
 
-bool ChipLinuxStorage::HasValue(const char * key)
+bool ChipWebOSStorage::HasValue(const char * key)
 {
     bool retval;
 
     mLock.lock();
 
-    retval = ChipLinuxStorageIni::HasValue(key);
+    retval = ChipWebOSStorageIni::HasValue(key);
 
     mLock.unlock();
 
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorage::Commit()
+CHIP_ERROR ChipWebOSStorage::Commit()
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
@@ -336,7 +337,7 @@ CHIP_ERROR ChipLinuxStorage::Commit()
     {
         mLock.lock();
 
-        retval = ChipLinuxStorageIni::CommitConfig(mConfigPath);
+        retval = ChipWebOSStorageIni::CommitConfig(mConfigPath);
 
         mLock.unlock();
     }

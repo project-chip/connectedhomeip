@@ -18,5 +18,8 @@ import("//build_overrides/chip.gni")
 group("ota-requestor") {
   # TODO: DefaultOTARequestor depends on controller, however the cluster server itself does not.
   # Maybe DefaultOTARequestor and related code should have its own source set.
-  public_deps = [ "${chip_root}/src/controller:interactions" ]
+  public_deps = [
+    "${chip_root}/src/app/clusters/basic-information",
+    "${chip_root}/src/controller:interactions",
+  ]
 }

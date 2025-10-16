@@ -48,25 +48,10 @@ enum class TagEntry : uint8_t
 // byte value, 1 byte end struct. 8 Bytes leaves space for potential increase in count_value size.
 static constexpr size_t kPersistentBufferEntryCountBytes = 8;
 
-template <class StorageId, class StorageData>
-struct EndpointEntryCount : public PersistentData<kPersistentBufferEntryCountBytes>
+struct BaseEntryCount : public PersistentData<kPersistentBufferEntryCountBytes>
 {
-    using Serializer = DefaultSerializer<StorageId, StorageData>;
-
-    EndpointId endpoint_id = kInvalidEndpointId;
-    uint8_t count_value    = 0;
-
-    EndpointEntryCount(EndpointId endpoint, uint8_t count = 0) : endpoint_id(endpoint), count_value(count) {}
-    ~EndpointEntryCount() {}
-
-    void Clear() override { count_value = 0; }
-
-    CHIP_ERROR UpdateKey(StorageKeyName & key) const override
-    {
-        VerifyOrReturnError(kInvalidEndpointId != endpoint_id, CHIP_ERROR_INVALID_ARGUMENT);
-        key = Serializer::EndpointEntryCountKey(endpoint_id);
-        return CHIP_NO_ERROR;
-    }
+    uint8_t count_value = 0;
+    BaseEntryCount(uint8_t count = 0) : count_value(count) {}
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
@@ -96,6 +81,26 @@ struct EndpointEntryCount : public PersistentData<kPersistentBufferEntryCountByt
             count_value = 0;
         }
 
+        return CHIP_NO_ERROR;
+    }
+};
+
+template <class StorageId, class StorageData>
+struct EndpointEntryCount : public BaseEntryCount
+{
+    using Serializer = DefaultSerializer<StorageId, StorageData>;
+
+    EndpointId endpoint_id = kInvalidEndpointId;
+
+    EndpointEntryCount(EndpointId endpoint, uint8_t count = 0) : BaseEntryCount(count), endpoint_id(endpoint) {}
+    ~EndpointEntryCount() {}
+
+    void Clear() override { count_value = 0; }
+
+    CHIP_ERROR UpdateKey(StorageKeyName & key) const override
+    {
+        VerifyOrReturnError(kInvalidEndpointId != endpoint_id, CHIP_ERROR_INVALID_ARGUMENT);
+        key = Serializer::EndpointEntryCountKey(endpoint_id);
         return CHIP_NO_ERROR;
     }
 };
@@ -227,11 +232,11 @@ struct FabricEntryData : public PersistentData<kFabricMaxBytes>
         TLV::TLVType fabricEntryContainer;
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, fabricEntryContainer));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagEntry::kEntryCount), entry_count));
+
+        // Storing the entry map
         TLV::TLVType entryMapContainer;
         ReturnErrorOnFailure(
             writer.StartContainer(TLV::ContextTag(TagEntry::kStorageIdArray), TLV::kTLVType_Array, entryMapContainer));
-
-        // Storing the entry map
         for (uint16_t i = 0; i < max_per_fabric; i++)
         {
             TLV::TLVType entryIdContainer;
@@ -240,6 +245,7 @@ struct FabricEntryData : public PersistentData<kFabricMaxBytes>
             ReturnErrorOnFailure(writer.EndContainer(entryIdContainer));
         }
         ReturnErrorOnFailure(writer.EndContainer(entryMapContainer));
+
         return writer.EndContainer(fabricEntryContainer);
     }
 
@@ -275,7 +281,6 @@ struct FabricEntryData : public PersistentData<kFabricMaxBytes>
         CHIP_ERROR err;
         deleted_entries_count = 0;
 
-        Store persistentStore;
         while ((err = reader.Next(TLV::AnonymousTag())) == CHIP_NO_ERROR)
         {
             TLV::TLVType entryIdContainer;
@@ -352,7 +357,8 @@ struct FabricEntryData : public PersistentData<kFabricMaxBytes>
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    CHIP_ERROR SaveEntry(PersistentStorageDelegate & storage, const StorageId & id, const StorageData & data)
+    CHIP_ERROR SaveEntry(PersistentStorageDelegate & storage, const StorageId & id, const StorageData & data,
+                         Store & persistentStore)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         // Look for empty storage space
@@ -360,7 +366,6 @@ struct FabricEntryData : public PersistentData<kFabricMaxBytes>
         EntryIndex index;
         err = this->Find(id, index);
 
-        Store persistentStore;
         // C++ doesn't have const constructors; variable is declared const
         const TypedTableEntryData entry(endpoint_id, fabric_index, const_cast<StorageId &>(id), const_cast<StorageData &>(data),
                                         index);
@@ -509,8 +514,8 @@ private:
     }
 };
 
-template <class StorageId, class StorageData, size_t kIteratorsMax>
-CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::Init(PersistentStorageDelegate & storage)
+template <class StorageId, class StorageData>
+CHIP_ERROR FabricTableImpl<StorageId, StorageData>::Init(PersistentStorageDelegate & storage)
 {
     // Verify the initialized parameter respects the maximum allowed values for entry capacity
     VerifyOrReturnError(mMaxPerFabric <= Serializer::kMaxPerFabric() && mMaxPerEndpoint <= Serializer::kMaxPerEndpoint(),
@@ -519,13 +524,12 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::Init(Persiste
     return CHIP_NO_ERROR;
 }
 
-template <class StorageId, class StorageData, size_t kIteratorsMax>
-void FabricTableImpl<StorageId, StorageData, kIteratorsMax>::Finish()
+template <class StorageId, class StorageData>
+void FabricTableImpl<StorageId, StorageData>::Finish()
 {}
 
-template <class StorageId, class StorageData, size_t kIteratorsMax>
-CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::GetFabricEntryCount(FabricIndex fabric_index,
-                                                                                       uint8_t & entry_count)
+template <class StorageId, class StorageData>
+CHIP_ERROR FabricTableImpl<StorageId, StorageData>::GetFabricEntryCount(FabricIndex fabric_index, uint8_t & entry_count)
 {
     using TypedFabricEntryData = FabricEntryData<StorageId, StorageData, Serializer::kEntryMaxBytes(),
                                                  Serializer::kFabricMaxBytes(), Serializer::kMaxPerFabric()>;
@@ -541,8 +545,8 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::GetFabricEntr
     return CHIP_NO_ERROR;
 }
 
-template <class StorageId, class StorageData, size_t kIteratorsMax>
-CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::GetEndpointEntryCount(uint8_t & entry_count)
+template <class StorageId, class StorageData>
+CHIP_ERROR FabricTableImpl<StorageId, StorageData>::GetEndpointEntryCount(uint8_t & entry_count)
 {
     using TypedEndpointEntryCount = EndpointEntryCount<StorageId, StorageData>;
 
@@ -556,8 +560,8 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::GetEndpointEn
     return CHIP_NO_ERROR;
 }
 
-template <class StorageId, class StorageData, size_t kIteratorsMax>
-CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::SetEndpointEntryCount(const uint8_t & entry_count)
+template <class StorageId, class StorageData>
+CHIP_ERROR FabricTableImpl<StorageId, StorageData>::SetEndpointEntryCount(const uint8_t & entry_count)
 {
     using TypedEndpointEntryCount = EndpointEntryCount<StorageId, StorageData>;
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
@@ -566,9 +570,8 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::SetEndpointEn
     return endpoint_entry_count.Save(mStorage);
 }
 
-template <class StorageId, class StorageData, size_t kIteratorsMax>
-CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::GetRemainingCapacity(FabricIndex fabric_index,
-                                                                                        uint8_t & capacity)
+template <class StorageId, class StorageData>
+CHIP_ERROR FabricTableImpl<StorageId, StorageData>::GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity)
 {
     using TypedFabricEntryData = FabricEntryData<StorageId, StorageData, Serializer::kEntryMaxBytes(),
                                                  Serializer::kFabricMaxBytes(), Serializer::kMaxPerFabric()>;
@@ -604,9 +607,11 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::GetRemainingC
     return CHIP_NO_ERROR;
 }
 
-template <class StorageId, class StorageData, size_t kIteratorsMax>
-CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::SetTableEntry(FabricIndex fabric_index, const StorageId & id,
-                                                                                 const StorageData & data)
+template <class StorageId, class StorageData>
+template <size_t kEntryMaxBytes>
+CHIP_ERROR FabricTableImpl<StorageId, StorageData>::SetTableEntry(FabricIndex fabric_index, const StorageId & id,
+                                                                  const StorageData & data,
+                                                                  PersistentStore<kEntryMaxBytes> & writeBuffer)
 {
     using TypedFabricEntryData = FabricEntryData<StorageId, StorageData, Serializer::kEntryMaxBytes(),
                                                  Serializer::kFabricMaxBytes(), Serializer::kMaxPerFabric()>;
@@ -619,15 +624,14 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::SetTableEntry
     CHIP_ERROR err = fabric.Load(mStorage);
     VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
 
-    err = fabric.SaveEntry(*mStorage, id, data);
+    err = fabric.SaveEntry(*mStorage, id, data, writeBuffer);
     return err;
 }
 
-template <class StorageId, class StorageData, size_t kIteratorsMax>
+template <class StorageId, class StorageData>
 template <size_t kEntryMaxBytes>
-CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::GetTableEntry(FabricIndex fabric_index, StorageId & entry_id,
-                                                                                 StorageData & data,
-                                                                                 PersistentStore<kEntryMaxBytes> & buffer)
+CHIP_ERROR FabricTableImpl<StorageId, StorageData>::GetTableEntry(FabricIndex fabric_index, StorageId & entry_id,
+                                                                  StorageData & data, PersistentStore<kEntryMaxBytes> & buffer)
 {
     using TypedFabricEntryData = FabricEntryData<StorageId, StorageData, Serializer::kEntryMaxBytes(),
                                                  Serializer::kFabricMaxBytes(), Serializer::kMaxPerFabric()>;
@@ -652,9 +656,9 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::GetTableEntry
     return CHIP_NO_ERROR;
 }
 
-template <class StorageId, class StorageData, size_t kIteratorsMax>
-CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::FindTableEntry(FabricIndex fabric_index,
-                                                                                  const StorageId & entry_id, EntryIndex & idx)
+template <class StorageId, class StorageData>
+CHIP_ERROR FabricTableImpl<StorageId, StorageData>::FindTableEntry(FabricIndex fabric_index, const StorageId & entry_id,
+                                                                   EntryIndex & idx)
 {
     using TypedFabricEntryData = FabricEntryData<StorageId, StorageData, Serializer::kEntryMaxBytes(),
                                                  Serializer::kFabricMaxBytes(), Serializer::kMaxPerFabric()>;
@@ -668,9 +672,8 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::FindTableEntr
     return CHIP_NO_ERROR;
 }
 
-template <class StorageId, class StorageData, size_t kIteratorsMax>
-CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::RemoveTableEntry(FabricIndex fabric_index,
-                                                                                    const StorageId & entry_id)
+template <class StorageId, class StorageData>
+CHIP_ERROR FabricTableImpl<StorageId, StorageData>::RemoveTableEntry(FabricIndex fabric_index, const StorageId & entry_id)
 {
     using TypedFabricEntryData = FabricEntryData<StorageId, StorageData, Serializer::kEntryMaxBytes(),
                                                  Serializer::kFabricMaxBytes(), Serializer::kMaxPerFabric()>;
@@ -688,10 +691,9 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::RemoveTableEn
 /// @param fabric_index Fabric in which the entry belongs
 /// @param entry_idx Position in the Table
 /// @return CHIP_NO_ERROR if removal was successful, errors if failed to remove the entry or to update the fabric after removing it
-template <class StorageId, class StorageData, size_t kIteratorsMax>
-CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::RemoveTableEntryAtPosition(EndpointId endpoint,
-                                                                                              FabricIndex fabric_index,
-                                                                                              EntryIndex entry_idx)
+template <class StorageId, class StorageData>
+CHIP_ERROR FabricTableImpl<StorageId, StorageData>::RemoveTableEntryAtPosition(EndpointId endpoint, FabricIndex fabric_index,
+                                                                               EntryIndex entry_idx)
 {
     using TypedFabricEntryData = FabricEntryData<StorageId, StorageData, Serializer::kEntryMaxBytes(),
                                                  Serializer::kFabricMaxBytes(), Serializer::kMaxPerFabric()>;
@@ -709,8 +711,8 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::RemoveTableEn
     return fabric.RemoveEntry(*mStorage, entryId);
 }
 
-template <class StorageId, class StorageData, size_t kIteratorsMax>
-CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::RemoveFabric(FabricIndex fabric_index)
+template <class StorageId, class StorageData>
+CHIP_ERROR FabricTableImpl<StorageId, StorageData>::RemoveFabric(FabricIndex fabric_index)
 {
     using TypedFabricEntryData = FabricEntryData<StorageId, StorageData, Serializer::kEntryMaxBytes(),
                                                  Serializer::kFabricMaxBytes(), Serializer::kMaxPerFabric()>;
@@ -747,8 +749,8 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::RemoveFabric(
     return CHIP_NO_ERROR;
 }
 
-template <class StorageId, class StorageData, size_t kIteratorsMax>
-CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::RemoveEndpoint()
+template <class StorageId, class StorageData>
+CHIP_ERROR FabricTableImpl<StorageId, StorageData>::RemoveEndpoint()
 {
     using TypedFabricEntryData = FabricEntryData<StorageId, StorageData, Serializer::kEntryMaxBytes(),
                                                  Serializer::kFabricMaxBytes(), Serializer::kMaxPerFabric()>;
@@ -780,14 +782,14 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData, kIteratorsMax>::RemoveEndpoin
     return CHIP_NO_ERROR;
 }
 
-template <class StorageId, class StorageData, size_t kIteratorsMax>
-void FabricTableImpl<StorageId, StorageData, kIteratorsMax>::SetEndpoint(EndpointId endpoint)
+template <class StorageId, class StorageData>
+void FabricTableImpl<StorageId, StorageData>::SetEndpoint(EndpointId endpoint)
 {
     mEndpointId = endpoint;
 }
 
-template <class StorageId, class StorageData, size_t kIteratorsMax>
-void FabricTableImpl<StorageId, StorageData, kIteratorsMax>::SetTableSize(uint16_t endpointTableSize, uint16_t maxPerFabric)
+template <class StorageId, class StorageData>
+void FabricTableImpl<StorageId, StorageData>::SetTableSize(uint16_t endpointTableSize, uint16_t maxPerFabric)
 {
     // Verify the endpoint passed size respects the limits of the device configuration
     VerifyOrDie(Serializer::kMaxPerFabric() > 0);
@@ -796,11 +798,24 @@ void FabricTableImpl<StorageId, StorageData, kIteratorsMax>::SetTableSize(uint16
     mMaxPerFabric   = std::min(endpointTableSize, std::min(Serializer::kMaxPerFabric(), maxPerFabric));
 }
 
-template <class StorageId, class StorageData, size_t kIteratorsMax>
-FabricTableImpl<StorageId, StorageData, kIteratorsMax>::EntryIteratorImpl::EntryIteratorImpl(
-    FabricTableImpl & provider, FabricIndex fabricIdx, EndpointId endpoint, uint16_t maxPerFabric, uint16_t maxPerEndpoint) :
+template <class StorageId, class StorageData>
+template <size_t kEntryMaxBytes, class UnaryFunc>
+CHIP_ERROR FabricTableImpl<StorageId, StorageData>::IterateEntries(FabricIndex fabric, PersistentStore<kEntryMaxBytes> & store,
+                                                                   UnaryFunc iterateFn)
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
+
+    EntryIteratorImpl<kEntryMaxBytes> iterator(*this, fabric, mEndpointId, mMaxPerFabric, mMaxPerEndpoint, store);
+    return iterateFn(iterator);
+}
+
+template <class StorageId, class StorageData>
+template <size_t kEntryMaxBytes>
+FabricTableImpl<StorageId, StorageData>::EntryIteratorImpl<kEntryMaxBytes>::EntryIteratorImpl(
+    FabricTableImpl & provider, FabricIndex fabricIdx, EndpointId endpoint, uint16_t maxPerFabric, uint16_t maxPerEndpoint,
+    PersistentStore<kEntryMaxBytes> & store) :
     mProvider(provider),
-    mFabric(fabricIdx), mEndpoint(endpoint), mMaxPerFabric(maxPerFabric), mMaxPerEndpoint(maxPerEndpoint)
+    mStore(store), mFabric(fabricIdx), mEndpoint(endpoint), mMaxPerFabric(maxPerFabric), mMaxPerEndpoint(maxPerEndpoint)
 {
     using TypedFabricEntryData = FabricEntryData<StorageId, StorageData, Serializer::kEntryMaxBytes(),
                                                  Serializer::kFabricMaxBytes(), Serializer::kMaxPerFabric()>;
@@ -811,14 +826,16 @@ FabricTableImpl<StorageId, StorageData, kIteratorsMax>::EntryIteratorImpl::Entry
     mEntryIndex   = 0;
 }
 
-template <class StorageId, class StorageData, size_t kIteratorsMax>
-size_t FabricTableImpl<StorageId, StorageData, kIteratorsMax>::EntryIteratorImpl::Count()
+template <class StorageId, class StorageData>
+template <size_t kEntryMaxBytes>
+size_t FabricTableImpl<StorageId, StorageData>::EntryIteratorImpl<kEntryMaxBytes>::Count()
 {
     return mTotalEntries;
 }
 
-template <class StorageId, class StorageData, size_t kIteratorsMax>
-bool FabricTableImpl<StorageId, StorageData, kIteratorsMax>::EntryIteratorImpl::Next(TableEntry & output)
+template <class StorageId, class StorageData>
+template <size_t kEntryMaxBytes>
+bool FabricTableImpl<StorageId, StorageData>::EntryIteratorImpl<kEntryMaxBytes>::Next(TableEntry & output)
 {
     using TypedFabricEntryData = FabricEntryData<StorageId, StorageData, Serializer::kEntryMaxBytes(),
                                                  Serializer::kFabricMaxBytes(), Serializer::kMaxPerFabric()>;
@@ -828,13 +845,12 @@ bool FabricTableImpl<StorageId, StorageData, kIteratorsMax>::EntryIteratorImpl::
     VerifyOrReturnError(fabric.Load(mProvider.mStorage) == CHIP_NO_ERROR, false);
 
     // looks for next available entry
-    PersistentStore<Serializer::kEntryMaxBytes()> persistentStore;
     while (mEntryIndex < mMaxPerFabric)
     {
         if (fabric.entry_map[mEntryIndex].IsValid())
         {
             TableEntryData<StorageId, StorageData> entry(mEndpoint, mFabric, output.mStorageId, output.mStorageData, mEntryIndex);
-            VerifyOrReturnError(persistentStore.Load(entry, mProvider.mStorage) == CHIP_NO_ERROR, false);
+            VerifyOrReturnError(mStore.Load(entry, mProvider.mStorage) == CHIP_NO_ERROR, false);
             mEntryIndex++;
 
             return true;
@@ -846,8 +862,9 @@ bool FabricTableImpl<StorageId, StorageData, kIteratorsMax>::EntryIteratorImpl::
     return false;
 }
 
-template <class StorageId, class StorageData, size_t kIteratorsMax>
-void FabricTableImpl<StorageId, StorageData, kIteratorsMax>::EntryIteratorImpl::Release()
+template <class StorageId, class StorageData>
+template <size_t kEntryMaxBytes>
+void FabricTableImpl<StorageId, StorageData>::EntryIteratorImpl<kEntryMaxBytes>::Release()
 {}
 } // namespace Storage
 } // namespace app

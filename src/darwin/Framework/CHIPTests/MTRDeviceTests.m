@@ -32,6 +32,7 @@
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
+#import "MTRSecureCodingTestHelpers.h"
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestControllerDelegate.h"
@@ -3329,41 +3330,21 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
 }
 
-- (NSData *)_encodeEncodable:(id<NSSecureCoding>)encodable
-{
-    // We know all our encodables are in fact NSObject.
-    NSObject * obj = (NSObject *) encodable;
-
-    NSError * encodeError;
-    NSData * encodedData = [NSKeyedArchiver archivedDataWithRootObject:encodable requiringSecureCoding:YES error:&encodeError];
-    XCTAssertNil(encodeError, @"Failed to encode %@", NSStringFromClass(obj.class));
-    return encodedData;
-}
-
 - (void)doEncodeDecodeRoundTrip:(id<NSSecureCoding>)encodable
 {
-    NSData * encodedData = [self _encodeEncodable:encodable];
-
     // We know all our encodables are in fact NSObject.
     NSObject * obj = (NSObject *) encodable;
 
     NSError * decodeError;
-    id decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:obj.class] fromData:encodedData error:&decodeError];
+    id decodedValue = RoundTripEncodable(encodable, &decodeError);
     XCTAssertNil(decodeError, @"Failed to decode %@", NSStringFromClass([obj class]));
-    XCTAssertTrue([decodedValue isKindOfClass:obj.class], @"Expected %@ but got %@", NSStringFromClass(obj.class), NSStringFromClass([decodedValue class]));
-
     XCTAssertEqualObjects(obj, decodedValue, @"Decoding for %@ did not round-trip correctly", NSStringFromClass([obj class]));
 }
 
 - (void)_ensureDecodeFails:(id<NSSecureCoding>)encodable
 {
-    NSData * encodedData = [self _encodeEncodable:encodable];
-
-    // We know all our encodables are in fact NSObject.
-    NSObject * obj = (NSObject *) encodable;
-
     NSError * decodeError;
-    id decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:obj.class] fromData:encodedData error:&decodeError];
+    id decodedValue = RoundTripEncodable(encodable, &decodeError);
     XCTAssertNil(decodedValue);
     XCTAssertNotNil(decodeError);
 }
@@ -4485,7 +4466,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Delegate 4
     XCTestExpectation * gotReportEnd4 = [self expectationWithDescription:@"Report end for delegate 4"];
     __auto_type * delegate4 = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
-    delegate3.skipSetupSubscription = YES;
+    delegate4.skipSetupSubscription = YES;
     __weak __auto_type weakDelegate4 = delegate4;
     __block NSUInteger attributesReceived4 = 0;
     delegate4.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
@@ -6217,7 +6198,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Now we can set up waiting for onSubscriptionPoolWorkComplete from the test
     XCTestExpectation * subscriptionPoolWorkCompleteForTriggerTestExpectation = [self expectationWithDescription:@"_triggerResubscribeWithReason work completed"];
+    __weak __auto_type weakDelegate = delegate;
     delegate.onSubscriptionPoolWorkComplete = ^{
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onSubscriptionPoolWorkComplete = nil;
         [subscriptionPoolWorkCompleteForTriggerTestExpectation fulfill];
     };
 
@@ -6322,6 +6306,31 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         // always waiting for at least a minute every time we don't expect onUTCTimeset to be called.
         [self waitForExpectations:@[ correctedTime ] timeout:10];
     }
+}
+
+- (void)test050_readAttributePaths_withWildCardPath
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    // read wildcard values
+    NSArray * values = [device readAttributePaths:@[ [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:nil attributeID:nil] ]];
+
+    XCTAssertNotNil(values);
+    // Conservatively assume all-clusters-app has more than 100 attributes ready by MTRDevice by subscription establishment time (last count 1308)
+    XCTAssertGreaterThan(values.count, 100);
 }
 
 @end

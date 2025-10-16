@@ -66,8 +66,8 @@ exclude:
     - "third_party/nanopb/repo/**/*"
     - "examples/android/CHIPTool/gradlew" # gradle wrapper generated file
     - "third_party/android_deps/gradlew" # gradle wrapper generated file
-    - "src/controller/python/chip/clusters/Objects.py" # generated file, no point to restyle
-    - "src/controller/python/chip/clusters/CHIPClusters.py" # generated file, no point to restyle
+    - "src/controller/python/matter/clusters/Objects.py" # generated file, no point to restyle
+    - "src/controller/python/matter/clusters/CHIPClusters.py" # generated file, no point to restyle
     - "scripts/py_matter_idl/matter/idl/tests/outputs/**/*" # Matches generated output 1:1
     - "scripts/tools/zap/tests/outputs/**/*" # Matches generated output 1:1
     - "examples/chef/sample_app_util/test_files/*.yaml"
@@ -224,7 +224,7 @@ restylers:
           - "**/*.sh"
           - "**/*.bash"
     - name: autopep8
-      image: restyled/restyler-autopep8:v2.0.0
+      image: restyled/restyler-autopep8:v2.3.1
       command:
           - autopep8
           - "--in-place"

@@ -16,6 +16,8 @@
  */
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
 
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <lib/support/CodeUtils.h>
 
@@ -66,7 +68,7 @@ using namespace chip::app::Clusters::SoftwareDiagnostics;
 
 CHIP_ERROR SoftwareDiagnosticsLogic::ReadThreadMetrics(AttributeValueEncoder & encoder) const
 {
-    AutoFreeThreadMetrics metrics(GetDiagnosticDataProvider());
+    AutoFreeThreadMetrics metrics(DeviceLayer::GetDiagnosticDataProvider());
 
     if (metrics.ReadThreadMetrics() != CHIP_NO_ERROR)
     {
@@ -85,7 +87,8 @@ CHIP_ERROR SoftwareDiagnosticsLogic::ReadThreadMetrics(AttributeValueEncoder & e
 
 CHIP_ERROR SoftwareDiagnosticsLogic::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (mEnabledAttributes.enableCurrentWatermarks && GetDiagnosticDataProvider().SupportsWatermarks())
+    if (mOptionalAttributeSet.IsSet(Attributes::CurrentHeapHighWatermark::Id) &&
+        DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
     {
         static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = { Commands::ResetWatermarks::kMetadataEntry };
         return builder.ReferenceExisting(kAcceptedCommands);
@@ -97,31 +100,18 @@ CHIP_ERROR SoftwareDiagnosticsLogic::AcceptedCommands(ReadOnlyBufferBuilder<Data
 
 CHIP_ERROR SoftwareDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    // ensure we have space for all attributes. We may add at most 4 attributes (which are ALL optional or
-    // guarded by feature maps)
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(4 + DefaultServerCluster::GlobalAttributes().size()));
+    AttributeListBuilder listBuilder(builder);
 
-    if (mEnabledAttributes.enableThreadMetrics)
-    {
-        ReturnErrorOnFailure(builder.Append(Attributes::ThreadMetrics::kMetadataEntry));
-    }
+    static constexpr DataModel::AttributeEntry optionalEntries[] = {
+        //
+        Attributes::ThreadMetrics::kMetadataEntry,            //
+        Attributes::CurrentHeapFree::kMetadataEntry,          //
+        Attributes::CurrentHeapUsed::kMetadataEntry,          //
+        Attributes::CurrentHeapHighWatermark::kMetadataEntry, //
+    };
 
-    if (mEnabledAttributes.enableCurrentHeapFree)
-    {
-        ReturnErrorOnFailure(builder.Append(Attributes::CurrentHeapFree::kMetadataEntry));
-    }
-
-    if (mEnabledAttributes.enableCurrentHeapUsed)
-    {
-        ReturnErrorOnFailure(builder.Append(Attributes::CurrentHeapUsed::kMetadataEntry));
-    }
-
-    if (mEnabledAttributes.enableCurrentWatermarks)
-    {
-        ReturnErrorOnFailure(builder.Append(Attributes::CurrentHeapHighWatermark::kMetadataEntry));
-    }
-
-    return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
+    return listBuilder.Append(Span(SoftwareDiagnostics::Attributes::kMandatoryMetadata), Span(optionalEntries),
+                              mOptionalAttributeSet);
 }
 
 } // namespace Clusters

@@ -85,8 +85,9 @@
 #endif                                                       // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-#include <app/server/JointFabricDatastore.h> //nogncheck
-#endif                                       // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+#include <app/server/JointFabricAdministrator.h> //nogncheck
+#include <app/server/JointFabricDatastore.h>     //nogncheck
+#endif                                           // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
 namespace chip {
 
@@ -114,6 +115,10 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                               ,
                                               chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>
+#if INET_CONFIG_ENABLE_IPV4
+                                              ,
+                                              chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>
+#endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
                                               ,
@@ -206,6 +211,8 @@ struct ServerInitParams
     // data model it wants to use. Backwards-compatibility can use `CodegenDataModelProviderInstance`
     // for ember/zap-generated models.
     chip::app::DataModel::Provider * dataModelProvider = nullptr;
+
+    bool advertiseCommissionableIfNoFabrics = CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART;
 };
 
 /**
@@ -431,6 +438,7 @@ public:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     app::JointFabricDatastore & GetJointFabricDatastore() { return mJointFabricDatastore; }
+    app::JointFabricAdministrator & GetJointFabricAdministrator() { return mJointFabricAdministrator; }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -714,6 +722,7 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     app::JointFabricDatastore mJointFabricDatastore;
+    app::JointFabricAdministrator mJointFabricAdministrator;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     TestEventTriggerDelegate * mTestEventTriggerDelegate;

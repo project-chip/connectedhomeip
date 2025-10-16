@@ -175,6 +175,16 @@ Example command:
 Use the out-of-band messages, chip-tool messages and the state machine diagram
 to transition to the required states.
 
+#### TC 2.5
+
+PIXIT: `PIXIT.RVCOPSTATE.RUNMODE_CLEANMODE:1`
+
+Example command:
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCOPSTATE_2_5.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --int-arg PIXIT.RVCOPSTATE.RUNMODE_CLEANMODE:1"`
+
+Use the out-of-band messages, chip-tool messages and the state machine diagram
+to transition to the required states.
+
 ### Running the yaml tests
 
 After commissioning the device, all the yaml tests can be run by running the

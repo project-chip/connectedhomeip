@@ -5,8 +5,9 @@
 
 # Ideally, core build scripts should depend only on the standard library.
 
-# scripts/build
+# scripts/build, scripts/codegen, py_matter_idl
 click
-click-option-group
-
--e ${PW_PROJECT_ROOT}/scripts/py_matter_idl
+coloredlogs
+jinja2
+lark
+python-path

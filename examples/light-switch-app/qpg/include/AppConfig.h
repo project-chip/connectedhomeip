@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+#pragma once
 
-// Mapping of Functional buttons
+#define BASE_APP_BUILD 0
 
-#endif // APP_CONFIG_H
+// This define activates the Identify cluster configuration on endpoint 2 in BaseAppTask.cpp
+#define ACTIVATE_IDENTIFY_ON_EP2 1

@@ -44,9 +44,10 @@ enum class CommssionAdvertiseMode : uint8_t
 
 enum class CommissioningMode
 {
-    kDisabled,       // Commissioning Mode is disabled, CM=0 in DNS-SD key/value pairs
-    kEnabledBasic,   // Basic Commissioning Mode, CM=1 in DNS-SD key/value pairs
-    kEnabledEnhanced // Enhanced Commissioning Mode, CM=2 in DNS-SD key/value pairs
+    kDisabled,           // Commissioning Mode is disabled, CM=0 in DNS-SD key/value pairs
+    kEnabledBasic,       // Basic Commissioning Mode, CM=1 in DNS-SD key/value pairs
+    kEnabledEnhanced,    // Enhanced Commissioning Mode, CM=2 in DNS-SD key/value pairs
+    kEnabledJointFabric, // Joint Fabric Commissioning Mode, CM=3 in DNS-SD key/value pairs
 };
 
 enum class ICDModeAdvertise : uint8_t

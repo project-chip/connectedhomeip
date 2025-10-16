@@ -1,0 +1,79 @@
+diff --color -bur hypercorn/asyncio/tcp_server.py hypercorn/asyncio/tcp_server.py
+--- hypercorn/asyncio/tcp_server.py     2025-06-02 09:30:41
++++ hypercorn/asyncio/tcp_server.py     2025-05-29 16:50:34
+@@ -47,11 +47,16 @@
+             server = parse_socket_addr(socket.family, socket.getsockname())
+             ssl_object = self.writer.get_extra_info("ssl_object")
+             if ssl_object is not None:
+-                ssl = True
++                ssl = {} # Changed
+                 alpn_protocol = ssl_object.selected_alpn_protocol()
+             else:
+-                ssl = False
++                ssl = None # Changed
+                 alpn_protocol = "http/1.1"
++
++            # Changed
++            client_certificate = ssl_object.getpeercert()
++            if client_certificate:
++                ssl["client_certificate"] = client_certificate
+ 
+             async with TaskGroup(self.loop) as task_group:
+                 self._task_group = task_group
+diff --color -bur hypercorn/protocol/__init__.py hypercorn/protocol/__init__.py
+--- hypercorn/protocol/__init__.py      2025-06-02 09:30:41
++++ hypercorn/protocol/__init__.py      2025-05-29 16:50:42
+@@ -17,7 +17,7 @@
+         context: WorkerContext,
+         task_group: TaskGroup,
+         state: ConnectionState,
+-        ssl: bool,
++        ssl: Optional[dict[str, Any]], # Changed
+         client: Optional[Tuple[str, int]],
+         server: Optional[Tuple[str, int]],
+         send: Callable[[Event], Awaitable[None]],
+diff --color -bur hypercorn/protocol/h2.py hypercorn/protocol/h2.py
+--- hypercorn/protocol/h2.py    2025-06-02 09:30:41
++++ hypercorn/protocol/h2.py    2025-05-29 16:50:57
+@@ -86,7 +86,7 @@
+         context: WorkerContext,
+         task_group: TaskGroup,
+         connection_state: ConnectionState,
+-        ssl: bool,
++        ssl: Optional[dict[str, Any]], # Changed
+         client: Optional[Tuple[str, int]],
+         server: Optional[Tuple[str, int]],
+         send: Callable[[Event], Awaitable[None]],
+diff --color -bur hypercorn/protocol/http_stream.py hypercorn/protocol/http_stream.py
+--- hypercorn/protocol/http_stream.py   2025-06-02 09:30:41
++++ hypercorn/protocol/http_stream.py   2025-05-29 16:51:17
+@@ -53,7 +53,7 @@
+         config: Config,
+         context: WorkerContext,
+         task_group: TaskGroup,
+-        ssl: bool,
++        ssl: Optional[dict[str, Any]], # Changed
+         client: Optional[Tuple[str, int]],
+         server: Optional[Tuple[str, int]],
+         send: Callable[[Event], Awaitable[None]],
+@@ -67,7 +67,8 @@
+         self.response: HTTPResponseStartEvent
+         self.scope: HTTPScope
+         self.send = send
+-        self.scheme = "https" if ssl else "http"
++        self.scheme = "https" if ssl is not None else "http" # Changed
++        self.ssl = ssl # Changed
+         self.server = server
+         self.start_time: float
+         self.state = ASGIHTTPState.REQUEST
+@@ -109,6 +110,10 @@
+ 
+             if event.http_version in EARLY_HINTS_VERSIONS:
+                 self.scope["extensions"]["http.response.early_hint"] = {}
++
++            # Changed
++            if self.ssl is not None:
++                self.scope["extensions"]["ssl"] = self.ssl
+ 
+             if valid_server_name(self.config, event):
+                 self.app_put = await self.task_group.spawn_app(

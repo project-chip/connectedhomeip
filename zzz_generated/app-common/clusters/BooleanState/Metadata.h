@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,14 +20,26 @@ namespace BooleanState {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace StateValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(StateValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace StateValue
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    StateValue::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {
+namespace StateChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace StateChange
+
+} // namespace Events
 } // namespace BooleanState
 } // namespace Clusters
 } // namespace app

@@ -37,8 +37,10 @@ public:
     virtual bool GetGPIO(uint32_t port, uint32_t pin) { return false; }
     virtual uint32_t GetRebootCause() = 0;
 
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
     // Scheduler
     virtual void StartScheduler(void) = 0;
+#endif // SL_CATALOG_CUSTOM_MAIN_PRESENT
 
     // Buttons
     typedef void (*SilabsButtonCb)(uint8_t, uint8_t);

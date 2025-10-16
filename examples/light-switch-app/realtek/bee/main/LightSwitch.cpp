@@ -35,7 +35,7 @@ void LightSwitch::Init()
 
 void LightSwitch::InitiateActionSwitch(chip::EndpointId endpointId, uint8_t action)
 {
-    BindingTable & bindingTable = BindingTable::GetInstance();
+    Binding::Table & bindingTable = Binding::Table::GetInstance();
     if (!bindingTable.Size())
     {
         ChipLogError(DeviceLayer, "bindingTable empty");
@@ -51,7 +51,7 @@ void LightSwitch::InitiateActionSwitch(chip::EndpointId endpointId, uint8_t acti
 
         for (auto & entry : bindingTable)
         {
-            if (endpointId == entry.local && MATTER_MULTICAST_BINDING == entry.type)
+            if (endpointId == entry.local && Binding::MATTER_MULTICAST_BINDING == entry.type)
             {
                 data->IsGroup = true;
                 break;
@@ -105,7 +105,7 @@ void LightSwitch::GenericSwitchReleasePress()
 #if CONFIG_ENABLE_ATTRIBUTE_SUBSCRIBE
 void LightSwitch::SubscribeRequestForOneNode(chip::EndpointId endpointId)
 {
-    BindingTable & bindingTable = BindingTable::GetInstance();
+    Binding::Table & bindingTable = Binding::Table::GetInstance();
 
     if (!bindingTable.Size())
     {
@@ -117,7 +117,7 @@ void LightSwitch::SubscribeRequestForOneNode(chip::EndpointId endpointId)
 
 void LightSwitch::ShutdownSubscribeRequestForOneNode(chip::EndpointId endpointId)
 {
-    BindingTable & bindingTable = BindingTable::GetInstance();
+    Binding::Table & bindingTable = Binding::Table::GetInstance();
     for (auto & entry : bindingTable)
     {
         ChipLogError(DeviceLayer, "entry.local %d", entry.local);

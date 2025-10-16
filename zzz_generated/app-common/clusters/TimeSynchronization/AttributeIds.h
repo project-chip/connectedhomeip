@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace TimeSynchronization {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 18;
+
 namespace UTCTime {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace UTCTime

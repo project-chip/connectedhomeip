@@ -29,9 +29,6 @@ config("openthread_mcxw71_config") {
   defines = [
     "OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1",
     "OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE=1",
-    "MBEDTLS_ENTROPY_HARDWARE_ALT=1",
-    "MBEDTLS_THREADING_C=1",
-    "MBEDTLS_THREADING_ALT=1",
   ]
 
   if (chip_mdns == "platform") {
@@ -54,6 +51,12 @@ config("openthread_mcxw71_config") {
     defines += [ "OT_PLAT_SAVE_NVM_DATA_ON_IDLE=0" ]
   } else if (nxp_nvm_component == "nvs") {
     defines += [ "CONFIG_SETTINGS_RUNTIME=1" ]
+  }
+
+  # When CLI is enabled, device log is being moved over to UART0 (auxiliary
+  # serial port) so that the CLI can be available on the default UART1
+  if (nxp_enable_matter_cli) {
+    defines += [ "OT_APP_UART_INSTANCE=0" ]
   }
 
   cflags = [

@@ -19,10 +19,12 @@
 #include <app/data-model-provider/Provider.h>
 
 #include <app/CommandHandlerInterface.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/server-cluster/SingleEndpointServerClusterRegistry.h>
 #include <app/util/af-types.h>
-#include <data-model-providers/codegen/ServerClusterInterfaceRegistry.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
@@ -54,7 +56,7 @@ public:
     void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate) { mPersistentStorageDelegate = delegate; }
     PersistentStorageDelegate * GetPersistentStorageDelegate() { return mPersistentStorageDelegate; }
 
-    ServerClusterInterfaceRegistry & Registry() { return mRegistry; }
+    SingleEndpointServerClusterRegistry & Registry() { return mRegistry; }
 
     /// Generic model implementations
     CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
@@ -65,7 +67,8 @@ public:
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
 
-    void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType) override;
+    void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType,
+                                        FabricIndex accessingFabric) override;
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
@@ -93,6 +96,10 @@ protected:
     virtual void InitDataModelForTesting();
 
 private:
+    // Context is available after startup and cleared in shutdown.
+    // This has a value for as long as we assume the context is valid.
+    std::optional<DataModel::InteractionModelContext> mContext;
+
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
     uint16_t mEndpointIterationHint = 0;
@@ -119,7 +126,7 @@ private:
     // Ember requires a persistence provider, so we make sure we can always have something
     PersistentStorageDelegate * mPersistentStorageDelegate = nullptr;
 
-    ServerClusterInterfaceRegistry mRegistry;
+    SingleEndpointServerClusterRegistry mRegistry;
 
     /// Finds the specified ember cluster
     ///
