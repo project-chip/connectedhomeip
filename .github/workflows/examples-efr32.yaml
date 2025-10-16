@@ -65,7 +65,7 @@ jobs:
       #     scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4187C --slc_generate --docker
       #     rm -rf ./out/
       - name: Build some BRD4187C variants (1)
-        # TODO #39216 : Deactivated Unit Testing (efr32-brd4187c-unit-test ) due to Pigweed incompatibility issues
+      # TODO #39216 : Deactivated Unit Testing (efr32-brd4187c-unit-test ) due to Pigweed incompatibility issues
         run: |
           ./scripts/run_in_build_env.sh \
              "./scripts/build/build_examples.py \
