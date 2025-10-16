@@ -182,8 +182,9 @@ def _GetZapVersionToUse(project_root) -> str:
     zap_json = json.load(open(zap_path))
     for package in zap_json.get("packages", []):
         for tag in package.get("tags", []):
-            if tag.startswith("version:2@"):
-                zap_version = tag.removeprefix("version:2@")
+            version_prefix = "version:"
+            if tag.startswith(version_prefix):
+                zap_version = tag.removeprefix(version_prefix)
                 suffix_index = zap_version.rfind(".")
                 if suffix_index != -1:
                     zap_version = zap_version[:suffix_index]
