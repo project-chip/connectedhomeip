@@ -110,7 +110,7 @@ jinja2==3.0.3
     # via -r requirements.build.txt
 jsonschema==4.17.3
     # via -r requirements.zephyr.txt
-kconfiglib==13.7.1
+kconfiglib==14.1.0
     # via esp-idf-kconfig
 lark==1.1.5
     # via
