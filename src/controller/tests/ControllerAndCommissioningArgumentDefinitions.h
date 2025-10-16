@@ -33,9 +33,14 @@ using TestSessionKeystoreImpl = chip::Crypto::DefaultSessionKeystore;
 namespace chip {
 namespace Test {
 
-chip::Credentials::GroupDataProviderImpl sProvider(5, 8);
+constexpr uint16_t kMaxGroupsPerFabric    = 5;
+constexpr uint16_t kMaxGroupKeysPerFabric = 8;
+
+chip::Credentials::GroupDataProviderImpl sProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
 chip::SimpleSessionResumptionStorage sessionStorage;
 
+// To prevent redundancy, the Engine_raii Class was created
+// Before using the engine, it is necessary to initialize it.
 class Engine_raii
 {
 public:
@@ -49,6 +54,7 @@ private:
     chip::app::InteractionModelEngine * engine;
 };
 
+// Fabric Init Params Class define the basic arguments to device controller factory
 class FactoryInitParamsSetter
 {
 public:
