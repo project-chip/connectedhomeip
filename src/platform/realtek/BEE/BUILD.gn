@@ -18,6 +18,10 @@ import("//src/platform/device.gni")
 
 assert(chip_device_platform == "realtek_bee")
 
+declare_args() {
+  chip_use_cg_secure_dac_vendor = false
+}
+
 static_library("BEE") {
   sources = [
     "//src/platform/FreeRTOS/SystemTimeSupport.cpp",
@@ -85,6 +89,13 @@ static_library("BEE") {
     "RTK/RTKDACVendorProvider.cpp",
     "RTK/RTKDACVendorProvider.h",
   ]
+
+  if(chip_use_cg_secure_dac_vendor){
+    sources += [
+      "CG/CGSecureDACVendorProvider.cpp",
+      "CG/CGSecureDACVendorProvider.h",
+    ]
+  }
 }
 
 source_set("logging") {

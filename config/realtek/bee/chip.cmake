@@ -183,6 +183,10 @@ else (matter_enable_rotating_id)
     string(APPEND CHIP_GN_ARGS "chip_enable_rotating_device_id = false\n")
 endif (matter_enable_rotating_id)
 
+if (matter_enable_cg_secure_dac_vendor)
+    string(APPEND CHIP_GN_ARGS "chip_use_cg_secure_dac_vendor = true\n")
+endif()
+
 file(GENERATE OUTPUT ${CHIP_OUTPUT}/args.gn CONTENT ${CHIP_GN_ARGS})
 
 ExternalProject_Add(
