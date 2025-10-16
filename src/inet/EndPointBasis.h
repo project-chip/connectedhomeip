@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2015-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,7 @@
 #include <inet/InetConfig.h>
 #include <lib/core/ReferenceCounted.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/ReferenceCountedPtr.h>
 
 namespace chip {
 
@@ -42,11 +43,14 @@ class EndPointManager;
 template <typename EndPointType>
 class EndPointDeletor;
 
+template <class EndPointType>
+class EndPointHandle;
+
 /**
- * Basis of internet transport endpoint classes.
+ * Base class of internet transport endpoint classes. Guarded by EndPointManager::CreateEndPoint to guarantee proper ref-counting.
  */
 template <typename EndPointType>
-class DLL_EXPORT EndPointBasis : public ReferenceCounted<EndPointType, EndPointDeletor<EndPointType>>
+class DLL_EXPORT EndPointBasis : public ReferenceCountedProtected<EndPointType, EndPointDeletor<EndPointType>>
 {
 public:
     using EndPoint = EndPointType;
@@ -65,6 +69,11 @@ public:
 
     void * mAppState;
 
+protected:
+    friend class EndPointHandle<EndPointType>;
+
+    inline void Delete() { GetEndPointManager().DeleteEndPoint(static_cast<EndPointType *>(this)); }
+
 private:
     EndPointManager<EndPoint> & mEndPointManager; /**< Factory that owns this object. */
 };
@@ -73,7 +82,7 @@ template <typename EndPointType>
 class EndPointDeletor
 {
 public:
-    static void Release(EndPointType * obj) { obj->GetEndPointManager().DeleteEndPoint(obj); }
+    static void Release(EndPointType * obj) { obj->Free(); }
 };
 
 } // namespace Inet

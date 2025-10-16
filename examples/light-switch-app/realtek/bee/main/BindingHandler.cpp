@@ -28,6 +28,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include <lib/shell/Engine.h>
@@ -79,8 +80,8 @@ void BindingHandler::OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERR
         *data                              = aBindingData;
 
         // Establish new CASE session and retrasmit command that was not applied.
-        error = BindingManager::GetInstance().NotifyBoundClusterChanged(aBindingData.EndpointId, aBindingData.ClusterId,
-                                                                        static_cast<void *>(data));
+        error = Binding::Manager::GetInstance().NotifyBoundClusterChanged(aBindingData.EndpointId, aBindingData.ClusterId,
+                                                                          static_cast<void *>(data));
 
         if (CHIP_NO_ERROR != error)
         {
@@ -94,7 +95,7 @@ void BindingHandler::OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERR
     }
 }
 
-void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding,
+void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const Binding::TableEntry & aBinding,
                                          OperationalDeviceProxy * aDevice, void * aContext)
 {
     CHIP_ERROR ret     = CHIP_NO_ERROR;
@@ -170,7 +171,7 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
     }
 }
 
-void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & aBinding, OperationalDeviceProxy * deviceProxy,
+void BindingHandler::LightSwitchChangedHandler(const Binding::TableEntry & aBinding, OperationalDeviceProxy * deviceProxy,
                                                void * context)
 {
 #if CONFIG_ENABLE_ATTRIBUTE_SUBSCRIBE
@@ -179,7 +180,7 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & aB
         chip::EndpointId localEndpointId = aBinding.local;
         ChipLogProgress(NotSpecified, "localEndpointId=%d", localEndpointId);
 
-        if (aBinding.type == MATTER_UNICAST_BINDING &&
+        if (aBinding.type == Binding::MATTER_UNICAST_BINDING &&
             (!aBinding.clusterId.has_value() || aBinding.clusterId.value() == Clusters::OnOff::Id))
         {
             auto onReport = [localEndpointId](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
@@ -216,7 +217,7 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & aB
     VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
     BindingData * data = static_cast<BindingData *>(context);
 
-    if (aBinding.type == MATTER_MULTICAST_BINDING && data->IsGroup)
+    if (aBinding.type == Binding::MATTER_MULTICAST_BINDING && data->IsGroup)
     {
         switch (data->ClusterId)
         {
@@ -228,7 +229,7 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & aB
             break;
         }
     }
-    else if (aBinding.type == MATTER_UNICAST_BINDING && !data->IsGroup)
+    else if (aBinding.type == Binding::MATTER_UNICAST_BINDING && !data->IsGroup)
     {
         switch (data->ClusterId)
         {
@@ -253,10 +254,10 @@ void BindingHandler::InitInternal(intptr_t arg)
 {
     ChipLogProgress(NotSpecified, "Initialize binding Handler");
     auto & server = chip::Server::GetInstance();
-    chip::BindingManager::GetInstance().Init(
+    Binding::Manager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
-    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
-    chip::BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
+    Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
+    Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
 }
 
 #ifdef CONFIG_ENABLE_CHIP_SHELL
@@ -358,13 +359,8 @@ CHIP_ERROR BindingHandler::BindingGroupBindCommandHandler(int argc, char ** argv
 {
     VerifyOrReturnError(argc == 2, CHIP_ERROR_INVALID_ARGUMENT);
 
-    EmberBindingTableEntry * entry = Platform::New<EmberBindingTableEntry>();
-    entry->type                    = MATTER_MULTICAST_BINDING;
-    entry->fabricIndex             = atoi(argv[0]);
-    entry->groupId                 = atoi(argv[1]);
-    entry->local                   = 1; // Hardcoded to endpoint 1 for now
-    entry->clusterId.emplace(6);        // Hardcoded to OnOff cluster for now
-
+    Binding::TableEntry * entry =
+        Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, std::make_optional<ClusterId>(6));
     DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
     return CHIP_NO_ERROR;
 }
@@ -373,14 +369,8 @@ CHIP_ERROR BindingHandler::BindingUnicastBindCommandHandler(int argc, char ** ar
 {
     VerifyOrReturnError(argc == 3, CHIP_ERROR_INVALID_ARGUMENT);
 
-    EmberBindingTableEntry * entry = Platform::New<EmberBindingTableEntry>();
-    entry->type                    = MATTER_UNICAST_BINDING;
-    entry->fabricIndex             = atoi(argv[0]);
-    entry->nodeId                  = atoi(argv[1]);
-    entry->local                   = 1; // Hardcoded to endpoint 1 for now
-    entry->remote                  = atoi(argv[2]);
-    entry->clusterId.emplace(6); // Hardcode to OnOff cluster for now
-
+    Binding::TableEntry * entry =
+        Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, atoi(argv[2]), std::make_optional<ClusterId>(6));
     DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
     return CHIP_NO_ERROR;
 }
@@ -463,7 +453,7 @@ CHIP_ERROR BindingHandler::GroupToggleSwitchCommandHandler(int argc, char ** arg
 
 CHIP_ERROR BindingHandler::TableCommandHelper(int argc, char ** argv)
 {
-    BindingTable & bindingTable = BindingTable::GetInstance();
+    Binding::Table & bindingTable = Binding::Table::GetInstance();
 
     streamer_printf(streamer_get(), "Binding Table size: [%d]:\r\n", bindingTable.Size());
     uint8_t i = 0;
@@ -471,7 +461,7 @@ CHIP_ERROR BindingHandler::TableCommandHelper(int argc, char ** argv)
     {
         switch (entry.type)
         {
-        case MATTER_UNICAST_BINDING:
+        case Binding::MATTER_UNICAST_BINDING:
             streamer_printf(streamer_get(), "[%d] UNICAST:\r\n", i++);
             streamer_printf(streamer_get(), "\t\t+ Fabric: %d\r\n \
             \t+ LocalEndpoint %d \r\n \
@@ -481,7 +471,7 @@ CHIP_ERROR BindingHandler::TableCommandHelper(int argc, char ** argv)
                             (int) entry.fabricIndex, (int) entry.local, (int) entry.clusterId.value_or(kInvalidClusterId),
                             (int) entry.remote, (int) entry.nodeId);
             break;
-        case MATTER_MULTICAST_BINDING:
+        case Binding::MATTER_MULTICAST_BINDING:
             streamer_printf(streamer_get(), "[%d] GROUP:\r\n", i++);
             streamer_printf(streamer_get(), "\t\t+ Fabric: %d\r\n \
             \t+ LocalEndpoint %d \r\n \
@@ -489,7 +479,7 @@ CHIP_ERROR BindingHandler::TableCommandHelper(int argc, char ** argv)
             \t+ GroupId %d\r\n",
                             (int) entry.fabricIndex, (int) entry.local, (int) entry.remote, (int) entry.groupId);
             break;
-        case MATTER_UNUSED_BINDING:
+        case Binding::MATTER_UNUSED_BINDING:
             streamer_printf(streamer_get(), "[%d] UNUSED\r\n", i++);
             break;
         default:
@@ -554,7 +544,7 @@ void BindingHandler::BindingWorkerFunction(intptr_t context)
 {
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "BindingWorkerFunction - Invalid work data"));
 
-    EmberBindingTableEntry * entry = reinterpret_cast<EmberBindingTableEntry *>(context);
+    Binding::TableEntry * entry = reinterpret_cast<Binding::TableEntry *>(context);
     AddBindingEntry(*entry);
 
     Platform::Delete(entry);
@@ -577,12 +567,12 @@ void BindingHandler::SwitchWorkerFunction(intptr_t context)
 #if CONFIG_ENABLE_CHIP_SHELL
     streamer_printf(streamer_get(), "Notify Bounded Cluster | endpoint: %d CLuster: %d\r\n", data->EndpointId, data->ClusterId);
 #endif
-    BindingManager::GetInstance().NotifyBoundClusterChanged(data->EndpointId, data->ClusterId, static_cast<void *>(data));
+    Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->EndpointId, data->ClusterId, static_cast<void *>(data));
 }
 
 void BindingHandler::SwitchWorkerFunction2(int localEndpointId)
 {
-    BindingManager::GetInstance().NotifyBoundClusterChanged(localEndpointId, Clusters::OnOff::Id, nullptr);
+    Binding::Manager::GetInstance().NotifyBoundClusterChanged(localEndpointId, Clusters::OnOff::Id, nullptr);
 }
 
 void BindingHandler::SwitchWorkerFunction3(intptr_t context)

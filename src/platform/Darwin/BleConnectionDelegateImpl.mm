@@ -690,7 +690,10 @@ namespace DeviceLayer {
     MATTER_LOG_METRIC_BEGIN(kMetricBLEConnectPeripheral);
     _peripheral = peripheral;
     _matchedLongDiscriminator = longDiscriminator;
-    [_centralManager connectPeripheral:peripheral options:nil];
+    auto * connectOptions = @{
+        @"kCBOptionUsecase" : @(271),
+    };
+    [_centralManager connectPeripheral:peripheral options:connectOptions];
 }
 
 - (void)detachScannerDelegate

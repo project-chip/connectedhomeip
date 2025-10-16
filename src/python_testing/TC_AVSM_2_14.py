@@ -188,6 +188,17 @@ class TC_AVSM_2_14(MatterBaseTest):
         logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
         asserts.assert_equal(len(aAllocatedAudioStreams), 1, "The number of allocated audio streams in the list is not 1.")
 
+        # Clear all allocated streams
+        aAllocatedAudioStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
+        )
+
+        for stream in aAllocatedAudioStreams:
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=commands.AudioStreamDeallocate(audioStreamID=(stream.audioStreamID)))
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
