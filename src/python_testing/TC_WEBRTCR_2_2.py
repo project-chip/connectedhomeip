@@ -228,7 +228,6 @@ class TC_WebRTCR_2_2(MatterBaseTest):
                 resp = 'Y'
             except TimeoutError:
                 resp = 'N'
-            resp = 'Y'
         else:
             resp = self.wait_for_user_input(prompt_msg)
 
