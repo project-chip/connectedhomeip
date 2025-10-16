@@ -24,12 +24,24 @@
 
 #include <mbedtls/platform.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if defined(SL_EM4_SLEEP) && (SL_EM4_SLEEP == 1)
+#include "sl_sleeptimer.h"
+#include <app/icd/server/ICDConfigurationData.h>
+
+#include "em_emu.h"
+#include "em_burtc.h"
+#include "em_cmu.h"
+#endif // defined(SL_EM4_SLEEP) && (SL_EM4_SLEEP == 1)
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
 #ifdef SL_WIFI
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #include <platform/silabs/wifi/WifiInterface.h> // nogncheck
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
+
 #endif                                                 // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 // TODO: We shouldn't need any platform specific includes in this file
@@ -339,9 +351,40 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     return CHIP_NO_ERROR;
 }
 
+extern "C" void OnEM4Trigger(uint32_t duration)
+{
+    CMU_ClockSelectSet(cmuClock_EM4GRPACLK, cmuSelect_ULFRCO);
+    CMU_ClockEnable(cmuClock_BURTC, true);
+    CMU_ClockEnable(cmuClock_BURAM, true);
+  
+    BURTC_Init_TypeDef burtcInit = BURTC_INIT_DEFAULT;
+    burtcInit.compare0Top = true; // reset counter when counter reaches compare value
+    burtcInit.em4comp = true;     // BURTC compare interrupt wakes from EM4 (causes reset)
+    BURTC_Init(&burtcInit);
+  
+    BURTC_CounterReset();
+    BURTC_CompareSet(0, duration);
+  
+    BURTC_IntEnable(BURTC_IEN_COMP);    // compare match
+    NVIC_EnableIRQ(BURTC_IRQn);
+    BURTC_Enable(true);
+    EMU_EM4Init_TypeDef em4Init = EMU_EM4INIT_DEFAULT;
+    EMU_EM4Init(&em4Init);
+    BURTC_CounterReset();
+    EMU_EnterEM4();
+}
+
+
 // ================================================================================
 // FreeRTOS Callbacks
 // ================================================================================
+
+#ifndef SL_EM4_THRESHOLD_PERCENTAGE
+#define SL_EM4_THRESHOLD_PERCENTAGE 90
+#endif
+
+static_assert(SL_EM4_THRESHOLD_PERCENTAGE > 0 && SL_EM4_THRESHOLD_PERCENTAGE < 100,
+              "SL_EM4_THRESHOLD_PERCENTAGE must be between 1 and 99");
 extern "C" void vApplicationIdleHook(void)
 {
 #if (SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER)
@@ -349,5 +392,21 @@ extern "C" void vApplicationIdleHook(void)
     SiWxPlatformInterface::sl_si91x_btn_event_handler();
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
     SiWxPlatformInterface::sl_si91x_uart_power_requirement_handler();
+#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if defined(SL_EM4_SLEEP) && (SL_EM4_SLEEP == 1) 
+    if(chip::ICDConfigurationData::GetInstance().GetICDMode() == chip::ICDConfigurationData::ICDMode::LIT)
+    {
+        uint32_t sleepTimeRemaining = 0;
+        sl_sleeptimer_get_remaining_time_of_first_timer( SL_SLEEPTIMER_ANY_FLAG ,&sleepTimeRemaining);
+        uint32_t idleDuration_seconds = static_cast<int32_t>(chip::ICDConfigurationData::GetInstance().GetIdleModeDuration().count());
+
+        // Since the sleep timer will never match the actual idle time (hardware latency, etc), we set a threshold
+        if (sleepTimeRemaining >= (idleDuration_seconds * SL_EM4_THRESHOLD_PERCENTAGE * 10)) 
+        {
+            OnEM4Trigger(sleepTimeRemaining);
+        }
+    }
+#endif
 #endif
 }
