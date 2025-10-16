@@ -55,9 +55,9 @@ ICDConfigurationData * ICDManagementServer::mICDConfigurationData = nullptr;
 } // namespace chip::app::Clusters
 
 namespace {
-IcdManagementAttributeAccess gAttribute;
+ICDManagementAttributeAccess gAttribute;
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-IcdManagementFabricDelegate gFabricDelegate;
+ICDManagementFabricDelegate gFabricDelegate;
 
 /**
  * @brief Function checks if the client has admin permissions to the cluster in the commandPath
@@ -92,7 +92,7 @@ CHIP_ERROR CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & c
 namespace chip::app::Clusters {
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-void IcdManagementFabricDelegate::Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore,
+void ICDManagementFabricDelegate::Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore,
                                        ICDConfigurationData & icdConfigurationData)
 {
     mStorage              = &storage;
@@ -100,7 +100,7 @@ void IcdManagementFabricDelegate::Init(PersistentStorageDelegate & storage, Cryp
     mICDConfigurationData = &icdConfigurationData;
 }
 
-void IcdManagementFabricDelegate::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+void ICDManagementFabricDelegate::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
     uint16_t supported_clients = mICDConfigurationData->GetClientsSupportedPerFabric();
     ICDMonitoringTable table(*mStorage, fabricIndex, supported_clients, mSymmetricKeystore);
@@ -109,11 +109,11 @@ void IcdManagementFabricDelegate::OnFabricRemoved(const FabricTable & fabricTabl
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
-IcdManagementAttributeAccess::IcdManagementAttributeAccess() :
+ICDManagementAttributeAccess::ICDManagementAttributeAccess() :
     AttributeAccessInterface(MakeOptional(kRootEndpointId), IcdManagement::Id)
 {}
 
-void IcdManagementAttributeAccess::Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore,
+void ICDManagementAttributeAccess::Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore,
                                         FabricTable & fabricTable, ICDConfigurationData & icdConfigurationData)
 {
 #if CHIP_CONFIG_ENABLE_ICD_CIP
@@ -124,7 +124,7 @@ void IcdManagementAttributeAccess::Init(PersistentStorageDelegate & storage, Cry
     mICDConfigurationData = &icdConfigurationData;
 }
 
-CHIP_ERROR IcdManagementAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ICDManagementAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == IcdManagement::Id);
 
@@ -163,28 +163,28 @@ CHIP_ERROR IcdManagementAttributeAccess::Read(const ConcreteReadAttributePath & 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR IcdManagementAttributeAccess::ReadIdleModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ICDManagementAttributeAccess::ReadIdleModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     return encoder.Encode(mICDConfigurationData->GetIdleModeDuration().count());
 }
 
-CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ICDManagementAttributeAccess::ReadActiveModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     return encoder.Encode(mICDConfigurationData->GetActiveModeDuration().count());
 }
 
-CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeThreshold(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ICDManagementAttributeAccess::ReadActiveModeThreshold(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     return encoder.Encode(mICDConfigurationData->GetActiveModeThreshold().count());
 }
 
-CHIP_ERROR IcdManagementAttributeAccess::ReadFeatureMap(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ICDManagementAttributeAccess::ReadFeatureMap(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     return encoder.Encode(mICDConfigurationData->GetFeatureMap());
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_LIT
-CHIP_ERROR IcdManagementAttributeAccess::ReadOperatingMode(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ICDManagementAttributeAccess::ReadOperatingMode(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     return mICDConfigurationData->GetICDMode() == ICDConfigurationData::ICDMode::SIT
         ? encoder.Encode(IcdManagement::OperatingModeEnum::kSit)
@@ -193,7 +193,7 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadOperatingMode(EndpointId endpoint, 
 #endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ICDManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     uint16_t supported_clients                    = mICDConfigurationData->GetClientsSupportedPerFabric();
     PersistentStorageDelegate * storage           = mStorage;
@@ -227,17 +227,17 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoi
     });
 }
 
-CHIP_ERROR IcdManagementAttributeAccess::ReadICDCounter(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ICDManagementAttributeAccess::ReadICDCounter(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     return encoder.Encode(mICDConfigurationData->GetICDCounter().GetValue());
 }
 
-CHIP_ERROR IcdManagementAttributeAccess::ReadClientsSupportedPerFabric(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ICDManagementAttributeAccess::ReadClientsSupportedPerFabric(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     return encoder.Encode(mICDConfigurationData->GetClientsSupportedPerFabric());
 }
 
-CHIP_ERROR IcdManagementAttributeAccess::ReadMaximumCheckInBackOff(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ICDManagementAttributeAccess::ReadMaximumCheckInBackOff(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     return encoder.Encode(mICDConfigurationData->GetMaximumCheckInBackoff().count());
 }
