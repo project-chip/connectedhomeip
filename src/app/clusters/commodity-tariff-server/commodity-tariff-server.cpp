@@ -40,6 +40,313 @@ namespace app {
 namespace Clusters {
 namespace CommodityTariff {
 
+namespace Utils {
+
+using CurrentTariffAttrsCtx = CommodityTariff::Instance::CurrentTariffAttrsCtx;
+
+static constexpr uint32_t kNotFoundPattern = UINT32_MAX;
+
+template <typename T>
+uint32_t GetIdFromEntry(const T & aEntry)
+{
+    return kNotFoundPattern;
+}
+
+template <>
+uint32_t GetIdFromEntry<Structs::DayEntryStruct::Type>(const Structs::DayEntryStruct::Type & aEntry)
+{
+    return aEntry.dayEntryID;
+}
+
+template <>
+uint32_t GetIdFromEntry<Structs::DayPatternStruct::Type>(const Structs::DayPatternStruct::Type & aEntry)
+{
+    return aEntry.dayPatternID;
+}
+
+template <>
+uint32_t GetIdFromEntry<Structs::TariffComponentStruct::Type>(const Structs::TariffComponentStruct::Type & aEntry)
+{
+    return aEntry.tariffComponentID;
+}
+
+template <typename T>
+const T * GetListEntryById(const DataModel::List<const T> & aList, uint32_t aId)
+{
+    for (size_t i = 0; i < aList.size(); ++i)
+    {
+        const T & item  = aList[i];
+        uint32_t itemId = GetIdFromEntry(item);
+
+        if (itemId == aId) // Replace 'id' with the actual field name
+        {
+            return &item;
+        }
+        // If list is sorted by ID and we've passed the target, break early
+        if (itemId > aId)
+        {
+            break;
+        }
+    }
+    return nullptr;
+}
+
+template <typename T, auto MemberPtr>
+bool isIdInList(const chip::app::DataModel::List<T> & list, uint32_t idToFind)
+{
+    for (const auto & entry : list)
+    {
+        if (entry.*MemberPtr == idToFind)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+DayPatternDayOfWeekBitmap GetDayOfWeek(uint32_t timestamp)
+{
+    time_t time = static_cast<time_t>(timestamp);
+    struct tm utcTimeStruct;
+    struct tm * utcTime = gmtime_r(&time, &utcTimeStruct);
+    return static_cast<DayPatternDayOfWeekBitmap>(1 << utcTime->tm_wday);
+}
+
+Structs::DayStruct::Type FindDay(CurrentTariffAttrsCtx & aCtx, uint32_t timestamp)
+{
+    Structs::DayStruct::Type defaultDay = { .date        = 0,
+                                            .dayType     = DayTypeEnum::kUnknownEnumValue,
+                                            .dayEntryIDs = DataModel::List<const uint32_t>() };
+    uint32_t DayStartTS                 = timestamp - (timestamp % kSecondsPerDay);
+
+    // First check IndividualDays
+    if (!aCtx.mTariffProvider->GetIndividualDays().IsNull())
+    {
+        for (const auto & day : aCtx.mTariffProvider->GetIndividualDays().Value())
+        {
+            if ((day.date >= DayStartTS) && (day.date < (DayStartTS + kSecondsPerDay)))
+            {
+                return day;
+            }
+        }
+    }
+
+    if (!aCtx.mTariffProvider->GetCalendarPeriods().IsNull())
+    {
+        const Structs::CalendarPeriodStruct::Type * period = nullptr;
+        bool first_item                                    = true;
+
+        for (const auto & entry : aCtx.mTariffProvider->GetCalendarPeriods().Value())
+        {
+            if (first_item && aCtx.mTariffProvider->GetStartDate().Value() == 0 &&
+                (entry.startDate.IsNull() || entry.startDate.Value() == 0))
+            {
+                period     = &entry; // Use this entry as fallback
+                first_item = false;
+                continue; // Keep looking for a better match
+            }
+
+            // Check if entry matches our target day
+            const auto entryStart = entry.startDate.Value();
+            if (entryStart >= DayStartTS && entryStart < (DayStartTS + kSecondsPerDay))
+            {
+                period = &entry; // Found perfect match
+                break;           // No need to continue searching
+            }
+        }
+
+        if (period != nullptr)
+        {
+            for (const auto & patternID : period->dayPatternIDs)
+            {
+                auto * pattern =
+                    GetListEntryById<Structs::DayPatternStruct::Type>(aCtx.mTariffProvider->GetDayPatterns().Value(), patternID);
+                if ((pattern != nullptr) && pattern->daysOfWeek.Has(GetDayOfWeek(timestamp)))
+                {
+                    defaultDay.date        = DayStartTS;
+                    defaultDay.dayType     = DayTypeEnum::kStandard;
+                    defaultDay.dayEntryIDs = pattern->dayEntryIDs;
+                    break;
+                }
+            }
+        }
+    }
+
+    return defaultDay;
+}
+
+bool DayIsValid(Structs::DayStruct::Type * aDay)
+{
+    if ((aDay->date == 0) || (aDay->dayType == DayTypeEnum::kUnknownEnumValue))
+    {
+        return false;
+    }
+    return true;
+}
+
+std::pair<const Structs::DayEntryStruct::Type *, const Structs::DayEntryStruct::Type *>
+FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t> & dayEntryIDs, uint16_t minutesSinceMidnight,
+             uint16_t * currentEntryMinutesRemain)
+{
+    const Structs::DayEntryStruct::Type * currentPtr = nullptr;
+    const Structs::DayEntryStruct::Type * nextPtr    = nullptr;
+    *currentEntryMinutesRemain                       = 0;
+
+    for (size_t i = 0; i < dayEntryIDs.size(); i++)
+    {
+        nextPtr    = nullptr;
+        currentPtr = GetListEntryById<Structs::DayEntryStruct::Type>(aCtx.mTariffProvider->GetDayEntries().Value(), dayEntryIDs[i]);
+        if (currentPtr == nullptr)
+        {
+            continue;
+        }
+
+        if (i + 1 < dayEntryIDs.size())
+        {
+            nextPtr =
+                GetListEntryById<Structs::DayEntryStruct::Type>(aCtx.mTariffProvider->GetDayEntries().Value(), dayEntryIDs[i + 1]);
+        }
+        else
+        {
+            nextPtr = nullptr;
+        }
+
+        // Default: Current entry lasts until end of day
+        uint16_t duration = (kDayEntryDurationLimit - currentPtr->startTime);
+
+        if (currentPtr->duration.HasValue())
+        {
+            duration = currentPtr->duration.Value();
+        }
+        else if (nextPtr != nullptr && nextPtr->startTime < kDayEntryDurationLimit)
+        {
+            if (nextPtr->startTime <= currentPtr->startTime)
+            {
+                // Next entry is on the following day
+                duration = static_cast<uint16_t>((kDayEntryDurationLimit - currentPtr->startTime) + nextPtr->startTime);
+            }
+            else
+            {
+                // Next entry is on the same day
+                duration = nextPtr->startTime - currentPtr->startTime;
+            }
+        }
+
+        // Check if current entry matches the current time
+        if (currentPtr->startTime <= minutesSinceMidnight && (currentPtr->startTime + duration) > minutesSinceMidnight)
+        {
+            *currentEntryMinutesRemain = static_cast<uint16_t>(duration - (minutesSinceMidnight - currentPtr->startTime));
+            break;
+        }
+    }
+
+    return { currentPtr, nextPtr };
+}
+
+const Structs::TariffPeriodStruct::Type * FindTariffPeriodByDayEntryId(CurrentTariffAttrsCtx & aCtx, uint32_t dayEntryID)
+{
+    for (const auto & period : aCtx.mTariffProvider->GetTariffPeriods().Value())
+    {
+        for (const auto & entryID : period.dayEntryIDs)
+        {
+            if (entryID == dayEntryID)
+            {
+                return &period;
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+template <size_t ReturnCapacity = CommodityTariffConsts::kTariffPeriodsAttrMaxLength>
+CTC_UnorderedSet<const Structs::TariffPeriodStruct::Type *, ReturnCapacity>
+FindTariffPeriodsByTariffComponentId(CurrentTariffAttrsCtx & aCtx, uint32_t componentID)
+{
+    const auto & tariffPeriods = aCtx.mTariffProvider->GetTariffPeriods().Value();
+    CTC_UnorderedSet<const Structs::TariffPeriodStruct::Type *, ReturnCapacity> matchingPeriods;
+
+    for (const auto & period : tariffPeriods)
+    {
+        if (std::find(period.tariffComponentIDs.begin(), period.tariffComponentIDs.end(), componentID) !=
+            period.tariffComponentIDs.end())
+        {
+            matchingPeriods.insert(&period);
+        }
+    }
+
+    return matchingPeriods;
+}
+
+CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentTariffAttrsCtx & aCtx, uint32_t dayEntryID,
+                                                  TariffComponentsDataClass & mgmtObj)
+{
+    CHIP_ERROR err                                   = CHIP_NO_ERROR;
+    const Structs::TariffPeriodStruct::Type * period = FindTariffPeriodByDayEntryId(aCtx, dayEntryID);
+
+    // Use a fixed-size array with maximum expected components
+    constexpr size_t MAX_COMPONENTS = 16; // Adjust this based on your maximum expected components
+    std::array<Structs::TariffComponentStruct::Type, MAX_COMPONENTS> tempArray;
+    size_t componentCount = 0;
+
+    if (period == nullptr)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    const DataModel::List<const uint32_t> & componentIDs = period->tariffComponentIDs;
+
+    for (const auto & entryID : componentIDs)
+    {
+        Structs::TariffComponentStruct::Type entry;
+        auto current =
+            GetListEntryById<Structs::TariffComponentStruct::Type>(aCtx.mTariffProvider->GetTariffComponents().Value(), entryID);
+        if (current == nullptr)
+        {
+            err = CHIP_ERROR_NOT_FOUND;
+            goto exit;
+        }
+        entry = *current;
+        if (current->label.HasValue())
+        {
+            DataModel::Nullable<chip::CharSpan> tmpNullLabel;
+            tmpNullLabel.SetNull();
+            if (!current->label.Value().IsNull())
+            {
+                chip::CharSpan srcLabelSpan = current->label.Value().Value();
+                if (CHIP_NO_ERROR !=
+                    (err = CommodityTariffAttrsDataMgmt::SpanCopier<char>::Copy(current->label.Value().Value(), tmpNullLabel,
+                                                                                srcLabelSpan.size())))
+                {
+                    goto exit;
+                }
+            }
+            entry.label = MakeOptional(tmpNullLabel);
+        }
+        tempArray[componentCount++] = entry;
+    }
+
+    err =
+        mgmtObj.SetNewValue(MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempArray.data(), componentCount)));
+    SuccessOrExit(err);
+
+    err = mgmtObj.UpdateBegin(nullptr);
+    SuccessOrExit(err);
+
+    if (mgmtObj.UpdateFinish(err == CHIP_NO_ERROR)) // Success path
+    {
+        aInstance->AttributeUpdCb(mgmtObj.GetAttrId());
+    }
+
+exit:
+    for (size_t i = 0; i < componentCount; i++)
+    {
+        mgmtObj.CleanupExtListEntry(tempArray[i]);
+    }
+
+    return err;
+}
+} // namespace Utils
+
 void Delegate::TariffDataUpdate(uint32_t aNowTimestamp)
 {
 
@@ -173,10 +480,19 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
             static_cast<StartDateDataClass &>(GetMgmtObj(CommodityTariffAttrTypeEnum::kStartDate)).GetNewValue().Value();
     }
 
+    const auto & dayEntries =
+        static_cast<DayEntriesDataClass &>(GetMgmtObj(CommodityTariffAttrTypeEnum::kDayEntries)).GetNewValue().Value();
+    const auto & dayPatterns =
+        static_cast<DayPatternsDataClass &>(GetMgmtObj(CommodityTariffAttrTypeEnum::kDayPatterns)).GetNewValue().Value();
+    const auto & tariffComponents =
+        static_cast<TariffComponentsDataClass &>(GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffComponents)).GetNewValue().Value();
+    const auto & tariffPeriods =
+        static_cast<TariffPeriodsDataClass &>(GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffPeriods)).GetNewValue().Value();
+
     // Checks that all DayEntryIDs in Tariff Periods are in main DayEntries list:
-    for (const auto & item : UpdCtx.TariffPeriodsDayEntryIDs)
+    for (const auto & item : UpdCtx.RefsToDayEntryIDsFromTariffPeriods)
     {
-        if (!UpdCtx.DayEntryKeyIDs.contains(item))
+        if (!Utils::isIdInList<DayEntryStruct::Type, &DayEntryStruct::Type::dayEntryID>(dayEntries, item))
         {
             ChipLogError(AppServer, "DayEntry ID%" PRIu32 "referenced from TariffPeriods doesn't exist in main DayEntries list",
                          item);
@@ -185,9 +501,10 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
     }
 
     // Checks that all TariffComponentIDs in Tariff Periods are in main TariffComponents list:
-    for (const auto & item : UpdCtx.TariffPeriodsTariffComponentIDs)
+    for (const auto & item : UpdCtx.RefsToTariffComponentIDsFromTariffPeriods)
     {
-        if (UpdCtx.TariffComponentKeyIDsFeatureMap.find(item) == nullptr)
+        if (!Utils::isIdInList<TariffComponentStruct::Type, &TariffComponentStruct::Type::tariffComponentID>(tariffComponents,
+                                                                                                             item))
         {
             ChipLogError(AppServer,
                          "TariffComponent ID%" PRIu32 "referenced from TariffPeriods doesn't exist in main TariffComponents list",
@@ -198,10 +515,10 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
 
     if (GetMgmtObj(CommodityTariffAttrTypeEnum::kDayPatterns).IsValid())
     {
-        // Checks that all DP_DEs are in main DE list:
-        for (const auto & item : UpdCtx.DayPatternsDayEntryIDs)
+        // Checks that all DEs refs are in main DE list:
+        for (const auto & item : UpdCtx.RefsToDayEntryIDsFromDays)
         {
-            if (!UpdCtx.DayEntryKeyIDs.contains(item))
+            if (!Utils::isIdInList<DayEntryStruct::Type, &DayEntryStruct::Type::dayEntryID>(dayEntries, item))
             {
                 ChipLogError(AppServer, "DayEntry ID%" PRIu32 "referenced from DayPatterns doesn't exist in main DayEntries list",
                              item);
@@ -214,20 +531,13 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
         (GetMgmtObj(CommodityTariffAttrTypeEnum::kIndividualDays).HasNewValue()))
     {
         // Checks that all ID_DE_IDs are in main DE list:
-        for (const auto & item : UpdCtx.IndividualDaysDayEntryIDs)
+        for (const auto & item : UpdCtx.RefsToDayEntryIDsFromDays)
         {
-            if (!UpdCtx.DayEntryKeyIDs.contains(item))
+            if (!Utils::isIdInList<DayEntryStruct::Type, &DayEntryStruct::Type::dayEntryID>(dayEntries, item))
             {
                 ChipLogError(AppServer,
                              "DayEntry ID%" PRIu32 "referenced from IndividualDays doesn't exist in main DayEntries list", item);
                 return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
-            }
-
-            if (UpdCtx.DayPatternsDayEntryIDs.contains(item))
-            {
-                ChipLogError(AppServer, "DayEntry ID%" PRIu32 "is duplicated - found in both IndividualDays and DayPatterns lists",
-                             item);
-                return CHIP_ERROR_DUPLICATE_KEY_ID; // If same item from ID list has found in DP list
             }
         }
 
@@ -238,9 +548,9 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
         (GetMgmtObj(CommodityTariffAttrTypeEnum::kCalendarPeriods).HasNewValue()))
     {
         // Checks that all DayPatternIDs are in main DayPattern list:
-        for (const auto & item : UpdCtx.CalendarPeriodsDayPatternIDs)
+        for (const auto & item : UpdCtx.RefsToDayPatternIDsFromCalendarPeriods)
         {
-            if (!UpdCtx.DayPatternKeyIDs.contains(item))
+            if (!Utils::isIdInList<DayPatternStruct::Type, &DayPatternStruct::Type::dayPatternID>(dayPatterns, item))
             {
                 ChipLogError(AppServer,
                              "DayPattern ID%" PRIu32 "referenced from CalendarPeriods doesn't exist in main DayPatterns list",
@@ -257,13 +567,6 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
         ChipLogError(AppServer, "Both IndividualDays and CalendarPeriods are not present or have no valid data");
         return CHIP_ERROR_INVALID_DATA_LIST;
     }
-
-    const auto & tariffPeriods =
-        static_cast<TariffPeriodsDataClass &>(GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffPeriods)).GetNewValue().Value();
-    const auto & dayEntries =
-        static_cast<DayEntriesDataClass &>(GetMgmtObj(CommodityTariffAttrTypeEnum::kDayEntries)).GetNewValue().Value();
-    const auto & tariffComponents =
-        static_cast<TariffComponentsDataClass &>(GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffComponents)).GetNewValue().Value();
 
     // Create lookup maps with const correctness
     CTC_UnorderedMap<uint32_t, const Structs::DayEntryStruct::Type *, CommodityTariffConsts::kDayEntriesAttrMaxLength>
@@ -307,7 +610,7 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
         for (const uint32_t deID : deIDs)
         {
             // Check if DE exists in original context
-            if (!UpdCtx.DayEntryKeyIDs.contains(deID))
+            if (!Utils::isIdInList<DayEntryStruct::Type, &DayEntryStruct::Type::dayEntryID>(dayEntries, deID))
             {
                 ChipLogError(AppServer, "DayEntry ID%" PRIu32 "doesn't exist in validation context", deID);
                 return CHIP_ERROR_KEY_NOT_FOUND; // Item not found in original list
@@ -709,300 +1012,6 @@ void Instance::TariffDataUpdatedCb(bool is_erased, const AttributeId * aUpdatedA
         InitCurrentAttrs();
     }
 }
-
-namespace Utils {
-
-using CurrentTariffAttrsCtx = CommodityTariff::Instance::CurrentTariffAttrsCtx;
-
-static constexpr uint32_t kNotFoundPattern = UINT32_MAX;
-
-template <typename T>
-uint32_t GetIdFromEntry(const T & aEntry)
-{
-    return kNotFoundPattern;
-}
-
-template <>
-uint32_t GetIdFromEntry<Structs::DayEntryStruct::Type>(const Structs::DayEntryStruct::Type & aEntry)
-{
-    return aEntry.dayEntryID;
-}
-
-template <>
-uint32_t GetIdFromEntry<Structs::DayPatternStruct::Type>(const Structs::DayPatternStruct::Type & aEntry)
-{
-    return aEntry.dayPatternID;
-}
-
-template <>
-uint32_t GetIdFromEntry<Structs::TariffComponentStruct::Type>(const Structs::TariffComponentStruct::Type & aEntry)
-{
-    return aEntry.tariffComponentID;
-}
-
-template <typename T>
-const T * GetListEntryById(const DataModel::List<const T> & aList, uint32_t aId)
-{
-    for (size_t i = 0; i < aList.size(); ++i)
-    {
-        const T & item  = aList[i];
-        uint32_t itemId = GetIdFromEntry(item);
-
-        if (itemId == aId) // Replace 'id' with the actual field name
-        {
-            return &item;
-        }
-        // If list is sorted by ID and we've passed the target, break early
-        if (itemId > aId)
-        {
-            break;
-        }
-    }
-    return nullptr;
-}
-
-DayPatternDayOfWeekBitmap GetDayOfWeek(uint32_t timestamp)
-{
-    time_t time = static_cast<time_t>(timestamp);
-    struct tm utcTimeStruct;
-    struct tm * utcTime = gmtime_r(&time, &utcTimeStruct);
-    return static_cast<DayPatternDayOfWeekBitmap>(1 << utcTime->tm_wday);
-}
-
-Structs::DayStruct::Type FindDay(CurrentTariffAttrsCtx & aCtx, uint32_t timestamp)
-{
-    Structs::DayStruct::Type defaultDay = { .date        = 0,
-                                            .dayType     = DayTypeEnum::kUnknownEnumValue,
-                                            .dayEntryIDs = DataModel::List<const uint32_t>() };
-    uint32_t DayStartTS                 = timestamp - (timestamp % kSecondsPerDay);
-
-    // First check IndividualDays
-    if (!aCtx.mTariffProvider->GetIndividualDays().IsNull())
-    {
-        for (const auto & day : aCtx.mTariffProvider->GetIndividualDays().Value())
-        {
-            if ((day.date >= DayStartTS) && (day.date < (DayStartTS + kSecondsPerDay)))
-            {
-                return day;
-            }
-        }
-    }
-
-    if (!aCtx.mTariffProvider->GetCalendarPeriods().IsNull())
-    {
-        const Structs::CalendarPeriodStruct::Type * period = nullptr;
-        bool first_item                                    = true;
-
-        for (const auto & entry : aCtx.mTariffProvider->GetCalendarPeriods().Value())
-        {
-            if (first_item && aCtx.mTariffProvider->GetStartDate().Value() == 0 &&
-                (entry.startDate.IsNull() || entry.startDate.Value() == 0))
-            {
-                period     = &entry; // Use this entry as fallback
-                first_item = false;
-                continue; // Keep looking for a better match
-            }
-
-            // Check if entry matches our target day
-            const auto entryStart = entry.startDate.Value();
-            if (entryStart >= DayStartTS && entryStart < (DayStartTS + kSecondsPerDay))
-            {
-                period = &entry; // Found perfect match
-                break;           // No need to continue searching
-            }
-        }
-
-        if (period != nullptr)
-        {
-            for (const auto & patternID : period->dayPatternIDs)
-            {
-                auto * pattern =
-                    GetListEntryById<Structs::DayPatternStruct::Type>(aCtx.mTariffProvider->GetDayPatterns().Value(), patternID);
-                if ((pattern != nullptr) && pattern->daysOfWeek.Has(GetDayOfWeek(timestamp)))
-                {
-                    defaultDay.date        = DayStartTS;
-                    defaultDay.dayType     = DayTypeEnum::kStandard;
-                    defaultDay.dayEntryIDs = pattern->dayEntryIDs;
-                    break;
-                }
-            }
-        }
-    }
-
-    return defaultDay;
-}
-
-bool DayIsValid(Structs::DayStruct::Type * aDay)
-{
-    if ((aDay->date == 0) || (aDay->dayType == DayTypeEnum::kUnknownEnumValue))
-    {
-        return false;
-    }
-    return true;
-}
-
-std::pair<const Structs::DayEntryStruct::Type *, const Structs::DayEntryStruct::Type *>
-FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t> & dayEntryIDs, uint16_t minutesSinceMidnight,
-             uint16_t * currentEntryMinutesRemain)
-{
-    const Structs::DayEntryStruct::Type * currentPtr = nullptr;
-    const Structs::DayEntryStruct::Type * nextPtr    = nullptr;
-    *currentEntryMinutesRemain                       = 0;
-
-    for (size_t i = 0; i < dayEntryIDs.size(); i++)
-    {
-        nextPtr    = nullptr;
-        currentPtr = GetListEntryById<Structs::DayEntryStruct::Type>(aCtx.mTariffProvider->GetDayEntries().Value(), dayEntryIDs[i]);
-        if (currentPtr == nullptr)
-        {
-            continue;
-        }
-
-        if (i + 1 < dayEntryIDs.size())
-        {
-            nextPtr =
-                GetListEntryById<Structs::DayEntryStruct::Type>(aCtx.mTariffProvider->GetDayEntries().Value(), dayEntryIDs[i + 1]);
-        }
-        else
-        {
-            nextPtr = nullptr;
-        }
-
-        // Default: Current entry lasts until end of day
-        uint16_t duration = (kDayEntryDurationLimit - currentPtr->startTime);
-
-        if (currentPtr->duration.HasValue())
-        {
-            duration = currentPtr->duration.Value();
-        }
-        else if (nextPtr != nullptr && nextPtr->startTime < kDayEntryDurationLimit)
-        {
-            if (nextPtr->startTime <= currentPtr->startTime)
-            {
-                // Next entry is on the following day
-                duration = static_cast<uint16_t>((kDayEntryDurationLimit - currentPtr->startTime) + nextPtr->startTime);
-            }
-            else
-            {
-                // Next entry is on the same day
-                duration = nextPtr->startTime - currentPtr->startTime;
-            }
-        }
-
-        // Check if current entry matches the current time
-        if (currentPtr->startTime <= minutesSinceMidnight && (currentPtr->startTime + duration) > minutesSinceMidnight)
-        {
-            *currentEntryMinutesRemain = static_cast<uint16_t>(duration - (minutesSinceMidnight - currentPtr->startTime));
-            break;
-        }
-    }
-
-    return { currentPtr, nextPtr };
-}
-
-const Structs::TariffPeriodStruct::Type * FindTariffPeriodByDayEntryId(CurrentTariffAttrsCtx & aCtx, uint32_t dayEntryID)
-{
-    for (const auto & period : aCtx.mTariffProvider->GetTariffPeriods().Value())
-    {
-        for (const auto & entryID : period.dayEntryIDs)
-        {
-            if (entryID == dayEntryID)
-            {
-                return &period;
-            }
-        }
-    }
-
-    return nullptr;
-}
-
-template <size_t ReturnCapacity = CommodityTariffConsts::kTariffPeriodsAttrMaxLength>
-CTC_UnorderedSet<const Structs::TariffPeriodStruct::Type *, ReturnCapacity>
-FindTariffPeriodsByTariffComponentId(CurrentTariffAttrsCtx & aCtx, uint32_t componentID)
-{
-    const auto & tariffPeriods = aCtx.mTariffProvider->GetTariffPeriods().Value();
-    CTC_UnorderedSet<const Structs::TariffPeriodStruct::Type *, ReturnCapacity> matchingPeriods;
-
-    for (const auto & period : tariffPeriods)
-    {
-        if (std::find(period.tariffComponentIDs.begin(), period.tariffComponentIDs.end(), componentID) !=
-            period.tariffComponentIDs.end())
-        {
-            matchingPeriods.insert(&period);
-        }
-    }
-
-    return matchingPeriods;
-}
-
-CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentTariffAttrsCtx & aCtx, uint32_t dayEntryID,
-                                                  TariffComponentsDataClass & mgmtObj)
-{
-    CHIP_ERROR err                                   = CHIP_NO_ERROR;
-    const Structs::TariffPeriodStruct::Type * period = FindTariffPeriodByDayEntryId(aCtx, dayEntryID);
-
-    // Use a fixed-size array with maximum expected components
-    constexpr size_t MAX_COMPONENTS = 16; // Adjust this based on your maximum expected components
-    std::array<Structs::TariffComponentStruct::Type, MAX_COMPONENTS> tempArray;
-    size_t componentCount = 0;
-
-    if (period == nullptr)
-    {
-        return CHIP_ERROR_NOT_FOUND;
-    }
-    const DataModel::List<const uint32_t> & componentIDs = period->tariffComponentIDs;
-
-    for (const auto & entryID : componentIDs)
-    {
-        Structs::TariffComponentStruct::Type entry;
-        auto current =
-            GetListEntryById<Structs::TariffComponentStruct::Type>(aCtx.mTariffProvider->GetTariffComponents().Value(), entryID);
-        if (current == nullptr)
-        {
-            err = CHIP_ERROR_NOT_FOUND;
-            goto exit;
-        }
-        entry = *current;
-        if (current->label.HasValue())
-        {
-            DataModel::Nullable<chip::CharSpan> tmpNullLabel;
-            tmpNullLabel.SetNull();
-            if (!current->label.Value().IsNull())
-            {
-                chip::CharSpan srcLabelSpan = current->label.Value().Value();
-                if (CHIP_NO_ERROR !=
-                    (err = CommodityTariffAttrsDataMgmt::SpanCopier<char>::Copy(current->label.Value().Value(), tmpNullLabel,
-                                                                                srcLabelSpan.size())))
-                {
-                    goto exit;
-                }
-            }
-            entry.label = MakeOptional(tmpNullLabel);
-        }
-        tempArray[componentCount++] = entry;
-    }
-
-    err =
-        mgmtObj.SetNewValue(MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempArray.data(), componentCount)));
-    SuccessOrExit(err);
-
-    err = mgmtObj.UpdateBegin(nullptr);
-    SuccessOrExit(err);
-
-    if (mgmtObj.UpdateFinish(err == CHIP_NO_ERROR)) // Success path
-    {
-        aInstance->AttributeUpdCb(mgmtObj.GetAttrId());
-    }
-
-exit:
-    for (size_t i = 0; i < componentCount; i++)
-    {
-        mgmtObj.CleanupExtListEntry(tempArray[i]);
-    }
-
-    return err;
-}
-} // namespace Utils
 
 using CurrentTariffAttrsCtx = CommodityTariff::Instance::CurrentTariffAttrsCtx;
 
