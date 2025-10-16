@@ -61,6 +61,7 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
         Define the step-by-step sequence for the test.
         """
         steps = [
+            TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success"),
             TestStep(2, "Turns ON the physical privacy switch (HardPrivacyModeOn is TRUE)",
@@ -89,9 +90,11 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
     @async_test_body
     async def test_TC_WEBRTCP_2_13(self):
         """
-        Executes the test steps for validating ProvideOffer behavior when physical privacy switch is ON.
+        Executes the test steps for validating ProvideOffer fails when physical privacy switch is ON.
         """
 
+        self.step("precondition")
+        # Commission DUT - already done
         endpoint = self.get_endpoint(default=1)
 
         self.step(1)
