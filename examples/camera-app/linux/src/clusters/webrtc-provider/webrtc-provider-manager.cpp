@@ -875,7 +875,14 @@ void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint1
     WebrtcTransport * transport = GetTransport(sessionId);
     if (transport == nullptr)
     {
-        ChipLogError(Camera, "Transport not found for session %u during connection state change", sessionId);
+        if (connected)
+        {
+            ChipLogError(Camera, "Transport not found for session %u during connection state change (connected)", sessionId);
+        }
+        else
+        {
+            ChipLogProgress(Camera, "Transport not found for session %u during disconnect; session may have already been cleaned up", sessionId);
+        }
         return;
     }
 
