@@ -216,15 +216,15 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         """
         if len(self.problems) > 0:
+            # Attempt to dump device attribute data for debugging when problems are found
+            self._dump_device_attributes_on_failure()
+
             LOGGER.info("###########################################################")
             LOGGER.info("Problems found:")
             LOGGER.info("===============")
             for problem in self.problems:
                 LOGGER.info(str(problem))
             LOGGER.info("###########################################################")
-
-            # Attempt to dump device attribute data for debugging when problems are found
-            self._dump_device_attributes_on_failure()
         super().teardown_class()
 
     def _dump_device_attributes_on_failure(self):
@@ -238,21 +238,14 @@ class MatterBaseTest(base_test.BaseTestClass):
         try:
             # Check if we have endpoints_tlv data (from BasicCompositionTests or similar)
             if hasattr(self, 'endpoints_tlv') and self.endpoints_tlv:
-                LOGGER.info("MatterBaseTest: Problems detected - generating device attribute dump")
-
                 # Check if we have the dump_wildcard method (from BasicCompositionTests)
                 if hasattr(self, 'dump_wildcard'):
-                    LOGGER.info("Device attribute data available - generating dump")
                     _, txt_str = self.dump_wildcard(None)
                     # Only dump the text format - it's more readable for debugging
                     self._log_structured_data('==== FAILURE_DUMP_txt: ', txt_str)
-                else:
-                    LOGGER.info("dump_wildcard method not available - skipping device attribute dump")
-            else:
-                LOGGER.debug("No device attribute data available (endpoints_tlv not populated)")
-        except Exception as e:
-            # Don't let logging errors interfere with the original test failure
-            LOGGER.warning(f"Failed to generate device attribute dump: {e}")
+        except (AttributeError, KeyError, ValueError, TypeError):
+            # Don't let data access or serialization errors interfere with the original test failure
+            pass
 
     def _log_structured_data(self, start_tag: str, dump_string: str):
         """Log structured data with a clear start and end marker.
