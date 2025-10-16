@@ -37,7 +37,7 @@ public:
         kAPStop             = 3,
         kScan               = 4, /* This combines the scan start and scan result events  */
         kStationStartJoin   = 5,
-        kConnectionComplete = 6, /* This combines the DHCP and Notify for SiWx917 */
+        kConnectionComplete = 6, /* This combines the DHCP and Notify */
         kStationDhcpDone    = 7,
         kStationDhcpPoll    = 8,
     };
@@ -67,7 +67,6 @@ public:
     bool HasAnIPv6Address() override;
     void CancelScanNetworks() override;
     bool IsWifiProvisioned() override;
-
     CHIP_ERROR InitWiFiStack(void) override;
     CHIP_ERROR GetAccessPointInfo(wfx_wifi_scan_result_t & info) override;
     CHIP_ERROR GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & info) override;

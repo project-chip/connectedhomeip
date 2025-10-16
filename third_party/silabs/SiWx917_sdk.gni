@@ -63,7 +63,7 @@ template("siwx917_sdk") {
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/config",
 
-      "${chip_root}/src/platform/silabs/rs911x",
+      "${chip_root}/src/platform/silabs/siwx917",
       "${chip_root}/src/platform/silabs/wifi",
 
       # ble component
@@ -191,8 +191,7 @@ template("siwx917_sdk") {
       "SL_WIFI=1",
       "CCP_SI917_BRINGUP=1",
       "SL_COMPONENT_CATALOG_PRESENT=1",
-      "RS911X_WIFI=1",
-      "RSI_WLAN_ENABLE",
+      "SIWX917_WIFI=1",
       "SLI_SI91X_ENABLE_OS=1",
       "SLI_SI91X_MCU_INTERFACE=1",  #Enable CCP bus Interface, Differentiation:
                                     # 1->SOC and 0->NCP
