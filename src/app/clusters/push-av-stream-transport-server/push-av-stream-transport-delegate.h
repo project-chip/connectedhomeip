@@ -51,7 +51,7 @@ public:
      *
      * @param transportOptions The configuration options of the transport to be allocated
      * @param connectionID The connectionID to allocate
-     * @param peerFabricIndex The FabricIndex to set
+     * @param AccessingFabricIndex The FrabricIndex of the assosciated Fabric
      * @return Success if allocation is successful and a PushTransportConnectionID was produced;
      *         otherwise, the command is rejected with Failure
      *
@@ -64,7 +64,7 @@ public:
      */
     virtual Protocols::InteractionModel::Status
     AllocatePushTransport(const PushAvStreamTransport::Structs::TransportOptionsStruct::Type & transportOptions,
-                          const uint16_t connectionID, FabricIndex peerFabricIndex) = 0;
+                          const uint16_t connectionID, FabricIndex accessingFabricIndex) = 0;
 
     /**
      * @brief Handles stream transport deallocation for the provided connectionID.

@@ -135,7 +135,7 @@ public:
         const chip::app::Clusters::PushAvStreamTransport::Structs::TransportMotionTriggerTimeControlStruct::DecodableType &
             timeControl);
 
-    void SetFabricIndex(chip::FabricIndex peerFabricIndex) { mFabricIndex = peerFabricIndex; }
+    void SetFabricIndex(chip::FabricIndex accessingFabricIndex) { mFabricIndex = accessingFabricIndex; }
 
     void StartNewSession(uint64_t newSessionID);
 

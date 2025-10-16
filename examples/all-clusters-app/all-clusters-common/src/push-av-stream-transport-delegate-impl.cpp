@@ -34,7 +34,7 @@ using chip::Protocols::InteractionModel::Status;
 
 Protocols::InteractionModel::Status
 PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
-                                                    FabricIndex peerFabricIndex)
+                                                    FabricIndex accessingFabricIndex)
 {
     PushAvStream stream{ connectionID, transportOptions, TransportStatusEnum::kInactive, PushAvStreamTransportStatusEnum::kIdle };
 

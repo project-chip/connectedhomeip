@@ -78,7 +78,8 @@ public:
 
     // Add missing override keywords and fix signatures
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
-                                                              const uint16_t connectionID, FabricIndex peerFabricIndex) override;
+                                                              const uint16_t connectionID,
+                                                              FabricIndex accessingFabricIndex) override;
 
     Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID) override;
 

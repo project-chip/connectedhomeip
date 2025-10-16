@@ -73,7 +73,7 @@ void PushAvStreamTransportManager::SetPushAvStreamTransportServer(PushAvStreamTr
 
 Protocols::InteractionModel::Status
 PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
-                                                    FabricIndex peerFabricIndex)
+                                                    FabricIndex accessingFabricIndex)
 {
     if (mCameraDevice == nullptr)
     {
@@ -88,7 +88,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
 
     mTransportMap[connectionID]->SetPushAvStreamTransportServer(mPushAvStreamTransportServer);
     mTransportMap[connectionID]->SetPushAvStreamTransportManager(this);
-    mTransportMap[connectionID]->SetFabricIndex(peerFabricIndex);
+    mTransportMap[connectionID]->SetFabricIndex(accessingFabricIndex);
 
     if (mMediaController == nullptr)
     {

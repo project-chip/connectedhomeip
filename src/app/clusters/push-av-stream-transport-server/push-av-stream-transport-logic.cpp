@@ -668,14 +668,18 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    bool isValidUrl = ValidateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
-
-    if (isValidUrl == false)
+    if (transportOptions.containerOptions.containerType == ContainerFormatEnum::kCmaf &&
+        transportOptions.containerOptions.CMAFContainerOptions.HasValue())
     {
-        auto status = to_underlying(StatusCodeEnum::kInvalidURL);
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Url", mEndpointId);
-        handler.AddClusterSpecificFailure(commandPath, status);
-        return std::nullopt;
+        bool isValidUrl = ValidateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
+
+        if (isValidUrl == false)
+        {
+            auto status = to_underlying(StatusCodeEnum::kInvalidURL);
+            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Url", mEndpointId);
+            handler.AddClusterSpecificFailure(commandPath, status);
+            return std::nullopt;
+        }
     }
 
     bool isValidStreamUsage = mDelegate->ValidateStreamUsage(transportOptions.streamUsage);
@@ -848,8 +852,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     if (transportOptions.containerOptions.containerType == ContainerFormatEnum::kCmaf &&
         transportOptions.containerOptions.CMAFContainerOptions.HasValue())
     {
-        // SegmentDuration validation is restricted to video streams because SegmentDuration must be a multiple of KeyFrameInterval.
-        // See spec issue: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/12322
+        // SegmentDuration validation is restricted to video streams because SegmentDuration must be a multiple of
+        // KeyFrameInterval. See spec issue: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/12322
         if (transportOptionsPtr->videoStreamID.HasValue())
         {
             bool isValidSegmentDuration = mDelegate->ValidateSegmentDuration(
@@ -873,9 +877,9 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    FabricIndex peerFabricIndex = handler.GetAccessingFabricIndex();
+    FabricIndex accessingFabricIndex = handler.GetAccessingFabricIndex();
 
-    status = mDelegate->AllocatePushTransport(*transportOptionsPtr, connectionID, peerFabricIndex);
+    status = mDelegate->AllocatePushTransport(*transportOptionsPtr, connectionID, accessingFabricIndex);
 
     if (status == Status::Success)
     {
@@ -884,7 +888,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
         outTransportConfiguration.transportStatus = TransportStatusEnum::kInactive;
 
-        outTransportConfiguration.SetFabricIndex(peerFabricIndex);
+        outTransportConfiguration.SetFabricIndex(accessingFabricIndex);
 
         UpsertStreamTransportConnection(outTransportConfiguration);
 
