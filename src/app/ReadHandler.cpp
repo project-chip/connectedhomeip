@@ -246,7 +246,7 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
                 err = SendSubscribeResponse();
 
                 SetStateFlag(ReadHandlerFlags::ActiveSubscription);
-
+                mSubjectDescriptor = GetSubjectDescriptor();
                 auto * appCallback = mManagementCallback.GetAppCallback();
                 if (appCallback)
                 {
@@ -416,7 +416,7 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
             // Trigger check-in message when a non-priming subscription report times out.
             ChipLogError(DataManagement, "Trigger check-in message when non-priming subscription report times out");
             Optional<Access::SubjectDescriptor> subjectDescriptor;
-            subjectDescriptor.SetValue(GetSubjectDescriptor());
+            subjectDescriptor.SetValue(mSubjectDescriptor);
             mManagementCallback.GetInteractionModelEngine()->GetICDManager()->SendCheckInMsgs(subjectDescriptor);
         }
         break;
