@@ -27,6 +27,7 @@
 #     script-args: >
 #       --in-test-commissioning-method on-network
 #       --discriminator 1234
+#       --passcode 20202021
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --int-arg NFC_Reader_index:0
 #       --storage-path admin_storage.json
