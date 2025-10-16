@@ -24,6 +24,7 @@ updates:
       - dependency-name: "third_party/mbedtls/repo"
       - dependency-name: "third_party/openthread/repo"
 
+      - dependency-name: "third_party/amazon-kinesis-video-streams-webrtc-sdk-c/repo"
       - dependency-name: "third_party/ameba/repo"
       - dependency-name: "third_party/android_deps/repo"
       - dependency-name: "third_party/asr/repo"

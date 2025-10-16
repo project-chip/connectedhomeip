@@ -2217,12 +2217,12 @@ cluster IcdManagement = 70 {
     int32u promisedActiveDuration = 0;
   }
 
-  /** Register a client to the end device */
+  /** This command allows a client to register itself with the ICD to be notified when the device is available for communication. */
   fabric command access(invoke: manage) RegisterClient(RegisterClientRequest): RegisterClientResponse = 0;
-  /** Unregister a client from an end device */
+  /** This command allows a client to unregister itself with the ICD. */
   fabric command access(invoke: manage) UnregisterClient(UnregisterClientRequest): DefaultSuccess = 2;
-  /** Request the end device to stay in Active Mode for an additional ActiveModeThreshold */
-  command access(invoke: manage) StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
+  /** This command allows a client to request that the server stays in active mode for at least a given time duration (in milliseconds) from when this command is received. */
+  command StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
 }
 
 /** An interface to a generic way to secure a door */
@@ -2877,7 +2877,7 @@ cluster DoorLock = 257 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 3;
+  device type ma_rootdevice = 22, version 4;
   device type ma_powersource = 17, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
@@ -3248,12 +3248,12 @@ endpoint 1 {
 
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0000;
-    ram      attribute identifyType default = 0x0;
+    callback attribute identifyTime;
+    callback attribute identifyType;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;

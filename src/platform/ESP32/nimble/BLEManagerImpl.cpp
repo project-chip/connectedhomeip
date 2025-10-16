@@ -64,6 +64,10 @@
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
 
+#ifdef CONFIG_ESP_HOSTED_ENABLE_BT_NIMBLE
+#include <esp_hosted.h>
+#endif
+
 // Not declared in any header file, hence requires a forward declaration.
 extern "C" void ble_store_config_init(void);
 
@@ -936,6 +940,26 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     SuccessOrExit(err);
 #endif
 
+#ifdef CONFIG_ESP_HOSTED_ENABLE_BT_NIMBLE
+    esp_hosted_connect_to_slave();
+
+    // init bt controller
+    err = MapBLEError(esp_hosted_bt_controller_init());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Ble, "esp_hosted_bt_controller_init() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ExitNow();
+    }
+
+    // enable bt controller
+    err = MapBLEError(esp_hosted_bt_controller_enable());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Ble, "esp_hosted_bt_controller_enable() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ExitNow();
+    }
+#endif
+
 // For ESP-IDF 5.0.1 and below, nimble_port_init() returns void
 #if ESP_IDF_VERSION <= ESP_IDF_VERSION_VAL(5, 0, 1)
     nimble_port_init();
@@ -1047,11 +1071,6 @@ CHIP_ERROR BLEManagerImpl::DeinitBLE()
 
     return MapBLEError(err);
 }
-
-#ifdef CONFIG_IDF_TARGET_ESP32P4
-// Stub function to avoid link error
-extern "C" void ble_transport_ll_deinit(void) {}
-#endif
 
 #ifdef CONFIG_BT_NIMBLE_EXT_ADV
 CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
