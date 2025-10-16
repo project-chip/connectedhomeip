@@ -176,10 +176,14 @@ class OTAProviderSubprocess(AppServerSubprocess):
         if isinstance(log_file, str):
             f_stdout = open(log_file, 'ab')
             self.log_file = log_file
+        else:
+            f_stdout = log_file
 
         if isinstance(err_log_file, str):
             f_stderr = open(err_log_file, 'ab')
             self.err_log_file = err_log_file
+        else:
+            f_stderr = err_log_file
 
         # Build OTA-specific arguments using the ota_source property
         combined_extra_args = ota_source.ota_args + extra_args
@@ -232,21 +236,3 @@ class OTAProviderSubprocess(AppServerSubprocess):
                 found_lines.append(match)
 
         return found_lines
-
-
-class OTARequestorSubProcess(AppServerSubprocess):
-    PREFIX = b"[OTA-REQUESTOR]"
-
-    def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5542, extra_args: list[str] = [],
-                 kvs_path: Optional[str] = None, log_file: Union[str, BinaryIO] = stdout.buffer, err_log_file: Union[str, BinaryIO] = stderr.buffer):
-        if isinstance(log_file, str):
-            f_stdout = open(log_file, 'ab')
-            self.log_file = log_file
-
-        if isinstance(err_log_file, str):
-            f_stderr = open(err_log_file, 'ab')
-            self.err_log_file = err_log_file
-
-        super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator,
-                         passcode=passcode, port=port, extra_args=extra_args, kvs_path=kvs_path, f_stdout=f_stdout, f_stderr=f_stderr)

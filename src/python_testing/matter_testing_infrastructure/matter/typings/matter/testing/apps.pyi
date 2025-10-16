@@ -55,7 +55,3 @@ class OTAProviderSubprocess(AppServerSubprocess):
     def get_pid(self) -> int: ...
 
     def read_from_logs(self, pattern: str, regex: bool = True, before: int = 4, after: int = 4) -> list[dict]: ...
-
-
-class OTARequestorSubProcess(AppServerSubprocess):
-    PREFIX: bytes
