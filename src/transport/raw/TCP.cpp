@@ -181,14 +181,14 @@ ActiveTCPConnectionHandle TCPBase::FindInUseConnection(const PeerAddress & addre
         {
             Inet::IPAddress addr;
             uint16_t port;
-            if (conn.IsConnected() && conn.mEndPoint->GetPeerInfo(&addr, &port) != CHIP_NO_ERROR)
+            if (conn.IsConnected())
             {
-                // Failure to get peer information means the connection is bad, re-establish connection
-                CHIP_ERROR err = TryResetConnection(conn);
+                // Failure to get peer information means the connection is bad; close it
+                CHIP_ERROR err = conn.mEndPoint->GetPeerInfo(&addr, &port);
                 if (err != CHIP_NO_ERROR)
                 {
                     CloseConnectionInternal(conn, err, SuppressCallback::No);
-                    continue;
+                    return nullptr;
                 }
             }
 
@@ -724,19 +724,6 @@ void TCPBase::InitEndpoint(const Inet::TCPEndPointHandle & endpoint)
     endpoint->mAppState         = reinterpret_cast<void *>(this);
     endpoint->OnConnectComplete = HandleTCPEndPointConnectComplete;
     endpoint->SetConnectTimeout(mConnectTimeout);
-}
-
-CHIP_ERROR TCPBase::TryResetConnection(ActiveTCPConnectionState & connection)
-{
-    Inet::TCPEndPointHandle endpoint;
-    ReturnErrorOnFailure(mListenSocket->GetEndPointManager().NewEndPoint(endpoint));
-
-    InitEndpoint(endpoint);
-    PeerAddress & addr = connection.mPeerAddr;
-    ReturnErrorOnFailure(endpoint->Connect(addr.GetIPAddress(), addr.GetPort(), addr.GetInterface()));
-    connection.mConnectionState = TCPState::kConnecting;
-    connection.mEndPoint        = endpoint;
-    return CHIP_NO_ERROR;
 }
 
 } // namespace Transport
