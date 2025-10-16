@@ -186,12 +186,12 @@ protected:
               typename std::enable_if_t<!DataModel::IsFabricScoped<RequestT>::value, bool> = true>
     __attribute__((always_inline)) inline void HandleCommand(HandlerContext & handlerContext, FuncT func)
     {
-        if (!PrehandleCommand(handlerContext, RequestT::GetClusterId(), RequestT::GetCommandId()))
+        if (!ShouldHandleCommand(handlerContext, RequestT::GetClusterId(), RequestT::GetCommandId()))
         {
             return;
         }
         RequestT requestPayload;
-        if (!HandleDecode(handlerContext, DataModel::Decode(handlerContext.mPayload, requestPayload)))
+        if (DecodeFailed(handlerContext, DataModel::Decode(handlerContext.mPayload, requestPayload)))
         {
             return;
         }
@@ -213,21 +213,23 @@ protected:
     template <typename RequestT, typename FuncT, typename std::enable_if_t<DataModel::IsFabricScoped<RequestT>::value, bool> = true>
     __attribute__((always_inline)) inline void HandleCommand(HandlerContext & handlerContext, FuncT func)
     {
-        if (!PrehandleCommand(handlerContext, RequestT::GetClusterId(), RequestT::GetCommandId()))
+        if (!ShouldHandleCommand(handlerContext, RequestT::GetClusterId(), RequestT::GetCommandId()))
         {
             return;
         }
         RequestT requestPayload;
-        if (!HandleDecode(handlerContext,
-                          requestPayload.Decode(handlerContext.mPayload, handlerContext.mCommandHandler.GetAccessingFabricIndex())))
+        if (DecodeFailed(handlerContext,
+                         requestPayload.Decode(handlerContext.mPayload, handlerContext.mCommandHandler.GetAccessingFabricIndex())))
         {
             return;
         }
 
         func(handlerContext, requestPayload);
     }
+    Optional<EndpointId> GetEndpointId() { return mEndpointId; }
 
-    inline bool PrehandleCommand(HandlerContext & handlerContext, ClusterId expectedClusterId, CommandId expectedCommandId)
+private:
+    bool ShouldHandleCommand(HandlerContext & handlerContext, ClusterId expectedClusterId, CommandId expectedCommandId)
     {
         if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mClusterId == expectedClusterId) &&
             (handlerContext.mRequestPath.mCommandId == expectedCommandId))
@@ -246,20 +248,17 @@ protected:
         return false;
     }
 
-    inline bool HandleDecode(HandlerContext & handlerContext, CHIP_ERROR decodeStatus)
+    bool DecodeFailed(HandlerContext & handlerContext, CHIP_ERROR decodeStatus)
     {
         if (decodeStatus == CHIP_NO_ERROR)
         {
-            return true;
+            return false;
         }
 
         handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
-        return false;
+        return true;
     }
 
-    Optional<EndpointId> GetEndpointId() { return mEndpointId; }
-
-private:
     Optional<EndpointId> mEndpointId;
     ClusterId mClusterId;
     CommandHandlerInterface * mNext = nullptr;
