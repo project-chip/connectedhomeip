@@ -76,7 +76,7 @@ void MatterUserLabelClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
-    // register a singleton server (root endpoint only)
+    // unregister a singleton server (root endpoint only)
     CodegenClusterIntegration::UnregisterServer(
         {
             .endpointId                = endpointId,
