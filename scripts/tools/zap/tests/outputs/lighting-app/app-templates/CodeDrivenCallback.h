@@ -82,3 +82,7 @@ void MatterGroupKeyManagementClusterShutdownCallback(chip::EndpointId endpointId
 void MatterFixedLabelClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterFixedLabelClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterUserLabelClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterUserLabelClusterShutdownCallback(chip::EndpointId endpointId);
