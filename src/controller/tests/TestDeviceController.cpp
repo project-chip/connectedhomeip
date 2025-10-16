@@ -24,8 +24,8 @@
 #include <app/util/DataModelHandler.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
-#include <controller/tests/DispatchDataModel.h>
 #include <controller/tests/ControllerAndCommissioningArgumentDefinitions.h>
+#include <controller/tests/DispatchDataModel.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
