@@ -38,6 +38,9 @@
 #       --nodeId 123
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --string-arg provider_app_path:${OTA_PROVIDER_APP}
+#       --string-arg ota_image:${OTA_IMAGE_V2}
+#       --int-arg ota_image_expected_version:2
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -64,30 +67,32 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
         "setup_pincode": 2321
     }
     requestor_setup_pincode = 2123
-    expected_software_version = 2
+
     kvs_path = '/tmp/chip_kvs_provider'
 
     @async_test_body
     async def teardown_class(self):
-        self.current_provider_app_proc.terminate()
+        if hasattr(self.current_provider_app_proc, 'terminate'):
+            self.current_provider_app_proc.terminate()
         super().teardown_class()
 
     @async_test_body
     async def setup_class(self):
         super().setup_class()
+        provider_app_path = self.user_params.get('provider_app_path', "")
+        ota_image_path = self.user_params.get('ota_image', None)
         self.requestor_node_id = self.dut_node_id  # 123 with discriminator 123
         self.controller = self.default_controller
-        ota_image_path = self.get_ota_image_path(version=self.expected_software_version)
-        image_path = 'bdx://0000000000000141/' + ota_image_path
-        extra_arguments = ['--queryImageStatus', 'updateAvailable', '--imageUri', image_path]
-
+        bdx_image_path = 'bdx://0000000000000141/' + ota_image_path
+        extra_arguments = ['--queryImageStatus', 'updateAvailable', '--imageUri', bdx_image_path]
         self.start_provider(
-            version=self.expected_software_version,
+            provier_app_path=provider_app_path,
+            ota_image_path=ota_image_path,
             setup_pincode=self.provider_data['setup_pincode'],
             discriminator=self.provider_data['discriminator'],
             port=5541,
             kvs_path=self.kvs_path,
-            log_file='/tmp/provider.log',
+            # log_file='/tmp/provider_2_4.log',
             extra_args=extra_arguments,
         )
         logger.info("About to start commissioning")
@@ -101,7 +106,7 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
         await self.create_acl_entry(dev_ctrl=self.controller,
                                     provider_node_id=self.provider_data['node_id'], requestor_node_id=self.requestor_node_id)
         logger.info("Write OTA Providers")
-        await self.write_ota_providers(controller=self.controller, provider_node_id=self.provider_data['node_id'], endpoint=0)
+        await self.set_default_ota_providers_list(controller=self.controller, provider_node_id=self.provider_data['node_id'], requestor_node_id=self.requestor_node_id, endpoint=0)
 
     def desc_TC_SU_2_4(self) -> str:
         return "  [TC-SU-2.4] ApplyUpdateRequest Command from DUT to OTA-P"
@@ -129,10 +134,12 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
 
     @async_test_body
     async def test_TC_SU_2_4(self):
-
+        # Gather data
+        expected_software_version = self.user_params.get('ota_image_expected_version')
         self.step(0)
 
         self.step(1)
+        expected_token = '32'
         update_state_attr_handler = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
@@ -140,14 +147,12 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
         await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
         await self.announce_ota_provider(self.controller, self.provider_data['node_id'], self.requestor_node_id)
-
         update_state_match = AttributeMatcher.from_callable(
             "Update state is applying",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
 
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60*6)
         # This value should be obtained from a response but for now is 32
-        expected_token = '32'
         found_lines = self.current_provider_app_proc.read_from_logs(
             'Provider received ApplyUpdateRequest', before=2, after=6)
         if len(found_lines) == 0:
@@ -155,11 +160,11 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
         update_token_line = found_lines[0]['after'][0]
         handle_apply_request_line = found_lines[0]['after'][2]
         logger.info(f"Handle Apply Request {handle_apply_request_line} and token line {update_token_line}")
-        version_string = f"version: {self.expected_software_version}"
-        token_stirng = f"Update Token: {expected_token}"
+        version_string = f"version: {expected_software_version}"
+        token_string = f"Update Token: {expected_token}"
         # Match for the expected strings
         asserts.assert_true(version_string in handle_apply_request_line, f"{version_string} is not in the expected line")
-        asserts.assert_true(token_stirng in update_token_line, f"{expected_token} is not in the expected line")
+        asserts.assert_true(token_string in update_token_line, f"{expected_token} is not in the expected line")
         update_state_attr_handler.reset()
         await update_state_attr_handler.cancel()
 
