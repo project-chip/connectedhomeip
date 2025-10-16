@@ -892,11 +892,13 @@ void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint1
         // cluster and update the reference counts.
         ReleaseAudioVideoStreams(sessionId);
 
+        // Capture args before unregistering in case the transport is invalidated
+        WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
+
         // Unregister the transport from the media controller
         UnregisterWebrtcTransport(sessionId);
 
         // Remove from session maps
-        WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
         mSessionIdMap.erase(ScopedNodeId(args.peerNodeId, args.fabricIndex));
 
         // Remove from current sessions list in the WebRTC Transport Provider
