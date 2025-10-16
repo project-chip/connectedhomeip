@@ -24,7 +24,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from matter.testing.apps import OTAProviderSubprocess, OtaImagePath, OTARequestorProcess
+from matter.testing.apps import OTAProviderSubprocess, OtaImagePath
 
 logger = logging.getLogger(__name__)
 
@@ -38,36 +38,16 @@ class SU_BaseTest(MatterBaseTest):
             logger.info("Terminating existing OTA Provider")
             self.ota_provider.terminate()
             self.ota_provider = None
-        if hasattr(self, "ota_requestor") and self.ota_requestor is not None:
-            logger.info("Terminating existing OTA Requestor")
-            self.ota_requestor.terminate()
-            self.ota_requestor = None
         super().teardown_test()
+
+# Start the OTA requestor before test:
+# ./out/debug/chip-ota-requestor-app --discriminator 123 --passcode 2123 --secured-device-port 5540 --KVS /tmp/chip_kvs_requestor --autoApplyImage
+#
+# Start the test:
+# python3 src/python_testing/TC_SU_AK.py --commissioning-method on-network -d 123 -p 2123 -n 123
 
 
 class TC_SU_My_Test(SU_BaseTest):
-    def start_requestor(self, extra_args: list[str], expected_output: Optional[str] = None, timeout: int = 30):
-        logger.info("getting config")
-        ota_r_app_filepath = self.user_params.get("ota-r-app-filepath", "./out/debug/chip-ota-requestor-app")
-        ota_r_storage_dir = self.user_params.get("ota-r-storage-dir", "/tmp")
-        ota_r_port = self.user_params.get("ota-r-port", 5540)
-        ota_r_discriminator = self.user_params.get("ota-r-discriminator", 123)
-        ota_r_passcode = self.user_params.get("ota-r-passcode", 2123)
-        ota_r_kvs_path = self.user_params.get("ota-r-kvs-path", "/tmp/chip_kvs_requestor")
-
-        logger.info("Starting OTA Requestor")
-        self.ota_requestor = OTARequestorProcess(
-            app=ota_r_app_filepath,
-            storage_dir=ota_r_storage_dir,
-            port=ota_r_port,
-            discriminator=ota_r_discriminator,
-            passcode=ota_r_passcode,
-            extra_args=extra_args
-            # kvs_path=ota_r_kvs_path
-        )
-        self.ota_requestor.start(expected_output=expected_output,
-                                 timeout=timeout)
-
     def start_provider(self, extra_args: list[str], expected_output: Optional[str] = None, timeout: int = 30):
         logger.info("getting config")
         ota_p_app_filepath = self.user_params.get("ota-p-app-filepath", "./out/debug/chip-ota-provider-app")
@@ -76,7 +56,7 @@ class TC_SU_My_Test(SU_BaseTest):
         ota_p_discriminator = self.user_params.get("ota-p-discriminator", 321)
         ota_p_passcode = self.user_params.get("ota-p-passcode", 2321)
         ota_p_image_path = self.user_params.get("ota-p-image-path", OtaImagePath("firmware_requestor_v2.ota"))
-        ota_p_kvs_path = self.user_params.get("ota-p-kvs-path", "/tmp/chip_kvs_provider")
+        ota_p_kvs_path = self.user_params.get("ota-p-kvs-path", None)
 
         logger.info("Starting OTA Provider")
         self.ota_provider = OTAProviderSubprocess(
@@ -103,18 +83,6 @@ class TC_SU_My_Test(SU_BaseTest):
             filter=321
         )
         logger.info("OTA Provider commissioned")
-
-    async def commission_requestor(self):
-        logger.info("Commissioning OTA Requestor")
-
-        dev_ctrl = self.default_controller
-        await dev_ctrl.CommissionOnNetwork(
-            nodeId=123,
-            setupPinCode=2123,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=123
-        )
-        logger.info("OTA Requestor commissioned")
 
     async def announce_provider(self, dev_ctrl, requestor_node_id, provider_node_id, vendor_id=0xFFF1, reason=None, endpoint=0):
         """
@@ -162,9 +130,6 @@ class TC_SU_My_Test(SU_BaseTest):
 
         self.step(1)
         logger.info("Starting OTA Requestor")
-        self.start_requestor(extra_args=["--autoApplyImage"], expected_output="Server initialization complete",
-                             timeout=3600)
-        await self.commission_requestor()
 
         logger.info("Starting OTA Provider and initiating the software update")
         self.start_provider(extra_args=["-q", "updateAvailable"],
@@ -203,9 +168,6 @@ class TC_SU_My_Test(SU_BaseTest):
 
         self.step(1)
         logger.info("Starting OTA Requestor")
-        self.start_requestor(extra_args=["--autoApplyImage"], expected_output="Server initialization complete",
-                             timeout=3600)
-        await self.commission_requestor()
 
         logger.info("Starting OTA Provider and initiating the software update")
         self.start_provider(extra_args=["-q", "busy", "-t", "60"],
@@ -220,11 +182,6 @@ class TC_SU_My_Test(SU_BaseTest):
             dev_ctrl=self.default_controller,
             requestor_node_id=123,
             provider_node_id=321)
-
-        logger.info("Starting OTA Provider and initiating the software update")
-        self.ota_requestor.send(message="Expecting the update now",
-                                expected_output="Scheduling a retry",
-                                timeout=300)
 
 
 if __name__ == "__main__":
