@@ -35,7 +35,7 @@ SERVER_URI = "ws://localhost:9002"
 class WEBRTCRTestBase(MatterBaseTest):
     """
     Base class for WebRTC Transport Requestor test cases.
-    
+
     Provides common functionality including:
     - WebSocket-based command sending to the DUT
     - Shared SERVER_URI constant
@@ -44,10 +44,10 @@ class WEBRTCRTestBase(MatterBaseTest):
     async def send_command(self, command):
         """
         Send a command to the DUT via WebSocket and wait for response.
-        
+
         Args:
             command: The command string to send to the DUT
-            
+
         This method:
         1. Connects to the WebSocket server at SERVER_URI
         2. Sends the command
