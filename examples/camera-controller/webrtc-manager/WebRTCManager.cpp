@@ -298,10 +298,9 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
                 mSessionEstablishedCallback(mCurrentVideoStreamId);
             }
         }
-        else if (state == rtc::PeerConnection::State::Disconnected || state == rtc::PeerConnection::State::Failed ||
-                 state == rtc::PeerConnection::State::Closed)
+        else if (state == rtc::PeerConnection::State::Failed || state == rtc::PeerConnection::State::Closed)
         {
-            // Clean up resources when connection is lost
+            // Limit the clearup to Failed and Closed only to avoid prematurely ending sessions.
             Disconnect();
         }
     });

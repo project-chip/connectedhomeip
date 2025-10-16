@@ -872,26 +872,22 @@ void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint1
 {
     ChipLogProgress(Camera, "Connection state changed for session %u: %s", sessionId, connected ? "connected" : "disconnected");
 
-    WebrtcTransport * transport = GetTransport(sessionId);
-    if (transport == nullptr)
-    {
-        if (connected)
-        {
-            ChipLogError(Camera, "Transport not found for session %u during connection state change (connected)", sessionId);
-        }
-        else
-        {
-            ChipLogProgress(Camera, "Transport not found for session %u during disconnect; session may have already been cleaned up", sessionId);
-        }
-        return;
-    }
-
     if (connected)
     {
         RegisterWebrtcTransport(sessionId);
     }
     else
     {
+        WebrtcTransport * transport = GetTransport(sessionId);
+        if (transport == nullptr)
+        {
+
+            ChipLogProgress(Camera,
+                            "Transport not found for session %u during disconnect; session may have already been cleaned up",
+                            sessionId);
+            return;
+        }
+
         // Connection was closed/disconnected by the peer - clean up the session
         ChipLogProgress(Camera, "Peer connection closed for session %u, cleaning up resources", sessionId);
 

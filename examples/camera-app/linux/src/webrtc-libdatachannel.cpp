@@ -302,9 +302,11 @@ public:
             {
                 onConnectionState(true);
             }
-            else if (state == rtc::PeerConnection::State::Disconnected || state == rtc::PeerConnection::State::Failed ||
-                     state == rtc::PeerConnection::State::Closed)
+            else if (state == rtc::PeerConnection::State::Failed || state == rtc::PeerConnection::State::Closed)
             {
+                // rtc::PeerConnection::State::Disconnected as a terminal state will trigger teardown on transient ICE disconnects;
+                // per WebRTC semantics, Disconnected can recover to Connected. Limit the false signal to Failed and Closed only to
+                // avoid prematurely ending sessions.
                 onConnectionState(false);
             }
         });
