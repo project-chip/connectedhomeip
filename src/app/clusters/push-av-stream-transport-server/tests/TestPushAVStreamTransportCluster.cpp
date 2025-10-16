@@ -285,7 +285,10 @@ public:
 
     bool ValidateStreamUsage(StreamUsageEnum streamUsage) override { return true; }
 
-    bool ValidateSegmentDuration(uint16_t segmentDuration) override { return true; }
+    bool ValidateSegmentDuration(uint16_t segmentDuration, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override
+    {
+        return true;
+    }
 
     Protocols::InteractionModel::Status
     ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
@@ -295,8 +298,6 @@ public:
         // Returning Status::Success to pass through checks in the Server Implementation.
         return Status::Success;
     }
-
-    bool ValidateUrl(const std::string & url) override { return true; }
 
     Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId) override
     {
@@ -312,14 +313,14 @@ public:
         return Status::Success;
     }
 
-    Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId) override
+    Protocols::InteractionModel::Status SetVideoStream(uint16_t videoStreamId) override
     {
         // TODO: Validate videoStreamID from the allocated videoStreams
         // Returning Status::Success to pass through checks in the Server Implementation.
         return Status::Success;
     }
 
-    Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) override
+    Protocols::InteractionModel::Status SetAudioStream(uint16_t audioStreamId) override
     {
         // TODO: Validate audioStreamID from the allocated audioStreams
         // Returning Status::Success to pass through checks in the Server Implementation.
@@ -350,6 +351,24 @@ public:
             }
         }
         return PushAvStreamTransportStatusEnum::kUnknown;
+    }
+
+    CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override
+    {
+        isActive = false;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override
+    {
+        isActive = false;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override
+    {
+        isActive = false;
+        return CHIP_NO_ERROR;
     }
 
     void OnAttributeChanged(AttributeId attributeId) override
@@ -411,10 +430,10 @@ public:
         return Status::Success;
     }
 
-    Protocols::InteractionModel::ClusterStatusCode RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                                 uint16_t endpointID) override
+    Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                      uint16_t endpointID) override
     {
-        return ClusterStatusCode(Status::Success);
+        return Status::Success;
     }
 
     CHIP_ERROR RootCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) override
@@ -426,6 +445,8 @@ public:
     {
         return CHIP_NO_ERROR;
     }
+
+    void RemoveFabric(FabricIndex fabric) override {}
 };
 
 class TestPushAVStreamTransportServerLogic : public ::testing::Test
@@ -446,7 +467,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
     std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
-    std::string url = "rtsp://192.168.1.100:554/stream";
+    std::string url = "https://192.168.1.100:554/stream/";
     TransportOptionsDecodableStruct transportOptions;
 
     uint8_t tlvBuffer[512];
@@ -485,7 +506,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(1);
     transportOptions.audioStreamID.SetValue(2);
-    transportOptions.endpointID       = 1;
+    transportOptions.TLSEndpointID    = 1;
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
     transportOptions.containerOptions = containerOptions;
@@ -575,7 +596,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
-    std::string url = "rtsp://192.168.1.100:554/stream";
+    std::string url = "https://192.168.1.100:554/stream/";
     TransportOptionsDecodableStruct transportOptions;
 
     uint8_t tlvBuffer[512];
@@ -652,7 +673,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(1);
     transportOptions.audioStreamID.SetValue(2);
-    transportOptions.endpointID       = 1;
+    transportOptions.TLSEndpointID    = 1;
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
     transportOptions.containerOptions = containerOptions;
@@ -731,9 +752,9 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     EXPECT_EQ(respTransportOptions.streamUsage, StreamUsageEnum::kAnalysis);
     EXPECT_EQ(respTransportOptions.videoStreamID, 1);
     EXPECT_EQ(respTransportOptions.audioStreamID, 2);
-    EXPECT_EQ(respTransportOptions.endpointID, 1);
+    EXPECT_EQ(respTransportOptions.TLSEndpointID, 1);
     std::string respUrlStr(respTransportOptions.url.data(), respTransportOptions.url.size());
-    EXPECT_EQ(respUrlStr, "rtsp://192.168.1.100:554/stream");
+    EXPECT_EQ(respUrlStr, "https://192.168.1.100:554/stream/");
 
     Structs::TransportTriggerOptionsStruct::DecodableType respTriggerOptions = respTransportOptions.triggerOptions;
     EXPECT_EQ(respTriggerOptions.triggerType, TransportTriggerTypeEnum::kMotion);
@@ -866,10 +887,10 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     EXPECT_EQ(readTransportOptions.streamUsage, StreamUsageEnum::kAnalysis);
     EXPECT_EQ(readTransportOptions.videoStreamID, 1);
     EXPECT_EQ(readTransportOptions.audioStreamID, 2);
-    EXPECT_EQ(readTransportOptions.endpointID, 1);
+    EXPECT_EQ(readTransportOptions.TLSEndpointID, 1);
 
     std::string urlStr(readTransportOptions.url.data(), readTransportOptions.url.size());
-    EXPECT_EQ(urlStr, "rtsp://192.168.1.100:554/stream");
+    EXPECT_EQ(urlStr, "https://192.168.1.100:554/stream/");
 
     Structs::TransportTriggerOptionsStruct::DecodableType readTriggerOptions = readTransportOptions.triggerOptions;
     EXPECT_EQ(readTriggerOptions.triggerType, TransportTriggerTypeEnum::kMotion);
@@ -962,7 +983,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
-    std::string url = "rtsp://192.168.1.100:554/stream";
+    std::string url = "https://192.168.1.100:554/stream/";
     TransportOptionsDecodableStruct transportOptions;
 
     uint8_t tlvBuffer[512];
@@ -1039,7 +1060,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(1);
     transportOptions.audioStreamID.SetValue(2);
-    transportOptions.endpointID       = 1;
+    transportOptions.TLSEndpointID    = 1;
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
     transportOptions.containerOptions = containerOptions;
@@ -1138,8 +1159,8 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(11);
     transportOptions.audioStreamID.SetValue(22);
-    transportOptions.endpointID       = 1;
-    url                               = "rtsp://192.168.1.100:554/modify-stream";
+    transportOptions.TLSEndpointID    = 1;
+    url                               = "https://192.168.1.100:554/modify-stream/";
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
     transportOptions.containerOptions = containerOptions;
@@ -1219,10 +1240,10 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     EXPECT_EQ(findTransportOptions.streamUsage, StreamUsageEnum::kAnalysis);
     EXPECT_EQ(findTransportOptions.videoStreamID, 11);
     EXPECT_EQ(findTransportOptions.audioStreamID, 22);
-    EXPECT_EQ(findTransportOptions.endpointID, 1);
+    EXPECT_EQ(findTransportOptions.TLSEndpointID, 1);
 
     std::string findUrlStr(findTransportOptions.url.data(), findTransportOptions.url.size());
-    EXPECT_EQ(findUrlStr, "rtsp://192.168.1.100:554/modify-stream");
+    EXPECT_EQ(findUrlStr, "https://192.168.1.100:554/modify-stream/");
 
     Structs::TransportTriggerOptionsStruct::DecodableType findTriggerOptions = findTransportOptions.triggerOptions;
     EXPECT_EQ(findTriggerOptions.triggerType, TransportTriggerTypeEnum::kMotion);
@@ -1297,7 +1318,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
-    std::string url = "rtsp://192.168.1.100:554/stream";
+    std::string url = "https://192.168.1.100:554/stream/";
     TransportOptionsDecodableStruct transportOptions;
 
     uint8_t tlvBuffer[512];
@@ -1374,7 +1395,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(1);
     transportOptions.audioStreamID.SetValue(2);
-    transportOptions.endpointID       = 1;
+    transportOptions.TLSEndpointID    = 1;
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
     transportOptions.containerOptions = containerOptions;

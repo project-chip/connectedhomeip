@@ -119,7 +119,6 @@ ALLOW: Dict[str, Set[str]] = {
 
     # Only uses <chrono> for zero-cost types.
     'src/system/SystemClock.h': {'chrono'},
-    'src/platform/mbed/MbedEventTimeout.h': {'chrono'},
     'src/lib/core/StringBuilderAdapters.h': {'chrono'},
 
     'src/app/app-platform/ContentApp.h': {'list', 'string'},
@@ -187,7 +186,8 @@ ALLOW: Dict[str, Set[str]] = {
     'src/tracing/json/json_tracing.h': {'fstream', 'unordered_map', 'string'},
 
     # esp32 diagnostic tracing
-    'src/tracing/esp32_diagnostic_trace/Counter.h': {'map'},
+    'src/tracing/esp32_diagnostics/Counter.h': {'map'},
+    'src/tracing/esp32_diagnostics/DiagnosticTracing.h': {'unordered_set'},
 
     # esp32 tracing
     'src/tracing/esp32_trace/esp32_tracing.h': {'unordered_map'},

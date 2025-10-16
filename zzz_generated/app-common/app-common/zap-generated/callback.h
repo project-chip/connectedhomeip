@@ -6896,18 +6896,6 @@ void emberAfSampleMeiClusterServerTickCallback(chip::EndpointId endpoint);
 // Cluster Commands Callback
 
 /**
- * @brief Identify Cluster Identify Command callback (from client)
- */
-bool emberAfIdentifyClusterIdentifyCallback(chip::app::CommandHandler * commandObj,
-                                            const chip::app::ConcreteCommandPath & commandPath,
-                                            const chip::app::Clusters::Identify::Commands::Identify::DecodableType & commandData);
-/**
- * @brief Identify Cluster TriggerEffect Command callback (from client)
- */
-bool emberAfIdentifyClusterTriggerEffectCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Identify::Commands::TriggerEffect::DecodableType & commandData);
-/**
  * @brief Groups Cluster AddGroup Command callback (from client)
  */
 bool emberAfGroupsClusterAddGroupCallback(chip::app::CommandHandler * commandObj,
@@ -7031,12 +7019,6 @@ bool emberAfLevelControlClusterMoveToClosestFrequencyCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::DecodableType & commandData);
 /**
- * @brief Access Control Cluster ReviewFabricRestrictions Command callback (from client)
- */
-bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AccessControl::Commands::ReviewFabricRestrictions::DecodableType & commandData);
-/**
  * @brief OTA Software Update Requestor Cluster AnnounceOTAProvider Command callback (from client)
  */
 bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOTAProviderCallback(
@@ -7084,66 +7066,6 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
 bool emberAfBridgedDeviceBasicInformationClusterKeepActiveCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::BridgedDeviceBasicInformation::Commands::KeepActive::DecodableType & commandData);
-/**
- * @brief Operational Credentials Cluster AttestationRequest Command callback (from client)
- */
-bool emberAfOperationalCredentialsClusterAttestationRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::DecodableType & commandData);
-/**
- * @brief Operational Credentials Cluster CertificateChainRequest Command callback (from client)
- */
-bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::DecodableType & commandData);
-/**
- * @brief Operational Credentials Cluster CSRRequest Command callback (from client)
- */
-bool emberAfOperationalCredentialsClusterCSRRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalCredentials::Commands::CSRRequest::DecodableType & commandData);
-/**
- * @brief Operational Credentials Cluster AddNOC Command callback (from client)
- */
-bool emberAfOperationalCredentialsClusterAddNOCCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalCredentials::Commands::AddNOC::DecodableType & commandData);
-/**
- * @brief Operational Credentials Cluster UpdateNOC Command callback (from client)
- */
-bool emberAfOperationalCredentialsClusterUpdateNOCCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::DecodableType & commandData);
-/**
- * @brief Operational Credentials Cluster UpdateFabricLabel Command callback (from client)
- */
-bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::DecodableType & commandData);
-/**
- * @brief Operational Credentials Cluster RemoveFabric Command callback (from client)
- */
-bool emberAfOperationalCredentialsClusterRemoveFabricCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::DecodableType & commandData);
-/**
- * @brief Operational Credentials Cluster AddTrustedRootCertificate Command callback (from client)
- */
-bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::DecodableType & commandData);
-/**
- * @brief Operational Credentials Cluster SetVIDVerificationStatement Command callback (from client)
- */
-bool emberAfOperationalCredentialsClusterSetVIDVerificationStatementCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::DecodableType & commandData);
-/**
- * @brief Operational Credentials Cluster SignVIDVerificationRequest Command callback (from client)
- */
-bool emberAfOperationalCredentialsClusterSignVIDVerificationRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::DecodableType & commandData);
 /**
  * @brief ICD Management Cluster RegisterClient Command callback (from client)
  */
@@ -7214,36 +7136,6 @@ bool emberAfDishwasherAlarmClusterResetCallback(
 bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DishwasherAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
-/**
- * @brief Groupcast Cluster JoinGroup Command callback (from client)
- */
-bool emberAfGroupcastClusterJoinGroupCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Groupcast::Commands::JoinGroup::DecodableType & commandData);
-/**
- * @brief Groupcast Cluster LeaveGroup Command callback (from client)
- */
-bool emberAfGroupcastClusterLeaveGroupCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Groupcast::Commands::LeaveGroup::DecodableType & commandData);
-/**
- * @brief Groupcast Cluster UpdateGroupKey Command callback (from client)
- */
-bool emberAfGroupcastClusterUpdateGroupKeyCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Groupcast::Commands::UpdateGroupKey::DecodableType & commandData);
-/**
- * @brief Groupcast Cluster ExpireGracePeriod Command callback (from client)
- */
-bool emberAfGroupcastClusterExpireGracePeriodCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::DecodableType & commandData);
-/**
- * @brief Groupcast Cluster ConfigureAuxiliaryACL Command callback (from client)
- */
-bool emberAfGroupcastClusterConfigureAuxiliaryACLCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & commandData);
 /**
  * @brief Boolean State Configuration Cluster SuppressAlarm Command callback (from client)
  */

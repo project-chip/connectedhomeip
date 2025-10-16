@@ -61,6 +61,7 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
         Define the step-by-step sequence for the test.
         """
         steps = [
+            TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success"),
             TestStep(2, "Turns ON the physical privacy switch (HardPrivacyModeOn is TRUE)",
@@ -77,26 +78,33 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
     def pics_TC_WEBRTCP_2_13(self) -> list[str]:
         pics = [
             "WEBRTCP.S",
+            "WEBRTCP.S.C02.Rsp",   # ProvideOffer command
+            "WEBRTCP.S.C03.Tx",    # ProvideOfferResponse command
             "AVSM.S",
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
+            "AVSM.S.A0015",        # HardPrivacyModeOn attribute
         ]
         return pics
 
     @async_test_body
     async def test_TC_WEBRTCP_2_13(self):
         """
-        Executes the test steps for validating ProvideOffer behavior when physical privacy switch is ON.
+        Executes the test steps for validating ProvideOffer fails when physical privacy switch is ON.
         """
 
+        self.step("precondition")
+        # Commission DUT - already done
         endpoint = self.get_endpoint(default=1)
 
         self.step(1)
         # Allocate both Audio and Video streams
-        audioStreamID = await self.allocate_one_audio_stream()
-        videoStreamID = await self.allocate_one_video_stream()
+        audio_stream_id = await self.allocate_one_audio_stream()
+        video_stream_id = await self.allocate_one_video_stream()
 
         # Validate that the streams were allocated successfully
-        await self.validate_allocated_audio_stream(audioStreamID)
-        await self.validate_allocated_video_stream(videoStreamID)
+        await self.validate_allocated_audio_stream(audio_stream_id)
+        await self.validate_allocated_video_stream(video_stream_id)
 
         self.step(2)
         # For CI: Use app pipe to simulate physical privacy switch being turned on
@@ -140,8 +148,8 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
             sdp=sdp_offer,
             streamUsage=3,
             originatingEndpointID=endpoint,
-            videoStreamID=videoStreamID,
-            audioStreamID=audioStreamID
+            videoStreamID=video_stream_id,
+            audioStreamID=audio_stream_id
         )
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)

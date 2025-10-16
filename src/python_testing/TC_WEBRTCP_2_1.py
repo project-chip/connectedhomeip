@@ -46,13 +46,13 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCProvider_2_1(MatterBaseTest, WEBRTCPTestBase):
+class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
 
-    def desc_TC_WebRTCProvider_2_1(self) -> str:
+    def desc_TC_WebRTCP_2_1(self) -> str:
         """Returns a description of this test"""
         return "[TC-{picsCode}-2.1] Validate delayed processing of SolicitOffer with {DUT_Server}"
 
-    def steps_TC_WebRTCProvider_2_1(self) -> list[TestStep]:
+    def steps_TC_WebRTCP_2_1(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
@@ -62,14 +62,29 @@ class TC_WebRTCProvider_2_1(MatterBaseTest, WEBRTCPTestBase):
             TestStep(2, "Send SolicitOffer with no Video or Audio StreamID => expect INVALID_COMMAND"),
             TestStep(3, "Send SolicitOffer with VideoStreamID that doesn't match AllocatedVideoStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
             TestStep(4, "Send SolicitOffer with AudioStreamID that doesn't match AllocatedAudioStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
-            TestStep(5, "Write SoftLivestreamPrivacyModeEnabled=true, send SolicitOffer => expect INVALID_IN_STATE"),
-            TestStep(6, "Write SoftLivestreamPrivacyModeEnabled=false, send SolicitOffer => expect DeferredOffer=TRUE"),
+            TestStep(5, "Write SoftLivestreamPrivacyModeEnabled=true, send SolicitOffer with StreamUsage = LiveView => expect INVALID_IN_STATE"),
+            TestStep(6, "Write SoftLivestreamPrivacyModeEnabled=false, send SolicitOffer with StreamUsage = LiveView => expect DeferredOffer=TRUE"),
             TestStep(7, "Read CurrentSessions attribute => expect 1 with valid session data"),
         ]
         return steps
 
+    def pics_TC_WebRTCP_2_1(self) -> list[str]:
+        """
+        Return the list of PICS applicable to this test case.
+        """
+        pics = [
+            "WEBRTCP.S",           # WebRTC Transport Provider Server
+            "WEBRTCP.S.A0000",     # CurrentSessions attribute
+            "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
+            "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
+            "AVSM.S",              # CameraAVStreamManagement Server
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
+        ]
+        return pics
+
     @async_test_body
-    async def test_TC_WebRTCProvider_2_1(self):
+    async def test_TC_WebRTCP_2_1(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """

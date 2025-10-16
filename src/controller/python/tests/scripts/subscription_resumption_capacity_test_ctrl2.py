@@ -122,7 +122,7 @@ async def main():
         nodeid=112244, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=True)
 
     FailIfNot(
-        await test.TestOnNetworkCommissioning(options.discriminator, options.setuppin, options.nodeid, options.deviceAddress),
+        await test.TestOnNetworkCommissioning(options.discriminator, options.setuppin, options.nodeid),
         "Failed on on-network commissioning")
 
     FailIfNot(

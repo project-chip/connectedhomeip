@@ -46,17 +46,18 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCProvider_2_7(MatterBaseTest, WEBRTCPTestBase):
+class TC_WebRTCP_2_7(MatterBaseTest, WEBRTCPTestBase):
 
-    def desc_TC_WebRTCProvider_2_7(self) -> str:
+    def desc_TC_WebRTCP_2_7(self) -> str:
         """Returns a description of this test"""
         return "[TC-{picsCode}-2.7] Validate SolicitOffer fails when physical privacy switch is ON"
 
-    def steps_TC_WebRTCProvider_2_7(self) -> list[TestStep]:
+    def steps_TC_WebRTCP_2_7(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
         steps = [
+            TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success"),
             TestStep(2, "Turns ON the physical privacy switch (HardPrivacyModeOn is TRUE)",
@@ -69,12 +70,29 @@ class TC_WebRTCProvider_2_7(MatterBaseTest, WEBRTCPTestBase):
         ]
         return steps
 
+    def pics_TC_WebRTCP_2_7(self) -> list[str]:
+        """
+        Return the list of PICS applicable to this test case.
+        """
+        pics = [
+            "WEBRTCP.S",           # WebRTC Transport Provider Server
+            "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
+            "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
+            "AVSM.S",              # CameraAVStreamManagement Server
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
+            "AVSM.S.A0015",        # HardPrivacyModeOn attribute
+        ]
+        return pics
+
     @async_test_body
-    async def test_TC_WebRTCProvider_2_7(self):
+    async def test_TC_WebRTCP_2_7(self):
         """
         Executes the test steps for validating SolicitOffer behavior when physical privacy switch is ON.
         """
 
+        self.step("precondition")
+        # Commission DUT - already done
         endpoint = self.get_endpoint(default=1)
 
         self.step(1)

@@ -32,6 +32,13 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 
+namespace {
+
+// Constants
+constexpr uint16_t kMaxConcurrentWebRTCSessions = 5;
+
+} // namespace
+
 void WebRTCProviderManager::SetCameraDevice(CameraDeviceInterface * aCameraDevice)
 {
     mCameraDevice = aCameraDevice;
@@ -74,15 +81,13 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     // Resolve or allocate a VIDEO stream
     if (args.videoStreamId.HasValue())
     {
-        if (args.videoStreamId.Value().IsNull())
+        // Stream has been validated and potentially selected by ValidateStreamUsage()
+        // in the cluster server before invoking this delegate method
+        const auto & videoStreamIdNullable = args.videoStreamId.Value();
+        outSession.videoStreamID           = videoStreamIdNullable;
+        if (!videoStreamIdNullable.IsNull())
         {
-            // TODO: Automatically select the closest matching video stream for the StreamUsage requested by looking at the and the
-            // server MAY allocate a new video stream if there are available resources.
-        }
-        else
-        {
-            outSession.videoStreamID = args.videoStreamId.Value();
-            videoStreamID            = args.videoStreamId.Value().Value();
+            videoStreamID = videoStreamIdNullable.Value();
         }
     }
     else
@@ -93,15 +98,13 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     // Resolve or allocate an AUDIO stream
     if (args.audioStreamId.HasValue())
     {
-        if (args.audioStreamId.Value().IsNull())
+        // Stream has been validated and potentially selected by ValidateStreamUsage()
+        // in the cluster server before invoking this delegate method
+        const auto & audioStreamIdNullable = args.audioStreamId.Value();
+        outSession.audioStreamID           = audioStreamIdNullable;
+        if (!audioStreamIdNullable.IsNull())
         {
-            // TODO: Automatically select the closest matching audio stream for the StreamUsage requested and the server MAY
-            // allocate a new audio stream if there are available resources.
-        }
-        else
-        {
-            outSession.audioStreamID = args.audioStreamId.Value();
-            audioStreamID            = args.audioStreamId.Value().Value();
+            audioStreamID = audioStreamIdNullable.Value();
         }
     }
     else
@@ -134,6 +137,23 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     }
 
     transport->SetRequestArgs(requestArgs);
+
+    // Check resource availability before proceeding
+    // If we cannot allocate resources, send End command with OutOfResources reason
+    if (mWebrtcTransportMap.size() > kMaxConcurrentWebRTCSessions)
+    {
+        ChipLogProgress(Camera, "Resource exhaustion detected: maximum WebRTC sessions (%u)", kMaxConcurrentWebRTCSessions);
+
+        transport->SetCommandType(WebrtcTransport::CommandType::kEnd);
+        transport->MoveToState(WebrtcTransport::State::SendingEnd);
+
+        // The resource exhaustion happens internally in the DUT, but it still creates a session
+        // and then sends an End command with OutOfResources reason.
+        ScheduleEndSend(args.sessionId);
+
+        return CHIP_NO_ERROR;
+    }
+
     transport->Start();
     transport->AddAudioTrack();
     transport->AddVideoTrack();
@@ -226,14 +246,13 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     // Resolve or allocate a VIDEO stream
     if (args.videoStreamId.HasValue())
     {
-        if (args.videoStreamId.Value().IsNull())
+        // Stream has been validated and potentially selected by ValidateStreamUsage()
+        // in the cluster server before invoking this delegate method
+        const auto & videoStreamIdNullable = args.videoStreamId.Value();
+        outSession.videoStreamID           = videoStreamIdNullable;
+        if (!videoStreamIdNullable.IsNull())
         {
-            // TODO: Automatically select the closest matching video stream for the StreamUsage requested.
-        }
-        else
-        {
-            outSession.videoStreamID = args.videoStreamId.Value();
-            videoStreamID            = args.videoStreamId.Value().Value();
+            videoStreamID = videoStreamIdNullable.Value();
         }
     }
     else
@@ -244,14 +263,13 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     // Resolve or allocate an AUDIO stream
     if (args.audioStreamId.HasValue())
     {
-        if (args.audioStreamId.Value().IsNull())
+        // Stream has been validated and potentially selected by ValidateStreamUsage()
+        // in the cluster server before invoking this delegate method
+        const auto & audioStreamIdNullable = args.audioStreamId.Value();
+        outSession.audioStreamID           = audioStreamIdNullable;
+        if (!audioStreamIdNullable.IsNull())
         {
-            // TODO: Automatically select the closest matching audio stream for the StreamUsage requested
-        }
-        else
-        {
-            outSession.audioStreamID = args.audioStreamId.Value();
-            audioStreamID            = args.audioStreamId.Value().Value();
+            audioStreamID = audioStreamIdNullable.Value();
         }
     }
     else
@@ -280,6 +298,15 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
                 this->OnLocalDescription(sdp, type, sessionId);
             },
             [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); });
+    }
+
+    // Check resource availability before proceeding
+    // If we cannot allocate resources, respond with a response status of RESOURCE_EXHAUSTED
+    if (mWebrtcTransportMap.size() > kMaxConcurrentWebRTCSessions)
+    {
+        ChipLogProgress(Camera, "Resource exhaustion detected in ProvideOffer: maximum WebRTC sessions (%u)",
+                        kMaxConcurrentWebRTCSessions);
+        return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
     }
 
     transport->SetRequestArgs(requestArgs);
@@ -457,7 +484,7 @@ CHIP_ERROR WebRTCProviderManager::ValidateAudioStreamID(uint16_t audioStreamId)
     return avsmController.ValidateAudioStreamID(audioStreamId);
 }
 
-CHIP_ERROR WebRTCProviderManager::IsPrivacyModeActive(bool & isActive)
+CHIP_ERROR WebRTCProviderManager::IsHardPrivacyModeActive(bool & isActive)
 {
     if (mCameraDevice == nullptr)
     {
@@ -467,7 +494,33 @@ CHIP_ERROR WebRTCProviderManager::IsPrivacyModeActive(bool & isActive)
 
     auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
 
-    return avsmController.IsPrivacyModeActive(isActive);
+    return avsmController.IsHardPrivacyModeActive(isActive);
+}
+
+CHIP_ERROR WebRTCProviderManager::IsSoftRecordingPrivacyModeActive(bool & isActive)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.IsSoftRecordingPrivacyModeActive(isActive);
+}
+
+CHIP_ERROR WebRTCProviderManager::IsSoftLivestreamPrivacyModeActive(bool & isActive)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.IsSoftLivestreamPrivacyModeActive(isActive);
 }
 
 bool WebRTCProviderManager::HasAllocatedVideoStreams()
