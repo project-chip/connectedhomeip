@@ -62,6 +62,11 @@ CGSecureDACVendorProvider::~CGSecureDACVendorProvider()
 
 CHIP_ERROR CGSecureDACVendorProvider::GetCertificationDeclaration(MutableByteSpan & outBuffer)
 {
+    if (IsInitSuccess() != CHIP_NO_ERROR)
+    {
+        return CHIP_ERROR_UNINITIALIZED;
+    }
+
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
 #if CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION
@@ -72,7 +77,7 @@ CHIP_ERROR CGSecureDACVendorProvider::GetCertificationDeclaration(MutableByteSpa
     param.return_length = sizeof(param.return_data);
 
     /* Certification Declaration */
-    ChipLogDetail(DeviceLayer, "secure_app_function_call Get_CD start");
+    ChipLogDetail(DeviceLayer, "secure_app_function_call GetCertificationDeclaration start");
     secure_app_function_call(SECURE_APP_FUNCTION_GET_CD, &param);
     if (param.status_code)
     {
@@ -98,6 +103,11 @@ CHIP_ERROR CGSecureDACVendorProvider::GetFirmwareInformation(MutableByteSpan & o
 
 CHIP_ERROR CGSecureDACVendorProvider::GetDeviceAttestationCert(MutableByteSpan & outBuffer)
 {
+    if (IsInitSuccess() != CHIP_NO_ERROR)
+    {
+        return CHIP_ERROR_UNINITIALIZED;
+    }
+
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
     memset(&param, 0, sizeof(cg_matter_data));
@@ -120,6 +130,11 @@ CHIP_ERROR CGSecureDACVendorProvider::GetDeviceAttestationCert(MutableByteSpan &
 
 CHIP_ERROR CGSecureDACVendorProvider::GetProductAttestationIntermediateCert(MutableByteSpan & outBuffer)
 {
+    if (IsInitSuccess() != CHIP_NO_ERROR)
+    {
+        return CHIP_ERROR_UNINITIALIZED;
+    }
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     memset(&param, 0, sizeof(cg_matter_data));
@@ -137,14 +152,18 @@ CHIP_ERROR CGSecureDACVendorProvider::GetProductAttestationIntermediateCert(Muta
                   (int) param.return_length);
     err = CopySpanToMutableSpan(ByteSpan(param.return_data, param.return_length), outBuffer);
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR CGSecureDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
 {
+    if (IsInitSuccess() != CHIP_NO_ERROR)
+    {
+        return CHIP_ERROR_UNINITIALIZED;
+    }
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     Crypto::P256ECDSASignature signature;
-    Crypto::P256Keypair keypair;
 
     VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSpanUsable(messageToSign), CHIP_ERROR_INVALID_ARGUMENT);

@@ -54,7 +54,7 @@ chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
 
 #if CONFIG_USE_CG_SECURE_DAC_VENDOR
 chip::DeviceLayer::CGSecureDACVendorProvider gCgSecureDACProvider;
-chip::Credentials::DeviceAttestationCredentialsProvider * my_provider_getter()
+chip::Credentials::DeviceAttestationCredentialsProvider * GetCGSecureDACVendorProvider()
 {
     return &gCgSecureDACProvider;
 }
@@ -93,7 +93,7 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     SuccessOrExit(err);
     SetCommissionableDataProvider(&mFactoryDataProvider);
 #if CONFIG_USE_CG_SECURE_DAC_VENDOR
-    RegisterDACProviderGetter(my_provider_getter);
+    RegisterDACProviderGetter(GetCGSecureDACVendorProvider);
 #endif
     SetDeviceAttestationCredentialsProvider(GetDACProvider());
     SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
