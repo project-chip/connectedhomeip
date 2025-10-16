@@ -130,7 +130,7 @@ list(
   APPEND chip_main_flags
   -DCONFIG_USE_CG_SECURE_DAC_VENDOR=1
 )
-endif()
+endif (matter_enable_cg_secure_dac_vendor)
 
 if (matter_enable_rpc)
 list(

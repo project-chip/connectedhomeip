@@ -153,7 +153,7 @@ endif (matter_enable_rpc)
 if(matter_enable_ftd)
 string(APPEND CHIP_GN_ARGS "chip_openthread_ftd = true\n")
 string(APPEND CHIP_GN_ARGS "chip_enable_icd_server = false\n")
-endif()
+endif(matter_enable_ftd)
 
 if(matter_enable_mtd)
 string(APPEND CHIP_GN_ARGS "chip_openthread_ftd = false\n")
@@ -161,8 +161,8 @@ if(matter_enable_med)
 string(APPEND CHIP_GN_ARGS "chip_enable_icd_server = false\n")
 else()
 string(APPEND CHIP_GN_ARGS "chip_enable_icd_server = true\n")
-endif()
-endif()
+endif(matter_enable_med)
+endif(matter_enable_mtd)
 
 # Build Matter Shell
 if (matter_enable_shell)
@@ -185,7 +185,7 @@ endif (matter_enable_rotating_id)
 
 if (matter_enable_cg_secure_dac_vendor)
     string(APPEND CHIP_GN_ARGS "chip_use_cg_secure_dac_vendor = true\n")
-endif()
+endif(matter_enable_cg_secure_dac_vendor)
 
 file(GENERATE OUTPUT ${CHIP_OUTPUT}/args.gn CONTENT ${CHIP_GN_ARGS})
 

@@ -62,7 +62,7 @@ CGSecureDACVendorProvider::~CGSecureDACVendorProvider()
 
 CHIP_ERROR CGSecureDACVendorProvider::GetCertificationDeclaration(MutableByteSpan & outBuffer)
 {
-    if (IsInitSuccess() != CHIP_NO_ERROR)
+    if (!IsInitSuccess())
     {
         return CHIP_ERROR_UNINITIALIZED;
     }
@@ -103,7 +103,7 @@ CHIP_ERROR CGSecureDACVendorProvider::GetFirmwareInformation(MutableByteSpan & o
 
 CHIP_ERROR CGSecureDACVendorProvider::GetDeviceAttestationCert(MutableByteSpan & outBuffer)
 {
-    if (IsInitSuccess() != CHIP_NO_ERROR)
+    if (!IsInitSuccess())
     {
         return CHIP_ERROR_UNINITIALIZED;
     }
@@ -130,7 +130,7 @@ CHIP_ERROR CGSecureDACVendorProvider::GetDeviceAttestationCert(MutableByteSpan &
 
 CHIP_ERROR CGSecureDACVendorProvider::GetProductAttestationIntermediateCert(MutableByteSpan & outBuffer)
 {
-    if (IsInitSuccess() != CHIP_NO_ERROR)
+    if (!IsInitSuccess())
     {
         return CHIP_ERROR_UNINITIALIZED;
     }
@@ -157,7 +157,7 @@ CHIP_ERROR CGSecureDACVendorProvider::GetProductAttestationIntermediateCert(Muta
 
 CHIP_ERROR CGSecureDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
 {
-    if (IsInitSuccess() != CHIP_NO_ERROR)
+    if (!IsInitSuccess())
     {
         return CHIP_ERROR_UNINITIALIZED;
     }

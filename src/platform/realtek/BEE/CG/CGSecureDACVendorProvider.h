@@ -39,7 +39,7 @@ public:
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) override;
 
 private:
-    bool IsInitSuccess() const { return initError; }
+    bool IsInitSuccess() const { return initError == CHIP_NO_ERROR; }
     cg_matter_data param;
     CHIP_ERROR initError = CHIP_NO_ERROR;
 };
