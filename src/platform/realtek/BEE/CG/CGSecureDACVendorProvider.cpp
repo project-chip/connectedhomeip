@@ -180,7 +180,7 @@ CHIP_ERROR CGSecureDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpa
     if (param.status_code)
     {
         ChipLogError(DeviceLayer, "secure_app_function_call Sign failed %d", param.status_code);
-        return CHIP_ERROR_INTERNAL;
+        return CHIP_ERROR_INVALID_SIGNATURE;
     }
     ChipLogDetail(DeviceLayer, "secure_app_function_call signature size: %d", (int) param.return_length);
     err = Crypto::EcdsaAsn1SignatureToRaw(Crypto::kP256_FE_Length, ByteSpan(param.return_data, param.return_length), outSignBuffer);
