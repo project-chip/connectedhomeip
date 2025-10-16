@@ -36,8 +36,7 @@ namespace DeviceLayer {
 
 CGSecureDACVendorProvider::CGSecureDACVendorProvider()
 {
-    cg_matter_data param;
-    memset(&param, 0, sizeof(cg_matter_data));
+    cg_matter_data param{};
     ChipLogDetail(DeviceLayer, "secure_app_function_call InitModule start");
     secure_app_function_call(SECURE_APP_FUNCTION_INIT_MODULE, &param);
 
@@ -54,8 +53,7 @@ CGSecureDACVendorProvider::CGSecureDACVendorProvider()
 
 CGSecureDACVendorProvider::~CGSecureDACVendorProvider()
 {
-    cg_matter_data param;
-    memset(&param, 0, sizeof(cg_matter_data));
+    cg_matter_data param{};
     // Release Module
     ChipLogDetail(DeviceLayer, "secure_app_function_call ReleaseModule start");
     secure_app_function_call(SECURE_APP_FUNCTION_RELEASE_MODULE, &param);
@@ -75,8 +73,7 @@ CHIP_ERROR CGSecureDACVendorProvider::GetCertificationDeclaration(MutableByteSpa
     constexpr uint8_t kCdForAllExamples[] = CHIP_DEVICE_CONFIG_CERTIFICATION_DECLARATION;
     err                                   = CopySpanToMutableSpan(ByteSpan{ kCdForAllExamples }, outBuffer);
 #else
-    cg_matter_data param;
-    memset(&param, 0, sizeof(cg_matter_data));
+    cg_matter_data param{};
     param.return_length = sizeof(param.return_data);
 
     /* Certification Declaration */
@@ -113,8 +110,7 @@ CHIP_ERROR CGSecureDACVendorProvider::GetDeviceAttestationCert(MutableByteSpan &
 
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
-    cg_matter_data param;
-    memset(&param, 0, sizeof(cg_matter_data));
+    cg_matter_data param{};
     param.return_length = sizeof(param.return_data);
     /* DeviceAttestationCert */
     ChipLogDetail(DeviceLayer, "secure_app_function_call Get DeviceAttestationCert start");
@@ -141,8 +137,7 @@ CHIP_ERROR CGSecureDACVendorProvider::GetProductAttestationIntermediateCert(Muta
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    cg_matter_data param;
-    memset(&param, 0, sizeof(cg_matter_data));
+    cg_matter_data param{};
     param.return_length = sizeof(param.return_data);
     /* Product Attestation Intermediate Cert */
     ChipLogDetail(DeviceLayer, "secure_app_function_call Get Product Attestation Intermediate Cert start");
@@ -170,8 +165,8 @@ CHIP_ERROR CGSecureDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpa
     CHIP_ERROR err = CHIP_NO_ERROR;
     Crypto::P256ECDSASignature signature;
 
-    VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(messageToSign), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!outSignBuffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!messageToSign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     cg_matter_data param;
