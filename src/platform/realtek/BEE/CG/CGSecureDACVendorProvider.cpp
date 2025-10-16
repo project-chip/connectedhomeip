@@ -169,8 +169,7 @@ CHIP_ERROR CGSecureDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpa
     VerifyOrReturnError(!messageToSign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    cg_matter_data param;
-    memset(&param, 0, sizeof(cg_matter_data));
+    cg_matter_data param{};
     param.return_length = sizeof(param.return_data);
     /* Sign With Device Attestation Key */
     ChipLogDetail(DeviceLayer, "secure_app_function_call Sign start");
