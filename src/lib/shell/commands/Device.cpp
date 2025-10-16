@@ -21,6 +21,8 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <app/server/Server.h>
+
 namespace chip {
 namespace Shell {
 
@@ -31,10 +33,50 @@ static CHIP_ERROR FactoryResetHandler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
+static CHIP_ERROR OpenCommissioningWindowHandler(int argc, char ** argv)
+{
+    if (chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
+    {
+        streamer_printf(streamer_get(), "Commissioning window is already open \r\n");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR err = chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+
+    if (err != CHIP_NO_ERROR)
+    {
+        streamer_printf(streamer_get(), "Opening commissioning window failed due to %" CHIP_ERROR_FORMAT "\r\n", err.Format());
+        return err;
+    }
+    else
+    {
+        streamer_printf(streamer_get(), "Opened commissioning window \r\n");
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR CloseCommissioningWindowHandler(int argc, char ** argv)
+{
+    if (!chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
+    {
+        streamer_printf(streamer_get(), "Commissioning window is not open \r\n");
+        return CHIP_NO_ERROR;
+    }
+
+    chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+
+    streamer_printf(streamer_get(), "Closed commissioning window \r\n");
+
+    return CHIP_NO_ERROR;
+}
+
 void RegisterDeviceCommands()
 {
     static constexpr Command subCommands[] = {
         { &FactoryResetHandler, "factoryreset", "Performs device factory reset" },
+        { &OpenCommissioningWindowHandler, "opencommissioningwindow", "Opens the basic commissioning window" },
+        { &CloseCommissioningWindowHandler, "closecommissioningwindow", "Closes the commissioning window" },
     };
 
     static constexpr Command deviceComand = { &SubShellCommand<MATTER_ARRAY_SIZE(subCommands), subCommands>, "device",

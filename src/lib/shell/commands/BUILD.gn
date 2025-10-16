@@ -26,7 +26,10 @@ source_set("commands") {
   ]
 
   deps = []
-  public_deps = [ "${chip_root}/src/lib/shell:shell_core" ]
+  public_deps = [
+    "${chip_root}/src/app/server:server",
+    "${chip_root}/src/lib/shell:shell_core",
+  ]
 
   if (chip_device_platform != "none") {
     sources += [
