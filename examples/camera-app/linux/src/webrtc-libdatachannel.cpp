@@ -302,6 +302,11 @@ public:
             {
                 onConnectionState(true);
             }
+            else if (state == rtc::PeerConnection::State::Disconnected || state == rtc::PeerConnection::State::Failed ||
+                     state == rtc::PeerConnection::State::Closed)
+            {
+                onConnectionState(false);
+            }
         });
 
         mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
