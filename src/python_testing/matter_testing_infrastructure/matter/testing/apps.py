@@ -174,10 +174,10 @@ class OTAProviderSubprocess(AppServerSubprocess):
         """
         # Create the BinaryIO fp allow to use if path is provided.
         if isinstance(log_file, str):
-            self.log_file = open(log_file, "ab+")
+            self.log_file = open(log_file, "ab")
 
         if isinstance(err_log_file, str):
-            self.err_log_file = open(err_log_file, "ab+")
+            self.err_log_file = open(err_log_file, "ab")
 
         # Build OTA-specific arguments using the ota_source property
         combined_extra_args = ota_source.ota_args + extra_args
@@ -212,8 +212,8 @@ class OTAProviderSubprocess(AppServerSubprocess):
         # read all lines at the moment
         all_lines = None
 
-        # with open(self.log_file, 'rb') as fp:
-        all_lines = self.log_file.readlines()
+        with open(self.log_file.name, 'rb') as fp:
+            all_lines = fp.log_file.readlines()
 
         found_lines = []
 
