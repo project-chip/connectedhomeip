@@ -39,18 +39,16 @@ import random
 import tempfile
 from time import sleep
 
-import websockets
 from mobly import asserts
+from TC_WEBRTCRTestBase import WEBRTCRTestBase
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-
-SERVER_URI = "ws://localhost:9002"
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCR_2_7(MatterBaseTest):
+class TC_WebRTCR_2_7(WEBRTCRTestBase):
     def setup_class(self):
         super().setup_class()
 
@@ -124,18 +122,6 @@ class TC_WebRTCR_2_7(MatterBaseTest):
     @property
     def default_timeout(self) -> int:
         return 3 * 60
-
-    async def send_command(self, command):
-        async with websockets.connect(SERVER_URI) as websocket:
-            logging.info(f"Connected to {SERVER_URI}")
-
-            # Send command
-            logging.info(f"Sending command: {command}")
-            await websocket.send(command)
-
-            # Receive response
-            await websocket.recv()
-            logging.info("Received command response")
 
     @async_test_body
     async def test_TC_WebRTCR_2_7(self):
@@ -230,7 +216,7 @@ class TC_WebRTCR_2_7(MatterBaseTest):
                 resp = 'Y'
             except TimeoutError:
                 resp = 'N'
-            resp = 'Y'
+            # Removed unconditional assignment to preserve try/except outcome
         else:
             resp = self.wait_for_user_input(prompt_msg)
 
