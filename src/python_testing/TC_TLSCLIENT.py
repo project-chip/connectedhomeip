@@ -39,6 +39,7 @@ import test_plan_support
 from mobly import asserts
 from TC_TLS_Utils import TLSUtils
 
+from datetime import timedelta
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
@@ -53,6 +54,11 @@ class TC_TLSCLIENT(MatterBaseTest):
         def __init__(self, cr1_cmd: TLSUtils, cr2_cmd: TLSUtils):
             self.cr1_cmd = cr1_cmd
             self.cr2_cmd = cr2_cmd
+
+    # This test creates the maximum number of endpoints, which can take some time
+    @property
+    def default_timeout(self) -> int:
+        return timedelta(minutes=5).total_seconds()
 
     async def common_setup(self):
         self.step(1)
