@@ -50,6 +50,7 @@ CommandHandlerInterfaceOnlyClusters:
     - General Commissioning
     - General Diagnostics
     - Group Key Management
+    - Groupcast
     - HEPA Filter Monitoring
     - Joint Fabric Administrator
     - Laundry Washer Mode
@@ -91,7 +92,6 @@ ClustersWithInitFunctions:
     - Groups
     - Identify
     - Level Control
-    - Localization Configuration
     - Mode Select
     - Occupancy Sensing
     - On/Off
@@ -131,7 +131,6 @@ ClustersWithPreAttributeChangeFunctions:
     - Fan Control
     - Laundry Dryer Controls
     - Laundry Washer Controls
-    - Localization Configuration
     - Mode Select
     - Pump Configuration and Control
     - Thermostat
@@ -154,6 +153,8 @@ CodeDrivenClusters:
     - General Commissioning
     - General Diagnostics
     - Group Key Management
+    - Groupcast
+    - Localization Configuration
     - OTA Software Update Provider
     - Operational Credentials
     - Push AV Stream Transport

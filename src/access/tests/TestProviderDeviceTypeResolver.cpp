@@ -88,7 +88,7 @@ public:
     {
         return Protocols::InteractionModel::Status::Success;
     }
-    void ListAttributeWriteNotification(const ConcreteAttributePath &, ListWriteOperation) override {}
+    void ListAttributeWriteNotification(const ConcreteAttributePath &, ListWriteOperation, FabricIndex) override {}
     std::optional<ActionReturnStatus> InvokeCommand(const InvokeRequest &, TLV::TLVReader &, CommandHandler *) override
     {
         return Protocols::InteractionModel::Status::Success;

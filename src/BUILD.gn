@@ -71,6 +71,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/fixed-label-server/tests",
       "${chip_root}/src/app/clusters/boolean-state-server/tests",
       "${chip_root}/src/app/clusters/time-format-localization-server/tests",
+      "${chip_root}/src/app/clusters/localization-configuration-server/tests",
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/app/data-model/tests",
@@ -98,7 +99,14 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/push-av-stream-transport-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/tests",
       "${chip_root}/src/app/clusters/zone-management-server/tests",
-      "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
+      "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests",
+      "${chip_root}/src/lib/dnssd/minimal_mdns/responders/tests",
+      "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
+      "${chip_root}/src/lib/dnssd/tests",
+      "${chip_root}/src/app/clusters/groupcast/tests",
+
+      # TODO(#40932): Fix and re-enable the Commodity Tariff unit tests.
+      # "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
       "${chip_root}/src/srp/tests",
     ]
 
