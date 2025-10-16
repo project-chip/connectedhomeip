@@ -853,7 +853,7 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
         GstBus * bus = gst_element_get_bus(videoPipeline);
         if (bus)
         {
-            GstMessage * msg = gst_bus_pop_filtered(bus, (GstMessageType) (GST_MESSAGE_ERROR | GST_MESSAGE_WARNING));
+            GstMessage * msg = gst_bus_pop_filtered(bus, GST_MESSAGE_ERROR | GST_MESSAGE_WARNING);
             if (msg)
             {
                 GError * err       = nullptr;
