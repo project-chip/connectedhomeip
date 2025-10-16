@@ -117,3 +117,10 @@ git config --global --add safe.directory /var/connectedhomeip/third_party/pigwee
 # SCP command to transfer the file
 scp ./out/linux-arm64-camera-clang/chip-camera-app ubuntu@<RASPBERRY_PI_IP_ADDRESS>:/home/ubuntu
 ```
+
+5. Add your user to the video group
+
+```
+sudo usermod -aG video $USER
+newgrp video
+```
