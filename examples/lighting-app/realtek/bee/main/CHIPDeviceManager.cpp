@@ -54,7 +54,7 @@ chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
 
 #if CONFIG_USE_CG_SECURE_DAC_VENDOR
 chip::DeviceLayer::CGSecureDACVendorProvider gCgSecureDACProvider;
-chip::Credentials::DeviceAttestationCredentialsProvider* my_provider_getter()
+chip::Credentials::DeviceAttestationCredentialsProvider * my_provider_getter()
 {
     return &gCgSecureDACProvider;
 }

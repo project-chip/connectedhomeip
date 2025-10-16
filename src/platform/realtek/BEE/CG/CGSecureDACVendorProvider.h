@@ -17,11 +17,11 @@
 
 #pragma once
 
+#include "cg/include/cg_nsc_veneer_customize.h"
 #include "chip_porting.h"
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
-#include "cg/include/cg_nsc_veneer_customize.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -31,7 +31,7 @@ class CGSecureDACVendorProvider : public chip::Credentials::DeviceAttestationCre
 public:
     CGSecureDACVendorProvider();
     ~CGSecureDACVendorProvider();
-    
+
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & outBuffer) override;
     CHIP_ERROR GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer) override;
     CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & outBuffer) override;
@@ -39,8 +39,8 @@ public:
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) override;
 
 private:
-    cg_matter_data param;     
-    CHIP_ERROR initError = CHIP_NO_ERROR; 
+    cg_matter_data param;
+    CHIP_ERROR initError = CHIP_NO_ERROR;
 };
 
 } // namespace DeviceLayer

@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include "FactoryDataProvider.h"
 #include "CGSecureDACVendorProvider.h"
+#include "FactoryDataProvider.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
@@ -34,13 +34,13 @@ using namespace ::chip::DeviceLayer::Internal;
 namespace chip {
 namespace DeviceLayer {
 
-CGSecureDACVendorProvider::CGSecureDACVendorProvider() 
-{  
+CGSecureDACVendorProvider::CGSecureDACVendorProvider()
+{
     memset(&param, 0, sizeof(cg_matter_data));
     ChipLogDetail(DeviceLayer, "secure_app_function_call InitModule start");
     secure_app_function_call(SECURE_APP_FUNCTION_INIT_MODULE, &param);
 
-    if (param.status_code) 
+    if (param.status_code)
     {
         ChipLogError(DeviceLayer, "secure_app_function_call InitModule failed %d", param.status_code);
         this->initError = CHIP_ERROR_UNINITIALIZED;
@@ -74,9 +74,10 @@ CHIP_ERROR CGSecureDACVendorProvider::GetCertificationDeclaration(MutableByteSpa
     /* Certification Declaration */
     ChipLogDetail(DeviceLayer, "secure_app_function_call Get_CD start");
     secure_app_function_call(SECURE_APP_FUNCTION_GET_CD, &param);
-    if (param.status_code) 
+    if (param.status_code)
     {
-        ChipLogError(DeviceLayer, "secure_app_function_call GetCertificationDeclaration failed %d, %d", param.status_code,(int) param.return_length);
+        ChipLogError(DeviceLayer, "secure_app_function_call GetCertificationDeclaration failed %d, %d", param.status_code,
+                     (int) param.return_length);
         return CHIP_ERROR_CERT_NOT_FOUND;
     }
 
@@ -104,9 +105,10 @@ CHIP_ERROR CGSecureDACVendorProvider::GetDeviceAttestationCert(MutableByteSpan &
     /* DeviceAttestationCert */
     ChipLogDetail(DeviceLayer, "secure_app_function_call Get DeviceAttestationCert start");
     secure_app_function_call(SECURE_APP_FUNCTION_GET_DAC, &param);
-    if (param.status_code) 
+    if (param.status_code)
     {
-        ChipLogError(DeviceLayer, "secure_app_function_call GetDeviceAttestationCert failed %d, %d", param.status_code,(int) param.return_length);
+        ChipLogError(DeviceLayer, "secure_app_function_call GetDeviceAttestationCert failed %d, %d", param.status_code,
+                     (int) param.return_length);
         return CHIP_ERROR_CERT_NOT_FOUND;
     }
 
@@ -125,12 +127,14 @@ CHIP_ERROR CGSecureDACVendorProvider::GetProductAttestationIntermediateCert(Muta
     /* Product Attestation Intermediate Cert */
     ChipLogDetail(DeviceLayer, "secure_app_function_call Get Product Attestation Intermediate Cert start");
     secure_app_function_call(SECURE_APP_FUNCTION_GET_PAI_CERT, &param);
-    if (param.status_code) 
+    if (param.status_code)
     {
-        ChipLogError(DeviceLayer, "secure_app_function_call Get Product Attestation Intermediate Cert failed %d ,%d", param.status_code,(int) param.return_length);
+        ChipLogError(DeviceLayer, "secure_app_function_call Get Product Attestation Intermediate Cert failed %d ,%d",
+                     param.status_code, (int) param.return_length);
         return CHIP_ERROR_CERT_NOT_FOUND;
     }
-    ChipLogDetail(DeviceLayer, "secure_app_function_call Get Product Attestation Intermediate Cert size: %d", (int) param.return_length);
+    ChipLogDetail(DeviceLayer, "secure_app_function_call Get Product Attestation Intermediate Cert size: %d",
+                  (int) param.return_length);
     err = CopySpanToMutableSpan(ByteSpan(param.return_data, param.return_length), outBuffer);
 
     return CHIP_NO_ERROR;
@@ -153,7 +157,7 @@ CHIP_ERROR CGSecureDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpa
     memcpy(param.input_data, messageToSign.data(), messageToSign.size());
     param.input_length = messageToSign.size();
     secure_app_function_call(SECURE_APP_FUNCTION_SIGN_WITH_DAKEY, &param);
-    if (param.status_code) 
+    if (param.status_code)
     {
         ChipLogError(DeviceLayer, "secure_app_function_call Sign failed %d", param.status_code);
         return CHIP_ERROR_INTERNAL;

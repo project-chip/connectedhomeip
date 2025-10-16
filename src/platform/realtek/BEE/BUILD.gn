@@ -90,7 +90,7 @@ static_library("BEE") {
     "RTK/RTKDACVendorProvider.h",
   ]
 
-  if(chip_use_cg_secure_dac_vendor){
+  if (chip_use_cg_secure_dac_vendor) {
     sources += [
       "CG/CGSecureDACVendorProvider.cpp",
       "CG/CGSecureDACVendorProvider.h",
