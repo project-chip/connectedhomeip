@@ -646,7 +646,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<TariffInformationStruct::Type>>
 template <>
 CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayEntryStruct::Type>>>::ValidateNewValue()
 {
-    //Temporary DE's ID values storage just for dups checking
+    // Temporary DE's ID values storage just for dups checking
     CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength> dayEntryKeyIDs;
 
     // Required field check

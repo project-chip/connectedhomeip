@@ -92,9 +92,9 @@ const T * GetListEntryById(const DataModel::List<const T> & aList, uint32_t aId)
 }
 
 template <typename T, auto MemberPtr>
-bool isIdInList(const chip::app::DataModel::List<T> &list, uint32_t idToFind)
+bool isIdInList(const chip::app::DataModel::List<T> & list, uint32_t idToFind)
 {
-    for (const auto &entry : list)
+    for (const auto & entry : list)
     {
         if (entry.*MemberPtr == idToFind)
         {
@@ -503,7 +503,8 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
     // Checks that all TariffComponentIDs in Tariff Periods are in main TariffComponents list:
     for (const auto & item : UpdCtx.RefsToTariffComponentIDsFromTariffPeriods)
     {
-        if (!Utils::isIdInList<TariffComponentStruct::Type, &TariffComponentStruct::Type::tariffComponentID>(tariffComponents, item))
+        if (!Utils::isIdInList<TariffComponentStruct::Type, &TariffComponentStruct::Type::tariffComponentID>(tariffComponents,
+                                                                                                             item))
         {
             ChipLogError(AppServer,
                          "TariffComponent ID%" PRIu32 "referenced from TariffPeriods doesn't exist in main TariffComponents list",
@@ -512,7 +513,7 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
         }
     }
 
-    if (GetMgmtObj(CommodityTariffAttrTypeEnum::kDayPatterns).IsValid())  
+    if (GetMgmtObj(CommodityTariffAttrTypeEnum::kDayPatterns).IsValid())
     {
         // Checks that all DEs refs are in main DE list:
         for (const auto & item : UpdCtx.RefsToDayEntryIDsFromDays)

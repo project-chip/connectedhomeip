@@ -18,9 +18,9 @@
 
 #pragma once
 
+#include <pw_containers/algorithm.h>
 #include <pw_containers/flat_map.h>
 #include <pw_containers/vector.h>
-#include <pw_containers/algorithm.h>
 
 #include "lib/core/CHIPError.h"
 #include <app-common/zap-generated/cluster-enums.h>
@@ -32,11 +32,12 @@ namespace chip {
 namespace app {
 namespace CommodityTariffContainers {
 
-template<typename T, size_t kMaxSize>
-class CTC_UnorderedSet {
+template <typename T, size_t kMaxSize>
+class CTC_UnorderedSet
+{
 public:
-    using ValueType = T;
-    using Iterator = typename pw::Vector<T, kMaxSize>::iterator;
+    using ValueType     = T;
+    using Iterator      = typename pw::Vector<T, kMaxSize>::iterator;
     using ConstIterator = typename pw::Vector<T, kMaxSize>::const_iterator;
 
     CTC_UnorderedSet() = default;
@@ -48,8 +49,10 @@ public:
     bool full() const { return data_.size() >= kMaxSize; }
 
     // Modifiers
-    bool insert(const T& value) {
-        if (contains(value) || full()) {
+    bool insert(const T & value)
+    {
+        if (contains(value) || full())
+        {
             return false;
         }
 
@@ -57,8 +60,10 @@ public:
         return true;
     }
 
-    bool insert(T&& value) {
-        if (contains(value) || full()) {
+    bool insert(T && value)
+    {
+        if (contains(value) || full())
+        {
             return false;
         }
 
@@ -66,35 +71,30 @@ public:
         return true;
     }
 
-    void remove(const T& value) {
+    void remove(const T & value)
+    {
         auto it = find(value);
-        if (it == end()) {
+        if (it == end())
+        {
             return;
         }
-        
+
         // Swap with last element and pop (O(1) removal)
-        if (it != data_.end() - 1) {
+        if (it != data_.end() - 1)
+        {
             *it = std::move(data_.back());
         }
         data_.pop_back();
     }
 
-    void clear() {
-        data_.clear();
-    }
+    void clear() { data_.clear(); }
 
     // Lookup
-    bool contains(const T& value) const {
-        return find(value) != end();
-    }
+    bool contains(const T & value) const { return find(value) != end(); }
 
-    Iterator find(const T& value) {
-        return pw::containers::Find(data_, value);
-    }
+    Iterator find(const T & value) { return pw::containers::Find(data_, value); }
 
-    ConstIterator find(const T& value) const {
-        return pw::containers::Find(data_, value);
-    }
+    ConstIterator find(const T & value) const { return pw::containers::Find(data_, value); }
 
     // Iterators
     Iterator begin() { return data_.begin(); }
@@ -105,35 +105,41 @@ public:
     ConstIterator cend() const { return data_.cend(); }
 
     // Access
-    T& operator[](size_t index) { return data_[index]; }
-    const T& operator[](size_t index) const { return data_[index]; }
+    T & operator[](size_t index) { return data_[index]; }
+    const T & operator[](size_t index) const { return data_[index]; }
 
-    T* data() { return data_.data(); }
-    const T* data() const { return data_.data(); }
+    T * data() { return data_.data(); }
+    const T * data() const { return data_.data(); }
 
     // Merge operations
-    template<size_t OtherMaxSize>
-    void merge(const CTC_UnorderedSet<T, OtherMaxSize>& other) {
-        for (const auto& item : other) {
+    template <size_t OtherMaxSize>
+    void merge(const CTC_UnorderedSet<T, OtherMaxSize> & other)
+    {
+        for (const auto & item : other)
+        {
             insert(item);
         }
     }
 
-    template<typename InputIterator>
-    void merge(InputIterator first, InputIterator last) {
-        for (auto it = first; it != last; ++it) {
+    template <typename InputIterator>
+    void merge(InputIterator first, InputIterator last)
+    {
+        for (auto it = first; it != last; ++it)
+        {
             insert(*it);
         }
     }
+
 private:
     pw::Vector<T, kMaxSize> data_;
 };
 
-template<typename Key, typename Value, size_t kMaxSize>
-class CTC_UnorderedMap {
+template <typename Key, typename Value, size_t kMaxSize>
+class CTC_UnorderedMap
+{
 public:
-    using PairType = std::pair<Key, Value>;
-    using Iterator = typename pw::Vector<PairType, kMaxSize>::iterator;
+    using PairType      = std::pair<Key, Value>;
+    using Iterator      = typename pw::Vector<PairType, kMaxSize>::iterator;
     using ConstIterator = typename pw::Vector<PairType, kMaxSize>::const_iterator;
 
     CTC_UnorderedMap() = default;
@@ -145,81 +151,88 @@ public:
     bool full() const { return data_.size() >= kMaxSize; }
 
     // Modifiers
-    bool insert(const Key& key, const Value& value) {
-        return insert(std::make_pair(key, value));
-    }
+    bool insert(const Key & key, const Value & value) { return insert(std::make_pair(key, value)); }
 
-    bool insert(const PairType& pair) {
-        if (contains(pair.first) || full()) {
+    bool insert(const PairType & pair)
+    {
+        if (contains(pair.first) || full())
+        {
             return false;
         }
         data_.push_back(pair);
         return true;
     }
 
-    bool insert(PairType&& pair) {
-        if (contains(pair.first) || full()) {
+    bool insert(PairType && pair)
+    {
+        if (contains(pair.first) || full())
+        {
             return false;
         }
         data_.push_back(std::move(pair));
         return true;
     }
 
-    void remove(const Key& key) {
+    void remove(const Key & key)
+    {
         auto it = find(key);
-        if (it == end()) {
+        if (it == end())
+        {
             return;
         }
-        
+
         // Swap with last element and pop
-        if (it != data_.end() - 1) {
+        if (it != data_.end() - 1)
+        {
             *it = std::move(data_.back());
         }
         data_.pop_back();
     }
 
-    CHIP_ERROR update(const Key& key, const Value& value) {
+    CHIP_ERROR update(const Key & key, const Value & value)
+    {
         auto it = find(key);
-        if (it == end()) {
+        if (it == end())
+        {
             return CHIP_ERROR_KEY_NOT_FOUND;
         }
         it->second = value;
         return CHIP_NO_ERROR;
     }
 
-    void clear() {
-        data_.clear();
-    }
+    void clear() { data_.clear(); }
 
     // Lookup
-    bool contains(const Key& key) const {
-        return find(key) != end();
-    }
+    bool contains(const Key & key) const { return find(key) != end(); }
 
-    Value* get_value(const Key& key) {
+    Value * get_value(const Key & key)
+    {
         auto it = find(key);
         return it != end() ? &it->second : nullptr;
     }
 
-    const Value* get_value(const Key& key) const {
+    const Value * get_value(const Key & key) const
+    {
         auto it = find(key);
         return it != end() ? &it->second : nullptr;
     }
 
-    Iterator find(const Key& key) {
-        return pw::containers::FindIf(data_, 
-            [&key](const PairType& pair) { return pair.first == key; });
+    Iterator find(const Key & key)
+    {
+        return pw::containers::FindIf(data_, [&key](const PairType & pair) { return pair.first == key; });
     }
 
-    ConstIterator find(const Key& key) const {
-        return pw::containers::FindIf(data_, 
-            [&key](const PairType& pair) { return pair.first == key; });
+    ConstIterator find(const Key & key) const
+    {
+        return pw::containers::FindIf(data_, [&key](const PairType & pair) { return pair.first == key; });
     }
 
     // Access
-    Value& operator[](const Key& key) {
-        auto* value = get_value(key);
-        if (!value) {
+    Value & operator[](const Key & key)
+    {
+        auto * value = get_value(key);
+        if (!value)
+        {
             // Insert default value if key doesn't exist
             insert(key, Value{});
             value = get_value(key);
@@ -235,17 +248,21 @@ public:
     ConstIterator cbegin() const { return data_.cbegin(); }
     ConstIterator cend() const { return data_.cend(); }
 
-    pw::Vector<Key, kMaxSize> get_keys() const {
+    pw::Vector<Key, kMaxSize> get_keys() const
+    {
         pw::Vector<Key, kMaxSize> keys;
-        for (const auto& pair : data_) {
+        for (const auto & pair : data_)
+        {
             keys.push_back(pair.first);
         }
         return keys;
     }
 
-    pw::Vector<Value, kMaxSize> get_values() const {
+    pw::Vector<Value, kMaxSize> get_values() const
+    {
         pw::Vector<Value, kMaxSize> values;
-        for (const auto& pair : data_) {
+        for (const auto & pair : data_)
+        {
             values.push_back(pair.second);
         }
         return values;
@@ -296,13 +313,15 @@ struct TariffUpdateCtx
      * @brief DayEntry IDs referenced by DayPattern and IndividualDays items
      * @details Collected separately for reference validation
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength> RefsToDayEntryIDsFromDays;
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength>
+        RefsToDayEntryIDsFromDays;
 
     /**
      * @brief DayEntry IDs referenced by TariffPeriod items
      * @details Collected separately for reference validation
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength> RefsToDayEntryIDsFromTariffPeriods;
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength>
+        RefsToDayEntryIDsFromTariffPeriods;
 
     /// @}
 
@@ -319,14 +338,16 @@ struct TariffUpdateCtx
      * @brief TariffComponent IDs referenced by TariffPeriod items
      * @details Collected for validating period->component references
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kTariffComponentsAttrMaxLength> RefsToTariffComponentIDsFromTariffPeriods;
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kTariffComponentsAttrMaxLength>
+        RefsToTariffComponentIDsFromTariffPeriods;
     /// @}
 
     /**
      * @brief DayPattern IDs referenced by CalendarPeriod items
      * @details Collected for validating calendar->pattern references
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayPatternsAttrMaxLength> RefsToDayPatternIDsFromCalendarPeriods;
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayPatternsAttrMaxLength>
+        RefsToDayPatternIDsFromCalendarPeriods;
     /// @}
 
     /**
