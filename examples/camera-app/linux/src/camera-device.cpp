@@ -878,10 +878,8 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
                     }
                 }
 
-                if (err)
-                    g_error_free(err);
-                if (debug_info)
-                    g_free(debug_info);
+                g_error_free(err);
+                g_free(debug_info);
                 gst_message_unref(msg);
             }
             gst_object_unref(bus);
