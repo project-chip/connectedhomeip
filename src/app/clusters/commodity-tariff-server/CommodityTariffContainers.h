@@ -21,7 +21,12 @@
 #include <pw_containers/flat_map.h>
 #include <pw_containers/vector.h>
 #include <pw_containers/algorithm.h>
+
 #include "lib/core/CHIPError.h"
+#include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
+
+#include "CommodityTariffConsts.h"
 
 namespace chip {
 namespace app {
@@ -34,7 +39,7 @@ public:
     using Iterator = typename pw::Vector<T, kMaxSize>::iterator;
     using ConstIterator = typename pw::Vector<T, kMaxSize>::const_iterator;
 
-    PwUnorderedSet() = default;
+    CTC_UnorderedSet() = default;
 
     // Capacity
     constexpr size_t capacity() const { return kMaxSize; }
@@ -43,30 +48,28 @@ public:
     bool full() const { return data_.size() >= kMaxSize; }
 
     // Modifiers
-    CHIP_ERROR insert(const T& value) {
-        if (contains(value)) {
-            return CHIP_ERROR_DUPLICATE_KEY_ID;
+    bool insert(const T& value) {
+        if (contains(value) || full()) {
+            return false;
         }
-        if (full()) {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        return data_.push_back(value) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+
+        data_.push_back(value);
+        return true;
     }
 
-    CHIP_ERROR insert(T&& value) {
-        if (contains(value)) {
-            return CHIP_ERROR_DUPLICATE_KEY_ID;
+    bool insert(T&& value) {
+        if (contains(value) || full()) {
+            return false;
         }
-        if (full()) {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        return data_.push_back(std::move(value)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+
+        data_.push_back(std::move(value));
+        return true;
     }
 
-    CHIP_ERROR remove(const T& value) {
+    void remove(const T& value) {
         auto it = find(value);
         if (it == end()) {
-            return CHIP_ERROR_KEY_NOT_FOUND;
+            return;
         }
         
         // Swap with last element and pop (O(1) removal)
@@ -74,7 +77,6 @@ public:
             *it = std::move(data_.back());
         }
         data_.pop_back();
-        return CHIP_NO_ERROR;
     }
 
     void clear() {
@@ -111,29 +113,21 @@ public:
 
     // Merge operations
     template<size_t OtherMaxSize>
-    CHIP_ERROR merge(const PwUnorderedSet<T, OtherMaxSize>& other) {
+    void merge(const CTC_UnorderedSet<T, OtherMaxSize>& other) {
         for (const auto& item : other) {
-            CHIP_ERROR err = insert(item);
-            if (err != CHIP_NO_ERROR && err != CHIP_ERROR_DUPLICATE_KEY_ID) {
-                return err; // Return on memory error, continue on duplicate
-            }
+            insert(item);
         }
-        return CHIP_NO_ERROR;
     }
 
     template<typename InputIterator>
-    CHIP_ERROR merge(InputIterator first, InputIterator last) {
+    void merge(InputIterator first, InputIterator last) {
         for (auto it = first; it != last; ++it) {
-            CHIP_ERROR err = insert(*it);
-            if (err != CHIP_NO_ERROR && err != CHIP_ERROR_DUPLICATE_KEY_ID) {
-                return err;
-            }
+            insert(*it);
         }
-        return CHIP_NO_ERROR;
     }
 private:
     pw::Vector<T, kMaxSize> data_;
-}
+};
 
 template<typename Key, typename Value, size_t kMaxSize>
 class CTC_UnorderedMap {
@@ -142,7 +136,7 @@ public:
     using Iterator = typename pw::Vector<PairType, kMaxSize>::iterator;
     using ConstIterator = typename pw::Vector<PairType, kMaxSize>::const_iterator;
 
-    PwUnorderedMap() = default;
+    CTC_UnorderedMap() = default;
 
     // Capacity
     constexpr size_t capacity() const { return kMaxSize; }
@@ -151,34 +145,30 @@ public:
     bool full() const { return data_.size() >= kMaxSize; }
 
     // Modifiers
-    CHIP_ERROR insert(const Key& key, const Value& value) {
+    bool insert(const Key& key, const Value& value) {
         return insert(std::make_pair(key, value));
     }
 
-    CHIP_ERROR insert(const PairType& pair) {
-        if (contains(pair.first)) {
-            return CHIP_ERROR_DUPLICATE_KEY_ID;
+    bool insert(const PairType& pair) {
+        if (contains(pair.first) || full()) {
+            return false;
         }
-        if (full()) {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        return data_.push_back(pair) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+        data_.push_back(pair);
+        return true;
     }
 
-    CHIP_ERROR insert(PairType&& pair) {
-        if (contains(pair.first)) {
-            return CHIP_ERROR_DUPLICATE_KEY_ID;
+    bool insert(PairType&& pair) {
+        if (contains(pair.first) || full()) {
+            return false;
         }
-        if (full()) {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        return data_.push_back(std::move(pair)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+        data_.push_back(std::move(pair));
+        return true;
     }
 
-    CHIP_ERROR remove(const Key& key) {
+    void remove(const Key& key) {
         auto it = find(key);
         if (it == end()) {
-            return CHIP_ERROR_KEY_NOT_FOUND;
+            return;
         }
         
         // Swap with last element and pop
@@ -186,7 +176,6 @@ public:
             *it = std::move(data_.back());
         }
         data_.pop_back();
-        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR update(const Key& key, const Value& value) {
@@ -260,46 +249,6 @@ public:
             values.push_back(pair.second);
         }
         return values;
-    }
-
-    // Merge operations
-    template<size_t OtherMaxSize>
-    CHIP_ERROR merge(const PwUnorderedMap<Key, Value, OtherMaxSize>& other, bool overwrite = false) {
-        for (const auto& pair : other) {
-            if (!contains(pair.first)) {
-                // New key
-                CHIP_ERROR err = insert(pair);
-                if (err != CHIP_NO_ERROR) {
-                    return err;
-                }
-            } else if (overwrite) {
-                // Existing key, overwrite
-                CHIP_ERROR err = update(pair.first, pair.second);
-                if (err != CHIP_NO_ERROR) {
-                    return err;
-                }
-            }
-            // else: keep existing (do nothing)
-        }
-        return CHIP_NO_ERROR;
-    }
-
-    template<typename InputIterator>
-    CHIP_ERROR merge(InputIterator first, InputIterator last, bool overwrite = false) {
-        for (auto it = first; it != last; ++it) {
-            if (!contains(it->first)) {
-                CHIP_ERROR err = insert(*it);
-                if (err != CHIP_NO_ERROR) {
-                    return err;
-                }
-            } else if (overwrite) {
-                CHIP_ERROR err = update(it->first, it->second);
-                if (err != CHIP_NO_ERROR) {
-                    return err;
-                }
-            }
-        }
-        return CHIP_NO_ERROR;
     }
 
 private:

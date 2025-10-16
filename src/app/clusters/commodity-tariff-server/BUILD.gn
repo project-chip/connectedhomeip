@@ -20,11 +20,14 @@ source_set("commodity-tariff-server") {
     "CommodityTariffAttrsDataMgmt.cpp",
     "CommodityTariffAttrsDataMgmt.h",
     "CommodityTariffConsts.h",
+    "CommodityTariffContainers.h",
   ]
 
   public_deps = [
+    "${chip_root}/third_party/pigweed/repo/pw_assert:assert",
+    "${chip_root}/third_party/pigweed/repo/pw_containers:algorithm",
+    "${chip_root}/third_party/pigweed/repo/pw_containers:flat_map",
+    "${chip_root}/third_party/pigweed/repo/pw_containers:vector",
     "${chip_root}/zzz_generated/app-common/clusters/CommodityTariff",
-    "//third_party/pigweed/repo/pw_containers",
-    "//third_party/pigweed/repo/pw_toolchain",
   ]
 }
