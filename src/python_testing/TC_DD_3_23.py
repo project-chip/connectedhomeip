@@ -26,6 +26,7 @@
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --in-test-commissioning-method on-network
+#       --discriminator 1234
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --int-arg NFC_Reader_index:0
 #       --storage-path admin_storage.json

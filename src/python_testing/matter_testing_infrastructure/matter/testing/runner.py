@@ -643,29 +643,6 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     config.discriminators.extend(args.discriminators)
     config.setup_passcodes.extend(args.passcodes)
 
-    if config.commissioning_method == "ble-wifi" or config.in_test_commissioning_method == "ble-wifi":
-        if args.wifi_ssid is None:
-            print("error: missing --wifi-ssid <SSID> for --commissioning-method ble-wifi!")
-            return False
-
-        if args.wifi_passphrase is None:
-            print("error: missing --wifi-passphrase <passphrase> for --commissioning-method ble-wifi!")
-            return False
-
-        config.wifi_ssid = args.wifi_ssid
-        config.wifi_passphrase = args.wifi_passphrase
-    elif (config.commissioning_method in ["ble-thread", "nfc-thread"]
-          or config.in_test_commissioning_method in ["ble-thread", "nfc-thread"]):
-        if args.thread_dataset_hex is None:
-            print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method ble-thread or nfc-thread!")
-            return False
-        config.thread_operational_dataset = args.thread_dataset_hex
-    elif config.commissioning_method == "on-network-ip":
-        if args.ip_addr is None:
-            print("error: missing --ip-addr <IP_ADDRESS> for --commissioning-method on-network-ip")
-            return False
-        config.commissionee_ip_address_just_for_testing = args.ip_addr
-
     if len(config.discriminators) != len(config.setup_passcodes):
         print("error: supplied number of discriminators does not match number of passcodes")
         return False
@@ -705,6 +682,33 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     if args.passcodes == [] and (args.qr_code == [] and args.manual_code == []):
         print("error: Missing --passcode when no --qr-code/--manual-code present!")
         return False
+
+    wifi_args = ['ble-wifi']
+    thread_args = ['ble-thread', 'nfc-thread']
+    if commissioning_method in wifi_args:
+        if args.wifi_ssid is None:
+            print("error: missing --wifi-ssid <SSID> for --commissioning-method "
+                  "or --in-test-commissioning-method ble-wifi!")
+            return False
+
+        if args.wifi_passphrase is None:
+            print("error: missing --wifi-passphrase <passphrase> for --commissioning-method or "
+                  "--in-test-commissioning-method ble-wifi!")
+            return False
+
+        config.wifi_ssid = args.wifi_ssid
+        config.wifi_passphrase = args.wifi_passphrase
+    elif commissioning_method in thread_args:
+        if args.thread_dataset_hex is None:
+            print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method or "
+                  "--in-test-commissioning-method ble-thread or nfc-thread!")
+            return False
+        config.thread_operational_dataset = args.thread_dataset_hex
+    elif config.commissioning_method == "on-network-ip":
+        if args.ip_addr is None:
+            print("error: missing --ip-addr <IP_ADDRESS> for --commissioning-method on-network-ip")
+            return False
+        config.commissionee_ip_address_just_for_testing = args.ip_addr
 
     if args.case_admin_subject is None:
         # Use controller node ID as CASE admin subject during commissioning if nothing provided
