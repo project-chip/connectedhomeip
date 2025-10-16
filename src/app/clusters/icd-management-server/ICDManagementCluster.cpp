@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "IcdManagementCluster.h"
+#include "ICDManagementCluster.h"
 
 #include <access/AccessControl.h>
 #include <access/Privilege.h>
@@ -40,62 +40,91 @@ using namespace chip::Access;
 
 using chip::Protocols::InteractionModel::Status;
 
+namespace chip::app::Clusters {
+
+/*
+ * ICD Management Implementation
+ */
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+PersistentStorageDelegate * ICDManagementServer::mStorage           = nullptr;
+Crypto::SymmetricKeystore * ICDManagementServer::mSymmetricKeystore = nullptr;
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+ICDConfigurationData * ICDManagementServer::mICDConfigurationData = nullptr;
+
+} // namespace chip::app::Clusters
+
 namespace {
+ICDManagementAttributeAccess gAttribute;
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+ICDManagementFabricDelegate gFabricDelegate;
 
 /**
- * @brief Implementation of attribute access for IcdManagement cluster
+ * @brief Function checks if the client has admin permissions to the cluster in the commandPath
+ *
+ * @param[out] isClientAdmin True : Client has admin permissions
+ *                           False : Client does not have admin permissions
+ *                           If an error occurs, isClientAdmin is not changed
+ * @return CHIP_ERROR
  */
-class IcdManagementAttributeAccess : public AttributeAccessInterface
+CHIP_ERROR CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, bool & isClientAdmin)
 {
-public:
-    IcdManagementAttributeAccess() : AttributeAccessInterface(MakeOptional(kRootEndpointId), IcdManagement::Id) {}
-
-    void Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore, FabricTable & fabricTable,
-              ICDConfigurationData & icdConfigurationData)
+    RequestPath requestPath{ .cluster     = commandPath.mClusterId,
+                             .endpoint    = commandPath.mEndpointId,
+                             .requestType = RequestType::kCommandInvokeRequest,
+                             .entityId    = commandPath.mCommandId };
+    CHIP_ERROR err = GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, Privilege::kAdminister);
+    if (CHIP_NO_ERROR == err)
     {
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-        mStorage           = &storage;
-        mSymmetricKeystore = symmetricKeystore;
-        mFabricTable       = &fabricTable;
+        isClientAdmin = true;
+    }
+    else if (CHIP_ERROR_ACCESS_DENIED == err)
+    {
+        isClientAdmin = false;
+        err           = CHIP_NO_ERROR;
+    }
+    return err;
+}
+
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
-        mICDConfigurationData = &icdConfigurationData;
-    }
+} // anonymous namespace
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-private:
-    CHIP_ERROR ReadIdleModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder);
-    CHIP_ERROR ReadActiveModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder);
-    CHIP_ERROR ReadActiveModeThreshold(EndpointId endpoint, AttributeValueEncoder & encoder);
-    CHIP_ERROR ReadFeatureMap(EndpointId endpoint, AttributeValueEncoder & encoder)
-    {
-        return encoder.Encode(mICDConfigurationData->GetFeatureMap());
-    }
-
-#if CHIP_CONFIG_ENABLE_ICD_LIT
-    CHIP_ERROR ReadOperatingMode(EndpointId endpoint, AttributeValueEncoder & encoder)
-    {
-        return mICDConfigurationData->GetICDMode() == ICDConfigurationData::ICDMode::SIT
-            ? encoder.Encode(IcdManagement::OperatingModeEnum::kSit)
-            : encoder.Encode(IcdManagement::OperatingModeEnum::kLit);
-    }
-#endif // CHIP_CONFIG_ENABLE_ICD_LIT
+namespace chip::app::Clusters {
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-    CHIP_ERROR ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder);
-    CHIP_ERROR ReadICDCounter(EndpointId endpoint, AttributeValueEncoder & encoder);
-    CHIP_ERROR ReadClientsSupportedPerFabric(EndpointId endpoint, AttributeValueEncoder & encoder);
-    CHIP_ERROR ReadMaximumCheckInBackOff(EndpointId endpoint, AttributeValueEncoder & encoder);
+void ICDManagementFabricDelegate::Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore,
+                                       ICDConfigurationData & icdConfigurationData)
+{
+    mStorage              = &storage;
+    mSymmetricKeystore    = symmetricKeystore;
+    mICDConfigurationData = &icdConfigurationData;
+}
 
-    PersistentStorageDelegate * mStorage           = nullptr;
-    Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
-    FabricTable * mFabricTable                     = nullptr;
+void ICDManagementFabricDelegate::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    uint16_t supported_clients = mICDConfigurationData->GetClientsSupportedPerFabric();
+    ICDMonitoringTable table(*mStorage, fabricIndex, supported_clients, mSymmetricKeystore);
+    table.RemoveAll();
+    ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
+}
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
-    ICDConfigurationData * mICDConfigurationData = nullptr;
-};
+ICDManagementAttributeAccess::ICDManagementAttributeAccess() :
+    AttributeAccessInterface(MakeOptional(kRootEndpointId), IcdManagement::Id)
+{}
 
-CHIP_ERROR IcdManagementAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+void ICDManagementAttributeAccess::Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore,
+                                        FabricTable & fabricTable, ICDConfigurationData & icdConfigurationData)
+{
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    mStorage           = &storage;
+    mSymmetricKeystore = symmetricKeystore;
+    mFabricTable       = &fabricTable;
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+    mICDConfigurationData = &icdConfigurationData;
+}
+
+CHIP_ERROR ICDManagementAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == IcdManagement::Id);
 
@@ -134,76 +163,37 @@ CHIP_ERROR IcdManagementAttributeAccess::Read(const ConcreteReadAttributePath & 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR IcdManagementAttributeAccess::ReadIdleModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ICDManagementAttributeAccess::ReadIdleModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     return encoder.Encode(mICDConfigurationData->GetIdleModeDuration().count());
 }
 
-CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ICDManagementAttributeAccess::ReadActiveModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     return encoder.Encode(mICDConfigurationData->GetActiveModeDuration().count());
 }
 
-CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeThreshold(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ICDManagementAttributeAccess::ReadActiveModeThreshold(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     return encoder.Encode(mICDConfigurationData->GetActiveModeThreshold().count());
 }
 
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-/**
- * @brief Implementation of Fabric Delegate for ICD Management cluster
- */
-class IcdManagementFabricDelegate : public FabricTable::Delegate
+CHIP_ERROR ICDManagementAttributeAccess::ReadFeatureMap(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
-public:
-    void Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore,
-              ICDConfigurationData & icdConfigurationData)
-    {
-        mStorage              = &storage;
-        mSymmetricKeystore    = symmetricKeystore;
-        mICDConfigurationData = &icdConfigurationData;
-    }
+    return encoder.Encode(mICDConfigurationData->GetFeatureMap());
+}
 
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
-    {
-        uint16_t supported_clients = mICDConfigurationData->GetClientsSupportedPerFabric();
-        ICDMonitoringTable table(*mStorage, fabricIndex, supported_clients, mSymmetricKeystore);
-        table.RemoveAll();
-        ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
-    }
-
-private:
-    PersistentStorageDelegate * mStorage           = nullptr;
-    Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
-    ICDConfigurationData * mICDConfigurationData   = nullptr;
-};
-
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
-
-} // namespace
-
-/*
- * ICD Management Implementation
- */
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-PersistentStorageDelegate * ICDManagementServer::mStorage           = nullptr;
-Crypto::SymmetricKeystore * ICDManagementServer::mSymmetricKeystore = nullptr;
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
-
-ICDConfigurationData * ICDManagementServer::mICDConfigurationData = nullptr;
-
-namespace {
-IcdManagementAttributeAccess gAttribute;
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-IcdManagementFabricDelegate gFabricDelegate;
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
-} // namespace
+#if CHIP_CONFIG_ENABLE_ICD_LIT
+CHIP_ERROR ICDManagementAttributeAccess::ReadOperatingMode(EndpointId endpoint, AttributeValueEncoder & encoder)
+{
+    return mICDConfigurationData->GetICDMode() == ICDConfigurationData::ICDMode::SIT
+        ? encoder.Encode(IcdManagement::OperatingModeEnum::kSit)
+        : encoder.Encode(IcdManagement::OperatingModeEnum::kLit);
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-
-namespace {
-
-CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ICDManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     uint16_t supported_clients                    = mICDConfigurationData->GetClientsSupportedPerFabric();
     PersistentStorageDelegate * storage           = mStorage;
@@ -237,49 +227,20 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoi
     });
 }
 
-CHIP_ERROR IcdManagementAttributeAccess::ReadICDCounter(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ICDManagementAttributeAccess::ReadICDCounter(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     return encoder.Encode(mICDConfigurationData->GetICDCounter().GetValue());
 }
 
-CHIP_ERROR IcdManagementAttributeAccess::ReadClientsSupportedPerFabric(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ICDManagementAttributeAccess::ReadClientsSupportedPerFabric(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     return encoder.Encode(mICDConfigurationData->GetClientsSupportedPerFabric());
 }
 
-CHIP_ERROR IcdManagementAttributeAccess::ReadMaximumCheckInBackOff(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ICDManagementAttributeAccess::ReadMaximumCheckInBackOff(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     return encoder.Encode(mICDConfigurationData->GetMaximumCheckInBackoff().count());
 }
-
-/**
- * @brief Function checks if the client has admin permissions to the cluster in the commandPath
- *
- * @param[out] isClientAdmin True : Client has admin permissions
- *                           False : Client does not have admin permissions
- *                           If an error occurs, isClientAdmin is not changed
- * @return CHIP_ERROR
- */
-CHIP_ERROR CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, bool & isClientAdmin)
-{
-    RequestPath requestPath{ .cluster     = commandPath.mClusterId,
-                             .endpoint    = commandPath.mEndpointId,
-                             .requestType = RequestType::kCommandInvokeRequest,
-                             .entityId    = commandPath.mCommandId };
-    CHIP_ERROR err = GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, Privilege::kAdminister);
-    if (CHIP_NO_ERROR == err)
-    {
-        isClientAdmin = true;
-    }
-    else if (CHIP_ERROR_ACCESS_DENIED == err)
-    {
-        isClientAdmin = false;
-        err           = CHIP_NO_ERROR;
-    }
-    return err;
-}
-
-} // namespace
 
 Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                            const Commands::RegisterClient::DecodableType & commandData, uint32_t & icdCounter)
@@ -414,6 +375,8 @@ void ICDManagementServer::Init(PersistentStorageDelegate & storage, Crypto::Symm
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
     mICDConfigurationData = &icdConfigurationData;
 }
+
+} // namespace chip::app::Clusters
 
 /**********************************************************
  * Callbacks Implementation
