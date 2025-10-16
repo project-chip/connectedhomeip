@@ -293,29 +293,16 @@ struct TariffUpdateCtx
     /// @name DayEntry ID Tracking
     /// @{
     /**
-     * @brief Master set of all valid DayEntry IDs
-     * @details Contains all DayEntry IDs that exist in the tariff definition
-     */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength> DayEntryKeyIDs;
-
-    /**
-     * @brief DayEntry IDs referenced by DayPattern items
+     * @brief DayEntry IDs referenced by DayPattern and IndividualDays items
      * @details Collected separately for reference validation
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength> DayPatternsDayEntryIDs;
-
-    /**
-     * @brief DayEntry IDs referenced by IndividualDays items
-     * @details Collected separately for reference validation
-     */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength>
-        IndividualDaysDayEntryIDs;
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength> RefsToDayEntryIDsFromDays;
 
     /**
      * @brief DayEntry IDs referenced by TariffPeriod items
      * @details Collected separately for reference validation
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength> TariffPeriodsDayEntryIDs;
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength> RefsToDayEntryIDsFromTariffPeriods;
 
     /// @}
 
@@ -332,24 +319,14 @@ struct TariffUpdateCtx
      * @brief TariffComponent IDs referenced by TariffPeriod items
      * @details Collected for validating period->component references
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kTariffComponentsAttrMaxLength>
-        TariffPeriodsTariffComponentIDs;
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kTariffComponentsAttrMaxLength> RefsToTariffComponentIDsFromTariffPeriods;
     /// @}
-
-    /// @name DayPattern ID Tracking
-    /// @{
-    /**
-     * @brief Master set of all valid DayPattern IDs
-     * @details Contains all DayPattern IDs that exist in the tariff definition
-     */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayPatternsAttrMaxLength> DayPatternKeyIDs;
 
     /**
      * @brief DayPattern IDs referenced by CalendarPeriod items
      * @details Collected for validating calendar->pattern references
      */
-    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayPatternsAttrMaxLength>
-        CalendarPeriodsDayPatternIDs;
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayPatternsAttrMaxLength> RefsToDayPatternIDsFromCalendarPeriods;
     /// @}
 
     /**
