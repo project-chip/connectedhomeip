@@ -110,8 +110,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                                     reason: Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum = Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable,
                                     vendor_id: int = 0xFFF1,
                                     endpoint: int = 0):
-        """Announce the OTA provider that a software update is requested.
-
+        """ Launch the requestor.AnnounceOTAProvider method with the specific configuration.
+            Starts the communication from the requestor to the provider to start a software update.
         Args:
             controller (ChipDeviceCtrl): Controller for DUT
             provider_node_id (int): Node id for the provider
@@ -121,7 +121,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             endpoint (int, optional): Endpoint id. Defaults to 0.
 
         Returns:
-            _type_: _description_
+            object: Return the data from the OtaSoftwareUpdateRequestor.AnnounceOTAProvider command.
         """
         cmd_announce_ota_provider = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
             providerNodeID=provider_node_id,
@@ -140,7 +140,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         logger.info(f"Announce command sent {cmd_resp}")
         return cmd_resp
 
-    async def write_providers_into_requestor(self, controller: ChipDeviceCtrl, provider_node_id: int, requestor_node_id: int, endpoint: int = 0):
+    async def set_default_ota_providers_list(self, controller: ChipDeviceCtrl, provider_node_id: int, requestor_node_id: int, endpoint: int = 0):
         """Write the provider list in the requestor to initiate the Software Update.
 
         Args:
@@ -224,10 +224,10 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
     def verify_state_transition_event(self,
                                       event_report: Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
-                                      previous_state,
-                                      new_state,
-                                      target_version: Optional[int] = None,
-                                      reason: Optional[int] = None):
+                                      expected_previous_state,
+                                      expected_new_state,
+                                      expected_target_version: Optional[int] = None,
+                                      expected_reason: Optional[int] = None):
         """Verify the values of the StateTransitionEvent from the EventHandler given the provided arguments.
 
         Args:
@@ -238,12 +238,14 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             reason (Optional[int], optional): UpdateStateEnum reason of the event, if not provided ignore. Defaults to None.
         """
         logger.info(f"Verifying the event {event_report}")
-        asserts.assert_equal(event_report.previousState, previous_state, f"Previous state was not {previous_state}")
-        asserts.assert_equal(event_report.newState,  new_state, f"New state is not {new_state}")
-        if target_version is not None:
-            asserts.assert_equal(event_report.targetSoftwareVersion,  target_version, f"Target version is not {target_version}")
-        if reason is not None:
-            asserts.assert_equal(event_report.reason,  reason, f"Reason is not {reason}")
+        asserts.assert_equal(event_report.previousState, expected_previous_state,
+                             f"Previous state was not {expected_previous_state}")
+        asserts.assert_equal(event_report.newState,  expected_new_state, f"New state is not {expected_new_state}")
+        if expected_target_version is not None:
+            asserts.assert_equal(event_report.targetSoftwareVersion,  expected_target_version,
+                                 f"Target version is not {expected_target_version}")
+        if expected_reason is not None:
+            asserts.assert_equal(event_report.reason,  expected_reason, f"Reason is not {expected_reason}")
 
     def create_acl_entry(self,
                          dev_ctrl: ChipDeviceCtrl.ChipDeviceController,

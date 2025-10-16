@@ -50,8 +50,9 @@ class AppServerSubprocess(Subprocess):
 
     # Prefix for log messages from the application server.
     PREFIX = b"[SERVER]"
-    log_file = ""
-    err_log_file = ""
+    # Custom file descriptor logs
+    log_file: BinaryIO = stdout.buffer
+    err_log_file: BinaryIO = stderr.buffer
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: Optional[str] = None, f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
@@ -151,7 +152,6 @@ class JFControllerSubprocess(Subprocess):
 class OTAProviderSubprocess(AppServerSubprocess):
     """Wrapper class for starting an OTA Provider application server in a subprocess."""
 
-    DEFAULT_ADMIN_NODE_ID = 112233
     # Prefix for log messages from the OTA provider application.
     PREFIX = b"[OTA-PROVIDER]"
 
@@ -172,25 +172,19 @@ class OTAProviderSubprocess(AppServerSubprocess):
             log_file(str,BinaryIO): Path to create the BinaryIO logger for stdoutput, if not use the default stdout.buffer.
             err_log_file(str,BinaryIO): Path to create the BinaryIO logger for stderr, if not use the default stderr.buffer.
         """
-        # Create the BinaryIO fp allow to use
+        # Create the BinaryIO fp allow to use if path is provided.
         if isinstance(log_file, str):
-            f_stdout = open(log_file, 'ab')
-            self.log_file = log_file
-        else:
-            f_stdout = log_file
+            self.log_file = open(log_file, "ab+")
 
         if isinstance(err_log_file, str):
-            f_stderr = open(err_log_file, 'ab')
-            self.err_log_file = err_log_file
-        else:
-            f_stderr = err_log_file
+            self.err_log_file = open(err_log_file, "ab+")
 
         # Build OTA-specific arguments using the ota_source property
         combined_extra_args = ota_source.ota_args + extra_args
 
         # Initialize with the combined arguments
-        super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator,
-                         passcode=passcode, port=port, extra_args=combined_extra_args, kvs_path=kvs_path, f_stdout=f_stdout, f_stderr=f_stderr)
+        super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator, passcode=passcode, port=port,
+                         extra_args=combined_extra_args, kvs_path=kvs_path, f_stdout=self.log_file, f_stderr=self.err_log_file)
 
     def kill(self):
         self.p.send_signal(signal.SIGKILL)
@@ -212,13 +206,14 @@ class OTAProviderSubprocess(AppServerSubprocess):
         Returns:
             list[dict]: List with a dict of the info retrieved.
         """
-        if not os.path.exists(self.log_file):
+        if not os.path.exists(self.log_file.name):
             raise FileNotFoundError
 
         # read all lines at the moment
         all_lines = None
-        with open(self.log_file, 'rb') as fp:
-            all_lines = fp.readlines()
+
+        # with open(self.log_file, 'rb') as fp:
+        all_lines = self.log_file.readlines()
 
         found_lines = []
 
