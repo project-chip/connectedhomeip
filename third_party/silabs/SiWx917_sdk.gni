@@ -745,7 +745,6 @@ template("siwx917_sdk") {
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_si91x_button_instances.c",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_ulp_timer_init.c",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/main.c",
-      "${matter_support_root}/board-support/si91x/support/hal/rsi_hal_mcu_m4.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/button/src/sl_si91x_button.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/clock_manager/src/sl_si91x_clock_manager.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/clock_manager/src/sli_si91x_clock_manager.c",
