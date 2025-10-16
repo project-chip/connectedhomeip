@@ -268,24 +268,18 @@ void UDPEndPointImplOT::CloseImpl()
 
         // In case that there is a UDPEndPointImplOT::handleUdpReceive event
         // pending in the event queue (SystemLayer::ScheduleLambda), we
-        // schedule a release call to the end of the queue, to ensure that the
+        // schedule a Unref call to the end of the queue, to ensure that the
         // queued pointer to UDPEndPointImplOT is not dangling.
-        Retain();
-        CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this] { Release(); });
+        Ref();
+        CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this] { Unref(); });
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Inet, "Unable scedule lambda: %" CHIP_ERROR_FORMAT, err.Format());
             // There is nothing we can do here, accept the chance of racing
-            Release();
+            Unref();
         }
     }
     UnlockOpenThread();
-}
-
-void UDPEndPointImplOT::Free()
-{
-    Close();
-    Release();
 }
 
 CHIP_ERROR UDPEndPointImplOT::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
