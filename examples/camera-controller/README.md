@@ -43,6 +43,7 @@ sudo apt install \
   gstreamer1.0-plugins-bad \
   gstreamer1.0-libav \
   libgstreamer1.0-dev \
+  libavformat60 \
   libgstreamer-plugins-base1.0-dev
 ```
 
