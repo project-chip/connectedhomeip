@@ -295,7 +295,8 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
 
     // Extract file extension from full path
     size_t dotPos = data.first.find_last_of('.');
-    if (dotPos != std::string::npos) {
+    if (dotPos != std::string::npos)
+    {
         std::string extension = data.first.substr(dotPos);
         if (extension == ".mpd")
         {
@@ -312,7 +313,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     }
 
     std::string contentTypeHeader = "Content-Type: " + contentType;
-    headers = curl_slist_append(headers, contentTypeHeader.c_str());
+    headers                       = curl_slist_append(headers, contentTypeHeader.c_str());
 
     // Extract the filename from the full path
     std::string fullPath = data.first;
