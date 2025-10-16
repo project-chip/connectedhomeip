@@ -113,7 +113,7 @@ def websocket_runner_options(f):
     return f
 
 
-def chip_repl_runner_options(f):
+def matter_repl_runner_options(f):
     f = click.option('--repl_storage_path', type=str, default='/tmp/repl-storage.json',
                      help='Path to persistent storage configuration file.')(f)
     f = click.option('--commission_on_network_dut', type=bool, default=False,
@@ -221,30 +221,30 @@ class YamlTestParserGroup(click.Group):
 CONTEXT_SETTINGS = dict(
     default_map={
         'chiptool': {
-            'adapter': 'matter_chip_tool_adapter.adapter',
+            'adapter': 'chipyaml.adapters.chiptool.adapter',
             'server_name': 'chip-tool',
             'server_arguments': 'interactive server',
         },
         'darwinframeworktool': {
-            'adapter': 'matter_chip_tool_adapter.adapter',
+            'adapter': 'chipyaml.adapters.chiptool.adapter',
             'server_name': 'darwin-framework-tool',
             'server_arguments': 'interactive server',
         },
         'app1': {
             'configuration_directory': 'examples/placeholder/linux/apps/app1',
-            'adapter': 'matter_placeholder_adapter.adapter',
+            'adapter': 'chipyaml.adapters.placeholder.adapter',
             'server_name': 'chip-app1',
             'server_arguments': '--interactive',
         },
         'app2': {
             'configuration_directory': 'examples/placeholder/linux/apps/app2',
-            'adapter': 'matter_placeholder_adapter.adapter',
+            'adapter': 'chipyaml.adapters.placeholder.adapter',
             'server_name': 'chip-app2',
             'server_arguments': '--interactive',
         },
-        'chip-repl': {
-            'adapter': 'matter_yamltest_repl_adapter.adapter',
-            'runner': 'matter_yamltest_repl_adapter.runner',
+        'matter-repl': {
+            'adapter': 'chipyaml.adapters.repl.adapter',
+            'runner': 'chipyaml.adapters.repl.runner',
         },
     },
     max_content_width=120,
@@ -336,10 +336,10 @@ def websocket(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop
 
 @runner_base.command()
 @test_runner_options
-@chip_repl_runner_options
+@matter_repl_runner_options
 @pass_parser_group
-def chip_repl(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_warning: bool, stop_at_number: int, show_adapter_logs: bool, show_adapter_logs_on_error: bool, use_test_harness_log_format: bool, delay_in_ms: int, runner: str, repl_storage_path: str, commission_on_network_dut: bool):
-    """Run the test suite using chip-repl."""
+def matter_repl(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_warning: bool, stop_at_number: int, show_adapter_logs: bool, show_adapter_logs_on_error: bool, use_test_harness_log_format: bool, delay_in_ms: int, runner: str, repl_storage_path: str, commission_on_network_dut: bool):
+    """Run the test suite using matter-repl."""
     adapter = __import__(adapter, fromlist=[None]).Adapter(parser_group.builder_config.parser_config.definitions)
     runner_options = TestRunnerOptions(stop_on_error, stop_on_warning, stop_at_number, delay_in_ms)
     runner_hooks = TestRunnerLogger(show_adapter_logs, show_adapter_logs_on_error, use_test_harness_log_format)

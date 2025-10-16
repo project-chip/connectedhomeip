@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "Identify.h"
 #include "LightingAppCommandDelegate.h"
 #include "LightingManager.h"
 #include <AppMain.h>
@@ -30,10 +31,10 @@
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
 #include <imgui_ui/ui.h>
+#include <imgui_ui/windows/connectivity.h>
 #include <imgui_ui/windows/light.h>
 #include <imgui_ui/windows/occupancy_sensing.h>
 #include <imgui_ui/windows/qrcode.h>
-
 #endif
 
 using namespace chip;
@@ -84,6 +85,7 @@ void ApplicationInit()
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();
     }
+    IdentifyInit();
 }
 
 void ApplicationShutdown()
@@ -113,6 +115,7 @@ int main(int argc, char * argv[])
     example::Ui::ImguiUi ui;
 
     ui.AddWindow(std::make_unique<example::Ui::Windows::QRCode>());
+    ui.AddWindow(std::make_unique<example::Ui::Windows::Connectivity>());
     ui.AddWindow(std::make_unique<example::Ui::Windows::OccupancySensing>(chip::EndpointId(1), "Occupancy"));
     ui.AddWindow(std::make_unique<example::Ui::Windows::Light>(chip::EndpointId(1)));
 

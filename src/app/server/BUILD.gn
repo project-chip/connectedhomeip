@@ -42,14 +42,18 @@ source_set("terms_and_conditions") {
   ]
 }
 
-source_set("joint_fabric_datastore") {
+source_set("joint_fabric") {
   sources = [
+    "JointFabricAdministrator.cpp",
+    "JointFabricAdministrator.h",
     "JointFabricDatastore.cpp",
     "JointFabricDatastore.h",
   ]
 
   public_deps = [
+    "${chip_root}/src/credentials",
     "${chip_root}/src/lib/core",
+    "${chip_root}/zzz_generated/app-common/clusters/JointFabricAdministrator",
     "${chip_root}/zzz_generated/app-common/clusters/JointFabricDatastore",
   ]
 }
@@ -100,7 +104,7 @@ static_library("server") {
   }
 
   if (chip_device_config_enable_joint_fabric) {
-    public_deps += [ ":joint_fabric_datastore" ]
+    public_deps += [ ":joint_fabric" ]
   }
 
   # TODO: Server.cpp uses TestGroupData.h. Unsure why test code would be in such a central place

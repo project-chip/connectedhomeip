@@ -19,3 +19,4 @@ matter_enable_tracing_support = true
 
 # Include to define nxp_crypto_impl
 import("${chip_root}/src/platform/nxp/crypto/se05x/args.gni")
+nxp_platform = "linux"

@@ -19,9 +19,10 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 
 class TC_CNET_4_15(MatterBaseTest):
@@ -41,7 +42,7 @@ class TC_CNET_4_15(MatterBaseTest):
         return '[TC-CNET-4.15] [Wi-Fi] NetworkIDNotFound returned in LastNetworkingStatus field validation [DUT-Server]'
 
     def pics_TC_CNET_4_15(self):
-        return ['CNET.S.F00(WI)']
+        return ['CNET.S.F00']
 
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
                                          Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))

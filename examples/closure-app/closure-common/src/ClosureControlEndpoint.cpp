@@ -17,12 +17,14 @@
  */
 
 #include <ClosureControlEndpoint.h>
+#include <ClosureManager.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::ClosureControl;
+using namespace chip::app::DataModel;
 
 using Protocols::InteractionModel::Status;
 
@@ -54,31 +56,18 @@ enum class ClosureControlTestEventTrigger : uint64_t
 
 Status ClosureControlDelegate::HandleCalibrateCommand()
 {
-    ChipLogProgress(AppServer, "HandleCalibrateCommand");
-    // Add the calibration logic here
-    return Status::Success;
+    return ClosureManager::GetInstance().OnCalibrateCommand();
 }
 
 Status ClosureControlDelegate::HandleMoveToCommand(const Optional<TargetPositionEnum> & position, const Optional<bool> & latch,
                                                    const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
-    ChipLogProgress(AppServer, "HandleMoveToCommand");
-    // Add the move to logic here
-    return Status::Success;
+    return ClosureManager::GetInstance().OnMoveToCommand(position, latch, speed);
 }
 
 Status ClosureControlDelegate::HandleStopCommand()
 {
-    ChipLogProgress(AppServer, "HandleStopCommand");
-    // Add the stop logic here
-    return Status::Success;
-}
-
-CHIP_ERROR ClosureControlDelegate::GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError)
-{
-    // This function should return the current error at the specified index.
-    // For now, we dont have a ErrorList implemented, so will return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED.
-    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    return ClosureManager::GetInstance().OnStopCommand();
 }
 
 bool ClosureControlDelegate::IsReadyToMove()
@@ -86,13 +75,6 @@ bool ClosureControlDelegate::IsReadyToMove()
     // This function should return true if the closure is ready to move.
     // For now, we will return true.
     return true;
-}
-
-bool ClosureControlDelegate::IsManualLatchingNeeded()
-{
-    // This function should return true if manual latching is needed.
-    // For now, we will return false.
-    return false;
 }
 
 ElapsedS ClosureControlDelegate::GetCalibrationCountdownTime()
@@ -125,19 +107,26 @@ CHIP_ERROR ClosureControlDelegate::HandleEventTrigger(uint64_t eventTrigger)
     switch (trigger)
     {
     case ClosureControlTestEventTrigger::kMainStateIsSetupRequired:
-        return logic->SetMainState(MainStateEnum::kSetupRequired);
+        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kSetupRequired));
+        break;
     case ClosureControlTestEventTrigger::kMainStateIsProtected:
-        return logic->SetMainState(MainStateEnum::kProtected);
+        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kProtected));
+        break;
     case ClosureControlTestEventTrigger::kMainStateIsError:
-        return logic->SetMainState(MainStateEnum::kError);
+        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kError));
+        ReturnErrorOnFailure(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor));
+        break;
     case ClosureControlTestEventTrigger::kMainStateIsDisengaged:
-        return logic->SetMainState(MainStateEnum::kDisengaged);
+        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kDisengaged));
+        break;
     case ClosureControlTestEventTrigger::kClearEvent:
-        // TODO : Implement logic to clear test event after Test plan Spec issue #5429 is resolved.
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kStopped));
+        logic->ClearCurrentErrorList();
+        break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ClosureControlEndpoint::Init()
@@ -160,4 +149,206 @@ CHIP_ERROR ClosureControlEndpoint::Init()
     ReturnErrorOnFailure(mInterface.Init());
 
     return CHIP_NO_ERROR;
+}
+
+void ClosureControlEndpoint::OnStopCalibrateActionComplete()
+{
+    VerifyOrReturn(mLogic.SetMainState(MainStateEnum::kStopped) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set main state in OnStopCalibrateActionComplete"));
+
+    // After stopping calibration, the overall and target state is explicitly nulled to indicate an unknown state,
+    VerifyOrReturn(mLogic.SetOverallCurrentState(DataModel::NullNullable) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set overall state to null in OnStopCalibrateActionComplete"));
+    VerifyOrReturn(mLogic.SetOverallTargetState(DataModel::NullNullable) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set overall target to null in OnStopCalibrateActionComplete"));
+    VerifyOrReturn(mLogic.SetCountdownTimeFromDelegate(0) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set countdown time to 0 in OnStopCalibrateActionComplete"));
+    VerifyOrReturn(mLogic.GenerateMovementCompletedEvent() == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to generate movement completed event in OnStopCalibrateActionComplete"));
+}
+
+void ClosureControlEndpoint::OnStopMotionActionComplete()
+{
+    MainStateEnum presentMainState;
+    VerifyOrReturn(mLogic.GetMainState(presentMainState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get main state in OnStopMotionActionComplete"));
+
+    // If the current main state is WaitingForMotion, it means the device hasn't started moving yet,
+    // so we don't need to update the current state.
+    if (presentMainState != MainStateEnum::kWaitingForMotion)
+    {
+        // Set the OverallState position to PartiallyOpened as motion has been stopped
+        // and the closure is not fully closed or fully opened.
+        auto position = MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened));
+
+        DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
+        VerifyOrReturn(mLogic.GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
+                       ChipLogError(AppServer, "Failed to get overall state in OnStopMotionActionComplete"));
+
+        if (overallCurrentState.IsNull())
+        {
+            overallCurrentState.SetNonNull(GenericOverallCurrentState(position, NullOptional, NullOptional, false));
+        }
+        else
+        {
+            overallCurrentState.Value().position    = position;
+            overallCurrentState.Value().secureState = false;
+        }
+
+        VerifyOrReturn(mLogic.SetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
+                       ChipLogError(AppServer, "Failed to set overall state in OnStopMotionActionComplete"));
+    }
+
+    VerifyOrReturn(mLogic.SetMainState(MainStateEnum::kStopped) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set main state in OnStopMotionActionComplete"));
+
+    // Set the Position, latch in OverallTargetState to Null and speed to Auto as the motion has been stopped.
+    GenericOverallTargetState overallTargetState(MakeOptional(DataModel::NullNullable), MakeOptional(DataModel::NullNullable),
+                                                 MakeOptional(Globals::ThreeLevelAutoEnum::kAuto));
+    VerifyOrReturn(mLogic.SetOverallTargetState(DataModel::MakeNullable(overallTargetState)) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set overall target in OnStopMotionActionComplete"));
+
+    VerifyOrReturn(mLogic.SetCountdownTimeFromDelegate(0) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set countdown time to 0 in OnStopMotionActionComplete"));
+    VerifyOrReturn(mLogic.GenerateMovementCompletedEvent() == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to generate movement completed event in OnStopMotionActionComplete"));
+}
+
+void ClosureControlEndpoint::OnCalibrateActionComplete()
+{
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(GenericOverallCurrentState(
+        MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
+        MakeOptional(Globals::ThreeLevelAutoEnum::kAuto), DataModel::MakeNullable(true)));
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState = DataModel::NullNullable;
+
+    mLogic.SetMainState(MainStateEnum::kStopped);
+    mLogic.SetOverallCurrentState(overallCurrentState);
+    mLogic.SetOverallTargetState(overallTargetState);
+    mLogic.SetCountdownTimeFromDelegate(0);
+    mLogic.GenerateMovementCompletedEvent();
+}
+
+void ClosureControlEndpoint::OnMoveToActionComplete()
+{
+    UpdateCurrentStateFromTargetState();
+    mLogic.SetMainState(MainStateEnum::kStopped);
+    mLogic.SetCountdownTimeFromDelegate(0);
+    mLogic.GenerateMovementCompletedEvent();
+}
+
+void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
+{
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState;
+
+    VerifyOrReturn(mLogic.GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get overall state from closure Endpoint"));
+    VerifyOrReturn(mLogic.GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get overall target from closure Endpoint"));
+
+    VerifyOrReturn(!overallTargetState.IsNull(), ChipLogError(AppServer, "Current overall target is null, Move to action Failed"));
+    VerifyOrReturn(!overallCurrentState.IsNull(), ChipLogError(AppServer, "Current overall state is null, Move to action Failed"));
+
+    if (overallTargetState.Value().position.HasValue() && !overallTargetState.Value().position.Value().IsNull())
+    {
+        // Map the target position to the current positioning enum.
+        CurrentPositionEnum currentPositioning =
+            MapTargetPositionToCurrentPositioning(overallTargetState.Value().position.Value().Value());
+        overallCurrentState.Value().position.SetValue(MakeNullable(currentPositioning));
+    }
+
+    if (overallTargetState.Value().latch.HasValue() && !overallTargetState.Value().latch.Value().IsNull())
+    {
+        overallCurrentState.Value().latch.SetValue(MakeNullable(overallTargetState.Value().latch.Value().Value()));
+    }
+
+    if (overallTargetState.Value().speed.HasValue())
+    {
+        overallCurrentState.Value().speed.SetValue(overallTargetState.Value().speed.Value());
+    }
+
+    bool isClosureInSecureState = true;
+
+    // First, check if the closure is fully closed and has positioning feature.
+    if (mLogic.GetConformance().FeatureMap().Has(Feature::kPositioning))
+    {
+        isClosureInSecureState &= overallCurrentState.Value().position.HasValue() &&
+            !overallCurrentState.Value().position.Value().IsNull() &&
+            overallCurrentState.Value().position.Value().Value() == CurrentPositionEnum::kFullyClosed;
+    }
+
+    // Next, check if motion latching is enabled and latch is true.
+    if (mLogic.GetConformance().FeatureMap().Has(Feature::kMotionLatching))
+    {
+        isClosureInSecureState &= overallCurrentState.Value().latch.HasValue() &&
+            !overallCurrentState.Value().latch.Value().IsNull() && overallCurrentState.Value().latch.Value().Value() == true;
+    }
+
+    overallCurrentState.Value().secureState.SetNonNull(isClosureInSecureState);
+
+    mLogic.SetOverallCurrentState(overallCurrentState);
+}
+
+CurrentPositionEnum ClosureControlEndpoint::MapTargetPositionToCurrentPositioning(TargetPositionEnum value)
+{
+    switch (value)
+    {
+    case TargetPositionEnum::kMoveToFullyClosed:
+        return CurrentPositionEnum::kFullyClosed;
+    case TargetPositionEnum::kMoveToFullyOpen:
+        return CurrentPositionEnum::kFullyOpened;
+    case TargetPositionEnum::kMoveToPedestrianPosition:
+        return CurrentPositionEnum::kOpenedForPedestrian;
+    case TargetPositionEnum::kMoveToVentilationPosition:
+        return CurrentPositionEnum::kOpenedForVentilation;
+    case TargetPositionEnum::kMoveToSignaturePosition:
+        return CurrentPositionEnum::kOpenedAtSignature;
+    default:
+        return CurrentPositionEnum::kUnknownEnumValue;
+    }
+}
+
+void ClosureControlEndpoint::OnPanelMotionActionComplete()
+{
+    mLogic.SetMainState(MainStateEnum::kStopped);
+
+    // Set the OverallState position to PartiallyOpened as motion has been stopped
+    auto position = MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened));
+
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState;
+
+    VerifyOrReturn(mLogic.GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get OverallCurrentState"));
+    VerifyOrReturn(mLogic.GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get OverallTargetState"));
+
+    if (overallCurrentState.IsNull())
+    {
+        overallCurrentState.SetNonNull(GenericOverallCurrentState(position, NullOptional, NullOptional, false));
+    }
+    else
+    {
+        overallCurrentState.Value().position    = position;
+        overallCurrentState.Value().secureState = false;
+    }
+
+    // Set latch and speed to their target values if they are set in the overall target.
+    if (!overallTargetState.IsNull())
+    {
+        if (overallTargetState.Value().latch.HasValue() && !overallTargetState.Value().latch.Value().IsNull())
+        {
+            overallCurrentState.Value().latch.SetValue(DataModel::MakeNullable(overallTargetState.Value().latch.Value().Value()));
+        }
+
+        if (overallTargetState.Value().speed.HasValue())
+        {
+            // If the target speed was Auto, we set it to Auto.
+            overallCurrentState.Value().speed.SetValue(overallTargetState.Value().speed.Value());
+        }
+    }
+    mLogic.SetOverallCurrentState(overallCurrentState);
+
+    mLogic.SetCountdownTimeFromDelegate(0);
+    mLogic.GenerateMovementCompletedEvent();
 }

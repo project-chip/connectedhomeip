@@ -4,6 +4,7 @@
 #include <app/data-model/Nullable.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/core/DataModelTypes.h>
 
 using chip::app::DataModel::Nullable;
@@ -46,6 +47,40 @@ using namespace chip::app::Clusters;
 #endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
 #endif // MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 
+#if MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include <app/clusters/identify-server/identify-server.h>
+
+namespace {
+// TODO: Move this to a standalone cluster cpp file.
+
+constexpr size_t kIdentifyTableSize = MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT;
+static_assert(kIdentifyTableSize <= kEmberInvalidEndpointIndex, "Identify table size error");
+std::unique_ptr<struct Identify> gIdentifyInstanceTable[kIdentifyTableSize];
+
+void InitIdentifyCluster()
+{
+    const uint16_t endpointCount = emberAfEndpointCount();
+
+    for (uint16_t endpointIndex = 0; endpointIndex < endpointCount; endpointIndex++)
+    {
+        chip::EndpointId endpointId = emberAfEndpointFromIndex(endpointIndex);
+        if (endpointId == kInvalidEndpointId)
+        {
+            continue;
+        }
+
+        // Check if endpoint has Identify cluster enabled
+        uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, chip::app::Clusters::Identify::Id,
+                                                                MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT);
+        if (epIndex >= kIdentifyTableSize)
+            continue;
+
+        gIdentifyInstanceTable[epIndex] =
+            std::make_unique<struct Identify>(endpointId, nullptr, nullptr, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone);
+    }
+}
+} // namespace
+#endif // MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT
 namespace {
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
@@ -111,6 +146,14 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeftTagList[] = { 
 #ifdef MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
 #include "oven-cavity-operational-state/chef-oven-cavity-operational-state.h"
 #endif // MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
+#include "microwave-oven-mode/chef-microwave-oven-mode.h"
+#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
+#include "microwave-oven-control/chef-microwave-oven-control.h"
+#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
 
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
@@ -523,6 +566,20 @@ void ApplicationInit()
     ChipLogProgress(NotSpecified, "Initializing OvenMode cluster.");
     ChefOvenMode::InitChefOvenModeCluster();
 #endif // MATTER_DM_PLUGIN_OVEN_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
+    ChipLogProgress(NotSpecified, "Initializing MicrowaveOvenMode cluster.");
+    ChefMicrowaveOvenMode::InitChefMicrowaveOvenModeCluster();
+#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
+    ChipLogProgress(NotSpecified, "Initializing MicrowaveOvenControl cluster.");
+    InitChefMicrowaveOvenControlCluster();
+#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
+
+#if MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    InitIdentifyCluster();
+#endif // MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT
 }
 
 void ApplicationShutdown()

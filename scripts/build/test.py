@@ -40,6 +40,7 @@ def build_actual_output(root: str, out: str, args: List[str]) -> List[str]:
         'PW_PROJECT_ROOT': root,
         'ANDROID_NDK_HOME': 'TEST_ANDROID_NDK_HOME',
         'ANDROID_HOME': 'TEST_ANDROID_HOME',
+        'TEST_ANDROID_SDK_MANAGER_PATH': 'TEST_ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager',
         'TIZEN_SDK_ROOT': 'TEST_TIZEN_SDK_ROOT',
         'TIZEN_SDK_SYSROOT': 'TEST_TIZEN_SDK_SYSROOT',
         'TELINK_ZEPHYR_SDK_DIR': 'TELINK_ZEPHYR_SDK_DIR',
@@ -48,7 +49,6 @@ def build_actual_output(root: str, out: str, args: List[str]) -> List[str]:
         'TI_SYSCONFIG_ROOT': 'TEST_TI_SYSCONFIG_ROOT',
         'JAVA_HOME': 'TEST_JAVA_HOME',
         'GSDK_ROOT': 'TEST_GSDK_ROOT',
-        'WISECONNECT_SDK_ROOT': 'TEST_WISECONNECT_SDK_ROOT',
         'WIFI_SDK_ROOT': 'TEST_WIFI_SDK_ROOT',
     })
 
@@ -110,8 +110,6 @@ class TestBuilder(unittest.TestCase):
             'android-arm64-chip-tool',
             'nrf-nrf52840dk-pump',
             'efr32-brd4187c-light-rpc-no-version',
-            'openiotsdk-lock-mbedtls',
-            'openiotsdk-shell-mbedtls'
         ]
 
         for target in TARGETS:

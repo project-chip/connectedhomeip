@@ -11,10 +11,8 @@ bouffalolab/index
 esp32/index
 infineon/index
 linux/index
-mbedos/index
 nrf/index
 nxp/index
-openiotsdk/index
 openthread/index
 silabs/index
 stm32/index
@@ -27,10 +25,8 @@ ti/index
 -   [ESP32](./esp32/)
 -   [Infineon](./infineon/)
 -   [Linux](./linux/)
--   [MbedOS](./mbedos/)
 -   [NRF](./nrf/)
 -   [NXP](./nxp/)
--   [OpenIoTSDK](./openiotsdk/)
 -   [OpenThread](./openthread/)
 -   [Silabs](./silabs/)
 -   [STM32](./stm32/)

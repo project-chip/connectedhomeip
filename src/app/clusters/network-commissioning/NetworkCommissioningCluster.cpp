@@ -16,6 +16,7 @@
  */
 #include "NetworkCommissioningCluster.h"
 
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/NetworkCommissioning/AttributeIds.h>
 #include <clusters/NetworkCommissioning/CommandIds.h>
@@ -41,7 +42,7 @@ DataModel::ActionReturnStatus NetworkCommissioningCluster::ReadAttribute(const D
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id:
-        return encoder.Encode(mLogic.Features().Raw());
+        return encoder.Encode(mLogic.Features());
     case ClusterRevision::Id:
         return encoder.Encode(NetworkCommissioning::kRevision);
     case MaxNetworks::Id:
@@ -90,7 +91,7 @@ DataModel::ActionReturnStatus NetworkCommissioningCluster::WriteAttribute(const 
     {
         bool value;
         ReturnErrorOnFailure(decoder.Decode(value));
-        return mLogic.SetInterfaceEnabled(value);
+        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, mLogic.SetInterfaceEnabled(value));
     }
 
     return Protocols::InteractionModel::Status::InvalidAction;
@@ -202,7 +203,7 @@ CHIP_ERROR NetworkCommissioningCluster::GeneratedCommands(const ConcreteClusterP
     using namespace NetworkCommissioning::Commands;
     using NetworkCommissioning::Feature;
 
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(4));
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(kAcceptedCommandsCount));
 
     if (mLogic.Features().HasAny(Feature::kWiFiNetworkInterface, Feature::kThreadNetworkInterface))
     {
@@ -226,43 +227,47 @@ CHIP_ERROR NetworkCommissioningCluster::Attributes(const ConcreteClusterPath & p
     using namespace NetworkCommissioning::Attributes;
     using NetworkCommissioning::Feature;
 
-    // mandatory attributes
-    ReturnErrorOnFailure(builder.AppendElements({
-        MaxNetworks::kMetadataEntry,
-        Networks::kMetadataEntry,
-        InterfaceEnabled::kMetadataEntry,
-        LastNetworkingStatus::kMetadataEntry,
-        LastNetworkID::kMetadataEntry,
-        LastConnectErrorValue::kMetadataEntry,
-    }));
+    AttributeListBuilder attributeListBuilder(builder);
+
+    constexpr DataModel::AttributeEntry kOptionalAttributes[] = {
+        ScanMaxTimeSeconds::kMetadataEntry,      //
+        ConnectMaxTimeSeconds::kMetadataEntry,   //
+        SupportedThreadFeatures::kMetadataEntry, //
+        ThreadVersion::kMetadataEntry,           //
+        SupportedWiFiBands::kMetadataEntry,      //
+    };
+
+    chip::app::OptionalAttributeSet<ScanMaxTimeSeconds::Id,      //
+                                    ConnectMaxTimeSeconds::Id,   //
+                                    SupportedThreadFeatures::Id, //
+                                    ThreadVersion::Id,           //
+                                    SupportedWiFiBands::Id       //
+                                    >
+        optionalAttributes;
 
     // NOTE: thread and wifi are mutually exclusive features
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (mLogic.Features().Has(Feature::kThreadNetworkInterface))
     {
-        ReturnErrorOnFailure(builder.AppendElements({
-            ScanMaxTimeSeconds::kMetadataEntry,
-            ConnectMaxTimeSeconds::kMetadataEntry,
-            SupportedThreadFeatures::kMetadataEntry,
-            ThreadVersion::kMetadataEntry,
-        }));
+        optionalAttributes.ForceSet<ScanMaxTimeSeconds::Id>();
+        optionalAttributes.ForceSet<ConnectMaxTimeSeconds::Id>();
+        optionalAttributes.ForceSet<SupportedThreadFeatures::Id>();
+        optionalAttributes.ForceSet<ThreadVersion::Id>();
     }
     else
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
         if (mLogic.Features().Has(Feature::kWiFiNetworkInterface))
     {
-        ReturnErrorOnFailure(builder.AppendElements({
-            ScanMaxTimeSeconds::kMetadataEntry,
-            ConnectMaxTimeSeconds::kMetadataEntry,
-            SupportedWiFiBands::kMetadataEntry,
-        }));
+        optionalAttributes.ForceSet<ScanMaxTimeSeconds::Id>();
+        optionalAttributes.ForceSet<ConnectMaxTimeSeconds::Id>();
+        optionalAttributes.ForceSet<SupportedWiFiBands::Id>();
     }
     else
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
     {}
 
-    return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
+    return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(kOptionalAttributes), optionalAttributes);
 }
 
 } // namespace Clusters

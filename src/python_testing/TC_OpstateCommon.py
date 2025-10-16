@@ -21,14 +21,16 @@ import time
 from dataclasses import dataclass
 from typing import Any
 
-import chip.clusters as Clusters
 import psutil
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import ClusterAttributeChangeAccumulator, EventChangeCallback, TestStep
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.clusters.Attribute import EventReadResult, SubscriptionTransaction
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.matter_testing import TestStep
 
 
 def get_pid(name):
@@ -929,7 +931,7 @@ class TC_OPSTATE_BASE():
             # STEP 2: Set up a subscription to the OperationalError event
             self.step(2)
             # Subscribe to Events and when they are sent push them to a queue for checking later
-            events_callback = EventChangeCallback(cluster)
+            events_callback = EventSubscriptionHandler(expected_cluster=cluster)
             await events_callback.start(self.default_controller,
                                         self.dut_node_id,
                                         endpoint)
@@ -1253,7 +1255,7 @@ class TC_OPSTATE_BASE():
         # Note that this does a subscribe-all instead of subscribing only to the CountdownTime attribute.
         # To-Do: Update the TP to subscribe-all.
         self.step(2)
-        sub_handler = ClusterAttributeChangeAccumulator(cluster)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=cluster)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(3)
