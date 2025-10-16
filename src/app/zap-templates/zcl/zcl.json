@@ -350,7 +350,12 @@
             "OperatingMode",
             "FeatureMap"
         ],
-        "Identify": ["ClusterRevision"],
+        "Identify": [
+            "ClusterRevision",
+            "FeatureMap",
+            "IdentifyTime",
+            "IdentifyType"
+        ],
         "Joint Fabric Datastore": ["Status"],
         "Meter Identification": [
             "MeterType",

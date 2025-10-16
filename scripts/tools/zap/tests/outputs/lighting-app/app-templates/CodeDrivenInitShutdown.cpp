@@ -27,6 +27,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
+    case app::Clusters::Identify::Id:
+        MatterIdentifyClusterInitCallback(endpoint);
+        break;
     case app::Clusters::AccessControl::Id:
         MatterAccessControlClusterInitCallback(endpoint);
         break;
@@ -79,6 +82,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
 {
     switch (clusterId)
     {
+    case app::Clusters::Identify::Id:
+        MatterIdentifyClusterShutdownCallback(endpoint);
+        break;
     case app::Clusters::AccessControl::Id:
         MatterAccessControlClusterShutdownCallback(endpoint);
         break;

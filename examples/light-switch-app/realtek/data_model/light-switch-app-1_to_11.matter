@@ -2880,10 +2880,10 @@ endpoint 1 {
   binding cluster ColorControl;
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0000;
-    ram      attribute identifyType default = 0x0;
+    callback attribute identifyTime;
+    callback attribute identifyType;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;
@@ -2915,9 +2915,9 @@ endpoint 2 {
   binding cluster ColorControl;
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x00;
-    ram      attribute featureMap default = 0;
+    callback attribute identifyTime;
+    callback attribute identifyType;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;
@@ -2948,9 +2948,9 @@ endpoint 3 {
   binding cluster ColorControl;
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x00;
-    ram      attribute featureMap default = 0;
+    callback attribute identifyTime;
+    callback attribute identifyType;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;
@@ -2981,9 +2981,9 @@ endpoint 4 {
   binding cluster ColorControl;
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x00;
-    ram      attribute featureMap default = 0;
+    callback attribute identifyTime;
+    callback attribute identifyType;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;
@@ -3014,9 +3014,9 @@ endpoint 5 {
   binding cluster ColorControl;
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x00;
-    ram      attribute featureMap default = 0;
+    callback attribute identifyTime;
+    callback attribute identifyType;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;
@@ -3047,9 +3047,9 @@ endpoint 6 {
   binding cluster ColorControl;
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x00;
-    ram      attribute featureMap default = 0;
+    callback attribute identifyTime;
+    callback attribute identifyType;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;
@@ -3080,9 +3080,9 @@ endpoint 7 {
   binding cluster ColorControl;
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x00;
-    ram      attribute featureMap default = 0;
+    callback attribute identifyTime;
+    callback attribute identifyType;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;
@@ -3113,9 +3113,9 @@ endpoint 8 {
   binding cluster ColorControl;
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x00;
-    ram      attribute featureMap default = 0;
+    callback attribute identifyTime;
+    callback attribute identifyType;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;
@@ -3146,9 +3146,9 @@ endpoint 9 {
   binding cluster ColorControl;
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x00;
-    ram      attribute featureMap default = 0;
+    callback attribute identifyTime;
+    callback attribute identifyType;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;
@@ -3176,12 +3176,12 @@ endpoint 10 {
 
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x0;
+    callback attribute identifyTime;
+    callback attribute identifyType;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;
@@ -3219,9 +3219,9 @@ endpoint 11 {
   binding cluster ColorControl;
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x00;
-    ram      attribute featureMap default = 0;
+    callback attribute identifyTime;
+    callback attribute identifyType;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;
@@ -3252,9 +3252,9 @@ endpoint 12 {
   binding cluster ColorControl;
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x00;
-    ram      attribute featureMap default = 0;
+    callback attribute identifyTime;
+    callback attribute identifyType;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;
@@ -3285,9 +3285,9 @@ endpoint 13 {
   binding cluster ColorControl;
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x00;
-    ram      attribute featureMap default = 0;
+    callback attribute identifyTime;
+    callback attribute identifyType;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;

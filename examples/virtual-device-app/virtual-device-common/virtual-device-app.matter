@@ -3928,9 +3928,9 @@ endpoint 1 {
 
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x0;
-    ram      attribute featureMap default = 0;
+    callback attribute identifyTime;
+    callback attribute identifyType;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;
