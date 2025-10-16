@@ -119,55 +119,6 @@ TEST_F(TestGroupKeyManagementCluster, AttributesTest)
     ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 }
 
-namespace TestHelpers {
-
-template <typename ClusterT, typename T>
-CHIP_ERROR WriteClusterAttribute(ClusterT & cluster, const chip::app::ConcreteAttributePath & path, const T & listToWrite)
-{
-    chip::app::Testing::WriteOperation writeOperation(path);
-    writeOperation.SetSubjectDescriptor(chip::app::Testing::kAdminSubjectDescriptor);
-    // 1. Manually encode the list to a TLV buffer.
-    uint8_t tlvBuffer[1024];
-    chip::TLV::TLVWriter writer;
-    writer.Init(tlvBuffer);
-
-    chip::TLV::TLVType outerContainer;
-    CHIP_ERROR err = writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Array, outerContainer);
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
-
-    for (const auto & item : listToWrite)
-    {
-        err = item.EncodeForWrite(writer, chip::TLV::AnonymousTag());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-    }
-
-    err = writer.EndContainer(outerContainer);
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
-
-    // 2. Create a TLV reader from the buffer.
-    chip::TLV::TLVReader reader;
-    reader.Init(tlvBuffer, writer.GetLengthWritten());
-    ReturnErrorOnFailure(reader.Next()); // Position reader on the array
-
-    // 3. FIX: Create the decoder with BOTH the reader AND the SubjectDescriptor.
-    // The SubjectDescriptor provides the security context (like the fabric index) for the write.
-    chip::app::AttributeValueDecoder decoder(reader, *writeOperation.GetRequest().subjectDescriptor);
-
-    // 4. Pass the correctly constructed decoder to the cluster.
-    return cluster.WriteAttribute(writeOperation.GetRequest(), decoder).GetUnderlyingError();
-}
-
-} // namespace TestHelpers
-
 class FakeGroupDataProvider : public chip::Credentials::GroupDataProvider
 {
 public:
@@ -284,13 +235,112 @@ struct ClusterTestContext
     }
 };
 
+namespace TestHelpers {
+
+template <typename ClusterT, typename T>
+CHIP_ERROR WriteClusterAttribute(ClusterT & cluster, const chip::app::ConcreteAttributePath & path, const T & listToWrite)
+{
+    chip::app::Testing::WriteOperation writeOperation(path);
+    writeOperation.SetSubjectDescriptor(chip::app::Testing::kAdminSubjectDescriptor);
+
+    // The ZAP-generated `GroupKeyMapStruct::Type` does not provide a generic `Encode()`
+    // method. Instead, it has context-specific `EncodeForWrite()` and `EncodeForRead()`
+    // methods. High-level helpers like `DecoderFor()` cannot resolve this and fail
+    // to compile. Hence we manually encode the list of structs into a TLV buffer.
+
+    uint8_t tlvBuffer[1024];
+    chip::TLV::TLVWriter writer;
+    writer.Init(tlvBuffer);
+
+    chip::TLV::TLVType outerContainer;
+    CHIP_ERROR err = writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Array, outerContainer);
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
+    for (const auto & item : listToWrite)
+    {
+        err = item.EncodeForWrite(writer, chip::TLV::AnonymousTag());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+    }
+
+    err = writer.EndContainer(outerContainer);
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(tlvBuffer, writer.GetLengthWritten());
+    ReturnErrorOnFailure(reader.Next()); // Position reader on the array
+
+    chip::app::AttributeValueDecoder decoder(reader, *writeOperation.GetRequest().subjectDescriptor);
+
+    return cluster.WriteAttribute(writeOperation.GetRequest(), decoder).GetUnderlyingError();
+}
+
+GroupKeyManagement::Structs::GroupKeyMapStruct::Type CreateKey(chip::GroupId groupId, uint16_t keySetId,
+                                                               chip::FabricIndex fabricIndex)
+{
+    GroupKeyManagement::Structs::GroupKeyMapStruct::Type key;
+    key.groupId       = groupId;
+    key.groupKeySetID = keySetId;
+    key.fabricIndex   = fabricIndex;
+    return key;
+}
+
+std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type>
+CreateGroupKeyMapList(size_t count, chip::FabricIndex fabricIndex, chip::GroupId startGroupId = 0x1001, uint16_t startKeySetId = 1,
+                      // Add a parameter for difference of key ids.
+                      uint16_t keySetIdIncrement = 1)
+{
+    std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> list;
+    for (size_t i = 0; i < count; ++i)
+    {
+        uint16_t currentKeySetId = static_cast<uint16_t>(startKeySetId + (i * keySetIdIncrement));
+        list.push_back(CreateKey(static_cast<chip::GroupId>(startGroupId + i), currentKeySetId, fabricIndex));
+    }
+    return list;
+}
+
+void PrepopulateGroupKeyMap(GroupKeyManagementCluster & cluster,
+                            const std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> & keys)
+{
+    auto listToWrite =
+        chip::app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
+
+    auto path = chip::app::ConcreteAttributePath(chip::kRootEndpointId, GroupKeyManagement::Id,
+                                                 GroupKeyManagement::Attributes::GroupKeyMap::Id);
+
+    CHIP_ERROR err = TestHelpers::WriteClusterAttribute(cluster, path, listToWrite);
+
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+}
+
+void VerifyGroupKeysMatch(FakeGroupDataProvider & provider, const chip::FabricIndex fabricIndex,
+                          const std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> & expectedKeys)
+{
+    ASSERT_EQ(provider.mFabricKeys.count(fabricIndex), 1u);
+
+    const auto & storedKeys = provider.mFabricKeys.at(fabricIndex);
+
+    ASSERT_EQ(storedKeys.size(), expectedKeys.size());
+
+    for (size_t i = 0; i < expectedKeys.size(); ++i)
+    {
+        EXPECT_EQ(storedKeys[i].group_id, expectedKeys[i].groupId);
+        EXPECT_EQ(storedKeys[i].keyset_id, expectedKeys[i].groupKeySetID);
+    }
+}
+} // namespace TestHelpers
+
 TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttribute)
 {
-    using namespace ::chip;
-    using namespace ::chip::app;
-    using namespace ::chip::app::Clusters;
-
-    ::chip::Test::TestServerClusterContext testStack;
+    chip::Test::TestServerClusterContext testStack;
     FakeGroupDataProvider fakeProvider;
     GroupKeyManagementCluster cluster;
     ClusterTestContext clusterContext(cluster, fakeProvider);
@@ -298,33 +348,13 @@ TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttribute)
     auto context = testStack.Create();
     ASSERT_EQ(cluster.Startup(context), CHIP_NO_ERROR);
 
-    const FabricIndex fabricIndex = chip::app::Testing::kTestFabrixIndex;
+    const chip::FabricIndex fabricIndex = chip::app::Testing::kTestFabrixIndex;
 
-    GroupKeyManagement::Structs::GroupKeyMapStruct::Type key1;
-    key1.groupId       = 0x1001;
-    key1.groupKeySetID = 1;
-    key1.fabricIndex   = fabricIndex;
+    auto keys = TestHelpers::CreateGroupKeyMapList(2, fabricIndex);
 
-    GroupKeyManagement::Structs::GroupKeyMapStruct::Type key2;
-    key2.groupId       = 0x1002;
-    key2.groupKeySetID = 2;
-    key2.fabricIndex   = fabricIndex;
+    TestHelpers::PrepopulateGroupKeyMap(cluster, keys);
 
-    const GroupKeyManagement::Structs::GroupKeyMapStruct::Type items[] = { key1, key2 };
-    auto listToWrite = DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(items);
-    auto path = ConcreteAttributePath(kRootEndpointId, GroupKeyManagement::Id, GroupKeyManagement::Attributes::GroupKeyMap::Id);
-
-    CHIP_ERROR err = TestHelpers::WriteClusterAttribute(cluster, path, listToWrite);
-
-    ASSERT_EQ(err, CHIP_NO_ERROR);
-    ASSERT_EQ(fakeProvider.mFabricKeys.count(fabricIndex), static_cast<size_t>(1));
-    ASSERT_EQ(fakeProvider.mFabricKeys[fabricIndex].size(), static_cast<size_t>(2));
-
-    const auto & storedKeys = fakeProvider.mFabricKeys[fabricIndex];
-    EXPECT_EQ(storedKeys[0].group_id, key1.groupId);
-    EXPECT_EQ(storedKeys[0].keyset_id, key1.groupKeySetID);
-    EXPECT_EQ(storedKeys[1].group_id, key2.groupId);
-    EXPECT_EQ(storedKeys[1].keyset_id, key2.groupKeySetID);
+    TestHelpers::VerifyGroupKeysMatch(fakeProvider, fabricIndex, keys);
 }
 
 } // namespace
