@@ -272,9 +272,14 @@ CHIP_ERROR PosixConfig::WriteConfigValue(Key key, bool val)
     err = storage->WriteValue(key.Name, val);
     SuccessOrExit(err);
 
-    // Commit the value to the persistent store.
-    err = storage->Commit();
-    SuccessOrExit(err);
+    // Commit the value to the persistent store, unless it's in the factory namespace.
+    // Technically the factory namespace should not be written to at all, but there
+    // are some code paths that write default values into it at startup.
+    if (storage != &gChipLinuxFactoryStorage)
+    {
+        err = storage->Commit();
+        SuccessOrExit(err);
+    }
 
     ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %s", StringOrNullMarker(key.Namespace), StringOrNullMarker(key.Name),
                     val ? "true" : "false");
