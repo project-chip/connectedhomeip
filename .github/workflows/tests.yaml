@@ -40,6 +40,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
+    CCACHE_NOHASHDIR: 1
     CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
