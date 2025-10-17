@@ -205,7 +205,7 @@ void ClosureUI::DrawOverallCurrentState(GLIB_Context_t * glibContext)
 void ClosureUI::DrawFooter(GLIB_Context_t * glibContext)
 {
     // Draw a simple footer indicating this is the closure app
-    GLIB_drawStringOnLine(glibContext, "Closure Control", FOOTER_DISPLAY_LINE, GLIB_ALIGN_CENTER, 0, 0, true);
+    GLIB_drawStringOnLine(glibContext, "Closure App", FOOTER_DISPLAY_LINE, GLIB_ALIGN_CENTER, 0, 0, true);
 }
 
 void ClosureUI::DrawStateIcon(GLIB_Context_t * glibContext, MainState state)
