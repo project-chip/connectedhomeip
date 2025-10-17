@@ -845,7 +845,7 @@ public:
                         Access::Privilege::kOperate },
     };
 
-    FakeDefaultServerCluster(const ConcreteClusterPath & path) : DefaultServerCluster(path) {}
+    constexpr FakeDefaultServerCluster(ConcreteClusterPath path) : DefaultServerCluster(std::move(path)) {}
 
     [[nodiscard]] BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath &) const override
     {
