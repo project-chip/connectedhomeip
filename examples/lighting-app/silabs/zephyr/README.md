@@ -5,19 +5,19 @@ Zephyr RTOS.
 
 <hr>
 
--   [Matter SiWx917 Lighting Example](#matter-siwx917-lighting-example)
-    -   [Introduction](#introduction)
-    -   [Building](#building)
-    -   [Flashing the Application](#flashing-the-application)
-    -   [Running the Complete Example](#running-the-complete-example)
-        -   [Commissioning over BLE](#commissioning-over-ble)
-        -   [Testing with chip-tool](#testing-with-chip-tool)
-    -   [Building Options](#building-options)
-        -   [Debug build / release build](#debug-build--release-build)
-        -   [Disabling logging](#disabling-logging)
-        -   [KVS maximum entry count](#kvs-maximum-entry-count)
-    -   [OTA Software Update](#ota-software-update)
-    -   [Limitations](#limitations)
+- [Matter SiWx917 Lighting Example](#matter-siwx917-lighting-example)
+    - [Introduction](#introduction)
+    - [Building](#building)
+    - [Flashing the Application](#flashing-the-application)
+    - [Running the Complete Example](#running-the-complete-example)
+        - [Commissioning over BLE](#commissioning-over-ble)
+        - [Testing with chip-tool](#testing-with-chip-tool)
+    - [Building Options](#building-options)
+        - [Debug build / release build](#debug-build--release-build)
+        - [Disabling logging](#disabling-logging)
+        - [KVS maximum entry count](#kvs-maximum-entry-count)
+    - [OTA Software Update](#ota-software-update)
+    - [Limitations](#limitations)
 
 <hr>
 
@@ -56,34 +56,31 @@ settings. Changes are automatically saved to the build configuration.
 
 ## Building
 
--   Install the required dependencies for Matter development:
+- Install the required dependencies for Matter development:
+    - [Matter Prerequisites](../../../../docs/guides/BUILDING.md)
 
-    -   [Matter Prerequisites](../../../../docs/guides/BUILDING.md)
+- Install the Silicon Labs Zephyr SDK and tools:
+    - Follow the
+      [Silicon Labs Zephyr Repo](https://github.com/SiliconLabsSoftware/zephyr-silabs)
 
--   Install the Silicon Labs Zephyr SDK and tools:
+- Supported hardware:
+    - **SiWx917 SoC boards:**
+        - BRD4338A (SiWx917 Radio Board with 2.4GHz WiFi)
 
-    -   Follow the
-        [Silicon Labs Zephyr Repo](https://github.com/SiliconLabsSoftware/zephyr-silabs)
-
--   Supported hardware:
-
-    -   **SiWx917 SoC boards:**
-        -   BRD4338A (SiWx917 Radio Board with 2.4GHz WiFi)
-
--   Build the example application:
+- Build the example application:
 
     ```bash
     cd silabs_zephyr
     west build -b siwx917_rb4338a connectedhomeip/examples/lighting-app/silabs/zephyr
     ```
 
--   To clean the build:
+- To clean the build:
 
     ```bash
     west build -t clean
     ```
 
--   For a pristine build (removes all build artifacts):
+- For a pristine build (removes all build artifacts):
 
     ```bash
     rm -rf build
@@ -97,26 +94,26 @@ settings. Changes are automatically saved to the build configuration.
 
 ## Flashing the Application
 
--   **SiWx917 SoC device support is available in the latest Simplicity
-    Commander.** The SiWx917 SOC board will support `.hex` files for flashing.
+- **SiWx917 SoC device support is available in the latest Simplicity
+  Commander.** The SiWx917 SOC board will support `.hex` files for flashing.
 
--   Flash using west:
+- Flash using west:
 
     ```bash
     west flash
     ```
 
--   Or flash using Simplicity Commander:
+- Or flash using Simplicity Commander:
 
     ```bash
     commander flash build/zephyr/zephyr.hex
     ```
 
--   **Bootloader and Connectivity Firmware:** All SiWx917 boards require
-    connectivity firmware. See Silicon Labs documentation for more info.
-    Pre-built bootloader binaries are available in the Assets section of the
-    Releases page on
-    [Wiseconnect](https://github.com/SiliconLabs/wiseconnect/tree/v3.5.0/connectivity_firmware/standard).
+- **Bootloader and Connectivity Firmware:** All SiWx917 boards require
+  connectivity firmware. See Silicon Labs documentation for more info. Pre-built
+  bootloader binaries are available in the Assets section of the Releases page
+  on
+  [Wiseconnect](https://github.com/SiliconLabs/wiseconnect/tree/v3.5.0/connectivity_firmware/standard).
 
 ## Running the Complete Example
 
@@ -130,13 +127,13 @@ using a Matter controller over BLE, then provide WiFi credentials.
 This procedure uses the chip-tool installed on the Matter Hub. The commissioning
 procedure does the following:
 
--   Chip-tool scans BLE and locates the Silicon Labs device that uses the
-    specified discriminator
--   Establishes operational certificates
--   Sends the WiFi SSID and Passkey
--   The Silicon Labs device will join the WiFi network and get an IP address
--   It then starts providing mDNS records on IPv4 and IPv6
--   Future communications (tests) will then happen over WiFi
+- Chip-tool scans BLE and locates the Silicon Labs device that uses the
+  specified discriminator
+- Establishes operational certificates
+- Sends the WiFi SSID and Passkey
+- The Silicon Labs device will join the WiFi network and get an IP address
+- It then starts providing mDNS records on IPv4 and IPv6
+- Future communications (tests) will then happen over WiFi
 
 ### Testing with chip-tool
 
@@ -178,10 +175,10 @@ Here is an example with the chip-tool:
 
 Where:
 
--   `${NODE_ID}` is the node ID assigned to the device
--   `20202021` is the setup PIN code
--   `3840` is the discriminator
--   `${SSID}` and `${PASSWORD}` are your WiFi network credentials
+- `${NODE_ID}` is the node ID assigned to the device
+- `20202021` is the setup PIN code
+- `3840` is the discriminator
+- `${SSID}` and `${PASSWORD}` are your WiFi network credentials
 
 ## Building Options
 
@@ -257,7 +254,7 @@ platform with the standard Silicon Labs lighting example.
 
 ### Additional Resources:
 
--   [Silicon Labs Matter Documentation](https://github.com/SiliconLabsSoftware/matter_sdk)
--   [SiWx917 Development Kit User Guide](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-development-kit)
--   [Matter Specification](https://csa-iot.org/all-solutions/matter/)
--   [Zephyr RTOS Documentation](https://docs.zephyrproject.org/)
+- [Silicon Labs Matter Documentation](https://github.com/SiliconLabsSoftware/matter_sdk)
+- [SiWx917 Development Kit User Guide](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-development-kit)
+- [Matter Specification](https://csa-iot.org/all-solutions/matter/)
+- [Zephyr RTOS Documentation](https://docs.zephyrproject.org/)

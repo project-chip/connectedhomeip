@@ -17,18 +17,18 @@ sample app.
 > Developers can find more resources on the
 > [Silicon Labs Matter Community Page](https://community.silabs.com/s/article/connected-home-over-ip-chip-faq?language=en_US).
 
--   [Introduction](#introduction)
--   [Requirements](#requirements)
-    -   [Hardware Requirements](#hardware-requirements)
-    -   [Software Requirements](#software-requirements)
-    -   [Software Artifacts](#software-artifacts)
--   [Building](#building)
-    -   [Build Script](#build-script)
-    -   [Build Arguments](#build-arguments)
--   [Flashing](#flashing)
-    -   [Flasher Arguments](#flasher-arguments)
--   [Standard Application Behavior](#standard-application-behavior)
--   [Silabs CLI](#silabs-cli)
+- [Introduction](#introduction)
+- [Requirements](#requirements)
+    - [Hardware Requirements](#hardware-requirements)
+    - [Software Requirements](#software-requirements)
+    - [Software Artifacts](#software-artifacts)
+- [Building](#building)
+    - [Build Script](#build-script)
+    - [Build Arguments](#build-arguments)
+- [Flashing](#flashing)
+    - [Flasher Arguments](#flasher-arguments)
+- [Standard Application Behavior](#standard-application-behavior)
+- [Silabs CLI](#silabs-cli)
 
 ## Requirements
 

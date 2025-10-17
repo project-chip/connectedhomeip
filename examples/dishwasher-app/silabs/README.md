@@ -5,16 +5,16 @@ An example showing the use of Matter on the Silicon Labs EFR32 MG24 boards.
 <hr>
 
 - [Matter Silabs dishwasher Example](#matter-silabs-dishwasher-example)
-  - [Introduction](#introduction)
-  - [Building](#building)
-  - [Flashing the Application](#flashing-the-application)
-  - [Viewing Logging Output](#viewing-logging-output)
-    - [SEGGER RTT](#segger-rtt)
-    - [Console Log](#console-log)
-      - [Configuring the VCOM](#configuring-the-vcom)
-    - [Using the console](#using-the-console)
-  - [Running the Complete Example](#running-the-complete-example)
-    - [Commissioning](#commissioning)
+    - [Introduction](#introduction)
+    - [Building](#building)
+    - [Flashing the Application](#flashing-the-application)
+    - [Viewing Logging Output](#viewing-logging-output)
+        - [SEGGER RTT](#segger-rtt)
+        - [Console Log](#console-log)
+            - [Configuring the VCOM](#configuring-the-vcom)
+        - [Using the console](#using-the-console)
+    - [Running the Complete Example](#running-the-complete-example)
+        - [Commissioning](#commissioning)
 
 <hr>
 
@@ -45,53 +45,47 @@ Silicon Labs platform.
 
 ## Building
 
--   Download the
-    [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
-    command line tool, and ensure that `commander` is your shell search path.
-    (For Mac OS X, `commander` is located inside
-    `Commander.app/Contents/MacOS/`.)
+- Download the
+  [Simplicity Commander](https://www.silabs.com/mcu/programming-options) command
+  line tool, and ensure that `commander` is your shell search path. (For Mac OS
+  X, `commander` is located inside `Commander.app/Contents/MacOS/`.)
 
--   Download and install a suitable ARM gcc tool chain:
-    [GNU Arm Embedded Toolchain 9-2019-q4-major](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
+- Download and install a suitable ARM gcc tool chain:
+  [GNU Arm Embedded Toolchain 9-2019-q4-major](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
 
--   Install some additional tools (likely already present for CHIP developers):
+- Install some additional tools (likely already present for CHIP developers):
+    - Linux: `sudo apt-get install git ninja-build`
 
-    -   Linux: `sudo apt-get install git ninja-build`
+    - Mac OS X: `brew install ninja`
 
-    -   Mac OS X: `brew install ninja`
-
--   Supported hardware:
-
-    -   > For the latest supported hardware please refer to the
-        > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
-        > in the Silicon Labs Matter Documentation
+- Supported hardware:
+    - > For the latest supported hardware please refer to the
+      > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
+      > in the Silicon Labs Matter Documentation
 
     MG21 boards: Currently not supported due to RAM limitation.
-
-    -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+    - BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
     MG24 boards :
+    - BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    - BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    - BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    - BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+    - BRD2703A / MG24 Explorer Kit
+    - BRD2704A / SparkFun Thing Plus MGM240P board
 
-    -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-    -   BRD2703A / MG24 Explorer Kit
-    -   BRD2704A / SparkFun Thing Plus MGM240P board
+* Region code Setting (917 WiFi projects)
+    - In Wifi configurations, the region code can be set in this
+      [file](https://github.com/project-chip/connectedhomeip/blob/85e9d5fd42071d52fa3940238739544fd2a3f717/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.cpp#L104).
+      The available region codes can be found
+      [here](https://github.com/SiliconLabs/wiseconnect/blob/f675628eefa1ac4990e94146abb75dd08b522571/components/device/silabs/si91x/wireless/inc/sl_si91x_types.h#L71)
 
-*   Region code Setting (917 WiFi projects)
-
-    -   In Wifi configurations, the region code can be set in this
-        [file](https://github.com/project-chip/connectedhomeip/blob/85e9d5fd42071d52fa3940238739544fd2a3f717/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.cpp#L104).
-        The available region codes can be found
-        [here](https://github.com/SiliconLabs/wiseconnect/blob/f675628eefa1ac4990e94146abb75dd08b522571/components/device/silabs/si91x/wireless/inc/sl_si91x_types.h#L71)
-
--   Build the example application:
+- Build the example application:
 
           cd ~/connectedhomeip
           ./scripts/examples/gn_silabs_example.sh ./silabs_examples/dishwasher-app/silabs/ ./out/dishwasher-app BRD4187C
 
-*   To delete generated executable, libraries and object files use:
+* To delete generated executable, libraries and object files use:
 
           $ cd ~/connectedhomeip
           $ rm -rf ./out/
@@ -105,7 +99,7 @@ Silicon Labs platform.
           $ gn gen out/dishwasher-app
           $ ninja -C out/dishwasher-app
 
-*   To delete generated executable, libraries and object files use:
+* To delete generated executable, libraries and object files use:
 
           $ cd ~/connectedhomeip/silabs_examples/dishwasher-app/silabs
           $ rm -rf out/
@@ -117,11 +111,11 @@ arguments
 
 ## Flashing the Application
 
--   On the command line:
+- On the command line:
 
           $ python3 out/dishwasher-app/matter-silabs-dishwasher-example.flash.py
 
--   Or with the Ozone debugger, just load the .out file.
+- Or with the Ozone debugger, just load the .out file.
 
 All EFR32 boards require a bootloader, see Silicon Labs documentation for more
 info. Pre-built bootloader binaries are available on the
@@ -143,33 +137,33 @@ Software and Documentation Pack_
 Alternatively, SEGGER Ozone J-Link debugger can be used to view RTT logs too
 after flashing the .out file.
 
--   Download the J-Link installer by navigating to the appropriate URL and
-    agreeing to the license agreement.
+- Download the J-Link installer by navigating to the appropriate URL and
+  agreeing to the license agreement.
 
--   [JLink_Linux_x86_64.deb](https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.deb)
--   [JLink_MacOSX.pkg](https://www.segger.com/downloads/jlink/JLink_MacOSX.pkg)
+- [JLink_Linux_x86_64.deb](https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.deb)
+- [JLink_MacOSX.pkg](https://www.segger.com/downloads/jlink/JLink_MacOSX.pkg)
 
-*   Install the J-Link software
+* Install the J-Link software
 
           $ cd ~/Downloads
           $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
 
-*   In Linux, grant the logged in user the ability to talk to the development
-    hardware via the linux tty device (/dev/ttyACMx) by adding them to the
-    dialout group.
+* In Linux, grant the logged in user the ability to talk to the development
+  hardware via the linux tty device (/dev/ttyACMx) by adding them to the dialout
+  group.
 
           $ sudo usermod -a -G dialout ${USER}
 
 Once the above is complete, log output can be viewed using the JLinkExe tool in
 combination with JLinkRTTClient as follows:
 
--   Run the JLinkExe tool with arguments to autoconnect to the WSTK board:
+- Run the JLinkExe tool with arguments to autoconnect to the WSTK board:
 
     For MG24 use:
 
           $ JLinkExe -device EFR32MG24AXXXF1024 -if SWD -speed 4000 -autoconnect 1
 
--   In a second terminal, run the JLinkRTTClient to view logs:
+- In a second terminal, run the JLinkRTTClient to view logs:
 
           $ JLinkRTTClient
 
@@ -186,9 +180,9 @@ the verbose mode is selected (--verbose)
 
 #### Configuring the VCOM
 
--   Using (Simplicity
-    Studio)[https://community.silabs.com/s/article/wstk-virtual-com-port-baudrate-setting?language=en_US]
--   Using commander-cli
+- Using (Simplicity
+  Studio)[https://community.silabs.com/s/article/wstk-virtual-com-port-baudrate-setting?language=en_US]
+- Using commander-cli
     ```
     commander vcom config --baudrate 921600 --handshake rtscts
     ```
@@ -199,18 +193,17 @@ With any serial terminal application such as screen, putty, minicom etc.
 
 ## Running the Complete Example
 
--   It is assumed here that you already have an OpenThread border router
-    configured and running. If not see the following guide
-    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/openthread_border_router_pi.md)
-    for more information on how to setup a border router on a raspberryPi.
+- It is assumed here that you already have an OpenThread border router
+  configured and running. If not see the following guide
+  [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/openthread_border_router_pi.md)
+  for more information on how to setup a border router on a raspberryPi.
 
     Take note that the RCP code is available directly through
     [Simplicity Studio 5](https://www.silabs.com/products/development-tools/software/simplicity-studio/simplicity-studio-5)
     under File->New->Project Wizard->Examples->Thread : ot-rcp
 
--   User interface : **LCD** The LCD on Silabs WSTK shows a QR Code. This QR
-    Code is be scanned by the CHIP Tool app For the Rendez-vous procedure over
-    BLE
+- User interface : **LCD** The LCD on Silabs WSTK shows a QR Code. This QR Code
+  is be scanned by the CHIP Tool app For the Rendez-vous procedure over BLE
 
         * On devices that do not have or support the LCD Display like the BRD4166A Thunderboard Sense 2,
           a URL can be found in the RTT logs.

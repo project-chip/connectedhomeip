@@ -5,26 +5,26 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
 <hr>
 
 - [Matter EFR32 Lighting Example](#matter-efr32-lighting-example)
-  - [Introduction](#introduction)
-  - [Building](#building)
-  - [Flashing the Application](#flashing-the-application)
-  - [Viewing Logging Output](#viewing-logging-output)
-    - [SEGGER RTT (recommended)](#segger-rtt-recommended)
-    - [Console Log](#console-log)
-      - [Configuring the VCOM](#configuring-the-vcom)
-    - [Using the console](#using-the-console)
-  - [Running the Complete Example](#running-the-complete-example)
-    - [Notes](#notes)
-  - [Running RPC console](#running-rpc-console)
-  - [Device Tracing](#device-tracing)
-  - [Memory settings](#memory-settings)
-  - [OTA Software Update](#ota-software-update)
-  - [Group Communication (Multicast)](#group-communication-multicast)
-  - [Building options](#building-options)
-    - [Disabling logging](#disabling-logging)
-    - [Debug build / release build](#debug-build--release-build)
-    - [Disabling LCD](#disabling-lcd)
-    - [KVS maximum entry count](#kvs-maximum-entry-count)
+    - [Introduction](#introduction)
+    - [Building](#building)
+    - [Flashing the Application](#flashing-the-application)
+    - [Viewing Logging Output](#viewing-logging-output)
+        - [SEGGER RTT (recommended)](#segger-rtt-recommended)
+        - [Console Log](#console-log)
+            - [Configuring the VCOM](#configuring-the-vcom)
+        - [Using the console](#using-the-console)
+    - [Running the Complete Example](#running-the-complete-example)
+        - [Notes](#notes)
+    - [Running RPC console](#running-rpc-console)
+    - [Device Tracing](#device-tracing)
+    - [Memory settings](#memory-settings)
+    - [OTA Software Update](#ota-software-update)
+    - [Group Communication (Multicast)](#group-communication-multicast)
+    - [Building options](#building-options)
+        - [Disabling logging](#disabling-logging)
+        - [Debug build / release build](#debug-build--release-build)
+        - [Disabling LCD](#disabling-lcd)
+        - [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -55,52 +55,47 @@ Silicon Labs platform.
 
 ## Building
 
--   Download the
-    [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
-    command line tool, and ensure that `commander` is your shell search path.
-    (For Mac OS X, `commander` is located inside
-    `Commander.app/Contents/MacOS/`.)
+- Download the
+  [Simplicity Commander](https://www.silabs.com/mcu/programming-options) command
+  line tool, and ensure that `commander` is your shell search path. (For Mac OS
+  X, `commander` is located inside `Commander.app/Contents/MacOS/`.)
 
--   Download and install a suitable ARM gcc tool chain (For most Host, the
-    bootstrap already installs the toolchain):
-    [GNU Arm Embedded Toolchain 12.2 Rel1](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
+- Download and install a suitable ARM gcc tool chain (For most Host, the
+  bootstrap already installs the toolchain):
+  [GNU Arm Embedded Toolchain 12.2 Rel1](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
 
--   Install some additional tools (likely already present for CHIP developers):
+- Install some additional tools (likely already present for CHIP developers):
+    - Linux: `sudo apt-get install git ninja-build`
 
-    -   Linux: `sudo apt-get install git ninja-build`
+    - Mac OS X: `brew install ninja`
 
-    -   Mac OS X: `brew install ninja`
-
--   Supported hardware:
-
-    -   > For the latest supported hardware please refer to the
-        > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
-        > in the Silicon Labs Matter Documentation
+- Supported hardware:
+    - > For the latest supported hardware please refer to the
+      > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
+      > in the Silicon Labs Matter Documentation
 
     MG24 boards :
+    - BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    - BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    - BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    - BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    - BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+    - BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+    - BRD2703A / MG24 Explorer Kit
+    - BRD2704A / SparkFun Thing Plus MGM240P board
 
-    -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-    -   BRD2703A / MG24 Explorer Kit
-    -   BRD2704A / SparkFun Thing Plus MGM240P board
+* Region code Setting (917 WiFi projects)
+    - In Wifi configurations, the region code can be set in this
+      [file](https://github.com/project-chip/connectedhomeip/blob/85e9d5fd42071d52fa3940238739544fd2a3f717/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.cpp#L104).
+      The available region codes can be found
+      [here](https://github.com/SiliconLabs/wiseconnect/blob/f675628eefa1ac4990e94146abb75dd08b522571/components/device/silabs/si91x/wireless/inc/sl_si91x_types.h#L71)
 
-*   Region code Setting (917 WiFi projects)
-
-    -   In Wifi configurations, the region code can be set in this
-        [file](https://github.com/project-chip/connectedhomeip/blob/85e9d5fd42071d52fa3940238739544fd2a3f717/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.cpp#L104).
-        The available region codes can be found
-        [here](https://github.com/SiliconLabs/wiseconnect/blob/f675628eefa1ac4990e94146abb75dd08b522571/components/device/silabs/si91x/wireless/inc/sl_si91x_types.h#L71)
-
-*   Build the example application:
+* Build the example application:
 
           cd ~/connectedhomeip
           ./scripts/examples/gn_silabs_example.sh ./examples/lighting-app/silabs/ ./out/lighting-app BRD4187C
 
--   To delete generated executable, libraries and object files use:
+- To delete generated executable, libraries and object files use:
 
           $ cd ~/connectedhomeip
           $ rm -rf ./out/
@@ -114,12 +109,12 @@ Silicon Labs platform.
           $ gn gen out/debug
           $ ninja -C out/debug
 
--   To delete generated executable, libraries and object files use:
+- To delete generated executable, libraries and object files use:
 
           $ cd ~/connectedhomeip/examples/lighting-app/silabs
           $ rm -rf out/
 
-*   Build the example as Intermittently Connected Device (ICD)
+* Build the example as Intermittently Connected Device (ICD)
 
           $ ./scripts/examples/gn_silabs_example.sh ./examples/lighting-app/silabs/ ./out/lighting-app_ICD BRD4187C --icd
 
@@ -127,7 +122,7 @@ Silicon Labs platform.
 
           $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
 
-*   Build the example with pigweed RPC
+* Build the example with pigweed RPC
 
           $ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/lighting_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
 
@@ -149,12 +144,12 @@ arguments
 
 ## Flashing the Application
 
--   On the command line:
+- On the command line:
 
           $ cd ~/connectedhomeip/examples/lighting-app/silabs
           $ python3 out/debug/matter-silabs-lighting-example.flash.py
 
--   Or with the Ozone debugger, just load the .out file.
+- Or with the Ozone debugger, just load the .out file.
 
 All EFR32 boards require a bootloader, see Silicon Labs documentation for more
 info. Pre-built bootloader binaries are available on the
@@ -176,27 +171,27 @@ Software and Documentation Pack_
 Alternatively, SEGGER Ozone J-Link debugger can be used to view RTT logs too
 after flashing the .out file.
 
--   Download the J-Link installer by navigating to the appropriate URL and
-    agreeing to the license agreement.
+- Download the J-Link installer by navigating to the appropriate URL and
+  agreeing to the license agreement.
 
--   [JLink_Linux_x86_64.deb](https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.deb)
--   [JLink_MacOSX.pkg](https://www.segger.com/downloads/jlink/JLink_MacOSX.pkg)
+- [JLink_Linux_x86_64.deb](https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.deb)
+- [JLink_MacOSX.pkg](https://www.segger.com/downloads/jlink/JLink_MacOSX.pkg)
 
-*   Install the J-Link software
+* Install the J-Link software
 
           $ cd ~/Downloads
           $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
 
-*   In Linux, grant the logged in user the ability to talk to the development
-    hardware via the linux tty device (/dev/ttyACMx) by adding them to the
-    dialout group.
+* In Linux, grant the logged in user the ability to talk to the development
+  hardware via the linux tty device (/dev/ttyACMx) by adding them to the dialout
+  group.
 
           $ sudo usermod -a -G dialout ${USER}
 
 Once the above is complete, log output can be viewed using the JLinkExe tool in
 combination with JLinkRTTClient as follows:
 
--   Run the JLinkExe tool with arguments to autoconnect to the WSTK board:
+- Run the JLinkExe tool with arguments to autoconnect to the WSTK board:
 
     For MG24 use:
 
@@ -204,7 +199,7 @@ combination with JLinkRTTClient as follows:
           $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
           ```
 
--   In a second terminal, run the JLinkRTTClient to view logs:
+- In a second terminal, run the JLinkRTTClient to view logs:
 
           $ JLinkRTTClient
 
@@ -221,9 +216,9 @@ the verbose mode is selected (--verbose)
 
 #### Configuring the VCOM
 
--   Using (Simplicity
-    Studio)[https://community.silabs.com/s/article/wstk-virtual-com-port-baudrate-setting?language=en_US]
--   Using commander-cli
+- Using (Simplicity
+  Studio)[https://community.silabs.com/s/article/wstk-virtual-com-port-baudrate-setting?language=en_US]
+- Using commander-cli
     ```
     commander vcom config --baudrate 921600 --handshake rtscts
     ```
@@ -234,18 +229,17 @@ With any serial terminal application such as screen, putty, minicom etc.
 
 ## Running the Complete Example
 
--   It is assumed here that you already have an OpenThread border router
-    configured and running. If not see the following guide
-    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/platforms/openthread/openthread_border_router_pi.md)
-    for more information on how to setup a border router on a raspberryPi.
+- It is assumed here that you already have an OpenThread border router
+  configured and running. If not see the following guide
+  [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/platforms/openthread/openthread_border_router_pi.md)
+  for more information on how to setup a border router on a raspberryPi.
 
     Take note that the RCP code is available directly through
     [Simplicity Studio 5](https://www.silabs.com/products/development-tools/software/simplicity-studio/simplicity-studio-5)
     under File->New->Project Wizard->Examples->Thread : ot-rcp
 
--   User interface : **LCD** The LCD on Silabs WSTK shows a QR Code. This QR
-    Code is be scanned by the CHIP Tool app For the Rendez-vous procedure over
-    BLE
+- User interface : **LCD** The LCD on Silabs WSTK shows a QR Code. This QR Code
+  is be scanned by the CHIP Tool app For the Rendez-vous procedure over BLE
 
         * On devices that do not have or support the LCD Display like the BRD4166A Thunderboard Sense 2,
           a URL can be found in the RTT logs.
@@ -290,11 +284,11 @@ With any serial terminal application such as screen, putty, minicom etc.
 
     **Push Button 1** Toggles the light state On/Off
 
-*   You can provision and control the Chip device using the python controller,
-    Chip tool standalone, Android or iOS app
+* You can provision and control the Chip device using the python controller,
+  Chip tool standalone, Android or iOS app
 
-*   You can provision and control the Chip device using the python controller,
-    Chip tool standalone, Android or iOS app
+* You can provision and control the Chip device using the python controller,
+  Chip tool standalone, Android or iOS app
 
     [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
 
@@ -305,36 +299,35 @@ With any serial terminal application such as screen, putty, minicom etc.
 
 ### Notes
 
--   Depending on your network settings your router might not provide native ipv6
-    addresses to your devices (Border router / PC). If this is the case, you
-    need to add a static ipv6 addresses on both device and then an ipv6 route to
-    the border router on your PC
+- Depending on your network settings your router might not provide native ipv6
+  addresses to your devices (Border router / PC). If this is the case, you need
+  to add a static ipv6 addresses on both device and then an ipv6 route to the
+  border router on your PC
+    - On Border Router: `sudo ip addr add dev <Network interface> 2002::2/64`
 
-    -   On Border Router: `sudo ip addr add dev <Network interface> 2002::2/64`
+    - On PC(Linux): `sudo ip addr add dev <Network interface> 2002::1/64`
 
-    -   On PC(Linux): `sudo ip addr add dev <Network interface> 2002::1/64`
-
-    -   Add Ipv6 route on PC(Linux)
-        `sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2`
+    - Add Ipv6 route on PC(Linux)
+      `sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2`
 
 ## Running RPC console
 
--   As part of building the example with RPCs enabled the chip_rpc python
-    interactive console is installed into your venv. The python wheel files are
-    also created in the output folder: out/debug/chip_rpc_console_wheels. To
-    install the wheel files without rebuilding:
-    `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
+- As part of building the example with RPCs enabled the chip_rpc python
+  interactive console is installed into your venv. The python wheel files are
+  also created in the output folder: out/debug/chip_rpc_console_wheels. To
+  install the wheel files without rebuilding:
+  `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
 
--   To use the chip-rpc console after it has been installed run:
-    `chip-console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
+- To use the chip-rpc console after it has been installed run:
+  `chip-console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
 
--   Then you can simulate a button press or release using the following command
-    where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for
-    RELEASE Test toggling the LED with
-    `rpcs.chip.rpc.Button.Event(idx=1, pushed=True)`
+- Then you can simulate a button press or release using the following command
+  where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for
+  RELEASE Test toggling the LED with
+  `rpcs.chip.rpc.Button.Event(idx=1, pushed=True)`
 
--   You can also Get and Set the light directly using the RPCs:
-    `rpcs.chip.rpc.Lighting.Get()`
+- You can also Get and Set the light directly using the RPCs:
+  `rpcs.chip.rpc.Lighting.Get()`
 
     `rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))`
 
