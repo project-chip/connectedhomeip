@@ -581,7 +581,6 @@ class TC_SC_4_1(MatterBaseTest):
                 # with a maximum length of 128 bytes
                 assert_valid_pi_key(pi_key)
 
-            assert_valid_pi_key("for-lint...")  # To de removed
         else:
             logging.info("TXT record NOT required.")
 
