@@ -27,7 +27,8 @@ namespace Clusters {
 class BindingCluster : public DefaultServerCluster
 {
 public:
-    BindingCluster(EndpointId endpointId) : DefaultServerCluster({ endpointId, Binding::Id }) {}
+    constexpr BindingCluster(EndpointId endpointId) : DefaultServerCluster(ConcreteClusterPath::ConstExpr(endpointId, Binding::Id))
+    {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -35,14 +36,13 @@ public:
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
 
-    void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType) override;
+    void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType,
+                                        FabricIndex accessingFabric) override;
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
 private:
-    CHIP_ERROR NotifyBindingsChanged();
-
-    FabricIndex mAccessingFabricIndex;
+    CHIP_ERROR NotifyBindingsChanged(FabricIndex accessingFabricIndex);
 };
 
 } // namespace Clusters

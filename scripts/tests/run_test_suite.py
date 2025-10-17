@@ -30,6 +30,10 @@ from chiptest.glob_matcher import GlobMatcher
 from chiptest.test_definition import TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
+# If running on Linux platform load the Linux specific code.
+if sys.platform == "linux":
+    import chiptest.linux
+
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
 

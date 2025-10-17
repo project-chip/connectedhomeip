@@ -58,6 +58,7 @@ class TC_WEBRTCP_2_14(MatterBaseTest, WEBRTCPTestBase):
         Define the step-by-step sequence for the test.
         """
         steps = [
+            TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success"),
             TestStep(2, "TH writes `SoftRecordingPrivacyModeEnabled` to TRUE on CameraAVStreamManagement cluster",
@@ -74,16 +75,22 @@ class TC_WEBRTCP_2_14(MatterBaseTest, WEBRTCPTestBase):
     def pics_TC_WEBRTCP_2_14(self) -> list[str]:
         pics = [
             "WEBRTCP.S",
+            "WEBRTCP.S.C02.Rsp",   # ProvideOffer command
             "AVSM.S",
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
+            "AVSM.S.A0013",        # SoftRecordingPrivacyModeEnabled attribute
         ]
         return pics
 
     @async_test_body
     async def test_TC_WEBRTCP_2_14(self):
         """
-        Executes the test steps for validating ProvideOffer behavior with SoftRecordingPrivacyModeEnabled.
+        Executes the test steps for validating ProvideOffer fails with SoftRecordingPrivacyModeEnabled.
         """
 
+        self.step("precondition")
+        # Commission DUT - already done
         endpoint = self.get_endpoint(default=1)
 
         self.step(1)

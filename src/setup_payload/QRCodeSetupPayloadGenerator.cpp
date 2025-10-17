@@ -190,13 +190,14 @@ static CHIP_ERROR generateBitSet(PayloadContents & payload, MutableByteSpan & bi
 }
 
 static CHIP_ERROR payloadBase38RepresentationWithTLV(PayloadContents & payload, MutableCharSpan & outBuffer, MutableByteSpan bits,
-                                                     uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
+                                                     uint8_t * tlvDataStart, size_t tlvDataLengthInBytes,
+                                                     const char * prefix = kQRCodePrefix)
 {
     memset(bits.data(), 0, bits.size());
     ReturnErrorOnFailure(generateBitSet(payload, bits, tlvDataStart, tlvDataLengthInBytes));
 
     CHIP_ERROR err   = CHIP_NO_ERROR;
-    size_t prefixLen = strlen(kQRCodePrefix);
+    size_t prefixLen = strlen(prefix);
 
     if (outBuffer.size() < prefixLen + 1)
     {
@@ -205,7 +206,7 @@ static CHIP_ERROR payloadBase38RepresentationWithTLV(PayloadContents & payload, 
     else
     {
         MutableCharSpan subSpan = outBuffer.SubSpan(prefixLen, outBuffer.size() - prefixLen);
-        memcpy(outBuffer.data(), kQRCodePrefix, prefixLen);
+        memcpy(outBuffer.data(), prefix, prefixLen);
         err = base38Encode(bits, subSpan);
         // Reduce output span size to be the size of written data
         outBuffer.reduce_size(subSpan.size() + prefixLen);
@@ -280,7 +281,9 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38Representation(std::string 
     std::vector<char> buffer(base38EncodedLength(bits.capacity()) + strlen(kQRCodePrefix));
     MutableCharSpan bufferSpan(buffer.data(), buffer.capacity());
 
-    ReturnErrorOnFailure(payloadBase38RepresentationWithTLV(mPayload, bufferSpan, bitsSpan, tlvDataStart, tlvDataLengthInBytes));
+    static constexpr char kDelimiterString[]{ kPayloadDelimiter, 0 };
+    ReturnErrorOnFailure(payloadBase38RepresentationWithTLV(mPayload, bufferSpan, bitsSpan, tlvDataStart, tlvDataLengthInBytes,
+                                                            (mAsConcatenation ? kDelimiterString : kQRCodePrefix)));
 
     base38Representation.assign(bufferSpan.data());
     return CHIP_NO_ERROR;
