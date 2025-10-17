@@ -296,11 +296,12 @@ public:
 
         mPeerConnection->onLocalCandidate([onICECandidate](rtc::Candidate candidate) {
             ICECandidateInfo candidateInfo;
-            candidateInfo.candidate  = std::string(candidate);
-            candidateInfo.mid        = candidate.mid();
-            candidateInfo.mlineIndex = static_cast<int>(candidate.mid().empty() ? -1 : 0);
-            // Note: libdatachannel doesn't directly provide mlineIndex, so we need to parse it from SDP
-            // For now, we'll use 0 as a placeholder when mid is present
+            candidateInfo.candidate = std::string(candidate);
+            candidateInfo.mid       = candidate.mid();
+
+            // Note: libdatachannel doesn't directly provide mlineIndex, so we use -1 to indicate it is not present.
+            candidateInfo.mlineIndex = -1;
+
             onICECandidate(candidateInfo);
         });
 

@@ -118,13 +118,9 @@ public:
      * target device. This is typically used to inform the remote side about potential network
      * endpoints it can use to establish or enhance a WebRTC session.
      *
-     * The function stores the candidate strings, mids, and ICECandidateStruct list as member variables
-     * to ensure they remain valid when the command is sent asynchronously after CASE session establishment.
-     *
      * @param webRTCSessionId   The unique identifier for the WebRTC session to which these
      *                          ICE candidates apply.
-     * @param iceCandidates     A list of ICECandidateInfo structures containing candidate string,
-     *                          SDPMid, and SDPMLineIndex for each ICE candidate.
+     * @param iceCandidates     A list of ICE candidate structs.
      *
      * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
      */
@@ -237,9 +233,8 @@ private:
     // We store the SDP here so that mProvideOfferData.sdp points to a stable buffer.
     std::string mSdpString;
 
-    // Store the ICECandidates and their mids here to use to send asynchronously.
-    std::vector<std::string> mClientICECandidates;
-    std::vector<std::string> mClientICECandidateMids;
+    // Store the ICECandidates here to use to send asynchronously.
+    std::vector<ICECandidateInfo> mClientICECandidates;
     std::vector<ICECandidateStruct> mICECandidateStructList;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;

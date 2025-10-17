@@ -175,24 +175,19 @@ CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionId, 
     // Store the command type
     mCommandType = CommandType::kProvideICECandidates;
 
-    // Store ICE Candidates and strings for lifetime management
-    mClientICECandidates.clear();
-    mClientICECandidateMids.clear();
+    // Store ICE Candidates for lifetime management
+    mClientICECandidates = iceCandidates;
     mICECandidateStructList.clear();
 
-    for (const auto & candidateInfo : iceCandidates)
+    for (const auto & candidateInfo : mClientICECandidates)
     {
-        // Store strings to ensure they remain valid
-        mClientICECandidates.push_back(candidateInfo.candidate);
-        mClientICECandidateMids.push_back(candidateInfo.mid);
-
         ICECandidateStruct iceCandidate;
-        iceCandidate.candidate = CharSpan::fromCharString(mClientICECandidates.back().c_str());
+        iceCandidate.candidate = CharSpan::fromCharString(candidateInfo.candidate.c_str());
 
         // Set SDPMid if available
         if (!candidateInfo.mid.empty())
         {
-            iceCandidate.SDPMid.SetNonNull(CharSpan::fromCharString(mClientICECandidateMids.back().c_str()));
+            iceCandidate.SDPMid.SetNonNull(CharSpan::fromCharString(candidateInfo.mid.c_str()));
         }
         else
         {
