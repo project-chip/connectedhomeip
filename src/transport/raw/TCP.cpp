@@ -628,7 +628,9 @@ CHIP_ERROR TCPBase::DoHandleIncomingConnection(const Inet::TCPEndPointHandle & l
     ReturnErrorOnFailure(GetPeerAddress(*endPoint, addr));
     ActiveTCPConnectionState * activeConnection = AllocateConnection(endPoint, addr);
     if (activeConnection == nullptr)
+    {
         return CHIP_ERROR_TOO_MANY_CONNECTIONS;
+    }
 
     auto connectionCleanup = ScopeExit([&]() { activeConnection->Free(); });
 
