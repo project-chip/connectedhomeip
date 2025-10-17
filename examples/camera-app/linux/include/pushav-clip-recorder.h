@@ -238,7 +238,7 @@ private:
      * @brief Removes files from previous recordings in the specified directory.
      * @param path The directory path to clean.
      */
-    void RemovePreviousRecordingFiles(const fs::path& path);
+    void RemovePreviousRecordingFiles(const fs::path & path);
 
     bool CheckAndUploadFile(std::string path);
 

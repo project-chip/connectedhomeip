@@ -19,12 +19,12 @@
 #include "pushav-clip-recorder.h"
 #include <cstring>
 #include <dirent.h>
+#include <filesystem>
 #include <fstream>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <push-av-stream-manager.h>
 #include <regex>
-#include <filesystem>
 #include <sys/stat.h>
 
 constexpr int kSegmentIdOffset       = 1000;
@@ -105,7 +105,7 @@ PushAVClipRecorder::~PushAVClipRecorder()
     }
 }
 
-void PushAVClipRecorder::RemovePreviousRecordingFiles(const fs::path& path)
+void PushAVClipRecorder::RemovePreviousRecordingFiles(const fs::path & path)
 {
     // Check if the directory exists
     if (!fs::exists(path) || !fs::is_directory(path))
@@ -115,7 +115,7 @@ void PushAVClipRecorder::RemovePreviousRecordingFiles(const fs::path& path)
     }
 
     // Iterate over all files in the directory
-    for (const auto& entry : fs::directory_iterator(path))
+    for (const auto & entry : fs::directory_iterator(path))
     {
         // Skip current and parent directory entries
         if (entry.path().filename() == "." || entry.path().filename() == "..")
@@ -124,7 +124,7 @@ void PushAVClipRecorder::RemovePreviousRecordingFiles(const fs::path& path)
         }
 
         // Check if the file has one of the recording-related extensions
-        const fs::path& filename = entry.path().filename();
+        const fs::path & filename = entry.path().filename();
         if ((filename.extension() == ".mpd" || filename.extension() == ".m4s" || filename.extension() == ".init"))
         {
             // Attempt to remove the file
@@ -134,7 +134,7 @@ void PushAVClipRecorder::RemovePreviousRecordingFiles(const fs::path& path)
             }
             else
             {
-                ChipLogError(Camera,"Failed to remove previous recording file: %s", entry.path().c_str());
+                ChipLogError(Camera, "Failed to remove previous recording file: %s", entry.path().c_str());
             }
         }
     }
@@ -159,12 +159,10 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
             }
             // Set permissions to 0755 (owner rwx, group rx, others rx)
             std::filesystem::permissions(p,
-                std::filesystem::perms::owner_all |
-                std::filesystem::perms::group_read |
-                std::filesystem::perms::group_exec |
-                std::filesystem::perms::others_read |
-                std::filesystem::perms::others_exec,
-                std::filesystem::perm_options::replace, ec);
+                                         std::filesystem::perms::owner_all | std::filesystem::perms::group_read |
+                                             std::filesystem::perms::group_exec | std::filesystem::perms::others_read |
+                                             std::filesystem::perms::others_exec,
+                                         std::filesystem::perm_options::replace, ec);
             ChipLogProgress(Camera, "Created directory: %s", p.c_str());
         }
         else if (!std::filesystem::is_directory(p, ec))
@@ -650,9 +648,12 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
             return false;
         }
 
-        std::string initSegName  = mClipInfo.mTrackName + std::to_string(std::filesystem::path::preferred_separator)  + mClipInfo.mTrackName + ".init";
-        std::string mediaSegName = mClipInfo.mTrackName + std::to_string(std::filesystem::path::preferred_separator)  + "segment_$Number%04d$.m4s";
-        std::string mpdPrefix    = "session_" + std::to_string(mClipInfo.mSessionNumber) + std::to_string(std::filesystem::path::preferred_separator)  + mClipInfo.mTrackName;
+        std::string initSegName =
+            mClipInfo.mTrackName + std::to_string(std::filesystem::path::preferred_separator) + mClipInfo.mTrackName + ".init";
+        std::string mediaSegName =
+            mClipInfo.mTrackName + std::to_string(std::filesystem::path::preferred_separator) + "segment_$Number%04d$.m4s";
+        std::string mpdPrefix = "session_" + std::to_string(mClipInfo.mSessionNumber) +
+            std::to_string(std::filesystem::path::preferred_separator) + mClipInfo.mTrackName;
 
         mInputFormatContext          = avformat_alloc_context();
         int64_t avioCtxBufferSize    = (static_cast<int64_t>(mVideoInfo.mBitRate) * mClipInfo.mSegmentDurationMs) / (8 * 1000);
@@ -815,14 +816,15 @@ std::string RenameSegmentFile(const std::string & originalPath)
 
         std::error_code error;
         std::filesystem::rename(originalPath.c_str(), newPath.c_str(), error);
-        if(error)
+        if (error)
         {
             ChipLogDetail(Camera, "Renamed segment %s to %s", originalPath.c_str(), newPath.c_str());
             return newPath;
         }
         else
         {
-            ChipLogDetail(Camera, "Failed to rename segment %s to %s, error: %d", originalPath.c_str(), newPath.c_str(), error.value());
+            ChipLogDetail(Camera, "Failed to rename segment %s to %s, error: %d", originalPath.c_str(), newPath.c_str(),
+                          error.value());
             return originalPath;
         }
     }
@@ -874,8 +876,8 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     const int64_t remainingDuration = mClipInfo.mInitialDurationS - mClipInfo.mElapsedTimeS + (mClipInfo.mPreRollLengthMs / 1000);
     const int64_t clipDuration      = (remainingDuration > 0) ? remainingDuration * AV_TIME_BASE_Q.den : 0;
     // Pre-calculate common path components
-    const std::string basePath =
-        mClipInfo.mOutputPath + "session_" + std::to_string(mClipInfo.mSessionNumber) + std::to_string(std::filesystem::path::preferred_separator)  + mClipInfo.mTrackName;
+    const std::string basePath = mClipInfo.mOutputPath + "session_" + std::to_string(mClipInfo.mSessionNumber) +
+        std::to_string(std::filesystem::path::preferred_separator) + mClipInfo.mTrackName;
 
     if (reason || ((clipLengthInPTS >= clipDuration) && (mClipInfo.mTriggerType != 2)))
     {
@@ -903,7 +905,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         return std::string(path_buffer);
     };
 
-    std::string formatTemplate = "%s" + std::to_string(std::filesystem::path::preferred_separator)  + "segment_%04d.m4s";
+    std::string formatTemplate = "%s" + std::to_string(std::filesystem::path::preferred_separator) + "segment_%04d.m4s";
     std::string segment_path   = make_path(formatTemplate.c_str(), mUploadSegmentID);
     while (std::filesystem::exists(segment_path) && !std::filesystem::exists(segment_path + ".tmp"))
     {
