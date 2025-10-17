@@ -48,7 +48,7 @@ namespace {
 using namespace chip::app::Compatibility::Internal;
 using Protocols::InteractionModel::Status;
 
-class ContextAttributesChangeListener : public AttributesChangedListener
+class ContextAttributesChangeListener : public DataModel::ProviderChangeListener
 {
 public:
     ContextAttributesChangeListener(DataModel::ProviderChangeListener & listener) : mListener(listener) {}
