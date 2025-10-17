@@ -208,7 +208,7 @@ fi
 # TODO: For now, the no-hash-dir is not enabled globally, however, anyone can
 #       enable it in the local environment, so apps build in different output
 #       directories can reuse cache. In order to enable it globally we need
-#       to figure out why NFR builds do not work when sharing cache between
+#       to figure out why NRF builds do not work when sharing cache between
 #       application.
 #export CCACHE_NOHASHDIR=1
 export CCACHE_PREFIX_CPP="$_CHIP_ROOT/scripts/helpers/ccache-prefix-cpp.sh"
