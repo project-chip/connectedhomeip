@@ -27,7 +27,7 @@
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #if defined(SL_EM4_SLEEP) && (SL_EM4_SLEEP == 1)
 #include "sl_sleeptimer.h"
-#include <app/icd/server/ICDConfigurationData.h>
+#include <app/icd/server/ICDConfigurationData.h> // nogncheck
 
 #include "em_emu.h"
 #include "em_burtc.h"
@@ -351,6 +351,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     return CHIP_NO_ERROR;
 }
 
+#if defined(SL_EM4_SLEEP) && (SL_EM4_SLEEP == 1)
 extern "C" void OnEM4Trigger(uint32_t duration)
 {
     CMU_ClockSelectSet(cmuClock_EM4GRPACLK, cmuSelect_ULFRCO);
@@ -374,7 +375,7 @@ extern "C" void OnEM4Trigger(uint32_t duration)
     EMU_EnterEM4();
 }
 
-
+#endif // defined(SL_EM4_SLEEP) && (SL_EM4_SLEEP == 1)
 // ================================================================================
 // FreeRTOS Callbacks
 // ================================================================================
