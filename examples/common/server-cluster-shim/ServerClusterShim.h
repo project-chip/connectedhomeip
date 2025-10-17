@@ -18,7 +18,6 @@
 
 #include <app/ConcreteClusterPath.h>
 #include <app/server-cluster/ServerClusterInterface.h>
-#include <app/util/AttributesChangedListener.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
 #include <optional>
