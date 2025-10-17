@@ -318,9 +318,6 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
 
-            - name: ccache stats
-              run: ccache -s
-
             - name: Run Tests using the python parser sending commands to chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -823,9 +820,6 @@ jobs:
                   --target linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test"
-
-            - name: ccache stats
-              run: ccache -s
 
             - name: Install push_av_server dependencies
               run: >-
