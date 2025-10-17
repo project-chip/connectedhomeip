@@ -313,13 +313,13 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
 }
 
 void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                             AttributesChangedListener * listener)
+                             Providerchangedlistener * listener)
 {
     gMockDataVersion++;
     listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
 }
 
-void emberAfEndpointChanged(EndpointId endpoint, AttributesChangedListener * listener)
+void emberAfEndpointChanged(EndpointId endpoint, ProviderChangedListener * listener)
 {
     listener->MarkDirty(AttributePathParams(endpoint));
 }
