@@ -424,11 +424,11 @@ void TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
         // Call the appropriate app callback if allowed.
         if (!suppressCallback)
         {
-            TCPEndPointHandle handle(this);
             if (oldState == State::kConnecting)
             {
                 if (OnConnectComplete != nullptr)
                 {
+                    TCPEndPointHandle handle(this);
                     OnConnectComplete(handle, err);
                 }
             }
@@ -436,6 +436,7 @@ void TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
                       oldState == State::kClosing) &&
                      OnConnectionClosed != nullptr)
             {
+                TCPEndPointHandle handle(this);
                 OnConnectionClosed(handle, err);
             }
         }
