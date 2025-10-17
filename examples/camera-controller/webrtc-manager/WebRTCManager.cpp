@@ -280,10 +280,16 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     });
 
     mPeerConnection->onLocalCandidate([this](rtc::Candidate candidate) {
-        std::string candidateStr = std::string(candidate);
-        mLocalCandidates.push_back(candidateStr);
+        ICECandidateInfo candidateInfo;
+        candidateInfo.candidate  = std::string(candidate);
+        candidateInfo.mid        = candidate.mid();
+        candidateInfo.mlineIndex = static_cast<int>(candidate.mid().empty() ? -1 : 0);
+        // Note: libdatachannel doesn't directly provide mlineIndex, so we use 0 when mid is present
+
+        mLocalCandidates.push_back(candidateInfo);
         ChipLogProgress(Camera, "Local Candidate:");
-        ChipLogProgress(Camera, "%s", candidateStr.c_str());
+        ChipLogProgress(Camera, "%s", candidateInfo.candidate.c_str());
+        ChipLogProgress(Camera, "  mid: %s, mlineIndex: %d", candidateInfo.mid.c_str(), candidateInfo.mlineIndex);
     });
 
     mPeerConnection->onStateChange([this](rtc::PeerConnection::State state) {

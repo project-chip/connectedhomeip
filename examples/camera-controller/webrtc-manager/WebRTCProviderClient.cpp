@@ -162,7 +162,7 @@ CHIP_ERROR WebRTCProviderClient::ProvideAnswer(uint16_t webRTCSessionId, const s
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionId, const std::vector<std::string> & iceCandidates)
+CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionId, const std::vector<ICECandidateInfo> & iceCandidates)
 {
     ChipLogProgress(Camera, "Sending ProvideICECandidates to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
 
@@ -175,14 +175,43 @@ CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionId, 
     // Store the command type
     mCommandType = CommandType::kProvideICECandidates;
 
-    // Store ICE Candidates.
-    mClientICECandidates = iceCandidates;
+    // Store ICE Candidates and strings for lifetime management
+    mClientICECandidates.clear();
+    mClientICECandidateMids.clear();
+    mICECandidateStructList.clear();
 
-    for (const auto & candidate : mClientICECandidates)
+    for (const auto & candidateInfo : iceCandidates)
     {
-        ICECandidateStruct iceCandidate = { CharSpan::fromCharString(candidate.c_str()) };
+        // Store strings to ensure they remain valid
+        mClientICECandidates.push_back(candidateInfo.candidate);
+        mClientICECandidateMids.push_back(candidateInfo.mid);
+
+        ICECandidateStruct iceCandidate;
+        iceCandidate.candidate = CharSpan::fromCharString(mClientICECandidates.back().c_str());
+
+        // Set SDPMid if available
+        if (!candidateInfo.mid.empty())
+        {
+            iceCandidate.SDPMid.SetNonNull(CharSpan::fromCharString(mClientICECandidateMids.back().c_str()));
+        }
+        else
+        {
+            iceCandidate.SDPMid.SetNull();
+        }
+
+        // Set SDPMLineIndex if valid
+        if (candidateInfo.mlineIndex >= 0)
+        {
+            iceCandidate.SDPMLineIndex.SetNonNull(static_cast<uint16_t>(candidateInfo.mlineIndex));
+        }
+        else
+        {
+            iceCandidate.SDPMLineIndex.SetNull();
+        }
+
         mICECandidateStructList.push_back(iceCandidate);
     }
+
     // Stash data in class members so the CommandSender can safely reference them async
     mProvideICECandidatesData.webRTCSessionID = webRTCSessionId;
     mProvideICECandidatesData.ICECandidates =

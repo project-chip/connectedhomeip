@@ -294,7 +294,15 @@ public:
         mPeerConnection->onLocalDescription(
             [onLocalDescription](rtc::Description desc) { onLocalDescription(std::string(desc), RtcTypeToSDPType(desc.type())); });
 
-        mPeerConnection->onLocalCandidate([onICECandidate](rtc::Candidate candidate) { onICECandidate(std::string(candidate)); });
+        mPeerConnection->onLocalCandidate([onICECandidate](rtc::Candidate candidate) {
+            ICECandidateInfo candidateInfo;
+            candidateInfo.candidate  = std::string(candidate);
+            candidateInfo.mid        = candidate.mid();
+            candidateInfo.mlineIndex = static_cast<int>(candidate.mid().empty() ? -1 : 0);
+            // Note: libdatachannel doesn't directly provide mlineIndex, so we need to parse it from SDP
+            // For now, we'll use 0 as a placeholder when mid is present
+            onICECandidate(candidateInfo);
+        });
 
         mPeerConnection->onStateChange([onConnectionState](rtc::PeerConnection::State state) {
             ChipLogProgress(Camera, "[PeerConnection State: %s]", GetPeerConnectionStateStr(state));
