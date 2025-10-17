@@ -16,6 +16,7 @@
 #
 
 import logging
+
 import websockets
 
 from matter.testing.matter_testing import MatterBaseTest
@@ -45,14 +46,35 @@ class WEBRTCRTestBase(MatterBaseTest):
         2. Sends the command
         3. Waits for and receives the response
         4. Logs the connection, command, and response status
+
+        Raises:
+            Exception: Re-raises any exceptions after logging them clearly
         """
-        async with websockets.connect(SERVER_URI) as websocket:
-            logging.info(f"Connected to {SERVER_URI}")
+        try:
+            async with websockets.connect(SERVER_URI) as websocket:
+                logging.info(f"Connected to {SERVER_URI}")
 
-            # Send command
-            logging.info(f"Sending command: {command}")
-            await websocket.send(command)
+                # Send command
+                logging.info(f"Sending command: {command}")
+                await websocket.send(command)
 
-            # Receive response
-            await websocket.recv()
-            logging.info("Received command response")
+                # Receive response
+                await websocket.recv()
+                logging.info("Received command response")
+
+        except ConnectionRefusedError as e:
+            logging.error(f"Failed to connect to WebSocket server at {SERVER_URI}: Connection refused. "
+                          f"Is the DUT WebSocket server running? Error: {e}")
+            raise
+
+        except websockets.exceptions.WebSocketException as e:
+            logging.error(f"WebSocket error while communicating with {SERVER_URI}: {e}")
+            raise
+
+        except OSError as e:
+            logging.error(f"Network error while connecting to {SERVER_URI}: {e}")
+            raise
+
+        except Exception as e:
+            logging.error(f"Unexpected error while sending command '{command}' to {SERVER_URI}: {e}")
+            raise
