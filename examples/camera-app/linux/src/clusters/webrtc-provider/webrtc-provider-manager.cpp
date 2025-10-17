@@ -191,6 +191,27 @@ void WebRTCProviderManager::RegisterWebrtcTransport(uint16_t sessionId)
     mMediaController->RegisterTransport(transport, args.videoStreamId, args.audioStreamId);
 }
 
+void WebRTCProviderManager::UnregisterWebrtcTransport(uint16_t sessionId)
+{
+    ChipLogProgress(Camera, "UnregisterWebrtcTransport called for sessionId: %u", sessionId);
+
+    WebrtcTransport * transport = GetTransport(sessionId);
+    if (transport == nullptr)
+    {
+        ChipLogProgress(Camera, "WebRTC Transport is null for sessionId %u. Already unregistered or not found", sessionId);
+        return;
+    }
+
+    if (mMediaController == nullptr)
+    {
+        ChipLogProgress(Camera, "mMediaController is null. Cannot unregister WebRTC Transport");
+        return;
+    }
+
+    mMediaController->UnregisterTransport(transport);
+    ChipLogProgress(Camera, "Successfully unregistered transport for sessionId: %u", sessionId);
+}
+
 std::string WebRTCProviderManager::ExtractMidFromSdp(const std::string & sdp, const std::string & mediaType)
 {
     if (sdp.empty() || mediaType.empty())
@@ -429,7 +450,7 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
         // TODO: Lookup the sessionID to get the Video/Audio StreamID
         ReleaseAudioVideoStreams(sessionId);
 
-        mMediaController->UnregisterTransport(transport);
+        UnregisterWebrtcTransport(sessionId);
         mWebrtcTransportMap.erase(sessionId);
         WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
         mSessionIdMap.erase(ScopedNodeId(args.peerNodeId, args.fabricIndex));
@@ -713,7 +734,7 @@ void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::Exchang
         // Release the Video and Audio Streams from the CameraAVStreamManagement
         // cluster and update the reference counts.
         self->ReleaseAudioVideoStreams(sessionId);
-        self->mMediaController->UnregisterTransport(transport);
+        self->UnregisterWebrtcTransport(sessionId);
         WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
         self->mSessionIdMap.erase(ScopedNodeId(args.peerNodeId, args.fabricIndex));
 
@@ -849,10 +870,50 @@ void WebRTCProviderManager::OnLocalDescription(const std::string & sdp, SDPType 
 
 void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint16_t sessionId)
 {
-    ChipLogProgress(Camera, "Connection state changed for session %u", sessionId);
+    ChipLogProgress(Camera, "Connection state changed for session %u: %s", sessionId, connected ? "connected" : "disconnected");
+
     if (connected)
     {
         RegisterWebrtcTransport(sessionId);
+    }
+    else
+    {
+        WebrtcTransport * transport = GetTransport(sessionId);
+        if (transport == nullptr)
+        {
+
+            ChipLogProgress(Camera,
+                            "Transport not found for session %u during disconnect; session may have already been cleaned up",
+                            sessionId);
+            return;
+        }
+
+        // Connection was closed/disconnected by the peer - clean up the session
+        ChipLogProgress(Camera, "Peer connection closed for session %u, cleaning up resources", sessionId);
+
+        // Release the Video and Audio Streams from the CameraAVStreamManagement
+        // cluster and update the reference counts.
+        ReleaseAudioVideoStreams(sessionId);
+
+        // Capture args before unregistering in case the transport is invalidated
+        WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
+
+        // Unregister the transport from the media controller
+        UnregisterWebrtcTransport(sessionId);
+
+        // Remove from session maps
+        mSessionIdMap.erase(ScopedNodeId(args.peerNodeId, args.fabricIndex));
+
+        // Remove from current sessions list in the WebRTC Transport Provider
+        if (mWebRTCTransportProvider != nullptr)
+        {
+            mWebRTCTransportProvider->RemoveSession(sessionId);
+        }
+
+        // Finally, remove and destroy the transport
+        mWebrtcTransportMap.erase(sessionId);
+
+        ChipLogProgress(Camera, "Session %u cleanup completed", sessionId);
     }
 }
 
