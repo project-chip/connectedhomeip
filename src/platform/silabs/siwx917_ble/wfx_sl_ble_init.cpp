@@ -25,7 +25,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/silabs/BLEManagerImpl.h>
-#include <platform/silabs/siwx917/wfx_sl_ble_init.h>
+#include <wfx_sl_ble_init.h>
 
 using namespace chip::DeviceLayer::Internal;
 

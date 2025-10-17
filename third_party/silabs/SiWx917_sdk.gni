@@ -63,7 +63,7 @@ template("siwx917_sdk") {
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/config",
 
-      "${chip_root}/src/platform/silabs/siwx917",
+      "${chip_root}/src/platform/silabs/siwx917_ble",
       "${chip_root}/src/platform/silabs/wifi",
 
       # ble component

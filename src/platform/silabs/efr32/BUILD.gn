@@ -72,10 +72,10 @@ static_library("efr32") {
 
   if (chip_enable_ble_siwx917) {
     sources += [
-      "../siwx917/BLEManagerImpl.cpp",
-      "../siwx917/ble_config.h",
-      "../siwx917/wfx_sl_ble_init.cpp",
-      "../siwx917/wfx_sl_ble_init.h",
+      "../siwx917_ble/BLEManagerImpl.cpp",
+      "../siwx917_ble/ble_config.h",
+      "../siwx917_ble/wfx_sl_ble_init.cpp",
+      "../siwx917_ble/wfx_sl_ble_init.h",
     ]
   } else {
     sources += [ "BLEManagerImpl.cpp" ]

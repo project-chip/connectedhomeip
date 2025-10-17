@@ -97,13 +97,13 @@ extern "C" {
 #define RSI_BLE_MAX_NBR_ATT_REC 20
 /* Number of BLE notifications */
 #define RSI_BLE_NUM_CONN_EVENTS 2
-#define RSI_BLE_MAX_NBR_PERIPHERALS 1
 #else
 #define RSI_BLE_MAX_NBR_ATT_REC 80
 /* Number of BLE notifications */
 #define RSI_BLE_NUM_CONN_EVENTS 20
 #endif
 
+#define RSI_BLE_MAX_NBR_PERIPHERALS 1
 #define RSI_BLE_MAX_NBR_CENTRALS (1)
 #define RSI_BLE_MAX_NBR_ATT_SERV (10)
 

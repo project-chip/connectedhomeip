@@ -387,7 +387,7 @@ template("efr32_sdk") {
     }
 
     if (use_SiWx917) {
-      _include_dirs += [ "${chip_root}/src/platform/silabs/siwx917" ]
+      _include_dirs += [ "${chip_root}/src/platform/silabs/siwx917_ble" ]
     }
 
     if (use_wf200 || use_SiWx917) {
@@ -526,8 +526,6 @@ template("efr32_sdk") {
       defines += [
         "SLI_SI91X_ENABLE_BLE=1",
         "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
-        "RSI_BLE_MAX_NBR_PERIPHERALS=1",
-        "RSI_BLE_MAX_NBR_CENTRALS=1",
       ]
     }
 
