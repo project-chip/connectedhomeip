@@ -293,6 +293,7 @@ jobs:
                   CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: |
                   echo "CCACHE_DISABLE=1" >> $GITHUB_ENV
+                  echo "DISABLE_CCACHE=true" >> $GITHUB_ENV
                   rm -rf "${{ github.workspace }}/.ccache" || true
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build_python.sh \
@@ -444,8 +445,38 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+            - name: Delete existing ccache before save
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              uses: actions/github-script@v7
+              env:
+                  CACHE_KEY: ${{ env.CCACHE_KEY }}
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const owner = context.repo.owner;
+                      const repo = context.repo.repo;
+                      const key = process.env.CACHE_KEY;
+                      const ref = context.ref;
+                      
+                      core.info(`Attempting to delete cache: ${key}`);
+                      
+                      try {
+                        await github.rest.actions.deleteActionsCacheByKey({
+                          owner: owner,
+                          repo: repo,
+                          key: key,
+                          ref: ref
+                        });
+                        core.info(`✅ Successfully deleted cache`);
+                      } catch (e) {
+                        if (e.status === 404) {
+                          core.info(`Cache not found (first run or already deleted)`);
+                        } else {
+                          core.warning(`Failed to delete cache: ${e.message}`);
+                        }
+                      }
             - name: Save ccache
-              if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true' && env.DISABLE_CCACHE != 'true' && env.CCACHE_DISABLE != '1'
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
               uses: actions/cache/save@v4
               with:
                   path: .ccache
@@ -586,6 +617,8 @@ jobs:
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
             BUILD_VARIANT: ${{matrix.build_variant}}
+            DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
+            CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
         runs-on: ubuntu-latest
 
@@ -620,9 +653,11 @@ jobs:
               uses: ./.github/actions/setup-ccache
               with:
                 build-variant: ${{ matrix.build_variant }}
+                disable: ${{ env.DISABLE_CCACHE }}
+                cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
 
             - name: Build python env
-              run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv --enable-ccache'
+              run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache)'
 
             - name: Build linux-x64-all-clusters
               env:
@@ -928,8 +963,38 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+            - name: Delete existing ccache before save
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              uses: actions/github-script@v7
+              env:
+                  CACHE_KEY: ${{ env.CCACHE_KEY }}
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const owner = context.repo.owner;
+                      const repo = context.repo.repo;
+                      const key = process.env.CACHE_KEY;
+                      const ref = context.ref;
+                      
+                      core.info(`Attempting to delete cache: ${key}`);
+                      
+                      try {
+                        await github.rest.actions.deleteActionsCacheByKey({
+                          owner: owner,
+                          repo: repo,
+                          key: key,
+                          ref: ref
+                        });
+                        core.info(`✅ Successfully deleted cache`);
+                      } catch (e) {
+                        if (e.status === 404) {
+                          core.info(`Cache not found (first run or already deleted)`);
+                        } else {
+                          core.warning(`Failed to delete cache: ${e.message}`);
+                        }
+                      }
             - name: Save ccache
-              if: github.ref == 'refs/heads/master' && steps.ccache.outputs.cache-hit != 'true'
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
               uses: actions/cache/save@v4
               with:
                   path: .ccache
