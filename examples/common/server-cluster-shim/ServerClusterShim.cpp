@@ -328,7 +328,8 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
         {
             // TODO: this is awkward since it provides AAI no control over this, specifically
             //       AAI may not want to increase versions for some attributes that are Q
-            emberAfAttributeChanged(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId, &mContext->interactionContext);
+            emberAfAttributeChanged(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
+                                    &mContext->interactionContext);
         }
         return *aai_result;
     }
