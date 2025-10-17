@@ -24,7 +24,7 @@ import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.GroupSettingFragmentBinding
 import com.google.chip.chiptool.util.DeviceIdUtil
 import java.lang.Exception
-import java.util.Optional;
+import java.util.Optional
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
