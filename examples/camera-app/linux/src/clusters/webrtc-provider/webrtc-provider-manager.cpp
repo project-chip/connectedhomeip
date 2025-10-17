@@ -975,7 +975,9 @@ CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeMa
         ChipLogError(Camera, "WebTransport not found for the sessionId: %u", sessionId);
         return CHIP_ERROR_INTERNAL;
     }
-    std::vector<ICECandidateInfo> localCandidates = transport->GetCandidates();
+
+    const std::vector<ICECandidateInfo> & localCandidates = transport->GetCandidates();
+
     // Build the command
     WebRTCTransportRequestor::Commands::ICECandidates::Type command;
 

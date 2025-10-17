@@ -105,7 +105,7 @@ public:
 
     void SetSdpAnswer(std::string localSdp) { mLocalSdp = localSdp; }
 
-    std::vector<ICECandidateInfo> GetCandidates() { return mLocalCandidates; }
+    const std::vector<ICECandidateInfo> & GetCandidates() { return mLocalCandidates; }
 
     void SetCandidates(std::vector<ICECandidateInfo> candidates) { mLocalCandidates = candidates; }
 
