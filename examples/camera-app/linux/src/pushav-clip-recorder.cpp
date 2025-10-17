@@ -21,10 +21,12 @@
 #include <dirent.h>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <push-av-stream-manager.h>
 #include <regex>
+#include <sstream>
 #include <sys/stat.h>
 
 constexpr int kSegmentIdOffset       = 1000;
@@ -648,12 +650,9 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
             return false;
         }
 
-        std::string initSegName =
-            mClipInfo.mTrackName + std::to_string(std::filesystem::path::preferred_separator) + mClipInfo.mTrackName + ".init";
-        std::string mediaSegName =
-            mClipInfo.mTrackName + std::to_string(std::filesystem::path::preferred_separator) + "segment_$Number%04d$.m4s";
-        std::string mpdPrefix = "session_" + std::to_string(mClipInfo.mSessionNumber) +
-            std::to_string(std::filesystem::path::preferred_separator) + mClipInfo.mTrackName;
+        std::string initSegName  = mClipInfo.mTrackName + std::filesystem::path::preferred_separator + mClipInfo.mTrackName + ".init";
+        std::string mediaSegName = mClipInfo.mTrackName + std::filesystem::path::preferred_separator + "segment_$Number%04d$.m4s";
+        std::string mpdPrefix    = "session_" + std::to_string(mClipInfo.mSessionNumber) + std::filesystem::path::preferred_separator + mClipInfo.mTrackName;
 
         mInputFormatContext          = avformat_alloc_context();
         int64_t avioCtxBufferSize    = (static_cast<int64_t>(mVideoInfo.mBitRate) * mClipInfo.mSegmentDurationMs) / (8 * 1000);
@@ -816,7 +815,7 @@ std::string RenameSegmentFile(const std::string & originalPath)
 
         std::error_code error;
         std::filesystem::rename(originalPath.c_str(), newPath.c_str(), error);
-        if (error)
+        if(error.value() == 0)
         {
             ChipLogDetail(Camera, "Renamed segment %s to %s", originalPath.c_str(), newPath.c_str());
             return newPath;
@@ -876,8 +875,8 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     const int64_t remainingDuration = mClipInfo.mInitialDurationS - mClipInfo.mElapsedTimeS + (mClipInfo.mPreRollLengthMs / 1000);
     const int64_t clipDuration      = (remainingDuration > 0) ? remainingDuration * AV_TIME_BASE_Q.den : 0;
     // Pre-calculate common path components
-    const std::string basePath = mClipInfo.mOutputPath + "session_" + std::to_string(mClipInfo.mSessionNumber) +
-        std::to_string(std::filesystem::path::preferred_separator) + mClipInfo.mTrackName;
+    std::filesystem::path basePath = std::filesystem::path(mClipInfo.mOutputPath) /
+        ("session_" + std::to_string(mClipInfo.mSessionNumber)) / mClipInfo.mTrackName;
 
     if (reason || ((clipLengthInPTS >= clipDuration) && (mClipInfo.mTriggerType != 2)))
     {
@@ -888,54 +887,44 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         mCurrentClipStartPts = AV_NOPTS_VALUE;
     }
 
-    // Helper function for safe path formatting
-    char path_buffer[512];
-    auto make_path = [&](const char * format, int number = -1) -> std::string {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-        if (number >= 0)
-        {
-            snprintf(path_buffer, sizeof(path_buffer), format, basePath.c_str(), number);
-        }
-        else
-        {
-            snprintf(path_buffer, sizeof(path_buffer), format, basePath.c_str());
-        }
-#pragma GCC diagnostic pop
-        return std::string(path_buffer);
+    // Helper function for safe path formatting using std::filesystem
+    auto make_segment_path = [&](int number) -> std::filesystem::path {
+        std::ostringstream oss;
+        oss << "segment_" << std::setw(4) << std::setfill('0') << number << ".m4s";
+        return basePath / oss.str();
     };
 
-    std::string formatTemplate = "%s" + std::to_string(std::filesystem::path::preferred_separator) + "segment_%04d.m4s";
-    std::string segment_path   = make_path(formatTemplate.c_str(), mUploadSegmentID);
-    while (std::filesystem::exists(segment_path) && !std::filesystem::exists(segment_path + ".tmp"))
+    std::filesystem::path segment_path = make_segment_path(mUploadSegmentID);
+    while (std::filesystem::exists(segment_path) && !std::filesystem::exists(segment_path.string() + ".tmp"))
     {
-        mUploadMPD                       = true;
-        std::string renamed_segment_path = RenameSegmentFile(segment_path);
+        mUploadMPD = true;
+        std::string renamed_segment_path = RenameSegmentFile(segment_path.string());
         CheckAndUploadFile(renamed_segment_path);
         mUploadSegmentID++;
-        segment_path = make_path(formatTemplate.c_str(), mUploadSegmentID);
+        segment_path = make_segment_path(mUploadSegmentID);
     }
 
     // Handle MPD and init file upload
     if (mUploadMPD)
     {
-        std::string mpd_path = make_path("%s.mpd");
-        if (std::filesystem::exists(mpd_path) && !std::filesystem::exists(mpd_path + ".tmp"))
+        std::filesystem::path mpd_path = basePath;
+        mpd_path += ".mpd";
+        if (std::filesystem::exists(mpd_path) && !std::filesystem::exists(mpd_path.string() + ".tmp"))
         {
-            mUploader->setMPDPath(std::make_pair(mpd_path, mClipInfo.mUrl));
-            UpdateMPDStartNumber(mpd_path);
-            CheckAndUploadFile(mpd_path);
+            mUploader->setMPDPath(std::make_pair(mpd_path.string(), mClipInfo.mUrl));
+            UpdateMPDStartNumber(mpd_path.string());
+            CheckAndUploadFile(mpd_path.string());
             mUploadMPD = false; // Reset flag after successful upload
         }
 
         // Handle init segment upload if needed
         if (!mUploadedInitSegment)
         {
-            std::string init_path = make_path(("%s/" + mClipInfo.mTrackName + ".init").c_str());
+            std::filesystem::path init_path = basePath / (mClipInfo.mTrackName + ".init");
             ChipLogProgress(Camera, "Recorder:Init segment upload ready [%s]", init_path.c_str());
-            if (std::filesystem::exists(init_path) && !std::filesystem::exists(init_path + ".tmp"))
+            if (std::filesystem::exists(init_path) && !std::filesystem::exists(init_path.string() + ".tmp"))
             {
-                CheckAndUploadFile(init_path);
+                CheckAndUploadFile(init_path.string());
             }
             mUploadedInitSegment = true;
         }
