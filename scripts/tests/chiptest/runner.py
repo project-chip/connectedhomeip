@@ -184,7 +184,7 @@ class Runner:
 
 
 class NamespacedRunner(Runner):
-    def __init__(self, capture_delegate=None, index):
+    def __init__(self, index, capture_delegate=None):
         super().__init__(capture_delegate)
         self.index = index
 
