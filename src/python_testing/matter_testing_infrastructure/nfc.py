@@ -321,5 +321,3 @@ def main():
     # Example usage: helper.read_t4t_ndef(), etc.
 
 
-if __name__ == "__main__":
-    main()
