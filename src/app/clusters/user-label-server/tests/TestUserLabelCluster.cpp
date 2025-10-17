@@ -22,7 +22,6 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/UserLabel/Attributes.h>
-#include <clusters/UserLabel/Enums.h>
 #include <clusters/UserLabel/Metadata.h>
 #include <clusters/UserLabel/Structs.h>
 
@@ -51,8 +50,8 @@ struct TestUserLabelCluster : public ::testing::Test
     UserLabelCluster userLabel;
 };
 
-template <typename ClusterT, typename T>
-inline CHIP_ERROR ReadClusterAttribute(ClusterT & cluster, AttributeId attr, T & val)
+template <typename T>
+inline CHIP_ERROR ReadClusterAttribute(UserLabelCluster & cluster, AttributeId attr, T & val)
 {
     return chip::Test::ReadClusterAttribute(cluster, ConcreteAttributePath(kRootEndpointId, UserLabel::Id, attr), val);
 }
