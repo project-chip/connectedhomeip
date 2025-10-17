@@ -891,7 +891,6 @@ void TCPEndPointImplSockets::ReceiveData()
         return;
     }
 
-    TCPEndPointHandle handle(this);
     if (mLastTCPKernelSendQueueLen == 0)
     {
         // If the output queue has been flushed then stop the timer.
@@ -905,6 +904,7 @@ void TCPEndPointImplSockets::ReceiveData()
         RestartTCPUserTimeoutTimer();
     }
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+    TCPEndPointHandle handle(this);
     // If an error occurred, abort the connection.
     if (rcvLen < 0)
     {
@@ -922,7 +922,6 @@ void TCPEndPointImplSockets::ReceiveData()
 
         DoClose(CHIP_ERROR_POSIX(systemErrno), false);
     }
-
     else
     {
         // Mark the connection as being active.
