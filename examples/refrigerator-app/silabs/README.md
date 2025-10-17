@@ -30,7 +30,7 @@ Wi-Fi Boards.
 > frequent releases thoroughly tested and validated. Developers looking to
 > develop matter products with silabs hardware are encouraged to use our latest
 > release with added tools and documentation.
-> [Silabs `matter_sdk` Github](https://github.com/SiliconLabsSoftware/matter_sdk/tags)
+> [Silabs matter_sdk Github](https://github.com/SiliconLabsSoftware/matter_sdk/tags)
 
 ## Introduction
 

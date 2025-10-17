@@ -22,7 +22,7 @@ An example showing the use of CHIP on the Silicon Labs SiWx917
 > frequent releases thoroughly tested and validated. Developers looking to
 > develop matter products with silabs hardware are encouraged to use our latest
 > release with added tools and documentation.
-> [Silabs `matter_sdk` Github](https://github.com/SiliconLabsSoftware/matter_sdk/tags)
+> [Silabs matter_sdk Github](https://github.com/SiliconLabsSoftware/matter_sdk/tags)
 
 ## Introduction
 
