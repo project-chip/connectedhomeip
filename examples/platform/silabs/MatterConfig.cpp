@@ -400,12 +400,14 @@ extern "C" void vApplicationIdleHook(void)
     {
         uint32_t sleepTimeRemaining = 0;
         sl_sleeptimer_get_remaining_time_of_first_timer( SL_SLEEPTIMER_ANY_FLAG ,&sleepTimeRemaining);
-        uint32_t idleDuration_seconds = static_cast<int32_t>(chip::ICDConfigurationData::GetInstance().GetIdleModeDuration().count());
+        uint32_t sleepTimeMs = sl_sleeptimer_tick_to_ms(sleepTimeRemaining);
+        uint32_t idleDuration_seconds = chip::ICDConfigurationData::GetInstance().GetIdleModeDuration().count();
 
         // Since the sleep timer will never match the actual idle time (hardware latency, etc), we set a threshold
-        if (sleepTimeRemaining >= (idleDuration_seconds * SL_EM4_THRESHOLD_PERCENTAGE * 10)) 
+        // Multiply by 10 to converts seconds into milliseconds (e.g. 90% of 1000sec in ms is 1000*90*10 = 900000ms)
+        if (sleepTimeMs >= (idleDuration_seconds * SL_EM4_THRESHOLD_PERCENTAGE * 10)) 
         {
-            OnEM4Trigger(sleepTimeRemaining);
+            OnEM4Trigger(sleepTimeMs);
         }
     }
 #endif
