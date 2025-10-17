@@ -125,6 +125,13 @@ list(
 )
 endif (matter_enable_shell)
 
+if (matter_enable_cg_secure_dac_vendor)
+list(
+  APPEND chip_main_flags
+  -DCONFIG_USE_CG_SECURE_DAC_VENDOR=1
+)
+endif (matter_enable_cg_secure_dac_vendor)
+
 if (matter_enable_rpc)
 list(
     APPEND ${list_chip_main_sources}

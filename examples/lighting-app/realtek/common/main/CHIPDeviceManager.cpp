@@ -34,6 +34,9 @@
 #include <platform/realtek/BEE/FactoryDataProvider.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+#if CONFIG_USE_CG_SECURE_DAC_VENDOR
+#include <platform/realtek/BEE/CG/CGSecureDACVendorProvider.h>
+#endif
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
@@ -48,6 +51,14 @@ namespace DeviceManager {
 using namespace ::chip::DeviceLayer;
 
 chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
+
+#if CONFIG_USE_CG_SECURE_DAC_VENDOR
+chip::DeviceLayer::CGSecureDACVendorProvider gCgSecureDACProvider;
+chip::Credentials::DeviceAttestationCredentialsProvider * GetCGSecureDACVendorProvider()
+{
+    return &gCgSecureDACProvider;
+}
+#endif
 
 #if CHIP_ENABLE_OPENTHREAD
 app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
@@ -81,6 +92,9 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     err = mFactoryDataProvider.Init();
     SuccessOrExit(err);
     SetCommissionableDataProvider(&mFactoryDataProvider);
+#if CONFIG_USE_CG_SECURE_DAC_VENDOR
+    RegisterDACProviderGetter(GetCGSecureDACVendorProvider);
+#endif
     SetDeviceAttestationCredentialsProvider(GetDACProvider());
     SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
 
