@@ -21,6 +21,7 @@ import subprocess
 import sys
 import threading
 import typing
+import pathlib
 
 
 class LogPipe(threading.Thread):
@@ -117,13 +118,25 @@ class RunnerWaitQueue:
     def get(self):
         return self.queue.get()
 
+@dataclass
+class Application:
+    kind: str
+    path: pathlib.Path
+    args: tuple[str, ...] = ()
+
+    def add_args(self, args: tuple[str, ...]) -> Application:
+        return Application(kind=self.kind, path=self.path, args=self.args + args)
 
 class Runner:
-
     def __init__(self, capture_delegate=None):
         self.capture_delegate = capture_delegate
 
-    def RunSubprocess(self, cmd, name, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
+    def app_to_cmd(self, application):
+        return [str(application.path)] + list(application.args)
+
+    def RunSubprocess(self, application, name, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
+        cmd = self.app_to_cmd(application)
+        
         outpipe = LogPipe(
             logging.DEBUG, capture_delegate=self.capture_delegate,
             name=name + ' OUT')
@@ -167,3 +180,13 @@ class Runner:
                 raise Exception('Command %r failed: %d' % (cmd, s.returncode))
 
         logging.debug('Command %r completed with error code 0', cmd)
+
+
+
+class NamespacedRunner(Runner):
+    def __init__(self, capture_delegate=None, index):
+        super().__init__(capture_delegate)
+        self.index = index
+
+    def app_to_cmd(self, application):
+        return ["ip", "netns", "exec", "{}-{}".format(application.kind, self.index)] + super().app_to_cmd(application)

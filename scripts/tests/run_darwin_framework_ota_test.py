@@ -8,7 +8,7 @@ from subprocess import PIPE
 
 import click
 from chiptest.accessories import AppsRegister
-from chiptest.runner import Runner
+from chiptest.runner import Runner, Application
 from chiptest.test_definition import App, ExecutionCapture
 from chipyaml.paths_finder import PathsFinder
 
@@ -18,16 +18,16 @@ TEST_PID = '0x8001'
 
 
 class DarwinToolRunner:
-    def __init__(self, runner, command):
+    def __init__(self, runner, application):
         self.process = None
         self.outpipe = None
         self.runner = runner
         self.lastLogIndex = 0
-        self.command = command
+        self.application = application
         self.stdin = None
 
     def start(self):
-        self.process, self.outpipe, errpipe = self.runner.RunSubprocess(self.command,
+        self.process, self.outpipe, errpipe = self.runner.RunSubprocess(self.application,
                                                                         name='DARWIN-TOOL',
                                                                         wait=False,
                                                                         stdin=PIPE)
@@ -61,7 +61,10 @@ class DarwinToolRunner:
 class InteractiveDarwinTool(DarwinToolRunner):
     def __init__(self, runner, binary_path):
         self.prompt = "WAITING FOR COMMANDS NOW"
-        super().__init__(runner, [binary_path, "interactive", "start", "--additional-prompt", self.prompt])
+        super().__init__(runner, Application(
+            kind="tool",
+            path=Path(binary_path),
+            args=("interactive", "start", "--additional-prompt", self.prompt)))
 
     def waitForPrompt(self):
         self.waitForMessage(self.prompt)

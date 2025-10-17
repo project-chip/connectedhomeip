@@ -22,6 +22,8 @@ import time
 import typing
 from dataclasses import dataclass, field
 
+import pathlib
+
 import chiptest
 import click
 import coloredlogs
@@ -29,6 +31,7 @@ from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.test_definition import TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
+from chiptest.runner import Application
 
 # If running on Linux platform load the Linux specific code.
 if sys.platform == "linux":
@@ -420,7 +423,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             ble_controller_app = 0   # Bind app to the first BLE controller
             ble_controller_tool = 1  # Bind tool to the second BLE controller
         
-        runner = runner = chiptest.runner.NamespacedRunner(index=0)
+        runner = runner = chiptest.runner.NamespacedRunner(index=ns.index)
     else:
         runner = chiptest.runner.Runner()
 
