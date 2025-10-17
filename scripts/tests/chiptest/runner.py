@@ -125,7 +125,7 @@ class Application:
     path: pathlib.Path
     args: tuple[str, ...] = ()
 
-    def add_args(self, args: tuple[str, ...]) -> Application:
+    def add_args(self, args: tuple[str, ...]):
         return Application(kind=self.kind, path=self.path, args=self.args + args)
 
     def to_cmd(self) -> typing.List[str]:
