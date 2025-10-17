@@ -1,0 +1,73 @@
+# STM32WB5MM-DK_sdk.gn_helper
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+declare_args() {
+  ## PATHS FOR STM32WB BOARD ##
+  stm32_board_src = "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1"
+  stm32_wb_bsp = "${chip_root}/third_party/st/STM32CubeWBA/Drivers/BSP"
+  
+  ## PATHS FOR ST UTILITIES ##
+  stm32_util = "${chip_root}/third_party/st/STM32CubeWBA/Utilities"
+}
+
+SOURCES = [ 
+  # BOARD APPLICATION SRC(in examples/platform/stm32/common/STM32WBA65I-DK1/)
+  "${stm32_board_src}/Src/flash_wb.c",
+  "${stm32_board_src}/Src/stm32wbaxx_hal_msp.c",
+  "${stm32_board_src}/Src/stm32wbaxx_it.c",
+  "${stm32_board_src}/Src/syscalls.c",
+  "${stm32_board_src}/Src/sysmem.c",
+  "${stm32_board_src}/Src/system_stm32wbaxx.c",
+  "${stm32_board_src}/Src/stm32wbaxx_hal_timebase_tim.c",
+  "${stm32_board_src}/Src/app_bsp.c",
+  "${stm32_board_src}/Src/stm32_factorydata.c",
+  "${stm32_board_src}/Src/entropy_hardware_poll.c",
+
+  "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/matter_config.h",
+  "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/FreeRTOSConfig.h",
+  
+  "${stm32_wb_bsp}/STM32WBA65I-DK1/stm32wba65i_discovery_bus.c",
+  "${stm32_wb_bsp}/STM32WBA65I-DK1/stm32wba65i_discovery_lcd.c",
+  "${stm32_wb_bsp}/STM32WBA65I-DK1/stm32wba65i_discovery.c",
+  "${stm32_wb_bsp}/STM32WBA65I-DK1/stm32wba65i_discovery_eeprom.c",
+  "${stm32_wb_bsp}/Components/ssd1315/ssd1315.c",
+  "${stm32_wb_bsp}/Components/ssd1315/ssd1315_reg.c",
+  "${stm32_wb_bsp}/Components/m95p32/m95p32.c",
+  
+  # BOARD UTILITIES
+  "${stm32_util}/trace/adv_trace/stm32_adv_trace.c",
+  "${stm32_util}/lpm/tiny_lpm/stm32_lpm.c",
+  "${stm32_util}/misc/stm32_mem.c",
+  "${stm32_util}/misc/stm32_systime.c",
+  "${stm32_util}/misc/stm32_tiny_sscanf.c",
+  "${stm32_util}/misc/stm32_tiny_vsnprintf.c",
+  "${stm32_util}/tim_serv/stm32_timer.c",
+  "${stm32_util}/LCD/stm32_lcd.c",
+  ]
+  
+INCLUDE_DIRS = [
+  "${stm32_util}",
+  "${stm32_board_src}/Inc",
+  "${stm32_board_src}/STM32_WPAN/App",
+  "${stm32_util}/trace/adv_trace",
+  "${stm32_util}/lpm/tiny_lpm",
+  "${stm32_util}/misc",
+  "${stm32_util}/tim_serv",
+  "${stm32_util}/sequencer",
+  "${stm32_util}/LCD",
+  "${stm32_wb_bsp}/STM32WBA65I-DK1",
+  "${stm32_wb_bsp}/Components/ssd1315",
+  "${stm32_wb_bsp}/Components/m95p32",
+  "${stm32_wb_bsp}/Components/Common",
+  ]
+
+DEFINES = [ 
+  ]
+
+LIBS = [
+  ]
+  
+FLAGS = [ 
+  ]

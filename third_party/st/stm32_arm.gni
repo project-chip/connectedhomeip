@@ -20,4 +20,8 @@ if (stm32_family == "stm32wb55" || stm32_family == "stm32wb5") {
   arm_cpu = "cortex-m4"
   arm_float_abi = "hard"
   arm_fpu = "fpv4-sp-d16"
+} else if (stm32_family == "stm32wba6") {
+  arm_cpu = "cortex-m33"
+  arm_float_abi = "hard"
+  arm_fpu = "fpv5-sp-d16"
 }
