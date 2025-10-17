@@ -33,6 +33,7 @@ import queue
 import threading
 import time
 from datetime import datetime, timezone
+from enum import Enum
 from typing import Any, Iterable, Optional
 
 from mobly import asserts
@@ -456,6 +457,37 @@ class AttributeSubscriptionHandler:
 
         asserts.fail(f"Did not get full sequence {sequence} in {timeout_sec:.1f} seconds. Got {actual_values} before time-out.")
 
+    def get_attribute_value_from_queue(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor = None, timeout_sec: float = 1.0) -> Any:
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+
+        # Handles cluster subcription or attribute subscription
+        attribute = attribute or self._expected_attribute
+
+        while time_remaining > 0:
+            logging.info(f"[FC] Waiting for up to {timeout_sec:.1f} seconds for report.")
+            try:
+                item: AttributeValue = self.attribute_queue.get(block=True, timeout=time_remaining)
+
+                # Track arrival of expected attribute
+                if item.endpoint_id == endpoint and item.attribute == attribute:
+                    elapsed = time.time() - start_time
+                    logging.info(
+                        f"[FC] Got attribute {attribute.__name__}, value {item.value} on endpoint {item.endpoint_id}. Elapsed {elapsed} sec.")
+                    return item.value
+
+            except queue.Empty:
+                # No error, we update timeouts and keep going
+                pass
+
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed
+
+        logging.info(f"[FC] Report for {attribute.__name__} not found before time-out ({timeout_sec} sec).")
+
+        return None
+
     @property
     def attribute_queue(self) -> queue.Queue:
         return self._q
@@ -483,3 +515,20 @@ class AttributeSubscriptionHandler:
         """Flush entire queue, returning nothing."""
         _ = self.get_last_report()
         return
+
+    def log_queue(self) -> None:
+        str = f"[FC] {len(self._q.queue)} attributes in the queue: ["
+        for attr_val in self._q.queue:
+            if isinstance(attr_val.value, Enum):
+                enum_class_name = type(attr_val.value).__name__
+                enum_item_name = attr_val.value.name
+                val_str = f"{enum_class_name}.{enum_item_name}: {attr_val.value}"
+            else:
+                val_str = attr_val.value
+
+            if attr_val == self._q.queue[-1]:
+                str += f"{attr_val.attribute.__name__}={val_str}"
+            else:
+                str += f"{attr_val.attribute.__name__}={val_str}, "
+        str += "]"
+        logging.info(f"{str}")
