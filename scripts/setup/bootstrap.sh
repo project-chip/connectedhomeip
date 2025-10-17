@@ -205,14 +205,14 @@ if [ -n "$ZSH_VERSION" ]; then
 fi
 
 # Set ccache environment variables
-# TODO: For now, the no-hash-dir is not enabled globally, however, anyone can
+# TODO: For now, the ccache env is not enabled globally, however, anyone can
 #       enable it in the local environment, so apps build in different output
 #       directories can reuse cache. In order to enable it globally we need
 #       to figure out why NRF builds do not work when sharing cache between
 #       applications.
 #export CCACHE_NOHASHDIR=1
 #export CCACHE_BASEDIR="$_CHIP_ROOT"
-export CCACHE_PREFIX_CPP="$_CHIP_ROOT/scripts/helpers/ccache-prefix-cpp.sh"
+#export CCACHE_PREFIX_CPP="$_CHIP_ROOT/scripts/helpers/ccache-prefix-cpp.sh"
 
 unset -f _bootstrap_or_activate
 unset -f _install_additional_pip_requirements
