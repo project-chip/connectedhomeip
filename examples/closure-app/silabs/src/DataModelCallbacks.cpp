@@ -53,8 +53,7 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
 /* Forwards all attributes changes */
 void MatterClosureControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    ChipLogProgress(Zcl, "Closure cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mAttributeId));
-    
+    ChipLogProgress(Zcl, "Closure attribute change 0x%08lX on endpoint %d ", attributePath.mAttributeId, attributePath.mEndpointId);
 #ifdef DISPLAY_ENABLED
     using namespace chip::app::Clusters::ClosureControl::Attributes;
     
@@ -64,11 +63,8 @@ void MatterClosureControlClusterServerAttributeChangedCallback(const app::Concre
     case MainState::Id:
     case OverallCurrentState::Id:
         AppTask::GetAppTask().UpdateClosureUI();
-        ChipLogProgress(Zcl, "UI updated for closure attribute 0x%08lX on endpoint %d", attributePath.mAttributeId, attributePath.mEndpointId);
         break;
     default:
-        // Log other attribute changes but don't update UI
-        ChipLogProgress(Zcl, "Closure attribute change 0x%08lX on endpoint %d ", attributePath.mAttributeId, attributePath.mEndpointId);
         break;
     }
 #endif // DISPLAY_ENABLED
