@@ -417,7 +417,7 @@
 		B2E0D7B9245B0B5C003C5B48 /* MTRSetupPayload.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7B0245B0B5C003C5B48 /* MTRSetupPayload.mm */; };
 		B409D0AE2CCFB89600A7ED5A /* DeviceDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = B409D0AC2CCFB89600A7ED5A /* DeviceDelegate.h */; };
 		B409D0AF2CCFB89600A7ED5A /* DeviceDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = B409D0AD2CCFB89600A7ED5A /* DeviceDelegate.mm */; };
-		B4382F882D6E231800F79AFC /* HomeKitConnector.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4382F872D6E231800F79AFC /* HomeKitConnector.mm */; platformFilters = (ios, maccatalyst, ); settings = {COMPILER_FLAGS = " -Wno-error=availability -Wno-nullability-completeness"; }; };
+		B4382F882D6E231800F79AFC /* HomeKitConnector.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4382F872D6E231800F79AFC /* HomeKitConnector.mm */; platformFilters = (ios, maccatalyst, ); settings = {COMPILER_FLAGS = "-Wno-error=availability -Wno-error=unguarded-availability -Wno-nullability-completeness"; }; };
 		B4382F892D6E231800F79AFC /* HomeKitConnector.h in Headers */ = {isa = PBXBuildFile; fileRef = B4382F862D6E231800F79AFC /* HomeKitConnector.h */; platformFilters = (ios, maccatalyst, ); };
 		B4382F8B2D6F554B00F79AFC /* HomeKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4382F8A2D6F554B00F79AFC /* HomeKit.framework */; platformFilters = (ios, maccatalyst, ); };
 		B43B39EA2CB859A5006AA284 /* DumpMemoryGraphCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B43B39E62CB859A5006AA284 /* DumpMemoryGraphCommand.mm */; };
