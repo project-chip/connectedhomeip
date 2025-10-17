@@ -143,9 +143,6 @@ template("siwx917_sdk") {
       # sl memory manager
       "${efr32_sdk_root}/platform/service/memory_manager/inc",
       "${efr32_sdk_root}/platform/service/memory_manager/src",
-      "${efr32_sdk_root}/platform/service/memory_manager/profiler/inc",
-      "${efr32_sdk_root}/platform/service/memory_manager/profiler/config",
-      "${efr32_sdk_root}/util/silicon_labs/silabs_core/memory_manager",
 
       # OTA
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade",
@@ -289,7 +286,7 @@ template("siwx917_sdk") {
     if (chip_enable_wifi_ipv4) {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
     }
-    if (invoker.enable_dic) {
+    if (invoker.enable_matter_aws) {
       _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
     }
 
@@ -343,12 +340,12 @@ template("siwx917_sdk") {
     if (chip_build_libshell || sl_uart_log_output) {
       defines += [ "SLI_SI91X_MCU_INTR_BASED_RX_ON_UART=1" ]
     }
-    if (enable_dic) {
-      defines += [ "DIC_ENABLE=1" ]
+    if (enable_matter_aws) {
+      defines += [ "SL_MATTER_ENABLE_AWS=1" ]
     }
 
     if (aws_sdk_ota) {
-      defines += [ "ENABLE_AWS_OTA_FEAT=1" ]
+      defines += [ "SL_MATTER_ENABLE_AWS_OTA_FEAT=1" ]
     }
 
     cflags += [ "-Wno-shadow" ]
@@ -599,6 +596,7 @@ template("siwx917_sdk") {
           # mbedtls + tinycrypt integration
           "${_mbedtls_root}/library/oid.c",
           "${_mbedtls_root}/library/pk.c",
+          "${_mbedtls_root}/library/pk_ecc.c",
           "${_mbedtls_root}/library/pk_wrap.c",
           "${_mbedtls_root}/library/pk_wrap.h",
           "${_mbedtls_root}/library/pkparse.c",
@@ -744,22 +742,16 @@ template("siwx917_sdk") {
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_si91x_button_instances.c",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_ulp_timer_init.c",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/main.c",
-      "${matter_support_root}/board-support/si91x/support/hal/rsi_hal_mcu_m4.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/button/src/sl_si91x_button.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/clock_manager/src/sl_si91x_clock_manager.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/clock_manager/src/sli_si91x_clock_manager.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.c",
 
       # sl memory manager
-      "${efr32_sdk_root}/platform/service/memory_manager/profiler/src/sli_memory_profiler_stubs.c",
-      "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager.c",
       "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_cpp.cpp",
-      "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_dynamic_reservation.c",
       "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_pool.c",
       "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_pool_common.c",
-      "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_region.c",
-      "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_retarget.c",
-      "${efr32_sdk_root}/platform/service/memory_manager/src/sli_memory_manager_common.c",
+      "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_redirect.c",
 
       # iostream
       "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream.c",
@@ -869,17 +861,21 @@ template("siwx917_sdk") {
     if (defined(invoker.sources)) {
       sources += invoker.sources
     }
-    if (invoker.enable_dic) {
+    if (invoker.enable_matter_aws) {
       sources += [
+        "${_mbedtls_root}/library/debug.c",
         "${_mbedtls_root}/library/ecjpake.c",
+        "${_mbedtls_root}/library/gcm.c",
         "${_mbedtls_root}/library/rsa.c",
-        "${_mbedtls_root}/library/rsa_internal.c",
+        "${_mbedtls_root}/library/rsa_alt_helpers.c",
         "${_mbedtls_root}/library/sha1.c",
         "${_mbedtls_root}/library/ssl_ciphersuites.c",
-        "${_mbedtls_root}/library/ssl_cli.c",
+        "${_mbedtls_root}/library/ssl_client.c",
+        "${_mbedtls_root}/library/ssl_debug_helpers_generated.c",
         "${_mbedtls_root}/library/ssl_msg.c",
-        "${_mbedtls_root}/library/ssl_srv.c",
         "${_mbedtls_root}/library/ssl_tls.c",
+        "${_mbedtls_root}/library/ssl_tls12_client.c",
+        "${_mbedtls_root}/library/ssl_tls12_server.c",
         "${_mbedtls_root}/library/x509.c",
         "${silabs_sdk_build_root}/mqtt/stack/mqtt.c",
       ]

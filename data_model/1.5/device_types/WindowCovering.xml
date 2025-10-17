@@ -57,12 +57,13 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0202" name="Window Covering" revision="4">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0202" name="Window Covering" revision="5">
   <revisionHistory>
     <revision revision="1" summary="Initial Zigbee 3.0 revision"/>
     <revision revision="2" summary="New data model format and notation"/>
     <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
     <revision revision="4" summary="Scenes Management cluster was removed from Cluster Requirements"/>
+    <revision revision="5" summary="Introduced conditions on Closure clusters"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>
@@ -79,6 +80,12 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0102" name="Window Covering" side="server">
       <mandatoryConform/>
+    </cluster>
+    <cluster id="0x0104" name="Closure Control" side="server">
+      <disallowConform/>
+    </cluster>
+    <cluster id="0x0105" name="Closure Dimension" side="server">
+      <disallowConform/>
     </cluster>
   </clusters>
 </deviceType>
