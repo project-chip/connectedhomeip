@@ -223,6 +223,7 @@ class OtaProviderClientFragment : Fragment() {
         2U /* CASE */,
         listOf(nodeId),
         null,
+        Optional.empty(),
         deviceController.fabricIndex.toUInt()
       )
     newEntry.toTlv(AnonymousTag, tlvWriter)

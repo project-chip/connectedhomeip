@@ -24,6 +24,7 @@ import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.GroupSettingFragmentBinding
 import com.google.chip.chiptool.util.DeviceIdUtil
 import java.lang.Exception
+import java.util.Optional;
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -483,6 +484,7 @@ class GroupSettingFragment : Fragment() {
         AccessControlEntry.Operate.id.toInt() /* Group */,
         arrayListOf(groupId.toULong().toLong()),
         null,
+        Optional.empty(),
         deviceController.fabricIndex.toUInt().toInt()
       )
     sendEntry.add(newEntry)
