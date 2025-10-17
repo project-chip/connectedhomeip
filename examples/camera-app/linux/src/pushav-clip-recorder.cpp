@@ -24,6 +24,7 @@
 #include <platform/PlatformManager.h>
 #include <push-av-stream-manager.h>
 #include <regex>
+#include <filesystem>
 #include <sys/stat.h>
 
 constexpr int kSegmentIdOffset       = 1000;
@@ -141,56 +142,55 @@ void PushAVClipRecorder::RemovePreviousRecordingFiles(const fs::path& path)
 
 bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
 {
-    struct stat info;
-    if (stat(path.c_str(), &info) != 0)
-    {
-        // Path doesn't exist, try to create directory
-        // 0755 = owner: rwx, group: rx, others: rx
-        if (mkdir(path.c_str(), 0755) != 0)
+    // Base output path
+    std::filesystem::path basePath(path);
+    std::filesystem::path sessionDir = basePath / ("session_" + std::to_string(mClipInfo.mSessionNumber));
+    std::filesystem::path trackDir   = sessionDir / mClipInfo.mTrackName;
+
+    // Helper lambda to ensure a directory exists and is writable, creating it with mode 0755
+    auto ensure = [&](const std::filesystem::path & p) -> bool {
+        std::error_code ec;
+        if (!std::filesystem::exists(p, ec))
         {
-            ChipLogError(Camera, "Failed to create directory: %s", path.c_str());
+            if (!std::filesystem::create_directories(p, ec))
+            {
+                ChipLogError(Camera, "Failed to create directory: %s", p.c_str());
+                return false;
+            }
+            // Set permissions to 0755 (owner rwx, group rx, others rx)
+            std::filesystem::permissions(p,
+                std::filesystem::perms::owner_all |
+                std::filesystem::perms::group_read |
+                std::filesystem::perms::group_exec |
+                std::filesystem::perms::others_read |
+                std::filesystem::perms::others_exec,
+                std::filesystem::perm_options::replace, ec);
+            ChipLogProgress(Camera, "Created directory: %s", p.c_str());
+        }
+        else if (!std::filesystem::is_directory(p, ec))
+        {
+            ChipLogError(Camera, "Path is not a directory: %s", p.c_str());
             return false;
         }
-        ChipLogProgress(Camera, "Created directory: %s", path.c_str());
-    }
-    else if (!(info.st_mode & S_IFDIR))
-    {
-        ChipLogError(Camera, "Path is not a directory: %s", path.c_str());
-        return false;
-    }
 
-    if (access(path.c_str(), W_OK) != 0)
-    {
-        ChipLogError(Camera, "Directory is not writable: %s", path.c_str());
-        return false;
-    }
+        auto perms = std::filesystem::status(p, ec).permissions();
+        if ((perms & std::filesystem::perms::owner_write) == std::filesystem::perms::none)
+        {
+            ChipLogError(Camera, "Directory is not writable: %s", p.c_str());
+            return false;
+        }
+        return true;
+    };
 
-    return true;
-}
-
-bool PushAVClipRecorder::IsOutputDirectoryValid(const std::string & path)
-{
-    std::string sessionDir = path + "session_" + std::to_string(mClipInfo.mSessionNumber);
-    std::string trackDir   = sessionDir + std::to_string(std::filesystem::path::preferred_separator)  + mClipInfo.mTrackName;
-
-    if (!EnsureDirectoryExists(path))
+    // Ensure base, session, and track directories exist
+    if (!ensure(basePath) || !ensure(sessionDir) || !ensure(trackDir))
     {
         return false;
     }
 
-    if (!EnsureDirectoryExists(sessionDir))
-    {
-        return false;
-    }
-
-    if (!EnsureDirectoryExists(trackDir))
-    {
-        return false;
-    }
-
-    // Remove files from previous recordings
-    RemovePreviousRecordingFiles(fs::path(sessionDir));
-    RemovePreviousRecordingFiles(fs::path(trackDir));
+    // Clean up any previous recording files
+    RemovePreviousRecordingFiles(sessionDir);
+    RemovePreviousRecordingFiles(trackDir);
 
     return true;
 }
@@ -333,7 +333,7 @@ void PushAVClipRecorder::Start()
         return;
     }
 
-    if (!IsOutputDirectoryValid(mClipInfo.mOutputPath))
+    if (!EnsureDirectoryExists(mClipInfo.mOutputPath))
     {
         ChipLogError(Camera, "ERROR: Invalid output directory");
         Stop();

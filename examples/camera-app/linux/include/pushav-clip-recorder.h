@@ -227,8 +227,6 @@ private:
     /// @name Internal Methods
     /// @{
 
-    bool IsOutputDirectoryValid(const std::string & path);
-
     /**
      * @brief Ensures a directory exists, creating it if necessary.
      * @param path The directory path to check/create.
