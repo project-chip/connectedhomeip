@@ -17,7 +17,7 @@
 #pragma once
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
-
+#include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 
@@ -26,6 +26,7 @@
 namespace chip {
 namespace Test {
 
+// Helper function to read any attribute value of a given type
 template <typename ClusterT, typename T>
 CHIP_ERROR ReadClusterAttribute(ClusterT & cluster, const app::ConcreteDataAttributePath & path, T & value)
 {
@@ -39,6 +40,16 @@ CHIP_ERROR ReadClusterAttribute(ClusterT & cluster, const app::ConcreteDataAttri
     VerifyOrReturnError(attributeData.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
 
     return app::DataModel::Decode(attributeData[0].dataReader, value);
+}
+
+// Helper function to read any attribute value of a given type
+template <typename ClusterT, typename T>
+CHIP_ERROR ReadClusterAttribute(ClusterT & cluster, AttributeId attr, T & val)
+{
+    const auto & paths = cluster.GetPaths();
+    // This should be a size-1 span
+    VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
+    return ReadClusterAttribute(cluster, chip::app::ConcreteAttributePath(paths[0].mEndpointId, paths[0].mClusterId, attr), val);
 }
 
 // Helper function to write any attribute value of a given type
