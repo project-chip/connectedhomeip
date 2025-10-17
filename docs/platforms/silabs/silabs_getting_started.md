@@ -115,9 +115,9 @@ command for the BRD4187C is
 ```
 
 > **Note**: The build argument `--wifi SiWx917` is necessary to build BRD4187C
-> image with the necessary code for the NCP combo. `chip_enable_ble_siwx917=true`
-> enables the SiWx917 NCP bluetooth. The MG24 + SiWx917 NCP combo does not yet
-> support external flash.
+> image with the necessary code for the NCP combo.
+> `chip_enable_ble_siwx917=true` enables the SiWx917 NCP bluetooth. The MG24 +
+> SiWx917 NCP combo does not yet support external flash.
 
 To build the lighting app as an Wi-Fi MG24 + wf200 NCP, the default build
 command for the BRD4187C is
