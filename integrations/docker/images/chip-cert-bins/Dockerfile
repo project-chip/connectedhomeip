@@ -83,7 +83,6 @@ RUN set -x \
     libssl-dev \
     libtool \
     libudev-dev \
-    liburiparser-dev \
     libusb-1.0-0 \
     libusb-dev \
     libxml2-dev \

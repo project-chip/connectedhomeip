@@ -1,0 +1,35 @@
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("${build_root}/config/compiler/compiler.gni")
+
+# Output directory
+_compiler_subdir = "gcc"
+if (is_clang) {
+  _compiler_subdir = "clang"
+}
+_output_dir = "build/$current_cpu-$_compiler_subdir"
+
+# Action to build uriparser
+action("build_uriparser") {
+  script = "scripts/build_uriparser.py"
+  outputs = [ "$target_gen_dir/repo/${_output_dir}/liburiparser.so" ]
+  args = [ "--output-dir=${_output_dir}" ]
+
+  if (is_clang) {
+    args += [ "--clang" ]
+  }
+}
+
+# Config for targets depending on uriparser
+config("uriparser_config") {
+  libs = [ "uriparser" ]
+  lib_dirs = [ rebase_path("repo/${_output_dir}") ]
+  include_dirs = [ rebase_path("repo/include") ]
+  cflags_cc = [ "-Wno-shadow" ]
+}
+
+# Group to bundle everything
+group("uriparser") {
+  deps = [ ":build_uriparser" ]
+  public_configs = [ ":uriparser_config" ]
+}
