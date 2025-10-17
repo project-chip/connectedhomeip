@@ -47,7 +47,7 @@ CHIP_ERROR ReadClusterAttribute(chip::app::ServerClusterInterface & cluster, con
 
 // Helper function to read any attribute value of a given type
 template <typename T>
-CHIP_ERROR ReadClusterAttribute(chip::app::ServerClusterInterface & cluster, AttributeId attr, T & val)
+CHIP_ERROR ReadClusterAttribute(chip::app::ServerClusterInterface & cluster, AttributeId attr, T & value)
 {
     static_assert(std::is_integral_v<T> || std::is_enum_v<T>);
 
@@ -55,7 +55,7 @@ CHIP_ERROR ReadClusterAttribute(chip::app::ServerClusterInterface & cluster, Att
     // This should be a size-1 span
     VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
     chip::app::ConcreteAttributePath attributePath(paths[0].mEndpointId, paths[0].mClusterId, attr);
-    return ReadClusterAttribute(cluster, attributePath, val);
+    return ReadClusterAttribute(cluster, attributePath, value);
 }
 
 // Helper function to write any attribute value of a given type
@@ -68,6 +68,19 @@ CHIP_ERROR WriteClusterAttribute(chip::app::ServerClusterInterface & cluster, co
     app::Testing::WriteOperation writeOperation(path);
     app::AttributeValueDecoder decoder = writeOperation.DecoderFor(value);
     return cluster.WriteAttribute(writeOperation.GetRequest(), decoder).GetUnderlyingError();
+}
+
+// Helper function to write any attribute value of a given type
+template <typename T>
+CHIP_ERROR WriteClusterAttribute(chip::app::ServerClusterInterface & cluster, AttributeId attr, const T & value)
+{
+    static_assert(std::is_integral_v<T> || std::is_enum_v<T>);
+
+    const auto & paths = cluster.GetPaths();
+    // This should be a size-1 span
+    VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
+    chip::app::ConcreteAttributePath attributePath(paths[0].mEndpointId, paths[0].mClusterId, attr);
+    return WriteClusterAttribute(cluster, attributePath, value);
 }
 
 } // namespace Test
