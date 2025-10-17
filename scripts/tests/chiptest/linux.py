@@ -200,6 +200,9 @@ class IsolatedNetworkNamespace:
         for command in self.COMMANDS_TERMINATE:
             self.run(command)
 
+    def app_to_namespaced_cmd(self, application):
+        return ["ip", "netns", "exec", "{}-{}".format(application.kind, self.index)] + application.to_cmd()
+
 
 class DBusTestSystemBus(subprocess.Popen):
     """Run a dbus-daemon in a subprocess as a test system bus."""

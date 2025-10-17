@@ -423,7 +423,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             ble_controller_app = 0   # Bind app to the first BLE controller
             ble_controller_tool = 1  # Bind tool to the second BLE controller
         
-        runner = runner = chiptest.runner.NamespacedRunner(index=ns.index)
+        runner = runner = chiptest.runner.NamespacedRunner(ns)
     else:
         runner = chiptest.runner.Runner()
 

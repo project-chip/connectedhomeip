@@ -127,12 +127,15 @@ class Application:
     def add_args(self, args: tuple[str, ...]) -> Application:
         return Application(kind=self.kind, path=self.path, args=self.args + args)
 
+    def to_cmd(self) -> typing.List[str]:
+        return [str(self.path)] + list(self.args)
+
 class Runner:
     def __init__(self, capture_delegate=None):
         self.capture_delegate = capture_delegate
 
     def app_to_cmd(self, application):
-        return [str(application.path)] + list(application.args)
+        return application.to_cmd()
 
     def RunSubprocess(self, application, name, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
         cmd = self.app_to_cmd(application)
@@ -184,9 +187,9 @@ class Runner:
 
 
 class NamespacedRunner(Runner):
-    def __init__(self, index, capture_delegate=None):
+    def __init__(self, ns, capture_delegate=None):
         super().__init__(capture_delegate)
-        self.index = index
+        self.ns = ns
 
     def app_to_cmd(self, application):
-        return ["ip", "netns", "exec", "{}-{}".format(application.kind, self.index)] + super().app_to_cmd(application)
+        return ns.app_to_namespaced_cmd(application)
