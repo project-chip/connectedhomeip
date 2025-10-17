@@ -103,7 +103,6 @@ protected:
 
 namespace Crypto {
 using SymmetricKeystore = chip::Crypto::SessionKeystore;
-;
 } // namespace Crypto
 
 /**
