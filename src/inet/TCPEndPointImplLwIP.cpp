@@ -696,12 +696,12 @@ void TCPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && buf)
         // Call the app's OnPeerClose.
         if (OnPeerClose != NULL)
         {
-            OnPeerClose(*this);
+            OnPeerClose(handle);
         }
     }
 
     // Drive the received data into the app.
-    DriveReceiving();
+    DriveReceiving(handle);
 }
 
 void TCPEndPointImplLwIP::HandleIncomingConnection(const TCPEndPointHandle & conEP)

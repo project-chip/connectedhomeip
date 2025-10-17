@@ -503,7 +503,7 @@ public:
      *
      * @details
      *  Provide a function of this type to the \c OnAcceptError delegate
-     *  member to process connection acceptance error events on \c listeningEndpoitn. The
+     *  member to process connection acceptance error events on \c listeningEndpoint. The
      *  \c err argument provides specific detail about the type of the error.
      */
     typedef void (*OnAcceptErrorFunct)(const TCPEndPointHandle & listeningEndpoint, CHIP_ERROR err);
