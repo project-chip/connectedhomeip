@@ -2511,6 +2511,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "AvailableEndpoints";
         case chip::app::Clusters::PowerTopology::Attributes::ActiveEndpoints::Id:
             return "ActiveEndpoints";
+        case chip::app::Clusters::PowerTopology::Attributes::ElectricalCircuitNodes::Id:
+            return "ElectricalCircuitNodes";
         case chip::app::Clusters::PowerTopology::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::PowerTopology::Attributes::AcceptedCommandList::Id:
@@ -7212,6 +7214,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Chime";
     case 0x00000147:
         return "Camera Controller";
+    case 0x00000148:
+        return "Doorbell";
     case 0x00000202:
         return "Window Covering";
     case 0x00000203:

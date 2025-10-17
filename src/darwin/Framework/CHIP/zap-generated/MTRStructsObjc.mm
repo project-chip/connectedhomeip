@@ -331,6 +331,42 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDataTypeSemanticTagStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mfgCode = nil;
+
+        _namespaceID = @(0);
+
+        _tag = @(0);
+
+        _label = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeSemanticTagStruct alloc] init];
+
+    other.mfgCode = self.mfgCode;
+    other.namespaceID = self.namespaceID;
+    other.tag = self.tag;
+    other.label = self.label;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mfgCode:%@; namespaceID:%@; tag:%@; label:%@; >", NSStringFromClass([self class]), _mfgCode, _namespaceID, _tag, _label];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDataTypeTestGlobalStruct
 - (instancetype)init
 {
@@ -490,42 +526,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRDescriptorClusterDeviceType : MTRDescriptorClusterDeviceTypeStruct
 @dynamic revision;
-@end
-
-@implementation MTRDescriptorClusterSemanticTagStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mfgCode = nil;
-
-        _namespaceID = @(0);
-
-        _tag = @(0);
-
-        _label = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRDescriptorClusterSemanticTagStruct alloc] init];
-
-    other.mfgCode = self.mfgCode;
-    other.namespaceID = self.namespaceID;
-    other.tag = self.tag;
-    other.label = self.label;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mfgCode:%@; namespaceID:%@; tag:%@; label:%@; >", NSStringFromClass([self class]), _mfgCode, _namespaceID, _tag, _label];
-    return descriptionString;
-}
-
 @end
 
 @implementation MTRBindingClusterTargetStruct
@@ -6457,6 +6457,42 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRPowerTopologyClusterCircuitNodeStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _node = @(0);
+
+        _endpoint = nil;
+
+        _label = nil;
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPowerTopologyClusterCircuitNodeStruct alloc] init];
+
+    other.node = self.node;
+    other.endpoint = self.endpoint;
+    other.label = self.label;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: node:%@; endpoint:%@; label:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _node, _endpoint, _label, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTREnergyEVSEModeClusterModeTagStruct
 - (instancetype)init
 {
@@ -10416,7 +10452,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _audioStreamID = nil;
 
-        _endpointID = @(0);
+        _tlsEndpointID = @(0);
 
         _url = @"";
 
@@ -10438,7 +10474,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.streamUsage = self.streamUsage;
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
-    other.endpointID = self.endpointID;
+    other.tlsEndpointID = self.tlsEndpointID;
     other.url = self.url;
     other.triggerOptions = self.triggerOptions;
     other.ingestMethod = self.ingestMethod;
@@ -10450,7 +10486,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; endpointID:%@; url:%@; triggerOptions:%@; ingestMethod:%@; containerOptions:%@; expiryTime:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _endpointID, _url, _triggerOptions, _ingestMethod, _containerOptions, _expiryTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; tlsEndpointID:%@; url:%@; triggerOptions:%@; ingestMethod:%@; containerOptions:%@; expiryTime:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _tlsEndpointID, _url, _triggerOptions, _ingestMethod, _containerOptions, _expiryTime];
     return descriptionString;
 }
 
@@ -10561,10 +10597,6 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _connectionID = @(0);
-
-        _triggerType = @(0);
-
-        _activationReason = nil;
     }
     return self;
 }
@@ -10574,15 +10606,13 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRPushAVStreamTransportClusterPushTransportEndEvent alloc] init];
 
     other.connectionID = self.connectionID;
-    other.triggerType = self.triggerType;
-    other.activationReason = self.activationReason;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; triggerType:%@; activationReason:%@; >", NSStringFromClass([self class]), _connectionID, _triggerType, _activationReason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; >", NSStringFromClass([self class]), _connectionID];
     return descriptionString;
 }
 

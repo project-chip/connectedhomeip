@@ -29,17 +29,13 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-// TODO: when fixing
-// https://github.com/project-chip/connectedhomeip/issues/34702, make this
-// namespace alias go the other way.
-
-namespace Globals {
+namespace Descriptor {
 namespace Structs {
 
-namespace SemanticTagStruct = Descriptor::Structs::SemanticTagStruct;
+namespace SemanticTagStruct = Globals::Structs::SemanticTagStruct;
 
 } // namespace Structs
-} // namespace Globals
+} // namespace Descriptor
 
 } // namespace Clusters
 } // namespace app

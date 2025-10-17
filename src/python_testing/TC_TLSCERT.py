@@ -976,12 +976,16 @@ class TC_TLSCERT(MatterBaseTest):
             asserts.assert_in(my_ccdid[i], found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
             asserts.assert_equal(found_certs[my_ccdid[i]].clientCertificate,
                                  my_client_cert[i], "Expected matching certificate detail")
+        asserts.assert_equal(found_certs[my_ccdid[1]].intermediateCertificates,
+                             my_intermediate_certs_1, "Expected matching certificate detail")
 
         self.step(12)
         found_certs = await cr2_cmd.read_client_certs_attribute_as_map(TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(len(found_certs), 1, "Expected 1 certificate")
         asserts.assert_in(my_ccdid[2], found_certs, "ProvisionedClientCertificates should contain provisioned client cert")
         asserts.assert_equal(found_certs[my_ccdid[2]].clientCertificate, my_client_cert[2], "Expected matching certificate detail")
+        asserts.assert_equal(found_certs[my_ccdid[2]].intermediateCertificates,
+                             my_intermediate_certs_2, "Expected matching certificate detail")
 
         self.step(13)
         # Must close session so we don't re-use large payload session
@@ -1014,8 +1018,8 @@ class TC_TLSCERT(MatterBaseTest):
         response = await cr1_cmd.send_csr_command(ccdid=my_ccdid[0], nonce=my_nonce[3])
         cr1_cmd.assert_valid_ccdid(response.ccdid)
         asserts.assert_equal(response.ccdid, my_ccdid[0], "Expected same ID")
-        my_csr[3] = cr1_cmd.assert_valid_csr(response, my_nonce[3])
-        my_client_cert[3] = cr1_cmd.gen_cert_with_key(root, public_key=my_csr[3].public_key(), subject=my_csr[3].subject)
+        cr1_cmd.assert_valid_csr(response, my_nonce[3])
+        my_client_cert[3] = cr1_cmd.gen_cert_with_key(root, public_key=my_csr[0].public_key(), subject=my_csr[0].subject)
 
         self.step(17)
         await cr1_cmd.send_provision_client_command(ccdid=my_ccdid[0], certificate=my_client_cert[3])

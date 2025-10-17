@@ -314,6 +314,9 @@
             "ClusterRevision"
         ],
         "General Commissioning": [
+            "FeatureMap",
+            "ClusterRevision",
+            "Breadcrumb",
             "RegulatoryConfig",
             "LocationCapability",
             "BasicCommissioningInfo",
@@ -347,6 +350,12 @@
             "MaximumCheckInBackOff",
             "OperatingMode",
             "FeatureMap"
+        ],
+        "Identify": [
+            "ClusterRevision",
+            "FeatureMap",
+            "IdentifyTime",
+            "IdentifyType"
         ],
         "Joint Fabric Datastore": ["Status"],
         "Meter Identification": [
@@ -539,19 +548,22 @@
             "OperationalState",
             "OperationalError",
             "CurrentPhase",
-            "CountdownTime"
+            "CountdownTime",
+            "ClusterRevision"
         ],
         "RVC Operational State": [
             "OperationalState",
             "OperationalError",
             "CurrentPhase",
-            "CountdownTime"
+            "CountdownTime",
+            "ClusterRevision"
         ],
         "Oven Cavity Operational State": [
             "OperationalState",
             "OperationalError",
             "CurrentPhase",
-            "CountdownTime"
+            "CountdownTime",
+            "ClusterRevision"
         ],
         "Activated Carbon Filter Monitoring": [
             "Condition",
@@ -750,6 +762,7 @@
             "FeatureMap"
         ],
         "Power Topology": ["FeatureMap"],
+        "Power Source": ["ClusterRevision"],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"],
         "Water Heater Management": [
@@ -816,6 +829,8 @@
             "FeatureMap"
         ],
         "Unit Localization": ["TemperatureUnit"],
+        "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
+        "Localization Configuration": ["ClusterRevision", "SupportedLocales"],
         "TLS Certificate Management": [
             "ClusterRevision",
             "MaxRootCertificates",
@@ -851,5 +866,6 @@
     },
     "uiOptions": {
         "showProfileId": false
-    }
+    },
+    "upgradeRules": "./upgrade-rules-matter.json"
 }
