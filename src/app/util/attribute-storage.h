@@ -346,7 +346,7 @@ chip::app::DataModel::ProviderChangeListener * emberAfGlobalInteractionModelAttr
 ///     receive updated attribute values for a cluster.
 ///
 /// This is a convenience function to make it clear when a `emberAfDataVersionStorage` increase
-/// and a `AttributesChangeListener::MarkDirty` always occur in lock-step.
+/// and a `ProviderChangeListener::MarkDirty` always occur in lock-step.
 void emberAfAttributeChanged(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
                              chip::app::DataModel::ProviderChangeListener * listener);
 
