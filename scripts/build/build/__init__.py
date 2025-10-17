@@ -1,7 +1,9 @@
 import logging
 import os
 import shutil
+import time
 from enum import Enum, auto
+from multiprocessing.pool import ThreadPool
 from typing import Sequence
 
 from builders.builder import BuilderOptions
@@ -11,6 +13,36 @@ from .targets import BUILD_TARGETS
 
 class BuildSteps(Enum):
     GENERATED = auto()
+
+
+class BuildTimer:
+    def __init__(self):
+        self._start_time = None
+        self._build_times = {}
+
+    def __enter__(self):
+        self._start_time = time.time()
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        total_time = time.time() - self._start_time
+        logging.info("Build Time Summary:")
+        for target, duration in self._build_times.items():
+            logging.info(f"  - {target}: {self._format_duration(duration)}")
+        logging.info(f"Total build time: {self._format_duration(total_time)}")
+
+    def time_it(self, name, func):
+        start_time = time.time()
+        func()
+        end_time = time.time()
+        self._build_times[name] = end_time - start_time
+
+    def _format_duration(self, seconds):
+        minutes = int(seconds // 60)
+        remaining_seconds = int(seconds % 60)
+        if minutes > 0:
+            return f"{minutes}m{remaining_seconds}s"
+        return f"{remaining_seconds}s"
 
 
 class Context:
@@ -70,9 +102,14 @@ class Context:
     def Build(self):
         self.Generate()
 
-        for builder in self.builders:
-            logging.info('Building %s', builder.output_dir)
-            builder.build()
+        with BuildTimer() as timer:
+            # Run everything in parallel
+            with ThreadPool(os.cpu_count()) as pool:
+                pool.map(
+                    lambda builder: timer.time_it(
+                        builder.identifier, builder.build),
+                    self.builders
+                )
 
     def CleanOutputDirectories(self):
         for builder in self.builders:
