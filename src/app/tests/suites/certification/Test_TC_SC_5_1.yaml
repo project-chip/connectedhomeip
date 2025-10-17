@@ -171,7 +171,7 @@ tests:
     - label:
           "Step 6a: TH sends ViewGroup command with the GroupID to the Group
           cluster on the DUT on PIXIT.G.ENDPOINT"
-      PICS: G.S.F00 && G.S.C01.Rsp
+      PICS: G.S.F00
       command: "ViewGroup"
       arguments:
           values:
@@ -189,7 +189,7 @@ tests:
     - label:
           "Step 6b: TH sends ViewGroup command with the GroupID to the Group
           cluster on the DUT on PIXIT.G.ENDPOINT"
-      PICS: " !G.S.F00 && G.S.C01.Rsp "
+      PICS: "!(G.S.F00)"
       command: "ViewGroup"
       arguments:
           values:
@@ -251,7 +251,7 @@ tests:
     - label:
           "Step 9a: TH reads GroupTable attribute from GroupKeyManagement
           cluster on DUT using a fabric-filtered read."
-      PICS: G.S.F00 && GRPKEY.S.A0001
+      PICS: G.S.F00
       cluster: "Group Key Management"
       endpoint: 0
       command: "readAttribute"
@@ -269,7 +269,7 @@ tests:
     - label:
           "Step 9b: TH reads GroupTable attribute from GroupKeyManagement
           cluster on DUT using a fabric-filtered read"
-      PICS: " !G.S.F00 && GRPKEY.S.A0001 "
+      PICS: "!(G.S.F00)"
       cluster: "Group Key Management"
       endpoint: 0
       command: "readAttribute"
