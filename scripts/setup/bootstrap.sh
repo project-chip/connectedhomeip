@@ -211,8 +211,8 @@ fi
 #       to figure out why NRF builds do not work when sharing cache between
 #       applications.
 #export CCACHE_NOHASHDIR=1
+#export CCACHE_BASEDIR="$_CHIP_ROOT"
 export CCACHE_PREFIX_CPP="$_CHIP_ROOT/scripts/helpers/ccache-prefix-cpp.sh"
-export CCACHE_BASEDIR="$_CHIP_ROOT"
 
 unset -f _bootstrap_or_activate
 unset -f _install_additional_pip_requirements
