@@ -125,11 +125,11 @@ CHIP_ERROR WiFiPAFDriverDbus::CancelPublish(uint32_t PublishId)
     ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel publish_id: %d ! ", PublishId);
     std::lock_guard<std::mutex> lock(*mWpaSupplicantMutex);
 
-    VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INTERNAL,
+    VerifyOrReturnError(mWpaSupplicant->iface, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "WiFi-PAF: Skip D-Bus 'cancel publish' call since wpa_supplicant is not ready"));
 
     gboolean result =
-        wpa_supplicant_1_interface_call_nancancel_publish_sync(mWpaSupplicant.iface.get(), PublishId, nullptr, &err.GetReceiver());
+        wpa_supplicant_1_interface_call_nancancel_publish_sync(mWpaSupplicant->iface.get(), PublishId, nullptr, &err.GetReceiver());
 
     // TODO #40814: make sure that the callers do check the return values. This doesn't seem to be happening now.
     VerifyOrReturnError(
