@@ -21,8 +21,8 @@
 #include "glib.h"
 #include "lcd.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/data-model/Nullable.h>
 #include <app/clusters/closure-control-server/closure-control-cluster-objects.h>
+#include <app/data-model/Nullable.h>
 
 /**
  * @brief Structure to hold closure data needed for UI display
@@ -39,20 +39,21 @@ public:
     // MainState enum values matching the ClosureControl cluster MainStateEnum
     enum MainState
     {
-        STATE_STOPPED          = 0x00,
-        STATE_MOVING           = 0x01,
+        STATE_STOPPED            = 0x00,
+        STATE_MOVING             = 0x01,
         STATE_WAITING_FOR_MOTION = 0x02,
-        STATE_ERROR            = 0x03,
-        STATE_CALIBRATING      = 0x04,
-        STATE_PROTECTED        = 0x05,
-        STATE_DISENGAGED       = 0x06,
-        STATE_SETUP_REQUIRED   = 0x07,
-        STATE_UNKNOWN          = 0x08,
+        STATE_ERROR              = 0x03,
+        STATE_CALIBRATING        = 0x04,
+        STATE_PROTECTED          = 0x05,
+        STATE_DISENGAGED         = 0x06,
+        STATE_SETUP_REQUIRED     = 0x07,
+        STATE_UNKNOWN            = 0x08,
     };
 
     static void DrawUI(GLIB_Context_t * glibContext);
     static void SetMainState(uint8_t state);
-    static void SetOverallCurrentState(const char * positionText, const char * latchText, const char * secureText, const char * speedText);
+    static void SetOverallCurrentState(const char * positionText, const char * latchText, const char * secureText,
+                                       const char * speedText);
 
 private:
     static void DrawHeader(GLIB_Context_t * glibContext);
@@ -65,8 +66,8 @@ private:
 
     // Static variables to store the current closure state
     static MainState sMainState;
-    static char sPositionText[24];  // "Position: Pedestrian" = 21 chars + null + safety margin
-    static char sLatchText[20];     // "Latch: Engaged" = 14 chars + null + safety margin
-    static char sSecureText[20];    // "Secure: Unknown" = 15 chars + null + safety margin
-    static char sSpeedText[18];     // "Speed: Unknown" = 14 chars + null + safety margin
+    static char sPositionText[24]; // "Position: Pedestrian" = 21 chars + null + safety margin
+    static char sLatchText[20];    // "Latch: Engaged" = 14 chars + null + safety margin
+    static char sSecureText[20];   // "Secure: Unknown" = 15 chars + null + safety margin
+    static char sSpeedText[18];    // "Speed: Unknown" = 14 chars + null + safety margin
 };

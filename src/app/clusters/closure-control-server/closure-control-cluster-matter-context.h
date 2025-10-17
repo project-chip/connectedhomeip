@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
-#include <app/ConcreteAttributePath.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 

@@ -60,10 +60,10 @@ static const uint8_t bleLogo[]          = { BLUETOOTH_ICON_SMALL };
 
 // Static variables to hold the current closure state
 ClosureUI::MainState ClosureUI::sMainState = ClosureUI::STATE_UNKNOWN;
-char ClosureUI::sPositionText[24] = "Position: Unknown";
-char ClosureUI::sLatchText[20] = "Latch: Unknown";
-char ClosureUI::sSecureText[20] = "Secure: Unknown";
-char ClosureUI::sSpeedText[18] = "Speed: Unknown";
+char ClosureUI::sPositionText[24]          = "Position: Unknown";
+char ClosureUI::sLatchText[20]             = "Latch: Unknown";
+char ClosureUI::sSecureText[20]            = "Secure: Unknown";
+char ClosureUI::sSpeedText[18]             = "Speed: Unknown";
 
 #ifdef SL_WIFI
 #define UI_WIFI 1
@@ -109,7 +109,8 @@ void ClosureUI::SetMainState(uint8_t state)
     }
 }
 
-void ClosureUI::SetOverallCurrentState(const char * positionText, const char * latchText, const char * secureText, const char * speedText)
+void ClosureUI::SetOverallCurrentState(const char * positionText, const char * latchText, const char * secureText,
+                                       const char * speedText)
 {
     // Validate input parameters
     if (positionText == nullptr || latchText == nullptr || secureText == nullptr || speedText == nullptr)
@@ -138,10 +139,8 @@ void ClosureUI::DrawHeader(GLIB_Context_t * glibContext)
     // Draw BLE Icon
     GLIB_drawBitmap(glibContext, BLE_ICON_POSITION_X, STATUS_ICON_LINE, BLUETOOTH_ICON_SIZE, BLUETOOTH_ICON_SIZE, bleLogo);
     // Draw WiFi/OpenThread Icon
-    GLIB_drawBitmap(glibContext, NETWORK_ICON_POSITION_X, STATUS_ICON_LINE,
-                    (UI_WIFI) ? WIFI_BITMAP_WIDTH : THREAD_BITMAP_WIDTH,
-                    (UI_WIFI) ? WIFI_BITMAP_HEIGHT : THREAD_BITMAP_HEIGHT,
-                    (UI_WIFI) ? wifiLogo : threadLogo);
+    GLIB_drawBitmap(glibContext, NETWORK_ICON_POSITION_X, STATUS_ICON_LINE, (UI_WIFI) ? WIFI_BITMAP_WIDTH : THREAD_BITMAP_WIDTH,
+                    (UI_WIFI) ? WIFI_BITMAP_HEIGHT : THREAD_BITMAP_HEIGHT, (UI_WIFI) ? wifiLogo : threadLogo);
     // Draw Matter Icon
     GLIB_drawBitmap(glibContext, MATTER_ICON_POSITION_X, STATUS_ICON_LINE, MATTER_LOGO_WIDTH, MATTER_LOGO_HEIGHT, matterLogoBitmap);
 }
@@ -199,8 +198,6 @@ void ClosureUI::DrawOverallCurrentState(GLIB_Context_t * glibContext)
     // Draw speed information
     GLIB_drawStringOnLine(glibContext, sSpeedText, SPEED_DISPLAY_LINE, GLIB_ALIGN_LEFT, 0, 0, true);
 }
-
-
 
 void ClosureUI::DrawFooter(GLIB_Context_t * glibContext)
 {

@@ -163,8 +163,7 @@ void AppTask::UpdateClosureUI()
 
     // Format position text
     const char * positionText = "Position: Unknown";
-    if (!uiData.overallCurrentState.IsNull() &&
-        uiData.overallCurrentState.Value().position.HasValue() &&
+    if (!uiData.overallCurrentState.IsNull() && uiData.overallCurrentState.Value().position.HasValue() &&
         !uiData.overallCurrentState.Value().position.Value().IsNull())
     {
         switch (uiData.overallCurrentState.Value().position.Value().Value())
@@ -192,8 +191,7 @@ void AppTask::UpdateClosureUI()
 
     // Format latch text
     const char * latchText = "Latch: Unknown";
-    if (!uiData.overallCurrentState.IsNull() &&
-        uiData.overallCurrentState.Value().latch.HasValue() &&
+    if (!uiData.overallCurrentState.IsNull() && uiData.overallCurrentState.Value().latch.HasValue() &&
         !uiData.overallCurrentState.Value().latch.Value().IsNull())
     {
         latchText = uiData.overallCurrentState.Value().latch.Value().Value() ? "Latch: Engaged" : "Latch: Released";
@@ -201,16 +199,14 @@ void AppTask::UpdateClosureUI()
 
     // Format secure state text
     const char * secureText = "Secure: Unknown";
-    if (!uiData.overallCurrentState.IsNull() &&
-        !uiData.overallCurrentState.Value().secureState.IsNull())
+    if (!uiData.overallCurrentState.IsNull() && !uiData.overallCurrentState.Value().secureState.IsNull())
     {
         secureText = uiData.overallCurrentState.Value().secureState.Value() ? "Secure: Yes" : "Secure: No";
     }
 
     // Format speed text
     const char * speedText = "Speed: Unknown";
-    if (!uiData.overallCurrentState.IsNull() &&
-        uiData.overallCurrentState.Value().speed.HasValue())
+    if (!uiData.overallCurrentState.IsNull() && uiData.overallCurrentState.Value().speed.HasValue())
     {
         switch (uiData.overallCurrentState.Value().speed.Value())
         {
