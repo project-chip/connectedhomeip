@@ -1,6 +1,6 @@
 # Matter Light Switch Example Application
 
-This reference application implements an light switch device type. You can use
+This reference application implements a light switch device type. You can use
 this example as a reference for creating your own application.
 
 The example is based on:

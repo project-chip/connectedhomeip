@@ -1,6 +1,6 @@
 # Matter Lock Example Application
 
-This reference application implements an lock device type. You can use this
+This reference application implements a lock device type. You can use this
 example as a reference for creating your own application.
 
 The example is based on:

@@ -1,4 +1,4 @@
-# Matter Lighting Example Application
+# Matter All Clusters Example Application
 
 The all-clusters example implements a server which can be accessed by a CHIP
 controller and can accept basic cluster commands. You can use this example as a
