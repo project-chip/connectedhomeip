@@ -213,7 +213,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
         all_lines = None
 
         with open(self.log_file.name, 'rb') as fp:
-            all_lines = fp.log_file.readlines()
+            all_lines = fp.readlines()
 
         found_lines = []
 
