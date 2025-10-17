@@ -767,6 +767,18 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
 
     switch (aPath.mAttributeId)
     {
+    case MinSetpointDeadBand::Id: {
+        int8_t minSetpointDeadBand;
+        ReturnErrorOnFailure(aDecoder.Decode(minSetpointDeadBand));
+        if (minSetpointDeadBand < 0) // || (minSetpointDeadBand > 127): type is int8_t, check is skipped
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+        // Spec requirement: For backwards compatiblity, this attribute is optionally writable. However any
+        // writes to this attribute SHALL be silently ignored.
+        return CHIP_NO_ERROR;
+    }
+    break;
     case RemoteSensing::Id:
         if (localTemperatureNotExposedSupported)
         {
