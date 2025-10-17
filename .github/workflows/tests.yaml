@@ -467,7 +467,7 @@ jobs:
                           key: key,
                           ref: ref
                         });
-                        core.info(`✅ Successfully deleted cache`);
+                        core.info(`Successfully deleted cache`);
                       } catch (e) {
                         if (e.status === 404) {
                           core.info(`Cache not found (first run or already deleted)`);
@@ -985,7 +985,7 @@ jobs:
                           key: key,
                           ref: ref
                         });
-                        core.info(`✅ Successfully deleted cache`);
+                        core.info(`Successfully deleted cache`);
                       } catch (e) {
                         if (e.status === 404) {
                           core.info(`Cache not found (first run or already deleted)`);
