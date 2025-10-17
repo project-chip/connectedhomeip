@@ -32,6 +32,7 @@
 #include <app/MessageDef/StatusIB.h>
 #include <app/WriteHandler.h>
 #include <app/clusters/ota-provider/ota-provider-cluster.h>
+#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/data-model/Decode.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
@@ -312,13 +313,14 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
     return CHIP_ERROR_NOT_FOUND;
 }
 
-void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, Providerchangedlistener * listener)
+void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
+                             chip::app::DataModel::ProviderChangeListener * listener)
 {
     gMockDataVersion++;
     listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
 }
 
-void emberAfEndpointChanged(EndpointId endpoint, ProviderChangedListener * listener)
+void emberAfEndpointChanged(EndpointId endpoint, chip::app::DataModel::ProviderChangeListener * listener)
 {
     listener->MarkDirty(AttributePathParams(endpoint));
 }

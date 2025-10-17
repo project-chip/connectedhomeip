@@ -329,7 +329,7 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
             // TODO: this is awkward since it provides AAI no control over this, specifically
             //       AAI may not want to increase versions for some attributes that are Q
             emberAfAttributeChanged(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
-                                    &mContext->interactionContext);
+                                    &mContext->interactionContext.dataModelChangeListener);
         }
         return *aai_result;
     }
@@ -348,7 +348,7 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
 
     Protocols::InteractionModel::Status status;
     EmberAfWriteDataInput dataInput(dataBuffer.data(), attributeMetadata->attributeType);
-    dataInput.SetChangeListener(&mContext->interactionContext);
+    dataInput.SetChangeListener(&mContext->interactionContext.dataModelChangeListener);
     // TODO: dataInput.SetMarkDirty() should be according to `ChangesOmmited`
 
     if (request.operationFlags.Has(DataModel::OperationFlags::kInternal))
