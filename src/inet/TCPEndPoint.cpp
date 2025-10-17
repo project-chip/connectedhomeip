@@ -322,10 +322,8 @@ CHIP_ERROR TCPEndPoint::DriveSending()
     return err;
 }
 
-void TCPEndPoint::DriveReceiving()
+void TCPEndPoint::DriveReceiving(const TCPEndPointHandle& handle)
 {
-    TCPEndPointHandle handle(this);
-
     // If there's data in the receive queue and the app is ready to receive it then call the app's callback
     // with the entire receive queue.
     if (!mRcvQueue.IsNull() && mReceiveEnabled && OnDataReceived != nullptr)
@@ -426,11 +424,11 @@ void TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
         // Call the appropriate app callback if allowed.
         if (!suppressCallback)
         {
+            TCPEndPointHandle handle(this);
             if (oldState == State::kConnecting)
             {
                 if (OnConnectComplete != nullptr)
                 {
-                    TCPEndPointHandle handle(this);
                     OnConnectComplete(handle, err);
                 }
             }
@@ -438,7 +436,7 @@ void TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
                       oldState == State::kClosing) &&
                      OnConnectionClosed != nullptr)
             {
-                OnConnectionClosed(*this, err);
+                OnConnectionClosed(handle, err);
             }
         }
     }

@@ -891,6 +891,7 @@ void TCPEndPointImplSockets::ReceiveData()
         return;
     }
 
+    TCPEndPointHandle handle(this);
     if (mLastTCPKernelSendQueueLen == 0)
     {
         // If the output queue has been flushed then stop the timer.
@@ -948,7 +949,7 @@ void TCPEndPointImplSockets::ReceiveData()
             // Call the app's OnPeerClose.
             if (OnPeerClose != nullptr)
             {
-                OnPeerClose(*this);
+                OnPeerClose(handle);
             }
         }
 
@@ -978,7 +979,7 @@ void TCPEndPointImplSockets::ReceiveData()
     }
 
     // Drive any received data into the app.
-    DriveReceiving();
+    DriveReceiving(handle);
 }
 
 CHIP_ERROR TCPEndPointImplSockets::HandleIncomingConnection()

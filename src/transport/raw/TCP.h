@@ -290,11 +290,14 @@ private:
 
     // Callback handler for TCPEndPoint. Called when a connection has been closed.
     // @see TCPEndpoint::OnConnectionClosedFunct
-    static void HandleTCPEndPointConnectionClosed(Inet::TCPEndPoint & endPoint, CHIP_ERROR err);
+    static void HandleTCPEndPointConnectionClosed(const Inet::TCPEndPointHandle & endPoint, CHIP_ERROR err);
 
     // Callback handler for TCPEndPoint. Called when a connection is received on the listening port.
     // @see TCPEndpoint::OnConnectionReceivedFunct
     static void HandleIncomingConnection(const Inet::TCPEndPointHandle & listenEndPoint, const Inet::TCPEndPointHandle & endPoint,
+                                         const Inet::IPAddress & peerAddress, uint16_t peerPort);
+
+    CHIP_ERROR DoHandleIncomingConnection(const Inet::TCPEndPointHandle & listenEndPoint, const Inet::TCPEndPointHandle & endPoint,
                                          const Inet::IPAddress & peerAddress, uint16_t peerPort);
 
     // Callback handler for handling accept error
