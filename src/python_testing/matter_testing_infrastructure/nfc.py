@@ -311,13 +311,11 @@ class NFCConnectionManager:
 
 # Main function to set up monitoring and handle tag events
 # it allows testing basic operation without a test.
-
-
-def main():
-    reader = NFCReaderHelper.get_connected_reader()
-    if reader is None:
-        sys.exit(1)
-    NFCReaderHelper(reader)
+#def main():
+#    reader = NFCReaderHelper.get_connected_reader()
+#    if reader is None:
+#        sys.exit(1)
+#    NFCReaderHelper(reader)
     # Example usage: helper.read_t4t_ndef(), etc.
 
 
