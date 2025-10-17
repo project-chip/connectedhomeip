@@ -16,7 +16,6 @@
 #pragma once
 
 #include <platform/silabs/wifi/WifiInterface.h>
-#include <sl_status.h>
 
 namespace chip {
 namespace DeviceLayer {

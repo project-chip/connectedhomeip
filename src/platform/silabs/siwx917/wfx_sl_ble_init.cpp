@@ -21,6 +21,7 @@
  *    limitations under the License.
  */
 
+#include "ble_config.h"
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/silabs/BLEManagerImpl.h>
