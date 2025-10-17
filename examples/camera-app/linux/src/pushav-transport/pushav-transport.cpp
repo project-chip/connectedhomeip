@@ -59,17 +59,23 @@ void PrintTransportSettings(PushAVClipRecorder::ClipInfoStruct clipInfo, PushAVC
     ChipLogProgress(Camera, "=== Clip Configuration ===");
     ChipLogProgress(Camera, "Has Audio: %s", clipInfo.mHasAudio ? "true" : "false");
     ChipLogProgress(Camera, "Has Video: %s", clipInfo.mHasVideo ? "true" : "false");
-    ChipLogProgress(Camera, "Initial Duration: %d sec", clipInfo.mInitialDurationS);
-    ChipLogProgress(Camera, "Augmentation Duration: %d sec", clipInfo.mAugmentationDurationS);
-    ChipLogProgress(Camera, "Max Clip Duration: %d sec", clipInfo.mMaxClipDurationS);
+    ChipLogProgress(Camera, "Session Group: %d", clipInfo.mSessionGroup);
     ChipLogProgress(Camera, "Chunk Duration: %d ms", clipInfo.mChunkDurationMs);
     ChipLogProgress(Camera, "Segment Duration: %d ms", clipInfo.mSegmentDurationMs);
-    ChipLogProgress(Camera, "Blind Duration: %d sec", clipInfo.mBlindDurationS);
     ChipLogProgress(Camera, "PreRoll Length: %d ms", clipInfo.mPreRollLengthMs);
     ChipLogProgress(Camera, "URL: %s", clipInfo.mUrl.c_str());
     ChipLogProgress(Camera, "Trigger Type: %d", clipInfo.mTriggerType);
     ChipLogProgress(Camera, "Output Path: %s", clipInfo.mOutputPath.c_str());
+    ChipLogProgress(Camera, "Track Name: %s", clipInfo.mTrackName.c_str());
     ChipLogProgress(Camera, "Input Time Base: %d/%d", clipInfo.mInputTimeBase.num, clipInfo.mInputTimeBase.den);
+    // Time control parameters are only passed during transport allocation for motion triggers.
+    if (clipInfo.mTriggerType == 1)
+    {
+        ChipLogProgress(Camera, "Initial Duration: %d sec", clipInfo.mInitialDurationS);
+        ChipLogProgress(Camera, "Augmentation Duration: %d sec", clipInfo.mAugmentationDurationS);
+        ChipLogProgress(Camera, "Max Clip Duration: %d sec", clipInfo.mMaxClipDurationS);
+        ChipLogProgress(Camera, "Blind Duration: %d sec", clipInfo.mBlindDurationS);
+    }
 
     ChipLogProgress(Camera, "=== Audio Configuration ===");
     ChipLogProgress(Camera, "Codec: %s", GetAudioCodecName(audioInfo.mAudioCodecId));
@@ -96,8 +102,7 @@ void PushAVTransport::ConfigureRecorderTimeSetting(
     mClipInfo.mMaxClipDurationS      = timeControl.maxDuration;
     mClipInfo.mBlindDurationS        = timeControl.blindDuration;
     mClipInfo.mElapsedTimeS          = 0;
-
-    ChipLogDetail(Camera, "PushAVTransport ConfigureRecorderTimeSetting done");
+    ChipLogDetail(Camera, "=== PushAVTransport ConfigureRecorderTimeSetting ===");
     ChipLogDetail(Camera, "Initial Duration: %d sec", mClipInfo.mInitialDurationS);
     ChipLogDetail(Camera, "Augmentation Duration: %d sec", mClipInfo.mAugmentationDurationS);
     ChipLogDetail(Camera, "Max Clip Duration: %d sec", mClipInfo.mMaxClipDurationS);
@@ -134,7 +139,8 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
     if (transportOptions.containerOptions.CMAFContainerOptions.HasValue())
     {
         mClipInfo.mSessionGroup      = transportOptions.containerOptions.CMAFContainerOptions.Value().sessionGroup;
-        mClipInfo.mTrackName         = std::string(transportOptions.containerOptions.CMAFContainerOptions.Value().trackName.data());
+        mClipInfo.mTrackName         = std::string(transportOptions.containerOptions.CMAFContainerOptions.Value().trackName.data(),
+                                                   transportOptions.containerOptions.CMAFContainerOptions.Value().trackName.size());
         mClipInfo.mChunkDurationMs   = transportOptions.containerOptions.CMAFContainerOptions.Value().chunkDuration;
         mClipInfo.mSegmentDurationMs = transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration;
     }
