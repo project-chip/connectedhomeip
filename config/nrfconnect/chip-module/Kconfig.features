@@ -103,6 +103,7 @@ config BT_BONDABLE
 	default n
 
 config BT_RX_STACK_SIZE
+	default 2560 if SOC_SERIES_NRF54LX
 	default 1536
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
