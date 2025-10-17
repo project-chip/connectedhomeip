@@ -57,7 +57,6 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         super().__init__(*args, **kwargs)
         self.endpoint = 0
 
-    # Instead of hardcoding UnitTesting.TimedWriteBoolean, we will try to find real timed-write attributes
     async def find_timed_write_attribute(
         self, endpoints_data: dict[int, Any]
     ) -> tuple[Optional[int], Optional[type[ClusterObjects.ClusterAttributeDescriptor]]]:
@@ -221,8 +220,8 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         // Reference: https://github.com/project-chip/connectedhomeip/issues/41227
 
         # Check if NodeLabel attribute exists for step 4 (SuppressResponse tests)
+        self.step(4)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
-            self.step(4)
             '''
             TH sends the WriteRequestMessage to the DUT to modify the value of one attribute and Set SuppressResponse to True.
             On the TH verify that the DUT does not send a Write Response message with a success back to the TH.
@@ -257,12 +256,10 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             asserts.assert_equal(actual_value, test_value,
                                  f"Attribute should be written. Expected {test_value}, got {actual_value}")
 
-        else:
-            self.skip_step(4)
         """
         # Check if NodeLabel attribute exists for steps 5 and 6 (DataVersion test steps)
+        self.step(5)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
-            self.step(5)
             '''
             TH sends a ReadRequest message to the DUT to read any attribute on any cluster.
             DUT returns with a report data action with the attribute values and the dataversion of the cluster.
@@ -297,7 +294,8 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             asserts.assert_equal(actual_value, new_value0,
                                  f"Read value {actual_value} should match written value {new_value0}")
 
-            self.step(6)
+        self.step(6)
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
             '''
             TH sends a ReadRequest message to the DUT to read any attribute on any cluster.
             DUT returns with a report data action with the attribute values and the dataversion of the cluster.
@@ -338,8 +336,6 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             # Created following follow-up task for the event that the node label attribute does not exist
             # TODO: https://github.com/project-chip/matter-test-scripts/issues/693
             logging.info("NodeLabel not found - this may be a non-commissionable device")
-            self.skip_step(5)
-            self.skip_step(6)
 
         endpoint_id, timed_attr = await self.find_timed_write_attribute(self.endpoints)
         if timed_attr:
