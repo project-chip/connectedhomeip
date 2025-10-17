@@ -32,7 +32,7 @@ class Esp32App(Enum):
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
     ENERGY_GATEWAY = auto()
-    ENERGY_MANAGEMENT = auto()
+    EVSE = auto()
     LIGHT = auto()
     LOCK = auto()
     SHELL = auto()
@@ -50,8 +50,8 @@ class Esp32App(Enum):
             return 'examples/all-clusters-minimal-app'
         if self == Esp32App.ENERGY_GATEWAY:
             return 'examples/energy-gateway-app'
-        if self == Esp32App.ENERGY_MANAGEMENT:
-            return 'examples/energy-management-app'
+        if self == Esp32App.EVSE:
+            return 'examples/evse-app'
         if self == Esp32App.LIGHT:
             return 'examples/lighting-app'
         if self == Esp32App.LOCK:
@@ -78,8 +78,8 @@ class Esp32App(Enum):
             return 'chip-all-clusters-minimal-app'
         if self == Esp32App.ENERGY_GATEWAY:
             return 'chip-energy-gateway-app'
-        if self == Esp32App.ENERGY_MANAGEMENT:
-            return 'chip-energy-management-app'
+        if self == Esp32App.EVSE:
+            return 'chip-evse-app'
         if self == Esp32App.LIGHT:
             return 'chip-lighting-app'
         if self == Esp32App.LOCK:

@@ -17,8 +17,8 @@ the [CI](./ci_testing).
 
 There are two main integration test types:
 
--   [YAML](./yaml.md)
--   [Python framework](./python.md)
+- [YAML](./yaml.md)
+- [Python framework](./python.md)
 
 YAML is a human-readable serialization language that uses structured tags to
 define test steps. Tests are defined in YAML, and parsed and run through a
@@ -34,16 +34,16 @@ testing, locally for the purposes of development and in the CI for the SDK. The
 appropriate test framework to use is whatever lets you automate your tests in a
 way that is understandable, readable, and has the features you need
 
--   YAML
-    -   pros: more readable, simpler to write, easy for ATLs to parse and
-        understand
-    -   cons: conditionals are harder (not all supported), no branch control,
-        schema not well documented
--   python
-    -   pros: full programming language, full control API with support for core
-        (certs, commissioning, etc), less plumbing if you need to add features,
-        can use python libraries
-    -   cons: more complex, can be harder to read
+- YAML
+    - pros: more readable, simpler to write, easy for ATLs to parse and
+      understand
+    - cons: conditionals are harder (not all supported), no branch control,
+      schema not well documented
+- python
+    - pros: full programming language, full control API with support for core
+      (certs, commissioning, etc), less plumbing if you need to add features,
+      can use python libraries
+    - cons: more complex, can be harder to read
 
 ## Running integration tests locally
 
@@ -96,7 +96,7 @@ scripts/tests/run_test_suite.py run --help-paths
   kind: app
 - key: energy-gateway
   kind: app
-- key: energy-management
+- key: evse
   kind: app
 - key: fabric-bridge
   kind: app

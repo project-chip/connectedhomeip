@@ -192,7 +192,7 @@
 # Run 7: Tests CASE connection using manual discriminator and passcode (12.1 only)
 # Run 8: Tests reusing storage from run7 (i.e. factory-reset=false)
 # Run 9: Test using the generated attribute wildcard file from previous run
-# Run 10: Tests against energy-management-app
+# Run 10: Tests against evse app
 # Run 11: Tests against lit-icd app
 # Run 12: Tests against microwave-oven app
 # Run 13: Tests against chip-rvc app

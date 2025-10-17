@@ -19,12 +19,12 @@ rather than the SDK GitHub issues.
 
 ### Google Integration
 
--   General integration link: <https://developers.home.google.com/matter>
--   Support via the communities areas:
-    -   Stack overflow:
-        <https://stackoverflow.com/questions/tagged/google-smart-home>
-    -   Google Nest Community:
-        <https://www.googlenestcommunity.com/t5/Smart-Home-Developer-Forum/bd-p/Smart-Home-Developer-Forum>
+- General integration link: <https://developers.home.google.com/matter>
+- Support via the communities areas:
+    - Stack overflow:
+      <https://stackoverflow.com/questions/tagged/google-smart-home>
+    - Google Nest Community:
+      <https://www.googlenestcommunity.com/t5/Smart-Home-Developer-Forum/bd-p/Smart-Home-Developer-Forum>
 
 ### Apple Integration
 
@@ -42,9 +42,9 @@ Zbkarsky to ensure it is noticed by the right people
 
 Some items are explicitly not maintained currently
 
--   Windows integration: no official maintainer for this so currently not
-    supported
--   Old compiler support: CHIP requires a C++17 or higher compiler.
+- Windows integration: no official maintainer for this so currently not
+  supported
+- Old compiler support: CHIP requires a C++17 or higher compiler.
 
 ## Platform maintainers
 
@@ -110,7 +110,7 @@ types or functionality) as well as individual examples.
 | `examples/contact-sensor-app`                  |                              | UNMAINTAINED |
 | `examples/darwin-framework-tool`               | Boris Zbarsky                |              |
 | `examples/dishwasher-app`                      |                              | UNMAINTAINED |
-| `examples/energy-management-app`               | James Harrow                 |              |
+| `examples/evse-app`                            | James Harrow                 |              |
 | `examples/fabric-admin`                        | Yufeng Wang, Terence Hampson |              |
 | `examples/fabric-bridge-app`                   | Yufeng Wang, Terence Hampson |              |
 | `examples/java-matter-controller`              | Yunhan Wang, Yufeng Wang     |              |
