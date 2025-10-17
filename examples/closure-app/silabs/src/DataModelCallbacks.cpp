@@ -56,7 +56,7 @@ void MatterClosureControlClusterServerAttributeChangedCallback(const app::Concre
     ChipLogProgress(Zcl, "Closure attribute change 0x%08lX on endpoint %d ", attributePath.mAttributeId, attributePath.mEndpointId);
 #ifdef DISPLAY_ENABLED
     using namespace chip::app::Clusters::ClosureControl::Attributes;
-    
+
     // Update UI only for attributes we display
     switch (attributePath.mAttributeId)
     {

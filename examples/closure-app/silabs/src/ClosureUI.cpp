@@ -40,7 +40,7 @@
 
 // Icon sizes
 #define SILABS_LOGO_WIDTH 47
-#define SILABS_LOGO_HEIGHT 18  
+#define SILABS_LOGO_HEIGHT 18
 #define BLUETOOTH_ICON_SIZE 18
 
 // State display positions
@@ -80,7 +80,7 @@ void ClosureUI::DrawUI(GLIB_Context_t * glibContext)
     }
 
     GLIB_clear(glibContext);
-    
+
     DrawHeader(glibContext);
     DrawMainState(glibContext);
     DrawOverallCurrentState(glibContext);
@@ -117,16 +117,16 @@ void ClosureUI::SetOverallCurrentState(const char * positionText, const char * l
         SILABS_LOG("ClosureUI: Null parameter in SetOverallCurrentState");
         return;
     }
-    
+
     strncpy(sPositionText, positionText, sizeof(sPositionText) - 1);
     sPositionText[sizeof(sPositionText) - 1] = '\0';
-    
+
     strncpy(sLatchText, latchText, sizeof(sLatchText) - 1);
     sLatchText[sizeof(sLatchText) - 1] = '\0';
-    
+
     strncpy(sSecureText, secureText, sizeof(sSecureText) - 1);
     sSecureText[sizeof(sSecureText) - 1] = '\0';
-    
+
     strncpy(sSpeedText, speedText, sizeof(sSpeedText) - 1);
     sSpeedText[sizeof(sSpeedText) - 1] = '\0';
 }
@@ -138,9 +138,9 @@ void ClosureUI::DrawHeader(GLIB_Context_t * glibContext)
     // Draw BLE Icon
     GLIB_drawBitmap(glibContext, BLE_ICON_POSITION_X, STATUS_ICON_LINE, BLUETOOTH_ICON_SIZE, BLUETOOTH_ICON_SIZE, bleLogo);
     // Draw WiFi/OpenThread Icon
-    GLIB_drawBitmap(glibContext, NETWORK_ICON_POSITION_X, STATUS_ICON_LINE, 
+    GLIB_drawBitmap(glibContext, NETWORK_ICON_POSITION_X, STATUS_ICON_LINE,
                     (UI_WIFI) ? WIFI_BITMAP_WIDTH : THREAD_BITMAP_WIDTH,
-                    (UI_WIFI) ? WIFI_BITMAP_HEIGHT : THREAD_BITMAP_HEIGHT, 
+                    (UI_WIFI) ? WIFI_BITMAP_HEIGHT : THREAD_BITMAP_HEIGHT,
                     (UI_WIFI) ? wifiLogo : threadLogo);
     // Draw Matter Icon
     GLIB_drawBitmap(glibContext, MATTER_ICON_POSITION_X, STATUS_ICON_LINE, MATTER_LOGO_WIDTH, MATTER_LOGO_HEIGHT, matterLogoBitmap);
@@ -149,7 +149,7 @@ void ClosureUI::DrawHeader(GLIB_Context_t * glibContext)
 void ClosureUI::DrawMainState(GLIB_Context_t * glibContext)
 {
     const char * stateText = "";
-    
+
     switch (sMainState)
     {
     case STATE_STOPPED:
@@ -181,7 +181,7 @@ void ClosureUI::DrawMainState(GLIB_Context_t * glibContext)
         stateText = "State: Unknown";
         break;
     }
-    
+
     GLIB_drawStringOnLine(glibContext, stateText, STATE_DISPLAY_LINE, GLIB_ALIGN_CENTER, 0, 0, true);
 }
 
@@ -189,13 +189,13 @@ void ClosureUI::DrawOverallCurrentState(GLIB_Context_t * glibContext)
 {
     // Draw position information
     GLIB_drawStringOnLine(glibContext, sPositionText, POSITION_DISPLAY_LINE, GLIB_ALIGN_LEFT, 0, 0, true);
-    
+
     // Draw latch information
     GLIB_drawStringOnLine(glibContext, sLatchText, LATCH_DISPLAY_LINE, GLIB_ALIGN_LEFT, 0, 0, true);
-    
+
     // Draw secure state information
     GLIB_drawStringOnLine(glibContext, sSecureText, SECURE_DISPLAY_LINE, GLIB_ALIGN_LEFT, 0, 0, true);
-    
+
     // Draw speed information
     GLIB_drawStringOnLine(glibContext, sSpeedText, SPEED_DISPLAY_LINE, GLIB_ALIGN_LEFT, 0, 0, true);
 }

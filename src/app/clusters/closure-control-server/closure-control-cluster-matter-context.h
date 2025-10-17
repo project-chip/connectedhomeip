@@ -40,11 +40,11 @@ public:
     MatterContext(EndpointId endpointId) : mEndpointId(endpointId) {}
     virtual ~MatterContext() = default;
 
-    virtual void MarkDirty(AttributeId attributeId) 
-    { 
+    virtual void MarkDirty(AttributeId attributeId)
+    {
         // Trigger reporting for subscriptions
         MatterReportingAttributeChangeCallback(mEndpointId, Id, attributeId);
-        
+
         // Trigger UI updates directly
         ConcreteAttributePath attributePath(mEndpointId, Id, attributeId);
         ::MatterClosureControlClusterServerAttributeChangedCallback(attributePath);

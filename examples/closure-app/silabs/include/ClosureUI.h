@@ -27,7 +27,7 @@
 /**
  * @brief Structure to hold closure data needed for UI display
  */
-struct ClosureUIData 
+struct ClosureUIData
 {
     chip::app::Clusters::ClosureControl::MainStateEnum mainState;
     chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::GenericOverallCurrentState> overallCurrentState;
@@ -62,7 +62,7 @@ private:
     static void DrawStateIcon(GLIB_Context_t * glibContext, MainState state);
     static void DrawFont(GLIB_Context_t * glibContext, uint8_t initial_x, uint8_t initial_y, uint8_t width, uint8_t * data,
                          uint32_t size);
-    
+
     // Static variables to store the current closure state
     static MainState sMainState;
     static char sPositionText[24];  // "Position: Pedestrian" = 21 chars + null + safety margin

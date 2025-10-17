@@ -148,23 +148,23 @@ void AppTask::UpdateClosureUI()
 {
 #ifdef DISPLAY_ENABLED
     ClosureManager & closureManager = ClosureManager::GetInstance();
-    
+
     // Lock ChipStack for thread-safe cluster data access
     DeviceLayer::PlatformMgr().LockChipStack();
-    
+
     // Get UI-specific data from ClosureManager
     auto uiData = closureManager.GetClosureUIData();
-    
+
     // Unlock ChipStack as UI updates don't need cluster access
     DeviceLayer::PlatformMgr().UnlockChipStack();
-    
+
     // Set main state in UI
     ClosureUI::SetMainState(static_cast<uint8_t>(uiData.mainState));
-    
+
     // Format position text
     const char * positionText = "Position: Unknown";
-    if (!uiData.overallCurrentState.IsNull() && 
-        uiData.overallCurrentState.Value().position.HasValue() && 
+    if (!uiData.overallCurrentState.IsNull() &&
+        uiData.overallCurrentState.Value().position.HasValue() &&
         !uiData.overallCurrentState.Value().position.Value().IsNull())
     {
         switch (uiData.overallCurrentState.Value().position.Value().Value())
@@ -189,27 +189,27 @@ void AppTask::UpdateClosureUI()
             break;
         }
     }
-    
-    // Format latch text  
+
+    // Format latch text
     const char * latchText = "Latch: Unknown";
-    if (!uiData.overallCurrentState.IsNull() && 
-        uiData.overallCurrentState.Value().latch.HasValue() && 
+    if (!uiData.overallCurrentState.IsNull() &&
+        uiData.overallCurrentState.Value().latch.HasValue() &&
         !uiData.overallCurrentState.Value().latch.Value().IsNull())
     {
         latchText = uiData.overallCurrentState.Value().latch.Value().Value() ? "Latch: Engaged" : "Latch: Released";
     }
-    
+
     // Format secure state text
     const char * secureText = "Secure: Unknown";
-    if (!uiData.overallCurrentState.IsNull() && 
+    if (!uiData.overallCurrentState.IsNull() &&
         !uiData.overallCurrentState.Value().secureState.IsNull())
     {
         secureText = uiData.overallCurrentState.Value().secureState.Value() ? "Secure: Yes" : "Secure: No";
     }
-    
+
     // Format speed text
     const char * speedText = "Speed: Unknown";
-    if (!uiData.overallCurrentState.IsNull() && 
+    if (!uiData.overallCurrentState.IsNull() &&
         uiData.overallCurrentState.Value().speed.HasValue())
     {
         switch (uiData.overallCurrentState.Value().speed.Value())
@@ -231,7 +231,7 @@ void AppTask::UpdateClosureUI()
             break;
         }
     }
-    
+
     ClosureUI::SetOverallCurrentState(positionText, latchText, secureText, speedText);
 
 #ifdef SL_WIFI
