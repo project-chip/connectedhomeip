@@ -595,7 +595,7 @@ protected:
 
     CHIP_ERROR DriveSending();
     // Take in a handle to self to guarantee this sticks around until we're done
-    void DriveReceiving(const TCPEndPointHandle& handle);
+    void DriveReceiving(const TCPEndPointHandle & handle);
     void HandleConnectComplete(CHIP_ERROR err);
     void HandleAcceptError(CHIP_ERROR err);
     void DoClose(CHIP_ERROR err, bool suppressCallback);

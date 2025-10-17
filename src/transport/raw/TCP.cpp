@@ -617,12 +617,13 @@ void TCPBase::HandleIncomingConnection(const Inet::TCPEndPointHandle & listenEnd
                                        const Inet::IPAddress & peerAddress, uint16_t peerPort)
 {
     TCPBase * tcp = reinterpret_cast<TCPBase *>(listenEndPoint->mAppState);
-    ReturnAndLogOnFailure(tcp->DoHandleIncomingConnection(listenEndPoint, endPoint, peerAddress, peerPort),
-        Inet, "Failure accepting incoming connection");
+    ReturnAndLogOnFailure(tcp->DoHandleIncomingConnection(listenEndPoint, endPoint, peerAddress, peerPort), Inet,
+                          "Failure accepting incoming connection");
 }
 
-CHIP_ERROR TCPBase::DoHandleIncomingConnection(const Inet::TCPEndPointHandle & listenEndPoint, const Inet::TCPEndPointHandle & endPoint,
-                                       const Inet::IPAddress & peerAddress, uint16_t peerPort)
+CHIP_ERROR TCPBase::DoHandleIncomingConnection(const Inet::TCPEndPointHandle & listenEndPoint,
+                                               const Inet::TCPEndPointHandle & endPoint, const Inet::IPAddress & peerAddress,
+                                               uint16_t peerPort)
 {
     PeerAddress addr;
     ReturnErrorOnFailure(GetPeerAddress(*endPoint, addr));
@@ -634,7 +635,7 @@ CHIP_ERROR TCPBase::DoHandleIncomingConnection(const Inet::TCPEndPointHandle & l
 
     auto connectionCleanup = ScopeExit([&]() { activeConnection->Free(); });
 
-    endPoint->mAppState = this;
+    endPoint->mAppState          = this;
     endPoint->OnDataReceived     = HandleTCPEndPointDataReceived;
     endPoint->OnDataSent         = nullptr;
     endPoint->OnConnectionClosed = HandleTCPEndPointConnectionClosed;

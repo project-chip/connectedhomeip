@@ -653,7 +653,8 @@ void TCPEndPointImplLwIP::HandleDataSent(uint16_t lenSent)
 void TCPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && buf)
 {
     // Only receive new data while in the Connected or SendShutdown states.
-    if (mState != State::kConnected && mState != State::kSendShutdown) {
+    if (mState != State::kConnected && mState != State::kSendShutdown)
+    {
         return;
     }
 

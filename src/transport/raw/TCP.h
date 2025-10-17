@@ -298,7 +298,7 @@ private:
                                          const Inet::IPAddress & peerAddress, uint16_t peerPort);
 
     CHIP_ERROR DoHandleIncomingConnection(const Inet::TCPEndPointHandle & listenEndPoint, const Inet::TCPEndPointHandle & endPoint,
-                                         const Inet::IPAddress & peerAddress, uint16_t peerPort);
+                                          const Inet::IPAddress & peerAddress, uint16_t peerPort);
 
     // Callback handler for handling accept error
     // @see TCPEndpoint::OnAcceptErrorFunct

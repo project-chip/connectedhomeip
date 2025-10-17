@@ -322,7 +322,7 @@ CHIP_ERROR TCPEndPoint::DriveSending()
     return err;
 }
 
-void TCPEndPoint::DriveReceiving(const TCPEndPointHandle& handle)
+void TCPEndPoint::DriveReceiving(const TCPEndPointHandle & handle)
 {
     // If there's data in the receive queue and the app is ready to receive it then call the app's callback
     // with the entire receive queue.
