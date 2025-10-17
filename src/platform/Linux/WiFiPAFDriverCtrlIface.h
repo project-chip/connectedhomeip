@@ -42,13 +42,13 @@ class WiFiPAFDriverCtrlIface : public WiFiPAFDriver
 {
 public:
     ~WiFiPAFDriverCtrlIface() override {}
-    virtual CHIP_ERROR Initialize();
-    virtual CHIP_ERROR Publish(std::unique_ptr<uint16_t[]> freq_list, uint16_t freq_list_len);
-    virtual CHIP_ERROR CancelPublish(uint32_t PublishId);
-    virtual CHIP_ERROR Subscribe(const uint16_t & connDiscriminator, uint16_t mApFreq);
-    virtual CHIP_ERROR CancelSubscribe(uint32_t SubscribeId);
-    virtual CHIP_ERROR Send(const WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msgBuf);
-    virtual CHIP_ERROR Shutdown(uint32_t id, WiFiPAF::WiFiPafRole role);
+    CHIP_ERROR Initialize() override;
+    CHIP_ERROR Publish(std::unique_ptr<uint16_t[]> freq_list, uint16_t freq_list_len) override;
+    CHIP_ERROR CancelPublish(uint32_t PublishId) override;
+    CHIP_ERROR Subscribe(const uint16_t & connDiscriminator, uint16_t mApFreq) override;
+    CHIP_ERROR CancelSubscribe(uint32_t SubscribeId) override;
+    CHIP_ERROR Send(const WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msgBuf) override;
+    CHIP_ERROR Shutdown(uint32_t id, WiFiPAF::WiFiPafRole role) override;
 
 private:
     const std::string kCtrlIfacePath = std::string(WIFIPAF_CTRL_IFACE_PATH);
