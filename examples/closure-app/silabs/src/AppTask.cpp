@@ -160,10 +160,9 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
         // Check if an action is already in progress
         if (ClosureManager::GetInstance().IsClosureControlMotionInProgress())
         {
-            SILABS_LOG("Action is already in progress or active.");
             // Stop the current action
             auto status = ClosureManager::GetInstance().OnStopCommand();
-            if (status != chip::Protocols::InteractionModel::Status::Success)
+            if (status != Protocols::InteractionModel::Status::Success)
             {
                 SILABS_LOG("Failed to stop closure action");
             }
@@ -172,43 +171,42 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
         {
             // Fetch the complete current state of closure with proper locking
             chip::DeviceLayer::PlatformMgr().LockChipStack();
-
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::GenericOverallCurrentState> currentState;
+            DataModel::Nullable<ClosureControl::GenericOverallCurrentState> currentState;
             CHIP_ERROR err = ClosureManager::GetInstance().GetClosureControlCurrentState(currentState);
+            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
             if (err != CHIP_NO_ERROR || currentState.IsNull() || !currentState.Value().position.HasValue() ||
                 currentState.Value().position.Value().IsNull())
             {
-                chip::DeviceLayer::PlatformMgr().UnlockChipStack();
                 SILABS_LOG("Failed to get current closure state");
                 return;
             }
 
             // Get current position and determine target position (toggle)
             auto currentPosition = currentState.Value().position.Value().Value();
-            chip::app::Clusters::ClosureControl::TargetPositionEnum targetPosition =
-                (currentPosition == chip::app::Clusters::ClosureControl::CurrentPositionEnum::kFullyOpened)
-                ? chip::app::Clusters::ClosureControl::TargetPositionEnum::kMoveToFullyClosed
-                : chip::app::Clusters::ClosureControl::TargetPositionEnum::kMoveToFullyOpen;
+            ClosureControl::TargetPositionEnum targetPosition =
+                (currentPosition == ClosureControl::CurrentPositionEnum::kFullyOpened)
+                ? ClosureControl::TargetPositionEnum::kMoveToFullyClosed
+                : ClosureControl::TargetPositionEnum::kMoveToFullyOpen;
 
             // Get latch and speed from current state to preserve them in target state
-            chip::Optional<bool> latch = chip::NullOptional;
+            Optional<bool> latch = chip::NullOptional;
             if (currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull())
             {
-                latch = chip::MakeOptional(currentState.Value().latch.Value().Value());
+                latch = MakeOptional(currentState.Value().latch.Value().Value());
             }
 
-            chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> speed = chip::NullOptional;
+            Optional<Globals::ThreeLevelAutoEnum> speed = NullOptional;
             if (currentState.Value().speed.HasValue())
             {
                 speed = chip::MakeOptional(currentState.Value().speed.Value());
             }
 
-            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+            
 
             // Move to the target position with preserved latch and speed values
-            auto status = ClosureManager::GetInstance().OnMoveToCommand(chip::MakeOptional(targetPosition), latch, speed);
-            if (status != chip::Protocols::InteractionModel::Status::Success)
+            auto status = ClosureManager::GetInstance().OnMoveToCommand(MakeOptional(targetPosition), latch, speed);
+            if (status != Protocols::InteractionModel::Status::Success)
             {
                 SILABS_LOG("Failed to move closure to target position");
             }
