@@ -21,6 +21,7 @@ import subprocess
 import sys
 import threading
 import typing
+from dataclasses import dataclass
 import pathlib
 
 
