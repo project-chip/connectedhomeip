@@ -331,3 +331,6 @@
 	url = https://github.com/awslabs/amazon-kinesis-video-streams-webrtc-sdk-c
 	platforms = esp32
 	recursive = true
+[submodule "third_party/hostap/repo"]
+	path = third_party/hostap/repo
+	url = https://w1.fi/hostap.git
