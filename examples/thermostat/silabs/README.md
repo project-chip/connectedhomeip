@@ -80,7 +80,7 @@ Silicon Labs platform.
 -   Supported hardware:
 
     -   > For the latest supported hardware please refer to the
-        > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-overview/#hardware-requirements)
+        > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
         > in the Silicon Labs Matter Documentation
 
     MG24 boards :
