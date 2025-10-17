@@ -656,32 +656,42 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     if not commissioning_method:
         return True
 
-    if len(config.dut_node_ids) > len(device_descriptors):
-        print("error: More node IDs provided than discriminators")
-        return False
+    # Skip discriminator/setup-pincode/QR-code/manual-code validation only for NFC in-test commissioning
+    skip_nfc_intest_commission_data_validation = (args.in_test_commissioning_method is not None and
+                                  'nfc' in args.in_test_commissioning_method)
 
-    if len(config.dut_node_ids) < len(device_descriptors):
-        # We generate new node IDs sequentially from the last one seen for all
-        # missing NodeIDs when commissioning many nodes at once.
-        missing = len(device_descriptors) - len(config.dut_node_ids)
-        for i in range(missing):
-            config.dut_node_ids.append(config.dut_node_ids[-1] + 1)
+    if not skip_nfc_intest_commission_data_validation:
+        if len(config.dut_node_ids) > len(device_descriptors):
+            print("error: More node IDs provided than discriminators")
+            return False
 
-    if len(config.dut_node_ids) != len(set(config.dut_node_ids)):
-        print("error: Duplicate values in node id list")
-        return False
+        if len(config.dut_node_ids) < len(device_descriptors):
+            # We generate new node IDs sequentially from the last one seen for all
+            # missing NodeIDs when commissioning many nodes at once.
+            missing = len(device_descriptors) - len(config.dut_node_ids)
+            for i in range(missing):
+                config.dut_node_ids.append(config.dut_node_ids[-1] + 1)
 
-    if len(config.discriminators) != len(set(config.discriminators)):
-        print("error: Duplicate value in discriminator list")
-        return False
+        if len(config.dut_node_ids) != len(set(config.dut_node_ids)):
+            print("error: Duplicate values in node id list")
+            return False
 
-    if args.discriminators == [] and (args.qr_code == [] and args.manual_code == []):
-        print("error: Missing --discriminator when no --qr-code/--manual-code present!")
-        return False
+        if len(config.discriminators) != len(set(config.discriminators)):
+            print("error: Duplicate value in discriminator list")
+            return False
 
-    if args.passcodes == [] and (args.qr_code == [] and args.manual_code == []):
-        print("error: Missing --passcode when no --qr-code/--manual-code present!")
-        return False
+        if args.discriminators == [] and (args.qr_code == [] and args.manual_code == []):
+            print("error: Missing --discriminator when no --qr-code/--manual-code present!")
+            return False
+
+        if args.passcodes == [] and (args.qr_code == [] and args.manual_code == []):
+            print("error: Missing --passcode when no --qr-code/--manual-code present!")
+            return False
+    else:
+        # For NFC in-test commissioning, we still need to ensure node IDs are unique if provided
+        if len(config.dut_node_ids) != len(set(config.dut_node_ids)):
+            print("error: Duplicate values in node id list")
+            return False
 
     wifi_args = ['ble-wifi']
     thread_args = ['ble-thread', 'nfc-thread']
