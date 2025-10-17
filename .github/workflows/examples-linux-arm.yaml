@@ -27,7 +27,9 @@ concurrency:
     cancel-in-progress: true
 
 env:
+    CCACHE_NOHASHDIR: 1
     CHIP_NO_LOG_TIMESTAMPS: true
+    CHIP_PW_COMMAND_LAUNCHER: ccache
 
 jobs:
     arm_crosscompile:
@@ -67,3 +69,6 @@ jobs:
                         --target linux-arm64-camera-clang \
                         build \
                      "
+
+            - name: CCache statistics
+              run: ccache --show-stats
