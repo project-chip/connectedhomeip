@@ -205,7 +205,8 @@ CHIP_ERROR WiFiPAFDriverCtrlIface::Publish(std::unique_ptr<uint16_t[]> freq_list
     VerifyOrDie(DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(PafPublish_ssi.DevInfo) == CHIP_NO_ERROR);
 
     std::ostringstream oss;
-    oss << "NAN_PUBLISH " << "srv_name=" << srv_name << " srv_proto_type=" << srv_proto_type << " ttl=" << ttl << " freq=" << freq
+    oss << "NAN_PUBLISH "
+        << "srv_name=" << srv_name << " srv_proto_type=" << srv_proto_type << " ttl=" << ttl << " freq=" << freq
         << " ssi=" << std::hex << std::setfill('0') // hex output, zero-padded
         << std::setw(2) << static_cast<int>(PafPublish_ssi.DevOpCode) << std::setw(4) << htons(PafPublish_ssi.DevInfo)
         << std::setw(4) << htons(PafPublish_ssi.ProductId) << std::setw(4) << htons(PafPublish_ssi.VendorId) << " freq_list=";
@@ -390,8 +391,8 @@ CHIP_ERROR WiFiPAFDriverCtrlIface::Subscribe(const uint16_t & connDiscriminator,
 
     std::ostringstream oss;
 
-    oss << "NAN_SUBSCRIBE " << "service_name=" << srv_name << " srv_proto_type=" << srv_proto_type << " active=" << is_active
-        << " ttl=" << ttl
+    oss << "NAN_SUBSCRIBE "
+        << "service_name=" << srv_name << " srv_proto_type=" << srv_proto_type << " active=" << is_active << " ttl=" << ttl
 #if !CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF_HOSTAPD
         << " freq=" << freq
 #endif
@@ -480,8 +481,8 @@ CHIP_ERROR WiFiPAFDriverCtrlIface::Send(const WiFiPAF::WiFiPAFSession & TxInfo, 
     auto ssi_str = oss_ssi.str();
 
     std::ostringstream oss;
-    oss << "NAN_TRANSMIT " << "handle=" << TxInfo.id << " req_instance_id=" << TxInfo.peer_id << " address=" << peer_mac
-        << " ssi=" << ssi_str;
+    oss << "NAN_TRANSMIT "
+        << "handle=" << TxInfo.id << " req_instance_id=" << TxInfo.peer_id << " address=" << peer_mac << " ssi=" << ssi_str;
 
     std::string cmd_str = oss.str();
     const char * cmd    = cmd_str.c_str();
