@@ -20,7 +20,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
-#include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/ServerClusterInterface.h>
 
 #include <lib/core/TLVReader.h>
 
@@ -29,7 +29,7 @@ namespace Test {
 
 // Helper function to read any attribute value of a given type
 template <typename T>
-CHIP_ERROR ReadClusterAttribute(chip::app::DefaultServerCluster & cluster, const app::ConcreteDataAttributePath & path, T & value)
+CHIP_ERROR ReadClusterAttribute(chip::app::ServerClusterInterface & cluster, const app::ConcreteDataAttributePath & path, T & value)
 {
     static_assert(std::is_integral_v<T> || std::is_enum_v<T>);
 
@@ -47,7 +47,7 @@ CHIP_ERROR ReadClusterAttribute(chip::app::DefaultServerCluster & cluster, const
 
 // Helper function to read any attribute value of a given type
 template <typename T>
-CHIP_ERROR ReadClusterAttribute(chip::app::DefaultServerCluster & cluster, AttributeId attr, T & val)
+CHIP_ERROR ReadClusterAttribute(chip::app::ServerClusterInterface & cluster, AttributeId attr, T & val)
 {
     static_assert(std::is_integral_v<T> || std::is_enum_v<T>);
 
@@ -60,7 +60,7 @@ CHIP_ERROR ReadClusterAttribute(chip::app::DefaultServerCluster & cluster, Attri
 
 // Helper function to write any attribute value of a given type
 template <typename T>
-CHIP_ERROR WriteClusterAttribute(chip::app::DefaultServerCluster & cluster, const app::ConcreteAttributePath & path,
+CHIP_ERROR WriteClusterAttribute(chip::app::ServerClusterInterface & cluster, const app::ConcreteAttributePath & path,
                                  const T & value)
 {
     static_assert(std::is_integral_v<T> || std::is_enum_v<T>);
