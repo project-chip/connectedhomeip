@@ -575,7 +575,7 @@ class TC_SC_4_1(MatterBaseTest):
             if 'PI' in txt_record.txt:
                 # Verify that it is non-empty
                 pi_key = txt_record.txt['PI']
-                asserts.assert_true(pi_key, "'PH' key is present but has no value.")
+                asserts.assert_true(pi_key, "'PI' key is present but has no value.")
 
                 # Verify it is encoded as a valid UTF-8 string
                 # with a maximum length of 128 bytes
