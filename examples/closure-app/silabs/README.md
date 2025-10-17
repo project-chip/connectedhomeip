@@ -4,17 +4,17 @@ An example showing the use of CHIP on the Silicon Labs SiWx917
 
 <hr>
 
--   [Matter SiWx917 Closure Example](#matter-siwx917-closure-example)
-    -   [Introduction](#introduction)
-    -   [Building](#building)
-    -   [Flashing the Application](#flashing-the-application)
-    -   [Running the Complete Example](#running-the-complete-example)
-    -   [Group Communication (Multicast)](#group-communication-multicast)
-    -   [Building options](#building-options)
-        -   [Disabling logging](#disabling-logging)
-        -   [Debug build / release build](#debug-build--release-build)
-        -   [Disabling QR CODE](#disabling-qr-code)
-        -   [KVS maximum entry count](#kvs-maximum-entry-count)
+- [Matter SiWx917 Closure Example](#matter-siwx917-closure-example)
+  - [Introduction](#introduction)
+  - [Building](#building)
+  - [Flashing the Application](#flashing-the-application)
+  - [Running the Complete Example](#running-the-complete-example)
+  - [Group Communication (Multicast)](#group-communication-multicast)
+  - [Building options](#building-options)
+    - [Disabling logging](#disabling-logging)
+    - [Debug build / release build](#debug-build--release-build)
+    - [Disabling QR CODE](#disabling-qr-code)
+    - [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -22,7 +22,7 @@ An example showing the use of CHIP on the Silicon Labs SiWx917
 > frequent releases thoroughly tested and validated. Developers looking to
 > develop matter products with silabs hardware are encouraged to use our latest
 > release with added tools and documentation.
-> [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases)
+> [Silabs `matter_sdk` Github](https://github.com/SiliconLabsSoftware/matter_sdk/tags)
 
 ## Introduction
 
@@ -58,8 +58,8 @@ based on the Silicon Labs platform.
 -   Supported hardware:
 
     -   > For the latest supported hardware please refer to the
-        > [Hardware Requirements](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/general/HARDWARE_REQUIREMENTS.md)
-        > in the Silicon Labs Matter Github Repo
+        > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
+        > in the Silicon Labs Matter Documentation
 
     917SoC boards :
 
@@ -105,9 +105,9 @@ arguments
 -   Or with the Ozone debugger, just load the .out file.
 
 All SiWx917 boards require a connectivity firmware, see Silicon Labs
-documentation for more info. Pre-built bootloader binaries are available in the
-Assets section of the Releases page on
-[Silabs Matter Github](https://github.com/SiliconLabs/matter/releases) .
+documentation for more info. Pre-built firmware binaries are available are
+available on the
+[Matter Software Artifacts page](https://docs.silabs.com/matter/latest/matter-prerequisites/matter-artifacts#siwx917-firmware-for-siwn917-ncp-and-siwg917-soc).
 
 ## Running the Complete Example
 

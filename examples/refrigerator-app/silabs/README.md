@@ -5,21 +5,24 @@ Wi-Fi Boards.
 
 <hr>
 
--   [Matter Refrigerator and Temperature Controlled Example](#matter-refrigerator-and-temperature-controlled-example)
-    -   [Introduction](#introduction)
-    -   [Building](#building)
-    -   [Flashing the Application](#flashing-the-application)
-    -   [Viewing Logging Output](#viewing-logging-output)
-        -   [SeggerRTT](#segger-rtt)
-        -   [Serial Console](#console-log)
-    -   [Running the Complete Example](#running-the-complete-example)
-        -   [Notes](#notes)
-    -   [OTA Software Update](#ota-software-update)
-    -   [Building options](#building-options)
-        -   [Disabling logging](#disabling-logging)
-        -   [Debug build / release build](#debug-build--release-build)
-        -   [Disabling LCD](#disabling-lcd)
-        -   [KVS maximum entry count](#kvs-maximum-entry-count)
+- [Matter Refrigerator and Temperature Controlled Example](#matter-refrigerator-and-temperature-controlled-example)
+  - [Introduction](#introduction)
+  - [Building](#building)
+  - [Flashing the Application](#flashing-the-application)
+  - [Viewing Logging Output](#viewing-logging-output)
+    - [SEGGER RTT](#segger-rtt)
+    - [Console Log](#console-log)
+      - [Configuring the VCOM](#configuring-the-vcom)
+    - [Using the console](#using-the-console)
+  - [Running the Complete Example](#running-the-complete-example)
+  - [Trigger events from Matter CLI](#trigger-events-from-matter-cli)
+    - [Notes](#notes)
+  - [OTA Software Update](#ota-software-update)
+  - [Building options](#building-options)
+    - [Disabling logging](#disabling-logging)
+    - [Debug build / release build](#debug-build--release-build)
+    - [Disabling LCD](#disabling-lcd)
+    - [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -27,7 +30,7 @@ Wi-Fi Boards.
 > frequent releases thoroughly tested and validated. Developers looking to
 > develop matter products with silabs hardware are encouraged to use our latest
 > release with added tools and documentation.
-> [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases)
+> [Silabs `matter_sdk` Github](https://github.com/SiliconLabsSoftware/matter_sdk/tags)
 
 ## Introduction
 
@@ -73,8 +76,8 @@ real products based on the Silicon Labs platform.
 -   Supported hardware:
 
     -   > For the latest supported hardware please refer to the
-        > [Hardware Requirements](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/general/HARDWARE_REQUIREMENTS.md)
-        > in the Silicon Labs Matter Github Repo
+        > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
+        > in the Silicon Labs Matter Documentation
 
     Silabs boards :
 
@@ -154,9 +157,8 @@ arguments
 -   Or with the Ozone debugger, just load the .out file.
 
 All EFR32 boards require a bootloader, see Silicon Labs documentation for more
-info. Pre-built bootloader binaries are available in the Assets section of the
-Releases page on
-[Silabs Matter Github](https://github.com/SiliconLabs/matter/releases) .
+info. Pre-built bootloader binaries are available on the
+[Matter Software Artifacts page](https://docs.silabs.com/matter/latest/matter-prerequisites/matter-artifacts#matter-bootloader-binaries).
 
 ## Viewing Logging Output
 

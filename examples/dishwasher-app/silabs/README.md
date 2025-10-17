@@ -4,15 +4,17 @@ An example showing the use of Matter on the Silicon Labs EFR32 MG24 boards.
 
 <hr>
 
--   [Matter Silabs dishwasher Example](#matter-silabs-dishwasher-example)
-    -   [Introduction](#introduction)
-    -   [Building](#building)
-    -   [Flashing the Application](#flashing-the-application)
-    -   [Viewing Logging Output](#viewing-logging-output)
-        -   [SeggerRTT](#segger-rtt)
-        -   [Serial Console](#console-log)
-    -   [Running the Complete Example](#running-the-complete-example)
-        -   [Commissioning](#commissioning)
+- [Matter Silabs dishwasher Example](#matter-silabs-dishwasher-example)
+  - [Introduction](#introduction)
+  - [Building](#building)
+  - [Flashing the Application](#flashing-the-application)
+  - [Viewing Logging Output](#viewing-logging-output)
+    - [SEGGER RTT](#segger-rtt)
+    - [Console Log](#console-log)
+      - [Configuring the VCOM](#configuring-the-vcom)
+    - [Using the console](#using-the-console)
+  - [Running the Complete Example](#running-the-complete-example)
+    - [Commissioning](#commissioning)
 
 <hr>
 
@@ -20,7 +22,7 @@ An example showing the use of Matter on the Silicon Labs EFR32 MG24 boards.
 > frequent releases thoroughly tested and validated. Developers looking to
 > develop matter products with silabs hardware are encouraged to use our latest
 > release with added tools and documentation.
-> [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases)
+> [Silabs `matter_sdk` Github](https://github.com/SiliconLabsSoftware/matter_sdk/tags)
 
 ## Introduction
 
@@ -61,8 +63,8 @@ Silicon Labs platform.
 -   Supported hardware:
 
     -   > For the latest supported hardware please refer to the
-        > [Hardware Requirements](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/general/HARDWARE_REQUIREMENTS.md)
-        > in the Silicon Labs Matter Github Repo
+        > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
+        > in the Silicon Labs Matter Documentation
 
     MG21 boards: Currently not supported due to RAM limitation.
 
@@ -121,10 +123,9 @@ arguments
 
 -   Or with the Ozone debugger, just load the .out file.
 
-All Silabs boards require a bootloader, see Silicon Labs documentation for more
-info. Pre-built bootloader binaries are available in the Assets section of the
-Releases page on
-[Silabs Matter Github](https://github.com/SiliconLabs/matter/releases) .
+All EFR32 boards require a bootloader, see Silicon Labs documentation for more
+info. Pre-built bootloader binaries are available on the
+[Matter Software Artifacts page](https://docs.silabs.com/matter/latest/matter-prerequisites/matter-artifacts#matter-bootloader-binaries).
 
 ## Viewing Logging Output
 
