@@ -1,4 +1,4 @@
-# Matter BEE4 Lock Example Application
+# Matter Lock Example Application
 
 This reference application implements an lock device type. You can use this
 example as a reference for creating your own application.
@@ -6,7 +6,7 @@ example as a reference for creating your own application.
 The example is based on:
 
 -   [Matter](https://github.com/project-chip/connectedhomeip)
--   [BEE4 github SDK](https://github.com/rtkconnectivity/rtl87x2g_sdk)
+-   [RTL87x2G github SDK](https://github.com/rtkconnectivity/rtl87x2g_sdk)
 -   [OT-REALTEK](https://github.com/rtkconnectivity/ot-realtek)
 
 ## Supported devices

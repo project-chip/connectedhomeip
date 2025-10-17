@@ -33,13 +33,11 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/examples/light-switch-app/realtek/bee/main/AppTask.cpp
-    ${chip_dir}/examples/light-switch-app/realtek/bee/main/LightSwitch.cpp
-    ${chip_dir}/examples/light-switch-app/realtek/bee/main/chipinterface.cpp
-    ${chip_dir}/examples/light-switch-app/realtek/bee/main/BindingHandler.cpp
-    ${chip_dir}/examples/light-switch-app/realtek/bee/main/DeviceCallbacks.cpp
-    ${chip_dir}/examples/light-switch-app/realtek/bee/main/CHIPDeviceManager.cpp
-    ${chip_dir}/examples/light-switch-app/realtek/bee/main/Globals.cpp
+    ${chip_dir}/examples/window-app/realtek/common/main/chipinterface.cpp
+    ${chip_dir}/examples/window-app/realtek/common/main/DeviceCallbacks.cpp
+    ${chip_dir}/examples/window-app/realtek/common/main/CHIPDeviceManager.cpp
+    ${chip_dir}/examples/window-app/realtek/common/main/WindowCovering.cpp
+    ${chip_dir}/examples/window-app/realtek/common/main/AppTask.cpp
     ${chip_dir}/examples/platform/realtek/util/LEDWidget.cpp
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
     ${chip_dir}/examples/platform/realtek/dac_provider/CommonDACProvider.cpp
@@ -53,19 +51,19 @@ add_library(
 
 chip_configure_data_model(chip_main
     INCLUDE_SERVER
-    ZAP_FILE ${matter_example_path}/../../light-switch-common/light-switch-app.zap
+    ZAP_FILE ${matter_example_path}/../../common/window-app.zap
 )
 
 target_include_directories(
     ${chip_main}
     PUBLIC
 	${inc_path}
-    ${chip_dir}/zzz_generated/light-switch-app
-    ${chip_dir}/zzz_generated/light-switch-app/zap-generated
+    ${chip_dir}/zzz_generated/window-app
+    ${chip_dir}/zzz_generated/window-app/zap-generated
     ${chip_dir}/zzz_generated/app-common
-    ${chip_dir}/examples/light-switch-app/light-switch-common
-    ${chip_dir}/examples/light-switch-app/realtek/bee/main/include
+    ${chip_dir}/examples/window-app/realtek/common/main/include
     ${chip_dir}/examples/platform/realtek
+    ${chip_dir}/examples/platform/realtek/util
     ${chip_dir}/examples/providers
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/

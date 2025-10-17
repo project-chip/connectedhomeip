@@ -28,9 +28,9 @@ pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
 pw_set_backend(pw_sys_io pw_sys_io.bee)
 pw_set_backend(pw_trace pw_trace_tokenized)
 
-add_subdirectory(${chip_dir}/third_party/pigweed/repo ${chip_dir}/examples/lock-app/realtek/bee/out/pigweed)
-add_subdirectory(${chip_dir}/third_party/nanopb/repo ${chip_dir}/examples/lock-app/realtek/bee/out/nanopb)
-add_subdirectory(${chip_dir}/examples/platform/realtek/pw_sys_io ${chip_dir}/examples/lock-app/realtek/bee/out/pw_sys_io)
+add_subdirectory(${chip_dir}/third_party/pigweed/repo ${chip_dir}/examples/lock-app/realtek/common/out/pigweed)
+add_subdirectory(${chip_dir}/third_party/nanopb/repo ${chip_dir}/examples/lock-app/realtek/common/out/nanopb)
+add_subdirectory(${chip_dir}/examples/platform/realtek/pw_sys_io ${chip_dir}/examples/lock-app/realtek/common/out/pw_sys_io)
 
 pw_proto_library(attributes_service
   SOURCES
@@ -152,12 +152,12 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/examples/lock-app/realtek/bee/main/AppTask.cpp
-    ${chip_dir}/examples/lock-app/realtek/bee/main/BoltLockManager.cpp
-    ${chip_dir}/examples/lock-app/realtek/bee/main/chipinterface.cpp
-    ${chip_dir}/examples/lock-app/realtek/bee/main/DeviceCallbacks.cpp
-    ${chip_dir}/examples/lock-app/realtek/bee/main/CHIPDeviceManager.cpp
-    ${chip_dir}/examples/lock-app/realtek/bee/main/Globals.cpp
+    ${chip_dir}/examples/lock-app/realtek/common/main/AppTask.cpp
+    ${chip_dir}/examples/lock-app/realtek/common/main/BoltLockManager.cpp
+    ${chip_dir}/examples/lock-app/realtek/common/main/chipinterface.cpp
+    ${chip_dir}/examples/lock-app/realtek/common/main/DeviceCallbacks.cpp
+    ${chip_dir}/examples/lock-app/realtek/common/main/CHIPDeviceManager.cpp
+    ${chip_dir}/examples/lock-app/realtek/common/main/Globals.cpp
     ${chip_dir}/examples/platform/realtek/util/LEDWidget.cpp
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
     ${chip_dir}/examples/platform/realtek/dac_provider/CommonDACProvider.cpp
@@ -183,7 +183,7 @@ target_include_directories(
     ${chip_dir}/examples/platform/realtek/pw_sys_io/public
     ${chip_dir}/examples/common
     ${chip_dir}/examples/common/pigweed
-    ${chip_dir}/examples/common/pigweed/realtek/bee
+    ${chip_dir}/examples/common/pigweed/realtek
     ${chip_dir}/src
     ${chip_dir}/src/lib/support
     ${pigweed_dir}/pw_rpc/nanopb/public
@@ -199,7 +199,7 @@ target_include_directories(
     ${chip_dir}/zzz_generated/app-common
     ${chip_dir}/examples/lock-app/lock-common
     ${chip_dir}/examples/lock-app/lock-common/include
-    ${chip_dir}/examples/lock-app/realtek/bee/main/include
+    ${chip_dir}/examples/lock-app/realtek/common/main/include
     ${chip_dir}/examples/platform/realtek
     ${chip_dir}/examples/providers
     ${chip_dir_output}/gen/include
