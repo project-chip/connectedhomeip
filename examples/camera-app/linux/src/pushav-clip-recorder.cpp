@@ -650,9 +650,11 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
             return false;
         }
 
-        std::string initSegName  = mClipInfo.mTrackName + std::filesystem::path::preferred_separator + mClipInfo.mTrackName + ".init";
+        std::string initSegName =
+            mClipInfo.mTrackName + std::filesystem::path::preferred_separator + mClipInfo.mTrackName + ".init";
         std::string mediaSegName = mClipInfo.mTrackName + std::filesystem::path::preferred_separator + "segment_$Number%04d$.m4s";
-        std::string mpdPrefix    = "session_" + std::to_string(mClipInfo.mSessionNumber) + std::filesystem::path::preferred_separator + mClipInfo.mTrackName;
+        std::string mpdPrefix = "session_" + std::to_string(mClipInfo.mSessionNumber) + std::filesystem::path::preferred_separator +
+            mClipInfo.mTrackName;
 
         mInputFormatContext          = avformat_alloc_context();
         int64_t avioCtxBufferSize    = (static_cast<int64_t>(mVideoInfo.mBitRate) * mClipInfo.mSegmentDurationMs) / (8 * 1000);
@@ -815,7 +817,7 @@ std::string RenameSegmentFile(const std::string & originalPath)
 
         std::error_code error;
         std::filesystem::rename(originalPath.c_str(), newPath.c_str(), error);
-        if(error.value() == 0)
+        if (error.value() == 0)
         {
             ChipLogDetail(Camera, "Renamed segment %s to %s", originalPath.c_str(), newPath.c_str());
             return newPath;
@@ -897,7 +899,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     std::filesystem::path segment_path = make_segment_path(mUploadSegmentID);
     while (std::filesystem::exists(segment_path) && !std::filesystem::exists(segment_path.string() + ".tmp"))
     {
-        mUploadMPD = true;
+        mUploadMPD                       = true;
         std::string renamed_segment_path = RenameSegmentFile(segment_path.string());
         CheckAndUploadFile(renamed_segment_path);
         mUploadSegmentID++;
