@@ -127,7 +127,8 @@ void PushAVClipRecorder::RemovePreviousRecordingFiles(const fs::path & path)
 
         // Check if the file has one of the recording-related extensions
         const fs::path & filename = entry.path().filename();
-        if ((filename.extension() == ".mpd" || filename.extension() == ".m4s" || filename.extension() == ".init"))
+        const fs::path & ext = filename.extension();
+        if (ext == ".mpd" || ext == ".m4s" || ext == ".init")
         {
             // Attempt to remove the file
             if (fs::remove(entry.path()))
