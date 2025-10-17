@@ -139,7 +139,7 @@ class TC_CGEN_2_8(MatterBaseTest):
         self.wait_for_user_input(prompt_msg="Manually trigger factory reset on the DUT, then continue")
 
         # Close the commissioner session with the device to clean up resources
-        commissioner.MarkSessionDefunct(nodeid=self.dut_node_id)
+        commissioner.MarkSessionForEviction(nodeid=self.dut_node_id)
 
         # Step 6: Put device in commissioning mode (requiring user input, so skip in CI)
         self.step(6)
