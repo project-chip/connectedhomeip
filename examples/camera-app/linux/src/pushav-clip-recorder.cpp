@@ -104,43 +104,39 @@ PushAVClipRecorder::~PushAVClipRecorder()
     }
 }
 
-void PushAVClipRecorder::RemovePreviousRecordingFiles(const std::string & path)
+void PushAVClipRecorder::RemovePreviousRecordingFiles(const fs::path& path)
 {
-    DIR * dir = opendir(path.c_str());
-    if (!dir)
+    // Check if the directory exists
+    if (!fs::exists(path) || !fs::is_directory(path))
     {
-        ChipLogError(Camera, "Failed to open directory for cleaning: %s", path.c_str());
+        ChipLogDetail(Camera, "Failed to open directory for cleaning: %s", path.c_str());
         return;
     }
 
-    struct dirent * entry;
-    while ((entry = readdir(dir)) != nullptr)
+    // Iterate over all files in the directory
+    for (const auto& entry : fs::directory_iterator(path))
     {
         // Skip current and parent directory entries
-        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+        if (entry.path().filename() == "." || entry.path().filename() == "..")
         {
             continue;
         }
 
-        // Check if file has one of the recording-related extensions
-        std::string filename(entry->d_name);
-        if (filename.length() > 4 &&
-            (filename.substr(filename.length() - 4) == ".mpd" || filename.substr(filename.length() - 4) == ".m4s" ||
-             filename.substr(filename.length() - 5) == ".init"))
+        // Check if the file has one of the recording-related extensions
+        const fs::path& filename = entry.path().filename();
+        if ((filename.extension() == ".mpd" || filename.extension() == ".m4s" || filename.extension() == ".init"))
         {
-            std::string filepath = path + "/" + filename;
-            if (unlink(filepath.c_str()) == 0)
+            // Attempt to remove the file
+            if (fs::remove(entry.path()))
             {
-                ChipLogDetail(Camera, "Removed previous recording file: %s", filepath.c_str());
+                ChipLogDetail(Camera, "Removed previous recording file: %s", entry.path().c_str());
             }
             else
             {
-                ChipLogError(Camera, "Failed to remove previous recording file: %s", filepath.c_str());
+                ChipLogError(Camera,"Failed to remove previous recording file: %s", entry.path().c_str());
             }
         }
     }
-
-    closedir(dir);
 }
 
 bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
@@ -175,7 +171,7 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
 bool PushAVClipRecorder::IsOutputDirectoryValid(const std::string & path)
 {
     std::string sessionDir = path + "session_" + std::to_string(mClipInfo.mSessionNumber);
-    std::string trackDir   = sessionDir + "/" + mClipInfo.mTrackName;
+    std::string trackDir   = sessionDir + std::to_string(std::filesystem::path::preferred_separator)  + mClipInfo.mTrackName;
 
     if (!EnsureDirectoryExists(path))
     {
@@ -193,8 +189,8 @@ bool PushAVClipRecorder::IsOutputDirectoryValid(const std::string & path)
     }
 
     // Remove files from previous recordings
-    RemovePreviousRecordingFiles(sessionDir);
-    RemovePreviousRecordingFiles(trackDir);
+    RemovePreviousRecordingFiles(fs::path(sessionDir));
+    RemovePreviousRecordingFiles(fs::path(trackDir));
 
     return true;
 }
@@ -654,9 +650,9 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
             return false;
         }
 
-        std::string initSegName  = mClipInfo.mTrackName + "/" + mClipInfo.mTrackName + ".init";
-        std::string mediaSegName = mClipInfo.mTrackName + "/segment_$Number%04d$.m4s";
-        std::string mpdPrefix    = "session_" + std::to_string(mClipInfo.mSessionNumber) + "/" + mClipInfo.mTrackName;
+        std::string initSegName  = mClipInfo.mTrackName + std::to_string(std::filesystem::path::preferred_separator)  + mClipInfo.mTrackName + ".init";
+        std::string mediaSegName = mClipInfo.mTrackName + std::to_string(std::filesystem::path::preferred_separator)  + "segment_$Number%04d$.m4s";
+        std::string mpdPrefix    = "session_" + std::to_string(mClipInfo.mSessionNumber) + std::to_string(std::filesystem::path::preferred_separator)  + mClipInfo.mTrackName;
 
         mInputFormatContext          = avformat_alloc_context();
         int64_t avioCtxBufferSize    = (static_cast<int64_t>(mVideoInfo.mBitRate) * mClipInfo.mSegmentDurationMs) / (8 * 1000);
@@ -817,14 +813,16 @@ std::string RenameSegmentFile(const std::string & originalPath)
         snprintf(newPathBuffer, sizeof(newPathBuffer), "%s%04d%s", pathPrefix.c_str(), newNumber, pathSuffix.c_str());
         std::string newPath = newPathBuffer;
 
-        if (rename(originalPath.c_str(), newPath.c_str()) == 0)
+        std::error_code error;
+        std::filesystem::rename(originalPath.c_str(), newPath.c_str(), error);
+        if(error)
         {
             ChipLogDetail(Camera, "Renamed segment %s to %s", originalPath.c_str(), newPath.c_str());
             return newPath;
         }
         else
         {
-            ChipLogDetail(Camera, "Failed to rename segment %s to %s: %s", originalPath.c_str(), newPath.c_str(), strerror(errno));
+            ChipLogDetail(Camera, "Failed to rename segment %s to %s, error: %d", originalPath.c_str(), newPath.c_str(), error.value());
             return originalPath;
         }
     }
@@ -877,7 +875,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     const int64_t clipDuration      = (remainingDuration > 0) ? remainingDuration * AV_TIME_BASE_Q.den : 0;
     // Pre-calculate common path components
     const std::string basePath =
-        mClipInfo.mOutputPath + "session_" + std::to_string(mClipInfo.mSessionNumber) + "/" + mClipInfo.mTrackName;
+        mClipInfo.mOutputPath + "session_" + std::to_string(mClipInfo.mSessionNumber) + std::to_string(std::filesystem::path::preferred_separator)  + mClipInfo.mTrackName;
 
     if (reason || ((clipLengthInPTS >= clipDuration) && (mClipInfo.mTriggerType != 2)))
     {
@@ -905,9 +903,9 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         return std::string(path_buffer);
     };
 
-    std::string formatTemplate = "%s/segment_%04d.m4s";
+    std::string formatTemplate = "%s" + std::to_string(std::filesystem::path::preferred_separator)  + "segment_%04d.m4s";
     std::string segment_path   = make_path(formatTemplate.c_str(), mUploadSegmentID);
-    while (FileExists(segment_path) && !FileExists(segment_path + ".tmp"))
+    while (std::filesystem::exists(segment_path) && !std::filesystem::exists(segment_path + ".tmp"))
     {
         mUploadMPD                       = true;
         std::string renamed_segment_path = RenameSegmentFile(segment_path);
@@ -920,7 +918,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     if (mUploadMPD)
     {
         std::string mpd_path = make_path("%s.mpd");
-        if (FileExists(mpd_path) && !FileExists(mpd_path + ".tmp"))
+        if (std::filesystem::exists(mpd_path) && !std::filesystem::exists(mpd_path + ".tmp"))
         {
             mUploader->setMPDPath(std::make_pair(mpd_path, mClipInfo.mUrl));
             UpdateMPDStartNumber(mpd_path);
@@ -933,7 +931,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         {
             std::string init_path = make_path(("%s/" + mClipInfo.mTrackName + ".init").c_str());
             ChipLogProgress(Camera, "Recorder:Init segment upload ready [%s]", init_path.c_str());
-            if (FileExists(init_path) && !FileExists(init_path + ".tmp"))
+            if (std::filesystem::exists(init_path) && !std::filesystem::exists(init_path + ".tmp"))
             {
                 CheckAndUploadFile(init_path);
             }
@@ -947,12 +945,6 @@ bool PushAVClipRecorder::CheckAndUploadFile(std::string filename)
     ChipLogProgress(Camera, "Recorder:File upload ready [%s] to [%s]", filename.c_str(), mClipInfo.mUrl.c_str());
     mUploader->AddUploadData(filename, mClipInfo.mUrl);
     return true;
-}
-
-bool PushAVClipRecorder::FileExists(const std::string & path)
-{
-    struct stat buffer;
-    return (stat(path.c_str(), &buffer) == 0);
 }
 
 void PushAVClipRecorder::SetRecorderStatus(bool status)
