@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/util/basic-types.h>
@@ -31,6 +32,7 @@
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 #include <app/ConcreteAttributePath.h>
 #include <app/icd/server/ICDMonitoringTable.h> // nogncheck
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
@@ -39,6 +41,10 @@ namespace Crypto {
 using SymmetricKeystore = SessionKeystore;
 } // namespace Crypto
 } // namespace chip
+
+namespace chip {
+namespace app {
+namespace Clusters {
 
 class ICDManagementServer
 {
@@ -82,3 +88,64 @@ private:
     static chip::Crypto::SymmetricKeystore * mSymmetricKeystore;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 };
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+/**
+ * @brief Implementation of Fabric Delegate for ICD Management cluster
+ */
+class ICDManagementFabricDelegate : public FabricTable::Delegate
+{
+public:
+    void Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore,
+              ICDConfigurationData & icdConfigurationData);
+
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+
+private:
+    PersistentStorageDelegate * mStorage           = nullptr;
+    Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
+    ICDConfigurationData * mICDConfigurationData   = nullptr;
+};
+
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+/**
+ * @brief Implementation of attribute access for IcdManagement cluster
+ */
+class ICDManagementAttributeAccess : public AttributeAccessInterface
+{
+public:
+    ICDManagementAttributeAccess();
+
+    void Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore, FabricTable & fabricTable,
+              ICDConfigurationData & icdConfigurationData);
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+private:
+    CHIP_ERROR ReadIdleModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadActiveModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadActiveModeThreshold(EndpointId endpoint, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadFeatureMap(EndpointId endpoint, AttributeValueEncoder & encoder);
+
+#if CHIP_CONFIG_ENABLE_ICD_LIT
+    CHIP_ERROR ReadOperatingMode(EndpointId endpoint, AttributeValueEncoder & encoder);
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    CHIP_ERROR ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadICDCounter(EndpointId endpoint, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadClientsSupportedPerFabric(EndpointId endpoint, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadMaximumCheckInBackOff(EndpointId endpoint, AttributeValueEncoder & encoder);
+
+    PersistentStorageDelegate * mStorage           = nullptr;
+    Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
+    FabricTable * mFabricTable                     = nullptr;
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+    ICDConfigurationData * mICDConfigurationData = nullptr;
+};
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip

@@ -27,6 +27,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
+    case app::Clusters::Identify::Id:
+        MatterIdentifyClusterInitCallback(endpoint);
+        break;
     case app::Clusters::AccessControl::Id:
         MatterAccessControlClusterInitCallback(endpoint);
         break;
@@ -69,6 +72,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::FixedLabel::Id:
         MatterFixedLabelClusterInitCallback(endpoint);
         break;
+    case app::Clusters::UserLabel::Id:
+        MatterUserLabelClusterInitCallback(endpoint);
+        break;
     }
 }
 
@@ -76,6 +82,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
 {
     switch (clusterId)
     {
+    case app::Clusters::Identify::Id:
+        MatterIdentifyClusterShutdownCallback(endpoint);
+        break;
     case app::Clusters::AccessControl::Id:
         MatterAccessControlClusterShutdownCallback(endpoint);
         break;
@@ -117,6 +126,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::FixedLabel::Id:
         MatterFixedLabelClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::UserLabel::Id:
+        MatterUserLabelClusterShutdownCallback(endpoint);
         break;
     }
 }
