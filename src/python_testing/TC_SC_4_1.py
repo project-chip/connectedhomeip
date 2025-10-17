@@ -570,17 +570,16 @@ class TC_SC_4_1(MatterBaseTest):
                 # text, omitting any leading zeros, and value different than '0'
                 assert_valid_ph_key(ph_key)
 
-            # TODO: Fix PI key present but null/None ??
             # *** PI KEY ***
-            # # If the PI key is present
-            # if 'PI' in txt_record.txt:
-            #     # Verify that it is non-empty
-            #     pi_key = txt_record.txt['PI']
-            #     asserts.assert_true(pi_key, "'PH' key is present but has no value.")
+            # If the PI key is present
+            if 'PI' in txt_record.txt:
+                # Verify that it is non-empty
+                pi_key = txt_record.txt['PI']
+                asserts.assert_true(pi_key, "'PH' key is present but has no value.")
 
-            #     # Verify it is encoded as a valid UTF-8 string
-            #     # with a maximum length of 128 bytes
-            #     assert_valid_pi_key(pi_key)
+                # Verify it is encoded as a valid UTF-8 string
+                # with a maximum length of 128 bytes
+                assert_valid_pi_key(pi_key)
 
             assert_valid_pi_key("for-lint...")  # To de removed
         else:
