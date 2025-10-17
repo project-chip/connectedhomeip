@@ -4,25 +4,25 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
 
 <hr>
 
-- [Matter EFR32 Smoke CO Alarm Example](#matter-efr32-smoke-co-alarm-example)
-    - [Introduction](#introduction)
-    - [Building](#building)
-    - [Flashing the Application](#flashing-the-application)
-    - [Viewing Logging Output](#viewing-logging-output)
-        - [SEGGER RTT](#segger-rtt)
-        - [Console Log](#console-log)
-            - [Configuring the VCOM](#configuring-the-vcom)
-        - [Using the console](#using-the-console)
-    - [Running the Complete Example](#running-the-complete-example)
-        - [Notes](#notes)
-    - [Memory settings](#memory-settings)
-    - [OTA Software Update](#ota-software-update)
-    - [Building options](#building-options)
-        - [Disabling logging](#disabling-logging)
-        - [Debug build / release build](#debug-build--release-build)
-        - [Disabling LCD](#disabling-lcd)
-        - [KVS maximum entry count](#kvs-maximum-entry-count)
-        - [Enabling test event trigger](#enabling-test-event-trigger)
+-   [Matter EFR32 Smoke CO Alarm Example](#matter-efr32-smoke-co-alarm-example)
+    -   [Introduction](#introduction)
+    -   [Building](#building)
+    -   [Flashing the Application](#flashing-the-application)
+    -   [Viewing Logging Output](#viewing-logging-output)
+        -   [SEGGER RTT](#segger-rtt)
+        -   [Console Log](#console-log)
+            -   [Configuring the VCOM](#configuring-the-vcom)
+        -   [Using the console](#using-the-console)
+    -   [Running the Complete Example](#running-the-complete-example)
+        -   [Notes](#notes)
+    -   [Memory settings](#memory-settings)
+    -   [OTA Software Update](#ota-software-update)
+    -   [Building options](#building-options)
+        -   [Disabling logging](#disabling-logging)
+        -   [Debug build / release build](#debug-build--release-build)
+        -   [Disabling LCD](#disabling-lcd)
+        -   [KVS maximum entry count](#kvs-maximum-entry-count)
+        -   [Enabling test event trigger](#enabling-test-event-trigger)
 
 <hr>
 
@@ -53,93 +53,97 @@ Silicon Labs platform.
 
 ## Building
 
-- Download the
-  [Simplicity Commander](https://www.silabs.com/mcu/programming-options) command
-  line tool, and ensure that `commander` is your shell search path. (For Mac OS
-  X, `commander` is located inside `Commander.app/Contents/MacOS/`.)
+-   Download the
+    [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
+    command line tool, and ensure that `commander` is your shell search path.
+    (For Mac OS X, `commander` is located inside
+    `Commander.app/Contents/MacOS/`.)
 
-- Download and install a suitable ARM gcc tool chain (For most Host, the
-  bootstrap already installs the toolchain):
-  [GNU Arm Embedded Toolchain 12.2 Rel1](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
+-   Download and install a suitable ARM gcc tool chain (For most Host, the
+    bootstrap already installs the toolchain):
+    [GNU Arm Embedded Toolchain 12.2 Rel1](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
 
-- Install some additional tools(likely already present for CHIP developers):
-    - Linux: `sudo apt-get install git ninja-build`
+-   Install some additional tools(likely already present for CHIP developers):
 
-    - Mac OS X: `brew install ninja`
+    -   Linux: `sudo apt-get install git ninja-build`
 
-- Supported hardware:
-    - > For the latest supported hardware please refer to the
-      > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
-      > in the Silicon Labs Matter Documentation
+    -   Mac OS X: `brew install ninja`
+
+-   Supported hardware:
+
+    -   > For the latest supported hardware please refer to the
+        > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
+        > in the Silicon Labs Matter Documentation
 
     MG24 boards :
-    - BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    - BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    - BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    - BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    - BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-    - BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
-* Build the example application:
+    -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
-          ```
-          cd ~/connectedhomeip
-          ./scripts/examples/gn_silabs_example.sh ./examples/smoke-co-alarm-app/silabs ./out/smoke-co-alarm-app BRD4187C
-          ```
+*   Build the example application:
 
-- To delete generated executable, libraries and object files use:
+            ```
+            cd ~/connectedhomeip
+            ./scripts/examples/gn_silabs_example.sh ./examples/smoke-co-alarm-app/silabs ./out/smoke-co-alarm-app BRD4187C
+            ```
 
-          ```
-          $ cd ~/connectedhomeip
-          $ rm -rf ./out/
-          ```
+-   To delete generated executable, libraries and object files use:
+
+            ```
+            $ cd ~/connectedhomeip
+            $ rm -rf ./out/
+            ```
 
     OR use GN/Ninja directly
 
-          ```
-          $ cd ~/connectedhomeip/examples/smoke-co-alarm-app/silabs
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export SILABS_BOARD=BRD4187C
-          $ gn gen out/debug
-          $ ninja -C out/debug
-          ```
+            ```
+            $ cd ~/connectedhomeip/examples/smoke-co-alarm-app/silabs
+            $ git submodule update --init
+            $ source third_party/connectedhomeip/scripts/activate.sh
+            $ export SILABS_BOARD=BRD4187C
+            $ gn gen out/debug
+            $ ninja -C out/debug
+            ```
 
-- To delete generated executable, libraries and object files use:
+-   To delete generated executable, libraries and object files use:
 
-          ```
-          $ cd ~/connectedhomeip/examples/smoke-co-alarm-app/silabs
-          $ rm -rf out/
-          ```
+            ```
+            $ cd ~/connectedhomeip/examples/smoke-co-alarm-app/silabs
+            $ rm -rf out/
+            ```
 
-* Build the example as Intermittently Connected Device (ICD)
+*   Build the example as Intermittently Connected Device (ICD)
 
-          ```
-          $ ./scripts/examples/gn_silabs_example.sh ./examples/smoke-co-alarm-app/silabs ./out/smoke-co-alarm-app_ICD BRD4187C --icd
-          ```
+            ```
+            $ ./scripts/examples/gn_silabs_example.sh ./examples/smoke-co-alarm-app/silabs ./out/smoke-co-alarm-app_ICD BRD4187C --icd
+            ```
 
     or use gn as previously mentioned but adding the following arguments:
 
-          ```
-          $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
-          ```
+            ```
+            $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
+            ```
 
-* Build the example with pigweed RPC
+*   Build the example with pigweed RPC
 
-          ```
-          $ ./scripts/examples/gn_silabs_example.sh examples/smoke-co-alarm-app/silabs out/smoke_co_alarm_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
-          ```
+            ```
+            $ ./scripts/examples/gn_silabs_example.sh examples/smoke-co-alarm-app/silabs out/smoke_co_alarm_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
+            ```
 
     or use GN/Ninja Directly
 
-          ```
-          $ cd ~/connectedhomeip/examples/smoke-co-alarm-app/silabs
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export SILABS_BOARD=BRD4187C
-          $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
-          $ ninja -C out/debug
-          ```
+            ```
+            $ cd ~/connectedhomeip/examples/smoke-co-alarm-app/silabs
+            $ git submodule update --init
+            $ source third_party/connectedhomeip/scripts/activate.sh
+            $ export SILABS_BOARD=BRD4187C
+            $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
+            $ ninja -C out/debug
+            ```
 
 For more build options, help is provided when running the build script without
 arguments
@@ -150,14 +154,14 @@ arguments
 
 ## Flashing the Application
 
-- On the command line:
+-   On the command line:
 
-          ```
-          $ cd ~/connectedhomeip/examples/smoke-co-alarm-app/silabs
-          $ python3 out/debug/matter-silabs-smoke-co-alarm-example.flash.py
-          ```
+            ```
+            $ cd ~/connectedhomeip/examples/smoke-co-alarm-app/silabs
+            $ python3 out/debug/matter-silabs-smoke-co-alarm-example.flash.py
+            ```
 
-- Or with the Ozone debugger, just load the .out file.
+-   Or with the Ozone debugger, just load the .out file.
 
 All EFR32 boards require a bootloader, see Silicon Labs documentation for more
 info. Pre-built bootloader binaries are available on the
@@ -179,43 +183,43 @@ Software and Documentation Pack_
 Alternatively, SEGGER Ozone J-Link debugger can be used to view RTT logs too
 after flashing the .out file.
 
-- Download the J-Link installer by navigating to the appropriate URL and
-  agreeing to the license agreement.
+-   Download the J-Link installer by navigating to the appropriate URL and
+    agreeing to the license agreement.
 
-- [JLink_Linux_x86_64.deb](https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.deb)
-- [JLink_MacOSX.pkg](https://www.segger.com/downloads/jlink/JLink_MacOSX.pkg)
+-   [JLink_Linux_x86_64.deb](https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.deb)
+-   [JLink_MacOSX.pkg](https://www.segger.com/downloads/jlink/JLink_MacOSX.pkg)
 
-* Install the J-Link software
+*   Install the J-Link software
 
-          ```
-          $ cd ~/Downloads
-          $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
-          ```
+            ```
+            $ cd ~/Downloads
+            $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
+            ```
 
-* In Linux, grant the logged in user the ability to talk to the development
-  hardware via the linux tty device (/dev/ttyACMx) by adding them to the dialout
-  group.
+*   In Linux, grant the logged in user the ability to talk to the development
+    hardware via the linux tty device (/dev/ttyACMx) by adding them to the
+    dialout group.
 
-          ```
-          $ sudo usermod -a -G dialout ${USER}
-          ```
+            ```
+            $ sudo usermod -a -G dialout ${USER}
+            ```
 
 Once the above is complete, log output can be viewed using the JLinkExe tool in
 combination with JLinkRTTClient as follows:
 
-- Run the JLinkExe tool with arguments to autoconnect to the WSTK board:
+-   Run the JLinkExe tool with arguments to autoconnect to the WSTK board:
 
     For MG24 use:
 
-          ```
-          $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
-          ```
+            ```
+            $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
+            ```
 
-- In a second terminal, run the JLinkRTTClient to view logs:
+-   In a second terminal, run the JLinkRTTClient to view logs:
 
-          ```
-          $ JLinkRTTClient
-          ```
+            ```
+            $ JLinkRTTClient
+            ```
 
 ### Console Log
 
@@ -230,9 +234,9 @@ the verbose mode is selected (--verbose)
 
 #### Configuring the VCOM
 
-- Using (Simplicity
-  Studio)[https://community.silabs.com/s/article/wstk-virtual-com-port-baudrate-setting?language=en_US]
-- Using commander-cli
+-   Using (Simplicity
+    Studio)[https://community.silabs.com/s/article/wstk-virtual-com-port-baudrate-setting?language=en_US]
+-   Using commander-cli
     ```
     commander vcom config --baudrate 921600 --handshake rtscts
     ```
@@ -243,56 +247,57 @@ With any serial terminal application such as screen, putty, minicom etc.
 
 ## Running the Complete Example
 
-- It is assumed here that you already have an OpenThread border router
-  configured and running. If not see the following guide
-  [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/platforms/openthread/openthread_border_router_pi.md)
-  for more information on how to setup a border router on a raspberryPi.
+-   It is assumed here that you already have an OpenThread border router
+    configured and running. If not see the following guide
+    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/platforms/openthread/openthread_border_router_pi.md)
+    for more information on how to setup a border router on a raspberryPi.
 
     Take note that the RCP code is available directly through
     [Simplicity Studio 5](https://www.silabs.com/products/development-tools/software/simplicity-studio/simplicity-studio-5)
     under File->New->Project Wizard->Examples->Thread : ot-rcp
 
-- User interface : **LCD** The LCD on Silabs WSTK shows a QR Code. This QR Code
-  is be scanned by the CHIP Tool app For the Rendez-vous procedure over BLE
+-   User interface : **LCD** The LCD on Silabs WSTK shows a QR Code. This QR
+    Code is be scanned by the CHIP Tool app For the Rendez-vous procedure over
+    BLE
 
-        * On devices that do not have or support the LCD Display like the BRD4166A Thunderboard Sense 2,
-          a URL can be found in the RTT logs.
+          * On devices that do not have or support the LCD Display like the BRD4166A Thunderboard Sense 2,
+            a URL can be found in the RTT logs.
 
-          <info  > [SVR] Copy/paste the below URL in a browser to see the QR Code:
-          <info  > [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
+            <info  > [SVR] Copy/paste the below URL in a browser to see the QR Code:
+            <info  > [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
 
     **LED 0** shows the overall state of the device and its connectivity. The
     following states are possible:
 
-        -   _Short Flash On (50 ms on/950 ms off)_ ; The device is in the
-            unprovisioned (unpaired) state and is waiting for a commissioning
-            application to connect.
+          -   _Short Flash On (50 ms on/950 ms off)_ ; The device is in the
+              unprovisioned (unpaired) state and is waiting for a commissioning
+              application to connect.
 
-        -   _Rapid Even Flashing_ ; (100 ms on/100 ms off)_ &mdash; The device is in the
-            unprovisioned state and a commissioning application is connected through
-            Bluetooth LE.
+          -   _Rapid Even Flashing_ ; (100 ms on/100 ms off)_ &mdash; The device is in the
+              unprovisioned state and a commissioning application is connected through
+              Bluetooth LE.
 
-        -   _Short Flash Off_ ; (950ms on/50ms off)_ &mdash; The device is fully
-            provisioned, but does not yet have full Thread network or service
-            connectivity.
+          -   _Short Flash Off_ ; (950ms on/50ms off)_ &mdash; The device is fully
+              provisioned, but does not yet have full Thread network or service
+              connectivity.
 
-        -   _Solid On_ ; The device is fully provisioned and has full Thread
-            network and service connectivity.
+          -   _Solid On_ ; The device is fully provisioned and has full Thread
+              network and service connectivity.
 
     **Push Button 0**
 
-        -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
-            for 30 seconds. The device will then switch to a slower interval advertisement.
-            After 15 minutes, the advertisement stops.
-            Additionally, it will cycle through the QR code, application status screen and device status screen, respectively.
+          -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
+              for 30 seconds. The device will then switch to a slower interval advertisement.
+              After 15 minutes, the advertisement stops.
+              Additionally, it will cycle through the QR code, application status screen and device status screen, respectively.
 
-        -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
-            Releasing the button within the 6-second window cancels the factory reset
-            procedure. **LEDs** blink in unison when the factory reset procedure is
-            initiated.
+          -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
+              Releasing the button within the 6-second window cancels the factory reset
+              procedure. **LEDs** blink in unison when the factory reset procedure is
+              initiated.
 
-* You can provision and control the Chip device using the python controller,
-  Chip tool standalone, Android or iOS app
+*   You can provision and control the Chip device using the python controller,
+    Chip tool standalone, Android or iOS app
 
     [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
 
@@ -310,16 +315,17 @@ Here is some CHIPTool examples:
 
 ### Notes
 
-- Depending on your network settings your router might not provide native ipv6
-  addresses to your devices (Border router / PC). If this is the case, you need
-  to add a static ipv6 addresses on both device and then an ipv6 route to the
-  border router on your PC
-    - On Border Router: `sudo ip addr add dev <Network interface> 2002::2/64`
+-   Depending on your network settings your router might not provide native ipv6
+    addresses to your devices (Border router / PC). If this is the case, you
+    need to add a static ipv6 addresses on both device and then an ipv6 route to
+    the border router on your PC
 
-    - On PC(Linux): `sudo ip addr add dev <Network interface> 2002::1/64`
+    -   On Border Router: `sudo ip addr add dev <Network interface> 2002::2/64`
 
-    - Add Ipv6 route on PC(Linux)
-      `sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2`
+    -   On PC(Linux): `sudo ip addr add dev <Network interface> 2002::1/64`
+
+    -   Add Ipv6 route on PC(Linux)
+        `sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2`
 
 ## Memory settings
 

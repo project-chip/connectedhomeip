@@ -4,23 +4,23 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
 
 <hr>
 
-- [Matter EFR32 Window Covering Example](#matter-efr32-window-covering-example)
-    - [Introduction](#introduction)
-    - [Building](#building)
-    - [Flashing the Application](#flashing-the-application)
-    - [Viewing Logging Output](#viewing-logging-output)
-        - [SEGGER RTT](#segger-rtt)
-        - [Console Log](#console-log)
-            - [Configuring the VCOM](#configuring-the-vcom)
-        - [Using the console](#using-the-console)
-    - [Running the Complete Example](#running-the-complete-example)
-        - [Notes](#notes)
-    - [OTA Software Update](#ota-software-update)
-    - [Building options](#building-options)
-        - [Disabling logging](#disabling-logging)
-        - [Debug build / release build](#debug-build--release-build)
-        - [Disabling LCD](#disabling-lcd)
-        - [KVS maximum entry count](#kvs-maximum-entry-count)
+-   [Matter EFR32 Window Covering Example](#matter-efr32-window-covering-example)
+    -   [Introduction](#introduction)
+    -   [Building](#building)
+    -   [Flashing the Application](#flashing-the-application)
+    -   [Viewing Logging Output](#viewing-logging-output)
+        -   [SEGGER RTT](#segger-rtt)
+        -   [Console Log](#console-log)
+            -   [Configuring the VCOM](#configuring-the-vcom)
+        -   [Using the console](#using-the-console)
+    -   [Running the Complete Example](#running-the-complete-example)
+        -   [Notes](#notes)
+    -   [OTA Software Update](#ota-software-update)
+    -   [Building options](#building-options)
+        -   [Disabling logging](#disabling-logging)
+        -   [Debug build / release build](#debug-build--release-build)
+        -   [Disabling LCD](#disabling-lcd)
+        -   [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -52,86 +52,90 @@ Silicon Labs platform.
 
 ## Building
 
-- Download the
-  [Simplicity Commander](https://www.silabs.com/mcu/programming-options) command
-  line tool, and ensure that `commander` is your shell search path. (For Mac OS
-  X, `commander` is located inside `Commander.app/Contents/MacOS/`.)
+-   Download the
+    [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
+    command line tool, and ensure that `commander` is your shell search path.
+    (For Mac OS X, `commander` is located inside
+    `Commander.app/Contents/MacOS/`.)
 
-- Download and install a suitable ARM gcc tool chain (For most Host, the
-  bootstrap already installs the toolchain):
-  [GNU Arm Embedded Toolchain 12.2 Rel1](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
+-   Download and install a suitable ARM gcc tool chain (For most Host, the
+    bootstrap already installs the toolchain):
+    [GNU Arm Embedded Toolchain 12.2 Rel1](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
 
-- Install some additional tools(likely already present for CHIP developers):
+-   Install some additional tools(likely already present for CHIP developers):
 
-           # Linux
-           $ sudo apt-get install git ninja-build
+             # Linux
+             $ sudo apt-get install git ninja-build
 
-           # Mac OS X
-           $ brew install ninja
+             # Mac OS X
+             $ brew install ninja
 
-- Supported hardware:
-    - > For the latest supported hardware please refer to the
-      > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
-      > in the Silicon Labs Matter Documentation
+-   Supported hardware:
+
+    -   > For the latest supported hardware please refer to the
+        > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
+        > in the Silicon Labs Matter Documentation
 
     MG24 boards :
-    - BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    - BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    - BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    - BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    - BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-    - BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
-* Region code Setting (917 WiFi projects)
-    - In Wifi configurations, the region code can be set in this
-      [file](https://github.com/project-chip/connectedhomeip/blob/85e9d5fd42071d52fa3940238739544fd2a3f717/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.cpp#L104).
-      The available region codes can be found
-      [here](https://github.com/SiliconLabs/wiseconnect/blob/f675628eefa1ac4990e94146abb75dd08b522571/components/device/silabs/si91x/wireless/inc/sl_si91x_types.h#L71)
+    -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
-* Build the example application:
+*   Region code Setting (917 WiFi projects)
 
-          cd ~/connectedhomeip
-          ./scripts/examples/gn_silabs_example.sh ./examples/window-app/silabs/ ./out/window-app BRD4187C
+    -   In Wifi configurations, the region code can be set in this
+        [file](https://github.com/project-chip/connectedhomeip/blob/85e9d5fd42071d52fa3940238739544fd2a3f717/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.cpp#L104).
+        The available region codes can be found
+        [here](https://github.com/SiliconLabs/wiseconnect/blob/f675628eefa1ac4990e94146abb75dd08b522571/components/device/silabs/si91x/wireless/inc/sl_si91x_types.h#L71)
 
-- To delete generated executable, libraries and object files use:
+*   Build the example application:
 
-          $ cd ~/connectedhomeip
-          $ rm -rf ./out/
+            cd ~/connectedhomeip
+            ./scripts/examples/gn_silabs_example.sh ./examples/window-app/silabs/ ./out/window-app BRD4187C
+
+-   To delete generated executable, libraries and object files use:
+
+            $ cd ~/connectedhomeip
+            $ rm -rf ./out/
 
     OR use GN/Ninja directly
 
-          $ cd ~/connectedhomeip/examples/window-app/silabs
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export SILABS_BOARD=BRD4187C
-          $ gn gen out/debug
-          $ ninja -C out/debug
+            $ cd ~/connectedhomeip/examples/window-app/silabs
+            $ git submodule update --init
+            $ source third_party/connectedhomeip/scripts/activate.sh
+            $ export SILABS_BOARD=BRD4187C
+            $ gn gen out/debug
+            $ ninja -C out/debug
 
-- To delete generated executable, libraries and object files use:
+-   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/window-app/silabs
-          $ rm -rf out/
+            $ cd ~/connectedhomeip/examples/window-app/silabs
+            $ rm -rf out/
 
-* Build the example as Intermittently Connected Device (ICD)
+*   Build the example as Intermittently Connected Device (ICD)
 
-          $ ./scripts/examples/gn_silabs_example.sh ./examples/window-app/silabs/ ./out/window-app_ICD BRD4187C --icd
+            $ ./scripts/examples/gn_silabs_example.sh ./examples/window-app/silabs/ ./out/window-app_ICD BRD4187C --icd
 
     or use gn as previously mentioned but adding the following arguments:
 
-          $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
+            $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
 
-* Build the example with pigweed RCP
+*   Build the example with pigweed RCP
 
-          $ ./scripts/examples/gn_silabs_example.sh examples/window-app/silabs/ out/window_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
+            $ ./scripts/examples/gn_silabs_example.sh examples/window-app/silabs/ out/window_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
 
     or use GN/Ninja Directly
 
-          $ cd ~/connectedhomeip/examples/window-app/silabs
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export SILABS_BOARD=BRD4187C
-          $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
-          $ ninja -C out/debug
+            $ cd ~/connectedhomeip/examples/window-app/silabs
+            $ git submodule update --init
+            $ source third_party/connectedhomeip/scripts/activate.sh
+            $ export SILABS_BOARD=BRD4187C
+            $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
+            $ ninja -C out/debug
 
 For more build options, help is provided when running the build script without
 arguments
@@ -140,12 +144,12 @@ arguments
 
 ## Flashing the Application
 
-- On the command line:
+-   On the command line:
 
-          $ cd ~/connectedhomeip/examples/window-app/silabs
-          $ python3 out/debug/matter-silabs-window-example.flash.py
+            $ cd ~/connectedhomeip/examples/window-app/silabs
+            $ python3 out/debug/matter-silabs-window-example.flash.py
 
-- Or with the Ozone debugger, just load the .out file.
+-   Or with the Ozone debugger, just load the .out file.
 
 All EFR32 boards require a bootloader, see Silicon Labs documentation for more
 info. Pre-built bootloader binaries are available on the
@@ -167,37 +171,37 @@ Software and Documentation Pack_
 Alternatively, SEGGER Ozone J-Link debugger can be used to view RTT logs too
 after flashing the .out file.
 
-- Download the J-Link installer by navigating to the appropriate URL and
-  agreeing to the license agreement.
+-   Download the J-Link installer by navigating to the appropriate URL and
+    agreeing to the license agreement.
 
-- [JLink_Linux_x86_64.deb](https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.deb)
-- [JLink_MacOSX.pkg](https://www.segger.com/downloads/jlink/JLink_MacOSX.pkg)
+-   [JLink_Linux_x86_64.deb](https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.deb)
+-   [JLink_MacOSX.pkg](https://www.segger.com/downloads/jlink/JLink_MacOSX.pkg)
 
-* Install the J-Link software
+*   Install the J-Link software
 
-          $ cd ~/Downloads
-          $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
+            $ cd ~/Downloads
+            $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
 
-* In Linux, grant the logged in user the ability to talk to the development
-  hardware via the linux tty device (/dev/ttyACMx) by adding them to the dialout
-  group.
+*   In Linux, grant the logged in user the ability to talk to the development
+    hardware via the linux tty device (/dev/ttyACMx) by adding them to the
+    dialout group.
 
-          $ sudo usermod -a -G dialout ${USER}
+            $ sudo usermod -a -G dialout ${USER}
 
 Once the above is complete, log output can be viewed using the JLinkExe tool in
 combination with JLinkRTTClient as follows:
 
-- Run the JLinkExe tool with arguments to autoconnect to the WSTK board:
+-   Run the JLinkExe tool with arguments to autoconnect to the WSTK board:
 
     For MG24 use:
 
-          ```
-          $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
-          ```
+            ```
+            $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
+            ```
 
-- In a second terminal, run the JLinkRTTClient to view logs:
+-   In a second terminal, run the JLinkRTTClient to view logs:
 
-          $ JLinkRTTClient
+            $ JLinkRTTClient
 
 ### Console Log
 
@@ -212,9 +216,9 @@ the verbose mode is selected (--verbose)
 
 #### Configuring the VCOM
 
-- Using (Simplicity
-  Studio)[https://community.silabs.com/s/article/wstk-virtual-com-port-baudrate-setting?language=en_US]
-- Using commander-cli
+-   Using (Simplicity
+    Studio)[https://community.silabs.com/s/article/wstk-virtual-com-port-baudrate-setting?language=en_US]
+-   Using commander-cli
     ```
     commander vcom config --baudrate 921600 --handshake rtscts
     ```
@@ -225,72 +229,73 @@ With any serial terminal application such as screen, putty, minicom etc.
 
 ## Running the Complete Example
 
-- It is assumed here that you already have an OpenThread border router
-  configured and running. If not see the following guide
-  [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/platforms/openthread/openthread_border_router_pi.md)
-  for more information on how to setup a border router on a raspberryPi.
+-   It is assumed here that you already have an OpenThread border router
+    configured and running. If not see the following guide
+    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/platforms/openthread/openthread_border_router_pi.md)
+    for more information on how to setup a border router on a raspberryPi.
 
     Take note that the RCP code is available directly through
     [Simplicity Studio 5](https://www.silabs.com/products/development-tools/software/simplicity-studio/simplicity-studio-5)
     under File->New->Project Wizard->Examples->Thread : ot-rcp
 
-- User interface : **LCD** The LCD on Silabs WSTK shows a QR Code. This QR Code
-  is be scanned by the CHIP Tool app For the Rendez-vous procedure over BLE
+-   User interface : **LCD** The LCD on Silabs WSTK shows a QR Code. This QR
+    Code is be scanned by the CHIP Tool app For the Rendez-vous procedure over
+    BLE
 
-        * On devices that do not have or support the LCD Display like the BRD4166A Thunderboard Sense 2,
-          a URL can be found in the RTT logs.
+          * On devices that do not have or support the LCD Display like the BRD4166A Thunderboard Sense 2,
+            a URL can be found in the RTT logs.
 
-          <info  > [SVR] Copy/paste the below URL in a browser to see the QR Code:
-          <info  > [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
+            <info  > [SVR] Copy/paste the below URL in a browser to see the QR Code:
+            <info  > [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
 
     **LED 0** shows the overall state of the device and its connectivity. The
     following states are possible:
 
-        -   _Short Flash On (50 ms on/950 ms off)_ ; The device is in the
-            unprovisioned (unpaired) state and is waiting for a commissioning
-            application to connect.
+          -   _Short Flash On (50 ms on/950 ms off)_ ; The device is in the
+              unprovisioned (unpaired) state and is waiting for a commissioning
+              application to connect.
 
-        -   _Rapid Even Flashing_ ; (100 ms on/100 ms off)_ &mdash; The device is in the
-            unprovisioned state and a commissioning application is connected through
-            Bluetooth LE.
+          -   _Rapid Even Flashing_ ; (100 ms on/100 ms off)_ &mdash; The device is in the
+              unprovisioned state and a commissioning application is connected through
+              Bluetooth LE.
 
-        -   _Short Flash Off_ ; (950ms on/50ms off)_ &mdash; The device is fully
-            provisioned, but does not yet have full Thread network or service
-            connectivity.
+          -   _Short Flash Off_ ; (950ms on/50ms off)_ &mdash; The device is fully
+              provisioned, but does not yet have full Thread network or service
+              connectivity.
 
-        -   _Solid On_ ; The device is fully provisioned and has full Thread
-            network and service connectivity.
+          -   _Solid On_ ; The device is fully provisioned and has full Thread
+              network and service connectivity.
 
     **LED 1** Shows the state of the window covering
 
-        -   _Solid On_ ; The window cover if fully open
-        -   _Off_ ; The window cover if fully closed
-        -   _Blinking slowly_ ; The window cover is half-open, either by tilt, or lift
-        -   _Blinking quickly_ ; The window cover is being automatically open or closed
+          -   _Solid On_ ; The window cover if fully open
+          -   _Off_ ; The window cover if fully closed
+          -   _Blinking slowly_ ; The window cover is half-open, either by tilt, or lift
+          -   _Blinking quickly_ ; The window cover is being automatically open or closed
 
     **Push Button 0** Increase either tilt or lift, and factory reset
 
-        -   Pressed and release: The lift/tilt increases by 10%
+          -   Pressed and release: The lift/tilt increases by 10%
 
-        -   Pressed and hold for 6 s: Initiates the factory reset of the device.
-            Releasing the button within the 6-second window cancels the factory reset
-            procedure. **LEDs** blink in unison when the factory reset procedure is
-            initiated.
+          -   Pressed and hold for 6 s: Initiates the factory reset of the device.
+              Releasing the button within the 6-second window cancels the factory reset
+              procedure. **LEDs** blink in unison when the factory reset procedure is
+              initiated.
 
     **Push Button 1** Decreases either tilt or lift, or switch the cover type
 
-        -   Pressed and release: The lift/tilt decreases by 10%
+          -   Pressed and release: The lift/tilt decreases by 10%
 
-        -   Press and hold for 3 s: Cycle between window covering type (Rollershade, Drapery, Tilt Blind - Lift and Tilt).
+          -   Press and hold for 3 s: Cycle between window covering type (Rollershade, Drapery, Tilt Blind - Lift and Tilt).
 
     **Push Button0 and Button1** Switch between lift and tilt
 
-        - Pressing and release both buttons at the same time: switches between lift and tilt modes. Most window covering types support either lift only, or tilt only, but type 0x08 support both (default)
+          - Pressing and release both buttons at the same time: switches between lift and tilt modes. Most window covering types support either lift only, or tilt only, but type 0x08 support both (default)
 
-        - Pressing and hold both buttons at the same time: Cycles between window covering 1, and window covering 2.
+          - Pressing and hold both buttons at the same time: Cycles between window covering 1, and window covering 2.
 
-* Once the device is provisioned, it will join the Thread network is
-  established, look for the RTT log
+*   Once the device is provisioned, it will join the Thread network is
+    established, look for the RTT log
 
     ```
         [DL] Device Role: CHILD
@@ -337,19 +342,19 @@ With any serial terminal application such as screen, putty, minicom etc.
 
 ### Notes
 
-- Depending on your network settings your router might not provide native ipv6
-  addresses to your devices (Border router / PC). If this is the case, you need
-  to add a static ipv6 addresses on both device and then an ipv6 route to the
-  border router on your PC
+-   Depending on your network settings your router might not provide native ipv6
+    addresses to your devices (Border router / PC). If this is the case, you
+    need to add a static ipv6 addresses on both device and then an ipv6 route to
+    the border router on your PC
 
-          # On Border Router :
-          $ sudo ip addr add dev <Network interface> 2002::2/64
+            # On Border Router :
+            $ sudo ip addr add dev <Network interface> 2002::2/64
 
-          # On PC (Linux) :
-          $ sudo ip addr add dev <Network interface> 2002::1/64
+            # On PC (Linux) :
+            $ sudo ip addr add dev <Network interface> 2002::1/64
 
-          # Add Ipv6 route on PC (Linux)
-          $ sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2
+            # Add Ipv6 route on PC (Linux)
+            $ sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2
 
 ## OTA Software Update
 

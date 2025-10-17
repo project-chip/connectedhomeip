@@ -8,15 +8,15 @@ line interface (CLI). For OpenThread devices, the OpenThread CLI can be used
 with or without the Matter CLI. For Wi-Fi devices, only the Matter CLI is
 available.
 
-- [Introduction](#introduction)
-- [Enable the CLI Interfaces](#enable-the-cli-interfaces)
-    - [Matter CLI](#matter-cli)
-    - [OpenThread CLI](#openthread-cli)
-- [Connecting to the Device](#connecting-to-the-device)
-    - [Screen Utility](#screen-utility)
-    - [Tera Term](#tera-term)
-- [Command List](#command-list)
-- [Application Specific Commands](#application-specific-commands)
+-   [Introduction](#introduction)
+-   [Enable the CLI Interfaces](#enable-the-cli-interfaces)
+    -   [Matter CLI](#matter-cli)
+    -   [OpenThread CLI](#openthread-cli)
+-   [Connecting to the Device](#connecting-to-the-device)
+    -   [Screen Utility](#screen-utility)
+    -   [Tera Term](#tera-term)
+-   [Command List](#command-list)
+-   [Application Specific Commands](#application-specific-commands)
 
 ## Enable the CLI Interfaces
 
@@ -80,21 +80,21 @@ When the prompt `matterCli>` is printed, the device is ready for a command.
 > **Note**: When the OpenThread CLI is used without the Matter CLI, the prompt
 > is `>`.
 
-- [help](#help)
-- [base64](#base64)
-- [exit](#exit)
-- [version](#version)
-- [ble](#ble)
-- [config](#config)
-- [device](#device)
-- [onboardingcodes](#onboardingcodes)
-- [dns](#dns)
-- [ota](#ota)
-- [stat](#stat)
-- [echo](#echo)
-- [log](#log)
-- [rand](#rand)
-- [otcli](#otcli)
+-   [help](#help)
+-   [base64](#base64)
+-   [exit](#exit)
+-   [version](#version)
+-   [ble](#ble)
+-   [config](#config)
+-   [device](#device)
+-   [onboardingcodes](#onboardingcodes)
+-   [dns](#dns)
+-   [ota](#ota)
+-   [stat](#stat)
+-   [echo](#echo)
+-   [log](#log)
+-   [rand](#rand)
+-   [otcli](#otcli)
 
 ### help
 
