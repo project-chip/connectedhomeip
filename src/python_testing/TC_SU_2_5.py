@@ -71,7 +71,6 @@ logger = logging.getLogger(__name__)
 
 class TC_SU_2_5(SoftwareUpdateBaseTest):
     "This test case verifies that the DUT behaves according to the spec when it is applying the software update."
-
     kvs_path = '/tmp/chip_kvs_provider'
     provider_log = '/tmp/provider_log_2_5.log'
     current_requestor_app_pid = None
@@ -95,6 +94,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # Set up Provider configuration and values for step1
         ota_image = self.user_params.get('ota_image_step1', None)
         self.expected_software_version = self.user_params.get('ota_image_step1_expected_version')
+        self.provider_app_path = self.user_params.get('provider_app_path', None)
 
         self.requestor_node_id = self.dut_node_id  # 123 with discriminator 123
         self.controller = self.default_controller
@@ -102,6 +102,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         extra_arguments = ['--applyUpdateAction', 'proceed', '--delayedApplyActionTimeSec', '0']
 
         self.start_provider(
+            provier_app_path=self.provider_app_path,
             ota_image_path=ota_image,
             setup_pincode=self.provider_data['setup_pincode'],
             discriminator=self.provider_data['discriminator'],
@@ -121,7 +122,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         await self.create_acl_entry(dev_ctrl=self.controller,
                                     provider_node_id=self.provider_data['node_id'], requestor_node_id=self.requestor_node_id)
         logger.info("Write OTA Providers")
-        await self.write_ota_providers(controller=self.controller, provider_node_id=self.provider_data['node_id'], endpoint=0)
+        await self.set_default_ota_providers_list(controller=self.controller, provider_node_id=self.provider_data['node_id'], requestor_node_id=self.requestor_node_id, endpoint=0)
         super().setup_test()
 
     def desc_TC_SU_2_5(self) -> str:
@@ -213,6 +214,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             node_id=self.requestor_node_id)
         extra_arguments = ['--applyUpdateAction', 'proceed', '--delayedApplyActionTimeSec', str(delayed_apply_action_time)]
         self.start_provider(
+            provier_app_path=self.provider_app_path,
             ota_image_path=ota_image,
             setup_pincode=self.provider_data['setup_pincode'],
             discriminator=self.provider_data['discriminator'],
@@ -284,6 +286,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         spec_wait_time = 120
         extra_arguments = ['--applyUpdateAction', 'awaitNextAction', '--delayedApplyActionTimeSec', str(delayed_apply_action_time)]
         self.start_provider(
+            provier_app_path=self.provider_app_path,
             ota_image_path=ota_image,
             setup_pincode=self.provider_data['setup_pincode'],
             discriminator=self.provider_data['discriminator'],
@@ -377,6 +380,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         delayed_apply_action_time = 180
         extra_arguments = ['--applyUpdateAction', 'awaitNextAction', '--delayedApplyActionTimeSec', str(delayed_apply_action_time)]
         self.start_provider(
+            provier_app_path=self.provider_app_path,
             ota_image_path=ota_image,
             setup_pincode=self.provider_data['setup_pincode'],
             discriminator=self.provider_data['discriminator'],
@@ -456,6 +460,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         ota_image = self.user_params.get('ota_image_step5', None)
         extra_arguments = ['--applyUpdateAction', 'discontinue']
         self.start_provider(
+            provier_app_path=self.provider_app_path,
             ota_image_path=ota_image,
             setup_pincode=self.provider_data['setup_pincode'],
             discriminator=self.provider_data['discriminator'],
