@@ -101,6 +101,8 @@ jobs:
                 build-variant: ${{ matrix.build_variant }}
                 disable: ${{ env.DISABLE_CCACHE }}
                 cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
+            - name: ccache zero stats
+              run: ccache -z
 
             - name: Validate that xml are parsable
               # The sub-items being run here are the same as the input XMLs listed
@@ -268,10 +270,18 @@ jobs:
                         --include_pytest_deps yes \
                         $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache) \
                      "
+                  mkdir -p ccache-debug
+                  CCACHE_DEBUG=1 CCACHE_DEBUGDIR="$GITHUB_WORKSPACE/ccache-debug" \
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target linux-x64-all-clusters-${BUILD_VARIANT} \
+                        --pw-command-launcher=ccache \
+                        build \
+                        --copy-artifacts-to objdir-clone \
+                     "
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
                         --target linux-x64-lock-${BUILD_VARIANT} \
                         --target linux-x64-ota-provider-${BUILD_VARIANT} \
                         --target linux-x64-ota-requestor-${BUILD_VARIANT} \
@@ -309,17 +319,32 @@ jobs:
                         --target linux-x64-tv-app-${BUILD_VARIANT} \
                         --target linux-x64-bridge-${BUILD_VARIANT} \
                         --target linux-x64-lit-icd-${BUILD_VARIANT} \
-                        --target linux-x64-microwave-oven-${BUILD_VARIIANT} \
+                        --target linux-x64-microwave-oven-${BUILD_VARIANT} \
                         --target linux-x64-rvc-${BUILD_VARIANT} \
                         --target linux-x64-network-manager-${BUILD_VARIANT} \
-                        --target linux-x64-energy-gateway-${BUILD_VARIIANT} \
+                        --target linux-x64-energy-gateway-${BUILD_VARIANT} \
                         --target linux-x64-energy-management-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
 
             - name: ccache stats
-              run: ccache -s
+              run: ccache --show-stats --verbose
+            - name: Rebuild chip-tool and all-clusters for cache-hit validation
+              run: |
+                  CCACHE_DEBUG=1 CCACHE_DEBUGDIR="$GITHUB_WORKSPACE/ccache-debug" \
+                  ./scripts/run_in_build_env.sh \
+                    "ninja -C out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} -t clean && ninja -C out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}"
+                  CCACHE_DEBUG=1 CCACHE_DEBUGDIR="$GITHUB_WORKSPACE/ccache-debug" \
+                  ./scripts/run_in_build_env.sh \
+                    "ninja -C out/linux-x64-all-clusters-${BUILD_VARIANT} -t clean && ninja -C out/linux-x64-all-clusters-${BUILD_VARIANT}"
+            - name: ccache stats (post-rebuild)
+              run: ccache --show-stats --verbose
+            - name: Upload ccache per-object diagnostics (chip-tool, all-clusters)
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ccache-debug-chip-tool-all-clusters
+                  path: ccache-debug/
 
             - name: Run Tests using the python parser sending commands to chip-tool
               run: |
@@ -825,7 +850,7 @@ jobs:
                   && rm -rf out/linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: ccache stats
-              run: ccache -s
+              run: ccache --show-stats --verbose
 
             - name: Install push_av_server dependencies
               run: >-
