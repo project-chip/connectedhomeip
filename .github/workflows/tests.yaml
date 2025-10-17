@@ -624,205 +624,35 @@ jobs:
             - name: Build python env
               run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv --enable-ccache'
 
-            - name: Build linux-x64-all-clusters
+            - name: Build apps for REPL tests
               env:
                   CCACHE_DIR: "${{ github.workspace }}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test
-                  "
-            # TODO: determine why some apps are tsan and some are not (and does that add runtime overhead? )
-            - name: Build linux-x64-bridge
-              env:
-                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test"
-
-            - name: Build linux-x64-lock
-              env:
-                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test"
-
-            - name: Build linux-x64-lit-icd
-              env:
-                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test"
-
-            - name: Build linux-x64-air-purifier
-              env:
-                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test"
-
-            - name: Build linux-x64-energy-gateway
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test"
-
-            - name: Build linux-x64-energy-management
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test"
-
-            - name: Build linux-x64-microwave-oven
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test"
-
-            - name: Build linux-x64-rvc
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test"
-
-            - name: Build linux-x64-network-manager
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test"
-
-            - name: Build linux-x64-fabric-admin-rpc
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang"
-
-            - name: Build linux-x64-fabric-bridge-rpc
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang"
-
-            - name: Build linux-x64-fabric-sync
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-fabric-sync-${BUILD_VARIANT}-clang
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-fabric-sync-${BUILD_VARIANT}-clang"
-
-            # TODO: camera app needs clang support
-            - name: Build linux-x64-camera
-              env:
-                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-camera
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-camera"
-
-            - name: Build linux-x64-camera-controller
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-camera-controller
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-camera-controller"
-
-            - name: Build linux-x64-light-data-model-no-unique-id
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang"
-
-            - name: Build linux-x64-terms-and-conditions
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-terms-and-conditions
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-terms-and-conditions"
-
-            - name: Build linux-x64-python-bindings
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-python-bindings-webrtc
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-python-bindings-webrtc"
-
-            - name: Build linux-x64-jf-control-app
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-jf-control-app
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-jf-control-app"
-
-            - name: Build linux-x64-jf-admin-app
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-jf-admin-app
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-jf-admin-app"
-
-            - name: Build linux-x64-closure-app
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test"
-
-            - name: Build linux-x64-water-leak-detector
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test"
+              run: |
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py \
+                    --target linux-x64-all-clusters-${{matrix.build_variant}}-tsan-clang-test \
+                    --target linux-x64-bridge-${{matrix.build_variant}}-tsan-clang-test \
+                    --target linux-x64-lock-${{matrix.build_variant}}-tsan-clang-test \
+                    --target linux-x64-lit-icd-${{matrix.build_variant}}-tsan-clang-test \
+                    --target linux-x64-air-purifier-${{matrix.build_variant}}-tsan-clang-test \
+                    --target linux-x64-energy-gateway-${{matrix.build_variant}}-tsan-clang-test \
+                    --target linux-x64-energy-management-${{matrix.build_variant}}-tsan-clang-test \
+                    --target linux-x64-microwave-oven-${{matrix.build_variant}}-tsan-clang-test \
+                    --target linux-x64-rvc-${{matrix.build_variant}}-tsan-clang-test \
+                    --target linux-x64-network-manager-${{matrix.build_variant}}-tsan-clang-test \
+                    --target linux-x64-fabric-admin-rpc-${{matrix.build_variant}}-clang \
+                    --target linux-x64-fabric-bridge-rpc-${{matrix.build_variant}}-clang \
+                    --target linux-x64-fabric-sync-${{matrix.build_variant}}-clang \
+                    --target linux-x64-camera \
+                    --target linux-x64-camera-controller \
+                    --target linux-x64-light-data-model-no-unique-id-${{matrix.build_variant}}-clang \
+                    --target linux-x64-terms-and-conditions \
+                    --target linux-x64-python-bindings-webrtc \
+                    --target linux-x64-jf-control-app \
+                    --target linux-x64-jf-admin-app \
+                    --target linux-x64-closure-${{matrix.build_variant}}-tsan-clang-test \
+                    --target linux-x64-water-leak-detector-${{matrix.build_variant}}-tsan-clang-test \
+                    --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone"
+                  rm -rf out
 
             - name: ccache stats
               run: ccache -s
