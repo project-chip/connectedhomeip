@@ -105,8 +105,7 @@ arguments
 -   Or with the Ozone debugger, just load the .out file.
 
 All SiWx917 boards require a connectivity firmware, see Silicon Labs
-documentation for more info. Pre-built firmware binaries are available are
-available on the
+documentation for more info. Pre-built firmware binaries are available on the
 [Matter Software Artifacts page](https://docs.silabs.com/matter/latest/matter-prerequisites/matter-artifacts#siwx917-firmware-for-siwn917-ncp-and-siwg917-soc).
 
 ## Running the Complete Example
