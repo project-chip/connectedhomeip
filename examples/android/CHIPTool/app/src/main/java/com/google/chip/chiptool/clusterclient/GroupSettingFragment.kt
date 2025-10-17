@@ -482,9 +482,9 @@ class GroupSettingFragment : Fragment() {
       AccessControlClusterAccessControlEntryStruct(
         privilege.toInt(),
         AccessControlEntry.Operate.id.toInt() /* Group */,
-        arrayListOf(groupId.toULong().toLong()),
-        null,
-        Optional.empty(),
+        arrayListOf(groupId.toULong().toLong()), /* GroupID as subject */
+        null, /* null (empty) targets: wildcard access to everything */
+        Optional.empty(), /* no auxiliaryType (does not apply to writes) */
         deviceController.fabricIndex.toUInt().toInt()
       )
     sendEntry.add(newEntry)
