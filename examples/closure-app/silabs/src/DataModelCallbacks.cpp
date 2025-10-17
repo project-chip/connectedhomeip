@@ -68,7 +68,7 @@ void MatterClosureControlClusterServerAttributeChangedCallback(const app::Concre
         break;
     default:
         // Log other attribute changes but don't update UI
-        ChipLogProgress(Zcl, "Closure attribute change 0x%08lX on endpoint %d (no UI update)", attributePath.mAttributeId, attributePath.mEndpointId);
+        ChipLogProgress(Zcl, "Closure attribute change 0x%08lX on endpoint %d ", attributePath.mAttributeId, attributePath.mEndpointId);
         break;
     }
 #endif // DISPLAY_ENABLED
