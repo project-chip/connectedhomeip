@@ -455,9 +455,9 @@ class TestDefinition:
                 setupCode = app.setupCode
 
             if test_runtime == TestRunTime.MATTER_REPL_PYTHON:
-                python_cmd = apps.matter_repl_yaml_tester_cmd
-                    .add_args(('--setup-code', setupCode))
-                    .add_args(('--yaml-path', self.run_name))
+                python_cmd = apps.matter_repl_yaml_tester_cmd \
+                    .add_args(('--setup-code', setupCode)) \
+                    .add_args(('--yaml-path', self.run_name)) \
                     .add_args(("--pics-file", pics_file))
 
                 if dry_run:
@@ -478,8 +478,8 @@ class TestDefinition:
                 if self.target == TestTarget.LIT_ICD and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
                     pairing_cmd = pairing_cmd.add_args(('--icd-registration', 'true'))
 
-                test_cmd = apps.chip_tool_with_python_cmd
-                    .add_args(('tests', self.run_name))
+                test_cmd = apps.chip_tool_with_python_cmd \
+                    .add_args(('tests', self.run_name)) \
                     .add_args(('--PICS', pics_file))
                 
                 server_args = (
