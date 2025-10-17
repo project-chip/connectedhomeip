@@ -312,8 +312,7 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
     return CHIP_ERROR_NOT_FOUND;
 }
 
-void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                             Providerchangedlistener * listener)
+void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, Providerchangedlistener * listener)
 {
     gMockDataVersion++;
     listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
