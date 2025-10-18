@@ -718,6 +718,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _targets = nil;
 
+        _auxiliaryType = nil;
+
         _fabricIndex = @(0);
     }
     return self;
@@ -731,6 +733,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.authMode = self.authMode;
     other.subjects = self.subjects;
     other.targets = self.targets;
+    other.auxiliaryType = self.auxiliaryType;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -738,7 +741,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: privilege:%@; authMode:%@; subjects:%@; targets:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _privilege, _authMode, _subjects, _targets, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: privilege:%@; authMode:%@; subjects:%@; targets:%@; auxiliaryType:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _privilege, _authMode, _subjects, _targets, _auxiliaryType, _fabricIndex];
     return descriptionString;
 }
 
@@ -896,6 +899,36 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: token:%@; instruction:%@; arlRequestFlowUrl:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _token, _instruction, _arlRequestFlowUrl, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAccessControlClusterAuxiliaryAccessUpdatedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _adminNodeID = nil;
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAccessControlClusterAuxiliaryAccessUpdatedEvent alloc] init];
+
+    other.adminNodeID = self.adminNodeID;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: adminNodeID:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _adminNodeID, _fabricIndex];
     return descriptionString;
 }
 
