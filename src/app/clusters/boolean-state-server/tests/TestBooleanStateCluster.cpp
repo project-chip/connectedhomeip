@@ -20,7 +20,6 @@
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/TestReadWriteAttribute.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/BooleanState/Attributes.h>
@@ -31,6 +30,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BooleanState;
 using namespace chip::app::Clusters::BooleanState::Attributes;
+using namespace chip::Test;
 
 namespace {
 
@@ -50,12 +50,6 @@ struct TestBooleanStateCluster : public ::testing::Test
     ServerClusterContext context;
     BooleanStateCluster booleanState;
 };
-
-template <typename T>
-inline CHIP_ERROR ReadClusterAttribute(BooleanStateCluster & cluster, AttributeId attr, T & val)
-{
-    return chip::Test::ReadClusterAttribute(cluster, ConcreteAttributePath(kRootEndpointId, BooleanState::Id, attr), val);
-}
 
 } // namespace
 
