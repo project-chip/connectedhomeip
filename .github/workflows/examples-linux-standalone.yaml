@@ -27,7 +27,9 @@ concurrency:
     cancel-in-progress: true
 
 env:
+    CCACHE_NOHASHDIR: 1
     CHIP_NO_LOG_TIMESTAMPS: true
+    CHIP_PW_COMMAND_LAUNCHER: ccache
 
 jobs:
     linux_standalone:
@@ -179,3 +181,6 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target linux-x64-closure \
                         build"
+
+            - name: CCache statistics
+              run: ccache --show-stats
