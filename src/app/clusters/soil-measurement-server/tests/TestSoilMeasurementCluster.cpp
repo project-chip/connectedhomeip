@@ -21,7 +21,6 @@
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/TestReadWriteAttribute.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/SoilMeasurement/Attributes.h>
 #include <clusters/SoilMeasurement/Metadata.h>
@@ -31,6 +30,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoilMeasurement;
 using namespace chip::app::Clusters::SoilMeasurement::Attributes;
+using namespace chip::Test;
 
 namespace {
 
@@ -82,13 +82,6 @@ struct TestSoilMeasurementCluster : public ::testing::Test
     SoilMeasurementClusterLocal soilMeasurement;
 };
 
-template <typename T>
-inline CHIP_ERROR ReadClusterAttribute(SoilMeasurementClusterLocal & cluster, AttributeId attr, T & val)
-{
-    return chip::Test::ReadClusterAttribute(cluster, ConcreteAttributePath(kEndpointWithSoilMeasurement, SoilMeasurement::Id, attr),
-                                            val);
-}
-
 } // namespace
 
 TEST_F(TestSoilMeasurementCluster, AttributeTest)
@@ -113,6 +106,11 @@ TEST_F(TestSoilMeasurementCluster, ReadAttributeTest)
 
     SoilMoistureMeasuredValue::TypeInfo::Type soilMoistureMeasuredValue;
     ASSERT_EQ(ReadClusterAttribute(soilMeasurement, SoilMoistureMeasuredValue::Id, soilMoistureMeasuredValue), CHIP_NO_ERROR);
+
+    // TODO: It's not safe to use ReadClusterAttribute() for SoilMoistureMeasurementLimits because it contains a list as a member
+    // SoilMoistureMeasurementLimits::TypeInfo::Type soilMoistureMeasurementLimits;
+    // ASSERT_EQ(ReadClusterAttribute(soilMeasurement, SoilMoistureMeasurementLimits::Id, soilMoistureMeasurementLimits),
+    // CHIP_NO_ERROR);
 }
 
 TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasuredValue)
