@@ -20,7 +20,6 @@
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/TestReadWriteAttribute.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/FixedLabel/Attributes.h>
 #include <clusters/FixedLabel/Metadata.h>
@@ -31,6 +30,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::FixedLabel;
 using namespace chip::app::Clusters::FixedLabel::Attributes;
+using namespace chip::Test;
 
 namespace {
 
@@ -50,12 +50,6 @@ struct TestFixedLabelCluster : public ::testing::Test
     ServerClusterContext context;
     FixedLabelCluster fixedLabel;
 };
-
-template <typename T>
-inline CHIP_ERROR ReadClusterAttribute(FixedLabelCluster & cluster, AttributeId attr, T & val)
-{
-    return chip::Test::ReadClusterAttribute(cluster, ConcreteAttributePath(kRootEndpointId, FixedLabel::Id, attr), val);
-}
 
 } // namespace
 
@@ -78,6 +72,7 @@ TEST_F(TestFixedLabelCluster, ReadAttributeTest)
     uint32_t features{};
     ASSERT_EQ(ReadClusterAttribute(fixedLabel, FeatureMap::Id, features), CHIP_NO_ERROR);
 
-    DataModel::DecodableList<Structs::LabelStruct::Type> labelList;
-    ASSERT_EQ(ReadClusterAttribute(fixedLabel, LabelList::Id, labelList), CHIP_NO_ERROR);
+    // TODO: It's not safe to use ReadClusterAttribute() for a list
+    // DataModel::DecodableList<Structs::LabelStruct::Type> labelList;
+    // ASSERT_EQ(ReadClusterAttribute(fixedLabel, LabelList::Id, labelList), CHIP_NO_ERROR);
 }
