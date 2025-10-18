@@ -213,7 +213,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
             '''
             TH sends the WriteRequestMessage to the DUT to modify the value of one attribute and Set SuppressResponse to True.
-            
+
             NOTE: Per Issue #41227, the current spec does not strictly enforce that devices must suppress the response.
             For now, we just ensure the device doesn't crash. The device MAY respond or may not - either is acceptable.
             Future spec revisions will enforce no response behavior.
@@ -225,7 +225,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
             logging.info("Testing SuppressResponse functionality with NodeLabel attribute")
             logging.info("NOTE: Device may or may not respond - both behaviors are acceptable for now per Issue #41227")
-            
+
             # Send write request with suppressResponse=True
             # Device may respond or not - we just ensure it doesn't crash
             try:
