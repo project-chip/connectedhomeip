@@ -29,6 +29,8 @@ logger = logging.getLogger(__name__)
 
 
 class PAVSTTestBase:
+    DEFAULT_AV_TRANSPORT_EXPIRY_TIME = 30  # 30s
+
     async def read_pavst_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.PushAvStreamTransport
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -187,8 +189,8 @@ class PAVSTTestBase:
 
     async def allocate_one_pushav_transport(self, endpoint, triggerType=Clusters.PushAvStreamTransport.Enums.TransportTriggerTypeEnum.kContinuous,
                                             trigger_Options=None, ingestMethod=Clusters.PushAvStreamTransport.Enums.IngestMethodsEnum.kCMAFIngest,
-                                            url="https://localhost:1234/streams/1", stream_Usage=None, container_Options=None,
-                                            videoStream_ID=None, audioStream_ID=None, expected_cluster_status=None, tlsEndPoint=1, expiryTime=10):
+                                            url="https://localhost:1234/streams/1/", stream_Usage=None, container_Options=None,
+                                            videoStream_ID=None, audioStream_ID=None, expected_cluster_status=None, tlsEndPoint=1, expiryTime=DEFAULT_AV_TRANSPORT_EXPIRY_TIME):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.PushAvStreamTransport
 
@@ -233,7 +235,7 @@ class PAVSTTestBase:
         containerOptions = {
             "containerType": cluster.Enums.ContainerFormatEnum.kCmaf,
             "CMAFContainerOptions": {"CMAFInterface": cluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 4000,
-                                     "sessionGroup": 3, "trackName": " "},
+                                     "sessionGroup": 3, "trackName": "media"},
         }
 
         if (container_Options is not None):
@@ -268,6 +270,8 @@ class PAVSTTestBase:
                     e.clusterStatus == expected_cluster_status, "Unexpected error returned"
                 )
                 return e.clusterStatus
+            if (e.status == Status.ResourceExhausted):
+                asserts.fail("RESOURCE_EXHAUSTED")
             return e.status
         pass
 

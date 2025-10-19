@@ -30,7 +30,7 @@ env
 cd "$ROOT_PATH"
 
 echo "Ensure submodules for Linux builds are checked out"
-./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --jobs 4 --platform linux
+./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
 
 echo "Setup build environment"
 source "./scripts/activate.sh"

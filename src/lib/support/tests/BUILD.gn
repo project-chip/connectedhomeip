@@ -53,6 +53,7 @@ chip_test_suite("tests") {
     "TestPool.cpp",
     "TestPrivateHeap.cpp",
     "TestReadOnlyBuffer.cpp",
+    "TestReferenceCountedPtr.cpp",
     "TestSafeInt.cpp",
     "TestSafeString.cpp",
     "TestScoped.cpp",

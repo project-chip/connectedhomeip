@@ -23,16 +23,21 @@ runs:
   using: "composite"
   steps:
     - name: Configure ccache
-      shell: bash
-      run: |
-        mkdir -p .ccache
-        echo "CCACHE_BASEDIR=${{ github.workspace }}" >> $GITHUB_ENV
-        echo "CCACHE_SLOPPINESS=time_macros" >> $GITHUB_ENV
-        echo "CCACHE_DIR=${{ github.workspace }}/.ccache" >> $GITHUB_ENV
-        echo "CCACHE_COMPILERCHECK=content" >> $GITHUB_ENV
-        echo "CCACHE_MAXSIZE=5G" >> $GITHUB_ENV
-        echo "CCACHE_COMPRESS=1" >> $GITHUB_ENV
-        echo "CCACHE_COMPRESSLEVEL=6" >> $GITHUB_ENV
+      uses: pyTooling/Actions/with-post-step@v0.4.5
+      with:
+        main: |
+          mkdir -p .ccache
+          echo "CCACHE_NOHASHDIR=1" >> $GITHUB_ENV
+          echo "CCACHE_BASEDIR=${{ github.workspace }}" >> $GITHUB_ENV
+          echo "CCACHE_SLOPPINESS=time_macros" >> $GITHUB_ENV
+          echo "CCACHE_DIR=${{ github.workspace }}/.ccache" >> $GITHUB_ENV
+          echo "CCACHE_COMPILERCHECK=content" >> $GITHUB_ENV
+          echo "CCACHE_MAXSIZE=5G" >> $GITHUB_ENV
+          echo "CCACHE_COMPRESS=1" >> $GITHUB_ENV
+          echo "CCACHE_COMPRESSLEVEL=6" >> $GITHUB_ENV
+          echo "CHIP_PW_COMMAND_LAUNCHER=ccache" >> $GITHUB_ENV
+        post: |
+          ccache --show-stats
     - name: Optionally disable ccache
       if: ${{ inputs.disable == 'true' }}
       shell: bash

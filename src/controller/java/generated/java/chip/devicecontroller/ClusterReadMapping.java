@@ -835,6 +835,17 @@ public class ClusterReadMapping {
           readAccessControlArlCommandParams
         );
         result.put("readArlAttribute", readAccessControlArlAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAccessControlAuxiliaryACLCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAccessControlAuxiliaryACLAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AccessControlCluster) cluster).readAuxiliaryACLAttribute(
+              (ChipClusters.AccessControlCluster.AuxiliaryACLAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAccessControlClusterAuxiliaryACLAttributeCallback(),
+          readAccessControlAuxiliaryACLCommandParams
+        );
+        result.put("readAuxiliaryACLAttribute", readAccessControlAuxiliaryACLAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readAccessControlGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readAccessControlGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -9378,6 +9389,17 @@ public class ClusterReadMapping {
           readPowerTopologyActiveEndpointsCommandParams
         );
         result.put("readActiveEndpointsAttribute", readPowerTopologyActiveEndpointsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readPowerTopologyElectricalCircuitNodesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readPowerTopologyElectricalCircuitNodesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.PowerTopologyCluster) cluster).readElectricalCircuitNodesAttribute(
+              (ChipClusters.PowerTopologyCluster.ElectricalCircuitNodesAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedPowerTopologyClusterElectricalCircuitNodesAttributeCallback(),
+          readPowerTopologyElectricalCircuitNodesCommandParams
+        );
+        result.put("readElectricalCircuitNodesAttribute", readPowerTopologyElectricalCircuitNodesAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readPowerTopologyGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readPowerTopologyGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

@@ -232,6 +232,53 @@ void PushAvStreamTransportServerLogic::PushAVStreamTransportDeallocateCallback(S
     }
 }
 
+bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
+{
+    const std::string https = "https://";
+
+    // Check minimum length and https prefix
+    if (url.size() <= https.size() || url.substr(0, https.size()) != https)
+    {
+        return false;
+    }
+
+    // Check that URL does not contain fragment character '#'
+    if (url.find('#') != std::string::npos)
+    {
+        ChipLogError(Camera, "URL contains fragment character '#'");
+        return false;
+    }
+
+    // Check that URL does not contain query character '?'
+    if (url.find('?') != std::string::npos)
+    {
+        ChipLogError(Camera, "URL contains query character '?'");
+        return false;
+    }
+
+    // Check that URL ends with a forward slash '/'
+    if (url.back() != '/')
+    {
+        ChipLogError(Camera, "URL does not end with '/'");
+        return false;
+    }
+
+    // Extract host part
+    size_t hostStart = https.size();
+    size_t hostEnd   = url.find('/', hostStart);
+    std::string host = url.substr(hostStart, hostEnd - hostStart);
+
+    // Basic host validation: ensure non-empty
+    if (host.empty())
+    {
+        ChipLogError(Camera, "URL does not contain a valid host.");
+        return false;
+    }
+
+    // Accept any host as long as non-empty
+    return true;
+}
+
 CHIP_ERROR PushAvStreamTransportServerLogic::ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec)
 {
     uint32_t timeoutMs = timeoutSec * MILLISECOND_TICKS_PER_SECOND;
@@ -621,14 +668,18 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    bool isValidUrl = mDelegate->ValidateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
-
-    if (isValidUrl == false)
+    if (transportOptions.containerOptions.containerType == ContainerFormatEnum::kCmaf &&
+        transportOptions.containerOptions.CMAFContainerOptions.HasValue())
     {
-        auto status = to_underlying(StatusCodeEnum::kInvalidURL);
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Url", mEndpointId);
-        handler.AddClusterSpecificFailure(commandPath, status);
-        return std::nullopt;
+        bool isValidUrl = ValidateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
+
+        if (isValidUrl == false)
+        {
+            auto status = to_underlying(StatusCodeEnum::kInvalidURL);
+            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Url", mEndpointId);
+            handler.AddClusterSpecificFailure(commandPath, status);
+            return std::nullopt;
+        }
     }
 
     bool isValidStreamUsage = mDelegate->ValidateStreamUsage(transportOptions.streamUsage);
@@ -798,14 +849,23 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         }
     }
 
-    bool isValidSegmentDuration = mDelegate->ValidateSegmentDuration(
-        transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration, transportOptionsPtr->videoStreamID);
-    if (isValidSegmentDuration == false)
+    if (transportOptions.containerOptions.containerType == ContainerFormatEnum::kCmaf &&
+        transportOptions.containerOptions.CMAFContainerOptions.HasValue())
     {
-        auto segmentDurationStatus = to_underlying(StatusCodeEnum::kInvalidOptions);
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Segment Duration not within allowed range", mEndpointId);
-        handler.AddClusterSpecificFailure(commandPath, segmentDurationStatus);
-        return std::nullopt;
+        // SegmentDuration validation is restricted to video streams because SegmentDuration must be a multiple of
+        // KeyFrameInterval. See spec issue: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/12322
+        if (transportOptionsPtr->videoStreamID.HasValue())
+        {
+            bool isValidSegmentDuration = mDelegate->ValidateSegmentDuration(
+                transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration, transportOptionsPtr->videoStreamID);
+            if (isValidSegmentDuration == false)
+            {
+                auto segmentDurationStatus = to_underlying(StatusCodeEnum::kInvalidOptions);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Segment Duration not within allowed range", mEndpointId);
+                handler.AddClusterSpecificFailure(commandPath, segmentDurationStatus);
+                return std::nullopt;
+            }
+        }
     }
 
     uint16_t connectionID = GenerateConnectionID();
@@ -817,18 +877,18 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    status = mDelegate->AllocatePushTransport(*transportOptionsPtr, connectionID);
+    FabricIndex accessingFabricIndex = handler.GetAccessingFabricIndex();
+
+    status = mDelegate->AllocatePushTransport(*transportOptionsPtr, connectionID, accessingFabricIndex);
 
     if (status == Status::Success)
     {
         // add connection to CurrentConnections
-        FabricIndex peerFabricIndex = handler.GetAccessingFabricIndex();
-
         TransportConfigurationStorage outTransportConfiguration(connectionID, transportOptionsPtr);
 
         outTransportConfiguration.transportStatus = TransportStatusEnum::kInactive;
 
-        outTransportConfiguration.SetFabricIndex(peerFabricIndex);
+        outTransportConfiguration.SetFabricIndex(accessingFabricIndex);
 
         UpsertStreamTransportConnection(outTransportConfiguration);
 
