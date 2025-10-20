@@ -44,10 +44,7 @@ if (chip_with_lwip) {
   import("//build_overrides/lwip.gni")
 }
 
-print("Current toolchain: ${current_toolchain}")
-
 if (current_toolchain != "${dir_pw_toolchain}/default:default") {
-  print("Configuring single CHIP build...\n")
   declare_args() {
     chip_enable_python_modules =
         (current_os == "mac" || current_os == "linux") &&
@@ -281,9 +278,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
   }
 } else {
-
-  print("Configuring unified CHIP build...\n")
-
   # This is the unified build. Configure various real toolchains.
   import("${chip_root}/build/chip/chip_build.gni")
   declare_args() {
@@ -416,9 +410,70 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_linux_ota_requestor_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
+    # Build the Linux Air Purifier app example.
+    enable_linux_air_purifier_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux Energy Gateway app example.
+    enable_linux_energy_gateway_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux Energy Management app example.
+    enable_linux_energy_management_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux Network Manager app example.
+    enable_linux_network_manager_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
     # TODO: #37983: Add darwin support for libdatachannel and then add host_os == "mac" here.
     # Build the Linux Camera app example.
     enable_linux_camera_app_build = enable_default_builds && host_os == "linux"
+
+    # Build the Linux Terms and Conditions app example.
+    enable_linux_terms_and_conditions_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux Python Bindings WebRTC app example.
+    enable_linux_python_bindings_webrtc_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux Python Bindings WebRTC app example.
+    enable_linux_python_bindings_webrtc_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux Closure app example.
+    enable_linux_closure_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux Water Leak Detector app example.
+    enable_linux_water_leak_detector_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux Light Data Model No Unique ID app example.
+    # enable_linux_light_data_model_no_unique_id_app_build =
+    #     enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux Camera Controller app example.
+    # enable_linux_camera_controller_app_build =
+    #     enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux Fabric Admin RPC app example.
+    # enable_linux_fabric_admin_rpc_app_build =
+    #     enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux Fabric Bridge RPC app example.
+    # enable_linux_fabric_bridge_rpc_app_build =
+    #     enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux JF Control app example.
+    # enable_linux_jf_control_app_build =
+    #     enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux JF Admin app example.
+    # enable_linux_jf_admin_app_build =
+    #     enable_default_builds && (host_os == "linux" || host_os == "mac")
+
 
     # Build the cc13x2x7_26x2x7 lock app example.
     enable_cc13x2x7_26x2x7_lock_app_build = enable_ti_simplelink_builds
@@ -781,7 +836,110 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     extra_build_deps += [ ":linux_ota_requestor_app" ]
   }
 
+  if (enable_linux_air_purifier_app_build) {
+    group("linux_air_purifier_app") {
+      deps = [ "${chip_root}/examples/air-purifier-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_air_purifier_app" ]
+  }
+
+  if (enable_linux_energy_gateway_app_build) {
+    group("linux_energy_gateway_app") {
+      deps = [ "${chip_root}/examples/energy-gateway-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_energy_gateway_app" ]
+  }
+
+  if (enable_linux_energy_management_app_build) {
+    group("linux_energy_management_app") {
+      deps = [ "${chip_root}/examples/energy-management-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_energy_management_app" ]
+  }
+
+  if (enable_linux_network_manager_app_build) {
+    group("linux_network_manager_app") {
+      deps = [ "${chip_root}/examples/network-manager-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_network_manager_app" ]
+  }
+
+  if (enable_linux_terms_and_conditions_app_build) {
+    group("linux_terms_and_conditions_app") {
+      deps = [ "${chip_root}/examples/terms-and-conditions-app/linux:default(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_terms_and_conditions_app" ]
+  }
+
+  if (enable_linux_python_bindings_webrtc_app_build) {
+    group("linux_python_bindings_webrtc_app") {
+      deps = [ "${chip_root}/src/controller/python:matter-repl(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_python_bindings_webrtc_app" ]
+  }
+
+  if (enable_linux_closure_app_build) {
+    group("linux_closure_app") {
+      deps = [ "${chip_root}/examples/closure-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_closure_app" ]
+  }
+
+  if (enable_linux_water_leak_detector_app_build) {
+    group("linux_water_leak_detector_app") {
+      deps = [ "${chip_root}/examples/water-leak-detector-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_water_leak_detector_app" ]
+  }
+
+
+  # if (enable_linux_fabric_admin_rpc_app_build) {
+  #   group("linux_fabric_admin_rpc_app") {
+  #     deps = [ "${chip_root}/examples/fabric-admin/(${standalone_toolchain})" ]
+  #   }
+
+  #   # extra_build_deps += [ ":linux_fabric_admin_rpc_app" ]
+  # }
+
+  # if (enable_linux_camera_app_build) {
+  #   group("linux_camera_app") {
+  #     deps =
+  #         [ "${chip_root}/examples/camera-app/linux(${standalone_toolchain})" ]
+  #   }
+
   #   extra_build_deps += [ ":linux_camera_app" ]
+  # }
+
+  # if (enable_linux_light_data_model_no_unique_id_app_build) {
+  #   group("linux_light_data_model_no_unique_id_app") {
+  #     deps = [ "${chip_root}/examples/lighting-app-data-mode-no-unique-id/linux(${standalone_toolchain})" ]
+  #   }
+
+  #   extra_build_deps += [ ":linux_light_data_model_no_unique_id_app" ]
+  # }
+
+  # if (enable_linux_jf_admin_app_build) {
+  #   group("linux_jf_admin_app") {
+  #     deps = [ "${chip_root}/examples/jf-admin-app/linux(${standalone_toolchain})" ]
+  #   }
+
+  #   extra_build_deps += [ ":linux_jf_admin_app" ]
+  # }
+
+  # if (enable_linux_camera_controller_app_build) {
+  #   group("linux_camera_controller_app") {
+  #     deps = [ "${chip_root}/examples/camera-controller(${standalone_toolchain})" ]
+  #   }
+
+  #   extra_build_deps += [ ":linux_camera_controller_app" ]
   # }
 
   group("default") {
@@ -790,18 +948,36 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   group("linux_apps_for_ci") {
     deps = [
+      ":linux_air_purifier_app",
       ":linux_all_clusters_app",
       ":linux_bridge_app",
+      ":linux_closure_app",
+      ":linux_energy_gateway_app",
+      ":linux_energy_management_app",
       ":linux_lighting_app",
       ":linux_lit_icd_app",
       ":linux_lock_app",
       ":linux_microwave_oven_app",
+      ":linux_network_manager_app",
       ":linux_ota_provider_app",
       ":linux_ota_requestor_app",
       ":linux_rvc_app",
+      ":linux_terms_and_conditions_app",
       ":linux_thermostat_app",
       ":linux_tv_app",
       ":linux_tv_casting_app",
+      ":linux_water_leak_detector_app",
+
+      # TODO: The following apps are temporarily disabled in the unified build because they're failing
+      # ":linux_camera_app",
+      # ":linux_camera_controller_app",
+      # ":linux_fabric_admin_rpc_app",
+      # ":linux_fabric_bridge_rpc_app",
+      # ":linux_fabric_sync_app",
+      # ":linux_jf_admin_app",
+      # ":linux_jf_control_app",
+      # ":linux_light_data_model_no_unique_id_app",
+      # ":linux_python_bindings_webrtc_app",
     ]
   }
 

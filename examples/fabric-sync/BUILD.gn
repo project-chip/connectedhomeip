@@ -44,6 +44,7 @@ executable("fabric-sync") {
     "${chip_root}/examples/fabric-sync/bridge:fabric-bridge-lib",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/Linux:chip_device_layer",
     "${chip_root}/third_party/inipp",
   ]
 

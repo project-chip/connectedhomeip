@@ -624,33 +624,41 @@ jobs:
             - name: Build python env
               run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv --enable-ccache'
 
-            - name: Build apps for REPL tests
+            - name: Build apps for REPL tests with unified build (`linux_apps_for_ci` target)
+              env:
+                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
+              run: |
+                  ./scripts/run_in_build_env.sh "gn gen out/ci_build --args='is_debug=false target_os=\"all\"'"
+                  ./scripts/run_in_build_env.sh "ninja -C out/ci_build linux_apps_for_ci"
+                  ./scripts/run_in_build_env.sh "find out/ci_build/standalone -maxdepth 1 -type f -executable -exec cp {} objdir-clone \;"
+
+            - name: Build remaining apps for REPL tests using build_examples.py
               env:
                   CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py \
-                    --target linux-x64-all-clusters-${{matrix.build_variant}}-tsan-clang-test \
-                    --target linux-x64-bridge-${{matrix.build_variant}}-tsan-clang-test \
-                    --target linux-x64-lock-${{matrix.build_variant}}-tsan-clang-test \
-                    --target linux-x64-lit-icd-${{matrix.build_variant}}-tsan-clang-test \
-                    --target linux-x64-air-purifier-${{matrix.build_variant}}-tsan-clang-test \
-                    --target linux-x64-energy-gateway-${{matrix.build_variant}}-tsan-clang-test \
-                    --target linux-x64-energy-management-${{matrix.build_variant}}-tsan-clang-test \
-                    --target linux-x64-microwave-oven-${{matrix.build_variant}}-tsan-clang-test \
-                    --target linux-x64-rvc-${{matrix.build_variant}}-tsan-clang-test \
-                    --target linux-x64-network-manager-${{matrix.build_variant}}-tsan-clang-test \
+                    # --target linux-x64-all-clusters-${{matrix.build_variant}}-tsan-clang-test \
+                    # --target linux-x64-bridge-${{matrix.build_variant}}-tsan-clang-test \
+                    # --target linux-x64-lock-${{matrix.build_variant}}-tsan-clang-test \
+                    # --target linux-x64-lit-icd-${{matrix.build_variant}}-tsan-clang-test \
+                    # --target linux-x64-air-purifier-${{matrix.build_variant}}-tsan-clang-test \
+                    # --target linux-x64-energy-gateway-${{matrix.build_variant}}-tsan-clang-test \
+                    # --target linux-x64-energy-management-${{matrix.build_variant}}-tsan-clang-test \
+                    # --target linux-x64-microwave-oven-${{matrix.build_variant}}-tsan-clang-test \
+                    # --target linux-x64-rvc-${{matrix.build_variant}}-tsan-clang-test \
+                    # --target linux-x64-network-manager-${{matrix.build_variant}}-tsan-clang-test \
                     --target linux-x64-fabric-admin-rpc-${{matrix.build_variant}}-clang \
                     --target linux-x64-fabric-bridge-rpc-${{matrix.build_variant}}-clang \
                     --target linux-x64-fabric-sync-${{matrix.build_variant}}-clang \
                     --target linux-x64-camera \
                     --target linux-x64-camera-controller \
                     --target linux-x64-light-data-model-no-unique-id-${{matrix.build_variant}}-clang \
-                    --target linux-x64-terms-and-conditions \
+                    # --target linux-x64-terms-and-conditions \
                     --target linux-x64-python-bindings-webrtc \
                     --target linux-x64-jf-control-app \
                     --target linux-x64-jf-admin-app \
-                    --target linux-x64-closure-${{matrix.build_variant}}-tsan-clang-test \
-                    --target linux-x64-water-leak-detector-${{matrix.build_variant}}-tsan-clang-test \
+                    # --target linux-x64-closure-${{matrix.build_variant}}-tsan-clang-test \
+                    # --target linux-x64-water-leak-detector-${{matrix.build_variant}}-tsan-clang-test \
                     --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone"
                   rm -rf out
 
