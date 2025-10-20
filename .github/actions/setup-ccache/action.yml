@@ -24,15 +24,13 @@ runs:
   steps:
     - name: Configure ccache
       uses: pyTooling/Actions/with-post-step@v0.4.5
-      # NOTE: the following was REMOVED because it causes invalid cache re-uses.
-      #       We observed changed headers not being detected in cpp file rebuilds and
-      #       caches being re-used when they should not be.
-      # echo "CCACHE_PREFIX_CPP=${{ github.workspace }}/scripts/helpers/ccache-prefix-cpp.sh" >> $GITHUB_ENV
       with:
         main: |
           mkdir -p .ccache
           echo "CCACHE_NOHASHDIR=1" >> $GITHUB_ENV
           echo "CCACHE_BASEDIR=${{ github.workspace }}" >> $GITHUB_ENV
+          echo "CCACHE_NODIRECT=1" >> $GITHUB_ENV
+          echo "CCACHE_PREFIX_CPP=${{ github.workspace }}/scripts/helpers/ccache-prefix-cpp.sh" >> $GITHUB_ENV
           echo "CCACHE_SLOPPINESS=time_macros" >> $GITHUB_ENV
           echo "CCACHE_DIR=${{ github.workspace }}/.ccache" >> $GITHUB_ENV
           echo "CCACHE_COMPILERCHECK=content" >> $GITHUB_ENV
