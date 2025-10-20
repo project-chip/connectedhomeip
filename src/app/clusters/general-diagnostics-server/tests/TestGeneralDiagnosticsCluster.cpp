@@ -67,8 +67,8 @@ class NullProvider : public DeviceLayer::DiagnosticDataProvider
 
 struct TestGeneralDiagnosticsCluster : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
     // Helper method to invoke TimeSnapshot command and decode response
     template <typename ClusterType>
@@ -130,9 +130,9 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
                   GeneralDiagnostics::Commands::TimeSnapshot::kMetadataEntry.GetInvokePrivilege());
 
         // Check required generated commands are present
-        ReadOnlyBufferBuilder<chip::CommandId> generatedCommandsBuilder;
+        ReadOnlyBufferBuilder<CommandId> generatedCommandsBuilder;
         ASSERT_EQ(cluster.GeneratedCommands(generalDiagnosticsPath, generatedCommandsBuilder), CHIP_NO_ERROR);
-        ReadOnlyBuffer<chip::CommandId> generatedCommands = generatedCommandsBuilder.TakeBuffer();
+        ReadOnlyBuffer<CommandId> generatedCommands = generatedCommandsBuilder.TakeBuffer();
 
         ASSERT_EQ(generatedCommands.size(), 1u);
         ASSERT_EQ(generatedCommands[0], GeneralDiagnostics::Commands::TimeSnapshotResponse::Id);
@@ -168,22 +168,22 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
                 totalOperationalHours = 456;
                 return CHIP_NO_ERROR;
             }
-            CHIP_ERROR GetBootReason(chip::app::Clusters::GeneralDiagnostics::BootReasonEnum & bootReason) override
+            CHIP_ERROR GetBootReason(Clusters::GeneralDiagnostics::BootReasonEnum & bootReason) override
             {
                 bootReason = GeneralDiagnostics::BootReasonEnum::kSoftwareReset;
                 return CHIP_NO_ERROR;
             }
             CHIP_ERROR
-            GetActiveHardwareFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & hardwareFaults) override
+            GetActiveHardwareFaults(DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & hardwareFaults) override
             {
                 return CHIP_NO_ERROR;
             }
-            CHIP_ERROR GetActiveRadioFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & radioFaults) override
+            CHIP_ERROR GetActiveRadioFaults(DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & radioFaults) override
             {
                 return CHIP_NO_ERROR;
             }
             CHIP_ERROR
-            GetActiveNetworkFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & networkFaults) override
+            GetActiveNetworkFaults(DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & networkFaults) override
             {
                 return CHIP_NO_ERROR;
             }
@@ -218,9 +218,9 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
                   GeneralDiagnostics::Commands::TimeSnapshot::kMetadataEntry.GetInvokePrivilege());
 
         // Check required generated commands are present
-        ReadOnlyBufferBuilder<chip::CommandId> generatedCommandsBuilder;
+        ReadOnlyBufferBuilder<CommandId> generatedCommandsBuilder;
         ASSERT_EQ(cluster.GeneratedCommands(generalDiagnosticsPath, generatedCommandsBuilder), CHIP_NO_ERROR);
-        ReadOnlyBuffer<chip::CommandId> generatedCommands = generatedCommandsBuilder.TakeBuffer();
+        ReadOnlyBuffer<CommandId> generatedCommands = generatedCommandsBuilder.TakeBuffer();
 
         ASSERT_EQ(generatedCommands.size(), 1u);
         ASSERT_EQ(generatedCommands[0], GeneralDiagnostics::Commands::TimeSnapshotResponse::Id);
