@@ -67,11 +67,6 @@ Davis, CA 95616, USA
     <cluster id="0x0003" name="Identify" side="server">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x0004" name="Groups" side="client">
-      <optionalConform>
-        <condition name="Zigbee"/>
-      </optionalConform>
-    </cluster>
     <cluster id="0x0404" name="Flow Measurement" side="server">
       <mandatoryConform/>
     </cluster>

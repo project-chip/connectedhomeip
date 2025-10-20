@@ -377,13 +377,6 @@
               "mfgCode": null,
               "side": "server",
               "included": 1
-            },
-            {
-              "name": "AccessControlExtensionChanged",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
             }
           ]
         },
@@ -2448,10 +2441,10 @@
               "side": "server",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -2464,10 +2457,10 @@
               "side": "server",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,

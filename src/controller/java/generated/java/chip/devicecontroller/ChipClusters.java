@@ -3029,6 +3029,7 @@ public class ChipClusters {
     private static final long ACCESS_CONTROL_ENTRIES_PER_FABRIC_ATTRIBUTE_ID = 4L;
     private static final long COMMISSIONING_ARL_ATTRIBUTE_ID = 5L;
     private static final long ARL_ATTRIBUTE_ID = 6L;
+    private static final long AUXILIARY_ACL_ATTRIBUTE_ID = 7L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -3093,6 +3094,10 @@ public class ChipClusters {
 
     public interface ArlAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.AccessControlClusterAccessRestrictionEntryStruct> value);
+    }
+
+    public interface AuxiliaryACLAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.AccessControlClusterAccessControlEntryStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -3320,6 +3325,37 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ARL_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAuxiliaryACLAttribute(
+        AuxiliaryACLAttributeCallback callback) {
+      readAuxiliaryACLAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readAuxiliaryACLAttributeWithFabricFilter(
+        AuxiliaryACLAttributeCallback callback, boolean isFabricFiltered) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AUXILIARY_ACL_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.AccessControlClusterAccessControlEntryStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, AUXILIARY_ACL_ATTRIBUTE_ID, isFabricFiltered);
+    }
+
+    public void subscribeAuxiliaryACLAttribute(
+        AuxiliaryACLAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AUXILIARY_ACL_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.AccessControlClusterAccessControlEntryStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, AUXILIARY_ACL_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -24979,11 +25015,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void joinGroup(DefaultClusterCallback callback, Integer groupID, ArrayList<Integer> endpoints, byte[] key, Long keyID, Optional<Long> gracePeriod, Optional<Boolean> useAuxiliaryACL) {
-      joinGroup(callback, groupID, endpoints, key, keyID, gracePeriod, useAuxiliaryACL, 0);
+    public void joinGroup(DefaultClusterCallback callback, Integer groupID, ArrayList<Integer> endpoints, Long keyID, Optional<byte[]> key, Optional<Long> gracePeriod, Optional<Boolean> useAuxiliaryACL) {
+      joinGroup(callback, groupID, endpoints, keyID, key, gracePeriod, useAuxiliaryACL, 0);
     }
 
-    public void joinGroup(DefaultClusterCallback callback, Integer groupID, ArrayList<Integer> endpoints, byte[] key, Long keyID, Optional<Long> gracePeriod, Optional<Boolean> useAuxiliaryACL, int timedInvokeTimeoutMs) {
+    public void joinGroup(DefaultClusterCallback callback, Integer groupID, ArrayList<Integer> endpoints, Long keyID, Optional<byte[]> key, Optional<Long> gracePeriod, Optional<Boolean> useAuxiliaryACL, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -24995,13 +25031,13 @@ public class ChipClusters {
       BaseTLVType endpointstlvValue = ArrayType.generateArrayType(endpoints, (elementendpoints) -> new UIntType(elementendpoints));
       elements.add(new StructElement(endpointsFieldID, endpointstlvValue));
 
-      final long keyFieldID = 2L;
-      BaseTLVType keytlvValue = new ByteArrayType(key);
-      elements.add(new StructElement(keyFieldID, keytlvValue));
-
-      final long keyIDFieldID = 3L;
+      final long keyIDFieldID = 2L;
       BaseTLVType keyIDtlvValue = new UIntType(keyID);
       elements.add(new StructElement(keyIDFieldID, keyIDtlvValue));
+
+      final long keyFieldID = 3L;
+      BaseTLVType keytlvValue = key.<BaseTLVType>map((nonOptionalkey) -> new ByteArrayType(nonOptionalkey)).orElse(new EmptyType());
+      elements.add(new StructElement(keyFieldID, keytlvValue));
 
       final long gracePeriodFieldID = 4L;
       BaseTLVType gracePeriodtlvValue = gracePeriod.<BaseTLVType>map((nonOptionalgracePeriod) -> new UIntType(nonOptionalgracePeriod)).orElse(new EmptyType());
@@ -25067,11 +25103,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void updateGroupKey(DefaultClusterCallback callback, Integer groupID, byte[] key, Long keyID, Optional<Long> gracePeriod) {
-      updateGroupKey(callback, groupID, key, keyID, gracePeriod, 0);
+    public void updateGroupKey(DefaultClusterCallback callback, Integer groupID, Long keyID, Optional<byte[]> key, Optional<Long> gracePeriod) {
+      updateGroupKey(callback, groupID, keyID, key, gracePeriod, 0);
     }
 
-    public void updateGroupKey(DefaultClusterCallback callback, Integer groupID, byte[] key, Long keyID, Optional<Long> gracePeriod, int timedInvokeTimeoutMs) {
+    public void updateGroupKey(DefaultClusterCallback callback, Integer groupID, Long keyID, Optional<byte[]> key, Optional<Long> gracePeriod, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -25079,13 +25115,13 @@ public class ChipClusters {
       BaseTLVType groupIDtlvValue = new UIntType(groupID);
       elements.add(new StructElement(groupIDFieldID, groupIDtlvValue));
 
-      final long keyFieldID = 1L;
-      BaseTLVType keytlvValue = new ByteArrayType(key);
-      elements.add(new StructElement(keyFieldID, keytlvValue));
-
-      final long keyIDFieldID = 2L;
+      final long keyIDFieldID = 1L;
       BaseTLVType keyIDtlvValue = new UIntType(keyID);
       elements.add(new StructElement(keyIDFieldID, keyIDtlvValue));
+
+      final long keyFieldID = 2L;
+      BaseTLVType keytlvValue = key.<BaseTLVType>map((nonOptionalkey) -> new ByteArrayType(nonOptionalkey)).orElse(new EmptyType());
+      elements.add(new StructElement(keyFieldID, keytlvValue));
 
       final long gracePeriodFieldID = 3L;
       BaseTLVType gracePeriodtlvValue = gracePeriod.<BaseTLVType>map((nonOptionalgracePeriod) -> new UIntType(nonOptionalgracePeriod)).orElse(new EmptyType());
@@ -31023,6 +31059,7 @@ public class ChipClusters {
 
     private static final long AVAILABLE_ENDPOINTS_ATTRIBUTE_ID = 0L;
     private static final long ACTIVE_ENDPOINTS_ATTRIBUTE_ID = 1L;
+    private static final long ELECTRICAL_CIRCUIT_NODES_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -31045,6 +31082,10 @@ public class ChipClusters {
 
     public interface ActiveEndpointsAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Integer> value);
+    }
+
+    public interface ElectricalCircuitNodesAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.PowerTopologyClusterCircuitNodeStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -31109,6 +31150,46 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACTIVE_ENDPOINTS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readElectricalCircuitNodesAttribute(
+        ElectricalCircuitNodesAttributeCallback callback) {
+      readElectricalCircuitNodesAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readElectricalCircuitNodesAttributeWithFabricFilter(
+        ElectricalCircuitNodesAttributeCallback callback, boolean isFabricFiltered) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ELECTRICAL_CIRCUIT_NODES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.PowerTopologyClusterCircuitNodeStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ELECTRICAL_CIRCUIT_NODES_ATTRIBUTE_ID, isFabricFiltered);
+    }
+
+    public void writeElectricalCircuitNodesAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.PowerTopologyClusterCircuitNodeStruct> value) {
+      writeElectricalCircuitNodesAttribute(callback, value, 0);
+    }
+
+    public void writeElectricalCircuitNodesAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.PowerTopologyClusterCircuitNodeStruct> value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = ArrayType.generateArrayType(value, (elementvalue) -> elementvalue.encodeTlv());
+      writeAttribute(new WriteAttributesCallbackImpl(callback), ELECTRICAL_CIRCUIT_NODES_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeElectricalCircuitNodesAttribute(
+        ElectricalCircuitNodesAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ELECTRICAL_CIRCUIT_NODES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.PowerTopologyClusterCircuitNodeStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, ELECTRICAL_CIRCUIT_NODES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

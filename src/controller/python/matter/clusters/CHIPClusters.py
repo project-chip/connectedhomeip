@@ -723,6 +723,12 @@ class ChipClusters:
                 "type": "",
                 "reportable": True,
             },
+            0x00000007: {
+                "attributeName": "AuxiliaryACL",
+                "attributeId": 0x00000007,
+                "type": "",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -5504,8 +5510,8 @@ class ChipClusters:
                 "args": {
                     "groupID": "int",
                     "endpoints": "int",
-                    "key": "bytes",
                     "keyID": "int",
+                    "key": "bytes",
                     "gracePeriod": "int",
                     "useAuxiliaryACL": "bool",
                 },
@@ -5523,8 +5529,8 @@ class ChipClusters:
                 "commandName": "UpdateGroupKey",
                 "args": {
                     "groupID": "int",
-                    "key": "bytes",
                     "keyID": "int",
+                    "key": "bytes",
                     "gracePeriod": "int",
                 },
             },
@@ -6891,6 +6897,13 @@ class ChipClusters:
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "ElectricalCircuitNodes",
+                "attributeId": 0x00000002,
+                "type": "",
+                "reportable": True,
+                "writable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
