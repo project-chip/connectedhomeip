@@ -414,11 +414,9 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
         {
             // Trigger check-in message when a non-priming subscription report times out.
             ChipLogError(DataManagement, "Trigger check-in message when non-priming subscription report times out");
-            Optional<Access::SubjectDescriptor> subjectDescriptor;
             if (mSessionHandle)
             {
-                subjectDescriptor.SetValue(GetSubjectDescriptor());
-                mManagementCallback.GetInteractionModelEngine()->GetICDManager()->SendCheckInMsgs(subjectDescriptor);
+                mManagementCallback.GetInteractionModelEngine()->GetICDManager()->SendCheckInMsgs(MakeOptional(GetSubjectDescriptor()));
             }
             else
             {
