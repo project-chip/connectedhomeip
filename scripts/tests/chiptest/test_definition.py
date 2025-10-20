@@ -408,7 +408,7 @@ class TestDefinition:
             if not dry_run:
                 for command, key in apps.items_with_key():
                     # Do not add chip-tool or matter-repl-yaml-tester-cmd to the register
-                    if (command == paths.chip_tool
+                    if (command == apps.chip_tool
                             or command == apps.matter_repl_yaml_tester_cmd
                             or command == apps.chip_tool_with_python_cmd):
                         continue
@@ -470,7 +470,7 @@ class TestDefinition:
                 pairing_server_args = ()
 
                 if ble_controller_tool is not None:
-                    pairing_cmd = paths.chip_tool_with_python_cmd.add_args((
+                    pairing_cmd = apps.chip_tool_with_python_cmd.add_args((
                         "pairing", "code-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", TEST_SETUP_QR_CODE))
                     pairing_server_args = ("--ble-controller", str(ble_controller_tool))
                 else:

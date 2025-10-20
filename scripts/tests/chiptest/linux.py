@@ -29,9 +29,6 @@ import time
 
 import sdbus
 
-from .runner import Runner
-from .test_definition import ApplicationPaths
-
 test_environ = os.environ.copy()
 
 
