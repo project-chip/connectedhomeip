@@ -659,6 +659,8 @@ CHIP_ERROR JointFabricDatastore::IsNodeIdAndEndpointInEndpointInformationEntries
 
 CHIP_ERROR JointFabricDatastore::AddGroupIDToEndpointForNode(NodeId nodeId, chip::EndpointId endpointId, chip::GroupId groupId)
 {
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     size_t index = 0;
     ReturnErrorOnFailure(IsNodeIdAndEndpointInEndpointInformationEntries(nodeId, endpointId, index));
 
@@ -687,11 +689,11 @@ CHIP_ERROR JointFabricDatastore::AddGroupIDToEndpointForNode(NodeId nodeId, chip
             newNodeKeySet.groupKeySetID     = groupKeySetID;
             newNodeKeySet.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
 
-            // TODO: Update device
-
             mNodeKeySetEntries.push_back(newNodeKeySet);
 
-            mNodeKeySetEntries.back().statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+            ReturnErrorOnFailure(mDelegate->SyncNode(nodeId, newNodeKeySet, [this]() {
+                mNodeKeySetEntries.back().statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+            }));
         }
     }
 
@@ -713,18 +715,18 @@ CHIP_ERROR JointFabricDatastore::AddGroupIDToEndpointForNode(NodeId nodeId, chip
     newGroupEntry.groupID           = groupId;
     newGroupEntry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
 
-    // TODO: Update device
-
     // Add the new ACL entry to the datastore
     mEndpointGroupIDEntries.push_back(newGroupEntry);
 
-    mEndpointGroupIDEntries.back().statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
-
-    return CHIP_NO_ERROR;
+    return mDelegate->SyncNode(nodeId, newGroupEntry, [this]() {
+        mEndpointGroupIDEntries.back().statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+    });
 }
 
 CHIP_ERROR JointFabricDatastore::RemoveGroupIDFromEndpointForNode(NodeId nodeId, chip::EndpointId endpointId, chip::GroupId groupId)
 {
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     size_t index = 0;
     ReturnErrorOnFailure(IsNodeIdAndEndpointInEndpointInformationEntries(nodeId, endpointId, index));
 
@@ -734,9 +736,11 @@ CHIP_ERROR JointFabricDatastore::RemoveGroupIDFromEndpointForNode(NodeId nodeId,
         {
             it->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
 
-            // TODO: Update device
+            // zero-initialized struct to indicate deletion for the SyncNode call
+            Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type endpointGroupIdNullEntry{ 0 };
 
-            mEndpointGroupIDEntries.erase(it);
+            ReturnErrorOnFailure(
+                mDelegate->SyncNode(nodeId, endpointGroupIdNullEntry, [this, it]() { mEndpointGroupIDEntries.erase(it); }));
 
             if (IsGroupIDInDatastore(groupId, index) == CHIP_NO_ERROR)
             {
@@ -748,8 +752,11 @@ CHIP_ERROR JointFabricDatastore::RemoveGroupIDFromEndpointForNode(NodeId nodeId,
                         it2->groupKeySetID == mGroupInformationEntries[index].groupKeySetID.Value())
                     {
                         it2->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
-                        // TODO: Update device
-                        it2 = mNodeKeySetEntries.erase(it2);
+
+                        // zero-initialized struct to indicate deletion for the SyncNode call
+                        Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type nodeKeySetNullEntry{ 0 };
+                        ReturnErrorOnFailure(
+                            mDelegate->SyncNode(nodeId, nodeKeySetNullEntry, [this, it2]() { mNodeKeySetEntries.erase(it2); }));
 
                         incrementIndex = false;
                     }
@@ -856,6 +863,8 @@ JointFabricDatastore::AddBindingToEndpointForNode(
     NodeId nodeId, chip::EndpointId endpointId,
     const Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type & binding)
 {
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     size_t index = 0;
     ReturnErrorOnFailure(IsNodeIdAndEndpointInEndpointInformationEntries(nodeId, endpointId, index));
 
@@ -884,16 +893,16 @@ JointFabricDatastore::AddBindingToEndpointForNode(
     // Add the new binding entry to the datastore
     mEndpointBindingEntries.push_back(newBindingEntry);
 
-    // TODO: Update device
-
-    mEndpointBindingEntries.back().statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
-
-    return CHIP_NO_ERROR;
+    return mDelegate->SyncNode(nodeId, newBindingEntry, [this]() {
+        mEndpointBindingEntries.back().statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+    });
 }
 
 CHIP_ERROR
 JointFabricDatastore::RemoveBindingFromEndpointForNode(uint16_t listId, NodeId nodeId, chip::EndpointId endpointId)
 {
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     size_t index = 0;
     ReturnErrorOnFailure(IsNodeIdAndEndpointInEndpointInformationEntries(nodeId, endpointId, index));
 
@@ -903,11 +912,9 @@ JointFabricDatastore::RemoveBindingFromEndpointForNode(uint16_t listId, NodeId n
         {
             it->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
 
-            // TODO: Update device
-
-            mEndpointBindingEntries.erase(it);
-
-            return CHIP_NO_ERROR;
+            // zero-initialized struct to indicate deletion for the SyncNode call
+            Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type nullEntry{ 0 };
+            return mDelegate->SyncNode(nodeId, nullEntry, [this, it]() { mEndpointBindingEntries.erase(it); });
         }
     }
 
@@ -1016,6 +1023,8 @@ CHIP_ERROR
 JointFabricDatastore::AddACLToNode(
     NodeId nodeId, const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::DecodableType & aclEntry)
 {
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     size_t index = 0;
     ReturnErrorOnFailure(IsNodeIdInNodeInformationEntries(nodeId, index));
 
@@ -1062,15 +1071,27 @@ JointFabricDatastore::AddACLToNode(
     // Add the new ACL entry to the datastore
     mACLEntries.push_back(newACLEntry);
 
-    // TODO: Update device
+    Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type entryToEncode;
+    entryToEncode.nodeID             = newACLEntry.nodeID;
+    entryToEncode.listID             = newACLEntry.listID;
+    entryToEncode.ACLEntry.authMode  = newACLEntry.ACLEntry.authMode;
+    entryToEncode.ACLEntry.privilege = newACLEntry.ACLEntry.privilege;
+    entryToEncode.ACLEntry.subjects =
+        DataModel::List<const uint64_t>(newACLEntry.ACLEntry.subjects.data(), newACLEntry.ACLEntry.subjects.size());
+    entryToEncode.ACLEntry.targets =
+        DataModel::List<const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type>(
+            newACLEntry.ACLEntry.targets.data(), newACLEntry.ACLEntry.targets.size());
+    entryToEncode.statusEntry = newACLEntry.statusEntry;
 
-    mACLEntries.back().statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
-
-    return CHIP_NO_ERROR;
+    return mDelegate->SyncNode(nodeId, entryToEncode, [this]() {
+        mACLEntries.back().statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+    });
 }
 
 CHIP_ERROR JointFabricDatastore::RemoveACLFromNode(uint16_t listId, NodeId nodeId)
 {
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     size_t index = 0;
     ReturnErrorOnFailure(IsNodeIdInNodeInformationEntries(nodeId, index));
 
@@ -1079,9 +1100,10 @@ CHIP_ERROR JointFabricDatastore::RemoveACLFromNode(uint16_t listId, NodeId nodeI
         if (it->nodeID == nodeId && it->listID == listId)
         {
             it->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
-            // TODO: Update device
-            mACLEntries.erase(it);
-            return CHIP_NO_ERROR;
+
+            // zero-initialized struct to indicate deletion for the SyncNode call
+            Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type nullEntry{ 0 };
+            return mDelegate->SyncNode(nodeId, nullEntry, [this, it]() { mACLEntries.erase(it); });
         }
     }
 
