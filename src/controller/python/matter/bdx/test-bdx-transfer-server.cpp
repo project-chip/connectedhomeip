@@ -36,16 +36,8 @@ CHIP_ERROR TestBdxTransferServer::Init(System::Layer * systemLayer, Messaging::E
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mSystemLayer     = systemLayer;
     mExchangeManager = exchangeManager;
-
-    // Save and remove the BDX SendInit handler registered as part of CHIPDeviceControllerFactory.
-    // There is no direct getter for the current handler in ExchangeManager, so we rely on the
-    // controller factory system state which owns the default BDXTransferServer instance.
-    // If available, remember it so we can restore it on Shutdown.
-    chip::Controller::DeviceControllerFactory & factory = chip::Controller::DeviceControllerFactory::GetInstance();
-    if (factory.GetSystemState() != nullptr && factory.GetSystemState()->BDXTransferServer() != nullptr)
-        mPrevSendInitHandler = factory.GetSystemState()->BDXTransferServer();
+    // This removes the BdxTransferServer registered as part of CHIPDeviceControllerFactory.
     mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(MessageType::SendInit);
-
     return mExchangeManager->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, this);
 }
 
@@ -56,11 +48,14 @@ void TestBdxTransferServer::Shutdown()
 
     // Re-register the BdxTransferServer that was registered as part of CHIPDeviceControllerFactory.
     // Otherwise when BdxTransferServer::Shutdown() attempts to unregister this, it causes an error.
-    if (mPrevSendInitHandler != nullptr)
-    {
-        LogErrorOnFailure(mExchangeManager->RegisterUnsolicitedMessageHandlerForType(MessageType::SendInit, mPrevSendInitHandler));
-        mPrevSendInitHandler = nullptr;
-    }
+    // Since there is no direct getter for the current handler in ExchangeManager, we can't save this during
+    // TestBdxTransferServer::Init, so instead we rely on the controller factory system state which owns the default
+    // BDXTransferServer instance.
+    const Controller::DeviceControllerSystemState * systemState =
+        Controller::DeviceControllerFactory::GetInstance().GetSystemState();
+    if (systemState != nullptr && systemState->BDXTransferServer() != nullptr)
+        LogErrorOnFailure(
+            mExchangeManager->RegisterUnsolicitedMessageHandlerForType(MessageType::SendInit, systemState->BDXTransferServer()));
 
     mExchangeManager = nullptr;
 }
