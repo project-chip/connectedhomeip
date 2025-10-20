@@ -242,6 +242,7 @@ def Init():
     handle.pychip_Bdx_InitCallbacks(
         _OnTransferObtainedCallback, _OnFailedToObtainTransferCallback, _OnDataReceivedCallback, _OnTransferCompletedCallback)
 
+
 def Shutdown():
     '''
     Shut down the BDX server.

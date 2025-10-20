@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <controller/python/matter/bdx/test-bdx-transfer-server.h>
 #include <controller/CHIPDeviceControllerFactory.h>
+#include <controller/python/matter/bdx/test-bdx-transfer-server.h>
 
 namespace chip {
 namespace bdx {
