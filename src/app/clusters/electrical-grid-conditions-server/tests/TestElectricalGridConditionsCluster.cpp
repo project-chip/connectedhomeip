@@ -33,7 +33,8 @@ bool gMatterReportingCalled = false;
 void MatterReportingAttributeChangeCallback(uint16_t endpoint, uint32_t clusterId, uint32_t attributeId)
 {
     ChipLogProgress(Test, "Mocked MatterReportingAttributeChangeCallback(ep=%u, cluster=%u, attr=%u)",
-                    static_cast<unsigned int>(endpoint), static_cast<unsigned int>(clusterId), static_cast<unsigned int>(attributeId));
+                    static_cast<unsigned int>(endpoint), static_cast<unsigned int>(clusterId),
+                    static_cast<unsigned int>(attributeId));
     gMatterReportingCalled = true;
 }
 
