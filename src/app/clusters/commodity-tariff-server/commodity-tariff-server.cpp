@@ -82,11 +82,6 @@ const T * GetListEntryById(const DataModel::List<const T> & aList, uint32_t aId)
         {
             return &item;
         }
-        // If list is sorted by ID and we've passed the target, break early
-        if (itemId > aId)
-        {
-            break;
-        }
     }
     return nullptr;
 }
@@ -285,7 +280,7 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
     const Structs::TariffPeriodStruct::Type * period = FindTariffPeriodByDayEntryId(aCtx, dayEntryID);
 
     // Use a fixed-size array with maximum expected components
-    constexpr size_t MAX_COMPONENTS = 16; // Adjust this based on your maximum expected components
+    constexpr size_t MAX_COMPONENTS = CommodityTariffConsts::kTariffPeriodItemMaxIDs;
     std::array<Structs::TariffComponentStruct::Type, MAX_COMPONENTS> tempArray;
     size_t componentCount = 0;
 
@@ -305,6 +300,14 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
             err = CHIP_ERROR_NOT_FOUND;
             goto exit;
         }
+
+        if (componentCount >= MAX_COMPONENTS)
+        {
+            ChipLogError(AppServer, "Component array is full, cannot add more components.");
+            err = CHIP_ERROR_BUFFER_TOO_SMALL;
+            goto exit;
+        }
+
         entry = *current;
         if (current->label.HasValue())
         {

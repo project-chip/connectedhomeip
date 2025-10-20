@@ -230,14 +230,18 @@ public:
     // Access
     Value & operator[](const Key & key)
     {
-        auto * value = get_value(key);
-        if (!value)
+        auto it = find(key);
+        
+        if (it != data_.end())
         {
-            // Insert default value if key doesn't exist
-            insert(key, Value{});
-            value = get_value(key);
+            return it->second;
         }
-        return *value;
+
+        VerifyOrDie(!full()); 
+
+        // Key not found, insert it.
+        data_.push_back({key, Value{}});
+        return data_.back().second;
     }
 
     // Iterators
@@ -247,27 +251,6 @@ public:
     ConstIterator end() const { return data_.end(); }
     ConstIterator cbegin() const { return data_.cbegin(); }
     ConstIterator cend() const { return data_.cend(); }
-
-    pw::Vector<Key, kMaxSize> get_keys() const
-    {
-        pw::Vector<Key, kMaxSize> keys;
-        for (const auto & pair : data_)
-        {
-            keys.push_back(pair.first);
-        }
-        return keys;
-    }
-
-    pw::Vector<Value, kMaxSize> get_values() const
-    {
-        pw::Vector<Value, kMaxSize> values;
-        for (const auto & pair : data_)
-        {
-            values.push_back(pair.second);
-        }
-        return values;
-    }
-
 private:
     pw::Vector<PairType, kMaxSize> data_;
 };
@@ -328,7 +311,7 @@ struct TariffUpdateCtx
     /// @name TariffComponent ID Tracking
     /// @{
     /**
-     * @brief Master set of all valid TariffComponent IDs
+     * @brief All tariff component identifiers are matched with the corresponding feature values.
      * @details Contains all TariffComponent IDs that exist in the tariff definition
      */
     CommodityTariffContainers::CTC_UnorderedMap<uint32_t, uint32_t, CommodityTariffConsts::kTariffComponentsAttrMaxLength>
