@@ -44,7 +44,10 @@ if (chip_with_lwip) {
   import("//build_overrides/lwip.gni")
 }
 
+print("Current toolchain: ${current_toolchain}")
+
 if (current_toolchain != "${dir_pw_toolchain}/default:default") {
+  print("Configuring single CHIP build...\n")
   declare_args() {
     chip_enable_python_modules =
         (current_os == "mac" || current_os == "linux") &&
@@ -278,6 +281,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
   }
 } else {
+
+  print("Configuring unified CHIP build...\n")
+
   # This is the unified build. Configure various real toolchains.
   import("${chip_root}/build/chip/chip_build.gni")
   declare_args() {
@@ -400,6 +406,14 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Build the Linux RVC app example.
     enable_linux_rvc_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux OTA Provider app example.
+    enable_linux_ota_provider_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux OTA Requestor app example.
+    enable_linux_ota_requestor_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
     # TODO: #37983: Add darwin support for libdatachannel and then add host_os == "mac" here.
@@ -751,17 +765,44 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     extra_build_deps += [ ":linux_rvc_app" ]
   }
 
-  if (enable_linux_camera_app_build) {
-    group("linux_camera_app") {
-      deps =
-          [ "${chip_root}/examples/camera-app/linux(${standalone_toolchain})" ]
+  if (enable_linux_ota_provider_app_build) {
+    group("linux_ota_provider_app") {
+      deps = [ "${chip_root}/examples/ota-provider-app/linux(${standalone_toolchain})" ]
     }
 
-    extra_build_deps += [ ":linux_camera_app" ]
+    extra_build_deps += [ ":linux_ota_provider_app" ]
   }
+
+  if (enable_linux_ota_requestor_app_build) {
+    group("linux_ota_requestor_app") {
+      deps = [ "${chip_root}/examples/ota-requestor-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_ota_requestor_app" ]
+  }
+
+  #   extra_build_deps += [ ":linux_camera_app" ]
+  # }
 
   group("default") {
     deps = extra_build_deps + builds
+  }
+
+  group("linux_apps_for_ci") {
+    deps = [
+      ":linux_all_clusters_app",
+      ":linux_bridge_app",
+      ":linux_lighting_app",
+      ":linux_lit_icd_app",
+      ":linux_lock_app",
+      ":linux_microwave_oven_app",
+      ":linux_ota_provider_app",
+      ":linux_ota_requestor_app",
+      ":linux_rvc_app",
+      ":linux_thermostat_app",
+      ":linux_tv_app",
+      ":linux_tv_casting_app",
+    ]
   }
 
   group("check") {
