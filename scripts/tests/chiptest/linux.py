@@ -29,6 +29,9 @@ import time
 
 import sdbus
 
+from .test_definition import ApplicationPaths
+from .runner import Runner, Application
+
 test_environ = os.environ.copy()
 
 
@@ -94,21 +97,21 @@ class IsolatedNetworkNamespace:
 
     # Bring up application connection link.
     COMMANDS_APP_LINK_UP = [
-        "ip netns exec app ip addr add 10.10.10.1/24 dev {app_link_name}-{index}",
-        "ip netns exec app ip link set dev {app_link_name}-{index} up",
-        "ip netns exec app ip link set dev lo up",
+        "ip netns exec app-{index} ip addr add 10.10.10.1/24 dev {app_link_name}-{index}",
+        "ip netns exec app-{index} ip link set dev {app_link_name}-{index} up",
+        "ip netns exec app-{index} ip link set dev lo up",
         "ip link set dev {app_link_name}-sw-{index} up",
         # Force IPv6 to use ULAs that we control.
-        "ip netns exec app ip -6 addr flush {app_link_name}-{index}",
-        "ip netns exec app ip -6 a add fd00:0:1:1::1/64 dev {app_link_name}-{index}",
+        "ip netns exec app-{index} ip -6 addr flush {app_link_name}-{index}",
+        "ip netns exec app-{index} ip -6 a add fd00:0:1:1::1/64 dev {app_link_name}-{index}",
 
     ]
 
     # Bring up tool (controller) connection link.
     COMMANDS_TOOL_LINK_UP = [
-        "ip netns exec tool ip addr add 10.10.10.2/24 dev {tool_link_name}-{index}",
-        "ip netns exec tool ip link set dev {tool_link_name}-{index} up",
-        "ip netns exec tool ip link set dev lo up",
+        "ip netns exec tool-{index} ip addr add 10.10.10.2/24 dev {tool_link_name}-{index}",
+        "ip netns exec tool-{index} ip link set dev {tool_link_name}-{index} up",
+        "ip netns exec tool-{index} ip link set dev lo up",
         "ip link set dev {tool_link_name}-sw-{index} up",
         # Force IPv6 to use ULAs that we control.
         "ip netns exec tool-{index} ip -6 addr flush {tool_link_name}-{index}",
@@ -197,8 +200,8 @@ class IsolatedNetworkNamespace:
         for command in self.COMMANDS_TERMINATE:
             self.run(command)
 
-    def app_to_namespaced_cmd(self, application):
-        return ["ip", "netns", "exec", "{}-{}".format(application.kind, self.index)] + application.to_cmd()
+    def wrap_in_namespace(self, application: Application):
+        return application.wrap_with(["ip", "netns", "exec", "{}-{}".format(application.kind, self.index)])
 
 
 class DBusTestSystemBus(subprocess.Popen):

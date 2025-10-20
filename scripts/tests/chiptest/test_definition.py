@@ -266,7 +266,7 @@ class ApplicationPaths:
             (
                 # This path varies, however it is a fixed python tool so it may be ok
                 self.chip_tool_with_python_cmd,
-                os.path.basename(self.chip_tool_with_python_cmd[-1]),
+                os.path.basename(self.chip_tool_with_python_cmd.args[-1]),
             ),
             (self.rvc_app, "chip-rvc-app"),
             (self.network_manager_app, "matter-network-manager-app"),
@@ -417,7 +417,7 @@ class TestDefinition:
                     # happen if the relevant application does not exist.  It's
                     # non-fatal as long as we are not trying to run any tests that
                     # need that application.
-                    if command[-1] is None:
+                    if command is None:
                         continue
 
                     # For the app indicated by self.target, give it the 'default' key to add to the register
@@ -482,18 +482,17 @@ class TestDefinition:
                 test_cmd = apps.chip_tool_with_python_cmd \
                     .add_args(('tests', self.run_name)) \
                     .add_args(('--PICS', pics_file))
-
                 server_args = (
-                    '--server_path', apps.chip_tool.args[-1],
+                    '--server_path', str(apps.chip_tool.path),
                     '--server_arguments', 'interactive server')
 
-                if test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
-                    server_args = server_args + ('--interface-id -1',)
+                # if test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
+                #    server_args = server_args + ('--interface-id', '-1')
 
                 server_args = server_args + tool_storage_args + pairing_server_args
 
-                pairing_cmd = pairing_cmd + server_args
-                test_cmd = test_cmd + server_args
+                pairing_cmd = pairing_cmd.add_args(server_args)
+                test_cmd = test_cmd.add_args(server_args)
 
                 if dry_run:
                     # Some of our command arguments have spaces in them, so if we are

@@ -150,12 +150,18 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     elif runner == 'darwin_framework_tool_python':
         runtime = TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON
 
-    if chip_tool is None and not runtime == TestRunTime.MATTER_REPL_PYTHON:
-        paths_finder = PathsFinder()
-        if runtime == TestRunTime.CHIP_TOOL_PYTHON:
-            chip_tool = Application(kind="tool", path=Path(paths_finder.get('chip-tool')))
-        else:
-            chip_tool = Application(kind="tool", path=Path(paths_finder.get('darwin-framework-tool')))
+    if chip_tool is not None:
+        chip_tool = Application(kind='tool', path=Path(chip_tool))
+    else:
+        if not runtime == TestRunTime.MATTER_REPL_PYTHON:
+            paths_finder = PathsFinder()
+            if runtime == TestRunTime.CHIP_TOOL_PYTHON:
+                chip_tool_path = paths_finder.get('chip-tool')
+            else:  # DARWIN_FRAMEWORK_TOOL_PYTHON
+                chip_tool_path = paths_finder.get('darwin-framework-tool')
+
+        if chip_tool_path is not None:
+            chip_tool = Application(kind='tool', path=Path(chip_tool_path))
 
     if include_tags:
         include_tags = set([TestTag.__members__[t] for t in include_tags])
@@ -327,50 +333,27 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
     paths_finder = PathsFinder()
 
-    if all_clusters_app is None:
-        all_clusters_app = Application(kind="app", path=Path(paths_finder.get('chip-all-clusters-app')))
+    def build_app(arg_value, kind: str, key: str):
+        app_path = arg_value if arg_value else paths_finder.get(key)
+        if app_path is not None:
+            return Application(kind=kind, path=Path(app_path))
+        return None
 
-    if lock_app is None:
-        lock_app = Application(kind="app", path=Path(paths_finder.get('chip-lock-app')))
-
-    if fabric_bridge_app is None:
-        fabric_bridge_app = Application(kind="app", path=Path(paths_finder.get('fabric-bridge-app')))
-
-    if ota_provider_app is None:
-        ota_provider_app = Application(kind="app", path=Path(paths_finder.get('chip-ota-provider-app')))
-
-    if ota_requestor_app is None:
-        ota_requestor_app = Application(kind="app", path=Path(paths_finder.get('chip-ota-requestor-app')))
-
-    if tv_app is None:
-        tv_app = Application(kind="app", path=Path(paths_finder.get('chip-tv-app')))
-
-    if bridge_app is None:
-        bridge_app = Application(kind="app", path=Path(paths_finder.get('chip-bridge-app')))
-
-    if lit_icd_app is None:
-        lit_icd_app = Application(kind="app", path=Path(paths_finder.get('lit-icd-app')))
-
-    if microwave_oven_app is None:
-        microwave_oven_app = Application(kind="app", path=Path(paths_finder.get('chip-microwave-oven-app')))
-
-    if rvc_app is None:
-        rvc_app = Application(kind="app", path=Path(paths_finder.get('chip-rvc-app')))
-
-    if network_manager_app is None:
-        network_manager_app = Application(kind="app", path=Path(paths_finder.get('matter-network-manager-app')))
-
-    if energy_gateway_app is None:
-        energy_gateway_app = Application(kind="app", path=Path(paths_finder.get('chip-energy-gateway-app')))
-
-    if energy_management_app is None:
-        energy_management_app = Application(kind="app", path=Path(paths_finder.get('chip-energy-management-app')))
-
-    if closure_app is None:
-        closure_app = Application(kind="app", path=Path(paths_finder.get('closure-app')))
-
-    if matter_repl_yaml_tester is None:
-        matter_repl_yaml_tester = Application(kind="tool", path=Path(paths_finder.get('yamltest_with_matter_repl_tester.py')))
+    all_clusters_app = build_app(all_clusters_app, 'app', 'chip-all-clusters-app')
+    lock_app = build_app(lock_app, 'app', 'chip-lock-app')
+    fabric_bridge_app = build_app(fabric_bridge_app, 'app', 'fabric-bridge-app')
+    ota_provider_app = build_app(ota_provider_app, 'app', 'chip-ota-provider-app')
+    ota_requestor_app = build_app(ota_requestor_app, 'app', 'chip-ota-requestor-app')
+    tv_app = build_app(tv_app, 'app', 'chip-tv-app')
+    bridge_app = build_app(bridge_app, 'app', 'chip-bridge-app')
+    lit_icd_app = build_app(lit_icd_app, 'app', 'lit-icd-app')
+    microwave_oven_app = build_app(microwave_oven_app, 'app', 'chip-microwave-oven-app')
+    rvc_app = build_app(rvc_app, 'app', 'chip-rvc-app')
+    network_manager_app = build_app(network_manager_app, 'app', 'matter-network-manager-app')
+    energy_gateway_app = build_app(energy_gateway_app, 'app', 'chip-energy-gateway-app')
+    energy_management_app = build_app(energy_management_app, 'app', 'chip-energy-management-app')
+    closure_app = build_app(closure_app, 'app', 'closure-app')
+    matter_repl_yaml_tester = build_app(matter_repl_yaml_tester, 'tool', 'yamltest_with_matter_repl_tester.py')
 
     if chip_tool_with_python is None:
         if context.obj.runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:

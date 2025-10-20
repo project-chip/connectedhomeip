@@ -134,7 +134,7 @@ class Application:
         return Application(kind=self.kind, path=self.path, args=self.args + args)
 
     def wrap_with(self, wrapper: tuple[str, ...]):
-        return Application(kind=self.kind, path=self.path, wrapper=wrapper + self.wrapper, args=self.args)
+        return Application(kind=self.kind, path=self.path, wrapper=wrapper + list(self.wrapper), args=self.args)
 
     def to_cmd(self) -> typing.List[str]:
         return list(self.wrapper) + [str(self.path)] + list(self.args)
@@ -150,6 +150,7 @@ class Runner:
             # Try harder to avoid any stdout buffering in our tests
             application = application.wrap_with(['stdbuf', '-o0', '-i0'])
 
+        logging.info('RunSubprocess starting application %s' % application)
         cmd = application.to_cmd()
 
         outpipe = LogPipe(
@@ -199,5 +200,5 @@ class NamespacedRunner(Runner):
         self.ns = ns
 
     def RunSubprocess(self, application, name, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
-        wrapped_app = ns.wrap_in_namespace(application)
-        super().RunSubprocess(wrapped_app, name, wait, dependencies, timeout_seconds, stdin)
+        wrapped_app = self.ns.wrap_in_namespace(application)
+        return super().RunSubprocess(wrapped_app, name, wait, dependencies, timeout_seconds, stdin)
