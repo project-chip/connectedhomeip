@@ -126,3 +126,60 @@ private:
 
 } // namespace Test
 } // namespace chip
+
+/////////////////////////////////////////////////////////////////////
+
+#include <app/ConcreteClusterPath.h>
+#include <app/ConcreteEventPath.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/server-cluster/ServerClusterInterface.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <data-model-providers/codedriven/endpoint/EndpointInterface.h>
+#include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/ReadOnlyBuffer.h>
+
+namespace chip {
+namespace Testing {
+
+struct CommandResponse {
+    app::ConcreteCommandPath path;
+    CommandId responseId;
+    template <typename T>
+    CHIP_ERROR GetResponseData(T & dest);
+
+private:
+    uint8_t mResponseEncodeBuffer[128];
+    ByteSpan mEncodedSpan;
+};
+
+class ClusterTester {
+public:
+    ClusterTester();
+    ~ClusterTester();
+
+    app::ServerClusterContext & GetServerClusterContext() { return mServerClusterContext.Get(); }
+
+    template <typename T>
+    app::DataModel::ActionReturnStatus ReadAttribute(const app::DataModel::ReadAttributeRequest & path, T & out);
+
+    template <typename T>
+    app::DataModel::ActionReturnStatus WriteAttribute(const app::DataModel::WriteAttributeRequest & path, const T & value);
+
+    template <typename T>
+    std::optional<std::variant<app::DataModel::ActionReturnStatus, CommandResponse>> InvokeCommand(const app::DataModel::InvokeRequest & request, const T & arguments);
+
+    EventInformation GetNextGeneratedEvent();
+
+    CHIP_ERROR TestGeneratedCommands(const app::ConcreteClusterPath & path, Span<CommandId> compareWith);
+    CHIP_ERROR TestAcceptedCommands(const app::ConcreteClusterPath & path, Span<app::DataModel::AcceptedCommandEntry> compareWith);
+    CHIP_ERROR TestAttributes(const app::ConcreteClusterPath & path, Span<app::DataModel::AttributeEntry> compareWith);
+
+private:
+    Test::TestServerClusterContext mServerClusterContext;
+};
+
+} // namespace Testing
+} // namespace chip
