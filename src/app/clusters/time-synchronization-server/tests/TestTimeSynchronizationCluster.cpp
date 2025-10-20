@@ -33,6 +33,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::TimeSynchronization;
 using namespace chip::app::Clusters::TimeSynchronization::Attributes;
+using namespace chip::Test;
 
 struct TestTimeSynchronizationCluster : public ::testing::Test
 {
@@ -45,12 +46,6 @@ struct TestTimeSynchronizationCluster : public ::testing::Test
     chip::Test::TestServerClusterContext testContext;
     ServerClusterContext context;
 };
-
-template <typename ClusterT, typename T>
-inline CHIP_ERROR ReadClusterAttribute(ClusterT & cluster, AttributeId attr, T & val)
-{
-    return chip::Test::ReadClusterAttribute(cluster, ConcreteAttributePath(kRootEndpointId, TimeSynchronization::Id, attr), val);
-}
 
 } // namespace
 
@@ -337,13 +332,13 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         UTCTime::TypeInfo::Type utcTime{};
         ASSERT_EQ(ReadClusterAttribute(timeSynchronization, UTCTime::Id, utcTime), CHIP_NO_ERROR);
 
-        DataModel::DecodableList<Structs::TimeZoneStruct::Type> timeZoneList;
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, TimeZone::Id, timeZoneList), CHIP_NO_ERROR);
-        // Expect the time zone list is not empty
-        EXPECT_TRUE(timeZoneList.begin().Next());
+        // TODO: It's not safe to use ReadClusterAttribute() for a list
+        // DataModel::DecodableList<Structs::TimeZoneStruct::Type> timeZoneList;
+        // ASSERT_EQ(ReadClusterAttribute(timeSynchronization, TimeZone::Id, timeZoneList), CHIP_NO_ERROR);
 
-        DataModel::DecodableList<Structs::DSTOffsetStruct::Type> dstOffsetList;
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, DSTOffset::Id, dstOffsetList), CHIP_NO_ERROR);
+        // TODO: It's not safe to use ReadClusterAttribute() for a list
+        // DataModel::DecodableList<Structs::DSTOffsetStruct::Type> dstOffsetList;
+        // ASSERT_EQ(ReadClusterAttribute(timeSynchronization, DSTOffset::Id, dstOffsetList), CHIP_NO_ERROR);
 
         LocalTime::TypeInfo::Type localTime{};
         ASSERT_EQ(ReadClusterAttribute(timeSynchronization, LocalTime::Id, localTime), CHIP_NO_ERROR);
