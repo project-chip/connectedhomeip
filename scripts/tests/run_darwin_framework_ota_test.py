@@ -4,6 +4,7 @@ import io
 import json
 import logging
 import time
+from pathlib import Path
 from subprocess import PIPE
 
 import click
@@ -11,7 +12,6 @@ from chiptest.accessories import AppsRegister
 from chiptest.runner import Application, Runner
 from chiptest.test_definition import App, ExecutionCapture
 from chipyaml.paths_finder import PathsFinder
-from pathlib import Path
 
 TEST_NODE_ID = '0x12344321'
 TEST_VID = '0xFFF1'
