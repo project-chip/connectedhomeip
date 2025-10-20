@@ -257,8 +257,9 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         UTCTime::TypeInfo::Type utcTime{};
         ASSERT_EQ(ReadClusterAttribute(timeSynchronization, UTCTime::Id, utcTime), CHIP_NO_ERROR);
 
-        TrustedTimeSource::TypeInfo::Type trustedTimeSource{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, TrustedTimeSource::Id, trustedTimeSource), CHIP_NO_ERROR);
+        // TODO: Currently ReadClusterAttribute() can not be used with template parameter type TrustedTimeSource::TypeInfo::Type
+        // TrustedTimeSource::TypeInfo::Type trustedTimeSource{};
+        // ASSERT_EQ(ReadClusterAttribute(timeSynchronization, TrustedTimeSource::Id, trustedTimeSource), CHIP_NO_ERROR);
 
         timeSynchronization.Shutdown();
     }
@@ -281,8 +282,9 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         UTCTime::TypeInfo::Type utcTime{};
         ASSERT_EQ(ReadClusterAttribute(timeSynchronization, UTCTime::Id, utcTime), CHIP_NO_ERROR);
 
-        DefaultNTP::TypeInfo::Type defaultNTP{};
-        ASSERT_EQ(ReadClusterAttribute(timeSynchronization, DefaultNTP::Id, defaultNTP), CHIP_NO_ERROR);
+        // TODO: Currently ReadClusterAttribute() can not be used with template parameter type DefaultNTP::TypeInfo::Type
+        // DefaultNTP::TypeInfo::Type defaultNTP{};
+        // ASSERT_EQ(ReadClusterAttribute(timeSynchronization, DefaultNTP::Id, defaultNTP), CHIP_NO_ERROR);
 
         SupportsDNSResolve::TypeInfo::Type supportsDNSResolve{};
         ASSERT_EQ(ReadClusterAttribute(timeSynchronization, SupportsDNSResolve::Id, supportsDNSResolve), CHIP_NO_ERROR);
