@@ -103,13 +103,9 @@ class Context:
         self.Generate()
 
         with BuildTimer() as timer:
-            # Run everything in parallel
-            with ThreadPool(os.cpu_count()) as pool:
-                pool.map(
-                    lambda builder: timer.time_it(
-                        builder.identifier, builder.build),
-                    self.builders
-                )
+            # Run everything sequentially
+            for builder in self.builders:
+                timer.time_it(builder.identifier, builder.build)
 
     def CleanOutputDirectories(self):
         for builder in self.builders:
