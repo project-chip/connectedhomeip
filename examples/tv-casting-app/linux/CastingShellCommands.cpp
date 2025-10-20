@@ -85,7 +85,7 @@ static CHIP_ERROR PrintAllCommands()
 
 void PrintBindings()
 {
-    for (const auto & binding : BindingTable::GetInstance())
+    for (const auto & binding : chip::app::Clusters::Binding::Table::GetInstance())
     {
         ChipLogProgress(NotSpecified,
                         "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64

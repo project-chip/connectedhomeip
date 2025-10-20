@@ -57,6 +57,7 @@ class TC_WebRTCP_2_7(MatterBaseTest, WEBRTCPTestBase):
         Define the step-by-step sequence for the test.
         """
         steps = [
+            TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success"),
             TestStep(2, "Turns ON the physical privacy switch (HardPrivacyModeOn is TRUE)",
@@ -90,6 +91,8 @@ class TC_WebRTCP_2_7(MatterBaseTest, WEBRTCPTestBase):
         Executes the test steps for validating SolicitOffer behavior when physical privacy switch is ON.
         """
 
+        self.step("precondition")
+        # Commission DUT - already done
         endpoint = self.get_endpoint(default=1)
 
         self.step(1)
@@ -107,7 +110,7 @@ class TC_WebRTCP_2_7(MatterBaseTest, WEBRTCPTestBase):
         if self.is_pics_sdk_ci_only:
             self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": True})
         else:
-            input("Please turn ON the physical privacy switch on the device, then press Enter to continue...")
+            self.wait_for_user_input("Please turn ON the physical privacy switch on the device, then press Enter to continue...")
 
         # Verify the attribute was set successfully
         hard_privacy_mode = await self.read_single_attribute_check_success(
@@ -138,7 +141,7 @@ class TC_WebRTCP_2_7(MatterBaseTest, WEBRTCPTestBase):
         if self.is_pics_sdk_ci_only:
             self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": False})
         else:
-            input("Please turn OFF the physical privacy switch on the device, then press Enter to continue...")
+            self.wait_for_user_input("Please turn OFF the physical privacy switch on the device, then press Enter to continue...")
 
         # Verify the attribute was set successfully
         hard_privacy_mode = await self.read_single_attribute_check_success(

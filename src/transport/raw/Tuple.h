@@ -95,7 +95,7 @@ public:
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR TCPConnect(const PeerAddress & address, AppTCPConnectionCallbackCtxt * appState,
-                          ActiveTCPConnectionHolder & peerConnState) override
+                          ActiveTCPConnectionHandle & peerConnState) override
     {
         return TCPConnectImpl<0>(address, appState, peerConnState);
     }
@@ -155,7 +155,7 @@ private:
      */
     template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
     CHIP_ERROR TCPConnectImpl(const PeerAddress & address, AppTCPConnectionCallbackCtxt * appState,
-                              ActiveTCPConnectionHolder & peerConnState)
+                              ActiveTCPConnectionHandle & peerConnState)
     {
         Base * base = &std::get<N>(mTransports);
         if (base->CanSendToPeer(address))
@@ -170,7 +170,7 @@ private:
      */
     template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
     CHIP_ERROR TCPConnectImpl(const PeerAddress & address, AppTCPConnectionCallbackCtxt * appState,
-                              ActiveTCPConnectionHolder & peerConnState)
+                              ActiveTCPConnectionHandle & peerConnState)
     {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
@@ -204,7 +204,7 @@ private:
      * @param conn pointer to the connection to the peer.
      */
     template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
-    void TCPDisconnectImpl(ActiveTCPConnectionHolder & conn, bool shouldAbort = 0)
+    void TCPDisconnectImpl(ActiveTCPConnectionHandle & conn, bool shouldAbort = 0)
     {
         std::get<N>(mTransports).TCPDisconnect(conn, shouldAbort);
         TCPDisconnectImpl<N + 1>(conn, shouldAbort);
@@ -214,7 +214,7 @@ private:
      * TCPDisconnectImpl template for out of range N.
      */
     template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
-    void TCPDisconnectImpl(ActiveTCPConnectionHolder & conn, bool shouldAbort = 0)
+    void TCPDisconnectImpl(ActiveTCPConnectionHandle & conn, bool shouldAbort = 0)
     {}
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 

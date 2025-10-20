@@ -127,6 +127,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/global-enums.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-structs.xml \
                       src/app/zap-templates/zcl/data-model/chip/groupcast-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/icd-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/meter-identification-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/push-av-stream-transport-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/semantic-tag-namespace-enums.xml \
@@ -316,9 +317,6 @@ jobs:
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
-
-            - name: ccache stats
-              run: ccache -s
 
             - name: Run Tests using the python parser sending commands to chip-tool
               run: |
@@ -822,9 +820,6 @@ jobs:
                   --target linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test"
-
-            - name: ccache stats
-              run: ccache -s
 
             - name: Install push_av_server dependencies
               run: >-

@@ -350,7 +350,12 @@
             "OperatingMode",
             "FeatureMap"
         ],
-        "Identify": ["ClusterRevision"],
+        "Identify": [
+            "ClusterRevision",
+            "FeatureMap",
+            "IdentifyTime",
+            "IdentifyType"
+        ],
         "Joint Fabric Datastore": ["Status"],
         "Meter Identification": [
             "MeterType",
@@ -407,6 +412,7 @@
             "global_struct",
             "nullable_global_struct"
         ],
+        "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
         "Thread Border Router Management": [
             "BorderRouterName",
             "BorderAgentID",
@@ -827,6 +833,7 @@
             "ClusterRevision",
             "FeatureMap"
         ],
+        "Localization Configuration": ["ClusterRevision", "SupportedLocales"],
         "TLS Certificate Management": [
             "ClusterRevision",
             "MaxRootCertificates",

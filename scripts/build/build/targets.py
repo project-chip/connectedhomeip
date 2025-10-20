@@ -294,7 +294,6 @@ def BuildEfr32Target():
     target.AppendModifier(
         'show-qr-code', show_qr_code=True).ExceptIfRe('-low-power')
     target.AppendModifier('wifi', enable_wifi=True)
-    target.AppendModifier('rs9116', enable_rs9116=True).OnlyIfRe('-wifi')
     target.AppendModifier('wf200', enable_wf200=True).OnlyIfRe('-wifi')
     target.AppendModifier('siwx917', enable_917_ncp=True).OnlyIfRe('-wifi')
     target.AppendModifier('ipv4', enable_wifi_ipv4=True).OnlyIfRe('-wifi')
