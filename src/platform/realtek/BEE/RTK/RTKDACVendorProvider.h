@@ -39,6 +39,9 @@ public:
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) override;
 
 private:
+#if FEATURE_TRUSTZONE_ENABLE && CONFIG_DAC_KEY_ENC
+    void ImportDACKey();
+#endif
     const FactoryData * pFactoryData;
 };
 
