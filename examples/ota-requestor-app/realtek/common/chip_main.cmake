@@ -33,12 +33,10 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/examples/thermostat/realtek/bee/main/AppTask.cpp
-    ${chip_dir}/examples/thermostat/realtek/bee/main/TemperatureManager.cpp
-    ${chip_dir}/examples/thermostat/realtek/bee/main/chipinterface.cpp
-    ${chip_dir}/examples/thermostat/realtek/bee/main/DeviceCallbacks.cpp
-    ${chip_dir}/examples/thermostat/realtek/bee/main/CHIPDeviceManager.cpp
-    ${chip_dir}/examples/thermostat/realtek/bee/main/Globals.cpp
+    ${chip_dir}/examples/ota-requestor-app/realtek/common/main/chipinterface.cpp
+    ${chip_dir}/examples/ota-requestor-app/realtek/common/main/DeviceCallbacks.cpp
+    ${chip_dir}/examples/ota-requestor-app/realtek/common/main/CHIPDeviceManager.cpp
+    ${chip_dir}/examples/ota-requestor-app/realtek/common/main/AppTask.cpp
     ${chip_dir}/examples/platform/realtek/util/LEDWidget.cpp
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
     ${chip_dir}/examples/platform/realtek/dac_provider/CommonDACProvider.cpp
@@ -52,20 +50,20 @@ add_library(
 
 chip_configure_data_model(chip_main
     INCLUDE_SERVER
-    ZAP_FILE ${matter_example_path}/../../thermostat-common/thermostat.zap
+    ZAP_FILE ${matter_example_path}/../../ota-requestor-common/ota-requestor-app.zap
 )
 
 target_include_directories(
     ${chip_main}
     PUBLIC
 	${inc_path}
-    ${chip_dir}/zzz_generated/thermostat
-    ${chip_dir}/zzz_generated/thermostat/zap-generated
+    ${chip_dir}/zzz_generated/ota-requestor-app
+    ${chip_dir}/zzz_generated/ota-requestor-app/zap-generated
     ${chip_dir}/zzz_generated/app-common
-    ${chip_dir}/examples/thermostat/realtek/bee/main/include
-    ${chip_dir}/examples/thermostat/thermostat-common
-    ${chip_dir}/examples/thermostat/thermostat-common/include
+    ${chip_dir}/examples/ota-requestor-app/ota-requestor-common
+    ${chip_dir}/examples/ota-requestor-app/realtek/common/main/include
     ${chip_dir}/examples/platform/realtek
+    ${chip_dir}/examples/platform/realtek/util
     ${chip_dir}/examples/providers
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/
@@ -103,20 +101,20 @@ list(
 )
 endif (matter_enable_shell)
 
-if(matter_enable_dlps)
-list(
-    APPEND chip_main_flags
-
-    -DDLPS_EN=1
-)
-endif (matter_enable_dlps)
-
 list(
     APPEND chip_main_cpp_flags
 
-    -Wno-unused-parameter
-    -std=gnu++17
-    -fno-rtti
+	-Wno-unused-parameter
+	-std=gnu++17
+#	-std=c++14
+	-fno-rtti
 )
 target_compile_definitions(${chip_main} PRIVATE ${chip_main_flags} )
 target_compile_options(${chip_main} PRIVATE ${chip_main_cpp_flags})
+
+# move static library post build command
+#add_custom_command(
+#    TARGET ${chip_main}
+#    POST_BUILD
+#    COMMAND cp chip/lib/libCHIP.a ${matter_output_path}/lib
+#)
