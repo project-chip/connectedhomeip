@@ -33,7 +33,8 @@ bool gMatterReportingCalled = false;
 // This replaces the implementation in src/app/reporting/reporting.cpp
 void MatterReportingAttributeChangeCallback(uint16_t endpoint, uint32_t clusterId, uint32_t attributeId)
 {
-    ChipLogProgress(Test, "Mocked MatterReportingAttributeChangeCallback(ep=%" PRIu16 ", cluster=%" PRIu32 ", attr=%" PRIu32 ")", endpoint, clusterId, attributeId);
+    ChipLogProgress(Test, "Mocked MatterReportingAttributeChangeCallback(ep=%" PRIu16 ", cluster=%" PRIu32 ", attr=%" PRIu32 ")",
+                    endpoint, clusterId, attributeId);
     gMatterReportingCalled = true;
 }
 
