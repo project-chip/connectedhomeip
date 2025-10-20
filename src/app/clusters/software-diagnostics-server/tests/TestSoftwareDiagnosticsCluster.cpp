@@ -241,7 +241,9 @@ TEST_F(TestSoftwareDiagnosticsCluster, SoftwareFaultListenerTest)
     SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(fault);
 
     chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::DecodableType decodedFault;
-    ASSERT_EQ(context.EventsGenerator().DecodeLastEvent(decodedFault), CHIP_NO_ERROR);
+    auto event = context.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+    ASSERT_EQ(event->GetEventData(decodedFault), CHIP_NO_ERROR);
 
     ASSERT_EQ(decodedFault.id, fault.id);
     ASSERT_TRUE(decodedFault.name.HasValue());
@@ -250,60 +252,6 @@ TEST_F(TestSoftwareDiagnosticsCluster, SoftwareFaultListenerTest)
     ASSERT_TRUE(decodedFault.faultRecording.Value().data_equal(fault.faultRecording.Value()));
 
     cluster.Shutdown();
-}
-
-TEST_F(TestSoftwareDiagnosticsCluster, SoftwareFaultListenerTest)
-{
-    class TestListener : public SoftwareDiagnostics::SoftwareFaultListener
-    {
-    public:
-        void
-        OnSoftwareFaultDetect(const chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault) override
-        {
-            received = softwareFault;
-            called   = true;
-        }
-
-        bool called = false;
-        chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type received;
-    };
-
-    TestListener listener;
-
-    // Initially no listener is set
-    ASSERT_EQ(SoftwareDiagnostics::SoftwareFaultListener::GetGlobalListener(), nullptr);
-
-    // Set the listener
-    SoftwareDiagnostics::SoftwareFaultListener::SetGlobalListener(&listener);
-    ASSERT_EQ(SoftwareDiagnostics::SoftwareFaultListener::GetGlobalListener(), &listener);
-
-    // Notify a fault, and verify it is received
-    chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type fault;
-    fault.id = 1234;
-    fault.name.SetValue(CharSpan::fromCharString("test"));
-    const char faultData[] = "faultdata";
-    fault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(faultData), sizeof(faultData)));
-
-    SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(fault);
-
-    ASSERT_TRUE(listener.called);
-    ASSERT_EQ(listener.received.id, fault.id);
-    ASSERT_TRUE(listener.received.name.HasValue());
-    ASSERT_EQ(listener.received.name.Value(), fault.name.Value());
-    ASSERT_TRUE(listener.received.faultRecording.HasValue());
-    ASSERT_EQ(listener.received.faultRecording.Value().size(), fault.faultRecording.Value().size());
-    ASSERT_EQ(memcmp(listener.received.faultRecording.Value().data(), fault.faultRecording.Value().data(),
-                     fault.faultRecording.Value().size()),
-              0);
-
-    // Clear the listener
-    SoftwareDiagnostics::SoftwareFaultListener::SetGlobalListener(nullptr);
-    ASSERT_EQ(SoftwareDiagnostics::SoftwareFaultListener::GetGlobalListener(), nullptr);
-
-    // Notify again, and verify nothing is called
-    listener.called = false;
-    SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(fault);
-    ASSERT_FALSE(listener.called);
 }
 
 } // namespace

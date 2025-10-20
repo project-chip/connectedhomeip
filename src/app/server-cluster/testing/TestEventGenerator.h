@@ -25,47 +25,46 @@
 namespace chip {
 namespace Test {
 
-class LogOnlyEvents;
-struct EventInformation {
-    EventNumber eventNumber;
-    app::EventOptions eventOptions;
-    bool wasDeliveredUrgently;
-    ByteSpan GetEncodeByteSpan() const { return ByteSpan(mEventEncodeBuffer, mEncodedLength); }
-
-    // This relies on the default encoding of events which uses
-    // DataModel::Encode on a EventDataIB::Tag::kData
-    template <typename T>
-    CHIP_ERROR GetEventData(T & dest)
-    {
-        // attempt to decode the last encoded event
-        TLV::TLVReader reader;
-        TLV::TLVType outerType;
-
-        reader.Init(GetEncodeByteSpan());
-
-        ReturnErrorOnFailure(reader.Next());
-        ReturnErrorOnFailure(reader.EnterContainer(outerType));
-
-        ReturnErrorOnFailure(reader.Next()); // MUST be positioned on the first element
-        ReturnErrorOnFailure(app::DataModel::Decode(reader, dest));
-
-        ReturnErrorOnFailure(reader.ExitContainer(outerType));
-
-        return CHIP_NO_ERROR;
-    }
-
-private:
-    uint8_t mEventEncodeBuffer[128];
-    uint32_t mEncodedLength;
-
-    friend class LogOnlyEvents;
-};
-
 
 /// Keeps a queue of generated events that can be aqueried later for testing purposes
 class LogOnlyEvents : public app::DataModel::EventsGenerator
 {
 public:
+    // struct to hold information about a generated event
+    struct EventInformation {
+        EventNumber eventNumber;
+        app::EventOptions eventOptions;
+        bool wasDeliveredUrgently;
+        ByteSpan GetEncodeByteSpan() const { return ByteSpan(mEventEncodeBuffer, mEncodedLength); }
+
+        // This relies on the default encoding of events which uses
+        // DataModel::Encode on a EventDataIB::Tag::kData
+        template <typename T>
+        CHIP_ERROR GetEventData(T & dest)
+        {
+            // attempt to decode the last encoded event
+            TLV::TLVReader reader;
+            TLV::TLVType outerType;
+
+            reader.Init(GetEncodeByteSpan());
+
+            ReturnErrorOnFailure(reader.Next());
+            ReturnErrorOnFailure(reader.EnterContainer(outerType));
+
+            ReturnErrorOnFailure(reader.Next()); // MUST be positioned on the first element
+            ReturnErrorOnFailure(app::DataModel::Decode(reader, dest));
+
+            ReturnErrorOnFailure(reader.ExitContainer(outerType));
+
+            return CHIP_NO_ERROR;
+        }
+
+    private:
+        uint8_t mEventEncodeBuffer[128];
+        uint32_t mEncodedLength;
+
+        friend class LogOnlyEvents;
+    };
 
     // Marks the last event (that has the given fabric index if given any) as delivered urgently.
     void ScheduleUrgentEventDeliverySync(std::optional<FabricIndex> fabricIndex = std::nullopt) override
