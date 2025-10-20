@@ -22,7 +22,7 @@ import sys
 import threading
 import typing
 from dataclasses import dataclass
-import pathlib
+from pathlib import Path
 
 
 class LogPipe(threading.Thread):

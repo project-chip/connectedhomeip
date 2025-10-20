@@ -22,7 +22,7 @@ import time
 import typing
 from dataclasses import dataclass, field
 
-import pathlib
+from pathlib import Path
 
 import chiptest
 import click
