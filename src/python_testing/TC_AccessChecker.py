@@ -48,6 +48,19 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --bool-arg ci_only_linux_skip_ota_cluster_disallowed_for_certification:True
 #       --tests test_TC_ACE_2_3
+#   run4:
+#     app: ${ALL_CLUSTERS_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --tests test_TC_ACE_2_4
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -57,6 +70,7 @@ from typing import Optional
 
 import matter.clusters as Clusters
 from matter.clusters.Attribute import ValueDecodeFailure
+from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
@@ -71,6 +85,7 @@ class AccessTestType(Enum):
     READ = auto()
     WRITE = auto()
     INVOKE = auto()
+    SUBSCRIBE = auto()
 
 
 def step_number_with_privilege(step: int, substep: str, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum) -> str:
@@ -128,10 +143,11 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         self.TH2 = fabric_admin.NewController(nodeId=self.TH2_nodeid)
 
     # Both the tests in this suite are potentially long-running if there are a large number of attributes on the DUT
-    # and the network is slow. Set the default to 3 minutes to account for this.
+    # and the network is slow. TC_ACE_2_4 (subscription test) is especially long as it tests ALL attributes.
+    # Set the default to 10 minutes to account for comprehensive subscription testing.
     @property
     def default_timeout(self) -> int:
-        return 180
+        return 600  # 10 minutes for comprehensive subscription testing
 
     @async_test_body
     async def setup_test(self):
@@ -273,6 +289,114 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 if ret is None:
                     self.success = False
 
+    async def _run_subscribe_access_test_for_cluster_privilege(self, endpoint_id, cluster_id, device_cluster_data, xml_cluster: XmlCluster, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum):
+        """ 
+            Tests subscription access control by verifying subscriptions can be established.
+            Follows TC-ACE-2.1 pattern but uses subscriptions instead of reads.
+            Uses keepSubscriptions=False and reportInterval=(0, 30) as specified in requirements.
+
+            This implementation follows the pattern from TC-IDM-4.3 step 2 which successfully
+            establishes subscriptions and verifies priming reports are received via subscription ID.
+
+            Note: Like TC-ACE-2.1, this loops through ALL checkable attributes in the cluster
+            to provide complete access control validation coverage.
+        """
+        # Loop through all checkable attributes, consistent with TC-ACE-2.1 read test
+        for attribute_id in checkable_attributes(cluster_id, device_cluster_data, xml_cluster):
+            attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]
+            attr_path = [(endpoint_id, attribute)]
+
+            spec_requires = xml_cluster.attributes[attribute_id].read_access
+            test_name = f'Subscribe access checker - {privilege}'
+
+            try:
+                logging.info(f"Subscribing to attribute {attribute} cluster {xml_cluster.name} privilege {privilege}")  # fmt: skip
+
+                # Subscribe to attribute using the same pattern as TC-IDM-4.3 step 2
+                # This establishes subscription and waits for priming report
+                subscription = await self.TH2.ReadAttribute(
+                    nodeid=self.dut_node_id,
+                    attributes=attr_path,
+                    reportInterval=(0, 30),
+                    keepSubscriptions=False,
+                    fabricFiltered=False
+                )
+
+                # Verify the subscription was successfully activated and priming report received
+                if operation_allowed(spec_requires, privilege):
+                    # Should succeed
+                    if subscription.subscriptionId is None:
+                        self.record_error(test_name=test_name,
+                                          location=AttributePathLocation(endpoint_id=endpoint_id,
+                                                                         cluster_id=cluster_id, attribute_id=attribute_id),
+                                          problem=f"Subscription activation failed - expected success with privilege {privilege}")
+                        self.success = False
+                        logging.info("Failed to establish subscription (expected success)")
+                    else:
+                        logging.info(f"Successfully established subscription (ID: {subscription.subscriptionId}) with privilege {privilege}")  # noqa # fmt: skip
+                else:
+                    # ERROR: Subscription succeeded but should have failed with
+                    # UnsupportedAccess. We reached here because no exception was
+                    # thrown (privilege insufficient but subscription was
+                    # allowed).
+                    self.record_error(test_name=test_name,
+                                      location=AttributePathLocation(endpoint_id=endpoint_id,
+                                                                     cluster_id=cluster_id, attribute_id=attribute_id),
+                                      problem=f"Subscription succeeded but should have failed with privilege {privilege} (requires {spec_requires})")
+                    self.success = False
+                    logging.info("Subscription succeeded but should have failed")
+
+                # Clean up subscription
+                subscription.Shutdown()
+
+            except InteractionModelError as e:
+                # Subscription failed - check if this was expected
+                if operation_allowed(spec_requires, privilege):
+                    # Should have succeeded but failed
+                    self.record_error(test_name=test_name,
+                                      location=AttributePathLocation(endpoint_id=endpoint_id,
+                                                                     cluster_id=cluster_id, attribute_id=attribute_id),
+                                      problem=f"Subscription failed with {e.status} but should have succeeded with privilege {privilege}")
+                    self.success = False
+                    logging.info(f"Subscription failed with {e.status} (expected success)")
+                else:
+                    if e.status != Status.UnsupportedAccess:
+                        self.record_error(test_name=test_name,
+                                          location=AttributePathLocation(endpoint_id=endpoint_id,
+                                                                         cluster_id=cluster_id, attribute_id=attribute_id),
+                                          problem=f"Subscription failed with {e.status} but expected UnsupportedAccess for privilege {privilege}")
+                        self.success = False
+                        logging.info(f"Subscription failed with {e.status} (expected UnsupportedAccess)")
+                    else:
+                        logging.info("Subscription correctly failed with UnsupportedAccess")
+
+            except ChipStackError as e:  # chipstack-ok
+                # Handle ChipStackError - some clusters/attributes don't support
+                # subscription or don't support subscriptions unless under
+                # certain conditions or in certain states.
+                # Common clusters: NetworkCommissioning, Camera AV Stream
+                # Management, Access Control, Operational Credentials.
+                if e.err == 0x00000580:  # INVALID_ACTION
+                    logging.warning(f"Skipping cluster {xml_cluster.name} attribute {attribute}")
+                    continue  # Skip this attribute, continue with next attribute in cluster
+                else:
+                    # Unexpected ChipStackError (not INVALID_ACTION)
+                    logging.error(f"Unexpected ChipStackError subscribing to cluster {xml_cluster.name}: {e}")
+                    self.record_error(test_name=test_name,
+                                      location=AttributePathLocation(endpoint_id=endpoint_id,
+                                                                     cluster_id=cluster_id, attribute_id=attribute_id),
+                                      problem=f"Unexpected ChipStackError during subscription: {e} (error code: 0x{e.err:08X})")
+                    self.success = False
+
+            # Handle other unexpected exceptions, not sure what they might be, but if they occur, we will catch them here
+            except Exception as e:
+                logging.error(f"Unexpected exception subscribing to cluster {xml_cluster.name}: {e}")
+                self.record_error(test_name=test_name,
+                                  location=AttributePathLocation(endpoint_id=endpoint_id,
+                                                                 cluster_id=cluster_id, attribute_id=attribute_id),
+                                  problem=f"Unexpected error during subscription: {e}")
+                self.success = False
+
     async def _run_write_access_test_for_cluster_privilege(self, endpoint_id, cluster_id, cluster, xml_cluster: XmlCluster, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, wildcard_read):
         for attribute_id in checkable_attributes(cluster_id, cluster, xml_cluster):
             spec_requires = xml_cluster.attributes[attribute_id].write_access
@@ -368,6 +492,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                         await self._run_write_access_test_for_cluster_privilege(endpoint_id, cluster_id, device_cluster_data, xml_cluster, privilege, wildcard_read)
                     elif test_type == AccessTestType.INVOKE:
                         await self._maybe_run_command_access_test_for_cluster_privilege(endpoint_id, cluster_id, device_cluster_data, xml_cluster, privilege)
+                    elif test_type == AccessTestType.SUBSCRIBE:
+                        await self._run_subscribe_access_test_for_cluster_privilege(endpoint_id, cluster_id, device_cluster_data, xml_cluster, privilege)
                     else:
                         self.fail_current_test("Unsupported test type")
         if not self.success:
@@ -443,6 +569,27 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
     @async_test_body
     async def test_TC_ACE_2_3(self):
         await self.run_access_test(AccessTestType.INVOKE)
+
+    def steps_TC_ACE_2_4(self):
+        steps = [TestStep("precondition", "DUT is commissioned", is_commissioning=True),
+                 TestStep(1, "TH_commissioner performs a wildcard read (done during test setup)"),
+                 TestStep(2, "TH_commissioner reads the ACL attribute (done during test setup)"),
+                 TestStep(3, "Repeat steps 5a and 5b for each permission level")]
+        enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
+        for p in privilege_enum:
+            steps.append(TestStep(step_number_with_privilege(3, 'a', p),
+                         "TH_commissioner gives TH_second_commissioner the specified privilege"))
+            steps.append(TestStep(step_number_with_privilege(3, 'b', p),
+                         "TH_second_controller subscribes to all the attributes and verifies the subscription is established and priming report is received with appropriate permission errors"))
+        return steps
+
+    def desc_TC_ACE_2_4(self):
+        return "[TC-ACE-2.4] Attribute read subscription report - [DUT as Server]"
+
+    @async_test_body
+    async def test_TC_ACE_2_4(self):
+        await self.run_access_test(AccessTestType.SUBSCRIBE)
 
 
 if __name__ == "__main__":
