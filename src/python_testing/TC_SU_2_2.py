@@ -180,6 +180,15 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         Returns:
             None
         """
+
+        logger.info(f"""Prerequisite - Provider info:
+            discriminator: {self.provider_data["discriminator"]},
+            setupPinCode: {self.provider_data["setup_pincode"]},
+            port: {self.provider_data["port"]},
+            extra_args: {extra_args},
+            kvs_path: {self.KVS_PATH},
+            log_file: {self.LOG_FILE_PATH}""")
+
         self.start_provider(
             version=version,
             setup_pincode=self.provider_data["setup_pincode"],
@@ -416,34 +425,33 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         step_number = "[STEP_1]"
         logger.info(f'{step_number}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
-        logger.info(f'{step_number}: Prerequisite #1.0 - Provider logs path {self.KVS_PATH}, KVS logs path {self.LOG_FILE_PATH}')
-
-        logger.info(f'{step_number}: Prerequisite #2.0 - Launched Provider')
+        logger.info(f'{step_number}: Prerequisite #1.0 - Launched Provider')
 
         provider_extra_args_updateAvailable = [
             "-q", "updateAvailable"
         ]
         await self.setup_provider(version=2, extra_args=provider_extra_args_updateAvailable)
 
-        # Prerequisite #3.0 - Commission Provider (Only one time)
+        # Prerequisite #2.0 - Commission Provider (Only one time)
         resp = await controller.CommissionOnNetwork(
             nodeId=provider_node_id,
             setupPinCode=provider_setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=provider_discriminator
         )
-        logger.info(f'{step_number}: Prerequisite #3 - Provider Commissioning response: {resp}')
+        logger.info(f'{step_number}: Prerequisite #2 - Provider Commissioning response: {resp}')
 
+        # Prerequisite #3.0 - ACLs (Only one time)
         await self.setup_acl(controller, requestor_node_id, provider_node_id, fabric_id, step_number)
 
-        # Prerequisite #5.0 - Add OTA Provider to the Requestor (Only if none exists, and only one time)
-        logger.info(f'{step_number}: Prerequisite #5.0 - Add Provider to Requestor(DUT) DefaultOTAProviders')
+        # Prerequisite #3.0 - Add OTA Provider to the Requestor (Only if none exists, and only one time)
+        logger.info(f'{step_number}: Prerequisite #4.0 - Add Provider to Requestor(DUT) DefaultOTAProviders')
         await self.add_single_ota_provider(controller, requestor_node_id, provider_node_id)
 
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.1 - Matcher for OTA records logs
         # Start AttributeSubscriptionHandler first to avoid missing any rapid OTA events (race condition)
-        # Atrributes: UpdateState and UpdateStateProgress
+        # Atrributes: UpdateState and UpdateStateProgress (updateAvailable sequence)
         # ------------------------------------------------------------------------------------
         subscription_attr_state = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -485,7 +493,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number}: Step #1.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
-        # [STEP_1]: Step #1.2 -  Track OTA attributes: UpdateState and UpdateStateProgress
+        # [STEP_1]: Step #1.2   - Track OTA attributes: UpdateState and UpdateStateProgress
         # [STEP_1]: Step #1.2.1 - UpdateState matcher: Track "Downloading > Applying > Idle"
         # [STEP_1]: Step #1.2.2 - UpdateStateProgress matcher: Track non-null values "rage 1–99" and final "None"
         # ------------------------------------------------------------------------------------
@@ -572,7 +580,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.3 - Start tasks to track OTA attributes:
-        # UpdateState (state sequence) and UpdateStateProgress (progress values) with validation
+        # UpdateState and UpdateStateProgress (updateAvailable sequence) with validations
         # ------------------------------------------------------------------------------------
         try:
             # Wait until the final state (Idle) is reached or timeout (5 min)
@@ -645,6 +653,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         step_number_s2 = "[STEP_2]"
         logger.info(f'{step_number_s2}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
+        logger.info(f'{step_number_s2}: Prerequisite #1.0 - Launched Provider')
 
         provider_extra_args_busy = [
             "-q", "busy",
@@ -682,9 +691,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_2]: Step #2.2 - Track OTA attributes: UpdateState (Busy sequence)
-        # UpdateState (Busy sequence) matcher: DUT stays in DelayedOnQuery or Querying for 120s interval
-        # After the interval, Downloading is optional.
+        # UpdateState (Busy sequence) matcher: Allowed states during 120s interval: Idle, DelayedOnQuery, Querying.
         # Any unexpected states during the 120s interval are asserted.
+        # After the interval, Downloading is optional.
         # ------------------------------------------------------------------------------------
 
         logger.info(
@@ -708,7 +717,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_2]:  Step #2.3 - Start tasks to track OTA attributes:
-        # UpdateState (Busy state sequence) with validation
         # ------------------------------------------------------------------------------------
         try:
             # Wait until the final state (Idle) is reached or timeout (2.5 min)
@@ -721,7 +729,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             await subscription_attr_state_busy.cancel()
 
         # ------------------------------------------------------------------------------------
-        # [STEP_2]: Step #2.4 - Verify image transfer from TH/OTA-P to DUT is Busy
+        # [STEP_2]: Step #2.4 - Verify Busy sequence
+        # Track the full OTA UpdateState Busy sequence and the 120s minimum interval.
+        # Verify that only the allowed states (Idle, DelayedOnQuery, Querying) are observed during this interval.
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s2}: Step #2.4 - Full OTA UpdateState (Busy sequence) observed: {state_sequence_busy}')
 
@@ -751,7 +761,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         self.step(3)
         # ------------------------------------------------------------------------------------
-        # [STEP_3]: Prerequisites - Setup Provider_S3
+        # [STEP_3]: Prerequisites - Setup Provider
         # ------------------------------------------------------------------------------------
         step_number_s3 = "[STEP_3]"
         logger.info(f'{step_number_s3}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
@@ -760,7 +770,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             "-q", "updateNotAvailable",
             "-t", "60"
         ]
-        await self.setup_provider(version=4, extra_args=provider_extra_args_updateNotAvailable)  # 4
+        await self.setup_provider(version=4, extra_args=provider_extra_args_updateNotAvailable)
 
         # ------------------------------------------------------------------------------------
         # [STEP_3]: Step #3.1 - Matcher for OTA records logs
@@ -792,7 +802,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_3]: Step #3.2 - Track OTA attributes: UpdateState (updateNotAvailable sequence)
-        # UpdateState (Busy sequence) matcher: DUT stays in Idle for at least 120s
+        # UpdateState (updateNotAvailable sequence) matcher:  Allowed states during 120s interval: Idle, Querying.
         # Any unexpected states during the 120s interval are asserted.
         # ------------------------------------------------------------------------------------
         logger.info(
@@ -829,7 +839,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             await subscription_attr_state_updatenotavailable.cancel()
 
         # ------------------------------------------------------------------------------------
-        # [STEP_3]: Step #3.4 - Verify image transfer from TH/OTA-P to DUT is Busy
+        # [STEP_3]: Step #3.4 - Verify updateNotAvailable sequence
+        # Track the full OTA UpdateState updateNotAvailable sequence and the 120s minimum interval.
+        # Verify that only the allowed states (Idle, Querying) are observed during this interval.
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s3}: Step #3.4 - Full OTA UpdateState (updateNotAvailable sequence) observed: {state_sequence_notavailable}')
         # interval_duration = t_end_interval - t_start_interval
@@ -850,7 +862,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                              f"Unexpected states: {list(observed_states_during_interval)}")
 
         # ------------------------------------------------------------------------------------
-        # [STEP_3]: Step #3.5 - Close Provider_S3 Process (CLEANUP!)
+        # [STEP_3]: Step #3.5 - Close Provider Process
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s3}: Step #3.5 - Closed Provider process.')
 
@@ -868,7 +880,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             "-q", "busy",
             "-t", "180"
         ]
-        await self.setup_provider(version=5, extra_args=provider_extra_args_busy_180)  # 5
+        await self.setup_provider(version=5, extra_args=provider_extra_args_busy_180)
 
         # ------------------------------------------------------------------------------------
         # [STEP_4]: Step #4.1 - Matcher for OTA records logs
@@ -911,8 +923,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number_s4}: Step #4.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
-        # [STEP_4]: Step #4.2 -  Track OTA attributes: UpdateState (Busy, 180s DelayedActionTime)
-        # UpdateState (Busy, 180s DelayedActionTime) matcher: DelayedOnQuery > Downloading after ~180s delay
+        # [STEP_4]: Step #2.4 - Track OTA attributes: UpdateState (Busy,  180s DelayedActionTime sequence)
+        # UpdateState (Busy, 180s DelayedActionTime sequence) matcher: Allowed states during 180s interval: Idle, DelayedOnQuery, Querying.
+        # Any unexpected states during the 180s interval are asserted.
+        # After the interval, Downloading is verified.
         # ------------------------------------------------------------------------------------
         logger.info(
             f'{step_number_s4}: Step #4.1 - Started subscription for UpdateState attribute '
@@ -949,7 +963,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             await subscription_attr_state_busy_180s.cancel()
 
         # ------------------------------------------------------------------------------------
-        # [STEP_4]: Step # 4.4 - Verify image transfer from TH/OTA-P to DUT is Busy (180s DelayedActionTime)
+        # [STEP_4]: Step #4.4 - Verify Busy, 180s DelayedActionTime sequence
+        # Track the full OTA UpdateState Busy sequence and the 180s minimum interval.
+        # Verify that only the allowed states (Idle, DelayedOnQuery, Querying) are observed during this interval.
         # ------------------------------------------------------------------------------------
         logger.info(
             f'{step_number_s4}: Step #4.4 - Full OTA UpdateState (Busy, 180s DelayedActionTime sequence) observed: {state_sequence_busy_180}')
@@ -975,7 +991,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                              f"Unexpected states: {list(observed_states_during_interval)}")
 
         # ------------------------------------------------------------------------------------
-        # [STEP_4]: Step #4.5 - Close Provider_S4 Process (CLEANUP!)
+        # [STEP_4]: Step #4.5 - Close Provider Process
         # ------------------------------------------------------------------------------------
         logger.info(
             f'{step_number_s4}: Step #4.5 - Closed Provider_S4 process.')
@@ -989,7 +1005,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         self.step(6)
         # ------------------------------------------------------------------------------------
-        # [STEP_6]: Prerequisites - Setup Provider_S6
+        # [STEP_6]: Prerequisites - Setup Provider
         # ------------------------------------------------------------------------------------
         step_number_s6 = "[STEP_6]"
         logger.info(f'{step_number_s6}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
@@ -1074,7 +1090,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_6]: Step #6.3 - Start tasks to track OTA events:
-        # StateTransition two events: (1) Idle > Querying, (2) Querying > Idle, ensuring no image transfer occurs if UpdateAvailable version is same or lower.
+        # StateTransition two events: Idle > Querying, Querying > Idle, ensuring no image transfer occurs if UpdateAvailable version is same or lower.
         # ------------------------------------------------------------------------------------
         try:
             timeout_total = 60  # 1 min
@@ -1109,7 +1125,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         self.step(7)
         # ------------------------------------------------------------------------------------
-        # [STEP_7]: Prerequisites - Setup Provider_S7
+        # [STEP_7]: Prerequisites - Setup Provider
         # ------------------------------------------------------------------------------------
         step_number_s7 = "[STEP_7]"
         logger.info(f'{step_number_s7}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
@@ -1192,7 +1208,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_7]: Step #7.3 - Start tasks to track OTA events:
-        # StateTransition two events: (1) Idle > Querying, (2) Querying > Idle, ensuring no image transfer occurs due invalid BDX ImageURI.
+        # StateTransition two events: Idle > Querying, Querying > Idle, ensuring no image transfer occurs due invalid BDX ImageURI.
         # ------------------------------------------------------------------------------------
         try:
             timeout_total = 60  # 1 min
