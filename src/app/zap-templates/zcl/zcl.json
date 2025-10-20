@@ -412,6 +412,7 @@
             "global_struct",
             "nullable_global_struct"
         ],
+        "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
         "Thread Border Router Management": [
             "BorderRouterName",
             "BorderAgentID",

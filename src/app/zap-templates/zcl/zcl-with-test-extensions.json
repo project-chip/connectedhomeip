@@ -829,6 +829,7 @@
             "FeatureMap"
         ],
         "Unit Localization": ["TemperatureUnit"],
+        "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
         "Localization Configuration": ["ClusterRevision", "SupportedLocales"],
         "TLS Certificate Management": [
             "ClusterRevision",
