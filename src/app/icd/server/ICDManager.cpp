@@ -683,6 +683,12 @@ void ICDManager::OnSubscriptionReport()
     this->UpdateOperationState(OperationalState::ActiveMode);
 }
 
+void ICDManager::OnSendCheckIn(const Access::SubjectDescriptor & subject)
+{
+    ChipLogProgress(AppServer, "Received OnSendCheckIn for subject: " ChipLogFormatX64, ChipLogValueX64(subject.subject));
+    SendCheckInMsgs(MakeOptional(subject));
+}
+
 void ICDManager::ExtendActiveMode(Milliseconds16 extendDuration)
 {
     DeviceLayer::SystemLayer().ExtendTimerTo(extendDuration, OnActiveModeDone, this);

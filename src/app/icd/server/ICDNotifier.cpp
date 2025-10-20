@@ -135,5 +135,15 @@ void ICDNotifier::NotifySubscriptionReport()
     }
 }
 
+void ICDNotifier::NotifySendCheckIn(const chip::Access::SubjectDescriptor & subject)
+{
+    for (auto subscriber : mSubscribers)
+    {
+        if (subscriber != nullptr)
+        {
+            subscriber->OnSendCheckIn(subject);
+        }
+    }
+}
 } // namespace app
 } // namespace chip

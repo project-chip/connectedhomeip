@@ -67,6 +67,7 @@ source_set("notifier") {
 
   deps = [
     ":icd-server-config",
+    "${chip_root}/src/access:types",
     "${chip_root}/src/lib/core",
   ]
 }

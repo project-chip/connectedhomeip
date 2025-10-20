@@ -51,7 +51,6 @@ namespace app {
 // Used in unit tests
 class TestICDManager_TestShouldCheckInMsgsBeSentAtActiveModeFunction_Test;
 
-class ReadHandler;
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
  */
@@ -256,12 +255,12 @@ public:
 
     void OnICDManagementServerEvent(ICDManagementEvents event) override;
     void OnSubscriptionReport() override;
+    void OnSendCheckIn(const Access::SubjectDescriptor & subject) override;
 
 private:
     // TODO : Once <gtest/gtest_prod.h> can be included, use FRIEND_TEST for the friend class.
     friend class TestICDManager_TestShouldCheckInMsgsBeSentAtActiveModeFunction_Test;
 
-    friend class ReadHandler;
     /**
      * @brief UpdateICDMode evaluates in which mode the ICD can be in; SIT or LIT mode.
      *        If the current operating mode does not match the evaluated operating mode, function updates the ICDMode and triggers
