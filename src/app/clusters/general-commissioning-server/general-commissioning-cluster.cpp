@@ -274,8 +274,8 @@ DataModel::ActionReturnStatus GeneralCommissioningCluster::WriteAttribute(const 
     case Breadcrumb::Id: {
         uint64_t value;
         ReturnErrorOnFailure(decoder.Decode(value));
-        // SetBreadCrumb handles notification internally, so we don't need WriteImpl
-        // to avoid double-notification.
+        // SetBreadCrumb handles notification internally via NotifyAttributeChanged(),
+        // so we don't need to call NotifyAttributeChangedIfSuccess here.
         SetBreadCrumb(value);
         return CHIP_NO_ERROR;
     }
@@ -320,7 +320,7 @@ std::optional<DataModel::ActionReturnStatus> GeneralCommissioningCluster::Invoke
 CHIP_ERROR GeneralCommissioningCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                          ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (kFeatures.Has(GeneralCommissioning::Feature::kTermsAndConditions))
+    if constexpr (kFeatures.Has(GeneralCommissioning::Feature::kTermsAndConditions))
     {
         ReturnErrorOnFailure(builder.AppendElements({ Commands::SetTCAcknowledgements::kMetadataEntry }));
     }
@@ -336,7 +336,7 @@ CHIP_ERROR GeneralCommissioningCluster::GeneratedCommands(const ConcreteClusterP
                                                           ReadOnlyBufferBuilder<CommandId> & builder)
 {
 
-    if (kFeatures.Has(GeneralCommissioning::Feature::kTermsAndConditions))
+    if constexpr (kFeatures.Has(GeneralCommissioning::Feature::kTermsAndConditions))
     {
         ReturnErrorOnFailure(builder.AppendElements({ Commands::SetTCAcknowledgementsResponse::Id }));
     }
@@ -352,7 +352,7 @@ CHIP_ERROR GeneralCommissioningCluster::Attributes(const ConcreteClusterPath & p
                                                    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
 
-    if (kFeatures.Has(GeneralCommissioning::Feature::kTermsAndConditions))
+    if constexpr (kFeatures.Has(GeneralCommissioning::Feature::kTermsAndConditions))
     {
         ReturnErrorOnFailure(builder.AppendElements({
             TCAcceptedVersion::kMetadataEntry,
@@ -363,7 +363,7 @@ CHIP_ERROR GeneralCommissioningCluster::Attributes(const ConcreteClusterPath & p
         }));
     }
 
-    if (kFeatures.Has(GeneralCommissioning::Feature::kNetworkRecovery))
+    if constexpr (kFeatures.Has(GeneralCommissioning::Feature::kNetworkRecovery))
     {
         ReturnErrorOnFailure(builder.AppendElements({
             RecoveryIdentifier::kMetadataEntry,

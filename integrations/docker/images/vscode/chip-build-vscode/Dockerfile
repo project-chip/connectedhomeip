@@ -63,7 +63,6 @@ COPY --from=bouffalolab /opt/bouffalolab_sdk /opt/bouffalolab_sdk
 COPY --from=asr /opt/asr /opt/asr
 
 COPY --from=efr32 /opt/silabs/simplicity_sdk /opt/silabs/simplicity_sdk
-COPY --from=efr32 /opt/silabs/wiseconnect-wifi-bt-sdk /opt/silabs/wiseconnect-wifi-bt-sdk
 COPY --from=efr32 /opt/silabs/wifi_sdk /opt/silabs/wifi_sdk
 
 COPY --from=nuttx /opt/nuttx /opt/nuttx
@@ -106,7 +105,6 @@ ENV SILABS_BOARD=BRD4186C
 ENV GSDK_ROOT=/opt/silabs/simplicity_sdk/
 ENV SISDK_ROOT=/opt/silabs/simplicity_sdk/
 ENV PATH=$PATH:/opt/silabs/slc_cli/
-ENV WISECONNECT_SDK_ROOT=/opt/silabs/wiseconnect-wifi-bt-sdk/
 ENV WIFI_SDK_ROOT=/opt/silabs/wifi_sdk
 ENV IDF_PATH=/opt/espressif/esp-idf/
 ENV IDF_TOOLS_PATH=/opt/espressif/tools

@@ -72,14 +72,14 @@
 // Setting the priority of the lwip thread to osPriorityAboveNormal
 #define TCPIP_THREAD_PRIO (32)
 
-#ifdef DIC_ENABLE
+#ifdef SL_MATTER_ENABLE_AWS
 #define LWIP_DNS 1
 #define DNS_RAND_TXID() ((u32_t) rand())
 #define TCP_MSS (4 * 1152)
 #else
 #define LWIP_DNS 0
 #define TCP_MSS (1152)
-#endif /* DIC_ENABLE */
+#endif /* SL_MATTER_ENABLE_AWS */
 
 #define LWIP_FREERTOS_USE_STATIC_TCPIP_TASK 1
 
@@ -124,12 +124,12 @@
 #define LWIP_ETHERNET (LWIP_IPV6) // Required for IPV6 only mode
 #define LWIP_IPV6_MLD (LWIP_IPV6)
 #define LWIP_ICMP6 (LWIP_IPV6)
-#define LWIP_IPV6_REASS (LWIP_IPV6)
 #define LWIP_IPV6_FRAG (LWIP_IPV6)
-#define LWIP_IPV6_DHCP6 0
 #define LWIP_IPV6_AUTOCONFIG (LWIP_IPV6)
-#define LWIP_IPV6_DUP_DETECT_ATTEMPTS 1
 #define LWIP_IPV6_ROUTER_SUPPORT (LWIP_IPV6)
+#define LWIP_IPV6_REASS 0
+#define LWIP_IPV6_DHCP6 0
+#define LWIP_IPV6_DUP_DETECT_ATTEMPTS 1
 #define LWIP_ND6_LISTEN_RA (LWIP_IPV6_ND)
 #define LWIP_ND6_NUM_NEIGHBORS (10)
 #define LWIP_ND6_NUM_DESTINATIONS (10)
@@ -174,6 +174,7 @@
 #define DEFAULT_TCP_RECVMBOX_SIZE 6
 
 #if SL_ICD_ENABLED
+#define SL_LWIP_ECO_TIMERS 1
 #define SL_LWIP_MLD6_TIMERS_ONDEMAND 1
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
