@@ -21,7 +21,6 @@ import sys
 import time
 import typing
 from dataclasses import dataclass, field
-
 from pathlib import Path
 
 import chiptest
@@ -29,9 +28,9 @@ import click
 import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
+from chiptest.runner import Application
 from chiptest.test_definition import TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
-from chiptest.runner import Application
 
 # If running on Linux platform load the Linux specific code.
 if sys.platform == "linux":
