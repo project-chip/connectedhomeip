@@ -596,7 +596,6 @@ private:
     uint16_t mMaxInterval                    = 0;
     uint16_t mSubscriberRequestedMaxInterval = 0;
 
-    SubjectDescriptor mSubjectDescriptor;
     // Current Handler state
     HandlerState mState            = HandlerState::Idle;
     PriorityLevel mCurrentPriority = PriorityLevel::Invalid;
