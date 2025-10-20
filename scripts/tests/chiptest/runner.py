@@ -119,38 +119,44 @@ class RunnerWaitQueue:
     def get(self):
         return self.queue.get()
 
+
 @dataclass
 class Application:
     kind: str
-    path: pathlib.Path
+    path: pathlib.Path | str
+    wrapper: tuple[str, ...] = ()
     args: tuple[str, ...] = ()
+
+    def __post_init__(self):
+        self.path = pathlib.Path(self.path)
 
     def add_args(self, args: tuple[str, ...]):
         return Application(kind=self.kind, path=self.path, args=self.args + args)
 
+    def wrap_with(self, wrapper: tuple[str, ...]):
+        return Application(kind=self.kind, path=self.path, wrapper=wrapper + self.wrapper, args=self.args)
+
     def to_cmd(self) -> typing.List[str]:
-        return [str(self.path)] + list(self.args)
+        return list(self.wrapper) + [str(self.path)] + list(self.args)
+
 
 class Runner:
     def __init__(self, capture_delegate=None):
         self.capture_delegate = capture_delegate
 
-    def app_to_cmd(self, application):
-        return application.to_cmd()
-
     def RunSubprocess(self, application, name, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
-        cmd = self.app_to_cmd(application)
-        
+        if sys.platform == 'darwin':
+            # Try harder to avoid any stdout buffering in our tests
+            application = application.wrap_with(['stdbuf', '-o0', '-i0'])
+
+        cmd = application.to_cmd()
+
         outpipe = LogPipe(
             logging.DEBUG, capture_delegate=self.capture_delegate,
             name=name + ' OUT')
         errpipe = LogPipe(
             logging.INFO, capture_delegate=self.capture_delegate,
             name=name + ' ERR')
-
-        if sys.platform == 'darwin':
-            # Try harder to avoid any stdout buffering in our tests
-            cmd = ['stdbuf', '-o0', '-i0'] + cmd
 
         if self.capture_delegate:
             self.capture_delegate.Log(name, 'EXECUTING %r' % cmd)
@@ -186,11 +192,11 @@ class Runner:
         logging.debug('Command %r completed with error code 0', cmd)
 
 
-
 class NamespacedRunner(Runner):
     def __init__(self, ns, capture_delegate=None):
         super().__init__(capture_delegate)
         self.ns = ns
 
-    def app_to_cmd(self, application):
-        return ns.app_to_namespaced_cmd(application)
+    def RunSubprocess(self, application, name, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
+        wrapped_app = ns.wrap_in_namespace(application)
+        super().RunSubprocess(wrapped_app, name, wait, dependencies, timeout_seconds, stdin)
