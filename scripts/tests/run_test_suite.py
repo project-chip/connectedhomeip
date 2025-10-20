@@ -375,7 +375,8 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
     if chip_tool_with_python is None:
         if context.obj.runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
-            chip_tool_with_python = Application(kind="tool", path=Path("python3"), args=(paths_finder.get('darwinframeworktool.py'),))
+            chip_tool_with_python = Application(kind="tool", path=Path(
+                "python3"), args=(paths_finder.get('darwinframeworktool.py'),))
         else:
             chip_tool_with_python = Application(kind="tool", path=Path("python3"), args=(paths_finder.get('chiptool.py'),))
 
@@ -422,7 +423,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             wifi = chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns)
             ble_controller_app = 0   # Bind app to the first BLE controller
             ble_controller_tool = 1  # Bind tool to the second BLE controller
-        
+
         runner = runner = chiptest.runner.NamespacedRunner(ns)
     else:
         runner = chiptest.runner.Runner()

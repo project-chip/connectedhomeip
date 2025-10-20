@@ -481,7 +481,7 @@ class TestDefinition:
                 test_cmd = apps.chip_tool_with_python_cmd \
                     .add_args(('tests', self.run_name)) \
                     .add_args(('--PICS', pics_file))
-                
+
                 server_args = (
                     '--server_path', apps.chip_tool.args[-1],
                     '--server_arguments', 'interactive server')
