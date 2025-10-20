@@ -27,7 +27,8 @@ namespace Clusters {
 class BindingCluster : public DefaultServerCluster
 {
 public:
-    BindingCluster(EndpointId endpointId) : DefaultServerCluster({ endpointId, Binding::Id }) {}
+    constexpr BindingCluster(EndpointId endpointId) : DefaultServerCluster(ConcreteClusterPath::ConstExpr(endpointId, Binding::Id))
+    {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;

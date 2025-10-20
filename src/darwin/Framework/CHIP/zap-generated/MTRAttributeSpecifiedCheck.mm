@@ -310,6 +310,9 @@ static BOOL AttributeIsSpecifiedInAccessControlCluster(AttributeId aAttributeId)
     case Attributes::Arl::Id: {
         return YES;
     }
+    case Attributes::AuxiliaryACL::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
