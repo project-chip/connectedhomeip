@@ -29,7 +29,9 @@ namespace Test {
 
 namespace Helper {
 
-auto ReadAttribute = [](app::ServerClusterInterface & cluster, const app::ConcreteDataAttributePath & path, auto & value) {
+template <typename T>
+CHIP_ERROR ReadAttribute(app::ServerClusterInterface & cluster, const app::ConcreteDataAttributePath & path, T & value)
+{
     app::Testing::ReadOperation readOperation(path);
     std::unique_ptr<app::AttributeValueEncoder> encoder = readOperation.StartEncoding();
     ReturnErrorOnFailure(cluster.ReadAttribute(readOperation.GetRequest(), *encoder).GetUnderlyingError());
@@ -42,7 +44,9 @@ auto ReadAttribute = [](app::ServerClusterInterface & cluster, const app::Concre
     return app::DataModel::Decode(attributeData[0].dataReader, value);
 };
 
-auto ReadAttr = [](app::ServerClusterInterface & cluster, AttributeId attr, auto & value) {
+template <typename T>
+CHIP_ERROR ReadAttr(app::ServerClusterInterface & cluster, AttributeId attr, T & value)
+{
     const auto & paths = cluster.GetPaths();
     // This should be a size-1 span
     VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
@@ -50,13 +54,17 @@ auto ReadAttr = [](app::ServerClusterInterface & cluster, AttributeId attr, auto
     return ReadAttribute(cluster, attributePath, value);
 };
 
-auto WriteAttribute = [](app::ServerClusterInterface & cluster, const app::ConcreteAttributePath & path, const auto & value) {
+template <typename T>
+CHIP_ERROR WriteAttribute(app::ServerClusterInterface & cluster, const app::ConcreteAttributePath & path, const T & value)
+{
     app::Testing::WriteOperation writeOperation(path);
     app::AttributeValueDecoder decoder = writeOperation.DecoderFor(value);
     return cluster.WriteAttribute(writeOperation.GetRequest(), decoder).GetUnderlyingError();
 };
 
-auto WriteAttr = [](app::ServerClusterInterface & cluster, AttributeId attr, const auto & value) {
+template <typename T>
+CHIP_ERROR WriteAttr(app::ServerClusterInterface & cluster, AttributeId attr, const T & value)
+{
     const auto & paths = cluster.GetPaths();
     // This should be a size-1 span
     VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
