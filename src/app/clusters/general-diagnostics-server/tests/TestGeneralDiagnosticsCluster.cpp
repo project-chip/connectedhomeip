@@ -77,7 +77,7 @@ struct TestGeneralDiagnosticsCluster : public ::testing::Test
     {
         chip::app::Testing::InvokeOperation invoker(kRootEndpointId, GeneralDiagnostics::Id,
                                                     GeneralDiagnostics::Commands::TimeSnapshot::Id);
-        auto result = invoker.InvokeEmpty(cluster);
+        auto result = invoker.Invoke(cluster);
         EXPECT_FALSE(result.has_value());
 
         auto & handler = invoker.GetHandler();
