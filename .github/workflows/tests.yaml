@@ -447,6 +447,7 @@ jobs:
               uses: ./.github/actions/delete-cache
               with:
                   cache-key: ${{ env.CCACHE_KEY }}
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
             - name: Save ccache
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
               uses: actions/cache/save@v4
@@ -937,6 +938,7 @@ jobs:
               uses: ./.github/actions/delete-cache
               with:
                   cache-key: ${{ env.CCACHE_KEY }}
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
             - name: Save ccache
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
               uses: actions/cache/save@v4
