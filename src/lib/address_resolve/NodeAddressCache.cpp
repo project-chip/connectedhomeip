@@ -24,36 +24,23 @@ namespace AddressResolve {
 CHIP_ERROR NodeAddressCache::CacheNode(NodeId nodeId, const ResolveResult & result)
 {
     // Check if nodeId already exists in cache to update it
-    for (size_t i = 0; i < mCacheCount; ++i)
-    {
-        if (mCache[i].nodeId == nodeId)
-        {
-            mCache[i].result = result;
-            ChipLogProgress(Discovery, "Updated cached result for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
-            return CHIP_NO_ERROR;
-        }
-    }
+    RemoveCachedNodeAddress(nodeId);
 
     // If cache is full, overwrite oldest entry (FIFO)
     if (mCacheCount >= kMaxCacheSize)
     {
-        ChipLogProgress(Discovery, "Cache full, overwriting oldest entry at index %u", static_cast<unsigned int>(mNextCacheIndex));
-        mCache[mNextCacheIndex].nodeId = nodeId;
-        mCache[mNextCacheIndex].result = result;
-        mNextCacheIndex                = (mNextCacheIndex + 1) % kMaxCacheSize;
-    }
-    else
-    {
-        // Add new entry
-        mCache[mCacheCount].nodeId = nodeId;
-        mCache[mCacheCount].result = result;
-        ++mCacheCount;
-        mNextCacheIndex = mCacheCount;
-        if (mNextCacheIndex >= kMaxCacheSize)
-        {
-            mNextCacheIndex = 0;
+        ChipLogProgress(Discovery, "Cache full, overwriting oldest entry");
+        RemoveCachedNodeAddress(mCache[0].nodeId);
+        if (mCacheCount >= kMaxCacheSize) {
+            ChipLogProgress(Discovery, "Cache removal failed");
+            return CHIP_ERROR_INCORRECT_STATE;
         }
     }
+
+    // Add new entry
+    mCache[mCacheCount].nodeId = nodeId;
+    mCache[mCacheCount].result = result;
+    ++mCacheCount;
 
     ChipLogProgress(Discovery, "Cached address for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
     return CHIP_NO_ERROR;
@@ -80,7 +67,15 @@ CHIP_ERROR NodeAddressCache::RemoveCachedNodeAddress(NodeId nodeId)
     {
         if (mCache[i].nodeId == nodeId)
         {
-            mCache[i].nodeId = 0;
+            // Shift all entries after the removed one to maintain FIFO order
+            for (size_t j = i; j < mCacheCount - 1; ++j)
+            {
+                mCache[j] = mCache[j + 1];
+            }
+            
+            mCache[mCacheCount - 1].nodeId = 0;
+            --mCacheCount;
+            
             ChipLogProgress(Discovery, "Removed cached address for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
             return CHIP_NO_ERROR;
         }
@@ -91,8 +86,7 @@ CHIP_ERROR NodeAddressCache::RemoveCachedNodeAddress(NodeId nodeId)
 
 void NodeAddressCache::Clear()
 {
-    mCacheCount     = 0;
-    mNextCacheIndex = 0;
+    mCacheCount = 0;
 }
 
 } // namespace AddressResolve

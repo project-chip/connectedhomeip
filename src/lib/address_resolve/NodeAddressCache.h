@@ -42,7 +42,6 @@ private:
 
     CacheEntry mCache[kMaxCacheSize];
     size_t mCacheCount     = 0;
-    size_t mNextCacheIndex = 0;
 };
 
 } // namespace AddressResolve
