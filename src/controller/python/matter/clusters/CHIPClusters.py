@@ -723,6 +723,12 @@ class ChipClusters:
                 "type": "",
                 "reportable": True,
             },
+            0x00000007: {
+                "attributeName": "AuxiliaryACL",
+                "attributeId": 0x00000007,
+                "type": "",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,

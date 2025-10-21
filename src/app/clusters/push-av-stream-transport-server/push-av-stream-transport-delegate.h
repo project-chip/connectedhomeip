@@ -51,6 +51,7 @@ public:
      *
      * @param transportOptions The configuration options of the transport to be allocated
      * @param connectionID The connectionID to allocate
+     * @param AccessingFabricIndex The FrabricIndex of the assosciated Fabric
      * @return Success if allocation is successful and a PushTransportConnectionID was produced;
      *         otherwise, the command is rejected with Failure
      *
@@ -63,7 +64,7 @@ public:
      */
     virtual Protocols::InteractionModel::Status
     AllocatePushTransport(const PushAvStreamTransport::Structs::TransportOptionsStruct::Type & transportOptions,
-                          const uint16_t connectionID) = 0;
+                          const uint16_t connectionID, FabricIndex accessingFabricIndex) = 0;
 
     /**
      * @brief Handles stream transport deallocation for the provided connectionID.
@@ -262,6 +263,12 @@ public:
      */
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
 
+    /**
+     * @brief Sets TLS certificates for secure push transport connections.
+     *
+     * @param clientCertEntry Reference to buffered client certificate entry
+     * @param rootCertEntry Reference to buffered root certificate entry
+     */
     virtual void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
                              Tls::CertificateTable::BufferedRootCert & rootCertEntry) = 0;
 

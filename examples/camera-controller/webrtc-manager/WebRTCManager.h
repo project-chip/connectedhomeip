@@ -91,7 +91,7 @@ private:
     std::vector<std::string> mLocalCandidates;
 
     std::shared_ptr<rtc::Track> mTrack;
-    std::shared_ptr<rtc::Track> audioTrack;
+    std::shared_ptr<rtc::Track> mAudioTrack;
 
     // Callback to notify when session is established
     SessionEstablishedCallback mSessionEstablishedCallback;

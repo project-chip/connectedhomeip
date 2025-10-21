@@ -1517,6 +1517,7 @@ public class ClusterIDMapping {
             AccessControlEntriesPerFabric(4L),
             CommissioningARL(5L),
             Arl(6L),
+            AuxiliaryACL(7L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -1544,7 +1545,8 @@ public class ClusterIDMapping {
         public enum Event {
             AccessControlEntryChanged(0L),
             AccessControlExtensionChanged(1L),
-            FabricRestrictionReviewUpdate(2L),;
+            FabricRestrictionReviewUpdate(2L),
+            AuxiliaryAccessUpdated(3L),;
             private final long id;
             Event(long id) {
                 this.id = id;

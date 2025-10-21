@@ -46,13 +46,6 @@ config("chip_examples_project_config") {
   # library with the sl_memory_manager in platform code.
   ldflags = [
     "-Wl,--wrap=MemoryAlloc",
-
-    # Wrap these in case internal newlib call them (e.g. strdup will)
-    # directly call _malloc_r)
-    "-Wl,--wrap=_malloc_r",
-    "-Wl,--wrap=_realloc_r",
-    "-Wl,--wrap=_free_r",
-    "-Wl,--wrap=_calloc_r",
     "-Wl,--wrap=main",
   ]
 }

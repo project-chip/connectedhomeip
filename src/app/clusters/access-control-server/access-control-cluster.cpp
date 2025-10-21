@@ -443,7 +443,6 @@ CHIP_ERROR AccessControlCluster::Startup(ServerClusterContext & context)
 void AccessControlCluster::Shutdown()
 {
     ChipLogProgress(DataManagement, "AccessControlCluster: shutdown");
-    DefaultServerCluster::Shutdown();
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     auto accessRestrictionProvider = GetAccessControl().GetAccessRestrictionProvider();
@@ -454,6 +453,7 @@ void AccessControlCluster::Shutdown()
 #endif
 
     GetAccessControl().RemoveEntryListener(*this);
+    DefaultServerCluster::Shutdown();
 }
 
 DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

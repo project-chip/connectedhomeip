@@ -105,6 +105,8 @@ private:
 
     void RegisterWebrtcTransport(uint16_t sessionId);
 
+    void UnregisterWebrtcTransport(uint16_t sessionId);
+
     CHIP_ERROR SendOfferCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
                                 uint16_t sessionId);
 

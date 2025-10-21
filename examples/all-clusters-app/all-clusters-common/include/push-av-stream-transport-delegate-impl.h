@@ -42,7 +42,8 @@ class PushAvStreamTransportManager : public PushAvStreamTransportDelegate
 {
 public:
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
-                                                              const uint16_t connectionID) override;
+                                                              const uint16_t connectionID,
+                                                              FabricIndex accessingFabricIndex) override;
 
     Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID) override;
 

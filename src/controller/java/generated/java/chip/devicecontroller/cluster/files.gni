@@ -233,6 +233,7 @@ structs_sources = [
 eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/AccessControlClusterAccessControlEntryChangedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/AccessControlClusterAccessControlExtensionChangedEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/AccessControlClusterAuxiliaryAccessUpdatedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/AccessControlClusterFabricRestrictionReviewUpdateEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/AccountLoginClusterLoggedOutEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/ActionsClusterActionFailedEvent.kt",

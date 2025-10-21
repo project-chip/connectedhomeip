@@ -238,7 +238,7 @@ void WebRTCManager::Disconnect()
 
     // Reset track
     mTrack.reset();
-    audioTrack.reset();
+    mAudioTrack.reset();
 
     // Clear state
     mCurrentVideoStreamId = 0;
@@ -298,11 +298,10 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
                 mSessionEstablishedCallback(mCurrentVideoStreamId);
             }
         }
-        else if (state == rtc::PeerConnection::State::Disconnected || state == rtc::PeerConnection::State::Failed ||
-                 state == rtc::PeerConnection::State::Closed)
+        else if (state == rtc::PeerConnection::State::Failed || state == rtc::PeerConnection::State::Closed)
         {
-            // Clean up resources when connection is lost
-            CloseRTPSocket();
+            // Limit the clearup to Failed and Closed only to avoid prematurely ending sessions.
+            Disconnect();
         }
     });
 
@@ -355,12 +354,12 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     rtc::Description::Audio audioMedia("audio", rtc::Description::Direction::RecvOnly);
     audioMedia.addOpusCodec(kOpusPayloadType);
     audioMedia.setBitrate(kAudioBitRate);
-    audioTrack = mPeerConnection->addTrack(audioMedia);
+    mAudioTrack = mPeerConnection->addTrack(audioMedia);
 
     auto audioSession = std::make_shared<rtc::RtcpReceivingSession>();
-    audioTrack->setMediaHandler(audioSession);
+    mAudioTrack->setMediaHandler(audioSession);
 
-    audioTrack->onMessage(
+    mAudioTrack->onMessage(
         [this, audioAddr](rtc::binary message) {
             // This is an RTP Audio packet
             sendto(mAudioRTPSocket, reinterpret_cast<const char *>(message.data()), static_cast<size_t>(message.size()), 0,

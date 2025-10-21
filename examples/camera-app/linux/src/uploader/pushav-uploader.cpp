@@ -17,6 +17,7 @@
  */
 
 #include "pushav-uploader.h"
+#include <algorithm>
 #include <cstring>
 #include <fstream>
 #include <iomanip>
@@ -288,13 +289,43 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     upload.mSize                = static_cast<long>(size);
     upload.mBytesRead           = 0;
     struct curl_slist * headers = nullptr;
-    headers                     = curl_slist_append(headers, "Content-Type: application/*");
 
-    // Extract just the filename from the full path
+    // Determine content type based on file extension
+    std::string contentType = "application/*"; // Default fallback
+
+    // Extract file extension from full path
+    size_t dotPos = data.first.find_last_of('.');
+    if (dotPos != std::string::npos)
+    {
+        std::string extension = data.first.substr(dotPos);
+        if (extension == ".mpd")
+        {
+            contentType = "application/dash+xml"; // Manifest file
+        }
+        else if (extension == ".m4s")
+        {
+            contentType = "video/iso.segment"; // Media segment
+        }
+        else if (extension == ".init")
+        {
+            contentType = "video/mp4"; // Initialization segment
+        }
+    }
+
+    std::string contentTypeHeader = "Content-Type: " + contentType;
+    headers                       = curl_slist_append(headers, contentTypeHeader.c_str());
+
+    // Extract the filename from the full path
     std::string fullPath = data.first;
-    std::string filename = fullPath.substr(fullPath.find_last_of("/\\") + 1);
-
-    // Construct the URL with just the filename
+    std::string filename;
+    if (fullPath.substr(0, 5) == "/tmp/")
+    {
+        filename = fullPath.substr(5);
+    }
+    else
+    {
+        filename = fullPath;
+    }
     std::string baseUrl = data.second;
     if (baseUrl.back() != '/')
     {

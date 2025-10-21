@@ -104,7 +104,7 @@ extern "C" {
 #define RSI_BLE_MAX_NBR_PERIPHERALS 3
 #endif
 
-#define RSI_BLE_MAX_NBR_CENTRALS 1
+#define RSI_BLE_MAX_NBR_CENTRALS (1)
 #define RSI_BLE_MAX_NBR_ATT_SERV (10)
 
 #define RSI_BLE_GATT_ASYNC_ENABLE (1)
@@ -253,7 +253,6 @@ extern "C" {
 #define NO_OF_VAL_ATT (5) //! Attribute value count
 
 #if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-#define RSI_BLE_MAX_NBR_CENTRALS (1)
 #define FRONT_END_SWITCH_SEL2 BIT(30)
 #define RSI_FEATURE_BIT_MAP                                                                                                        \
     (SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE | SL_SI91X_FEAT_DEV_TO_HOST_ULP_GPIO_1) //! To set wlan feature select bit map

@@ -2627,6 +2627,7 @@ class AccessControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="accessControlEntriesPerFabric", Tag=0x00000004, Type=uint),
                 ClusterObjectFieldDescriptor(Label="commissioningARL", Tag=0x00000005, Type=typing.Optional[typing.List[AccessControl.Structs.CommissioningAccessRestrictionEntryStruct]]),
                 ClusterObjectFieldDescriptor(Label="arl", Tag=0x00000006, Type=typing.Optional[typing.List[AccessControl.Structs.AccessRestrictionEntryStruct]]),
+                ClusterObjectFieldDescriptor(Label="auxiliaryACL", Tag=0x00000007, Type=typing.Optional[typing.List[AccessControl.Structs.AccessControlEntryStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -2641,6 +2642,7 @@ class AccessControl(Cluster):
     accessControlEntriesPerFabric: uint = 0
     commissioningARL: typing.Optional[typing.List[AccessControl.Structs.CommissioningAccessRestrictionEntryStruct]] = None
     arl: typing.Optional[typing.List[AccessControl.Structs.AccessRestrictionEntryStruct]] = None
+    auxiliaryACL: typing.Optional[typing.List[AccessControl.Structs.AccessControlEntryStruct]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -2648,6 +2650,15 @@ class AccessControl(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
+        class AccessControlAuxiliaryTypeEnum(MatterIntEnum):
+            kSystem = 0x00
+            kGroupcast = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
+
         class AccessControlEntryAuthModeEnum(MatterIntEnum):
             kPase = 0x01
             kCase = 0x02
@@ -2695,6 +2706,7 @@ class AccessControl(Cluster):
         class Feature(IntFlag):
             kExtension = 0x1
             kManagedDevice = 0x2
+            kAuxiliary = 0x4
 
     class Structs:
         @dataclass
@@ -2767,6 +2779,7 @@ class AccessControl(Cluster):
                         ClusterObjectFieldDescriptor(Label="authMode", Tag=2, Type=AccessControl.Enums.AccessControlEntryAuthModeEnum),
                         ClusterObjectFieldDescriptor(Label="subjects", Tag=3, Type=typing.Union[Nullable, typing.List[uint]]),
                         ClusterObjectFieldDescriptor(Label="targets", Tag=4, Type=typing.Union[Nullable, typing.List[AccessControl.Structs.AccessControlTargetStruct]]),
+                        ClusterObjectFieldDescriptor(Label="auxiliaryType", Tag=5, Type=typing.Optional[AccessControl.Enums.AccessControlAuxiliaryTypeEnum]),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
@@ -2774,6 +2787,7 @@ class AccessControl(Cluster):
             authMode: 'AccessControl.Enums.AccessControlEntryAuthModeEnum' = 0
             subjects: 'typing.Union[Nullable, typing.List[uint]]' = NullValue
             targets: 'typing.Union[Nullable, typing.List[AccessControl.Structs.AccessControlTargetStruct]]' = NullValue
+            auxiliaryType: 'typing.Optional[AccessControl.Enums.AccessControlAuxiliaryTypeEnum]' = None
             fabricIndex: 'uint' = 0
 
         @dataclass
@@ -2936,6 +2950,22 @@ class AccessControl(Cluster):
             value: typing.Optional[typing.List[AccessControl.Structs.AccessRestrictionEntryStruct]] = None
 
         @dataclass
+        class AuxiliaryACL(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000001F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[AccessControl.Structs.AccessControlEntryStruct]])
+
+            value: typing.Optional[typing.List[AccessControl.Structs.AccessControlEntryStruct]] = None
+
+        @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -3093,6 +3123,27 @@ class AccessControl(Cluster):
             token: uint = 0
             instruction: typing.Optional[str] = None
             ARLRequestFlowUrl: typing.Optional[str] = None
+            fabricIndex: uint = 0
+
+        @dataclass
+        class AuxiliaryAccessUpdated(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000001F
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="adminNodeID", Tag=0, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
+                    ])
+
+            adminNodeID: typing.Union[Nullable, uint] = NullValue
             fabricIndex: uint = 0
 
 
