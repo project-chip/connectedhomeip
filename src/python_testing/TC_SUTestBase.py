@@ -80,7 +80,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         if log_file is None:
             # Assign the file descriptor to log_file
             log_file = tempfile.NamedTemporaryFile(
-                dir=storage_dir, prefix='provider_', suffix='.log', delete=True, mode='ab')
+                dir=storage_dir, prefix='provider_', suffix='.log', mode='ab')
             logger.info(f"Writing Provider logs at :{log_file.name}")
         else:
             logger.info(f"Writing Provider logs at : {log_file}")
