@@ -1,12 +1,13 @@
-# Matter BEE4 Light Switch Example Application
+# Matter All Clusters Example Application
 
-This reference application implements an light switch device type. You can use
-this example as a reference for creating your own application.
+The all-clusters example implements a server which can be accessed by a CHIP
+controller and can accept basic cluster commands. You can use this example as a
+reference for creating your own application.
 
 The example is based on:
 
 -   [Matter](https://github.com/project-chip/connectedhomeip)
--   [BEE4 github SDK](https://github.com/rtkconnectivity/rtl87x2g_sdk)
+-   [RTL87x2G github SDK](https://github.com/rtkconnectivity/rtl87x2g_sdk)
 -   [OT-REALTEK](https://github.com/rtkconnectivity/ot-realtek)
 
 ## Supported devices
@@ -15,11 +16,8 @@ The example is based on:
 
 ## Introduction
 
-The application showcases a light switch device that communicates with clients
-over a low-power, 802.15.4 Thread network.
-
-It can be commissioned into an existing Matter network using a controller such
-as `chip-tool`.
+The device can be commissioned into an existing Matter network using a
+controller such as `chip-tool`.
 
 This example implements a `Standard commissioning flow`, meaning devices not
 connected to the network automatically broadcast advertising when powered on.
@@ -74,11 +72,11 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-
 -   To build the demo application:
 
     ```bash
-    $ ./scripts/build/build_examples.py --target realtek-rtl8777g-light-switch build
+    $ ./scripts/build/build_examples.py --target realtek-rtl8777g-all-clusters build
     ```
 
-    You can find the target built file called **matter-cli-mtd** under the
-    `out/realtek-rtl8777g-light-switch/bin` directory.
+    You can find the target built file called **matter-cli-ftd** under the
+    `out/realtek-rtl8777g-all-clusters/bin` directory.
 
 ## More information
 

@@ -37,6 +37,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Commissioner Control
     - Commodity Price
     - Commodity Tariff
+    - Descriptor
     - Device Energy Management
     - Device Energy Management Mode
     - Diagnostic Logs
@@ -147,6 +148,7 @@ CodeDrivenClusters:
     - Basic Information
     - Binding
     - Boolean State
+    - Descriptor
     - Diagnostic Logs
     - Ethernet Network Diagnostics
     - Fixed Label

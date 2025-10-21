@@ -1,12 +1,13 @@
-# Matter BEE4 Lighting Example Application
+# Matter Window Covering Example Application
 
-This reference application implements an On/Off Light device type. You can use
-this example as a reference for creating your own application.
+This reference application demonstrates how to remotely control a window shutter
+device. You can use this example as a reference for creating your own
+application.
 
 The example is based on:
 
 -   [Matter](https://github.com/project-chip/connectedhomeip)
--   [BEE4 github SDK](https://github.com/rtkconnectivity/rtl87x2g_sdk)
+-   [RTL87x2G github SDK](https://github.com/rtkconnectivity/rtl87x2g_sdk)
 -   [OT-REALTEK](https://github.com/rtkconnectivity/ot-realtek)
 
 ## Supported devices
@@ -15,8 +16,9 @@ The example is based on:
 
 ## Introduction
 
-The application showcases a light bulb device that communicates with clients
-over a low-power, 802.15.4 Thread network.
+The application showcases a window covering device. It uses buttons to test
+changing cover position and device states and LEDs to show the state of these
+changes.
 
 It can be commissioned into an existing Matter network using a controller such
 as `chip-tool`.
