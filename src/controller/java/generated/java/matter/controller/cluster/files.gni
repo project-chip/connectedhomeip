@@ -233,6 +233,7 @@ matter_structs_sources = [
 matter_eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/AccessControlClusterAccessControlEntryChangedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/AccessControlClusterAccessControlExtensionChangedEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/AccessControlClusterAuxiliaryAccessUpdatedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/AccessControlClusterFabricRestrictionReviewUpdateEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/AccountLoginClusterLoggedOutEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/ActionsClusterActionFailedEvent.kt",
