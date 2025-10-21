@@ -46,6 +46,7 @@
 # === END CI TEST ARGUMENTS ===
 
 
+import asyncio
 import logging
 
 from mobly import asserts
@@ -69,6 +70,7 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
     requestor_setup_pincode = 2123
 
     kvs_path = '/tmp/chip_kvs_provider'
+    bdx_image_path = ""
 
     @async_test_body
     async def teardown_class(self):
@@ -79,12 +81,12 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
-        provider_app_path = self.user_params.get('provider_app_path', "")
+        provider_app_path = self.user_params.get('provider_app_path', None)
         ota_image_path = self.user_params.get('ota_image', None)
         self.requestor_node_id = self.dut_node_id  # 123 with discriminator 123
         self.controller = self.default_controller
-        bdx_image_path = 'bdx://0000000000000141/' + ota_image_path
-        extra_arguments = ['--queryImageStatus', 'updateAvailable', '--imageUri', bdx_image_path]
+        self.bdx_image_path = 'bdx://0000000000000141/' + ota_image_path
+        extra_arguments = ['--queryImageStatus', 'updateAvailable', '--imageUri', self.bdx_image_path]
         self.start_provider(
             provier_app_path=provider_app_path,
             ota_image_path=ota_image_path,
@@ -92,7 +94,7 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
             discriminator=self.provider_data['discriminator'],
             port=5541,
             kvs_path=self.kvs_path,
-            # log_file='/tmp/provider_2_4.log',
+            log_file='/tmp/provider_2_4.log',
             extra_args=extra_arguments,
         )
         logger.info("About to start commissioning")
@@ -136,10 +138,10 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
     async def test_TC_SU_2_4(self):
         # Gather data
         expected_software_version = self.user_params.get('ota_image_expected_version')
+        logger.info(f"Expected software version {expected_software_version}")
         self.step(0)
 
         self.step(1)
-        expected_token = '32'
         update_state_attr_handler = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
@@ -147,26 +149,42 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
         await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
         await self.announce_ota_provider(self.controller, self.provider_data['node_id'], self.requestor_node_id)
+        # Provide some time to see the line in the logs
+        await asyncio.sleep(2)
+        # Read to find the Query Image line.
+        query_image_lines = self.current_provider_app_proc.read_from_logs(
+            'OTA Provider received QueryImage', before=2, after=12)
+        asserts.assert_equal(1, len(query_image_lines))
+        expected_token = ''
+        for line in query_image_lines[0]['after']:
+            if 'updateToken' in line:
+                expected_token = line.split("updateToken:")[1].strip()
+
+        logger.info("Update Token: " + expected_token)
+        asserts.assert_greater(len(expected_token), 0)
+
         update_state_match = AttributeMatcher.from_callable(
             "Update state is applying",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
 
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60*6)
-        # This value should be obtained from a response but for now is 32
-        found_lines = self.current_provider_app_proc.read_from_logs(
-            'Provider received ApplyUpdateRequest', before=2, after=6)
-        if len(found_lines) == 0:
-            asserts.fail("No found lines while searching for the string 'Provider received ApplyUpdateRequest'")
-        update_token_line = found_lines[0]['after'][0]
-        handle_apply_request_line = found_lines[0]['after'][2]
-        logger.info(f"Handle Apply Request {handle_apply_request_line} and token line {update_token_line}")
-        version_string = f"version: {expected_software_version}"
-        token_string = f"Update Token: {expected_token}"
-        # Match for the expected strings
-        asserts.assert_true(version_string in handle_apply_request_line, f"{version_string} is not in the expected line")
-        asserts.assert_true(token_string in update_token_line, f"{expected_token} is not in the expected line")
         update_state_attr_handler.reset()
         await update_state_attr_handler.cancel()
+
+        # Read from the logs the line ApplyUpdateRequest which is triggered after the kApplying State.
+        found_lines = self.current_provider_app_proc.read_from_logs(
+            'Provider received ApplyUpdateRequest', before=2, after=6)
+        asserts.assert_is_not(len(found_lines), 0,
+                              "No found lines while searching for the string 'Provider received ApplyUpdateRequest")
+        handle_apply_request_line = found_lines[0]['after'][2].strip()
+        logger.info(f"Token Repr: {repr(expected_token)}")
+        logger.info(f"Line Repr: {repr(handle_apply_request_line)}")
+        logger.info(f"HandleApplyRequest {handle_apply_request_line} and token line")
+        version_string = f"version: {expected_software_version}"
+        asserts.assert_true(version_string in handle_apply_request_line,
+                            f"{version_string} is not in the expected line: {handle_apply_request_line}")
+        asserts.assert_true(expected_token in handle_apply_request_line,
+                            f"{expected_token} is not in the expected line: {handle_apply_request_line}")
 
 
 if __name__ == "__main__":
