@@ -313,9 +313,6 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             return True
 
         except ChipStackError as e:  # chipstack-ok
-            if e.err == 0x00000580:  # INVALID_ACTION - some attributes don't support subscription
-                logging.warning(f"Skipping attribute (INVALID_ACTION): {attribute}")
-                return None  # Indicates skip
             # Unexpected ChipStackError
             logging.error(f"Unexpected ChipStackError subscribing to attribute {attribute}: {e}")
             self.record_error(test_name=test_name,
@@ -358,7 +355,14 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
 
         except ChipStackError as e:  # chipstack-ok
             if e.err == 0x00000580:  # INVALID_ACTION - some attributes don't support subscription
-                logging.warning(f"Skipping attribute (INVALID_ACTION): {attribute}")
+                # This occurs for attributes that cannot be subscribed to when testing with insufficient privileges.
+                # The attributes are write-only or have special subscription restrictions.
+                # These are the current clusters where this is noticed:
+                # - AccessControl
+                # - NetworkCommissioning
+                # - CameraAvStreamManagement
+                # - OperationalCredentials
+                logging.warning(f"INVALID_ACTION: {cluster_class.__name__}.{attribute.__name__} (Cluster=0x{cluster_id:04X}, Attribute=0x{attribute_id:04X}, Endpoint={endpoint_id}, Privilege={privilege.name})")
                 return None  # Indicates skip
             # Unexpected ChipStackError
             logging.error(f"Unexpected ChipStackError subscribing to attribute {attribute}: {e}")
