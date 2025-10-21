@@ -81,7 +81,7 @@ static_library("nxp_platform") {
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
     "../common/CHIPDevicePlatformEvent.h",
-    "../common/ConfigurationManagerImpl.cpp",
+    "../mcxw71/ConfigurationManagerImpl.cpp",
     "../common/ConfigurationManagerImpl.h",
     "../common/ConnectivityManagerImpl.cpp",
     "../common/ConnectivityManagerImpl.h",
