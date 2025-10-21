@@ -577,8 +577,9 @@ bool EventManagement::IncludeEventInReport(EventLoadOutContext * eventLoadOutCon
         Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, eventInfo.readPrivilege);
     if (accessControlError != CHIP_NO_ERROR)
     {
-        // If we don't have the access for the event, the interested path should be a wildcard path. Return false so that
-        // the event path will be excluded in the generated event report.
+        // If we don't have the access for the event, the only way we could have gotten here
+        // is due to a wildcard event path that includes the event.  Return false so that
+        // the event will be excluded in the generated event report.
         return false;
     }
 
