@@ -635,7 +635,7 @@ jobs:
               env:
                   CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: |
-                  ./scripts/run_in_build_env.sh "gn gen out/ci_build --args='is_debug=false target_os=\"all\"'"
+                  ./scripts/run_in_build_env.sh "gn gen out/ci_build --check --fail-on-unused-args --add-export-compile-commands=* --args='is_debug=false target_os=\"all\" chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_ble=false chip_enable_wifi=false is_tsan=true is_clang=true chip_im_force_fabric_quota_check=true'"
                   ./scripts/run_in_build_env.sh "ninja -C out/ci_build linux_apps_for_ci"
                   ./scripts/run_in_build_env.sh "find out/ci_build/standalone -maxdepth 1 -type f -executable -exec cp {} objdir-clone \;"
                   rm -rf out/ci_build
