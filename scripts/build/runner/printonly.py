@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import shlex
+
 from .command_dedup import CommandDedup
 
 
