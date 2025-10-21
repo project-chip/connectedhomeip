@@ -368,7 +368,7 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement key-set-remove 42 1 0
 
-          Verify TH receives KeySetRemove command on TH(Reference app)log and below is the sample log provided for the raspi platform:
+          Verify TH receives KeySetRemove command on TH(Reference app)log and below is the sample log provided for a linux platform:
 
           [1708328664.952463][17247:17247] CHIP:DMG: InvokeRequestMessage =
           [1708328664.952466][17247:17247] CHIP:DMG: {
