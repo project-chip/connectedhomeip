@@ -23,16 +23,16 @@ namespace app {
 namespace Device {
 
 constexpr DeviceTypeId kDoorLockDeviceTypeId  = 0x0000000A;
-constexpr uint8_t kDoorLockDeviceTypeRevision = 1;
+constexpr uint8_t kDoorLockDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kDoorLockControllerDeviceTypeId  = 0x0000000B;
-constexpr uint8_t kDoorLockControllerDeviceTypeRevision = 1;
+constexpr uint8_t kDoorLockControllerDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kAggregatorDeviceTypeId  = 0x0000000E;
-constexpr uint8_t kAggregatorDeviceTypeRevision = 1;
+constexpr uint8_t kAggregatorDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kGenericSwitchDeviceTypeId  = 0x0000000F;
-constexpr uint8_t kGenericSwitchDeviceTypeRevision = 1;
+constexpr uint8_t kGenericSwitchDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kPowerSourceDeviceTypeId  = 0x00000011;
 constexpr uint8_t kPowerSourceDeviceTypeRevision = 1;
@@ -41,16 +41,16 @@ constexpr DeviceTypeId kOtaRequestorDeviceTypeId  = 0x00000012;
 constexpr uint8_t kOtaRequestorDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kBridgedNodeDeviceTypeId  = 0x00000013;
-constexpr uint8_t kBridgedNodeDeviceTypeRevision = 1;
+constexpr uint8_t kBridgedNodeDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kOtaProviderDeviceTypeId  = 0x00000014;
 constexpr uint8_t kOtaProviderDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kContactSensorDeviceTypeId  = 0x00000015;
-constexpr uint8_t kContactSensorDeviceTypeRevision = 1;
+constexpr uint8_t kContactSensorDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kRootNodeDeviceTypeId  = 0x00000016;
-constexpr uint8_t kRootNodeDeviceTypeRevision = 1;
+constexpr uint8_t kRootNodeDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kSolarPowerDeviceTypeId  = 0x00000017;
 constexpr uint8_t kSolarPowerDeviceTypeRevision = 1;
@@ -65,31 +65,31 @@ constexpr DeviceTypeId kSpeakerDeviceTypeId  = 0x00000022;
 constexpr uint8_t kSpeakerDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kCastingVideoPlayerDeviceTypeId  = 0x00000023;
-constexpr uint8_t kCastingVideoPlayerDeviceTypeRevision = 1;
+constexpr uint8_t kCastingVideoPlayerDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kContentAppDeviceTypeId  = 0x00000024;
-constexpr uint8_t kContentAppDeviceTypeRevision = 1;
+constexpr uint8_t kContentAppDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kModeSelectDeviceTypeId  = 0x00000027;
 constexpr uint8_t kModeSelectDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kBasicVideoPlayerDeviceTypeId  = 0x00000028;
-constexpr uint8_t kBasicVideoPlayerDeviceTypeRevision = 1;
+constexpr uint8_t kBasicVideoPlayerDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kCastingVideoClientDeviceTypeId  = 0x00000029;
-constexpr uint8_t kCastingVideoClientDeviceTypeRevision = 1;
+constexpr uint8_t kCastingVideoClientDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kVideoRemoteControlDeviceTypeId  = 0x0000002A;
-constexpr uint8_t kVideoRemoteControlDeviceTypeRevision = 1;
+constexpr uint8_t kVideoRemoteControlDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kFanDeviceTypeId  = 0x0000002B;
-constexpr uint8_t kFanDeviceTypeRevision = 1;
+constexpr uint8_t kFanDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kAirQualitySensorDeviceTypeId  = 0x0000002C;
 constexpr uint8_t kAirQualitySensorDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kAirPurifierDeviceTypeId  = 0x0000002D;
-constexpr uint8_t kAirPurifierDeviceTypeRevision = 1;
+constexpr uint8_t kAirPurifierDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kWaterFreezeDetectorDeviceTypeId  = 0x00000041;
 constexpr uint8_t kWaterFreezeDetectorDeviceTypeRevision = 1;
@@ -107,82 +107,82 @@ constexpr DeviceTypeId kSoilSensorDeviceTypeId  = 0x00000045;
 constexpr uint8_t kSoilSensorDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kRefrigeratorDeviceTypeId  = 0x00000070;
-constexpr uint8_t kRefrigeratorDeviceTypeRevision = 1;
+constexpr uint8_t kRefrigeratorDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kTemperatureControlledCabinetDeviceTypeId  = 0x00000071;
-constexpr uint8_t kTemperatureControlledCabinetDeviceTypeRevision = 1;
+constexpr uint8_t kTemperatureControlledCabinetDeviceTypeRevision = 5;
 
 constexpr DeviceTypeId kRoomAirConditionerDeviceTypeId  = 0x00000072;
-constexpr uint8_t kRoomAirConditionerDeviceTypeRevision = 1;
+constexpr uint8_t kRoomAirConditionerDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kLaundryWasherDeviceTypeId  = 0x00000073;
-constexpr uint8_t kLaundryWasherDeviceTypeRevision = 1;
+constexpr uint8_t kLaundryWasherDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kRoboticVacuumCleanerDeviceTypeId  = 0x00000074;
-constexpr uint8_t kRoboticVacuumCleanerDeviceTypeRevision = 1;
+constexpr uint8_t kRoboticVacuumCleanerDeviceTypeRevision = 4;
 
 constexpr DeviceTypeId kDishwasherDeviceTypeId  = 0x00000075;
-constexpr uint8_t kDishwasherDeviceTypeRevision = 1;
+constexpr uint8_t kDishwasherDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kSmokeCoAlarmDeviceTypeId  = 0x00000076;
 constexpr uint8_t kSmokeCoAlarmDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kCookSurfaceDeviceTypeId  = 0x00000077;
-constexpr uint8_t kCookSurfaceDeviceTypeRevision = 1;
+constexpr uint8_t kCookSurfaceDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kCooktopDeviceTypeId  = 0x00000078;
 constexpr uint8_t kCooktopDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kMicrowaveOvenDeviceTypeId  = 0x00000079;
-constexpr uint8_t kMicrowaveOvenDeviceTypeRevision = 1;
+constexpr uint8_t kMicrowaveOvenDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kExtractorHoodDeviceTypeId  = 0x0000007A;
 constexpr uint8_t kExtractorHoodDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kOvenDeviceTypeId  = 0x0000007B;
-constexpr uint8_t kOvenDeviceTypeRevision = 1;
+constexpr uint8_t kOvenDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kLaundryDryerDeviceTypeId  = 0x0000007C;
-constexpr uint8_t kLaundryDryerDeviceTypeRevision = 1;
+constexpr uint8_t kLaundryDryerDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kNetworkInfrastructureManagerDeviceTypeId  = 0x00000090;
-constexpr uint8_t kNetworkInfrastructureManagerDeviceTypeRevision = 1;
+constexpr uint8_t kNetworkInfrastructureManagerDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kThreadBorderRouterDeviceTypeId  = 0x00000091;
 constexpr uint8_t kThreadBorderRouterDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kOnOffLightDeviceTypeId  = 0x00000100;
-constexpr uint8_t kOnOffLightDeviceTypeRevision = 1;
+constexpr uint8_t kOnOffLightDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kDimmableLightDeviceTypeId  = 0x00000101;
-constexpr uint8_t kDimmableLightDeviceTypeRevision = 1;
+constexpr uint8_t kDimmableLightDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kOnOffLightSwitchDeviceTypeId  = 0x00000103;
-constexpr uint8_t kOnOffLightSwitchDeviceTypeRevision = 1;
+constexpr uint8_t kOnOffLightSwitchDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kDimmerSwitchDeviceTypeId  = 0x00000104;
-constexpr uint8_t kDimmerSwitchDeviceTypeRevision = 1;
+constexpr uint8_t kDimmerSwitchDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kColorDimmerSwitchDeviceTypeId  = 0x00000105;
-constexpr uint8_t kColorDimmerSwitchDeviceTypeRevision = 1;
+constexpr uint8_t kColorDimmerSwitchDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kLightSensorDeviceTypeId  = 0x00000106;
-constexpr uint8_t kLightSensorDeviceTypeRevision = 1;
+constexpr uint8_t kLightSensorDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kOccupancySensorDeviceTypeId  = 0x00000107;
-constexpr uint8_t kOccupancySensorDeviceTypeRevision = 1;
+constexpr uint8_t kOccupancySensorDeviceTypeRevision = 4;
 
 constexpr DeviceTypeId kOnOffPlugInUnitDeviceTypeId  = 0x0000010A;
-constexpr uint8_t kOnOffPlugInUnitDeviceTypeRevision = 1;
+constexpr uint8_t kOnOffPlugInUnitDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kDimmablePlugInUnitDeviceTypeId  = 0x0000010B;
-constexpr uint8_t kDimmablePlugInUnitDeviceTypeRevision = 1;
+constexpr uint8_t kDimmablePlugInUnitDeviceTypeRevision = 4;
 
 constexpr DeviceTypeId kColorTemperatureLightDeviceTypeId  = 0x0000010C;
-constexpr uint8_t kColorTemperatureLightDeviceTypeRevision = 1;
+constexpr uint8_t kColorTemperatureLightDeviceTypeRevision = 4;
 
 constexpr DeviceTypeId kExtendedColorLightDeviceTypeId  = 0x0000010D;
-constexpr uint8_t kExtendedColorLightDeviceTypeRevision = 1;
+constexpr uint8_t kExtendedColorLightDeviceTypeRevision = 4;
 
 constexpr DeviceTypeId kMountedOnOffControlDeviceTypeId  = 0x0000010F;
 constexpr uint8_t kMountedOnOffControlDeviceTypeRevision = 1;
@@ -221,10 +221,10 @@ constexpr DeviceTypeId kDoorbellDeviceTypeId  = 0x00000148;
 constexpr uint8_t kDoorbellDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kWindowCoveringDeviceTypeId  = 0x00000202;
-constexpr uint8_t kWindowCoveringDeviceTypeRevision = 1;
+constexpr uint8_t kWindowCoveringDeviceTypeRevision = 4;
 
 constexpr DeviceTypeId kWindowCoveringControllerDeviceTypeId  = 0x00000203;
-constexpr uint8_t kWindowCoveringControllerDeviceTypeRevision = 1;
+constexpr uint8_t kWindowCoveringControllerDeviceTypeRevision = 4;
 
 constexpr DeviceTypeId kClosureDeviceTypeId  = 0x00000230;
 constexpr uint8_t kClosureDeviceTypeRevision = 1;
@@ -236,25 +236,25 @@ constexpr DeviceTypeId kClosureControllerDeviceTypeId  = 0x0000023E;
 constexpr uint8_t kClosureControllerDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kThermostatDeviceTypeId  = 0x00000301;
-constexpr uint8_t kThermostatDeviceTypeRevision = 1;
+constexpr uint8_t kThermostatDeviceTypeRevision = 4;
 
 constexpr DeviceTypeId kTemperatureSensorDeviceTypeId  = 0x00000302;
-constexpr uint8_t kTemperatureSensorDeviceTypeRevision = 1;
+constexpr uint8_t kTemperatureSensorDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kPumpDeviceTypeId  = 0x00000303;
-constexpr uint8_t kPumpDeviceTypeRevision = 1;
+constexpr uint8_t kPumpDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kPumpControllerDeviceTypeId  = 0x00000304;
-constexpr uint8_t kPumpControllerDeviceTypeRevision = 1;
+constexpr uint8_t kPumpControllerDeviceTypeRevision = 4;
 
 constexpr DeviceTypeId kPressureSensorDeviceTypeId  = 0x00000305;
-constexpr uint8_t kPressureSensorDeviceTypeRevision = 1;
+constexpr uint8_t kPressureSensorDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kFlowSensorDeviceTypeId  = 0x00000306;
-constexpr uint8_t kFlowSensorDeviceTypeRevision = 1;
+constexpr uint8_t kFlowSensorDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kHumiditySensorDeviceTypeId  = 0x00000307;
-constexpr uint8_t kHumiditySensorDeviceTypeRevision = 1;
+constexpr uint8_t kHumiditySensorDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kHeatPumpDeviceTypeId  = 0x00000309;
 constexpr uint8_t kHeatPumpDeviceTypeRevision = 1;
@@ -263,10 +263,10 @@ constexpr DeviceTypeId kThermostatControllerDeviceTypeId  = 0x0000030A;
 constexpr uint8_t kThermostatControllerDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kEvseDeviceTypeId  = 0x0000050C;
-constexpr uint8_t kEvseDeviceTypeRevision = 1;
+constexpr uint8_t kEvseDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kDeviceEnergyManagementDeviceTypeId  = 0x0000050D;
-constexpr uint8_t kDeviceEnergyManagementDeviceTypeRevision = 1;
+constexpr uint8_t kDeviceEnergyManagementDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kWaterHeaterDeviceTypeId  = 0x0000050F;
 constexpr uint8_t kWaterHeaterDeviceTypeRevision = 1;
@@ -287,10 +287,10 @@ constexpr DeviceTypeId kElectricalMeterDeviceTypeId  = 0x00000514;
 constexpr uint8_t kElectricalMeterDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kControlBridgeDeviceTypeId  = 0x00000840;
-constexpr uint8_t kControlBridgeDeviceTypeRevision = 1;
+constexpr uint8_t kControlBridgeDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kOnOffSensorDeviceTypeId  = 0x00000850;
-constexpr uint8_t kOnOffSensorDeviceTypeRevision = 1;
+constexpr uint8_t kOnOffSensorDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kOrphanClustersDeviceTypeId  = 0xFFF10001;
 constexpr uint8_t kOrphanClustersDeviceTypeRevision = 1;
