@@ -10,7 +10,6 @@ constexpr DeviceTypeId k{{asUpperCamelCase caption}}DeviceTypeId = {{asHex code 
 constexpr uint8_t k{{asUpperCamelCase caption}}DeviceTypeRevision = 1;
 
 {{/zcl_device_types}}
-} // namespace Type
 } // namespace Device
 } // namespace app
 } // namespace chip

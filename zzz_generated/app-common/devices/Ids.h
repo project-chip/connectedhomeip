@@ -298,7 +298,6 @@ constexpr uint8_t kOrphanClustersDeviceTypeRevision = 1;
 constexpr DeviceTypeId kAllClustersAppServerExampleDeviceTypeId  = 0xFFF10003;
 constexpr uint8_t kAllClustersAppServerExampleDeviceTypeRevision = 1;
 
-} // namespace Type
 } // namespace Device
 } // namespace app
 } // namespace chip
