@@ -45,7 +45,7 @@ CHIP_ERROR ReadAttribute(app::ServerClusterInterface & cluster, const app::Concr
 };
 
 template <typename T>
-CHIP_ERROR ReadAttr(app::ServerClusterInterface & cluster, AttributeId attr, T & value)
+CHIP_ERROR ReadAttribute(app::ServerClusterInterface & cluster, AttributeId attr, T & value)
 {
     const auto & paths = cluster.GetPaths();
     // This should be a size-1 span
@@ -63,7 +63,7 @@ CHIP_ERROR WriteAttribute(app::ServerClusterInterface & cluster, const app::Conc
 };
 
 template <typename T>
-CHIP_ERROR WriteAttr(app::ServerClusterInterface & cluster, AttributeId attr, const T & value)
+CHIP_ERROR WriteAttribute(app::ServerClusterInterface & cluster, AttributeId attr, const T & value)
 {
     const auto & paths = cluster.GetPaths();
     // This should be a size-1 span
@@ -99,7 +99,7 @@ CHIP_ERROR ReadClusterAttribute(app::ServerClusterInterface & cluster, Attribute
 {
     static_assert(std::is_integral_v<T> || std::is_enum_v<T>);
 
-    return Helper::ReadAttr(cluster, attr, value);
+    return Helper::ReadAttribute(cluster, attr, value);
 }
 
 // Helper function to read any attribute value of a given type
@@ -108,7 +108,7 @@ CHIP_ERROR ReadClusterAttribute(app::ServerClusterInterface & cluster, Attribute
 {
     static_assert(std::is_integral_v<T> || std::is_enum_v<T>);
 
-    return Helper::ReadAttr(cluster, attr, value);
+    return Helper::ReadAttributte(cluster, attr, value);
 }
 
 // Helper function to write any attribute value of a given type
@@ -136,7 +136,7 @@ CHIP_ERROR WriteClusterAttribute(app::ServerClusterInterface & cluster, Attribut
 {
     static_assert(std::is_integral_v<T> || std::is_enum_v<T>);
 
-    return Helper::WriteAttr(cluster, attr, value);
+    return Helper::WriteAttribute(cluster, attr, value);
 }
 
 // Helper function to write any attribute value of a given type
@@ -145,7 +145,7 @@ CHIP_ERROR WriteClusterAttribute(app::ServerClusterInterface & cluster, Attribut
 {
     static_assert(std::is_integral_v<T> || std::is_enum_v<T>);
 
-    return Helper::WriteAttr(cluster, attr, value);
+    return Helper::WriteAttribute(cluster, attr, value);
 }
 
 } // namespace Test
