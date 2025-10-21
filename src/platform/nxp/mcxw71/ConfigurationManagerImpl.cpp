@@ -108,7 +108,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     else
     {
         // The first boot after factory reset of the Node.
-        err = StoreRebootCount(1);
+        err = StoreRebootCount(0);
         SuccessOrExit(err);
     }
 
@@ -118,7 +118,8 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
-    SuccessOrExit(err = DetermineBootReason(CMC_GetSystemResetStatus(CMC0)));
+    err = DetermineBootReason(CMC_GetSystemResetStatus(CMC0));
+    SuccessOrExit(err);
 
     if (!NXPConfig::ConfigValueExists(NXPConfig::kCounterKey_BootReason))
     {
