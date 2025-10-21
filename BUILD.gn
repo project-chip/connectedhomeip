@@ -507,6 +507,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_fake_tests = enable_default_builds && host_os == "linux"
 
     enable_tizen_lighting_app = enable_tizen_builds
+
+    # A group of linux apps to be used by CI.
+    enable_linux_apps_for_ci_build = enable_default_builds && (host_os == "linux" || host_os == "mac")
   }
 
   builds = []
@@ -945,43 +948,45 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   #   extra_build_deps += [ ":linux_camera_controller_app" ]
   # }
 
-  group("default") {
-    deps = extra_build_deps + builds
+  if (enable_linux_apps_for_ci_build) {
+    group("linux_apps_for_ci") {
+      deps = [
+        ":linux_air_purifier_app",
+        ":linux_all_clusters_app",
+        ":linux_bridge_app",
+        ":linux_closure_app",
+        ":linux_energy_gateway_app",
+        ":linux_energy_management_app",
+        ":linux_lighting_app",
+        ":linux_lit_icd_app",
+        ":linux_lock_app",
+        ":linux_microwave_oven_app",
+        ":linux_network_manager_app",
+        ":linux_ota_provider_app",
+        ":linux_ota_requestor_app",
+        ":linux_rvc_app",
+        ":linux_terms_and_conditions_app",
+        ":linux_thermostat_app",
+        ":linux_tv_app",
+        ":linux_tv_casting_app",
+        ":linux_water_leak_detector_app",
+
+        # TODO: The following apps are temporarily disabled in the unified build because they're failing
+        # ":linux_camera_app",
+        # ":linux_camera_controller_app",
+        # ":linux_fabric_admin_rpc_app",
+        # ":linux_fabric_bridge_rpc_app",
+        # ":linux_fabric_sync_app",
+        # ":linux_jf_admin_app",
+        # ":linux_jf_control_app",
+        # ":linux_light_data_model_no_unique_id_app",
+        # ":linux_python_bindings_webrtc_app",
+      ]
+    }
   }
 
-  group("linux_apps_for_ci") {
-    deps = [
-      ":linux_air_purifier_app",
-      ":linux_all_clusters_app",
-      ":linux_bridge_app",
-      ":linux_closure_app",
-      ":linux_energy_gateway_app",
-      ":linux_energy_management_app",
-      ":linux_lighting_app",
-      ":linux_lit_icd_app",
-      ":linux_lock_app",
-      ":linux_microwave_oven_app",
-      ":linux_network_manager_app",
-      ":linux_ota_provider_app",
-      ":linux_ota_requestor_app",
-      ":linux_rvc_app",
-      ":linux_terms_and_conditions_app",
-      ":linux_thermostat_app",
-      ":linux_tv_app",
-      ":linux_tv_casting_app",
-      ":linux_water_leak_detector_app",
-
-      # TODO: The following apps are temporarily disabled in the unified build because they're failing
-      # ":linux_camera_app",
-      # ":linux_camera_controller_app",
-      # ":linux_fabric_admin_rpc_app",
-      # ":linux_fabric_bridge_rpc_app",
-      # ":linux_fabric_sync_app",
-      # ":linux_jf_admin_app",
-      # ":linux_jf_control_app",
-      # ":linux_light_data_model_no_unique_id_app",
-      # ":linux_python_bindings_webrtc_app",
-    ]
+  group("default") {
+    deps = extra_build_deps + builds
   }
 
   group("check") {
