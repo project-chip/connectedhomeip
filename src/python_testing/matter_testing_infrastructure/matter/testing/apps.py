@@ -14,6 +14,7 @@
 
 
 import os
+import re
 import signal
 import tempfile
 from dataclasses import dataclass
@@ -173,11 +174,16 @@ class OTAProviderSubprocess(AppServerSubprocess):
             err_log_file(str,BinaryIO): Path to create the BinaryIO logger for stderr, if not use the default stderr.buffer.
         """
         # Create the BinaryIO fp allow to use if path is provided.
+        # Or assign it to the previously opened fp.
         if isinstance(log_file, str):
             self.log_file = open(log_file, "ab")
+        else:
+            self.log_file = log_file
 
         if isinstance(err_log_file, str):
             self.err_log_file = open(err_log_file, "ab")
+        else:
+            self.err_log_file = err_log_file
 
         # Build OTA-specific arguments using the ota_source property
         combined_extra_args = ota_source.ota_args + extra_args
@@ -206,11 +212,16 @@ class OTAProviderSubprocess(AppServerSubprocess):
         Returns:
             list[dict]: List with a dict of the info retrieved.
         """
+        ANSI_RE = re.compile(r'\x1b\[[0-9;]*m')
         if not os.path.exists(self.log_file.name):
             raise FileNotFoundError
 
         # read all lines at the moment
         all_lines = None
+
+        def clean_string(x):
+            text = x.decode("utf-8", 'replace')
+            return ANSI_RE.sub('', text)
 
         with open(self.log_file.name, 'rb') as fp:
             all_lines = fp.readlines()
@@ -218,15 +229,15 @@ class OTAProviderSubprocess(AppServerSubprocess):
         found_lines = []
 
         for index, line in enumerate(all_lines):
-            n_line = line.decode("utf-8", 'replace')
+            n_line = clean_string(line)
             if pattern in n_line:
                 before_lines = all_lines[(index-before):index]
                 after_lines = all_lines[index+1:(index+after+1)]
                 match = {
-                    'before': list(map(lambda x: x.decode("utf-8"), before_lines)),
+                    'before': list(map(clean_string, before_lines)),
                     'match': n_line,
                     'line': index,
-                    'after': list(map(lambda x: x.decode("utf-8"), after_lines))
+                    'after': list(map(clean_string, after_lines))
                 }
                 found_lines.append(match)
 

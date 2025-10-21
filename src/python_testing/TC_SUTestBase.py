@@ -39,7 +39,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
     provider_app_path: Optional[str] = None
 
     def start_provider(self,
-                       provier_app_path: str = "",
+                       provider_app_path: str = "",
                        ota_image_path: str = "",
                        setup_pincode: int = 20202021,
                        discriminator: int = 1234,
@@ -66,9 +66,9 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         """
         logger.info(f"Launching provider app with with ota image {ota_image_path}")
         # Image to launch
-        self.provider_app_path = provier_app_path
-        if not path.exists(provier_app_path):
-            raise FileNotFoundError(f"Provider app not found {self.provider_app_path}")
+        self.provider_app_path = provider_app_path
+        if not path.exists(provider_app_path):
+            raise FileNotFoundError(f"Provider app not found {provider_app_path}")
 
         if not path.exists(ota_image_path):
             raise FileNotFoundError(f"Ota image provided does not exists {ota_image_path}")
@@ -86,7 +86,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             logger.info(f"Writing Provider logs at : {log_file}")
         # Launch the Provider subprocess using the Wrapper
         proc = OTAProviderSubprocess(
-            self.provider_app_path,
+            provider_app_path,
             storage_dir=storage_dir,
             port=port,
             discriminator=discriminator,
