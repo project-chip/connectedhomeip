@@ -249,7 +249,7 @@ public:
 
 #if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
     // cache node address
-    virtual void CacheNode(NodeId nodeId, const ResolveResult & result) = 0;
+    virtual void CacheNode(const PeerId & peerId, const ResolveResult & result) {};
 #endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 
     /// Shut down any active resolves

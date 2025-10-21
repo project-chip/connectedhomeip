@@ -177,7 +177,7 @@ public:
     CHIP_ERROR CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method) override;
 
 #if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
-    virtual void CacheNode(NodeId nodeId, const ResolveResult & result) override;
+    virtual void CacheNode(const PeerId & peerId, const ResolveResult & result) override;
 #endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 
     void Shutdown() override;

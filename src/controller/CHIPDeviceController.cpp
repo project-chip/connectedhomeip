@@ -1688,7 +1688,8 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
         result.mrpRemoteConfig   = proxy->GetSecureSession().Value()->GetRemoteMRPConfig();
         result.supportsTcpClient = result.address.GetTransportType() == Transport::Type::kTcp;
         result.supportsTcpServer = result.address.GetTransportType() == Transport::Type::kTcp;
-        Resolver::Instance().CacheNode(proxy->GetDeviceId(), result);
+        PeerId peerId(GetFabricId(), proxy->GetDeviceId());
+        Resolver::Instance().CacheNode(peerId, result);
     }
 #endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 

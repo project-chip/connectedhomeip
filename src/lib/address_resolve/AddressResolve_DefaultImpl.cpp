@@ -213,7 +213,7 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
 
 #if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
     ResolveResult result;
-    if (mNodeAddressCache.GetCachedNodeAddress(request.GetPeerId().GetNodeId(), result) == CHIP_NO_ERROR)
+    if (mNodeAddressCache.GetCachedNodeAddress(peerId, result) == CHIP_NO_ERROR)
     {
         ChipLogProgress(Discovery, "LookupNode seeding with cached value");
         handle.LookupResult(result);
@@ -225,9 +225,9 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
 
 #if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 
-void Resolver::CacheNode(NodeId nodeId, const ResolveResult & result)
+void Resolver::CacheNode(const PeerId & peerId, const ResolveResult & result)
 {
-    mNodeAddressCache.CacheNode(nodeId, result);
+    mNodeAddressCache.CacheNode(peerId, result);
 }
 
 #endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
@@ -391,7 +391,7 @@ void Resolver::HandleAction(IntrusiveList<NodeLookupHandle>::Iterator & current)
         break;
     }
 #if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
-    mNodeAddressCache.RemoveCachedNodeAddress(peerId.GetNodeId());
+    mNodeAddressCache.RemoveCachedNodeAddress(peerId);
 #endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 }
 

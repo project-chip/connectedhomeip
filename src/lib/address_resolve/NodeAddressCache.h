@@ -26,16 +26,16 @@ class NodeAddressCache
 public:
     static constexpr size_t kMaxCacheSize = 16;
 
-    void CacheNode(NodeId nodeId, const ResolveResult & result);
-    CHIP_ERROR GetCachedNodeAddress(NodeId nodeId, ResolveResult & result) const;
-    CHIP_ERROR RemoveCachedNodeAddress(NodeId nodeId);
+    void CacheNode(const PeerId & peerId, const ResolveResult & result);
+    CHIP_ERROR GetCachedNodeAddress(const PeerId & peerId, ResolveResult & result) const;
+    CHIP_ERROR RemoveCachedNodeAddress(const PeerId & peerId);
     void Clear();
     size_t GetCacheSize() const { return mCacheCount; }
 
 private:
     struct CacheEntry
     {
-        NodeId nodeId;
+        PeerId peerId;
         ResolveResult result;
     };
 
