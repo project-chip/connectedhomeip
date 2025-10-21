@@ -285,15 +285,7 @@ private:
     void DeinitCurrentAttrs();
 
 protected:
-    virtual uint32_t GetCurrentTimestamp()
-    {
-        System::Clock::Microseconds64 utcTimeUnix;
-        uint64_t chipEpochTime;
-        System::SystemClock().GetClock_RealTime(utcTimeUnix);
-        UnixEpochToChipEpochMicros(utcTimeUnix.count(), chipEpochTime);
-
-        return static_cast<uint32_t>(chipEpochTime / chip::kMicrosecondsPerSecond);
-    };
+    uint32_t GetCurrentTimestamp();
 };
 
 } // namespace CommodityTariff

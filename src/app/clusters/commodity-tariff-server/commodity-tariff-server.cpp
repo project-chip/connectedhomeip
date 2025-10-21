@@ -57,6 +57,16 @@ bool Instance::HasFeature(Feature aFeature) const
     return mFeature.Has(aFeature);
 }
 
+uint32_t Instance::GetCurrentTimestamp()
+{
+    System::Clock::Microseconds64 utcTimeUnix;
+    uint32_t matterEpoch;
+    VerifyOrDie(CHIP_NO_ERROR == System::SystemClock().GetClock_RealTime(utcTimeUnix));
+    VerifyOrDie(CHIP_NO_ERROR == System::Clock::GetClock_MatterEpochS(matterEpoch));
+
+    return matterEpoch;
+};
+
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
