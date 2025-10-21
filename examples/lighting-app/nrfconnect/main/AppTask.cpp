@@ -167,6 +167,7 @@ void MarkDirtyInterpreter::MarkDirty(const chip::app::AttributePathParams & path
 
 void AppTask::MarkDirty(const chip::app::AttributePathParams & path)
 {
+    k_mutex_lock(&Instance().mMutex, K_FOREVER);
     Instance().mAttributePaths.push_back(path);
     // Batch all changes that happen within the timer window.
     if (!Instance().mFunctionTimerActive)
@@ -175,6 +176,7 @@ void AppTask::MarkDirty(const chip::app::AttributePathParams & path)
         Instance().StartTimer(kUpdateClusterStateBaseTimeoutMs + jitter);
     }
     Instance().mFunction = FunctionEvent::UpdateClusterState;
+    k_mutex_unlock(&Instance().mMutex);
 };
 
 CHIP_ERROR AppTask::Init()
@@ -195,6 +197,8 @@ CHIP_ERROR AppTask::Init()
         LOG_ERR("PlatformMgr().InitChipStack() failed");
         return err;
     }
+
+    k_mutex_init(&mMutex);
 
 #if defined(CONFIG_NET_L2_OPENTHREAD)
     err = ThreadStackMgr().InitThreadStack();
@@ -530,6 +534,7 @@ void AppTask::FunctionTimerEventHandler(const AppEvent & event)
     }
     else if (Instance().mFunction == FunctionEvent::UpdateClusterState)
     {
+        k_mutex_lock(&Instance().mMutex, K_FOREVER);
         for (const auto & path : Instance().mAttributePaths)
         {
             CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
@@ -541,6 +546,7 @@ void AppTask::FunctionTimerEventHandler(const AppEvent & event)
         Instance().mAttributePaths.clear();
         Instance().mFunction = FunctionEvent::NoneSelected;
         Instance().CancelTimer();
+        k_mutex_unlock(&Instance().mMutex);
     }
 }
 

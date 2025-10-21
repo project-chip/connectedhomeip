@@ -103,6 +103,7 @@ private:
     PWMDevice mPWMDevice;
     std::unique_ptr<MarkDirtyInterpreter> mMarkDirtyInterpreter = std::make_unique<MarkDirtyInterpreter>();
     std::vector<chip::app::AttributePathParams> mAttributePaths;
+    struct k_mutex mMutex;
 
 #if CONFIG_CHIP_FACTORY_DATA
     chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;
