@@ -248,7 +248,13 @@ public:
     virtual CHIP_ERROR CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method) = 0;
 
 #if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
-    // cache node address
+    /// Caches the peerId's address
+    ///
+    /// Allows the caller to pre-cache an address that has just been used, for example, 
+    /// when moving from PASE to CASE during on-network commissioning.
+    ///
+    /// The cache should remember the given address for a single lookup. In other words,
+    /// the entry should be removed after a single cache hit.
     virtual void CacheNode(const PeerId & peerId, const ResolveResult & result) {};
 #endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 
