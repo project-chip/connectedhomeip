@@ -261,7 +261,6 @@ class TC_CC_10_1(MatterBaseTest):
             asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster][attributes.ColorTemperatureMireds], CTmin,
                                          "ColorTemperatureMireds is not greater than or equal to %d" % CTmin)
 
-        // step 2g no longer exists
         
         self.step("2h")
         if self.pics_guard(self.check_pics("CC.S.F01")):
