@@ -111,16 +111,17 @@ void CommodityTariffInstance::AdvanceMockTime(chip::System::Clock::Seconds32 off
     // Update both real time and monotonic time consistently
     mMockClock->SetClock_RealTime(newTime);
     
-    // Advance monotonic time by the same amount to keep them synchronized
-    mMockClock->AdvanceMonotonic(std::chrono::duration_cast<chip::System::Clock::Milliseconds64>(offset));
+    mMockClock->AdvanceMonotonic(
+        std::chrono::duration_cast<chip::System::Clock::Milliseconds64>(offset)
+    );
     
     // Update base time reference
     mMockBaseTime = newTime;
     
     ChipLogProgress(DeviceLayer, 
-                   "Advanced mock time: %" PRIu64 "s -> %" PRIu64 "s (+%" PRIu32 "s)",
-                   currentTime.count() / chip::kMicrosecondsPerSecond,
-                   newTime.count() / chip::kMicrosecondsPerSecond,
+                   "Advanced mock time: %" PRIu32 "s -> %" PRIu32 "s (+%" PRIu32 "s)",
+                   std::chrono::duration_cast<chip::System::Clock::Milliseconds32>(currentTime).count(),
+                   std::chrono::duration_cast<chip::System::Clock::Milliseconds32>(newTime).count(),
                    offset.count());
 }
 
@@ -165,7 +166,7 @@ void CommodityTariffInstance::AdvanceTestTime(chip::System::Clock::Seconds32 off
 {
     if (!mTestTimeEnabled)
     {
-        ChipLogError(DeviceLayer, 
+        ChipLogError(DeviceLayer,
                     "Cannot advance time - test time not enabled. Call EnableTestTime(true) first.");
         return;
     }
