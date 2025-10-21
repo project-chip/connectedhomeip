@@ -27,10 +27,6 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    CCACHE_NOHASHDIR: 1
-    CCACHE_BASEDIR: ${{ github.workspace }}
-    # Disabled as this seems to cause invalid cache re-uses
-    # CCACHE_PREFIX_CPP: ${{ github.workspace }}/scripts/helpers/ccache-prefix-cpp.sh
     CHIP_NO_LOG_TIMESTAMPS: true
     CHIP_PW_COMMAND_LAUNCHER: ccache
 
