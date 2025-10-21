@@ -62,6 +62,14 @@ functionality can still work fine.
     $ source scripts/activate.sh
     ```
 
+-   Install IDF requirements for IDF v5.5.1
+
+    For IDF v5.5.1 you need to install esp-idf-kconfig and idf-component-manager for Matter environment.
+
+    ```
+    pip install -r ./scripts/setup/requirements.esp32.idfv5_5.txt
+    ```
+
 -   Ccache
 
     Enable Ccache for faster IDF builds. It is recommended to have Ccache

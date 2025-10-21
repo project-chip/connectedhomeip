@@ -60,7 +60,7 @@ jobs:
             - name: Install esp-idf-kconfig
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "pip install esp-idf-kconfig==2.5.0"
+                    "pip install -r ./scripts/setup/requirements.esp32.idfv5_5.txt"
 
             - name: Build example All Clusters App(Target:ESP32C3)
               run: |
