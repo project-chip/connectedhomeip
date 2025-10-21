@@ -362,7 +362,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 # - NetworkCommissioning
                 # - CameraAvStreamManagement
                 # - OperationalCredentials
-                logging.warning(f"INVALID_ACTION: {cluster_class.__name__}.{attribute.__name__} (Cluster=0x{cluster_id:04X}, Attribute=0x{attribute_id:04X}, Endpoint={endpoint_id}, Privilege={privilege.name})")
+                logging.warning(
+                    f"INVALID_ACTION: {cluster_class.__name__}.{attribute.__name__} (Cluster=0x{cluster_id:04X}, Attribute=0x{attribute_id:04X}, Endpoint={endpoint_id}, Privilege={privilege.name})")
                 return None  # Indicates skip
             # Unexpected ChipStackError
             logging.error(f"Unexpected ChipStackError subscribing to attribute {attribute}: {e}")
