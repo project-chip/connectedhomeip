@@ -291,8 +291,27 @@ public:
     void SetCallbacks(OnLocalDescriptionCallback onLocalDescription, OnICECandidateCallback onICECandidate,
                       OnConnectionStateCallback onConnectionState, OnTrackCallback onTrack) override
     {
-        mPeerConnection->onLocalDescription(
-            [onLocalDescription](rtc::Description desc) { onLocalDescription(std::string(desc), RtcTypeToSDPType(desc.type())); });
+        mPeerConnection->onLocalDescription([onLocalDescription, onICECandidate](rtc::Description desc) {
+            // First, notify about the local description
+            onLocalDescription(std::string(desc), RtcTypeToSDPType(desc.type()));
+
+            // Extract any candidates embedded in the SDP description
+            std::vector<rtc::Candidate> candidates = desc.candidates();
+            ChipLogProgress(Camera, "Extracted %lu candidates from SDP description", candidates.size());
+
+            for (const auto & candidate : candidates)
+            {
+                ICECandidateInfo candidateInfo;
+                candidateInfo.candidate  = std::string(candidate);
+                candidateInfo.mid        = candidate.mid();
+                candidateInfo.mlineIndex = -1; // libdatachannel doesn't provide mlineIndex
+
+                ChipLogProgress(Camera, "[From SDP] Candidate: %s, mid: %s", candidateInfo.candidate.c_str(),
+                                candidateInfo.mid.c_str());
+
+                onICECandidate(candidateInfo);
+            }
+        });
 
         mPeerConnection->onLocalCandidate([onICECandidate](rtc::Candidate candidate) {
             ICECandidateInfo candidateInfo;
