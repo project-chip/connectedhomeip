@@ -299,7 +299,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 keepSubscriptions=False,
                 fabricFiltered=False
             )
-            
+
             if subscription.subscriptionId is None:
                 self.record_error(test_name=test_name,
                                   location=AttributePathLocation(endpoint_id=endpoint_id,
@@ -307,11 +307,11 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                                   problem=f"Subscription activation failed - expected success with privilege {privilege}")
                 self.success = False
                 return False
-            
+
             logging.info(f"Successfully established subscription (ID: {subscription.subscriptionId}) with privilege {privilege}")
             subscription.Shutdown()
             return True
-            
+
         except ChipStackError as e:  # chipstack-ok
             if e.err == 0x00000580:  # INVALID_ACTION - some attributes don't support subscription
                 logging.warning(f"Skipping attribute (INVALID_ACTION): {attribute}")
@@ -335,7 +335,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 keepSubscriptions=False,
                 fabricFiltered=False
             )
-            
+
             # Subscription succeeded but should have failed
             subscription.Shutdown()
             self.record_error(test_name=test_name,
@@ -344,7 +344,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                               problem=f"Subscription succeeded but should have failed with privilege {privilege}")
             self.success = False
             return False
-            
+
         except InteractionModelError as e:
             if e.status != Status.UnsupportedAccess:
                 self.record_error(test_name=test_name,
@@ -355,7 +355,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 return False
             logging.info("Subscription correctly failed with UnsupportedAccess")
             return True
-            
+
         except ChipStackError as e:  # chipstack-ok
             if e.err == 0x00000580:  # INVALID_ACTION - some attributes don't support subscription
                 logging.warning(f"Skipping attribute (INVALID_ACTION): {attribute}")
@@ -371,7 +371,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
 
     async def _run_subscribe_access_test_for_cluster_privilege(self, endpoint_id, cluster_id, device_cluster_data, xml_cluster: XmlCluster, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum):
         """Tests subscription access control by verifying subscriptions can be established.
-        
+
         This follows the same pattern as _run_read_access_test_for_cluster_privilege,
         but uses subscription parameters in the ReadAttribute call.
         """
@@ -383,7 +383,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
 
             try:
                 logging.info(f"Subscribing to attribute {attribute} cluster {xml_cluster.name} privilege {privilege}")
-                
+
                 if operation_allowed(spec_requires, privilege):
                     result = await self._subscribe_single_attribute_check_success(
                         endpoint_id, cluster_id, attribute_id, attribute, cluster_class, privilege, test_name)
@@ -394,7 +394,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                         endpoint_id, cluster_id, attribute_id, attribute, cluster_class, privilege, test_name)
                     if result is None:  # Skip this attribute (INVALID_ACTION)
                         continue
-                
+
             except Exception as e:
                 # Catch any other unexpected exceptions not handled by helper methods
                 logging.error(f"Unexpected exception subscribing to cluster {xml_cluster.name}: {e}")
