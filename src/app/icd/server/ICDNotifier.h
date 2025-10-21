@@ -107,6 +107,7 @@ public:
      */
     virtual void OnSubscriptionReport() = 0;
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
     /**
      * @brief This function is called for all subscribers of the ICDNotifier when it calls NotifySendCheckIn.
      * It informs the subscriber that a Check-In message needs to be sent for the provided subject.
@@ -114,6 +115,7 @@ public:
      * @param subject : The subject descriptor for which the Check-In message needs to be sent.
      */
     virtual void OnSendCheckIn(const chip::Access::SubjectDescriptor & subject) = 0;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 };
 
 class ICDNotifier
@@ -138,7 +140,9 @@ public:
     void NotifyICDManagementEvent(ICDListener::ICDManagementEvents event);
     void NotifySubscriptionReport();
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
     void NotifySendCheckIn(const chip::Access::SubjectDescriptor & subject);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 
     inline void BroadcastActiveRequest(ICDListener::KeepActiveFlags request, bool notify)
     {

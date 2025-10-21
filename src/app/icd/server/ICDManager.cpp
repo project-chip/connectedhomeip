@@ -683,11 +683,13 @@ void ICDManager::OnSubscriptionReport()
     this->UpdateOperationState(OperationalState::ActiveMode);
 }
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 void ICDManager::OnSendCheckIn(const Access::SubjectDescriptor & subject)
 {
     ChipLogProgress(AppServer, "Received OnSendCheckIn for subject: " ChipLogFormatX64, ChipLogValueX64(subject.subject));
     SendCheckInMsgs(MakeOptional(subject));
 }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 
 void ICDManager::ExtendActiveMode(Milliseconds16 extendDuration)
 {
