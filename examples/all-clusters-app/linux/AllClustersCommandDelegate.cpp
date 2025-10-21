@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
 #include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
 #include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
@@ -1032,6 +1033,15 @@ void AllClustersAppCommandHandler::OccupancyPresentTimerHandler(System::Layer * 
     {
         ChipLogDetail(NotSpecified, "Set Occupancy attribute to clear");
         EmitOccupancyChangedEvent(endpointId, clearValue);
+    }
+}
+
+void AllClustersAppCommandHandler::OnBooleanStateChangeHandler(chip::EndpointId endpointId, bool newState)
+{
+    auto booleanState = BooleanState::FindClusterOnEndpoint(1);
+    if (booleanState != nullptr)
+    {
+        booleanState->SetStateValue(newState);
     }
 }
 
