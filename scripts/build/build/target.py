@@ -222,6 +222,15 @@ class BuildTarget:
         # Modifiers can be combined in any way
         self.modifiers: List[TargetPart] = []
 
+    @property
+    def isUnifiedBuild(self):
+        """Unified build will search for a `unified` boolean set as part of the modifiers"""
+        for m in self.modifiers:
+            if 'unified' not in m.build_arguments:
+                continue
+            return m.build_arguments['unified']
+        return False
+
     def AppendFixedTargets(self, parts: List[TargetPart]):
         """Append a list of potential targets/variants.
 
@@ -460,7 +469,11 @@ class BuildTarget:
         builder = self.builder_class(repository_path, runner=runner, **kargs)
         builder.target = self
         builder.identifier = name
-        builder.output_dir = os.path.join(output_prefix, name)
+        if self.isUnifiedBuild:
+            builder.output_dir = os.path.join(output_prefix, 'unified-build')
+        else:
+            # TODO: can we check if builds are compatible?
+            builder.output_dir = os.path.join(output_prefix, name)
         builder.verbose = verbose
         builder.ninja_jobs = ninja_jobs
         builder.chip_dir = os.path.abspath(repository_path)

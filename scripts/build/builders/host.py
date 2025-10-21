@@ -95,6 +95,36 @@ class HostApp(Enum):
     JF_ADMIN = auto()
     CLOSURE = auto()
 
+    def UnifiedTargetName(self):
+        """
+        returns the target name to compile an app as a unified build (i.e. with the GN
+        root set to '')
+        """
+        TARGETS = {
+            # keep-sorted start
+            HostApp.AIR_PURIFIER: ":linux_air_purifier_app",
+            HostApp.ALL_CLUSTERS: ":linux_all_clusters_app",
+            HostApp.BRIDGE: ":linux_bridge_app",
+            HostApp.CLOSURE: ":linux_closure_app",
+            HostApp.ENERGY_GATEWAY: ":linux_energy_gateway_app",
+            HostApp.ENERGY_MANAGEMENT: ":linux_energy_management_app",
+            HostApp.LIGHT: ":linux_lighting_app",
+            HostApp.LIT_ICD: ":linux_lit_icd_app",
+            HostApp.LOCK: ":linux_lock_app",
+            HostApp.MICROWAVE_OVEN: ":linux_microwave_oven_app",
+            HostApp.NETWORK_MANAGER: ":linux_network_manager_app",
+            HostApp.OTA_PROVIDER: ":linux_ota_provider_app",
+            HostApp.OTA_REQUESTOR: ":linux_ota_requestor_app",
+            HostApp.RVC: ":linux_rvc_app",
+            HostApp.TERMS_AND_CONDITIONS: ":linux_terms_and_conditions_app",
+            HostApp.THERMOSTAT: ":linux_thermostat_app",
+            HostApp.TV_APP: ":linux_tv_app",
+            HostApp.TV_CASTING_APP: ":linux_tv_casting_app",
+            HostApp.WATER_LEAK_DETECTOR: ":linux_water_leak_detector_app",
+            # keep-sorted end
+        }
+        return TARGETS[self]
+
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
             return 'all-clusters-app/linux'
@@ -379,16 +409,29 @@ class HostBuilder(GnBuilder):
                  use_googletest=False,
                  enable_webrtc=False,
                  terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
+                 unified=False
                  ):
-        super(HostBuilder, self).__init__(
-            root=os.path.join(root, 'examples', app.ExamplePath()),
-            runner=runner)
+        """
+        Construct a host builder.
+
+        Params (limited docs, documenting interesting ones):
+
+           - unified: build will happen in a SINGLE output directory instead of separated out
+                      into per-target directories. Directory name will be "unified"
+        """
+
+        # Unified builds use the top level root for compilation
+        if not unified:
+            root = os.path.join(root, 'examples', app.ExamplePath()),
+
+        super(HostBuilder, self).__init__(root=root, runner=runner)
 
         self.app = app
         self.board = board
         self.extra_gn_options = []
         self.build_env = {}
         self.fuzzing_type = fuzzing_type
+        self.unified = unified
 
         if enable_rpcs:
             self.extra_gn_options.append('import("//with_pw_rpc.gni")')
@@ -400,8 +443,13 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
             self.extra_gn_options.append('chip_enable_ble=false')
 
+        if unified:
+            self.extra_gn_options.append('target_os="all"')
+            self.build_command = app.UnifiedTargetName()
+
         if not enable_wifipaf:
-            self.extra_gn_options.append('chip_device_config_enable_wifipaf=false')
+            self.extra_gn_options.append(
+                'chip_device_config_enable_wifipaf=false')
 
         if not enable_wifi:
             self.extra_gn_options.append('chip_enable_wifi=false')
@@ -422,8 +470,10 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('is_ubsan=true')
 
         if use_dmalloc:
-            self.extra_gn_options.append('chip_config_memory_debug_checks=true')
-            self.extra_gn_options.append('chip_config_memory_debug_dmalloc=true')
+            self.extra_gn_options.append(
+                'chip_config_memory_debug_checks=true')
+            self.extra_gn_options.append(
+                'chip_config_memory_debug_dmalloc=true')
 
             # this is from `dmalloc -b -l DMALLOC_LOG -i 1 high`
             self.build_env['DMALLOC_OPTIONS'] = 'debug=0x4f4ed03,inter=1,log=DMALLOC_LOG'
@@ -466,7 +516,8 @@ class HostBuilder(GnBuilder):
         if minmdns_address_policy:
             if use_platform_mdns:
                 raise Exception('Address policy applies to minmdns only')
-            self.extra_gn_options.append('chip_minmdns_default_policy="%s"' % minmdns_address_policy)
+            self.extra_gn_options.append(
+                'chip_minmdns_default_policy="%s"' % minmdns_address_policy)
 
         if use_platform_mdns:
             self.extra_gn_options.append('chip_mdns="platform"')
@@ -496,7 +547,8 @@ class HostBuilder(GnBuilder):
 
         if enable_test_event_triggers is not None:
             if 'EVSE' in enable_test_event_triggers:
-                self.extra_gn_options.append('chip_enable_energy_evse_trigger=true')
+                self.extra_gn_options.append(
+                    'chip_enable_energy_evse_trigger=true')
 
         if enable_dnssd_tests is not None:
             if enable_dnssd_tests:
@@ -506,21 +558,27 @@ class HostBuilder(GnBuilder):
 
         if chip_enable_nfc_based_commissioning is not None:
             if chip_enable_nfc_based_commissioning:
-                self.extra_gn_options.append('chip_enable_nfc_based_commissioning=true')
+                self.extra_gn_options.append(
+                    'chip_enable_nfc_based_commissioning=true')
             else:
-                self.extra_gn_options.append('chip_enable_nfc_based_commissioning=false')
+                self.extra_gn_options.append(
+                    'chip_enable_nfc_based_commissioning=false')
 
         if chip_casting_simplified is not None:
-            self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
+            self.extra_gn_options.append(f'chip_casting_simplified={
+                                         str(chip_casting_simplified).lower()}')
 
         if enable_webrtc:
-            self.extra_gn_options.append('chip_support_webrtc_python_bindings=true')
+            self.extra_gn_options.append(
+                'chip_support_webrtc_python_bindings=true')
 
         if terms_and_conditions_required is not None:
             if terms_and_conditions_required:
-                self.extra_gn_options.append('chip_terms_and_conditions_required=true')
+                self.extra_gn_options.append(
+                    'chip_terms_and_conditions_required=true')
             else:
-                self.extra_gn_options.append('chip_terms_and_conditions_required=false')
+                self.extra_gn_options.append(
+                    'chip_terms_and_conditions_required=false')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:
@@ -529,13 +587,15 @@ class HostBuilder(GnBuilder):
         if app == HostApp.CERT_TOOL:
             # Certification only built for openssl
             if self.board == HostBoard.ARM64 and crypto_library == HostCryptoLibrary.MBEDTLS:
-                raise Exception("MbedTLS not supported for cross compiling cert tool")
+                raise Exception(
+                    "MbedTLS not supported for cross compiling cert tool")
             self.build_command = 'src/tools/chip-cert'
         elif app == HostApp.ADDRESS_RESOLVE:
             self.build_command = 'src/lib/address_resolve:address-resolve-tool'
         elif app == HostApp.PYTHON_BINDINGS:
             self.extra_gn_options.append('enable_rtti=false')
-            self.extra_gn_options.append('chip_project_config_include_dirs=["//config/python"]')
+            self.extra_gn_options.append(
+                'chip_project_config_include_dirs=["//config/python"]')
             self.build_command = 'matter-repl'
 
         if self.app == HostApp.SIMULATED_APP1:
@@ -551,10 +611,14 @@ class HostBuilder(GnBuilder):
             self.build_command = 'pw_fuzz_tests'
 
         if self.app == HostApp.TESTS and use_googletest:
-            self.extra_gn_options.append('import("//build_overrides/pigweed.gni")')
-            self.extra_gn_options.append('import("//build_overrides/googletest.gni")')
-            self.extra_gn_options.append('pw_unit_test_BACKEND="$dir_pw_unit_test:googletest"')
-            self.extra_gn_options.append('dir_pw_third_party_googletest="$dir_googletest"')
+            self.extra_gn_options.append(
+                'import("//build_overrides/pigweed.gni")')
+            self.extra_gn_options.append(
+                'import("//build_overrides/googletest.gni")')
+            self.extra_gn_options.append(
+                'pw_unit_test_BACKEND="$dir_pw_unit_test:googletest"')
+            self.extra_gn_options.append(
+                'dir_pw_third_party_googletest="$dir_googletest"')
             self.extra_gn_options.append('chip_build_tests_googletest=true')
 
     def GnBuildArgs(self):
@@ -601,7 +665,8 @@ class HostBuilder(GnBuilder):
             # distinct.
             #
             # Output is relative to "oputput_dir" since that is where GN executs
-            self.build_env['LLVM_PROFILE_FILE'] = os.path.join("coverage", "profiles", "run_%b.profraw")
+            self.build_env['LLVM_PROFILE_FILE'] = os.path.join(
+                "coverage", "profiles", "run_%b.profraw")
 
         return self.build_env
 
@@ -611,7 +676,7 @@ class HostBuilder(GnBuilder):
         return os.environ[name]
 
     def generate(self):
-        super(HostBuilder, self).generate()
+        super(HostBuilder, self).generate(dedup=self.unified)
         if 'JAVA_HOME' in os.environ:
             self._Execute(
                 ["third_party/java_deps/set_up_java_deps.sh"],
@@ -640,7 +705,8 @@ class HostBuilder(GnBuilder):
 
         if self.app == HostApp.TESTS and self.use_coverage:
             self.coverage_dir = os.path.join(self.output_dir, 'coverage')
-            self._Execute(['mkdir', '-p', self.coverage_dir], title="Create coverage output location")
+            self._Execute(['mkdir', '-p', self.coverage_dir],
+                          title="Create coverage output location")
 
     def PreBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage and not self.use_clang:
@@ -653,9 +719,12 @@ class HostBuilder(GnBuilder):
 
             self._Execute(cmd, title="Build-only")
             self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
-                           '--exclude', os.path.join(self.chip_dir, '**/tests/*'),
-                           '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
-                           '--exclude', os.path.join(self.chip_dir, 'third_party/*'),
+                           '--exclude', os.path.join(self.chip_dir,
+                                                     '**/tests/*'),
+                           '--exclude', os.path.join(self.chip_dir,
+                                                     'zzz_generated/*'),
+                           '--exclude', os.path.join(self.chip_dir,
+                                                     'third_party/*'),
                            '--exclude', os.path.join(self.chip_dir, 'out/*'),
                            '--exclude', '/usr/include/*',
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
@@ -664,15 +733,20 @@ class HostBuilder(GnBuilder):
         # TODO: CLANG coverage is not yet implemented, requires different tooling
         if self.app == HostApp.TESTS and self.use_coverage and not self.use_clang:
             self._Execute(['lcov', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
-                           '--exclude', os.path.join(self.chip_dir, '**/tests/*'),
-                           '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
-                           '--exclude', os.path.join(self.chip_dir, 'third_party/*'),
+                           '--exclude', os.path.join(self.chip_dir,
+                                                     '**/tests/*'),
+                           '--exclude', os.path.join(self.chip_dir,
+                                                     'zzz_generated/*'),
+                           '--exclude', os.path.join(self.chip_dir,
+                                                     'third_party/*'),
                            '--exclude', os.path.join(self.chip_dir, 'out/*'),
                            '--exclude', '/usr/include/*',
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_test.info')], title="Update coverage")
             self._Execute(['lcov', '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_base.info'),
-                           '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_test.info'),
-                           '--output-file', os.path.join(self.coverage_dir, 'lcov_final.info')
+                           '--add-tracefile', os.path.join(
+                               self.coverage_dir, 'lcov_test.info'),
+                           '--output-file', os.path.join(
+                               self.coverage_dir, 'lcov_final.info')
                            ], title="Final coverage info")
             self._Execute(['genhtml', os.path.join(self.coverage_dir, 'lcov_final.info'), '--output-directory',
                            os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
@@ -682,7 +756,8 @@ class HostBuilder(GnBuilder):
             # Clang coverage config generates "coverage/{name}.profraw" for each test indivdually
             # Here we are merging ALL raw profiles into a single indexed file
 
-            _indexed_instrumentation = shlex.quote(os.path.join(self.coverage_dir, "merged.profdata"))
+            _indexed_instrumentation = shlex.quote(
+                os.path.join(self.coverage_dir, "merged.profdata"))
 
             self._Execute([
                 "bash",
@@ -700,7 +775,8 @@ class HostBuilder(GnBuilder):
                 f'find {shlex.quote(self.coverage_dir)} -name "*.profraw"'
                 + ' | xargs -n1 basename | sed "s/\\.profraw//" '
                 + f' | xargs -I @ echo -object {shlex.quote(os.path.join(self.output_dir, "tests", "@"))}'
-                + f' | xargs -n 10240 llvm-cov export -format=lcov --instr-profile {_indexed_instrumentation} '
+                + f' | xargs -n 10240 llvm-cov export -format=lcov --instr-profile {
+                    _indexed_instrumentation} '
                 # only care about SDK code. third_party is not considered sdk
                 + ' --ignore-filename-regex "/third_party/"'
                 # about 75K lines with almost 0% coverage
@@ -746,5 +822,7 @@ class HostBuilder(GnBuilder):
                 for root, dirs, files in os.walk(path):
                     for file in files:
                         yield BuilderOutput(os.path.join(root, file), file)
+            elif self.unified:
+                yield BuilderOutput(os.path.join(self.output_dir, "standalone", name), name)
             else:
                 yield BuilderOutput(os.path.join(self.output_dir, name), name)

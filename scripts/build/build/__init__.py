@@ -4,11 +4,11 @@ import shutil
 import time
 from enum import Enum, auto
 from multiprocessing.pool import ThreadPool
-from typing import Sequence
+from typing import Optional, Sequence
 
 from builders.builder import BuilderOptions
 
-from .targets import BUILD_TARGETS
+from .targets import BUILD_TARGETS, BuildTarget
 
 
 class BuildSteps(Enum):
@@ -67,18 +67,31 @@ class Context:
         """
 
         self.builders = []
+        unified_variants = None
         for target in targets:
-            found = False
+            found_choice = None
             for choice in BUILD_TARGETS:
                 builder = choice.Create(target, self.runner, self.repository_path,
                                         self.output_prefix, self.verbose, self.ninja_jobs,
                                         options)
                 if builder:
                     self.builders.append(builder)
-                    found = True
+                    found_choice = choice
+                    # assume a single match. we do not support wildcards
+                    break
 
-            if not found:
+            if found_choice is None:
                 logging.error(f"Target '{target}' could not be found. Nothing executed for it")
+                continue
+
+            if found_choice.isUnifiedBuild:
+                # we want to ensure identical settings across builds. For now ensure that
+                # variants are identical
+                variants = '-'.join([x.name for x in found_choice.modifiers])
+                if unified_variants is None:
+                    unified_variants = variants
+                elif unified_variants != variants:
+                    raise Exception("Incompatible build variants: %s and %s" % (unified_variants, variants))
 
         # whenever builders change, assume generation is required again
         self.completed_steps.discard(BuildSteps.GENERATED)
