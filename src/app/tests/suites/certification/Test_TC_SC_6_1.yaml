@@ -402,7 +402,7 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement key-set-read-all-indices   1 0
 
-          Verify TH receives KeySetReadAllIndices command on TH(Reference app)log and below is the sample log provided for the raspi platform:
+          Verify TH receives KeySetReadAllIndices command on TH(Reference app)log and below is the sample log provided for a Linux platform:
 
           [1708328722.189390][17247:17247] CHIP:DMG: InvokeRequestMessage =
           [1708328722.189403][17247:17247] CHIP:DMG: {
