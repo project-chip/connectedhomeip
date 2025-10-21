@@ -232,6 +232,53 @@ void PushAvStreamTransportServerLogic::PushAVStreamTransportDeallocateCallback(S
     }
 }
 
+bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
+{
+    const std::string https = "https://";
+
+    // Check minimum length and https prefix
+    if (url.size() <= https.size() || url.substr(0, https.size()) != https)
+    {
+        return false;
+    }
+
+    // Check that URL does not contain fragment character '#'
+    if (url.find('#') != std::string::npos)
+    {
+        ChipLogError(Camera, "URL contains fragment character '#'");
+        return false;
+    }
+
+    // Check that URL does not contain query character '?'
+    if (url.find('?') != std::string::npos)
+    {
+        ChipLogError(Camera, "URL contains query character '?'");
+        return false;
+    }
+
+    // Check that URL ends with a forward slash '/'
+    if (url.back() != '/')
+    {
+        ChipLogError(Camera, "URL does not end with '/'");
+        return false;
+    }
+
+    // Extract host part
+    size_t hostStart = https.size();
+    size_t hostEnd   = url.find('/', hostStart);
+    std::string host = url.substr(hostStart, hostEnd - hostStart);
+
+    // Basic host validation: ensure non-empty
+    if (host.empty())
+    {
+        ChipLogError(Camera, "URL does not contain a valid host.");
+        return false;
+    }
+
+    // Accept any host as long as non-empty
+    return true;
+}
+
 CHIP_ERROR PushAvStreamTransportServerLogic::ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec)
 {
     uint32_t timeoutMs = timeoutSec * MILLISECOND_TICKS_PER_SECOND;
@@ -551,22 +598,6 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     });
 
-    // Ensure that Privacy is not active
-    bool privacyModeActive = false;
-    if (mDelegate->IsPrivacyModeActive(privacyModeActive) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "HandleAllocatePushTransport: Cannot determine privacy mode state");
-        handler.AddStatus(commandPath, Status::InvalidInState);
-        return std::nullopt;
-    }
-
-    if (privacyModeActive)
-    {
-        ChipLogError(Zcl, "HandleAllocatePushTransport: Privacy mode is enabled");
-        handler.AddStatus(commandPath, Status::InvalidInState);
-        return std::nullopt;
-    }
-
     // Validate the TLS Endpoint
     TlsClientManagementDelegate::EndpointStructType TLSEndpoint;
     if (mTLSClientManagementDelegate != nullptr)
@@ -637,14 +668,18 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    bool isValidUrl = mDelegate->ValidateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
-
-    if (isValidUrl == false)
+    if (transportOptions.containerOptions.containerType == ContainerFormatEnum::kCmaf &&
+        transportOptions.containerOptions.CMAFContainerOptions.HasValue())
     {
-        auto status = to_underlying(StatusCodeEnum::kInvalidURL);
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Url", mEndpointId);
-        handler.AddClusterSpecificFailure(commandPath, status);
-        return std::nullopt;
+        bool isValidUrl = ValidateUrl(std::string(transportOptions.url.data(), transportOptions.url.size()));
+
+        if (isValidUrl == false)
+        {
+            auto status = to_underlying(StatusCodeEnum::kInvalidURL);
+            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Url", mEndpointId);
+            handler.AddClusterSpecificFailure(commandPath, status);
+            return std::nullopt;
+        }
     }
 
     bool isValidStreamUsage = mDelegate->ValidateStreamUsage(transportOptions.streamUsage);
@@ -770,7 +805,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         else
         {
             auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-                mDelegate->ValidateVideoStream(transportOptions.videoStreamID.Value().Value()));
+                mDelegate->SetVideoStream(transportOptions.videoStreamID.Value().Value()));
 
             if (!delegateStatus.IsSuccess())
             {
@@ -802,7 +837,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         else
         {
             auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-                mDelegate->ValidateAudioStream(transportOptions.audioStreamID.Value().Value()));
+                mDelegate->SetAudioStream(transportOptions.audioStreamID.Value().Value()));
 
             if (!delegateStatus.IsSuccess())
             {
@@ -814,14 +849,23 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         }
     }
 
-    bool isValidSegmentDuration = mDelegate->ValidateSegmentDuration(
-        transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration, transportOptionsPtr->videoStreamID);
-    if (isValidSegmentDuration == false)
+    if (transportOptions.containerOptions.containerType == ContainerFormatEnum::kCmaf &&
+        transportOptions.containerOptions.CMAFContainerOptions.HasValue())
     {
-        auto segmentDurationStatus = to_underlying(StatusCodeEnum::kInvalidOptions);
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Segment Duration not within allowed range", mEndpointId);
-        handler.AddClusterSpecificFailure(commandPath, segmentDurationStatus);
-        return std::nullopt;
+        // SegmentDuration validation is restricted to video streams because SegmentDuration must be a multiple of
+        // KeyFrameInterval. See spec issue: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/12322
+        if (transportOptionsPtr->videoStreamID.HasValue())
+        {
+            bool isValidSegmentDuration = mDelegate->ValidateSegmentDuration(
+                transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration, transportOptionsPtr->videoStreamID);
+            if (isValidSegmentDuration == false)
+            {
+                auto segmentDurationStatus = to_underlying(StatusCodeEnum::kInvalidOptions);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Segment Duration not within allowed range", mEndpointId);
+                handler.AddClusterSpecificFailure(commandPath, segmentDurationStatus);
+                return std::nullopt;
+            }
+        }
     }
 
     uint16_t connectionID = GenerateConnectionID();
@@ -833,18 +877,18 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    status = mDelegate->AllocatePushTransport(*transportOptionsPtr, connectionID);
+    FabricIndex accessingFabricIndex = handler.GetAccessingFabricIndex();
+
+    status = mDelegate->AllocatePushTransport(*transportOptionsPtr, connectionID, accessingFabricIndex);
 
     if (status == Status::Success)
     {
         // add connection to CurrentConnections
-        FabricIndex peerFabricIndex = handler.GetAccessingFabricIndex();
-
         TransportConfigurationStorage outTransportConfiguration(connectionID, transportOptionsPtr);
 
         outTransportConfiguration.transportStatus = TransportStatusEnum::kInactive;
 
-        outTransportConfiguration.SetFabricIndex(peerFabricIndex);
+        outTransportConfiguration.SetFabricIndex(accessingFabricIndex);
 
         UpsertStreamTransportConnection(outTransportConfiguration);
 
@@ -1076,22 +1120,6 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
         });
     }
 
-    // Ensure that Privacy is not active
-    bool privacyModeActive = false;
-    if (mDelegate->IsPrivacyModeActive(privacyModeActive) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "HandleManuallyTriggerTransport: Cannot determine privacy mode state");
-        handler.AddStatus(commandPath, Status::InvalidInState);
-        return std::nullopt;
-    }
-
-    if (privacyModeActive)
-    {
-        ChipLogError(Zcl, "HandleManuallyTriggerTransport: Privacy mode is enabled");
-        handler.AddStatus(commandPath, Status::InvalidInState);
-        return std::nullopt;
-    }
-
     FabricIndex fabricIndex                                = handler.GetAccessingFabricIndex();
     TransportConfigurationStorage * transportConfiguration = FindStreamTransportConnectionWithinFabric(connectionID, fabricIndex);
 
@@ -1099,6 +1127,14 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
     {
         ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: ConnectionID Not Found.", mEndpointId);
         handler.AddStatus(commandPath, Status::NotFound);
+        return std::nullopt;
+    }
+
+    // Note, we will always have Transport Options as they're mandatory in the initial allocate
+    status = CheckPrivacyModes(transportConfiguration->transportOptions.Value().streamUsage);
+    if (status != Status::Success)
+    {
+        handler.AddStatus(commandPath, status);
         return std::nullopt;
     }
 
@@ -1117,23 +1153,20 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
         return std::nullopt;
     }
 
-    if (transportConfiguration->transportOptions.HasValue())
+    if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kContinuous)
     {
-        if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kContinuous)
-        {
-            auto clusterStatus = to_underlying(StatusCodeEnum::kInvalidTriggerType);
-            ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Invalid Trigger type", mEndpointId);
-            handler.AddClusterSpecificFailure(commandPath, clusterStatus);
-            return std::nullopt;
-        }
+        auto clusterStatus = to_underlying(StatusCodeEnum::kInvalidTriggerType);
+        ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Invalid Trigger type", mEndpointId);
+        handler.AddClusterSpecificFailure(commandPath, clusterStatus);
+        return std::nullopt;
+    }
 
-        if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kCommand &&
-            !timeControl.HasValue())
-        {
-            ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Time control field not present", mEndpointId);
-            handler.AddStatus(commandPath, Status::DynamicConstraintError);
-            return std::nullopt;
-        }
+    if (transportConfiguration->transportOptions.Value().triggerOptions.triggerType == TransportTriggerTypeEnum::kCommand &&
+        !timeControl.HasValue())
+    {
+        ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Time control field not present", mEndpointId);
+        handler.AddStatus(commandPath, Status::DynamicConstraintError);
+        return std::nullopt;
     }
 
     // When trigger type is motion in the allocated transport but triggering it manually
@@ -1215,6 +1248,62 @@ PushAvStreamTransportServerLogic::HandleFindTransport(CommandHandler & handler, 
     handler.AddResponse(commandPath, response);
 
     return std::nullopt;
+}
+
+Status PushAvStreamTransportServerLogic::CheckPrivacyModes(StreamUsageEnum streamUsage)
+{
+    bool hardPrivacyModeActive = false;
+
+    CHIP_ERROR err = mDelegate->IsHardPrivacyModeActive(hardPrivacyModeActive);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "PushAvStreamTransport:CheckPrivacyModes: Failed to check Hard Privacy mode: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+        return Status::Failure;
+    }
+
+    if (hardPrivacyModeActive)
+    {
+        ChipLogError(Zcl, "PushAvStreamTransport:CheckPrivacyModes: Hard Privacy mode is enabled");
+        return Status::InvalidInState;
+    }
+
+    bool softLivestreamPrivacyModeActive = false;
+    err                                  = mDelegate->IsSoftLivestreamPrivacyModeActive(softLivestreamPrivacyModeActive);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl,
+                     "PushAvStreamTransport:CheckPrivacyModes: Failed to check Soft LivestreamPrivacy mode: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+        return Status::Failure;
+    }
+
+    if (softLivestreamPrivacyModeActive && streamUsage == StreamUsageEnum::kLiveView)
+    {
+        ChipLogError(Zcl,
+                     "PushAvStreamTransport:CheckPrivacyModes: Soft LivestreamPrivacy mode is enabled and StreamUsage is LiveView");
+        return Status::InvalidInState;
+    }
+
+    bool softRecordingPrivacyModeActive = false;
+    err                                 = mDelegate->IsSoftRecordingPrivacyModeActive(softRecordingPrivacyModeActive);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl,
+                     "PushAvStreamTransport:CheckPrivacyModes: Failed to check SoftRecordingPrivacyModeActive: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+        return Status::Failure;
+    }
+
+    if (softRecordingPrivacyModeActive && (streamUsage == StreamUsageEnum::kRecording || streamUsage == StreamUsageEnum::kAnalysis))
+    {
+        ChipLogError(Zcl,
+                     "PushAvStreamTransport:CheckPrivacyModes: Soft RecordingPrivacy mode is enabled and StreamUsage is Recording "
+                     "or Analysis");
+        return Status::InvalidInState;
+    }
+
+    return Status::Success;
 }
 
 Status
