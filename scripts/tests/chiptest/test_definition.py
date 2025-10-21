@@ -424,7 +424,7 @@ class TestDefinition:
                     if command == target_app:
                         key = 'default'
                     if ble_controller_app is not None:
-                        command += ["--ble-controller", str(ble_controller_app), "--wifi"]
+                        command.add_args(("--ble-controller", str(ble_controller_app), "--wifi"))
                     app = App(runner, command)
                     # Add the App to the register immediately, so if it fails during
                     # start() we will be able to clean things up properly.
