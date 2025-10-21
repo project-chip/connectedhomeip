@@ -37,6 +37,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Commissioner Control
     - Commodity Price
     - Commodity Tariff
+    - Descriptor
     - Device Energy Management
     - Device Energy Management Mode
     - Diagnostic Logs
@@ -52,6 +53,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Group Key Management
     - Groupcast
     - HEPA Filter Monitoring
+    - Identify
     - Joint Fabric Administrator
     - Laundry Washer Mode
     - Microwave Oven Control
@@ -75,6 +77,7 @@ CommandHandlerInterfaceOnlyClusters:
     - TLS Client Management
     - Thread Border Router Management
     - Thread Network Directory
+    - User Label
     - Water Heater Management
     - Water Heater Mode
     - WebRTC Transport Provider
@@ -90,7 +93,6 @@ ClustersWithInitFunctions:
     # keep-sorted start
     - Color Control
     - Groups
-    - Identify
     - Level Control
     - Mode Select
     - Occupancy Sensing
@@ -106,7 +108,6 @@ ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic Information
     - Door Lock
     - Fan Control
-    - Identify
     - Pump Configuration and Control
     - Thermostat
     - Window Covering
@@ -147,6 +148,7 @@ CodeDrivenClusters:
     - Basic Information
     - Binding
     - Boolean State
+    - Descriptor
     - Diagnostic Logs
     - Ethernet Network Diagnostics
     - Fixed Label
@@ -154,11 +156,13 @@ CodeDrivenClusters:
     - General Diagnostics
     - Group Key Management
     - Groupcast
+    - Identify
     - Localization Configuration
     - OTA Software Update Provider
     - Operational Credentials
     - Push AV Stream Transport
     - Software Diagnostics
     - Time Format Localization
+    - User Label
     - Wi-Fi Network Diagnostics
     # keep-sorted end
