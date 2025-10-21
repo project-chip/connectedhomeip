@@ -486,7 +486,7 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
     if (interface != nullptr)
     {
         CHIP_ERROR err = interface->RetrieveAcceptedCommands(path, builder);
-        // If retrieving the accepted commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal procesing.
+        // If retrieving the accepted commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal processing.
         // Otherwise we finished.
         if (err != CHIP_ERROR_NOT_IMPLEMENTED)
         {
