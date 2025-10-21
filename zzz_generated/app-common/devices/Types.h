@@ -24,190 +24,281 @@ namespace chip {
 namespace app {
 namespace Device {
 
-constexpr DeviceTypeId kDoorLockDeviceTypeId                           = 0x0000000A;
-constexpr DeviceTypeId kDoorLockDeviceTypeRevision                     = 1;
-constexpr DeviceTypeId kDoorLockControllerDeviceTypeId                 = 0x0000000B;
-constexpr DeviceTypeId kDoorLockControllerDeviceTypeRevision           = 1;
-constexpr DeviceTypeId kAggregatorDeviceTypeId                         = 0x0000000E;
-constexpr DeviceTypeId kAggregatorDeviceTypeRevision                   = 1;
-constexpr DeviceTypeId kGenericSwitchDeviceTypeId                      = 0x0000000F;
-constexpr DeviceTypeId kGenericSwitchDeviceTypeRevision                = 1;
-constexpr DeviceTypeId kPowerSourceDeviceTypeId                        = 0x00000011;
-constexpr DeviceTypeId kPowerSourceDeviceTypeRevision                  = 1;
-constexpr DeviceTypeId kOtaRequestorDeviceTypeId                       = 0x00000012;
-constexpr DeviceTypeId kOtaRequestorDeviceTypeRevision                 = 1;
-constexpr DeviceTypeId kBridgedNodeDeviceTypeId                        = 0x00000013;
-constexpr DeviceTypeId kBridgedNodeDeviceTypeRevision                  = 1;
-constexpr DeviceTypeId kOtaProviderDeviceTypeId                        = 0x00000014;
-constexpr DeviceTypeId kOtaProviderDeviceTypeRevision                  = 1;
-constexpr DeviceTypeId kContactSensorDeviceTypeId                      = 0x00000015;
-constexpr DeviceTypeId kContactSensorDeviceTypeRevision                = 1;
-constexpr DeviceTypeId kRootNodeDeviceTypeId                           = 0x00000016;
-constexpr DeviceTypeId kRootNodeDeviceTypeRevision                     = 1;
-constexpr DeviceTypeId kSolarPowerDeviceTypeId                         = 0x00000017;
-constexpr DeviceTypeId kSolarPowerDeviceTypeRevision                   = 1;
-constexpr DeviceTypeId kBatteryStorageDeviceTypeId                     = 0x00000018;
-constexpr DeviceTypeId kBatteryStorageDeviceTypeRevision               = 1;
-constexpr DeviceTypeId kSecondaryNetworkInterfaceDeviceTypeId          = 0x00000019;
-constexpr DeviceTypeId kSecondaryNetworkInterfaceDeviceTypeRevision    = 1;
-constexpr DeviceTypeId kSpeakerDeviceTypeId                            = 0x00000022;
-constexpr DeviceTypeId kSpeakerDeviceTypeRevision                      = 1;
-constexpr DeviceTypeId kCastingVideoPlayerDeviceTypeId                 = 0x00000023;
-constexpr DeviceTypeId kCastingVideoPlayerDeviceTypeRevision           = 1;
-constexpr DeviceTypeId kContentAppDeviceTypeId                         = 0x00000024;
-constexpr DeviceTypeId kContentAppDeviceTypeRevision                   = 1;
-constexpr DeviceTypeId kModeSelectDeviceTypeId                         = 0x00000027;
-constexpr DeviceTypeId kModeSelectDeviceTypeRevision                   = 1;
-constexpr DeviceTypeId kBasicVideoPlayerDeviceTypeId                   = 0x00000028;
-constexpr DeviceTypeId kBasicVideoPlayerDeviceTypeRevision             = 1;
-constexpr DeviceTypeId kCastingVideoClientDeviceTypeId                 = 0x00000029;
-constexpr DeviceTypeId kCastingVideoClientDeviceTypeRevision           = 1;
-constexpr DeviceTypeId kVideoRemoteControlDeviceTypeId                 = 0x0000002A;
-constexpr DeviceTypeId kVideoRemoteControlDeviceTypeRevision           = 1;
-constexpr DeviceTypeId kFanDeviceTypeId                                = 0x0000002B;
-constexpr DeviceTypeId kFanDeviceTypeRevision                          = 1;
-constexpr DeviceTypeId kAirQualitySensorDeviceTypeId                   = 0x0000002C;
-constexpr DeviceTypeId kAirQualitySensorDeviceTypeRevision             = 1;
-constexpr DeviceTypeId kAirPurifierDeviceTypeId                        = 0x0000002D;
-constexpr DeviceTypeId kAirPurifierDeviceTypeRevision                  = 1;
-constexpr DeviceTypeId kWaterFreezeDetectorDeviceTypeId                = 0x00000041;
-constexpr DeviceTypeId kWaterFreezeDetectorDeviceTypeRevision          = 1;
-constexpr DeviceTypeId kWaterValveDeviceTypeId                         = 0x00000042;
-constexpr DeviceTypeId kWaterValveDeviceTypeRevision                   = 1;
-constexpr DeviceTypeId kWaterLeakDetectorDeviceTypeId                  = 0x00000043;
-constexpr DeviceTypeId kWaterLeakDetectorDeviceTypeRevision            = 1;
-constexpr DeviceTypeId kRainSensorDeviceTypeId                         = 0x00000044;
-constexpr DeviceTypeId kRainSensorDeviceTypeRevision                   = 1;
-constexpr DeviceTypeId kSoilSensorDeviceTypeId                         = 0x00000045;
-constexpr DeviceTypeId kSoilSensorDeviceTypeRevision                   = 1;
-constexpr DeviceTypeId kRefrigeratorDeviceTypeId                       = 0x00000070;
-constexpr DeviceTypeId kRefrigeratorDeviceTypeRevision                 = 1;
-constexpr DeviceTypeId kTemperatureControlledCabinetDeviceTypeId       = 0x00000071;
-constexpr DeviceTypeId kTemperatureControlledCabinetDeviceTypeRevision = 1;
-constexpr DeviceTypeId kRoomAirConditionerDeviceTypeId                 = 0x00000072;
-constexpr DeviceTypeId kRoomAirConditionerDeviceTypeRevision           = 1;
-constexpr DeviceTypeId kLaundryWasherDeviceTypeId                      = 0x00000073;
-constexpr DeviceTypeId kLaundryWasherDeviceTypeRevision                = 1;
-constexpr DeviceTypeId kRoboticVacuumCleanerDeviceTypeId               = 0x00000074;
-constexpr DeviceTypeId kRoboticVacuumCleanerDeviceTypeRevision         = 1;
-constexpr DeviceTypeId kDishwasherDeviceTypeId                         = 0x00000075;
-constexpr DeviceTypeId kDishwasherDeviceTypeRevision                   = 1;
-constexpr DeviceTypeId kSmokeCoAlarmDeviceTypeId                       = 0x00000076;
-constexpr DeviceTypeId kSmokeCoAlarmDeviceTypeRevision                 = 1;
-constexpr DeviceTypeId kCookSurfaceDeviceTypeId                        = 0x00000077;
-constexpr DeviceTypeId kCookSurfaceDeviceTypeRevision                  = 1;
-constexpr DeviceTypeId kCooktopDeviceTypeId                            = 0x00000078;
-constexpr DeviceTypeId kCooktopDeviceTypeRevision                      = 1;
-constexpr DeviceTypeId kMicrowaveOvenDeviceTypeId                      = 0x00000079;
-constexpr DeviceTypeId kMicrowaveOvenDeviceTypeRevision                = 1;
-constexpr DeviceTypeId kExtractorHoodDeviceTypeId                      = 0x0000007A;
-constexpr DeviceTypeId kExtractorHoodDeviceTypeRevision                = 1;
-constexpr DeviceTypeId kOvenDeviceTypeId                               = 0x0000007B;
-constexpr DeviceTypeId kOvenDeviceTypeRevision                         = 1;
-constexpr DeviceTypeId kLaundryDryerDeviceTypeId                       = 0x0000007C;
-constexpr DeviceTypeId kLaundryDryerDeviceTypeRevision                 = 1;
-constexpr DeviceTypeId kNetworkInfrastructureManagerDeviceTypeId       = 0x00000090;
-constexpr DeviceTypeId kNetworkInfrastructureManagerDeviceTypeRevision = 1;
-constexpr DeviceTypeId kThreadBorderRouterDeviceTypeId                 = 0x00000091;
-constexpr DeviceTypeId kThreadBorderRouterDeviceTypeRevision           = 1;
-constexpr DeviceTypeId kOnOffLightDeviceTypeId                         = 0x00000100;
-constexpr DeviceTypeId kOnOffLightDeviceTypeRevision                   = 1;
-constexpr DeviceTypeId kDimmableLightDeviceTypeId                      = 0x00000101;
-constexpr DeviceTypeId kDimmableLightDeviceTypeRevision                = 1;
-constexpr DeviceTypeId kOnOffLightSwitchDeviceTypeId                   = 0x00000103;
-constexpr DeviceTypeId kOnOffLightSwitchDeviceTypeRevision             = 1;
-constexpr DeviceTypeId kDimmerSwitchDeviceTypeId                       = 0x00000104;
-constexpr DeviceTypeId kDimmerSwitchDeviceTypeRevision                 = 1;
-constexpr DeviceTypeId kColorDimmerSwitchDeviceTypeId                  = 0x00000105;
-constexpr DeviceTypeId kColorDimmerSwitchDeviceTypeRevision            = 1;
-constexpr DeviceTypeId kLightSensorDeviceTypeId                        = 0x00000106;
-constexpr DeviceTypeId kLightSensorDeviceTypeRevision                  = 1;
-constexpr DeviceTypeId kOccupancySensorDeviceTypeId                    = 0x00000107;
-constexpr DeviceTypeId kOccupancySensorDeviceTypeRevision              = 1;
-constexpr DeviceTypeId kOnOffPlugInUnitDeviceTypeId                    = 0x0000010A;
-constexpr DeviceTypeId kOnOffPlugInUnitDeviceTypeRevision              = 1;
-constexpr DeviceTypeId kDimmablePlugInUnitDeviceTypeId                 = 0x0000010B;
-constexpr DeviceTypeId kDimmablePlugInUnitDeviceTypeRevision           = 1;
-constexpr DeviceTypeId kColorTemperatureLightDeviceTypeId              = 0x0000010C;
-constexpr DeviceTypeId kColorTemperatureLightDeviceTypeRevision        = 1;
-constexpr DeviceTypeId kExtendedColorLightDeviceTypeId                 = 0x0000010D;
-constexpr DeviceTypeId kExtendedColorLightDeviceTypeRevision           = 1;
-constexpr DeviceTypeId kMountedOnOffControlDeviceTypeId                = 0x0000010F;
-constexpr DeviceTypeId kMountedOnOffControlDeviceTypeRevision          = 1;
-constexpr DeviceTypeId kMountedDimmableLoadControlDeviceTypeId         = 0x00000110;
-constexpr DeviceTypeId kMountedDimmableLoadControlDeviceTypeRevision   = 1;
-constexpr DeviceTypeId kJointFabricAdministratorDeviceTypeId           = 0x00000130;
-constexpr DeviceTypeId kJointFabricAdministratorDeviceTypeRevision     = 1;
-constexpr DeviceTypeId kIntercomDeviceTypeId                           = 0x00000140;
-constexpr DeviceTypeId kIntercomDeviceTypeRevision                     = 1;
-constexpr DeviceTypeId kAudioDoorbellDeviceTypeId                      = 0x00000141;
-constexpr DeviceTypeId kAudioDoorbellDeviceTypeRevision                = 1;
-constexpr DeviceTypeId kCameraDeviceTypeId                             = 0x00000142;
-constexpr DeviceTypeId kCameraDeviceTypeRevision                       = 1;
-constexpr DeviceTypeId kVideoDoorbellDeviceTypeId                      = 0x00000143;
-constexpr DeviceTypeId kVideoDoorbellDeviceTypeRevision                = 1;
-constexpr DeviceTypeId kFloodlightCameraDeviceTypeId                   = 0x00000144;
-constexpr DeviceTypeId kFloodlightCameraDeviceTypeRevision             = 1;
-constexpr DeviceTypeId kSnapshotCameraDeviceTypeId                     = 0x00000145;
-constexpr DeviceTypeId kSnapshotCameraDeviceTypeRevision               = 1;
-constexpr DeviceTypeId kChimeDeviceTypeId                              = 0x00000146;
-constexpr DeviceTypeId kChimeDeviceTypeRevision                        = 1;
-constexpr DeviceTypeId kCameraControllerDeviceTypeId                   = 0x00000147;
-constexpr DeviceTypeId kCameraControllerDeviceTypeRevision             = 1;
-constexpr DeviceTypeId kDoorbellDeviceTypeId                           = 0x00000148;
-constexpr DeviceTypeId kDoorbellDeviceTypeRevision                     = 1;
-constexpr DeviceTypeId kWindowCoveringDeviceTypeId                     = 0x00000202;
-constexpr DeviceTypeId kWindowCoveringDeviceTypeRevision               = 1;
-constexpr DeviceTypeId kWindowCoveringControllerDeviceTypeId           = 0x00000203;
-constexpr DeviceTypeId kWindowCoveringControllerDeviceTypeRevision     = 1;
-constexpr DeviceTypeId kClosureDeviceTypeId                            = 0x00000230;
-constexpr DeviceTypeId kClosureDeviceTypeRevision                      = 1;
-constexpr DeviceTypeId kClosurePanelDeviceTypeId                       = 0x00000231;
-constexpr DeviceTypeId kClosurePanelDeviceTypeRevision                 = 1;
-constexpr DeviceTypeId kClosureControllerDeviceTypeId                  = 0x0000023E;
-constexpr DeviceTypeId kClosureControllerDeviceTypeRevision            = 1;
-constexpr DeviceTypeId kThermostatDeviceTypeId                         = 0x00000301;
-constexpr DeviceTypeId kThermostatDeviceTypeRevision                   = 1;
-constexpr DeviceTypeId kTemperatureSensorDeviceTypeId                  = 0x00000302;
-constexpr DeviceTypeId kTemperatureSensorDeviceTypeRevision            = 1;
-constexpr DeviceTypeId kPumpDeviceTypeId                               = 0x00000303;
-constexpr DeviceTypeId kPumpDeviceTypeRevision                         = 1;
-constexpr DeviceTypeId kPumpControllerDeviceTypeId                     = 0x00000304;
-constexpr DeviceTypeId kPumpControllerDeviceTypeRevision               = 1;
-constexpr DeviceTypeId kPressureSensorDeviceTypeId                     = 0x00000305;
-constexpr DeviceTypeId kPressureSensorDeviceTypeRevision               = 1;
-constexpr DeviceTypeId kFlowSensorDeviceTypeId                         = 0x00000306;
-constexpr DeviceTypeId kFlowSensorDeviceTypeRevision                   = 1;
-constexpr DeviceTypeId kHumiditySensorDeviceTypeId                     = 0x00000307;
-constexpr DeviceTypeId kHumiditySensorDeviceTypeRevision               = 1;
-constexpr DeviceTypeId kHeatPumpDeviceTypeId                           = 0x00000309;
-constexpr DeviceTypeId kHeatPumpDeviceTypeRevision                     = 1;
-constexpr DeviceTypeId kThermostatControllerDeviceTypeId               = 0x0000030A;
-constexpr DeviceTypeId kThermostatControllerDeviceTypeRevision         = 1;
-constexpr DeviceTypeId kEvseDeviceTypeId                               = 0x0000050C;
-constexpr DeviceTypeId kEvseDeviceTypeRevision                         = 1;
-constexpr DeviceTypeId kDeviceEnergyManagementDeviceTypeId             = 0x0000050D;
-constexpr DeviceTypeId kDeviceEnergyManagementDeviceTypeRevision       = 1;
-constexpr DeviceTypeId kWaterHeaterDeviceTypeId                        = 0x0000050F;
-constexpr DeviceTypeId kWaterHeaterDeviceTypeRevision                  = 1;
-constexpr DeviceTypeId kElectricalSensorDeviceTypeId                   = 0x00000510;
-constexpr DeviceTypeId kElectricalSensorDeviceTypeRevision             = 1;
-constexpr DeviceTypeId kElectricalUtilityMeterDeviceTypeId             = 0x00000511;
-constexpr DeviceTypeId kElectricalUtilityMeterDeviceTypeRevision       = 1;
-constexpr DeviceTypeId kMeterReferencePointDeviceTypeId                = 0x00000512;
-constexpr DeviceTypeId kMeterReferencePointDeviceTypeRevision          = 1;
-constexpr DeviceTypeId kElectricalEnergyTariffDeviceTypeId             = 0x00000513;
-constexpr DeviceTypeId kElectricalEnergyTariffDeviceTypeRevision       = 1;
-constexpr DeviceTypeId kElectricalMeterDeviceTypeId                    = 0x00000514;
-constexpr DeviceTypeId kElectricalMeterDeviceTypeRevision              = 1;
-constexpr DeviceTypeId kControlBridgeDeviceTypeId                      = 0x00000840;
-constexpr DeviceTypeId kControlBridgeDeviceTypeRevision                = 1;
-constexpr DeviceTypeId kOnOffSensorDeviceTypeId                        = 0x00000850;
-constexpr DeviceTypeId kOnOffSensorDeviceTypeRevision                  = 1;
-constexpr DeviceTypeId kOrphanClustersDeviceTypeId                     = 0xFFF10001;
-constexpr DeviceTypeId kOrphanClustersDeviceTypeRevision               = 1;
-constexpr DeviceTypeId kAllClustersAppServerExampleDeviceTypeId        = 0xFFF10003;
-constexpr DeviceTypeId kAllClustersAppServerExampleDeviceTypeRevision  = 1;
+constexpr DeviceTypeId kDoorLockDeviceTypeId  = 0x0000000A;
+constexpr uint8_t kDoorLockDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kDoorLockControllerDeviceTypeId  = 0x0000000B;
+constexpr uint8_t kDoorLockControllerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kAggregatorDeviceTypeId  = 0x0000000E;
+constexpr uint8_t kAggregatorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kGenericSwitchDeviceTypeId  = 0x0000000F;
+constexpr uint8_t kGenericSwitchDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kPowerSourceDeviceTypeId  = 0x00000011;
+constexpr uint8_t kPowerSourceDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kOtaRequestorDeviceTypeId  = 0x00000012;
+constexpr uint8_t kOtaRequestorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kBridgedNodeDeviceTypeId  = 0x00000013;
+constexpr uint8_t kBridgedNodeDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kOtaProviderDeviceTypeId  = 0x00000014;
+constexpr uint8_t kOtaProviderDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kContactSensorDeviceTypeId  = 0x00000015;
+constexpr uint8_t kContactSensorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kRootNodeDeviceTypeId  = 0x00000016;
+constexpr uint8_t kRootNodeDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kSolarPowerDeviceTypeId  = 0x00000017;
+constexpr uint8_t kSolarPowerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kBatteryStorageDeviceTypeId  = 0x00000018;
+constexpr uint8_t kBatteryStorageDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kSecondaryNetworkInterfaceDeviceTypeId  = 0x00000019;
+constexpr uint8_t kSecondaryNetworkInterfaceDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kSpeakerDeviceTypeId  = 0x00000022;
+constexpr uint8_t kSpeakerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kCastingVideoPlayerDeviceTypeId  = 0x00000023;
+constexpr uint8_t kCastingVideoPlayerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kContentAppDeviceTypeId  = 0x00000024;
+constexpr uint8_t kContentAppDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kModeSelectDeviceTypeId  = 0x00000027;
+constexpr uint8_t kModeSelectDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kBasicVideoPlayerDeviceTypeId  = 0x00000028;
+constexpr uint8_t kBasicVideoPlayerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kCastingVideoClientDeviceTypeId  = 0x00000029;
+constexpr uint8_t kCastingVideoClientDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kVideoRemoteControlDeviceTypeId  = 0x0000002A;
+constexpr uint8_t kVideoRemoteControlDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kFanDeviceTypeId  = 0x0000002B;
+constexpr uint8_t kFanDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kAirQualitySensorDeviceTypeId  = 0x0000002C;
+constexpr uint8_t kAirQualitySensorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kAirPurifierDeviceTypeId  = 0x0000002D;
+constexpr uint8_t kAirPurifierDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kWaterFreezeDetectorDeviceTypeId  = 0x00000041;
+constexpr uint8_t kWaterFreezeDetectorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kWaterValveDeviceTypeId  = 0x00000042;
+constexpr uint8_t kWaterValveDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kWaterLeakDetectorDeviceTypeId  = 0x00000043;
+constexpr uint8_t kWaterLeakDetectorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kRainSensorDeviceTypeId  = 0x00000044;
+constexpr uint8_t kRainSensorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kSoilSensorDeviceTypeId  = 0x00000045;
+constexpr uint8_t kSoilSensorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kRefrigeratorDeviceTypeId  = 0x00000070;
+constexpr uint8_t kRefrigeratorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kTemperatureControlledCabinetDeviceTypeId  = 0x00000071;
+constexpr uint8_t kTemperatureControlledCabinetDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kRoomAirConditionerDeviceTypeId  = 0x00000072;
+constexpr uint8_t kRoomAirConditionerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kLaundryWasherDeviceTypeId  = 0x00000073;
+constexpr uint8_t kLaundryWasherDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kRoboticVacuumCleanerDeviceTypeId  = 0x00000074;
+constexpr uint8_t kRoboticVacuumCleanerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kDishwasherDeviceTypeId  = 0x00000075;
+constexpr uint8_t kDishwasherDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kSmokeCoAlarmDeviceTypeId  = 0x00000076;
+constexpr uint8_t kSmokeCoAlarmDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kCookSurfaceDeviceTypeId  = 0x00000077;
+constexpr uint8_t kCookSurfaceDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kCooktopDeviceTypeId  = 0x00000078;
+constexpr uint8_t kCooktopDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kMicrowaveOvenDeviceTypeId  = 0x00000079;
+constexpr uint8_t kMicrowaveOvenDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kExtractorHoodDeviceTypeId  = 0x0000007A;
+constexpr uint8_t kExtractorHoodDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kOvenDeviceTypeId  = 0x0000007B;
+constexpr uint8_t kOvenDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kLaundryDryerDeviceTypeId  = 0x0000007C;
+constexpr uint8_t kLaundryDryerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kNetworkInfrastructureManagerDeviceTypeId  = 0x00000090;
+constexpr uint8_t kNetworkInfrastructureManagerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kThreadBorderRouterDeviceTypeId  = 0x00000091;
+constexpr uint8_t kThreadBorderRouterDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kOnOffLightDeviceTypeId  = 0x00000100;
+constexpr uint8_t kOnOffLightDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kDimmableLightDeviceTypeId  = 0x00000101;
+constexpr uint8_t kDimmableLightDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kOnOffLightSwitchDeviceTypeId  = 0x00000103;
+constexpr uint8_t kOnOffLightSwitchDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kDimmerSwitchDeviceTypeId  = 0x00000104;
+constexpr uint8_t kDimmerSwitchDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kColorDimmerSwitchDeviceTypeId  = 0x00000105;
+constexpr uint8_t kColorDimmerSwitchDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kLightSensorDeviceTypeId  = 0x00000106;
+constexpr uint8_t kLightSensorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kOccupancySensorDeviceTypeId  = 0x00000107;
+constexpr uint8_t kOccupancySensorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kOnOffPlugInUnitDeviceTypeId  = 0x0000010A;
+constexpr uint8_t kOnOffPlugInUnitDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kDimmablePlugInUnitDeviceTypeId  = 0x0000010B;
+constexpr uint8_t kDimmablePlugInUnitDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kColorTemperatureLightDeviceTypeId  = 0x0000010C;
+constexpr uint8_t kColorTemperatureLightDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kExtendedColorLightDeviceTypeId  = 0x0000010D;
+constexpr uint8_t kExtendedColorLightDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kMountedOnOffControlDeviceTypeId  = 0x0000010F;
+constexpr uint8_t kMountedOnOffControlDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kMountedDimmableLoadControlDeviceTypeId  = 0x00000110;
+constexpr uint8_t kMountedDimmableLoadControlDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kJointFabricAdministratorDeviceTypeId  = 0x00000130;
+constexpr uint8_t kJointFabricAdministratorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kIntercomDeviceTypeId  = 0x00000140;
+constexpr uint8_t kIntercomDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kAudioDoorbellDeviceTypeId  = 0x00000141;
+constexpr uint8_t kAudioDoorbellDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kCameraDeviceTypeId  = 0x00000142;
+constexpr uint8_t kCameraDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kVideoDoorbellDeviceTypeId  = 0x00000143;
+constexpr uint8_t kVideoDoorbellDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kFloodlightCameraDeviceTypeId  = 0x00000144;
+constexpr uint8_t kFloodlightCameraDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kSnapshotCameraDeviceTypeId  = 0x00000145;
+constexpr uint8_t kSnapshotCameraDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kChimeDeviceTypeId  = 0x00000146;
+constexpr uint8_t kChimeDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kCameraControllerDeviceTypeId  = 0x00000147;
+constexpr uint8_t kCameraControllerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kDoorbellDeviceTypeId  = 0x00000148;
+constexpr uint8_t kDoorbellDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kWindowCoveringDeviceTypeId  = 0x00000202;
+constexpr uint8_t kWindowCoveringDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kWindowCoveringControllerDeviceTypeId  = 0x00000203;
+constexpr uint8_t kWindowCoveringControllerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kClosureDeviceTypeId  = 0x00000230;
+constexpr uint8_t kClosureDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kClosurePanelDeviceTypeId  = 0x00000231;
+constexpr uint8_t kClosurePanelDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kClosureControllerDeviceTypeId  = 0x0000023E;
+constexpr uint8_t kClosureControllerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kThermostatDeviceTypeId  = 0x00000301;
+constexpr uint8_t kThermostatDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kTemperatureSensorDeviceTypeId  = 0x00000302;
+constexpr uint8_t kTemperatureSensorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kPumpDeviceTypeId  = 0x00000303;
+constexpr uint8_t kPumpDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kPumpControllerDeviceTypeId  = 0x00000304;
+constexpr uint8_t kPumpControllerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kPressureSensorDeviceTypeId  = 0x00000305;
+constexpr uint8_t kPressureSensorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kFlowSensorDeviceTypeId  = 0x00000306;
+constexpr uint8_t kFlowSensorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kHumiditySensorDeviceTypeId  = 0x00000307;
+constexpr uint8_t kHumiditySensorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kHeatPumpDeviceTypeId  = 0x00000309;
+constexpr uint8_t kHeatPumpDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kThermostatControllerDeviceTypeId  = 0x0000030A;
+constexpr uint8_t kThermostatControllerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kEvseDeviceTypeId  = 0x0000050C;
+constexpr uint8_t kEvseDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kDeviceEnergyManagementDeviceTypeId  = 0x0000050D;
+constexpr uint8_t kDeviceEnergyManagementDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kWaterHeaterDeviceTypeId  = 0x0000050F;
+constexpr uint8_t kWaterHeaterDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kElectricalSensorDeviceTypeId  = 0x00000510;
+constexpr uint8_t kElectricalSensorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kElectricalUtilityMeterDeviceTypeId  = 0x00000511;
+constexpr uint8_t kElectricalUtilityMeterDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kMeterReferencePointDeviceTypeId  = 0x00000512;
+constexpr uint8_t kMeterReferencePointDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kElectricalEnergyTariffDeviceTypeId  = 0x00000513;
+constexpr uint8_t kElectricalEnergyTariffDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kElectricalMeterDeviceTypeId  = 0x00000514;
+constexpr uint8_t kElectricalMeterDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kControlBridgeDeviceTypeId  = 0x00000840;
+constexpr uint8_t kControlBridgeDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kOnOffSensorDeviceTypeId  = 0x00000850;
+constexpr uint8_t kOnOffSensorDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kOrphanClustersDeviceTypeId  = 0xFFF10001;
+constexpr uint8_t kOrphanClustersDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kAllClustersAppServerExampleDeviceTypeId  = 0xFFF10003;
+constexpr uint8_t kAllClustersAppServerExampleDeviceTypeRevision = 1;
 
 namespace Type {
 
@@ -215,366 +306,457 @@ constexpr DataModel::DeviceTypeEntry kDoorLock = {
     .deviceTypeId       = kDoorLockDeviceTypeId,
     .deviceTypeRevision = kDoorLockDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kDoorLockController = {
     .deviceTypeId       = kDoorLockControllerDeviceTypeId,
     .deviceTypeRevision = kDoorLockControllerDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kAggregator = {
     .deviceTypeId       = kAggregatorDeviceTypeId,
     .deviceTypeRevision = kAggregatorDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kGenericSwitch = {
     .deviceTypeId       = kGenericSwitchDeviceTypeId,
     .deviceTypeRevision = kGenericSwitchDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kPowerSource = {
     .deviceTypeId       = kPowerSourceDeviceTypeId,
     .deviceTypeRevision = kPowerSourceDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kOtaRequestor = {
     .deviceTypeId       = kOtaRequestorDeviceTypeId,
     .deviceTypeRevision = kOtaRequestorDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kBridgedNode = {
     .deviceTypeId       = kBridgedNodeDeviceTypeId,
     .deviceTypeRevision = kBridgedNodeDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kOtaProvider = {
     .deviceTypeId       = kOtaProviderDeviceTypeId,
     .deviceTypeRevision = kOtaProviderDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kContactSensor = {
     .deviceTypeId       = kContactSensorDeviceTypeId,
     .deviceTypeRevision = kContactSensorDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kRootNode = {
     .deviceTypeId       = kRootNodeDeviceTypeId,
     .deviceTypeRevision = kRootNodeDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kSolarPower = {
     .deviceTypeId       = kSolarPowerDeviceTypeId,
     .deviceTypeRevision = kSolarPowerDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kBatteryStorage = {
     .deviceTypeId       = kBatteryStorageDeviceTypeId,
     .deviceTypeRevision = kBatteryStorageDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kSecondaryNetworkInterface = {
     .deviceTypeId       = kSecondaryNetworkInterfaceDeviceTypeId,
     .deviceTypeRevision = kSecondaryNetworkInterfaceDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kSpeaker = {
     .deviceTypeId       = kSpeakerDeviceTypeId,
     .deviceTypeRevision = kSpeakerDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kCastingVideoPlayer = {
     .deviceTypeId       = kCastingVideoPlayerDeviceTypeId,
     .deviceTypeRevision = kCastingVideoPlayerDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kContentApp = {
     .deviceTypeId       = kContentAppDeviceTypeId,
     .deviceTypeRevision = kContentAppDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kModeSelect = {
     .deviceTypeId       = kModeSelectDeviceTypeId,
     .deviceTypeRevision = kModeSelectDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kBasicVideoPlayer = {
     .deviceTypeId       = kBasicVideoPlayerDeviceTypeId,
     .deviceTypeRevision = kBasicVideoPlayerDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kCastingVideoClient = {
     .deviceTypeId       = kCastingVideoClientDeviceTypeId,
     .deviceTypeRevision = kCastingVideoClientDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kVideoRemoteControl = {
     .deviceTypeId       = kVideoRemoteControlDeviceTypeId,
     .deviceTypeRevision = kVideoRemoteControlDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kFan = {
     .deviceTypeId       = kFanDeviceTypeId,
     .deviceTypeRevision = kFanDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kAirQualitySensor = {
     .deviceTypeId       = kAirQualitySensorDeviceTypeId,
     .deviceTypeRevision = kAirQualitySensorDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kAirPurifier = {
     .deviceTypeId       = kAirPurifierDeviceTypeId,
     .deviceTypeRevision = kAirPurifierDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kWaterFreezeDetector = {
     .deviceTypeId       = kWaterFreezeDetectorDeviceTypeId,
     .deviceTypeRevision = kWaterFreezeDetectorDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kWaterValve = {
     .deviceTypeId       = kWaterValveDeviceTypeId,
     .deviceTypeRevision = kWaterValveDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kWaterLeakDetector = {
     .deviceTypeId       = kWaterLeakDetectorDeviceTypeId,
     .deviceTypeRevision = kWaterLeakDetectorDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kRainSensor = {
     .deviceTypeId       = kRainSensorDeviceTypeId,
     .deviceTypeRevision = kRainSensorDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kSoilSensor = {
     .deviceTypeId       = kSoilSensorDeviceTypeId,
     .deviceTypeRevision = kSoilSensorDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kRefrigerator = {
     .deviceTypeId       = kRefrigeratorDeviceTypeId,
     .deviceTypeRevision = kRefrigeratorDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kTemperatureControlledCabinet = {
     .deviceTypeId       = kTemperatureControlledCabinetDeviceTypeId,
     .deviceTypeRevision = kTemperatureControlledCabinetDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kRoomAirConditioner = {
     .deviceTypeId       = kRoomAirConditionerDeviceTypeId,
     .deviceTypeRevision = kRoomAirConditionerDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kLaundryWasher = {
     .deviceTypeId       = kLaundryWasherDeviceTypeId,
     .deviceTypeRevision = kLaundryWasherDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kRoboticVacuumCleaner = {
     .deviceTypeId       = kRoboticVacuumCleanerDeviceTypeId,
     .deviceTypeRevision = kRoboticVacuumCleanerDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kDishwasher = {
     .deviceTypeId       = kDishwasherDeviceTypeId,
     .deviceTypeRevision = kDishwasherDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kSmokeCoAlarm = {
     .deviceTypeId       = kSmokeCoAlarmDeviceTypeId,
     .deviceTypeRevision = kSmokeCoAlarmDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kCookSurface = {
     .deviceTypeId       = kCookSurfaceDeviceTypeId,
     .deviceTypeRevision = kCookSurfaceDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kCooktop = {
     .deviceTypeId       = kCooktopDeviceTypeId,
     .deviceTypeRevision = kCooktopDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kMicrowaveOven = {
     .deviceTypeId       = kMicrowaveOvenDeviceTypeId,
     .deviceTypeRevision = kMicrowaveOvenDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kExtractorHood = {
     .deviceTypeId       = kExtractorHoodDeviceTypeId,
     .deviceTypeRevision = kExtractorHoodDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kOven = {
     .deviceTypeId       = kOvenDeviceTypeId,
     .deviceTypeRevision = kOvenDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kLaundryDryer = {
     .deviceTypeId       = kLaundryDryerDeviceTypeId,
     .deviceTypeRevision = kLaundryDryerDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kNetworkInfrastructureManager = {
     .deviceTypeId       = kNetworkInfrastructureManagerDeviceTypeId,
     .deviceTypeRevision = kNetworkInfrastructureManagerDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kThreadBorderRouter = {
     .deviceTypeId       = kThreadBorderRouterDeviceTypeId,
     .deviceTypeRevision = kThreadBorderRouterDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kOnOffLight = {
     .deviceTypeId       = kOnOffLightDeviceTypeId,
     .deviceTypeRevision = kOnOffLightDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kDimmableLight = {
     .deviceTypeId       = kDimmableLightDeviceTypeId,
     .deviceTypeRevision = kDimmableLightDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kOnOffLightSwitch = {
     .deviceTypeId       = kOnOffLightSwitchDeviceTypeId,
     .deviceTypeRevision = kOnOffLightSwitchDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kDimmerSwitch = {
     .deviceTypeId       = kDimmerSwitchDeviceTypeId,
     .deviceTypeRevision = kDimmerSwitchDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kColorDimmerSwitch = {
     .deviceTypeId       = kColorDimmerSwitchDeviceTypeId,
     .deviceTypeRevision = kColorDimmerSwitchDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kLightSensor = {
     .deviceTypeId       = kLightSensorDeviceTypeId,
     .deviceTypeRevision = kLightSensorDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kOccupancySensor = {
     .deviceTypeId       = kOccupancySensorDeviceTypeId,
     .deviceTypeRevision = kOccupancySensorDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kOnOffPlugInUnit = {
     .deviceTypeId       = kOnOffPlugInUnitDeviceTypeId,
     .deviceTypeRevision = kOnOffPlugInUnitDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kDimmablePlugInUnit = {
     .deviceTypeId       = kDimmablePlugInUnitDeviceTypeId,
     .deviceTypeRevision = kDimmablePlugInUnitDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kColorTemperatureLight = {
     .deviceTypeId       = kColorTemperatureLightDeviceTypeId,
     .deviceTypeRevision = kColorTemperatureLightDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kExtendedColorLight = {
     .deviceTypeId       = kExtendedColorLightDeviceTypeId,
     .deviceTypeRevision = kExtendedColorLightDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kMountedOnOffControl = {
     .deviceTypeId       = kMountedOnOffControlDeviceTypeId,
     .deviceTypeRevision = kMountedOnOffControlDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kMountedDimmableLoadControl = {
     .deviceTypeId       = kMountedDimmableLoadControlDeviceTypeId,
     .deviceTypeRevision = kMountedDimmableLoadControlDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kJointFabricAdministrator = {
     .deviceTypeId       = kJointFabricAdministratorDeviceTypeId,
     .deviceTypeRevision = kJointFabricAdministratorDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kIntercom = {
     .deviceTypeId       = kIntercomDeviceTypeId,
     .deviceTypeRevision = kIntercomDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kAudioDoorbell = {
     .deviceTypeId       = kAudioDoorbellDeviceTypeId,
     .deviceTypeRevision = kAudioDoorbellDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kCamera = {
     .deviceTypeId       = kCameraDeviceTypeId,
     .deviceTypeRevision = kCameraDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kVideoDoorbell = {
     .deviceTypeId       = kVideoDoorbellDeviceTypeId,
     .deviceTypeRevision = kVideoDoorbellDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kFloodlightCamera = {
     .deviceTypeId       = kFloodlightCameraDeviceTypeId,
     .deviceTypeRevision = kFloodlightCameraDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kSnapshotCamera = {
     .deviceTypeId       = kSnapshotCameraDeviceTypeId,
     .deviceTypeRevision = kSnapshotCameraDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kChime = {
     .deviceTypeId       = kChimeDeviceTypeId,
     .deviceTypeRevision = kChimeDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kCameraController = {
     .deviceTypeId       = kCameraControllerDeviceTypeId,
     .deviceTypeRevision = kCameraControllerDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kDoorbell = {
     .deviceTypeId       = kDoorbellDeviceTypeId,
     .deviceTypeRevision = kDoorbellDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kWindowCovering = {
     .deviceTypeId       = kWindowCoveringDeviceTypeId,
     .deviceTypeRevision = kWindowCoveringDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kWindowCoveringController = {
     .deviceTypeId       = kWindowCoveringControllerDeviceTypeId,
     .deviceTypeRevision = kWindowCoveringControllerDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kClosure = {
     .deviceTypeId       = kClosureDeviceTypeId,
     .deviceTypeRevision = kClosureDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kClosurePanel = {
     .deviceTypeId       = kClosurePanelDeviceTypeId,
     .deviceTypeRevision = kClosurePanelDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kClosureController = {
     .deviceTypeId       = kClosureControllerDeviceTypeId,
     .deviceTypeRevision = kClosureControllerDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kThermostat = {
     .deviceTypeId       = kThermostatDeviceTypeId,
     .deviceTypeRevision = kThermostatDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kTemperatureSensor = {
     .deviceTypeId       = kTemperatureSensorDeviceTypeId,
     .deviceTypeRevision = kTemperatureSensorDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kPump = {
     .deviceTypeId       = kPumpDeviceTypeId,
     .deviceTypeRevision = kPumpDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kPumpController = {
     .deviceTypeId       = kPumpControllerDeviceTypeId,
     .deviceTypeRevision = kPumpControllerDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kPressureSensor = {
     .deviceTypeId       = kPressureSensorDeviceTypeId,
     .deviceTypeRevision = kPressureSensorDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kFlowSensor = {
     .deviceTypeId       = kFlowSensorDeviceTypeId,
     .deviceTypeRevision = kFlowSensorDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kHumiditySensor = {
     .deviceTypeId       = kHumiditySensorDeviceTypeId,
     .deviceTypeRevision = kHumiditySensorDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kHeatPump = {
     .deviceTypeId       = kHeatPumpDeviceTypeId,
     .deviceTypeRevision = kHeatPumpDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kThermostatController = {
     .deviceTypeId       = kThermostatControllerDeviceTypeId,
     .deviceTypeRevision = kThermostatControllerDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kEvse = {
     .deviceTypeId       = kEvseDeviceTypeId,
     .deviceTypeRevision = kEvseDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kDeviceEnergyManagement = {
     .deviceTypeId       = kDeviceEnergyManagementDeviceTypeId,
     .deviceTypeRevision = kDeviceEnergyManagementDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kWaterHeater = {
     .deviceTypeId       = kWaterHeaterDeviceTypeId,
     .deviceTypeRevision = kWaterHeaterDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kElectricalSensor = {
     .deviceTypeId       = kElectricalSensorDeviceTypeId,
     .deviceTypeRevision = kElectricalSensorDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kElectricalUtilityMeter = {
     .deviceTypeId       = kElectricalUtilityMeterDeviceTypeId,
     .deviceTypeRevision = kElectricalUtilityMeterDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kMeterReferencePoint = {
     .deviceTypeId       = kMeterReferencePointDeviceTypeId,
     .deviceTypeRevision = kMeterReferencePointDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kElectricalEnergyTariff = {
     .deviceTypeId       = kElectricalEnergyTariffDeviceTypeId,
     .deviceTypeRevision = kElectricalEnergyTariffDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kElectricalMeter = {
     .deviceTypeId       = kElectricalMeterDeviceTypeId,
     .deviceTypeRevision = kElectricalMeterDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kControlBridge = {
     .deviceTypeId       = kControlBridgeDeviceTypeId,
     .deviceTypeRevision = kControlBridgeDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kOnOffSensor = {
     .deviceTypeId       = kOnOffSensorDeviceTypeId,
     .deviceTypeRevision = kOnOffSensorDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kOrphanClusters = {
     .deviceTypeId       = kOrphanClustersDeviceTypeId,
     .deviceTypeRevision = kOrphanClustersDeviceTypeRevision,
 };
+
 constexpr DataModel::DeviceTypeEntry kAllClustersAppServerExample = {
     .deviceTypeId       = kAllClustersAppServerExampleDeviceTypeId,
     .deviceTypeRevision = kAllClustersAppServerExampleDeviceTypeRevision,

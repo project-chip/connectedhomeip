@@ -10,12 +10,13 @@ namespace Device {
 
 {{#zcl_device_types}}
 constexpr DeviceTypeId k{{asUpperCamelCase caption}}DeviceTypeId = {{asHex code 8}};
-constexpr DeviceTypeId k{{asUpperCamelCase caption}}DeviceTypeRevision = 1;
+constexpr uint8_t k{{asUpperCamelCase caption}}DeviceTypeRevision = 1;
+
 {{/zcl_device_types}}
 
 namespace Type {
-
 {{#zcl_device_types}}
+
 constexpr DataModel::DeviceTypeEntry k{{asUpperCamelCase caption}} = {
    .deviceTypeId = k{{asUpperCamelCase caption}}DeviceTypeId,
    .deviceTypeRevision = k{{asUpperCamelCase caption}}DeviceTypeRevision,
