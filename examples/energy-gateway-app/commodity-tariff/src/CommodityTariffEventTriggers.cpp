@@ -109,8 +109,16 @@ void SetTestEventTrigger_TariffDataUpdated()
     if (err != CHIP_NO_ERROR)
         return;
 
-    instance->ActivateTariffTimeTracking(tariff_preset.TariffTestTimestamp);
-    dg->TariffDataUpdate(tariff_preset.TariffTestTimestamp);
+    if (instance)
+    {
+        instance->EnableTestTime(true);
+        instance->AdvanceTestTime(chip::System::Clock::Seconds32(tariff_preset.TariffTestTimestamp));
+    }
+
+    if (dg)
+    {
+        dg->TariffDataUpdate(tariff_preset.TariffTestTimestamp);
+    }
 }
 
 void SetTestEventTrigger_TariffDataClear()
@@ -130,8 +138,8 @@ void SetTestEventTrigger_TimeShift24h()
 
     if (instance)
     {
-        instance->TariffTimeTrackingSetOffset(kSecondsPerDay);
-        instance->TariffTimeAttrsSync();
+        instance->EnableTestTime(true);
+        instance->AdvanceTestTime(chip::System::Clock::Seconds32(kSecondsPerDay));
     }
 }
 
@@ -145,8 +153,8 @@ void SetTestEventTrigger_TimeShift4h()
 
     if (instance)
     {
-        instance->TariffTimeTrackingSetOffset(kSecondsPer4hr);
-        instance->TariffTimeAttrsSync();
+        instance->EnableTestTime(true);
+        instance->AdvanceTestTime(chip::System::Clock::Seconds32(kSecondsPer4hr));
     }
 }
 
@@ -156,7 +164,7 @@ void SetTestEventTrigger_TimeShiftDisable()
 
     if (instance)
     {
-        instance->TariffTimeTrackingSetOffset(0);
+        instance->EnableTestTime(false);
     }
 }
 

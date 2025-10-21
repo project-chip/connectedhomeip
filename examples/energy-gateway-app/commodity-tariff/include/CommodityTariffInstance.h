@@ -52,7 +52,7 @@ public:
     void CleanupTariffData();
 };
 
-class CommodityTariffInstance : public Instance
+class CommodityTariffInstance : public CommodityTariff::Instance
 {
 public:
     CommodityTariffInstance(EndpointId aEndpointId, CommodityTariffDelegate & aDelegate, Feature aFeature) :
@@ -72,19 +72,29 @@ public:
 
     CommodityTariffDelegate * GetDelegate() { return mCommodityTariffDelegate; };
 
-    void ActivateTariffTimeTracking(uint32_t timestamp);
-    void TariffTimeTrackingSetOffset(uint32_t offset);
+    // Simplified Test Time Control API
+    void EnableTestTime(bool enable);
+    void AdvanceTestTime(chip::System::Clock::Seconds32 offset);
+    bool IsTestTimeEnabled() const { return mTestTimeEnabled; }
+
+    // Remove ResetTestTime() - functionality is handled by EnableTestTime(false)
 
 private:
     CommodityTariffDelegate * mCommodityTariffDelegate;
-    uint32_t TimestampNow    = 0;
-    uint32_t TestTimeOverlay = 0;
+    
+    // Test Time Management
+    bool mTestTimeEnabled = false;
+    std::unique_ptr<chip::System::Clock::Internal::MockClock> mMockClock;
+    chip::System::Clock::Microseconds64 mMockBaseTime{0};
 
+    // Private methods for tariff time management
     void ScheduleTariffTimeUpdate();
     void TariffTimeUpdCb();
 
-protected:
-    uint32_t GetCurrentTimestamp() override;
+    // Internal test time helpers
+    void InitializeMockClock();
+    void ShutdownMockClock();
+    void AdvanceMockTime(chip::System::Clock::Seconds32 offset);
 };
 
 } // namespace CommodityTariff
