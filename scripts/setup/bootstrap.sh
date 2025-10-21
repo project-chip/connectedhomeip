@@ -207,7 +207,7 @@ fi
 # Set ccache environment variables
 #
 # Rewrite includes to use relative paths within BASEDIR and do not add PWD to
-# the hash key, so we can share cached objects even thought apps are built in
+# the hash key, so we can share cached objects even though apps are built in
 # different output directories.
 export CCACHE_BASEDIR="$_CHIP_ROOT" CCACHE_NOHASHDIR=1
 # Always create cache key based on preprocessed source. It is important, because
