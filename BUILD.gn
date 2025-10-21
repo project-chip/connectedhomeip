@@ -509,7 +509,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_tizen_lighting_app = enable_tizen_builds
 
     # A group of linux apps to be used by CI.
-    enable_linux_apps_for_ci_build = enable_default_builds && (host_os == "linux" || host_os == "mac")
+    enable_linux_apps_for_ci_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
   }
 
   builds = []
