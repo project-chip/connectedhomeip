@@ -583,7 +583,7 @@ bool EventManagement::IncludeEventInReport(EventLoadOutContext * eventLoadOutCon
         return false;
     }
 
-    // If all the checks pass, the event path will be included in the generated event report.
+    // If all the checks pass, the event will be included in the generated event report.
     return true;
 }
 
