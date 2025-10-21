@@ -1259,10 +1259,17 @@ void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)
 
 void Engine::MarkDirty(const AttributePathParams & path)
 {
-    CHIP_ERROR err = SetDirty(path);
-    if (err != CHIP_NO_ERROR)
+    if (mMarkDirtyInterceptor)
     {
-        ChipLogError(DataManagement, "Failed to set path dirty: %" CHIP_ERROR_FORMAT, err.Format());
+        mMarkDirtyInterceptor->MarkDirty(path);
+    }
+    else
+    {
+        CHIP_ERROR err = SetDirty(path);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DataManagement, "Failed to set path dirty: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 }
 

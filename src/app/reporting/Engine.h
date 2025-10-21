@@ -132,6 +132,11 @@ public:
     /* ProviderChangeListener implementation */
     void MarkDirty(const AttributePathParams & path) override;
 
+    void SetMarkDirtyInterceptor(std::unique_ptr<DataModel::ProviderChangeListener> aMarkDirtyInterceptor)
+    {
+        mMarkDirtyInterceptor = std::move(aMarkDirtyInterceptor);
+    }
+
 private:
     /**
      * Main work-horse function that executes the run-loop.
@@ -292,6 +297,8 @@ private:
     InteractionModelEngine * mpImEngine = nullptr;
 
     EventManagement * mpEventManagement = nullptr;
+
+    std::unique_ptr<DataModel::ProviderChangeListener> mMarkDirtyInterceptor;
 };
 
 }; // namespace reporting
