@@ -22,7 +22,10 @@
 #include "LEDWidget.h"
 #include "PWMDevice.h"
 
+#include <app/AttributePathParams.h>
+#include <app/data-model-provider/ProviderChangeListener.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <vector>
 
 #if CONFIG_CHIP_FACTORY_DATA
 #include <platform/nrfconnect/FactoryDataProvider.h>
@@ -43,6 +46,12 @@
 struct k_timer;
 struct Identify;
 
+class MarkDirtyInterpreter : public chip::app::DataModel::ProviderChangeListener
+{
+public:
+    void MarkDirty(const chip::app::AttributePathParams & path) override;
+};
+
 class AppTask
 {
 public:
@@ -59,6 +68,7 @@ public:
 
     static void IdentifyStartHandler(Identify *);
     static void IdentifyStopHandler(Identify *);
+    static void MarkDirty(const chip::app::AttributePathParams & path);
 
 private:
 #ifdef CONFIG_CHIP_PW_RPC
@@ -91,6 +101,8 @@ private:
     FunctionEvent mFunction   = FunctionEvent::NoneSelected;
     bool mFunctionTimerActive = false;
     PWMDevice mPWMDevice;
+    std::unique_ptr<MarkDirtyInterpreter> mMarkDirtyInterpreter = std::make_unique<MarkDirtyInterpreter>();
+    std::vector<chip::app::AttributePathParams> mAttributePaths;
 
 #if CONFIG_CHIP_FACTORY_DATA
     chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;
