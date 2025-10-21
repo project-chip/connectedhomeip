@@ -26,7 +26,7 @@ class NodeAddressCache
 public:
     static constexpr size_t kMaxCacheSize = 16;
 
-    CHIP_ERROR CacheNode(NodeId nodeId, const ResolveResult & result);
+    void CacheNode(NodeId nodeId, const ResolveResult & result);
     CHIP_ERROR GetCachedNodeAddress(NodeId nodeId, ResolveResult & result) const;
     CHIP_ERROR RemoveCachedNodeAddress(NodeId nodeId);
     void Clear();

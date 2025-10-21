@@ -225,9 +225,9 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
 
 #if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 
-CHIP_ERROR Resolver::CacheNode(NodeId nodeId, const ResolveResult & result)
+void Resolver::CacheNode(NodeId nodeId, const ResolveResult & result)
 {
-    return mNodeAddressCache.CacheNode(nodeId, result);
+    mNodeAddressCache.CacheNode(nodeId, result);
 }
 
 #endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE

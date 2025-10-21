@@ -23,7 +23,7 @@
 namespace chip {
 namespace AddressResolve {
 
-CHIP_ERROR NodeAddressCache::CacheNode(NodeId nodeId, const ResolveResult & result)
+void NodeAddressCache::CacheNode(NodeId nodeId, const ResolveResult & result)
 {
     // Check if nodeId already exists in cache to update it
     RemoveCachedNodeAddress(nodeId);
@@ -35,7 +35,7 @@ CHIP_ERROR NodeAddressCache::CacheNode(NodeId nodeId, const ResolveResult & resu
         RemoveCachedNodeAddress(mCache[0].nodeId);
         if (mCacheCount >= kMaxCacheSize) {
             ChipLogProgress(Discovery, "Cache removal failed");
-            return CHIP_ERROR_INCORRECT_STATE;
+            return;
         }
     }
 
@@ -45,7 +45,7 @@ CHIP_ERROR NodeAddressCache::CacheNode(NodeId nodeId, const ResolveResult & resu
     ++mCacheCount;
 
     ChipLogProgress(Discovery, "Cached address for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
-    return CHIP_NO_ERROR;
+    return;
 }
 
 CHIP_ERROR NodeAddressCache::GetCachedNodeAddress(NodeId nodeId, ResolveResult & result) const
