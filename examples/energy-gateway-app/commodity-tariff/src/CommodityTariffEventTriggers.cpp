@@ -114,7 +114,7 @@ void SetTestEventTrigger_TariffDataUpdated()
         instance->EnableTestTime(true);
         instance->AdvanceTestTime(chip::System::Clock::Seconds32(tariff_preset.TariffTestTimestamp));
     }
-    else 
+    else
     {
         ChipLogError(AppServer, "The sever instance is null");
     }
