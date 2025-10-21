@@ -16,7 +16,6 @@
  */
 #pragma once
 
-#include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/NodeId.h>
 
 namespace chip {

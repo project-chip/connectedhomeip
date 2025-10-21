@@ -15,7 +15,9 @@
  *    limitations under the License.
  */
 
+
 #include <lib/address_resolve/AddressResolve.h>
+#include <lib/address_resolve/NodeAddressCache.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
