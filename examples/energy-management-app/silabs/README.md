@@ -9,8 +9,10 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
     -   [Building](#building)
     -   [Flashing the Application](#flashing-the-application)
     -   [Viewing Logging Output](#viewing-logging-output)
-        -   [SeggerRTT](#segger-rtt)
-        -   [Serial Console](#console-log)
+        -   [SEGGER RTT](#segger-rtt)
+        -   [Console Log](#console-log)
+            -   [Configuring the VCOM](#configuring-the-vcom)
+        -   [Using the console](#using-the-console)
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
     -   [Running RPC console](#running-rpc-console)
@@ -30,7 +32,7 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
 > frequent releases thoroughly tested and validated. Developers looking to
 > develop matter products with silabs hardware are encouraged to use our latest
 > release with added tools and documentation.
-> [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases)
+> [Silabs matter_sdk Github](https://github.com/SiliconLabsSoftware/matter_sdk/tags)
 
 ## Introduction
 
@@ -71,8 +73,8 @@ creating real products based on the Silicon Labs platform.
 -   Supported hardware:
 
     -   > For the latest supported hardware please refer to the
-        > [Hardware Requirements](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/general/HARDWARE_REQUIREMENTS.md)
-        > in the Silicon Labs Matter Github Repo
+        > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
+        > in the Silicon Labs Matter Documentation
 
     MG24 boards :
 
@@ -87,60 +89,60 @@ creating real products based on the Silicon Labs platform.
 
 *   Build the example application:
 
-          cd ~/connectedhomeip
-          ./scripts/examples/gn_silabs_example.sh ./examples/energy-management-app/silabs/ ./out/energy-management-app BRD4187C
+            cd ~/connectedhomeip
+            ./scripts/examples/gn_silabs_example.sh ./examples/energy-management-app/silabs/ ./out/energy-management-app BRD4187C
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip
-          $ rm -rf ./out/
+            $ cd ~/connectedhomeip
+            $ rm -rf ./out/
 
     OR use GN/Ninja directly
 
-          $ cd ~/connectedhomeip/examples/energy-management-app/silabs
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export SILABS_BOARD=BRD4187C
+            $ cd ~/connectedhomeip/examples/energy-management-app/silabs
+            $ git submodule update --init
+            $ source third_party/connectedhomeip/scripts/activate.sh
+            $ export SILABS_BOARD=BRD4187C
 
     To build the EVSE example
 
-          $ gn gen out/debug
-          $ ninja -C out/debug
+            $ gn gen out/debug
+            $ ninja -C out/debug
 
     To build the Water Heater example you can change the args to gn gen (see
     BUILD.gn for arg options)
 
-          $ gn gen out/debug --args='sl_enable_example_evse_device=false sl_enable_example_water_heater_device=true'
-          $ ninja -C out/debug
+            $ gn gen out/debug --args='sl_enable_example_evse_device=false sl_enable_example_water_heater_device=true'
+            $ ninja -C out/debug
 
     To change Device Energy Management feature support (e.g. Power forecast or
     State forecast reporting), you can change the args to gn gen (see BUILD.gn
     for arg options)
 
-          $ gn gen out/debug --args='sl_dem_support_state_forecast_reporting=true sl_dem_support_power_forecast_reporting=false'
-          $ ninja -C out/debug
+            $ gn gen out/debug --args='sl_dem_support_state_forecast_reporting=true sl_dem_support_power_forecast_reporting=false'
+            $ ninja -C out/debug
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/energy-management-app/silabs
-          $ rm -rf out/
+            $ cd ~/connectedhomeip/examples/energy-management-app/silabs
+            $ rm -rf out/
 
 *   Build the example as Intermittently Connected Device (ICD)
 
-          $ ./scripts/examples/gn_silabs_example.sh ./examples/energy-management-app/silabs/ ./out/energy-management-app_ICD BRD4187C --icd
+            $ ./scripts/examples/gn_silabs_example.sh ./examples/energy-management-app/silabs/ ./out/energy-management-app_ICD BRD4187C --icd
 
 *   Build the example with pigweed RPC
 
-          $ ./scripts/examples/gn_silabs_example.sh examples/energy-management-app/silabs/ out/energy_management_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
+            $ ./scripts/examples/gn_silabs_example.sh examples/energy-management-app/silabs/ out/energy_management_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
 
     or use GN/Ninja Directly
 
-          $ cd ~/connectedhomeip/examples/energy-management-app/silabs
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export SILABS_BOARD=BRD4187C
-          $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
-          $ ninja -C out/debug
+            $ cd ~/connectedhomeip/examples/energy-management-app/silabs
+            $ git submodule update --init
+            $ source third_party/connectedhomeip/scripts/activate.sh
+            $ export SILABS_BOARD=BRD4187C
+            $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
+            $ ninja -C out/debug
 
     [Running Pigweed RPC console](#running-rpc-console)
 
@@ -153,15 +155,14 @@ arguments
 
 -   On the command line:
 
-          $ cd ~/connectedhomeip/examples/energy-management-app/silabs
-          $ python3 out/debug/matter-silabs-energy-management-example.flash.py
+            $ cd ~/connectedhomeip/examples/energy-management-app/silabs
+            $ python3 out/debug/matter-silabs-energy-management-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
 
 All EFR32 boards require a bootloader, see Silicon Labs documentation for more
-info. Pre-built bootloader binaries are available in the Assets section of the
-Releases page on
-[Silabs Matter Github](https://github.com/SiliconLabs/matter/releases) .
+info. Pre-built bootloader binaries are available on the
+[Matter Software Artifacts page](https://docs.silabs.com/matter/latest/matter-prerequisites/matter-artifacts#matter-bootloader-binaries).
 
 ## Viewing Logging Output
 
@@ -187,14 +188,14 @@ after flashing the .out file.
 
 *   Install the J-Link software
 
-          $ cd ~/Downloads
-          $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
+            $ cd ~/Downloads
+            $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
 
 *   In Linux, grant the logged in user the ability to talk to the development
     hardware via the linux tty device (/dev/ttyACMx) by adding them to the
     dialout group.
 
-          $ sudo usermod -a -G dialout ${USER}
+            $ sudo usermod -a -G dialout ${USER}
 
 Once the above is complete, log output can be viewed using the JLinkExe tool in
 combination with JLinkRTTClient as follows:
@@ -203,15 +204,15 @@ combination with JLinkRTTClient as follows:
 
     For MG12 use:
 
-          $ JLinkExe -device EFR32MG12PXXXF1024 -if JTAG -speed 4000 -autoconnect 1
+            $ JLinkExe -device EFR32MG12PXXXF1024 -if JTAG -speed 4000 -autoconnect 1
 
     For MG21 use:
 
-          $ JLinkExe -device EFR32MG21AXXXF1024 -if SWD -speed 4000 -autoconnect 1
+            $ JLinkExe -device EFR32MG21AXXXF1024 -if SWD -speed 4000 -autoconnect 1
 
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
-          $ JLinkRTTClient
+            $ JLinkRTTClient
 
 ### Console Log
 
@@ -252,41 +253,41 @@ With any serial terminal application such as screen, putty, minicom etc.
     Code is be scanned by the CHIP Tool app For the Rendez-vous procedure over
     BLE
 
-        * On devices that do not have or support the LCD Display like the BRD4166A Thunderboard Sense 2,
-          a URL can be found in the RTT logs.
+          * On devices that do not have or support the LCD Display like the BRD4166A Thunderboard Sense 2,
+            a URL can be found in the RTT logs.
 
-          <info  > [SVR] Copy/paste the below URL in a browser to see the QR Code:
-          <info  > [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
+            <info  > [SVR] Copy/paste the below URL in a browser to see the QR Code:
+            <info  > [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
 
     **LED 0** shows the overall state of the device and its connectivity. The
     following states are possible:
 
-        -   _Short Flash On (50 ms on/950 ms off)_ ; The device is in the
-            unprovisioned (unpaired) state and is waiting for a commissioning
-            application to connect.
+          -   _Short Flash On (50 ms on/950 ms off)_ ; The device is in the
+              unprovisioned (unpaired) state and is waiting for a commissioning
+              application to connect.
 
-        -   _Rapid Even Flashing_ ; (100 ms on/100 ms off)_ &mdash; The device is in the
-            unprovisioned state and a commissioning application is connected through
-            Bluetooth LE.
+          -   _Rapid Even Flashing_ ; (100 ms on/100 ms off)_ &mdash; The device is in the
+              unprovisioned state and a commissioning application is connected through
+              Bluetooth LE.
 
-        -   _Short Flash Off_ ; (950ms on/50ms off)_ &mdash; The device is fully
-            provisioned, but does not yet have full Thread network or service
-            connectivity.
+          -   _Short Flash Off_ ; (950ms on/50ms off)_ &mdash; The device is fully
+              provisioned, but does not yet have full Thread network or service
+              connectivity.
 
-        -   _Solid On_ ; The device is fully provisioned and has full Thread
-            network and service connectivity.
+          -   _Solid On_ ; The device is fully provisioned and has full Thread
+              network and service connectivity.
 
     **Push Button 0**
 
-        -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
-            for 30 seconds. The device will then switch to a slower interval advertisement.
-            After 15 minutes, the advertisement stops.
-            Additionally, it will cycle through the QR code, application status screen and device status screen, respectively.
+          -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
+              for 30 seconds. The device will then switch to a slower interval advertisement.
+              After 15 minutes, the advertisement stops.
+              Additionally, it will cycle through the QR code, application status screen and device status screen, respectively.
 
-        -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
-            Releasing the button within the 6-second window cancels the factory reset
-            procedure. **LEDs** blink in unison when the factory reset procedure is
-            initiated.
+          -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
+              Releasing the button within the 6-second window cancels the factory reset
+              procedure. **LEDs** blink in unison when the factory reset procedure is
+              initiated.
 
 *   You can provision and control the Chip device using the python controller,
     Chip tool standalone, Android or iOS app
@@ -298,7 +299,7 @@ With any serial terminal application such as screen, putty, minicom etc.
 
     Here is an example with the chip-tool:
 
-          $ chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
+            $ chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
 
 ### Notes
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC.
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
@@ -119,6 +119,12 @@ CHIP_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
     CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT();
 
     return CHIP_NO_ERROR;
+}
+
+void UDPEndPoint::Free()
+{
+    Close();
+    Delete();
 }
 
 void UDPEndPoint::Close()

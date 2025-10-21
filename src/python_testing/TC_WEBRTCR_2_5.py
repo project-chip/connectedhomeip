@@ -44,7 +44,7 @@ from matter.testing.apps import AppServerSubprocess
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCRequestor_2_5(MatterBaseTest):
+class TC_WebRTCR_2_5(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
 
@@ -86,11 +86,11 @@ class TC_WebRTCRequestor_2_5(MatterBaseTest):
             self.storage.cleanup()
         super().teardown_class()
 
-    def desc_TC_WebRTCRequestor_2_5(self) -> str:
+    def desc_TC_WebRTCR_2_5(self) -> str:
         """Returns a description of this test"""
         return "[TC-{picsCode}-2.5] Validate CurrentSessions attribute read"
 
-    def steps_TC_WebRTCRequestor_2_5(self) -> list[TestStep]:
+    def steps_TC_WebRTCR_2_5(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
@@ -106,6 +106,17 @@ class TC_WebRTCRequestor_2_5(MatterBaseTest):
         ]
         return steps
 
+    def pics_TC_WebRTCR_2_5(self) -> list[str]:
+        """
+        Return the list of PICS applicable to this test case.
+        """
+        pics = [
+            "WEBRTCR.S",           # WebRTC Transport Requestor Server
+            "WEBRTCR.S.A0000",     # CurrentSessions attribute
+            "WEBRTCR.S.C03.Rsp",   # End command
+        ]
+        return pics
+
     # This test has multiple manual steps for attribute reads and session management.
     # Test typically runs under 2 mins, so 5 minutes is sufficient.
     @property
@@ -113,7 +124,7 @@ class TC_WebRTCRequestor_2_5(MatterBaseTest):
         return 5 * 60
 
     @async_test_body
-    async def test_TC_WebRTCRequestor_2_5(self):
+    async def test_TC_WebRTCR_2_5(self):
         """
         Executes the test steps for the WebRTC CurrentSessions attribute validation.
         """
@@ -240,7 +251,8 @@ class TC_WebRTCRequestor_2_5(MatterBaseTest):
         asserts.assert_equal(
             session_read_success,
             True,
-            f"CurrentSessions attribute read {'succeeded with session info' if session_read_success else 'failed or returned incorrect data'}"
+            ("CurrentSessions attribute read "
+             f"{'succeeded with session info' if session_read_success else 'failed or returned incorrect data'}")
         )
 
         # Ensure we have a valid session ID before proceeding
@@ -292,7 +304,8 @@ class TC_WebRTCRequestor_2_5(MatterBaseTest):
         asserts.assert_equal(
             final_read_success,
             True,
-            f"Final CurrentSessions attribute read {'succeeded with empty list' if final_read_success else 'failed or returned non-empty list'}"
+            ("CurrentSessions attribute read"
+             f"{'succeeded with empty list' if final_read_success else 'failed or returned non-empty list'}")
         )
 
 

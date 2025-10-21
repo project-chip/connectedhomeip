@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "Identify.h"
 #include "RvcAppCommandDelegate.h"
 #include "rvc-device.h"
 #include <AppMain.h>
@@ -48,6 +49,7 @@ void ApplicationInit()
     gRvcDevice->Init();
 
     sRvcAppCommandDelegate.SetRvcDevice(gRvcDevice);
+    IdentifyInit();
 }
 
 void ApplicationShutdown()

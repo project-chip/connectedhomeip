@@ -144,8 +144,8 @@ async def commission_device(
 
     if commissioning_info.tc_version_to_simulate is not None and commissioning_info.tc_user_response_to_simulate is not None:
         LOGGER.debug(
-            f"Setting TC Acknowledgements to version {commissioning_info.tc_version_to_simulate} with user response {
-                commissioning_info.tc_user_response_to_simulate}."
+            f"Setting TC Acknowledgements to version {commissioning_info.tc_version_to_simulate} with user response "
+            f"{commissioning_info.tc_user_response_to_simulate}."
         )
         dev_ctrl.SetTCAcknowledgements(commissioning_info.tc_version_to_simulate, commissioning_info.tc_user_response_to_simulate)
 
@@ -260,9 +260,16 @@ def get_setup_payload_info_config(matter_test_config: Any) -> List[SetupPayloadI
         except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Can not use 'with' because it is not expected to fail
             asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
 
+    manual_code_equivalents = [(s.long_discriminator >> 8, s.setup_passcode) for s in setup_payloads]
     for manual_code in matter_test_config.manual_code:
         try:
-            setup_payloads.append(SetupPayload().ParseManualPairingCode(manual_code))
+            # Remove any duplicate codes - where the discriminator and passcode match a previously added QR code.
+            # This lets testers pass in the QR and equivalent manual code in order to run
+            # the DD tests with a single set of parameters
+            temp_payload = SetupPayload().ParseManualPairingCode(manual_code)
+            if (temp_payload.short_discriminator, temp_payload.setup_passcode) in manual_code_equivalents:
+                continue
+            setup_payloads.append(temp_payload)
         except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Can not use 'with' because it is not expected to fail
             asserts.fail(
                 f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")

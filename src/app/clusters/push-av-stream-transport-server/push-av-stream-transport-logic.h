@@ -58,10 +58,8 @@ public:
                            Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason =
                                Optional<PushAvStreamTransport::TriggerActivationReasonEnum>());
 
-    Protocols::InteractionModel::Status
-    NotifyTransportStopped(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
-                           Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason =
-                               Optional<PushAvStreamTransport::TriggerActivationReasonEnum>());
+    Protocols::InteractionModel::Status NotifyTransportStopped(uint16_t connectionID,
+                                                               PushAvStreamTransport::TransportTriggerTypeEnum triggerType);
 
     enum class UpsertResultEnum : uint8_t
     {
@@ -122,9 +120,7 @@ public:
     Protocols::InteractionModel::Status
     GeneratePushTransportBeginEvent(const uint16_t connectionID, const PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
                                     const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason);
-    Protocols::InteractionModel::Status
-    GeneratePushTransportEndEvent(const uint16_t connectionID, const PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
-                                  const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason);
+    Protocols::InteractionModel::Status GeneratePushTransportEndEvent(const uint16_t connectionID);
 
 private:
     PushAvStreamTransportDelegate * mDelegate                            = nullptr;
@@ -158,13 +154,24 @@ private:
 
     void RemoveTimerAppState(const uint16_t connectionID);
 
+    Protocols::InteractionModel::Status CheckPrivacyModes(Globals::StreamUsageEnum streamUsage);
+
     /**
      * @brief Schedule deallocate with a given timeout
      *
-     * @param endpointId    endpoint where DoorLockServer is running
-     * @param timeoutSec    timeout in seconds
+     * @param connectionID    ID of the connection to deallocate
+     * @param timeoutSec      timeout in seconds
+     * @return               CHIP_ERROR code indicating the result of the operation
      */
     CHIP_ERROR ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec);
+
+    /**
+     * @brief Validates the provided URL.
+     *
+     * @param url The URL to validate
+     * @return true if URL is valid, false otherwise
+     */
+    bool ValidateUrl(const std::string & url);
 };
 
 } // namespace Clusters
