@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:169
+            image: ghcr.io/project-chip/chip-build:172
             options: --user root
 
         steps:
@@ -58,7 +58,7 @@ jobs:
         timeout-minutes: 90
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build:169
+            image: ghcr.io/project-chip/chip-build:172
             options: >-
                 --privileged
                 --sysctl net.ipv6.conf.all.disable_ipv6=0
@@ -96,7 +96,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:168
+            image: ghcr.io/project-chip/chip-build-esp32:172
             options: --user root
 
         steps:
@@ -117,7 +117,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:169
+            image: ghcr.io/project-chip/chip-build-nrf-platform:172
             options: --user root
 
         steps:
@@ -138,7 +138,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:168
+            image: ghcr.io/project-chip/chip-build-telink:172
             options: --user root
 
         steps:
