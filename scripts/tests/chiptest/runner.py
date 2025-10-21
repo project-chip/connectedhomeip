@@ -17,12 +17,12 @@ import os
 import pty
 import queue
 import re
+import patlib
 import subprocess
 import sys
 import threading
 import typing
 from dataclasses import dataclass
-from pathlib import Path
 
 
 class LogPipe(threading.Thread):
