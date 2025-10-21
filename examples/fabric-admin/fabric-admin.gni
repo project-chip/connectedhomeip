@@ -16,9 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 declare_args() {
-  # By default, fabric-admin will use RPCs.
-  chip_build_fabric_admin_rpc = true
-
-  # By default, fabric-admin will use local storage.
+  # Use a separate eventloop for CHIP tasks
+  config_use_separate_eventloop = true
   config_use_local_storage = true
 }
