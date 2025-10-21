@@ -23,9 +23,6 @@ from typing import List
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
-REQ_NODE_ID = 0x12344321  # you can adjust if your lab uses another
-REQ_ENDPOINT = 0
-
 
 class TC_DGGEN_2_1_Py(MatterBaseTest):
     """
@@ -57,9 +54,12 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
 
     # ------- helpers -------
 
-    async def _read_attr(self, dev_ctrl, cluster_attr, endpoint=REQ_ENDPOINT, node_id=REQ_NODE_ID):
+    async def _read_attr(self, dev_ctrl, cluster_attr, endpoint=None, node_id=None):
         return await self.read_single_attribute(
-            dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint, attribute=cluster_attr
+            dev_ctrl=dev_ctrl,
+            node_id=node_id if node_id is not None else self.req_node_id,
+            endpoint=endpoint if endpoint is not None else self.endpoint,
+            attribute=cluster_attr
         )
 
     async def _read_reboot_count(self, dev_ctrl) -> int:
@@ -74,9 +74,10 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
     async def _read_net_ifaces(self, dev_ctrl):
         return await self._read_attr(dev_ctrl, Clusters.GeneralDiagnostics.Attributes.NetworkInterfaces)
 
-    async def _wait_for_commissionee(self, node_id=REQ_NODE_ID, timeout_s=120):
+    async def _wait_for_commissionee(self, node_id=None, timeout_s=120):
         # If your harness has a specific helper, replace this.
         # Here we do a small poll to State (read + sleep).
+        node_id = node_id if node_id is not None else self.req_node_id
         end = self.event_loop.time() + timeout_s
         while self.event_loop.time() < end:
             try:
@@ -127,6 +128,9 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
 
     @async_test_body
     async def test_TC_DGGEN_2_1_Py(self):
+        self.endpoint = self.get_endpoint(0)
+        self.req_node_id = self.user_params.get('req_node_id', 0x12344321)
+
         ctrl = self.default_controller
 
         # Step 0: Manual precondition
