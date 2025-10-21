@@ -1168,7 +1168,6 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-
 CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_length, P256PublicKey & pubkey)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
