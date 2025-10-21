@@ -1,6 +1,14 @@
 import("//build_overrides/chip.gni")
 
+source_set("ids") {
+  sources = [ "Ids.h" ]
+}
+
 source_set("devices") {
   sources = [ "Types.h" ]
-  public_deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+
+  public_deps = [
+    ":ids",
+    "${chip_root}/src/app/data-model-provider:metadata",
+  ]
 }

@@ -190,6 +190,11 @@
             "output": "../../clusters/{name:touppercamelcase}/EnumsCheck.h"
         },
         {
+            "path": "../../zap-templates/templates/app/devices-Ids.h.zapt",
+            "name": "Device type ids",
+            "output": "../../devices/Ids.h"
+        },
+        {
             "path": "../../zap-templates/templates/app/devices-Types.h.zapt",
             "name": "Device type definitions",
             "output": "../../devices/Types.h"
