@@ -57,7 +57,7 @@ CHIP_ERROR NodeAddressCache::GetCachedNodeAddress(const PeerId & peerId, Resolve
         ChipLogProgress(Discovery, "Retrieved cached address for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
         return CHIP_NO_ERROR;
     }
-    ChipLogError(Discovery, "No cached address for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+    ChipLogProgress(Discovery, "No cached address for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
@@ -70,7 +70,7 @@ CHIP_ERROR NodeAddressCache::RemoveCachedNodeAddress(const PeerId & peerId)
         ChipLogProgress(Discovery, "Removed cached address for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
         return CHIP_NO_ERROR;
     }
-    ChipLogError(Discovery, "No cached address to remove for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+    ChipLogProgress(Discovery, "No cached address to remove for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
