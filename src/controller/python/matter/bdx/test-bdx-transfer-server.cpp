@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/python/matter/bdx/test-bdx-transfer-server.h>
 
 namespace chip {
@@ -37,7 +36,8 @@ CHIP_ERROR TestBdxTransferServer::Init(System::Layer * systemLayer, Messaging::E
     mSystemLayer     = systemLayer;
     mExchangeManager = exchangeManager;
     // This removes the BdxTransferServer registered as part of CHIPDeviceControllerFactory.
-    mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(MessageType::SendInit);
+    // Capture the handler that was previously registered for SendInit so we can restore it on shutdown.
+    mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(MessageType::SendInit, &mPrevSendInitHandler);
     return mExchangeManager->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, this);
 }
 
@@ -48,14 +48,8 @@ void TestBdxTransferServer::Shutdown()
 
     // Re-register the BdxTransferServer that was registered as part of CHIPDeviceControllerFactory.
     // Otherwise when BdxTransferServer::Shutdown() attempts to unregister this, it causes an error.
-    // Since there is no direct getter for the current handler in ExchangeManager, we can't save this during
-    // TestBdxTransferServer::Init, so instead we rely on the controller factory system state which owns the default
-    // BDXTransferServer instance.
-    const Controller::DeviceControllerSystemState * systemState =
-        Controller::DeviceControllerFactory::GetInstance().GetSystemState();
-    if (systemState != nullptr && systemState->BDXTransferServer() != nullptr)
-        LogErrorOnFailure(
-            mExchangeManager->RegisterUnsolicitedMessageHandlerForType(MessageType::SendInit, systemState->BDXTransferServer()));
+    if (mPrevSendInitHandler != nullptr)
+        LogErrorOnFailure(mExchangeManager->RegisterUnsolicitedMessageHandlerForType(MessageType::SendInit, mPrevSendInitHandler));
 
     mExchangeManager = nullptr;
 }
