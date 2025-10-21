@@ -631,22 +631,81 @@ jobs:
                   ./scripts/run_in_build_env.sh "gn gen out/ci_build --args='is_debug=false target_os=\"all\"'"
                   ./scripts/run_in_build_env.sh "ninja -C out/ci_build linux_apps_for_ci"
                   ./scripts/run_in_build_env.sh "find out/ci_build/standalone -maxdepth 1 -type f -executable -exec cp {} objdir-clone \;"
+                  rm -rf out/ci_build
 
-            - name: Build remaining apps for REPL tests using build_examples.py
+            - name: Build linux-x64-fabric-admin-rpc
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang"
+            - name: Build linux-x64-fabric-bridge-rpc
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang"
+            - name: Build linux-x64-fabric-sync
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-fabric-sync-${BUILD_VARIANT}-clang
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-fabric-sync-${BUILD_VARIANT}-clang"
+            # TODO: camera app needs clang support
+            - name: Build linux-x64-camera
               env:
                   CCACHE_DIR: "${{ github.workspace }}/.ccache"
-              run: |
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py \
-                    --target linux-x64-fabric-admin-rpc-${{matrix.build_variant}}-clang \
-                    --target linux-x64-fabric-bridge-rpc-${{matrix.build_variant}}-clang \
-                    --target linux-x64-fabric-sync-${{matrix.build_variant}}-clang \
-                    --target linux-x64-camera \
-                    --target linux-x64-camera-controller \
-                    --target linux-x64-light-data-model-no-unique-id-${{matrix.build_variant}}-clang \
-                    --target linux-x64-python-bindings-webrtc \
-                    --target linux-x64-jf-control-app \
-                    --target linux-x64-jf-admin-app \
-                    --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone"
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-camera
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-camera"
+            - name: Build linux-x64-camera-controller
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-camera-controller
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-camera-controller"
+            - name: Build linux-x64-light-data-model-no-unique-id
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang"
+            - name: Build linux-x64-python-bindings
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-python-bindings-webrtc
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-python-bindings-webrtc"
+            - name: Build linux-x64-jf-control-app
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-jf-control-app
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-jf-control-app"
+            - name: Build linux-x64-jf-admin-app
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-jf-admin-app
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-jf-admin-app"
 
             - name: ccache stats
               run: ccache -s
