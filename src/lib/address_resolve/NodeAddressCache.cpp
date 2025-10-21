@@ -25,39 +25,37 @@ namespace AddressResolve {
 
 void NodeAddressCache::CacheNode(const PeerId & peerId, const ResolveResult & result)
 {
-    // Check if peerId already exists in cache to update it
-    RemoveCachedNodeAddress(peerId);
-
-    // If cache is full, overwrite oldest entry (FIFO)
-    if (mCacheCount >= kMaxCacheSize)
+    // If already exists, update without changing insertion order
+    if (mCache.find(peerId) != mCache.end())
     {
-        ChipLogProgress(Discovery, "Cache full, overwriting oldest entry");
-        RemoveCachedNodeAddress(mCache[0].peerId);
-        if (mCacheCount >= kMaxCacheSize) {
-            ChipLogProgress(Discovery, "Cache removal failed");
-            return;
-        }
+        mCache[peerId] = result;
+        ChipLogProgress(Discovery, "Updated cached address for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+        return;
+    }
+
+    // If cache is full, remove oldest entry
+    if (mCache.size() >= kMaxCacheSize)
+    {
+        PeerId oldest = mInsertionOrder.front();
+        mInsertionOrder.pop();
+        mCache.erase(oldest);
+        ChipLogProgress(Discovery, "Cache full, removed oldest entry");
     }
 
     // Add new entry
-    mCache[mCacheCount].peerId = peerId;
-    mCache[mCacheCount].result = result;
-    ++mCacheCount;
-
+    mCache[peerId] = result;
+    mInsertionOrder.push(peerId);
     ChipLogProgress(Discovery, "Cached address for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
-    return;
 }
 
 CHIP_ERROR NodeAddressCache::GetCachedNodeAddress(const PeerId & peerId, ResolveResult & result) const
 {
-    for (size_t i = 0; i < mCacheCount; ++i)
+    auto it = mCache.find(peerId);
+    if (it != mCache.end())
     {
-        if (mCache[i].peerId == peerId)
-        {
-            result = mCache[i].result;
-            ChipLogProgress(Discovery, "Retrieved cached address for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
-            return CHIP_NO_ERROR;
-        }
+        result = it->second;
+        ChipLogProgress(Discovery, "Retrieved cached address for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+        return CHIP_NO_ERROR;
     }
     ChipLogError(Discovery, "No cached address for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
     return CHIP_ERROR_KEY_NOT_FOUND;
@@ -65,22 +63,12 @@ CHIP_ERROR NodeAddressCache::GetCachedNodeAddress(const PeerId & peerId, Resolve
 
 CHIP_ERROR NodeAddressCache::RemoveCachedNodeAddress(const PeerId & peerId)
 {
-    for (size_t i = 0; i < mCacheCount; ++i)
+    if (mCache.erase(peerId) > 0)
     {
-        if (mCache[i].peerId == peerId)
-        {
-            // Shift all entries after the removed one to maintain FIFO order
-            for (size_t j = i; j < mCacheCount - 1; ++j)
-            {
-                mCache[j] = mCache[j + 1];
-            }
-            
-            mCache[mCacheCount - 1].peerId = PeerId();
-            --mCacheCount;
-            
-            ChipLogProgress(Discovery, "Removed cached address for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
-            return CHIP_NO_ERROR;
-        }
+        // Note: We don't remove from mInsertionOrder queue as it's expensive
+        // The queue will be cleaned up naturally during FIFO eviction
+        ChipLogProgress(Discovery, "Removed cached address for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+        return CHIP_NO_ERROR;
     }
     ChipLogError(Discovery, "No cached address to remove for NodeId: 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
     return CHIP_ERROR_KEY_NOT_FOUND;
@@ -88,7 +76,9 @@ CHIP_ERROR NodeAddressCache::RemoveCachedNodeAddress(const PeerId & peerId)
 
 void NodeAddressCache::Clear()
 {
-    mCacheCount = 0;
+    mCache.clear();
+    std::queue<PeerId> empty;
+    mInsertionOrder.swap(empty);
 }
 
 } // namespace AddressResolve

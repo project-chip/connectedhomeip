@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <map>
+#include <queue>
 #include <lib/core/NodeId.h>
 
 namespace chip {
@@ -30,17 +32,21 @@ public:
     CHIP_ERROR GetCachedNodeAddress(const PeerId & peerId, ResolveResult & result) const;
     CHIP_ERROR RemoveCachedNodeAddress(const PeerId & peerId);
     void Clear();
-    size_t GetCacheSize() const { return mCacheCount; }
+    size_t GetCacheSize() const { return mCache.size(); }
 
 private:
-    struct CacheEntry
+    struct PeerIdComparator
     {
-        PeerId peerId;
-        ResolveResult result;
+        bool operator()(const PeerId & lhs, const PeerId & rhs) const
+        {
+            if (lhs.GetCompressedFabricId() != rhs.GetCompressedFabricId())
+                return lhs.GetCompressedFabricId() < rhs.GetCompressedFabricId();
+            return lhs.GetNodeId() < rhs.GetNodeId();
+        }
     };
 
-    CacheEntry mCache[kMaxCacheSize];
-    size_t mCacheCount     = 0;
+    std::map<PeerId, ResolveResult, PeerIdComparator> mCache;
+    std::queue<PeerId> mInsertionOrder;
 };
 
 } // namespace AddressResolve
