@@ -182,12 +182,12 @@ CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionId, 
     for (const auto & candidateInfo : mClientICECandidates)
     {
         ICECandidateStruct iceCandidate;
-        iceCandidate.candidate = CharSpan::fromCharString(candidateInfo.candidate.c_str());
+        iceCandidate.candidate = CharSpan(candidateInfo.candidate.data(), candidateInfo.candidate.size());
 
         // Set SDPMid if available
         if (!candidateInfo.mid.empty())
         {
-            iceCandidate.SDPMid.SetNonNull(CharSpan::fromCharString(candidateInfo.mid.c_str()));
+            iceCandidate.SDPMid.SetNonNull(CharSpan(candidateInfo.mid.data(), candidateInfo.mid.size()));
         }
         else
         {
