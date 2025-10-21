@@ -563,9 +563,9 @@ bool EventManagement::IncludeEventInReport(EventLoadOutContext * eventLoadOutCon
         // (other than omitting the event), because the only way we can end up in this situation
         // is with a wildcard event path.
         //
-        // TODO: We should not record the event in the log buffer when the event is not supported by the data model
+        // TODO: We should not record the event in the log buffer when the event is not supported by the data model, see #41448.
         // TODO: We should remove the event from the log buffer when the event path is no longer valid (eg. when the endpoint of the
-        // event path is removed).
+        // event path is removed), see #41448
         return false;
     }
 
