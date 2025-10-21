@@ -108,7 +108,7 @@ CHIP_ERROR ReadClusterAttribute(app::ServerClusterInterface & cluster, Attribute
 {
     static_assert(std::is_integral_v<T> || std::is_enum_v<T>);
 
-    return Helper::ReadAttributte(cluster, attr, value);
+    return Helper::ReadAttribute(cluster, attr, value);
 }
 
 // Helper function to write any attribute value of a given type
