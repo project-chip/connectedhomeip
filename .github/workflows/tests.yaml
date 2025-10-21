@@ -660,7 +660,6 @@ jobs:
                     # --target linux-x64-closure-${{matrix.build_variant}}-tsan-clang-test \
                     # --target linux-x64-water-leak-detector-${{matrix.build_variant}}-tsan-clang-test \
                     --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone"
-                  rm -rf out
 
             - name: ccache stats
               run: ccache -s
