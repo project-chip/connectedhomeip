@@ -557,8 +557,12 @@ bool EventManagement::IncludeEventInReport(EventLoadOutContext * eventLoadOutCon
     DataModel::EventEntry eventInfo;
     if (InteractionModelEngine::GetInstance()->GetDataModelProvider()->EventInfo(path, eventInfo) != CHIP_NO_ERROR)
     {
-        // If we cannot get event info here, the interested path should be a wildcard path but the data model does't support the
-        // event (eg. The endpoint is removed), return false here so the event path will be excluded in the generated event report.
+        // If we cannot get event info here, that means the data model doesn't support the
+        // event (eg. the endpoint is removed).  Return false, because we can't even perform ACL checks here,
+        // since we don't know what permissions to check for.  This is not an error condition
+        // (other than omitting the event), because the only way we can end up in this situation
+        // is with a wildcard event path.
+        //
         // TODO: We should not record the event in the log buffer when the event is not supported by the data model
         // TODO: We should remove the event from the log buffer when the event path is no longer valid (eg. when the endpoint of the
         // event path is removed).
