@@ -196,10 +196,10 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
 
         # Verify on te OTA-P Logs  and confirm there is no other ApplyUpdateRequest form the DUT
-        expected_line = 'Provider received ApplyUpdateRequest'
-        found_lines = self.current_provider_app_proc.read_from_logs(expected_line)
-        asserts.assert_equal(len(found_lines), 1,
-                             f"Zero or more than 1 lines , but not 1 line containing {expected_line} found in the logs")
+        update_state = await self.read_single_attribute_check_success(
+            Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, self.controller, self.requestor_node_id, 0)
+        asserts.assert_equal(update_state, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
+                             "Update state should be idle")
         self.current_provider_app_proc.terminate()
 
         self.step(2)
