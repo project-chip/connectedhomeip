@@ -78,10 +78,15 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::WriteImpl(const DataMod
     switch (request.path.mAttributeId)
     {
     case ResourceMonitoring::Attributes::LastChangedTime::Id: {
+
         uint32_t lastChangedTime;
-        ReturnErrorOnFailure(persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, lastChangedTime));
-        mLastChangedTime = DataModel::MakeNullable(lastChangedTime);
-        return DataModel::ActionReturnStatus(CHIP_NO_ERROR);
+
+        DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, lastChangedTime);
+        if (status == CHIP_NO_ERROR)
+        {
+            mLastChangedTime = DataModel::MakeNullable(lastChangedTime);
+        }
+        return status;
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
