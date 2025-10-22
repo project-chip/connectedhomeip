@@ -53,7 +53,7 @@ void CommodityTariffInstance::InitializeMockClock(uint32_t aInitialTimeValue_s)
 {
     // Create and configure the mock clock
     mMockClock = std::make_unique<Internal::MockClock>();
-    Microseconds64 realTime_us;    
+    Microseconds64 realTime_us;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (aInitialTimeValue_s == 0)
@@ -63,9 +63,8 @@ void CommodityTariffInstance::InitializeMockClock(uint32_t aInitialTimeValue_s)
     }
     else
     {
-        realTime_us = aInitialTimeValue_s * 1'000'000_us;  // seconds to microseconds
+        realTime_us = aInitialTimeValue_s * 1'000'000_us; // seconds to microseconds
     }
-
 
     if (err == CHIP_NO_ERROR)
     {
@@ -202,8 +201,8 @@ void CommodityTariffInstance::ScheduleTariffTimeUpdate()
     constexpr auto pollInterval = kTimerPollIntervalInSec * 1_s;
 
     DeviceLayer::SystemLayer().StartTimer(
-        pollInterval,
-        [](System::Layer *, void * context) { static_cast<CommodityTariffInstance *>(context)->TariffTimeUpdCb(); }, this);
+        pollInterval, [](System::Layer *, void * context) { static_cast<CommodityTariffInstance *>(context)->TariffTimeUpdCb(); },
+        this);
     AdvanceTestTime(pollInterval);
 }
 
