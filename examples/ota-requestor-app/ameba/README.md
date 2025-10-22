@@ -6,11 +6,11 @@ A prototype application that demonstrates OTA Requestor capabilities.
 
 -   Pull docker image:
 
-          $ docker pull ghcr.io/project-chip/chip-build-ameba:168
+          $ docker pull ghcr.io/project-chip/chip-build-ameba:172
 
 -   Run docker container:
 
-          $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-ameba:168
+          $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-ameba:172
 
 -   Setup build environment:
 
