@@ -34,6 +34,7 @@
 #include <app/reporting/ReportScheduler.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
+#include <credentials/GroupcastDataProvider.h>
 #include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPConfig.h>
 #include <protocols/bdx/BdxTransferServer.h>
@@ -119,6 +120,7 @@ struct DeviceControllerSystemStateParams
     WiFiPAF::WiFiPAFLayer * wifipaf_layer = nullptr;
 #endif
     Credentials::GroupDataProvider * groupDataProvider = nullptr;
+    chip::Groupcast::DataProvider * groupcastDataProvider = nullptr;
     Crypto::SessionKeystore * sessionKeystore          = nullptr;
 
     // NOTE: Exactly one of externalSessionResumptionStorage (externally provided,
@@ -176,7 +178,8 @@ public:
         mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable),
         mBDXTransferServer(params.bdxTransferServer), mCASEServer(params.caseServer),
         mCASESessionManager(params.caseSessionManager), mSessionSetupPool(params.sessionSetupPool),
-        mCASEClientPool(params.caseClientPool), mGroupDataProvider(params.groupDataProvider), mTimerDelegate(params.timerDelegate),
+        mCASEClientPool(params.caseClientPool), mGroupDataProvider(params.groupDataProvider),
+        mGroupcastDataProvider(params.groupcastDataProvider), mTimerDelegate(params.timerDelegate),
         mReportScheduler(params.reportScheduler), mSessionKeystore(params.sessionKeystore),
         mFabricTableDelegate(params.fabricTableDelegate),
         mOwnedSessionResumptionStorage(std::move(params.ownedSessionResumptionStorage))
@@ -229,7 +232,7 @@ public:
         return mSystemLayer != nullptr && mUDPEndPointManager != nullptr && mTransportMgr != nullptr && mSessionMgr != nullptr &&
             mUnsolicitedStatusHandler != nullptr && mExchangeMgr != nullptr && mMessageCounterManager != nullptr &&
             mFabrics != nullptr && mCASESessionManager != nullptr && mSessionSetupPool != nullptr && mCASEClientPool != nullptr &&
-            mGroupDataProvider != nullptr && mReportScheduler != nullptr && mTimerDelegate != nullptr &&
+            mGroupDataProvider != nullptr && mGroupcastDataProvider != nullptr && mReportScheduler != nullptr && mTimerDelegate != nullptr &&
             mSessionKeystore != nullptr && mSessionResumptionStorage != nullptr && mBDXTransferServer != nullptr;
     };
     bool IsShutDown() const { return mHaveShutDown; }
@@ -247,6 +250,7 @@ public:
 #endif
     CASESessionManager * CASESessionMgr() const { return mCASESessionManager; }
     Credentials::GroupDataProvider * GetGroupDataProvider() const { return mGroupDataProvider; }
+    Groupcast::DataProvider * GetGroupcastDataProvider() const { return mGroupcastDataProvider; }
     chip::app::reporting::ReportScheduler * GetReportScheduler() const { return mReportScheduler; }
     SessionResumptionStorage * GetSessionResumptionStorage() const { return mSessionResumptionStorage; }
 
@@ -279,6 +283,7 @@ private:
     SessionSetupPool * mSessionSetupPool                                           = nullptr;
     CASEClientPool * mCASEClientPool                                               = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider                            = nullptr;
+    Groupcast::DataProvider * mGroupcastDataProvider                               = nullptr;
     app::reporting::ReportScheduler::TimerDelegate * mTimerDelegate                = nullptr;
     app::reporting::ReportScheduler * mReportScheduler                             = nullptr;
     Crypto::SessionKeystore * mSessionKeystore                                     = nullptr;

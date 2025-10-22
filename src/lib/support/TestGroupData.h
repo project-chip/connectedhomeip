@@ -19,6 +19,7 @@
 #pragma once
 
 #include <credentials/GroupDataProvider.h>
+#include <credentials/GroupcastDataProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
 
 namespace chip {
@@ -39,9 +40,10 @@ public:
     }
 };
 
-inline CHIP_ERROR InitData(chip::Credentials::GroupDataProvider * provider, chip::FabricIndex fabric_index,
+inline CHIP_ERROR InitData(chip::Credentials::GroupDataProvider * provider, chip::Groupcast::DataProvider *groupcast, chip::FabricIndex fabric_index,
                            const ByteSpan & compressed_fabric_id)
 {
+    VerifyOrReturnValue((nullptr != provider) && (nullptr != groupcast), CHIP_ERROR_INTERNAL);
     static const chip::GroupId kGroup1   = 0x0101;
     static const chip::GroupId kGroup2   = 0x0102;
     static const chip::GroupId kGroup3   = 0x0103;
@@ -101,6 +103,19 @@ inline CHIP_ERROR InitData(chip::Credentials::GroupDataProvider * provider, chip
     provider->SetGroupKeyAt(fabric_index, 0, chip::Credentials::GroupDataProvider::GroupKey(kGroup1, kKeySet1));
     provider->SetGroupKeyAt(fabric_index, 1, chip::Credentials::GroupDataProvider::GroupKey(kGroup2, kKeySet2));
     provider->SetGroupKeyAt(fabric_index, 2, chip::Credentials::GroupDataProvider::GroupKey(kGroup3, kKeySet3));
+
+    // Groupcast
+
+    static const chip::GroupId kGroup4 = 0x8101;
+    static const chip::GroupId kGroup5 = 0x8102;
+    chip::Groupcast::Group group(kGroup4, kKeySet1);
+    group.endpoint_count = 1;
+    group.endpoints[0] = 1;
+    groupcast->AddGroup(fabric_index, group);
+
+    group.group_id = kGroup5;
+    group.key_id = kKeySet2;
+    groupcast->AddGroup(fabric_index, group);
 
     return CHIP_NO_ERROR;
 }

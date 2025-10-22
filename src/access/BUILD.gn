@@ -59,6 +59,10 @@ static_library("access") {
     "examples/ExampleAccessControlDelegate.h",
     "examples/PermissiveAccessControlDelegate.cpp",
     "examples/PermissiveAccessControlDelegate.h",
+    "examples/ExtendedAccessControlDelegate.cpp",
+    "examples/ExtendedAccessControlDelegate.h",
+    "examples/GroupcastAccessControlDelegate.cpp",
+    "examples/GroupcastAccessControlDelegate.h",
   ]
 
   cflags = [ "-Wconversion" ]

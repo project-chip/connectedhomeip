@@ -20,6 +20,10 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 };
 } // namespace
 
+GroupcastCluster::GroupcastCluster() :
+    DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mLogic(BitFlags<Groupcast::Feature>())
+{}
+
 GroupcastCluster::GroupcastCluster(BitFlags<Groupcast::Feature> features) :
     DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mLogic(features)
 {}
@@ -62,10 +66,11 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
         return mLogic.JoinGroup(fabric_index, data);
     }
     case Groupcast::Commands::LeaveGroup::Id: {
+        chip::Groupcast::Group group;
         Groupcast::Commands::LeaveGroup::DecodableType data;
         Groupcast::Commands::LeaveGroupResponse::Type response;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        mLogic.LeaveGroup(fabric_index, data, response);
+        mLogic.LeaveGroup(fabric_index, group, data, response);
         handler->AddResponse(request.path, response);
         return std::nullopt;
     }
