@@ -50,9 +50,6 @@ using CalendarPeriodStructType    = CalendarPeriodStruct::Type;
 // Test Time Management Implementation
 // ============================================================================
 
-Clock::Internal::MockClock * pMockClock = nullptr;
-Clock::ClockBase * pRealClock           = nullptr;
-
 void CommodityTariffInstance::InitializeMockClock(uint32_t aInitialTimeValue_s)
 {
     // Create and configure the mock clock
@@ -126,8 +123,8 @@ void CommodityTariffInstance::AdvanceMockTime(Seconds32 offset)
     pMockClock->GetClock_RealTime(newTime);
 
     ChipLogProgress(DeviceLayer, "Advanced mock time: %" PRIu32 "s -> %" PRIu32 "s (+%" PRIu32 "s)",
-                    std::chrono::duration_cast<Milliseconds32>(currentTime).count(),
-                    std::chrono::duration_cast<Milliseconds32>(newTime).count(), offset.count());
+                    std::chrono::duration_cast<Seconds32>(currentTime).count(),
+                    std::chrono::duration_cast<Seconds32>(newTime).count(), offset.count());
 }
 
 // ============================================================================

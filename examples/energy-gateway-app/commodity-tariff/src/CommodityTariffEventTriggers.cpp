@@ -173,7 +173,6 @@ void SetTestEventTrigger_TimeShiftDisable()
     if (instance)
     {
         instance->EnableTestTime(false);
-        instance->AdvanceTestTime(chip::System::Clock::Seconds32(0));
     }
 }
 

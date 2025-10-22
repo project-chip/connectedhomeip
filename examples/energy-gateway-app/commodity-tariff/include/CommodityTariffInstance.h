@@ -81,6 +81,8 @@ public:
 
 private:
     CommodityTariffDelegate * mCommodityTariffDelegate;
+    chip::System::Clock::Internal::MockClock * pMockClock = nullptr;
+    chip::System::Clock::ClockBase * pRealClock           = nullptr;
 
     // Test Time Management
     bool mTestTimeEnabled = false;
