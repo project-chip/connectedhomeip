@@ -313,8 +313,8 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
         // This ensures that retransmissions for first message are spaced out enough to
         // avoid unnecessary retries and potential message congestion.
         // If not enough, we can consider increasing it further via sAdditionalLitBackoffInterval.
-        // Note: a controller should only try to transmit when the LIT device is known to be in 
-        // its Session Active Interval since, in almost all cases, it won't be reachable when its 
+        // Note: a controller should only try to transmit when the LIT device is known to be in
+        // its Session Active Interval since, in almost all cases, it won't be reachable when its
         // on Session Idle Interval.
         config.mIdleRetransTimeout = config.mActiveRetransTimeout + sAdditionalLitBackoffInterval;
     }
