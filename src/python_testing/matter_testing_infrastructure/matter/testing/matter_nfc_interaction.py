@@ -145,7 +145,7 @@ def _read_ndef_length(connection):
     # Convert 2-byte big-endian length to integer
     length = (data[0] << 8) + data[1]
     asserts.assert_less(length, MAX_NDEF_DATA_LENGTH, msg=f"NDEF of longer length than 256 are currently not managed,"
-                                               f" current length: {length}")
+                        f" current length: {length}")
     return length
 
 
@@ -269,8 +269,8 @@ def connect_read_nfc_tag_data(nfc_reader_index):
     asserts.assert_true(len(available_nfc_readers) > 0, "No NFC readers found.")
 
     # Read and return NFC tag data
-    asserts.assert_greater( len(available_nfc_readers),nfc_reader_index,
-                                  f"Invalid NFC reader index {nfc_reader_index} provided by user as the Number of "
-                                  f"NFC Readers available is {len(available_nfc_readers)}")
+    asserts.assert_greater(len(available_nfc_readers), nfc_reader_index,
+                           f"Invalid NFC reader index {nfc_reader_index} provided by user as the Number of "
+                           f"NFC Readers available is {len(available_nfc_readers)}")
     nfc_tag_data = _read_nfc_tag_data(available_nfc_readers, nfc_reader_index)
     return nfc_tag_data

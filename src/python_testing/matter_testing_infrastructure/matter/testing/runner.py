@@ -658,7 +658,7 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
 
     # Skip discriminator/setup-pincode/QR-code/manual-code validation only for NFC in-test commissioning
     skip_nfc_intest_commission_data_validation = (args.in_test_commissioning_method is not None and
-                                  'nfc' in args.in_test_commissioning_method)
+                                                  'nfc' in args.in_test_commissioning_method)
 
     if not skip_nfc_intest_commission_data_validation:
         if len(config.dut_node_ids) > len(device_descriptors):
