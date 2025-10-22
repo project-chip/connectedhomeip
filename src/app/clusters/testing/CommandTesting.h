@@ -237,6 +237,10 @@ public:
     const DataModel::InvokeRequest & GetRequest() const { return mRequest; }
 
 private:
+    // Buffer size for TLV encoding/decoding of command payloads.
+    // 256 bytes was chosen as a conservative upper bound for typical command payloads in tests.
+    // All command payloads used in tests must fit within this buffer; tests with larger payloads will fail.
+    // If protocol or test requirements change, this value may need to be increased.
     static constexpr size_t kTlvBufferSize = 256;
 
     ConcreteCommandPath mCommandPath;
