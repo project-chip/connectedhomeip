@@ -45,7 +45,7 @@ struct TestUserLabelCluster : public ::testing::Test
 
     void TearDown() override { userLabel.Shutdown(); }
 
-    TestUserLabelCluster() : testContext(), context(testContext.Create()), userLabel(kRootEndpointId) {}
+    TestUserLabelCluster() : context(testContext.Create()), userLabel(kRootEndpointId) {}
 
     chip::Test::TestServerClusterContext testContext;
     ServerClusterContext context;

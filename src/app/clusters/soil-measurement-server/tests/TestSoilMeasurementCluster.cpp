@@ -72,8 +72,7 @@ struct TestSoilMeasurementCluster : public ::testing::Test
     void TearDown() override { soilMeasurement.Shutdown(); }
 
     TestSoilMeasurementCluster() :
-        testContext(), context(testContext.Create()),
-        soilMeasurement(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits)
+        context(testContext.Create()), soilMeasurement(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits)
     {}
 
     chip::Test::TestServerClusterContext testContext;

@@ -44,7 +44,7 @@ struct TestFixedLabelCluster : public ::testing::Test
 
     void TearDown() override { fixedLabel.Shutdown(); }
 
-    TestFixedLabelCluster() : testContext(), context(testContext.Create()), fixedLabel(kRootEndpointId) {}
+    TestFixedLabelCluster() : context(testContext.Create()), fixedLabel(kRootEndpointId) {}
 
     chip::Test::TestServerClusterContext testContext;
     ServerClusterContext context;

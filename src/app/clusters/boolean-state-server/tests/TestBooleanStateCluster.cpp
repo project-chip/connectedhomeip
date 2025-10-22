@@ -44,7 +44,7 @@ struct TestBooleanStateCluster : public ::testing::Test
 
     void TearDown() override { booleanState.Shutdown(); }
 
-    TestBooleanStateCluster() : testContext(), context(testContext.Create()), booleanState(kRootEndpointId) {}
+    TestBooleanStateCluster() : context(testContext.Create()), booleanState(kRootEndpointId) {}
 
     chip::Test::TestServerClusterContext testContext;
     ServerClusterContext context;
