@@ -40,8 +40,7 @@ import time
 from typing import List
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from matter.testing.matter_testing import asserts
+from matter.testing.matter_testing import MatterBaseTest, TestStep, asserts, async_test_body, default_matter_test_main
 
 
 class TC_DGGEN_2_1_Py(MatterBaseTest):
