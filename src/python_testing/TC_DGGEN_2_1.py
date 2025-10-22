@@ -1,5 +1,5 @@
-#
-#    Copyright (c) 2023 Project CHIP Authors
+
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +14,34 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/dggen_2_1_fifo
+#     app-ready-pattern: "Server initialization complete"
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --app-pipe /tmp/dggen_2_1_fifo
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 0
+# === END CI TEST ARGUMENTS ===
 
 
 import asyncio
 import logging
+import time
 from typing import List
 
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import asserts
 
 
 class TC_DGGEN_2_1_Py(MatterBaseTest):
@@ -133,6 +153,13 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
 
         ctrl = self.default_controller
 
+        # CI-specific setup: Set uptime > 2 hours for CI testing
+        if self.is_pics_sdk_ci_only:
+            logging.info("CI environment detected - setting uptime > 2 hours via named pipe")
+            # Set TotalOperationalHours to 3 hours (10800 seconds) for CI testing
+            self.write_to_app_pipe({"Name": "SetTotalOperationalHours", "Hours": 3})
+            logging.info("Uptime manipulation completed for CI")
+
         # Step 0: Manual precondition
         self.step(0)
         logging.info(
@@ -140,19 +167,13 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
             "If not, retry later."
         )
 
-        # Step 1: TotalOperationalHours > 2  (with skip/bypass support)
+        # Step 1: TotalOperationalHours > 2
         self.step(1)
         total_hrs = await self._read_total_hrs(ctrl)
         logging.info(f"TotalOperationalHours (pre): {total_hrs}")
 
-        if total_hrs > 2:
-            logging.info("Precondition met: TotalOperationalHours > 2")
-        else:
-            logging.warning(
-                "Precondition NOT met: TotalOperationalHours=%s <= 2. "
-                "Proceeding with the rest of the test anyway for development runs.",
-                total_hrs,
-            )
+        assert total_hrs > 2, f"Precondition not met: TotalOperationalHours={total_hrs} <= 2. Device must have been in use for more than 2 hours without factory reset."
+        logging.info("Precondition met: TotalOperationalHours > 2")
 
         # Step 2: 2a mod — save RebootCount (without requiring value)
         self.step(2)
@@ -169,9 +190,39 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
 
         # Step 4: 4c — Reboot (manual/automated) + wait for reconnection
         self.step(4)
-        logging.info("[Required action] Reboot the DUT now (manual or external lab command).")
-        logging.info("Waiting for the DUT to become accessible again...")
-        await self._wait_for_commissionee(timeout_s=180)
+        # Check if restart flag file is available (indicates test runner supports app restart)
+        restart_flag_file = self.get_restart_flag_file()
+
+        if not restart_flag_file:
+            # No restart flag file: ask user to manually reboot
+            self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
+
+            # After manual reboot, expire previous sessions so that we can re-establish connections
+            logging.info("Expiring sessions after manual device reboot")
+            self.th1.ExpireSessions(self.dut_node_id)
+            self.th2.ExpireSessions(self.dut_node_id)
+            logging.info("Manual device reboot completed")
+
+        else:
+            try:
+                # Create the restart flag file to signal the test runner
+                with open(restart_flag_file, "w") as f:
+                    f.write("restart")
+                logging.info("Created restart flag file to signal app restart")
+
+                # The test runner will automatically wait for the app-ready-pattern before continuing
+                # Waiting 1 second after the app-ready-pattern is detected as we need to wait a tad longer for the app to be ready and stable, otherwise TH2 connection fails later on in test step 14.
+                time.sleep(1)
+
+                # Expire sessions and re-establish connections
+                self.th1.ExpireSessions(self.dut_node_id)
+                self.th2.ExpireSessions(self.dut_node_id)
+
+                logging.info("App restart completed successfully")
+
+            except Exception as e:
+                logging.error(f"Failed to restart app: {e}")
+                asserts.fail(f"App restart failed: {e}")
 
         # Step 5: 2b mod — RebootCount must be boot_count1 + 1
         self.step(5)
