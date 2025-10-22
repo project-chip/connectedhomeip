@@ -631,14 +631,36 @@ jobs:
             - name: Build python env
               run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache)'
 
-            - name: Build apps for REPL tests with unified build (`linux_apps_for_ci` target)
+            - name: Build apps for REPL tests with unified build
               env:
                   CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: |
-                  ./scripts/run_in_build_env.sh "gn gen out/ci_build --check --fail-on-unused-args --add-export-compile-commands=* --args='is_debug=false target_os=\"all\" chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_ble=false chip_enable_wifi=false is_tsan=true is_clang=true chip_im_force_fabric_quota_check=true'"
-                  ./scripts/run_in_build_env.sh "ninja -C out/ci_build linux_apps_for_ci"
-                  ./scripts/run_in_build_env.sh "find out/ci_build/standalone -maxdepth 1 -type f -executable -exec cp {} objdir-clone \;"
-                  rm -rf out/ci_build
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-air-purifier-${BUILD_VARIANT}-clang-unified \
+                        --target linux-x64-all-clusters-${BUILD_VARIANT}-clang-unified \
+                        --target linux-x64-bridge-${BUILD_VARIANT}-clang-unified \
+                        --target linux-x64-closure-${BUILD_VARIANT}-clang-unified \
+                        --target linux-x64-energy-gateway-${BUILD_VARIANT}-clang-unified \
+                        --target linux-x64-energy-management-${BUILD_VARIANT}-clang-unified \
+                        --target linux-x64-light-${BUILD_VARIANT}-clang-unified \
+                        --target linux-x64-lit-icd-${BUILD_VARIANT}-clang-unified \
+                        --target linux-x64-lock-${BUILD_VARIANT}-clang-unified \
+                        --target linux-x64-microwave-oven-${BUILD_VARIANT}-clang-unified \
+                        --target linux-x64-network-manager-${BUILD_VARIANT}-clang-unified \
+                        --target linux-x64-ota-provider-${BUILD_VARIANT}-clang-unified \
+                        --target linux-x64-ota-requestor-${BUILD_VARIANT}-clang-unified \
+                        --target linux-x64-rvc-${BUILD_VARIANT}-clang-unified \
+                        --target linux-x64-terms-and-conditions-${BUILD_VARIANT}-clang-unified \
+                        --target linux-x64-thermostat-${BUILD_VARIANT}-clang-unified \
+                        --target linux-x64-tv-app-${BUILD_VARIANT}-clang-unified \
+                        --target linux-x64-tv-casting-app-${BUILD_VARIANT}-clang-unified \
+                        --target linux-x64-water-leak-detector-${BUILD_VARIANT}-clang-unified \
+                        --pw-command-launcher=ccache \
+                        build \
+                        --copy-artifacts-to objdir-clone \
+                     "
+                  rm -rf out/unified-build
 
             - name: Build linux-x64-fabric-admin-rpc
               env:
