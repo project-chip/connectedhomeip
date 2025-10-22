@@ -15,6 +15,13 @@
 #
 mainmenu "NXP Matter Unit Test Application"
 
+if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+
+config gMainThreadStackSize_c
+	default 6144
+
+endif # if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+
 source "$(CHIP_ROOT)/config/nxp/chip-cmake-freertos/Kconfig.defaults"
 source "$(CHIP_ROOT)/examples/platform/nxp/common/Kconfig"
 source "Kconfig.mcuxpresso"

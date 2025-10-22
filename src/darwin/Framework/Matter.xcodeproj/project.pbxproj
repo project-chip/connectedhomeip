@@ -168,6 +168,16 @@
 		5129BCFD26A9EE3300122DDF /* MTRError.h in Headers */ = {isa = PBXBuildFile; fileRef = 5129BCFC26A9EE3300122DDF /* MTRError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		512E8E7A2D52F7B6009407E3 /* MTRCommandWithRequiredResponse.mm in Sources */ = {isa = PBXBuildFile; fileRef = 512E8E792D52F7B6009407E3 /* MTRCommandWithRequiredResponse.mm */; };
 		512E8E7B2D52F7B6009407E3 /* MTRCommandWithRequiredResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 512E8E782D52F7B6009407E3 /* MTRCommandWithRequiredResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		512FC0E32E7DB2FC00239104 /* CodegenIntegration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 512FC0E22E7DB2FC00239104 /* CodegenIntegration.cpp */; };
+		512FC0E42E7DB2FC00239104 /* CodegenIntegration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 512FC0E22E7DB2FC00239104 /* CodegenIntegration.cpp */; };
+		512FC0E62E7DB5C100239104 /* AttributeListBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 512FC0E52E7DB5C100239104 /* AttributeListBuilder.cpp */; };
+		512FC0E72E7DB5C100239104 /* AttributeListBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 512FC0E52E7DB5C100239104 /* AttributeListBuilder.cpp */; };
+		512FC0E92E7DB5D000239104 /* AttributeListBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 512FC0E82E7DB5D000239104 /* AttributeListBuilder.h */; };
+		512FC0EA2E7DB5D000239104 /* AttributeListBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 512FC0E82E7DB5D000239104 /* AttributeListBuilder.h */; };
+		512FC0ED2E7DB60E00239104 /* ClusterIntegration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 512FC0EC2E7DB60E00239104 /* ClusterIntegration.cpp */; };
+		512FC0EE2E7DB60E00239104 /* ClusterIntegration.h in Headers */ = {isa = PBXBuildFile; fileRef = 512FC0EB2E7DB60E00239104 /* ClusterIntegration.h */; };
+		512FC0EF2E7DB60E00239104 /* ClusterIntegration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 512FC0EC2E7DB60E00239104 /* ClusterIntegration.cpp */; };
+		512FC0F02E7DB60E00239104 /* ClusterIntegration.h in Headers */ = {isa = PBXBuildFile; fileRef = 512FC0EB2E7DB60E00239104 /* ClusterIntegration.h */; };
 		5131BF662BE2E1B000D5D6BC /* MTRTestCase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5131BF642BE2E1B000D5D6BC /* MTRTestCase.mm */; };
 		51339B1F2A0DA64D00C798C1 /* MTRCertificateValidityTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 51339B1E2A0DA64D00C798C1 /* MTRCertificateValidityTests.m */; };
 		5136661328067D550025EDAE /* MTRDeviceController_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 5136660F28067D540025EDAE /* MTRDeviceController_Internal.h */; };
@@ -192,8 +202,6 @@
 		514A98AF2CD98C5E000EF4FD /* MTRAttributeValueWaiter.h in Headers */ = {isa = PBXBuildFile; fileRef = 514A98AC2CD98C5E000EF4FD /* MTRAttributeValueWaiter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		514A98B02CD98C5E000EF4FD /* MTRAttributeValueWaiter_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 514A98AE2CD98C5E000EF4FD /* MTRAttributeValueWaiter_Internal.h */; };
 		514A98B12CD98C5E000EF4FD /* MTRAttributeValueWaiter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 514A98AD2CD98C5E000EF4FD /* MTRAttributeValueWaiter.mm */; };
-		514C79F02B62ADDA00DD6D7B /* descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 514C79EF2B62ADDA00DD6D7B /* descriptor.cpp */; };
-		514C79F12B62ADDA00DD6D7B /* descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 514C79EF2B62ADDA00DD6D7B /* descriptor.cpp */; };
 		514C79F32B62ED5500DD6D7B /* attribute-storage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 514C79F22B62ED5500DD6D7B /* attribute-storage.cpp */; };
 		514C79F42B62ED5500DD6D7B /* attribute-storage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 514C79F22B62ED5500DD6D7B /* attribute-storage.cpp */; };
 		514C79F62B62F0B900DD6D7B /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 514C79F52B62F0B900DD6D7B /* util.cpp */; };
@@ -201,6 +209,8 @@
 		514C7A012B64223400DD6D7B /* MTRServerAttribute_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 514C79FF2B64223400DD6D7B /* MTRServerAttribute_Internal.h */; };
 		514C7A022B64223400DD6D7B /* MTRServerEndpoint_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 514C7A002B64223400DD6D7B /* MTRServerEndpoint_Internal.h */; };
 		514C7A042B6436D500DD6D7B /* MTRServerCluster_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 514C7A032B6436D500DD6D7B /* MTRServerCluster_Internal.h */; };
+		51517B1D2E7DB25B00904908 /* descriptor-cluster.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 51517B1C2E7DB25B00904908 /* descriptor-cluster.cpp */; };
+		51517B1E2E7DB25B00904908 /* descriptor-cluster.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 51517B1C2E7DB25B00904908 /* descriptor-cluster.cpp */; };
 		51565CAE2A79D42100469F18 /* MTRConversion.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51565CAD2A79D42100469F18 /* MTRConversion.mm */; };
 		51565CB12A7AD77600469F18 /* MTRDeviceControllerDataStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 51565CAF2A7AD77600469F18 /* MTRDeviceControllerDataStore.h */; };
 		51565CB22A7AD77600469F18 /* MTRDeviceControllerDataStore.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51565CB02A7AD77600469F18 /* MTRDeviceControllerDataStore.mm */; };
@@ -796,6 +806,11 @@
 		5129BCFC26A9EE3300122DDF /* MTRError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRError.h; sourceTree = "<group>"; };
 		512E8E782D52F7B6009407E3 /* MTRCommandWithRequiredResponse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRCommandWithRequiredResponse.h; sourceTree = "<group>"; };
 		512E8E792D52F7B6009407E3 /* MTRCommandWithRequiredResponse.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRCommandWithRequiredResponse.mm; sourceTree = "<group>"; };
+		512FC0E22E7DB2FC00239104 /* CodegenIntegration.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = CodegenIntegration.cpp; path = clusters/descriptor/CodegenIntegration.cpp; sourceTree = "<group>"; };
+		512FC0E52E7DB5C100239104 /* AttributeListBuilder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AttributeListBuilder.cpp; sourceTree = "<group>"; };
+		512FC0E82E7DB5D000239104 /* AttributeListBuilder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AttributeListBuilder.h; sourceTree = "<group>"; };
+		512FC0EB2E7DB60E00239104 /* ClusterIntegration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ClusterIntegration.h; sourceTree = "<group>"; };
+		512FC0EC2E7DB60E00239104 /* ClusterIntegration.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ClusterIntegration.cpp; sourceTree = "<group>"; };
 		5131BF642BE2E1B000D5D6BC /* MTRTestCase.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRTestCase.mm; sourceTree = "<group>"; };
 		5131BF652BE2E1B000D5D6BC /* MTRTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestCase.h; sourceTree = "<group>"; };
 		51339B1E2A0DA64D00C798C1 /* MTRCertificateValidityTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRCertificateValidityTests.m; sourceTree = "<group>"; };
@@ -821,12 +836,12 @@
 		514A98AC2CD98C5E000EF4FD /* MTRAttributeValueWaiter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRAttributeValueWaiter.h; sourceTree = "<group>"; };
 		514A98AD2CD98C5E000EF4FD /* MTRAttributeValueWaiter.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRAttributeValueWaiter.mm; sourceTree = "<group>"; };
 		514A98AE2CD98C5E000EF4FD /* MTRAttributeValueWaiter_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRAttributeValueWaiter_Internal.h; sourceTree = "<group>"; };
-		514C79EF2B62ADDA00DD6D7B /* descriptor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = descriptor.cpp; path = clusters/descriptor/descriptor.cpp; sourceTree = "<group>"; };
 		514C79F22B62ED5500DD6D7B /* attribute-storage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-storage.cpp"; path = "util/attribute-storage.cpp"; sourceTree = "<group>"; };
 		514C79F52B62F0B900DD6D7B /* util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util.cpp; path = util/util.cpp; sourceTree = "<group>"; };
 		514C79FF2B64223400DD6D7B /* MTRServerAttribute_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRServerAttribute_Internal.h; sourceTree = "<group>"; };
 		514C7A002B64223400DD6D7B /* MTRServerEndpoint_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRServerEndpoint_Internal.h; sourceTree = "<group>"; };
 		514C7A032B6436D500DD6D7B /* MTRServerCluster_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRServerCluster_Internal.h; sourceTree = "<group>"; };
+		51517B1C2E7DB25B00904908 /* descriptor-cluster.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "descriptor-cluster.cpp"; path = "clusters/descriptor/descriptor-cluster.cpp"; sourceTree = "<group>"; };
 		51565CAD2A79D42100469F18 /* MTRConversion.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRConversion.mm; sourceTree = "<group>"; };
 		51565CAF2A7AD77600469F18 /* MTRDeviceControllerDataStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDeviceControllerDataStore.h; sourceTree = "<group>"; };
 		51565CB02A7AD77600469F18 /* MTRDeviceControllerDataStore.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceControllerDataStore.mm; sourceTree = "<group>"; };
@@ -1390,7 +1405,8 @@
 				75A202E72BA8DBB700A771DD /* reporting */,
 				5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */,
 				514C79F22B62ED5500DD6D7B /* attribute-storage.cpp */,
-				514C79EF2B62ADDA00DD6D7B /* descriptor.cpp */,
+				51517B1C2E7DB25B00904908 /* descriptor-cluster.cpp */,
+				512FC0E22E7DB2FC00239104 /* CodegenIntegration.cpp */,
 				E04AC67B2BEEA17F00BA409B /* ember-io-storage.cpp */,
 				516415FE2B6B132200D5CE11 /* DataModelHandler.cpp */,
 				514C79F52B62F0B900DD6D7B /* util.cpp */,
@@ -1636,6 +1652,8 @@
 		7521D2932CBECE3F00218E16 /* codegen-data-model-provider */ = {
 			isa = PBXGroup;
 			children = (
+				512FC0EB2E7DB60E00239104 /* ClusterIntegration.h */,
+				512FC0EC2E7DB60E00239104 /* ClusterIntegration.cpp */,
 				7592BD092CC6BCC300EB74A0 /* EmberAttributeDataBuffer.h */,
 				7592BD0A2CC6BCC300EB74A0 /* EmberAttributeDataBuffer.cpp */,
 				7592BCEB2CBEE98C00EB74A0 /* CodegenDataModelProvider.h */,
@@ -1663,6 +1681,8 @@
 		7567A2082DA5ABA500D91529 /* server-cluster */ = {
 			isa = PBXGroup;
 			children = (
+				512FC0E52E7DB5C100239104 /* AttributeListBuilder.cpp */,
+				512FC0E82E7DB5D000239104 /* AttributeListBuilder.h */,
 				F811B3312F29417E8456E37F /* SingleEndpointServerClusterRegistry.cpp */,
 				F811B32E2F29417E8456E37F /* SingleEndpointServerClusterRegistry.h */,
 				7567A2022D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.cpp */,
@@ -2164,6 +2184,7 @@
 				037C3DC92991BD5100B7EEE2 /* MTRDevice_Externs.h in Headers */,
 				037C3DC22991BD5100B7EEE2 /* SetupPayloadParseCommand.h in Headers */,
 				037C3DD12991BD5200B7EEE2 /* Commands.h in Headers */,
+				512FC0EE2E7DB60E00239104 /* ClusterIntegration.h in Headers */,
 				037C3DB92991BD5000B7EEE2 /* ReportCommandBridge.h in Headers */,
 				037C3DBE2991BD5000B7EEE2 /* OTASoftwareUpdateInteractive.h in Headers */,
 				B43B39EC2CB859A5006AA284 /* DumpMemoryGraphCommand.h in Headers */,
@@ -2187,6 +2208,7 @@
 				7534D17B2CF8CDDF00F64654 /* AttributePersistenceProvider.h in Headers */,
 				7592BD022CBEE98C00EB74A0 /* CodegenDataModelProvider.h in Headers */,
 				B4382F892D6E231800F79AFC /* HomeKitConnector.h in Headers */,
+				512FC0EA2E7DB5D000239104 /* AttributeListBuilder.h in Headers */,
 				037C3DAD2991BD4F00B7EEE2 /* PairingCommandBridge.h in Headers */,
 				037C3DBB2991BD5000B7EEE2 /* Commands.h in Headers */,
 				512431262BA0C8BA000BC136 /* ResetMRPParametersCommand.h in Headers */,
@@ -2293,6 +2315,7 @@
 				514C7A012B64223400DD6D7B /* MTRServerAttribute_Internal.h in Headers */,
 				3DFCB32C29678C9500332B35 /* MTRConversion.h in Headers */,
 				5A60370827EA1FF60020DB79 /* MTRClusterStateCacheContainer+XPC.h in Headers */,
+				512FC0E92E7DB5D000239104 /* AttributeListBuilder.h in Headers */,
 				7567A20E2DA5ABCF00D91529 /* DefaultServerCluster.h in Headers */,
 				51445F742E5E565F003C7C98 /* MTRCommissioningOperation.h in Headers */,
 				51445F752E5E565F003C7C98 /* MTRCommissioningOperation_Internal.h in Headers */,
@@ -2309,6 +2332,7 @@
 				757DA3112DB0369100E4AD75 /* ota-provider-delegate.h in Headers */,
 				B4FCD56A2B5EDBD300832859 /* MTRDiagnosticLogsType.h in Headers */,
 				5A6FEC9A27B5C89300F25F42 /* MTRDeviceControllerXPCConnection.h in Headers */,
+				512FC0F02E7DB60E00239104 /* ClusterIntegration.h in Headers */,
 				5129BCFD26A9EE3300122DDF /* MTRError.h in Headers */,
 				93E610AA2B626E290077F02A /* MTRClusterNames.h in Headers */,
 				2C8C8FC1253E0C2100797F05 /* MTRStorage.h in Headers */,
@@ -2565,6 +2589,7 @@
 				7592BCFF2CBEE98C00EB74A0 /* CodegenDataModelProvider_Write.cpp in Sources */,
 				B4D67A922D527F4A00C49965 /* DCLClient.cpp in Sources */,
 				B4D67A932D527F4A00C49965 /* DisplayTermsAndConditions.cpp in Sources */,
+				51517B1E2E7DB25B00904908 /* descriptor-cluster.cpp in Sources */,
 				B4D67A952D527F4A00C49965 /* JsonSchemaMacros.cpp in Sources */,
 				B45373C12A9FEA9100807602 /* close.c in Sources */,
 				B45373D42A9FEB0C00807602 /* context.c in Sources */,
@@ -2624,11 +2649,14 @@
 				037C3DD52991C2E200B7EEE2 /* CHIPCommandBridge.mm in Sources */,
 				516411312B6BF70300E67C05 /* DataModelHandler.cpp in Sources */,
 				0382FA2C2992F06C00247BBB /* Commands.cpp in Sources */,
+				512FC0ED2E7DB60E00239104 /* ClusterIntegration.cpp in Sources */,
 				B4E2621E2AA0D02D00DBA5BC /* WaitForCommissioneeCommand.mm in Sources */,
 				7567A2062D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.cpp in Sources */,
 				51445F6A2E5E4281003C7C98 /* SingleEndpointServerClusterRegistry.cpp in Sources */,
+				512FC0E62E7DB5C100239104 /* AttributeListBuilder.cpp in Sources */,
 				757DA30A2DB035A900E4AD75 /* DefaultServerCluster.cpp in Sources */,
 				757DA30B2DB035A900E4AD75 /* ServerClusterInterface.cpp in Sources */,
+				512FC0E42E7DB2FC00239104 /* CodegenIntegration.cpp in Sources */,
 				03F430A7299410C000166449 /* ExamplePersistentStorage.cpp in Sources */,
 				B45373AA2A9FE73400807602 /* WebSocketServer.cpp in Sources */,
 				B4E262162AA0CF1C00DBA5BC /* RemoteDataModelLogger.mm in Sources */,
@@ -2656,7 +2684,6 @@
 				516411322B6BF75700E67C05 /* MTRIMDispatch.mm in Sources */,
 				037C3DB42991BD5000B7EEE2 /* DeviceControllerDelegateBridge.mm in Sources */,
 				039547012992D461006D42A8 /* generic-callback-stubs.cpp in Sources */,
-				514C79F12B62ADDA00DD6D7B /* descriptor.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2668,6 +2695,7 @@
 				2C8C8FC2253E0C2100797F05 /* MTRPersistentStorageDelegateBridge.mm in Sources */,
 				99AECC802798A57F00B6355B /* MTRCommissioningParameters.mm in Sources */,
 				2CB7163C252E8A7C0026E2BB /* MTRDeviceControllerDelegateBridge.mm in Sources */,
+				51517B1D2E7DB25B00904908 /* descriptor-cluster.cpp in Sources */,
 				997DED162695343400975E97 /* MTRThreadOperationalDataset.mm in Sources */,
 				515C1C6F284F9FFB00A48F0C /* MTRFramework.mm in Sources */,
 				510B18F72E385DCD000F9181 /* MTRDelegateManager.mm in Sources */,
@@ -2675,6 +2703,7 @@
 				CF3B63D22CA31E71003C1C87 /* MTROTAUnsolicitedBDXMessageHandler.mm in Sources */,
 				27A53C1827FBC6920053F131 /* MTRAttestationTrustStoreBridge.mm in Sources */,
 				7592BCF62CBEE98C00EB74A0 /* CodegenDataModelProvider_Read.cpp in Sources */,
+				512FC0EF2E7DB60E00239104 /* ClusterIntegration.cpp in Sources */,
 				7592BCF72CBEE98C00EB74A0 /* Instance.cpp in Sources */,
 				7592BCF92CBEE98C00EB74A0 /* CodegenDataModelProvider.cpp in Sources */,
 				7592BCFA2CBEE98C00EB74A0 /* CodegenDataModelProvider_Write.cpp in Sources */,
@@ -2711,6 +2740,7 @@
 				514304202914CED9004DC7FE /* generic-callback-stubs.cpp in Sources */,
 				1EDCE546289049A100E41EC9 /* MTROTAHeader.mm in Sources */,
 				51D0B13D2B61B2F2006E3511 /* MTRDeviceTypeRevision.mm in Sources */,
+				512FC0E32E7DB2FC00239104 /* CodegenIntegration.cpp in Sources */,
 				1EC4CE5D25CC26E900D7304F /* MTRBaseClusters.mm in Sources */,
 				514C79F62B62F0B900DD6D7B /* util.cpp in Sources */,
 				51565CB22A7AD77600469F18 /* MTRDeviceControllerDataStore.mm in Sources */,
@@ -2739,10 +2769,10 @@
 				9B5CCB5C2C6EC890009DD99B /* MTRDevice_XPC.mm in Sources */,
 				513DDB8A2761F6F900DAA01A /* MTRAttributeTLVValueDecoder.mm in Sources */,
 				5117DD3829A931AE00FFA1AA /* MTROperationalBrowser.mm in Sources */,
-				514C79F02B62ADDA00DD6D7B /* descriptor.cpp in Sources */,
 				5109E9B42CB8B5DF0006884B /* MTRDeviceType.mm in Sources */,
 				3D843757294AD25A0070D20A /* MTRCertificateInfo.mm in Sources */,
 				7567A2052D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.cpp in Sources */,
+				512FC0E72E7DB5C100239104 /* AttributeListBuilder.cpp in Sources */,
 				F811B3322F29417E8456E37F /* SingleEndpointServerClusterRegistry.cpp in Sources */,
 				512E8E7A2D52F7B6009407E3 /* MTRCommandWithRequiredResponse.mm in Sources */,
 				3D9F2FCE2D112295003CA2BB /* MTRAttributeTLVValueDecoder_Internal.mm in Sources */,
