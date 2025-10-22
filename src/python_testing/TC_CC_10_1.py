@@ -109,10 +109,9 @@ class TC_CC_10_1(MatterBaseTest):
             TestStep("2c", "TH sends _MoveToColor command_ to DUT, with: ColorX = 32768/0x8000 (x=0.5) (purple), ColorY = 19660/0x4CCC (y=0.3), TransitionTime = 0 (immediate)"),
             TestStep("2d", "TH reads _CurrentX and CurrentY attributes_ from DUT."),
             TestStep("2e", "TH sends _MoveToColorTemperature command_ to DUT with _ColorTemperatureMireds_=(_ColorTempPhysicalMinMireds_ + _ColorTempPhysicalMaxMireds_)/2"),
-            TestStep("2f", "TH sends _MoveColorTemperature command_ to DUT with _MoveMode_ = 0x01 (up), _Rate_ = (_ColorTempPhysicalMaxMireds_ - _ColorTempPhysicalMinMireds_)/40"),
-            TestStep("2g", "After 10 seconds, TH reads _ColorTemperatureMireds attribute_ from DUT."),
-            TestStep("2h", "TH sends _EnhancedMoveToHueAndSaturation command_ to DUT with _EnhancedHue_=20000, _Saturation_=50 and _TransitionTime_=0 (immediately)."),
-            TestStep("2i", "TH reads _EnhancedCurrentHue and CurrentSaturation attributes_ from DUT."),
+            TestStep("2f", "TH reads _ColorTemperatureMireds attribute_ from DUT."),
+            TestStep("2g", "TH sends _EnhancedMoveToHueAndSaturation command_ to DUT with _EnhancedHue_=20000, _Saturation_=50 and _TransitionTime_=0 (immediately)."),
+            TestStep("2h", "TH reads _EnhancedCurrentHue and CurrentSaturation attributes_ from DUT."),
             TestStep("3", "TH sends a _StoreScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
             TestStep("4", "TH sends a _ViewScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
             TestStep(
@@ -262,12 +261,12 @@ class TC_CC_10_1(MatterBaseTest):
             asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster][attributes.ColorTemperatureMireds], CTmin,
                                          "ColorTemperatureMireds is not greater than or equal to %d" % CTmin)
 
-        self.step("2h")
+        self.step("2g")
         if self.pics_guard(self.check_pics("CC.S.F01")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, cluster.Commands.EnhancedMoveToHueAndSaturation(20000, 50, 0, 1, 1))
             await asyncio.sleep(1)
 
-        self.step("2i")
+        self.step("2h")
         if self.pics_guard(self.check_pics("CC.S.F01")):
             result = await self.TH1.ReadAttribute(self.dut_node_id, [(self.matter_test_config.endpoint, attributes.EnhancedCurrentHue), (self.matter_test_config.endpoint, attributes.CurrentSaturation)])
             asserts.assert_less_equal(result[self.matter_test_config.endpoint][cluster][attributes.EnhancedCurrentHue], 21800,
