@@ -33,6 +33,7 @@
 #include <app/MessageDef/AttributeDataIB.h>
 #include <app/MessageDef/AttributeReportIB.h>
 #include <app/MessageDef/AttributeStatusIB.h>
+#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/mock/Constants.h>
@@ -391,13 +392,13 @@ chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsig
 }
 
 void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                             AttributesChangedListener * listener)
+                             DataModel::ProviderChangeListener * listener)
 {
     dataVersion++;
     listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
 }
 
-void emberAfEndpointChanged(EndpointId endpoint, AttributesChangedListener * listener)
+void emberAfEndpointChanged(EndpointId endpoint, DataModel::ProviderChangeListener * listener)
 {
     listener->MarkDirty(AttributePathParams(endpoint));
 }

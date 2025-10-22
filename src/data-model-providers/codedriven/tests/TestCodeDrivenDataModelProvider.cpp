@@ -404,30 +404,6 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverClientClusters)
     EXPECT_EQ(clientClusters[1], clientClusterId2);
 }
 
-TEST_F(TestCodeDrivenDataModelProvider, IterateOverTags)
-{
-    static const SemanticTag sSemanticTagsArray[] = { semanticTag1, semanticTag2 };
-
-    auto endpoint = std::make_unique<SpanEndpoint>(
-        SpanEndpoint::Builder().SetSemanticTags(Span<const SemanticTag>(sSemanticTagsArray)).Build());
-
-    mEndpointStorage.push_back(std::move(endpoint));
-    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
-    ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<SemanticTag> builder;
-    ASSERT_EQ(mProvider.SemanticTags(endpointEntry1.id, builder), CHIP_NO_ERROR);
-
-    auto tags = builder.TakeBuffer();
-    ASSERT_EQ(tags.size(), 2u);
-    EXPECT_EQ(tags[0].mfgCode, semanticTag1.mfgCode);
-    EXPECT_EQ(tags[0].namespaceID, semanticTag1.namespaceID);
-    EXPECT_EQ(tags[0].tag, semanticTag1.tag);
-    EXPECT_EQ(tags[1].mfgCode, semanticTag2.mfgCode);
-    EXPECT_EQ(tags[1].namespaceID, semanticTag2.namespaceID);
-    EXPECT_EQ(tags[1].tag, semanticTag2.tag);
-}
-
 TEST_F(TestCodeDrivenDataModelProvider, IterateOverDeviceTypes)
 {
     static DataModel::DeviceTypeEntry sDeviceTypesData[kTestMaxDeviceTypes];

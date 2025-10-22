@@ -126,7 +126,7 @@ class TC_SC_4_1(MatterBaseTest):
                         """See the 'Commissionable Subtypes Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(10, """VVerify SRV record advertisements""",
+            TestStep(10, """Verify SRV record advertisements""",
                      """See the 'SRV Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
@@ -155,7 +155,7 @@ class TC_SC_4_1(MatterBaseTest):
                      """See the 'Commissionable Subtypes Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(17, """VVerify SRV record advertisements""",
+            TestStep(17, """Verify SRV record advertisements""",
                      """See the 'SRV Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
@@ -182,7 +182,7 @@ class TC_SC_4_1(MatterBaseTest):
                      """See the 'Commissionable Subtypes Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(23, """VVerify SRV record advertisements""",
+            TestStep(23, """Verify SRV record advertisements""",
                      """See the 'SRV Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
@@ -204,7 +204,7 @@ class TC_SC_4_1(MatterBaseTest):
             attribute=Clusters.Descriptor.Attributes.ServerList
         )
 
-    async def get_active_mode_threshhold_ms(self):
+    async def get_active_mode_threshold_ms(self):
         return await self.read_single_attribute_check_success(
             endpoint=ROOT_NODE_ENDPOINT_ID,
             dev_ctrl=self.default_controller,
@@ -664,7 +664,7 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Read the ActiveModeThreshold attribute if ICD is supported
         if self.supports_icd:
-            self.active_mode_threshold_ms = await self.get_active_mode_threshhold_ms()
+            self.active_mode_threshold_ms = await self.get_active_mode_threshold_ms()
             logging.info(f"\n\n\t** active_mode_threshold_ms: {self.active_mode_threshold_ms}\n")
 
         # *** STEP 3 ***
@@ -694,7 +694,7 @@ class TC_SC_4_1(MatterBaseTest):
         # *** STEP 6 ***
         # Get the 'Long Discriminator Subtype'
         self.step(6)
-        long_discriminator_sybtype, long_discriminator = self.get_long_discriminator_subtype()
+        long_discriminator_subtype, long_discriminator = self.get_long_discriminator_subtype()
 
         # *** STEP 7 ***
         # If 'supports_obcw' is True DUT is put in Commissioning
@@ -713,7 +713,7 @@ class TC_SC_4_1(MatterBaseTest):
             # *** STEP 8 ***
             # Get the 'Long Discriminator Subtype' PTR record's instance name
             self.step(8)
-            long_discriminator_ptr_instance_name = await self._get_verify_long_discriminator_subtype_ptr_instance_name(long_discriminator_sybtype)
+            long_discriminator_ptr_instance_name = await self._get_verify_long_discriminator_subtype_ptr_instance_name(long_discriminator_subtype)
 
             # *** STEP 9 ***
             # Verify commissionable subtype advertisements
@@ -758,7 +758,7 @@ class TC_SC_4_1(MatterBaseTest):
         # *** STEP 15 ***
         # Get the 'Long Discriminator Subtype' PTR record's instance name
         self.step(15)
-        long_discriminator_ptr_instance_name = await self._get_verify_long_discriminator_subtype_ptr_instance_name(long_discriminator_sybtype)
+        long_discriminator_ptr_instance_name = await self._get_verify_long_discriminator_subtype_ptr_instance_name(long_discriminator_subtype)
 
         # *** STEP 16 ***
         # Verify commissionable subtype advertisements
@@ -789,7 +789,7 @@ class TC_SC_4_1(MatterBaseTest):
         # Check if DUT Extended Discovery mode is active
         self.step(21)
         # Get the 'Long Discriminator Subtype' PTR record's instance name
-        long_discriminator_ptr_instance_name = await self._get_verify_long_discriminator_subtype_ptr_instance_name(long_discriminator_sybtype, must_be_present=False)
+        long_discriminator_ptr_instance_name = await self._get_verify_long_discriminator_subtype_ptr_instance_name(long_discriminator_subtype, must_be_present=False)
 
         # If the DUT's 'Long Discriminator Subtype' PTR record's instance name is present, Extended Discovery mode is active
         extended_discovery_mode = long_discriminator_ptr_instance_name is not None
