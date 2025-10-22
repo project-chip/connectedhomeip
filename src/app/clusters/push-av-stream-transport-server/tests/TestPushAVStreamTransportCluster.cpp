@@ -44,22 +44,7 @@ namespace app {
 class MockCommandHandler : public Testing::MockCommandHandler
 {
 public:
-    struct MockStatusRecord
-    {
-        ConcreteCommandPath path;
-        Protocols::InteractionModel::ClusterStatusCode status;
-    };
-
     ~MockCommandHandler() override {}
-
-    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath,
-                                 const Protocols::InteractionModel::ClusterStatusCode & aStatus,
-                                 const char * context = nullptr) override
-    {
-        MockStatusRecord record{ aRequestCommandPath, aStatus };
-        mStatuses.push_back(std::move(record));
-        return Testing::MockCommandHandler::FallibleAddStatus(aRequestCommandPath, aStatus, context);
-    }
 
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus) override
     {
@@ -102,7 +87,6 @@ public:
 
     // Specialized methods for this test
     const std::vector<ResponseRecord> & GetResponses() const { return mResponses; }
-    const std::vector<MockStatusRecord> & GetStatuses() const { return mStatuses; }
 
     // Optional for test configuration
     void SetTimedInvoke(bool isTimed) { mIsTimedInvoke = isTimed; }
@@ -110,7 +94,6 @@ public:
 
 private:
     std::vector<ResponseRecord> mResponses;
-    std::vector<MockStatusRecord> mStatuses;
 
     bool mIsTimedInvoke                           = false;
     bool mAcksFlushed                             = false;

@@ -30,6 +30,8 @@ CHIP_ERROR MockCommandHandler::FallibleAddStatus(const ConcreteCommandPath & aRe
                                                  const Protocols::InteractionModel::ClusterStatusCode & aStatus,
                                                  const char * context)
 {
+    StatusRecord record{ aRequestCommandPath, aStatus, context };
+    mStatuses.push_back(std::move(record));
     return CHIP_NO_ERROR;
 }
 
