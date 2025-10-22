@@ -2013,9 +2013,9 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *  @def CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL
  *
  *  @brief
- *    A duration, in milliseconds, to be added to the backoff interval for sigma1 message retransmission in controller side if the remote device is
- * LIT. This additional interval is to mitigate the issue that the sigma2 message may not be able to reach the controller in
- * congested network in time.
+ *    A duration, in milliseconds, to be added to the backoff interval for sigma1 message retransmission in controller side if the
+ * remote device is LIT. This additional interval is to mitigate the issue that the sigma2 message may not be able to reach the
+ * controller in congested network in time.
  */
 #ifndef CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL
 #define CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL 0

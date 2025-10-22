@@ -298,7 +298,8 @@ void OperationalSessionSetup::UpdateDeviceData(const ResolveResult & result)
 
 void OperationalSessionSetup::SetAdditionalBackoffInterval(const Optional<System::Clock::Timeout> & additionalTime)
 {
-    sAdditionalLitBackoffInterval = additionalTime.ValueOr(System::Clock::Milliseconds32(CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL));
+    sAdditionalLitBackoffInterval =
+        additionalTime.ValueOr(System::Clock::Milliseconds32(CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL));
 }
 
 CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & result)
