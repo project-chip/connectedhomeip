@@ -60,20 +60,21 @@ enum ID : uint16_t
     kGeneratorFW   = 0x0135,
     kProductionFW  = 0x0136,
     kCertToolPath  = 0x0137,
-    kPylinkLib     = 0x0138,
+    kPylinkLib     = 0x013a,
+    kBufferSize    = 0x013b,
     // Instance Info,
-    kSerialNumber      = 0x0141,
-    kVendorId          = 0x0142,
-    kVendorName        = 0x0143,
-    kProductId         = 0x0144,
-    kProductName       = 0x0145,
-    kProductLabel      = 0x0146,
-    kProductUrl        = 0x0147,
-    kPartNumber        = 0x0148,
-    kHwVersion         = 0x0151,
-    kHwVersionStr      = 0x0152,
-    kManufacturingDate = 0x0153,
-    kUniqueId          = 0x0154,
+    kSerialNumber       = 0x0141,
+    kVendorId           = 0x0142,
+    kVendorName         = 0x0143,
+    kProductId          = 0x0144,
+    kProductName        = 0x0145,
+    kProductLabel       = 0x0146,
+    kProductUrl         = 0x0147,
+    kPartNumber         = 0x0148,
+    kHwVersion          = 0x0151,
+    kHwVersionStr       = 0x0152,
+    kManufacturingDate  = 0x0153,
+    kPersistentUniqueId = 0x0154,
     // Commissionable Data,
     kDiscriminator     = 0x0161,
     kSpake2pPasscode   = 0x0162,
@@ -143,12 +144,11 @@ struct Storage : public GenericStorage,
     static constexpr size_t kPartNumberLengthMax         = 32;
     static constexpr size_t kHardwareVersionStrLengthMax = 32;
     static constexpr size_t kManufacturingDateLengthMax  = 11; // yyyy-mm-dd + \0
-    static constexpr size_t kUniqueIdLengthMax           = 16;
+    static constexpr size_t kPersistentUniqueIdMaxLength = 16;
     static constexpr size_t kSpake2pVerifierB64LengthMax = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
     static constexpr size_t kSpake2pSaltB64LengthMax     = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
     static constexpr size_t kFirmwareInfoSizeMax         = 32;
     static constexpr size_t kCertificationSizeMax        = 350;
-    static constexpr size_t kCertificateSizeMax          = kArgumentSizeMax;
     static constexpr size_t kDeviceAttestationKeySizeMax = 128;
     static constexpr size_t kSetupPayloadSizeMax         = 32;
     static constexpr size_t kCsrLengthMax                = 512;
@@ -160,8 +160,6 @@ struct Storage : public GenericStorage,
     static constexpr size_t kTotalPayloadDataSize = kTotalPayloadDataSizeInBits / 8;
 
 public:
-    static uint8_t aux_buffer[Storage::kArgumentSizeMax];
-
     friend class Manager;
     friend class Protocol1;
     friend class Command;
@@ -238,6 +236,8 @@ public:
     CHIP_ERROR SetProvisionRequest(bool value);
     CHIP_ERROR GetProvisionRequest(bool & value);
     CHIP_ERROR GetTestEventTriggerKey(MutableByteSpan & keySpan);
+    void SetBufferSize(size_t size) { mBufferSize = size > 0 ? size : kArgumentSizeMax; }
+    size_t GetBufferSize() { return mBufferSize; }
 
 private:
     // Generic Interface
@@ -259,8 +259,10 @@ private:
     CHIP_ERROR SetHardwareVersionString(const char * value, size_t len);
     CHIP_ERROR SetManufacturingDate(const char * value, size_t len);
     CHIP_ERROR GetManufacturingDate(uint8_t * value, size_t max, size_t & size);
-    CHIP_ERROR SetUniqueId(const uint8_t * value, size_t size);
-    CHIP_ERROR GetUniqueId(uint8_t * value, size_t max, size_t & size);
+    // PersistentUniqueId is used to generate the RotatingUniqueId
+    // This PersistentUniqueId SHALL NOT be the same as the UniqueID attribute exposed in the Basic Information cluster.
+    CHIP_ERROR SetPersistentUniqueId(const uint8_t * value, size_t size);
+    CHIP_ERROR GetPersistentUniqueId(uint8_t * value, size_t max, size_t & size);
     // CommissionableDataProvider
     CHIP_ERROR SetSetupDiscriminator(uint16_t value);
     CHIP_ERROR SetSpake2pIterationCount(uint32_t value);
@@ -289,6 +291,7 @@ private:
     uint32_t mRendezvousFlags        = 0;
     uint32_t mPasscode               = 0;
     uint32_t mKeyId                  = 0;
+    uint32_t mBufferSize             = kArgumentSizeMax;
     char mCommonName[kCommonNameMax] = { 0 };
     CustomStorage mCustom;
 };

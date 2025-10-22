@@ -199,7 +199,7 @@ else
                     exit 1
                 fi
                 USE_WIFI=true
-                optArgs+="chip_device_platform =\"efr32\" "
+                optArgs+="chip_device_platform =\"efr32\" chip_crypto_keystore=\"psa\""
                 shift
                 shift
                 ;;
