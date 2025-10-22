@@ -261,7 +261,7 @@ class TC_CC_10_1(MatterBaseTest):
                                       "ColorTemperatureMireds is not less than or equal to %d" % CTmax)
             asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster][attributes.ColorTemperatureMireds], CTmin,
                                          "ColorTemperatureMireds is not greater than or equal to %d" % CTmin)
-        
+
         self.step("2h")
         if self.pics_guard(self.check_pics("CC.S.F01")):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, cluster.Commands.EnhancedMoveToHueAndSaturation(20000, 50, 0, 1, 1))
