@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 
-#include <app-common/clusters/UnitLocalization/AttributeIds.h>
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
 #include <app/persistence/AttributePersistenceMigration.h>
 #include <app/persistence/AttributePersistenceProvider.h>
+#include <clusters/UnitLocalization/AttributeIds.h>
 namespace chip {
 namespace app {
 namespace Clusters {
