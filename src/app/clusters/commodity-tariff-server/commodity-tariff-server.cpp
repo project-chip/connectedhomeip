@@ -64,7 +64,7 @@ uint32_t Instance::GetCurrentTimestamp()
     VerifyOrDie(CHIP_NO_ERROR == err);
 
     return matterEpoch;
-};
+}
 
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -617,7 +617,7 @@ void Instance::InitCurrentAttrs()
 void Instance::TariffTimeAttrsSync()
 {
     CHIP_ERROR err = UpdateCurrentAttrs();
-    if (err != CHIP_NO_ERROR)
+    if ((err != CHIP_NO_ERROR) && (err != CHIP_ERROR_NOT_FOUND))
     {
         ChipLogError(AppServer, "Failed to sync tariff time attributes: %" CHIP_ERROR_FORMAT, err.Format());
     }

@@ -84,11 +84,10 @@ private:
 
     // Test Time Management
     bool mTestTimeEnabled = false;
-    std::unique_ptr<chip::System::Clock::Internal::MockClock> mMockClock;
-    chip::System::Clock::Microseconds64 mMockBaseTime{ 0 };
 
     // Private methods for tariff time management
     void ScheduleTariffTimeUpdate();
+    void CancelTariffTimeUpdate();
     void TariffTimeUpdCb();
 
     // Internal test time helpers

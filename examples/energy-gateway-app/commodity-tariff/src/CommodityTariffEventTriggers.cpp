@@ -115,7 +115,7 @@ void SetTestEventTrigger_TariffDataUpdated()
     }
     else
     {
-        ChipLogError(AppServer, "The sever instance is null");
+        ChipLogError(AppServer, "The server instance is null");
     }
 
     if (dg)
@@ -173,6 +173,7 @@ void SetTestEventTrigger_TimeShiftDisable()
     if (instance)
     {
         instance->EnableTestTime(false);
+        instance->AdvanceTestTime(chip::System::Clock::Seconds32(0));
     }
 }
 
