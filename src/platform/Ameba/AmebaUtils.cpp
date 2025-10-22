@@ -230,7 +230,7 @@ CHIP_ERROR AmebaUtils::SetCurrentProvisionedNetwork()
         if (!memcmp(config.ssid, pSetting.ssid, strlen((const char *) pSetting.ssid) + 1))
         {
             ChipLogProgress(DeviceLayer, "STA Wi-Fi Info exist, do nothing");
-            matter_set_autoreconnect(0);
+            matter_wifi_set_autoreconnect(0);
             goto exit;
         }
         else
@@ -243,7 +243,7 @@ CHIP_ERROR AmebaUtils::SetCurrentProvisionedNetwork()
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DeviceLayer, "SetWiFiConfig() failed");
-                matter_set_autoreconnect(0);
+                matter_wifi_set_autoreconnect(0);
                 goto exit;
             }
         }
