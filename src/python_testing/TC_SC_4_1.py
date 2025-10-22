@@ -669,7 +669,7 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Read the ActiveModeThreshold attribute if ICD is supported
         if self.supports_icd:
-            self.active_mode_threshold_ms = await self.get_active_mode_threshhold_ms()
+            self.active_mode_threshold_ms = await self.get_active_mode_threshold_ms()
             logging.info(f"\n\n\t** active_mode_threshold_ms: {self.active_mode_threshold_ms}\n")
 
         # *** STEP 3 ***
