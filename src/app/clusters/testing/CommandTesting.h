@@ -75,9 +75,18 @@ public:
     Messaging::ExchangeContext * GetExchangeContext() const override { return nullptr; }
 
     // Helper methods to extract response data
-    bool HasResponse() const { return !mResponse.encodedData.IsNull(); }
-    CommandId GetResponseCommandId() const { return mResponse.commandId; }
-    const ResponseRecord & GetResponse() const { return mResponse; }
+    bool HasResponse() const { return !mResponses.empty(); }
+    bool HasResponses() const { return !mResponses.empty(); }
+    size_t GetResponseCount() const { return mResponses.size(); }
+
+    // Methods for working with single response (first in array)
+    CommandId GetResponseCommandId() const { return mResponses.empty() ? 0 : mResponses[0].commandId; }
+    const ResponseRecord & GetResponse() const { return mResponses[0]; }
+
+    // Methods for working with all responses
+    const std::vector<ResponseRecord> & GetResponses() const { return mResponses; }
+    const ResponseRecord & GetResponse(size_t index) const { return mResponses[index]; }
+    void ClearResponses() { mResponses.clear(); }
 
     // Helper methods to access stored statuses
     bool HasStatus() const { return !mStatuses.empty(); }
@@ -85,10 +94,13 @@ public:
     const StatusRecord & GetLastStatus() const { return mStatuses.back(); }
     void ClearStatuses() { mStatuses.clear(); }
 
-    // Get a TLV reader positioned at the response data fields
+    // Get a TLV reader positioned at the response data fields (first response)
     CHIP_ERROR GetResponseReader(TLV::TLVReader & reader) const;
 
-    // Decode response into a specific DecodableType
+    // Get a TLV reader positioned at the response data fields (specific response)
+    CHIP_ERROR GetResponseReader(TLV::TLVReader & reader, size_t index) const;
+
+    // Decode response into a specific DecodableType (first response)
     template <typename ResponseType>
     CHIP_ERROR DecodeResponse(ResponseType & response) const
     {
@@ -97,11 +109,20 @@ public:
         return response.Decode(reader);
     }
 
+    // Decode specific response into a specific DecodableType
+    template <typename ResponseType>
+    CHIP_ERROR DecodeResponse(ResponseType & response, size_t index) const
+    {
+        TLV::TLVReader reader;
+        ReturnErrorOnFailure(GetResponseReader(reader, index));
+        return response.Decode(reader);
+    }
+
     // Configuration methods
     void SetFabricIndex(FabricIndex index) { mFabricIndex = index; }
 
 private:
-    ResponseRecord mResponse;
+    std::vector<ResponseRecord> mResponses;
     std::vector<StatusRecord> mStatuses;
     FabricIndex mFabricIndex = 1; // Default to 1 to maintain backward compatibility
 };

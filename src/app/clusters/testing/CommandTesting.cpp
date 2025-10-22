@@ -58,9 +58,11 @@ CHIP_ERROR MockCommandHandler::AddResponseData(const ConcreteCommandPath & aRequ
     ReturnErrorOnFailure(static_cast<TLV::TLVWriter &>(writer).EndContainer(ct));
     handle->SetDataLength(static_cast<TLV::TLVWriter &>(writer).GetLengthWritten());
 
-    mResponse.path        = aRequestCommandPath;
-    mResponse.commandId   = aResponseCommandId;
-    mResponse.encodedData = std::move(handle);
+    ResponseRecord record;
+    record.path        = aRequestCommandPath;
+    record.commandId   = aResponseCommandId;
+    record.encodedData = std::move(handle);
+    mResponses.push_back(std::move(record));
     return CHIP_NO_ERROR;
 }
 
@@ -72,9 +74,16 @@ void MockCommandHandler::AddResponse(const ConcreteCommandPath & aRequestCommand
 
 CHIP_ERROR MockCommandHandler::GetResponseReader(TLV::TLVReader & reader) const
 {
-    VerifyOrReturnError(!mResponse.encodedData.IsNull(), CHIP_ERROR_INCORRECT_STATE);
+    return GetResponseReader(reader, 0);
+}
 
-    reader.Init(mResponse.encodedData->Start(), mResponse.encodedData->DataLength());
+CHIP_ERROR MockCommandHandler::GetResponseReader(TLV::TLVReader & reader, size_t index) const
+{
+    VerifyOrReturnError(!mResponses.empty(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(index < mResponses.size(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!mResponses[index].encodedData.IsNull(), CHIP_ERROR_INCORRECT_STATE);
+
+    reader.Init(mResponses[index].encodedData->Start(), mResponses[index].encodedData->DataLength());
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
 
     TLV::TLVType outerContainer;

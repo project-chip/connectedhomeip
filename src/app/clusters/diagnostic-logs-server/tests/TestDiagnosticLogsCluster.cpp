@@ -111,6 +111,9 @@ TEST_F(TestDiagnosticLogsCluster, ResponsePayload_WithDelegate_Success)
     const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
     Testing::MockCommandHandler handler;
     diagnosticLogsCluster.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport);
+
+    // Verify we have exactly one response
+    EXPECT_EQ(handler.GetResponseCount(), (size_t) 1);
     EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler);
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kSuccess);
@@ -132,6 +135,9 @@ TEST_F(TestDiagnosticLogsCluster, Bdx_WithDelegate_kExhausted)
     Testing::MockCommandHandler handler;
     diagnosticLogsCluster.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
                                                  MakeOptional(CharSpan::fromCharString("enduser.log")));
+
+    // Verify we have exactly one response
+    EXPECT_EQ(handler.GetResponseCount(), (size_t) 1);
     EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler);
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kExhausted);
@@ -152,6 +158,9 @@ TEST_F(TestDiagnosticLogsCluster, Bdx_WithDelegate_kExhausted_with_buffer_greate
     Testing::MockCommandHandler handler;
     diagnosticLogsCluster.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
                                                  MakeOptional(CharSpan::fromCharString("enduser.log")));
+
+    // Verify we have exactly one response
+    EXPECT_EQ(handler.GetResponseCount(), (size_t) 1);
     EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler);
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kExhausted);
@@ -168,6 +177,9 @@ TEST_F(TestDiagnosticLogsCluster, ResponsePayload_NoDelegate_NoLogs)
     const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
     Testing::MockCommandHandler handler;
     diagnosticLogsCluster.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport);
+
+    // Verify we have exactly one response
+    EXPECT_EQ(handler.GetResponseCount(), (size_t) 1);
     EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler);
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kNoLogs);
@@ -185,6 +197,9 @@ TEST_F(TestDiagnosticLogsCluster, ResponsePayload_ZeroBufferSize_NoLogs)
     const ConcreteCommandPath kPath{ kRootEndpoint, DiagnosticLogs::Id, DiagnosticLogs::Commands::RetrieveLogsRequest::Id };
     Testing::MockCommandHandler handler;
     diagnosticLogsCluster.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport);
+
+    // Verify we have exactly one response
+    EXPECT_EQ(handler.GetResponseCount(), (size_t) 1);
     EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler);
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kNoLogs);
@@ -198,6 +213,9 @@ TEST_F(TestDiagnosticLogsCluster, Bdx_NoDelegate_NoLogs)
     Testing::MockCommandHandler handler;
     diagnosticLogsCluster.HandleLogRequestForBdx(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport,
                                                  MakeOptional(CharSpan::fromCharString("enduser.log")));
+
+    // Verify we have exactly one response
+    EXPECT_EQ(handler.GetResponseCount(), (size_t) 1);
     EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler);
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kNoLogs);

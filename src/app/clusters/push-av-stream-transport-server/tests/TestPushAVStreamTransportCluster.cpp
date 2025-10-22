@@ -58,35 +58,17 @@ public:
                                  Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(aClusterStatus));
     }
 
-    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                               const DataModel::EncodableToTLV & aEncodable) override
-    {
-        CHIP_ERROR err = Testing::MockCommandHandler::AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable);
-        if (err == CHIP_NO_ERROR)
-        {
-            // Create a copy of the encoded data for our local tracking
-            chip::System::PacketBufferHandle encodedDataCopy;
-            if (!GetResponse().encodedData.IsNull())
-            {
-                encodedDataCopy = GetResponse().encodedData.CloneData();
-            }
-
-            ResponseRecord record{ aRequestCommandPath, aResponseCommandId, std::move(encodedDataCopy) };
-            mResponses.push_back(std::move(record));
-        }
-        return err;
-    }
-
-    // Specialized methods for this test
-    const std::vector<ResponseRecord> & GetResponses() const { return mResponses; }
+    // Override base class methods for testing
+    bool IsTimedInvoke() const override { return mIsTimedInvoke; }
+    void FlushAcksRightAwayOnSlowCommand() override { mAcksFlushed = true; }
+    Messaging::ExchangeContext * GetExchangeContext() const override { return mExchangeContext; }
+    Access::SubjectDescriptor GetSubjectDescriptor() const override { return mSubjectDescriptor; }
 
     // Configuration methods for testing
     void SetTimedInvoke(bool isTimed) { mIsTimedInvoke = isTimed; }
     void SetExchangeContext(Messaging::ExchangeContext * context) { mExchangeContext = context; }
 
 private:
-    std::vector<ResponseRecord> mResponses;
-
     bool mIsTimedInvoke                           = false;
     bool mAcksFlushed                             = false;
     Messaging::ExchangeContext * mExchangeContext = nullptr;
