@@ -35,7 +35,8 @@ inline constexpr uint8_t kMaxSupportedLocalizationUnits = 3;
 class UnitLocalizationCluster : public DefaultServerCluster
 {
 public:
-    UnitLocalizationCluster(EndpointId endpointId, BitFlags<UnitLocalization::Feature> feature);
+    using MigrationCallback = void(const ConcreteClusterPath &, ServerClusterContext &);
+    UnitLocalizationCluster(EndpointId endpointId, BitFlags<UnitLocalization::Feature> feature, MigrationCallback * mclb);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
@@ -49,6 +50,7 @@ public:
     CHIP_ERROR SetSupportedTemperatureUnits(DataModel::List<UnitLocalization::TempUnitEnum> & units);
 
 private:
+    MigrationCallback * mCallback;
     BitFlags<UnitLocalization::Feature> mFeatures   = {};
     UnitLocalization::TempUnitEnum mTemperatureUnit = UnitLocalization::TempUnitEnum::kCelsius;
     UnitLocalization::TempUnitEnum mUnitsBuffer[UnitLocalization::kMaxSupportedLocalizationUnits] = {

@@ -34,8 +34,9 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitLocalization;
 using namespace chip::app::Clusters::UnitLocalization::Attributes;
 
-UnitLocalizationCluster::UnitLocalizationCluster(EndpointId endpointId, BitFlags<UnitLocalization::Feature> feature) :
-    DefaultServerCluster({ endpointId, UnitLocalization::Id }), mFeatures{ feature }
+UnitLocalizationCluster::UnitLocalizationCluster(EndpointId endpointId, BitFlags<UnitLocalization::Feature> feature,
+                                                 UnitLocalizationCluster::MigrationCallback * mclb) :
+    DefaultServerCluster({ endpointId, UnitLocalization::Id }), mFeatures{ feature }, mCallback{ mclb }
 {}
 
 CHIP_ERROR UnitLocalizationCluster::SetSupportedTemperatureUnits(DataModel::List<TempUnitEnum> & units)
@@ -58,10 +59,10 @@ CHIP_ERROR UnitLocalizationCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-#ifndef CHIP_SKIP_PERSISTENCE_MIGRATION
-    AttributeId attributesToUpdate[] = { TemperatureUnit::Id };
-    MigrateFromSafeAttributePersistenceProvider(mPath, Span(attributesToUpdate), context.storage);
-#endif
+    if (mCallback != nullptr)
+    {
+        mCallback(mPath, context);
+    }
 
     AttributePersistence attrPersistence{ context.attributeStorage };
 
