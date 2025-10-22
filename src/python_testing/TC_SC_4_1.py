@@ -208,7 +208,7 @@ class TC_SC_4_1(MatterBaseTest):
             attribute=Clusters.Descriptor.Attributes.ServerList
         )
 
-    async def get_active_mode_threshhold_ms(self):
+    async def get_active_mode_threshold_ms(self):
         return await self.read_single_attribute_check_success(
             endpoint=ROOT_NODE_ENDPOINT_ID,
             dev_ctrl=self.default_controller,
