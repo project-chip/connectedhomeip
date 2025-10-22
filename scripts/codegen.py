@@ -175,11 +175,11 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
 
                 sys.exit(1)
 
-    cpp_files = [
-        path
-        for path in storage.generated_paths
-        if os.path.splitext(path)[1] in {'.h', '.cpp', '.c', '.hpp'}
-    ]
+    cpp_files = []
+    for file in storage.generated_paths:
+        _, ext = os.path.splitext(file)
+        if ext in ['.h', '.cpp', '.c', '.hpp']:
+            cpp_files.append(file)
     if cpp_files:
         try:
             logging.debug("Formatting files: %s", cpp_files)
