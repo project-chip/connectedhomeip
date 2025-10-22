@@ -177,7 +177,9 @@ public:
     }
 
     // Tag type to distinguish the test constructor from the normal constructor
-    struct TestOnlyOverrideTimedRequestFlagTag {};
+    struct TestOnlyOverrideTimedRequestFlagTag
+    {
+    };
 
     /**
      * TestOnly constructor that allows performing a Timed Request action while setting the TimedRequest flag
@@ -194,11 +196,11 @@ public:
      * @param[in] aTimedWriteTimeoutMs The timeout for the Timed Request action (WILL be sent)
      * @param[in] aForceTimedRequestFlag If false, the TimedRequest flag in WriteRequest will be false despite the action
      */
-    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback,
-                const Optional<uint16_t> & aTimedWriteTimeoutMs, bool aForceTimedRequestFlag,
-                TestOnlyOverrideTimedRequestFlagTag) :
-        mpExchangeMgr(apExchangeMgr), mExchangeCtx(*this), mpCallback(apCallback),
-        mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mForceTimedRequestFlag(aForceTimedRequestFlag)
+    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
+                bool aForceTimedRequestFlag, TestOnlyOverrideTimedRequestFlagTag) :
+        mpExchangeMgr(apExchangeMgr),
+        mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
+        mForceTimedRequestFlag(aForceTimedRequestFlag)
     {
         assertChipStackLockedByCurrentThread();
     }
