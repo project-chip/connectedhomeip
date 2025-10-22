@@ -29,6 +29,7 @@ runs:
           mkdir -p .ccache
           echo "CCACHE_NOHASHDIR=1" >> $GITHUB_ENV
           echo "CCACHE_BASEDIR=${{ github.workspace }}" >> $GITHUB_ENV
+          echo "CCACHE_NODIRECT=1" >> $GITHUB_ENV
           echo "CCACHE_PREFIX_CPP=${{ github.workspace }}/scripts/helpers/ccache-prefix-cpp.sh" >> $GITHUB_ENV
           echo "CCACHE_SLOPPINESS=time_macros" >> $GITHUB_ENV
           echo "CCACHE_DIR=${{ github.workspace }}/.ccache" >> $GITHUB_ENV
@@ -48,14 +49,11 @@ runs:
       id: cache-vars
       shell: bash
       run: |
-        CACHE_WEEK=$(date +%G-%V)
-        echo "CACHE_WEEK=${CACHE_WEEK}" >> "$GITHUB_ENV"
-
         CACHE_SUFFIX="${{ inputs.cache-suffix }}"
         if [ -n "$CACHE_SUFFIX" ]; then
-          CCACHE_KEY="ccache-${{ runner.os }}-${{ inputs.build-variant }}-w${CACHE_WEEK}-${CACHE_SUFFIX}"
+          CCACHE_KEY="ccache-${{ runner.os }}-${{ inputs.build-variant }}-${CACHE_SUFFIX}"
         else
-          CCACHE_KEY="ccache-${{ runner.os }}-${{ inputs.build-variant }}-w${CACHE_WEEK}"
+          CCACHE_KEY="ccache-${{ runner.os }}-${{ inputs.build-variant }}"
         fi
         echo "CCACHE_KEY=${CCACHE_KEY}" >> "$GITHUB_ENV"
         echo "cache_key=${CCACHE_KEY}" >> "$GITHUB_OUTPUT"
