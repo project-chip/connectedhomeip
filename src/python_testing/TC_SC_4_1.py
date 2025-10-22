@@ -155,7 +155,7 @@ class TC_SC_4_1(MatterBaseTest):
                      """See the 'Commissionable Subtypes Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(17, """VVerify SRV record advertisements""",
+            TestStep(17, """Verify SRV record advertisements""",
                      """See the 'SRV Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
