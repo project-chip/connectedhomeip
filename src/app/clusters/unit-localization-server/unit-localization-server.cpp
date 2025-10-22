@@ -36,7 +36,8 @@ using namespace chip::app::Clusters::UnitLocalization::Attributes;
 
 UnitLocalizationCluster::UnitLocalizationCluster(EndpointId endpointId, BitFlags<UnitLocalization::Feature> feature,
                                                  UnitLocalizationCluster::MigrationCallback * mclb) :
-    DefaultServerCluster({ endpointId, UnitLocalization::Id }), mFeatures{ feature }, mCallback{ mclb }
+    DefaultServerCluster({ endpointId, UnitLocalization::Id }),
+    mFeatures{ feature }, mCallback{ mclb }
 {}
 
 CHIP_ERROR UnitLocalizationCluster::SetSupportedTemperatureUnits(DataModel::List<TempUnitEnum> & units)
