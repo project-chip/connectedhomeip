@@ -794,7 +794,7 @@ class TC_SC_4_1(MatterBaseTest):
         # Check if DUT Extended Discovery mode is active
         self.step(21)
         # Get the 'Long Discriminator Subtype' PTR record's instance name
-        long_discriminator_ptr_instance_name = await self._get_verify_long_discriminator_subtype_ptr_instance_name(long_discriminator_sybtype, must_be_present=False)
+        long_discriminator_ptr_instance_name = await self._get_verify_long_discriminator_subtype_ptr_instance_name(long_discriminator_subtype, must_be_present=False)
 
         # If the DUT's 'Long Discriminator Subtype' PTR record's instance name is present, Extended Discovery mode is active
         extended_discovery_mode = long_discriminator_ptr_instance_name is not None
