@@ -132,17 +132,32 @@ private:
 class InvokeOperation
 {
 public:
+    // Default constructor: creates a new MockCommandHandler
     InvokeOperation(EndpointId endpoint, ClusterId cluster, CommandId command) :
         mCommandPath(endpoint, cluster, command), mHandler(std::make_unique<MockCommandHandler>())
     {
         mRequest.path = mCommandPath;
     }
 
+    // Default constructor: creates a new MockCommandHandler
     InvokeOperation(const ConcreteCommandPath & path) : mCommandPath(path), mHandler(std::make_unique<MockCommandHandler>())
     {
         mRequest.path = mCommandPath;
     }
 
+    // New constructor: allows injection of a custom MockCommandHandler
+    InvokeOperation(const ConcreteCommandPath & path, std::unique_ptr<MockCommandHandler> handler)
+        : mCommandPath(path), mHandler(std::move(handler))
+    {
+        mRequest.path = mCommandPath;
+    }
+
+    // Optionally, add an overload for (EndpointId, ClusterId, CommandId, handler)
+    InvokeOperation(EndpointId endpoint, ClusterId cluster, CommandId command, std::unique_ptr<MockCommandHandler> handler)
+        : mCommandPath(endpoint, cluster, command), mHandler(std::move(handler))
+    {
+        mRequest.path = mCommandPath;
+    }
     // Invoke a command with parameters using variadic template
     // Use for commands that take no parameters (empty TLV structure) or multiple parameters
     template <typename ClusterType, typename... Args>
