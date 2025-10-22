@@ -15,8 +15,12 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/CommandHandler.h>
+#include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
+#include <app/clusters/testing/CommandTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/GeneralDiagnostics/Enums.h>
@@ -24,9 +28,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <messaging/ExchangeContext.h>
 #include <platform/DiagnosticDataProvider.h>
-
-#include <cmath>
 
 namespace {
 
@@ -57,10 +60,32 @@ private:
     T mProvider;
 };
 
+// Mock DiagnosticDataProvider for testing
+class NullProvider : public DeviceLayer::DiagnosticDataProvider
+{
+};
+
 struct TestGeneralDiagnosticsCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
+    // Helper method to invoke TimeSnapshot command and decode response
+    template <typename ClusterType>
+    static void InvokeTimeSnapshotAndGetResponse(ClusterType & cluster,
+                                                 GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType & response)
+    {
+        chip::app::Testing::InvokeOperation invoker(kRootEndpointId, GeneralDiagnostics::Id,
+                                                    GeneralDiagnostics::Commands::TimeSnapshot::Id);
+        auto result = invoker.InvokeEmpty(cluster);
+        EXPECT_FALSE(result.has_value());
+
+        auto & handler = invoker.GetHandler();
+        EXPECT_TRUE(handler.HasResponse());
+        EXPECT_EQ(handler.GetResponseCommandId(), GeneralDiagnostics::Commands::TimeSnapshotResponse::Id);
+
+        ASSERT_EQ(invoker.DecodeResponse(response), CHIP_NO_ERROR);
+    }
 };
 
 TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
@@ -84,9 +109,6 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
 {
     {
         // everything returns empty here ..
-        class NullProvider : public DeviceLayer::DiagnosticDataProvider
-        {
-        };
         const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
         ScopedDiagnosticsProvider<NullProvider> nullProvider;
         GeneralDiagnosticsCluster cluster(optionalAttributeSet);
@@ -129,7 +151,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
                   }),
                   CHIP_NO_ERROR);
 
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
     }
 
     {
@@ -222,7 +244,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
                   }),
                   CHIP_NO_ERROR);
 
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 
         // Check proper read/write of values and returns
         uint16_t rebootCount                               = 0;
@@ -245,6 +267,71 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         EXPECT_EQ(cluster.GetActiveRadioFaults(radioFaults), CHIP_NO_ERROR);
         EXPECT_EQ(cluster.GetActiveNetworkFaults(networkFaults), CHIP_NO_ERROR);
     }
+}
+
+TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandTest)
+{
+    // Create a cluster with no optional attributes enabled
+    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
+    ScopedDiagnosticsProvider<NullProvider> nullProvider;
+    GeneralDiagnosticsCluster cluster(optionalAttributeSet);
+
+    // Invoke TimeSnapshot command and get response
+    GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType response;
+    InvokeTimeSnapshotAndGetResponse(cluster, response);
+
+    // Verify that systemTimeMs is present
+    EXPECT_GE(response.systemTimeMs, 0u);
+
+    // Basic configuration excludes POSIX time
+    EXPECT_TRUE(response.posixTimeMs.IsNull());
+}
+
+TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandWithPosixTimeTest)
+{
+    // Configure cluster with POSIX time support enabled and no optional attributes enabled
+    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
+    ScopedDiagnosticsProvider<NullProvider> nullProvider;
+    const GeneralDiagnosticsFunctionsConfig functionsConfig{
+        .enablePosixTime      = true,
+        .enablePayloadSnaphot = false,
+    };
+    GeneralDiagnosticsClusterFullConfigurable cluster(optionalAttributeSet, functionsConfig);
+
+    // Invoke TimeSnapshot command and get response
+    GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType response;
+    InvokeTimeSnapshotAndGetResponse(cluster, response);
+
+    // Verify that systemTimeMs is present
+    EXPECT_GE(response.systemTimeMs, 0u);
+
+    // POSIX time is included when available (system dependent)
+    if (!response.posixTimeMs.IsNull())
+    {
+        EXPECT_GT(response.posixTimeMs.Value(), 0u);
+    }
+}
+
+TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotResponseValues)
+{
+    // Create a cluster with no optional attributes enabled
+    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
+    ScopedDiagnosticsProvider<NullProvider> nullProvider;
+    GeneralDiagnosticsCluster cluster(optionalAttributeSet);
+
+    // First invocation. Capture initial timestamp
+    GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType firstResponse;
+    InvokeTimeSnapshotAndGetResponse(cluster, firstResponse);
+
+    // Verify first response is valid
+    EXPECT_GE(firstResponse.systemTimeMs, 0u);
+
+    // Second invocation. Capture subsequent timestamp
+    GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType secondResponse;
+    InvokeTimeSnapshotAndGetResponse(cluster, secondResponse);
+
+    // Verify second response is also valid and greater than first
+    EXPECT_GE(secondResponse.systemTimeMs, firstResponse.systemTimeMs);
 }
 
 } // namespace
