@@ -253,9 +253,9 @@ class TC_CC_10_1(MatterBaseTest):
             await asyncio.sleep(1)
 
         self.step("2f")
-        CTmax = round(CTtarget * (1 + kTempTolerance))
-        CTmin = round(CTtarget * (1 - kTempTolerance))
         if self.pics_guard(self.check_pics("CC.S.F04")):
+            CTmax = round(CTtarget * (1 + kTempTolerance))
+            CTmin = round(CTtarget * (1 - kTempTolerance))
             result = await self.TH1.ReadAttribute(self.dut_node_id, [(self.matter_test_config.endpoint, attributes.ColorTemperatureMireds)])
             asserts.assert_less_equal(result[self.matter_test_config.endpoint][cluster][attributes.ColorTemperatureMireds], CTmax,
                                       "ColorTemperatureMireds is not less than or equal to %d" % CTmax)
