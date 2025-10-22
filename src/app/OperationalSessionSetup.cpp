@@ -48,7 +48,7 @@ using namespace chip::Tracing;
 
 namespace chip {
 
-System::Clock::Timeout sAdditionalLitBackoffInterval = CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL;
+System::Clock::Timeout sAdditionalLitBackoffInterval = System::Clock::Milliseconds32(CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL);
 
 void OperationalSessionSetup::MoveToState(State aTargetState)
 {
@@ -296,9 +296,9 @@ void OperationalSessionSetup::UpdateDeviceData(const ResolveResult & result)
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
 
-void OperationalSessionSetup::SetAdditionalLitBackoffInterval(const Optional<System::Clock::Timeout> & additionalTime)
+void OperationalSessionSetup::SetAdditionalBackoffInterval(const Optional<System::Clock::Timeout> & additionalTime)
 {
-    sAdditionalLitBackoffInterval = additionalTime.ValueOr(CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL);
+    sAdditionalLitBackoffInterval = additionalTime.ValueOr(System::Clock::Milliseconds32(CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL));
 }
 
 CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & result)
@@ -312,7 +312,10 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
         // Set the idle retransmission timeout to be the SAI time
         // This ensures that retransmissions for first message are spaced out enough to
         // avoid unnecessary retries and potential message congestion.
-        // If not enough, we can consider increasing it further via sAdditionalLitBackoffInterval
+        // If not enough, we can consider increasing it further via sAdditionalLitBackoffInterval.
+        // Note: a controller should only try to transmit when the LIT device is known to be in 
+        // its Session Active Interval since, in almost all cases, it won't be reachable when its 
+        // on Session Idle Interval.
         config.mIdleRetransTimeout = config.mActiveRetransTimeout + sAdditionalLitBackoffInterval;
     }
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
