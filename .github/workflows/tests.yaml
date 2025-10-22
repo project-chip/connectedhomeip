@@ -637,25 +637,25 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target linux-x64-air-purifier-${BUILD_VARIANT}-clang-test-unified \
-                        --target linux-x64-all-clusters-${BUILD_VARIANT}-clang-test-unified \
-                        --target linux-x64-bridge-${BUILD_VARIANT}-clang-test-unified \
-                        --target linux-x64-closure-${BUILD_VARIANT}-clang-test-unified \
-                        --target linux-x64-energy-gateway-${BUILD_VARIANT}-clang-test-unified \
-                        --target linux-x64-energy-management-${BUILD_VARIANT}-clang-test-unified \
-                        --target linux-x64-light-${BUILD_VARIANT}-clang-test-unified \
-                        --target linux-x64-lit-icd-${BUILD_VARIANT}-clang-test-unified \
-                        --target linux-x64-lock-${BUILD_VARIANT}-clang-test-unified \
-                        --target linux-x64-microwave-oven-${BUILD_VARIANT}-clang-test-unified \
-                        --target linux-x64-network-manager-${BUILD_VARIANT}-clang-test-unified \
-                        --target linux-x64-ota-provider-${BUILD_VARIANT}-clang-test-unified \
-                        --target linux-x64-ota-requestor-${BUILD_VARIANT}-clang-test-unified \
-                        --target linux-x64-rvc-${BUILD_VARIANT}-clang-test-unified \
-                        --target linux-x64-terms-and-conditions-${BUILD_VARIANT}-unified \
-                        --target linux-x64-thermostat-${BUILD_VARIANT}-clang-test-unified \
-                        --target linux-x64-tv-app-${BUILD_VARIANT}-clang-test-unified \
-                        --target linux-x64-tv-casting-app-${BUILD_VARIANT}-clang-test-unified \
-                        --target linux-x64-water-leak-detector-${BUILD_VARIANT}-clang-test-unified \
+                        --target linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-light-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-terms-and-conditions-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-thermostat-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-tv-app-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-tv-casting-app-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --pw-command-launcher=ccache \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -765,7 +765,7 @@ jobs:
                   echo "FABRIC_BRIDGE_APP: objdir-clone/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang/fabric-bridge-app" >> /tmp/test_env.yaml
                   echo "FABRIC_SYNC_APP: objdir-clone/linux-x64-fabric-sync-${BUILD_VARIANT}-clang/fabric-sync" >> /tmp/test_env.yaml
                   echo "LIGHTING_APP_NO_UNIQUE_ID: objdir-clone/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang/chip-lighting-app" >> /tmp/test_env.yaml
-                  echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions-unified/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
+                  echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions-${BUILD_VARIANT}-tsan-clang-test-unified/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "JF_CONTROL_APP: objdir-clone/linux-x64-jf-control-app/jfc-app" >> /tmp/test_env.yaml
                   echo "JF_ADMIN_APP: objdir-clone/linux-x64-jf-admin-app/jfa-app" >> /tmp/test_env.yaml
