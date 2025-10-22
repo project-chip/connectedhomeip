@@ -25,9 +25,8 @@
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
-#       --in-test-commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
+#       --in-test-commissioning-method nfc-thread
+#       --thread-dataset-hex 0e080000000000010000000300001935060004001fffe002085b35dead5b35beef0708fd1dc324dec8779d051000112233445566778899aabbccddeeff03043562333501025b3504108b930382a737b00cdd648e3ab3ee2e190c0402a0f7f8
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --int-arg NFC_Reader_index:0
 #       --storage-path admin_storage.json
