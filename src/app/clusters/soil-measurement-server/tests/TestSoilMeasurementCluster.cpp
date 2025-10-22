@@ -18,7 +18,7 @@
 
 #include <app/clusters/soil-measurement-server/soil-measurement-cluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTesting.h>
+#include <app/clusters/testing/ClusterTester.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/SoilMeasurement/Attributes.h>
@@ -105,12 +105,11 @@ TEST_F(TestSoilMeasurementCluster, ReadAttributeTest)
     uint32_t features{};
     ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, features), CHIP_NO_ERROR);
 
-    SoilMoistureMeasuredValue::TypeInfo::Type soilMoistureMeasuredValue;
+    SoilMoistureMeasuredValue::TypeInfo::DecodableType soilMoistureMeasuredValue;
     ASSERT_EQ(tester.ReadAttribute(SoilMoistureMeasuredValue::Id, soilMoistureMeasuredValue), CHIP_NO_ERROR);
 
-    // TODO: app::DataModel::Decode() not available for type SoilMoistureMeasurementLimits::TypeInfo::Type
-    // SoilMoistureMeasurementLimits::TypeInfo::Type soilMoistureMeasurementLimits;
-    // ASSERT_EQ(tester.ReadAttribute(SoilMoistureMeasurementLimits::Id, soilMoistureMeasurementLimits), CHIP_NO_ERROR);
+    SoilMoistureMeasurementLimits::TypeInfo::DecodableType soilMoistureMeasurementLimits;
+    ASSERT_EQ(tester.ReadAttribute(SoilMoistureMeasurementLimits::Id, soilMoistureMeasurementLimits), CHIP_NO_ERROR);
 }
 
 TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasuredValue)

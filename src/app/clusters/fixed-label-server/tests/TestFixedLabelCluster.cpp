@@ -18,7 +18,7 @@
 
 #include <app/clusters/fixed-label-server/fixed-label-cluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTesting.h>
+#include <app/clusters/testing/ClusterTester.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -74,7 +74,7 @@ TEST_F(TestFixedLabelCluster, ReadAttributeTest)
     uint32_t features{};
     ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, features), CHIP_NO_ERROR);
 
-    DataModel::DecodableList<Structs::LabelStruct::Type> labelList;
+    DataModel::DecodableList<Structs::LabelStruct::DecodableType> labelList;
     ASSERT_EQ(tester.ReadAttribute(LabelList::Id, labelList), CHIP_NO_ERROR);
     auto it = labelList.begin();
     while (it.Next())

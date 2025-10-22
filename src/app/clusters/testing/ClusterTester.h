@@ -27,13 +27,15 @@ namespace chip {
 namespace Test {
 
 // Helper class for testing clusters.
-// Currently it has a generic ReadAttribute() and WriteAttribute().
-// It can be extended in the future to support other cluster operations.
-// The function template instantiations will succeed only for types that support the expected operations.
-// For example, in the case of ReadAttribute(), the call to app::DataModel::Decode() for the given type T should be supported.
-// Otherwise, that template instantiation will fail.
-// This helper class can also be used with attributes that are lists or strings because it maintains the read/write memory.
-// This is why ReadOperation and WriteOperation are data members.
+//
+// This class ensures that data read by attribute is referencing valid memory for one
+// read request (e.g. for case where the underlying read references a list or string that
+// points to TLV data).
+//
+// Calling `ReadAttribute` again may invalidate the result of a previous `ReadAttribute`.
+//
+// Read/Write of all attribute types should work, but make sure to use ::Type for encoding
+// and ::DecodableType for decoding structure types.
 //
 // Example of usage:
 //
@@ -43,7 +45,7 @@ namespace Test {
 // uint32_t features{};
 // ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, features), CHIP_NO_ERROR);
 //
-// DataModel::DecodableList<Structs::LabelStruct::Type> labelList;
+// DataModel::DecodableList<Structs::LabelStruct::DecodableType> labelList;
 // ASSERT_EQ(tester.ReadAttribute(LabelList::Id, labelList), CHIP_NO_ERROR);
 // auto it = labelList.begin();
 // while (it.Next())
@@ -59,7 +61,10 @@ public:
     CHIP_ERROR ReadAttribute(AttributeId attr, T & value)
     {
         const auto & paths = mCluster.GetPaths();
-        // This must be a size-1 span
+        // To make the API simpler, we require the attribute id only as input and deduce
+        // the full path based on the cluster GetPaths(). This does require a single path
+        // supported to not be ambigous. This is most often the case (e.g. DefaultServerCluster
+        // does this).
         VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
         app::ConcreteAttributePath attributePath(paths[0].mEndpointId, paths[0].mClusterId, attr);
         mReadOperation = std::make_unique<app::Testing::ReadOperation>(attributePath);
@@ -79,18 +84,20 @@ public:
     CHIP_ERROR WriteAttribute(AttributeId attr, const T & value)
     {
         const auto & paths = mCluster.GetPaths();
-        // This must be a size-1 span
+        // To make the API simpler, we require the attribute id only as input and deduce
+        // the full path based on the cluster GetPaths(). This does require a single path
+        // supported to not be ambigous. This is most often the case (e.g. DefaultServerCluster
+        // does this).
         VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
         app::ConcreteAttributePath attributePath(paths[0].mEndpointId, paths[0].mClusterId, attr);
-        mWriteOperation                    = std::make_unique<app::Testing::WriteOperation>(attributePath);
-        app::AttributeValueDecoder decoder = mWriteOperation->DecoderFor(value);
-        return mCluster.WriteAttribute(mWriteOperation->GetRequest(), decoder).GetUnderlyingError();
+        app::Testing::WriteOperation writeOperation(attributePath);
+        app::AttributeValueDecoder decoder = writeOperation.DecoderFor(value);
+        return mCluster.WriteAttribute(writeOperation.GetRequest(), decoder).GetUnderlyingError();
     };
 
 private:
     app::ServerClusterInterface & mCluster;
     std::unique_ptr<app::Testing::ReadOperation> mReadOperation;
-    std::unique_ptr<app::Testing::WriteOperation> mWriteOperation;
 };
 
 } // namespace Test
