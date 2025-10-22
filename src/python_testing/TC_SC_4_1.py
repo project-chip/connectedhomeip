@@ -495,7 +495,7 @@ class TC_SC_4_1(MatterBaseTest):
             if 'VP' in txt_record.txt:
                 # Verify that it is non-empty
                 vp_key = txt_record.txt['VP']
-                asserts.assert_true(d_key, "'D' key is present but has no value.")
+                asserts.assert_true(vp_key, "'VP' key is present but has no value.")
 
                 # Verify that it contain at least Vendor ID, and if Product ID
                 # is present, both values must be separated by a + sign
