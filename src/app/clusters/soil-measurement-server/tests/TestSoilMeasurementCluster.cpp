@@ -17,9 +17,8 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/soil-measurement-server/soil-measurement-cluster.h>
-
 #include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/TestReadWriteAttribute.h>
+#include <app/clusters/testing/ClusterTesting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/SoilMeasurement/Attributes.h>
@@ -98,19 +97,20 @@ TEST_F(TestSoilMeasurementCluster, AttributeTest)
 
 TEST_F(TestSoilMeasurementCluster, ReadAttributeTest)
 {
+    ClusterTester tester(soilMeasurement);
+
     uint16_t revision{};
-    ASSERT_EQ(ReadClusterAttribute(soilMeasurement, Globals::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
 
     uint32_t features{};
-    ASSERT_EQ(ReadClusterAttribute(soilMeasurement, FeatureMap::Id, features), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, features), CHIP_NO_ERROR);
 
     SoilMoistureMeasuredValue::TypeInfo::Type soilMoistureMeasuredValue;
-    ASSERT_EQ(ReadClusterAttribute(soilMeasurement, SoilMoistureMeasuredValue::Id, soilMoistureMeasuredValue), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(SoilMoistureMeasuredValue::Id, soilMoistureMeasuredValue), CHIP_NO_ERROR);
 
-    // TODO: It's not safe to use ReadClusterAttribute() for SoilMoistureMeasurementLimits because it contains a list as a member
+    // TODO: app::DataModel::Decode() not available for type SoilMoistureMeasurementLimits::TypeInfo::Type
     // SoilMoistureMeasurementLimits::TypeInfo::Type soilMoistureMeasurementLimits;
-    // ASSERT_EQ(ReadClusterAttribute(soilMeasurement, SoilMoistureMeasurementLimits::Id, soilMoistureMeasurementLimits),
-    // CHIP_NO_ERROR);
+    // ASSERT_EQ(tester.ReadAttribute(SoilMoistureMeasurementLimits::Id, soilMoistureMeasurementLimits), CHIP_NO_ERROR);
 }
 
 TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasuredValue)

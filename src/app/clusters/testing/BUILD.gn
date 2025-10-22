@@ -20,7 +20,7 @@ source_set("testing") {
   sources = [
     "AttributeTesting.cpp",
     "AttributeTesting.h",
-    "TestReadWriteAttribute.h",
+    "ClusterTesting.h",
   ]
 
   public_deps = [
