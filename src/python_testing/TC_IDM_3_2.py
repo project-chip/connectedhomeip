@@ -75,7 +75,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                 # if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard and cluster_type_enum != global_attribute_ids.ClusterIdType.kTest:
                 if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard:
                     continue
-                 
+
                 for attr_type in cluster_data:
                     # Check if this is an attribute descriptor class
                     if (isinstance(attr_type, type) and
