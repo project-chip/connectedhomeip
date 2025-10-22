@@ -26,6 +26,7 @@ source_set("testing") {
   public_deps = [
     "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
+    "${chip_root}/src/app/server-cluster:server-cluster",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
   ]

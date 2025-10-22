@@ -33,6 +33,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UserLabel;
 using namespace chip::app::Clusters::UserLabel::Attributes;
+using namespace chip::Test;
 
 struct TestUserLabelCluster : public ::testing::Test
 {
@@ -50,12 +51,6 @@ struct TestUserLabelCluster : public ::testing::Test
     ServerClusterContext context;
     UserLabelCluster userLabel;
 };
-
-template <typename ClusterT, typename T>
-inline CHIP_ERROR ReadClusterAttribute(ClusterT & cluster, AttributeId attr, T & val)
-{
-    return chip::Test::ReadClusterAttribute(cluster, ConcreteAttributePath(kRootEndpointId, UserLabel::Id, attr), val);
-}
 
 } // namespace
 
@@ -78,6 +73,7 @@ TEST_F(TestUserLabelCluster, ReadAttributeTest)
     uint32_t features{};
     ASSERT_EQ(ReadClusterAttribute(userLabel, FeatureMap::Id, features), CHIP_NO_ERROR);
 
-    DataModel::DecodableList<Structs::LabelStruct::Type> labelList;
-    ASSERT_EQ(ReadClusterAttribute(userLabel, LabelList::Id, labelList), CHIP_NO_ERROR);
+    // TODO: It's not safe to use ReadClusterAttribute() for a list
+    // DataModel::DecodableList<Structs::LabelStruct::Type> labelList;
+    // ASSERT_EQ(ReadClusterAttribute(userLabel, LabelList::Id, labelList), CHIP_NO_ERROR);
 }

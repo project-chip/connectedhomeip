@@ -383,6 +383,15 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    // Check if we already received an SDP answer (duplicate answer scenario)
+    // If we're already in SendingICECandidates or later state, we've already processed an answer
+    if (transport->GetState() != WebrtcTransport::State::SendingOffer && transport->GetState() != WebrtcTransport::State::Idle)
+    {
+        ChipLogProgress(Camera, "Ignoring duplicate SDP answer for session ID %u (current state: %s)", sessionId,
+                        transport->GetStateStr());
+        return CHIP_NO_ERROR;
+    }
+
     transport->GetPeerConnection()->SetRemoteDescription(sdpAnswer, SDPType::Answer);
 
     transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
