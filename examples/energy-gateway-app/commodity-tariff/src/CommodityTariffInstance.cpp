@@ -174,8 +174,8 @@ void CommodityTariffInstance::AdvanceTestTime(Seconds32 offset)
     if (offset.count() > 0)
     {
         AdvanceMockTime(offset);
-        ChipLogProgress(DeviceLayer, "⏩ Time advanced by %" PRIu32 " seconds (%" PRIu32 " minutes, %" PRIu32 " hours)", offset.count(),
-                    offset.count() / 60, offset.count() / 3600);        
+        ChipLogProgress(DeviceLayer, "⏩ Time advanced by %" PRIu32 " seconds (%" PRIu32 " minutes, %" PRIu32 " hours)",
+                        offset.count(), offset.count() / 60, offset.count() / 3600);
     }
 
     TariffTimeAttrsSync();
@@ -185,8 +185,6 @@ void CommodityTariffInstance::AdvanceTestTime(Seconds32 offset)
 // Existing Tariff Implementation
 // ============================================================================
 
-
-
 void CommodityTariffInstance::ScheduleTariffTimeUpdate()
 {
     constexpr auto pollInterval = kTimerPollIntervalInSec * 1_s;
@@ -194,7 +192,7 @@ void CommodityTariffInstance::ScheduleTariffTimeUpdate()
     DeviceLayer::SystemLayer().StartTimer(
         pollInterval, [](System::Layer *, void * context) { static_cast<CommodityTariffInstance *>(context)->TariffTimeUpdCb(); },
         this);
-    
+
     if (mTestTimeEnabled)
     {
         AdvanceMockTime(pollInterval);
@@ -204,7 +202,7 @@ void CommodityTariffInstance::ScheduleTariffTimeUpdate()
 void CommodityTariffInstance::CancelTariffTimeUpdate()
 {
     DeviceLayer::SystemLayer().CancelTimer(
-            [](System::Layer *, void * context) { static_cast<CommodityTariffInstance *>(context)->TariffTimeUpdCb(); }, this);
+        [](System::Layer *, void * context) { static_cast<CommodityTariffInstance *>(context)->TariffTimeUpdCb(); }, this);
 }
 
 void CommodityTariffInstance::TariffTimeUpdCb()
@@ -223,7 +221,7 @@ void CommodityTariffInstance::TariffTimeUpdCb()
 CHIP_ERROR CommodityTariffInstance::Init()
 {
     pRealClock = &SystemClock();
-    ScheduleTariffTimeUpdate();    
+    ScheduleTariffTimeUpdate();
     return Instance::Init();
 }
 
