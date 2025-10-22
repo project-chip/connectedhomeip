@@ -33,58 +33,45 @@ using namespace chip::app::Clusters::ResourceMonitoring;
 using namespace Protocols::InteractionModel;
 
 namespace {
-struct ActiveCluster
+struct ListEntry
 {
     template <typename... Args>
-    ActiveCluster(Args &&... args) : cluster(std::forward<Args>(args)...), registration(cluster)
+    ListEntry(Args &&... args) : cluster(std::forward<Args>(args)...), registration(cluster)
     {}
 
-    ClusterId clusterId;
     ResourceMonitoringCluster cluster;
     ServerClusterRegistration registration;
-    ActiveCluster * next{ nullptr };
+    ListEntry * next{ nullptr };
 };
 
-ActiveCluster * gActiveClusters{ nullptr };
+ListEntry * gActiveClusters{ nullptr };
 
-// Removes the first node with a matching clusterId from the list.
-// Returns the new head of the list.
-
-ActiveCluster * removeActiveClusterFromList(ActiveCluster * head, ClusterId clusterId)
+// Removes the first node with a matching pair (endpointId, clusterId) from the list and returns the new head of the list.
+ListEntry * removeListEntryFromList(ListEntry * head, EndpointId endpointId, ClusterId clusterId)
 {
-    // Handle the case where the head needs to be removed
-    while (head && head->clusterId == clusterId)
+    ListEntry * current = head;
+    ListEntry * previous = nullptr;
+
+    while (current)
     {
-        ActiveCluster * temp = head;
-
-        CodegenDataModelProvider::Instance().Registry().Unregister(&(temp->cluster));
-        temp->registration.~ServerClusterRegistration();
-        temp->cluster.~ResourceMonitoringCluster();
-
-        head = head->next;
-        delete temp;
-    }
-    // No head left
-    if (!head)
-        return nullptr;
-
-    // Remove subsequent nodes
-    ActiveCluster * current = head;
-    while (current->next)
-    {
-        if (current->next->clusterId == clusterId)
+        if (current->cluster.GetEndpointId() == endpointId && current->cluster.GetClusterId() == clusterId)
         {
-            ActiveCluster * temp = current->next;
-
-            CodegenDataModelProvider::Instance().Registry().Unregister(&(temp->cluster));
-            temp->registration.~ServerClusterRegistration();
-            temp->cluster.~ResourceMonitoringCluster();
-
-            current->next = temp->next;
+            CodegenDataModelProvider::Instance().Registry().Unregister(&(current->cluster));
+            ListEntry * temp = current;
+            if (previous)
+            {
+                previous->next = current->next;
+            }
+            else
+            {
+                head = current->next;
+            }
+            current = current->next;
             delete temp;
         }
         else
         {
+            previous = current;
             current = current->next;
         }
     }
@@ -93,6 +80,50 @@ ActiveCluster * removeActiveClusterFromList(ActiveCluster * head, ClusterId clus
 
 } // namespace
 
+
+
+// Common helper for cluster initialization
+void InitResourceMonitoringCluster(EndpointId endpointId, ClusterId clusterId, BitFlags<ResourceMonitoring::Feature> featureFlags,
+                                  const ResourceMonitoring::ResourceMonitoringCluster::OptionalAttributeSet & optionalAttributeSet,
+                                  chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum degradationDirection,
+                                  bool resetConditionSupported)
+{
+    ListEntry * previous = nullptr;
+    ListEntry * current = gActiveClusters;
+
+    while (current != nullptr)
+    {
+        previous = current;
+        current = current->next;
+    }
+
+    ListEntry * newNode = new ListEntry{
+        endpointId,
+        clusterId,
+        featureFlags,
+        optionalAttributeSet,
+        degradationDirection,
+        resetConditionSupported
+    };
+
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(newNode->registration);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to register cluster %u/" ChipLogFormatMEI ":   %" CHIP_ERROR_FORMAT, endpointId,
+                     ChipLogValueMEI(clusterId), err.Format());
+    }
+
+    if (previous)
+    {
+        previous->next = newNode;
+    }
+    else
+    {
+        gActiveClusters = newNode; // List was empty
+    }
+}
+
 //
 // HEPA Filter Monitoring Cluster
 //
@@ -100,39 +131,22 @@ ActiveCluster * removeActiveClusterFromList(ActiveCluster * head, ClusterId clus
 void MatterHepaFilterMonitoringClusterInitCallback(EndpointId endpointId)
 {
     uint32_t optionalAttributeBits = 0;
-
     ResourceMonitoring::ResourceMonitoringCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
-
-    ActiveCluster * current = gActiveClusters;
-
-    while (current != nullptr)
-    {
-        current = current->next;
-    }
-
     uint32_t featureMap = CodegenClusterIntegration::LoadFeatureMap(endpointId, HepaFilterMonitoring::Id);
 
-    current = new ActiveCluster{
+    InitResourceMonitoringCluster(
         endpointId,
         HepaFilterMonitoring::Id,
         BitFlags<ResourceMonitoring::Feature>{ featureMap },
         optionalAttributeSet,
         chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown,
         true // reset condition command supported
-    };
-
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(current->registration);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register cluster %u/" ChipLogFormatMEI ":   %" CHIP_ERROR_FORMAT, endpointId,
-                     ChipLogValueMEI(HepaFilterMonitoring::Id), err.Format());
-    }
+    );
 }
 
 void MatterHepaFilterMonitoringClusterShutdownCallback(EndpointId endpointId)
 {
-    gActiveClusters = removeActiveClusterFromList(gActiveClusters, HepaFilterMonitoring::Id);
+    gActiveClusters = removeListEntryFromList(gActiveClusters, endpointId, HepaFilterMonitoring::Id);
 }
 
 //
@@ -142,37 +156,22 @@ void MatterHepaFilterMonitoringClusterShutdownCallback(EndpointId endpointId)
 void MatterActivatedCarbonFilterMonitoringClusterInitCallback(EndpointId endpointId)
 {
     uint32_t optionalAttributeBits = 0;
-
     ResourceMonitoring::ResourceMonitoringCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
+    uint32_t featureMap = CodegenClusterIntegration::LoadFeatureMap(endpointId, ActivatedCarbonFilterMonitoring::Id);
 
-    ActiveCluster * current = gActiveClusters;
-
-    while (current != nullptr)
-    {
-        current = current->next;
-    }
-
-    uint32_t featureMap = CodegenClusterIntegration::LoadFeatureMap(endpointId, HepaFilterMonitoring::Id);
-
-    current = new ActiveCluster{ endpointId,
-                                 ActivatedCarbonFilterMonitoring::Id,
-                                 BitFlags<ResourceMonitoring::Feature>{ featureMap },
-                                 optionalAttributeSet,
-                                 chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown,
-                                 true };
-
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(current->registration);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register cluster %u/" ChipLogFormatMEI ":   %" CHIP_ERROR_FORMAT, endpointId,
-                     ChipLogValueMEI(ActivatedCarbonFilterMonitoring::Id), err.Format());
-    }
+    InitResourceMonitoringCluster(
+        endpointId,
+        ActivatedCarbonFilterMonitoring::Id,
+        BitFlags<ResourceMonitoring::Feature>{ featureMap },
+        optionalAttributeSet,
+        chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown,
+        true // reset condition command supported
+    );
 }
 
 void MatterActivatedCarbonFilterMonitoringClusterShutdownCallback(EndpointId endpointId)
 {
-    gActiveClusters = removeActiveClusterFromList(gActiveClusters, ActivatedCarbonFilterMonitoring::Id);
+    gActiveClusters = removeListEntryFromList(gActiveClusters, endpointId, ActivatedCarbonFilterMonitoring::Id);
 }
 
 namespace chip {
@@ -180,20 +179,20 @@ namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
 
-void SetDelegate(EndpointId endpointId, ClusterId clusterId, ResourceMonitoringDelegate * delegate)
+ResourceMonitoringCluster* GetClusterInstance(EndpointId endpointId, ClusterId clusterId)
 {
+    ListEntry * current = gActiveClusters;
 
-    ActiveCluster * current = gActiveClusters;
-
-    while (current && current->clusterId != clusterId)
+    while (current)
     {
+        if (current->cluster.GetEndpointId() == endpointId && current->cluster.GetClusterId() == clusterId)
+        {
+            return &(current->cluster);
+        }
         current = current->next;
     }
 
-    if (current)
-    {
-        current->cluster.SetDelegate(delegate);
-    }
+    return nullptr;
 }
 
 } // namespace ResourceMonitoring

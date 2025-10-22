@@ -74,7 +74,7 @@ struct TestResourceMonitoringCluster : public ::testing::Test
     MockDelegate mDelegate;
 };
 
-constexpr EndpointId kEndpointWitResourceMonitoring = 1;
+// constexpr EndpointId kEndpointWitResourceMonitoring = 1;
 
 using namespace HepaFilterMonitoring::Attributes;
 
