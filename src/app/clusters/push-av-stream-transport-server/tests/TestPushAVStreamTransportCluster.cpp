@@ -77,18 +77,10 @@ public:
         return err;
     }
 
-    bool IsTimedInvoke() const override { return mIsTimedInvoke; }
-
-    void FlushAcksRightAwayOnSlowCommand() override { mAcksFlushed = true; }
-
-    Access::SubjectDescriptor GetSubjectDescriptor() const override { return mSubjectDescriptor; }
-
-    Messaging::ExchangeContext * GetExchangeContext() const override { return mExchangeContext; }
-
     // Specialized methods for this test
     const std::vector<ResponseRecord> & GetResponses() const { return mResponses; }
 
-    // Optional for test configuration
+    // Configuration methods for testing
     void SetTimedInvoke(bool isTimed) { mIsTimedInvoke = isTimed; }
     void SetExchangeContext(Messaging::ExchangeContext * context) { mExchangeContext = context; }
 
