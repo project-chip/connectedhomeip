@@ -24,13 +24,13 @@ with PythonPath('py_matter_idl', relative_to=__file__):
     from matter.idl.matter_idl_parser import CreateParser
 
 import logging
-import sys
 
-import click
 import os.path
 import subprocess
+import sys
 import traceback
 
+import click
 from tools.zap.clang_format import getClangFormatBinary
 
 try:
