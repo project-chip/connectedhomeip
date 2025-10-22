@@ -333,7 +333,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     //
     // This remains the single point of entry to ensure that all cluster-level
     // initialization is performed in the correct order.
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider);
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(initParams.dataModelProvider,
+                                                                     initParams.dataModelProviderChangeListner);
 
 #if defined(CHIP_APP_USE_ECHO)
     err = InitEchoHandler(&mExchangeMgr);

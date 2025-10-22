@@ -438,7 +438,7 @@ public:
     // state
     //
     // Returns the old data model provider value.
-    DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
+    DataModel::Provider * SetDataModelProvider(DataModel::Provider * model, DataModel::ProviderChangeListener * listener = nullptr);
 
 private:
     /* DataModel::ActionContext implementation */
