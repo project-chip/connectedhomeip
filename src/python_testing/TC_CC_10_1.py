@@ -225,9 +225,9 @@ class TC_CC_10_1(MatterBaseTest):
             asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster][attributes.CurrentHue], 170,
                                          "CurrentHue is not greater than or equal to 170")
             asserts.assert_less_equal(result[self.matter_test_config.endpoint][cluster]
-                                      [attributes.CurrentSaturation], 58, "CurrentSaturation is not 58")
+                                      [attributes.CurrentSaturation], 58, "CurrentSaturation is not less than or equal 58")
             asserts.assert_greater_equal(result[self.matter_test_config.endpoint][cluster]
-                                         [attributes.CurrentSaturation], 42, "CurrentSaturation is not 42")
+                                         [attributes.CurrentSaturation], 42, "CurrentSaturation is not greater than or equal 42")
 
         self.step("2c")
         if self.pics_guard(self.check_pics("CC.S.F03")):
