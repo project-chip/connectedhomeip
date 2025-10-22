@@ -22,6 +22,8 @@
 #include "LEDWidget.h"
 #include "PWMDevice.h"
 
+#include <app/AttributePathParams.h>
+#include <app/data-model-provider/ProviderChangeListener.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #if CONFIG_CHIP_FACTORY_DATA
@@ -43,6 +45,12 @@
 struct k_timer;
 struct Identify;
 
+class CustomizedProviderChangeListener : public chip::app::DataModel::ProviderChangeListener
+{
+public:
+    void MarkDirty(const chip::app::AttributePathParams & path) override;
+};
+
 class AppTask
 {
 public:
@@ -51,6 +59,11 @@ public:
         static AppTask sAppTask;
         return sAppTask;
     };
+    static chip::app::DataModel::ProviderChangeListener & GetCustomizedProviderChangeListener()
+    {
+        static CustomizedProviderChangeListener sCustomizedProviderChangeListener;
+        return sCustomizedProviderChangeListener;
+    }
 
     CHIP_ERROR StartApp();
 
@@ -59,6 +72,7 @@ public:
 
     static void IdentifyStartHandler(Identify *);
     static void IdentifyStopHandler(Identify *);
+    static void MarkDirty(const chip::app::AttributePathParams & path);
 
 private:
 #ifdef CONFIG_CHIP_PW_RPC
@@ -91,6 +105,8 @@ private:
     FunctionEvent mFunction   = FunctionEvent::NoneSelected;
     bool mFunctionTimerActive = false;
     PWMDevice mPWMDevice;
+    std::vector<chip::app::AttributePathParams> mAttributePaths;
+    struct k_mutex mMutex;
 
 #if CONFIG_CHIP_FACTORY_DATA
     chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;

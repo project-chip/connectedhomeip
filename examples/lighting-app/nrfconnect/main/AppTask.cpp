@@ -26,6 +26,7 @@
 
 #include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/InteractionModelEngine.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -77,12 +78,14 @@ using namespace ::chip::DeviceLayer;
 
 namespace {
 
-constexpr int kFactoryResetTriggerTimeout      = 3000;
-constexpr int kFactoryResetCancelWindowTimeout = 3000;
-constexpr int kAppEventQueueSize               = 10;
-constexpr EndpointId kLightEndpointId          = 1;
-constexpr uint8_t kDefaultMinLevel             = 0;
-constexpr uint8_t kDefaultMaxLevel             = 254;
+constexpr int kFactoryResetTriggerTimeout        = 3000;
+constexpr int kFactoryResetCancelWindowTimeout   = 3000;
+constexpr int kUpdateClusterStateBaseTimeoutMs   = 1000;
+constexpr int kUpdateClusterStateJitterTimeoutMs = 1000;
+constexpr int kAppEventQueueSize                 = 10;
+constexpr EndpointId kLightEndpointId            = 1;
+constexpr uint8_t kDefaultMinLevel               = 0;
+constexpr uint8_t kDefaultMaxLevel               = 254;
 #if NUMBER_OF_BUTTONS == 2
 constexpr uint32_t kAdvertisingTriggerTimeout = 3000;
 #endif
@@ -156,6 +159,25 @@ constexpr uint32_t kOff_ms{ 950 };
 app::Clusters::NetworkCommissioning::Instance sWiFiCommissioningInstance(0, &(NetworkCommissioning::NrfWiFiDriver::Instance()));
 #endif
 
+void CustomizedProviderChangeListener::MarkDirty(const chip::app::AttributePathParams & path)
+{
+    AppTask::MarkDirty(path);
+}
+
+void AppTask::MarkDirty(const chip::app::AttributePathParams & path)
+{
+    k_mutex_lock(&Instance().mMutex, K_FOREVER);
+    Instance().mAttributePaths.push_back(path);
+    // Batch all changes that happen within the timer window.
+    if (!Instance().mFunctionTimerActive)
+    {
+        uint32_t jitter = chip::Crypto::GetRandU16() % kUpdateClusterStateJitterTimeoutMs;
+        Instance().StartTimer(kUpdateClusterStateBaseTimeoutMs + jitter);
+    }
+    Instance().mFunction = FunctionEvent::UpdateClusterState;
+    k_mutex_unlock(&Instance().mMutex);
+};
+
 CHIP_ERROR AppTask::Init()
 {
     // Initialize CHIP stack
@@ -174,6 +196,7 @@ CHIP_ERROR AppTask::Init()
         LOG_ERR("PlatformMgr().InitChipStack() failed");
         return err;
     }
+    k_mutex_init(&mMutex);
 
 #if defined(CONFIG_NET_L2_OPENTHREAD)
     err = ThreadStackMgr().InitThreadStack();
@@ -286,6 +309,8 @@ CHIP_ERROR AppTask::Init()
 
     initParams.dataModelProvider        = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+    // provide a customzied ProviderChangeListener
+    initParams.dataModelProviderChangeListner = &GetCustomizedProviderChangeListener();
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();
 
@@ -502,6 +527,22 @@ void AppTask::FunctionTimerEventHandler(const AppEvent & event)
         StartBLEAdvertisementHandler(event);
         Instance().mFunction = FunctionEvent::NoneSelected;
 #endif
+    }
+    else if (Instance().mFunction == FunctionEvent::UpdateClusterState)
+    {
+        k_mutex_lock(&Instance().mMutex, K_FOREVER);
+        for (const auto & path : Instance().mAttributePaths)
+        {
+            CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+            if (err != CHIP_NO_ERROR)
+            {
+                LOG_ERR("Failed to set path dirty with error %" CHIP_ERROR_FORMAT, err.Format());
+            }
+        }
+        Instance().mAttributePaths.clear();
+        Instance().mFunction = FunctionEvent::NoneSelected;
+        Instance().CancelTimer();
+        k_mutex_unlock(&Instance().mMutex);
     }
 }
 

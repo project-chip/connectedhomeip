@@ -42,7 +42,8 @@ enum class FunctionEvent : uint8_t
     NoneSelected   = 0,
     SoftwareUpdate = 0,
     FactoryReset,
-    AdvertisingStart
+    AdvertisingStart,
+    UpdateClusterState
 };
 
 struct AppEvent
