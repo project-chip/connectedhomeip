@@ -162,13 +162,11 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         th1 = self.default_controller
         fabric_id_th2 = th1.fabricId + 1
         vendor_id = self.matter_test_config.admin_vendor_id
-        product_id = 32769  # Default value
 
         logging.info(f"Endpoint: {endpoint}.")
         logging.info(f"DUT Node ID: {dut_node_id}.")
         logging.info(f"Requestor Node ID: {requestor_node_id}.")
         logging.info(f"Vendor ID: {vendor_id}.")
-        logging.info(f"Product ID: {product_id}.")
 
         logging.info(f"TH1 fabric id: {th1.fabricId}.")
         logging.info(f"TH2 fabric id: {fabric_id_th2}.")
