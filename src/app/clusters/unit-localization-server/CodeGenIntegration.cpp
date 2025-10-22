@@ -24,10 +24,8 @@
 #include <platform/DeviceInfoProvider.h>
 #include <platform/PlatformManager.h>
 
-#ifndef CHIP_SKIP_PERSISTENCE_MIGRATION
 #include <app/persistence/AttributePersistenceMigration.h>
 #include <app/persistence/AttributePersistenceProvider.h>
-#endif
 
 using namespace chip;
 using namespace chip::app;
@@ -40,11 +38,8 @@ LazyRegisteredServerCluster<UnitLocalizationCluster> gServer;
 
 void Migration(const ConcreteClusterPath & clusterPath, ServerClusterContext & context)
 {
-
-#ifndef CHIP_SKIP_PERSISTENCE_MIGRATION
     AttributeId attributesToUpdate[] = { UnitLocalization::Attributes::TemperatureUnit::Id };
     MigrateFromSafeAttributePersistenceProvider(clusterPath, Span(attributesToUpdate), context.storage);
-#endif
 }
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate

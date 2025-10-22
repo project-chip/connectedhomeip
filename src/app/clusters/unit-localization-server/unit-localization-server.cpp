@@ -23,11 +23,6 @@
 #include <platform/DeviceInfoProvider.h>
 #include <tracing/macros.h>
 
-#ifndef CHIP_SKIP_PERSISTENCE_MIGRATION
-#include <app/persistence/AttributePersistenceMigration.h>
-#include <app/persistence/AttributePersistenceProvider.h>
-#endif
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -36,8 +31,7 @@ using namespace chip::app::Clusters::UnitLocalization::Attributes;
 
 UnitLocalizationCluster::UnitLocalizationCluster(EndpointId endpointId, BitFlags<UnitLocalization::Feature> feature,
                                                  UnitLocalizationCluster::MigrationCallback * mclb) :
-    DefaultServerCluster({ endpointId, UnitLocalization::Id }),
-    mFeatures{ feature }, mCallback{ mclb }
+    DefaultServerCluster({ endpointId, UnitLocalization::Id }), mFeatures{ feature }, mCallback{ mclb }
 {}
 
 CHIP_ERROR UnitLocalizationCluster::SetSupportedTemperatureUnits(DataModel::List<TempUnitEnum> & units)
@@ -89,7 +83,7 @@ CHIP_ERROR UnitLocalizationCluster::Attributes(const ConcreteClusterPath & path,
         optionalAttributeSet.Set<SupportedTemperatureUnits::Id>();
     }
 
-    return listBuilder.Append(Span<DataModel::AttributeEntry>(), Span(optionalAttributes), optionalAttributeSet);
+    return listBuilder.Append(kMandatoryMetadata, Span(optionalAttributes), optionalAttributeSet);
 }
 
 DataModel::ActionReturnStatus UnitLocalizationCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,
