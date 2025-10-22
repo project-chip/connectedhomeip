@@ -699,7 +699,7 @@ class TC_SC_4_1(MatterBaseTest):
         # *** STEP 6 ***
         # Get the 'Long Discriminator Subtype'
         self.step(6)
-        long_discriminator_sybtype, long_discriminator = self.get_long_discriminator_subtype()
+        long_discriminator_subtype, long_discriminator = self.get_long_discriminator_subtype()
 
         # *** STEP 7 ***
         # If 'supports_obcw' is True DUT is put in Commissioning
