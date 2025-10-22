@@ -102,22 +102,14 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    // Returns next event in the event queue, removing it from the queue.
+    // Returns `std::nullopt` if no event is in the queue (i.e. no event was generated after consuming last generated one).
     [[nodiscard]] std::optional<EventInformation> GetNextEvent()
     {
-        if (mEventQueue.empty())
-        {
-            return std::nullopt;
-        }
+        if (mEventQueue.empty()) return std::nullopt;
         std::optional<EventInformation> info{mEventQueue.front()};
         mEventQueue.pop_front();
         return info;
-    }
-
-
-    template <typename T>
-    CHIP_ERROR DecodeLastEvent(T & dest)
-    {
-
     }
 
 private:
