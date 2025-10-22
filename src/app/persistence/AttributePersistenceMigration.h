@@ -65,7 +65,7 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
  *         and return last error encountered
  */
 template <int attributeBufferSize = 255>
-CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(const ConcreteClusterPath & cluster, Span<AttributeId> attributes,
+CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(const ConcreteClusterPath & cluster, Span<const AttributeId> attributes,
                                                        PersistentStorageDelegate & storageDelegate)
 {
     DefaultSafeAttributePersistenceProvider safeProvider;
