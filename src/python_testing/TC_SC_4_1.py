@@ -394,11 +394,10 @@ class TC_SC_4_1(MatterBaseTest):
             log_output=True
         )
 
-        # Verify that the TXT record, when required, is returned and is non-empty
-        txt_record_required = self.supports_icd or self.supports_tcp
+        # Verify that the TXT record is returned and is non-empty
         txt_record_returned = (txt_record is not None) and (len(txt_record.txt) > 0)
-        asserts.assert_true((not txt_record_required) or txt_record_returned,
-                            "TXT record is required and was not returned or contains no values")
+        asserts.assert_true(txt_record_returned,
+                            "TXT record was not returned or contains no values")
 
         # If the TXT record is returned, verify its TXT keys
         if txt_record_returned:
