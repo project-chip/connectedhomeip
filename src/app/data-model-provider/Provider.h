@@ -48,6 +48,10 @@ public:
     // `context` references  will be guaranteed valid until Shutdown is called()
     virtual CHIP_ERROR Startup(InteractionModelContext context) { return CHIP_NO_ERROR; }
     virtual CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
+    virtual std::optional<std::reference_wrapper<DataModel::ProviderChangeListener>> GetProviderChangeListener()
+    {
+        return std::nullopt;
+    }
 
     /// NOTE: this code is NOT required to handle `List` global attributes:
     ///       AcceptedCommandsList, GeneratedCommandsList OR AttributeList

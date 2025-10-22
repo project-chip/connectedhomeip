@@ -106,6 +106,16 @@ CHIP_ERROR CodeDrivenDataModelProvider::Shutdown()
     return CHIP_NO_ERROR;
 }
 
+std::optional<std::reference_wrapper<DataModel::ProviderChangeListener>> CodeDrivenDataModelProvider::GetProviderChangeListener()
+{
+    if (!mInteractionModelContext)
+    {
+        ChipLogError(DataManagement, "GetProviderChangeListener called before provider has been started.");
+        return std::nullopt;
+    }
+    return mInteractionModelContext->dataModelChangeListener;
+}
+
 DataModel::ActionReturnStatus CodeDrivenDataModelProvider::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                          AttributeValueEncoder & encoder)
 {

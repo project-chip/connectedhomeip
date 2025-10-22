@@ -1592,7 +1592,12 @@ DataVersion * emberAfDataVersionStorage(const ConcreteClusterPath & aConcreteClu
 
 DataModel::ProviderChangeListener * emberAfGlobalInteractionModelAttributesChangedListener()
 {
-    return &InteractionModelEngine::GetInstance()->GetReportingEngine();
+    auto providerChangeListener = InteractionModelEngine::GetInstance()->GetProviderChangeListener();
+    if (providerChangeListener == std::nullopt)
+    {
+        return nullptr;
+    }
+    return &(providerChangeListener.value().get());
 }
 
 void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,

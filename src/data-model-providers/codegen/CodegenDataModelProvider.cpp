@@ -164,6 +164,16 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
     });
 }
 
+std::optional<std::reference_wrapper<DataModel::ProviderChangeListener>> CodegenDataModelProvider::GetProviderChangeListener()
+{
+    if (!mContext)
+    {
+        ChipLogError(DataManagement, "GetProviderChangeListener called before provider has been started.");
+        return std::nullopt;
+    }
+    return mContext->dataModelChangeListener;
+}
+
 std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                      TLV::TLVReader & input_arguments,
                                                                                      CommandHandler * handler)

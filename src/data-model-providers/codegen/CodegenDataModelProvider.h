@@ -61,6 +61,7 @@ public:
     /// Generic model implementations
     CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
     CHIP_ERROR Shutdown() override;
+    std::optional<std::reference_wrapper<DataModel::ProviderChangeListener>> GetProviderChangeListener() override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;

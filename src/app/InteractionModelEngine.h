@@ -199,6 +199,17 @@ public:
 
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
+    /**
+     * Returns the ProviderChangeListener, which can be customized ProviderChangeListener if provided, or reporting engine if
+     * customized ProviderChangeListener is not provided.
+     */
+    std::optional<std::reference_wrapper<DataModel::ProviderChangeListener>> GetProviderChangeListener()
+    {
+        if (mDataModelProvider == nullptr)
+            return std::nullopt;
+        return mDataModelProvider->GetProviderChangeListener();
+    };
+
     reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
     void ReleaseAttributePathList(SingleLinkedListNode<AttributePathParams> *& aAttributePathList);
