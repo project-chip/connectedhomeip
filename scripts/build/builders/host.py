@@ -56,7 +56,6 @@ class HostApp(Enum):
     MIN_MDNS = auto()
     ADDRESS_RESOLVE = auto()
     TV_APP = auto()
-    TV_CASTING_APP = auto()
     LIGHT = auto()
     LIGHT_DATA_MODEL_NO_UNIQUE_ID = auto()
     LOCK = auto()
@@ -69,7 +68,7 @@ class HostApp(Enum):
     SIMULATED_APP2 = auto()
     PYTHON_BINDINGS = auto()
     EFR32_TEST_RUNNER = auto()
-    TV_CASTING = auto()
+    TV_CASTING_APP = auto()
     BRIDGE = auto()
     FABRIC_ADMIN = auto()
     FABRIC_BRIDGE = auto()
@@ -162,7 +161,7 @@ class HostApp(Enum):
             return '../'
         elif self == HostApp.EFR32_TEST_RUNNER:
             return '../src/test_driver/efr32'
-        elif self == HostApp.TV_CASTING:
+        elif self == HostApp.TV_CASTING_APP:
             return 'tv-casting-app/linux'
         elif self == HostApp.BRIDGE:
             return 'bridge-app/linux'
@@ -279,7 +278,7 @@ class HostApp(Enum):
             yield 'controller/python'  # Directory containing WHL files
         elif self == HostApp.EFR32_TEST_RUNNER:
             yield 'chip_pw_test_runner_wheels'
-        elif self == HostApp.TV_CASTING:
+        elif self == HostApp.TV_CASTING_APP:
             yield 'chip-tv-casting-app'
             yield 'chip-tv-casting-app.map'
         elif self == HostApp.BRIDGE:

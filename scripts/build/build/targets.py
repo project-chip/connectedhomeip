@@ -129,7 +129,7 @@ def BuildHostTarget():
                    enable_ble=False, enable_wifipaf=False),
         TargetPart('python-bindings', app=HostApp.PYTHON_BINDINGS),
         TargetPart('tv-app', app=HostApp.TV_APP),
-        TargetPart('tv-casting-app', app=HostApp.TV_CASTING),
+        TargetPart('tv-casting-app', app=HostApp.TV_CASTING_APP),
         TargetPart('bridge', app=HostApp.BRIDGE),
         TargetPart('fabric-admin', app=HostApp.FABRIC_ADMIN).OnlyIfRe("-rpc"),
         TargetPart('fabric-bridge', app=HostApp.FABRIC_BRIDGE).OnlyIfRe("-rpc"),
@@ -233,7 +233,7 @@ def BuildHostTarget():
             'terms-and-conditions',
             'thermostat',
             'tv-app',
-            'tv_casting-app',
+            'tv-casting-app',
             'water-leak-detector',
             # keep-sorted end
         ]) + "-)")
