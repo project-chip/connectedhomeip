@@ -422,7 +422,7 @@ class HostBuilder(GnBuilder):
 
         # Unified builds use the top level root for compilation
         if not unified:
-            root = os.path.join(root, 'examples', app.ExamplePath()),
+            root = os.path.join(root, 'examples', app.ExamplePath())
 
         super(HostBuilder, self).__init__(root=root, runner=runner)
 

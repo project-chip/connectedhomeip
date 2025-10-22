@@ -222,13 +222,11 @@ class BuildTarget:
         # Modifiers can be combined in any way
         self.modifiers: List[TargetPart] = []
 
-    @property
-    def isUnifiedBuild(self):
-        """Unified build will search for a `unified` boolean set as part of the modifiers"""
-        for m in self.modifiers:
-            if 'unified' not in m.build_arguments:
-                continue
-            return m.build_arguments['unified']
+    def isUnifiedBuild(self, parts: List[TargetPart]):
+        """Checks if the given parts combine into a unified build."""
+        for part in parts:
+            if part.build_arguments.get('unified', False):
+                return True
         return False
 
     def AppendFixedTargets(self, parts: List[TargetPart]):
@@ -469,7 +467,7 @@ class BuildTarget:
         builder = self.builder_class(repository_path, runner=runner, **kargs)
         builder.target = self
         builder.identifier = name
-        if self.isUnifiedBuild:
+        if self.isUnifiedBuild(parts):
             builder.output_dir = os.path.join(output_prefix, 'unified-build')
         else:
             # TODO: can we check if builds are compatible?
