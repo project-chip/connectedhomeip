@@ -390,7 +390,7 @@ const TariffDataSet kTariffPresets[] = {
             DataModel::List<Structs::DayStruct::Type>(Sample1::IndividualDays, std::size(Sample1::IndividualDays))),
         .CalendarPeriods = DataModel::MakeNullable(
             DataModel::List<Structs::CalendarPeriodStruct::Type>(Sample1::CalendarPeriods, std::size(Sample1::CalendarPeriods))),
-        .TariffTestTimestamp = 1733011200, // 01-Dec-2024
+        .TariffTestTimestamp = 1733011200, // 01-Dec-2024, In CHIP epoch: 786326400
     },
     // Sample 2
     {
@@ -410,7 +410,7 @@ const TariffDataSet kTariffPresets[] = {
         .IndividualDays  = NullOptional, // No individual days in sample 2
         .CalendarPeriods = DataModel::MakeNullable(
             DataModel::List<Structs::CalendarPeriodStruct::Type>(Sample2::CalendarPeriods, std::size(Sample2::CalendarPeriods))),
-        .TariffTestTimestamp = 1748736000, // 01-Jun-2025
+        .TariffTestTimestamp = 1748736000, // 01-Jun-2025, In CHIP epoch: 802051200
     }
 };
 

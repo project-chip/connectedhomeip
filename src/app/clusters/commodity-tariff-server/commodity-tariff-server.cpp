@@ -59,11 +59,8 @@ bool Instance::HasFeature(Feature aFeature) const
 
 uint32_t Instance::GetCurrentTimestamp()
 {
-    System::Clock::Microseconds64 utcTimeUnix;
     uint32_t matterEpoch;
-    CHIP_ERROR err = System::SystemClock().GetClock_RealTime(utcTimeUnix);
-    VerifyOrDie(CHIP_NO_ERROR == err);
-    err = System::Clock::GetClock_MatterEpochS(matterEpoch);
+    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(matterEpoch);
     VerifyOrDie(CHIP_NO_ERROR == err);
 
     return matterEpoch;

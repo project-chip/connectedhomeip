@@ -73,7 +73,7 @@ public:
     CommodityTariffDelegate * GetDelegate() { return mCommodityTariffDelegate; };
 
     // Simplified Test Time Control API
-    void EnableTestTime(bool enable);
+    void EnableTestTime(bool enable, uint32_t aInitialTimeValue = 0);
     void AdvanceTestTime(chip::System::Clock::Seconds32 offset);
     bool IsTestTimeEnabled() const { return mTestTimeEnabled; }
 
@@ -92,7 +92,7 @@ private:
     void TariffTimeUpdCb();
 
     // Internal test time helpers
-    void InitializeMockClock();
+    void InitializeMockClock(uint32_t aInitialTimeValue = 0);
     void ShutdownMockClock();
     void AdvanceMockTime(chip::System::Clock::Seconds32 offset);
 };

@@ -111,8 +111,7 @@ void SetTestEventTrigger_TariffDataUpdated()
 
     if (instance)
     {
-        instance->EnableTestTime(true);
-        instance->AdvanceTestTime(chip::System::Clock::Seconds32(tariff_preset.TariffTestTimestamp));
+        instance->EnableTestTime(true, tariff_preset.TariffTestTimestamp);
     }
     else
     {
@@ -134,6 +133,7 @@ void SetTestEventTrigger_TariffDataClear()
     CommodityTariffDelegate * dg = GetCommodityTariffDelegate();
 
     dg->CleanupTariffData();
+    presetIndex = 0;
 }
 
 /*
