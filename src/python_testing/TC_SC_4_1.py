@@ -196,10 +196,6 @@ class TC_SC_4_1(MatterBaseTest):
                         section of the Test Plan for the list of verifications to be performed"""),
         ]
 
-    async def read_attribute(self, attribute: Any) -> Any:
-        cluster = Clusters.Objects.IcdManagement
-        return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
-
     async def get_descriptor_server_list(self):
         return await self.read_single_attribute_check_success(
             endpoint=ROOT_NODE_ENDPOINT_ID,
