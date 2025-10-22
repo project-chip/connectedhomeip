@@ -1646,6 +1646,38 @@ class ChipDeviceControllerBase():
             interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
         return await future
 
+    async def TestOnlyWriteAttributeTimedActionNoTimedRequestFlag(self, nodeid: int,
+                                                                  attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
+                                                                  timedRequestTimeoutMs: int,
+                                                                  interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                                                                  payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+        '''
+        ONLY TO BE USED FOR TEST: Write attributes with Timed Action performed but TimedRequest flag set to false.
+        This should result in TIMED_REQUEST_MISMATCH error.
+
+        Please see WriteAttribute for description of parameters.
+
+        Returns:
+            [AttributeStatus] (list - one for each path).
+
+        Raises:
+            InteractionModelError on error (expected: TIMED_REQUEST_MISMATCH)
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
+
+        attrs = self._prepare_write_attribute_requests(attributes)
+
+        ClusterAttribute.TestOnlyWriteAttributeTimedActionNoTimedRequestFlag(
+            future, eventLoop, device.deviceProxy, attrs,
+            timedRequestTimeoutMs=timedRequestTimeoutMs,
+            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
+        return await future
+
     async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None,
                           timedRequestTimeoutMs: typing.Optional[int] = None,
                           interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,

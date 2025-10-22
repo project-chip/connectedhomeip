@@ -71,9 +71,11 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                 cluster_id = cluster_type.id
 
                 cluster_type_enum = global_attribute_ids.cluster_id_type(cluster_id)
+                # If debugging, please uncomment the following line to add Unit Testing clusters to the search and comment out the line below it.
+                # if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard and cluster_type_enum != global_attribute_ids.ClusterIdType.kTest:
                 if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard:
                     continue
-
+                 
                 for attr_type in cluster_data:
                     # Check if this is an attribute descriptor class
                     if (isinstance(attr_type, type) and
@@ -336,9 +338,18 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             TH sends the WriteRequestMessage to the DUT to modify the value of a specific attribute data that needs 
             timed write transaction to write and this action is not part of a timed write transaction.
             
-            This step tests both timed write error scenarios:
+            This step tests the following 3 timed write error scenarios:
             1. NEEDS_TIMED_INTERACTION: Writing timed-write-required attribute without timed transaction
             2. TIMED_REQUEST_MISMATCH: Writing with TimedRequest flag but no actual timed transaction
+                                        (Timed Request ACTION = No, TimedRequest FLAG = True)
+            3. TIMED_REQUEST_MISMATCH: Writing with timed action performed but TimedRequest flag set to false
+                                        (Timed Request ACTION = Yes, TimedRequest FLAG = False)
+            
+            Understanding the distinction:
+            - TIMED REQUEST ACTION: The TimedRequest protocol message sent BEFORE the WriteRequest
+            - TIMEDREQUEST FLAG: A boolean field IN the WriteRequest message itself
+            
+            Normal timed write: Action=Yes, Flag=True (both must match)
             '''
 
             # Test with the real timed-write attribute found on the device
@@ -350,7 +361,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             try:
                 await self.default_controller.WriteAttribute(
                     self.dut_node_id,
-                    attributes=[(self.endpoint, timed_attr(True))]
+                    attributes=[(endpoint_id, timed_attr(True))]
                 )
                 asserts.fail("The write request should be rejected due to InteractionModelError: NeedsTimedInteraction (0xc6).")
             except InteractionModelError as e:
@@ -363,7 +374,20 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             try:
                 await self.default_controller.TestOnlyWriteAttributeTimedRequestFlagWithNoTimedAction(
                     self.dut_node_id,
-                    attributes=[(self.endpoint, timed_attr(False))]
+                    attributes=[(endpoint_id, timed_attr(False))]
+                )
+                asserts.fail("The write request should be rejected due to InteractionModelError: TimedRequestMismatch (0xc9).")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.TimedRequestMismatch,
+                                     f"WriteAttribute should return TimedRequestMismatch, got {e.status}")
+
+            # TIMED_REQUEST_MISMATCH - Writing with timed action performed but TimedRequest flag set to false
+            logging.info("Writing with timed action but TimedRequest flag=false should return TIMED_REQUEST_MISMATCH")
+            try:
+                await self.default_controller.TestOnlyWriteAttributeTimedActionNoTimedRequestFlag(
+                    self.dut_node_id,
+                    timedRequestTimeoutMs=1000,
+                    attributes=[(endpoint_id, timed_attr(False))]
                 )
                 asserts.fail("The write request should be rejected due to InteractionModelError: TimedRequestMismatch (0xc9).")
             except InteractionModelError as e:

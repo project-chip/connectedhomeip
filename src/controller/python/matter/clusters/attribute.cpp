@@ -270,6 +270,9 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
 PyChipError pychip_WriteClient_TestOnlyWriteAttributesTimedRequestNoTimedAction(
     void * appContext, DeviceProxy * device, size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
     chip::python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength);
+PyChipError pychip_WriteClient_TestOnlyWriteAttributesTimedActionNoTimedRequestFlag(
+    void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT, size_t interactionTimeoutMsSizeT,
+    size_t busyWaitMsSizeT, chip::python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength);
 PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::Controller::DeviceCommissioner * devCtrl,
                                                     size_t busyWaitMsSizeT,
                                                     chip::python::PyWriteAttributeData * writeAttributesData,
@@ -474,6 +477,49 @@ PyChipError pychip_WriteClient_TestOnlyWriteAttributesTimedRequestNoTimedAction(
     SuccessOrExit(err = ProcessWriteAttributesData(client.get(), writeAttributesData, attributeDataLength));
 
     // Send WriteRequest with TimedRequest flag set but no preceding TimedRequest action
+    // This should trigger TIMED_REQUEST_MISMATCH error
+    SuccessOrExit(err = client->SendWriteRequest(device->GetSecureSession().Value(),
+                                                 interactionTimeoutMs != 0 ? System::Clock::Milliseconds32(interactionTimeoutMs)
+                                                                           : System::Clock::kZero));
+
+    client.release();
+    callback.release();
+
+    if (busyWaitMs)
+    {
+        usleep(busyWaitMs * 1000);
+    }
+
+exit:
+    return ToPyChipError(err);
+}
+
+PyChipError pychip_WriteClient_TestOnlyWriteAttributesTimedActionNoTimedRequestFlag(
+    void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT, size_t interactionTimeoutMsSizeT,
+    size_t busyWaitMsSizeT, python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    uint16_t timedWriteTimeoutMs  = static_cast<uint16_t>(timedWriteTimeoutMsSizeT);
+    uint16_t interactionTimeoutMs = static_cast<uint16_t>(interactionTimeoutMsSizeT);
+    uint16_t busyWaitMs           = static_cast<uint16_t>(busyWaitMsSizeT);
+
+    std::unique_ptr<WriteClientCallback> callback = std::make_unique<WriteClientCallback>(appContext);
+
+    // CRITICAL: Use TestOnly constructor to perform TimedRequest action but set flag to false.
+    // This function intentionally DOES send a TimedRequest action first, but then sets TimedRequest=false in WriteRequest.
+    // This should result in TIMED_REQUEST_MISMATCH error.
+    std::unique_ptr<WriteClient> client = std::make_unique<WriteClient>(
+        app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback->GetChunkedCallback(),
+        Optional<uint16_t>(timedWriteTimeoutMs),        // Provide timeout (action WILL be sent)
+        false,                                           // But set flag to false (lying about the action)
+        WriteClient::TestOnlyOverrideTimedRequestFlagTag{}); // Tag to select this constructor
+
+    VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
+
+    SuccessOrExit(err = ProcessWriteAttributesData(client.get(), writeAttributesData, attributeDataLength));
+
+    // Send WriteRequest with TimedRequest action performed but flag set to false
     // This should trigger TIMED_REQUEST_MISMATCH error
     SuccessOrExit(err = client->SendWriteRequest(device->GetSecureSession().Value(),
                                                  interactionTimeoutMs != 0 ? System::Clock::Milliseconds32(interactionTimeoutMs)

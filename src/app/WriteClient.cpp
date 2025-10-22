@@ -171,7 +171,41 @@ CHIP_ERROR WriteClient::StartNewMessage()
         ReturnErrorOnFailure(FinalizeMessage(true));
     }
 
-    // Do not allow timed request with chunks.
+    /**
+     * Timed Writes and Chunking are Incompatible
+     *
+     * The Matter specification prohibits combining the Timed Request protocol with chunked writes.
+     * Here's why this restriction exists:
+     *
+     * How Timed Writes Work:
+     *   1. Client sends a TimedRequest message to the server with a timeout value (e.g., 1000ms)
+     *   2. Server responds and opens a time window (e.g., the next 1000ms)
+     *   3. Client must send THE write within that time window
+     *   4. Server accepts the write only if it arrives within the window
+     *
+     * Why Chunking Breaks This:
+     *   - Chunking means sending MULTIPLE WriteRequest messages for a single logical write operation
+     *   - The Timed Request protocol only establishes a window for ONE write, not multiple
+     *   - If we tried to chunk a timed write, only the first chunk would be within the time window
+     *   - Subsequent chunks would arrive after the window expires and be rejected
+     *   - There's no protocol mechanism to extend the window or apply it to multiple messages
+     *
+     * Why We Check mForceTimedRequestFlag:
+     *   - In normal operation, mForceTimedRequestFlag == true means we're doing a Timed Request action
+     *     (because it's set from mTimedWriteTimeoutMs.HasValue())
+     *   - If mForceTimedRequestFlag is true, it means the WriteRequest will have its TimedRequest flag set,
+     *     which indicates to the server that this write is part of the Timed Request protocol
+     *   - We check this flag to prevent chunking when we're in a timed write scenario
+     *
+     * Edge Case (Test Scenarios Only):
+     *   - In unit tests, mForceTimedRequestFlag can be set without mTimedWriteTimeoutMs
+     *   - This creates an invalid state (flag=true but no actual Timed Request action)
+     *   - This check will correctly prevent chunking in that scenario too
+     *   - The server should reject such requests anyway, but we prevent them at the client level
+     *
+     * Note: We check when !mChunks.IsNull() because that means we already have at least one chunk
+     * and are about to create another, which would make this a chunked write.
+     */
     VerifyOrReturnError(!(mForceTimedRequestFlag && !mChunks.IsNull()), CHIP_ERROR_NO_MEMORY);
 
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
