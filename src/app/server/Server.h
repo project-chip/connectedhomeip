@@ -22,6 +22,8 @@
 
 #include <access/AccessControl.h>
 #include <access/examples/ExampleAccessControlDelegate.h>
+#include <access/examples/ExtendedAccessControlDelegate.h>
+#include <access/examples/GroupcastAccessControlDelegate.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
@@ -37,6 +39,7 @@
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <credentials/GroupcastDataProvider.h>
 #include <credentials/OperationalCertificateStore.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/DefaultSessionKeystore.h>
@@ -305,6 +308,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         sGroupDataProvider.SetSessionKeystore(this->sessionKeystore);
         ReturnErrorOnFailure(sGroupDataProvider.Init());
         this->groupDataProvider = &sGroupDataProvider;
+        // Groupcast
+        chip::Groupcast::DataProvider::Instance().Initialize(this->persistentStorageDelegate, this->sessionKeystore);
 
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
         ReturnErrorOnFailure(sSessionResumptionStorage.Init(this->persistentStorageDelegate));
@@ -314,7 +319,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
 #endif
 
         // Inject access control delegate
-        this->accessDelegate = Access::Examples::GetAccessControlDelegate();
+        sExtendedAccessControlDelegate.Init(Access::Examples::GetAccessControlDelegate(), Access::Groupcast::GetAccessControlDelegate(this->persistentStorageDelegate));
+        this->accessDelegate = &sExtendedAccessControlDelegate;;
 
         // Inject ACL storage. (Don't initialize it.)
         this->aclStorage = &sAclStorage;
@@ -342,6 +348,7 @@ private:
     static PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
     static Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
     static Credentials::GroupDataProviderImpl sGroupDataProvider;
+    static chip::Access::ExtendedAccessControlDelegate sExtendedAccessControlDelegate;
     static chip::app::DefaultTimerDelegate sTimerDelegate;
     static app::reporting::ReportSchedulerImpl sReportScheduler;
 

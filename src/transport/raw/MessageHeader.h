@@ -160,6 +160,9 @@ using SecFlags = BitFlags<SecFlagValues>;
 
 using ExFlags = BitFlags<ExFlagValues>;
 
+// Use a subset of GroupID range for multicast
+constexpr uint16_t kGroupcastMask = 0x8000;
+
 } // namespace Header
 
 /**
