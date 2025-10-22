@@ -33,11 +33,12 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/examples/window-app/realtek/bee/main/chipinterface.cpp
-    ${chip_dir}/examples/window-app/realtek/bee/main/DeviceCallbacks.cpp
-    ${chip_dir}/examples/window-app/realtek/bee/main/CHIPDeviceManager.cpp
-    ${chip_dir}/examples/window-app/realtek/bee/main/WindowCovering.cpp
-    ${chip_dir}/examples/window-app/realtek/bee/main/AppTask.cpp
+    ${chip_dir}/examples/thermostat/realtek/common/main/AppTask.cpp
+    ${chip_dir}/examples/thermostat/realtek/common/main/TemperatureManager.cpp
+    ${chip_dir}/examples/thermostat/realtek/common/main/chipinterface.cpp
+    ${chip_dir}/examples/thermostat/realtek/common/main/DeviceCallbacks.cpp
+    ${chip_dir}/examples/thermostat/realtek/common/main/CHIPDeviceManager.cpp
+    ${chip_dir}/examples/thermostat/realtek/common/main/Globals.cpp
     ${chip_dir}/examples/platform/realtek/util/LEDWidget.cpp
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
     ${chip_dir}/examples/platform/realtek/dac_provider/CommonDACProvider.cpp
@@ -51,19 +52,20 @@ add_library(
 
 chip_configure_data_model(chip_main
     INCLUDE_SERVER
-    ZAP_FILE ${matter_example_path}/../../common/window-app.zap
+    ZAP_FILE ${matter_example_path}/../../thermostat-common/thermostat.zap
 )
 
 target_include_directories(
     ${chip_main}
     PUBLIC
 	${inc_path}
-    ${chip_dir}/zzz_generated/window-app
-    ${chip_dir}/zzz_generated/window-app/zap-generated
+    ${chip_dir}/zzz_generated/thermostat
+    ${chip_dir}/zzz_generated/thermostat/zap-generated
     ${chip_dir}/zzz_generated/app-common
-    ${chip_dir}/examples/window-app/realtek/bee/main/include
+    ${chip_dir}/examples/thermostat/realtek/common/main/include
+    ${chip_dir}/examples/thermostat/thermostat-common
+    ${chip_dir}/examples/thermostat/thermostat-common/include
     ${chip_dir}/examples/platform/realtek
-    ${chip_dir}/examples/platform/realtek/util
     ${chip_dir}/examples/providers
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/
@@ -101,7 +103,6 @@ list(
 )
 endif (matter_enable_shell)
 
-
 if(matter_enable_dlps)
 list(
     APPEND chip_main_flags
@@ -113,9 +114,9 @@ endif (matter_enable_dlps)
 list(
     APPEND chip_main_cpp_flags
 
-	-Wno-unused-parameter
-	-std=gnu++17
-	-fno-rtti
+    -Wno-unused-parameter
+    -std=gnu++17
+    -fno-rtti
 )
 target_compile_definitions(${chip_main} PRIVATE ${chip_main_flags} )
 target_compile_options(${chip_main} PRIVATE ${chip_main_cpp_flags})

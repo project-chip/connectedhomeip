@@ -16,7 +16,7 @@
  *
  */
 
-#include "valve-configuration-and-control-server.h"
+#include "valve-configuration-and-control-cluster.h"
 
 #include <app/util/config.h>
 #ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
