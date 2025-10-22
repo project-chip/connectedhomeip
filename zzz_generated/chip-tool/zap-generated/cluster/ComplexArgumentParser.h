@@ -336,6 +336,16 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ModeSelect::Str
 
 static void Finalize(chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MicrowaveOvenMode::Structs::ModeTagStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::MicrowaveOvenMode::Structs::ModeTagStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MicrowaveOvenMode::Structs::ModeOptionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::MicrowaveOvenMode::Structs::ModeOptionStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type & request,
                         Json::Value & value);
