@@ -48,7 +48,7 @@
 
 import logging
 from time import sleep
-from typing import Any, Optional
+from typing import Optional
 
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_valid_cm_key,
