@@ -50,7 +50,7 @@ public:
     CHIP_ERROR SetSupportedTemperatureUnits(DataModel::List<UnitLocalization::TempUnitEnum> & units);
 
 private:
-    MigrationCallback * mCallback;
+    MigrationCallback * mCallback                   = nullptr;
     BitFlags<UnitLocalization::Feature> mFeatures   = {};
     UnitLocalization::TempUnitEnum mTemperatureUnit = UnitLocalization::TempUnitEnum::kCelsius;
     UnitLocalization::TempUnitEnum mUnitsBuffer[UnitLocalization::kMaxSupportedLocalizationUnits] = {
