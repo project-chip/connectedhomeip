@@ -794,6 +794,14 @@ class HostBuilder(GnBuilder):
                     for file in files:
                         yield BuilderOutput(os.path.join(root, file), file)
             elif self.unified:
-                yield BuilderOutput(os.path.join(self.output_dir, "standalone", name), name)
+                # unified builds are generally in 'standalone' however this is not
+                # a rule and lit-icd is a special case.
+                path = os.path.join(self.output_dir, "standalone", name)
+                if not os.path.exists(path):
+                    path = os.path.join(self.output_dir, 'lit_icd', name)
+                if not os.path.exists(path):
+                    path = os.path.join(self.output_dir, name)
+
+                yield BuilderOutput(path, name)
             else:
                 yield BuilderOutput(os.path.join(self.output_dir, name), name)
