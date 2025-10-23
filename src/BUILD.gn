@@ -55,6 +55,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/access-control-server/tests",
       "${chip_root}/src/app/clusters/basic-information/tests",
       "${chip_root}/src/app/clusters/bindings/tests",
+      "${chip_root}/src/app/clusters/descriptor/tests",
       "${chip_root}/src/app/clusters/general-commissioning-server/tests",
       "${chip_root}/src/app/clusters/general-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/group-key-mgmt-server/tests",
@@ -70,7 +71,10 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/soil-measurement-server/tests",
       "${chip_root}/src/app/clusters/fixed-label-server/tests",
       "${chip_root}/src/app/clusters/boolean-state-server/tests",
+      "${chip_root}/src/app/clusters/user-label-server/tests",
+      "${chip_root}/src/app/clusters/identify-server/tests",
       "${chip_root}/src/app/clusters/time-format-localization-server/tests",
+      "${chip_root}/src/app/clusters/localization-configuration-server/tests",
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/app/data-model/tests",
@@ -102,6 +106,7 @@ if (chip_build_tests) {
       "${chip_root}/src/lib/dnssd/minimal_mdns/responders/tests",
       "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
       "${chip_root}/src/lib/dnssd/tests",
+      "${chip_root}/src/app/clusters/groupcast/tests",
 
       # TODO(#40932): Fix and re-enable the Commodity Tariff unit tests.
       # "${chip_root}/src/app/clusters/commodity-tariff-server/tests",

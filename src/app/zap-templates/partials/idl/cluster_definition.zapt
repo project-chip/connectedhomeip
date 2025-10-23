@@ -37,7 +37,7 @@ cluster {{asUpperCamelCase name}} = {{!}}
 
   {{/zcl_structs}}
   {{#zcl_events}}
-  {{#if isFabricSensitive}}fabric_sensitive {{/if~}} {{priority}} event {{!ensure space}}
+  {{#if apiMaturity}}{{apiMaturity}} {{/if~}} {{#if isFabricSensitive}}fabric_sensitive {{/if~}} {{priority}} event {{!ensure space}}
   {{~#chip_access_elements entity="event"~}}
       {{~#first~}}access({{~/first~}}
       {{~#not_first~}}, {{/not_first~}}
@@ -71,4 +71,4 @@ cluster {{asUpperCamelCase name}} = {{!}}
     {{~>idl_command_request_response}}{{~new_line 1~}}
   {{/zcl_commands_source_client}}
 }
-
+{{new_line 1}}

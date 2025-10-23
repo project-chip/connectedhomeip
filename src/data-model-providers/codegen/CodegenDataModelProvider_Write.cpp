@@ -48,16 +48,6 @@ namespace {
 using namespace chip::app::Compatibility::Internal;
 using Protocols::InteractionModel::Status;
 
-class ContextAttributesChangeListener : public AttributesChangedListener
-{
-public:
-    ContextAttributesChangeListener(DataModel::ProviderChangeListener & listener) : mListener(listener) {}
-    void MarkDirty(const AttributePathParams & path) override { mListener.MarkDirty(path); }
-
-private:
-    DataModel::ProviderChangeListener & mListener;
-};
-
 /// Attempts to write via an attribute access interface (AAI)
 ///
 /// If it returns a CHIP_ERROR, then this is a FINAL result (i.e. either failure or success)
@@ -94,10 +84,6 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     // we must be started up to accept writes (we make use of the context below)
     VerifyOrReturnError(mContext.has_value(), CHIP_ERROR_INCORRECT_STATE);
 
-    // Codegen logic specific: we accept AAI writes BEFORE server cluster interface, so that we are backwards compatible
-    // in case some application installed AAI before Server Cluster Interfaces were supported
-    ContextAttributesChangeListener change_listener(mContext->dataModelChangeListener);
-
     const EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
 
@@ -114,7 +100,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
                 // TODO: this is awkward since it provides AAI no control over this, specifically
                 //       AAI may not want to increase versions for some attributes that are Q
                 emberAfAttributeChanged(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
-                                        &change_listener);
+                                        &mContext->dataModelChangeListener);
             }
             return *aai_result;
         }
@@ -147,7 +133,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 
     EmberAfWriteDataInput dataInput(dataBuffer.data(), attributeMetadata->attributeType);
 
-    dataInput.SetChangeListener(&change_listener);
+    dataInput.SetChangeListener(&mContext->dataModelChangeListener);
     // TODO: dataInput.SetMarkDirty() should be according to `ChangesOmmited`
 
     if (request.operationFlags.Has(DataModel::OperationFlags::kInternal))
@@ -171,9 +157,8 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 }
 
 void CodegenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttributePath & aPath,
-                                                              DataModel::ListWriteOperation opType)
+                                                              DataModel::ListWriteOperation opType, FabricIndex accessingFabric)
 {
-
     // NOTE: for backwards compatibility, we process AAI logic BEFORE Server Cluster Interface
     //       so that AttributeAccessInterface logic works if one was installed before Server Cluster Interface
     //       support was introduced in the SDK.
@@ -204,7 +189,7 @@ void CodegenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttr
 
     if (auto * cluster = mRegistry.Get(aPath); cluster != nullptr)
     {
-        cluster->ListAttributeWriteNotification(aPath, opType);
+        cluster->ListAttributeWriteNotification(aPath, opType, accessingFabric);
         return;
     }
 }
@@ -214,17 +199,16 @@ void CodegenDataModelProvider::Temporary_ReportAttributeChanged(const AttributeP
     // we must be started up to process changes since we use the context
     VerifyOrReturn(mContext.has_value());
 
-    ContextAttributesChangeListener change_listener(mContext->dataModelChangeListener);
     if (path.mClusterId != kInvalidClusterId)
     {
-        emberAfAttributeChanged(path.mEndpointId, path.mClusterId, path.mAttributeId, &change_listener);
+        emberAfAttributeChanged(path.mEndpointId, path.mClusterId, path.mAttributeId, &mContext->dataModelChangeListener);
     }
     else
     {
         // When the path has wildcard cluster Id, call the emberAfEndpointChanged to mark attributes on the given endpoint
         // as having changing, but do NOT increase/alter any cluster data versions, as this happens when a bridged endpoint is
         // added or removed from a bridge and the cluster data is not changed during the process.
-        emberAfEndpointChanged(path.mEndpointId, &change_listener);
+        emberAfEndpointChanged(path.mEndpointId, &mContext->dataModelChangeListener);
     }
 }
 
