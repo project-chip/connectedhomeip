@@ -1,6 +1,8 @@
 {{> header}}
 // This file is generated from devices-Types.h.zapt
 
+#pragma once
+
 #include <app/data-model-provider/MetadataTypes.h>
 
 #include "Ids.h"

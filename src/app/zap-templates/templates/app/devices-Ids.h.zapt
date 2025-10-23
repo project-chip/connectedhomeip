@@ -1,6 +1,10 @@
 {{> header}}
 // This file is generated from devices-Ids.h.zapt
 
+#pragma once
+
+#include <lib/core/DataModelTypes.h>
+
 namespace chip {
 namespace app {
 namespace Device {

@@ -2,6 +2,8 @@ import("//build_overrides/chip.gni")
 
 source_set("ids") {
   sources = [ "Ids.h" ]
+
+  public_deps = [ "${chip_root}/src/lib/core:types" ]
 }
 
 source_set("devices") {
