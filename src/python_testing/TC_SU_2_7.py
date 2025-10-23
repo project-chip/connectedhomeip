@@ -172,8 +172,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
     def steps_TC_SU_2_7_2(self) -> list[TestStep]:
         return self.all_steps()
 
-    # Different runs
-
     @async_test_body
     async def test_TC_SU_2_7_1(self):
         # Requestor is the DUT
@@ -381,6 +379,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         await error_download_event_handler.cancel()
         state_transition_event_handler.reset()
         await state_transition_event_handler.cancel()
+        self.current_provider_app_proc.terminate()
 
         self.step(6)
         ota_image = self.user_params.get('ota_image_step6')
@@ -392,7 +391,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             discriminator=self.provider_data['discriminator'],
             port=5541, extra_args=['--applyUpdateAction', 'awaitNextAction', '--delayedApplyActionTimeSec', '3'],
             kvs_path=self.provider_kvs_path,
-            log_file='/tmp/provider_log_2_7_2.log',
+            log_file='/tmp/provider_log_2_7_3.log',
             timeout=10
         )
         # EventHandlers
@@ -415,18 +414,26 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
         await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*12)
-        # Applying
+        # Download complete then Applying
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*5)
         logger.info(f"Event report: {event_report}")
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kApplying)
-        # DelayedOnApply
+
+        # Verification of the testStep DelayedOnApply
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=5)
         logger.info(f"Event report: {event_report}")
         self.verify_state_transition_event(event_report=event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kApplying, expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnApply,
                                            expected_reason=self.ota_req.Enums.ChangeReasonEnum.kDelayByProvider, expected_target_version=NullValue)
+
+        # The following actions is to be able to catch the Event on time for VersionApplied Event
+        # Wait until Apply
+        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*5)
+        logger.info(f"Event report: {event_report}")
+        self.verify_state_transition_event(event_report=event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnApply, expected_new_state=self.ota_req.Enums.UpdateStateEnum.kApplying,
+                                           expected_reason=self.ota_req.Enums.ChangeReasonEnum.kSuccess, expected_target_version=expected_version)
         state_transition_event_handler.reset()
         await state_transition_event_handler.cancel()
-        # Wait for Restart on ShutdownEvent
+        # Wait for Restart after ShutdownEvent
         shutdown_event = basicinformation_handler.wait_for_event_report(Clusters.BasicInformation.Events.ShutDown, timeout_sec=60)
         logger.info(f"Shutting down {shutdown_event}")
         basicinformation_handler.reset()
@@ -452,7 +459,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         asserts.assert_equal(expected_version, version_applied_event_data.softwareVersion,
                              f"Software version from VersionAppliedEvent is not {expected_version}")
         asserts.assert_is_not_none(version_applied_event_data.productID, "Product ID from VersionApplied Event is None")
-        await self.verify_version_applied_basic_information(controller=controller, node_id=self.requestor_node_id, expected_target_version=expected_version)
+        await self.verify_version_applied_basic_information(controller=controller, node_id=self.requestor_node_id, target_version=expected_version)
 
     @async_test_body
     async def test_TC_SU_2_7_2(self):
