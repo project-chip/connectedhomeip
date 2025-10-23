@@ -125,7 +125,7 @@ bool NodeLookupHandle::TryUseCache(System::Clock::Timestamp now, const NodeAddre
     }
 
     ResolveResult result;
-    if (cache.GetCachedNodeAddress(mRequest.GetPeerId(), result) == CHIP_NO_ERROR)
+    if (cache.Lookup(mRequest.GetPeerId(), result))
     {
         ChipLogProgress(Discovery, "Using cached address after %lu ms delay", static_cast<unsigned long>(elapsed.count()));
         LookupResult(result);

@@ -49,17 +49,17 @@ void NodeAddressCache::CacheNode(const PeerId & peerId, const ResolveResult & re
     ChipLogProgress(Discovery, "Cached address for " ChipLogFormatPeerId, ChipLogValuePeerId(peerId));
 }
 
-CHIP_ERROR NodeAddressCache::GetCachedNodeAddress(const PeerId & peerId, ResolveResult & result) const
+bool NodeAddressCache::Lookup(const PeerId & peerId, ResolveResult & result) const
 {
     auto it = mCache.find(peerId);
     if (it != mCache.end())
     {
         result = it->second;
         ChipLogProgress(Discovery, "Retrieved cached address for " ChipLogFormatPeerId, ChipLogValuePeerId(peerId));
-        return CHIP_NO_ERROR;
+        return true;
     }
     ChipLogProgress(Discovery, "No cached address for " ChipLogFormatPeerId, ChipLogValuePeerId(peerId));
-    return CHIP_ERROR_KEY_NOT_FOUND;
+    return false;
 }
 
 CHIP_ERROR NodeAddressCache::RemoveCachedNodeAddress(const PeerId & peerId)

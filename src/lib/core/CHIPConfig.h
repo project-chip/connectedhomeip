@@ -2026,7 +2026,9 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 
 /**
- * CHIP_DEVICE_CASE_DNS_CACHE_TIMEOUT_SECONDS sets the timeout for when to use the cached value
+ * @def CHIP_DEVICE_CASE_DNS_CACHE_TIMEOUT_SECONDS
+ * 
+ * @brief The timeout for when to use the cached value
  * when CHIP_DEVICE_ENABLE_CASE_DNS_CACHE is enabled
  */
 #ifndef CHIP_DEVICE_CASE_DNS_CACHE_TIMEOUT_SECONDS
@@ -2059,7 +2061,3 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
 #define CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS 8
 #endif // CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
->>>>>>> upstream/master
-/**
- * @}
- */
