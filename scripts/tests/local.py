@@ -22,6 +22,7 @@ import logging
 import multiprocessing
 import os
 import platform
+import re
 import shlex
 import stat
 import subprocess
@@ -37,6 +38,25 @@ import colorama
 import coloredlogs
 import tabulate
 import yaml
+
+
+def _get_apps_from_script(path: str) -> List[str]:
+    """
+    Parses a python script and returns the apps it is for.
+
+    The app is expected to be in a comment block:
+      # test-runner-runs:
+      #   run1:
+      #     app: ${SOME_APP}
+    """
+    apps = set()
+    app_regex = re.compile(r'app:\s*\$\{(.*?)\}')
+    with open(path, "rt") as f:
+        for line in f:
+            match = app_regex.search(line)
+            if match:
+                apps.add(match.group(1))
+    return list(apps)
 
 
 def _get_native_machine_target():
@@ -778,6 +798,18 @@ def gen_coverage(flat):
     type=click.Choice(list(__RUNNERS__.keys()), case_sensitive=False),
     help="Determines the verbosity of script output",
 )
+@click.option(
+    "--override-binary-path",
+    default=None,
+    nargs=2,
+    help="Defines an override binary path for a given app. E.g. --override-binary-path ALL_CLUSTERS_APP out/some/path/chip-all-clusters-app"
+)
+@click.option(
+    "--app-filter",
+    default="*",
+    show_default=True,
+    help="Run only tests that are for the given app. Comma separated list of apps. E.g. --app-filter ALL_CLUSTERS_APP,CHIP_TOOL",
+)
 def python_tests(
     test_filter,
     skip,
@@ -789,6 +821,8 @@ def python_tests(
     keep_going,
     coverage,
     fail_log_dir,
+    override_binary_path,
+    app_filter,
 ):
     """
     Run python tests via `run_python_test.py`
@@ -812,9 +846,16 @@ def python_tests(
         return _maybe_with_runner(os.path.basename(path), path, runner)
 
     # create an env file
+    override_binaries = {}
+    if override_binary_path:
+        override_binaries[override_binary_path[0]] = override_binary_path[1]
+
     with open("./out/test_env.yaml", "wt") as f:
         for target in _get_targets(coverage):
-            run_path = as_runner(f"out/{target.target}/{target.binary}")
+            if target.key in override_binaries:
+                run_path = as_runner(override_binaries[target.key])
+            else:
+                run_path = as_runner(f"out/{target.target}/{target.binary}")
             f.write(f"{target.key}: {run_path}\n")
         f.write("TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}\n")
         f.write("TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}\n")
@@ -823,6 +864,10 @@ def python_tests(
     if not test_filter:
         test_filter = "*"
     test_filter = _parse_filters(test_filter)
+
+    if not app_filter:
+        app_filter = "*"
+    app_filter_list = _parse_filters(app_filter)
 
     if skip:
         print("SKIP IS %r" % skip)
@@ -873,6 +918,12 @@ def python_tests(
     try:
         to_run = []
         for script in [t for t in test_scripts if test_filter.any_matches(t)]:
+            if app_filter != "*":
+                required_apps = _get_apps_from_script(script)
+                if not any(app_filter_list.any_matches(app) for app in required_apps):
+                    logging.info("Skipping %s due to app filter (requires %r)", script, required_apps)
+                    continue
+
             if from_filter:
                 if not fnmatch.fnmatch(script, from_filter):
                     logging.info("From-filter SKIP %s", script)
@@ -899,6 +950,9 @@ def python_tests(
                     "out/venv",
                     f"./scripts/tests/run_python_test.py --load-from-env out/test_env.yaml --script {script}",
                 ]
+
+                if app_filter != "*":
+                    cmd.append(f'--app-filter "{app_filter}"')
 
                 if dry_run:
                     print(shlex.join(cmd))
