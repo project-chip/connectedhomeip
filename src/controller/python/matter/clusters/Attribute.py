@@ -1037,7 +1037,7 @@ def _prepare_write_attributes_data(attributes: List[AttributeWriteRequest], must
 def WriteAttributes(future: Future, eventLoop, device,
                     attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: Union[None, int] = None,
                     interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None,
-                    suppressResponse: bool = False, forceLegacyListEncoding: bool = False) -> PyChipError:
+                    forceLegacyListEncoding: bool = False) -> PyChipError:
     handle = GetLibraryHandle()
 
     pyWriteAttributes, numberOfAttributes = _prepare_write_attributes_data(
@@ -1054,7 +1054,7 @@ def WriteAttributes(future: Future, eventLoop, device,
                 0 if interactionTimeoutMs is None else interactionTimeoutMs),
             ctypes.c_size_t(0 if busyWaitMs is None else busyWaitMs),
             pyWriteAttributes, ctypes.c_size_t(numberOfAttributes),
-            ctypes.c_bool(suppressResponse), ctypes.c_bool(forceLegacyListEncoding))
+            ctypes.c_bool(forceLegacyListEncoding))
     )
     if not res.is_success:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
@@ -1311,7 +1311,7 @@ def Init():
         # time where simply specified the argtypes, because of time constraints. This solution was quicker
         # to fix the crash on ARM64 Apple platforms without a refactor.
         handle.pychip_WriteClient_WriteAttributes.argtypes = [py_object, c_void_p,
-                                                              c_size_t, c_size_t, c_size_t, POINTER(PyWriteAttributeData), c_size_t, c_bool, c_bool]
+                                                              c_size_t, c_size_t, c_size_t, POINTER(PyWriteAttributeData), c_size_t, c_bool]
         handle.pychip_WriteClient_WriteGroupAttributes.argtypes = [
             c_size_t, c_void_p, c_size_t, POINTER(PyWriteAttributeData), c_size_t]
 
