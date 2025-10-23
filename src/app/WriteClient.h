@@ -139,13 +139,13 @@ public:
                 uint16_t aReservedSize) :
         mpExchangeMgr(apExchangeMgr),
         mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mReservedSize(aReservedSize),
-        mForceTimedRequestFlag(aTimedWriteTimeoutMs.HasValue())
+        mTimedRequestFieldValue(aTimedWriteTimeoutMs.HasValue())
     {
         assertChipStackLockedByCurrentThread();
     }
 
     /**
-     * TestOnly constructor that allows setting the TimedRequest flag in the WriteRequest without performing
+     * TestOnly constructor that allows setting the TimedRequest field in the WriteRequest without performing
      * a Timed Request action (i.e., without actually sending a TimedRequest message first).
      *
      * IMPORTANT: Understanding the distinction between two concepts:
@@ -159,19 +159,19 @@ public:
      *
      * Normal behavior: When you provide a timeout value to the standard constructor, both happen together:
      *   - A Timed Request action is sent (controlled by mTimedWriteTimeoutMs)
-     *   - The TimedRequest flag in WriteRequest is set to true (mForceTimedRequestFlag = true)
+     *   - The TimedRequest field in WriteRequest is set to true (mTimedRequestFieldValue = true)
      *
      * This test constructor allows you to decouple these for testing edge cases:
-     *   - aTimedRequest = false: No Timed Request action AND TimedRequest flag is false (normal non-timed write)
-     *   - aTimedRequest = true:  No Timed Request action BUT TimedRequest flag is true
+     *   - aTimedRequestFieldValue = false: No Timed Request action AND TimedRequest field is false (normal non-timed write)
+     *   - aTimedRequestFieldValue = true:  No Timed Request action BUT TimedRequest field is true
      *                            (This is invalid behavior that should be rejected by the server, used for negative testing)
      *
-     * @param[in] aTimedRequest If true, sets the TimedRequest flag in WriteRequest to true without actually
+     * @param[in] aTimedRequestFieldValue If true, sets the TimedRequest field in WriteRequest to true without actually
      *                          performing a Timed Request action. This creates a mismatch that should be rejected
      *                          by a compliant server.
      */
-    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, bool aTimedRequest) :
-        mpExchangeMgr(apExchangeMgr), mExchangeCtx(*this), mpCallback(apCallback), mForceTimedRequestFlag(aTimedRequest)
+    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, bool aTimedRequestFieldValue) :
+        mpExchangeMgr(apExchangeMgr), mExchangeCtx(*this), mpCallback(apCallback), mTimedRequestFieldValue(aTimedRequestFieldValue)
     {
         assertChipStackLockedByCurrentThread();
     }
@@ -182,25 +182,25 @@ public:
     };
 
     /**
-     * TestOnly constructor that allows performing a Timed Request action while setting the TimedRequest flag
+     * TestOnly constructor that allows performing a Timed Request action while setting the TimedRequest field
      * in the WriteRequest to false (i.e., sending a TimedRequest message first, but then lying about it in the WriteRequest).
      *
-     * This tests the third edge case: Timed Request action IS performed, but the TimedRequest flag is set to false.
+     * This tests the third edge case: Timed Request action IS performed, but the TimedRequest field is set to false.
      *
      * Test scenarios enabled by WriteClient constructors:
-     * 1. Normal write (both false):              Action = No,  Flag = False  [Standard constructor with no timeout]
-     * 2. Normal timed write (both true):         Action = Yes, Flag = True   [Standard constructor with timeout]
-     * 3. Flag true, no action (invalid):         Action = No,  Flag = True   [Test constructor taking bool aTimedRequest]
-     * 4. Action present, flag false (invalid):   Action = Yes, Flag = False  [THIS constructor]
+     * 1. Normal write (both false):              Action = No,  Field = False  [Standard constructor with no timeout]
+     * 2. Normal timed write (both true):         Action = Yes, Field = True   [Standard constructor with timeout]
+     * 3. Field true, no action (invalid):        Action = No,  Field = True   [Test constructor taking bool aTimedRequestFieldValue]
+     * 4. Action present, field false (invalid):  Action = Yes, Field = False  [THIS constructor]
      *
      * @param[in] aTimedWriteTimeoutMs The timeout for the Timed Request action (WILL be sent)
-     * @param[in] aForceTimedRequestFlag If false, the TimedRequest flag in WriteRequest will be false despite the action
+     * @param[in] aTimedRequestFieldValue If false, the TimedRequest field in WriteRequest will be false despite the action
      */
     WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
-                bool aForceTimedRequestFlag, TestOnlyOverrideTimedRequestFlagTag) :
+                bool aTimedRequestFieldValue, TestOnlyOverrideTimedRequestFieldTag) :
         mpExchangeMgr(apExchangeMgr),
         mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
-        mForceTimedRequestFlag(aForceTimedRequestFlag)
+        mTimedRequestFieldValue(aTimedRequestFieldValue)
     {
         assertChipStackLockedByCurrentThread();
     }
@@ -589,32 +589,12 @@ private:
 
     /**
      * The value of the TimedRequest field in the WriteRequest message.
-     *
-     * In normal operation (non-test scenarios):
-     *   - This flag is automatically set based on whether mTimedWriteTimeoutMs has a value
-     *   - If mTimedWriteTimeoutMs.HasValue() == true, then mForceTimedRequestFlag = true
-     *   - This means: "We are doing the Timed Request protocol AND setting the flag in WriteRequest"
-     *
-     * In test scenarios (using the test-only constructors):
-     *   - This flag can be set independently of mTimedWriteTimeoutMs
-     *   - This allows testing edge cases where the flag doesn't match the actual protocol behavior
-     *
-     * Why this exists:
-     *   - The TimedRequest flag in the WriteRequest message tells the server "this write was preceded
-     *     by a Timed Request action"
-     *   - The server uses this to validate that the client followed the timed write protocol correctly
-     *   - Normally, if you do a Timed Request action, you MUST set this flag to true
-     *   - Mismatches between the action and the flag should be rejected by the server
-     *
-     * Complete test scenario matrix:
-     *   1. Normal non-timed write:    Action=No,  Flag=False  [Standard constructor, no timeout]
-     *   2. Normal timed write:        Action=Yes, Flag=True   [Standard constructor, with timeout]
-     *   3. Invalid (flag mismatch):   Action=No,  Flag=True   [Test constructor: bool aTimedRequest=true]
-     *   4. Invalid (action mismatch): Action=Yes, Flag=False  [Test constructor: timeout + flag override]
-     *
-     * All invalid cases (3 & 4) should result in TIMED_REQUEST_MISMATCH from a compliant server.
+     * 
+     * This tells the server whether this write was preceded by a Timed Request action.
+     * Normally this matches whether mTimedWriteTimeoutMs has a value, but test constructors
+     * can decouple these to test protocol mismatch scenarios.
      */
-    bool mForceTimedRequestFlag = false;
+    bool mTimedRequestFieldValue = false;
 
     /**
      * Below we define several const variables for encoding overheads.

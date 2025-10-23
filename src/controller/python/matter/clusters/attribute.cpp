@@ -506,20 +506,20 @@ PyChipError pychip_WriteClient_TestOnlyWriteAttributesTimedActionNoTimedRequestF
 
     std::unique_ptr<WriteClientCallback> callback = std::make_unique<WriteClientCallback>(appContext);
 
-    // CRITICAL: Use TestOnly constructor to perform TimedRequest action but set flag to false.
-    // This function intentionally DOES send a TimedRequest action first, but then sets TimedRequest=false in WriteRequest.
+    // CRITICAL: Use TestOnly constructor to perform TimedRequest action but set field to false.
+    // This function intentionally DOES send a TimedRequest action first, but then sets TimedRequest field=false in WriteRequest.
     // This should result in TIMED_REQUEST_MISMATCH error.
     std::unique_ptr<WriteClient> client = std::make_unique<WriteClient>(
         app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback->GetChunkedCallback(),
         Optional<uint16_t>(timedWriteTimeoutMs),             // Provide timeout (action WILL be sent)
-        false,                                               // But set flag to false (lying about the action)
-        WriteClient::TestOnlyOverrideTimedRequestFlagTag{}); // Tag to select this constructor
+        false,                                               // But set field to false (lying about the action)
+        WriteClient::TestOnlyOverrideTimedRequestFieldTag{}); // Tag to select this constructor
 
     VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
 
     SuccessOrExit(err = ProcessWriteAttributesData(client.get(), writeAttributesData, attributeDataLength));
 
-    // Send WriteRequest with TimedRequest action performed but flag set to false
+    // Send WriteRequest with TimedRequest action performed but field set to false
     // This should trigger TIMED_REQUEST_MISMATCH error
     SuccessOrExit(err = client->SendWriteRequest(device->GetSecureSession().Value(),
                                                  interactionTimeoutMs != 0 ? System::Clock::Milliseconds32(interactionTimeoutMs)
