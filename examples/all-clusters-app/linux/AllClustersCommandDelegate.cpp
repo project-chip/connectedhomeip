@@ -595,6 +595,12 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     {
         Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     }
+    else if (name == "SetBooleanState")
+    {
+        bool newState = static_cast<bool>(self->mJsonValue["NewState"].asUInt());
+        EndpointId endpointId = static_cast<EndpointId>(self->mJsonValue["EndpointId"].asUInt());
+        self->OnBooleanStateChangeHandler(endpointId, newState);
+    }
     else
     {
         ChipLogError(NotSpecified, "Unhandled command '%s': this should never happen", name.c_str());
@@ -1042,6 +1048,7 @@ void AllClustersAppCommandHandler::OnBooleanStateChangeHandler(chip::EndpointId 
     if (booleanState != nullptr)
     {
         booleanState->SetStateValue(newState);
+        ChipLogProgress(NotSpecified, "BooleanState changed to %d on endpoint %d", newState, endpointId);
     }
 }
 
