@@ -73,7 +73,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
                 cluster_type_enum = global_attribute_ids.cluster_id_type(cluster_id)
                 # If debugging, please uncomment the following line to add Unit Testing clusters to the search and comment out the line below it.
                 if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard and cluster_type_enum != global_attribute_ids.ClusterIdType.kTest:
-                # if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard:
+                    # if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard:
                     continue
 
                 for attr_type in cluster_data:
