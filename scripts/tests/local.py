@@ -38,25 +38,25 @@ import colorama
 import coloredlogs
 import tabulate
 import yaml
+from matter.testing.metadata import extract_runs_args
 
 
 def _get_apps_from_script(path: str) -> List[str]:
     """
     Parses a python script and returns the apps it is for.
-
-    The app is expected to be in a comment block:
-      # test-runner-runs:
-      #   run1:
-      #     app: ${SOME_APP}
     """
-    apps = set()
-    app_regex = re.compile(r'app:\s*\$\{(.*?)\}')
-    with open(path, "rt") as f:
-        for line in f:
-            match = app_regex.search(line)
-            if match:
-                apps.add(match.group(1))
-    return list(apps)
+    try:
+        runs_args = extract_runs_args(path)
+        apps = set()
+        for run_config in runs_args.values():
+            if run_config and 'app' in run_config:
+                # app is like "${ALL_CLUSTERS_APP}"
+                app_name = run_config['app'].strip('${}')
+                apps.add(app_name)
+        return list(apps)
+    except Exception as e:
+        logging.warning(f"Failed to parse metadata from {path}: {e}")
+        return []
 
 
 def _get_native_machine_target():
