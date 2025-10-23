@@ -371,6 +371,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled()
 
 void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
     uint8_t associationFailureCause =
         chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);
@@ -485,6 +486,32 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
     case WLAN_REASON_INITIALIZED:
         sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
         sInstance._SetWiFiStationMode(kWiFiStationMode_Enabled);
+        if (IsWifiRecovering)
+        {
+            /*
+            Wifi recovery mechanism (due to firmware hang) is finish, we will attempt to reconnect to the previously staged network
+            */
+            IsWifiRecovering = false;
+            err = NetworkCommissioning::NXPWiFiDriver::GetInstance().ConnectWifiStagedNetwork();
+            if(err == CHIP_ERROR_KEY_NOT_FOUND)
+            {
+                /* if no SSID is staged, notify the network commissioning module to clean environnement for next commissioning  */
+                NetworkCommissioning::NXPWiFiDriver::GetInstance().OnConnectWiFiNetwork(NetworkCommissioning::Status::kNetworkIDNotFound,
+                                                                                CharSpan(), wlanEvent);
+            }
+        }
+        break;
+
+    case WLAN_REASON_FW_HANG:
+        /* 
+         If Wifi driver is hang, recovery mechanism has be triggered, this mechanism will be ended by re-initializing the wifi driver.
+         If wifi state is different to kWiFiStationState_NotConnected and kWiFiStationState_Disconnecting, 
+         we want to retry the wifi connection once the driver will be re-initialized.
+        */
+        if(mWiFiStationState != kWiFiStationState_NotConnected && mWiFiStationState != kWiFiStationState_Disconnecting)
+        {
+            IsWifiRecovering = true;
+        }
         break;
 
     default:
