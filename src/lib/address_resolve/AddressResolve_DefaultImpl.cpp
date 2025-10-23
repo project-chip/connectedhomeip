@@ -35,7 +35,9 @@ void NodeLookupHandle::ResetForLookup(System::Clock::Timestamp now, const NodeLo
     mRequestStartTime = now;
     mRequest          = request;
     mResults          = NodeLookupResults();
+#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
     mCacheUsed        = false;
+#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 }
 
 void NodeLookupHandle::LookupResult(const ResolveResult & result)
@@ -82,7 +84,7 @@ System::Clock::Timeout NodeLookupHandle::NextEventTimeout(System::Clock::Timesta
         // start of a new lookup.  Or it could happen because
         // OnOperationalNodeResolved got called close to our min lookup time,
         // and we crossed that line while going through mActiveLookups and
-        // before we got to calling ReArmTimer.
+        // before we got to calling ReArmTimer.mCacheUsed
         //
         // In this case, we should just fire the timer ASAP, since our min
         // lookup time has elapsed and we have results.

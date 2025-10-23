@@ -28,7 +28,9 @@ namespace AddressResolve {
 namespace Impl {
 
 inline constexpr uint8_t kNodeLookupResultsLen = CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS;
-inline constexpr System::Clock::Timeout kCacheDelayTimeout = System::Clock::Seconds16(5);
+#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+inline constexpr System::Clock::Timeout kCacheDelayTimeout = System::Clock::Seconds16(CHIP_DEVICE_CASE_DNS_CACHE_TIMEOUT_SECONDS);
+#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 
 enum class NodeLookupResult
 {
