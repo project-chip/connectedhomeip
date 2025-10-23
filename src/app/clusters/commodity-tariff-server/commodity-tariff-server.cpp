@@ -57,15 +57,6 @@ bool Instance::HasFeature(Feature aFeature) const
     return mFeature.Has(aFeature);
 }
 
-uint32_t Instance::GetCurrentTimestamp()
-{
-    uint32_t matterEpoch;
-    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(matterEpoch);
-    VerifyOrDie(CHIP_NO_ERROR == err);
-
-    return matterEpoch;
-}
-
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -625,10 +616,12 @@ void Instance::TariffTimeAttrsSync()
 
 CHIP_ERROR Instance::UpdateCurrentAttrs()
 {
-    uint32_t matterEpochNow_s = GetCurrentTimestamp();
-    if (!matterEpochNow_s)
+    uint32_t matterEpochNow_s;
+    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(matterEpochNow_s);
+
+    if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(AppServer, "The timestamp value can't be zero!");
+        ChipLogError(AppServer, "Unable to get valid time value");
         return CHIP_ERROR_INVALID_TIME;
     }
 
