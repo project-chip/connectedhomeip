@@ -414,7 +414,8 @@ async def assert_is_commissioned(
 async def assert_factory_fresh(
     dev_ctrl,
     node_id: int,
-    description: str = "Device"
+    description: str = "Device",
+    pase_params: Optional[dict] = None
 ) -> None:
     """
     Asserts that the device has NO commissioned fabrics (factory fresh state).
@@ -422,7 +423,7 @@ async def assert_factory_fresh(
     Reads the TrustedRootCertificates attribute from the OperationalCredentials cluster
     and verifies that the list is empty. A non-empty list indicates the device has fabrics.
 
-    This assertion works over PASE (before a CASE session is established).
+    This assertion works over PASE (before a CASE session is established) or CASE.
 
     Useful for tests that require factory-default state, such as discriminator uniqueness
     tests or device attestation tests.
@@ -431,6 +432,8 @@ async def assert_factory_fresh(
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
         description: User-defined description for error messages (default: "Device")
+        pase_params: Optional parameters for establishing PASE if needed.
+                    See is_commissioned() for format details.
 
     Raises:
         AssertionError: If device has any commissioned fabrics
@@ -440,13 +443,13 @@ async def assert_factory_fresh(
         # Verify device is factory reset before running test
         await assert_factory_fresh(controller, node_id=1234, "DUT")
 
-        # Check multiple devices in a multi-DUT test
-        await assert_factory_fresh(controller, node_id=1, "DUT1")
-        await assert_factory_fresh(controller, node_id=2, "DUT2")
+        # Verify factory-fresh device (establishes PASE if needed)
+        pase_params = {'method': 'on-network', 'discriminator': 1234, 'passcode': 20202021}
+        await assert_factory_fresh(controller, node_id=1234, "DUT", pase_params=pase_params)
     """
     from matter.testing.commissioning import is_commissioned
 
-    commissioned = await is_commissioned(dev_ctrl, node_id)
+    commissioned = await is_commissioned(dev_ctrl, node_id, pase_params=pase_params)
     asserts.assert_false(
         commissioned,
         f"{description} must be factory fresh (no commissioned fabrics). "
@@ -459,7 +462,8 @@ async def assert_fabric_count(
     dev_ctrl,
     node_id: int,
     expected_count: int,
-    description: str = "Device"
+    description: str = "Device",
+    pase_params: Optional[dict] = None
 ) -> None:
     """
     Asserts that the device has exactly the expected number of commissioned fabrics.
@@ -468,7 +472,7 @@ async def assert_fabric_count(
     and compares the count to the expected value. Each trusted root certificate
     corresponds to one commissioned fabric.
 
-    This assertion works over PASE (before a CASE session is established).
+    This assertion works over PASE (before a CASE session is established) or CASE.
 
     Useful for multi-fabric tests where you need to verify the exact number of fabrics
     at different stages of the test.
@@ -478,6 +482,8 @@ async def assert_fabric_count(
         node_id: Node ID of the device to check
         expected_count: Expected number of commissioned fabrics
         description: User-defined description for error messages (default: "Device")
+        pase_params: Optional parameters for establishing PASE if needed.
+                    See is_commissioned() for format details.
 
     Raises:
         AssertionError: If actual fabric count doesn't match expected count
@@ -487,15 +493,13 @@ async def assert_fabric_count(
         # Verify device has exactly 1 fabric before adding second
         await assert_fabric_count(controller, node_id=1234, expected_count=1, "DUT")
 
-        # After adding second fabric, verify count is 2
-        await assert_fabric_count(controller, node_id=1234, expected_count=2, "DUT")
-
-        # Verify all fabrics removed after test cleanup
-        await assert_fabric_count(controller, node_id=1234, expected_count=0, "DUT after cleanup")
+        # Verify factory-fresh device has 0 fabrics (establishes PASE if needed)
+        pase_params = {'method': 'on-network', 'discriminator': 1234, 'passcode': 20202021}
+        await assert_fabric_count(controller, node_id=1234, expected_count=0, "DUT", pase_params=pase_params)
     """
     from matter.testing.commissioning import get_commissioned_fabric_count
 
-    actual_count = await get_commissioned_fabric_count(dev_ctrl, node_id)
+    actual_count = await get_commissioned_fabric_count(dev_ctrl, node_id, pase_params=pase_params)
     asserts.assert_equal(
         actual_count,
         expected_count,
