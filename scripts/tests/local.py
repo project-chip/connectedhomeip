@@ -807,8 +807,8 @@ def gen_coverage(flat):
 )
 @click.option(
     "--app-filter",
-    default="*",
-    show_default=True,
+    default=None,
+    type=str,
     help="Run only tests that are for the given app. Comma separated list of apps. E.g. --app-filter ALL_CLUSTERS_APP,CHIP_TOOL",
 )
 def python_tests(
@@ -864,9 +864,9 @@ def python_tests(
         test_filter = "*"
     test_filter = _parse_filters(test_filter)
 
-    if not app_filter:
-        app_filter = "*"
-    app_filter_list = _parse_filters(app_filter)
+    app_filter_list = None
+    if app_filter:
+        app_filter_list = _parse_filters(app_filter)
 
     if skip:
         print("SKIP IS %r" % skip)
@@ -917,7 +917,7 @@ def python_tests(
     try:
         to_run = []
         for script in [t for t in test_scripts if test_filter.any_matches(t)]:
-            if app_filter != "*":
+            if app_filter_list:
                 required_apps = _get_apps_from_script(script)
                 if not any(app_filter_list.any_matches(app) for app in required_apps):
                     logging.info("Skipping %s due to app filter (requires %r)", script, required_apps)
@@ -950,7 +950,7 @@ def python_tests(
                     f"./scripts/tests/run_python_test.py --load-from-env out/test_env.yaml --script {script}",
                 ]
 
-                if app_filter != "*":
+                if app_filter_list:
                     cmd.extend(('--app-filter', app_filter))
 
                 if dry_run:
