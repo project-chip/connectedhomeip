@@ -84,7 +84,7 @@ System::Clock::Timeout NodeLookupHandle::NextEventTimeout(System::Clock::Timesta
         // start of a new lookup.  Or it could happen because
         // OnOperationalNodeResolved got called close to our min lookup time,
         // and we crossed that line while going through mActiveLookups and
-        // before we got to calling ReArmTimer.mCacheUsed
+        // before we got to calling ReArmTimer.
         //
         // In this case, we should just fire the timer ASAP, since our min
         // lookup time has elapsed and we have results.
@@ -251,7 +251,6 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
     mActiveLookups.PushBack(&handle);
     ReArmTimer();
     ChipLogProgress(Discovery, "Lookup started for " ChipLogFormatPeerId, ChipLogValuePeerId(peerId));
-
     return CHIP_NO_ERROR;
 }
 

@@ -3641,7 +3641,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // we don't need to worry about ExpireAllSessionsOnLogicalFabric.
         mSystemState->SessionMgr()->ExpireAllSessions(scopedPeerId);
 
-        // CHRIS
 #if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
         {
             // cache the address we are using for PASE as a backup

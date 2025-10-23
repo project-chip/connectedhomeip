@@ -161,14 +161,18 @@ public:
     /// be triggered for this lookup handle
     System::Clock::Timeout NextEventTimeout(System::Clock::Timestamp now);
 
+#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
     /// Check if cache should be used and apply cached result if available
     bool TryUseCache(System::Clock::Timestamp now, const NodeAddressCache & cache);
+#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 
 private:
     NodeLookupResults mResults;
     NodeLookupRequest mRequest; // active request to process
     System::Clock::Timestamp mRequestStartTime;
+#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
     bool mCacheUsed = false; // tracks if cache has been checked
+#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 };
 
 class Resolver : public ::chip::AddressResolve::Resolver, public Dnssd::OperationalResolveDelegate
