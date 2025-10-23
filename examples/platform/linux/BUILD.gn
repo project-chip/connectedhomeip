@@ -99,6 +99,20 @@ source_set("commodity-metering-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h" ]
 }
 
+source_set("linux-commissionable-data-provider") {
+  sources = [
+    "LinuxCommissionableDataProvider.cpp",
+    "LinuxCommissionableDataProvider.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+  ]
+
+  public_configs = [ ":app-main-config" ]
+}
+
 source_set("commodity-tariff-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h" ]
 }
@@ -115,8 +129,6 @@ source_set("app-main") {
     "AppMain.h",
     "CommissionableInit.cpp",
     "CommissionableInit.h",
-    "LinuxCommissionableDataProvider.cpp",
-    "LinuxCommissionableDataProvider.h",
     "NamedPipeCommands.cpp",
     "NamedPipeCommands.h",
     "Options.cpp",
@@ -137,6 +149,7 @@ source_set("app-main") {
     ":electrical-grid-conditions-test-event-trigger",
     ":energy-evse-test-event-trigger",
     ":energy-reporting-test-event-trigger",
+    ":linux-commissionable-data-provider",
     ":meter-identification-test-event-trigger",
     ":smco-test-event-trigger",
     ":software-diagnostics-test-event-trigger",

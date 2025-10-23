@@ -1,0 +1,29 @@
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+config("includes") {
+  # allows includes like "devices/..."
+  include_dirs = [ ".." ]
+}
+
+source_set("water-leak-detector") {
+  sources = [
+    "WaterLeakDetectorDevice.cpp",
+    "WaterLeakDetectorDevice.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/base-device",
+    "${chip_root}/src/app/clusters/boolean-state-server",
+    "${chip_root}/src/app/clusters/identify-server",
+    "${chip_root}/src/data-model-providers/codedriven",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/zzz_generated/app-common/clusters/Descriptor",
+  ]
+
+  public_configs = [
+    ":includes",
+    "${chip_root}/src:includes",
+  ]
+}

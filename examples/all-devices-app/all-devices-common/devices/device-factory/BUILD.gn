@@ -1,0 +1,24 @@
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+config("includes") {
+  # allows includes like "devices/..."
+  include_dirs = [ "../.." ]
+}
+
+source_set("device-factory"){
+  sources = [
+    "DeviceFactory.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/contact-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/water-leak-detector",
+  ]
+  
+  public_configs = [
+    ":includes",
+    "${chip_root}/src:includes",
+  ]
+}
