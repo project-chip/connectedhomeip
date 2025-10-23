@@ -1770,7 +1770,7 @@ static id _Nullable DecodeEventPayloadForOvenCavityOperationalStateCluster(Event
         do {
             MTROvenCavityOperationalStateClusterErrorStateStruct * _Nonnull memberValue;
             memberValue = [MTROvenCavityOperationalStateClusterErrorStateStruct new];
-            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorState.errorStateID];
+            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.errorState.errorStateID)];
             if (cppValue.errorState.errorStateLabel.HasValue()) {
                 memberValue.errorStateLabel = AsString(cppValue.errorState.errorStateLabel.Value());
                 if (memberValue.errorStateLabel == nil) {
@@ -2287,7 +2287,7 @@ static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventI
         do {
             MTROperationalStateClusterErrorStateStruct * _Nonnull memberValue;
             memberValue = [MTROperationalStateClusterErrorStateStruct new];
-            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorState.errorStateID];
+            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.errorState.errorStateID)];
             if (cppValue.errorState.errorStateLabel.HasValue()) {
                 memberValue.errorStateLabel = AsString(cppValue.errorState.errorStateLabel.Value());
                 if (memberValue.errorStateLabel == nil) {
@@ -2381,7 +2381,7 @@ static id _Nullable DecodeEventPayloadForRVCOperationalStateCluster(EventId aEve
         do {
             MTRRVCOperationalStateClusterErrorStateStruct * _Nonnull memberValue;
             memberValue = [MTRRVCOperationalStateClusterErrorStateStruct new];
-            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorState.errorStateID];
+            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.errorState.errorStateID)];
             if (cppValue.errorState.errorStateLabel.HasValue()) {
                 memberValue.errorStateLabel = AsString(cppValue.errorState.errorStateLabel.Value());
                 if (memberValue.errorStateLabel == nil) {

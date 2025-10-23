@@ -1860,7 +1860,7 @@ cluster RvcCleanMode = 85 {
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum. */
 cluster RvcOperationalState = 97 {
-  revision 1;
+  revision 3;
 
   enum ErrorStateEnum : enum8 {
     kNoError = 0;
@@ -1898,14 +1898,14 @@ cluster RvcOperationalState = 97 {
     kUpdatingMaps = 70;
   }
 
-  shared struct ErrorStateStruct {
-    enum8 errorStateID = 0;
+  struct ErrorStateStruct {
+    ErrorStateEnum errorStateID = 0;
     optional char_string<64> errorStateLabel = 1;
     optional char_string<64> errorStateDetails = 2;
   }
 
-  shared struct OperationalStateStruct {
-    enum8 operationalStateID = 0;
+  struct OperationalStateStruct {
+    OperationalStateEnum operationalStateID = 0;
     optional char_string<64> operationalStateLabel = 1;
   }
 
@@ -1923,7 +1923,7 @@ cluster RvcOperationalState = 97 {
   readonly attribute nullable int8u currentPhase = 1;
   readonly attribute optional nullable elapsed_s countdownTime = 2;
   readonly attribute OperationalStateStruct operationalStateList[] = 3;
-  readonly attribute enum8 operationalState = 4;
+  readonly attribute OperationalStateEnum operationalState = 4;
   readonly attribute ErrorStateStruct operationalError = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1935,9 +1935,9 @@ cluster RvcOperationalState = 97 {
     ErrorStateStruct commandResponseState = 0;
   }
 
-  /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
+  /** This command SHALL be supported if the device supports remotely pausing the operation. */
   command Pause(): OperationalCommandResponse = 0;
-  /** Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press). */
+  /** This command SHALL be supported if the device supports remotely resuming the operation. */
   command Resume(): OperationalCommandResponse = 3;
   /** On receipt of this command, the device SHALL start seeking the charging dock, if possible in the current state of the device. */
   command GoHome(): OperationalCommandResponse = 128;

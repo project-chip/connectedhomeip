@@ -27,7 +27,81 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace OvenCavityOperationalState {
-namespace Structs {} // namespace Structs
+namespace Structs {
+
+namespace ErrorStateStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kErrorStateID), errorStateID);
+    encoder.Encode(to_underlying(Fields::kErrorStateLabel), errorStateLabel);
+    encoder.Encode(to_underlying(Fields::kErrorStateDetails), errorStateDetails);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kErrorStateID))
+        {
+            err = DataModel::Decode(reader, errorStateID);
+        }
+        else if (__context_tag == to_underlying(Fields::kErrorStateLabel))
+        {
+            err = DataModel::Decode(reader, errorStateLabel);
+        }
+        else if (__context_tag == to_underlying(Fields::kErrorStateDetails))
+        {
+            err = DataModel::Decode(reader, errorStateDetails);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace ErrorStateStruct
+
+namespace OperationalStateStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kOperationalStateID), operationalStateID);
+    encoder.Encode(to_underlying(Fields::kOperationalStateLabel), operationalStateLabel);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kOperationalStateID))
+        {
+            err = DataModel::Decode(reader, operationalStateID);
+        }
+        else if (__context_tag == to_underlying(Fields::kOperationalStateLabel))
+        {
+            err = DataModel::Decode(reader, operationalStateLabel);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace OperationalStateStruct
+} // namespace Structs
 } // namespace OvenCavityOperationalState
 } // namespace Clusters
 } // namespace app
