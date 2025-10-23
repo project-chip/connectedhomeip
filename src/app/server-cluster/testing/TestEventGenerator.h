@@ -39,6 +39,8 @@ public:
 
         // This relies on the default encoding of events which uses
         // DataModel::Encode on a EventDataIB::Tag::kData
+        // The caller MUST ensure that T is the correct type for the event
+        // Use app::Clusters::<ClusterName>::Events::<EventName>::DecodableType to be spec compliant
         template <typename T>
         CHIP_ERROR GetEventData(T & dest)
         {
