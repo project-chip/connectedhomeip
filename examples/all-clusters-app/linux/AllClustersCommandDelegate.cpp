@@ -590,6 +590,10 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
 
         self->OnSoilMoistureChange(endpoint, soilMoistureMeasuredValue);
     }
+    else if (name == "UserIntentCommissioningStart")
+    {
+        Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+    }
     else
     {
         ChipLogError(NotSpecified, "Unhandled command '%s': this should never happen", name.c_str());
@@ -957,11 +961,6 @@ void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, D
     if (soilMoisture.IsNull())
     {
         ChipLogDetail(NotSpecified, "Set SoilMoisture value to null");
-    }
-    else if (soilMoisture.Value() > 100)
-    {
-        ChipLogDetail(NotSpecified, "Invalid SoilMoisture value");
-        return;
     }
     else
     {

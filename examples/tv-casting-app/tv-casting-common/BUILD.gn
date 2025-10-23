@@ -135,8 +135,10 @@ chip_data_model("tv-casting-common") {
     "${chip_root}/third_party/jsoncpp",
   ]
 
+  public_deps = [ "${chip_root}/src/app/clusters/bindings:binding-manager" ]
+
   if (chip_enable_transport_trace) {
-    public_deps =
+    public_deps +=
         [ "${chip_root}/examples/common/tracing:trace_handlers_decoder" ]
   }
 

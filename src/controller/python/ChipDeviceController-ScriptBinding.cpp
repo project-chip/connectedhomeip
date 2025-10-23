@@ -145,6 +145,8 @@ PyChipError pychip_DeviceController_GetNodeId(chip::Controller::DeviceCommission
 // Rendezvous
 PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
                                                bool isShortDiscriminator, uint32_t setupPINCode, chip::NodeId nodeid);
+PyChipError pychip_DeviceController_ConnectNFC(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
+                                               uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                               uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl, const char * onboardingPayload,
@@ -313,7 +315,7 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
     //
     // In situations where all the controller instances get shutdown, the entire stack is then also
     // implicitly shutdown. In the REPL, users can create such a situation by manually shutting down
-    // controllers (for example, when they call ChipReplStartup::LoadFabricAdmins multiple times). In
+    // controllers (for example, when they call ReplStartup::LoadFabricAdmins multiple times). In
     // that situation, momentarily, the stack gets de-initialized. This results in further interactions with
     // the stack being dangerous (and in fact, causes crashes).
     //
@@ -431,6 +433,22 @@ PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissio
     return ToPyChipError(devCtrl->PairDevice(nodeid,
                                              chip::RendezvousParameters()
                                                  .SetPeerAddress(Transport::PeerAddress(Transport::Type::kBle))
+                                                 .SetSetupPINCode(setupPINCode)
+                                                 .SetSetupDiscriminator(setupDiscriminator),
+                                             sCommissioningParameters));
+}
+
+PyChipError pychip_DeviceController_ConnectNFC(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
+                                               uint32_t setupPINCode, chip::NodeId nodeid)
+{
+    SetupDiscriminator setupDiscriminator;
+
+    // With NFC, only a long discriminator can be used
+    setupDiscriminator.SetLongValue(discriminator);
+
+    return ToPyChipError(devCtrl->PairDevice(nodeid,
+                                             chip::RendezvousParameters()
+                                                 .SetPeerAddress(Transport::PeerAddress::NFC(discriminator))
                                                  .SetSetupPINCode(setupPINCode)
                                                  .SetSetupDiscriminator(setupDiscriminator),
                                              sCommissioningParameters));
@@ -932,7 +950,7 @@ PyChipError pychip_IsSessionOverTCPConnection(chip::OperationalDeviceProxy * dev
     VerifyOrReturnError(isSessionOverTCP != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    *isSessionOverTCP = deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetTCPConnection() != nullptr;
+    *isSessionOverTCP = !deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetTCPConnection().IsNull();
 #else
     *isSessionOverTCP = false;
 #endif
@@ -960,8 +978,11 @@ PyChipError pychip_CloseTCPConnectionWithPeer(chip::OperationalDeviceProxy * dev
     VerifyOrReturnError(deviceProxy->GetSecureSession().Value()->AsSecureSession()->AllowsLargePayload(),
                         ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
-    deviceProxy->GetExchangeManager()->GetSessionManager()->TCPDisconnect(
-        deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetTCPConnection(), /* shouldAbort = */ false);
+    auto tcpConnection = deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetTCPConnection();
+    if (!tcpConnection.IsNull())
+    {
+        tcpConnection->ForceDisconnect();
+    }
 
     return ToPyChipError(CHIP_NO_ERROR);
 #else

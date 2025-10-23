@@ -52,8 +52,8 @@ qrcode_format = BitStruct(
 
 
 class CommissioningFlow(enum.IntEnum):
-    Standard = 0,
-    UserIntent = 1,
+    Standard = 0
+    UserIntent = 1
     Custom = 2
 
 

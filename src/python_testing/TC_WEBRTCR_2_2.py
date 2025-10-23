@@ -45,7 +45,7 @@ from matter.testing.apps import AppServerSubprocess
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCRequestor_2_2(MatterBaseTest):
+class TC_WebRTCR_2_2(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
 
@@ -86,11 +86,11 @@ class TC_WebRTCRequestor_2_2(MatterBaseTest):
             self.storage.cleanup()
         super().teardown_class()
 
-    def desc_TC_WebRTCRequestor_2_2(self) -> str:
+    def desc_TC_WebRTCR_2_2(self) -> str:
         """Returns a description of this test"""
-        return "[TC-{picsCode}-2.2] Validate sending an SDP Answer command to {DUT_Server} with an invalid session id"
+        return "[TC-{picsCode}-2.2] Validate Answer command with invalid session id"
 
-    def steps_TC_WebRTCRequestor_2_2(self) -> list[TestStep]:
+    def steps_TC_WebRTCR_2_2(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
@@ -98,10 +98,20 @@ class TC_WebRTCRequestor_2_2(MatterBaseTest):
             TestStep(1, "Commission the {TH_Server} from TH"),
             TestStep(2, "Open the Commissioning Window of the {TH_Server}"),
             TestStep(3, "Commission the {TH_Server} from DUT"),
-            TestStep(4, "Activate the Fault injection to modify the session ID of the WebRTC Answer command from {TH_Server}"),
-            TestStep(5, "Send ProvideOffer command to the {TH_Server} from DUT"),
+            TestStep(4, "Activate fault injection on {TH_Server} to modify the session ID of the WebRTC Answer command"),
+            TestStep(5, "Trigger {TH_Server} to send an Answer command to DUT with an invalid/non-existent WebRTCSessionID"),
         ]
         return steps
+
+    def pics_TC_WebRTCR_2_2(self) -> list[str]:
+        """
+        Return the list of PICS applicable to this test case.
+        """
+        pics = [
+            "WEBRTCR.S",           # WebRTC Transport Requestor Server
+            "WEBRTCR.S.C01.Rsp",   # Answer command
+        ]
+        return pics
 
     # This test has some manual steps and one sleep for up to 30 seconds. Test typically
     # runs under 1 mins, so 3 minutes is more than enough.
@@ -110,7 +120,7 @@ class TC_WebRTCRequestor_2_2(MatterBaseTest):
         return 3 * 60
 
     @async_test_body
-    async def test_TC_WebRTCRequestor_2_2(self):
+    async def test_TC_WebRTCR_2_2(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """

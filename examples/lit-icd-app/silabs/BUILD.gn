@@ -93,15 +93,6 @@ if (wifi_soc) {
       include_dirs += [ "${examples_plat_dir}/wf200" ]
     }
 
-    if (chip_enable_ble_rs911x) {
-      # TODO efr32_sdk should not need a header from this location
-      include_dirs += [
-        "${chip_root}/src/platform/silabs/efr32/rs911x",
-        "${examples_plat_dir}/rs911x",
-        "${examples_plat_dir}/rs911x/hal",
-      ]
-    }
-
     defines = []
     if (chip_enable_pw_rpc) {
       defines += [
@@ -120,7 +111,7 @@ silabs_executable("lit_icd_app") {
   sources = [
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
-    "src/ZclCallbacks.cpp",
+    "src/DataModelCallbacks.cpp",
   ]
 
   deps = [

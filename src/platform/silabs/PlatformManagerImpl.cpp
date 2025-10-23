@@ -32,8 +32,8 @@
 #include <platform/silabs/DiagnosticDataProviderImpl.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-#include <platform/silabs/wifi/WifiInterface.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+#include <platform/silabs/wifi/WifiInterface.h> // nogncheck
+#endif                                          // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 
 #if defined(SL_MBEDTLS_USE_TINYCRYPT)
 #include "tinycrypt/ecc.h"

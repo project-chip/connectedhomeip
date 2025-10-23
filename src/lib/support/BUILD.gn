@@ -233,6 +233,7 @@ static_library("support") {
     "ReadOnlyBuffer.cpp",
     "ReadOnlyBuffer.h",
     "ReferenceCountedHandle.h",
+    "ReferenceCountedPtr.h",
     "SafePointerCast.h",
     "SafeString.h",
     "Scoped.h",

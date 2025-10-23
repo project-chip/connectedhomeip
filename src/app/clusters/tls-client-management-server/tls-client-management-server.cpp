@@ -40,9 +40,10 @@ using namespace chip::app::Clusters::Tls;
 using namespace chip::app::Clusters::TlsClientManagement;
 using namespace chip::app::Clusters::TlsClientManagement::Structs;
 using namespace chip::app::Clusters::TlsClientManagement::Attributes;
-using chip::Protocols::InteractionModel::Status;
+using namespace Protocols::InteractionModel;
 
-static constexpr uint16_t kSpecMaxHostname = 253;
+static constexpr uint16_t kSpecMaxHostname  = 253;
+static constexpr uint16_t kMaxTlsEndpointId = 65534;
 
 TlsClientManagementServer::TlsClientManagementServer(EndpointId endpointId, TlsClientManagementDelegate & delegate,
                                                      CertificateTable & certificateTable, uint8_t maxProvisioned) :
@@ -72,12 +73,17 @@ CHIP_ERROR TlsClientManagementServer::Init()
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
 
-    return CHIP_NO_ERROR;
+    return Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
 }
 
 CHIP_ERROR TlsClientManagementServer::Finish()
 {
     mCertificateTable.Finish();
+
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+
     return CHIP_NO_ERROR;
 }
 
@@ -159,10 +165,19 @@ void TlsClientManagementServer::HandleProvisionEndpoint(HandlerContext & ctx,
 
     VerifyOrReturn(req.hostname.size() >= 4 && req.hostname.size() <= kSpecMaxHostname,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+    VerifyOrReturn(req.caid <= kMaxRootCertId, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+
+    auto fabric = ctx.mCommandHandler.GetAccessingFabricIndex();
+
+    ReturnOnFailure(mCertificateTable.HasRootCertificateEntry(fabric, req.caid),
+                    ctx.mCommandHandler.AddStatus(
+                        ctx.mRequestPath, ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kRootCertificateNotFound)));
+    VerifyOrReturn(req.ccdid.IsNull() || mCertificateTable.HasClientCertificateEntry(fabric, req.ccdid.Value()) == CHIP_NO_ERROR,
+                   ctx.mCommandHandler.AddStatus(
+                       ctx.mRequestPath, ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kClientCertificateNotFound)));
 
     Commands::ProvisionEndpointResponse::Type response;
-    auto status = mDelegate.ProvisionEndpoint(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), req,
-                                              response.endpointID);
+    auto status = mDelegate.ProvisionEndpoint(ctx.mRequestPath.mEndpointId, fabric, req, response.endpointID);
 
     if (status.IsSuccess())
     {
@@ -177,6 +192,8 @@ void TlsClientManagementServer::HandleProvisionEndpoint(HandlerContext & ctx,
 void TlsClientManagementServer::HandleFindEndpoint(HandlerContext & ctx, const Commands::FindEndpoint::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsClientManagement: FindEndpoint");
+
+    VerifyOrReturn(req.endpointID <= kMaxTlsEndpointId, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
     Commands::FindEndpointResponse::Type response;
     TlsClientManagementDelegate::EndpointStructType endpoint;
@@ -197,9 +214,16 @@ void TlsClientManagementServer::HandleRemoveEndpoint(HandlerContext & ctx, const
 {
     ChipLogDetail(Zcl, "TlsClientManagement: RemoveEndpoint");
 
+    VerifyOrReturn(req.endpointID <= kMaxTlsEndpointId, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+
     auto status = mDelegate.RemoveProvisionedEndpointByID(ctx.mRequestPath.mEndpointId,
                                                           ctx.mCommandHandler.GetAccessingFabricIndex(), req.endpointID);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+}
+
+void TlsClientManagementServer::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    mDelegate.RemoveFabric(fabricIndex);
 }
 
 /** @brief TlsClientManagement Cluster Server Init

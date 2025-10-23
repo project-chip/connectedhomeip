@@ -24,6 +24,8 @@
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
+#       --string-arg th_server_app_path:${PUSH_AV_SERVER}
+#       --string-arg host_ip:127.0.0.1
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
@@ -38,6 +40,7 @@ import logging
 
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
+from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
 
 import matter.clusters as Clusters
 from matter.clusters import Globals
@@ -47,12 +50,30 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_b
 logger = logging.getLogger(__name__)
 
 
-class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
+class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
     def desc_TC_PAVSTI_1_2(self) -> str:
         return "[TC-PAVSTI-1.2] Verify transmission with trigger type as Continuous and ensure privacy settings are checked if supported."
 
     def pics_TC_PAVSTI_1_2(self):
         return ["PAVST.S"]
+
+    @async_test_body
+    async def setup_class(self):
+        th_server_app = self.user_params.get("th_server_app_path", None)
+        self.host_ip = self.user_params.get("host_ip", None)
+        if self.host_ip is None:
+            self.host_ip = self.get_private_ip()
+        self.server = PushAvServerProcess(server_path=th_server_app, server_ip=self.host_ip)
+        self.server.start(
+            expected_output="Running on https://0.0.0.0:1234",
+            timeout=30,
+        )
+        super().setup_class()
+
+    def teardown_class(self):
+        if self.server is not None:
+            self.server.terminate()
+        super().teardown_class()
 
     def steps_TC_PAVSTI_1_2(self) -> list[TestStep]:
         return [
@@ -81,18 +102,18 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 5,
+                "TH sends the AllocatePushTransport command with valid parameters and TriggerType = Continuous",
+                "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID, TransportOptions, and TransportStatus in the TransportConfigurationStruct. Store ConnectionID as aConnectionID.",
+            ),
+            TestStep(
+                6,
                 "TH writes SoftRecordingPrivacyModeEnabled as True",
                 "DUT responds with SUCCESS status code.",
             ),
             TestStep(
-                6,
+                7,
                 "TH writes SoftLiveStreamPrivacyModeEnabled as True",
                 "DUT responds with SUCCESS status code.",
-            ),
-            TestStep(
-                7,
-                "TH sends the AllocatePushTransport command with valid parameters and TriggerType = Continuous",
-                "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID, TransportOptions, and TransportStatus in the TransportConfigurationStruct. Store ConnectionID as aConnectionID.",
             ),
             TestStep(
                 8,
@@ -133,6 +154,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
 
     @async_test_body
     async def test_TC_PAVSTI_1_2(self):
+        PICS_PRIVACY = "AVSM.S.F03"
         endpoint = self.get_endpoint(default=1)
         pushavCluster = Clusters.PushAvStreamTransport
         avsmCluster = Clusters.CameraAvStreamManagement
@@ -143,6 +165,8 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
         # Commission DUT - already done
         await self.precondition_one_allocated_video_stream(streamUsage=Globals.Enums.StreamUsageEnum.kRecording)
         await self.precondition_one_allocated_audio_stream(streamUsage=Globals.Enums.StreamUsageEnum.kRecording)
+        tlsEndpointId, _ = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=self.host_ip)
+        uploadStreamId = self.server.create_stream()
 
         self.step(1)
         currentConnections = await self.read_single_attribute_check_success(
@@ -210,7 +234,35 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
         audioStreamId = allocatedAudioStream.audioStreamID
 
         self.step(5)
-        if self.pics_guard(self.check_pics("AVSM.S.F0003")):
+        trackName = "media"
+        self.server.update_track_name(uploadStreamId, trackName)
+        allocatePushTransportResponse = await self.send_single_cmd(
+            cmd=pushavCluster.Commands.AllocatePushTransport(
+                transportOptions={
+                    "streamUsage": Globals.Enums.StreamUsageEnum.kRecording,
+                    "videoStreamID": videoStreamId,
+                    "audioStreamID": audioStreamId,
+                    "TLSEndpointID": tlsEndpointId,
+                    "url": f"https://{self.host_ip}:1234/streams/{uploadStreamId}/",
+                    "triggerOptions": {"triggerType": pushavCluster.Enums.TransportTriggerTypeEnum.kContinuous},
+                    "ingestMethod": pushavCluster.Enums.IngestMethodsEnum.kCMAFIngest,
+                    "containerFormat": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
+                    "containerOptions": {
+                        "containerType": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
+                        "CMAFContainerOptions": {"CMAFInterface": 0, "segmentDuration": 4000, "chunkDuration": 2000, "sessionGroup": 1, "trackName": trackName},
+                    },
+                }
+            ),
+            endpoint=endpoint,
+        )
+        logger.info(
+            f"Rx'd allocatePushTransportResponse = {allocatePushTransportResponse}"
+        )
+        aConnectionID = (
+            allocatePushTransportResponse.transportConfiguration.connectionID
+        )
+        if self.pics_guard(self.check_pics(PICS_PRIVACY)):
+            self.step(6)
             aFeatureMap = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=avsmCluster, attribute=avsmAttr.FeatureMap
             )
@@ -226,8 +278,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
                 "Error when trying to write SoftRecordingPrivacyModeEnabled",
             )
 
-        self.step(6)
-        if self.pics_guard(self.check_pics("AVSM.S.F0003")):
+            self.step(7)
             result = await self.write_single_attribute(
                 avsmAttr.SoftLivestreamPrivacyModeEnabled(True), endpoint_id=endpoint
             )
@@ -237,35 +288,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
                 "Error when trying to write SoftLivestreamPrivacyModeEnabled",
             )
 
-        self.step(7)
-        allocatePushTransportResponse = await self.send_single_cmd(
-            cmd=pushavCluster.Commands.AllocatePushTransport(
-                transportOptions={
-                    "streamUsage": Globals.Enums.StreamUsageEnum.kRecording,
-                    "videoStreamID": videoStreamId,
-                    "audioStreamID": audioStreamId,
-                    "endpointID": 1,  # TODO: Revisit TLS arguments once TLSCM cluster is available.
-                    "url": "https://localhost:1234/streams/1",
-                    "triggerOptions": {"triggerType": pushavCluster.Enums.TransportTriggerTypeEnum.kContinuous},
-                    "ingestMethod": pushavCluster.Enums.IngestMethodsEnum.kCMAFIngest,
-                    "containerFormat": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
-                    "containerOptions": {
-                        "containerType": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
-                        "CMAFContainerOptions": {"chunkDuration": 4},
-                    },
-                }
-            ),
-            endpoint=endpoint,
-        )
-        logger.info(
-            f"Rx'd allocatePushTransportResponse = {allocatePushTransportResponse}"
-        )
-        aConnectionID = (
-            allocatePushTransportResponse.transportConfiguration.connectionID
-        )
-
-        self.step(8)
-        if self.pics_guard(self.check_pics("AVSM.S.F0003")):
+            self.step(8)
             try:
                 await self.send_single_cmd(
                     cmd=pushavCluster.Commands.SetTransportStatus(
@@ -283,8 +306,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
                     "Unexpected error returned when expecting INVALID_IN_STATE due to SoftPrivacy mode set to True",
                 )
 
-        self.step(9)
-        if self.pics_guard(self.check_pics("AVSM.S.F0003")):
+            self.step(9)
             result = await self.write_single_attribute(
                 avsmAttr.SoftRecordingPrivacyModeEnabled(False), endpoint_id=endpoint
             )
@@ -294,8 +316,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
                 "Error when trying to write SoftRecordingPrivacyModeEnabled",
             )
 
-        self.step(10)
-        if self.pics_guard(self.check_pics("AVSM.S.F0003")):
+            self.step(10)
             result = await self.write_single_attribute(
                 avsmAttr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint
             )
@@ -304,6 +325,12 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
                 Status.Success,
                 "Error when trying to write SoftLivestreamPrivacyModeEnabled",
             )
+        else:
+            self.skip_step(6)
+            self.skip_step(7)
+            self.skip_step(8)
+            self.skip_step(9)
+            self.skip_step(10)
 
         self.step(11)
         await self.send_single_cmd(
@@ -313,14 +340,22 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
         )
 
         self.step(12)
-        # TODO: Add a step to allow user to verify this through TH UI.
         if not self.check_pics("PICS_SDK_CI_ONLY"):
-            user_response = self.wait_for_user_input(
-                prompt_msg="Verify the video stream is being transmitted and is of CMAF format. Enter 'y' to confirm.",
-                prompt_msg_placeholder="y",
-                default_value="y",
+            skipped = self.user_verify_push_av_stream(
+                prompt_msg="Verify the video stream is being transmitted by playing the live video and viewing the uploaded contents."
             )
-            asserts.assert_equal(user_response.lower(), "y")
+
+            if skipped:
+                # For when running in CLI
+                prompt = ("\nVerify the video segments are being received by the server by viewing the logs with [PUSH_AV_SERVER] tag.\n"
+                          "The uploaded content must be accepted by the server without any errors.\n"
+                          "Enter 'y' to confirm.")
+                user_response = self.wait_for_user_input(
+                    prompt_msg=prompt,
+                    prompt_msg_placeholder="y",
+                    default_value="y",
+                )
+                asserts.assert_equal(user_response.lower(), "y")
 
         self.step(13)
         await self.send_single_cmd(
@@ -330,14 +365,24 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase):
         )
 
         self.step(14)
-        # TODO: Add a step to allow user to verify this through TH UI.
         if not self.check_pics("PICS_SDK_CI_ONLY"):
-            user_response = self.wait_for_user_input(
-                prompt_msg="Verify the transmission of video stream has stopped. Enter 'y' to confirm.",
-                prompt_msg_placeholder="y",
-                default_value="y",
+            prompt = ("Verify the video stream uploaded can be played. Verify that DUT has stopped uploading by viewing the uploaded content and ensure no new files are received.\n"
+                      "Click on the 'Refresh Streams' button to view the latest uploaded contents"
+                      "The uploaded segment's extended path must conform to the Matter's extended path format")
+            skipped = self.user_verify_push_av_stream(
+                prompt_msg=prompt
             )
-            asserts.assert_equal(user_response.lower(), "y")
+            if skipped:
+                # For when running in CLI
+                prompt = ("\nVerify that DUT has stopped transmitting content by viewing the server logs with [PUSH_AV_SERVER] tag."
+                          "No new segments should be received."
+                          "Enter 'y' to confirm.")
+                user_response = self.wait_for_user_input(
+                    prompt_msg=prompt,
+                    prompt_msg_placeholder="y",
+                    default_value="y",
+                )
+                asserts.assert_equal(user_response.lower(), "y")
 
 
 if __name__ == "__main__":

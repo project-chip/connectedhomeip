@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,10 +18,12 @@
 #include <assert.h>
 
 #include <app/clusters/bindings/PendingNotificationMap.h>
-#include <app/util/binding-table.h>
-#include <app/util/config.h>
+#include <app/clusters/bindings/binding-table.h>
 
 namespace chip {
+namespace app {
+namespace Clusters {
+namespace Binding {
 
 CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(ScopedNodeId & nodeId)
 {
@@ -30,15 +32,15 @@ CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(ScopedNodeId & nodeId)
     // to the start of the list than the last entry of any other peer.
 
     // First, set up a way to easily track which entries correspond to the same peer.
-    uint8_t bindingWithSamePeer[MATTER_BINDING_TABLE_SIZE];
+    uint8_t bindingWithSamePeer[Table::kMaxBindingEntries];
 
-    for (auto iter = BindingTable::GetInstance().begin(); iter != BindingTable::GetInstance().end(); ++iter)
+    for (auto iter = Table::GetInstance().begin(); iter != Table::GetInstance().end(); ++iter)
     {
         if (iter->type != MATTER_UNICAST_BINDING)
         {
             continue;
         }
-        for (auto checkIter = BindingTable::GetInstance().begin(); checkIter != BindingTable::GetInstance().end(); ++checkIter)
+        for (auto checkIter = Table::GetInstance().begin(); checkIter != Table::GetInstance().end(); ++checkIter)
         {
             if (checkIter->type == MATTER_UNICAST_BINDING && checkIter->fabricIndex == iter->fabricIndex &&
                 checkIter->nodeId == iter->nodeId)
@@ -49,7 +51,7 @@ CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(ScopedNodeId & nodeId)
         }
     }
 
-    uint16_t lastAppear[MATTER_BINDING_TABLE_SIZE];
+    uint16_t lastAppear[Table::kMaxBindingEntries];
     for (uint16_t & value : lastAppear)
     {
         value = UINT16_MAX;
@@ -62,7 +64,7 @@ CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(ScopedNodeId & nodeId)
     }
     uint8_t lruBindingEntryIndex;
     uint16_t minLastAppearValue = UINT16_MAX;
-    for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE; i++)
+    for (uint8_t i = 0; i < Table::kMaxBindingEntries; i++)
     {
         if (lastAppear[i] < minLastAppearValue)
         {
@@ -72,8 +74,8 @@ CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(ScopedNodeId & nodeId)
     }
     if (minLastAppearValue < UINT16_MAX)
     {
-        EmberBindingTableEntry entry = BindingTable::GetInstance().GetAt(static_cast<uint8_t>(lruBindingEntryIndex));
-        nodeId                       = ScopedNodeId(entry.nodeId, entry.fabricIndex);
+        TableEntry entry = Table::GetInstance().GetAt(static_cast<uint8_t>(lruBindingEntryIndex));
+        nodeId           = ScopedNodeId(entry.nodeId, entry.fabricIndex);
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_NOT_FOUND;
@@ -82,7 +84,7 @@ CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(ScopedNodeId & nodeId)
 CHIP_ERROR PendingNotificationMap::AddPendingNotification(uint8_t bindingEntryId, PendingNotificationContext * context)
 {
     RemoveEntry(bindingEntryId);
-    if (mNumEntries == MATTER_BINDING_TABLE_SIZE)
+    if (mNumEntries == Table::kMaxBindingEntries)
     {
         // We know that the RemoveEntry above did not do anything so we don't need to try restoring it.
         return CHIP_ERROR_NO_MEMORY;
@@ -121,7 +123,7 @@ void PendingNotificationMap::RemoveAllEntriesForNode(const ScopedNodeId & nodeId
     uint8_t newEntryCount = 0;
     for (int i = 0; i < mNumEntries; i++)
     {
-        EmberBindingTableEntry entry = BindingTable::GetInstance().GetAt(mPendingBindingEntries[i]);
+        TableEntry entry = Table::GetInstance().GetAt(mPendingBindingEntries[i]);
         if (entry.fabricIndex != nodeId.GetFabricIndex() || entry.nodeId != nodeId.GetNodeId())
         {
             mPendingBindingEntries[newEntryCount] = mPendingBindingEntries[i];
@@ -141,7 +143,7 @@ void PendingNotificationMap::RemoveAllEntriesForFabric(FabricIndex fabric)
     uint8_t newEntryCount = 0;
     for (int i = 0; i < mNumEntries; i++)
     {
-        EmberBindingTableEntry entry = BindingTable::GetInstance().GetAt(mPendingBindingEntries[i]);
+        TableEntry entry = Table::GetInstance().GetAt(mPendingBindingEntries[i]);
         if (entry.fabricIndex != fabric)
         {
             mPendingBindingEntries[newEntryCount] = mPendingBindingEntries[i];
@@ -156,4 +158,7 @@ void PendingNotificationMap::RemoveAllEntriesForFabric(FabricIndex fabric)
     mNumEntries = newEntryCount;
 }
 
+} // namespace Binding
+} // namespace Clusters
+} // namespace app
 } // namespace chip

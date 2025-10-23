@@ -1123,6 +1123,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC
+ *
+ * @brief Defines the number of binding entries per fabric.
+ */
+#ifndef CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC
+#define CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC 4
+#endif
+
+/**
  * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
  *
  * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.
@@ -1914,6 +1923,21 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
 
 /**
+ *  @def CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE
+ *
+ *  @brief
+ *    Maximum block size recommended by device for BDX transfers of diagnostic logs.
+ *    If increased, also increase CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX.
+ *    Note that SecureSession::AllowsLargePayload limits the payload size for all transport
+ *    types besides TCP, so, if using UDP, BDX blocks larger than a certain size (e.g. 1174)
+ *    will be unable to send.
+ *
+ */
+#ifndef CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE
+#define CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE 1024
+#endif // CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE
+
+/**
  *  @def CHIP_CONFIG_TEST_GOOGLETEST
  *
  *  @brief
@@ -2001,10 +2025,41 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_DEVICE_ENABLE_CASE_DNS_CACHE 0
 #endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 
+/**
+ * CHIP_DEVICE_CASE_DNS_CACHE_TIMEOUT_SECONDS sets the timeout for when to use the cached value
+ * when CHIP_DEVICE_ENABLE_CASE_DNS_CACHE is enabled
+ */
 #ifndef CHIP_DEVICE_CASE_DNS_CACHE_TIMEOUT_SECONDS
 #define CHIP_DEVICE_CASE_DNS_CACHE_TIMEOUT_SECONDS 5
 #endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 
+/**
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
+ *
+ * @brief The maximum number of video streams per device
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS
+ *
+ * @brief The maximum number of audio streams per device
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
+ *
+ * @brief The maximum number of snapshot streams per device
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
+>>>>>>> upstream/master
 /**
  * @}
  */

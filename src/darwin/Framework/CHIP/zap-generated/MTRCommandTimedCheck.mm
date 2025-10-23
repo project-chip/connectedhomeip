@@ -536,6 +536,15 @@ static BOOL CommandNeedsTimedInvokeInScenesManagementCluster(AttributeId aAttrib
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInGroupcastCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Groupcast;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInHEPAFilterMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::HepaFilterMonitoring;
@@ -1164,6 +1173,18 @@ static BOOL CommandNeedsTimedInvokeInContentControlCluster(AttributeId aAttribut
 {
     using namespace Clusters::ContentControl;
     switch (aAttributeId) {
+    case Commands::UpdatePIN::Id: {
+        return YES;
+    }
+    case Commands::ResetPIN::Id: {
+        return YES;
+    }
+    case Commands::Enable::Id: {
+        return YES;
+    }
+    case Commands::Disable::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
@@ -1520,6 +1541,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ScenesManagement::Id: {
         return CommandNeedsTimedInvokeInScenesManagementCluster(commandID);
+    }
+    case Clusters::Groupcast::Id: {
+        return CommandNeedsTimedInvokeInGroupcastCluster(commandID);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return CommandNeedsTimedInvokeInHEPAFilterMonitoringCluster(commandID);
