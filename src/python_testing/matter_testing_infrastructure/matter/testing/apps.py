@@ -14,7 +14,6 @@
 
 
 import os
-import re
 import signal
 import tempfile
 from dataclasses import dataclass
