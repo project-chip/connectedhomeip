@@ -261,7 +261,7 @@ class TC_SC_4_1(MatterBaseTest):
     async def _verify_commissionable_subtypes(self, long_discriminator_ptr_instance_name: str, extended_discovery: bool = False) -> None:
         # Construct CM subtype
         cm_subtype = f"_CM._sub.{MdnsServiceType.COMMISSIONABLE.value}"
-        
+
         # TH performs a browse for the rest of the 'Commissionable Service' subtypes
         subtypes = await MdnsDiscovery().get_commissionable_subtypes(log_output=True)
 
@@ -311,7 +311,7 @@ class TC_SC_4_1(MatterBaseTest):
             # Verify that the 'In Commissioning Mode Subtype' PTR record's instance name
             # is equal to the 'Long Discriminator Subtype' PTR record's instance name
             asserts.assert_equal(cm_ptr.instance_name, long_discriminator_ptr_instance_name,
-                                "'In Commissioning Mode Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
+                                 "'In Commissioning Mode Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
         # *** VENDOR SUBTYPE ***
         # Check for the presence of the 'Vendor Subtype' _V
@@ -408,7 +408,7 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Verify that the TXT record's instance name is equal to 'long_discriminator_subtype_ptr_instance_name'
         asserts.assert_equal(txt_record.instance_name, long_discriminator_ptr_instance_name,
-                                "TXT record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
+                             "TXT record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
         # *** ICD KEY ***
         icd_key: str | None = None
@@ -475,7 +475,7 @@ class TC_SC_4_1(MatterBaseTest):
             # that the value is equal to 'active_mode_threshold_ms'
             if self.supports_icd:
                 asserts.assert_equal(int(sat_key), self.active_mode_threshold_ms,
-                                        f"'SAT' key value ({sat_key}) must be equal to 'active_mode_threshold_ms' ({self.active_mode_threshold_ms})")
+                                     f"'SAT' key value ({sat_key}) must be equal to 'active_mode_threshold_ms' ({self.active_mode_threshold_ms})")
 
         # Verify that the 'SAI' key is present if the 'SAT' key is present
         asserts.assert_true(
