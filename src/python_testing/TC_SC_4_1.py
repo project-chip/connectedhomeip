@@ -399,185 +399,179 @@ class TC_SC_4_1(MatterBaseTest):
         asserts.assert_true(txt_record_returned,
                             "TXT record was not returned or contains no values")
 
-        # If the TXT record is returned, verify its TXT keys
-        if txt_record_returned:
+        # Verify that the TXT record's instance name is equal to 'long_discriminator_subtype_ptr_instance_name'
+        asserts.assert_equal(txt_record.instance_name, long_discriminator_ptr_instance_name,
+                                "TXT record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
-            # Verify that the TXT record's instance name is equal to 'long_discriminator_subtype_ptr_instance_name'
-            asserts.assert_equal(txt_record.instance_name, long_discriminator_ptr_instance_name,
-                                 "TXT record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
+        # *** ICD KEY ***
+        icd_key: str | None = None
+        if self.supports_lit:
+            # Verify that the 'ICD' key is present and non-empty
+            asserts.assert_in('ICD', txt_record.txt, "'ICD' key must be present.")
+            icd_key = txt_record.txt.get('ICD')
+            asserts.assert_true(icd_key, "'ICD' key is present but has no value.")
 
-            # *** ICD KEY ***
-            icd_key: str | None = None
-            if self.supports_lit:
-                # Verify that the 'ICD' key is present and non-empty
-                asserts.assert_in('ICD', txt_record.txt, "'ICD' key must be present.")
-                icd_key = txt_record.txt.get('ICD')
-                asserts.assert_true(icd_key, "'ICD' key is present but has no value.")
-
-                # Verify that the 'ICD' key has the value of 0 or 1 encoded
-                # as a decimal number in ASCII text ommiting any leading zeros
-                assert_valid_icd_key(icd_key)
-            else:
-                # Verify that the 'ICD' TXT key is NOT present
-                asserts.assert_not_in('ICD', txt_record.txt, "'ICD' key must NOT be present.")
-
-            # Set sit_mode = True when:
-            #   - supports_icd is True and supports_lit is False.
-            #   - supports_icd is True and supports_lit is True and ICD == '0'
-            # Set sit_mode = False when:
-            #   - supports_icd is False.
-            #   - supports_icd is True and supports_lit is True and ICD == '1'
-            sit_mode = self.supports_icd and (not self.supports_lit or icd_key == '0')
-            logging.info(f"\n\n\t** sit_mode: {sit_mode}\n")
-
-            # *** SII KEY ***
-            if sit_mode:
-                # Verify that the 'SII' key is present and non-empty if 'sit_mode' is True
-                asserts.assert_in('SII', txt_record.txt, "'SII' key must be present.")
-                sii_key = txt_record.txt['SII']
-                asserts.assert_true(sii_key, "'SII' key is present but has no value.")
-
-                # Verify that the 'SII' key is an unsigned integer with units of milliseconds
-                # encoded as a variable length decimal number in ASCII text, omitting any
-                # leading zeros, and shall not exceed 3600000
-                assert_valid_sii_key(sii_key)
-
-            # *** SAI KEY ***
-            if self.supports_icd:
-                # Verify that the 'SAI' key is present and non-empty if 'supports_icd' is True
-                asserts.assert_in('SAI', txt_record.txt, "'SAI' key must be present.")
-                sai_key = txt_record.txt['SAI']
-                asserts.assert_true(sai_key, "'SAI' key is present but has no value.")
-
-                # Verify that the 'SAI' key is an unsigned integer with units of milliseconds
-                # encoded as a variable length decimal number in ASCII text, omitting any
-                # leading zeros, and shall not exceed 3600000
-                assert_valid_sai_key(sai_key)
-
-            # *** SAT KEY ***
-            # If the 'SAT' key is present:
-            if 'SAT' in txt_record.txt:
-                sat_key = txt_record.txt['SAT']
-
-                # Verify that it is non-empty
-                asserts.assert_true(sat_key, "'SAT' key is present but has no value.")
-
-                # Verify that it is an unsigned integer with units of milliseconds encoded as
-                # a variable length decimal number in ASCII text, omitting any leading zeros,
-                # and shall be less than or equal to 65535
-                assert_valid_sat_key(sat_key)
-
-                # If the 'SAT' key is present and supports_icd is true, verify
-                # that the value is equal to 'active_mode_threshold_ms'
-                if self.supports_icd:
-                    asserts.assert_equal(int(sat_key), self.active_mode_threshold_ms,
-                                         f"'SAT' key value ({sat_key}) must be equal to 'active_mode_threshold_ms' ({self.active_mode_threshold_ms})")
-
-            # Verify that the 'SAI' key is present if the 'SAT' key is present
-            asserts.assert_true(
-                'SAT' not in txt_record.txt
-                or 'SAI' in txt_record.txt,
-                "SAI key must be present if SAT key is present."
-            )
-
-            # *** D KEY ***
-            # Verify that the 'D' key is present and non-empty
-            asserts.assert_in('D', txt_record.txt, "'D' key must be present.")
-            d_key = txt_record.txt['D']
-            asserts.assert_true(d_key, "'D' key is present but has no value.")
-
-            # Verify that it is a full 12-bit discriminator encoded as a variable length
-            # decimal number in ASCII text, omitting any leading zeros, and up to 4 digits
-            assert_valid_d_key(d_key)
-
-            # *** VP KEY ***
-            # If the VP key is present
-            if 'VP' in txt_record.txt:
-                # Verify that it is non-empty
-                vp_key = txt_record.txt['VP']
-                asserts.assert_true(vp_key, "'VP' key is present but has no value.")
-
-                # Verify that it contain at least Vendor ID, and if Product ID
-                # is present, both values must be separated by a + sign
-                assert_valid_vp_key(vp_key)
-
-            # *** T KEY ***
-            self.verify_t_key(txt_record)
-
-            # *** CM KEY ***
-            # If the 'CM' key is present
-            if 'CM' in txt_record.txt:
-                # Verify that it is non-empty
-                cm_key = txt_record.txt['CM']
-                asserts.assert_true(cm_key, "'CM' key is present but has no value.")
-
-                # Verify value is a decimal number in ASCII text with allowed values (0, 1, 2, 3)
-                assert_valid_cm_key(cm_key)
-
-                # Verify that the 'CM' key value is equal to the expected value
-                asserts.assert_true(cm_key == expected_cm, f"'CM' key must be '{expected_cm}', got '{cm_key}'")
-            else:
-                # When the 'CM' key is not present, or present and equal to '0', the DUT is in Extended Discovery mode
-                # Verify that the expected 'CM' value is '0' (Extended Discovery mode)
-                asserts.assert_equal(expected_cm, "0",
-                                     "Expected 'CM' key value must be '0' when 'CM' key is not present in the TXT record.")
-
-            # *** DT KEY ***
-            # If the DT key is present
-            if 'DT' in txt_record.txt:
-                # Verify that it is non-empty
-                dt_key = txt_record.txt['DT']
-                asserts.assert_true(dt_key, "'DT' key is present but has no value.")
-
-                # Verify that it contains the device type identifier encoded as a
-                # variable length decimal number in ASCII text without leading zeros
-                assert_valid_dt_key(dt_key)
-
-            # *** DN KEY ***
-            # If the DN key is present
-            if 'DN' in txt_record.txt:
-                # Verify that it is non-empty
-                dn_key = txt_record.txt['DN']
-                asserts.assert_true(dn_key, "'DN' key is present but has no value.")
-
-                # Verify that it is a valid UTF-8 encoded string of maximum length of 32 bytes
-                assert_valid_dn_key(dn_key)
-
-            # *** RI KEY ***
-            # If the RI key is present
-            if 'RI' in txt_record.txt:
-                # Verify that it is non-empty
-                ri_key = txt_record.txt['RI']
-                asserts.assert_true(ri_key, "'RI' key is present but has no value.")
-
-                # Verify that it is encoded as an uppercase string with a maximum length of
-                # 100 chars (each octet encoded as a 2-digit hex number, max 50 octets)
-                assert_valid_ri_key(ri_key)
-
-            # *** PH KEY ***
-            # If the PH key is present
-            if 'PH' in txt_record.txt:
-                # Verify that it is non-empty
-                ph_key = txt_record.txt['PH']
-                asserts.assert_true(ph_key, "'PH' key is present but has no value.")
-
-                # Verify that it is encoded as a variable-length decimal number in ASCII
-                # text, omitting any leading zeros, and value different than '0'
-                assert_valid_ph_key(ph_key)
-
-            # *** PI KEY ***
-            # If the PI key is present
-            if 'PI' in txt_record.txt:
-                # Verify that it is non-empty
-                pi_key = txt_record.txt['PI']
-                asserts.assert_true(pi_key, "'PI' key is present but has no value.")
-
-                # Verify it is encoded as a valid UTF-8 string
-                # with a maximum length of 128 bytes
-                assert_valid_pi_key(pi_key)
-
+            # Verify that the 'ICD' key has the value of 0 or 1 encoded
+            # as a decimal number in ASCII text ommiting any leading zeros
+            assert_valid_icd_key(icd_key)
         else:
-            logging.info("TXT record NOT required.")
+            # Verify that the 'ICD' TXT key is NOT present
+            asserts.assert_not_in('ICD', txt_record.txt, "'ICD' key must NOT be present.")
+
+        # Set sit_mode = True when:
+        #   - supports_icd is True and supports_lit is False.
+        #   - supports_icd is True and supports_lit is True and ICD == '0'
+        # Set sit_mode = False when:
+        #   - supports_icd is False.
+        #   - supports_icd is True and supports_lit is True and ICD == '1'
+        sit_mode = self.supports_icd and (not self.supports_lit or icd_key == '0')
+        logging.info(f"\n\n\t** sit_mode: {sit_mode}\n")
+
+        # *** SII KEY ***
+        if sit_mode:
+            # Verify that the 'SII' key is present and non-empty if 'sit_mode' is True
+            asserts.assert_in('SII', txt_record.txt, "'SII' key must be present.")
+            sii_key = txt_record.txt['SII']
+            asserts.assert_true(sii_key, "'SII' key is present but has no value.")
+
+            # Verify that the 'SII' key is an unsigned integer with units of milliseconds
+            # encoded as a variable length decimal number in ASCII text, omitting any
+            # leading zeros, and shall not exceed 3600000
+            assert_valid_sii_key(sii_key)
+
+        # *** SAI KEY ***
+        if self.supports_icd:
+            # Verify that the 'SAI' key is present and non-empty if 'supports_icd' is True
+            asserts.assert_in('SAI', txt_record.txt, "'SAI' key must be present.")
+            sai_key = txt_record.txt['SAI']
+            asserts.assert_true(sai_key, "'SAI' key is present but has no value.")
+
+            # Verify that the 'SAI' key is an unsigned integer with units of milliseconds
+            # encoded as a variable length decimal number in ASCII text, omitting any
+            # leading zeros, and shall not exceed 3600000
+            assert_valid_sai_key(sai_key)
+
+        # *** SAT KEY ***
+        # If the 'SAT' key is present:
+        if 'SAT' in txt_record.txt:
+            sat_key = txt_record.txt['SAT']
+
+            # Verify that it is non-empty
+            asserts.assert_true(sat_key, "'SAT' key is present but has no value.")
+
+            # Verify that it is an unsigned integer with units of milliseconds encoded as
+            # a variable length decimal number in ASCII text, omitting any leading zeros,
+            # and shall be less than or equal to 65535
+            assert_valid_sat_key(sat_key)
+
+            # If the 'SAT' key is present and supports_icd is true, verify
+            # that the value is equal to 'active_mode_threshold_ms'
+            if self.supports_icd:
+                asserts.assert_equal(int(sat_key), self.active_mode_threshold_ms,
+                                        f"'SAT' key value ({sat_key}) must be equal to 'active_mode_threshold_ms' ({self.active_mode_threshold_ms})")
+
+        # Verify that the 'SAI' key is present if the 'SAT' key is present
+        asserts.assert_true(
+            'SAT' not in txt_record.txt
+            or 'SAI' in txt_record.txt,
+            "SAI key must be present if SAT key is present."
+        )
+
+        # *** D KEY ***
+        # Verify that the 'D' key is present and non-empty
+        asserts.assert_in('D', txt_record.txt, "'D' key must be present.")
+        d_key = txt_record.txt['D']
+        asserts.assert_true(d_key, "'D' key is present but has no value.")
+
+        # Verify that it is a full 12-bit discriminator encoded as a variable length
+        # decimal number in ASCII text, omitting any leading zeros, and up to 4 digits
+        assert_valid_d_key(d_key)
+
+        # *** VP KEY ***
+        # If the VP key is present
+        if 'VP' in txt_record.txt:
+            # Verify that it is non-empty
+            vp_key = txt_record.txt['VP']
+            asserts.assert_true(vp_key, "'VP' key is present but has no value.")
+
+            # Verify that it contain at least Vendor ID, and if Product ID
+            # is present, both values must be separated by a + sign
+            assert_valid_vp_key(vp_key)
+
+        # *** T KEY ***
+        self.verify_t_key(txt_record)
+
+        # *** CM KEY ***
+        # If the 'CM' key is present
+        if 'CM' in txt_record.txt:
+            # Verify that it is non-empty
+            cm_key = txt_record.txt['CM']
+            asserts.assert_true(cm_key, "'CM' key is present but has no value.")
+
+            # Verify value is a decimal number in ASCII text with allowed values (0, 1, 2, 3)
+            assert_valid_cm_key(cm_key)
+
+            # Verify that the 'CM' key value is equal to the expected value
+            asserts.assert_true(cm_key == expected_cm, f"'CM' key must be '{expected_cm}', got '{cm_key}'")
+        else:
+            # When the 'CM' key is not present, or present and equal to '0', the DUT is in Extended Discovery mode
+            # Verify that the expected 'CM' value is '0' (Extended Discovery mode)
+            asserts.assert_equal(expected_cm, "0",
+                                    "Expected 'CM' key value must be '0' when 'CM' key is not present in the TXT record.")
+
+        # *** DT KEY ***
+        # If the DT key is present
+        if 'DT' in txt_record.txt:
+            # Verify that it is non-empty
+            dt_key = txt_record.txt['DT']
+            asserts.assert_true(dt_key, "'DT' key is present but has no value.")
+
+            # Verify that it contains the device type identifier encoded as a
+            # variable length decimal number in ASCII text without leading zeros
+            assert_valid_dt_key(dt_key)
+
+        # *** DN KEY ***
+        # If the DN key is present
+        if 'DN' in txt_record.txt:
+            # Verify that it is non-empty
+            dn_key = txt_record.txt['DN']
+            asserts.assert_true(dn_key, "'DN' key is present but has no value.")
+
+            # Verify that it is a valid UTF-8 encoded string of maximum length of 32 bytes
+            assert_valid_dn_key(dn_key)
+
+        # *** RI KEY ***
+        # If the RI key is present
+        if 'RI' in txt_record.txt:
+            # Verify that it is non-empty
+            ri_key = txt_record.txt['RI']
+            asserts.assert_true(ri_key, "'RI' key is present but has no value.")
+
+            # Verify that it is encoded as an uppercase string with a maximum length of
+            # 100 chars (each octet encoded as a 2-digit hex number, max 50 octets)
+            assert_valid_ri_key(ri_key)
+
+        # *** PH KEY ***
+        # If the PH key is present
+        if 'PH' in txt_record.txt:
+            # Verify that it is non-empty
+            ph_key = txt_record.txt['PH']
+            asserts.assert_true(ph_key, "'PH' key is present but has no value.")
+
+            # Verify that it is encoded as a variable-length decimal number in ASCII
+            # text, omitting any leading zeros, and value different than '0'
+            assert_valid_ph_key(ph_key)
+
+        # *** PI KEY ***
+        # If the PI key is present
+        if 'PI' in txt_record.txt:
+            # Verify that it is non-empty
+            pi_key = txt_record.txt['PI']
+            asserts.assert_true(pi_key, "'PI' key is present but has no value.")
+
+            # Verify it is encoded as a valid UTF-8 string
+            # with a maximum length of 128 bytes
+            assert_valid_pi_key(pi_key)
 
     def verify_t_key(self, txt_record) -> None:
         # If 'supports_tcp' is False and T key is not present, nothing to check
