@@ -246,8 +246,8 @@ class TC_CC_10_1(MatterBaseTest):
                                          "CurrentY is not greater than or equal to 17000")
 
         self.step("2e")
-        CTtarget = round((ColorTempPhysicalMinMiredsValue + ColorTempPhysicalMaxMiredsValue) / 2)
         if self.pics_guard(self.check_pics("CC.S.F04")):
+            CTtarget = round((ColorTempPhysicalMinMiredsValue + ColorTempPhysicalMaxMiredsValue) / 2)
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, cluster.Commands.MoveToColorTemperature(CTtarget, 0, 1, 1))
             await asyncio.sleep(1)
 
