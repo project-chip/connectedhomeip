@@ -32,6 +32,7 @@
 #include <app/util/ember-strings.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/generic-callbacks.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
@@ -1592,12 +1593,7 @@ DataVersion * emberAfDataVersionStorage(const ConcreteClusterPath & aConcreteClu
 
 DataModel::ProviderChangeListener * emberAfGlobalInteractionModelAttributesChangedListener()
 {
-    auto providerChangeListener = InteractionModelEngine::GetInstance()->GetProviderChangeListener();
-    if (providerChangeListener == std::nullopt)
-    {
-        return nullptr;
-    }
-    return &(providerChangeListener.value().get());
+    return CodegenDataModelProvider::Instance().GetProviderChangeListener();
 }
 
 void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
