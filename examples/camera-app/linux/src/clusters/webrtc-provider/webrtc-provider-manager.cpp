@@ -975,7 +975,9 @@ CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeMa
         ChipLogError(Camera, "WebTransport not found for the sessionId: %u", sessionId);
         return CHIP_ERROR_INTERNAL;
     }
-    std::vector<std::string> localCandidates = transport->GetCandidates();
+
+    const std::vector<ICECandidateInfo> & localCandidates = transport->GetCandidates();
+
     // Build the command
     WebRTCTransportRequestor::Commands::ICECandidates::Type command;
 
@@ -986,9 +988,31 @@ CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeMa
     }
 
     std::vector<ICECandidateStruct> iceCandidateStructList;
-    for (const auto & candidate : localCandidates)
+    for (const auto & candidateInfo : localCandidates)
     {
-        ICECandidateStruct iceCandidate = { CharSpan::fromCharString(candidate.c_str()) };
+        ICECandidateStruct iceCandidate;
+        iceCandidate.candidate = CharSpan(candidateInfo.candidate.data(), candidateInfo.candidate.size());
+
+        // Set SDPMid if available
+        if (!candidateInfo.mid.empty())
+        {
+            iceCandidate.SDPMid.SetNonNull(CharSpan(candidateInfo.mid.data(), candidateInfo.mid.size()));
+        }
+        else
+        {
+            iceCandidate.SDPMid.SetNull();
+        }
+
+        // Set SDPMLineIndex if valid
+        if (candidateInfo.mlineIndex >= 0)
+        {
+            iceCandidate.SDPMLineIndex.SetNonNull(static_cast<uint16_t>(candidateInfo.mlineIndex));
+        }
+        else
+        {
+            iceCandidate.SDPMLineIndex.SetNull();
+        }
+
         iceCandidateStructList.push_back(iceCandidate);
     }
 
