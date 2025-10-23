@@ -3640,8 +3640,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // clearing the ones associated with our fabric index is good enough and
         // we don't need to worry about ExpireAllSessionsOnLogicalFabric.
         mSystemState->SessionMgr()->ExpireAllSessions(scopedPeerId);
-
 #if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+        Transport::Type type = proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
+        // cache address if we are connected over TCP or UDP
+        if (type == Transport::Type::kTcp || type == Transport::Type::kUdp)
         {
             // cache the address we are using for PASE as a backup
             ResolveResult result;
@@ -3653,7 +3655,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             Resolver::Instance().CacheNode(peerId, result);
         }
 #endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
-
         CommissioningStageComplete(CHIP_NO_ERROR);
 
         return;
