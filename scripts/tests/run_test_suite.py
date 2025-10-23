@@ -362,7 +362,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             chip_tool_with_python = build_app(None, 'tool', 'chiptool.py')
 
         if chip_tool_with_python:
-            chip_tool_with_python = chip_tool_with_python.wrap_with(('python3'))
+            chip_tool_with_python = chip_tool_with_python.wrap_with(('python3',))
 
     if ble_wifi and sys.platform != "linux":
         raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
