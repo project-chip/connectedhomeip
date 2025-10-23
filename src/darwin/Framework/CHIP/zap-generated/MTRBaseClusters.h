@@ -13985,7 +13985,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command LaunchApp
  *
- * Upon receipt, this SHALL launch the specified app with optional data. The TV Device SHALL launch and bring to foreground the identified application in the command if the application is not already launched and in foreground. The TV Device SHALL update state attribute on the Application Basic cluster of the Endpoint corresponding to the launched application. This command returns a Launch Response.
+ * Upon receipt of this command, the server SHALL launch the application with optional data.
  */
 - (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams * _Nullable)params completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)launchAppWithCompletion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -13993,7 +13993,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command StopApp
  *
- * Upon receipt on a Video Player endpoint this SHALL stop the specified application if it is running.
+ * Upon receipt of this command, the server SHALL stop the application if it is running.
  */
 - (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams * _Nullable)params completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)stopAppWithCompletion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -14001,7 +14001,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command HideApp
  *
- * Upon receipt on a Video Player endpoint this SHALL hide the specified application if it is running and visible.
+ * Upon receipt of this command, the server SHALL hide the application.
  */
 - (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams * _Nullable)params completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)hideAppWithCompletion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion

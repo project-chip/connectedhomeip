@@ -731,31 +731,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::detail::Structs::ApplicationStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("CatalogVendorID", indent + 1, value.catalogVendorID);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CatalogVendorID'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ApplicationID", indent + 1, value.applicationID);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ApplicationID'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::detail::Structs::ErrorStateStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -5538,6 +5513,32 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("CatalogVendorID", indent + 1, value.catalogVendorID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CatalogVendorID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ApplicationID", indent + 1, value.applicationID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ApplicationID'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -5554,6 +5555,31 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Endpoint'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("CatalogVendorID", indent + 1, value.catalogVendorID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CatalogVendorID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ApplicationID", indent + 1, value.applicationID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ApplicationID'");
             return err;
         }
     }
