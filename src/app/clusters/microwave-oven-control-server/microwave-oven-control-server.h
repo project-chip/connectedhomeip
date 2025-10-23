@@ -192,6 +192,7 @@ private:
 protected:
     /**
      * @brief Provides access to the const Instance pointer.
+     * This method is placed in the protected section because it must be called by classes derived from the delegate.
      *
      * @return A const pointer to the Instance object associated with this delegate.
      */
@@ -199,6 +200,7 @@ protected:
 
     /**
      * @brief Provides access to the Instance pointer.
+     * This method is placed in the protected section because it must be called by classes derived from the delegate.
      *
      * @return A pointer to the Instance object associated with this delegate.
      */
