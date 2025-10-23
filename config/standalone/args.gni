@@ -21,3 +21,5 @@ chip_build_tests = false
 pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/setup/constraints.txt" ]
 pw_build_PIP_REQUIREMENTS =
     [ "${chip_root}/scripts/setup/requirements.build.txt" ]
+
+matter_enable_tracing_support = true
