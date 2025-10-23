@@ -296,8 +296,9 @@ void OperationalSessionSetup::UpdateDeviceData(const ResolveResult & result)
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
 
-void OperationalSessionSetup::SetAdditionalBackoffInterval(const Optional<System::Clock::Timeout> & additionalTime)
+void OperationalSessionSetup::SetAdditionalLitBackoffInterval(const Optional<System::Clock::Milliseconds32> & additionalTime)
 {
+    assertChipStackLockedByCurrentThread();
     sAdditionalLitBackoffInterval =
         additionalTime.ValueOr(System::Clock::Milliseconds32(CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL));
 }
@@ -308,15 +309,13 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
 
     if (result.isICDOperatingAsLIT)
     {
-        // When ICD is operating as LIT, we need to adjust the MRP idle retransmission timeout
-        // to accommodate the potentially long sleep periods.
-        // Set the idle retransmission timeout to be the SAI time
-        // This ensures that retransmissions for first message are spaced out enough to
-        // avoid unnecessary retries and potential message congestion.
-        // If not enough, we can consider increasing it further via sAdditionalLitBackoffInterval.
-        // Note: a controller should only try to transmit when the LIT device is known to be in
-        // its Session Active Interval since, in almost all cases, it won't be reachable when its
-        // on Session Idle Interval.
+        // When an ICD operates as a LIT, the SII is missing in mdns advertisement, resulting in
+        // mIdleRetransTimeout being 0, which is not a usable value. Since CASE
+        // is set up for LIT ICDs only when they are active, it is known that
+        // the ICD is in active mode. Therefore, using mActiveRetransTimeout
+        // for the initial message in the exchange is appropriate. If
+        // mActiveRetransTimeout is insufficient, consider increasing it further
+        // using sAdditionalLitBackoffInterval.
         config.mIdleRetransTimeout = config.mActiveRetransTimeout + sAdditionalLitBackoffInterval;
     }
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
