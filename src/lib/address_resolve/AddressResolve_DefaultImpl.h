@@ -28,6 +28,7 @@ namespace AddressResolve {
 namespace Impl {
 
 inline constexpr uint8_t kNodeLookupResultsLen = CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS;
+inline constexpr System::Clock::Timeout kCacheDelayTimeout = System::Clock::Seconds16(5);
 
 enum class NodeLookupResult
 {
@@ -158,10 +159,14 @@ public:
     /// be triggered for this lookup handle
     System::Clock::Timeout NextEventTimeout(System::Clock::Timestamp now);
 
+    /// Check if cache should be used and apply cached result if available
+    bool TryUseCache(System::Clock::Timestamp now, const NodeAddressCache & cache);
+
 private:
     NodeLookupResults mResults;
     NodeLookupRequest mRequest; // active request to process
     System::Clock::Timestamp mRequestStartTime;
+    bool mCacheUsed = false; // tracks if cache has been checked
 };
 
 class Resolver : public ::chip::AddressResolve::Resolver, public Dnssd::OperationalResolveDelegate

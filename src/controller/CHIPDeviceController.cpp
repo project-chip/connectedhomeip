@@ -1680,19 +1680,6 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
         mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(GetFabricId());
     }
 
-#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
-    {
-        // cache the address we are using for PASE as a backup
-        ResolveResult result;
-        result.address           = proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress();
-        result.mrpRemoteConfig   = proxy->GetSecureSession().Value()->GetRemoteMRPConfig();
-        result.supportsTcpClient = result.address.GetTransportType() == Transport::Type::kTcp;
-        result.supportsTcpServer = result.address.GetTransportType() == Transport::Type::kTcp;
-        PeerId peerId(GetFabricId(), proxy->GetDeviceId());
-        Resolver::Instance().CacheNode(peerId, result);
-    }
-#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
-
     return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, csrNonce, AttestationSignature, attestationChallenge,
                                                              dac, pai, &mDeviceNOCChainCallback);
 }
@@ -3653,7 +3640,23 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // clearing the ones associated with our fabric index is good enough and
         // we don't need to worry about ExpireAllSessionsOnLogicalFabric.
         mSystemState->SessionMgr()->ExpireAllSessions(scopedPeerId);
+
+        // CHRIS
+#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+        {
+            // cache the address we are using for PASE as a backup
+            ResolveResult result;
+            result.address           = proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress();
+            result.mrpRemoteConfig   = proxy->GetSecureSession().Value()->GetRemoteMRPConfig();
+            result.supportsTcpClient = result.address.GetTransportType() == Transport::Type::kTcp;
+            result.supportsTcpServer = result.address.GetTransportType() == Transport::Type::kTcp;
+            PeerId peerId(GetCompressedFabricId(), proxy->GetDeviceId());
+            Resolver::Instance().CacheNode(peerId, result);
+        }
+#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+
         CommissioningStageComplete(CHIP_NO_ERROR);
+
         return;
     }
     case CommissioningStage::kFindOperationalForStayActive:

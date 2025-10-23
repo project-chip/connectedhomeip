@@ -35,6 +35,7 @@ void NodeLookupHandle::ResetForLookup(System::Clock::Timestamp now, const NodeLo
     mRequestStartTime = now;
     mRequest          = request;
     mResults          = NodeLookupResults();
+    mCacheUsed        = false;
 }
 
 void NodeLookupHandle::LookupResult(const ResolveResult & result)
@@ -88,6 +89,16 @@ System::Clock::Timeout NodeLookupHandle::NextEventTimeout(System::Clock::Timesta
         return System::Clock::Timeout::zero();
     }
 
+#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+    // Check if we need to trigger cache usage after delay
+    if (!mCacheUsed && elapsed < kCacheDelayTimeout)
+    {
+        auto cacheTimeout = kCacheDelayTimeout - elapsed;
+        auto maxTimeout = mRequest.GetMaxLookupTime() - elapsed;
+        return (cacheTimeout < maxTimeout) ? cacheTimeout : maxTimeout;
+    }
+#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+
     if (elapsed < mRequest.GetMaxLookupTime())
     {
         return mRequest.GetMaxLookupTime() - elapsed;
@@ -96,6 +107,34 @@ System::Clock::Timeout NodeLookupHandle::NextEventTimeout(System::Clock::Timesta
     ChipLogError(Discovery, "Unexpected timeout: lookup should have been cleaned already.");
     return System::Clock::Timeout::zero();
 }
+
+#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+bool NodeLookupHandle::TryUseCache(System::Clock::Timestamp now, const NodeAddressCache & cache)
+{
+    if (mCacheUsed)
+    {
+        return false;
+    }
+
+    const System::Clock::Timestamp elapsed = now - mRequestStartTime;
+    if (elapsed < kCacheDelayTimeout)
+    {
+        return false;
+    }
+
+    ResolveResult result;
+    if (cache.GetCachedNodeAddress(mRequest.GetPeerId(), result) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Discovery, "Using cached address after %lu ms delay", static_cast<unsigned long>(elapsed.count()));
+        LookupResult(result);
+        mCacheUsed = true;
+        return true;
+    }
+
+    mCacheUsed = true; // Mark as tried even if no cache entry found
+    return false;
+}
+#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 
 NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
 {
@@ -210,15 +249,6 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
     mActiveLookups.PushBack(&handle);
     ReArmTimer();
     ChipLogProgress(Discovery, "Lookup started for " ChipLogFormatPeerId, ChipLogValuePeerId(peerId));
-
-#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
-    ResolveResult result;
-    if (mNodeAddressCache.GetCachedNodeAddress(peerId, result) == CHIP_NO_ERROR)
-    {
-        ChipLogProgress(Discovery, "LookupNode seeding with cached value");
-        handle.LookupResult(result);
-    }
-#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 
     return CHIP_NO_ERROR;
 }
@@ -402,6 +432,14 @@ void Resolver::HandleTimer()
     {
         auto current = it;
         it++;
+
+#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+        // Try to use cache after delay if no results yet
+        if (!current->HasLookupResult())
+        {
+            current->TryUseCache(mTimeSource.GetMonotonicTimestamp(), mNodeAddressCache);
+        }
+#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 
         HandleAction(current);
     }
