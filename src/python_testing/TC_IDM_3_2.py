@@ -406,5 +406,6 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             self.skip_step(7)
         """
 
+
 if __name__ == "__main__":
     default_matter_test_main()
