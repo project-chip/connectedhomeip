@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include <app/util/basic-types.h>
 #include <app/clusters/descriptor/descriptor-cluster.h>
+#include <app/util/basic-types.h>
+#include <clusters/Descriptor/Structs.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
-#include <clusters/Descriptor/Structs.h>
 
 #include <string>
 

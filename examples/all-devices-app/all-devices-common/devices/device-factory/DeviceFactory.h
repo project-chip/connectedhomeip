@@ -25,21 +25,23 @@
 
 namespace chip::app {
 
-class DeviceFactory {
+class DeviceFactory
+{
 public:
     using DeviceCreator = std::function<std::unique_ptr<Device>()>;
 
-    static DeviceFactory & GetInstance() {
+    static DeviceFactory & GetInstance()
+    {
         static DeviceFactory instance;
         return instance;
     }
 
-    bool IsValidDevice(const std::string& deviceTypeArg){
-        return mRegistry.find(deviceTypeArg) != mRegistry.end();
-    }
+    bool IsValidDevice(const std::string & deviceTypeArg) { return mRegistry.find(deviceTypeArg) != mRegistry.end(); }
 
-    std::unique_ptr<Device> Create(const std::string& deviceTypeArg) {
-        if (IsValidDevice(deviceTypeArg)) {
+    std::unique_ptr<Device> Create(const std::string & deviceTypeArg)
+    {
+        if (IsValidDevice(deviceTypeArg))
+        {
             return mRegistry.find(deviceTypeArg)->second();
         }
         return nullptr;
@@ -48,10 +50,11 @@ public:
 private:
     std::map<std::string, DeviceCreator> mRegistry;
 
-    DeviceFactory() {
-        mRegistry["contact-sensor"] = []() { return std::make_unique<ContactSensorDevice>(); };
+    DeviceFactory()
+    {
+        mRegistry["contact-sensor"]      = []() { return std::make_unique<ContactSensorDevice>(); };
         mRegistry["water-leak-detector"] = []() { return std::make_unique<WaterLeakDetectorDevice>(); };
     }
 };
 
-}
+} // namespace chip::app

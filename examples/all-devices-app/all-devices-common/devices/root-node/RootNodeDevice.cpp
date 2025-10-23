@@ -66,11 +66,14 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     mAccessControlCluster.Create();
     ReturnErrorOnFailure(provider.AddCluster(mAccessControlCluster.Registration()));
 
-    mOperationalCredentialsCluster.Create(endpointId, OperationalCredentialsCluster::Context{ .fabricTable     = Server::GetInstance().GetFabricTable(),
-                                                       .failSafeContext = Server::GetInstance().GetFailSafeContext(),
-                                                       .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
-                                                       .dnssdServer     = app::DnssdServer::Instance(),
-                                                       .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager() });
+    mOperationalCredentialsCluster.Create(
+        endpointId,
+        OperationalCredentialsCluster::Context{ .fabricTable     = Server::GetInstance().GetFabricTable(),
+                                                .failSafeContext = Server::GetInstance().GetFailSafeContext(),
+                                                .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
+                                                .dnssdServer     = app::DnssdServer::Instance(),
+                                                .commissioningWindowManager =
+                                                    Server::GetInstance().GetCommissioningWindowManager() });
     ReturnErrorOnFailure(provider.AddCluster(mOperationalCredentialsCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);
@@ -126,8 +129,7 @@ CHIP_ERROR WifiRootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataMod
     ReturnErrorOnFailure(RootNodeDevice::Register(endpointId, provider, parentId));
 
     mWifiDiagnosticsCluster.Create(endpointId, DeviceLayer::GetDiagnosticDataProvider(),
-                                    WiFiDiagnosticsServerLogic::OptionalAttributeSet{},
-                                    BitFlags<WiFiNetworkDiagnostics::Feature>{});
+                                   WiFiDiagnosticsServerLogic::OptionalAttributeSet{}, BitFlags<WiFiNetworkDiagnostics::Feature>{});
     ReturnErrorOnFailure(provider.AddCluster(mWifiDiagnosticsCluster.Registration()));
 
     mNetworkCommissioningCluster.Create(endpointId, mWifiDriver);
@@ -136,7 +138,8 @@ CHIP_ERROR WifiRootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataMod
     return CHIP_NO_ERROR;
 }
 
-void WifiRootNodeDevice::UnRegister(CodeDrivenDataModelProvider & provider) {
+void WifiRootNodeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
+{
     RootNodeDevice::UnRegister(provider);
     if (mNetworkCommissioningCluster.IsConstructed())
     {

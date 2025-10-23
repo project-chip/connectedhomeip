@@ -16,9 +16,9 @@
  */
 #pragma once
 
+#include <app/TimerDelegates.h>
 #include <app/clusters/boolean-state-server/boolean-state-cluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
-#include <app/TimerDelegates.h>
 #include <devices/base-device/Device.h>
 
 namespace chip {
@@ -29,8 +29,10 @@ constexpr DeviceTypeId kWaterLeakDetectorDeviceTypeRevision = 1;
 class WaterLeakDetectorDevice : public Device
 {
 public:
-    WaterLeakDetectorDevice() : Device(Device::DeviceType{ .deviceType = static_cast<DeviceTypeId>(0x0043),
-                                                       .revision   = kWaterLeakDetectorDeviceTypeRevision }) {}
+    WaterLeakDetectorDevice() :
+        Device(
+            Device::DeviceType{ .deviceType = static_cast<DeviceTypeId>(0x0043), .revision = kWaterLeakDetectorDeviceTypeRevision })
+    {}
     ~WaterLeakDetectorDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,

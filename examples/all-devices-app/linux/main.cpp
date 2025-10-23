@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include <DeviceInfoProviderImpl.h>
+#include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/access-control-server/access-control-cluster.h>
@@ -34,19 +36,17 @@
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <data-model-providers/codedriven/endpoint/SpanEndpoint.h>
+#include <devices/contact-sensor/ContactSensorDevice.h>
+#include <devices/device-factory/DeviceFactory.h>
+#include <devices/root-node/RootNodeDevice.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemLayer.h>
-#include <devices/device-factory/DeviceFactory.h>
-#include <devices/contact-sensor/ContactSensorDevice.h>
-#include <devices/root-node/RootNodeDevice.h>
-#include <DeviceInfoProviderImpl.h>
-#include <LinuxCommissionableDataProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <AppMain.h>
 #include <map>
@@ -71,7 +71,7 @@ LinuxCommissionableDataProvider gCommissionableDataProvider;
 
 // App custom argument handling
 constexpr uint16_t kOptionDeviceType = 0xffd0;
-const char * deviceTypeName = "contact-sensor"; //defaulting to contact sensor if not specified
+const char * deviceTypeName          = "contact-sensor"; // defaulting to contact sensor if not specified
 
 chip::ArgParser::OptionDef sAllDevicesAppOptionDefs[] = {
     { "device", chip::ArgParser::kArgumentRequired, kOptionDeviceType },

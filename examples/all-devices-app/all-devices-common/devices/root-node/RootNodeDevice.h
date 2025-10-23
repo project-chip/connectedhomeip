@@ -16,14 +16,14 @@
  */
 #pragma once
 
-#include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/clusters/operational-credentials-server/operational-credentials-cluster.h>
 #include <app/clusters/access-control-server/access-control-cluster.h>
 #include <app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/clusters/group-key-mgmt-server/group-key-mgmt-cluster.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/clusters/operational-credentials-server/operational-credentials-cluster.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
@@ -58,20 +58,21 @@ private:
     LazyRegisteredServerCluster<Clusters::OperationalCredentialsCluster> mOperationalCredentialsCluster;
 };
 
-class WifiRootNodeDevice : public RootNodeDevice {
+class WifiRootNodeDevice : public RootNodeDevice
+{
 public:
-    WifiRootNodeDevice(DeviceLayer::NetworkCommissioning::WiFiDriver *wifiDriver) : RootNodeDevice(), mWifiDriver(wifiDriver)
-    {}
+    WifiRootNodeDevice(DeviceLayer::NetworkCommissioning::WiFiDriver * wifiDriver) : RootNodeDevice(), mWifiDriver(wifiDriver) {}
 
     ~WifiRootNodeDevice() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
     void UnRegister(CodeDrivenDataModelProvider & provider) override;
+
 private:
     LazyRegisteredServerCluster<Clusters::NetworkCommissioningCluster> mNetworkCommissioningCluster;
     LazyRegisteredServerCluster<Clusters::WiFiDiagnosticsServerCluster> mWifiDiagnosticsCluster;
-    DeviceLayer::NetworkCommissioning::WiFiDriver *mWifiDriver;
+    DeviceLayer::NetworkCommissioning::WiFiDriver * mWifiDriver;
 };
 
 } // namespace app
