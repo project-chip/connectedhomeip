@@ -1061,13 +1061,17 @@ def WriteAttributes(future: Future, eventLoop, device,
     return res
 
 
-def TestOnlyWriteAttributeTimedRequestFlagWithNoTimedAction(future: Future, eventLoop, device,
-                                                            attributes: List[AttributeWriteRequest],
-                                                            interactionTimeoutMs: Union[None, int] = None,
-                                                            busyWaitMs: Union[None, int] = None) -> PyChipError:
+def TestOnlyWriteAttributeWithMismatchedTimedRequestField(future: Future, eventLoop, device,
+                                                          attributes: List[AttributeWriteRequest],
+                                                          timedRequestTimeoutMs: int,
+                                                          timedRequestFieldValue: bool,
+                                                          interactionTimeoutMs: Union[None, int] = None,
+                                                          busyWaitMs: Union[None, int] = None) -> PyChipError:
     ''' 
-    ONLY TO BE USED FOR TEST: Writes attributes with TimedRequest flag but no TimedAction transaction
-    This should result in TIMED_REQUEST_MISMATCH error.
+    ONLY TO BE USED FOR TEST: Writes attributes with decoupled Timed Request action and TimedRequest field.
+    This allows testing TIMED_REQUEST_MISMATCH scenarios:
+    - timedRequestTimeoutMs=0, timedRequestFieldValue=True: No action, but field=true (MISMATCH)
+    - timedRequestTimeoutMs>0, timedRequestFieldValue=False: Action sent, but field=false (MISMATCH)
     '''
     handle = GetLibraryHandle()
 
@@ -1079,43 +1083,12 @@ def TestOnlyWriteAttributeTimedRequestFlagWithNoTimedAction(future: Future, even
     transaction = AsyncWriteTransaction(future, eventLoop)
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
 
-    # Call the TestOnly C++ function that sets TimedRequest=True but no timed transaction
+    # Call the TestOnly C++ function that decouples action and field
     res = builtins.chipStack.Call(
-        lambda: handle.pychip_WriteClient_TestOnlyWriteAttributesTimedRequestNoTimedAction(
-            ctypes.py_object(transaction), device,
-            ctypes.c_size_t(0 if interactionTimeoutMs is None else interactionTimeoutMs),
-            ctypes.c_size_t(0 if busyWaitMs is None else busyWaitMs),
-            pyWriteAttributes, ctypes.c_size_t(numberOfAttributes))
-    )
-    if not res.is_success:
-        ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
-    return res
-
-
-def TestOnlyWriteAttributeTimedActionNoTimedRequestFlag(future: Future, eventLoop, device,
-                                                        attributes: List[AttributeWriteRequest],
-                                                        timedRequestTimeoutMs: int,
-                                                        interactionTimeoutMs: Union[None, int] = None,
-                                                        busyWaitMs: Union[None, int] = None) -> PyChipError:
-    ''' 
-    ONLY TO BE USED FOR TEST: Writes attributes with Timed Action performed but TimedRequest flag set to false.
-    This should result in TIMED_REQUEST_MISMATCH error.
-    '''
-    handle = GetLibraryHandle()
-
-    # Note: We skip the timed write check here to allow testing the TIMED_REQUEST_MISMATCH scenario
-    # In normal WriteAttributes, this would check for must_use_timed_write
-    pyWriteAttributes, numberOfAttributes = _prepare_write_attributes_data(
-        attributes, must_use_timed_write_check=False)
-
-    transaction = AsyncWriteTransaction(future, eventLoop)
-    ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
-
-    # Call the TestOnly C++ function that performs TimedRequest action but sets flag=False
-    res = builtins.chipStack.Call(
-        lambda: handle.pychip_WriteClient_TestOnlyWriteAttributesTimedActionNoTimedRequestFlag(
+        lambda: handle.pychip_WriteClient_TestOnlyWriteAttributesWithMismatchedTimedRequestField(
             ctypes.py_object(transaction), device,
             ctypes.c_size_t(timedRequestTimeoutMs),
+            ctypes.c_bool(timedRequestFieldValue),
             ctypes.c_size_t(0 if interactionTimeoutMs is None else interactionTimeoutMs),
             ctypes.c_size_t(0 if busyWaitMs is None else busyWaitMs),
             pyWriteAttributes, ctypes.c_size_t(numberOfAttributes))
@@ -1295,12 +1268,9 @@ def Init():
 
         handle.pychip_WriteClient_WriteAttributes.restype = PyChipError
         handle.pychip_WriteClient_WriteGroupAttributes.restype = PyChipError
-        handle.pychip_WriteClient_TestOnlyWriteAttributesTimedRequestNoTimedAction.restype = PyChipError
-        handle.pychip_WriteClient_TestOnlyWriteAttributesTimedRequestNoTimedAction.argtypes = [py_object, c_void_p,
-                                                                                               c_size_t, c_size_t, POINTER(PyWriteAttributeData), c_size_t]
-        handle.pychip_WriteClient_TestOnlyWriteAttributesTimedActionNoTimedRequestFlag.restype = PyChipError
-        handle.pychip_WriteClient_TestOnlyWriteAttributesTimedActionNoTimedRequestFlag.argtypes = [py_object, c_void_p,
-                                                                                                   c_size_t, c_size_t, c_size_t, POINTER(PyWriteAttributeData), c_size_t]
+        handle.pychip_WriteClient_TestOnlyWriteAttributesWithMismatchedTimedRequestField.restype = PyChipError
+        handle.pychip_WriteClient_TestOnlyWriteAttributesWithMismatchedTimedRequestField.argtypes = [py_object, c_void_p,
+                                                                                                     c_size_t, c_bool, c_size_t, c_size_t, POINTER(PyWriteAttributeData), c_size_t]
 
         # Both WriteAttributes and WriteGroupAttributes are variadic functions. As per ctype documentation
         # https://docs.python.org/3/library/ctypes.html#calling-varadic-functions, it is critical that we

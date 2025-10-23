@@ -72,8 +72,8 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
                 cluster_type_enum = global_attribute_ids.cluster_id_type(cluster_id)
                 # If debugging, please uncomment the following line to add Unit Testing clusters to the search and comment out the line below it.
-                # if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard and cluster_type_enum != global_attribute_ids.ClusterIdType.kTest:
-                if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard:
+                if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard and cluster_type_enum != global_attribute_ids.ClusterIdType.kTest:
+                # if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard:
                     continue
 
                 for attr_type in cluster_data:
@@ -381,8 +381,10 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             # Thanks to Cecille for the guidance on the test step logic and plumbing for this to function below.
             logging.info("Writing with TimedRequest flag but no timed transaction should return TIMED_REQUEST_MISMATCH")
             try:
-                await self.default_controller.TestOnlyWriteAttributeTimedRequestFlagWithNoTimedAction(
+                await self.default_controller.TestOnlyWriteAttributeWithMismatchedTimedRequestField(
                     self.dut_node_id,
+                    timedRequestTimeoutMs=0,  # No timed action
+                    timedRequestFieldValue=True,  # But field=true
                     attributes=[(endpoint_id, timed_attr(False))]
                 )
                 asserts.fail("The write request should be rejected due to InteractionModelError: TimedRequestMismatch (0xc9).")
@@ -393,9 +395,10 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             # TIMED_REQUEST_MISMATCH - Writing with timed action performed but TimedRequest flag set to false
             logging.info("Writing with timed action but TimedRequest flag=false should return TIMED_REQUEST_MISMATCH")
             try:
-                await self.default_controller.TestOnlyWriteAttributeTimedActionNoTimedRequestFlag(
+                await self.default_controller.TestOnlyWriteAttributeWithMismatchedTimedRequestField(
                     self.dut_node_id,
-                    timedRequestTimeoutMs=1000,
+                    timedRequestTimeoutMs=1000,  # Timed action performed
+                    timedRequestFieldValue=False,  # But field=false
                     attributes=[(endpoint_id, timed_attr(False))]
                 )
                 asserts.fail("The write request should be rejected due to InteractionModelError: TimedRequestMismatch (0xc9).")

@@ -144,9 +144,13 @@ public:
         assertChipStackLockedByCurrentThread();
     }
 
+    // Tag type to distinguish the test constructor from the normal constructor
+    struct TestOnlyOverrideTimedRequestFieldTag
+    {
+    };
+
     /**
-     * TestOnly constructor that allows setting the TimedRequest field in the WriteRequest without performing
-     * a Timed Request action (i.e., without actually sending a TimedRequest message first).
+     * TestOnly constructor that decouples the Timed Request action from the TimedRequest field value.
      *
      * IMPORTANT: Understanding the distinction between two concepts:
      * 1. TIMED REQUEST ACTION: A preceding TimedRequest protocol message sent before the actual Write Request.
@@ -161,41 +165,16 @@ public:
      *   - A Timed Request action is sent (controlled by mTimedWriteTimeoutMs)
      *   - The TimedRequest field in WriteRequest is set to true (mTimedRequestFieldValue = true)
      *
-     * This test constructor allows you to decouple these for testing edge cases:
-     *   - aTimedRequestFieldValue = false: No Timed Request action AND TimedRequest field is false (normal non-timed write)
-     *   - aTimedRequestFieldValue = true:  No Timed Request action BUT TimedRequest field is true
-     *                            (This is invalid behavior that should be rejected by the server, used for negative testing)
+     * This test constructor allows you to decouple these for testing all edge cases:
      *
-     * @param[in] aTimedRequestFieldValue If true, sets the TimedRequest field in WriteRequest to true without actually
-     *                          performing a Timed Request action. This creates a mismatch that should be rejected
-     *                          by a compliant server.
-     */
-    WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, bool aTimedRequestFieldValue) :
-        mpExchangeMgr(apExchangeMgr), mExchangeCtx(*this), mpCallback(apCallback), mTimedRequestFieldValue(aTimedRequestFieldValue)
-    {
-        assertChipStackLockedByCurrentThread();
-    }
-
-    // Tag type to distinguish the test constructor from the normal constructor
-    struct TestOnlyOverrideTimedRequestFieldTag
-    {
-    };
-
-    /**
-     * TestOnly constructor that allows performing a Timed Request action while setting the TimedRequest field
-     * in the WriteRequest to false (i.e., sending a TimedRequest message first, but then lying about it in the WriteRequest).
+     * Test scenarios enabled by this constructor:
+     * 1. Normal write (both false):              Action = No,  Field = False  [aTimedWriteTimeoutMs = Missing, aTimedRequestFieldValue = false]
+     * 2. Normal timed write (both true):         Action = Yes, Field = True   [aTimedWriteTimeoutMs = value, aTimedRequestFieldValue = true]
+     * 3. Field true, no action (invalid):        Action = No,  Field = True   [aTimedWriteTimeoutMs = Missing, aTimedRequestFieldValue = true]
+     * 4. Action present, field false (invalid):  Action = Yes, Field = False  [aTimedWriteTimeoutMs = value, aTimedRequestFieldValue = false]
      *
-     * This tests the third edge case: Timed Request action IS performed, but the TimedRequest field is set to false.
-     *
-     * Test scenarios enabled by WriteClient constructors:
-     * 1. Normal write (both false):              Action = No,  Field = False  [Standard constructor with no timeout]
-     * 2. Normal timed write (both true):         Action = Yes, Field = True   [Standard constructor with timeout]
-     * 3. Field true, no action (invalid):        Action = No,  Field = True   [Test constructor taking bool
-     * aTimedRequestFieldValue]
-     * 4. Action present, field false (invalid):  Action = Yes, Field = False  [THIS constructor]
-     *
-     * @param[in] aTimedWriteTimeoutMs The timeout for the Timed Request action (WILL be sent)
-     * @param[in] aTimedRequestFieldValue If false, the TimedRequest field in WriteRequest will be false despite the action
+     * @param[in] aTimedWriteTimeoutMs The timeout for the Timed Request action (if provided, action WILL be sent)
+     * @param[in] aTimedRequestFieldValue The value of the TimedRequest field in WriteRequest (can mismatch the action for testing)
      */
     WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                 bool aTimedRequestFieldValue, TestOnlyOverrideTimedRequestFieldTag) :
