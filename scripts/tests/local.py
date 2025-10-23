@@ -802,7 +802,8 @@ def gen_coverage(flat):
     "--override-binary-path",
     default=None,
     nargs=2,
-    help="Defines an override binary path for a given app. E.g. --override-binary-path ALL_CLUSTERS_APP out/some/path/chip-all-clusters-app"
+    multiple=True,
+    help="Defines an override binary path for a given app. Can be used multiple times. E.g. --override-binary-path ALL_CLUSTERS_APP out/some/path/chip-all-clusters-app"
 )
 @click.option(
     "--app-filter",
@@ -846,9 +847,7 @@ def python_tests(
         return _maybe_with_runner(os.path.basename(path), path, runner)
 
     # create an env file
-    override_binaries = {}
-    if override_binary_path:
-        override_binaries[override_binary_path[0]] = override_binary_path[1]
+    override_binaries = dict(override_binary_path or [])
 
     with open("./out/test_env.yaml", "wt") as f:
         for target in _get_targets(coverage):
