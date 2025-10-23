@@ -1132,6 +1132,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedAccessControlClusterAuxiliaryACLAttributeCallback implements ChipClusters.AccessControlCluster.AuxiliaryACLAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.AccessControlClusterAccessControlEntryStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.AccessControlClusterAccessControlEntryStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedAccessControlClusterGeneratedCommandListAttributeCallback implements ChipClusters.AccessControlCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
