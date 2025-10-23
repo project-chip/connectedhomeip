@@ -374,7 +374,7 @@ class TC_ACL_2_3(MatterBaseTest):
         ]
         return steps
 
-    @async_test_body
+    @run_if_endpoint_matches(has_attribute(Clusters.AccessControl.Attributes.Extension))
     async def test_TC_ACL_2_3(self):
         await self.internal_test_TC_ACL_2_3(force_legacy_encoding=False)
         self.current_step_index = 0

@@ -123,7 +123,7 @@ class TC_ACL_2_7(MatterBaseTest):
         ]
         return steps
 
-    @async_test_body
+    @run_if_endpoint_matches(has_attribute(Clusters.AccessControl.Attributes.Extension))
     async def test_TC_ACL_2_7(self):
         self.step(1)
         self.th1 = self.default_controller
