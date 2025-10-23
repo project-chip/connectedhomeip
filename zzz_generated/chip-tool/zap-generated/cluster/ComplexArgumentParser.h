@@ -708,6 +708,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ApplicationLaun
 
 static void Finalize(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentControl::Structs::TimePeriodStruct::Type & request,
                         Json::Value & value);
 
