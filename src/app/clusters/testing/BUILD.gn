@@ -23,6 +23,7 @@ source_set("testing") {
     "CommandTesting.cpp",
     "CommandTesting.h",
     "TestReadWriteAttribute.h",
+    "ClusterTester.h",
   ]
 
   public_deps = [
