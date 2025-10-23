@@ -29,10 +29,8 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitLocalization;
 using namespace chip::app::Clusters::UnitLocalization::Attributes;
 
-UnitLocalizationCluster::UnitLocalizationCluster(EndpointId endpointId, BitFlags<UnitLocalization::Feature> feature,
-                                                 UnitLocalizationCluster::MigrationCallback * mclb) :
-    DefaultServerCluster({ endpointId, UnitLocalization::Id }),
-    mFeatures{ feature }, mCallback{ mclb }
+UnitLocalizationCluster::UnitLocalizationCluster(EndpointId endpointId, BitFlags<UnitLocalization::Feature> feature) :
+    DefaultServerCluster({ endpointId, UnitLocalization::Id }), mFeatures{ feature }
 {}
 
 CHIP_ERROR UnitLocalizationCluster::SetSupportedTemperatureUnits(DataModel::List<TempUnitEnum> & units)
@@ -54,11 +52,6 @@ CHIP_ERROR UnitLocalizationCluster::SetSupportedTemperatureUnits(DataModel::List
 CHIP_ERROR UnitLocalizationCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-
-    if (mCallback != nullptr)
-    {
-        mCallback(mPath, context);
-    }
 
     AttributePersistence attrPersistence{ context.attributeStorage };
 
@@ -126,4 +119,16 @@ DataModel::ActionReturnStatus UnitLocalizationCluster::ReadAttribute(const DataM
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
+}
+
+UnitLocalizationClusterWithMigration::UnitLocalizationClusterWithMigration(EndpointId endpointId,
+                                                                           BitFlags<UnitLocalization::Feature> feature) :
+    UnitLocalizationCluster(endpointId, feature)
+{}
+
+CHIP_ERROR UnitLocalizationClusterWithMigration::Startup(ServerClusterContext & context)
+{
+    static constexpr AttributeId attributesToUpdate[] = { UnitLocalization::Attributes::TemperatureUnit::Id };
+    MigrateFromSafeAttributePersistenceProvider(mPath, Span(attributesToUpdate), context.storage);
+    UnitLocalizationCluster::Startup(context);
 }

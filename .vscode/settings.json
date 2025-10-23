@@ -199,5 +199,6 @@
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8"
     },
-    "autopep8.args": ["--max-line-length", "132"]
+    "autopep8.args": ["--max-line-length", "132"],
+    "clang-format.executable": "/usr/local/google/home/torresguzman/dev/connectedhomeip/.environment/cipd/packages/pigweed/bin/clang-format"
 }
