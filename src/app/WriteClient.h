@@ -168,10 +168,14 @@ public:
      * This test constructor allows you to decouple these for testing all edge cases:
      *
      * Test scenarios enabled by this constructor:
-     * 1. Normal write (both false):              Action = No,  Field = False  [aTimedWriteTimeoutMs = Missing, aTimedRequestFieldValue = false]
-     * 2. Normal timed write (both true):         Action = Yes, Field = True   [aTimedWriteTimeoutMs = value, aTimedRequestFieldValue = true]
-     * 3. Field true, no action (invalid):        Action = No,  Field = True   [aTimedWriteTimeoutMs = Missing, aTimedRequestFieldValue = true]
-     * 4. Action present, field false (invalid):  Action = Yes, Field = False  [aTimedWriteTimeoutMs = value, aTimedRequestFieldValue = false]
+     * 1. Normal write (both false):              Action = No,  Field = False  [aTimedWriteTimeoutMs = Missing,
+     * aTimedRequestFieldValue = false]
+     * 2. Normal timed write (both true):         Action = Yes, Field = True   [aTimedWriteTimeoutMs = value,
+     * aTimedRequestFieldValue = true]
+     * 3. Field true, no action (invalid):        Action = No,  Field = True   [aTimedWriteTimeoutMs = Missing,
+     * aTimedRequestFieldValue = true]
+     * 4. Action present, field false (invalid):  Action = Yes, Field = False  [aTimedWriteTimeoutMs = value,
+     * aTimedRequestFieldValue = false]
      *
      * @param[in] aTimedWriteTimeoutMs The timeout for the Timed Request action (if provided, action WILL be sent)
      * @param[in] aTimedRequestFieldValue The value of the TimedRequest field in WriteRequest (can mismatch the action for testing)

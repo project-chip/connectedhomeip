@@ -469,8 +469,8 @@ PyChipError pychip_WriteClient_TestOnlyWriteAttributesWithMismatchedTimedRequest
     // - timedWriteTimeoutMs > 0, timedRequestFieldValue = false: Action sent, but field=false (TIMED_REQUEST_MISMATCH)
     std::unique_ptr<WriteClient> client = std::make_unique<WriteClient>(
         app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback->GetChunkedCallback(),
-        timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing(),
-        timedRequestFieldValue, WriteClient::TestOnlyOverrideTimedRequestFieldTag{});
+        timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing(), timedRequestFieldValue,
+        WriteClient::TestOnlyOverrideTimedRequestFieldTag{});
 
     VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
 
