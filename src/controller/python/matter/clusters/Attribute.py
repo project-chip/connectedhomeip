@@ -1010,38 +1010,34 @@ def _OnWriteDoneCallback(closure):
     closure.handleDone()
 
 
-def _prepare_write_attributes_data(attributes: List[AttributeWriteRequest], must_use_timed_write_check: bool = True, timedRequestTimeoutMs: Union[None, int] = None) -> Tuple[ctypes.Array[PyWriteAttributeData], int]:
-    """Helper function to prepare PyWriteAttributeData array from AttributeWriteRequest list."""
+def WriteAttributes(future: Future, eventLoop, device,
+                    attributes: List[AttributeWriteRequest], suppressResponse: bool = False, timedRequestTimeoutMs: Union[None, int] = None,
+                    interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None, forceLegacyListEncoding: bool = False) -> PyChipError:
+    handle = GetLibraryHandle()
+
     numberOfAttributes = len(attributes)
     pyWriteAttributesArrayType = PyWriteAttributeData * numberOfAttributes
     pyWriteAttributes = pyWriteAttributesArrayType()
-
     for idx, attr in enumerate(attributes):
-        if must_use_timed_write_check and attr.Attribute.must_use_timed_write and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
+        if attr.Attribute.must_use_timed_write and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
             raise InteractionModelError(
                 InteractionModelStatus.NeedsTimedInteraction)
 
         tlv = attr.Attribute.ToTLV(None, attr.Data)
 
-        pyWriteAttributes[idx].attributePath.endpointId = c_uint16(attr.EndpointId)
-        pyWriteAttributes[idx].attributePath.clusterId = c_uint32(attr.Attribute.cluster_id)
-        pyWriteAttributes[idx].attributePath.attributeId = c_uint32(attr.Attribute.attribute_id)
-        pyWriteAttributes[idx].attributePath.dataVersion = c_uint32(attr.DataVersion)
-        pyWriteAttributes[idx].attributePath.hasDataVersion = c_uint8(attr.HasDataVersion)
-        pyWriteAttributes[idx].tlvData = cast(ctypes.c_char_p(bytes(tlv)), c_void_p)
+        pyWriteAttributes[idx].attributePath.endpointId = c_uint16(
+            attr.EndpointId)
+        pyWriteAttributes[idx].attributePath.clusterId = c_uint32(
+            attr.Attribute.cluster_id)
+        pyWriteAttributes[idx].attributePath.attributeId = c_uint32(
+            attr.Attribute.attribute_id)
+        pyWriteAttributes[idx].attributePath.dataVersion = c_uint32(
+            attr.DataVersion)
+        pyWriteAttributes[idx].attributePath.hasDataVersion = c_uint8(
+            attr.HasDataVersion)
+        pyWriteAttributes[idx].tlvData = cast(
+            ctypes.c_char_p(bytes(tlv)), c_void_p)
         pyWriteAttributes[idx].tlvLength = c_size_t(len(tlv))
-
-    return pyWriteAttributes, numberOfAttributes
-
-
-def WriteAttributes(future: Future, eventLoop, device,
-                    attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: Union[None, int] = None,
-                    interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None,
-                    suppressResponse: bool = False, forceLegacyListEncoding: bool = False) -> PyChipError:
-    handle = GetLibraryHandle()
-
-    pyWriteAttributes, numberOfAttributes = _prepare_write_attributes_data(
-        attributes, must_use_timed_write_check=True, timedRequestTimeoutMs=timedRequestTimeoutMs)
 
     transaction = AsyncWriteTransaction(future, eventLoop)
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
@@ -1054,71 +1050,7 @@ def WriteAttributes(future: Future, eventLoop, device,
                 0 if interactionTimeoutMs is None else interactionTimeoutMs),
             ctypes.c_size_t(0 if busyWaitMs is None else busyWaitMs),
             pyWriteAttributes, ctypes.c_size_t(numberOfAttributes),
-            ctypes.c_bool(suppressResponse), ctypes.c_bool(forceLegacyListEncoding))
-    )
-    if not res.is_success:
-        ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
-    return res
-
-
-def TestOnlyWriteAttributeTimedRequestFlagWithNoTimedAction(future: Future, eventLoop, device,
-                                                            attributes: List[AttributeWriteRequest],
-                                                            interactionTimeoutMs: Union[None, int] = None,
-                                                            busyWaitMs: Union[None, int] = None) -> PyChipError:
-    ''' 
-    ONLY TO BE USED FOR TEST: Writes attributes with TimedRequest flag but no TimedAction transaction
-    This should result in TIMED_REQUEST_MISMATCH error.
-    '''
-    handle = GetLibraryHandle()
-
-    # Note: We skip the timed write check here to allow testing the TIMED_REQUEST_MISMATCH scenario
-    # In normal WriteAttributes, this would check for must_use_timed_write
-    pyWriteAttributes, numberOfAttributes = _prepare_write_attributes_data(
-        attributes, must_use_timed_write_check=False)
-
-    transaction = AsyncWriteTransaction(future, eventLoop)
-    ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
-
-    # Call the TestOnly C++ function that sets TimedRequest=True but no timed transaction
-    res = builtins.chipStack.Call(
-        lambda: handle.pychip_WriteClient_TestOnlyWriteAttributesTimedRequestNoTimedAction(
-            ctypes.py_object(transaction), device,
-            ctypes.c_size_t(0 if interactionTimeoutMs is None else interactionTimeoutMs),
-            ctypes.c_size_t(0 if busyWaitMs is None else busyWaitMs),
-            pyWriteAttributes, ctypes.c_size_t(numberOfAttributes))
-    )
-    if not res.is_success:
-        ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
-    return res
-
-
-def TestOnlyWriteAttributeTimedActionNoTimedRequestFlag(future: Future, eventLoop, device,
-                                                        attributes: List[AttributeWriteRequest],
-                                                        timedRequestTimeoutMs: int,
-                                                        interactionTimeoutMs: Union[None, int] = None,
-                                                        busyWaitMs: Union[None, int] = None) -> PyChipError:
-    ''' 
-    ONLY TO BE USED FOR TEST: Writes attributes with Timed Action performed but TimedRequest flag set to false.
-    This should result in TIMED_REQUEST_MISMATCH error.
-    '''
-    handle = GetLibraryHandle()
-
-    # Note: We skip the timed write check here to allow testing the TIMED_REQUEST_MISMATCH scenario
-    # In normal WriteAttributes, this would check for must_use_timed_write
-    pyWriteAttributes, numberOfAttributes = _prepare_write_attributes_data(
-        attributes, must_use_timed_write_check=False)
-
-    transaction = AsyncWriteTransaction(future, eventLoop)
-    ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
-
-    # Call the TestOnly C++ function that performs TimedRequest action but sets flag=False
-    res = builtins.chipStack.Call(
-        lambda: handle.pychip_WriteClient_TestOnlyWriteAttributesTimedActionNoTimedRequestFlag(
-            ctypes.py_object(transaction), device,
-            ctypes.c_size_t(timedRequestTimeoutMs),
-            ctypes.c_size_t(0 if interactionTimeoutMs is None else interactionTimeoutMs),
-            ctypes.c_size_t(0 if busyWaitMs is None else busyWaitMs),
-            pyWriteAttributes, ctypes.c_size_t(numberOfAttributes))
+            ctypes.c_bool(forceLegacyListEncoding))
     )
     if not res.is_success:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
@@ -1295,12 +1227,6 @@ def Init():
 
         handle.pychip_WriteClient_WriteAttributes.restype = PyChipError
         handle.pychip_WriteClient_WriteGroupAttributes.restype = PyChipError
-        handle.pychip_WriteClient_TestOnlyWriteAttributesTimedRequestNoTimedAction.restype = PyChipError
-        handle.pychip_WriteClient_TestOnlyWriteAttributesTimedRequestNoTimedAction.argtypes = [py_object, c_void_p,
-                                                                                               c_size_t, c_size_t, POINTER(PyWriteAttributeData), c_size_t]
-        handle.pychip_WriteClient_TestOnlyWriteAttributesTimedActionNoTimedRequestFlag.restype = PyChipError
-        handle.pychip_WriteClient_TestOnlyWriteAttributesTimedActionNoTimedRequestFlag.argtypes = [py_object, c_void_p,
-                                                                                                   c_size_t, c_size_t, c_size_t, POINTER(PyWriteAttributeData), c_size_t]
 
         # Both WriteAttributes and WriteGroupAttributes are variadic functions. As per ctype documentation
         # https://docs.python.org/3/library/ctypes.html#calling-varadic-functions, it is critical that we
@@ -1311,7 +1237,7 @@ def Init():
         # time where simply specified the argtypes, because of time constraints. This solution was quicker
         # to fix the crash on ARM64 Apple platforms without a refactor.
         handle.pychip_WriteClient_WriteAttributes.argtypes = [py_object, c_void_p,
-                                                              c_size_t, c_size_t, c_size_t, POINTER(PyWriteAttributeData), c_size_t, c_bool, c_bool]
+                                                              c_size_t, c_size_t, c_size_t, POINTER(PyWriteAttributeData), c_size_t, c_bool]
         handle.pychip_WriteClient_WriteGroupAttributes.argtypes = [
             c_size_t, c_void_p, c_size_t, POINTER(PyWriteAttributeData), c_size_t]
 

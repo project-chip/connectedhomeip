@@ -1604,80 +1604,6 @@ class ChipDeviceControllerBase():
             ), payload).raise_on_error()
         return await future
 
-    def _prepare_write_attribute_requests(self, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]]) -> typing.List[ClusterAttribute.AttributeWriteRequest]:
-        """Helper method to prepare attribute write requests."""
-        attrs = []
-        for v in attributes:
-            if len(v) == 2:
-                attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    v[0], v[1], 0, 0, v[1].value))  # type: ignore[attr-defined]
-            else:
-                attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    v[0], v[1], v[2], 1, v[1].value))
-        return attrs
-
-    async def TestOnlyWriteAttributeTimedRequestFlagWithNoTimedAction(self, nodeid: int,
-                                                                      attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
-                                                                      interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
-                                                                      payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
-        '''
-        ONLY TO BE USED FOR TEST: Write attributes with TimedRequest flag but no TimedAction transaction.
-        This should result in TIMED_REQUEST_MISMATCH error.
-
-        Please see WriteAttribute for description of parameters.
-
-        Returns:
-            [AttributeStatus] (list - one for each path).
-
-        Raises:
-            InteractionModelError on error (expected: TIMED_REQUEST_MISMATCH)
-        '''
-        self.CheckIsActive()
-
-        eventLoop = asyncio.get_running_loop()
-        future = eventLoop.create_future()
-
-        device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
-
-        attrs = self._prepare_write_attribute_requests(attributes)
-
-        ClusterAttribute.TestOnlyWriteAttributeTimedRequestFlagWithNoTimedAction(
-            future, eventLoop, device.deviceProxy, attrs,
-            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
-        return await future
-
-    async def TestOnlyWriteAttributeTimedActionNoTimedRequestFlag(self, nodeid: int,
-                                                                  attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
-                                                                  timedRequestTimeoutMs: int,
-                                                                  interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
-                                                                  payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
-        '''
-        ONLY TO BE USED FOR TEST: Write attributes with Timed Action performed but TimedRequest flag set to false.
-        This should result in TIMED_REQUEST_MISMATCH error.
-
-        Please see WriteAttribute for description of parameters.
-
-        Returns:
-            [AttributeStatus] (list - one for each path).
-
-        Raises:
-            InteractionModelError on error (expected: TIMED_REQUEST_MISMATCH)
-        '''
-        self.CheckIsActive()
-
-        eventLoop = asyncio.get_running_loop()
-        future = eventLoop.create_future()
-
-        device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
-
-        attrs = self._prepare_write_attribute_requests(attributes)
-
-        ClusterAttribute.TestOnlyWriteAttributeTimedActionNoTimedRequestFlag(
-            future, eventLoop, device.deviceProxy, attrs,
-            timedRequestTimeoutMs=timedRequestTimeoutMs,
-            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
-        return await future
-
     async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None,
                           timedRequestTimeoutMs: typing.Optional[int] = None,
                           interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
@@ -1791,7 +1717,7 @@ class ChipDeviceControllerBase():
         attributes: A list of tuples of type (endpoint, cluster-object):
         interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
-        suppressResponse: if True, the controller will set the suppressResponse flag on the write request. Note that handling for suppressResponse is not currently implemented in the SDK thus this flag will have no effect, but should not cause problems on the device. ```
+        suppressResponse: if True, the controller will set the suppressResponse flag on the write request. Note that handling for suppressResponse is not currently implemented on the server side of the SDK thus this flag will have no effect, but should not cause problems on the device. ```
         E.g
             (1, Clusters.UnitTesting.Attributes.XYZAttribute('hello')) -- Write 'hello'
             to the XYZ attribute on the test cluster to endpoint 1
@@ -1826,7 +1752,14 @@ class ChipDeviceControllerBase():
 
         device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
 
-        attrs = self._prepare_write_attribute_requests(attributes)
+        attrs = []
+        for v in attributes:
+            if len(v) == 2:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    v[0], v[1], 0, 0, v[1].value))  # type: ignore[attr-defined]  # 'value' added dynamically to ClusterAttributeDescriptor
+            else:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    v[0], v[1], v[2], 1, v[1].value))
 
         ClusterAttribute.WriteAttributes(
             future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs,

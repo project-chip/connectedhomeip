@@ -331,6 +331,14 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             # TODO: https://github.com/project-chip/matter-test-scripts/issues/693
             logging.info("NodeLabel not found - this may be a non-commissionable device")
 
+        self.skip_step(7)
+        # Skipping Step 7 (Timed Write / Timed Request).
+        # This validation is covered in the main IDM_3_2 PR:
+        #   https://github.com/project-chip/connectedhomeip/pull/41066
+        # SuppressResponse client behavior is currently broken; tracking here:
+        #   https://github.com/project-chip/connectedhomeip/issues/41227
+        # TODO(j-ororke): Re-enable and restore the timed write code here once the SuppressResponse functionality is fixed and approved before merge.
+        """
         endpoint_id, timed_attr = await self.find_timed_write_attribute(self.endpoints)
         if timed_attr:
             self.step(7)
@@ -396,7 +404,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
         else:
             self.skip_step(7)
-
+        """
 
 if __name__ == "__main__":
     default_matter_test_main()
