@@ -664,6 +664,146 @@ TEST_F(TestCHIPArgParser, MissingValueTest_MissingLongOptionValue)
     VerifyArgErrorContains(0, "--run");
 }
 
+TEST_F(TestCHIPArgParser, ParseArgsFromString_Simple)
+{
+    bool res;
+
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, nullptr };
+
+    // clang-format off
+    const char * argStr = "--foo --run run-value -s non-opt-1 non-opt-2";
+    // clang-format on
+
+    ClearCallbackRecords();
+    PrintArgError = HandleArgError;
+
+    res = ParseArgsFromString(__FUNCTION__, argStr, optionSets, HandleNonOptionArgs);
+    ASSERT_TRUE(res) << "ParseArgsFromString() returned false";
+
+    // Expect: 3 option callbacks (--foo, --run, -s) + 1 non-option-args handler + 2 non-option-arg entries
+    ASSERT_EQ(sCallbackRecordCount, 6u) << "Invalid value returned for sCallbackRecordCount";
+
+    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
+    VerifyHandleOptionCallback(1, __FUNCTION__, &sOptionSetB, 1000, "--run", "run-value");
+    VerifyHandleOptionCallback(2, __FUNCTION__, &sOptionSetB, 's', "-s", nullptr);
+
+    VerifyHandleNonOptionArgsCallback(3, __FUNCTION__, 2);
+    VerifyNonOptionArg(4, "non-opt-1");
+    VerifyNonOptionArg(5, "non-opt-2");
+}
+
+TEST_F(TestCHIPArgParser, ParseArgsFromEnvVar_AllOverloads)
+{
+    bool res;
+
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, nullptr };
+
+    // Overload 1: ParseArgsFromEnvVar(progName, varName, optSets[])
+    // Use only options (no non-option args) so the overload without non-opt handler succeeds.
+    ClearCallbackRecords();
+    PrintArgError = HandleArgError;
+    setenv("TEST_ARGS1", "--foo --run run-value -s", 1);
+    res = ParseArgsFromEnvVar(__FUNCTION__, "TEST_ARGS1", optionSets);
+    ASSERT_TRUE(res) << "ParseArgsFromEnvVar() (no non-opt handler) returned false";
+    // Expect 3 option callbacks: --foo, --run, -s
+    ASSERT_EQ(sCallbackRecordCount, 3u) << "Invalid value returned for sCallbackRecordCount (TEST_ARGS1)";
+    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
+    VerifyHandleOptionCallback(1, __FUNCTION__, &sOptionSetB, 1000, "--run", "run-value");
+    VerifyHandleOptionCallback(2, __FUNCTION__, &sOptionSetB, 's', "-s", nullptr);
+    unsetenv("TEST_ARGS1");
+
+    // Overload 2: ParseArgsFromEnvVar(progName, varName, optSets[], nonOptArgHandler)
+    // Include non-option args and supply a handler.
+    ClearCallbackRecords();
+    setenv("TEST_ARGS2", "--foo --run run-value -s non-opt-1 non-opt-2", 1);
+    res = ParseArgsFromEnvVar(__FUNCTION__, "TEST_ARGS2", optionSets, HandleNonOptionArgs);
+    ASSERT_TRUE(res) << "ParseArgsFromEnvVar() (with non-opt handler) returned false";
+    // Expect: 3 option callbacks + 1 non-opt-args handler + 2 non-opt-arg entries = 6
+    ASSERT_EQ(sCallbackRecordCount, 6u) << "Invalid value returned for sCallbackRecordCount (TEST_ARGS2)";
+    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
+    VerifyHandleOptionCallback(1, __FUNCTION__, &sOptionSetB, 1000, "--run", "run-value");
+    VerifyHandleOptionCallback(2, __FUNCTION__, &sOptionSetB, 's', "-s", nullptr);
+    VerifyHandleNonOptionArgsCallback(3, __FUNCTION__, 2);
+    VerifyNonOptionArg(4, "non-opt-1");
+    VerifyNonOptionArg(5, "non-opt-2");
+    unsetenv("TEST_ARGS2");
+
+    // Overload 3: ParseArgsFromEnvVar(progName, varName, optSets[], nonOptArgHandler, ignoreUnknown)
+    // Unknown option -> with ignoreUnknown=true should succeed (silently ignored), with false should fail.
+    ClearCallbackRecords();
+    setenv("TEST_ARGS3", "--this-option-does-not-exist", 1);
+    // ignoreUnknown = true -> should return true and produce no callbacks.
+    res = ParseArgsFromEnvVar(__FUNCTION__, "TEST_ARGS3", optionSets, nullptr, true);
+    ASSERT_TRUE(res) << "ParseArgsFromEnvVar() (ignoreUnknown=true) returned false";
+    ASSERT_EQ(sCallbackRecordCount, 0u) << "Expected no callbacks for ignored unknown option";
+    unsetenv("TEST_ARGS3");
+
+    // Same unknown option with ignoreUnknown = false -> should return false.
+    ClearCallbackRecords();
+    setenv("TEST_ARGS4", "--this-option-does-not-exist", 1);
+    res = ParseArgsFromEnvVar(__FUNCTION__, "TEST_ARGS4", optionSets, nullptr, false);
+    ASSERT_FALSE(res) << "ParseArgsFromEnvVar() (ignoreUnknown=false) returned true for unknown option";
+    unsetenv("TEST_ARGS4");
+}
+
+TEST_F(TestCHIPArgParser, HelpOptions_PrintLongUsage_WithDesc)
+{
+    FILE * f = tmpfile();
+    ASSERT_NE(f, nullptr);
+
+    // Create a HelpOptions instance with a description.
+    chip::ArgParser::HelpOptions helpWithDesc("prog-name", "USAGE: prog-name [opts]", "v1.2.3", "This is a description.");
+    static OptionSet * optionSetsWithDesc[] = { &sOptionSetA, &sOptionSetB, reinterpret_cast<OptionSet *>(&helpWithDesc), nullptr };
+
+    // Print long usage to temporary file and capture output.
+    helpWithDesc.PrintLongUsage(optionSetsWithDesc, f);
+
+    // Read contents.
+    fseek(f, 0, SEEK_END);
+    long sz = ftell(f);
+    ASSERT_GE(sz, 0L);
+    rewind(f);
+    std::string out;
+    out.resize(static_cast<size_t>(sz));
+    size_t n = fread(&out[0], 1, static_cast<size_t>(sz), f);
+    ASSERT_EQ(n, static_cast<size_t>(sz));
+    fclose(f);
+
+    // Verify presence of usage, description and help option text.
+    ASSERT_NE(out.find("USAGE: prog-name [opts]"), std::string::npos);
+    ASSERT_NE(out.find("This is a description."), std::string::npos);
+    ASSERT_NE(out.find("HELP"), std::string::npos);
+}
+
+TEST_F(TestCHIPArgParser, HelpOptions_PrintLongUsage_WithoutDesc)
+{
+    FILE * f = tmpfile();
+    ASSERT_NE(f, nullptr);
+
+    // Create a HelpOptions instance without a description (uses the other constructor).
+    chip::ArgParser::HelpOptions helpNoDesc("prog-name", "USAGE: prog-name [opts]", "v1.2.3");
+    static OptionSet * optionSetsNoDesc[] = { &sOptionSetA, &sOptionSetB, reinterpret_cast<OptionSet *>(&helpNoDesc), nullptr };
+
+    // Print long usage to temporary file and capture output.
+    helpNoDesc.PrintLongUsage(optionSetsNoDesc, f);
+
+    // Read contents.
+    fseek(f, 0, SEEK_END);
+    long sz = ftell(f);
+    ASSERT_GE(sz, 0L);
+    rewind(f);
+    std::string out;
+    out.resize(static_cast<size_t>(sz));
+    size_t n = fread(&out[0], 1, static_cast<size_t>(sz), f);
+    ASSERT_EQ(n, static_cast<size_t>(sz));
+    fclose(f);
+
+    // Verify presence of usage and help option text; description should not be present.
+    EXPECT_NE(out.find("USAGE: prog-name [opts]"), std::string::npos);
+    EXPECT_EQ(out.find("This is a description."), std::string::npos);
+    EXPECT_NE(out.find("HELP"), std::string::npos);
+}
+
 static void ClearCallbackRecords()
 {
     for (size_t i = 0; i < sCallbackRecordCount; i++)
