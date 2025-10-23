@@ -134,7 +134,7 @@ class Application:
         return Application(kind=self.kind, path=self.path, args=self.args + args)
 
     def wrap_with(self, wrapper: tuple[str, ...]):
-        return Application(kind=self.kind, path=self.path, wrapper=wrapper + list(self.wrapper), args=self.args)
+        return Application(kind=self.kind, path=self.path, wrapper=wrapper + self.wrapper, args=self.args)
 
     def to_cmd(self) -> typing.List[str]:
         return list(self.wrapper) + [str(self.path)] + list(self.args)
