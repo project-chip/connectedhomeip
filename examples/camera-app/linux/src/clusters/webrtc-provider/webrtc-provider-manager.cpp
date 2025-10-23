@@ -887,42 +887,45 @@ void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint1
     }
     else
     {
-        WebrtcTransport * transport = GetTransport(sessionId);
-        if (transport == nullptr)
-        {
+        // Schedule cleanup on Matter thread to ensure proper locking when calling RemoveSession
+        DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
+            WebrtcTransport * transport = GetTransport(sessionId);
+            if (transport == nullptr)
+            {
+                ChipLogProgress(Camera,
+                                "Transport not found for session %u during disconnect; session may have already been cleaned up",
+                                sessionId);
+                return;
+            }
 
-            ChipLogProgress(Camera,
-                            "Transport not found for session %u during disconnect; session may have already been cleaned up",
-                            sessionId);
-            return;
-        }
+            // Connection was closed/disconnected by the peer - clean up the session
+            ChipLogProgress(Camera, "Peer connection closed for session %u, cleaning up resources", sessionId);
 
-        // Connection was closed/disconnected by the peer - clean up the session
-        ChipLogProgress(Camera, "Peer connection closed for session %u, cleaning up resources", sessionId);
+            // Release the Video and Audio Streams from the CameraAVStreamManagement
+            // cluster and update the reference counts.
+            ReleaseAudioVideoStreams(sessionId);
 
-        // Release the Video and Audio Streams from the CameraAVStreamManagement
-        // cluster and update the reference counts.
-        ReleaseAudioVideoStreams(sessionId);
+            // Capture args before unregistering in case the transport is invalidated
+            WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
 
-        // Capture args before unregistering in case the transport is invalidated
-        WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
+            // Unregister the transport from the media controller
+            UnregisterWebrtcTransport(sessionId);
 
-        // Unregister the transport from the media controller
-        UnregisterWebrtcTransport(sessionId);
+            // Remove from session maps
+            mSessionIdMap.erase(ScopedNodeId(args.peerNodeId, args.fabricIndex));
 
-        // Remove from session maps
-        mSessionIdMap.erase(ScopedNodeId(args.peerNodeId, args.fabricIndex));
+            // Remove from current sessions list in the WebRTC Transport Provider
+            // This MUST be called on the Matter thread with the stack lock held
+            if (mWebRTCTransportProvider != nullptr)
+            {
+                mWebRTCTransportProvider->RemoveSession(sessionId);
+            }
 
-        // Remove from current sessions list in the WebRTC Transport Provider
-        if (mWebRTCTransportProvider != nullptr)
-        {
-            mWebRTCTransportProvider->RemoveSession(sessionId);
-        }
+            // Finally, remove and destroy the transport
+            mWebrtcTransportMap.erase(sessionId);
 
-        // Finally, remove and destroy the transport
-        mWebrtcTransportMap.erase(sessionId);
-
-        ChipLogProgress(Camera, "Session %u cleanup completed", sessionId);
+            ChipLogProgress(Camera, "Session %u cleanup completed", sessionId);
+        });
     }
 }
 
