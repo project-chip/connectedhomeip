@@ -360,7 +360,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             chip_tool_with_python = build_app(None, 'tool', 'darwinframeworktool.py')
         else:
             chip_tool_with_python = build_app(None, 'tool', 'chiptool.py')
-        
+
         if chip_tool_with_python:
             chip_tool_with_python = chip_tool_with_python.wrap_with(('python3'))
 
