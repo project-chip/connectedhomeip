@@ -190,7 +190,8 @@ public:
      * Test scenarios enabled by WriteClient constructors:
      * 1. Normal write (both false):              Action = No,  Field = False  [Standard constructor with no timeout]
      * 2. Normal timed write (both true):         Action = Yes, Field = True   [Standard constructor with timeout]
-     * 3. Field true, no action (invalid):        Action = No,  Field = True   [Test constructor taking bool aTimedRequestFieldValue]
+     * 3. Field true, no action (invalid):        Action = No,  Field = True   [Test constructor taking bool
+     * aTimedRequestFieldValue]
      * 4. Action present, field false (invalid):  Action = Yes, Field = False  [THIS constructor]
      *
      * @param[in] aTimedWriteTimeoutMs The timeout for the Timed Request action (WILL be sent)

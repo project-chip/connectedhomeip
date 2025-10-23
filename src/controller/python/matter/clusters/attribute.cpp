@@ -511,8 +511,8 @@ PyChipError pychip_WriteClient_TestOnlyWriteAttributesTimedActionNoTimedRequestF
     // This should result in TIMED_REQUEST_MISMATCH error.
     std::unique_ptr<WriteClient> client = std::make_unique<WriteClient>(
         app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback->GetChunkedCallback(),
-        Optional<uint16_t>(timedWriteTimeoutMs),             // Provide timeout (action WILL be sent)
-        false,                                               // But set field to false (lying about the action)
+        Optional<uint16_t>(timedWriteTimeoutMs),              // Provide timeout (action WILL be sent)
+        false,                                                // But set field to false (lying about the action)
         WriteClient::TestOnlyOverrideTimedRequestFieldTag{}); // Tag to select this constructor
 
     VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
