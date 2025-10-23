@@ -35,9 +35,11 @@
 
   <xs:complexType name="AttributeRequirementType">
     <xs:sequence>
+      <xs:element name="default" type="DefaultType" minOccurs="0" maxOccurs="1"></xs:element>
+      <xs:element name="access" type="AccessType" minOccurs="0" maxOccurs="1"></xs:element>
       <xs:element name="quality" type="QualityType" minOccurs="0" maxOccurs="1" />
-      <xs:element name="constraint" type="ConstraintType" minOccurs="0" maxOccurs="1" />
       <xs:group ref="ConformanceSetGroup" minOccurs="0" maxOccurs="1" />
+      <xs:element name="constraint" type="ConstraintType" minOccurs="0" maxOccurs="1" />
     </xs:sequence>
     <xs:attribute name="code" type="xs:string" use="required" />
     <xs:attribute name="name" type="xs:string" use="required" />
@@ -155,7 +157,8 @@
   <xs:complexType name="DeviceTypeType">
     <xs:sequence>
       <xs:element name="revisionHistory" type="RevisionHistoryType" minOccurs="1" maxOccurs="1" />
-      <xs:element name="classification" type="DeviceTypeClassificationType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="classification" type="DeviceTypeClassificationType" minOccurs="0"
+        maxOccurs="1" />
       <xs:element name="conditions" type="ConditionsType" minOccurs="0" maxOccurs="1" />
       <xs:element name="conditionRequirements" type="ConditionRequirementsType" minOccurs="0"
         maxOccurs="1" />
