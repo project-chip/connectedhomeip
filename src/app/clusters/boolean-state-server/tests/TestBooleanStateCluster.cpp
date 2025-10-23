@@ -18,7 +18,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/TestReadWriteAttribute.h>
+#include <app/clusters/testing/ClusterTester.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -44,7 +44,7 @@ struct TestBooleanStateCluster : public ::testing::Test
 
     void TearDown() override { booleanState.Shutdown(); }
 
-    TestBooleanStateCluster() : testContext(), context(testContext.Create()), booleanState(kRootEndpointId) {}
+    TestBooleanStateCluster() : context(testContext.Create()), booleanState(kRootEndpointId) {}
 
     chip::Test::TestServerClusterContext testContext;
     ServerClusterContext context;
@@ -66,14 +66,16 @@ TEST_F(TestBooleanStateCluster, AttributeTest)
 
 TEST_F(TestBooleanStateCluster, ReadAttributeTest)
 {
+    ClusterTester tester(booleanState);
+
     uint16_t revision{};
-    ASSERT_EQ(ReadClusterAttribute(booleanState, Globals::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
 
     uint32_t features{};
-    ASSERT_EQ(ReadClusterAttribute(booleanState, FeatureMap::Id, features), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, features), CHIP_NO_ERROR);
 
     bool stateValue{};
-    ASSERT_EQ(ReadClusterAttribute(booleanState, StateValue::Id, stateValue), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(StateValue::Id, stateValue), CHIP_NO_ERROR);
 }
 
 TEST_F(TestBooleanStateCluster, StateValue)
