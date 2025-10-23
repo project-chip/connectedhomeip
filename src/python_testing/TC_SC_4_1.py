@@ -292,10 +292,10 @@ class TC_SC_4_1(MatterBaseTest):
         # *** IN COMMISSIONING MODE SUBTYPE ***
         # Verify the expected presence of the 'In Commissioning Mode Subtype' _CM
         if extended_discovery:
-            # When in extended discovery mode, verify that the _CM subtype is NOT present
+            # When in Extended Discovery Dode, verify that the _CM subtype is NOT present
             asserts.assert_not_in(cm_subtype, subtypes, f"In Commissioning Mode Subtype '{cm_subtype}' must NOT be present.")
         else:
-            # When NOT in extended discovery mode, verify that the _CM subtype is present
+            # When NOT in Extended Discovery Mode, verify that the _CM subtype is present
             asserts.assert_in(cm_subtype, subtypes, f"In Commissioning Mode Subtype '{cm_subtype}' must be present.")
 
             # TH performs a PTR record query against the 'In Commissioning Mode Subtype'
