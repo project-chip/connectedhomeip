@@ -589,7 +589,7 @@ private:
 
     /**
      * The value of the TimedRequest field in the WriteRequest message.
-     * 
+     *
      * This tells the server whether this write was preceded by a Timed Request action.
      * Normally this matches whether mTimedWriteTimeoutMs has a value, but test constructors
      * can decouple these to test protocol mismatch scenarios.

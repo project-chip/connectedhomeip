@@ -171,7 +171,7 @@ CHIP_ERROR WriteClient::StartNewMessage()
         ReturnErrorOnFailure(FinalizeMessage(true));
     }
 
-    // Per Matter specification: a Write Request that is part of a Timed Write Interaction SHALL NOT be chunked. 
+    // Per Matter specification: a Write Request that is part of a Timed Write Interaction SHALL NOT be chunked.
     VerifyOrReturnError(!(mTimedWriteTimeoutMs.HasValue() && !mChunks.IsNull()), CHIP_ERROR_NO_MEMORY);
 
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
