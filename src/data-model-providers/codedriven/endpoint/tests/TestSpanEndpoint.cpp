@@ -50,7 +50,6 @@ TEST(TestSpanEndpoint, InstantiateWithAllParameters)
     // compare content as well
     EXPECT_EQ(buffer[1].deviceTypeId, deviceTypes[1].deviceTypeId);
     EXPECT_EQ(buffer[1].deviceTypeRevision, deviceTypes[1].deviceTypeRevision);
-
 }
 
 TEST(TestSpanEndpoint, SetAndGetClientClusters)
