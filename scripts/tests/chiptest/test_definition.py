@@ -266,7 +266,7 @@ class ApplicationPaths:
             (
                 # This path varies, however it is a fixed python tool so it may be ok
                 self.chip_tool_with_python_cmd,
-                os.path.basename(self.chip_tool_with_python_cmd.args[-1]),
+                self.chip_tool_with_python_cmd.path.name,
             ),
             (self.rvc_app, "chip-rvc-app"),
             (self.network_manager_app, "matter-network-manager-app"),
@@ -424,7 +424,7 @@ class TestDefinition:
                     if command == target_app:
                         key = 'default'
                     if ble_controller_app is not None:
-                        command.add_args(("--ble-controller", str(ble_controller_app), "--wifi"))
+                        command = command.add_args(("--ble-controller", str(ble_controller_app), "--wifi"))
                     app = App(runner, command)
                     # Add the App to the register immediately, so if it fails during
                     # start() we will be able to clean things up properly.
