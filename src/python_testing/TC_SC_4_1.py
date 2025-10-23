@@ -510,6 +510,9 @@ class TC_SC_4_1(MatterBaseTest):
 
         # *** CM KEY ***
         # If the 'CM' key is present
+        # At this point, we've already established if the DUT is
+        # in Extended Discovery Mode earlier in the code and are
+        # expecting a 'CM' key value of 0 if the key is present
         if 'CM' in txt_record.txt:
             # Verify that it is non-empty
             cm_key = txt_record.txt['CM']
@@ -521,10 +524,11 @@ class TC_SC_4_1(MatterBaseTest):
             # Verify that the 'CM' key value is equal to the expected value
             asserts.assert_true(cm_key == expected_cm, f"'CM' key must be '{expected_cm}', got '{cm_key}'")
         else:
-            # When the 'CM' key is not present, or present but equal to '0', the DUT is in Extended Discovery mode
-            # Verify that the expected 'CM' value is '0' (Extended Discovery mode)
-            asserts.assert_equal(expected_cm, "0",
-                                    "Expected 'CM' key value must be '0' when 'CM' key is not present in the TXT record.")
+            # If the 'CM' key is not present but the expected value was 0, it's
+            # also a valid scenario where the DUT is in Extended Discovery Mode
+            valid_extended_discovery_mode = expected_cm == "0"
+            asserts.assert_true(valid_extended_discovery_mode,
+                                f"When the 'CM' key is not present in the TXT record, the expected 'CM' key value must be '0', got '{expected_cm}'.")
 
         # *** DT KEY ***
         # If the DT key is present
