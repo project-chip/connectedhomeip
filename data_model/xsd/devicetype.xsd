@@ -50,11 +50,24 @@
     </xs:sequence>
   </xs:complexType>
 
+    <xs:complexType name="FieldRequirementType">
+    <xs:sequence>
+      <xs:element name="default" type="DefaultType" minOccurs="0" maxOccurs="1"></xs:element>
+      <xs:element name="access" type="AccessType" minOccurs="0" maxOccurs="1"></xs:element>
+      <xs:element name="quality" type="QualityType" minOccurs="0" maxOccurs="1" />
+      <xs:group ref="ConformanceSetGroup" minOccurs="0" maxOccurs="1" />
+      <xs:element name="constraint" type="ConstraintType" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="code" type="xs:string" use="required" />
+    <xs:attribute name="name" type="xs:string" use="required" />
+  </xs:complexType>
+
   <xs:complexType name="CommandRequirementType">
     <xs:sequence>
       <xs:element name="quality" type="QualityType" minOccurs="0" maxOccurs="1" />
       <xs:element name="constraint" type="ConstraintType" minOccurs="0" maxOccurs="1" />
       <xs:group ref="ConformanceSetGroup" minOccurs="0" maxOccurs="1" />
+      <xs:element name="field" type="FieldRequirementType" minOccurs="0" maxOccurs="unbounded" />
     </xs:sequence>
     <xs:attribute name="id" type="xs:string" use="required" />
     <xs:attribute name="name" type="xs:string" use="required" />
