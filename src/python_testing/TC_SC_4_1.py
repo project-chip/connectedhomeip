@@ -258,7 +258,10 @@ class TC_SC_4_1(MatterBaseTest):
 
         return None
 
-    async def _verify_commissionable_subtypes(self, long_discriminator_ptr_instance_name: str) -> None:
+    async def _verify_commissionable_subtypes(self, long_discriminator_ptr_instance_name: str, extended_discovery: bool = False) -> None:
+        # Construct CM subtype
+        cm_subtype = f"_CM._sub.{MdnsServiceType.COMMISSIONABLE.value}"
+        
         # TH performs a browse for the rest of the 'Commissionable Service' subtypes
         subtypes = await MdnsDiscovery().get_commissionable_subtypes(log_output=True)
 
@@ -287,24 +290,28 @@ class TC_SC_4_1(MatterBaseTest):
                              "'Short Discriminator Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
         # *** IN COMMISSIONING MODE SUBTYPE ***
-        # Verify that the 'In Commissioning Mode Subtype' _CM is present
-        cm_subtype = f"_CM._sub.{MdnsServiceType.COMMISSIONABLE.value}"
-        asserts.assert_in(cm_subtype, subtypes, f"In Commissioning Mode Subtype '{cm_subtype}' must be present.")
+        # Verify the expected presence of the 'In Commissioning Mode Subtype' _CM
+        if extended_discovery:
+            # When in extended discovery mode, verify that the _CM subtype is NOT present
+            asserts.assert_not_in(cm_subtype, subtypes, f"In Commissioning Mode Subtype '{cm_subtype}' must NOT be present.")
+        else:
+            # When NOT in extended discovery mode, verify that the _CM subtype is present
+            asserts.assert_in(cm_subtype, subtypes, f"In Commissioning Mode Subtype '{cm_subtype}' must be present.")
 
-        # TH performs a PTR record query against the 'In Commissioning Mode Subtype'
-        ptr_records = await MdnsDiscovery().get_ptr_records(
-            service_types=[cm_subtype],
-            log_output=True
-        )
+            # TH performs a PTR record query against the 'In Commissioning Mode Subtype'
+            ptr_records = await MdnsDiscovery().get_ptr_records(
+                service_types=[cm_subtype],
+                log_output=True
+            )
 
-        # Verify that there is one, and only one, 'In Commissioning Mode Subtype' PTR record
-        asserts.assert_equal(len(ptr_records), 1, "There must only be one 'In Commissioning Mode Subtype' subtype PTR record.")
-        cm_ptr = ptr_records[0]
+            # Verify that there is one, and only one, 'In Commissioning Mode Subtype' PTR record
+            asserts.assert_equal(len(ptr_records), 1, "There must only be one 'In Commissioning Mode Subtype' subtype PTR record.")
+            cm_ptr = ptr_records[0]
 
-        # Verify that the 'In Commissioning Mode Subtype' PTR record's instance name
-        # is equal to the 'Long Discriminator Subtype' PTR record's instance name
-        asserts.assert_equal(cm_ptr.instance_name, long_discriminator_ptr_instance_name,
-                             "'In Commissioning Mode Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
+            # Verify that the 'In Commissioning Mode Subtype' PTR record's instance name
+            # is equal to the 'Long Discriminator Subtype' PTR record's instance name
+            asserts.assert_equal(cm_ptr.instance_name, long_discriminator_ptr_instance_name,
+                                "'In Commissioning Mode Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
         # *** VENDOR SUBTYPE ***
         # Check for the presence of the 'Vendor Subtype' _V
@@ -514,7 +521,7 @@ class TC_SC_4_1(MatterBaseTest):
             # Verify that the 'CM' key value is equal to the expected value
             asserts.assert_true(cm_key == expected_cm, f"'CM' key must be '{expected_cm}', got '{cm_key}'")
         else:
-            # When the 'CM' key is not present, or present and equal to '0', the DUT is in Extended Discovery mode
+            # When the 'CM' key is not present, or present but equal to '0', the DUT is in Extended Discovery mode
             # Verify that the expected 'CM' value is '0' (Extended Discovery mode)
             asserts.assert_equal(expected_cm, "0",
                                     "Expected 'CM' key value must be '0' when 'CM' key is not present in the TXT record.")
@@ -793,7 +800,7 @@ class TC_SC_4_1(MatterBaseTest):
             # *** STEP 22 ***
             # Verify commissionable subtype advertisements
             self.step(22)
-            await self._verify_commissionable_subtypes(long_discriminator_ptr_instance_name)
+            await self._verify_commissionable_subtypes(long_discriminator_ptr_instance_name, extended_discovery_mode)
 
             # *** STEP 23 ***
             # Verify SRV record advertisements
