@@ -887,7 +887,9 @@ void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint1
     }
     else
     {
-        // Schedule cleanup on Matter thread to ensure proper locking when calling RemoveSession
+        // Schedule cleanup on Matter thread to ensure proper locking when calling RemoveSession.
+        // Safe to capture 'this' by value: WebRTCProviderManager is a member of the global CameraDevice
+        // object which has static storage duration and lives for the entire program lifetime.
         DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
             WebrtcTransport * transport = GetTransport(sessionId);
             if (transport == nullptr)
