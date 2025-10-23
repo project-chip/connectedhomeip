@@ -157,9 +157,7 @@ private:
 };
 
 MockConfigurationManager gMockConfigurationManager;
-// Static member definition
 MockDeviceInstanceInfoProvider gMockDeviceInstanceInfoProvider;
-// Test fixture
 struct TestBasicInformationReadWrite : public ::testing::Test
 {
     static void SetUpTestSuite()
