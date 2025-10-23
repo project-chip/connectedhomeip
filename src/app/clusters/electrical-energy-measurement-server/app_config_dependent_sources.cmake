@@ -17,6 +17,6 @@ TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
     "${CLUSTER_DIR}/EnergyReportingTestEventTriggerHandler.h"
-    "${CLUSTER_DIR}/electrical-energy-measurement-server.cpp"
+    "${CLUSTER_DIR}/ElectricalEnergyMeasurementCluster.cpp.cpp"
     "${CLUSTER_DIR}/electrical-energy-measurement-server.h"
 )
