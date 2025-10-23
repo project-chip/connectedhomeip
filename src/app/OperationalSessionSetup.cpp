@@ -309,7 +309,7 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
 
     if (result.isICDOperatingAsLIT)
     {
-        // When an ICD operates as a LIT, the SII is missing in mdns advertisement, resulting in
+        // When an ICD operates as a LIT, the SII is missing in DNS-SD advertisement, resulting in
         // mIdleRetransTimeout being 0, which is not a usable value. Since CASE
         // is set up for LIT ICDs only when they are active, it is known that
         // the ICD is in active mode. Therefore, using mActiveRetransTimeout
