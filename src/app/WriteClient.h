@@ -129,7 +129,7 @@ public:
                 bool aSuppressResponse = false) :
         mpExchangeMgr(apExchangeMgr),
         mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
-        mSuppressResponse(aSuppressResponse), mForceTimedRequestFlag(aTimedWriteTimeoutMs.HasValue())
+        mSuppressResponse(aSuppressResponse), mTimedRequestFieldValue(aTimedWriteTimeoutMs.HasValue())
     {
         assertChipStackLockedByCurrentThread();
     }
@@ -153,9 +153,9 @@ public:
      *                          This establishes a time window during which the server will accept the write.
      *                          This is controlled by the mTimedWriteTimeoutMs field.
      *
-     * 2. TIMEDREQUEST FLAG: A boolean field in the WriteRequest message itself that indicates whether
+     * 2. TIMEDREQUEST FIELD: A boolean field in the WriteRequest message itself that indicates whether
      *                       the write was preceded by a Timed Request action.
-     *                       This is controlled by the mForceTimedRequestFlag field.
+     *                       This is controlled by the mTimedRequestFieldValue field.
      *
      * Normal behavior: When you provide a timeout value to the standard constructor, both happen together:
      *   - A Timed Request action is sent (controlled by mTimedWriteTimeoutMs)
@@ -177,7 +177,7 @@ public:
     }
 
     // Tag type to distinguish the test constructor from the normal constructor
-    struct TestOnlyOverrideTimedRequestFlagTag
+    struct TestOnlyOverrideTimedRequestFieldTag
     {
     };
 
@@ -588,7 +588,7 @@ private:
     // #endif
 
     /**
-     * Controls whether the TimedRequest flag in the WriteRequest message is set to true.
+     * The value of the TimedRequest field in the WriteRequest message.
      *
      * In normal operation (non-test scenarios):
      *   - This flag is automatically set based on whether mTimedWriteTimeoutMs has a value
