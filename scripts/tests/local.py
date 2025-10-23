@@ -951,7 +951,7 @@ def python_tests(
                 ]
 
                 if app_filter != "*":
-                    cmd.append(f'--app-filter "{app_filter}"')
+                    cmd.extend(('--app-filter', app_filter))
 
                 if dry_run:
                     print(shlex.join(cmd))
