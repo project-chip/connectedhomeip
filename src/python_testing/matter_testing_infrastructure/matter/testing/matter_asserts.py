@@ -368,3 +368,137 @@ def assert_valid_map8(value: Any, description: str = "Value") -> None:
                         f"{description} must be an integer")
     asserts.assert_true(0 <= value <= 0xFF,
                         f"{description} must be between 0 and 255 (inclusive)")
+
+
+# Commissioning-related assertions
+
+async def assert_is_commissioned(
+    dev_ctrl,
+    node_id: int,
+    description: str = "Device"
+) -> None:
+    """
+    Asserts that the device has at least one commissioned fabric.
+
+    Reads the TrustedRootCertificates attribute from the OperationalCredentials cluster
+    and verifies that the list is not empty. An empty list indicates factory fresh state.
+
+    This assertion works over PASE (before a CASE session is established).
+
+    Args:
+        dev_ctrl: The chip device controller instance
+        node_id: Node ID of the device to check
+        description: User-defined description for error messages (default: "Device")
+
+    Raises:
+        AssertionError: If device has no commissioned fabrics (is factory fresh)
+        ChipStackError: If unable to read the TrustedRootCertificates attribute
+
+    Example:
+        # Verify device is commissioned before running multi-fabric test
+        await assert_is_commissioned(controller, node_id=1234, "DUT")
+
+        # Check that device has been successfully commissioned in previous step
+        await assert_is_commissioned(controller, node_id=1234, "Newly commissioned device")
+    """
+    from matter.testing.commissioning import is_commissioned
+
+    commissioned = await is_commissioned(dev_ctrl, node_id)
+    asserts.assert_true(
+        commissioned,
+        f"{description} must have at least one commissioned fabric. "
+        "TrustedRootCertificates list is empty (device is factory fresh)."
+    )
+
+
+async def assert_factory_fresh(
+    dev_ctrl,
+    node_id: int,
+    description: str = "Device"
+) -> None:
+    """
+    Asserts that the device has NO commissioned fabrics (factory fresh state).
+
+    Reads the TrustedRootCertificates attribute from the OperationalCredentials cluster
+    and verifies that the list is empty. A non-empty list indicates the device has fabrics.
+
+    This assertion works over PASE (before a CASE session is established).
+
+    Useful for tests that require factory-default state, such as discriminator uniqueness
+    tests or device attestation tests.
+
+    Args:
+        dev_ctrl: The chip device controller instance
+        node_id: Node ID of the device to check
+        description: User-defined description for error messages (default: "Device")
+
+    Raises:
+        AssertionError: If device has any commissioned fabrics
+        ChipStackError: If unable to read the TrustedRootCertificates attribute
+
+    Example:
+        # Verify device is factory reset before running test
+        await assert_factory_fresh(controller, node_id=1234, "DUT")
+
+        # Check multiple devices in a multi-DUT test
+        await assert_factory_fresh(controller, node_id=1, "DUT1")
+        await assert_factory_fresh(controller, node_id=2, "DUT2")
+    """
+    from matter.testing.commissioning import is_commissioned
+
+    commissioned = await is_commissioned(dev_ctrl, node_id)
+    asserts.assert_false(
+        commissioned,
+        f"{description} must be factory fresh (no commissioned fabrics). "
+        "TrustedRootCertificates list is not empty. "
+        "Please factory reset the device before running this test."
+    )
+
+
+async def assert_fabric_count(
+    dev_ctrl,
+    node_id: int,
+    expected_count: int,
+    description: str = "Device"
+) -> None:
+    """
+    Asserts that the device has exactly the expected number of commissioned fabrics.
+
+    Reads the TrustedRootCertificates attribute from the OperationalCredentials cluster
+    and compares the count to the expected value. Each trusted root certificate
+    corresponds to one commissioned fabric.
+
+    This assertion works over PASE (before a CASE session is established).
+
+    Useful for multi-fabric tests where you need to verify the exact number of fabrics
+    at different stages of the test.
+
+    Args:
+        dev_ctrl: The chip device controller instance
+        node_id: Node ID of the device to check
+        expected_count: Expected number of commissioned fabrics
+        description: User-defined description for error messages (default: "Device")
+
+    Raises:
+        AssertionError: If actual fabric count doesn't match expected count
+        ChipStackError: If unable to read the TrustedRootCertificates attribute
+
+    Example:
+        # Verify device has exactly 1 fabric before adding second
+        await assert_fabric_count(controller, node_id=1234, expected_count=1, "DUT")
+
+        # After adding second fabric, verify count is 2
+        await assert_fabric_count(controller, node_id=1234, expected_count=2, "DUT")
+
+        # Verify all fabrics removed after test cleanup
+        await assert_fabric_count(controller, node_id=1234, expected_count=0, "DUT after cleanup")
+    """
+    from matter.testing.commissioning import get_commissioned_fabric_count
+
+    actual_count = await get_commissioned_fabric_count(dev_ctrl, node_id)
+    asserts.assert_equal(
+        actual_count,
+        expected_count,
+        f"{description} must have exactly {expected_count} commissioned fabric(s), "
+        f"but has {actual_count} (based on TrustedRootCertificates count)"
+    )
