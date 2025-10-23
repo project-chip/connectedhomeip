@@ -38,6 +38,7 @@ import colorama
 import coloredlogs
 import tabulate
 import yaml
+
 from matter.testing.metadata import extract_runs_args
 
 
