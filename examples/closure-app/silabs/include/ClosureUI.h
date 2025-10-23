@@ -61,8 +61,6 @@ private:
     static void DrawMainState(GLIB_Context_t * glibContext);
     static void DrawOverallCurrentState(GLIB_Context_t * glibContext);
     static void DrawStateIcon(GLIB_Context_t * glibContext, MainState state);
-    static void DrawFont(GLIB_Context_t * glibContext, uint8_t initial_x, uint8_t initial_y, uint8_t width, uint8_t * data,
-                         uint32_t size);
 
     // Static variables to store the current closure state
     static MainState sMainState;

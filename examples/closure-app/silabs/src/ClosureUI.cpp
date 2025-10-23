@@ -100,7 +100,6 @@ void ClosureUI::SetMainState(uint8_t state)
     // Validate state value is within valid range
     if (state > STATE_UNKNOWN)
     {
-        SILABS_LOG("ClosureUI: Invalid state value %d, defaulting to STATE_UNKNOWN", state);
         sMainState = STATE_UNKNOWN;
     }
     else
@@ -112,23 +111,17 @@ void ClosureUI::SetMainState(uint8_t state)
 void ClosureUI::SetOverallCurrentState(const char * positionText, const char * latchText, const char * secureText,
                                        const char * speedText)
 {
-    // Validate input parameters
-    if (positionText == nullptr || latchText == nullptr || secureText == nullptr || speedText == nullptr)
-    {
-        SILABS_LOG("ClosureUI: Null parameter in SetOverallCurrentState");
-        return;
-    }
-
-    strncpy(sPositionText, positionText, sizeof(sPositionText) - 1);
+    // Use fallback values for null parameters - default to "Unknown" state
+    strncpy(sPositionText, (positionText != nullptr) ? positionText : "Position: Unknown", sizeof(sPositionText) - 1);
     sPositionText[sizeof(sPositionText) - 1] = '\0';
 
-    strncpy(sLatchText, latchText, sizeof(sLatchText) - 1);
+    strncpy(sLatchText, (latchText != nullptr) ? latchText : "Latch: Unknown", sizeof(sLatchText) - 1);
     sLatchText[sizeof(sLatchText) - 1] = '\0';
 
-    strncpy(sSecureText, secureText, sizeof(sSecureText) - 1);
+    strncpy(sSecureText, (secureText != nullptr) ? secureText : "Secure: Unknown", sizeof(sSecureText) - 1);
     sSecureText[sizeof(sSecureText) - 1] = '\0';
 
-    strncpy(sSpeedText, speedText, sizeof(sSpeedText) - 1);
+    strncpy(sSpeedText, (speedText != nullptr) ? speedText : "Speed: Unknown", sizeof(sSpeedText) - 1);
     sSpeedText[sizeof(sSpeedText) - 1] = '\0';
 }
 
@@ -209,32 +202,4 @@ void ClosureUI::DrawStateIcon(GLIB_Context_t * glibContext, MainState state)
 {
     // For future enhancement: draw visual icons based on closure state
     // This could include door/window icons, arrows for movement, etc.
-}
-
-void ClosureUI::DrawFont(GLIB_Context_t * glibContext, uint8_t initial_x, uint8_t initial_y, uint8_t width, uint8_t * data,
-                         uint32_t size)
-{
-    uint8_t x = initial_x, y = initial_y;
-    for (uint16_t i = 0; i < size; i++)
-    {
-        for (uint8_t mask = 0; mask < 8; mask++)
-        {
-            if (!(data[i] & (0x01 << mask)))
-            {
-                GLIB_drawPixel(glibContext, x, y);
-            }
-            // Check line changes
-            if (((x - initial_x) % width) == 0 && x != initial_x)
-            {
-                x = initial_x;
-                y++;
-                // Font is 8 bit align with paddings bits;
-                mask = 8;
-            }
-            else
-            {
-                x++;
-            }
-        }
-    }
 }

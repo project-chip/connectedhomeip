@@ -78,10 +78,12 @@ public:
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
+#ifdef DISPLAY_ENABLED
     /**
      * @brief Updates the closure UI with current closure state
      */
     static void UpdateClosureUI();
+#endif // DISPLAY_ENABLED
 
 private:
     static AppTask sAppTask;

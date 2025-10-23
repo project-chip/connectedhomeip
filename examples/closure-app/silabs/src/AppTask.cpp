@@ -144,9 +144,9 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     AppTask::GetAppTask().PostEvent(&button_event);
 }
 
+#ifdef DISPLAY_ENABLED
 void AppTask::UpdateClosureUI()
 {
-#ifdef DISPLAY_ENABLED
     ClosureManager & closureManager = ClosureManager::GetInstance();
 
     // Lock ChipStack for thread-safe cluster data access
@@ -238,7 +238,5 @@ void AppTask::UpdateClosureUI()
     {
         AppTask::GetAppTask().GetLCD().WriteDemoUI(false); // State doesn't matter for custom UI
     }
-#else
-    (void) 0;
-#endif // DISPLAY_ENABLED
 }
+#endif // DISPLAY_ENABLED
