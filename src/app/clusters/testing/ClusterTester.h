@@ -34,7 +34,7 @@
 #include <lib/support/ReadOnlyBuffer.h>
 
 #include <memory>
-#include <list>
+#include <vector>
 
 namespace chip {
 namespace Test {
@@ -104,6 +104,9 @@ public:
     template <typename T>
     app::DataModel::ActionReturnStatus ReadAttribute(app::ServerClusterInterface & cluster, const app::DataModel::ReadAttributeRequest & path, T & out)
     {
+        // Store the read operation in a vector<std::unique_ptr<...>> to ensure its lifetime
+        // using std::unique_ptr because ReadOperation is non-copyable and non-movable
+        // vector reallocation is not an issue since we store unique_ptrs
         std::unique_ptr<app::Testing::ReadOperation> readOperation = std::make_unique<app::Testing::ReadOperation>(path.path);
         readOperation->SetReadFlags(path.readFlags).SetOperationFlags(path.operationFlags);
         if (path.subjectDescriptor) readOperation->SetSubjectDescriptor(*path.subjectDescriptor);
@@ -269,7 +272,7 @@ public:
     std::optional<LogOnlyEvents::EventInformation> GetNextGeneratedEvent() { return mTestServerClusterContext.EventsGenerator().GetNextEvent(); }
 
     // Compare the attributes of the cluster against the expected set.
-    bool TestAttributes(app::ServerClusterInterface & cluster, const app::ConcreteClusterPath & path, Span<app::DataModel::AttributeEntry> expected)
+    bool TestAttributesList(app::ServerClusterInterface & cluster, const app::ConcreteClusterPath & path, Span<app::DataModel::AttributeEntry> expected)
     {
         ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> attributesBuilder;
         if (cluster.Attributes(path, attributesBuilder) != CHIP_NO_ERROR) return false;
@@ -278,34 +281,34 @@ public:
 
     // Compare the attributes of the cluster against the expected set.
     // @returns `false` if no default cluster is set. (see constructor or `SetDefaultCluster` or use other overload specifying the cluster)
-    bool TestAttributes(const app::ConcreteClusterPath & path, Span<app::DataModel::AttributeEntry> expected)
+    bool TestAttributesList(const app::ConcreteClusterPath & path, Span<app::DataModel::AttributeEntry> expected)
     {
         if (!verifyDefaultClusterSet()) return false;
-        return TestAttributes(*mDefaultCluster, path, expected);
+        return TestAttributesList(*mDefaultCluster, path, expected);
     }
 
     // Compare the attributes of the cluster against the expected set.
     // Will use the first path returned by `GetPaths()` on the cluster.
     // For specifying a different cluster path, use the overload taking a `ConcreteClusterPath`
-    bool TestAttributes(app::ServerClusterInterface & cluster, Span<app::DataModel::AttributeEntry> expected)
+    bool TestAttributesList(app::ServerClusterInterface & cluster, Span<app::DataModel::AttributeEntry> expected)
     {
         if(!verifyClusterPathsValid(cluster)) return false;
         const auto & paths = cluster.GetPaths();
-        return TestAttributes(cluster, app::ConcreteClusterPath(paths[0].mEndpointId, paths[0].mClusterId), expected);
+        return TestAttributesList(cluster, app::ConcreteClusterPath(paths[0].mEndpointId, paths[0].mClusterId), expected);
     }
 
     // Compare the attributes of the cluster against the expected set.
     // Will use the first path returned by `GetPaths()` on the cluster.
     // For specifying a different cluster path, use the overload taking a `ConcreteClusterPath`
     // @returns `false` if no default cluster is set. (see constructor or `SetDefaultCluster` or use other overload specifying the cluster)
-    bool TestAttributes(Span<app::DataModel::AttributeEntry> expected)
+    bool TestAttributesList(Span<app::DataModel::AttributeEntry> expected)
     {
         if(verifyDefaultClusterSet()) return false;
-        return TestAttributes(*mDefaultCluster, expected);
+        return TestAttributesList(*mDefaultCluster, expected);
     }
 
     // Compare the accepted commands of the cluster against the expected set.
-    bool TestAcceptedCommands(app::ServerClusterInterface & cluster, const app::ConcreteClusterPath & path, Span<app::DataModel::AcceptedCommandEntry> expected)
+    bool TestAcceptedCommandsList(app::ServerClusterInterface & cluster, const app::ConcreteClusterPath & path, Span<app::DataModel::AcceptedCommandEntry> expected)
     {
         ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> commandsBuilder;
         if (cluster.AcceptedCommands(path, commandsBuilder) != CHIP_NO_ERROR) return false;
@@ -314,35 +317,35 @@ public:
 
     // Compare the accepted commands of the cluster against the expected set.
     // @returns `false` if no default cluster is set. (see constructor or `SetDefaultCluster` or use other overload specifying the cluster)
-    bool TestAcceptedCommands(const app::ConcreteClusterPath & path, Span<app::DataModel::AcceptedCommandEntry> expected)
+    bool TestAcceptedCommandsList(const app::ConcreteClusterPath & path, Span<app::DataModel::AcceptedCommandEntry> expected)
     {
         if (!verifyDefaultClusterSet()) return false;
-        return TestAcceptedCommands(*mDefaultCluster, path, expected);
+        return TestAcceptedCommandsList(*mDefaultCluster, path, expected);
     }
 
     // Compare the accepted commands of the cluster against the expected set.
     // Will use the first path returned by `GetPaths()` on the cluster.
     // For specifying a different cluster path, use the overload taking a `ConcreteClusterPath`
-    bool TestAcceptedCommands(app::ServerClusterInterface & cluster, Span<app::DataModel::AcceptedCommandEntry> expected)
+    bool TestAcceptedCommandsList(app::ServerClusterInterface & cluster, Span<app::DataModel::AcceptedCommandEntry> expected)
     {
         if(!verifyClusterPathsValid(cluster)) return false;
         const auto & paths = cluster.GetPaths();
-        return TestAcceptedCommands(cluster, app::ConcreteClusterPath(paths[0].mEndpointId, paths[0].mClusterId), expected);
+        return TestAcceptedCommandsList(cluster, app::ConcreteClusterPath(paths[0].mEndpointId, paths[0].mClusterId), expected);
     }
 
     // Compare the accepted commands of the cluster against the expected set.
     // Will use the first path returned by `GetPaths()` on the cluster.
     // For specifying a different cluster path, use the overload taking a `ConcreteClusterPath`
     // @returns `false` if no default cluster is set. (see constructor or `SetDefaultCluster` or use other overload specifying the cluster)
-    bool TestAcceptedCommands(Span<app::DataModel::AcceptedCommandEntry> expected)
+    bool TestAcceptedCommandsList(Span<app::DataModel::AcceptedCommandEntry> expected)
     {
         if(!verifyDefaultClusterSet()) return false;
-        return TestAcceptedCommands(*mDefaultCluster, expected);
+        return TestAcceptedCommandsList(*mDefaultCluster, expected);
     }
 
 
     // Compare the generated commands of the cluster against the expected set.
-    bool TestGeneratedCommands(app::ServerClusterInterface & cluster, const app::ConcreteClusterPath & path, Span<CommandId> expected)
+    bool TestGeneratedCommandsList(app::ServerClusterInterface & cluster, const app::ConcreteClusterPath & path, Span<CommandId> expected)
     {
         ReadOnlyBufferBuilder<CommandId> commandsBuilder;
         if (cluster.GeneratedCommands(path, commandsBuilder) != CHIP_NO_ERROR) return false;
@@ -351,30 +354,30 @@ public:
 
     // Compare the generated commands of the cluster against the expected set.
     // @returns `false` if no default cluster is set. (see constructor or `SetDefaultCluster` or use other overload specifying the cluster)
-    bool TestGeneratedCommands(const app::ConcreteClusterPath & path, Span<CommandId> expected)
+    bool TestGeneratedCommandsList(const app::ConcreteClusterPath & path, Span<CommandId> expected)
     {
         if (!verifyDefaultClusterSet()) return false;
-        return TestGeneratedCommands(*mDefaultCluster, path, expected);
+        return TestGeneratedCommandsList(*mDefaultCluster, path, expected);
     }
 
     // Compare the generated commands of the cluster against the expected set.
     // Will use the first path returned by `GetPaths()` on the cluster.
     // For specifying a different cluster path, use the overload taking a `ConcreteClusterPath`
-    bool TestGeneratedCommands(app::ServerClusterInterface & cluster, Span<CommandId> expected)
+    bool TestGeneratedCommandsList(app::ServerClusterInterface & cluster, Span<CommandId> expected)
     {
         if(!verifyClusterPathsValid(cluster)) return false;
         const auto & paths = cluster.GetPaths();
-        return TestGeneratedCommands(cluster, app::ConcreteClusterPath(paths[0].mEndpointId, paths[0].mClusterId), expected);
+        return TestGeneratedCommandsList(cluster, app::ConcreteClusterPath(paths[0].mEndpointId, paths[0].mClusterId), expected);
     }
 
     // Compare the generated commands of the cluster against the expected set.
     // Will use the first path returned by `GetPaths()` on the cluster.
     // For specifying a different cluster path, use the overload taking a `ConcreteClusterPath`
     // @returns `false` if no default cluster is set. (see constructor or `SetDefaultCluster` or use other overload specifying the cluster)
-    bool TestGeneratedCommands(Span<CommandId> expected)
+    bool TestGeneratedCommandsList(Span<CommandId> expected)
     {
         if(!verifyDefaultClusterSet()) return false;
-        return TestGeneratedCommands(*mDefaultCluster, expected);
+        return TestGeneratedCommandsList(*mDefaultCluster, expected);
     }
 
 private:
@@ -402,7 +405,7 @@ private:
 
     TestServerClusterContext mTestServerClusterContext{};
     app::ServerClusterInterface * mDefaultCluster{nullptr};
-    std::list<std::unique_ptr<app::Testing::ReadOperation>> mReadOperations;
+    std::vector<std::unique_ptr<app::Testing::ReadOperation>> mReadOperations;
 };
 
 } // namespace Test
