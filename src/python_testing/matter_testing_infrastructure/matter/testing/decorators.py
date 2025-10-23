@@ -369,3 +369,142 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
                 body(test_instance, *args, **kwargs), timeout=timeout))
         return per_endpoint_runner
     return run_if_endpoint_matches_internal
+
+
+# Commissioning-related decorators
+
+def require_factory_reset(body):
+    """Decorator to ensure test runs only on factory-fresh (not commissioned) device.
+
+    This decorator checks if the device has any commissioned fabrics before running the test.
+    If fabrics are found, the test fails with a clear error message indicating that a
+    factory reset is required.
+
+    The check is performed by reading the TrustedRootCertificates attribute from the
+    OperationalCredentials cluster. This works over PASE (before CASE session is established).
+
+    Useful for tests that require factory-default state, such as:
+    - Discriminator uniqueness tests (TC_SC_7_1)
+    - Device attestation tests requiring pristine state
+    - Tests validating initial provisioning behavior
+
+    Args:
+        body: The async test method to wrap
+
+    Returns:
+        Wrapped test method that checks factory reset status before execution
+
+    Example:
+        @require_factory_reset
+        @async_test_body
+        async def test_TC_SC_7_1(self):
+            # Test automatically fails if device has any fabrics
+            # Test body runs only on factory-fresh devices
+            ...
+
+    Note:
+        - This decorator should be placed ABOVE @async_test_body decorator
+        - The test will fail immediately with informative message if device is commissioned
+        - Works with both PASE and CASE sessions
+        - Requires test class to inherit from MatterBaseTest and have default_controller
+    """
+    def factory_reset_checker(test_instance, *args, **kwargs):
+        # Import locally to avoid circular dependency
+        from matter.testing.commissioning import is_commissioned
+        from matter.testing.matter_testing import MatterBaseTest
+        assert isinstance(test_instance, MatterBaseTest)
+
+        LOGGER.info("Checking if device is factory fresh (required for this test)...")
+
+        # Check if device is commissioned
+        check_commissioned = asyncio.wait_for(
+            is_commissioned(
+                test_instance.default_controller,
+                test_instance.dut_node_id
+            ),
+            timeout=30
+        )
+        device_is_commissioned = test_instance.event_loop.run_until_complete(check_commissioned)
+
+        if device_is_commissioned:
+            asserts.fail(
+                "Test requires factory reset device. "
+                "Device has commissioned fabrics (TrustedRootCertificates is not empty). "
+                "Please factory reset the device before running this test."
+            )
+
+        LOGGER.info("Device is factory fresh - proceeding with test")
+
+        # Device is factory fresh, run the test
+        timeout = getattr(test_instance.matter_test_config, 'timeout', None) or test_instance.default_timeout
+        test_instance.event_loop.run_until_complete(
+            asyncio.wait_for(body(test_instance, *args, **kwargs), timeout=timeout)
+        )
+
+    return factory_reset_checker
+
+
+def skip_if_commissioned(body):
+    """Decorator to skip test if device is already commissioned.
+
+    This decorator checks if the device has any commissioned fabrics before running the test.
+    If fabrics are found, the test is skipped (not failed) with an informative message.
+
+    The check is performed by reading the TrustedRootCertificates attribute from the
+    OperationalCredentials cluster. This works over PASE (before CASE session is established).
+
+    Useful for tests that should only run on factory-fresh devices but where having
+    commissioned fabrics is not an error condition (just not applicable).
+
+    Args:
+        body: The async test method to wrap
+
+    Returns:
+        Wrapped test method that checks commissioning status before execution
+
+    Example:
+        @skip_if_commissioned
+        @async_test_body
+        async def test_initial_commissioning_only(self):
+            # Test runs only on factory-fresh devices
+            # Test is skipped (not failed) if device is already commissioned
+            ...
+
+    Note:
+        - This decorator should be placed ABOVE @async_test_body decorator
+        - The test will be skipped with informative message if device is commissioned
+        - Works with both PASE and CASE sessions
+        - Requires test class to inherit from MatterBaseTest and have default_controller
+    """
+    def commissioned_skipper(test_instance, *args, **kwargs):
+        # Import locally to avoid circular dependency
+        from matter.testing.commissioning import is_commissioned
+        from matter.testing.matter_testing import MatterBaseTest
+        assert isinstance(test_instance, MatterBaseTest)
+
+        LOGGER.info("Checking device commissioning status...")
+
+        # Check if device is commissioned
+        check_commissioned = asyncio.wait_for(
+            is_commissioned(
+                test_instance.default_controller,
+                test_instance.dut_node_id
+            ),
+            timeout=30
+        )
+        device_is_commissioned = test_instance.event_loop.run_until_complete(check_commissioned)
+
+        if device_is_commissioned:
+            LOGGER.info("Device is already commissioned - skipping test")
+            asserts.skip("Test skipped: device already has commissioned fabrics")
+            return
+
+        LOGGER.info("Device is factory fresh - proceeding with test")
+
+        # Device is factory fresh, run the test
+        timeout = getattr(test_instance.matter_test_config, 'timeout', None) or test_instance.default_timeout
+        test_instance.event_loop.run_until_complete(
+            asyncio.wait_for(body(test_instance, *args, **kwargs), timeout=timeout)
+        )
+
+    return commissioned_skipper

@@ -379,3 +379,127 @@ class SetupParameters:
     def manual_code(self):
         return SetupPayload().GenerateManualPairingCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
                                                         self.custom_flow, self.capabilities, self.version)
+
+
+# Commissioning Status Detection Functions
+
+async def is_commissioned(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+    node_id: int,
+    endpoint: int = 0
+) -> bool:
+    """
+    Check if a device has any commissioned fabrics.
+
+    Uses TrustedRootCertificates attribute from the OperationalCredentials cluster.
+    An empty list indicates the device is not commissioned (factory fresh state).
+
+    This function works over PASE (before a CASE session is established), making it
+    suitable for checking commissioning status before or during the commissioning process.
+
+    Args:
+        dev_ctrl: The chip device controller instance
+        node_id: Node ID of the device to check
+        endpoint: Endpoint to query (default 0, where OperationalCredentials cluster resides)
+
+    Returns:
+        True if device has at least one commissioned fabric (one or more root certificates),
+        False if device is factory fresh (no root certificates)
+
+    Raises:
+        ChipStackError: If unable to read the TrustedRootCertificates attribute
+
+    Example:
+        # Check if device is commissioned before attempting to add as second fabric
+        if await is_commissioned(controller, node_id=1234):
+            LOGGER.info("Device already commissioned, adding as second fabric")
+        else:
+            LOGGER.info("Device is factory fresh, commissioning as first fabric")
+
+        # Verify device is factory reset before running discriminator test
+        if await is_commissioned(controller, node_id=1234):
+            raise AssertionError("Device must be factory reset for this test")
+    """
+    try:
+        # Import locally to avoid potential circular dependencies
+        import matter.clusters as Clusters
+
+        # Read TrustedRootCertificates attribute - this works over PASE
+        result = await dev_ctrl.ReadAttribute(
+            nodeid=node_id,
+            attributes=[(endpoint, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
+        )
+
+        # Extract the trusted root certificates list
+        root_certs = result[endpoint][Clusters.OperationalCredentials][
+            Clusters.OperationalCredentials.Attributes.TrustedRootCertificates
+        ]
+
+        # Device is commissioned if it has any root certificates
+        return len(root_certs) > 0
+
+    except Exception as e:
+        LOGGER.error(f"Failed to check commissioning status for node {node_id}: {e}")
+        raise
+
+
+async def get_commissioned_fabric_count(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+    node_id: int,
+    endpoint: int = 0
+) -> int:
+    """
+    Get the number of commissioned fabrics on a device.
+
+    Reads the TrustedRootCertificates attribute and returns the count.
+    Each trusted root certificate corresponds to one commissioned fabric.
+
+    This function works over PASE (before a CASE session is established).
+
+    Args:
+        dev_ctrl: The chip device controller instance
+        node_id: Node ID of the device to check
+        endpoint: Endpoint to query (default 0, where OperationalCredentials cluster resides)
+
+    Returns:
+        Number of commissioned fabrics (equals number of trusted root certificates).
+        Returns 0 if device is factory fresh.
+
+    Raises:
+        ChipStackError: If unable to read the TrustedRootCertificates attribute
+
+    Example:
+        # Log fabric count for debugging
+        fabric_count = await get_commissioned_fabric_count(controller, node_id=1234)
+        LOGGER.info(f"Device has {fabric_count} commissioned fabric(s)")
+
+        # Verify expected fabric count in multi-fabric test
+        fabric_count = await get_commissioned_fabric_count(controller, node_id=1234)
+        assert fabric_count == 2, f"Expected 2 fabrics, found {fabric_count}"
+
+        # Check if device has room for more fabrics (max is typically 16)
+        fabric_count = await get_commissioned_fabric_count(controller, node_id=1234)
+        if fabric_count >= 16:
+            LOGGER.warning("Device fabric table is full")
+    """
+    try:
+        # Import locally to avoid potential circular dependencies
+        import matter.clusters as Clusters
+
+        # Read TrustedRootCertificates attribute
+        result = await dev_ctrl.ReadAttribute(
+            nodeid=node_id,
+            attributes=[(endpoint, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
+        )
+
+        # Extract the trusted root certificates list
+        root_certs = result[endpoint][Clusters.OperationalCredentials][
+            Clusters.OperationalCredentials.Attributes.TrustedRootCertificates
+        ]
+
+        # Return the count
+        return len(root_certs)
+
+    except Exception as e:
+        LOGGER.error(f"Failed to get fabric count for node {node_id}: {e}")
+        raise
