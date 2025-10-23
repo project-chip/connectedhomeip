@@ -47,7 +47,7 @@ logging.basicConfig(level=logging.INFO)
 class TC_BOOL_2_2(MatterBaseTest):
 
     async def read_bstate_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.BooleanState
+        cluster = Clusters.BooleanState
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     def desc_TC_BOOL_2_2(self) -> str:
@@ -95,10 +95,8 @@ class TC_BOOL_2_2(MatterBaseTest):
 
         try:
             logger.info(" --- Step 2a: Sending Off command to the DUT")
-            await self.send_single_cmd(
-                cmd=Clusters.OnOff.Commands.Off(),
-                timedRequestTimeoutMs=1000
-            )
+            command_dict = {"Name": "SetBooleanState", "EndpointId": endpoint, "NewState": False}
+            self.write_to_app_pipe(command_dict, "/tmp/chip_pipe")
         except Exception as e:
             logger.error(f" --- Step 2a: SendCommand failed: {e}")
             raise
@@ -126,21 +124,8 @@ class TC_BOOL_2_2(MatterBaseTest):
 
         try:
             logger.info(" --- Step 3a: Sending On command to the DUT")
-            await self.send_single_cmd(
-                cmd=Clusters.OnOff.Commands.On(),
-                timedRequestTimeoutMs=1000
-            )
-            # Wait for device state to stabilize after level changes
-            await asyncio.sleep(2)
-
-            # Verify OnOff state first
-            onoff_state = await self.read_single_attribute_check_success(
-                endpoint=endpoint,
-                cluster=Clusters.OnOff,
-                attribute=Clusters.OnOff.Attributes.OnOff
-            )
-            logger.info(f" --- Step 3a: OnOff state after command: {onoff_state}")
-
+            command_dict = {"Name": "SetBooleanState", "EndpointId": endpoint, "NewState": True}
+            self.write_to_app_pipe(command_dict, "/tmp/chip_pipe")
         except Exception as e:
             logger.error(f" --- Step 3a: SendCommand failed: {e}")
             raise
@@ -161,12 +146,6 @@ class TC_BOOL_2_2(MatterBaseTest):
         # Verify that value in the response is TRUE.
         if state_value is not None:
             asserts.assert_true(state_value, " --- Step 3b: state_value should be True.")
-
-        # Clean up - turn off after test completes
-        try:
-            await self.send_single_cmd(cmd=Clusters.OnOff.Commands.Off())
-        except Exception:
-            pass  # Ignore cleanup errors
 
         # Set up subscription to StateChange event.
         self.step("4a")
