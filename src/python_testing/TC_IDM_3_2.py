@@ -210,10 +210,9 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             asserts.assert_equal(write_status2, Status.UnsupportedAttribute,
                                  f"Write to unsupported attribute should return UNSUPPORTED_ATTRIBUTE, got {write_status2}")
 
-        
         self.skip_step(4)
         # Currently skipping step 4 as we have removed support in the python framework for this functionality currently.
-        # This is now contained in the SuppressResponse test module PR referenced below for TC_IDM_3_2, once this test module merges that PR can then be merged 
+        # This is now contained in the SuppressResponse test module PR referenced below for TC_IDM_3_2, once this test module merges that PR can then be merged
         # and this test step will become valid after issues with SuppressResponse mentioned in issue https://github.com/project-chip/connectedhomeip/issues/41227.
         # SuppressResponse PR Reference: https://github.com/project-chip/connectedhomeip/pull/41590
         # TODO: Once the SuppressResponse test module PR merges, uncomment the following code and remove the skip_step line above.
