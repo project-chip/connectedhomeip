@@ -753,7 +753,7 @@ TEST_F(TestCHIPArgParser, HelpOptions_PrintLongUsage_WithDesc)
 
     // Create a HelpOptions instance with a description.
     chip::ArgParser::HelpOptions helpWithDesc("prog-name", "USAGE: prog-name [opts]", "v1.2.3", "This is a description.");
-    static OptionSet * optionSetsWithDesc[] = { &sOptionSetA, &sOptionSetB, reinterpret_cast<OptionSet *>(&helpWithDesc), nullptr };
+    static OptionSet * optionSetsWithDesc[] = { &sOptionSetA, &sOptionSetB, static_cast<OptionSet *>(&helpWithDesc), nullptr };
 
     // Print long usage to temporary file and capture output.
     helpWithDesc.PrintLongUsage(optionSetsWithDesc, f);
@@ -782,7 +782,7 @@ TEST_F(TestCHIPArgParser, HelpOptions_PrintLongUsage_WithoutDesc)
 
     // Create a HelpOptions instance without a description (uses the other constructor).
     chip::ArgParser::HelpOptions helpNoDesc("prog-name", "USAGE: prog-name [opts]", "v1.2.3");
-    static OptionSet * optionSetsNoDesc[] = { &sOptionSetA, &sOptionSetB, reinterpret_cast<OptionSet *>(&helpNoDesc), nullptr };
+    static OptionSet * optionSetsNoDesc[] = { &sOptionSetA, &sOptionSetB, static_cast<OptionSet *>(&helpNoDesc), nullptr };
 
     // Print long usage to temporary file and capture output.
     helpNoDesc.PrintLongUsage(optionSetsNoDesc, f);
