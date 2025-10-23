@@ -35,9 +35,9 @@ void NodeLookupHandle::ResetForLookup(System::Clock::Timestamp now, const NodeLo
     mRequestStartTime = now;
     mRequest          = request;
     mResults          = NodeLookupResults();
-#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+#if CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
     mCacheUsed        = false;
-#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
 }
 
 void NodeLookupHandle::LookupResult(const ResolveResult & result)
@@ -91,7 +91,7 @@ System::Clock::Timeout NodeLookupHandle::NextEventTimeout(System::Clock::Timesta
         return System::Clock::Timeout::zero();
     }
 
-#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+#if CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
     // Check if we need to trigger cache usage after delay
     if (!mCacheUsed && elapsed < kCacheDelayTimeout)
     {
@@ -99,7 +99,7 @@ System::Clock::Timeout NodeLookupHandle::NextEventTimeout(System::Clock::Timesta
         auto maxTimeout = mRequest.GetMaxLookupTime() - elapsed;
         return (cacheTimeout < maxTimeout) ? cacheTimeout : maxTimeout;
     }
-#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
 
     if (elapsed < mRequest.GetMaxLookupTime())
     {
@@ -110,7 +110,7 @@ System::Clock::Timeout NodeLookupHandle::NextEventTimeout(System::Clock::Timesta
     return System::Clock::Timeout::zero();
 }
 
-#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+#if CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
 bool NodeLookupHandle::TryUseCache(System::Clock::Timestamp now, const NodeAddressCache & cache)
 {
     if (mCacheUsed)
@@ -136,7 +136,7 @@ bool NodeLookupHandle::TryUseCache(System::Clock::Timestamp now, const NodeAddre
     mCacheUsed = true; // Mark as tried even if no cache entry found
     return false;
 }
-#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
 
 NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
 {
@@ -254,14 +254,12 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
-
-void Resolver::CacheNode(const PeerId & peerId, const ResolveResult & result)
+void Resolver::AddFallbackEntry(const PeerId & peerId, const ResolveResult & result)
 {
+#if CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
     mNodeAddressCache.CacheNode(peerId, result);
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
 }
-
-#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
 
 CHIP_ERROR Resolver::TryNextResult(Impl::NodeLookupHandle & handle)
 {
@@ -421,9 +419,9 @@ void Resolver::HandleAction(IntrusiveList<NodeLookupHandle>::Iterator & current)
         ChipLogError(Discovery, "Unexpected lookup state (not success or fail).");
         break;
     }
-#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+#if CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
     mNodeAddressCache.RemoveCachedNodeAddress(peerId);
-#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
 }
 
 void Resolver::HandleTimer()
@@ -434,13 +432,13 @@ void Resolver::HandleTimer()
         auto current = it;
         it++;
 
-#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+#if CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
         // Try to use cache after delay if no results yet
         if (!current->HasLookupResult())
         {
             current->TryUseCache(mTimeSource.GetMonotonicTimestamp(), mNodeAddressCache);
         }
-#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
 
         HandleAction(current);
     }

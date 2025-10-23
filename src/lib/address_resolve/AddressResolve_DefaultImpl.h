@@ -28,9 +28,9 @@ namespace AddressResolve {
 namespace Impl {
 
 inline constexpr uint8_t kNodeLookupResultsLen = CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS;
-#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
-inline constexpr System::Clock::Timeout kCacheDelayTimeout = System::Clock::Seconds16(CHIP_DEVICE_CASE_DNS_CACHE_TIMEOUT_SECONDS);
-#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+#if CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
+inline constexpr System::Clock::Timeout kCacheDelayTimeout = System::Clock::Seconds16(CHIP_DEVICE_DNS_FALLBACK_TIMEOUT_SECONDS);
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
 
 enum class NodeLookupResult
 {
@@ -161,18 +161,18 @@ public:
     /// be triggered for this lookup handle
     System::Clock::Timeout NextEventTimeout(System::Clock::Timestamp now);
 
-#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+#if CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
     /// Check if cache should be used and apply cached result if available
     bool TryUseCache(System::Clock::Timestamp now, const NodeAddressCache & cache);
-#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
 
 private:
     NodeLookupResults mResults;
     NodeLookupRequest mRequest; // active request to process
     System::Clock::Timestamp mRequestStartTime;
-#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+#if CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
     bool mCacheUsed = false; // tracks if cache has been checked
-#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
 };
 
 class Resolver : public ::chip::AddressResolve::Resolver, public Dnssd::OperationalResolveDelegate
@@ -187,9 +187,9 @@ public:
     CHIP_ERROR TryNextResult(Impl::NodeLookupHandle & handle) override;
     CHIP_ERROR CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method) override;
 
-#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
-    virtual void CacheNode(const PeerId & peerId, const ResolveResult & result) override;
-#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+#if CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
+    virtual void AddFallbackEntry(const PeerId & peerId, const ResolveResult & result) override;
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
 
     void Shutdown() override;
 
@@ -221,9 +221,9 @@ private:
     Time::TimeSource<Time::Source::kSystem> mTimeSource;
     IntrusiveList<NodeLookupHandle> mActiveLookups;
 
-#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+#if CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
     NodeAddressCache mNodeAddressCache;
-#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
 };
 
 } // namespace Impl

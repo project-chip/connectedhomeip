@@ -78,7 +78,7 @@
 
 #define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
 
-#define CHIP_DEVICE_ENABLE_CASE_DNS_CACHE 1
+#define CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY 1
 
 // Include the CHIPProjectConfig from platform implementation config
 #include <CHIPProjectConfig.h>

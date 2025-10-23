@@ -3750,7 +3750,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // clearing the ones associated with our fabric index is good enough and
         // we don't need to worry about ExpireAllSessionsOnLogicalFabric.
         mSystemState->SessionMgr()->ExpireAllSessions(scopedPeerId);
-#if CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
         Transport::Type type = proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
         // cache address if we are connected over TCP or UDP
         if (type == Transport::Type::kTcp || type == Transport::Type::kUdp)
@@ -3762,9 +3761,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             result.supportsTcpClient = result.address.GetTransportType() == Transport::Type::kTcp;
             result.supportsTcpServer = result.address.GetTransportType() == Transport::Type::kTcp;
             PeerId peerId(GetCompressedFabricId(), proxy->GetDeviceId());
-            Resolver::Instance().CacheNode(peerId, result);
+            Resolver::Instance().AddFallbackEntry(peerId, result);
         }
-#endif // CHIP_DEVICE_ENABLE_CASE_DNS_CACHE
         CommissioningStageComplete(CHIP_NO_ERROR);
 
         return;
