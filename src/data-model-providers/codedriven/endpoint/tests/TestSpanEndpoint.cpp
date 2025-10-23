@@ -40,6 +40,17 @@ TEST(TestSpanEndpoint, InstantiateWithAllParameters)
     ReadOnlyBufferBuilder<DeviceTypeEntry> deviceTypeBuilder;
     ASSERT_EQ(endpoint.DeviceTypes(deviceTypeBuilder), CHIP_NO_ERROR);
     ASSERT_EQ(deviceTypeBuilder.Size(), std::size(deviceTypes));
+
+    // A basic test that device types content looks reasonable
+    auto buffer = deviceTypeBuilder.TakeBuffer();
+
+    EXPECT_EQ(buffer[0].deviceTypeId, Device::kDoorLockDeviceTypeId);
+    EXPECT_EQ(buffer[0].deviceTypeRevision, Device::kDoorLockDeviceTypeRevision);
+
+    // compare content as well
+    EXPECT_EQ(buffer[1].deviceTypeId, deviceTypes[1].deviceTypeId);
+    EXPECT_EQ(buffer[1].deviceTypeRevision, deviceTypes[1].deviceTypeRevision);
+
 }
 
 TEST(TestSpanEndpoint, SetAndGetClientClusters)
