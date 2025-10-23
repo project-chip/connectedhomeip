@@ -39,7 +39,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
-from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_attribute,
+from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_attribute,
                                            run_if_endpoint_matches)
 
 # These below variables are used to test the AccessControl clusters Extension attribute and come from the test plan here:
