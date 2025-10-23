@@ -1048,7 +1048,7 @@ void AllClustersAppCommandHandler::OnBooleanStateChangeHandler(chip::EndpointId 
     if (booleanState != nullptr)
     {
         booleanState->SetStateValue(newState);
-        ChipLogProgress(NotSpecified, "BooleanState changed to %d on endpoint %d", newState, endpointId);
+        ChipLogProgress(NotSpecified, "BooleanState changed to %s on endpoint %d", newState ? "true" : "false", endpointId);
     }
 }
 

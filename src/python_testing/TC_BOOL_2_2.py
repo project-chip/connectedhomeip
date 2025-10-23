@@ -19,12 +19,13 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/boolean_state_2_2_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --app-pipe /tmp/boolean_state_2_2_fifo
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -89,17 +90,14 @@ class TC_BOOL_2_2(MatterBaseTest):
         endpoint = self.get_endpoint()
         node_id = self.dut_node_id
         dev_ctrl = self.default_controller
-        logger.info(f" --- Step 2a: endpoint: {endpoint}")
-        logger.info(f" --- Step 2a: node_id: {node_id}")
-        logger.info(f" --- Step 2a: dev_ctrl: {dev_ctrl}")
 
-        try:
+        if self.is_pics_sdk_ci_only:
             logger.info(" --- Step 2a: Sending Off command to the DUT")
             command_dict = {"Name": "SetBooleanState", "EndpointId": endpoint, "NewState": False}
-            self.write_to_app_pipe(command_dict, "/tmp/chip_pipe")
-        except Exception as e:
-            logger.error(f" --- Step 2a: SendCommand failed: {e}")
-            raise
+            self.write_to_app_pipe(command_dict, "/tmp/boolean_state_2_2_fifo")
+        else:
+            self.wait_for_user_input(
+                prompt_msg="Bring the DUT into a state so StateValue is FALSE.")
 
         # TH reads the StateValue attribute from the DUT.
         self.step("2b")
@@ -122,13 +120,13 @@ class TC_BOOL_2_2(MatterBaseTest):
         # Bring the DUT into a state so StateValue is TRUE.
         self.step("3a")
 
-        try:
+        if self.is_pics_sdk_ci_only:
             logger.info(" --- Step 3a: Sending On command to the DUT")
             command_dict = {"Name": "SetBooleanState", "EndpointId": endpoint, "NewState": True}
-            self.write_to_app_pipe(command_dict, "/tmp/chip_pipe")
-        except Exception as e:
-            logger.error(f" --- Step 3a: SendCommand failed: {e}")
-            raise
+            self.write_to_app_pipe(command_dict, "/tmp/boolean_state_2_2_fifo")
+        else:
+            self.wait_for_user_input(
+                prompt_msg="Bring the DUT into a state so StateValue is TRUE.")
 
         # TH reads the StateValue attribute from the DUT.
         self.step("3b")
