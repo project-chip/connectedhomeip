@@ -44,7 +44,7 @@ public:
         }
         return nullptr;
     }
-    
+
 private:
     std::map<std::string, DeviceCreator> mRegistry;
 
