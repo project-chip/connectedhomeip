@@ -187,7 +187,7 @@ public:
 
     uint32_t GetNumActiveWriteHandlers() const;
 
-    /**sFunctionTimer
+    /**
      * Returns the handler at a particular index within the active handler list.
      */
     ReadHandler * ActiveHandlerAt(unsigned int aIndex);
