@@ -40,7 +40,7 @@ public:
     MatterContext(EndpointId endpointId) : mEndpointId(endpointId) {}
     virtual ~MatterContext() = default;
 
-    virtual void MarkDirty(AttributeId attributeId) 
+    virtual void MarkDirty(AttributeId attributeId)
     {
         MatterReportingAttributeChangeCallback(mEndpointId, Id, attributeId);
 
