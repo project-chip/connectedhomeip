@@ -72,30 +72,13 @@ public:
 
     CommodityTariffDelegate * GetDelegate() { return mCommodityTariffDelegate; };
 
-    // Simplified Test Time Control API
-    void EnableTestTime(bool enable, uint32_t aInitialTimeValue = 0);
-    void AdvanceTestTime(chip::System::Clock::Seconds32 offset);
-    bool IsTestTimeEnabled() const { return mTestTimeEnabled; }
-
-    // Remove ResetTestTime() - functionality is handled by EnableTestTime(false)
-
 private:
     CommodityTariffDelegate * mCommodityTariffDelegate;
-    chip::System::Clock::Internal::MockClock * pMockClock = nullptr;
-    chip::System::Clock::ClockBase * pRealClock           = nullptr;
-
-    // Test Time Management
-    bool mTestTimeEnabled = false;
 
     // Private methods for tariff time management
     void ScheduleTariffTimeUpdate();
     void CancelTariffTimeUpdate();
     void TariffTimeUpdCb();
-
-    // Internal test time helpers
-    void InitializeMockClock(uint32_t aInitialTimeValue = 0);
-    void ShutdownMockClock();
-    void AdvanceMockTime(chip::System::Clock::Seconds32 offset);
 };
 
 } // namespace CommodityTariff
