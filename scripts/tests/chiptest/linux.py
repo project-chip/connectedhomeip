@@ -200,7 +200,7 @@ class IsolatedNetworkNamespace:
             self.run(command)
 
     def wrap_in_namespace(self, application: Application):
-        return application.wrap_with(["ip", "netns", "exec", "{}-{}".format(application.kind, self.index)])
+        return application.wrap_with(("ip", "netns", "exec", "{}-{}".format(application.kind, self.index)))
 
 
 class DBusTestSystemBus(subprocess.Popen):
