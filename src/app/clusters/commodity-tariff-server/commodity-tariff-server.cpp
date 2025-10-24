@@ -400,54 +400,26 @@ struct ThresholdsPerFeatureValidationContext
 {
     struct FeatureEntry
     {
-        uint32_t id;
-        int64_t thresholds[CommodityTariffConsts::kTariffComponentsAttrMaxLength];
-        uint8_t thresholdCount;
+        int64_t thresholdVal;
+        BitMask<Feature> featureVal;
+
+        bool operator==(const FeatureEntry& other) const {
+            return (this->featureVal == other.featureVal) && (this->thresholdVal == other.thresholdVal);
+        }
     };
-    FeatureEntry features[CommodityTariffConsts::kFeaturesCount];
-    uint8_t featureCount;
-    void Reset()
+
+    CommodityTariffContainers::CTC_UnorderedSet<FeatureEntry, CommodityTariffConsts::kTariffComponentsAttrMaxLength> featuresPerThreshold;
+
+    CHIP_ERROR AddThreshold(uint32_t feature, int64_t threshold)
     {
-        featureCount = 0;
-        for (auto & feature : features)
+        CHIP_ERROR ret = CHIP_NO_ERROR;
+        FeatureEntry entry = {.thresholdVal = threshold, .featureVal = feature};
+
+        if (!featuresPerThreshold.insert(entry))
         {
-            feature.thresholdCount = 0;
+            ret = CHIP_ERROR_DUPLICATE_KEY_ID;
         }
-    }
-    CHIP_ERROR AddThreshold(uint32_t featureId, int64_t threshold)
-    {
-        CHIP_ERROR ret = CHIP_ERROR_NOT_FOUND;
-        // Find existing feature
-        for (uint8_t i = 0; i < featureCount; i++)
-        {
-            if (features[i].id == featureId)
-            {
-                // Check for duplicate threshold
-                for (uint8_t j = 0; j < features[i].thresholdCount; j++)
-                {
-                    if (features[i].thresholds[j] == threshold)
-                    {
-                        ret = CHIP_ERROR_DUPLICATE_KEY_ID; // Duplicate found
-                        break;
-                    }
-                }
-                // Add threshold
-                VerifyOrReturnError(CommodityTariffConsts::kTariffComponentsAttrMaxLength, CHIP_ERROR_INTERNAL);
-                features[i].thresholds[features[i].thresholdCount++] = threshold;
-                ret                                                  = CHIP_NO_ERROR;
-                break;
-            }
-        }
-        // Create new feature entry
-        VerifyOrReturnError(featureCount < CommodityTariffConsts::kFeaturesCount, CHIP_ERROR_INTERNAL);
-        if (ret == CHIP_ERROR_NOT_FOUND)
-        {
-            features[featureCount].id             = featureId;
-            features[featureCount].thresholds[0]  = threshold;
-            features[featureCount].thresholdCount = 1;
-            featureCount++;
-            ret = CHIP_NO_ERROR;
-        }
+    
         return ret;
     }
 };
@@ -644,7 +616,6 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
 
         // Validate Tariff Components
         ThresholdsPerFeatureValidationContext validationCtx;
-        validationCtx.Reset();
 
         for (const uint32_t tcID : tcIDs)
         {
@@ -679,10 +650,6 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
                 ChipLogError(AppServer,
                              "Duplicated threshold value among TCs for the 0x%" PRIx32 " feature in the same tariff period",
                              featureID);
-            }
-            else if (sts != CHIP_NO_ERROR)
-            {
-                ChipLogError(AppServer, "An error at thresholds duplication checking per feature");
                 return sts;
             }
         }
