@@ -41,7 +41,7 @@ LazyRegisteredServerCluster<ICDManagementCluster> gServer;
 constexpr chip::BitMask<OptionalCommands> kEnabledCommands()
 {
     chip::BitMask<OptionalCommands> result;
-#if defined(ICD_MANAGEMENT_STAY_ACTIVE_REQUEST_COMMAND) || defined(ICD_MANAGEMENT_STAY_ACTIVE_RESPONSE_COMMAND)
+#if defined(ICD_MANAGEMENT_STAY_ACTIVE_REQUEST_COMMAND)
     result.Set(kStayActive);
 #endif
     return result;
@@ -54,7 +54,7 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         ICDManagementCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
-        const BitMask<OptionalCommands> enabledCommands = kEnabledCommands();
+        constexpr BitMask<OptionalCommands> enabledCommands = kEnabledCommands();
 
         // Get UserActiveModeTriggerHint
         BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint(0);
@@ -62,27 +62,23 @@ public:
             Protocols::InteractionModel::Status::Success)
         {
             ChipLogError(Zcl, "Failed to get UserActiveModeTriggerHint, using default (0)");
+            userActiveModeTriggerHint = BitMask<IcdManagement::UserActiveModeTriggerBitmap>(0);
         }
 
         // Get UserActiveModeTriggerInstruction
         char instructionBuffer[kUserActiveModeTriggerInstructionMaxLength];
-        MutableCharSpan instructionSpan(instructionBuffer, sizeof(instructionBuffer));
-        CharSpan userActiveModeTriggerInstruction;
+        MutableCharSpan instructionSpan(instructionBuffer);
 
         if (Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::Get(endpointId, instructionSpan) !=
             Protocols::InteractionModel::Status::Success)
         {
             ChipLogError(Zcl, "Failed to get UserActiveModeTriggerInstruction, using default (empty string)");
-            userActiveModeTriggerInstruction = CharSpan();
-        }
-        else
-        {
-            userActiveModeTriggerInstruction = CharSpan(instructionSpan.data(), instructionSpan.size());
+            instructionSpan = MutableCharSpan();
         }
 
         gServer.Create(endpointId, Server::GetInstance().GetPersistentStorage(), *Server::GetInstance().GetSessionKeystore(),
                        Server::GetInstance().GetFabricTable(), ICDConfigurationData::GetInstance().GetInstance(),
-                       optionalAttributeSet, enabledCommands, userActiveModeTriggerHint, userActiveModeTriggerInstruction);
+                       optionalAttributeSet, enabledCommands, userActiveModeTriggerHint, instructionSpan);
         return gServer.Registration();
     }
 
