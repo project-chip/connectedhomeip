@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,23 +15,16 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/thread-border-router-management-server/thread-border-router-management-server.h>
-#include <app/server/Server.h>
-#include <lib/core/CHIPEncoding.h>
+#include <app/clusters/thread-border-router-management-server/thread-br-delegate.h>
+#include <clusters/ThreadBorderRouterManagement/Attributes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <optional>
+namespace chip {
 
-using namespace chip;
-using namespace chip::literals;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-
-namespace {
-class FakeBorderRouterDelegate final : public ThreadBorderRouterManagement::Delegate
+class FakeBorderRouterDelegate final : public app::Clusters::ThreadBorderRouterManagement::Delegate
 {
     CHIP_ERROR Init(AttributeChangeCallback * attributeChangeCallback) override
     {
@@ -126,9 +119,9 @@ private:
         self->mPendingDataset.Clear();
         // This could just call MatterReportingAttributeChangeCallback directly
         self->mAttributeChangeCallback->ReportAttributeChanged(
-            ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
+            app::Clusters::ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
         self->mAttributeChangeCallback->ReportAttributeChanged(
-            ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
+            app::Clusters::ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
     }
 
     AttributeChangeCallback * mAttributeChangeCallback;
@@ -139,13 +132,4 @@ private:
     uint32_t mActivateDatasetSequence;
 };
 
-FakeBorderRouterDelegate gBorderRouterDelegate{};
-} // namespace
-
-std::optional<ThreadBorderRouterManagement::ServerInstance> gThreadBorderRouterManagementServer;
-void emberAfThreadBorderRouterManagementClusterInitCallback(EndpointId endpoint)
-{
-    VerifyOrDie(!gThreadBorderRouterManagementServer);
-    gThreadBorderRouterManagementServer.emplace(endpoint, &gBorderRouterDelegate, Server::GetInstance().GetFailSafeContext())
-        .Init();
-}
+} // namespace chip

@@ -172,7 +172,11 @@ source_set("testing") {
 }
 
 source_set("type-traits") {
-  sources = [ "TypeTraits.h" ]
+  sources = [
+    "CompileTimeString.h",
+    "FunctionTraits.h",
+    "TypeTraits.h",
+  ]
 }
 
 source_set("static-support") {
@@ -211,7 +215,6 @@ static_library("support") {
     "FixedBufferAllocator.cpp",
     "FixedBufferAllocator.h",
     "Fold.h",
-    "FunctionTraits.h",
     "IniEscaping.cpp",
     "IniEscaping.h",
     "IntrusiveList.h",
