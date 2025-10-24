@@ -634,14 +634,14 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const 
 
     // Lock the chip stack before calling SetTargetState to prevent assertion failures
     DeviceLayer::PlatformMgr().LockChipStack();
-    
+
     if (mClosurePanelEndpoint2.GetLogic().SetTargetState(DataModel::MakeNullable(mClosurePanelEndpoint2Target)) != CHIP_NO_ERROR)
     {
         DeviceLayer::PlatformMgr().UnlockChipStack();
         ChipLogError(AppServer, "Failed to set target for Endpoint 2");
         return Status::Failure;
     }
-    
+
     if (mClosurePanelEndpoint3.GetLogic().SetTargetState(DataModel::MakeNullable(mClosurePanelEndpoint3Target)) != CHIP_NO_ERROR)
     {
         DeviceLayer::PlatformMgr().UnlockChipStack();
@@ -829,7 +829,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
 {
     // Lock chip stack to safely access cluster state
     DeviceLayer::PlatformMgr().LockChipStack();
-    
+
     MainStateEnum mClosureEndpoint1MainState;
     if (mClosureEndpoint1.GetLogic().GetMainState(mClosureEndpoint1MainState) != CHIP_NO_ERROR)
     {
@@ -837,7 +837,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
         ChipLogError(AppServer, "Failed to get main state for SetTarget command on Endpoint 1");
         return Status::Failure;
     }
-    
+
     DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // If this command is received while the MainState attribute is currently either in Disengaged, Protected, Calibrating,
@@ -1124,7 +1124,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
 {
     // Lock chip stack to safely access cluster state
     DeviceLayer::PlatformMgr().LockChipStack();
-    
+
     MainStateEnum mClosureEndpoint1MainState;
     if (mClosureEndpoint1.GetLogic().GetMainState(mClosureEndpoint1MainState) != CHIP_NO_ERROR)
     {
@@ -1132,7 +1132,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
         ChipLogError(AppServer, "Failed to get main state for Step command on Endpoint 1");
         return Status::Failure;
     }
-    
+
     DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // If this command is received while the MainState attribute is currently either in Disengaged, Protected, Calibrating,
