@@ -103,19 +103,18 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
 
 CHIP_ERROR NXPWiFiDriver::ConnectWiFiStagedNetwork()
 {
-    if(mSavedNetwork.ssidLen !=0)
+    if (mSavedNetwork.ssidLen != 0)
     {
         // Connect to saved network
-        return ConnectWiFiNetwork(mSavedNetwork.ssid, mSavedNetwork.ssidLen, mSavedNetwork.credentials, mSavedNetwork.credentialsLen);
+        return ConnectWiFiNetwork(mSavedNetwork.ssid, mSavedNetwork.ssidLen, mSavedNetwork.credentials,
+                                  mSavedNetwork.credentialsLen);
     }
     else
     {
         // no needed to connect to the staged network if commissioning failed
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
-
 }
-
 
 void NXPWiFiDriver::Shutdown()
 {

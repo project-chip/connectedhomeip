@@ -371,7 +371,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled()
 
 void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
     WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
     uint8_t associationFailureCause =
         chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);
@@ -489,26 +489,27 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
         if (mIsWifiRecovering)
         {
             /*
-            Wifi recovery mechanism (due to firmware hang) is finished, we will attempt to reconnect to the previously staged network
+            Wifi recovery mechanism (due to firmware hang) is finished, we will attempt to reconnect to the previously staged
+            network
             */
             mIsWifiRecovering = false;
-            err = NetworkCommissioning::NXPWiFiDriver::GetInstance().ConnectWiFiStagedNetwork();
-            if(err == CHIP_ERROR_KEY_NOT_FOUND)
+            err               = NetworkCommissioning::NXPWiFiDriver::GetInstance().ConnectWiFiStagedNetwork();
+            if (err == CHIP_ERROR_KEY_NOT_FOUND)
             {
                 /* if no SSID is staged, notify the network commissioning module to clean environnement for next commissioning  */
-                NetworkCommissioning::NXPWiFiDriver::GetInstance().OnConnectWiFiNetwork(NetworkCommissioning::Status::kNetworkIDNotFound,
-                                                                                CharSpan(), wlanEvent);
+                NetworkCommissioning::NXPWiFiDriver::GetInstance().OnConnectWiFiNetwork(
+                    NetworkCommissioning::Status::kNetworkIDNotFound, CharSpan(), wlanEvent);
             }
         }
         break;
 
     case WLAN_REASON_FW_HANG:
         /*
-         If the Wifi driver hangs, a recovery mechanism has been triggered. This mechanism will end with re-initializing the wifi driver.
-         If the wifi state is different from kWiFiStationState_NotConnected and kWiFiStationState_Disconnecting,
-         we want to retry the wifi connection once the driver is re-initialized.
+         If the Wifi driver hangs, a recovery mechanism has been triggered. This mechanism will end with re-initializing the wifi
+         driver. If the wifi state is different from kWiFiStationState_NotConnected and kWiFiStationState_Disconnecting, we want to
+         retry the wifi connection once the driver is re-initialized.
         */
-        if(mWiFiStationState != kWiFiStationState_NotConnected && mWiFiStationState != kWiFiStationState_Disconnecting)
+        if (mWiFiStationState != kWiFiStationState_NotConnected && mWiFiStationState != kWiFiStationState_Disconnecting)
         {
             mIsWifiRecovering = true;
         }

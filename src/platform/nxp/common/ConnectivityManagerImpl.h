@@ -155,7 +155,7 @@ private:
     uint32_t mWiFiStationReconnectIntervalMS;
     bool mWifiManagerInit   = false;
     bool mWifiIsProvisioned = false;
-    bool mIsWifiRecovering = false;
+    bool mIsWifiRecovering  = false;
 
     enum WiFiEventGroup{
         kWiFiEventGroup_WiFiStationModeBit = (1 << 0),
