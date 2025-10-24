@@ -31,22 +31,24 @@ chip_enable_rotating_device_id = true
 chip_enable_additional_data_advertising = true
 chip_build_libshell = true
 
+# Note: commented out "trigger" settings as they cause linker errors. Need to find a better way to enable these features.
 # All clusters settings
-chip_enable_smoke_co_trigger = true
-chip_enable_boolean_state_configuration_trigger = true
-chip_enable_software_diagnostics_trigger = true
-chip_enable_wifi_diagnostics_trigger = true
+# chip_enable_smoke_co_trigger = true
+# chip_enable_boolean_state_configuration_trigger = true
+# chip_enable_software_diagnostics_trigger = true
+# chip_enable_wifi_diagnostics_trigger = true
 # energy gateway settings
-chip_enable_commodity_price_trigger = true
-chip_enable_commodity_tariff_trigger = true
-chip_enable_electrical_grid_conditions_trigger = true
-chip_enable_meter_identification_trigger = true
-chip_enable_commodity_metering_trigger = true
+# chip_enable_commodity_price_trigger = true
+# chip_enable_commodity_tariff_trigger = true
+# chip_enable_electrical_grid_conditions_trigger = true
+# chip_enable_meter_identification_trigger = true
+# chip_enable_commodity_metering_trigger = true
 # energy management settings
-chip_enable_energy_evse_trigger = true
-chip_enable_energy_reporting_trigger = true
-chip_enable_device_energy_management_trigger = true
-chip_enable_water_heater_management_trigger = true
+# chip_enable_energy_evse_trigger = true
+# chip_enable_energy_reporting_trigger = true
+# chip_enable_device_energy_management_trigger = true
+# chip_enable_water_heater_management_trigger = true
+
 # lit-icd-app settings
 chip_enable_icd_server = true
 chip_subscription_timeout_resumption = true
@@ -54,10 +56,10 @@ chip_icd_report_on_active_mode = true
 chip_enable_icd_lit = true
 chip_enable_icd_dsls = true
 # network-manager app settings
-chip_config_network_layer_ble = false
+# chip_config_network_layer_ble = false
 chip_enable_access_restrictions = true
 # ota-requestor-app settings
-chip_enable_ota_requestor = true
+# chip_enable_ota_requestor = true # undefined reference to `chip::Shell::RegisterOtaCommands()'
 # terms-and-conditions-app settings:
 chip_terms_and_conditions_required = true
 # tv-app settings
