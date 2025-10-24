@@ -35,11 +35,16 @@
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 namespace chip {
+
+namespace Crypto {
+using SymmetricKeystore = Crypto::SessionKeystore;
+} // namespace Crypto
+
 namespace app {
 namespace Clusters {
 
 namespace IcdManagement {
-enum class OptionalCommands : uint32_t
+enum class OptionalCommands : uint8_t
 {
     kStayActive = 0x01,
 };
@@ -56,9 +61,14 @@ constexpr size_t kUserActiveModeTriggerInstructionMaxLength = 128;
 class ICDManagementCluster : public DefaultServerCluster
 {
 public:
-    using OptionalAttributeSet = chip::app::OptionalAttributeSet<IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id>;
+    using OptionalAttributeSet = app::OptionalAttributeSet<IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id>;
 
-    ICDManagementCluster(EndpointId endpointId, PersistentStorageDelegate & storage, Crypto::SessionKeystore & symmetricKeystore,
+    // TODO: The interaction between aEnabledCommands and feature flags (particularly LITS) needs clarification.
+    // According to spec, LITS implies StayActiveRequest support. Options:
+    // 1. Document that kStayActive bit in aEnabledCommands is ignored when LITS feature is set
+    // 2. Add Startup() validation to fail if aEnabledCommands and feature flags are inconsistent,
+    //    and simplify AcceptedCommands/GeneratedCommands to only check mEnabledCommands
+    ICDManagementCluster(EndpointId endpointId, PersistentStorageDelegate & storage, Crypto::SymmetricKeystore & symmetricKeystore,
                          FabricTable & fabricTable, ICDConfigurationData & icdConfigurationData,
                          OptionalAttributeSet optionalAttributeSet, BitMask<IcdManagement::OptionalCommands> aEnabledCommands,
                          BitMask<IcdManagement::UserActiveModeTriggerBitmap> aUserActiveModeTriggerBitmap,
@@ -82,20 +92,17 @@ protected:
 #endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
     PersistentStorageDelegate & mStorage;
-    Crypto::SessionKeystore & mSymmetricKeystore;
+    Crypto::SymmetricKeystore & mSymmetricKeystore;
     FabricTable & mFabricTable;
     ICDConfigurationData & mICDConfigurationData;
     const OptionalAttributeSet mOptionalAttributeSet;
     BitMask<IcdManagement::OptionalCommands> mEnabledCommands;
     BitMask<IcdManagement::UserActiveModeTriggerBitmap> mUserActiveModeTriggerBitmap;
     char mUserActiveModeTriggerInstruction[IcdManagement::kUserActiveModeTriggerInstructionMaxLength];
+    uint8_t mUserActiveModeTriggerInstructionLength;
 };
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-
-namespace Crypto {
-using SymmetricKeystore = chip::Crypto::SessionKeystore;
-} // namespace Crypto
 
 /**
  * @brief Implementation of Fabric Delegate for ICD Management cluster
@@ -125,7 +132,7 @@ class ICDManagementClusterWithCIP : public ICDManagementCluster
 {
 public:
     ICDManagementClusterWithCIP(EndpointId endpointId, PersistentStorageDelegate & storage,
-                                chip::Crypto::SessionKeystore & symmetricKeystore, FabricTable & fabricTable,
+                                Crypto::SymmetricKeystore & symmetricKeystore, FabricTable & fabricTable,
                                 ICDConfigurationData & icdConfigurationData, OptionalAttributeSet optionalAttributeSet,
                                 BitMask<IcdManagement::OptionalCommands> aEnabledCommands,
                                 BitMask<IcdManagement::UserActiveModeTriggerBitmap> aUserActiveModeTriggerBitmap,
@@ -136,6 +143,8 @@ public:
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & aEncoder) override;
+
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
@@ -156,14 +165,13 @@ private:
      * ICDConfigurationData If function fails, icdCounter will be unchanged
      * @return Status
      */
-    chip::Protocols::InteractionModel::Status
-    RegisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                   const chip::app::Clusters::IcdManagement::Commands::RegisterClient::DecodableType & commandData,
-                   uint32_t & icdCounter);
+    Protocols::InteractionModel::Status RegisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                       const IcdManagement::Commands::RegisterClient::DecodableType & commandData,
+                                                       uint32_t & icdCounter);
 
-    chip::Protocols::InteractionModel::Status
-    UnregisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                     const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
+    Protocols::InteractionModel::Status
+    UnregisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                     const IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
 
     ICDManagementFabricDelegate mFabricDelegate;
 };
