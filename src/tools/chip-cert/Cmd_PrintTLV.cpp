@@ -218,7 +218,6 @@ bool PrintTLV(ByteSpan tlv)
     chip::TLV::TLVReader reader;
 
     VerifyOrReturnError(!tlv.empty(), false);
-    VerifyOrReturnError(OpenFile(gOutFileName, gOutFile, true), false);
 
     reader.Init(tlv);
     reader.ImplicitProfileId = 0;
@@ -249,5 +248,10 @@ bool Cmd_PrintTLV(int argc, char * argv[])
     std::optional<std::vector<uint8_t>> tlv = ReadTLV(gInFileNameOrStr);
     VerifyOrReturnError(tlv.has_value(), false);
 
-    return PrintTLV(ByteSpan{ tlv->data(), tlv->size() });
+    bool isSuccess = false;
+    VerifyOrReturnError(OpenFile(gOutFileName, gOutFile, true), false);
+    isSuccess = PrintTLV(ByteSpan{ tlv->data(), tlv->size() });
+    CloseFile(gOutFile);
+
+    return isSuccess;
 }

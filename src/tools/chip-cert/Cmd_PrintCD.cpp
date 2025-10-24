@@ -238,7 +238,6 @@ bool PrintCD(ByteSpan cd)
     uint32_t signerKeyIdHexLen = 0;
 
     VerifyOrReturnError(!cd.empty(), false);
-    VerifyOrReturnError(OpenFile(gOutFileName, gOutFile, true), false);
     VerifyOrReturnError(CMS_ExtractKeyId(cd, signerKeyId) == CHIP_NO_ERROR, false);
     VerifyOrReturnError(CMS_ExtractCDContent(cd, cdContent) == CHIP_NO_ERROR, false);
 
@@ -272,5 +271,10 @@ bool Cmd_PrintCD(int argc, char * argv[])
     std::optional<std::vector<uint8_t>> cd = ReadCD(gInFileNameOrStr);
     VerifyOrReturnError(cd.has_value(), false);
 
-    return PrintCD(ByteSpan{ cd->data(), cd->size() });
+    bool isSuccess = false;
+    VerifyOrReturnError(OpenFile(gOutFileName, gOutFile, true), false);
+    isSuccess = PrintCD(ByteSpan{ cd->data(), cd->size() });
+    CloseFile(gOutFile);
+
+    return isSuccess;
 }
