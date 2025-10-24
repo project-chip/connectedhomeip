@@ -52,7 +52,6 @@ public:
     ~WiFiDiagnosticsServerCluster() { mDiagnosticProvider.SetWiFiDiagnosticsDelegate(nullptr); }
 
     // Server cluster implementation
-
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
@@ -62,48 +61,16 @@ public:
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
 
-    template <typename T, typename Type>
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (DeviceLayer::DiagnosticDataProvider::*getter)(T &), Type & data,
-                               AttributeValueEncoder & aEncoder)
-    {
-        T value;
-        CHIP_ERROR err = (mDiagnosticProvider.*getter)(value);
-
-        if (err == CHIP_NO_ERROR)
-        {
-            data.SetNonNull(value);
-        }
-        else
-        {
-            ChipLogProgress(Zcl, "The WiFi interface is not currently configured or operational.");
-        }
-
-        return aEncoder.Encode(data);
-    }
-
-    // Gets called when the Node detects Node's Wi-Fi connection has been disconnected.
+    // DeviceLayer::WiFiDiagnosticsDelegate implementation
     void OnDisconnectionDetected(uint16_t reasonCode) override;
-
-    // Gets called when the Node fails to associate or authenticate an access point.
     void OnAssociationFailureDetected(uint8_t associationFailureCause, uint16_t status) override;
-
-    // Gets when the Node's connection status to a Wi-Fi network has changed.
     void OnConnectionStatusChanged(uint8_t connectionStatus) override;
-
-    // Getter methods for private members
-    EndpointId GetEndpointId() const { return mEndpointId; }
-    const BitFlags<WiFiNetworkDiagnostics::Feature> & GetFeatureFlags() const { return mFeatureFlags; }
-    const OptionalAttributeSet & GetOptionalAttributeSet() const { return mOptionalAttributeSet; }
 
 private:
     EndpointId mEndpointId;
     DeviceLayer::DiagnosticDataProvider & mDiagnosticProvider;
     const OptionalAttributeSet mOptionalAttributeSet;
     const BitFlags<WiFiNetworkDiagnostics::Feature> mFeatureFlags;
-
-    // WiFiBssId uses custom implementations instead of ReadIfSupported because it
-    // is attribute of type octet string.
-    CHIP_ERROR ReadWiFiBssId(AttributeValueEncoder & aEncoder);
 };
 
 } // namespace Clusters

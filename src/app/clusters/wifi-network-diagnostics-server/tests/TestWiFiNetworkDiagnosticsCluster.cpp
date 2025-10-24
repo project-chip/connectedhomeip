@@ -68,7 +68,7 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
 
         NullProvider nullProvider;
         WiFiDiagnosticsServerCluster cluster(kRootEndpointId, nullProvider, WiFiDiagnosticsServerCluster::OptionalAttributeSet(),
-                                         BitFlags<WiFiNetworkDiagnostics::Feature>(0));
+                                             BitFlags<WiFiNetworkDiagnostics::Feature>(0));
 
         // without any enabled attributes, no commands are accepted
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
