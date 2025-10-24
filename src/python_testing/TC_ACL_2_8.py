@@ -517,6 +517,9 @@ class TC_ACL_2_8(MatterBaseTest):
     def desc_TC_ACL_2_8(self) -> str:
         return "[TC-ACL-2.8] ACL multi-fabric"
 
+    def pics_TC_ACL_2_8(self) -> list[str]:
+        return ['ACL.S']
+
     def steps_TC_ACL_2_8(self) -> list[TestStep]:
         steps = [
             TestStep(1, "TH1 commissions DUT using admin node ID N1",
