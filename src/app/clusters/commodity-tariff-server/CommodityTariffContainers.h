@@ -237,10 +237,16 @@ public:
             return it->second;
         }
 
-        VerifyOrDie(!full());
+        if(!full())
+        {
+            // Key not found, insert it.
+            data_.push_back({ key, Value{} });            
+        }
+        else
+        {
+            ChipLogError(AppServer, "Can't place new entry - the buffer is full");
+        }
 
-        // Key not found, insert it.
-        data_.push_back({ key, Value{} });
         return data_.back().second;
     }
 
