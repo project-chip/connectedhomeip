@@ -149,8 +149,10 @@ TEST_F(TestExchangeMgr, CheckSessionExpirationBasics)
     EXPECT_FALSE(receiveDelegate.IsOnMessageReceivedCalled);
     ec1->Close();
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &receiveDelegate);
 
     // recreate closed session.
     EXPECT_EQ(CreateSessionAliceToBob(), CHIP_NO_ERROR);
@@ -219,11 +221,15 @@ TEST_F(TestExchangeMgr, CheckUmhRegistrationTest)
     err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::Echo::Id);
     EXPECT_NE(err, CHIP_NO_ERROR);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::Echo::Id, kMsgType_TEST1);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::Echo::Id, kMsgType_TEST1, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockAppDelegate);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::Echo::Id, kMsgType_TEST2);
+    removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::Echo::Id, kMsgType_TEST2, &removedHandler);
     EXPECT_NE(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, nullptr);
 }
 
 TEST_F(TestExchangeMgr, CheckExchangeMessages)
@@ -256,8 +262,10 @@ TEST_F(TestExchangeMgr, CheckExchangeMessages)
     DrainAndServiceIO();
     EXPECT_TRUE(mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockUnsolicitedAppDelegate);
 }
 
 } // namespace
