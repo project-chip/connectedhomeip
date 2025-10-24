@@ -30,6 +30,7 @@ class WaterLeakDetectorDevice : public Device
 {
 public:
     WaterLeakDetectorDevice() :
+        //TODO: Update the hard coded device type once #41602 is merged
         Device(
             Device::DeviceType{ .deviceType = static_cast<DeviceTypeId>(0x0043), .revision = kWaterLeakDetectorDeviceTypeRevision })
     {}

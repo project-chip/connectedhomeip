@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -116,7 +116,7 @@ void StopSignalHandler(int /* signal */)
     }
 }
 
-[[maybe_unused]] chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentStorageDelegate * delegate)
+chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentStorageDelegate * delegate)
 {
     static chip::app::DefaultAttributePersistenceProvider attributePersistenceProvider;
     static chip::app::CodeDrivenDataModelProvider dataModelProvider =

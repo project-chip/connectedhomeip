@@ -44,6 +44,7 @@ public:
 
 protected:
     // Most implementations require network commissioning, so only subclasses have access to this.
+    //TODO: Update the hard coded device type once #41602 is merged
     RootNodeDevice() : Device(Device::DeviceType{ .deviceType = static_cast<uint32_t>(0x0016), .revision = 3 }) {}
 
 private:

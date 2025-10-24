@@ -24,7 +24,7 @@ CHIP_ERROR ContactSensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDa
 {
     ReturnErrorOnFailure(BaseRegistration(endpoint, provider, parentId));
 
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, *mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mBooleanStateCluster.Create(endpoint);

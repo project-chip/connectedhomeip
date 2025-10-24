@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/TimerDelegates.h>
 #include <devices/contact-sensor/ContactSensorDevice.h>
 #include <devices/water-leak-detector/WaterLeakDetectorDevice.h>
 #include <functional>
@@ -52,7 +53,7 @@ private:
 
     DeviceFactory()
     {
-        mRegistry["contact-sensor"]      = []() { return std::make_unique<ContactSensorDevice>(); };
+        mRegistry["contact-sensor"]      = []() { return std::make_unique<ContactSensorDevice>(std::make_unique<DefaultTimerDelegate>()); };
         mRegistry["water-leak-detector"] = []() { return std::make_unique<WaterLeakDetectorDevice>(); };
     }
 };

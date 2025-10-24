@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <app/TimerDelegates.h>
+#include <app/reporting/ReportScheduler.h>
 #include <app/clusters/boolean-state-server/boolean-state-cluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <devices/base-device/Device.h>
@@ -29,8 +29,9 @@ constexpr DeviceTypeId kContactSensorDeviceTypeRevision = 2;
 class ContactSensorDevice : public Device
 {
 public:
-    ContactSensorDevice() :
-        Device(Device::DeviceType{ .deviceType = static_cast<DeviceTypeId>(0x0015), .revision = kContactSensorDeviceTypeRevision })
+    ContactSensorDevice(std::unique_ptr<reporting::ReportScheduler::TimerDelegate> timerDelegate) :
+        //TODO: Update the hard coded device type once #41602 is merged
+        Device(Device::DeviceType{ .deviceType = static_cast<DeviceTypeId>(0x0015), .revision = kContactSensorDeviceTypeRevision }), mTimerDelegate(std::move(timerDelegate))
     {}
     ~ContactSensorDevice() override = default;
 
@@ -41,7 +42,7 @@ public:
     Clusters::BooleanStateCluster & Cluster() { return mBooleanStateCluster.Cluster(); }
 
 private:
-    DefaultTimerDelegate mTimerDelegate;
+    std::unique_ptr<reporting::ReportScheduler::TimerDelegate> mTimerDelegate;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::BooleanStateCluster> mBooleanStateCluster;
 };
