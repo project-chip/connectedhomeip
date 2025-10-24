@@ -603,7 +603,7 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
             ChipLogError(NotSpecified, "The SetTotalOperationalHours command requires the Hours key.");
             return;
         }
-        
+
         uint32_t hours = static_cast<uint32_t>(self->mJsonValue["Hours"].asUInt());
         CHIP_ERROR err = DeviceLayer::ConfigurationMgr().StoreTotalOperationalHours(hours);
         if (err != CHIP_NO_ERROR)
