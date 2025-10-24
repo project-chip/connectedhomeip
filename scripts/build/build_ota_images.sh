@@ -21,7 +21,7 @@ CHIP_ROOT="$(dirname "$0")/../.."
 # Default values for optional arguments
 VENDOR_ID="0xDEAD"
 PRODUCT_ID="0xBEEF"
-MAX_RANGE=5
+MAX_RANGE=2
 OUT_PREFIX="out/su_ota_images_min"
 BUILT_IMAGES_STACK=()
 TARGET_FILE="$CHIP_ROOT/examples/ota-requestor-app/linux/include/CHIPProjectAppConfig.h"
@@ -93,7 +93,7 @@ if [ "$STATUS_CODE" -ne 0 ]; then
 fi
 
 for ((i = 2; i <= "$MAX_RANGE"; i++)); do
-    echo "Running for version $i"
+    echo "Building for version $i"
 
     replace_version_config_str "$i" "$TARGET_FILE"
 

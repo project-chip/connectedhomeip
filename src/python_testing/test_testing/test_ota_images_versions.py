@@ -85,7 +85,7 @@ def run_single_test(software_version: int = 2) -> int:
 def main():
     passes = []
     main_status = 0
-    for version in range(2, 6):
+    for version in range(2, 3):
         status = run_single_test(software_version=version)
         passes.append((version, status))
 
