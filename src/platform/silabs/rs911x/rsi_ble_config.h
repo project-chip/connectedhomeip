@@ -21,12 +21,8 @@ extern "C" {
 #endif
 
 #include "rsi_ble_apis.h"
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #include "rsi_bt_common_apis.h"
 #include "rsi_user.h"
-#else
-#include <rsi_data_types.h>
-#endif
 
 #ifdef __cplusplus
 }
@@ -96,28 +92,19 @@ extern "C" {
 #define RSI_BLE_CUSTOM_SERVICE_UUID (0xFFF6)
 #define RSI_BLE_CUSTOM_LEVEL_UUID (0x1FF1)
 
-#if (defined(RSI_M4_INTERFACE) || defined(SLI_SI91X_MCU_INTERFACE))
-#define RSI_BLE_MAX_NBR_ATT_REC (20)
-
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-#define RSI_BLE_MAX_NBR_PERIPHERALS (1)
+#ifdef SLI_SI91X_MCU_INTERFACE
+#define RSI_BLE_MAX_NBR_ATT_REC 20
+/* Number of BLE notifications */
+#define RSI_BLE_NUM_CONN_EVENTS 2
+#define RSI_BLE_MAX_NBR_PERIPHERALS 1
 #else
-#define RSI_BLE_MAX_NBR_SLAVES (1)
-#endif // (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
+#define RSI_BLE_MAX_NBR_ATT_REC 80
+/* Number of BLE notifications */
+#define RSI_BLE_NUM_CONN_EVENTS 20
+#define RSI_BLE_MAX_NBR_PERIPHERALS 3
+#endif
 
-#define RSI_BLE_NUM_CONN_EVENTS (2)
-#else
-#define RSI_BLE_MAX_NBR_ATT_REC (80)
-
-#if (EXP_BOARD)
-#define RSI_BLE_MAX_NBR_PERIPHERALS (3)
-#else
-#define RSI_BLE_MAX_NBR_SLAVES (3)
-#endif // (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-
-#define RSI_BLE_NUM_CONN_EVENTS (20)
-#endif // (defined(RSI_M4_INTERFACE) || defined(SLI_SI91X_MCU_INTERFACE))
-
+#define RSI_BLE_MAX_NBR_CENTRALS (1)
 #define RSI_BLE_MAX_NBR_ATT_SERV (10)
 
 #define RSI_BLE_GATT_ASYNC_ENABLE (1)
@@ -256,7 +243,7 @@ extern "C" {
 #define SL_WFX_BT_INVALID_RANGE (0x4E60)
 
 /***********************************************************************************************************************************************/
-//! RS9116 Firmware Configurations
+//! SiWx917 Firmware Configurations
 /***********************************************************************************************************************************************/
 /*=======================================================================*/
 //! Power save command parameters
@@ -266,7 +253,6 @@ extern "C" {
 #define NO_OF_VAL_ATT (5) //! Attribute value count
 
 #if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-#define RSI_BLE_MAX_NBR_CENTRALS (1)
 #define FRONT_END_SWITCH_SEL2 BIT(30)
 #define RSI_FEATURE_BIT_MAP                                                                                                        \
     (SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE | SL_SI91X_FEAT_DEV_TO_HOST_ULP_GPIO_1) //! To set wlan feature select bit map
