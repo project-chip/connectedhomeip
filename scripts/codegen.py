@@ -24,9 +24,13 @@ with PythonPath('py_matter_idl', relative_to=__file__):
     from matter.idl.matter_idl_parser import CreateParser
 
 import logging
+import os.path
+import subprocess
 import sys
+import traceback
 
 import click
+from tools.zap.clang_format import getClangFormatBinary
 
 try:
     import coloredlogs
@@ -169,6 +173,19 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
                     logging.fatal("   '%s' was expected but not generated" % name)
 
                 sys.exit(1)
+
+    cpp_files = []
+    for file in storage.generated_paths:
+        _, ext = os.path.splitext(file)
+        if ext in ['.h', '.cpp', '.c', '.hpp']:
+            cpp_files.append(file)
+    if cpp_files:
+        try:
+            logging.debug("Formatting files: %s", cpp_files)
+
+            subprocess.check_call([getClangFormatBinary(), "-i"] + cpp_files)
+        except Exception:
+            traceback.print_exc()
 
     logging.info("Done")
 

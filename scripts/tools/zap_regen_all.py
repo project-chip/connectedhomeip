@@ -33,8 +33,6 @@ from enum import Flag, auto
 from pathlib import Path
 from typing import List
 
-from zap.clang_format import getClangFormatBinary
-
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
 
@@ -303,16 +301,6 @@ class JinjaCodegenTarget():
             traceback.print_exc()
             raise
 
-    def formatWithClangFormat(self, paths):
-        try:
-            logging.info("Formatting %d cpp files:", len(paths))
-            for name in paths:
-                logging.info("    %s" % name)
-
-            subprocess.check_call([getClangFormatBinary(), "-i"] + paths)
-        except Exception:
-            traceback.print_exc()
-
     def codeFormat(self):
         outputs = subprocess.check_output(["./scripts/codegen.py", "--name-only", "--generator",
                                            self.generator, "--log-level", "fatal", self.idl_path]).decode("utf8").split("\n")
@@ -326,12 +314,6 @@ class JinjaCodegenTarget():
 
         if '.kt' in name_dict:
             self.formatKotlinFiles(name_dict['.kt'])
-
-        cpp_files = []
-        for ext in ['.h', '.cpp', '.c', '.hpp']:
-            cpp_files.extend(name_dict.get(ext, []))
-        if cpp_files:
-            self.formatWithClangFormat(cpp_files)
 
     def generate(self) -> TargetRunStats:
         generate_start = time.time()
