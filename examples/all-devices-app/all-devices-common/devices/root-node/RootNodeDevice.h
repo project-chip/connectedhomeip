@@ -27,9 +27,9 @@
 #include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <devices/Types.h>
 #include <devices/base-device/Device.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
-#include <devices/Types.h>
 
 namespace chip {
 namespace app {

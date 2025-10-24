@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <AppMain.h>
 #include <DeviceInfoProviderImpl.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
@@ -32,9 +33,8 @@
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/OnboardingCodesUtil.h>
-#include <system/SystemLayer.h>
-#include <AppMain.h>
 #include <string>
+#include <system/SystemLayer.h>
 
 using namespace chip;
 using namespace chip::app;

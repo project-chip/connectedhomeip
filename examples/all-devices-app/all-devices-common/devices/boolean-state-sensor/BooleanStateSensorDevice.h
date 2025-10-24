@@ -16,9 +16,9 @@
  */
 #pragma once
 
-#include <app/reporting/ReportScheduler.h>
 #include <app/clusters/boolean-state-server/boolean-state-cluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
+#include <app/reporting/ReportScheduler.h>
 #include <devices/base-device/Device.h>
 
 namespace chip {
@@ -32,9 +32,11 @@ public:
      * determine the type of sensor it is (contact, water leak, etc.) This is meant to be a reusable
      * class for the sensor types that share the same core functionality through the identify and
      * boolean state clusters.
-    */
-    BooleanStateSensorDevice(std::unique_ptr<reporting::ReportScheduler::TimerDelegate> timerDelegate, const DataModel::DeviceTypeEntry & deviceType) :
-        BaseDevice(deviceType), mTimerDelegate(std::move(timerDelegate))
+     */
+    BooleanStateSensorDevice(std::unique_ptr<reporting::ReportScheduler::TimerDelegate> timerDelegate,
+                             const DataModel::DeviceTypeEntry & deviceType) :
+        BaseDevice(deviceType),
+        mTimerDelegate(std::move(timerDelegate))
     {}
     ~BooleanStateSensorDevice() override = default;
 

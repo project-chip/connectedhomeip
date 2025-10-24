@@ -20,7 +20,8 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-CHIP_ERROR BooleanStateSensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR BooleanStateSensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                              EndpointId parentId)
 {
     ReturnErrorOnFailure(BaseRegistration(endpoint, provider, parentId));
 

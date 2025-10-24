@@ -18,11 +18,11 @@
 #pragma once
 
 #include <app/TimerDelegates.h>
+#include <devices/Types.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <functional>
 #include <lib/core/CHIPError.h>
 #include <map>
-#include <devices/Types.h>
 
 namespace chip::app {
 
@@ -61,8 +61,14 @@ private:
 
     DeviceFactory()
     {
-        mRegistry["contact-sensor"]      = []() { return std::make_unique<BooleanStateSensorDevice>(std::make_unique<DefaultTimerDelegate>(), Device::Type::kContactSensor); };
-        mRegistry["water-leak-detector"] = []() { return std::make_unique<BooleanStateSensorDevice>(std::make_unique<DefaultTimerDelegate>(), Device::Type::kWaterLeakDetector); };
+        mRegistry["contact-sensor"] = []() {
+            return std::make_unique<BooleanStateSensorDevice>(std::make_unique<DefaultTimerDelegate>(),
+                                                              Device::Type::kContactSensor);
+        };
+        mRegistry["water-leak-detector"] = []() {
+            return std::make_unique<BooleanStateSensorDevice>(std::make_unique<DefaultTimerDelegate>(),
+                                                              Device::Type::kWaterLeakDetector);
+        };
     }
 };
 
