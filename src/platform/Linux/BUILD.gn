@@ -74,8 +74,6 @@ static_library("Linux") {
     "PosixConfig.h",
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
-    "WiFiPAFDriver.cpp",
-    "WiFiPAFDriver.h",
     "WpaDbusDefs.h",
   ]
 
@@ -184,16 +182,18 @@ static_library("Linux") {
 
   if (chip_device_config_enable_wifipaf) {
     public_deps += [ "${chip_root}/src/wifipaf" ]
+    sources += [
+      "WiFiPAFDriver.cpp",
+      "WiFiPAFDriver.h",
+    ]
   }
 
-  include_dirs = [ "${chip_root}/third_party/hostap/repo/src/common" ]
-
   if (chip_device_config_enable_wifipaf_ctrl_iface) {
+    include_dirs = [ "${chip_root}/third_party/hostap/repo/src/common" ]
     sources += [
       "WiFiPAFDriverCtrlIface.cpp",
       "WiFiPAFDriverCtrlIface.h",
     ]
-
     deps += [ ":wpa_ctrl" ]
   } else {
     sources += [
