@@ -1,0 +1,2 @@
+esp-idf-kconfig==2.5.0
+idf-component-manager==2.4.1
