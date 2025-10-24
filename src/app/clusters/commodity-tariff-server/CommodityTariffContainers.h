@@ -231,16 +231,16 @@ public:
     Value & operator[](const Key & key)
     {
         auto it = find(key);
-        
+
         if (it != data_.end())
         {
             return it->second;
         }
 
-        VerifyOrDie(!full()); 
+        VerifyOrDie(!full());
 
         // Key not found, insert it.
-        data_.push_back({key, Value{}});
+        data_.push_back({ key, Value{} });
         return data_.back().second;
     }
 
@@ -251,6 +251,7 @@ public:
     ConstIterator end() const { return data_.end(); }
     ConstIterator cbegin() const { return data_.cbegin(); }
     ConstIterator cend() const { return data_.cend(); }
+
 private:
     pw::Vector<PairType, kMaxSize> data_;
 };

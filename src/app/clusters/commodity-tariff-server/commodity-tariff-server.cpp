@@ -403,23 +403,25 @@ struct ThresholdsPerFeatureValidationContext
         int64_t thresholdVal;
         BitMask<Feature> featureVal;
 
-        bool operator==(const FeatureEntry& other) const {
+        bool operator==(const FeatureEntry & other) const
+        {
             return (this->featureVal == other.featureVal) && (this->thresholdVal == other.thresholdVal);
         }
     };
 
-    CommodityTariffContainers::CTC_UnorderedSet<FeatureEntry, CommodityTariffConsts::kTariffComponentsAttrMaxLength> featuresPerThreshold;
+    CommodityTariffContainers::CTC_UnorderedSet<FeatureEntry, CommodityTariffConsts::kTariffComponentsAttrMaxLength>
+        featuresPerThreshold;
 
     CHIP_ERROR AddThreshold(uint32_t feature, int64_t threshold)
     {
-        CHIP_ERROR ret = CHIP_NO_ERROR;
-        FeatureEntry entry = {.thresholdVal = threshold, .featureVal = feature};
+        CHIP_ERROR ret     = CHIP_NO_ERROR;
+        FeatureEntry entry = { .thresholdVal = threshold, .featureVal = feature };
 
         if (!featuresPerThreshold.insert(entry))
         {
             ret = CHIP_ERROR_DUPLICATE_KEY_ID;
         }
-    
+
         return ret;
     }
 };
