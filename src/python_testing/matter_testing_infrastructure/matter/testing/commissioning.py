@@ -441,7 +441,7 @@ async def _establish_pase_session(
             # Use first non-link-local address
             device = devices[0] if isinstance(devices, list) else devices
             selected_ip = None
-            for addr in device.addresses:
+            for addr in device.addresses or []:
                 import ipaddress
                 if not ipaddress.ip_address(addr).is_link_local:
                     selected_ip = addr
