@@ -96,7 +96,10 @@ class TC_ACL_2_7(MatterBaseTest):
                 found_other_event, f"{controller_name} should not see any events from {other_controller}'s fabric when fabric filtered")
 
     def desc_TC_ACL_2_7(self) -> str:
-        return "[TC-ACL-2.7] Multiple fabrics test"
+        return "[TC-ACL-2.7] Extension multi-fabric"
+
+    def pics_TC_ACL_2_7(self) -> list[str]:
+        return ['ACL.S.A0001']
 
     def steps_TC_ACL_2_7(self) -> list[TestStep]:
         steps = [
