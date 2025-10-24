@@ -174,7 +174,8 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
 
         if self.pics_guard(self.check_pics("RVCOPSTATE.S.A0004") and self.check_pics("RVCOPSTATE.S.C80.Rsp")
                            and self.check_pics("RVCRUNM.S.A0000") and self.check_pics("RVCRUNM.S.A0001")
-                           and self.check_pics("RVCRUNM.S.M.CAN_MANUALLY_CONTROLLED")):
+                           and self.check_pics("RVCRUNM.S.M.CAN_MANUALLY_CONTROLLED")
+                           and self.check_pics("RVCOPSTATE.S.M.CAN_MANUALLY_CONTROLLED")):
 
             # Manually put the device in a RVC Run Mode cluster mode with the Idle mode tag and in a device state that allows changing to {PIXIT_RUNMODE_CLEANMODE}
             self.step("2")

@@ -111,6 +111,8 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.A0004"), "RVCOPSTATE.S.A0004 must be supported")
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.C04.Tx"), "RVCOPSTATE.S.C04.Tx must be supported")
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.C80.Rsp"), "RVCOPSTATE.S.C80.Rsp must be supported")
+        asserts.assert_true(self.check_pics("RVCOPSTATE.S.M.CAN_MANUALLY_CONTROLLED"),
+                            "RVCOPSTATE.S.M.CAN_MANUALLY_CONTROLLED must be supported")
 
         op_states = Clusters.OperationalState.Enums.OperationalStateEnum
         rvc_op_states = Clusters.RvcOperationalState.Enums.OperationalStateEnum
