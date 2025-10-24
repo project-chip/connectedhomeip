@@ -113,7 +113,7 @@ CHIP_ERROR NXPWiFiDriver::ConnectWiFiStagedNetwork()
         // no needed to connect to the staged network if commissioning failed
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
-    
+
 }
 
 

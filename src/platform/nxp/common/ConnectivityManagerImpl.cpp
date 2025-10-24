@@ -503,9 +503,9 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
         break;
 
     case WLAN_REASON_FW_HANG:
-        /* 
+        /*
          If the Wifi driver hangs, a recovery mechanism has been triggered. This mechanism will end with re-initializing the wifi driver.
-         If the wifi state is different from kWiFiStationState_NotConnected and kWiFiStationState_Disconnecting, 
+         If the wifi state is different from kWiFiStationState_NotConnected and kWiFiStationState_Disconnecting,
          we want to retry the wifi connection once the driver is re-initialized.
         */
         if(mWiFiStationState != kWiFiStationState_NotConnected && mWiFiStationState != kWiFiStationState_Disconnecting)
