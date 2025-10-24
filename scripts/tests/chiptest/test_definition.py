@@ -482,14 +482,15 @@ class TestDefinition:
                 test_cmd = apps.chip_tool_with_python_cmd \
                     .add_args(('tests', self.run_name)) \
                     .add_args(('--PICS', pics_file))
+
+                interactive_server_args = ('interactive server',) + tool_storage_args + pairing_server_args
+
+                if test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
+                   interactive_server_args = interactive_server_args + ('--interface-id', '-1')
+
                 server_args = (
                     '--server_path', str(apps.chip_tool.path),
-                    '--server_arguments', 'interactive server')
-
-                # if test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
-                #    server_args = server_args + ('--interface-id', '-1')
-
-                server_args = server_args + tool_storage_args + pairing_server_args
+                    '--server_arguments', ' '.join(interactive_server_args))
 
                 pairing_cmd = pairing_cmd.add_args(server_args)
                 test_cmd = test_cmd.add_args(server_args)
