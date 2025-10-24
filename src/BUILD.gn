@@ -199,7 +199,12 @@ if (chip_build_tests) {
     }
 
     if (chip_device_config_enable_joint_fabric) {
-      tests += [ "${chip_root}/src/app/server/tests" ]
+      tests += [
+        "${chip_root}/src/app/server/tests",
+        "${chip_root}/src/controller/tests/jcm",
+        "${chip_root}/src/credentials/tests/jcm",
+        "${chip_root}/src/app/clusters/joint-fabric-administrator-server/tests",
+      ]
     }
   }
 

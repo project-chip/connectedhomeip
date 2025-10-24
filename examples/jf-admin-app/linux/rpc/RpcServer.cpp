@@ -32,11 +32,6 @@ MutableByteSpan icacCSRSpan{ icacCSRBuf };
         ChipLogError(JointFabric, "Invalid Peer Admin Endpoint ID for the JF Administrator Cluster");
     }
 
-    for (size_t i = 0; i < Crypto::kP256_PublicKey_Length; ++i)
-    {
-        ChipLogProgress(JointFabric, "trustedIcacPublicKeyB[%li] = %02X", i, request.trustedIcacPublicKeyB.bytes[i]);
-    }
-
     OwnershipTransferContext * data = Platform::New<OwnershipTransferContext>(
         request.node_id, request.jcm, ByteSpan(request.trustedIcacPublicKeyB.bytes, request.trustedIcacPublicKeyB.size),
         request.peerAdminJFAdminClusterEndpointId);
