@@ -31,10 +31,10 @@
 #include <utility>
 
 #include <errno.h>
-#include <stddef.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/SafeInt.h>
+#include <stddef.h>
 
 using namespace chip;
 using namespace chip::Credentials;

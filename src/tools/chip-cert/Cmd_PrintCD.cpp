@@ -272,5 +272,5 @@ bool Cmd_PrintCD(int argc, char * argv[])
     std::optional<std::vector<uint8_t>> cd = ReadCD(gInFileNameOrStr);
     VerifyOrReturnError(cd.has_value(), false);
 
-    return PrintCD(ByteSpan{cd->data(), cd->size()});
+    return PrintCD(ByteSpan{ cd->data(), cd->size() });
 }

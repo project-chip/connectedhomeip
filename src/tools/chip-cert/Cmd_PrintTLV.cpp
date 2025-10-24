@@ -137,7 +137,7 @@ enum class TLVFormat
 std::optional<std::vector<uint8_t>> ReadTLV(const char * fileNameOrStr)
 {
     TLVFormat tlvFmt = TLVFormat::kTLVFormat_Unknown;
-    size_t tlvLen  = 0;
+    size_t tlvLen    = 0;
     std::vector<uint8_t> tlvBuf;
 
     // If fileNameOrStr is a file name
