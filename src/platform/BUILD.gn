@@ -144,6 +144,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG=${chip_device_config_enable_dynamic_mrp_config}",
       "CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF=${chip_device_config_enable_wifipaf}",
       "CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=${chip_device_config_enable_joint_fabric}",
+      "CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF_CTRL_IFACE=${chip_device_config_enable_wifipaf_ctrl_iface}",
+      "CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF_HOSTAPD=${chip_device_config_enable_wifipaf_hostapd}",
     ]
 
     public_deps = [ "${chip_root}/src/app/icd/server:icd-server-config" ]
