@@ -21,6 +21,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
+#     app: ${CAMERA_CONTROLLER_APP}
+#     app-args: interactive server
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
@@ -38,14 +40,15 @@ import tempfile
 from time import sleep
 
 from mobly import asserts
+from TC_WEBRTCRTestBase import WEBRTCRTestBase
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCR_2_2(MatterBaseTest):
+class TC_WebRTCR_2_2(WEBRTCRTestBase):
     def setup_class(self):
         super().setup_class()
 
@@ -152,7 +155,7 @@ class TC_WebRTCR_2_2(MatterBaseTest):
         )
 
         if self.is_pics_sdk_ci_only:
-            # TODO: send command to DUT via websocket
+            await self.send_command(f"pairing onnetwork 1 {passcode}")
             resp = 'Y'
         else:
             resp = self.wait_for_user_input(prompt_msg)
@@ -201,8 +204,17 @@ class TC_WebRTCR_2_2(MatterBaseTest):
         )
 
         if self.is_pics_sdk_ci_only:
-            # TODO: send command to DUT via websocket
-            resp = 'Y'
+            self.th_server.set_output_match("NOT_FOUND")
+            self.th_server.event.clear()
+
+            try:
+                await self.send_command("webrtc establish-session 1")
+                # Wait up to 90s until the provider logs that the data‑channel opened
+                if not self.th_server.event.wait(90):
+                    raise TimeoutError("PeerConnection is not connected within 90s")
+                resp = 'Y'
+            except TimeoutError:
+                resp = 'N'
         else:
             resp = self.wait_for_user_input(prompt_msg)
 
