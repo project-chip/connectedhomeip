@@ -283,9 +283,6 @@ private:
     CHIP_ERROR UpdateDayInformation(uint32_t now);
     CHIP_ERROR UpdateDayEntryInformation(uint32_t now);
     void DeinitCurrentAttrs();
-
-protected:
-    uint32_t GetCurrentTimestamp();
 };
 
 } // namespace CommodityTariff

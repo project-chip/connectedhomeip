@@ -287,7 +287,6 @@ void SetTestEventTrigger_TariffDataClear()
     CommodityTariffDelegate * dg = GetCommodityTariffDelegate();
 
     dg->CleanupTariffData();
-    presetIndex = 0;
 }
 
 /*
