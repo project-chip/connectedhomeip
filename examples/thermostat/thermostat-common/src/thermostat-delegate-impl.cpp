@@ -33,13 +33,13 @@ ThermostatDelegate ThermostatDelegate::sInstance;
 
 ThermostatDelegate::ThermostatDelegate()
 {
-    mNumberOfPresets                          = kMaxNumberOfPresetsSupported;
-    mNextFreeIndexInPresetsList               = 0;
-    mNextFreeIndexInPendingPresetsList        = 0;
-    mMaxThermostatSuggestions                 = kMaxNumberOfThermostatSuggestions;
-    mIndexOfCurrentSuggestion                 = mMaxThermostatSuggestions;
-    mNextFreeIndexInThermostatSuggestionsList = 0;
-    mMaxSchedules                             = kMaxNumberOfSchedulesSupported;
+    mNumberOfPresets                            = kMaxNumberOfPresetsSupported;
+    mNextFreeIndexInPresetsList                 = 0;
+    mNextFreeIndexInPendingPresetsList          = 0;
+    mMaxThermostatSuggestions                   = kMaxNumberOfThermostatSuggestions;
+    mIndexOfCurrentSuggestion                   = mMaxThermostatSuggestions;
+    mNextFreeIndexInThermostatSuggestionsList   = 0;
+    mMaxNumberOfSchedulesAllowedPerScheduleType = kMaxNumberOfSchedulesSupported;
 
     // Start the unique ID from 0 and it increases montonically.
     mUniqueID = 0;
@@ -489,12 +489,14 @@ size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime
 
 void ThermostatDelegate::InitializeScheduleTypes()
 {
+    static_assert(MATTER_ARRAY_SIZE(mScheduleTypes) == 2);
+
     mScheduleTypes[0] = { .systemMode           = SystemModeEnum::kHeat,
-                          .numberOfSchedules    = mMaxSchedules,
+                          .numberOfSchedules    = mMaxNumberOfSchedulesAllowedPerScheduleType,
                           .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) };
 
     mScheduleTypes[1] = { .systemMode           = SystemModeEnum::kCool,
-                          .numberOfSchedules    = mMaxSchedules,
+                          .numberOfSchedules    = mMaxNumberOfSchedulesAllowedPerScheduleType,
                           .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) };
 }
 

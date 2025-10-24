@@ -162,7 +162,7 @@ private:
 
     bool mIsExpirationTimerRunning = false;
 
-    uint8_t mMaxSchedules;
+    uint8_t mMaxNumberOfSchedulesAllowedPerScheduleType;
 
     Structs::ScheduleTypeStruct::Type mScheduleTypes[kMaxNumberOfScheduleTypes];
 
