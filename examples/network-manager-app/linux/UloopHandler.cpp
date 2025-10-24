@@ -160,16 +160,16 @@ UloopSignalGuard::~UloopSignalGuard()
 void UloopSignalGuard::Guard(int sig, struct sigaction & action)
 {
     sigaction(sig, nullptr, &action);
-
-    // uloop will only touch signals set to SIG_DFL
     VerifyOrReturn(action.sa_handler == SIG_DFL);
 
+    // Uloop will only modify signal handlers if they are currently set to SIG_DFL.
+    // In that case, install a handler (which won't equal SIG_DFL) while the guard
+    // is active. In the unlikely case that the guard handler receives a signal,
+    // the handler is reset to SIG_DFL via SA_RESETHAND and re-raised.
     struct sigaction guard = {};
     sigemptyset(&guard.sa_mask);
-    guard.sa_handler = [](int caught) {
-        signal(caught, SIG_DFL); // restore SIG_DFL (don't worry about masks etc)
-        raise(caught);           // re-raise the signal to the default handler
-    };
+    guard.sa_flags   = SA_RESETHAND;
+    guard.sa_handler = [](int received) { raise(received); };
     sigaction(sig, &guard, nullptr);
 }
 

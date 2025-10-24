@@ -64,8 +64,6 @@ CHIP_ERROR UbusManager::Init()
     }
 
     ChipLogDetail(DeviceLayer, "Connected to ubus");
-    Context().connection_lost = [](ubus_context * ctx) { static_cast<UbusManager *>(ctx)->HandleConnectionLost(); };
-    ubus_add_uloop(&Context());
     mInitialized = true;
     return CHIP_NO_ERROR;
 }
@@ -89,7 +87,7 @@ void UbusManager::Shutdown()
 void UbusManager::HandleConnectionLost()
 {
     ChipLogProgress(DeviceLayer, "Ubus connection lost, reconnection will be attempted periodically");
-    // ubus_shutdown(&Context());
+    ubus_shutdown(&Context());
 
     ResetEventHandler();
     for (auto & watch : mWatches)
@@ -101,7 +99,7 @@ void UbusManager::HandleConnectionLost()
         watch.ResetSubscriber();
     }
 
-    AttemptReconnect();
+    AttemptReconnect(); // side effect: Connected() = false
 }
 
 void UbusManager::AttemptReconnect()
@@ -129,7 +127,6 @@ void UbusManager::AttemptReconnect()
 
     ChipLogProgress(DeviceLayer, "Ubus connection restored");
     ReconnectTimer().cb = nullptr; // cb == nullptr -> Connected() = true
-    ubus_add_uloop(&Context());
 
     RegisterEventHandler();
     LookupAll();
@@ -138,7 +135,10 @@ void UbusManager::AttemptReconnect()
 bool UbusManager::Connect()
 {
     UloopSignalGuard guard; // ubus_connect_ctx() indirectly calls ubus_init()
-    return CheckAndLog(ubus_connect_ctx(&Context(), mUbusSocketPath), "ubus_connect_ctx");
+    VerifyOrReturnValue(CheckAndLog(ubus_connect_ctx(&Context(), mUbusSocketPath), "ubus_connect_ctx"), false);
+    Context().connection_lost = [](ubus_context * ctx) { static_cast<UbusManager *>(ctx)->HandleConnectionLost(); };
+    ubus_add_uloop(&Context());
+    return true;
 }
 
 void UbusManager::Register(UbusWatch & watch)
