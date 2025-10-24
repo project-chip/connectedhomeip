@@ -20,7 +20,9 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 };
 } // namespace
 
-GroupcastCluster::GroupcastCluster() : DefaultServerCluster({ kRootEndpointId, Groupcast::Id }) {}
+GroupcastCluster::GroupcastCluster(BitFlags<Groupcast::Feature> features) :
+    DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mLogic(features)
+{}
 
 DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                               AttributeValueEncoder & encoder)

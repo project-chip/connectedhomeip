@@ -31,7 +31,7 @@ namespace Clusters {
 class GroupcastCluster : public DefaultServerCluster
 {
 public:
-    GroupcastCluster();
+    GroupcastCluster(BitFlags<Groupcast::Feature> features);
     virtual ~GroupcastCluster() {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
