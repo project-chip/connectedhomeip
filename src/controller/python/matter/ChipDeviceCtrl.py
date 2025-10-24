@@ -1604,6 +1604,58 @@ class ChipDeviceControllerBase():
             ), payload).raise_on_error()
         return await future
 
+    def _prepare_write_attribute_requests(self, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]]) -> typing.List[ClusterAttribute.AttributeWriteRequest]:
+        """Helper method to prepare attribute write requests."""
+        attrs = []
+        for v in attributes:
+            if len(v) == 2:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    v[0], v[1], 0, 0, v[1].value))  # type: ignore[attr-defined]
+            else:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    v[0], v[1], v[2], 1, v[1].value))
+        return attrs
+
+    async def TestOnlyWriteAttributeWithMismatchedTimedRequestField(self, nodeid: int,
+                                                                    attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
+                                                                    timedRequestTimeoutMs: int,
+                                                                    timedRequestFieldValue: bool,
+                                                                    interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                                                                    payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+        '''
+        ONLY TO BE USED FOR TEST: Write attributes with decoupled Timed Request action and TimedRequest field.
+        This allows testing TIMED_REQUEST_MISMATCH scenarios:
+        - timedRequestTimeoutMs=0, timedRequestFieldValue=True: No action, but field=true (MISMATCH)
+        - timedRequestTimeoutMs>0, timedRequestFieldValue=False: Action sent, but field=false (MISMATCH)
+
+        Please see WriteAttribute for description of common parameters.
+
+        Additional parameters:
+            timedRequestTimeoutMs: Timeout for the Timed Request action (0 means no action)
+            timedRequestFieldValue: Value of the TimedRequest field in WriteRequest
+
+        Returns:
+            [AttributeStatus] (list - one for each path).
+
+        Raises:
+            InteractionModelError on error (expected: TIMED_REQUEST_MISMATCH)
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
+
+        attrs = self._prepare_write_attribute_requests(attributes)
+
+        ClusterAttribute.TestOnlyWriteAttributeWithMismatchedTimedRequestField(
+            future, eventLoop, device.deviceProxy, attrs,
+            timedRequestTimeoutMs=timedRequestTimeoutMs,
+            timedRequestFieldValue=timedRequestFieldValue,
+            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
+        return await future
+
     async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None,
                           timedRequestTimeoutMs: typing.Optional[int] = None,
                           interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
@@ -1716,7 +1768,6 @@ class ChipDeviceControllerBase():
         attributes: A list of tuples of type (endpoint, cluster-object):
         interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
-
         E.g
             (1, Clusters.UnitTesting.Attributes.XYZAttribute('hello')) -- Write 'hello'
             to the XYZ attribute on the test cluster to endpoint 1
@@ -1749,14 +1800,7 @@ class ChipDeviceControllerBase():
 
         device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
 
-        attrs = []
-        for v in attributes:
-            if len(v) == 2:
-                attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    v[0], v[1], 0, 0, v[1].value))  # type: ignore[attr-defined]  # 'value' added dynamically to ClusterAttributeDescriptor
-            else:
-                attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    v[0], v[1], v[2], 1, v[1].value))
+        attrs = self._prepare_write_attribute_requests(attributes)
 
         ClusterAttribute.WriteAttributes(
             future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs,
