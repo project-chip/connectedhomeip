@@ -53,7 +53,7 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
     """
 
     def desc_TC_DGGEN_2_1_Py(self) -> str:
-        return "[TC-DGGEN-2.1] Attributes (Server) — Pythonized + tweaks"
+        return "[TC-DGGEN-2.1] Attributes (Server) — Pythonized + tweaks - REQUIRES device running >2h without factory reset"
 
     def pics_TC_DGGEN_2_1_Py(self):
         return ["DGGEN.S"]
@@ -152,21 +152,33 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
 
         ctrl = self.default_controller
 
+        # IMPORTANT: This test requires the device to have been running for >2 hours without factory reset
+        logging.info("=" * 80)
+        logging.info("IMPORTANT PRECONDITION: This test requires the device to have been running")
+        logging.info("for MORE THAN 2 HOURS without factory reset. If this condition is not met,")
+        logging.info("the test will FAIL. You can run other tests in the meantime as long as")
+        logging.info("you don't factory reset the device.")
+        logging.info("=" * 80)
+
         # CI-specific setup: Set uptime > 2 hours for CI testing
         if self.is_pics_sdk_ci_only:
             logging.info("CI environment detected - setting uptime > 2 hours via named pipe")
-            # Set TotalOperationalHours to 3 hours (10800 seconds) for CI testing
+            # Set TotalOperationalHours to 3 hours for CI testing
             self.write_to_app_pipe({"Name": "SetTotalOperationalHours", "Hours": 3})
             logging.info("Uptime manipulation completed for CI")
 
             # Wait a moment for the command to be processed
             await asyncio.sleep(1.0)
 
-            # Verify the setting worked
+            # Verify the setting worked - this is critical for the test
             total_hrs_check = await self._read_total_hrs(ctrl)
             logging.info(f"TotalOperationalHours after setting: {total_hrs_check}")
             if total_hrs_check < 2:
-                logging.warning("Failed to set TotalOperationalHours via named pipe, continuing with manual confirmation")
+                logging.error("CRITICAL: Failed to set TotalOperationalHours via named pipe!")
+                logging.error("The SetTotalOperationalHours command handler may not be implemented in the app.")
+                logging.error("This test requires the device to have been running for >2 hours.")
+                logging.error("Please ensure the all-clusters-app has the SetTotalOperationalHours command handler.")
+                asserts.fail("Failed to set TotalOperationalHours via named pipe - command handler not working")
 
         # Step 0: Manual precondition
         self.step(0)
@@ -180,13 +192,9 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
         total_hrs = await self._read_total_hrs(ctrl)
         logging.info(f"TotalOperationalHours (pre): {total_hrs}")
 
-        # In CI environments, if the named pipe command didn't work, we'll skip this check
-        if self.is_pics_sdk_ci_only and total_hrs < 2:
-            logging.warning(f"CI environment: TotalOperationalHours={total_hrs} < 2, but continuing test as this is expected in CI")
-            logging.info("Skipping TotalOperationalHours precondition check in CI environment")
-        else:
-            assert total_hrs > 2, f"Precondition not met: TotalOperationalHours={total_hrs} <= 2. Device must have been in use for more than 2 hours without factory reset."
-            logging.info("Precondition met: TotalOperationalHours > 2")
+        # This assertion MUST pass - the test is designed to verify devices that have been running >2 hours
+        assert total_hrs > 2, f"Precondition not met: TotalOperationalHours={total_hrs} <= 2. Device must have been in use for more than 2 hours without factory reset."
+        logging.info("Precondition met: TotalOperationalHours > 2")
 
         # Step 2: 2a mod — save RebootCount (without requiring value)
         self.step(2)
@@ -265,17 +273,7 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
 
         total_hrs_after_fr = await self._read_total_hrs(ctrl)
         logging.info(f"TotalOperationalHours post-factory-reset: {total_hrs_after_fr}")
-
-        # In CI environments, be more flexible with the post-factory-reset check
-        if self.is_pics_sdk_ci_only:
-            logging.info(f"CI environment: TotalOperationalHours post-factory-reset={total_hrs_after_fr}")
-            if total_hrs_after_fr <= 1:
-                logging.info("Post-factory-reset check passed: TotalOperationalHours <= 1")
-            else:
-                logging.warning(
-                    f"Post-factory-reset check: TotalOperationalHours={total_hrs_after_fr} > 1, but continuing in CI environment")
-        else:
-            assert total_hrs_after_fr <= 1, f"Expected TotalOperationalHours ≤1 post-FR (actual={total_hrs_after_fr})"
+        assert total_hrs_after_fr <= 1, f"Expected TotalOperationalHours ≤1 post-FR (actual={total_hrs_after_fr})"
 
 
 if __name__ == "__main__":
