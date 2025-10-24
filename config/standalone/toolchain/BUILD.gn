@@ -22,7 +22,11 @@ gcc_toolchain("standalone") {
     current_os = host_os
     current_cpu = host_cpu
     is_clang = false
-    import("${chip_root}/config/standalone/args.gni")
+    if (current_os == "linux" || current_os == "mac") {
+      import("${chip_root}/config/standalone/host_args.gni")
+    } else {
+      import("${chip_root}/config/standalone/args.gni")
+    }
   }
 }
 
