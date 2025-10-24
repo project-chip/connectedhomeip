@@ -80,8 +80,12 @@ limitations under the License.
         <attribute side="server" code="1"  define="VENDOR_NAME"               type="char_string"               length="32"                              optional="true">VendorName</attribute>
         <attribute side="server" code="2"  define="VENDOR_ID"                 type="vendor_id"                                                          optional="true">VendorID</attribute>
         <attribute side="server" code="3"  define="PRODUCT_NAME"              type="char_string"               length="32"                              optional="true">ProductName</attribute>
-        <attribute side="server" code="4"  define="PRODUCT_ID"                type="int16u"  optional="true">ProductID</attribute>
-        <attribute side="server" code="5"  define="NODE_LABEL"                type="char_string"               length="32"  default=""  writable="true" optional="true">NodeLabel</attribute>
+        <attribute side="server" code="4"  define="PRODUCT_ID"                type="int16u"                                                             optional="true">ProductID</attribute>
+        <attribute side="server" code="5"  define="NODE_LABEL"                type="char_string"               length="32"  default=""  writable="true" optional="true">
+          <description>NodeLabel</description>
+          <access op="read" privilege="view"/>
+          <access op="write" privilege="manage"/>
+        </attribute>
         <attribute side="server" code="7"  define="HARDWARE_VERSION"          type="int16u"                                 default="0"                 optional="true">HardwareVersion</attribute>
         <attribute side="server" code="8"  define="HARDWARE_VERSION_STRING"   type="char_string" minLength="1" length="64"                              optional="true">HardwareVersionString</attribute>
         <attribute side="server" code="9"  define="SOFTWARE_VERSION"          type="int32u"                                 default="0"                 optional="true">SoftwareVersion</attribute>
