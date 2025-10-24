@@ -1793,29 +1793,43 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 
 Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request)
 {
+    // Spec §9.6.2 says we should return UnsupportedCommand as soon as the path is unknown. We check
+    // privilege first instead. This is equivalent to the spec as long as every command requires at
+    // least Operate privilege (the default we apply when metadata is missing). Should a command ever
+    // demand less than Operate, the spec’s algorithm would also need to change to stay consistent.
+
+    // Validation happens before we decode or dispatch command payloads. The flow intentionally mirrors the logic used by the
+    // generated data-model provider so that we only ever resolve command metadata once:
+    //   1. `CheckCommandExistence` asks the active data-model provider for an `AcceptedCommandEntry`.  `CodegenDataModelProvider`
+    //   caches the most recent lookup and returns the same entry that `InvokeCommand` will later reuse for dispatch.  This avoids
+    //   duplicate registry/metadata traversals and keeps privilege data consistent.
+    //   2. `CheckCommandAccess` enforces ACL/privilege requirements derived from that entry.  By relying on the provider’s metadata
+    //   we ensure the privilege used here matches what the generated handler expects.
+    //   3. `CheckCommandFlags` validates timed / fabric-scoped / payload-size constraints that were also computed by the provider
+    //   so any change to generated metadata automatically applies to both validation and dispatch.
+    //
+    // Should any other code want to modify the command validation policy, it must do so via the provider or these helper functions
+    // so that pre-dispatch validation and the eventual dispatch path remain in lock-step.
 
     DataModel::AcceptedCommandEntry acceptedCommandEntry;
 
-    // Execute the ACL Access Granting Algorithm before existence checks, assuming the required_privilege for the element is
-    // Operate, to determine if the subject would have had at least some access against the concrete path. This is done so we don't
-    // leak information if we do fail existence checks.
-    // SPEC-DIVERGENCE: For non-concrete paths (Group Commands), the spec mandates only one ACL check AFTER the existence check.
-    // However, because this code is also used in the group path case, we end up performing an ADDITIONAL ACL check before the
-    // existence check. In practice, this divergence is not observable if all commands require at least Operate privilege.
-    Status status = CheckCommandAccess(request, Access::Privilege::kOperate);
-    VerifyOrReturnValue(status == Status::Success, status);
+    Status existenceStatus = CheckCommandExistence(request.path, acceptedCommandEntry);
 
-    status = CheckCommandExistence(request.path, acceptedCommandEntry);
+    // Default to Operate when the command metadata is unknown so we can fail closed while still avoiding
+    // leaking information about whether the path actually exists. When the metadata lookup succeeds we
+    // enforce the precise privilege declared for the command.
+    Access::Privilege privilegeToCheck =
+        (existenceStatus == Status::Success) ? acceptedCommandEntry.GetInvokePrivilege() : Access::Privilege::kOperate;
 
-    if (status != Status::Success)
+    Status accessStatus = CheckCommandAccess(request, privilegeToCheck);
+    VerifyOrReturnValue(accessStatus == Status::Success, accessStatus);
+
+    if (existenceStatus != Status::Success)
     {
         ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint %u",
                       ChipLogValueMEI(request.path.mCommandId), ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId);
-        return status;
+        return existenceStatus;
     }
-
-    status = CheckCommandAccess(request, acceptedCommandEntry.GetInvokePrivilege());
-    VerifyOrReturnValue(status == Status::Success, status);
 
     return CheckCommandFlags(request, acceptedCommandEntry);
 }
