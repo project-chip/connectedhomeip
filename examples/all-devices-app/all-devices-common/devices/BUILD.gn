@@ -12,24 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
-import("//build_overrides/chip.gni")
-
-source_set("base-device") {
-  sources = [
-    "Device.cpp",
-    "Device.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/app/clusters/descriptor",
-    "${chip_root}/src/data-model-providers/codedriven",
-    "${chip_root}/src/lib/core:error",
-    "${chip_root}/src/lib/support",
-  ]
-
-  public_configs = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/:includes",
-    "${chip_root}/src:includes",
-  ]
+config("includes") {
+  # allows includes like "devices/..."
+  include_dirs = [ ".." ]
 }

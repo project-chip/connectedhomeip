@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "Device.h"
+#include <devices/base-device/Device.h>
 #include <memory>
 
 using namespace chip::app::Clusters;
