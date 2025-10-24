@@ -394,13 +394,13 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         instance.mClosurePanelEndpoint3.OnCalibrateActionComplete();
 
         DeviceLayer::PlatformMgr().LockChipStack();
-        isCalibrationInProgress = false;
+        mIsCalibrationInProgress = false;
         DeviceLayer::PlatformMgr().UnlockChipStack();
 
         break;
     }
     case Action_t::STOP_ACTION: {
-        if (isCalibrationInProgress)
+        if (mIsCalibrationInProgress)
         {
             ChipLogDetail(AppServer, "Stopping calibration action");
             instance.mClosureEndpoint1.OnStopCalibrateActionComplete();
@@ -408,10 +408,10 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
             instance.mClosurePanelEndpoint3.OnStopCalibrateActionComplete();
 
             DeviceLayer::PlatformMgr().LockChipStack();
-            isCalibrationInProgress = false;
+            mIsCalibrationInProgress = false;
             DeviceLayer::PlatformMgr().UnlockChipStack();
         }
-        else if (isMoveToInProgress)
+        else if (mIsMoveToInProgress)
         {
             ChipLogDetail(AppServer, "Stopping move to action");
             instance.mClosureEndpoint1.OnStopMotionActionComplete();
@@ -419,7 +419,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
             instance.mClosurePanelEndpoint3.OnStopMotionActionComplete();
 
             DeviceLayer::PlatformMgr().LockChipStack();
-            isMoveToInProgress = false;
+            mIsMoveToInProgress = false;
             DeviceLayer::PlatformMgr().UnlockChipStack();
         }
         else
@@ -435,7 +435,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         instance.mClosurePanelEndpoint3.OnMoveToActionComplete();
 
         DeviceLayer::PlatformMgr().LockChipStack();
-        instance.isMoveToInProgress = false;
+        instance.mIsMoveToInProgress = false;
         DeviceLayer::PlatformMgr().UnlockChipStack();
         ChipLogDetail(AppServer, "MoveTo action completed");
         break;
@@ -451,7 +451,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         }
 
         DeviceLayer::PlatformMgr().LockChipStack();
-        instance.isSetTargetInProgress = false;
+        instance.mIsSetTargetInProgress = false;
         DeviceLayer::PlatformMgr().UnlockChipStack();
         break;
     case Action_t::PANEL_STEP_ACTION:
@@ -466,7 +466,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         }
 
         DeviceLayer::PlatformMgr().LockChipStack();
-        instance.isStepActionInProgress = false;
+        instance.mIsStepActionInProgress = false;
         DeviceLayer::PlatformMgr().UnlockChipStack();
         break;
     default:
@@ -489,7 +489,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     DeviceLayer::PlatformMgr().LockChipStack();
     SetCurrentAction(Action_t::CALIBRATE_ACTION);
     mCurrentActionEndpointId = mClosureEndpoint1.GetEndpointId();
-    isCalibrationInProgress  = true;
+    mIsCalibrationInProgress = true;
     DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // Post an event to initiate the calibration action asynchronously.
@@ -632,20 +632,33 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const 
         }
     }
 
-    VerifyOrReturnError(mClosurePanelEndpoint2.GetLogic().SetTargetState(DataModel::MakeNullable(mClosurePanelEndpoint2Target)) ==
-                            CHIP_NO_ERROR,
-                        Status::Failure, ChipLogError(AppServer, "Failed to set target for Endpoint 2"));
-    VerifyOrReturnError(mClosurePanelEndpoint3.GetLogic().SetTargetState(DataModel::MakeNullable(mClosurePanelEndpoint3Target)) ==
-                            CHIP_NO_ERROR,
-                        Status::Failure, ChipLogError(AppServer, "Failed to set target for Endpoint 3"));
+    // Lock the chip stack before calling SetTargetState to prevent assertion failures
+    DeviceLayer::PlatformMgr().LockChipStack();
 
-    VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) == CHIP_NO_ERROR,
-                        Status::Failure, ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
+    if (mClosurePanelEndpoint2.GetLogic().SetTargetState(DataModel::MakeNullable(mClosurePanelEndpoint2Target)) != CHIP_NO_ERROR)
+    {
+        DeviceLayer::PlatformMgr().UnlockChipStack();
+        ChipLogError(AppServer, "Failed to set target for Endpoint 2");
+        return Status::Failure;
+    }
+
+    if (mClosurePanelEndpoint3.GetLogic().SetTargetState(DataModel::MakeNullable(mClosurePanelEndpoint3Target)) != CHIP_NO_ERROR)
+    {
+        DeviceLayer::PlatformMgr().UnlockChipStack();
+        ChipLogError(AppServer, "Failed to set target for Endpoint 3");
+        return Status::Failure;
+    }
+
+    if (mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) != CHIP_NO_ERROR)
+    {
+        DeviceLayer::PlatformMgr().UnlockChipStack();
+        ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1");
+        return Status::Failure;
+    }
 
     // Set the current action to UNLATCH_ACTION if Latching feature is supported.
     // This is to ensure that the closure is unlatched before starting the motion action.
     // The Closure Control Cluster will handle the unlatch action before proceeding with the motion action.
-    DeviceLayer::PlatformMgr().LockChipStack();
     if (mClosureEndpoint1.GetLogic().GetConformance().HasFeature(ClosureControl::Feature::kMotionLatching))
     {
         SetCurrentAction(UNLATCH_ACTION);
@@ -654,7 +667,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const 
     {
         SetCurrentAction(MOVE_TO_ACTION);
     }
-    isMoveToInProgress = true;
+    mIsMoveToInProgress = true;
     DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // Post an event to initiate the move to action asynchronously.
@@ -814,9 +827,18 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
                                                                              const Optional<Globals::ThreeLevelAutoEnum> & speed,
                                                                              const chip::EndpointId endpointId)
 {
+    // Lock chip stack to safely access cluster state
+    DeviceLayer::PlatformMgr().LockChipStack();
+
     MainStateEnum mClosureEndpoint1MainState;
-    VerifyOrReturnError(mClosureEndpoint1.GetLogic().GetMainState(mClosureEndpoint1MainState) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to get main state for Step command on Endpoint 1"));
+    if (mClosureEndpoint1.GetLogic().GetMainState(mClosureEndpoint1MainState) != CHIP_NO_ERROR)
+    {
+        DeviceLayer::PlatformMgr().UnlockChipStack();
+        ChipLogError(AppServer, "Failed to get main state for SetTarget command on Endpoint 1");
+        return Status::Failure;
+    }
+
+    DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // If this command is received while the MainState attribute is currently either in Disengaged, Protected, Calibrating,
     //  SetupRequired or Error, then a status code of INVALID_IN_STATE shall be returned.
@@ -827,7 +849,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
         Status::InvalidInState,
         ChipLogError(AppServer, "Step command not allowed in current state: %d", static_cast<int>(mClosureEndpoint1MainState)));
 
-    if (isSetTargetInProgress && mCurrentActionEndpointId != endpointId)
+    if (mIsSetTargetInProgress && mCurrentActionEndpointId != endpointId)
     {
         ChipLogError(AppServer, "SetTarget action is already in progress on Endpoint %d", mCurrentActionEndpointId);
         return Status::Failure;
@@ -886,7 +908,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
         SetCurrentAction(Action_t::SET_TARGET_ACTION);
     }
     mCurrentActionEndpointId = endpointId;
-    isSetTargetInProgress    = true;
+    mIsSetTargetInProgress   = true;
     DeviceLayer::PlatformMgr().UnlockChipStack();
 
     AppEvent event;
@@ -1100,9 +1122,18 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
                                                                         const Optional<Globals::ThreeLevelAutoEnum> & speed,
                                                                         const chip::EndpointId & endpointId)
 {
+    // Lock chip stack to safely access cluster state
+    DeviceLayer::PlatformMgr().LockChipStack();
+
     MainStateEnum mClosureEndpoint1MainState;
-    VerifyOrReturnError(mClosureEndpoint1.GetLogic().GetMainState(mClosureEndpoint1MainState) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to get main state for Step command on Endpoint 1"));
+    if (mClosureEndpoint1.GetLogic().GetMainState(mClosureEndpoint1MainState) != CHIP_NO_ERROR)
+    {
+        DeviceLayer::PlatformMgr().UnlockChipStack();
+        ChipLogError(AppServer, "Failed to get main state for Step command on Endpoint 1");
+        return Status::Failure;
+    }
+
+    DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // If this command is received while the MainState attribute is currently either in Disengaged, Protected, Calibrating,
     //  SetupRequired or Error, then a status code of INVALID_IN_STATE shall be returned.
@@ -1113,7 +1144,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
         Status::InvalidInState,
         ChipLogError(AppServer, "Step command not allowed in current state: %d", static_cast<int>(mClosureEndpoint1MainState)));
 
-    if (isStepActionInProgress && mCurrentActionEndpointId != endpointId)
+    if (mIsStepActionInProgress && mCurrentActionEndpointId != endpointId)
     {
         ChipLogError(AppServer, "Step action is already in progress on Endpoint %d", mCurrentActionEndpointId);
         return Status::Failure;
@@ -1145,7 +1176,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
     DeviceLayer::PlatformMgr().LockChipStack();
     SetCurrentAction(PANEL_STEP_ACTION);
     mCurrentActionEndpointId = endpointId;
-    isStepActionInProgress   = true;
+    mIsStepActionInProgress  = true;
     DeviceLayer::PlatformMgr().UnlockChipStack();
 
     AppEvent event;
@@ -1283,4 +1314,14 @@ bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & cu
         return false; // No update needed
     }
     return true;
+}
+
+CHIP_ERROR ClosureManager::GetClosureControlCurrentState(DataModel::Nullable<GenericOverallCurrentState> & currentState)
+{
+    return mClosureEndpoint1.GetLogic().GetOverallCurrentState(currentState);
+}
+
+bool ClosureManager::IsClosureControlMotionInProgress() const
+{
+    return mIsMoveToInProgress;
 }
