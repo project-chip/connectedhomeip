@@ -167,8 +167,8 @@ private:
     Structs::ScheduleTypeStruct::Type mScheduleTypes[kMaxNumberOfScheduleTypes];
 
     /**
-    * @brief Initializes the schedules types array with example schedule types.
-    */
+     * @brief Initializes the schedules types array with example schedule types.
+     */
     void InitializeScheduleTypes();
 };
 
