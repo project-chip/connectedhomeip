@@ -42,6 +42,7 @@
 #include <assert.h>
 #include <lib/support/BitMask.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <setup_payload/OnboardingCodesUtil.h>
@@ -116,11 +117,11 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("AppTask.Init() failed");
+        ChipLogError(AppServer, "AppTask Init failed");
         appError(err);
     }
 
-    SILABS_LOG("App Task started");
+    ChipLogProgress(AppServer, "App Task started");
 
     while (true)
     {
@@ -164,7 +165,7 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
             auto status = ClosureManager::GetInstance().OnStopCommand();
             if (status != Protocols::InteractionModel::Status::Success)
             {
-                SILABS_LOG("Failed to stop closure action");
+                ChipLogError(AppServer, "Failed to stop closure action");
             }
         }
         else
@@ -178,7 +179,7 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
             if (err != CHIP_NO_ERROR || currentState.IsNull() || !currentState.Value().position.HasValue() ||
                 currentState.Value().position.Value().IsNull())
             {
-                SILABS_LOG("Failed to get current closure state");
+                ChipLogError(AppServer, "Failed to get current closure state");
                 return;
             }
 
@@ -202,19 +203,17 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
                 speed = chip::MakeOptional(currentState.Value().speed.Value());
             }
 
-            
-
             // Move to the target position with preserved latch and speed values
             auto status = ClosureManager::GetInstance().OnMoveToCommand(MakeOptional(targetPosition), latch, speed);
             if (status != Protocols::InteractionModel::Status::Success)
             {
-                SILABS_LOG("Failed to move closure to target position");
+                ChipLogError(AppServer, "Failed to move closure to target position");
             }
         }
     }
     else
     {
         err = APP_ERROR_UNHANDLED_EVENT;
-        SILABS_LOG("Unhandled event type in ClosureButtonActionEventHandler");
+        ChipLogError(AppServer, "Unhandled event type in ClosureButtonActionEventHandler");
     }
 }

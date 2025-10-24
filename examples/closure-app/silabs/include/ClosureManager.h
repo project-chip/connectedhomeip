@@ -204,10 +204,10 @@ private:
     // make them thread-safe using mutex or other synchronization mechanisms. Presently, we use
     // DeviceLayer::PlatformMgr().LockChipStack() and DeviceLayer::PlatformMgr().UnlockChipStack()
     // to ensure that these variables are set in thread safe manner in chip task context.
-    bool isCalibrationInProgress = false;
-    bool isMoveToInProgress      = false;
-    bool isSetTargetInProgress   = false;
-    bool isStepActionInProgress  = false;
+    bool mIsCalibrationInProgress = false;
+    bool mIsMoveToInProgress      = false;
+    bool mIsSetTargetInProgress   = false;
+    bool mIsStepActionInProgress  = false;
 
     Action_t mCurrentAction                   = Action_t::INVALID_ACTION;
     chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
