@@ -626,7 +626,7 @@ CHIP_ERROR Instance::UpdateCurrentAttrs()
         return CHIP_ERROR_INVALID_TIME;
     }
 
-    unixEpochNow_s +=matterEpochNow_s;
+    unixEpochNow_s += matterEpochNow_s;
 
     if (mServerTariffAttrsCtx.mTariffProvider == nullptr)
     {
