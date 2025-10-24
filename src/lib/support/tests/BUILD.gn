@@ -32,6 +32,7 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestAutoRelease.cpp",
+    "TestBase64.cpp",
     "TestBitMask.cpp",
     "TestBufferReader.cpp",
     "TestBufferWriter.cpp",
