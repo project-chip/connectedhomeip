@@ -62,12 +62,13 @@ private:
     DeviceFactory()
     {
         mRegistry["contact-sensor"] = []() {
-            return std::make_unique<BooleanStateSensorDevice>(std::make_unique<DefaultTimerDelegate>(),
-                                                              Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
+            return std::make_unique<BooleanStateSensorDevice>(
+                std::make_unique<DefaultTimerDelegate>(), Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
         };
         mRegistry["water-leak-detector"] = []() {
-            return std::make_unique<BooleanStateSensorDevice>(std::make_unique<DefaultTimerDelegate>(),
-                                                              Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
+            return std::make_unique<BooleanStateSensorDevice>(
+                std::make_unique<DefaultTimerDelegate>(),
+                Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
         };
     }
 };
