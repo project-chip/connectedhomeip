@@ -197,7 +197,8 @@ class TC_WebRTCP_2_3(MatterBaseTest, WEBRTCPTestBase):
                 webRTCSessionID=NullValue,
                 sdp=test_sdp,
                 streamUsage=3,
-                originatingEndpointID=endpoint
+                originatingEndpointID=endpoint,
+                videoStreamID=videoStreamID
             )
             try:
                 await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)

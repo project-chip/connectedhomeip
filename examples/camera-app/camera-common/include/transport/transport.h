@@ -16,9 +16,11 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <lib/core/Optional.h>
 #include <lib/support/Span.h>
 #pragma once
 // Base class for media transports(WebRTC, PushAV)
@@ -46,4 +48,9 @@ public:
     virtual bool CanSendAudio() = 0;
 
     virtual ~Transport() = default;
+
+    // SFrame End-to-End Encryption configuration (optional)
+    // For transport types that support SFrame (e.g., WebRTC), this will contain the encryption config.
+    // For transport types that don't support SFrame (e.g., PushAV), this will remain empty (!HasValue()).
+    chip::Optional<chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type> sFrameConfig;
 };

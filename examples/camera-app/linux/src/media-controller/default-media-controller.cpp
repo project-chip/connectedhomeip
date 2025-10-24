@@ -115,3 +115,29 @@ void DefaultMediaController::SetPreRollLength(Transport * transport, uint16_t pr
         ChipLogError(Camera, "SetDelay: Transport not registered");
     }
 }
+
+Transport * DefaultMediaController::GetTransportForVideoStream(uint16_t videoStreamID)
+{
+    std::lock_guard<std::mutex> lock(mConnectionsMutex);
+    for (const auto & conn : mConnections)
+    {
+        if (conn.videoStreamID == videoStreamID)
+        {
+            return conn.transport;
+        }
+    }
+    return nullptr;
+}
+
+Transport * DefaultMediaController::GetTransportForAudioStream(uint16_t audioStreamID)
+{
+    std::lock_guard<std::mutex> lock(mConnectionsMutex);
+    for (const auto & conn : mConnections)
+    {
+        if (conn.audioStreamID == audioStreamID)
+        {
+            return conn.transport;
+        }
+    }
+    return nullptr;
+}
