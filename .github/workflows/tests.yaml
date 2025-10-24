@@ -654,7 +654,6 @@ jobs:
                         --target linux-x64-terms-and-conditions-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-thermostat-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-tv-app-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-tv-casting-app-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --pw-command-launcher=ccache \
                         build \
@@ -662,6 +661,14 @@ jobs:
                      "
                   rm -rf out/unified-build
 
+            - name: Build linux-x64-tv-casting-app
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-tv-casting-app-${BUILD_VARIANT}-clang
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-tv-casting-app-${BUILD_VARIANT}-clang"
             - name: Build linux-x64-fabric-admin-rpc
               env:
                   CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"

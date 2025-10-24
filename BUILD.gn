@@ -969,7 +969,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         ":linux_terms_and_conditions_app",
         ":linux_thermostat_app",
         ":linux_tv_app",
-        ":linux_tv_casting_app",
         ":linux_water_leak_detector_app",
 
         # TODO: The following apps are temporarily disabled in the unified build because they're failing
@@ -982,6 +981,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         # ":linux_jf_control_app",
         # ":linux_light_data_model_no_unique_id_app",
         # ":linux_python_bindings_webrtc_app",
+        # ":linux_tv_casting_app", # needs CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT 1
       ]
     }
   }
