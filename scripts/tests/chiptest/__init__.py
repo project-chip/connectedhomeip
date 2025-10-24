@@ -143,7 +143,6 @@ def _GetExtraSlowTests() -> Set[str]:
        1 minute seems like a good threshold to consider something extra slow
     """
     return {
-        "Test_TC_DGGEN_2_1.yaml",                         # > 2 hours
     }
 
 
