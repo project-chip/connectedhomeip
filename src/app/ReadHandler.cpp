@@ -416,7 +416,7 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
             ChipLogError(DataManagement, "Trigger check-in message when non-priming subscription report times out");
             if (mSessionHandle)
             {
-                chip::app::ICDNotifier::GetInstance().NotifySendCheckIn(GetSubjectDescriptor());
+                ICDNotifier::GetInstance().NotifySendCheckIn(GetSubjectDescriptor());
             }
             else
             {
