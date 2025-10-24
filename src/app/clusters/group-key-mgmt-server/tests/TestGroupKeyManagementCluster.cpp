@@ -36,7 +36,7 @@
 #include <credentials/GroupDataProvider.h>
 
 #include <app/server-cluster/testing/TestServerClusterContext.h>
-
+#include <app/clusters/testing/TestReadWriteAttribute.h>
 // #include <app/data-model-provider/tests/ReadTesting.h>
 // #include <lib/core/TLVWriter.h>
 // #include <app/clusters/testing/AttributeTesting.h>
@@ -51,7 +51,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
-
+using namespace chip::Test;
 namespace {
 
 struct TestGroupKeyManagementCluster : public ::testing::Test
