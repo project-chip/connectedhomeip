@@ -28,12 +28,173 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CommodityTariff;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
 using namespace chip::app::Clusters::CommodityTariff::TariffDataSamples;
+using namespace chip::System;
+using namespace chip::System::Clock;
+using namespace chip::System::Clock::Literals;
 
 static constexpr uint32_t kSecondsPer4hr = 14400; // 4 hours in seconds
 
 static uint8_t presetIndex = 0;
 
-// Number of presets (compile-time constant)
+// Test Time Management Implementation
+namespace {
+
+class TestTimeManager
+{
+public:
+    TestTimeManager() = default;
+    ~TestTimeManager() { ShutdownMockClock(); }
+
+    void EnableTestTime(bool enable, uint32_t aInitialTimeValue_s = 0);
+    void AdvanceTestTime(chip::System::Clock::Seconds32 offset);
+    bool IsTestTimeEnabled() const { return mTestTimeEnabled; }
+
+private:
+    void InitializeMockClock(uint32_t aInitialTimeValue_s = 0);
+    void ShutdownMockClock();
+    void AdvanceMockTime(chip::System::Clock::Seconds32 offset);
+
+    chip::System::Clock::Internal::MockClock * pMockClock = nullptr;
+    chip::System::Clock::ClockBase * pRealClock           = nullptr;
+    bool mTestTimeEnabled                                 = false;
+};
+
+TestTimeManager gTestTimeManager;
+
+void TestTimeManager::InitializeMockClock(uint32_t aInitialTimeValue_s)
+{
+    // Create and configure the mock clock
+    pMockClock = new Clock::Internal::MockClock();
+    pRealClock = &SystemClock();
+    Microseconds64 realTime_us;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (aInitialTimeValue_s == 0)
+    {
+        // Get current real time to use as initial mock time
+        err = chip::System::SystemClock().GetClock_RealTime(realTime_us);
+    }
+    else
+    {
+        realTime_us = aInitialTimeValue_s * 1'000'000_us; // seconds to microseconds
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        pMockClock->SetClock_RealTime(realTime_us);
+
+        // Also set monotonic time to maintain consistency
+        auto monotonicTime = std::chrono::duration_cast<Milliseconds64>(realTime_us);
+        pMockClock->SetMonotonic(monotonicTime);
+
+        ChipLogProgress(DeviceLayer, "Mock clock initialized with current real time");
+    }
+    else
+    {
+        // Fallback: use a reasonable default time if real time is unavailable
+        Microseconds64 defaultTime(std::chrono::seconds(1704067200)); // Jan 1, 2024
+        pMockClock->SetClock_RealTime(defaultTime);
+        pMockClock->SetMonotonic(std::chrono::duration_cast<Milliseconds64>(defaultTime));
+
+        ChipLogProgress(DeviceLayer, "Mock clock initialized with default time");
+    }
+
+    // Install the mock clock globally
+    Clock::Internal::SetSystemClockForTesting(pMockClock);
+}
+
+void TestTimeManager::ShutdownMockClock()
+{
+    if (pMockClock)
+    {
+        // Restore the real system clock
+        Clock::Internal::SetSystemClockForTesting(pRealClock);
+        delete pMockClock;
+        pMockClock = nullptr;
+    }
+}
+
+void TestTimeManager::AdvanceMockTime(Seconds32 offset)
+{
+    if (!mTestTimeEnabled || !pMockClock)
+    {
+        ChipLogError(DeviceLayer, "Cannot advance time - test time not enabled");
+        return;
+    }
+
+    // Get current mock time
+    Microseconds64 currentTime, newTime;
+
+    pMockClock->GetClock_RealTime(currentTime);
+
+    // Update both real time and monotonic time consistently
+    pMockClock->AdvanceRealTime(std::chrono::duration_cast<Milliseconds64>(offset));
+    pMockClock->AdvanceMonotonic(std::chrono::duration_cast<Milliseconds64>(offset));
+
+    // Update base time reference
+    pMockClock->GetClock_RealTime(newTime);
+
+    ChipLogProgress(DeviceLayer, "Advanced mock time: %" PRIu32 "s -> %" PRIu32 "s (+%" PRIu32 "s)",
+                    std::chrono::duration_cast<Seconds32>(currentTime).count(),
+                    std::chrono::duration_cast<Seconds32>(newTime).count(), offset.count());
+}
+
+void TestTimeManager::EnableTestTime(bool enable, uint32_t aInitialTimeValue_s)
+{
+    if (enable == mTestTimeEnabled)
+    {
+        // No change needed, but still trigger updates if re-enabling with same state
+        if (enable)
+        {
+            ChipLogProgress(DeviceLayer, "Test time already enabled");
+        }
+        else
+        {
+            ChipLogProgress(DeviceLayer, "Test time already disabled");
+        }
+        return;
+    }
+
+    if (enable)
+    {
+        // Enable test time mode
+        InitializeMockClock(aInitialTimeValue_s);
+        mTestTimeEnabled = true;
+        ChipLogProgress(DeviceLayer, "🔧 Test time mode ENABLED - using mock clock");
+    }
+    else
+    {
+        // Disable test time mode - this effectively resets to real time
+        ShutdownMockClock();
+        mTestTimeEnabled = false;
+        ChipLogProgress(DeviceLayer, "⏰ Test time mode DISABLED - restored real system clock");
+    }
+}
+
+void TestTimeManager::AdvanceTestTime(Seconds32 offset)
+{
+    if (!mTestTimeEnabled)
+    {
+        ChipLogError(DeviceLayer, "Cannot advance time - test time not enabled. Call EnableTestTime(true) first.");
+        return;
+    }
+
+    if (offset.count() > 0)
+    {
+        AdvanceMockTime(offset);
+        ChipLogProgress(DeviceLayer, "⏩ Time advanced by %" PRIu32 " seconds (%" PRIu32 " minutes, %" PRIu32 " hours)",
+                        offset.count(), offset.count() / 60, offset.count() / 3600);
+    }
+
+    // Trigger tariff time synchronization
+    CommodityTariffInstance * instance = GetCommodityTariffInstance();
+    if (instance)
+    {
+        instance->TariffTimeAttrsSync();
+    }
+}
+
+} // anonymous namespace
 
 // Safe accessor function
 static const TariffDataSet & GetNextPreset()
@@ -47,7 +208,6 @@ void SetTestEventTrigger_TariffDataUpdated()
 {
     const TariffDataSet & tariff_preset = GetNextPreset();
     CommodityTariffDelegate * dg        = GetCommodityTariffDelegate();
-    CommodityTariffInstance * instance  = GetCommodityTariffInstance();
 
     using namespace chip::app::CommodityTariffAttrsDataMgmt;
     using CommodityTariffAttrTypeEnum = chip::app::Clusters::CommodityTariff::CommodityTariffDelegate::CommodityTariffAttrTypeEnum;
@@ -109,8 +269,17 @@ void SetTestEventTrigger_TariffDataUpdated()
     if (err != CHIP_NO_ERROR)
         return;
 
-    instance->ActivateTariffTimeTracking(tariff_preset.TariffTestTimestamp);
-    dg->TariffDataUpdate(tariff_preset.TariffTestTimestamp);
+    // Enable test time with the preset timestamp
+    gTestTimeManager.EnableTestTime(true, tariff_preset.TariffTestTimestamp);
+
+    if (dg)
+    {
+        dg->TariffDataUpdate(tariff_preset.TariffTestTimestamp);
+    }
+    else
+    {
+        ChipLogError(AppServer, "The tariff provider instance is null");
+    }
 }
 
 void SetTestEventTrigger_TariffDataClear()
@@ -126,13 +295,8 @@ void SetTestEventTrigger_TariffDataClear()
  */
 void SetTestEventTrigger_TimeShift24h()
 {
-    CommodityTariffInstance * instance = GetCommodityTariffInstance();
-
-    if (instance)
-    {
-        instance->TariffTimeTrackingSetOffset(kSecondsPerDay);
-        instance->TariffTimeAttrsSync();
-    }
+    gTestTimeManager.EnableTestTime(true);
+    gTestTimeManager.AdvanceTestTime(chip::System::Clock::Seconds32(kSecondsPerDay));
 }
 
 /*
@@ -141,23 +305,13 @@ void SetTestEventTrigger_TimeShift24h()
  */
 void SetTestEventTrigger_TimeShift4h()
 {
-    CommodityTariffInstance * instance = GetCommodityTariffInstance();
-
-    if (instance)
-    {
-        instance->TariffTimeTrackingSetOffset(kSecondsPer4hr);
-        instance->TariffTimeAttrsSync();
-    }
+    gTestTimeManager.EnableTestTime(true);
+    gTestTimeManager.AdvanceTestTime(chip::System::Clock::Seconds32(kSecondsPer4hr));
 }
 
 void SetTestEventTrigger_TimeShiftDisable()
 {
-    CommodityTariffInstance * instance = GetCommodityTariffInstance();
-
-    if (instance)
-    {
-        instance->TariffTimeTrackingSetOffset(0);
-    }
+    gTestTimeManager.EnableTestTime(false);
 }
 
 bool HandleCommodityTariffTestEventTrigger(uint64_t eventTrigger)

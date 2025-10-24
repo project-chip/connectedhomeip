@@ -608,7 +608,7 @@ void Instance::InitCurrentAttrs()
 void Instance::TariffTimeAttrsSync()
 {
     CHIP_ERROR err = UpdateCurrentAttrs();
-    if (err != CHIP_NO_ERROR)
+    if ((err != CHIP_NO_ERROR) && (err != CHIP_ERROR_NOT_FOUND))
     {
         ChipLogError(AppServer, "Failed to sync tariff time attributes: %" CHIP_ERROR_FORMAT, err.Format());
     }
@@ -616,12 +616,17 @@ void Instance::TariffTimeAttrsSync()
 
 CHIP_ERROR Instance::UpdateCurrentAttrs()
 {
-    uint32_t matterEpochNow_s = GetCurrentTimestamp();
-    if (!matterEpochNow_s)
+    uint32_t matterEpochNow_s;
+    uint32_t unixEpochNow_s = kChipEpochSecondsSinceUnixEpoch;
+    CHIP_ERROR err          = System::Clock::GetClock_MatterEpochS(matterEpochNow_s);
+
+    if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(AppServer, "The timestamp value can't be zero!");
+        ChipLogError(AppServer, "Unable to get valid time value");
         return CHIP_ERROR_INVALID_TIME;
     }
+
+    unixEpochNow_s += matterEpochNow_s;
 
     if (mServerTariffAttrsCtx.mTariffProvider == nullptr)
     {
@@ -630,10 +635,10 @@ CHIP_ERROR Instance::UpdateCurrentAttrs()
     }
 
     // Update day information
-    ReturnErrorOnFailure(UpdateDayInformation(matterEpochNow_s));
+    ReturnErrorOnFailure(UpdateDayInformation(unixEpochNow_s));
 
     // Update day entry information
-    ReturnErrorOnFailure(UpdateDayEntryInformation(matterEpochNow_s));
+    ReturnErrorOnFailure(UpdateDayEntryInformation(unixEpochNow_s));
 
     return CHIP_NO_ERROR;
 }
