@@ -187,9 +187,7 @@ public:
     CHIP_ERROR TryNextResult(Impl::NodeLookupHandle & handle) override;
     CHIP_ERROR CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method) override;
 
-#if CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
     virtual void AddFallbackEntry(const PeerId & peerId, const ResolveResult & result) override;
-#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
 
     void Shutdown() override;
 

@@ -34,7 +34,7 @@ TEST(TestNodeAddressCache, CacheBasicOperations)
     // Test empty cache
     PeerId peerId(1, 1);
     EXPECT_EQ(cache.GetCacheSize(), 0u);
-    EXPECT_EQ(cache.GetCachedNodeAddress(peerId, retrievedResult), CHIP_ERROR_KEY_NOT_FOUND);
+    EXPECT_EQ(cache.Lookup(peerId, retrievedResult), false);
 
     // Test caching a node
     Inet::IPAddress ipAddress;
@@ -45,13 +45,13 @@ TEST(TestNodeAddressCache, CacheBasicOperations)
     EXPECT_EQ(cache.GetCacheSize(), 1u);
 
     // Test retrieving cached node
-    EXPECT_EQ(cache.GetCachedNodeAddress(peerId, retrievedResult), CHIP_NO_ERROR);
+    EXPECT_EQ(cache.Lookup(peerId, retrievedResult), true);
     EXPECT_EQ(retrievedResult.address.GetIPAddress(), result.address.GetIPAddress());
     EXPECT_EQ(retrievedResult.address.GetPort(), result.address.GetPort());
 
     // Test removing cached node
     EXPECT_EQ(cache.RemoveCachedNodeAddress(peerId), CHIP_NO_ERROR);
-    EXPECT_EQ(cache.GetCachedNodeAddress(peerId, retrievedResult), CHIP_ERROR_KEY_NOT_FOUND);
+    EXPECT_EQ(cache.Lookup(peerId, retrievedResult), false);
 }
 
 TEST(TestNodeAddressCache, CacheUpdate)
@@ -77,7 +77,7 @@ TEST(TestNodeAddressCache, CacheUpdate)
     EXPECT_EQ(cache.GetCacheSize(), 1u); // Size should remain 1
 
     // Verify updated result
-    EXPECT_EQ(cache.GetCachedNodeAddress(peerId, retrievedResult), CHIP_NO_ERROR);
+    EXPECT_EQ(cache.Lookup(peerId, retrievedResult), true);
     EXPECT_EQ(retrievedResult.address.GetIPAddress(), result2.address.GetIPAddress());
     EXPECT_EQ(retrievedResult.address.GetPort(), result2.address.GetPort());
 }
@@ -107,10 +107,10 @@ TEST(TestNodeAddressCache, CacheFIFOReplacement)
 
     // First entry should be gone
     PeerId firstPeerId(1, 1);
-    EXPECT_EQ(cache.GetCachedNodeAddress(firstPeerId, retrievedResult), CHIP_ERROR_KEY_NOT_FOUND);
+    EXPECT_EQ(cache.Lookup(firstPeerId, retrievedResult), false);
 
     // New entry should be present
-    EXPECT_EQ(cache.GetCachedNodeAddress(newPeerId, retrievedResult), CHIP_NO_ERROR);
+    EXPECT_EQ(cache.Lookup(newPeerId, retrievedResult), true);
     EXPECT_EQ(retrievedResult.address.GetPort(), 9999);
 }
 
@@ -139,7 +139,7 @@ TEST(TestNodeAddressCache, CacheClear)
     for (size_t i = 0; i < 5; ++i)
     {
         PeerId peerId(1, i + 1);
-        EXPECT_EQ(cache.GetCachedNodeAddress(peerId, retrievedResult), CHIP_ERROR_KEY_NOT_FOUND);
+        EXPECT_EQ(cache.Lookup(peerId, retrievedResult), false);
     }
 }
 
