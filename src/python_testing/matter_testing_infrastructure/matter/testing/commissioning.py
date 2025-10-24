@@ -537,7 +537,7 @@ async def is_commissioned(
                 nodeid=node_id,
                 attributes=[(endpoint, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
             )
-        except ChipStackErrorImport as e:
+        except ChipStackErrorImport as e:  # chipstack-ok: Need to catch CASE connection failure to attempt PASE fallback
             # If connection failed and we have PASE parameters, try establishing PASE
             if pase_params is not None:
                 LOGGER.info(f"CASE connection failed, attempting PASE session establishment: {e}")
@@ -618,7 +618,7 @@ async def get_commissioned_fabric_count(
                 nodeid=node_id,
                 attributes=[(endpoint, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
             )
-        except ChipStackErrorImport as e:
+        except ChipStackErrorImport as e:  # chipstack-ok: Need to catch CASE connection failure to attempt PASE fallback
             # If connection failed and we have PASE parameters, try establishing PASE
             if pase_params is not None:
                 LOGGER.info(f"CASE connection failed, attempting PASE session establishment: {e}")
