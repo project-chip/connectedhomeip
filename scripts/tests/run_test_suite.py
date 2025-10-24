@@ -160,8 +160,8 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
             else:  # DARWIN_FRAMEWORK_TOOL_PYTHON
                 chip_tool_path = paths_finder.get('darwin-framework-tool')
 
-        if chip_tool_path is not None:
-            chip_tool = Application(kind='tool', path=Path(chip_tool_path))
+            if chip_tool_path is not None:
+                chip_tool = Application(kind='tool', path=Path(chip_tool_path))
 
     if include_tags:
         include_tags = set([TestTag.__members__[t] for t in include_tags])
