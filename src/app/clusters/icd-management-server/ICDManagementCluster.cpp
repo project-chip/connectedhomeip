@@ -90,7 +90,7 @@ void ICDManagementFabricDelegate::OnFabricRemoved(const FabricTable & fabricTabl
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 ICDManagementCluster::ICDManagementCluster(EndpointId endpointId, PersistentStorageDelegate & storage,
-                                           chip::Crypto::SessionKeystore & symmetricKeystore, FabricTable & fabricTable,
+                                           Crypto::SymmetricKeystore & symmetricKeystore, FabricTable & fabricTable,
                                            ICDConfigurationData & icdConfigurationData, OptionalAttributeSet optionalAttributeSet,
                                            BitMask<IcdManagement::OptionalCommands> aEnabledCommands,
                                            BitMask<IcdManagement::UserActiveModeTriggerBitmap> aUserActiveModeTriggerBitmap,
@@ -98,10 +98,11 @@ ICDManagementCluster::ICDManagementCluster(EndpointId endpointId, PersistentStor
     DefaultServerCluster({ endpointId, IcdManagement::Id }),
     mStorage(storage), mSymmetricKeystore(symmetricKeystore), mFabricTable(fabricTable),
     mICDConfigurationData(icdConfigurationData), mOptionalAttributeSet(optionalAttributeSet), mEnabledCommands(aEnabledCommands),
-    mUserActiveModeTriggerBitmap(aUserActiveModeTriggerBitmap)
+    mUserActiveModeTriggerBitmap(aUserActiveModeTriggerBitmap), mUserActiveModeTriggerInstructionLength(0)
 {
     MutableCharSpan buffer(mUserActiveModeTriggerInstruction);
     CopyCharSpanToMutableCharSpanWithTruncation(aUserActiveModeTriggerInstruction, buffer);
+    mUserActiveModeTriggerInstructionLength = static_cast<uint8_t>(buffer.size());
 }
 
 DataModel::ActionReturnStatus ICDManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -133,9 +134,7 @@ DataModel::ActionReturnStatus ICDManagementCluster::ReadAttribute(const DataMode
         return aEncoder.Encode(mUserActiveModeTriggerBitmap);
 
     case IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id:
-        return aEncoder.Encode(
-            CharSpan(mUserActiveModeTriggerInstruction,
-                     strnlen(mUserActiveModeTriggerInstruction, IcdManagement::kUserActiveModeTriggerInstructionMaxLength)));
+        return aEncoder.Encode(CharSpan(mUserActiveModeTriggerInstruction, mUserActiveModeTriggerInstructionLength));
 
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
@@ -146,27 +145,17 @@ CHIP_ERROR ICDManagementCluster::Attributes(const ConcreteClusterPath & path,
                                             ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder attributeListBuilder(builder);
-    const DataModel::AttributeEntry kMandatoryAttributes[] = {
-        IcdManagement::Attributes::IdleModeDuration::kMetadataEntry,
-        IcdManagement::Attributes::ActiveModeDuration::kMetadataEntry,
-        IcdManagement::Attributes::ActiveModeThreshold::kMetadataEntry,
-    };
     BitFlags<IcdManagement::Feature> featureMap = mICDConfigurationData.GetFeatureMap();
-    const bool hasCIP                           = featureMap.Has(IcdManagement::Feature::kCheckInProtocolSupport);
     const bool hasUAT                           = featureMap.Has(IcdManagement::Feature::kUserActiveModeTrigger);
     const bool hasLIT                           = featureMap.Has(IcdManagement::Feature::kLongIdleTimeSupport);
 
     const AttributeListBuilder::OptionalAttributeEntry optionalEntries[] = {
-        { hasCIP, IcdManagement::Attributes::RegisteredClients::kMetadataEntry },
-        { hasCIP, IcdManagement::Attributes::ICDCounter::kMetadataEntry },
-        { hasCIP, IcdManagement::Attributes::ClientsSupportedPerFabric::kMetadataEntry },
         { hasUAT, IcdManagement::Attributes::UserActiveModeTriggerHint::kMetadataEntry },
         { mOptionalAttributeSet.IsSet(IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id),
           IcdManagement::Attributes::UserActiveModeTriggerInstruction::kMetadataEntry },
         { hasLIT, IcdManagement::Attributes::OperatingMode::kMetadataEntry },
-        { hasCIP, IcdManagement::Attributes::MaximumCheckInBackOff::kMetadataEntry },
     };
-    return attributeListBuilder.Append(Span(kMandatoryAttributes), Span(optionalEntries));
+    return attributeListBuilder.Append(Span(IcdManagement::Attributes::kMandatoryMetadata), Span(optionalEntries));
 }
 
 std::optional<DataModel::ActionReturnStatus> ICDManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request,
@@ -184,23 +173,24 @@ std::optional<DataModel::ActionReturnStatus> ICDManagementCluster::InvokeCommand
         Commands::StayActiveRequest::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
-        IcdManagement::Commands::StayActiveResponse::Type response;
+        Commands::StayActiveResponse::Type response;
         response.promisedActiveDuration = Server::GetInstance().GetICDManager().StayActiveRequest(commandData.stayActiveDuration);
         handler->AddResponse(request.path, response);
+        return std::nullopt;
+#else
+        return Status::Success; // TODO: WHY? Is this not an error? should we return error instead?
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-        break;
     }
     default:
         return Status::UnsupportedCommand;
     }
-    return Status::Success;
 }
 
 CHIP_ERROR ICDManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                   ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     BitFlags<IcdManagement::Feature> featureMap = mICDConfigurationData.GetFeatureMap();
-    const bool hasCIP                           = featureMap.Has(IcdManagement::Feature::kCheckInProtocolSupport);
+    const bool hasCIP                           = featureMap.Has(Feature::kCheckInProtocolSupport);
 
     if (hasCIP)
     {
@@ -211,8 +201,8 @@ CHIP_ERROR ICDManagementCluster::AcceptedCommands(const ConcreteClusterPath & pa
         ReturnErrorOnFailure(builder.ReferenceExisting(kAcceptedCommands));
     }
 
-    if (mICDConfigurationData.GetFeatureMap().Has(IcdManagement::Feature::kLongIdleTimeSupport) ||
-        mEnabledCommands.Has(IcdManagement::OptionalCommands::kStayActive))
+    if (mICDConfigurationData.GetFeatureMap().Has(Feature::kLongIdleTimeSupport) ||
+        mEnabledCommands.Has(OptionalCommands::kStayActive))
     {
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
         ReturnErrorOnFailure(builder.Append(Commands::StayActiveRequest::kMetadataEntry));
@@ -223,7 +213,7 @@ CHIP_ERROR ICDManagementCluster::AcceptedCommands(const ConcreteClusterPath & pa
 CHIP_ERROR ICDManagementCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
     BitFlags<IcdManagement::Feature> featureMap = mICDConfigurationData.GetFeatureMap();
-    const bool hasCIP                           = featureMap.Has(IcdManagement::Feature::kCheckInProtocolSupport);
+    const bool hasCIP                           = featureMap.Has(Feature::kCheckInProtocolSupport);
 
     if (hasCIP)
     {
@@ -233,8 +223,8 @@ CHIP_ERROR ICDManagementCluster::GeneratedCommands(const ConcreteClusterPath & p
         ReturnErrorOnFailure(builder.ReferenceExisting(kGeneratedCommands));
     }
 
-    if (mICDConfigurationData.GetFeatureMap().Has(IcdManagement::Feature::kLongIdleTimeSupport) ||
-        mEnabledCommands.Has(IcdManagement::OptionalCommands::kStayActive))
+    if (mICDConfigurationData.GetFeatureMap().Has(Feature::kLongIdleTimeSupport) ||
+        mEnabledCommands.Has(OptionalCommands::kStayActive))
     {
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
         ReturnErrorOnFailure(builder.Append(Commands::StayActiveResponse::Id));
@@ -253,7 +243,7 @@ CHIP_ERROR ICDManagementCluster::ReadOperatingMode(AttributeValueEncoder & encod
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 
 ICDManagementClusterWithCIP::ICDManagementClusterWithCIP(
-    EndpointId endpointId, PersistentStorageDelegate & storage, chip::Crypto::SessionKeystore & symmetricKeystore,
+    EndpointId endpointId, PersistentStorageDelegate & storage, Crypto::SymmetricKeystore & symmetricKeystore,
     FabricTable & fabricTable, ICDConfigurationData & icdConfigurationData, OptionalAttributeSet optionalAttributeSet,
     BitMask<IcdManagement::OptionalCommands> aEnabledCommands,
     BitMask<IcdManagement::UserActiveModeTriggerBitmap> aUserActiveModeTriggerBitmap, CharSpan aUserActiveModeTriggerInstruction) :
@@ -294,6 +284,28 @@ DataModel::ActionReturnStatus ICDManagementClusterWithCIP::ReadAttribute(const D
     }
 }
 
+CHIP_ERROR ICDManagementClusterWithCIP::Attributes(const ConcreteClusterPath & path,
+                                                   ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    // First get the base class attributes
+    ReturnErrorOnFailure(ICDManagementCluster::Attributes(path, builder));
+
+    // Add CIP-specific attributes
+    BitFlags<IcdManagement::Feature> featureMap = mICDConfigurationData.GetFeatureMap();
+    const bool hasCIP                           = featureMap.Has(Feature::kCheckInProtocolSupport);
+
+    if (hasCIP)
+    {
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(4));
+        ReturnErrorOnFailure(builder.Append(Attributes::RegisteredClients::kMetadataEntry));
+        ReturnErrorOnFailure(builder.Append(Attributes::ICDCounter::kMetadataEntry));
+        ReturnErrorOnFailure(builder.Append(Attributes::ClientsSupportedPerFabric::kMetadataEntry));
+        ReturnErrorOnFailure(builder.Append(Attributes::MaximumCheckInBackOff::kMetadataEntry));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 std::optional<DataModel::ActionReturnStatus> ICDManagementClusterWithCIP::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                         TLV::TLVReader & input_arguments,
                                                                                         CommandHandler * handler)
@@ -330,15 +342,15 @@ std::optional<DataModel::ActionReturnStatus> ICDManagementClusterWithCIP::Invoke
         // Delegate to base class for all other commands
         return ICDManagementCluster::InvokeCommand(request, input_arguments, handler);
     }
-    return Protocols::InteractionModel::Status::Success;
+    return std::nullopt;
 }
 
 CHIP_ERROR ICDManagementClusterWithCIP::ReadRegisteredClients(AttributeValueEncoder & encoder)
 {
-    uint16_t supported_clients                        = mICDConfigurationData.GetClientsSupportedPerFabric();
-    PersistentStorageDelegate & storage               = mStorage;
-    chip::Crypto::SessionKeystore & symmetricKeystore = mSymmetricKeystore;
-    const FabricTable & fabricTable                   = mFabricTable;
+    uint16_t supported_clients                    = mICDConfigurationData.GetClientsSupportedPerFabric();
+    PersistentStorageDelegate & storage           = mStorage;
+    Crypto::SymmetricKeystore & symmetricKeystore = mSymmetricKeystore;
+    const FabricTable & fabricTable               = mFabricTable;
 
     return encoder.EncodeList(
         [supported_clients, &storage, &symmetricKeystore, &fabricTable](const auto & subEncoder) -> CHIP_ERROR {
