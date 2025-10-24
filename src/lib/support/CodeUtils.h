@@ -217,7 +217,7 @@
  *  @def LogOnFailure(expr, MOD, MSG, ...)
  *
  *  @brief
- *    If expr returns something than CHIP_NO_ERROR, log a chip message for the specified module
+ *    If expr returns something other than CHIP_NO_ERROR, log a message for the specified module
  *    in the 'Error' category.
  *
  *  Example usage:
@@ -303,7 +303,7 @@
  *  @def ReturnValueAndLogOnFailure(expr, value, MOD, MSG, ...)
  *
  *  @brief
- *    If expr returns something than CHIP_NO_ERROR, log a chip message for the specified module
+ *    If expr returns something other than CHIP_NO_ERROR, log a message for the specified module
  *    in the 'Error' category and return the error.
  *
  *  Example usage:
