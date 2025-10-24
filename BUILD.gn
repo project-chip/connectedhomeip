@@ -959,12 +959,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         ":linux_energy_gateway_app",
         ":linux_energy_management_app",
         ":linux_lighting_app",
-        ":linux_lit_icd_app",
         ":linux_lock_app",
         ":linux_microwave_oven_app",
         ":linux_network_manager_app",
         ":linux_ota_provider_app",
-        ":linux_ota_requestor_app",
         ":linux_rvc_app",
         ":linux_terms_and_conditions_app",
         ":linux_thermostat_app",
@@ -982,6 +980,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         # ":linux_light_data_model_no_unique_id_app",
         # ":linux_python_bindings_webrtc_app",
         # ":linux_tv_casting_app", # needs CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT 1
+        # ":linux_lit_icd_app",  # moved out of unified build because it defines its own toolchain and it's slow to build
+        # ":linux_ota_requestor_app", # disabled because it needs chip_enable_ota_requestor = true and causes undefined reference to `chip::Shell::RegisterOtaCommands()'
+
+
       ]
     }
   }

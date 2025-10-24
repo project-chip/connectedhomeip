@@ -645,12 +645,10 @@ jobs:
                         --target linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-light-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-terms-and-conditions-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-thermostat-${BUILD_VARIANT}-tsan-clang-test-unified \
@@ -662,6 +660,22 @@ jobs:
                      "
                   rm -rf out/unified-build
 
+            - name: Build linux-x64-ota-requestor
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-ota-requestor-${BUILD_VARIANT}-clang
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-ota-requestor-${BUILD_VARIANT}-clang"
+            - name: Build linux-x64-lit-icd
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-lit-icd-${BUILD_VARIANT}-clang
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-lit-icd-${BUILD_VARIANT}-clang"
             - name: Build linux-x64-tv-casting-app
               env:
                   CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"

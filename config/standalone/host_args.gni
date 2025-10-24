@@ -49,25 +49,26 @@ chip_build_libshell = true
 # chip_enable_device_energy_management_trigger = true
 # chip_enable_water_heater_management_trigger = true
 
-# lit-icd-app settings
-chip_enable_icd_server = true
-chip_subscription_timeout_resumption = true
-chip_icd_report_on_active_mode = true
-chip_enable_icd_lit = true
-chip_enable_icd_dsls = true
+# lit-icd-app settings (disabled from unified build)
+# chip_enable_icd_server = true
+# chip_subscription_timeout_resumption = true
+# chip_icd_report_on_active_mode = true
+# chip_enable_icd_lit = true
+# chip_enable_icd_dsls = true
 
 # network-manager app settings
-# chip_config_network_layer_ble = false
+chip_config_network_layer_ble = false
 chip_enable_access_restrictions = true
 
-# ota-requestor-app settings
-# chip_enable_ota_requestor = true # undefined reference to `chip::Shell::RegisterOtaCommands()'
+# # ota-requestor-app settings (disabled # undefined reference to `chip::Shell::RegisterOtaCommands()')
+# chip_enable_ota_requestor = true
+
 # terms-and-conditions-app settings:
 chip_terms_and_conditions_required = true
 
 # tv-app settings
 chip_enable_openthread = false
 
-# tv-casting-app:
-chip_max_discovered_ip_addresses = 20
-enable_rtti = true
+# tv-casting-app: (disabled from unified build)
+# chip_max_discovered_ip_addresses = 20
+# enable_rtti = true
