@@ -28,6 +28,7 @@
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <platform/ConfigurationManager.h>
 #include <platform/PlatformManager.h>
 #include <soil-measurement-stub.h>
 
@@ -593,6 +594,26 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     else if (name == "UserIntentCommissioningStart")
     {
         Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+    }
+    else if (name == "SetTotalOperationalHours")
+    {
+        bool hasHours = HasNumericField(self->mJsonValue, "Hours");
+        if (!hasHours)
+        {
+            ChipLogError(NotSpecified, "The SetTotalOperationalHours command requires the Hours key.");
+            return;
+        }
+        
+        uint32_t hours = static_cast<uint32_t>(self->mJsonValue["Hours"].asUInt());
+        CHIP_ERROR err = DeviceLayer::ConfigurationMgr().StoreTotalOperationalHours(hours);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Failed to store TotalOperationalHours: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "Successfully set TotalOperationalHours to %u hours", hours);
+        }
     }
     else
     {
