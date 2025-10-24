@@ -87,7 +87,7 @@ def run_single_test(otaimage: str, otaimage_version: int) -> int:
 @click.option('--otaimagesversions', '-v', multiple=True, type=(int))
 def main(otaimages: str, otaimagesversions: int):
     if len(otaimages) == 0 or otaimagesversions == 0:
-        logging.error(f"Must provide at least one single image to verify")
+        logging.error("Must provide at least one image to verify")
         exit(1)
     if len(otaimages) != len(otaimagesversions):
         logging.error("Provided non matching images to provided versions")
@@ -102,7 +102,7 @@ def main(otaimages: str, otaimagesversions: int):
 
     for iter in passes:
         if iter[2] != 0:
-            logging.error(f"Image version missmatched for ota image {iter[0]} expected {iter[1]}")
+            logging.error(f"Image version missmatched for ota image: {iter[0]} expected: {iter[1]}")
             main_status = 1
 
     sys.exit(main_status)
