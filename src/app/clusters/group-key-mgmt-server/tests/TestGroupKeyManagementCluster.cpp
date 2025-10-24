@@ -316,7 +316,7 @@ void PrepopulateGroupKeyMap(GroupKeyManagementCluster & cluster,
     auto path = chip::app::ConcreteAttributePath(chip::kRootEndpointId, GroupKeyManagement::Id,
                                                  GroupKeyManagement::Attributes::GroupKeyMap::Id);
 
-    CHIP_ERROR err = TestHelpers::WriteClusterAttribute(cluster, path, listToWrite);
+    CHIP_ERROR err = Test::WriteClusterAttribute(cluster, path, listToWrite);
 
     ASSERT_EQ(err, CHIP_NO_ERROR);
 }
