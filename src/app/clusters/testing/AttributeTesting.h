@@ -23,9 +23,11 @@ namespace Testing {
 // Compare two attribute entries as "sets of attributes" and ensures that the content is identical
 bool EqualAttributeSets(Span<const app::DataModel::AttributeEntry> a, Span<const app::DataModel::AttributeEntry> b);
 
-// Compare two attribute entries as "sets of attributes" and ensures that the content is identical
+// Compare two accepted commands entries as "sets of accepted commands" and ensures that the content is identical
 bool EqualAcceptedCommandSets(Span<const app::DataModel::AcceptedCommandEntry> a,
                               Span<const app::DataModel::AcceptedCommandEntry> b);
 
+// Compare two generated commands entries as "sets of generated commands" and ensures that the content is identical
+bool EqualGeneratedCommandSets(Span<const CommandId> a, Span<const CommandId> b);
 } // namespace Testing
 } // namespace chip
