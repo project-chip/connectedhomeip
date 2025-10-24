@@ -27,7 +27,7 @@
 namespace chip::app {
 
 /**
- * This is a factory class made to be used to create any valid device type as part of the 
+ * This is a factory class made to be used to create any valid device type as part of the
  * all-devices-app. This class is meant to abstract away some details of device specific code,
  * and to have more generic implementation code being used in main to create a device. The keys
  * in the device registry map are the command line arguments used to start the respective device.

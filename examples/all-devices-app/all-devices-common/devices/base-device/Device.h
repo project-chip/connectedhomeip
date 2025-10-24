@@ -54,7 +54,7 @@ public:
 
 protected:
     BaseDevice(const DataModel::DeviceTypeEntry & deviceType) : mDeviceType(deviceType), mEndpointRegistration(*this, {}) {}
-    
+
     /// Internal registration function for common device clusters and endpoint registration.
     /// Subclasses are expected to call this
     CHIP_ERROR BaseRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId);

@@ -28,9 +28,9 @@ class BooleanStateSensorDevice : public BaseDevice
 {
 public:
     /*
-     * This is a general class for boolean state sensor devices. The device type passed here will 
-     * determine the type of sensor it is (contact, water leak, etc.) This is meant to be a reusable 
-     * class for the sensor types that share the same core functionality through the identify and 
+     * This is a general class for boolean state sensor devices. The device type passed here will
+     * determine the type of sensor it is (contact, water leak, etc.) This is meant to be a reusable
+     * class for the sensor types that share the same core functionality through the identify and
      * boolean state clusters.
     */
     BooleanStateSensorDevice(std::unique_ptr<reporting::ReportScheduler::TimerDelegate> timerDelegate, const DataModel::DeviceTypeEntry & deviceType) :

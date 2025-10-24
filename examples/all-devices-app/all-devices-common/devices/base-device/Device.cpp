@@ -31,8 +31,8 @@ CHIP_ERROR BaseDevice::BaseRegistration(EndpointId endpoint, CodeDrivenDataModel
     ReturnErrorOnFailure(provider.AddCluster(mDescriptorCluster.Registration()));
 
     mEndpointRegistration.endpointEntry = DataModel::EndpointEntry{
-        .id                 = endpoint, 
-        .parentId           = parentId, 
+        .id                 = endpoint,
+        .parentId           = parentId,
         .compositionPattern = DataModel::EndpointCompositionPattern::kFullFamily,
     };
     return CHIP_NO_ERROR;
