@@ -18,8 +18,6 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 import("${chip_root}/config/standalone/args.gni")
 
-chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
-chip_project_config_include = "<CHIPProjectAppConfig.h>"
 chip_system_project_config_include = "<SystemProjectConfig.h>"
 
 chip_project_config_include_dirs =

@@ -53,14 +53,14 @@ public:
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 
 protected:
-    BaseDevice(const DataModel::DeviceTypeEntry & deviceType) : mDeviceType(deviceType), mEndpointRegistration(*this, {}) {}
+    BaseDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes) : mDeviceTypes(deviceTypes), mEndpointRegistration(*this, {}) {}
 
     /// Internal registration function for common device clusters and endpoint registration.
     /// Subclasses are expected to call this
     CHIP_ERROR BaseRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId);
 
     EndpointId mEndpointId = kInvalidEndpointId;
-    const DataModel::DeviceTypeEntry mDeviceType;
+    Span<const DataModel::DeviceTypeEntry> mDeviceTypes;
     EndpointInterfaceRegistration mEndpointRegistration;
 
     // Common clusters..

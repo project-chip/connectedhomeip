@@ -34,7 +34,7 @@ public:
      * boolean state clusters.
      */
     BooleanStateSensorDevice(std::unique_ptr<reporting::ReportScheduler::TimerDelegate> timerDelegate,
-                             const DataModel::DeviceTypeEntry & deviceType) :
+                             Span<const DataModel::DeviceTypeEntry> deviceType) :
         BaseDevice(deviceType),
         mTimerDelegate(std::move(timerDelegate))
     {}

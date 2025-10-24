@@ -41,12 +41,7 @@ CHIP_ERROR BaseDevice::BaseRegistration(EndpointId endpoint, CodeDrivenDataModel
 CHIP_ERROR BaseDevice::DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const
 {
     VerifyOrReturnValue(mDescriptorCluster.IsConstructed(), CHIP_NO_ERROR);
-    ReturnErrorOnFailure(out.EnsureAppendCapacity(1));
-
-    if (mDescriptorCluster.IsConstructed())
-    {
-        ReturnErrorOnFailure(out.Append(mDeviceType));
-    }
+    ReturnErrorOnFailure(out.ReferenceExisting(mDeviceTypes));
 
     return CHIP_NO_ERROR;
 }

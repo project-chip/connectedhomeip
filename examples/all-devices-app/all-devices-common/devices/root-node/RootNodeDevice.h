@@ -29,7 +29,7 @@
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <devices/Types.h>
 #include <devices/base-device/Device.h>
-#include <platform/Linux/NetworkCommissioningDriver.h>
+#include <platform/NetworkCommissioning.h>
 
 namespace chip {
 namespace app {
@@ -45,7 +45,7 @@ public:
 
 protected:
     // Most implementations require network commissioning, so only subclasses have access to this.
-    RootNodeDevice() : BaseDevice(Device::Type::kRootNode) {}
+    RootNodeDevice() : BaseDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1)) {}
 
 private:
     LazyRegisteredServerCluster<Clusters::BasicInformationCluster> mBasicInformationCluster;
