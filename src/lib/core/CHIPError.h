@@ -1851,8 +1851,7 @@ using CHIP_ERROR = ::chip::ChipError;
 
 // Prior to ChipError being marked [[nodiscard]], there were numerous places
 // where the return value was ignored.
-// This grandfathers those usages, which should be reviewed to make sure they
-// are safe & correct behavior
+// This grandfathers those usages.
 // NEW CODE SHOULD NOT USE THIS
 #define TEMPORARY_RETURN_IGNORED (void)
 
