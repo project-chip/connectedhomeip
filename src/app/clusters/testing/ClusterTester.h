@@ -16,6 +16,7 @@
 
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
+#include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
@@ -94,6 +95,27 @@ public:
         app::AttributeValueDecoder decoder = writeOperation.DecoderFor(value);
         return mCluster.WriteAttribute(writeOperation.GetRequest(), decoder).GetUnderlyingError();
     };
+
+    // Helper function to invoke a command and return the result.
+    template <typename T>
+    std::optional<chip::app::DataModel::ActionReturnStatus> InvokeCommand(chip::CommandId commandId, const T & data,
+                                                                          app::CommandHandler * handler)
+    {
+        const auto & paths = mCluster.GetPaths();
+        VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
+        const chip::app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
+
+        uint8_t buffer[128];
+        chip::TLV::TLVWriter tlvWriter;
+        tlvWriter.Init(buffer);
+        ReturnErrorOnFailure(data.Encode(tlvWriter, chip::TLV::AnonymousTag()));
+
+        chip::TLV::TLVReader tlvReader;
+        tlvReader.Init(buffer, tlvWriter.GetLengthWritten());
+        ReturnErrorOnFailure(tlvReader.Next());
+
+        return mCluster.InvokeCommand(request, tlvReader, handler);
+    }
 
 private:
     app::ServerClusterInterface & mCluster;
