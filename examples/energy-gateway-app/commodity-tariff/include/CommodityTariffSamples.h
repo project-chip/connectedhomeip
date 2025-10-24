@@ -130,7 +130,7 @@ static inline Structs::DayPatternStruct::Type DayPatterns[] = {
     { .dayPatternID = 1, .daysOfWeek = BitMask<DayPatternDayOfWeekBitmap>(0x2A), .dayEntryIDs = Span<const uint32_t>(dayEntryIDs2) }
 };
 
-static const uint32_t dayPatternIDs[] = { 0, 1 };
+static const uint32_t dayPatternIDs[] = { 1, 0 };
 
 // Calendar Periods
 static inline Structs::CalendarPeriodStruct::Type CalendarPeriods[] = { { .startDate     = DataModel::Nullable<uint32_t>(0),
