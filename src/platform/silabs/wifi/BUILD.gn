@@ -42,7 +42,7 @@ if (chip_enable_wifi && !wifi_soc && !sl_build_unit_tests) {
   import("${chip_root}/src/platform/silabs/wifi/args.gni")
 
   if (use_SiWx917) {
-    import("${silabs_platform_dir}/wifi/SiWx/ncp/rs9117.gni")
+    import("${silabs_platform_dir}/wifi/SiWx/ncp/siwx917_ncp.gni")
   } else if (use_wf200) {
     import("${silabs_platform_dir}/wifi/wf200/wf200.gni")
   }
@@ -60,7 +60,7 @@ config("wifi-platform-config") {
 
   if (use_SiWx917) {
     # All the stuff from wiseconnect
-    include_dirs += rs9117_inc_plat
+    include_dirs += siwx917_ncp_inc_plat
   }
 
   if (chip_default_wifi_ssid != "") {
@@ -121,10 +121,10 @@ source_set("wifi-platform") {
   ]
 
   if (use_SiWx917) {
-    sources += rs911x_src_plat
+    sources += siwx917_ncp_src_plat
 
     # All the stuff from wiseconnect
-    sources += rs9117_src_sapi
+    sources += siwx917_ncp_src_sapi
   } else if (use_wf200) {
     sources += wf200_plat_src
   }

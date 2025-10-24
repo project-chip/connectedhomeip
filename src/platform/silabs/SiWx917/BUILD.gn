@@ -69,10 +69,10 @@ static_library("SiWx917") {
     "${silabs_platform_dir}/platformAbstraction/WiseMcuSpam.cpp",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    "../rs911x/BLEManagerImpl.cpp",
-    "../rs911x/rsi_ble_config.h",
-    "../rs911x/wfx_sl_ble_init.cpp",
-    "../rs911x/wfx_sl_ble_init.h",
+    "../siwx917_ble/BLEManagerImpl.cpp",
+    "../siwx917_ble/ble_config.h",
+    "../siwx917_ble/wfx_sl_ble_init.cpp",
+    "../siwx917_ble/wfx_sl_ble_init.h",
     "SiWxPlatformInterface.h",
   ]
 
