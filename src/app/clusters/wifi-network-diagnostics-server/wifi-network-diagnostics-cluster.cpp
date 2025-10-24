@@ -180,8 +180,6 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
 {
     AttributeListBuilder attributeListBuilder(builder);
 
-    const BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags = mFeatureFlags;
-
     const DataModel::AttributeEntry optionalAttributes[] = {
         BeaconLostCount::kMetadataEntry,        //
         OverrunCount::kMetadataEntry,           //
@@ -206,13 +204,13 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
                                     >
         optionalAttributeSet(mOptionalAttributeSet);
 
-    if (featureFlags.Has(Feature::kErrorCounts))
+    if (mFeatureFlags.Has(Feature::kErrorCounts))
     {
         optionalAttributeSet.Set<BeaconLostCount::Id>();
         optionalAttributeSet.Set<OverrunCount::Id>();
     }
 
-    if (featureFlags.Has(Feature::kPacketCounts))
+    if (mFeatureFlags.Has(Feature::kPacketCounts))
     {
         optionalAttributeSet.Set<BeaconRxCount::Id>();
         optionalAttributeSet.Set<PacketMulticastRxCount::Id>();
