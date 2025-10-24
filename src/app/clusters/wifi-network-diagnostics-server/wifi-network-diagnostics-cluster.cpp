@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
-#include "lib/support/CodeUtils.h"
-#include "platform/DiagnosticDataProvider.h"
 #include <app/EventLogging.h>
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/WiFiNetworkDiagnostics/Ids.h>
 #include <clusters/WiFiNetworkDiagnostics/Metadata.h>
+#include <lib/support/CodeUtils.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <tracing/macros.h>
 #include <tracing/metric_event.h>
 
