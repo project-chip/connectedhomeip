@@ -108,9 +108,14 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
-        asserts.assert_true(self.check_pics("RVCOPSTATE.S.A0004"), "RVCOPSTATE.S.A0004 must be supported")
-        asserts.assert_true(self.check_pics("RVCOPSTATE.S.C04.Tx"), "RVCOPSTATE.S.C04.Tx must be supported")
-        asserts.assert_true(self.check_pics("RVCOPSTATE.S.C80.Rsp"), "RVCOPSTATE.S.C80.Rsp must be supported")
+        required_pics = [
+            "RVCOPSTATE.S.A0004",
+            "RVCOPSTATE.S.C04.Tx",
+            "RVCOPSTATE.S.C80.Rsp",
+            "RVCOPSTATE.S.M.CAN_MANUALLY_CONTROLLED",
+        ]
+        for pics in required_pics:
+            asserts.assert_true(self.check_pics(pics), f"{pics} must be supported")
 
         op_states = Clusters.OperationalState.Enums.OperationalStateEnum
         rvc_op_states = Clusters.RvcOperationalState.Enums.OperationalStateEnum
