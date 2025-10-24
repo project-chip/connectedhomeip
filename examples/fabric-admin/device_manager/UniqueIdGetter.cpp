@@ -38,7 +38,7 @@ void OnDeviceConnectionFailureWrapper(void * context, const ScopedNodeId & peerI
 
 bool SuccessOrLogName(CHIP_ERROR err, const char * name)
 {
-    SuccessOrLog(err, "Failed to read %s", name);
+    SuccessOrLog(err, NotSpecified, "Failed to read %s", name);
     return (err == CHIP_NO_ERROR);
 }
 
