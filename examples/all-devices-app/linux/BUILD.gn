@@ -29,9 +29,7 @@ config("includes") {
 }
 
 executable("all-devices-app") {
-  sources = [
-    "main.cpp",
-  ]
+  sources = [ "main.cpp" ]
 
   deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
