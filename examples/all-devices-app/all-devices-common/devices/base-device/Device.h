@@ -31,12 +31,10 @@ namespace chip::app {
 ///
 /// Current implementation assumes that a device is registered on a single
 /// endpoint.
-class Device : public EndpointInterface
+class BaseDevice : public EndpointInterface
 {
 public:
-    using DeviceType = Clusters::Descriptor::Structs::DeviceTypeStruct::Type;
-    Device(const DeviceType & deviceType) : mDeviceType(deviceType), mEndpointRegistration(*this, {}) {}
-    virtual ~Device() = default;
+    virtual ~BaseDevice() = default;
 
     EndpointId GetEndpointId() const { return mEndpointId; }
 
@@ -55,12 +53,14 @@ public:
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 
 protected:
+    BaseDevice(const DataModel::DeviceTypeEntry & deviceType) : mDeviceType(deviceType), mEndpointRegistration(*this, {}) {}
+    
     /// Internal registration function for common device clusters and endpoint registration.
     /// Subclasses are expected to call this
     CHIP_ERROR BaseRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId);
 
     EndpointId mEndpointId = kInvalidEndpointId;
-    const DeviceType mDeviceType;
+    const DataModel::DeviceTypeEntry mDeviceType;
     EndpointInterfaceRegistration mEndpointRegistration;
 
     // Common clusters..

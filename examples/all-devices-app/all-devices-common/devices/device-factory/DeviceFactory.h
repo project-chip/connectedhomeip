@@ -18,18 +18,26 @@
 #pragma once
 
 #include <app/TimerDelegates.h>
-#include <devices/contact-sensor/ContactSensorDevice.h>
-#include <devices/water-leak-detector/WaterLeakDetectorDevice.h>
+#include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <functional>
 #include <lib/core/CHIPError.h>
 #include <map>
+#include <devices/Types.h>
 
 namespace chip::app {
 
+/**
+ * This is a factory class made to be used to create any valid device type as part of the 
+ * all-devices-app. This class is meant to abstract away some details of device specific code,
+ * and to have more generic implementation code being used in main to create a device. The keys
+ * in the device registry map are the command line arguments used to start the respective device.
+ * Create devices by fetching the instance of this class and passing in the device type argument
+ * i.e. DeviceFactory::GetInstance().Create(deviceTypeName)
+ */
 class DeviceFactory
 {
 public:
-    using DeviceCreator = std::function<std::unique_ptr<Device>()>;
+    using DeviceCreator = std::function<std::unique_ptr<BaseDevice>()>;
 
     static DeviceFactory & GetInstance()
     {
@@ -39,7 +47,7 @@ public:
 
     bool IsValidDevice(const std::string & deviceTypeArg) { return mRegistry.find(deviceTypeArg) != mRegistry.end(); }
 
-    std::unique_ptr<Device> Create(const std::string & deviceTypeArg)
+    std::unique_ptr<BaseDevice> Create(const std::string & deviceTypeArg)
     {
         if (IsValidDevice(deviceTypeArg))
         {
@@ -53,8 +61,8 @@ private:
 
     DeviceFactory()
     {
-        mRegistry["contact-sensor"]      = []() { return std::make_unique<ContactSensorDevice>(std::make_unique<DefaultTimerDelegate>()); };
-        mRegistry["water-leak-detector"] = []() { return std::make_unique<WaterLeakDetectorDevice>(); };
+        mRegistry["contact-sensor"]      = []() { return std::make_unique<BooleanStateSensorDevice>(std::make_unique<DefaultTimerDelegate>(), Device::Type::kContactSensor); };
+        mRegistry["water-leak-detector"] = []() { return std::make_unique<BooleanStateSensorDevice>(std::make_unique<DefaultTimerDelegate>(), Device::Type::kWaterLeakDetector); };
     }
 };
 

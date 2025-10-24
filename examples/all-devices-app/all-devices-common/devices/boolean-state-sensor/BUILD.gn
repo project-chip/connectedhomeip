@@ -20,10 +20,10 @@ config("includes") {
   include_dirs = [ ".." ]
 }
 
-source_set("contact-sensor") {
+source_set("boolean-state-sensor") {
   sources = [
-    "ContactSensorDevice.cpp",
-    "ContactSensorDevice.h",
+    "BooleanStateSensorDevice.cpp",
+    "BooleanStateSensorDevice.h",
   ]
 
   public_deps = [
@@ -33,7 +33,6 @@ source_set("contact-sensor") {
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
-    "${chip_root}/zzz_generated/app-common/clusters/Descriptor",
   ]
 
   public_configs = [

@@ -19,19 +19,6 @@
 #include <DeviceInfoProviderImpl.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/access-control-server/access-control-cluster.h>
-#include <app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.h>
-#include <app/clusters/basic-information/BasicInformationCluster.h>
-#include <app/clusters/descriptor/descriptor-cluster.h>
-#include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
-#include <app/clusters/group-key-mgmt-server/group-key-mgmt-cluster.h>
-#include <app/clusters/identify-server/IdentifyCluster.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/clusters/operational-credentials-server/operational-credentials-cluster.h>
-#include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
-#include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Dnssd.h>
@@ -39,7 +26,6 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <data-model-providers/codedriven/endpoint/SpanEndpoint.h>
-#include <devices/contact-sensor/ContactSensorDevice.h>
 #include <devices/device-factory/DeviceFactory.h>
 #include <devices/root-node/RootNodeDevice.h>
 #include <platform/CommissionableDataProvider.h>
@@ -47,9 +33,7 @@
 #include <platform/PlatformManager.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemLayer.h>
-
 #include <AppMain.h>
-#include <map>
 #include <string>
 
 using namespace chip;
@@ -123,7 +107,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         chip::app::CodeDrivenDataModelProvider(*delegate, attributePersistenceProvider);
 
     static WifiRootNodeDevice rootNodeDevice(&sWiFiDriver);
-    static std::unique_ptr<Device> constructedDevice;
+    static std::unique_ptr<BaseDevice> constructedDevice;
 
     rootNodeDevice.Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
     constructedDevice = DeviceFactory::GetInstance().Create(deviceTypeName);

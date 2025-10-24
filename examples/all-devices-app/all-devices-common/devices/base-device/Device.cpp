@@ -22,7 +22,7 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-CHIP_ERROR Device::BaseRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR BaseDevice::BaseRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     mEndpointId = endpoint;
@@ -31,36 +31,33 @@ CHIP_ERROR Device::BaseRegistration(EndpointId endpoint, CodeDrivenDataModelProv
     ReturnErrorOnFailure(provider.AddCluster(mDescriptorCluster.Registration()));
 
     mEndpointRegistration.endpointEntry = DataModel::EndpointEntry{
-        .id                 = endpoint, //
-        .parentId           = parentId, //
+        .id                 = endpoint, 
+        .parentId           = parentId, 
         .compositionPattern = DataModel::EndpointCompositionPattern::kFullFamily,
     };
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Device::DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const
+CHIP_ERROR BaseDevice::DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const
 {
     VerifyOrReturnValue(mDescriptorCluster.IsConstructed(), CHIP_NO_ERROR);
     ReturnErrorOnFailure(out.EnsureAppendCapacity(1));
 
     if (mDescriptorCluster.IsConstructed())
     {
-        ReturnErrorOnFailure(out.Append(DataModel::DeviceTypeEntry{
-            .deviceTypeId       = mDeviceType.deviceType,
-            .deviceTypeRevision = static_cast<uint8_t>(mDeviceType.revision),
-        }));
+        ReturnErrorOnFailure(out.Append(mDeviceType));
     }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Device::SemanticTags(ReadOnlyBufferBuilder<SemanticTag> & out) const
+CHIP_ERROR BaseDevice::SemanticTags(ReadOnlyBufferBuilder<SemanticTag> & out) const
 {
     // no semantic tags
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Device::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const
+CHIP_ERROR BaseDevice::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const
 {
     // no bindings
     return CHIP_NO_ERROR;

@@ -24,9 +24,9 @@ source_set("device-factory") {
   sources = [ "DeviceFactory.h" ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/contact-sensor",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/water-leak-detector",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
     "${chip_root}/src/lib/core:error",
+    "${chip_root}/zzz_generated/app-common/devices/",
   ]
 
   public_configs = [

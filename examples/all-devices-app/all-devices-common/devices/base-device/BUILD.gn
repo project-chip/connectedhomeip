@@ -31,7 +31,6 @@ source_set("base-device") {
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
-    "${chip_root}/zzz_generated/app-common/clusters/Descriptor",
   ]
 
   public_configs = [

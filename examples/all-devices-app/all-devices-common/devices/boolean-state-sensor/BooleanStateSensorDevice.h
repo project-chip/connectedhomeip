@@ -24,22 +24,25 @@
 namespace chip {
 namespace app {
 
-constexpr DeviceTypeId kContactSensorDeviceTypeRevision = 2;
-
-class ContactSensorDevice : public Device
+class BooleanStateSensorDevice : public BaseDevice
 {
 public:
-    ContactSensorDevice(std::unique_ptr<reporting::ReportScheduler::TimerDelegate> timerDelegate) :
-        //TODO: Update the hard coded device type once #41602 is merged
-        Device(Device::DeviceType{ .deviceType = static_cast<DeviceTypeId>(0x0015), .revision = kContactSensorDeviceTypeRevision }), mTimerDelegate(std::move(timerDelegate))
+    /*
+     * This is a general class for boolean state sensor devices. The device type passed here will 
+     * determine the type of sensor it is (contact, water leak, etc.) This is meant to be a reusable 
+     * class for the sensor types that share the same core functionality through the identify and 
+     * boolean state clusters.
+    */
+    BooleanStateSensorDevice(std::unique_ptr<reporting::ReportScheduler::TimerDelegate> timerDelegate, const DataModel::DeviceTypeEntry & deviceType) :
+        BaseDevice(deviceType), mTimerDelegate(std::move(timerDelegate))
     {}
-    ~ContactSensorDevice() override = default;
+    ~BooleanStateSensorDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
     void UnRegister(CodeDrivenDataModelProvider & provider) override;
 
-    Clusters::BooleanStateCluster & Cluster() { return mBooleanStateCluster.Cluster(); }
+    Clusters::BooleanStateCluster & BooleanState() { return mBooleanStateCluster.Cluster(); }
 
 private:
     std::unique_ptr<reporting::ReportScheduler::TimerDelegate> mTimerDelegate;

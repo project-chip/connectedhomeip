@@ -29,11 +29,12 @@
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <devices/base-device/Device.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
+#include <devices/Types.h>
 
 namespace chip {
 namespace app {
 
-class RootNodeDevice : public Device
+class RootNodeDevice : public BaseDevice
 {
 public:
     ~RootNodeDevice() override = default;
@@ -44,8 +45,7 @@ public:
 
 protected:
     // Most implementations require network commissioning, so only subclasses have access to this.
-    //TODO: Update the hard coded device type once #41602 is merged
-    RootNodeDevice() : Device(Device::DeviceType{ .deviceType = static_cast<uint32_t>(0x0016), .revision = 3 }) {}
+    RootNodeDevice() : BaseDevice(Device::Type::kRootNode) {}
 
 private:
     LazyRegisteredServerCluster<Clusters::BasicInformationCluster> mBasicInformationCluster;

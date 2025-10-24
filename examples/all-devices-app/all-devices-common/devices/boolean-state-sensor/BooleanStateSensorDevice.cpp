@@ -14,13 +14,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <devices/contact-sensor/ContactSensorDevice.h>
+#include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 
 using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-CHIP_ERROR ContactSensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR BooleanStateSensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
     ReturnErrorOnFailure(BaseRegistration(endpoint, provider, parentId));
 
@@ -33,7 +33,7 @@ CHIP_ERROR ContactSensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDa
     return provider.AddEndpoint(mEndpointRegistration);
 }
 
-void ContactSensorDevice::UnRegister(CodeDrivenDataModelProvider & provider)
+void BooleanStateSensorDevice::UnRegister(CodeDrivenDataModelProvider & provider)
 {
     provider.RemoveEndpoint(mEndpointId);
     if (mBooleanStateCluster.IsConstructed())
