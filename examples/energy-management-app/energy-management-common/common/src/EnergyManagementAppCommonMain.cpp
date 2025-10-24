@@ -20,6 +20,7 @@
 #include "EnergyManagementAppCmdLineOptions.h"
 #include <DeviceEnergyManagementDelegateImpl.h>
 #include <DeviceEnergyManagementManager.h>
+#include <ElectricalEnergyMeasurementCluster.h>
 #include <ElectricalPowerMeasurementDelegate.h>
 #include <EnergyEvseMain.h>
 #include <PowerTopologyDelegate.h>

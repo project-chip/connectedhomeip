@@ -11,5 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("electrical-energy-measurement-server") {
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+config("electrical-energy-measurement-server-config") {
+  include_dirs = [ "." ]
+}
+
+source_set("electrical-energy-measurement-server") {
+  sources = [
+    "ElectricalEnergyMeasurementCluster.cpp",
+    "ElectricalEnergyMeasurementCluster.h",
+  ]
+
+  public_configs = [ ":electrical-energy-measurement-server-config" ]
+
+  public_deps = [
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/zzz_generated/app-common/clusters/ElectricalEnergyMeasurement",
+  ]
 }
