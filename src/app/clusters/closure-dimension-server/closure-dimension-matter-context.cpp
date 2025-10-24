@@ -30,7 +30,7 @@ namespace ClosureDimension {
 void MatterContext::MarkDirty(const AttributeId attributeId)
 {
     MatterReportingAttributeChangeCallback(mEndpoint, Id, attributeId);
-    
+
     ConcreteAttributePath attributePath(mEndpoint, Id, attributeId);
     MatterClosureDimensionClusterServerAttributeChangedCallback(attributePath);
 }
