@@ -214,7 +214,7 @@
     } while (false)
 
 /**
- *  @def LogOnFailure(expr, MOD, MSG, ...)
+ *  @def SuccessOrLog(expr, MOD, MSG, ...)
  *
  *  @brief
  *    If expr returns something than CHIP_NO_ERROR, log a chip message for the specified module
@@ -223,7 +223,7 @@
  *  Example usage:
  *
  *  @code
- *    LogOnFailure(channel->SendMsg(msg), Module, "Failure message: %s", param);
+ *    SuccessOrLog(channel->SendMsg(msg), Module, "Failure message: %s", param);
  *  @endcode
  *
  *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
@@ -231,7 +231,7 @@
  *  @param[in]  MSG         The log message format string.
  *  @param[in]  ...         Optional arguments for the log message.
  */
-#define LogOnFailure(expr, MOD, MSG, ...)                                                                                          \
+#define SuccessOrLog(expr, MOD, MSG, ...)                                                                                          \
     do                                                                                                                             \
     {                                                                                                                              \
         CHIP_ERROR __lerr = (expr);                                                                                                \
@@ -265,7 +265,7 @@
         CHIP_ERROR __err = (expr);                                                                                                 \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
-            LogOnFailure(__err, MOD, MSG, ##__VA_ARGS__);                                                                          \
+            SuccessOrLog(__err, MOD, MSG, ##__VA_ARGS__);                                                                          \
             return;                                                                                                                \
         }                                                                                                                          \
     } while (false)
@@ -294,7 +294,7 @@
         CHIP_ERROR __err = (expr);                                                                                                 \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
-            LogOnFailure(__err, MOD, MSG, ##__VA_ARGS__);                                                                          \
+            SuccessOrLog(__err, MOD, MSG, ##__VA_ARGS__);                                                                          \
             return __err;                                                                                                          \
         }                                                                                                                          \
     } while (false)
@@ -324,7 +324,7 @@
         CHIP_ERROR __err = (expr);                                                                                                 \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
-            LogOnFailure(__err, MOD, MSG, ##__VA_ARGS__);                                                                          \
+            SuccessOrLog(__err, MOD, MSG, ##__VA_ARGS__);                                                                          \
             return value;                                                                                                          \
         }                                                                                                                          \
     } while (false)
