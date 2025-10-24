@@ -281,6 +281,7 @@
     0x0000001F, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
+    0x0000001F, /* Cluster: Access Control, Event: AuxiliaryAccessUpdated, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *event*, privilege) for read event
@@ -288,6 +289,7 @@
     0x00000000, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
     0x00000002, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
+    0x00000003, /* Cluster: Access Control, Event: AuxiliaryAccessUpdated, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, event, *privilege*) for read event
@@ -295,6 +297,7 @@
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AuxiliaryAccessUpdated, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

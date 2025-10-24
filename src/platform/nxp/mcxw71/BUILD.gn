@@ -76,6 +76,7 @@ config("nxp_platform_config") {
 
 static_library("nxp_platform") {
   defines = [
+    "CONFIG_CHIP_NXP_PLATFORM_MCXW71=1",
     "NXP_DEVICE_MCXW7X=1",
     "NXP_USE_MML=1",
   ]
