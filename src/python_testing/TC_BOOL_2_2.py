@@ -38,7 +38,8 @@ import logging
 
 import matter.clusters as Clusters
 from matter.clusters.Attribute import ValueDecodeFailure
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, async_test_body, has_attribute, run_if_endpoint_matches
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_attribute, run_if_endpoint_matches
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -58,16 +59,20 @@ class TC_BOOL_2_2(MatterBaseTest):
         steps = [
             TestStep("1", "Commission DUT to TH", is_commissioning=True),
             TestStep("2a", "Bring the DUT into a state so StateValue is FALSE."),
-            TestStep("2b", "TH reads the StateValue attribute from the DUT.", "Verify that value in the response is FALSE."),
+            TestStep("2b", "TH reads the StateValue attribute from the DUT.",
+                     "Verify that value in the response is FALSE."),
             TestStep("3a", "Bring the DUT into a state so StateValue is TRUE."),
-            TestStep("3b", "TH reads the StateValue attribute from the DUT.", "Verify that value in the response is TRUE."),
+            TestStep("3b", "TH reads the StateValue attribute from the DUT.",
+                     "Verify that value in the response is TRUE."),
             TestStep("4a", "Set up subscription to StateChange event."),
             TestStep("4b", "Bring the DUT into a state so StateValue is FALSE.",
                      "Receive StateChange event with StateValue set to FALSE."),
-            TestStep("4c", "TH reads the StateValue attribute from the DUT.", "Verify that value in the response is FALSE."),
+            TestStep("4c", "TH reads the StateValue attribute from the DUT.",
+                     "Verify that value in the response is FALSE."),
             TestStep("4d", "Bring the DUT into a state so StateValue is TRUE.",
                      "Receive StateChange event with StateValue set to TRUE."),
-            TestStep("4e", "TH reads the StateValue attribute from the DUT.", "Verify that value in the response is TRUE."),
+            TestStep("4e", "TH reads the StateValue attribute from the DUT.",
+                     "Verify that value in the response is TRUE."),
         ]
         return steps
 
@@ -87,11 +92,12 @@ class TC_BOOL_2_2(MatterBaseTest):
         self.step("2a")
 
         cbool = Clusters.BooleanState
-        endpoint = self.get_endpoint()
+        endpoint = self.get_endpoint(default=1)
         node_id = self.dut_node_id
         dev_ctrl = self.default_controller
 
-        if self.is_pics_sdk_ci_only:
+        # if self.is_pics_sdk_ci_only:
+        if True:
             logger.info(" --- Step 2a: Sending Off command to the DUT")
             command_dict = {"Name": "SetBooleanState", "EndpointId": endpoint, "NewState": False}
             self.write_to_app_pipe(command_dict, "/tmp/boolean_state_2_2_fifo")
@@ -120,7 +126,8 @@ class TC_BOOL_2_2(MatterBaseTest):
         # Bring the DUT into a state so StateValue is TRUE.
         self.step("3a")
 
-        if self.is_pics_sdk_ci_only:
+        # if self.is_pics_sdk_ci_only:
+        if True:
             logger.info(" --- Step 3a: Sending On command to the DUT")
             command_dict = {"Name": "SetBooleanState", "EndpointId": endpoint, "NewState": True}
             self.write_to_app_pipe(command_dict, "/tmp/boolean_state_2_2_fifo")
@@ -148,62 +155,84 @@ class TC_BOOL_2_2(MatterBaseTest):
         # Set up subscription to StateChange event.
         self.step("4a")
 
-        # # Suscribirse a eventos
-        # event_listener = EventChangeCallback(Clusters.BooleanState)
-        # await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
+        event_listener = EventSubscriptionHandler(expected_cluster=cbool)
+        await event_listener.start(dev_ctrl, node_id, endpoint=endpoint)
 
-        # # Para eventos específicos:
-        # subscription = await self.default_controller.ReadEvent(
-        #     nodeid=self.dut_node_id,
-        #     events=[(endpoint_id, Clusters.BooleanState.Events.StateChange, 1)],
-        #     reportInterval=(1, 5),
-        #     keepSubscriptions=True
-        # )
-
-        # async def do_test(self):
-        #     # Detectar modo de ejecución
-        #     self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-
-        #     # Para cada paso que requiere cambio de estado:
-        #     if self.is_ci:
-        #         # Modo CI: usar named pipes para automatizar
-        #         self.write_to_app_pipe({
-        #             "Name": "SetBooleanState",
-        #             "EndpointId": 1,
-        #             "StateValue": true
-        #         })
-        #     else:
-        #         # Modo Manual: pedir interacción humana
-        #         self.wait_for_user_input(
-        #             prompt_msg="Manually change device state to make StateValue=true, then press Enter"
-        #         )
-
-        #     # Las verificaciones son SIEMPRE automáticas en ambos modos
-        #     state_value = await self.read_single_attribute_check_success(
-        #         cluster=Clusters.BooleanState,
-        #         attribute=Clusters.BooleanState.Attributes.StateValue
-        #     )
-        #     asserts.assert_equal(state_value, True)
+        subscription = await dev_ctrl.ReadEvent(
+            nodeid=node_id,
+            events=[(endpoint, cbool.Events.StateChange, 1)],
+            reportInterval=(1, 5),
+            keepSubscriptions=True
+        )
 
         # Bring the DUT into a state so StateValue is FALSE.
         self.step("4b")
 
+        # CI call to trigger off
+        # if self.is_pics_sdk_ci_only:
+        if True:
+            command_dict = {"Name": "SetBooleanState", "EndpointId": endpoint, "NewState": False}
+            self.write_to_app_pipe(command_dict)
+        else:
+            # Trigger sensor to change BooleanState attribute value to False => TESTER ACTION on DUT
+            self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after a sensor is triggered.")
+
         # Receive StateChange event with StateValue set to FALSE.
+        post_prompt_settle_delay_seconds = 1.0 if self.is_pics_sdk_ci_only else 10.0
+        event = event_listener.wait_for_event_report(
+            cbool.Events.StateChange, timeout_sec=post_prompt_settle_delay_seconds)
+        asserts.assert_false(event.stateValue, "Unexpected stateValue on StateChange")
 
         # TH reads the StateValue attribute from the DUT.
         self.step("4c")
 
+        state_value = None
+        try:
+            state_value = await self.read_bstate_attribute_expect_success(endpoint=endpoint, attribute=cbool.Attributes.StateValue)
+            if isinstance(state_value, ValueDecodeFailure):
+                logger.error(f" --- Step 4b: Value decode failed: {state_value.Reason}")
+            else:
+                logger.info(f" --- Step 4b: state_value: {state_value}")
+        except Exception as e:
+            logger.error(f" --- Step 4b: Failed to read attribute: {e}")
+
         # Verify that value in the response is FALSE.
+        if state_value is not None:
+            asserts.assert_false(state_value, " --- Step 4b: state_value should be False.")
 
         # Bring the DUT into a state so StateValue is TRUE.
         self.step("4d")
 
+        # CI call to trigger on
+        # if self.is_pics_sdk_ci_only:
+        if True:
+            command_dict = {"Name": "SetBooleanState", "EndpointId": endpoint, "NewState": True}
+            self.write_to_app_pipe(command_dict)
+        else:
+            # Trigger sensor to change BooleanState attribute value to False => TESTER ACTION on DUT
+            self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after a sensor is triggered.")
+
         # Receive StateChange event with StateValue set to TRUE.
+        event = event_listener.wait_for_event_report(
+            cbool.Events.StateChange, timeout_sec=post_prompt_settle_delay_seconds)
+        asserts.assert_true(event.stateValue, "Unexpected stateValue on StateChange")
 
         # TH reads the StateValue attribute from the DUT.
         self.step("4e")
 
+        state_value = None
+        try:
+            state_value = await self.read_bstate_attribute_expect_success(endpoint=endpoint, attribute=cbool.Attributes.StateValue)
+            if isinstance(state_value, ValueDecodeFailure):
+                logger.error(f" --- Step 4e: Value decode failed: {state_value.Reason}")
+            else:
+                logger.info(f" --- Step 4e: state_value: {state_value}")
+        except Exception as e:
+            logger.error(f" --- Step 4e: Failed to read attribute: {e}")
+
         # Verify that value in the response is TRUE.
+        if state_value is not None:
+            asserts.assert_true(state_value, " --- Step 4e: state_value should be True.")
 
 
 if __name__ == "__main__":
