@@ -1,20 +1,21 @@
 /*
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    All rights reserved.
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
+
 #pragma once
 
 #include <controller/AutoCommissioner.h>
@@ -40,13 +41,11 @@ public:
     AutoCommissionerTestAccess() = delete;
     AutoCommissionerTestAccess(Controller::AutoCommissioner * commissioner) : mCommissioner(commissioner) {}
 
-    Controller::CommissioningStage AccessGetNextCommissioningStageInternal(Controller::CommissioningStage currentStage,
-                                                                           CHIP_ERROR & lastErr)
+    Controller::CommissioningStage GetNextCommissioningStageInternal(Controller::CommissioningStage currentStage,
+                                                                     CHIP_ERROR & lastErr)
     {
         return mCommissioner->GetNextCommissioningStageInternal(currentStage, lastErr);
     }
-
-    Controller::CommissioningParameters & AccessParams() { return mCommissioner->mParams; }
 
     void CleanupCommissioning() { mCommissioner->CleanupCommissioning(); }
 
@@ -71,7 +70,7 @@ public:
         return mCommissioner->GetNextCommissioningStageNetworkSetup(currentStage, lastErr);
     }
 
-    OperationalDeviceProxy GetOperationalDeviceProxy() { return mCommissioner->mOperationalDeviceProxy; }
+    OperationalDeviceProxy & GetOperationalDeviceProxy() { return mCommissioner->mOperationalDeviceProxy; }
 
     const ByteSpan GetPAI() { return mCommissioner->GetPAI(); }
 
@@ -98,6 +97,17 @@ public:
     void TrySecondaryNetwork() { mCommissioner->TrySecondaryNetwork(); }
 
     bool TryingSecondaryNetwork() const { return mCommissioner->TryingSecondaryNetwork(); }
+
+    void SetNeedsDST() { mCommissioner->mNeedsDST = true; }
+
+    void SetDeviceCommissioneeProxy(CommissioneeDeviceProxy * device) { mCommissioner->mCommissioneeDeviceProxy = device; }
+
+    DeviceProxy * GetDeviceProxyForStep(Controller::CommissioningStage nextStage)
+    {
+        return mCommissioner->GetDeviceProxyForStep(nextStage);
+    }
+
+    void SetOperationalDeviceProxy(OperationalDeviceProxy & device) { mCommissioner->mOperationalDeviceProxy = std::move(device); }
 
 private:
     Controller::AutoCommissioner * mCommissioner = nullptr;
