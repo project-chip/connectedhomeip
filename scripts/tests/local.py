@@ -22,7 +22,6 @@ import logging
 import multiprocessing
 import os
 import platform
-import re
 import shlex
 import stat
 import subprocess
