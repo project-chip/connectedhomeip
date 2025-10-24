@@ -486,7 +486,7 @@ class TestDefinition:
                 interactive_server_args = ('interactive server',) + tool_storage_args + pairing_server_args
 
                 if test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
-                   interactive_server_args = interactive_server_args + ('--interface-id', '-1')
+                    interactive_server_args = interactive_server_args + ('--interface-id', '-1')
 
                 server_args = (
                     '--server_path', str(apps.chip_tool.path),
