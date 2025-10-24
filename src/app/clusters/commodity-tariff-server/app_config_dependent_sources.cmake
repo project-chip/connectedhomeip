@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # This is the equivalent to app_config_dependent_sources.gni
+
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
@@ -22,4 +23,5 @@ TARGET_SOURCES(
   "${CLUSTER_DIR}/CommodityTariffAttrsDataMgmt.cpp"
   "${CLUSTER_DIR}/CommodityTariffAttrsDataMgmt.h"
   "${CLUSTER_DIR}/CommodityTariffConsts.h"
+  "${CLUSTER_DIR}/CommodityTariffContainers.h"
 )
