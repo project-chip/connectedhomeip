@@ -489,7 +489,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     DeviceLayer::PlatformMgr().LockChipStack();
     SetCurrentAction(Action_t::CALIBRATE_ACTION);
     mCurrentActionEndpointId = mClosureEndpoint1.GetEndpointId();
-    mIsCalibrationInProgress  = true;
+    mIsCalibrationInProgress = true;
     DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // Post an event to initiate the calibration action asynchronously.
@@ -908,7 +908,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
         SetCurrentAction(Action_t::SET_TARGET_ACTION);
     }
     mCurrentActionEndpointId = endpointId;
-    mIsSetTargetInProgress    = true;
+    mIsSetTargetInProgress   = true;
     DeviceLayer::PlatformMgr().UnlockChipStack();
 
     AppEvent event;
@@ -1176,7 +1176,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
     DeviceLayer::PlatformMgr().LockChipStack();
     SetCurrentAction(PANEL_STEP_ACTION);
     mCurrentActionEndpointId = endpointId;
-    mIsStepActionInProgress   = true;
+    mIsStepActionInProgress  = true;
     DeviceLayer::PlatformMgr().UnlockChipStack();
 
     AppEvent event;
