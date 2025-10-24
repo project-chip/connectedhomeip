@@ -28,7 +28,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --endpoint 1
+#       --endpoint 0
 # === END CI TEST ARGUMENTS ===
 
 import logging
