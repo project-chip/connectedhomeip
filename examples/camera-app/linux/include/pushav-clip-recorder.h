@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
+#include <filesystem>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -30,6 +31,8 @@
 #include <string>
 #include <thread>
 #include <vector>
+
+namespace fs = std::filesystem;
 
 // FFmpeg headers
 extern "C" {
@@ -223,9 +226,6 @@ private:
 
     /// @name Internal Methods
     /// @{
-    bool FileExists(const std::string & path);
-
-    bool IsOutputDirectoryValid(const std::string & path);
 
     /**
      * @brief Ensures a directory exists, creating it if necessary.
@@ -238,7 +238,7 @@ private:
      * @brief Removes files from previous recordings in the specified directory.
      * @param path The directory path to clean.
      */
-    void RemovePreviousRecordingFiles(const std::string & path);
+    void RemovePreviousRecordingFiles(const fs::path & path);
 
     bool CheckAndUploadFile(std::string path);
 
