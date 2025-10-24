@@ -486,13 +486,13 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
     case WLAN_REASON_INITIALIZED:
         sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
         sInstance._SetWiFiStationMode(kWiFiStationMode_Enabled);
-        if (IsWifiRecovering)
+        if (mIsWifiRecovering)
         {
             /*
-            Wifi recovery mechanism (due to firmware hang) is finish, we will attempt to reconnect to the previously staged network
+            Wifi recovery mechanism (due to firmware hang) is finished, we will attempt to reconnect to the previously staged network
             */
-            IsWifiRecovering = false;
-            err = NetworkCommissioning::NXPWiFiDriver::GetInstance().ConnectWifiStagedNetwork();
+            mIsWifiRecovering = false;
+            err = NetworkCommissioning::NXPWiFiDriver::GetInstance().ConnectWiFiStagedNetwork();
             if(err == CHIP_ERROR_KEY_NOT_FOUND)
             {
                 /* if no SSID is staged, notify the network commissioning module to clean environnement for next commissioning  */
@@ -504,13 +504,13 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
 
     case WLAN_REASON_FW_HANG:
         /* 
-         If Wifi driver is hang, recovery mechanism has be triggered, this mechanism will be ended by re-initializing the wifi driver.
-         If wifi state is different to kWiFiStationState_NotConnected and kWiFiStationState_Disconnecting, 
-         we want to retry the wifi connection once the driver will be re-initialized.
+         If the Wifi driver hangs, a recovery mechanism has been triggered. This mechanism will end with re-initializing the wifi driver.
+         If the wifi state is different from kWiFiStationState_NotConnected and kWiFiStationState_Disconnecting, 
+         we want to retry the wifi connection once the driver is re-initialized.
         */
         if(mWiFiStationState != kWiFiStationState_NotConnected && mWiFiStationState != kWiFiStationState_Disconnecting)
         {
-            IsWifiRecovering = true;
+            mIsWifiRecovering = true;
         }
         break;
 

@@ -101,7 +101,7 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     return err;
 }
 
-CHIP_ERROR NXPWiFiDriver::ConnectWifiStagedNetwork()
+CHIP_ERROR NXPWiFiDriver::ConnectWiFiStagedNetwork()
 {
     if(mSavedNetwork.ssidLen !=0)
     {
