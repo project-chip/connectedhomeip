@@ -177,7 +177,7 @@ std::optional<std::vector<uint8_t>> ReadTLV(const char * fileNameOrStr)
     {
         if (tlvLen % 2 != 0)
         {
-            fprintf(stderr, "Invalid hex input string: length must be even, but got %zu\n", tlvLen);
+            fprintf(stderr, "Invalid hex input string: length must be even, but got %u\n", static_cast<unsigned>(tlvLen));
             return std::nullopt;
         }
         size_t len = chip::Encoding::HexToBytes(Uint8::to_char(tlvBuf.data()), tlvLen, tlvBuf.data(), tlvLen);
