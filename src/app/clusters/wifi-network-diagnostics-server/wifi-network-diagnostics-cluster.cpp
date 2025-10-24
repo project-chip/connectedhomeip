@@ -218,7 +218,10 @@ std::optional<DataModel::ActionReturnStatus> WiFiDiagnosticsServerCluster::Invok
     switch (request.path.mCommandId)
     {
     case Commands::ResetCounts::Id: {
-        HandleResetCounts();
+        // Note that this reset does return a CHIP_ERROR however for backwards compatibility
+        // we completely ignore that. It would probably be more correct to return the reset
+        // result, however that seems to potentially cause backwards compatibility issues.
+        mDiagnosticProvider.ResetWiFiNetworkDiagnosticsCounts();
         return Protocols::InteractionModel::Status::Success;
     }
     default:

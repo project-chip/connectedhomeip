@@ -81,16 +81,6 @@ public:
         return aEncoder.Encode(data);
     }
 
-    // WiFiBssId uses custom implementations instead of ReadIfSupported because it
-    // is attribute of type octet string.
-    CHIP_ERROR ReadWiFiBssId(AttributeValueEncoder & aEncoder);
-
-    CHIP_ERROR HandleResetCounts()
-    {
-        mDiagnosticProvider.ResetWiFiNetworkDiagnosticsCounts();
-        return CHIP_NO_ERROR;
-    }
-
     // Gets called when the Node detects Node's Wi-Fi connection has been disconnected.
     void OnDisconnectionDetected(uint16_t reasonCode) override;
 
@@ -110,6 +100,10 @@ private:
     DeviceLayer::DiagnosticDataProvider & mDiagnosticProvider;
     const OptionalAttributeSet mOptionalAttributeSet;
     const BitFlags<WiFiNetworkDiagnostics::Feature> mFeatureFlags;
+
+    // WiFiBssId uses custom implementations instead of ReadIfSupported because it
+    // is attribute of type octet string.
+    CHIP_ERROR ReadWiFiBssId(AttributeValueEncoder & aEncoder);
 };
 
 } // namespace Clusters
