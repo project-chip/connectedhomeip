@@ -114,6 +114,7 @@ source_set("efr32_test_main") {
   ]
 
   include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
+  public_configs = [ ":efr32_ldflags" ]
 }
 
 # This target is referred to by BuildRoot in scripts/build/builders/efr32.py, as well as the example in README.md.
