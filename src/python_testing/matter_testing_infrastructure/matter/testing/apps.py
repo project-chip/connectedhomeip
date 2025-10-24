@@ -12,16 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import os
+import re
 import signal
 import tempfile
 from dataclasses import dataclass
-from typing import Optional, Union
+from sys import stderr, stdout
+from typing import BinaryIO, Optional, Union
 
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Types import NullValue
 from matter.testing.tasks import Subprocess
+from sys import stderr, stdout
+from typing import BinaryIO, Optional, Union
 
 
 @dataclass
@@ -53,9 +58,15 @@ class AppServerSubprocess(Subprocess):
     PREFIX = b"[SERVER]"
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: list[str] = []):
+                 passcode: int, port: int = 5540, extra_args: list[str] = [],
+                 kvs_path: Optional[str] = None):
         # Create a temporary KVS file and keep the descriptor to avoid leaks.
-        self.kvs_fd, kvs_path = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")
+
+        if kvs_path is not None:
+            self.kvs_fd = None
+            kvs_path = kvs_path
+        else:
+            self.kvs_fd, kvs_path = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")
         try:
             # Build the command list
             command = [app]
@@ -71,17 +82,19 @@ class AppServerSubprocess(Subprocess):
 
             # Start the server application
             super().__init__(*command,  # Pass the constructed command list
-                             output_cb=lambda line, is_stderr: self.PREFIX + line)
+                             output_cb=lambda line, is_stderr: self.PREFIX + line, f_stdout=f_stdout, f_stderr=f_stderr)
         except Exception:
             # Do not leak KVS file descriptor on failure
-            os.close(self.kvs_fd)
-            raise
+            if self.kvs_fd is not None:
+                os.close(self.kvs_fd)
+                raise
 
     def __del__(self):
         # Do not leak KVS file descriptor.
         if hasattr(self, "kvs_fd"):
             try:
-                os.close(self.kvs_fd)
+                if self.kvs_fd is not None:
+                    os.close(self.kvs_fd)
             except OSError:
                 pass
 
@@ -150,7 +163,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5541, extra_args: list[str] = []):
+                 port: int = 5541, extra_args: list[str] = [], kvs_path: Optional[str] = None):
         """Initialize the OTA Provider subprocess.
 
         Args:
@@ -168,7 +181,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
         # Initialize with the combined arguments
         super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator,
-                         passcode=passcode, port=port, extra_args=combined_extra_args)
+                         passcode=passcode, port=port, extra_args=combined_extra_args, kvs_path=kvs_path)
 
     def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int, requestor_node_id: Optional[int] = None):
         """Create ACL entries to allow OTA requestors to access the provider.
