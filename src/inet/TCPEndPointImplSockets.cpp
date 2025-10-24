@@ -904,6 +904,7 @@ void TCPEndPointImplSockets::ReceiveData()
         RestartTCPUserTimeoutTimer();
     }
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+    TCPEndPointHandle handle(this);
     // If an error occurred, abort the connection.
     if (rcvLen < 0)
     {
@@ -921,7 +922,6 @@ void TCPEndPointImplSockets::ReceiveData()
 
         DoClose(CHIP_ERROR_POSIX(systemErrno), false);
     }
-
     else
     {
         // Mark the connection as being active.
@@ -948,7 +948,7 @@ void TCPEndPointImplSockets::ReceiveData()
             // Call the app's OnPeerClose.
             if (OnPeerClose != nullptr)
             {
-                OnPeerClose(*this);
+                OnPeerClose(handle);
             }
         }
 
@@ -978,7 +978,7 @@ void TCPEndPointImplSockets::ReceiveData()
     }
 
     // Drive any received data into the app.
-    DriveReceiving();
+    DriveReceiving(handle);
 }
 
 CHIP_ERROR TCPEndPointImplSockets::HandleIncomingConnection()

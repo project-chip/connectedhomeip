@@ -17,7 +17,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/TestReadWriteAttribute.h>
+#include <app/clusters/testing/ClusterTester.h>
 #include <app/clusters/user-label-server/user-label-cluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -33,6 +33,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UserLabel;
 using namespace chip::app::Clusters::UserLabel::Attributes;
+using namespace chip::Test;
 
 struct TestUserLabelCluster : public ::testing::Test
 {
@@ -44,18 +45,12 @@ struct TestUserLabelCluster : public ::testing::Test
 
     void TearDown() override { userLabel.Shutdown(); }
 
-    TestUserLabelCluster() : testContext(), context(testContext.Create()), userLabel(kRootEndpointId) {}
+    TestUserLabelCluster() : context(testContext.Create()), userLabel(kRootEndpointId) {}
 
     chip::Test::TestServerClusterContext testContext;
     ServerClusterContext context;
     UserLabelCluster userLabel;
 };
-
-template <typename ClusterT, typename T>
-inline CHIP_ERROR ReadClusterAttribute(ClusterT & cluster, AttributeId attr, T & val)
-{
-    return chip::Test::ReadClusterAttribute(cluster, ConcreteAttributePath(kRootEndpointId, UserLabel::Id, attr), val);
-}
 
 } // namespace
 
@@ -72,12 +67,19 @@ TEST_F(TestUserLabelCluster, AttributeTest)
 
 TEST_F(TestUserLabelCluster, ReadAttributeTest)
 {
+    ClusterTester tester(userLabel);
+
     uint16_t revision{};
-    ASSERT_EQ(ReadClusterAttribute(userLabel, Globals::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
 
     uint32_t features{};
-    ASSERT_EQ(ReadClusterAttribute(userLabel, FeatureMap::Id, features), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, features), CHIP_NO_ERROR);
 
-    DataModel::DecodableList<Structs::LabelStruct::Type> labelList;
-    ASSERT_EQ(ReadClusterAttribute(userLabel, LabelList::Id, labelList), CHIP_NO_ERROR);
+    DataModel::DecodableList<Structs::LabelStruct::DecodableType> labelList;
+    ASSERT_EQ(tester.ReadAttribute(LabelList::Id, labelList), CHIP_NO_ERROR);
+    auto it = labelList.begin();
+    while (it.Next())
+    {
+        ASSERT_GT(it.GetValue().label.size(), 0u);
+    }
 }

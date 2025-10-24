@@ -828,6 +828,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"ARL";
             break;
 
+        case MTRAttributeIDTypeClusterAccessControlAttributeAuxiliaryACLID:
+            result = @"AuxiliaryACL";
+            break;
+
         case MTRAttributeIDTypeClusterAccessControlAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -8036,6 +8040,18 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"BlockUnrated";
             break;
 
+        case MTRAttributeIDTypeClusterContentControlAttributeBlockChannelListID:
+            result = @"BlockChannelList";
+            break;
+
+        case MTRAttributeIDTypeClusterContentControlAttributeBlockApplicationListID:
+            result = @"BlockApplicationList";
+            break;
+
+        case MTRAttributeIDTypeClusterContentControlAttributeBlockContentTimeWindowID:
+            result = @"BlockContentTimeWindow";
+            break;
+
         case MTRAttributeIDTypeClusterContentControlAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -11785,6 +11801,30 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"SetScheduledContentRatingThreshold";
             break;
 
+        case MTRCommandIDTypeClusterContentControlCommandAddBlockChannelsID:
+            result = @"AddBlockChannels";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandRemoveBlockChannelsID:
+            result = @"RemoveBlockChannels";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandAddBlockApplicationsID:
+            result = @"AddBlockApplications";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandRemoveBlockApplicationsID:
+            result = @"RemoveBlockApplications";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandSetBlockContentTimeWindowID:
+            result = @"SetBlockContentTimeWindow";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandRemoveBlockContentTimeWindowID:
+            result = @"RemoveBlockContentTimeWindow";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -14372,6 +14412,10 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
             result = @"FabricRestrictionReviewUpdate";
             break;
 
+        case MTREventIDTypeClusterAccessControlEventAuxiliaryAccessUpdatedID:
+            result = @"AuxiliaryAccessUpdated";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
             break;
@@ -15995,6 +16039,10 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
             // Cluster ContentControl events
         case MTREventIDTypeClusterContentControlEventRemainingScreenTimeExpiredID:
             result = @"RemainingScreenTimeExpired";
+            break;
+
+        case MTREventIDTypeClusterContentControlEventEnteringBlockContentTimeWindowID:
+            result = @"EnteringBlockContentTimeWindow";
             break;
 
         default:

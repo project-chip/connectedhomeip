@@ -81,7 +81,6 @@ static_library("nxp_platform") {
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
     "../common/CHIPDevicePlatformEvent.h",
-    "../common/ConfigurationManagerImpl.cpp",
     "../common/ConfigurationManagerImpl.h",
     "../common/ConnectivityManagerImpl.cpp",
     "../common/ConnectivityManagerImpl.h",
@@ -94,6 +93,7 @@ static_library("nxp_platform") {
     "../common/NetworkProvisioningServerImpl.h",
     "../common/PlatformManagerImpl.h",
     "../common/SoftwareUpdateManagerImpl.h",
+    "../mcxw71/ConfigurationManagerImpl.cpp",
     "CHIPDevicePlatformConfig.h",
     "PlatformManagerImpl.cpp",
   ]
