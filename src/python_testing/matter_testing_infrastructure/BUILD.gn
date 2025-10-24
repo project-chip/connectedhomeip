@@ -52,6 +52,7 @@ pw_python_package("matter-testing-module") {
     "matter/testing/global_stash.py",
     "matter/testing/matchers.py",
     "matter/testing/matter_asserts.py",
+    "matter/testing/matter_nfc_interaction.py",
     "matter/testing/matter_stack_state.py",
     "matter/testing/matter_test_config.py",
     "matter/testing/matter_testing.py",
