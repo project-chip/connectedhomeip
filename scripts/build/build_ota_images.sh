@@ -21,7 +21,7 @@ CHIP_ROOT="$(dirname "$0")/../.."
 # Default values for optional arguments
 VENDOR_ID="0xDEAD"
 PRODUCT_ID="0xBEEF"
-MAX_RANGE=2
+MAX_RANGE=6
 OUT_PREFIX="out/su_ota_images_min"
 BUILT_IMAGES_STACK=()
 TARGET_FILE="$CHIP_ROOT/examples/ota-requestor-app/linux/include/CHIPProjectAppConfig.h"

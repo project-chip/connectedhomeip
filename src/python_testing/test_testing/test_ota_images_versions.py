@@ -16,10 +16,12 @@
 #    limitations under the License.
 #
 
+import click
 import logging
 import os
 import subprocess
 import sys
+
 
 CHIP_ROOT = os.path.abspath(os.path.join(
     os.path.dirname(__file__), '../../..'))
@@ -27,14 +29,12 @@ RUNNER_SCRIPT_DIR = os.path.join(CHIP_ROOT, 'scripts/tests')
 OTA_TOOL_DIR = os.path.join(CHIP_ROOT, 'src/app')
 
 
-def run_single_test(software_version: int = 2) -> int:
+def run_single_test(otaimage: str, otaimage_version: int) -> int:
 
     # Find the image
-    ota_image = os.path.join(
-        CHIP_ROOT, f'objdir-clone/chip-ota-requestor-app_v{software_version}.min.ota')
+    ota_image = os.path.join(CHIP_ROOT, otaimage)
 
-    ota_image_bin = os.path.join(
-        CHIP_ROOT, f'objdir-clone/chip-ota-requestor-app_v{software_version}.min')
+    ota_image_bin = os.path.join(CHIP_ROOT, f'{ota_image}.bin')
 
     # Extract the image into the directory
     ota_tool = os.path.abspath(os.path.join(
@@ -43,7 +43,7 @@ def run_single_test(software_version: int = 2) -> int:
     status = subprocess.call(extract_cmd, shell=True)
     logging.info("Extract image : " + str(status))
     if status != 0:
-        logging.info(f"Failed to extract the image from {ota_image}")
+        logging.error(f"Failed to extract the image from {ota_image}")
         exit(1)
     logging.info(f"Image extracted into {ota_image_bin}")
 
@@ -51,16 +51,16 @@ def run_single_test(software_version: int = 2) -> int:
     cmd_mod = "chmod +x " + str(ota_image_bin)
     status = subprocess.call(cmd_mod, shell=True)
     if status != 0:
-        logging.info(f"Failed to mod the image  {ota_image_bin}")
+        logging.info(f"Failed to change +x permission on the image  {ota_image_bin}")
         exit(1)
 
-    app_args = '--discriminator 1234 '
+    app_args = ' --discriminator 1234 '
 
     script_args = [
         "--commissioning-method on-network",
         "--passcode 20202021",
         "--discriminator 1234",
-        f"--int-arg SOFTWAREVERSION:{software_version}",
+        f"--int-arg SOFTWAREVERSION:{otaimage_version}",
         "--storage-path admin_storage.json"
     ]
 
@@ -72,26 +72,37 @@ def run_single_test(software_version: int = 2) -> int:
     # run_python_test uses click so call as a command
     run_python_test = os.path.abspath(os.path.join(
         RUNNER_SCRIPT_DIR, 'run_python_test.py'))
-    cmd = str(run_python_test) + ' --factory-reset  --app ' + str(ota_image_bin) + ' --app-args "' + \
+    test_cmd = str(run_python_test) + ' --factory-reset  --app ' + str(ota_image_bin) + ' --app-args "' + \
         app_args + '" --script ' + str(script) + ' --script-args "' + script_args + '"'
 
-    process_status = subprocess.call(cmd, shell=True)
+    process_status = subprocess.call(test_cmd, shell=True)
 
     cmd_clean = "rm " + str(ota_image_bin)
     subprocess.call(cmd_clean, shell=True)
     return process_status
 
 
-def main():
+@click.command()
+@click.option('--otaimages', '-i', multiple=True, type=click.Path(exists=True))
+@click.option('--otaimagesversions', '-v', multiple=True, type=(int))
+def main(otaimages: str, otaimagesversions: int):
+    if len(otaimages) == 0 or otaimagesversions == 0:
+        logging.error(f"Must provide at least one single image to verify")
+        exit(1)
+    if len(otaimages) != len(otaimagesversions):
+        logging.error("Provided non matching images to provided versions")
     passes = []
     main_status = 0
-    for version in range(2, 3):
-        status = run_single_test(software_version=version)
-        passes.append((version, status))
+    for index in range(len(otaimages)):
+        otaimage = otaimages[index]
+        otaimage_version = otaimagesversions[index]
+        logging.info(f"Verifying the image {otaimage} has the reported version {otaimage_version}")
+        status = run_single_test(otaimage=otaimage, otaimage_version=otaimage_version)
+        passes.append((otaimage, otaimage_version, status))
 
     for iter in passes:
-        if iter[1] != 0:
-            logging.error(f"Image version missmatched for ota image expected {iter[0]}")
+        if iter[2] != 0:
+            logging.error(f"Image version missmatched for ota image {iter[0]} expected {iter[1]}")
             main_status = 1
 
     sys.exit(main_status)
