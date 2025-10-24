@@ -99,7 +99,8 @@ inline void PlatformManagerImpl::_RunEventLoop(void)
     constexpr size_t kPlatformManagerSecureContextSize = 2 * 1024;
 #else // RTK Encrypt DAC
     constexpr size_t kPlatformManagerSecureContextSize = 8 * 1024;
-    +#endif os_alloc_secure_ctx(kPlatformManagerSecureContextSize);
+#endif
+    os_alloc_secure_ctx(kPlatformManagerSecureContextSize);
 #endif
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_RunEventLoop();
 }
