@@ -132,6 +132,9 @@ not_automated:
       reason: Depends on a browser peer for webrtc. CI is not supported.
     - name: TC_CHIMETestBase.py
       reason: Shared code for the Chime Cluster, not a standalone test.
+    - name: TC_WEBRTCRTestBase.py
+      reason:
+          Shared code for the WebRTC Requestor Cluster, not a standalone test.
     - name: TC_WEBRTCPTestBase.py
       reason:
           Shared code for the WebRTC Provider Cluster, not a standalone test.
