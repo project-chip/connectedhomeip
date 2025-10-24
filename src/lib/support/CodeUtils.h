@@ -214,7 +214,7 @@
     } while (false)
 
 /**
- *  @def LogOnFailure(expr)
+ *  @def LogOnFailure(expr, MOD, MSG, ...)
  *
  *  @brief
  *    If expr returns something than CHIP_NO_ERROR, log a chip message for the specified module
@@ -227,6 +227,9 @@
  *  @endcode
  *
  *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ *  @param[in]  MOD         The log module to use.
+ *  @param[in]  MSG         The log message format string.
+ *  @param[in]  ...         Optional arguments for the log message.
  */
 #define LogOnFailure(expr, MOD, MSG, ...)                                                                                          \
     do                                                                                                                             \
@@ -239,7 +242,7 @@
     } while (false)
 
 /**
- *  @def ReturnAndLogOnFailure(expr)
+ *  @def ReturnAndLogOnFailure(expr, MOD, MSG, ...)
  *
  *  @brief
  *    If expr returns something than CHIP_NO_ERROR, log a chip message for the specified module
@@ -252,6 +255,9 @@
  *  @endcode
  *
  *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ *  @param[in]  MOD         The log module to use.
+ *  @param[in]  MSG         The log message format string.
+ *  @param[in]  ...         Optional arguments for the log message.
  */
 #define ReturnAndLogOnFailure(expr, MOD, MSG, ...)                                                                                 \
     do                                                                                                                             \
@@ -265,7 +271,7 @@
     } while (false)
 
 /**
- *  @def ReturnErrorAndLogOnFailure(expr)
+ *  @def ReturnErrorAndLogOnFailure(expr, MOD, MSG, ...)
  *
  *  @brief
  *    If expr returns something than CHIP_NO_ERROR, log a chip message for the specified module
@@ -278,6 +284,9 @@
  *  @endcode
  *
  *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ *  @param[in]  MOD         The log module to use.
+ *  @param[in]  MSG         The log message format string.
+ *  @param[in]  ...         Optional arguments for the log message.
  */
 #define ReturnErrorAndLogOnFailure(expr, MOD, MSG, ...)                                                                            \
     do                                                                                                                             \
@@ -285,13 +294,13 @@
         CHIP_ERROR __err = (expr);                                                                                                 \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
-            LogOnFailure(__err, MOD, MSG##__VA_ARGS__);                                                                            \
+            LogOnFailure(__err, MOD, MSG, ##__VA_ARGS__);                                                                          \
             return __err;                                                                                                          \
         }                                                                                                                          \
     } while (false)
 
 /**
- *  @def ReturnValueAndLogOnFailure(expr)
+ *  @def ReturnValueAndLogOnFailure(expr, value, MOD, MSG, ...)
  *
  *  @brief
  *    If expr returns something than CHIP_NO_ERROR, log a chip message for the specified module
@@ -304,6 +313,10 @@
  *  @endcode
  *
  *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ *  @param[in]  value       A value to return if @a expr is an error.
+ *  @param[in]  MOD         The log module to use.
+ *  @param[in]  MSG         The log message format string.
+ *  @param[in]  ...         Optional arguments for the log message.
  */
 #define ReturnValueAndLogOnFailure(expr, value, MOD, MSG, ...)                                                                     \
     do                                                                                                                             \
@@ -311,7 +324,7 @@
         CHIP_ERROR __err = (expr);                                                                                                 \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
-            LogOnFailure(__err, MOD, MSG##__VA_ARGS__);                                                                            \
+            LogOnFailure(__err, MOD, MSG, ##__VA_ARGS__);                                                                          \
             return value;                                                                                                          \
         }                                                                                                                          \
     } while (false)
