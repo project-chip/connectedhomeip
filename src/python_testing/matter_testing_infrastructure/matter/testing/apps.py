@@ -15,7 +15,6 @@
 
 import os
 import signal
-import re
 import tempfile
 from dataclasses import dataclass
 from sys import stderr, stdout

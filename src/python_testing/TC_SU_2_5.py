@@ -350,7 +350,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.SoftwareVersion,
             node_id=self.requestor_node_id)
-        asserts.assert_equal(start_software_version, current_sw_version, f"Sofware versions are different")
+        asserts.assert_equal(start_software_version, current_sw_version, "Software versions are different")
 
         start_time = time()
         # Waiting for Software Version to change in the range for spec wait time then verify it did took more than 120 seconds to change the version
