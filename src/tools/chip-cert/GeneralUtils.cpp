@@ -204,7 +204,7 @@ bool IsBase64String(const char * str, size_t strLen)
 
 bool IsHexString(const uint8_t * s, size_t len)
 {
-    for (uint32_t i = 0; i < len; i++)
+    for (size_t i = 0; i < len; i++)
     {
         if (!isxdigit(s[i]))
         {

@@ -32,9 +32,6 @@ namespace {
 
 using namespace chip;
 using namespace chip::ArgParser;
-
-using namespace chip;
-using namespace chip::ArgParser;
 using namespace chip::Credentials;
 
 #define CMD_NAME "chip-cert print-tlv"
@@ -178,6 +175,11 @@ std::optional<std::vector<uint8_t>> ReadTLV(const char * fileNameOrStr)
 
     if (tlvFmt == TLVFormat::kTLVFormat_Hex)
     {
+        if (tlvLen % 2 != 0)
+        {
+            fprintf(stderr, "Invalid hex input string: length must be even, but got %zu\n", tlvLen);
+            return std::nullopt;
+        }
         size_t len = chip::Encoding::HexToBytes(Uint8::to_char(tlvBuf.data()), tlvLen, tlvBuf.data(), tlvLen);
         VerifyOrReturnError(CanCastTo<uint32_t>(2 * len), std::nullopt);
         VerifyOrReturnError(2 * len == tlvLen, std::nullopt);
