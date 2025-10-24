@@ -46,6 +46,7 @@ from TC_PAVSTTestBase import PAVSTTestBase
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable
 from matter.interaction_model import Status
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
                                            run_if_endpoint_matches)
 
@@ -85,8 +86,10 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             transportStatus=not aTransportStatus
         )
         status = await self.psvt_set_transport_status(cmd, expected_status=Status.InvalidInState)
-        asserts.assert_true(status == Status.InvalidInState, f"Unexpected response {
-                            status} received on SetTransportStatus with privacy mode enabled")
+        asserts.assert_true(status == Status.InvalidInState,
+                            (f"Unexpected response {status} received on SetTransportStatus "
+                             "with privacy mode enabled")
+                            )
         await self.write_single_attribute(
             attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftRecordingPrivacyModeEnabled(False),
             endpoint_id=endpoint,
@@ -122,8 +125,8 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             ),
             TestStep(
                 6,
-                "Ensure SoftRecordingPrivacy is False, then TH1 sends the SetTransportStatus  command with ConnectionID = aConnectionID.",
-                "DUT responds with SUCCESS status code.",
+                "Ensure SoftRecordingPrivacy is False, then TH1 sends the SetTransportStatus command with ConnectionID = aConnectionID and TransportStatus = !aTransportStatus. Wait for the event status report from DUT with 5 sec timeout.",
+                "DUT responds with SUCCESS status code. Verify that the event report received from DUT for PushTransportBegin event with ConnectionID = aConnectionID",
             ),
             TestStep(
                 7,
@@ -132,7 +135,7 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             ),
             TestStep(
                 8,
-                "Ensure SoftRecordingPrivacy is False, then TH1 sends the SetTransportStatus  command with ConnectionID = Null.",
+                "Ensure SoftRecordingPrivacy is False, then TH1 sends the SetTransportStatus  command with ConnectionID = Null. TH1 sends the ModifyPushTransport to check queued uploads or removed on DUT.",
                 "DUT responds with SUCCESS status code.",
             ),
             TestStep(
@@ -242,23 +245,23 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                 self.privacy_setting_test(endpoint, aConnectionID, aTransportStatus)
 
         self.step(6)
+        # TH establishes a subscription to all of the Events from the Cluster
+        event_callback = EventSubscriptionHandler(expected_cluster=pvcluster)
+        await event_callback.start(self.default_controller,
+                                   self.dut_node_id,
+                                   self.get_endpoint(1))
         cmd = pvcluster.Commands.SetTransportStatus(
             connectionID=aConnectionID,
             transportStatus=not aTransportStatus
         )
         status = await self.psvt_set_transport_status(cmd)
-        cmd = pvcluster.Commands.ModifyPushTransport(
-            connectionID=aConnectionID,
-            transportOptions=aTransportOptions,
-        )
-        # Transport Status is now active, if upload started and its in progress then ModifyPushTransport would check for Busy Transport Status
-        status1 = await self.psvt_modify_push_transport(cmd)
-        asserts.assert_true(
-            status1 == Status.Success,
-            "DUT responds with SUCCESS status code.")
         asserts.assert_true(
             status == Status.Success,
             "DUT responds with SUCCESS status code.")
+        # TH verifies that a PushTransportBegin Event was received.
+        event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)
+        logger.info(f"Event data {event_data}")
+        asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
 
         self.step(7)
         if aTransportStatus:
@@ -272,16 +275,17 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             transportStatus=Clusters.PushAvStreamTransport.Enums.TransportStatusEnum.kInactive
         )
         status = await self.psvt_set_transport_status(cmd)
+        asserts.assert_true(
+            status == Status.Success,
+            "DUT responds with SUCCESS status code.")
         cmd = pvcluster.Commands.ModifyPushTransport(
             connectionID=aConnectionID,
             transportOptions=aTransportOptions,
         )
+        # TH1 sends the ModifyPushTransport to check queued uploads are removed
         status1 = await self.psvt_modify_push_transport(cmd)
         asserts.assert_true(
             status1 == Status.Success,
-            "DUT responds with SUCCESS status code.")
-        asserts.assert_true(
-            status == Status.Success,
             "DUT responds with SUCCESS status code.")
 
         self.step(9)

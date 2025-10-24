@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "Identify.h"
 #include "LightingAppCommandDelegate.h"
 #include "LightingManager.h"
 #include <AppMain.h>
@@ -84,6 +85,7 @@ void ApplicationInit()
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();
     }
+    IdentifyInit();
 }
 
 void ApplicationShutdown()

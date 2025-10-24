@@ -26,6 +26,8 @@
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
+using namespace chip::app::Clusters;
+
 #if defined(ENABLE_CHIP_SHELL)
 #include <lib/shell/Engine.h> // nogncheck
 
@@ -40,7 +42,7 @@ static bool sSwitchOnOffState = false;
 static void ToggleSwitchOnOff(bool newState)
 {
     sSwitchOnOffState = newState;
-    chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
+    Binding::Manager::GetInstance().NotifyBoundClusterChanged(1, OnOff::Id, nullptr);
 }
 
 static CHIP_ERROR SwitchCommandHandler(int argc, char ** argv)
@@ -63,23 +65,22 @@ static void RegisterSwitchCommands()
 {
     static const shell_command_t sSwitchCommand = { SwitchCommandHandler, "switch", "Switch commands. Usage: switch [on|off]" };
     Engine::Root().RegisterCommands(&sSwitchCommand, 1);
-    return;
 }
 #endif // defined(ENABLE_CHIP_SHELL)
 
-static void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, chip::OperationalDeviceProxy * peer_device,
+static void BoundDeviceChangedHandler(const Binding::TableEntry & binding, chip::OperationalDeviceProxy * peer_device,
                                       void * context)
 {
     using namespace chip;
     using namespace chip::app;
 
-    if (binding.type == MATTER_MULTICAST_BINDING)
+    if (binding.type == Binding::MATTER_MULTICAST_BINDING)
     {
         ChipLogError(NotSpecified, "Group binding is not supported now");
         return;
     }
 
-    if (binding.type == MATTER_UNICAST_BINDING && binding.local == 1 &&
+    if (binding.type == Binding::MATTER_UNICAST_BINDING && binding.local == 1 &&
         binding.clusterId.value_or(Clusters::OnOff::Id) == Clusters::OnOff::Id)
     {
         auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
@@ -113,10 +114,10 @@ static void BoundDeviceContextReleaseHandler(void * context)
 static void InitBindingHandlerInternal(intptr_t arg)
 {
     auto & server = chip::Server::GetInstance();
-    chip::BindingManager::GetInstance().Init(
+    Binding::Manager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
-    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler);
-    chip::BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(BoundDeviceContextReleaseHandler);
+    Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler);
+    Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(BoundDeviceContextReleaseHandler);
 }
 
 CHIP_ERROR InitBindingHandlers()

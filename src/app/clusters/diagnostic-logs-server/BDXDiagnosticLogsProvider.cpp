@@ -36,7 +36,7 @@ constexpr System::Clock::Timeout kBdxPollIntervalMs = System::Clock::Millisecond
 // Timeout for the BDX transfer session
 constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
 
-constexpr uint16_t kBdxMaxBlockSize = 1024;
+constexpr uint16_t kBdxMaxBlockSize = CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE;
 
 CHIP_ERROR BDXDiagnosticLogsProvider::InitializeTransfer(CommandHandler * commandObj, const ConcreteCommandPath & path,
                                                          DiagnosticLogsProviderDelegate * delegate, IntentEnum intent,

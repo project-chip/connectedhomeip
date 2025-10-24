@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -198,7 +198,7 @@ void TCPEndPoint::Free()
     // Ensure the end point is Closed or Closing.
     Close();
 
-    GetEndPointManager().DeleteEndPoint(this);
+    Delete();
 }
 
 #if INET_TCP_IDLE_CHECK_INTERVAL > 0
@@ -226,7 +226,7 @@ void TCPEndPoint::HandleIdleTimer(chip::System::Layer * aSystemLayer, void * aAp
     auto & endPointManager = *reinterpret_cast<EndPointManager<TCPEndPoint> *>(aAppState);
     bool lTimerRequired    = IsIdleTimerRunning(endPointManager);
 
-    endPointManager.ForEachEndPoint([](TCPEndPoint * lEndPoint) -> Loop {
+    endPointManager.ForEachEndPoint([](const TCPEndPointHandle & lEndPoint) -> Loop {
         if (!lEndPoint->IsConnected())
             return Loop::Continue;
         if (lEndPoint->mIdleTimeout == 0)
@@ -254,7 +254,7 @@ void TCPEndPoint::HandleIdleTimer(chip::System::Layer * aSystemLayer, void * aAp
 bool TCPEndPoint::IsIdleTimerRunning(EndPointManager<TCPEndPoint> & endPointManager)
 {
     // See if there are any TCP connections with the idle timer check in use.
-    return Loop::Break == endPointManager.ForEachEndPoint([](TCPEndPoint * lEndPoint) {
+    return Loop::Break == endPointManager.ForEachEndPoint([](const TCPEndPointHandle & lEndPoint) {
         return (lEndPoint->mIdleTimeout == 0) ? Loop::Continue : Loop::Break;
     });
 }
@@ -322,7 +322,7 @@ CHIP_ERROR TCPEndPoint::DriveSending()
     return err;
 }
 
-void TCPEndPoint::DriveReceiving()
+void TCPEndPoint::DriveReceiving(const TCPEndPointHandle & handle)
 {
     // If there's data in the receive queue and the app is ready to receive it then call the app's callback
     // with the entire receive queue.
@@ -331,7 +331,7 @@ void TCPEndPoint::DriveReceiving()
         // Acknowledgement is done after handling the buffers to allow the
         // application processing to throttle flow.
         size_t ackLength = mRcvQueue->TotalLength();
-        CHIP_ERROR err   = OnDataReceived(this, std::move(mRcvQueue));
+        CHIP_ERROR err   = OnDataReceived(handle, std::move(mRcvQueue));
         if (err != CHIP_NO_ERROR)
         {
             DoClose(err, false);
@@ -350,6 +350,7 @@ void TCPEndPoint::DriveReceiving()
 
 void TCPEndPoint::HandleConnectComplete(CHIP_ERROR err)
 {
+    TCPEndPointHandle handle(this);
     // If the connect succeeded enter the Connected state and call the app's callback.
     if (err == CHIP_NO_ERROR)
     {
@@ -365,7 +366,7 @@ void TCPEndPoint::HandleConnectComplete(CHIP_ERROR err)
 
         if (OnConnectComplete != nullptr)
         {
-            OnConnectComplete(this, CHIP_NO_ERROR);
+            OnConnectComplete(handle, CHIP_NO_ERROR);
         }
     }
 
@@ -427,14 +428,16 @@ void TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
             {
                 if (OnConnectComplete != nullptr)
                 {
-                    OnConnectComplete(this, err);
+                    TCPEndPointHandle handle(this);
+                    OnConnectComplete(handle, err);
                 }
             }
             else if ((oldState == State::kConnected || oldState == State::kSendShutdown || oldState == State::kReceiveShutdown ||
                       oldState == State::kClosing) &&
                      OnConnectionClosed != nullptr)
             {
-                OnConnectionClosed(this, err);
+                TCPEndPointHandle handle(this);
+                OnConnectionClosed(handle, err);
             }
         }
     }

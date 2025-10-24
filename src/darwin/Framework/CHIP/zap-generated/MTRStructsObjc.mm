@@ -718,6 +718,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _targets = nil;
 
+        _auxiliaryType = nil;
+
         _fabricIndex = @(0);
     }
     return self;
@@ -731,6 +733,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.authMode = self.authMode;
     other.subjects = self.subjects;
     other.targets = self.targets;
+    other.auxiliaryType = self.auxiliaryType;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -738,7 +741,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: privilege:%@; authMode:%@; subjects:%@; targets:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _privilege, _authMode, _subjects, _targets, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: privilege:%@; authMode:%@; subjects:%@; targets:%@; auxiliaryType:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _privilege, _authMode, _subjects, _targets, _auxiliaryType, _fabricIndex];
     return descriptionString;
 }
 
@@ -896,6 +899,36 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: token:%@; instruction:%@; arlRequestFlowUrl:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _token, _instruction, _arlRequestFlowUrl, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAccessControlClusterAuxiliaryAccessUpdatedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _adminNodeID = nil;
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAccessControlClusterAuxiliaryAccessUpdatedEvent alloc] init];
+
+    other.adminNodeID = self.adminNodeID;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: adminNodeID:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _adminNodeID, _fabricIndex];
     return descriptionString;
 }
 
@@ -6457,6 +6490,42 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRPowerTopologyClusterCircuitNodeStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _node = @(0);
+
+        _endpoint = nil;
+
+        _label = nil;
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPowerTopologyClusterCircuitNodeStruct alloc] init];
+
+    other.node = self.node;
+    other.endpoint = self.endpoint;
+    other.label = self.label;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: node:%@; endpoint:%@; label:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _node, _endpoint, _label, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTREnergyEVSEModeClusterModeTagStruct
 - (instancetype)init
 {
@@ -9494,6 +9563,141 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRContentControlClusterTimePeriodStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _startHour = @(0);
+
+        _startMinute = @(0);
+
+        _endHour = @(0);
+
+        _endMinute = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentControlClusterTimePeriodStruct alloc] init];
+
+    other.startHour = self.startHour;
+    other.startMinute = self.startMinute;
+    other.endHour = self.endHour;
+    other.endMinute = self.endMinute;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startHour:%@; startMinute:%@; endHour:%@; endMinute:%@; >", NSStringFromClass([self class]), _startHour, _startMinute, _endHour, _endMinute];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentControlClusterTimeWindowStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _timeWindowIndex = nil;
+
+        _dayOfWeek = @(0);
+
+        _timePeriod = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentControlClusterTimeWindowStruct alloc] init];
+
+    other.timeWindowIndex = self.timeWindowIndex;
+    other.dayOfWeek = self.dayOfWeek;
+    other.timePeriod = self.timePeriod;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeWindowIndex:%@; dayOfWeek:%@; timePeriod:%@; >", NSStringFromClass([self class]), _timeWindowIndex, _dayOfWeek, _timePeriod];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentControlClusterAppInfoStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _catalogVendorID = @(0);
+
+        _applicationID = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentControlClusterAppInfoStruct alloc] init];
+
+    other.catalogVendorID = self.catalogVendorID;
+    other.applicationID = self.applicationID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: catalogVendorID:%@; applicationID:%@; >", NSStringFromClass([self class]), _catalogVendorID, _applicationID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentControlClusterBlockChannelStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _blockChannelIndex = nil;
+
+        _majorNumber = @(0);
+
+        _minorNumber = @(0);
+
+        _identifier = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentControlClusterBlockChannelStruct alloc] init];
+
+    other.blockChannelIndex = self.blockChannelIndex;
+    other.majorNumber = self.majorNumber;
+    other.minorNumber = self.minorNumber;
+    other.identifier = self.identifier;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: blockChannelIndex:%@; majorNumber:%@; minorNumber:%@; identifier:%@; >", NSStringFromClass([self class]), _blockChannelIndex, _majorNumber, _minorNumber, _identifier];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRContentControlClusterRatingNameStruct
 - (instancetype)init
 {
@@ -9535,6 +9739,29 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRContentControlClusterRemainingScreenTimeExpiredEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentControlClusterEnteringBlockContentTimeWindowEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentControlClusterEnteringBlockContentTimeWindowEvent alloc] init];
 
     return other;
 }

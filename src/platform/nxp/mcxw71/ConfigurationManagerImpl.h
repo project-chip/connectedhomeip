@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020, 2025 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -20,7 +20,7 @@
 /**
  *    @file
  *          Provides an implementation of the ConfigurationManager object
- *          for K32W platforms using the NXP SDK.
+ *          for NXP MCXW7X platforms using the NXP SDK.
  */
 
 #pragma once
@@ -36,7 +36,7 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the ConfigurationManager singleton object for the K32W platform.
+ * Concrete implementation of the ConfigurationManager singleton object for the NXP MCXW7X platform.
  */
 class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<Internal::NXPConfig>
 {
@@ -54,6 +54,9 @@ private:
     void InitiateFactoryReset(void) override;
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
+    CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
+    CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override;
+    CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override;
     CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
     CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
@@ -80,12 +83,9 @@ private:
     // ===== Private members reserved for use by this class only.
 
     static void DoFactoryReset(intptr_t arg);
-};
 
-inline CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
+    CHIP_ERROR DetermineBootReason(uint32_t reason);
+};
 
 /**
  * Returns the platform-specific implementation of the ConfigurationManager object.
