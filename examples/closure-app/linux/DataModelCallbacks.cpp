@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,26 +16,20 @@
  *    limitations under the License.
  */
 
-#include "closure-dimension-matter-context.h"
 #include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/reporting/reporting.h>
+#include <lib/support/logging/CHIPLogging.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ClosureDimension {
+using namespace chip;
+using namespace chip::app;
 
-void MatterContext::MarkDirty(const AttributeId attributeId)
+/* Forwards all attributes changes */
+void MatterClosureControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    MatterReportingAttributeChangeCallback(mEndpoint, Id, attributeId);
-    
-    ConcreteAttributePath attributePath(mEndpoint, Id, attributeId);
-    MatterClosureDimensionClusterServerAttributeChangedCallback(attributePath);
+    ChipLogProgress(Zcl, "Closure Control cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mAttributeId));
 }
 
-} // namespace ClosureDimension
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+void MatterClosureDimensionClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
+{
+    ChipLogProgress(Zcl, "Closure Dimension cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mAttributeId));
+}
