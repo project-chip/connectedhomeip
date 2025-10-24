@@ -237,10 +237,10 @@ public:
             return it->second;
         }
 
-        if(!full())
+        if (!full())
         {
             // Key not found, insert it.
-            data_.push_back({ key, Value{} });            
+            data_.push_back({ key, Value{} });
         }
         else
         {
