@@ -1284,3 +1284,13 @@ bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & cu
     }
     return true;
 }
+
+#ifdef DISPLAY_ENABLED
+ClosureUIData ClosureManager::GetClosureUIData()
+{
+    ClosureUIData uiData;
+    mClosureEndpoint1.GetLogic().GetMainState(uiData.mainState);
+    mClosureEndpoint1.GetLogic().GetOverallCurrentState(uiData.overallCurrentState);
+    return uiData;
+}
+#endif // DISPLAY_ENABLED
