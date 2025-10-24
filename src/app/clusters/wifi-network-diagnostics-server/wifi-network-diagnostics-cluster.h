@@ -18,25 +18,38 @@
 
 #pragma once
 
-#include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-logic.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
+#include <clusters/WiFiNetworkDiagnostics/Attributes.h>
 #include <clusters/WiFiNetworkDiagnostics/ClusterId.h>
+#include <clusters/WiFiNetworkDiagnostics/Enums.h>
+#include <lib/core/DataModelTypes.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
-class WiFiDiagnosticsServerCluster : public DefaultServerCluster
+class WiFiDiagnosticsServerCluster : public DefaultServerCluster, public DeviceLayer::WiFiDiagnosticsDelegate
 {
 public:
+    // NOTE: this set is smaller than the full optional attributes supported by diagnostics
+    //       as other attributes are controlled by feature flags
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id>;
+
     WiFiDiagnosticsServerCluster(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
-                                 const WiFiDiagnosticsServerLogic::OptionalAttributeSet & optionalAttributeSet,
+                                 const OptionalAttributeSet & optionalAttributeSet,
                                  BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
         DefaultServerCluster({ endpointId, WiFiNetworkDiagnostics::Id }),
-        mLogic(endpointId, diagnosticProvider, optionalAttributeSet, featureFlags)
-    {}
+        mEndpointId(endpointId), mDiagnosticProvider(diagnosticProvider), mOptionalAttributeSet(optionalAttributeSet),
+        mFeatureFlags(featureFlags)
+    {
+        mDiagnosticProvider.SetWiFiDiagnosticsDelegate(this);
+    }
+
+    ~WiFiDiagnosticsServerCluster() { mDiagnosticProvider.SetWiFiDiagnosticsDelegate(nullptr); }
 
     // Server cluster implementation
 
@@ -49,10 +62,54 @@ public:
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
 
-    WiFiDiagnosticsServerLogic & GetLogic() { return mLogic; }
+    template <typename T, typename Type>
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (DeviceLayer::DiagnosticDataProvider::*getter)(T &), Type & data,
+                               AttributeValueEncoder & aEncoder)
+    {
+        T value;
+        CHIP_ERROR err = (mDiagnosticProvider.*getter)(value);
+
+        if (err == CHIP_NO_ERROR)
+        {
+            data.SetNonNull(value);
+        }
+        else
+        {
+            ChipLogProgress(Zcl, "The WiFi interface is not currently configured or operational.");
+        }
+
+        return aEncoder.Encode(data);
+    }
+
+    // WiFiBssId uses custom implementations instead of ReadIfSupported because it
+    // is attribute of type octet string.
+    CHIP_ERROR ReadWiFiBssId(AttributeValueEncoder & aEncoder);
+
+    CHIP_ERROR HandleResetCounts()
+    {
+        mDiagnosticProvider.ResetWiFiNetworkDiagnosticsCounts();
+        return CHIP_NO_ERROR;
+    }
+
+    // Gets called when the Node detects Node's Wi-Fi connection has been disconnected.
+    void OnDisconnectionDetected(uint16_t reasonCode) override;
+
+    // Gets called when the Node fails to associate or authenticate an access point.
+    void OnAssociationFailureDetected(uint8_t associationFailureCause, uint16_t status) override;
+
+    // Gets when the Node's connection status to a Wi-Fi network has changed.
+    void OnConnectionStatusChanged(uint8_t connectionStatus) override;
+
+    // Getter methods for private members
+    EndpointId GetEndpointId() const { return mEndpointId; }
+    const BitFlags<WiFiNetworkDiagnostics::Feature> & GetFeatureFlags() const { return mFeatureFlags; }
+    const OptionalAttributeSet & GetOptionalAttributeSet() const { return mOptionalAttributeSet; }
 
 private:
-    WiFiDiagnosticsServerLogic mLogic;
+    EndpointId mEndpointId;
+    DeviceLayer::DiagnosticDataProvider & mDiagnosticProvider;
+    const OptionalAttributeSet mOptionalAttributeSet;
+    const BitFlags<WiFiNetworkDiagnostics::Feature> mFeatureFlags;
 };
 
 } // namespace Clusters
