@@ -251,6 +251,10 @@
 #include <clusters/HepaFilterMonitoring/Commands.ipp>
 #include <clusters/HepaFilterMonitoring/Events.ipp>
 #include <clusters/HepaFilterMonitoring/Structs.ipp>
+#include <clusters/Humidistat/Attributes.ipp>
+#include <clusters/Humidistat/Commands.ipp>
+#include <clusters/Humidistat/Events.ipp>
+#include <clusters/Humidistat/Structs.ipp>
 #include <clusters/IcdManagement/Attributes.ipp>
 #include <clusters/IcdManagement/Commands.ipp>
 #include <clusters/IcdManagement/Events.ipp>

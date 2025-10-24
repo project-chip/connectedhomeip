@@ -77,6 +77,7 @@
 #include <clusters/Groupcast/AttributeIds.h>
 #include <clusters/Groups/AttributeIds.h>
 #include <clusters/HepaFilterMonitoring/AttributeIds.h>
+#include <clusters/Humidistat/AttributeIds.h>
 #include <clusters/IcdManagement/AttributeIds.h>
 #include <clusters/Identify/AttributeIds.h>
 #include <clusters/IlluminanceMeasurement/AttributeIds.h>
