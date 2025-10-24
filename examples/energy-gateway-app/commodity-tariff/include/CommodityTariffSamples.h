@@ -130,7 +130,7 @@ static inline Structs::DayPatternStruct::Type DayPatterns[] = {
     { .dayPatternID = 1, .daysOfWeek = BitMask<DayPatternDayOfWeekBitmap>(0x2A), .dayEntryIDs = Span<const uint32_t>(dayEntryIDs2) }
 };
 
-static const uint32_t dayPatternIDs[] = { 1, 0 };
+static const uint32_t dayPatternIDs[] = { 0, 1 };
 
 // Calendar Periods
 static inline Structs::CalendarPeriodStruct::Type CalendarPeriods[] = { { .startDate     = DataModel::Nullable<uint32_t>(0),
@@ -390,7 +390,7 @@ const TariffDataSet kTariffPresets[] = {
             DataModel::List<Structs::DayStruct::Type>(Sample1::IndividualDays, std::size(Sample1::IndividualDays))),
         .CalendarPeriods = DataModel::MakeNullable(
             DataModel::List<Structs::CalendarPeriodStruct::Type>(Sample1::CalendarPeriods, std::size(Sample1::CalendarPeriods))),
-        .TariffTestTimestamp = 1733011200, // 01-Dec-2024, In CHIP epoch: 786326400
+        .TariffTestTimestamp = 1733011200, // 01-Dec-2024
     },
     // Sample 2
     {
@@ -410,7 +410,7 @@ const TariffDataSet kTariffPresets[] = {
         .IndividualDays  = NullOptional, // No individual days in sample 2
         .CalendarPeriods = DataModel::MakeNullable(
             DataModel::List<Structs::CalendarPeriodStruct::Type>(Sample2::CalendarPeriods, std::size(Sample2::CalendarPeriods))),
-        .TariffTestTimestamp = 1748736000, // 01-Jun-2025, In CHIP epoch: 802051200
+        .TariffTestTimestamp = 1748736000, // 01-Jun-2025
     }
 };
 
