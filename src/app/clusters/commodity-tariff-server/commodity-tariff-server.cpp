@@ -618,7 +618,7 @@ CHIP_ERROR Instance::UpdateCurrentAttrs()
 {
     uint32_t matterEpochNow_s;
     uint32_t unixEpochNow_s = kChipEpochSecondsSinceUnixEpoch;
-    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(matterEpochNow_s);
+    CHIP_ERROR err          = System::Clock::GetClock_MatterEpochS(matterEpochNow_s);
 
     if (CHIP_NO_ERROR != err)
     {
