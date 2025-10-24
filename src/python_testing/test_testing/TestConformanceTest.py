@@ -28,7 +28,7 @@ from matter.testing.basic_composition import arls_populated
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation, ProblemLocation
 from matter.testing.runner import default_matter_test_main
-from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types
+from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, build_xml_namespaces
 
 
 def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]:
@@ -406,6 +406,230 @@ class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
         problems = self.check_root_node_restricted_clusters()
         asserts.assert_equal(len(problems), len(root_node_restricted_clusters),
                              "Did not see expected problems with all clusters on EP1")
+
+    def test_closure_restricted_clusters(self):
+        # This test is specific to clusters at 1.5 revisions
+        xml_clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
+        xml_device_types, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
+        # TODO: change this once https://github.com/project-chip/matter-test-scripts/issues/689 is implemented
+        closure_id = [id for id, xml in xml_device_types.items() if xml.name == 'Closure'][0]
+        closure_panel_id = [id for id, xml in xml_device_types.items() if xml.name == 'Closure Panel'][0]
+        window_covering_id = [id for id, xml in xml_device_types.items() if xml.name == 'Window Covering'][0]
+        on_off_id = [id for id, xml in xml_device_types.items() if xml.name == 'On/Off Light'][0]
+
+        def run_checks_for_device_type(id: int):
+            one_five_revision = xml_device_types[id].revision
+
+            def create_endpoint(rev: int, cluster_list: list[Clusters.Objects.Cluster]):
+                self.endpoints = {1: create_minimal_dt(xml_clusters, xml_device_types, id, is_tlv_endpoint=False)}
+                self.endpoints[1].pop(Clusters.ClosureControl, None)
+                self.endpoints[1].pop(Clusters.ClosureDimension, None)
+                self.endpoints[1].pop(Clusters.WindowCovering, None)
+                for c in cluster_list:
+                    # For the purposes of this test, I don't care what's in the cluster, just that it exists
+                    self.endpoints[1][c] = {}
+                self.endpoints[1][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList][0].revision = rev
+
+            # At 1.5 rev with both or all 3 - not OK
+            create_endpoint(one_five_revision, [Clusters.ClosureControl, Clusters.WindowCovering])
+            problems = self.check_closure_restricted_clusters()
+            asserts.assert_equal(len(problems), 1, "Did not find expected problem with closure")
+            create_endpoint(one_five_revision, [Clusters.ClosureDimension, Clusters.WindowCovering])
+            problems = self.check_closure_restricted_clusters()
+            asserts.assert_equal(len(problems), 1, "Did not find expected problem with closure")
+            create_endpoint(one_five_revision, [Clusters.ClosureControl, Clusters.ClosureDimension, Clusters.WindowCovering])
+            problems = self.check_closure_restricted_clusters()
+            asserts.assert_equal(len(problems), 1, "Did not find expected problem with closure")
+
+            # Below 1.5 rev with both - not OK
+            create_endpoint(one_five_revision-1, [Clusters.ClosureControl, Clusters.WindowCovering])
+            problems = self.check_closure_restricted_clusters()
+            asserts.assert_equal(len(problems), 1, "Did not find expected problem with closure")
+            create_endpoint(one_five_revision-1, [Clusters.ClosureDimension, Clusters.WindowCovering])
+            problems = self.check_closure_restricted_clusters()
+            asserts.assert_equal(len(problems), 1, "Did not find expected problem with closure")
+            create_endpoint(one_five_revision-1, [Clusters.ClosureControl, Clusters.ClosureDimension, Clusters.WindowCovering])
+            problems = self.check_closure_restricted_clusters()
+            asserts.assert_equal(len(problems), 1, "Did not find expected problem with closure")
+
+            # Above 1.5 rev with both - OK (though this won't pass the revision test)
+            create_endpoint(one_five_revision+1, [Clusters.ClosureControl, Clusters.WindowCovering])
+            problems = self.check_closure_restricted_clusters()
+            asserts.assert_equal(len(problems), 0, "Unexpected problem with closures above 1.5 revision")
+            create_endpoint(one_five_revision+1, [Clusters.ClosureDimension, Clusters.WindowCovering])
+            problems = self.check_closure_restricted_clusters()
+            asserts.assert_equal(len(problems), 0, "Unexpected problem with closures above 1.5 revision")
+            create_endpoint(one_five_revision+1, [Clusters.ClosureControl, Clusters.ClosureDimension, Clusters.WindowCovering])
+            problems = self.check_closure_restricted_clusters()
+            asserts.assert_equal(len(problems), 0, "Unexpected problem with closures above 1.5 revision")
+
+            # Just window covering cluster - OK
+            create_endpoint(one_five_revision, [Clusters.WindowCovering])
+            problems = self.check_closure_restricted_clusters()
+            asserts.assert_equal(len(problems), 0, "Unexpected problem with closures with only the expected cluster")
+
+            # Just closure clusters alone or in combination - OK (note, restrictions on dimension cluster are checked in a different test function)
+            create_endpoint(one_five_revision, [Clusters.ClosureControl])
+            problems = self.check_closure_restricted_clusters()
+            asserts.assert_equal(len(problems), 0, "Unexpected problem with closures")
+            create_endpoint(one_five_revision, [Clusters.ClosureDimension])
+            problems = self.check_closure_restricted_clusters()
+            asserts.assert_equal(len(problems), 0, "Unexpected problem with closures")
+            create_endpoint(one_five_revision, [Clusters.ClosureControl, Clusters.ClosureDimension])
+            problems = self.check_closure_restricted_clusters()
+            asserts.assert_equal(len(problems), 0, "Unexpected problem with closures")
+
+        run_checks_for_device_type(window_covering_id)
+        run_checks_for_device_type(closure_id)
+        run_checks_for_device_type(closure_panel_id)
+
+        # Random endpoint with closure and window covering - ok. Weird and useless, but ok from the POV of this test.
+        def test_as_extra_cluster(cluster_list: list[Clusters.Objects.Cluster]):
+            self.endpoints = {1: create_minimal_dt(xml_clusters, xml_device_types, on_off_id, is_tlv_endpoint=False)}
+            for c in cluster_list:
+                # For the purposes of this test, I don't care what's in the cluster, just that it exists
+                self.endpoints[1][c] = {}
+            problems = self.check_closure_restricted_clusters()
+            asserts.assert_equal(len(problems), 0, "Unexpected problem with extra cluster")
+
+        test_as_extra_cluster([Clusters.ClosureControl])
+        test_as_extra_cluster([Clusters.ClosureDimension])
+        test_as_extra_cluster([Clusters.WindowCovering])
+        test_as_extra_cluster([Clusters.WindowCovering, Clusters.ClosureControl, Clusters.ClosureDimension])
+
+    def test_closure_restricted_tags(self):
+        # This test is specific to clusters at 1.5 revisions
+        xml_clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
+        xml_device_types, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
+        xml_namespaces, _ = build_xml_namespaces(PrebuiltDataModelDirectory.k1_5)
+        # TODO: change this once https://github.com/project-chip/matter-test-scripts/issues/689 is implemented
+        closure_id = [id for id, xml in xml_device_types.items() if xml.name == 'Closure'][0]
+        closure_panel_id = [id for id, xml in xml_device_types.items() if xml.name == 'Closure Panel'][0]
+        closure_namespace_id = [id for id, xml in xml_namespaces.items() if xml.name == 'Closure'][0]
+        closure_panel_namespace_id = [id for id, xml in xml_namespaces.items() if xml.name == 'Closure Panel'][0]
+
+        def create_endpoint(id: int, rev: int, tag_list: list[Clusters.Globals.Structs.SemanticTagStruct]):
+            self.endpoints = {1: create_minimal_dt(xml_clusters, xml_device_types, id, is_tlv_endpoint=False)}
+            # For the purposes of this test, I don't care that no clusters are present
+
+            self.endpoints[1][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList][0].revision = rev
+            self.endpoints[1][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = tag_list
+
+        # Closure
+        one_five_revision = xml_device_types[closure_id].revision
+
+        # No Closure tags present - not OK
+        tags = []
+        create_endpoint(closure_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem with Closure tags")
+
+        # Multiple Closure tags present - not OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_namespace_id, tag=0), Clusters.Globals.Structs.SemanticTagStruct(namespaceID=closure_namespace_id, tag=1)]
+        create_endpoint(closure_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem with Closure tags")
+
+        # Closure Panel and Closure tag present - not OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_namespace_id, tag=0), Clusters.Globals.Structs.SemanticTagStruct(namespaceID=closure_panel_namespace_id, tag=0)]
+        create_endpoint(closure_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem with Closure tags")
+
+        # Only Closure Panel tag present - not OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(namespaceID=closure_panel_namespace_id, tag=0)]
+        create_endpoint(closure_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 2, "Did not find expected problem with Closure tags")
+
+        # Multiple Closure Panel tags present and no Closure tag - not OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_panel_namespace_id, tag=0), Clusters.Globals.Structs.SemanticTagStruct(namespaceID=closure_panel_namespace_id, tag=1)]
+        create_endpoint(closure_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 3, "Did not find expected problem with Closure tags")
+
+        # Other tag from unrelated namespace and no Closure tag
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=0x11, tag=0x31)]
+        create_endpoint(closure_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem with Closure tags")
+
+        # Single Closure tag - OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_namespace_id, tag=0)]
+        create_endpoint(closure_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 0, "Unexpected problem with Closure tags")
+
+        # Single Closure tag with other tag from unrelated namespace - OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_namespace_id, tag=0), Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=0x11, tag=0x31)]
+        create_endpoint(closure_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 0, "Unexpected problem with Closure tags")
+
+        # Closure Panel
+        one_five_revision = xml_device_types[closure_panel_id].revision
+
+        # No Closure Panel tags present - not OK
+        tags = []
+        create_endpoint(closure_panel_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem with Closure Panel tags")
+
+        # Multiple Closure Panel tags present - not OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_panel_namespace_id, tag=0), Clusters.Globals.Structs.SemanticTagStruct(namespaceID=closure_panel_namespace_id, tag=1)]
+        create_endpoint(closure_panel_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem with Closure Panel tags")
+
+        # Closure Panel and Closure tag present - not OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_namespace_id, tag=0), Clusters.Globals.Structs.SemanticTagStruct(namespaceID=closure_panel_namespace_id, tag=0)]
+        create_endpoint(closure_panel_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem with Closure Panel tags")
+
+        # Only Closure tag present - not OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(namespaceID=closure_namespace_id, tag=0)]
+        create_endpoint(closure_panel_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 2, "Did not find expected problem with Closure Panel tags")
+
+        # Multiple Closure tags present and no Closure Panel tag - not OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_namespace_id, tag=0), Clusters.Globals.Structs.SemanticTagStruct(namespaceID=closure_namespace_id, tag=1)]
+        create_endpoint(closure_panel_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 3, "Did not find expected problem with Closure Panel tags")
+
+        # Other tag from unrelated namespace and no Closure Panel tag - not ok
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=0x11, tag=0x31)]
+        create_endpoint(closure_panel_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 1, "Did not find expected problem with Closure Panel tags")
+
+        # Single Closure Panel tag - OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_panel_namespace_id, tag=0)]
+        create_endpoint(closure_panel_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 0, "Unexpected problem with Closure Panel tags")
+
+        # Single Closure Panel tag with other tag from unrelated namespace - OK
+        tags = [Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=closure_panel_namespace_id, tag=0), Clusters.Globals.Structs.SemanticTagStruct(
+            namespaceID=0x11, tag=0x31)]
+        create_endpoint(closure_panel_id, one_five_revision, tags)
+        problems = self.check_closure_restricted_sem_tags()
+        asserts.assert_equal(len(problems), 0, "Unexpected problem with Closure Panel tags")
 
 
 if __name__ == "__main__":

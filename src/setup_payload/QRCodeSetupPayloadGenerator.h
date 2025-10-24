@@ -113,11 +113,19 @@ public:
      */
     void SetAllowInvalidPayload(bool allow) { mAllowInvalidPayload = allow; }
 
+    /**
+     * When set to true, the encoded payload will start with the delimiter character ('*')
+     * instead of the QR code prefix ("MT:"), suitable for generating concatenated QR codes.
+     * Default is false
+     */
+    void SetAsConcatenation(bool concatenation) { mAsConcatenation = concatenation; }
+
 private:
     CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t maxLen,
                                            size_t & tlvDataLengthInBytes);
 
     bool mAllowInvalidPayload = false;
+    bool mAsConcatenation     = false;
 };
 
 /**
