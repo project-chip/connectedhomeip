@@ -76,14 +76,12 @@ void ThermostatApp::DeviceCallbacks::DeviceEventCallback(const chip::DeviceLayer
     chip::NXP::App::CommonDeviceCallbacks::DeviceEventCallback(event, arg);
 
 // Example of how to process WLAN events from the application layer
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    if (event != nullptr)
+// Such event is visible only on WPA enabled builds with FreeRTOS OS
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CONFIG_APP_FREERTOS_OS
+    if (event != nullptr && event->Type == chip::DeviceLayer::DeviceEventType::kPlatformNxpWlanEvent &&
+        event->Platform.WlanEventReason == WLAN_REASON_CONNECT_FAILED)
     {
-        if (event->Type == chip::DeviceLayer::DeviceEventType::kPlatformNxpWlanEvent &&
-            event->Platform.WlanEventReason == WLAN_REASON_CONNECT_FAILED)
-        {
-            ChipLogError(DeviceLayer, "WLAN connection failed");
-        }
+        ChipLogError(DeviceLayer, "WLAN connection failed");
     }
 #endif
 }
