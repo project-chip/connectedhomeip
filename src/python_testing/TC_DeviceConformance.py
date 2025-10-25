@@ -41,7 +41,7 @@ from test_testing.DeviceConformanceTests import DeviceConformanceTests
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
+class TC_DeviceConformance(DeviceConformanceTests, MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
