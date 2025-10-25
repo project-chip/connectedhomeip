@@ -153,16 +153,9 @@ private:
 
 class Delegate
 {
-    friend class Instance;
 
 private:
     Instance * mInstance = nullptr;
-
-    /**
-     * This method is used by the SDK to set the instance pointer. This is done during the instantiation of an Instance object.
-     * @param aInstance A pointer to the Instance object related to this delegate object.
-     */
-    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
 
 protected:
     /**
@@ -233,6 +226,17 @@ public:
      *                              the failure.
      */
     virtual Protocols::InteractionModel::Status PostResetCondition();
+
+    /**
+     * This method is used by the SDK to set the instance pointer. This is done during the instantiation of a Instance object.
+     * @param aInstance A pointer to the Instance object related to this delegate object.
+     * @note This method is for internal SDK use and should only be called by the `Instance` constructor and destructor.
+     */
+    void SetInstance(Instance * aInstance)
+    {
+        VerifyOrDie(mInstance == nullptr || aInstance == nullptr || mInstance == aInstance);
+        mInstance = aInstance;
+    }
 };
 
 } // namespace ResourceMonitoring
