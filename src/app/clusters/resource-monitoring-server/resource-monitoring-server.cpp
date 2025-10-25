@@ -53,10 +53,14 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
     mResetConditionCommandSupported(aResetConditionCommandSupported)
 {
     mDelegate->SetInstance(this);
-};
+}
 
 Instance::~Instance()
 {
+    if (mDelegate)
+    {
+        mDelegate->SetInstance(nullptr);
+    }
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
