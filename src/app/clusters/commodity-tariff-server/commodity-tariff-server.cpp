@@ -419,24 +419,22 @@ struct ThresholdsPerFeatureValidationContext
 
     CHIP_ERROR AddThreshold(uint32_t feature, int64_t threshold)
     {
-        CHIP_ERROR ret     = CHIP_NO_ERROR;
         FeatureEntry entry = { .thresholdVal = threshold, .featureVal = feature };
 
         for (const auto & existingEntry : featuresPerThreshold)
         {
             if (entry.haveJointFeatures(existingEntry))
             {
-                ret = CHIP_ERROR_DUPLICATE_KEY_ID;
-                break;
+                return CHIP_ERROR_DUPLICATE_KEY_ID;
             }
         }
 
         if (!featuresPerThreshold.insert(entry))
         {
-            ret = CHIP_ERROR_DUPLICATE_KEY_ID;
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
         }
 
-        return ret;
+        return CHIP_NO_ERROR;
     }
 };
 
@@ -562,7 +560,7 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
     // Create lookup maps with const correctness
     CTC_UnorderedMap<uint32_t, const Structs::DayEntryStruct::Type *, CommodityTariffConsts::kDayEntriesAttrMaxLength>
         dayEntriesMap;
-    CTC_UnorderedMap<uint32_t, const Structs::TariffComponentStruct::Type *, CommodityTariffConsts::kTariffComponentMaxLabelLength>
+    CTC_UnorderedMap<uint32_t, const Structs::TariffComponentStruct::Type *, CommodityTariffConsts::kTariffComponentsAttrMaxLength>
         tariffComponentsMap;
 
     CommodityTariffAttrsDataMgmt::ListToMap<Structs::DayEntryStruct::Type, &Structs::DayEntryStruct::Type::dayEntryID,
@@ -570,7 +568,7 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
 
     CommodityTariffAttrsDataMgmt::ListToMap<Structs::TariffComponentStruct::Type,
                                             &Structs::TariffComponentStruct::Type::tariffComponentID,
-                                            CommodityTariffConsts::kTariffComponentMaxLabelLength>(tariffComponents,
+                                            CommodityTariffConsts::kTariffComponentsAttrMaxLength>(tariffComponents,
                                                                                                    tariffComponentsMap);
 
     struct DeStartDurationPair
