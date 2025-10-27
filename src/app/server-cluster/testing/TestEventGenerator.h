@@ -16,22 +16,22 @@
  */
 #pragma once
 
-#include <deque>
 #include <app/EventLoggingDelegate.h>
 #include <app/EventLoggingTypes.h>
 #include <app/data-model-provider/EventsGenerator.h>
 #include <app/data-model/Decode.h>
+#include <deque>
 
 namespace chip {
 namespace Test {
-
 
 /// Keeps a queue of generated events that can be aqueried later for testing purposes
 class LogOnlyEvents : public app::DataModel::EventsGenerator
 {
 public:
     // struct to hold information about a generated event
-    struct EventInformation {
+    struct EventInformation
+    {
         EventNumber eventNumber;
         app::EventOptions eventOptions;
         bool wasDeliveredUrgently;
@@ -96,7 +96,7 @@ public:
         ReturnErrorOnFailure(writer.Finalize());
         eventInfo.mEncodedLength = writer.GetLengthWritten();
         eventInfo.eventOptions   = options;
-        eventInfo.eventNumber    = generatedEventNumber     = ++mCurrentEventNumber;
+        eventInfo.eventNumber = generatedEventNumber = ++mCurrentEventNumber;
 
         mEventQueue.push_back(eventInfo);
 
@@ -107,8 +107,9 @@ public:
     // Returns `std::nullopt` if no event is in the queue (i.e. no event was generated after consuming last generated one).
     [[nodiscard]] std::optional<EventInformation> GetNextEvent()
     {
-        if (mEventQueue.empty()) return std::nullopt;
-        std::optional<EventInformation> info{mEventQueue.front()};
+        if (mEventQueue.empty())
+            return std::nullopt;
+        std::optional<EventInformation> info{ mEventQueue.front() };
         mEventQueue.pop_front();
         return info;
     }

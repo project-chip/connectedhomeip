@@ -145,7 +145,7 @@ TEST_F(TestBooleanStateCluster, NoEventWhenValueUnchanged)
     EXPECT_EQ(booleanState.GetStateValue(), false);
 
     // Get initial event count before attempting to set the same value
-    auto & logOnlyEvents     = testContext.EventsGenerator();
+    auto & logOnlyEvents = testContext.EventsGenerator();
 
     // Re-set to the same value (false) and confirm no new event is generated
     auto firstEvent = booleanState.SetStateValue(false);
