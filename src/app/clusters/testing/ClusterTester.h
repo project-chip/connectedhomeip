@@ -93,8 +93,8 @@ public:
     // Read attribute into `out` parameter.
     // The `out` parameter must be of the correct type for the attribute being read.
     // Use `app::Clusters::<ClusterName>::Attributes::<AttributeName>::TypeInfo::DecodableType` for the `out` parameter to be spec
-    // compliant (see the comment of the class for usage example). Will construct the attribute path using the first path returned
-    // by `GetPaths()` on the cluster.
+    // compliant (see the comment of the class for usage example).
+    // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` returned an empty list.
     template <typename T>
     app::DataModel::ActionReturnStatus ReadAttribute(AttributeId attr_id, T & out)
@@ -126,8 +126,8 @@ public:
     // Write attribute from `value` parameter.
     // The `value` parameter must be of the correct type for the attribute being written.
     // Use `app::Clusters::<ClusterName>::Attributes::<AttributeName>::TypeInfo::Type` for the `value` parameter to be spec
-    // compliant (see the comment of the class for usage example). Will construct the attribute path using the first path returned
-    // by `GetPaths()` on the cluster.
+    // compliant (see the comment of the class for usage example).
+    // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` returned an empty list.
     template <typename T>
     app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr_id, T & value)
@@ -144,8 +144,8 @@ public:
     // Invoke a command with `arguments`.
     // The `arguments` parameter must be of the correct type for the command being invoked.
     // Use `app::Clusters::<ClusterName>::Commands::<CommandName>::Type` for the `arguments` parameter to be spec compliant (see the
-    // comment of the class for usage example). Will construct the command path using the first path returned by `GetPaths()` on the
-    // cluster.
+    // comment of the class for usage example).
+    // Will construct the command path using the first path returned by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` returned an empty list.
     template <typename T>
     std::optional<std::variant<app::DataModel::ActionReturnStatus, CommandResponse>> InvokeCommand(CommandId command_id,
