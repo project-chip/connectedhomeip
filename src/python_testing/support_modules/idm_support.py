@@ -40,13 +40,13 @@ from matter.testing.matter_testing import MatterBaseTest
 
 def get_all_cmds_for_cluster_id(cid: int) -> list[Clusters.ClusterObjects.ClusterCommand]:
     """Get all commands for a given cluster ID.
-    
+
     Args:
         cid: Cluster ID to get commands for
-        
+
     Returns:
         List of command classes for the cluster, or empty list if cluster has no commands
-        
+
     Note:
         Some clusters don't have a Commands attribute (they have no commands defined).
         Returning an empty list allows callers to safely iterate through all clusters
@@ -60,13 +60,13 @@ def get_all_cmds_for_cluster_id(cid: int) -> list[Clusters.ClusterObjects.Cluste
 
 def client_cmd(cmd_class):
     """Filter to check if a command class is a client command.
-    
+
     Args:
         cmd_class: Command class to check
-        
+
     Returns:
         The command class if it's a client command, None otherwise
-        
+
     Note:
         Inspect returns all classes, not just command classes. Some builtin classes
         won't have the is_client attribute, so we check for it explicitly.
@@ -93,9 +93,9 @@ class IDMSupport:
 
 class IDMBaseTest(MatterBaseTest):
     """Base test class for IDM tests with shared functionality."""
-    
+
     ROOT_NODE_ENDPOINT_ID = 0
-    
+
     # ========================================================================
     # Descriptor and Cluster Reading Utilities
     # ========================================================================
