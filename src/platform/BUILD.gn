@@ -86,6 +86,9 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     # Allows enabling dynamic setting of the local MRP configuration, for
     # devices with multiple radios that have different sleep behavior for
     # different radios.
+    #
+    # Defaults to enabled on Linux since it's useful for tests and for
+    # performance evaluation in general. Default values are retaiened.
     chip_device_config_enable_dynamic_mrp_config =
         chip_device_platform == "linux"
 
