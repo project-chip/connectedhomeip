@@ -179,7 +179,7 @@ TEST_F(TestDiagnosticLogsCluster, ResponsePayload_NoDelegate_NoLogs)
     diagnosticLogsCluster.HandleLogRequestForResponsePayload(&handler, kPath, DiagnosticLogs::IntentEnum::kEndUserSupport);
 
     // Verify we have exactly one response
-    EXPECT_EQ(handler.GetResponseCount(), (size_t) 1);
+    EXPECT_EQ(handler.GetResponseCount(), static_cast<size_t>(1));
     EXPECT_EQ(handler.GetResponseCommandId(), DiagnosticLogs::Commands::RetrieveLogsResponse::Id);
     auto decoded = DecodeRetrieveLogsResponse(handler);
     EXPECT_EQ(decoded.status, DiagnosticLogs::StatusEnum::kNoLogs);
