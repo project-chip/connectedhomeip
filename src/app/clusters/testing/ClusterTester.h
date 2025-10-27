@@ -41,7 +41,10 @@ struct CommandResponse
     app::ConcreteCommandPath path;
     CommandId responseId;
     template <typename T>
-    CHIP_ERROR GetResponseData(T & dest);
+    CHIP_ERROR GetResponseData(T & dest)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
 private:
     uint8_t mResponseEncodeBuffer[128];
@@ -105,15 +108,15 @@ public:
             std::make_unique<app::Testing::ReadOperation>(path.mEndpointId, path.mClusterId, attr_id);
 
         mReadOperations.push_back(std::move(readOperation));
-        app::Testing::ReadOperation & readOpeationRef = *mReadOperations.back().get();
+        app::Testing::ReadOperation & readOperationRef = *mReadOperations.back().get();
 
-        std::unique_ptr<app::AttributeValueEncoder> encoder = readOpeationRef.StartEncoding();
-        app::DataModel::ActionReturnStatus status           = mCluster->ReadAttribute(readOpeationRef.GetRequest(), *encoder);
+        std::unique_ptr<app::AttributeValueEncoder> encoder = readOperationRef.StartEncoding();
+        app::DataModel::ActionReturnStatus status           = mCluster->ReadAttribute(readOperationRef.GetRequest(), *encoder);
         VerifyOrReturnError(status.IsSuccess(), status);
-        ReturnErrorOnFailure(readOpeationRef.FinishEncoding());
+        ReturnErrorOnFailure(readOperationRef.FinishEncoding());
 
         std::vector<app::Testing::DecodedAttributeData> attributeData;
-        ReturnErrorOnFailure(readOpeationRef.GetEncodedIBs().Decode(attributeData));
+        ReturnErrorOnFailure(readOperationRef.GetEncodedIBs().Decode(attributeData));
         VerifyOrReturnError(attributeData.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
 
         return app::DataModel::Decode(attributeData[0].dataReader, out);
@@ -126,7 +129,7 @@ public:
     // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` returned an empty list.
     template <typename T>
-    app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr_id, T & value)
+    app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr_id, const T & value)
     {
         VerifyOrReturnError(verifyClusterPathsValid(), CHIP_ERROR_INCORRECT_STATE);
         const auto & path = mCluster->GetPaths()[0];

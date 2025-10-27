@@ -34,7 +34,7 @@ public:
     {
         EventNumber eventNumber;
         app::EventOptions eventOptions;
-        bool wasDeliveredUrgently;
+        bool wasDeliveredUrgently{false};
         ByteSpan GetEncodeByteSpan() const { return ByteSpan(mEventEncodeBuffer, mEncodedLength); }
 
         // This relies on the default encoding of events which uses
@@ -109,7 +109,7 @@ public:
     {
         if (mEventQueue.empty())
             return std::nullopt;
-        std::optional<EventInformation> info{ mEventQueue.front() };
+        std::optional<EventInformation> info{ std::move(mEventQueue.front()) };
         mEventQueue.pop_front();
         return info;
     }
