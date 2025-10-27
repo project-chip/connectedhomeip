@@ -18,11 +18,9 @@
 Support module for IDM (Interaction Data Model) test modules containing shared functionality.
 """
 
-import asyncio
 import copy
 import inspect
 import logging
-from typing import Optional
 
 from mobly import asserts
 
