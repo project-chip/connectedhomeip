@@ -41,6 +41,7 @@ from mobly import asserts
 from support_modules.idm_support import IDMBaseTest
 
 import matter.clusters as Clusters
+from matter.testing.matter_asserts import is_valid_uint_value
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.exceptions import ChipStackError
@@ -184,12 +185,12 @@ class TC_IDM_4_2(IDMBaseTest):
         )
 
         # Verify subscriptionId is of uint32 type
-        asserts.assert_true(self.is_valid_uint32_value(sub_cr1_step1.subscriptionId), "subscriptionId is not of uint32 type.")
+        asserts.assert_true(is_valid_uint_value(sub_cr1_step1.subscriptionId, 32), "subscriptionId is not of uint32 type.")
 
         # Verify MaxInterval is of uint32 type
         sub_cr1_step1_intervals = sub_cr1_step1.GetReportingIntervalsSeconds()
         sub_cr1_step1_min_interval_floor_sec, sub_cr1_step1_max_interval_ceiling_sec = sub_cr1_step1_intervals
-        asserts.assert_true(self.is_valid_uint32_value(sub_cr1_step1_max_interval_ceiling_sec),
+        asserts.assert_true(is_valid_uint_value(sub_cr1_step1_max_interval_ceiling_sec, 32),
                             "MaxInterval is not of uint32 type.")
 
         # Verify MaxInterval is less than or equal to MaxIntervalCeiling
@@ -227,12 +228,12 @@ class TC_IDM_4_2(IDMBaseTest):
         )
 
         # Verify subscriptionId is of uint32 type
-        asserts.assert_true(self.is_valid_uint32_value(sub_cr1_step2.subscriptionId), "subscriptionId is not of uint32 type.")
+        asserts.assert_true(is_valid_uint_value(sub_cr1_step2.subscriptionId, 32), "subscriptionId is not of uint32 type.")
 
         # Verify MaxInterval is of uint32 type
         sub_cr1_step2_intervals = sub_cr1_step2.GetReportingIntervalsSeconds()
         sub_cr1_step2_min_interval_floor_sec, sub_cr1_step2_max_interval_ceiling_sec = sub_cr1_step2_intervals
-        asserts.assert_true(self.is_valid_uint32_value(sub_cr1_step2_max_interval_ceiling_sec),
+        asserts.assert_true(is_valid_uint_value(sub_cr1_step2_max_interval_ceiling_sec, 32),
                             "MaxInterval is not of uint32 type.")
 
         # Verify MaxInterval is less than or equal to MaxIntervalCeiling
@@ -527,7 +528,7 @@ class TC_IDM_4_2(IDMBaseTest):
         cluster_revision_attr_value = sub_cr1_step11.GetAttribute(cluster_rev_attr_typed_path)
 
         # Verify ClusterRevision is of uint16 type
-        asserts.assert_true(self.is_valid_uint16_value(cluster_revision_attr_value), "ClusterRevision is not of uint16 type.")
+        asserts.assert_true(is_valid_uint_value(cluster_revision_attr_value, 16), "ClusterRevision is not of uint16 type.")
 
         # Verify valid ClusterRevision value
         asserts.assert_greater_equal(cluster_revision_attr_value, 0, "Invalid ClusterRevision value.")
@@ -570,7 +571,7 @@ class TC_IDM_4_2(IDMBaseTest):
         cluster_revision_attr_value = sub_cr1_step12.GetAttribute(cluster_rev_attr_typed_path)
 
         # Verify ClusterRevision is of uint16 type
-        asserts.assert_true(self.is_valid_uint16_value(cluster_revision_attr_value), "ClusterRevision is not of uint16 type.")
+        asserts.assert_true(is_valid_uint_value(cluster_revision_attr_value, 16), "ClusterRevision is not of uint16 type.")
 
         sub_cr1_step12.Shutdown()
 

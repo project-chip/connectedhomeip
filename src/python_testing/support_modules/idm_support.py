@@ -93,42 +93,14 @@ class IDMSupport:
 
 class IDMBaseTest(MatterBaseTest):
     """Base test class for IDM tests with shared functionality."""
-
+    
     ROOT_NODE_ENDPOINT_ID = 0
-
-    # ========================================================================
-    # Type Validators
-    # ========================================================================
-
-    @staticmethod
-    def is_valid_uint32_value(var):
-        """Check if a value is a valid uint32.
-
-        Args:
-            var: Value to check
-
-        Returns:
-            True if value is a valid uint32, False otherwise
-        """
-        return isinstance(var, int) and 0 <= var <= 0xFFFFFFFF
-
-    @staticmethod
-    def is_valid_uint16_value(var):
-        """Check if a value is a valid uint16.
-
-        Args:
-            var: Value to check
-
-        Returns:
-            True if value is a valid uint16, False otherwise
-        """
-        return isinstance(var, int) and 0 <= var <= 0xFFFF
-
+    
     # ========================================================================
     # Descriptor and Cluster Reading Utilities
     # ========================================================================
 
-    async def get_descriptor_server_list(self, ctrl: ChipDeviceCtrl, ep: int = None):
+    async def get_descriptor_server_list(self, ctrl: ChipDeviceCtrl, ep: int = ROOT_NODE_ENDPOINT_ID):
         """Read ServerList attribute from Descriptor cluster.
 
         Args:
@@ -138,8 +110,6 @@ class IDMBaseTest(MatterBaseTest):
         Returns:
             ServerList attribute value
         """
-        if ep is None:
-            ep = self.ROOT_NODE_ENDPOINT_ID
         return await self.read_single_attribute_check_success(
             endpoint=ep,
             dev_ctrl=ctrl,
@@ -147,7 +117,7 @@ class IDMBaseTest(MatterBaseTest):
             attribute=Clusters.Descriptor.Attributes.ServerList
         )
 
-    async def get_descriptor_parts_list(self, ctrl: ChipDeviceCtrl, ep: int = None):
+    async def get_descriptor_parts_list(self, ctrl: ChipDeviceCtrl, ep: int = ROOT_NODE_ENDPOINT_ID):
         """Read PartsList attribute from Descriptor cluster.
 
         Args:
@@ -157,8 +127,6 @@ class IDMBaseTest(MatterBaseTest):
         Returns:
             PartsList attribute value
         """
-        if ep is None:
-            ep = self.ROOT_NODE_ENDPOINT_ID
         return await self.read_single_attribute_check_success(
             endpoint=ep,
             dev_ctrl=ctrl,
@@ -166,7 +134,7 @@ class IDMBaseTest(MatterBaseTest):
             attribute=Clusters.Descriptor.Attributes.PartsList
         )
 
-    async def get_idle_mode_duration_sec(self, ctrl: ChipDeviceCtrl, ep: int = None):
+    async def get_idle_mode_duration_sec(self, ctrl: ChipDeviceCtrl, ep: int = ROOT_NODE_ENDPOINT_ID):
         """Read IdleModeDuration attribute from ICD Management cluster.
 
         Args:
@@ -176,8 +144,6 @@ class IDMBaseTest(MatterBaseTest):
         Returns:
             IdleModeDuration attribute value in seconds
         """
-        if ep is None:
-            ep = self.ROOT_NODE_ENDPOINT_ID
         return await self.read_single_attribute_check_success(
             endpoint=ep,
             dev_ctrl=ctrl,
@@ -189,7 +155,7 @@ class IDMBaseTest(MatterBaseTest):
     # ACL Management Functions
     # ========================================================================
 
-    async def get_dut_acl(self, ctrl: ChipDeviceCtrl, ep: int = None):
+    async def get_dut_acl(self, ctrl: ChipDeviceCtrl, ep: int = ROOT_NODE_ENDPOINT_ID):
         """Read the ACL attribute from the DUT.
 
         Args:
@@ -199,8 +165,6 @@ class IDMBaseTest(MatterBaseTest):
         Returns:
             ACL list from the DUT
         """
-        if ep is None:
-            ep = self.ROOT_NODE_ENDPOINT_ID
         sub = await ctrl.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=[(ep, Clusters.AccessControl.Attributes.Acl)],
@@ -210,7 +174,7 @@ class IDMBaseTest(MatterBaseTest):
         acl_list = sub[ep][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
         return acl_list
 
-    async def write_dut_acl(self, ctrl: ChipDeviceCtrl, acl, ep: int = None):
+    async def write_dut_acl(self, ctrl: ChipDeviceCtrl, acl, ep: int = ROOT_NODE_ENDPOINT_ID):
         """Write an ACL to the DUT.
 
         Args:
@@ -218,8 +182,6 @@ class IDMBaseTest(MatterBaseTest):
             acl: ACL list to write
             ep: Endpoint to write to (default: ROOT_NODE_ENDPOINT_ID)
         """
-        if ep is None:
-            ep = self.ROOT_NODE_ENDPOINT_ID
         result = await ctrl.WriteAttribute(self.dut_node_id, [(ep, Clusters.AccessControl.Attributes.Acl(acl))])
         asserts.assert_equal(result[ep].Status, Status.Success, "ACL write failed")
 
@@ -240,7 +202,7 @@ class IDMBaseTest(MatterBaseTest):
     # ========================================================================
 
     @staticmethod
-    def get_typed_attribute_path(attribute, ep: int = None):
+    def get_typed_attribute_path(attribute, ep: int = ROOT_NODE_ENDPOINT_ID):
         """Create a TypedAttributePath from an attribute.
 
         Args:
@@ -250,8 +212,6 @@ class IDMBaseTest(MatterBaseTest):
         Returns:
             TypedAttributePath object
         """
-        if ep is None:
-            ep = IDMBaseTest.ROOT_NODE_ENDPOINT_ID
         return TypedAttributePath(
             Path=AttributePath.from_attribute(
                 EndpointId=ep,
@@ -264,7 +224,7 @@ class IDMBaseTest(MatterBaseTest):
     # ========================================================================
 
     @staticmethod
-    def verify_attribute_exists(sub, cluster, attribute, ep: int = None):
+    def verify_attribute_exists(sub, cluster, attribute, ep: int = ROOT_NODE_ENDPOINT_ID):
         """Verify that an attribute exists in a subscription or read response.
 
         Args:
@@ -273,8 +233,6 @@ class IDMBaseTest(MatterBaseTest):
             attribute: Attribute to check for
             ep: Endpoint to check (default: ROOT_NODE_ENDPOINT_ID)
         """
-        if ep is None:
-            ep = IDMBaseTest.ROOT_NODE_ENDPOINT_ID
         sub_attrs = sub
         if isinstance(sub, Clusters.Attribute.SubscriptionTransaction):
             sub_attrs = sub.GetAttributes()
