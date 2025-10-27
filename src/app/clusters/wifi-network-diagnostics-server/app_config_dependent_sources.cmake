@@ -26,6 +26,5 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/WiFiDiagnosticsTestEventTriggerHandler.h"
     "${CLUSTER_DIR}/wifi-network-diagnostics-cluster.cpp"
     "${CLUSTER_DIR}/wifi-network-diagnostics-cluster.h"
-    "${CLUSTER_DIR}/wifi-network-diagnostics-logic.cpp"
-    "${CLUSTER_DIR}/wifi-network-diagnostics-logic.h"
+
 )

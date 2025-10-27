@@ -31,6 +31,7 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+static constexpr uint16_t kSpecMaxHostname = 253;
 
 class TlsClientManagementDelegate;
 
@@ -105,63 +106,37 @@ private:
 class TlsClientManagementDelegate : public Tls::CertificateDependencyChecker
 {
 public:
-    struct EndpointStructType : TlsClientManagement::Structs::TLSEndpointStruct::DecodableType
-    {
-        EndpointStructType() {}
-
-        EndpointStructType(const EndpointStructType & src) : TlsClientManagement::Structs::TLSEndpointStruct::DecodableType(src)
-        {
-            // Should never fail, as payload should always be the same statically-compiled size
-            SuccessOrDie(CopyHostnameFrom(src.hostname));
-        }
-        EndpointStructType & operator=(const EndpointStructType & src)
-        {
-            TlsClientManagement::Structs::TLSEndpointStruct::DecodableType::operator=(src);
-            // Should never fail, as payload should always be the same statically-compiled size
-            SuccessOrDie(CopyHostnameFrom(src.hostname));
-            return *this;
-        }
-
-        EndpointStructType & operator=(EndpointStructType &&) = delete;
-
-        inline CHIP_ERROR CopyHostnameFrom(const ByteSpan & source)
-        {
-            MutableByteSpan hostnameSpan(hostnameMem);
-            ReturnErrorOnFailure(CopySpanToMutableSpan(source, hostnameSpan));
-            hostname = hostnameSpan;
-            return CHIP_NO_ERROR;
-        }
-
-    private:
-        std::array<uint8_t, 253> hostnameMem;
-    };
+    using EndpointStructType     = TlsClientManagement::Structs::TLSEndpointStruct::DecodableType;
+    using LoadedEndpointCallback = std::function<CHIP_ERROR(EndpointStructType & endpoint)>;
 
     TlsClientManagementDelegate() = default;
 
     virtual ~TlsClientManagementDelegate() = default;
 
+    virtual CHIP_ERROR Init(PersistentStorageDelegate & storage) = 0;
+
     /**
-     * @brief Get the TLSEndpointStruct at a given index
+     * @brief Executes callback for each TLSEndpointStruct matching (matterEndpoint, fabric). The endpoint passed to
+     * callback has a guaranteed lifetime of the method call.
+     *
      * @param[in] matterEndpoint The matter endpoint to query against
-     * @param[in] fabric The fabric to query against
-     * @param[in] index The index of the endpoint in the list.
-     * @param[out] outEndpoint The endpoint at the given index in the list.
-     * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the preset types list.
+     * @param[in] fabric The fabric the endpoint is associated with
+     * @param[in] callback lambda to execute for each endpoint.  If this function returns an error result,
+     * iteration stops and returns that same error result.
      */
-    virtual CHIP_ERROR GetProvisionedEndpointByIndex(EndpointId matterEndpoint, FabricIndex fabric, size_t index,
-                                                     EndpointStructType & outEndpoint) const = 0;
+    virtual CHIP_ERROR ForEachEndpoint(EndpointId matterEndpoint, FabricIndex fabric, LoadedEndpointCallback callback) = 0;
 
     /**
      * @brief Finds the TLSEndpointStruct with the given EndpointID
      *
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] endpointID The EndpoitnID to find.
-     * @param[out] outEndpoint The endpoint at the given index in the list.
-     * @return Success if found, a failure Status otherwise.
+     * @param[in] callback lambda to execute for found endpoint.  If this function returns an error result,
+     * iteration stops and returns that same error result.
+     * @return CHIP_ERROR_NOT_FOUND if not found
      */
-    virtual Protocols::InteractionModel::Status FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                            uint16_t endpointID,
-                                                                            EndpointStructType & outEndpoint) const = 0;
+    virtual CHIP_ERROR FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
+                                                   LoadedEndpointCallback callback) = 0;
 
     /**
      * @brief Appends a TLSEndpointStruct to the provisioned endpoints list maintained by the delegate.
@@ -195,6 +170,18 @@ public:
      * @brief Removes all associated endpoints for the given fabricIndex.
      */
     virtual void RemoveFabric(FabricIndex fabricIndex) = 0;
+
+    /**
+     * @brief Mutates the referenceCount of the TLSEndpointStruct by delta with the given EndpointID
+     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric to query against
+     * @param[in] endpointID The ID of the endpoint to remove.
+     * @param[in] delta The amount to mutate the reference count by.
+     * @return CHIP_NO_ERROR if the mutation was successful, CHIP_ERROR_NOT_FOUND if not found, a failure code otherwise.
+     */
+    virtual CHIP_ERROR MutateEndpointReferenceCount(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
+                                                    int8_t delta) = 0;
 
 protected:
     friend class TlsClientManagementServer;
