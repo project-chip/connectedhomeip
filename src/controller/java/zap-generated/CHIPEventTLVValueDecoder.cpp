@@ -9142,6 +9142,37 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             return value;
         }
+        case Events::EnteringBlockContentTimeWindow::Id: {
+            Events::EnteringBlockContentTimeWindow::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass enteringBlockContentTimeWindowStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ContentControlClusterEnteringBlockContentTimeWindowEvent",
+                enteringBlockContentTimeWindowStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$ContentControlClusterEnteringBlockContentTimeWindowEvent");
+                return nullptr;
+            }
+
+            jmethodID enteringBlockContentTimeWindowStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, enteringBlockContentTimeWindowStructClass, "<init>", "()V",
+                                                                &enteringBlockContentTimeWindowStructCtor);
+            if (err != CHIP_NO_ERROR || enteringBlockContentTimeWindowStructCtor == nullptr)
+            {
+                ChipLogError(
+                    Zcl, "Could not find ChipEventStructs$ContentControlClusterEnteringBlockContentTimeWindowEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(enteringBlockContentTimeWindowStructClass, enteringBlockContentTimeWindowStructCtor);
+
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
