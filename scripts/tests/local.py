@@ -38,19 +38,18 @@ import coloredlogs
 import tabulate
 import yaml
 
-# Attempt to import extract_runs_args. If it fails, attempt to add the
-# controller python path to the sys.path as a fallback.
 try:
     from matter.testing.metadata import extract_runs_args  # May fail if python environment not built yet
 except ImportError:
-    _CONTROLLER_PYTHON_PATH = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'controller', 'python')
-    if _CONTROLLER_PYTHON_PATH not in sys.path:
-        sys.path.insert(0, _CONTROLLER_PYTHON_PATH)
+    # Fallback to manual import from source tree
+    _MATTER_TESTING_PATH = os.path.join(os.path.dirname(
+        __file__), '..', '..', 'src', 'python_testing', 'matter_testing_infrastructure')
+    if _MATTER_TESTING_PATH not in sys.path:
+        sys.path.insert(0, _MATTER_TESTING_PATH)
     try:
         from matter.testing.metadata import extract_runs_args
     except ImportError:
-        # filtering by app (--app-filter) will not work.
-        extract_runs_args = None
+       extract_runs_args = None # filtering by app (--app-filter) will not work. 
 
 
 def _get_apps_from_script(path: str) -> List[str]:
