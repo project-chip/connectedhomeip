@@ -21,21 +21,12 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <lib/core/Optional.h>
+#include "electrical-energy-measurement-server.h"
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ElectricalEnergyMeasurement {
-
-struct MeasurementData
-{
-    Structs::MeasurementAccuracyStruct::Type measurementAccuracy;
-    Optional<Structs::EnergyMeasurementStruct::Type> cumulativeImported;
-    Optional<Structs::EnergyMeasurementStruct::Type> cumulativeExported;
-    Optional<Structs::EnergyMeasurementStruct::Type> periodicImported;
-    Optional<Structs::EnergyMeasurementStruct::Type> periodicExported;
-    Optional<Structs::CumulativeEnergyResetStruct::Type> cumulativeReset;
-};
 
 enum class OptionalAttributes : uint32_t
 {
@@ -64,8 +55,6 @@ private:
     BitMask<Feature> mFeature;
     BitMask<OptionalAttributes> mOptionalAttrs;
 };
-
-MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId);
 
 } // namespace ElectricalEnergyMeasurement
 } // namespace Clusters
