@@ -155,7 +155,7 @@ public:
     {
         mRequest.path = mCommandPath;
     }
-    // Invoke a command using a pre-defined request structure
+    // Invoke a command using a predefined request structure
     template <typename ClusterType, typename RequestType>
     std::optional<DataModel::ActionReturnStatus> Invoke(ClusterType & cluster, const RequestType & request)
     {
