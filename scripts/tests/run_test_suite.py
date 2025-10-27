@@ -358,12 +358,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
     if chip_tool_with_python is None:
         if context.obj.runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
-            chip_tool_with_python = build_app(None, 'tool', 'darwinframeworktool.py')
+            chip_tool_with_python = build_app(None, 'tool', 'darwinframeworktool.py').wrap_with(('python3',))
         else:
-            chip_tool_with_python = build_app(None, 'tool', 'chiptool.py')
-
-        if chip_tool_with_python:
-            chip_tool_with_python = chip_tool_with_python.wrap_with(('python3',))
+            chip_tool_with_python = build_app(None, 'tool', 'chiptool.py').wrap_with(('python3',))
 
     if ble_wifi and sys.platform != "linux":
         raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
