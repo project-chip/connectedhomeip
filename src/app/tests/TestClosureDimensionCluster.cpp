@@ -2429,7 +2429,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingSpeedValu
 } // namespace chip
 
 // Mock callback functions
-__attribute__((unused)) void MatterClosureDimensionClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
+__attribute__((unused)) void
+MatterClosureDimensionClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
 {
     // Mock implementation - no-op for tests
 }

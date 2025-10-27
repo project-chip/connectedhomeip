@@ -107,7 +107,8 @@ private:
 } // namespace chip
 
 // Mock callback functions
-__attribute__((unused)) void MatterClosureControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
+__attribute__((unused)) void
+MatterClosureControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
 {
     // Mock implementation - no-op for tests
 }
