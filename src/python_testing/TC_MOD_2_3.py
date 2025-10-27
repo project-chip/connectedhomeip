@@ -46,39 +46,10 @@ from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 # ModeSelect attribute IDs
-kModeSelectAttributeValueIDs = [0x0003]  # CurrentMode attribute ID
+current_mode_attribute_id = 0x00000003
 
 
 class TC_MOD_2_3(MatterBaseTest):
-
-    #
-    # Class Helper functions
-    #
-    def _prepare_modeselect_extension_field_set(self, attribute_value_list: List[Clusters.ScenesManagement.Structs.AttributeValuePairStruct]) -> Clusters.ScenesManagement.Structs.ExtensionFieldSetStruct:
-        efs_attribute_value_list: List[Clusters.ScenesManagement.Structs.AttributeValuePairStruct] = []
-        for attribute_id in kModeSelectAttributeValueIDs:
-            # Attempt to find the attribute in the input list
-            found = False
-            for pair in attribute_value_list:
-                if pair.attributeID == attribute_id:
-                    efs_attribute_value_list.append(pair)
-                    found = True
-                    break
-
-            if not found:
-                if attribute_id == 0x0003:  # CurrentMode attribute
-                    empty_attribute_value = Clusters.ScenesManagement.Structs.AttributeValuePairStruct(
-                        attributeID=attribute_id,
-                        valueUnsigned8=0x00,
-                    )
-                efs_attribute_value_list.append(empty_attribute_value)
-
-        extension_field_set = Clusters.ScenesManagement.Structs.ExtensionFieldSetStruct(
-            clusterID=Clusters.Objects.ModeSelect.id,
-            attributeValueList=efs_attribute_value_list
-        )
-
-        return extension_field_set
 
     def desc_TC_MOD_2_3(self) -> str:
         """Returns a description of this test"""
@@ -146,11 +117,13 @@ class TC_MOD_2_3(MatterBaseTest):
         result = await self.TH1.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping_structs))])
         asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
 
+        th1 = self.default_controller
+
         self.step("0c")
-        await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
+        await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
 
         self.step("1a")
-        result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(self.kGroup1, "Group1"))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(self.kGroup1, "Group1"))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 1 failed")
 
         self.step("1b")
@@ -166,10 +139,12 @@ class TC_MOD_2_3(MatterBaseTest):
 
     @async_test_body
     async def teardown_test(self):
-        result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RemoveAllScenes(self.kGroup1))
+        th1 = self.default_controller
+
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RemoveAllScenes(self.kGroup1))
         asserts.assert_equal(result.status, Status.Success, "Remove All Scenes failed on status")
         asserts.assert_equal(result.groupID, self.kGroup1, "Remove All Scenes failed on groupID")
-        await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
+        await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
         super().teardown_test()
 
     @async_test_body
@@ -181,21 +156,20 @@ class TC_MOD_2_3(MatterBaseTest):
         mode_select_m1_mode = None  # Mode to be used in step 5a
 
         self.step("2")
-        if self.pics_guard(self.check_pics("MOD.S.F00")):
-            mode_select_supported_modes = await self.read_single_attribute_check_success(cluster, attributes.SupportedModes)
-            if len(mode_select_supported_modes) < 1:
-                # Supported modes has less than 1 mode, skipping tests 3 to 7"
-                return
+        mode_select_supported_modes = await self.read_single_attribute_check_success(cluster, attributes.SupportedModes)
+        if len(mode_select_supported_modes) < 1:
+            # Supported modes has less than 1 mode, skipping tests 3 to 7"
+            return
 
         self.step("3")
-        if self.pics_guard(self.check_pics("MOD.S.F00")):
-            mode_select_current_mode = await self.read_single_attribute_check_success(cluster, attributes.CurrentMode)
+        mode_select_current_mode = await self.read_single_attribute_check_success(cluster, attributes.CurrentMode)
 
-            mode_select_m1_mode = mode_select_current_mode
-            for supported_mode in mode_select_supported_modes:
-                if supported_mode.mode != mode_select_current_mode:
-                    mode_select_m1_mode = supported_mode.mode
-                    break
+        mode_select_m1_mode = mode_select_current_mode
+        for supported_mode in mode_select_supported_modes:
+            if supported_mode.mode != mode_select_current_mode:
+                mode_select_m1_mode = supported_mode.mode
+                break
+        mode_select_m1_mode = 7
 
         self.step("4a")
         result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.StoreScene(self.kGroup1, 0x01))
@@ -210,37 +184,40 @@ class TC_MOD_2_3(MatterBaseTest):
         asserts.assert_equal(result.sceneID, 0x01, "View Scene failed on sceneID")
         asserts.assert_equal(result.transitionTime, 0, "View Scene failed on transitionTime")
 
+        found_var = False
         for EFS in result.extensionFieldSetStructs:
             if EFS.clusterID != Clusters.Objects.ModeSelect.id:
                 continue
 
             for AV in EFS.attributeValueList:
-                if AV.attributeID == 0x0003 and self.pics_guard(self.check_pics("MOD.S.F00")):  # CurrentMode attribute
+                if AV.attributeID == current_mode_attribute_id:
                     asserts.assert_equal(AV.valueUnsigned8, mode_select_current_mode, "View Scene failed on CurrentMode")
+                    found_var = True
+        asserts.assert_true(found_var, "View Scene failed to find CurrentMode attribute in ExtensionFieldSets")
 
         self.step("5a")
-        if self.pics_guard(self.check_pics("MOD.S.F00")):
-            result = await self.TH1.SendCommand(
-                self.dut_node_id, self.matter_test_config.endpoint,
-                Clusters.ScenesManagement.Commands.AddScene(
-                    self.kGroup1,
-                    0x02,
-                    0,
-                    "ModeSelect Scene",
-                    [
-                        self._prepare_modeselect_extension_field_set(
-                            [
-                                Clusters.ScenesManagement.Structs.AttributeValuePairStruct(
-                                    attributeID=0x0003, valueUnsigned8=mode_select_m1_mode)
-                            ]
-                        )
-                    ]
+        result = await self.TH1.SendCommand(
+            self.dut_node_id, self.matter_test_config.endpoint,
+            Clusters.ScenesManagement.Commands.AddScene(
+                self.kGroup1,
+                0x02,
+                0,
+                "ModeSelect Scene",
+                [
+                    Clusters.ScenesManagement.Structs.ExtensionFieldSetStruct(
+                        clusterID=Clusters.Objects.ModeSelect.id,
+                        attributeValueList=[
+                            Clusters.ScenesManagement.Structs.AttributeValuePairStruct(
+                                attributeID=current_mode_attribute_id, valueUnsigned8=mode_select_m1_mode)
+                        ]
+                    )
+                ]
 
-                )
             )
-            asserts.assert_equal(result.status, Status.Success, "Add Scene failed on status")
-            asserts.assert_equal(result.groupID, self.kGroup1, "Add Scene failed on groupID")
-            asserts.assert_equal(result.sceneID, 0x02, "Add Scene failed on sceneID")
+        )
+        asserts.assert_equal(result.status, Status.Success, "Add Scene failed on status")
+        asserts.assert_equal(result.groupID, self.kGroup1, "Add Scene failed on groupID")
+        asserts.assert_equal(result.sceneID, 0x02, "Add Scene failed on sceneID")
 
         self.step("5b")
         result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.ViewScene(self.kGroup1, 0x02))
@@ -249,36 +226,36 @@ class TC_MOD_2_3(MatterBaseTest):
         asserts.assert_equal(result.sceneID, 0x02, "View Scene failed on sceneID")
         asserts.assert_equal(result.transitionTime, 0, "View Scene failed on transitionTime")
 
+        found_var = False
+
         for EFS in result.extensionFieldSetStructs:
             if EFS.clusterID != Clusters.Objects.ModeSelect.id:
                 continue
 
             for AV in EFS.attributeValueList:
-                if AV.attributeID == 0x0003 and self.pics_guard(self.check_pics("MOD.S.F00")):  # CurrentMode attribute
+                if AV.attributeID == current_mode_attribute_id:
                     asserts.assert_equal(AV.valueUnsigned8, mode_select_m1_mode,
                                          "View Scene failed on CurrentMode value")
+                    found_var = True
+        asserts.assert_true(found_var, "View Scene failed to find CurrentMode attribute in ExtensionFieldSets")
 
         self.step("6a")
-        if self.pics_guard(self.check_pics("MOD.S.F00")):
-            await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x02))
+        await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x02, 0))
 
         self.step("6b")
-        if self.pics_guard(self.check_pics("MOD.S.F00")):
-            await asyncio.sleep(2)  # Wait a few seconds as per test spec
-            current_mode_after_recall = await self.read_single_attribute_check_success(cluster, attributes.CurrentMode)
-            asserts.assert_equal(current_mode_after_recall, mode_select_m1_mode,
-                                 "CurrentMode is not equal to expected value after Recall Scene")
+        await asyncio.sleep(2)  # Wait a few seconds as per test spec
+        current_mode_after_recall = await self.read_single_attribute_check_success(cluster, attributes.CurrentMode)
+        asserts.assert_equal(current_mode_after_recall, mode_select_m1_mode,
+                             "CurrentMode is not equal to expected value after Recall Scene")
 
         self.step("7a")
-        if self.pics_guard(self.check_pics("MOD.S.F00")):
-            result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x01))
+        result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x01))
 
         self.step("7b")
-        if self.pics_guard(self.check_pics("MOD.S.F00")):
-            await asyncio.sleep(2)  # Wait a few seconds as per test spec
-            current_mode_after_recall = await self.read_single_attribute_check_success(cluster, attributes.CurrentMode)
-            asserts.assert_equal(current_mode_after_recall, mode_select_current_mode,
-                                 "CurrentMode is not equal to expected value after Recall Scene")
+        await asyncio.sleep(2)  # Wait a few seconds as per test spec
+        current_mode_after_recall = await self.read_single_attribute_check_success(cluster, attributes.CurrentMode)
+        asserts.assert_equal(current_mode_after_recall, mode_select_current_mode,
+                             "CurrentMode is not equal to expected value after Recall Scene")
 
 
 if __name__ == "__main__":
