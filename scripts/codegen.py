@@ -27,9 +27,12 @@ import logging
 import os.path
 import subprocess
 import sys
+import tempfile
 import traceback
+import urllib.request
 
 import click
+from pathlib import Path
 from tools.zap.clang_format import getClangFormatBinary
 
 try:
@@ -105,6 +108,28 @@ __LOG_LEVELS__ = {
     'idl_path',
     type=click.Path(exists=True))
 def main(log_level, generator, option, output_dir, dry_run, name_only, expected_outputs, idl_path):
+
+    def formatKotlinFiles(paths):
+        try:
+            logging.info("Prettifying %d kotlin files:", len(paths))
+            for name in paths:
+                logging.info("    %s" % name)
+
+            VERSION = "0.58"
+            JAR_NAME = f"ktfmt-{VERSION}-with-dependencies.jar"
+            jar_url = f"https://repo1.maven.org/maven2/com/facebook/ktfmt/{VERSION}/{JAR_NAME}"
+
+            # ensure we have some headers otherwise maven seems to 403 us
+            opener = urllib.request.build_opener()
+            opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+            urllib.request.install_opener(opener)
+
+            with tempfile.TemporaryDirectory(prefix='ktfmt') as tmpdir:
+                path, _ = urllib.request.urlretrieve(jar_url, Path(tmpdir).joinpath(JAR_NAME).as_posix())
+                subprocess.check_call(['java', '-jar', path, '--google-style'] + paths)
+        except Exception:
+            traceback.print_exc()
+            raise
     """
     Parses MATTER IDL files (.matter) and performs SDK code generation
     as set up by the program arguments.
@@ -152,6 +177,31 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
     generator = CodeGenerator.FromString(generator).Create(storage, idl=idl_tree, plugin_module=plugin_module, **extra_args)
     generator.render(dry_run)
 
+    outputs = [os.path.join(output_dir, name) for name in storage.generated_paths if name]
+
+    # Split output files by extension,
+    name_dict = {}
+    for name in outputs:
+        _, extension = os.path.splitext(name)
+        name_dict[extension] = name_dict.get(extension, []) + [name]
+
+    if name_dict.get('.kt', []):
+        try:
+            logging.debug("Formatting kt_files: %s" % name_dict['.kt'])
+        except Exception:
+            traceback.print_exc()
+        formatKotlinFiles(name_dict['.kt'])
+
+    cpp_files = []
+    for ext in [".h", ".cpp", ".c", ".hpp"]:
+        cpp_files.extend(name_dict.get(ext, []))
+    if cpp_files:
+        try:
+            logging.debug("Formatting cpp_files: %s", cpp_files)
+            subprocess.check_call([getClangFormatBinary(), "-i"] + cpp_files)
+        except Exception:
+            traceback.print_exc()
+
     if expected_outputs:
         with open(expected_outputs, 'rt') as fin:
             expected = set()
@@ -173,19 +223,6 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
                     logging.fatal("   '%s' was expected but not generated" % name)
 
                 sys.exit(1)
-
-    cpp_files = [
-        path
-        for path in storage.generated_paths
-        if os.path.splitext(path)[1] in {'.h', '.cpp', '.c', '.hpp'}
-    ]
-    if cpp_files:
-        try:
-            logging.debug("Formatting files: %s", cpp_files)
-
-            subprocess.check_call([getClangFormatBinary(), "-i"] + cpp_files)
-        except Exception:
-            traceback.print_exc()
 
     logging.info("Done")
 
