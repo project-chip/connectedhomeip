@@ -48,7 +48,6 @@ public:
     virtual void UnRegister(CodeDrivenDataModelProvider & provider) = 0;
 
     // Endpoint interface implementation
-    CHIP_ERROR SemanticTags(ReadOnlyBufferBuilder<SemanticTag> & out) const override;
     CHIP_ERROR DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const override;
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 

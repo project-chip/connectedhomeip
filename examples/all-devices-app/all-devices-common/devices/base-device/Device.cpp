@@ -48,12 +48,6 @@ CHIP_ERROR BaseDevice::DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEn
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BaseDevice::SemanticTags(ReadOnlyBufferBuilder<SemanticTag> & out) const
-{
-    // no semantic tags
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR BaseDevice::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const
 {
     // no bindings
