@@ -151,7 +151,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         runtime = TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON
 
     if chip_tool is not None:
-        chip_tool = Application(kind='tool', path=Path(chip_tool))
+        chip_tool = Application(kind='tool', path=Path(chip_tool)).wrap_with(('python3',))
     else:
         if not runtime == TestRunTime.MATTER_REPL_PYTHON:
             paths_finder = PathsFinder()
