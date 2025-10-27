@@ -18,7 +18,6 @@
 
 #include "pushav-clip-recorder.h"
 #include <cstring>
-#include <dirent.h>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -26,7 +25,6 @@
 #include <platform/PlatformManager.h>
 #include <push-av-stream-manager.h>
 #include <regex>
-#include <sstream>
 #include <sys/stat.h>
 
 constexpr int kSegmentIdOffset       = 1000;
@@ -107,42 +105,6 @@ PushAVClipRecorder::~PushAVClipRecorder()
     }
 }
 
-void PushAVClipRecorder::RemovePreviousRecordingFiles(const fs::path & path)
-{
-    // Check if the directory exists
-    if (!fs::exists(path) || !fs::is_directory(path))
-    {
-        ChipLogDetail(Camera, "Failed to open directory for cleaning: %s", path.c_str());
-        return;
-    }
-
-    // Iterate over all files in the directory
-    for (const auto & entry : fs::directory_iterator(path))
-    {
-        // Skip current and parent directory entries
-        if (entry.path().filename() == "." || entry.path().filename() == "..")
-        {
-            continue;
-        }
-
-        // Check if the file has one of the recording-related extensions
-        const fs::path & filename = entry.path().filename();
-        const fs::path & ext      = filename.extension();
-        if (ext == ".mpd" || ext == ".m4s" || ext == ".init")
-        {
-            // Attempt to remove the file
-            if (fs::remove(entry.path()))
-            {
-                ChipLogDetail(Camera, "Removed previous recording file: %s", entry.path().c_str());
-            }
-            else
-            {
-                ChipLogError(Camera, "Failed to remove previous recording file: %s", entry.path().c_str());
-            }
-        }
-    }
-}
-
 bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
 {
     // Base output path
@@ -183,15 +145,20 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
         return true;
     };
 
-    // Ensure base, session, and track directories exist
-    if (!ensure(basePath) || !ensure(sessionDir) || !ensure(trackDir))
+    // Ensure base directory exists
+    if (!ensure(basePath))
     {
         return false;
     }
 
-    // Clean up any previous recording files
-    RemovePreviousRecordingFiles(sessionDir);
-    RemovePreviousRecordingFiles(trackDir);
+    // Clean up previous session directory if it exists
+    fs::remove_all(sessionDir);
+
+    // Create session and track directories
+    if (!ensure(sessionDir) || !ensure(trackDir))
+    {
+        return false;
+    }
 
     return true;
 }

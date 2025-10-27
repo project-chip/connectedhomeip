@@ -234,12 +234,6 @@ private:
      */
     bool EnsureDirectoryExists(const std::string & path);
 
-    /**
-     * @brief Removes files from previous recordings in the specified directory.
-     * @param path The directory path to clean.
-     */
-    void RemovePreviousRecordingFiles(const fs::path & path);
-
     bool CheckAndUploadFile(std::string path);
 
     bool IsH264IFrame(const uint8_t * data, unsigned int length);
