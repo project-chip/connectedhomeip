@@ -342,11 +342,14 @@ const T * GetListEntryById(const DataModel::List<const T> & aList, uint32_t aId)
     return nullptr;
 }
 
-DayPatternDayOfWeekBitmap GetDayOfWeek(uint32_t timestamp)
+DayPatternDayOfWeekBitmap GetDayOfWeek(uint32_t matterTimestamp_s)
 {
-    time_t time = static_cast<time_t>(timestamp);
+    // Convert Matter time to Unix epoch
+    time_t unixTime = static_cast<time_t>(matterTimestamp_s + kChipEpochSecondsSinceUnixEpoch);
+    
     struct tm utcTimeStruct;
-    struct tm * utcTime = gmtime_r(&time, &utcTimeStruct);
+    struct tm * utcTime = gmtime_r(&unixTime, &utcTimeStruct);
+    
     return static_cast<DayPatternDayOfWeekBitmap>(1 << utcTime->tm_wday);
 }
 
@@ -617,16 +620,13 @@ void Instance::TariffTimeAttrsSync()
 CHIP_ERROR Instance::UpdateCurrentAttrs()
 {
     uint32_t matterEpochNow_s;
-    uint32_t unixEpochNow_s = kChipEpochSecondsSinceUnixEpoch;
-    CHIP_ERROR err          = System::Clock::GetClock_MatterEpochS(matterEpochNow_s);
+    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(matterEpochNow_s);
 
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(AppServer, "Unable to get valid time value");
         return CHIP_ERROR_INVALID_TIME;
     }
-
-    unixEpochNow_s += matterEpochNow_s;
 
     if (mServerTariffAttrsCtx.mTariffProvider == nullptr)
     {
@@ -635,10 +635,10 @@ CHIP_ERROR Instance::UpdateCurrentAttrs()
     }
 
     // Update day information
-    ReturnErrorOnFailure(UpdateDayInformation(unixEpochNow_s));
+    ReturnErrorOnFailure(UpdateDayInformation(matterEpochNow_s));
 
     // Update day entry information
-    ReturnErrorOnFailure(UpdateDayEntryInformation(unixEpochNow_s));
+    ReturnErrorOnFailure(UpdateDayEntryInformation(matterEpochNow_s));
 
     return CHIP_NO_ERROR;
 }
