@@ -190,7 +190,8 @@ public class ChipDeviceController {
       long setupPincode,
       @Nullable byte[] csrNonce,
       NetworkCredentials networkCredentials) {
-    pairDeviceThroughBLE(bleServer, connId, deviceId, setupPincode, csrNonce, networkCredentials, null);
+    pairDeviceThroughBLE(
+        bleServer, connId, deviceId, setupPincode, csrNonce, networkCredentials, null);
   }
 
   /**
@@ -207,7 +208,8 @@ public class ChipDeviceController {
    *     {@link ICDRegistrationInfo}. If this value is null when commissioning an ICD device, {@link
    *     CompletionListener.onICDRegistrationInfoRequired} is called to request the
    *     ICDRegistrationInfo value. This method was deprecated. Please use {@link
-   *     ChipDeviceController.pairDeviceThroughBLE(BluetoothGatt, int, long, long, CommissionParameters)}.
+   *     ChipDeviceController.pairDeviceThroughBLE(BluetoothGatt, int, long, long,
+   *     CommissionParameters)}.
    */
   @Deprecated
   public void pairDevice(
