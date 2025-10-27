@@ -35,6 +35,9 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     ReturnErrorOnFailure(BaseRegistration(endpointId, provider, parentId));
 
     mBasicInformationCluster.Create();
+
+    //TODO: This needs to be refactored so the optional attributes being set for 
+    // the cluster are configurable to allow different settings 
     mBasicInformationCluster.Cluster()
         .OptionalAttributes()
         .Set<BasicInformation::Attributes::ManufacturingDate::Id>()
