@@ -38,12 +38,14 @@ matter_log_json_payload_decode_full = true
 # # chip_enable_boolean_state_configuration_trigger = true
 # # chip_enable_software_diagnostics_trigger = true
 # # chip_enable_wifi_diagnostics_trigger = true
+
 # # energy gateway settings
 # # chip_enable_commodity_price_trigger = true
 # # chip_enable_commodity_tariff_trigger = true
 # # chip_enable_electrical_grid_conditions_trigger = true
 # # chip_enable_meter_identification_trigger = true
 # # chip_enable_commodity_metering_trigger = true
+
 # # energy management settings
 # # chip_enable_energy_evse_trigger = true
 # # chip_enable_energy_reporting_trigger = true
