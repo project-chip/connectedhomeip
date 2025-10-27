@@ -586,7 +586,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         steps = [TestStep("precondition", "DUT is commissioned", is_commissioning=True),
                  TestStep(1, "TH_commissioner performs a wildcard read (done during test setup)"),
                  TestStep(2, "TH_commissioner reads the ACL attribute (done during test setup)"),
-                 TestStep(3, "Repeat steps 5a and 5b for each permission level")]
+                 TestStep(3, "Repeat steps 3a and 3b for each permission level")]
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
         privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
         for p in privilege_enum:
