@@ -50,7 +50,7 @@ class TC_BOOL_2_2(MatterBaseTest):
         logger.info(f" --- Setting DUT StateValue to {'TRUE' if state else 'FALSE'}")
         if self.is_pics_sdk_ci_only:
             command_dict = {"Name": "SetBooleanState", "EndpointId": endpoint, "NewState": state}
-            self.write_to_app_pipe(command_dict, "/tmp/boolean_state_2_2_fifo")
+            self.write_to_app_pipe(command_dict)
         else:
             self.wait_for_user_input(
                 prompt_msg=f"Bring the DUT into a state so StateValue is {'TRUE' if state else 'FALSE'}.")
