@@ -17,11 +17,11 @@
  */
 #pragma once
 
+#include "electrical-energy-measurement-server.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <lib/core/Optional.h>
-#include "electrical-energy-measurement-server.h"
 
 namespace chip {
 namespace app {
