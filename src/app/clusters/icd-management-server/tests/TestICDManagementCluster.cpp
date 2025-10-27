@@ -63,8 +63,15 @@ TEST_F(TestIcdManagementCluster, TestAttributes)
         BitMask<IcdManagement::OptionalCommands>(IcdManagement::OptionalCommands::kStayActive);
     BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint(0);
 
-    ICDManagementCluster cluster(kRootEndpointId, storage, keystore, fabricTable, icdConfig, OptionalAttributeSet(),
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    ICDManagementClusterWithCIP cluster(kRootEndpointId, storage, keystore, fabricTable, icdConfig,
+                                        OptionalAttributeSet(IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id),
+                                        optionalCommands, userActiveModeTriggerHint, CharSpan());
+#else
+    ICDManagementCluster cluster(kRootEndpointId, storage, keystore, fabricTable, icdConfig,
+                                 OptionalAttributeSet(IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id),
                                  optionalCommands, userActiveModeTriggerHint, CharSpan());
+#endif
 
     // Test attribute list
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
