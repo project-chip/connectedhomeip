@@ -13,7 +13,7 @@ namespace ContentControl {
 namespace Commands {
 
 // Total number of client to server commands supported by the cluster
-inline constexpr uint32_t kAcceptedCommandsCount = 10;
+inline constexpr uint32_t kAcceptedCommandsCount = 16;
 
 // Total number of server to client commands supported by the cluster (response commands)
 inline constexpr uint32_t kGeneratedCommandsCount = 1;
@@ -57,6 +57,30 @@ inline constexpr CommandId Id = 0x00000009;
 namespace SetScheduledContentRatingThreshold {
 inline constexpr CommandId Id = 0x0000000A;
 } // namespace SetScheduledContentRatingThreshold
+
+namespace AddBlockChannels {
+inline constexpr CommandId Id = 0x0000000B;
+} // namespace AddBlockChannels
+
+namespace RemoveBlockChannels {
+inline constexpr CommandId Id = 0x0000000C;
+} // namespace RemoveBlockChannels
+
+namespace AddBlockApplications {
+inline constexpr CommandId Id = 0x0000000D;
+} // namespace AddBlockApplications
+
+namespace RemoveBlockApplications {
+inline constexpr CommandId Id = 0x0000000E;
+} // namespace RemoveBlockApplications
+
+namespace SetBlockContentTimeWindow {
+inline constexpr CommandId Id = 0x0000000F;
+} // namespace SetBlockContentTimeWindow
+
+namespace RemoveBlockContentTimeWindow {
+inline constexpr CommandId Id = 0x00000010;
+} // namespace RemoveBlockContentTimeWindow
 
 namespace ResetPINResponse {
 inline constexpr CommandId Id = 0x00000002;
