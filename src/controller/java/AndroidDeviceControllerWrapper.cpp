@@ -820,7 +820,7 @@ void AndroidDeviceControllerWrapper::OnCommissioningStatusUpdate(PeerId peerId, 
                         jStageCompleted.jniValue(), static_cast<jlong>(error.AsInteger()));
 }
 
-void AndroidDeviceControllerWrapper::OnCommissioningStageStart(PeerId peerId, chip::Controller::CommissioningStage stageCompleted)
+void AndroidDeviceControllerWrapper::OnCommissioningStageStart(PeerId peerId, chip::Controller::CommissioningStage stage)
 {
     chip::DeviceLayer::StackUnlock unlock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -831,9 +831,9 @@ void AndroidDeviceControllerWrapper::OnCommissioningStageStart(PeerId peerId, ch
                                                              "(JLjava/lang/String;)V", &onCommissioningStageStartMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    UtfString jStageCompleted(env, StageToString(stageCompleted));
+    UtfString jStage(env, StageToString(stage));
     env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onCommissioningStageStartMethod, static_cast<jlong>(peerId.GetNodeId()),
-                        jStageCompleted.jniValue());
+                        jStage.jniValue());
 }
 
 void AndroidDeviceControllerWrapper::OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info)
