@@ -34,10 +34,11 @@
 
 import logging
 
+from mobly import asserts
+
 import matter.clusters as Clusters
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_attribute, run_if_endpoint_matches
-from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
@@ -47,8 +48,7 @@ class TC_BOOL_2_2(MatterBaseTest):
     async def set_dut_state_value(self, endpoint: int, state: bool):
         """Set the DUT's BooleanState value via named pipe command."""
         logger.info(f" --- Setting DUT StateValue to {'TRUE' if state else 'FALSE'}")
-        # if self.is_pics_sdk_ci_only:
-        if True:
+        if self.is_pics_sdk_ci_only:
             command_dict = {"Name": "SetBooleanState", "EndpointId": endpoint, "NewState": state}
             self.write_to_app_pipe(command_dict, "/tmp/boolean_state_2_2_fifo")
         else:
