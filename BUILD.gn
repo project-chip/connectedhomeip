@@ -945,8 +945,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   #   extra_build_deps += [ ":linux_camera_controller_app" ]
   # }
 
-  }
-
   group("default") {
     deps = extra_build_deps + builds
   }
