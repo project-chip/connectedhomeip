@@ -39,6 +39,7 @@ import random
 from dataclasses import dataclass
 
 from mobly import asserts
+from support_modules.idm_support import IDMBaseTest, client_cmd, get_all_cmds_for_cluster_id
 
 import matter.clusters as Clusters
 import matter.discovery as Discovery
@@ -46,7 +47,6 @@ from matter import ChipUtility
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import async_test_body, default_matter_test_main, matchers
-from support_modules.idm_support import IDMBaseTest, get_all_cmds_for_cluster_id, client_cmd
 
 # one of the steps in this test requires sending a command that requires a timed interaction
 # without first sending the TimedRequest action

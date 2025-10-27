@@ -35,7 +35,6 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
 from matter.testing.matter_testing import MatterBaseTest
 
-
 # ============================================================================
 # Module-Level Utility Functions
 # ============================================================================

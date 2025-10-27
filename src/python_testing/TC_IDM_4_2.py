@@ -38,6 +38,7 @@ import logging
 import time
 
 from mobly import asserts
+from support_modules.idm_support import IDMBaseTest
 
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
@@ -47,7 +48,6 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import Status
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
-from support_modules.idm_support import IDMBaseTest
 
 '''
 Category:
