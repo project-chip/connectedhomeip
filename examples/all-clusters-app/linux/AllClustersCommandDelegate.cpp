@@ -597,8 +597,26 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "SetBooleanState")
     {
-        bool newState         = static_cast<bool>(self->mJsonValue["NewState"].asUInt());
-        EndpointId endpointId = static_cast<EndpointId>(self->mJsonValue["EndpointId"].asUInt());
+        bool hasEndpointId = HasNumericField(self->mJsonValue, "EndpointId");
+        bool hasNewState   = self->mJsonValue.isMember("NewState");
+
+        if (!hasEndpointId || !hasNewState)
+        {
+            std::string inputJson = self->mJsonValue.toStyledString();
+            ChipLogError(NotSpecified, "Missing or invalid value for one of EndpointId, NewState in %s", inputJson.c_str());
+            return;
+        }
+
+        if (!self->mJsonValue["EndpointId"].isUInt() || !self->mJsonValue["NewState"].isBool())
+        {
+            std::string inputJson = self->mJsonValue.toStyledString();
+            ChipLogError(NotSpecified, "Invalid type for one of EndpointId, NewState in %s", inputJson.c_str());
+            return;
+        }
+
+        auto endpointId = static_cast<chip::EndpointId>(self->mJsonValue["EndpointId"].asUInt());
+        auto newState   = self->mJsonValue["NewState"].asBool();
+
         self->OnBooleanStateChangeHandler(endpointId, newState);
     }
     else
@@ -1044,7 +1062,7 @@ void AllClustersAppCommandHandler::OccupancyPresentTimerHandler(System::Layer * 
 
 void AllClustersAppCommandHandler::OnBooleanStateChangeHandler(chip::EndpointId endpointId, bool newState)
 {
-    auto booleanState = BooleanState::FindClusterOnEndpoint(1);
+    auto booleanState = BooleanState::FindClusterOnEndpoint(endpointId);
     if (booleanState != nullptr)
     {
         booleanState->SetStateValue(newState);
