@@ -21,14 +21,10 @@
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
-#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/ServerClusterInterface.h>
-#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
-#include <data-model-providers/codedriven/endpoint/EndpointInterface.h>
-#include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLVReader.h>
 #include <lib/support/ReadOnlyBuffer.h>
