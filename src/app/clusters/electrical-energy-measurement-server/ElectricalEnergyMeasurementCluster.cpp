@@ -22,8 +22,8 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueEncoder.h>
 
-#include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 
 using chip::Protocols::InteractionModel::Status;
 

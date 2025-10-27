@@ -17,8 +17,8 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <lib/core/Optional.h>
 
