@@ -1070,7 +1070,7 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
         requested = *value;
         if (!AutoSupported)
             return Status::UnsupportedAttribute;
-        if (requested < 0 || requested > 25)
+        if (requested < 0 || requested > 127)
             return Status::InvalidValue;
         return Status::Success;
     }
