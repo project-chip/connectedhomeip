@@ -346,10 +346,10 @@ DayPatternDayOfWeekBitmap GetDayOfWeek(uint32_t matterTimestamp_s)
 {
     // Convert Matter time to Unix epoch
     time_t unixTime = static_cast<time_t>(matterTimestamp_s + kChipEpochSecondsSinceUnixEpoch);
-    
+
     struct tm utcTimeStruct;
     struct tm * utcTime = gmtime_r(&unixTime, &utcTimeStruct);
-    
+
     return static_cast<DayPatternDayOfWeekBitmap>(1 << utcTime->tm_wday);
 }
 
