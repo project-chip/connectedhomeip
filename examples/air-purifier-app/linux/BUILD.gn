@@ -48,11 +48,11 @@ executable("chip-air-purifier-app") {
   if (chip_examples_enable_imgui_ui) {
     deps += [
       "${chip_root}/examples/common/imgui_ui",
-      "${chip_root}/examples/common/imgui_ui/windows:fan_control",
-      "${chip_root}/examples/common/imgui_ui/windows:temperature_measurement",
-      "${chip_root}/examples/common/imgui_ui/windows:humidity_measurement",
       "${chip_root}/examples/common/imgui_ui/windows:connectivity",
+      "${chip_root}/examples/common/imgui_ui/windows:fan_control",
+      "${chip_root}/examples/common/imgui_ui/windows:humidity_measurement",
       "${chip_root}/examples/common/imgui_ui/windows:qrcode",
+      "${chip_root}/examples/common/imgui_ui/windows:temperature_measurement",
     ]
   }
 
