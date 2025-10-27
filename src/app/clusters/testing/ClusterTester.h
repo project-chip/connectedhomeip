@@ -40,7 +40,8 @@ namespace chip {
 namespace Test {
 
 // This will be used for testing commands
-struct CommandResponse {
+struct CommandResponse
+{
     app::ConcreteCommandPath path;
     CommandId responseId;
     template <typename T>
@@ -54,8 +55,8 @@ private:
 // Helper class for testing clusters.
 //
 // This class ensures that data read by attribute is referencing valid memory for all
-// read requests until the ClusterTester object goes out of scope. (for the case where the underlying read references a list or string that
-// points to TLV data).
+// read requests until the ClusterTester object goes out of scope. (for the case where the underlying read references a list or
+// string that points to TLV data).
 //
 // Read/Write of all attribute types should work, but make sure to use ::Type for encoding
 // and ::DecodableType for decoding structure types.
@@ -78,12 +79,11 @@ private:
 //     ASSERT_GT(it.GetValue().label.size(), 0u);
 // }
 //
-class ClusterTester {
+class ClusterTester
+{
 public:
     // Sets the cluster to be used for Read/Write/Invoke operations.
-    ClusterTester(app::ServerClusterInterface & cluster) :
-        mCluster(&cluster)
-    {}
+    ClusterTester(app::ServerClusterInterface & cluster) : mCluster(&cluster) {}
 
     // Sets the cluster to be used for Read/Write/Invoke operations.
     void SetCluster(app::ServerClusterInterface & cluster) { mCluster = &cluster; }
@@ -92,8 +92,9 @@ public:
 
     // Read attribute into `out` parameter.
     // The `out` parameter must be of the correct type for the attribute being read.
-    // Use `app::Clusters::<ClusterName>::Attributes::<AttributeName>::TypeInfo::DecodableType` for the `out` parameter to be spec compliant (see the comment of the class for usage example).
-    // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
+    // Use `app::Clusters::<ClusterName>::Attributes::<AttributeName>::TypeInfo::DecodableType` for the `out` parameter to be spec
+    // compliant (see the comment of the class for usage example). Will construct the attribute path using the first path returned
+    // by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` returned an empty list.
     template <typename T>
     app::DataModel::ActionReturnStatus ReadAttribute(AttributeId attr_id, T & out)
@@ -104,13 +105,14 @@ public:
         // Store the read operation in a vector<std::unique_ptr<...>> to ensure its lifetime
         // using std::unique_ptr because ReadOperation is non-copyable and non-movable
         // vector reallocation is not an issue since we store unique_ptrs
-        std::unique_ptr<app::Testing::ReadOperation> readOperation = std::make_unique<app::Testing::ReadOperation>(path.mEndpointId, path.mClusterId, attr_id);
+        std::unique_ptr<app::Testing::ReadOperation> readOperation =
+            std::make_unique<app::Testing::ReadOperation>(path.mEndpointId, path.mClusterId, attr_id);
 
         mReadOperations.push_back(std::move(readOperation));
-        app::Testing::ReadOperation& readOpeationRef = *mReadOperations.back().get();
+        app::Testing::ReadOperation & readOpeationRef = *mReadOperations.back().get();
 
         std::unique_ptr<app::AttributeValueEncoder> encoder = readOpeationRef.StartEncoding();
-        app::DataModel::ActionReturnStatus status = mCluster->ReadAttribute(readOpeationRef.GetRequest(), *encoder);
+        app::DataModel::ActionReturnStatus status           = mCluster->ReadAttribute(readOpeationRef.GetRequest(), *encoder);
         VerifyOrReturnError(status.IsSuccess(), status);
         ReturnErrorOnFailure(readOpeationRef.FinishEncoding());
 
@@ -123,8 +125,9 @@ public:
 
     // Write attribute from `value` parameter.
     // The `value` parameter must be of the correct type for the attribute being written.
-    // Use `app::Clusters::<ClusterName>::Attributes::<AttributeName>::TypeInfo::Type` for the `value` parameter to be spec compliant (see the comment of the class for usage example).
-    // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
+    // Use `app::Clusters::<ClusterName>::Attributes::<AttributeName>::TypeInfo::Type` for the `value` parameter to be spec
+    // compliant (see the comment of the class for usage example). Will construct the attribute path using the first path returned
+    // by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` returned an empty list.
     template <typename T>
     app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr_id, T & value)
@@ -140,11 +143,13 @@ public:
 
     // Invoke a command with `arguments`.
     // The `arguments` parameter must be of the correct type for the command being invoked.
-    // Use `app::Clusters::<ClusterName>::Commands::<CommandName>::Type` for the `arguments` parameter to be spec compliant (see the comment of the class for usage example).
-    // Will construct the command path using the first path returned by `GetPaths()` on the cluster.
+    // Use `app::Clusters::<ClusterName>::Commands::<CommandName>::Type` for the `arguments` parameter to be spec compliant (see the
+    // comment of the class for usage example). Will construct the command path using the first path returned by `GetPaths()` on the
+    // cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` returned an empty list.
     template <typename T>
-    std::optional<std::variant<app::DataModel::ActionReturnStatus, CommandResponse>> InvokeCommand(CommandId command_id, const T & arguments)
+    std::optional<std::variant<app::DataModel::ActionReturnStatus, CommandResponse>> InvokeCommand(CommandId command_id,
+                                                                                                   const T & arguments)
     {
         VerifyOrReturnError(verifyClusterPathsValid(), CHIP_ERROR_INCORRECT_STATE);
         const auto & path = mCluster->GetPaths()[0];
@@ -158,10 +163,12 @@ public:
     // @returns `false` if `GetPaths()` returned an empty list.
     bool TestAttributesList(Span<app::DataModel::AttributeEntry> expected)
     {
-        if(!verifyClusterPathsValid()) return false;
+        if (!verifyClusterPathsValid())
+            return false;
         const auto & path = mCluster->GetPaths()[0];
         ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> attributesBuilder;
-        if (mCluster->Attributes(path, attributesBuilder) != CHIP_NO_ERROR) return false;
+        if (mCluster->Attributes(path, attributesBuilder) != CHIP_NO_ERROR)
+            return false;
         return Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expected);
     }
 
@@ -170,10 +177,12 @@ public:
     // @returns `false` if `GetPaths()` returned an empty list.
     bool TestAcceptedCommandsList(Span<app::DataModel::AcceptedCommandEntry> expected)
     {
-        if(!verifyClusterPathsValid()) return false;
+        if (!verifyClusterPathsValid())
+            return false;
         const auto & path = mCluster->GetPaths()[0];
         ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> commandsBuilder;
-        if (mCluster->AcceptedCommands(path, commandsBuilder) != CHIP_NO_ERROR) return false;
+        if (mCluster->AcceptedCommands(path, commandsBuilder) != CHIP_NO_ERROR)
+            return false;
         return Testing::EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expected);
     }
 
@@ -182,15 +191,16 @@ public:
     // @returns `false` if `GetPaths()` returned an empty list.
     bool TestGeneratedCommandsList(Span<CommandId> expected)
     {
-        if(!verifyClusterPathsValid()) return false;
+        if (!verifyClusterPathsValid())
+            return false;
         const auto & path = mCluster->GetPaths()[0];
         ReadOnlyBufferBuilder<CommandId> commandsBuilder;
-        if (mCluster->GeneratedCommands(path, commandsBuilder) != CHIP_NO_ERROR) return false;
+        if (mCluster->GeneratedCommands(path, commandsBuilder) != CHIP_NO_ERROR)
+            return false;
         return Testing::EqualGeneratedCommandSets(commandsBuilder.TakeBuffer(), expected);
     }
 
 private:
-
     bool verifyClusterPathsValid()
     {
         const auto & paths = mCluster->GetPaths();
@@ -203,7 +213,7 @@ private:
     }
 
     TestServerClusterContext mTestServerClusterContext{};
-    app::ServerClusterInterface * mCluster{nullptr};
+    app::ServerClusterInterface * mCluster{ nullptr };
     std::vector<std::unique_ptr<app::Testing::ReadOperation>> mReadOperations;
 };
 

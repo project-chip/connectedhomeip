@@ -65,7 +65,7 @@ TEST(TestInteractionModelEventEmitting, TestBasicType)
     ASSERT_EQ(decoded_event.softwareVersion, kFakeSoftwareVersion);
 
     std::optional<EventNumber> n2 = events->GenerateEvent(event, /* endpointId = */ 1);
-    eventInfo = logOnlyEvents.GetNextEvent();
+    eventInfo                     = logOnlyEvents.GetNextEvent();
     ASSERT_TRUE(eventInfo.has_value());
     ASSERT_EQ(n2, eventInfo->eventNumber);
 
