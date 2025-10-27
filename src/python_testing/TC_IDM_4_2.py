@@ -41,11 +41,11 @@ from mobly import asserts
 from support_modules.idm_support import IDMBaseTest
 
 import matter.clusters as Clusters
-from matter.testing.matter_asserts import is_valid_uint_value
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.exceptions import ChipStackError
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_asserts import is_valid_uint_value
 from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
 '''
