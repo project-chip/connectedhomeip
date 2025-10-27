@@ -49,7 +49,7 @@ except ImportError:
     try:
         from matter.testing.metadata import extract_runs_args
     except ImportError:
-       extract_runs_args = None # filtering by app (--app-filter) will not work. 
+        extract_runs_args = None  # filtering by app (--app-filter) will not work.
 
 
 def _get_apps_from_script(path: str) -> List[str]:
