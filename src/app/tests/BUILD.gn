@@ -315,6 +315,7 @@ chip_test_suite("tests") {
 
   if (chip_device_platform != "android") {
     test_sources += [
+      "TestCertificateTableImpl.cpp",
       "TestExtensionFieldSets.cpp",
       "TestSceneTable.cpp",
     ]
@@ -322,6 +323,7 @@ chip_test_suite("tests") {
       ":actions-cluster-test-srcs",
       ":power-cluster-test-srcs",
       ":scenes-table-test-srcs",
+      "${chip_root}/src/app/clusters/tls-certificate-management-server:certificate-table",
     ]
   }
 
