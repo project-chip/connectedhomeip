@@ -597,7 +597,7 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "SetBooleanState")
     {
-        bool newState = static_cast<bool>(self->mJsonValue["NewState"].asUInt());
+        bool newState         = static_cast<bool>(self->mJsonValue["NewState"].asUInt());
         EndpointId endpointId = static_cast<EndpointId>(self->mJsonValue["EndpointId"].asUInt());
         self->OnBooleanStateChangeHandler(endpointId, newState);
     }
