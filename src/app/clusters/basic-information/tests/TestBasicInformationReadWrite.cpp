@@ -313,7 +313,7 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
         ASSERT_EQ(tester.ReadAttribute(Attributes::ClusterRevision::Id, clusterRev), CHIP_NO_ERROR);
         char buf[256];
         CharSpan val(buf);
-        CHIP_ERROR err = tester.ReadAttribute(Attributes::UniqueID::Id, val);
+        app::DataModel::ActionReturnStatus err = tester.ReadAttribute(Attributes::UniqueID::Id, val);
 
         if (err != CHIP_NO_ERROR)
         {
@@ -371,7 +371,7 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
         CharSpan invalidLocation        = CharSpan::fromCharString(invalidLocationStr);
 
         // Attempt to write the invalid location and confirm it fails
-        CHIP_ERROR writeErr = tester.WriteAttribute(Attributes::Location::Id, invalidLocation);
+        app::DataModel::ActionReturnStatus writeErr = tester.WriteAttribute(Attributes::Location::Id, invalidLocation);
         EXPECT_NE(writeErr, CHIP_NO_ERROR); // Expect a failure (ConstraintError)
     }
 }
