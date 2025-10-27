@@ -130,5 +130,5 @@ CHIP_ERROR UnitLocalizationClusterWithMigration::Startup(ServerClusterContext & 
 {
     static constexpr AttributeId attributesToUpdate[] = { UnitLocalization::Attributes::TemperatureUnit::Id };
     MigrateFromSafeAttributePersistenceProvider(mPath, Span(attributesToUpdate), context.storage);
-    UnitLocalizationCluster::Startup(context);
+    return UnitLocalizationCluster::Startup(context);
 }
