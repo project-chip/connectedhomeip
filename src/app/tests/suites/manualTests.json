@@ -7,10 +7,6 @@
         "Test_TC_DD_1_9",
         "Test_TC_DD_1_10",
         "Test_TC_DD_1_11",
-        "Test_TC_DD_1_12",
-        "Test_TC_DD_1_13",
-        "Test_TC_DD_1_14",
-        "Test_TC_DD_1_15",
         "Test_TC_DD_2_1",
         "Test_TC_DD_2_2",
         "Test_TC_DD_3_1",
@@ -83,7 +79,6 @@
         "Test_TC_BINFO_3_1",
         "Test_TC_OPCREDS_3_1",
         "Test_TC_OPCREDS_3_3",
-        "Test_TC_OPCREDS_3_4",
         "Test_TC_OPCREDS_3_6",
         "Test_TC_CNET_4_1",
         "Test_TC_CNET_4_2",
@@ -252,7 +247,12 @@
         "Test_TC_TCCM_2_1"
     ],
     "Switch": ["Test_TC_SWTCH_3_2"],
-    "TemperatureControl": [],
+    "TemperatureControl": [
+        "Test_TC_TCTL_2_1",
+        "Test_TC_TCTL_2_2",
+        "Test_TC_TCTL_3_2",
+        "Test_TC_TCTL_3_2"
+    ],
     "TemperatureMeasurement": ["Test_TC_TMP_2_2"],
     "Thermostat": ["Test_TC_TSTAT_3_2"],
     "ThermostatUserConfiguration": [],

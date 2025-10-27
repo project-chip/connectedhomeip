@@ -175,6 +175,16 @@ class TC_AVSM_2_7(MatterBaseTest):
                 "TH sends the VideoStreamAllocate command with the same arguments from step 10 except MaxFrameRate set to a value not in aVideoSensorParams.",
                 "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
             ),
+            TestStep(
+                26,
+                "TH reads MaxConcurrentEncoders attribute from CameraAVStreamManagement Cluster on DUT.",
+                "Store this value in aMaxConcurrentEncoders.",
+            ),
+            TestStep(
+                27,
+                "TH sends (aMaxConcurrentEncoders + 1) number of VideoStreamAllocate commands with different valid arguments for resolution and framerate to make the DUT exhaust its stream allocation.",
+                "DUT eventually responds with a RESOURCE_EXHAUSTED status code.",
+            ),
         ]
 
     @run_if_endpoint_matches(
@@ -603,6 +613,103 @@ class TC_AVSM_2_7(MatterBaseTest):
                 "Unexpected error returned when expecting DYNAMIC_CONSTRAINT_ERROR due to unsupported MaxFrameRate",
             )
             pass
+
+        self.step(26)
+        aMaxConcurrentEncoders = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.MaxConcurrentEncoders
+        )
+        logger.info(f"Rx'd MaxConcurrentEncoders: {aMaxConcurrentEncoders}")
+
+        self.step(27)
+        logger.info(f"De-allocate previously allocated stream in step 10 with ID: {myStreamID}")
+        try:
+            await self.send_single_cmd(endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=(myStreamID)))
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            pass
+
+        # Check if video stream has already been allocated
+        aAllocatedVideoStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
+        )
+        if len(aAllocatedVideoStreams) > 0:
+            asserts.fail("Allocated video streams not cleared")
+        minFrameRateConfig = 30
+        maxFrameRateConfig = 40
+        # Try and allocate up to maxConcurrentEncoders. If all these streams are
+        # successfully allocated, the next one should hit a resource exhausted
+        # error.
+        # Note: One of these allocations may also hit a resource-exhausted error
+        # if an existing candidate stream cannot be re-used because of range
+        # parameters not intersecting.
+        for i in range(aMaxConcurrentEncoders):
+            try:
+                asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
+                asserts.assert_greater(len(aRateDistortionTradeOffPoints), 0, "RateDistortionTradeOffPoints is empty")
+                videoStreamAllocateCmd = commands.VideoStreamAllocate(
+                    streamUsage=aStreamUsagePriorities[0],
+                    videoCodec=aRateDistortionTradeOffPoints[0].codec,
+                    minFrameRate=minFrameRateConfig,
+                    maxFrameRate=maxFrameRateConfig,
+                    minResolution=aMinViewportRes,
+                    maxResolution=cluster.Structs.VideoResolutionStruct(
+                        width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
+                    ),
+                    minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
+                    maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
+                    keyFrameInterval=4000,
+                    watermarkEnabled=watermark,
+                    OSDEnabled=osd,
+                )
+                videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
+                logger.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
+                asserts.assert_is_not_none(
+                    videoStreamAllocateResponse.videoStreamID, "VideoStreamAllocateResponse does not contain StreamID"
+                )
+                myStreamID = videoStreamAllocateResponse.videoStreamID
+            except InteractionModelError as e:
+                asserts.assert_in(e.status, [Status.Success, Status.ResourceExhausted], "Unexpected error returned")
+                pass
+            minFrameRateConfig = maxFrameRateConfig
+            maxFrameRateConfig = maxFrameRateConfig + 20
+
+        # Try again to elicit a ResourceExhausted error.
+        try:
+            videoStreamAllocateCmd = commands.VideoStreamAllocate(
+                streamUsage=aStreamUsagePriorities[0],
+                videoCodec=aRateDistortionTradeOffPoints[0].codec,
+                minFrameRate=minFrameRateConfig,  # An acceptable value for min frame rate
+                maxFrameRate=maxFrameRateConfig,
+                minResolution=aMinViewportRes,
+                maxResolution=cluster.Structs.VideoResolutionStruct(
+                    width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
+                ),
+                minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
+                maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
+                keyFrameInterval=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd,
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
+            asserts.fail("Unexpected success when expecting RESOURCE_EXHAUSTED error due to exceeding MaxEncodedPixelRate")
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status,
+                Status.ResourceExhausted,
+                "Unexpected error returned when expecting RESOURCE_EXHAUSTED error due to exceeding MaxEncodedPixelRate",
+            )
+            pass
+
+        # Clear all allocated streams
+        aAllocatedVideoStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
+        )
+
+        for stream in aAllocatedVideoStreams:
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=(stream.videoStreamID)))
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
 
 if __name__ == "__main__":

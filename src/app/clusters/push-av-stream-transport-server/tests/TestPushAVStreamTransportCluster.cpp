@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/Optional.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -214,7 +215,8 @@ class TestPushAVStreamTransportDelegateImpl : public PushAvStreamTransportDelega
 {
 public:
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
-                                                              const uint16_t connectionID) override
+                                                              const uint16_t connectionID,
+                                                              FabricIndex accessingFabricIndex) override
     {
         PushAvStream stream{ connectionID, transportOptions, TransportStatusEnum::kInactive,
                              PushAvStreamTransportStatusEnum::kIdle };
@@ -282,6 +284,13 @@ public:
         return Status::Success;
     }
 
+    bool ValidateStreamUsage(StreamUsageEnum streamUsage) override { return true; }
+
+    bool ValidateSegmentDuration(uint16_t segmentDuration, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override
+    {
+        return true;
+    }
+
     Protocols::InteractionModel::Status
     ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                            const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override
@@ -290,8 +299,6 @@ public:
         // Returning Status::Success to pass through checks in the Server Implementation.
         return Status::Success;
     }
-
-    bool ValidateUrl(const std::string & url) override { return true; }
 
     Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId) override
     {
@@ -307,18 +314,32 @@ public:
         return Status::Success;
     }
 
-    Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId) override
+    Protocols::InteractionModel::Status SetVideoStream(uint16_t videoStreamId) override
     {
         // TODO: Validate videoStreamID from the allocated videoStreams
         // Returning Status::Success to pass through checks in the Server Implementation.
         return Status::Success;
     }
 
-    Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) override
+    Protocols::InteractionModel::Status SetAudioStream(uint16_t audioStreamId) override
     {
         // TODO: Validate audioStreamID from the allocated audioStreams
         // Returning Status::Success to pass through checks in the Server Implementation.
         return Status::Success;
+    }
+
+    Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) override
+    {
+        // TODO: Validate zoneId from the allocated zones
+        // Returning Status::Success to pass through checks in the Server Implementation.
+        return Status::Success;
+    }
+
+    bool ValidateMotionZoneListSize(size_t zoneListSize) override
+    {
+        // TODO: Validate motion zone size
+        // Returning true to pass through checks in the Server Implementation.
+        return true;
     }
 
     PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) override
@@ -331,6 +352,24 @@ public:
             }
         }
         return PushAvStreamTransportStatusEnum::kUnknown;
+    }
+
+    CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override
+    {
+        isActive = false;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override
+    {
+        isActive = false;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override
+    {
+        isActive = false;
+        return CHIP_NO_ERROR;
     }
 
     void OnAttributeChanged(AttributeId attributeId) override
@@ -352,8 +391,69 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                     Tls::CertificateTable::BufferedRootCert & rootCertEntry) override
+    {
+        // No-op implementation for tests
+    }
+
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) override
+    {
+        // No-op implementation for tests
+    }
+
 private:
     std::vector<Clusters::PushAvStreamTransport::PushAvStream> pushavStreams;
+};
+
+class TestTlsClientManagementDelegate : public TlsClientManagementDelegate
+{
+
+public:
+    CHIP_ERROR Init(PersistentStorageDelegate & storage) override { return CHIP_NO_ERROR; }
+
+    CHIP_ERROR ForEachEndpoint(EndpointId matterEndpoint, FabricIndex fabric, LoadedEndpointCallback callback) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    Protocols::InteractionModel::ClusterStatusCode
+    ProvisionEndpoint(EndpointId matterEndpoint, FabricIndex fabric,
+                      const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & provisionReq,
+                      uint16_t & endpointID) override
+    {
+        return ClusterStatusCode(Status::Success);
+    }
+
+    CHIP_ERROR FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
+                                           LoadedEndpointCallback callback) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                      uint16_t endpointID) override
+    {
+        return Status::Success;
+    }
+
+    CHIP_ERROR RootCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR ClientCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    void RemoveFabric(FabricIndex fabric) override {}
+
+    CHIP_ERROR MutateEndpointReferenceCount(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
+                                            int8_t delta) override
+    {
+        return CHIP_NO_ERROR;
+    }
 };
 
 class TestPushAVStreamTransportServerLogic : public ::testing::Test
@@ -374,7 +474,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
     std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
-    std::string url = "rtsp://192.168.1.100:554/stream";
+    std::string url = "https://192.168.1.100:554/stream/";
     TransportOptionsDecodableStruct transportOptions;
 
     uint8_t tlvBuffer[512];
@@ -413,7 +513,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(1);
     transportOptions.audioStreamID.SetValue(2);
-    transportOptions.endpointID       = 1;
+    transportOptions.TLSEndpointID    = 1;
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
     transportOptions.containerOptions = containerOptions;
@@ -463,6 +563,15 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
 
     // Upadate the trigger options in the transport options
     transportOptions.triggerOptions = triggerOptions;
+    EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions),
+              Status::ConstraintError); // ConstraintError because segmentDuration is not set
+
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    std::string trackName                = "video";
+    cmafContainerOptions.trackName       = Span(trackName.data(), trackName.size());
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+    transportOptions.containerOptions = containerOptions;
     EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::Success);
 }
 
@@ -494,7 +603,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
-    std::string url = "rtsp://192.168.1.100:554/stream";
+    std::string url = "https://192.168.1.100:554/stream/";
     TransportOptionsDecodableStruct transportOptions;
 
     uint8_t tlvBuffer[512];
@@ -503,7 +612,10 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
 
     // Create CMAFContainerOptionsStruct object
-    cmafContainerOptions.chunkDuration = 1000;
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    std::string trackName                = "video";
+    cmafContainerOptions.trackName       = Span(trackName.data(), trackName.size());
     cmafContainerOptions.metadataEnabled.ClearValue();
 
     cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
@@ -568,7 +680,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(1);
     transportOptions.audioStreamID.SetValue(2);
-    transportOptions.endpointID       = 1;
+    transportOptions.TLSEndpointID    = 1;
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
     transportOptions.containerOptions = containerOptions;
@@ -576,6 +688,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
 
     PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
     TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTlsClientManagementDelegate tlsClientManagementDelegate;
 
     MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
@@ -587,7 +700,8 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
     // Set the delegate to the server logic
-    server.GetLogic().SetDelegate(1, &mockDelegate);
+    server.GetLogic().SetDelegate(&mockDelegate);
+    server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
     EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
     EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
@@ -645,9 +759,9 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     EXPECT_EQ(respTransportOptions.streamUsage, StreamUsageEnum::kAnalysis);
     EXPECT_EQ(respTransportOptions.videoStreamID, 1);
     EXPECT_EQ(respTransportOptions.audioStreamID, 2);
-    EXPECT_EQ(respTransportOptions.endpointID, 1);
+    EXPECT_EQ(respTransportOptions.TLSEndpointID, 1);
     std::string respUrlStr(respTransportOptions.url.data(), respTransportOptions.url.size());
-    EXPECT_EQ(respUrlStr, "rtsp://192.168.1.100:554/stream");
+    EXPECT_EQ(respUrlStr, "https://192.168.1.100:554/stream/");
 
     Structs::TransportTriggerOptionsStruct::DecodableType respTriggerOptions = respTransportOptions.triggerOptions;
     EXPECT_EQ(respTriggerOptions.triggerType, TransportTriggerTypeEnum::kMotion);
@@ -694,7 +808,10 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     EXPECT_EQ(respContainerOptions.containerType, ContainerFormatEnum::kCmaf);
     EXPECT_TRUE(respContainerOptions.CMAFContainerOptions.HasValue());
     Structs::CMAFContainerOptionsStruct::Type respCMAFContainerOptions = respContainerOptions.CMAFContainerOptions.Value();
-    EXPECT_EQ(respCMAFContainerOptions.chunkDuration, 1000);
+    EXPECT_EQ(respCMAFContainerOptions.segmentDuration, 1000);
+    EXPECT_EQ(respCMAFContainerOptions.chunkDuration, 500);
+    std::string respTrackName(respCMAFContainerOptions.trackName.data(), respCMAFContainerOptions.trackName.size());
+    EXPECT_EQ(respTrackName, "video");
     EXPECT_FALSE(respCMAFContainerOptions.metadataEnabled.HasValue());
 
     std::string respCENCKeyStr(respCMAFContainerOptions.CENCKey.Value().data(),
@@ -777,10 +894,10 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     EXPECT_EQ(readTransportOptions.streamUsage, StreamUsageEnum::kAnalysis);
     EXPECT_EQ(readTransportOptions.videoStreamID, 1);
     EXPECT_EQ(readTransportOptions.audioStreamID, 2);
-    EXPECT_EQ(readTransportOptions.endpointID, 1);
+    EXPECT_EQ(readTransportOptions.TLSEndpointID, 1);
 
     std::string urlStr(readTransportOptions.url.data(), readTransportOptions.url.size());
-    EXPECT_EQ(urlStr, "rtsp://192.168.1.100:554/stream");
+    EXPECT_EQ(urlStr, "https://192.168.1.100:554/stream/");
 
     Structs::TransportTriggerOptionsStruct::DecodableType readTriggerOptions = readTransportOptions.triggerOptions;
     EXPECT_EQ(readTriggerOptions.triggerType, TransportTriggerTypeEnum::kMotion);
@@ -827,7 +944,10 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     EXPECT_EQ(readContainerOptions.containerType, ContainerFormatEnum::kCmaf);
     EXPECT_TRUE(readContainerOptions.CMAFContainerOptions.HasValue());
     Structs::CMAFContainerOptionsStruct::Type readCMAFContainerOptions = readContainerOptions.CMAFContainerOptions.Value();
-    EXPECT_EQ(readCMAFContainerOptions.chunkDuration, 1000);
+    EXPECT_EQ(readCMAFContainerOptions.segmentDuration, 1000);
+    EXPECT_EQ(readCMAFContainerOptions.chunkDuration, 500);
+    std::string readTrackName(readCMAFContainerOptions.trackName.data(), readCMAFContainerOptions.trackName.size());
+    EXPECT_EQ(readTrackName, "video");
     EXPECT_FALSE(readCMAFContainerOptions.metadataEnabled.HasValue());
 
     std::string cencKeyStr(readCMAFContainerOptions.CENCKey.Value().data(),
@@ -870,7 +990,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
-    std::string url = "rtsp://192.168.1.100:554/stream";
+    std::string url = "https://192.168.1.100:554/stream/";
     TransportOptionsDecodableStruct transportOptions;
 
     uint8_t tlvBuffer[512];
@@ -879,7 +999,10 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
 
     // Create CMAFContainerOptionsStruct object
-    cmafContainerOptions.chunkDuration = 1000;
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    std::string trackName                = "video";
+    cmafContainerOptions.trackName       = Span(trackName.data(), trackName.size());
     cmafContainerOptions.metadataEnabled.ClearValue();
 
     cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
@@ -944,7 +1067,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(1);
     transportOptions.audioStreamID.SetValue(2);
-    transportOptions.endpointID       = 1;
+    transportOptions.TLSEndpointID    = 1;
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
     transportOptions.containerOptions = containerOptions;
@@ -952,6 +1075,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
 
     PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
     TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTlsClientManagementDelegate tlsClientManagementDelegate;
 
     MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
@@ -960,7 +1084,8 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     commandData.transportOptions = transportOptions;
 
     // Set the delegate to the server logic
-    server.GetLogic().SetDelegate(1, &mockDelegate);
+    server.GetLogic().SetDelegate(&mockDelegate);
+    server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
     EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
     EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
@@ -971,7 +1096,8 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
      */
 
     // Create CMAFContainerOptionsStruct object
-    cmafContainerOptions.chunkDuration = 500;
+    cmafContainerOptions.segmentDuration = 30000;
+    cmafContainerOptions.chunkDuration   = 1000;
     cmafContainerOptions.metadataEnabled.ClearValue();
 
     cencKey   = "ABCDEF1234567890";
@@ -1040,8 +1166,8 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(11);
     transportOptions.audioStreamID.SetValue(22);
-    transportOptions.endpointID       = 1;
-    url                               = "rtsp://192.168.1.100:554/modify-stream";
+    transportOptions.TLSEndpointID    = 1;
+    url                               = "https://192.168.1.100:554/modify-stream/";
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
     transportOptions.containerOptions = containerOptions;
@@ -1121,10 +1247,10 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     EXPECT_EQ(findTransportOptions.streamUsage, StreamUsageEnum::kAnalysis);
     EXPECT_EQ(findTransportOptions.videoStreamID, 11);
     EXPECT_EQ(findTransportOptions.audioStreamID, 22);
-    EXPECT_EQ(findTransportOptions.endpointID, 1);
+    EXPECT_EQ(findTransportOptions.TLSEndpointID, 1);
 
     std::string findUrlStr(findTransportOptions.url.data(), findTransportOptions.url.size());
-    EXPECT_EQ(findUrlStr, "rtsp://192.168.1.100:554/modify-stream");
+    EXPECT_EQ(findUrlStr, "https://192.168.1.100:554/modify-stream/");
 
     Structs::TransportTriggerOptionsStruct::DecodableType findTriggerOptions = findTransportOptions.triggerOptions;
     EXPECT_EQ(findTriggerOptions.triggerType, TransportTriggerTypeEnum::kMotion);
@@ -1171,7 +1297,8 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     EXPECT_EQ(findContainerOptions.containerType, ContainerFormatEnum::kCmaf);
     EXPECT_TRUE(findContainerOptions.CMAFContainerOptions.HasValue());
     Structs::CMAFContainerOptionsStruct::Type findCMAFContainerOptions = findContainerOptions.CMAFContainerOptions.Value();
-    EXPECT_EQ(findCMAFContainerOptions.chunkDuration, 500);
+    EXPECT_EQ(findCMAFContainerOptions.segmentDuration, 30000);
+    EXPECT_EQ(findCMAFContainerOptions.chunkDuration, 1000);
     EXPECT_FALSE(findCMAFContainerOptions.metadataEnabled.HasValue());
 
     std::string cencKeyStr(findCMAFContainerOptions.CENCKey.Value().data(),
@@ -1198,7 +1325,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
-    std::string url = "rtsp://192.168.1.100:554/stream";
+    std::string url = "https://192.168.1.100:554/stream/";
     TransportOptionsDecodableStruct transportOptions;
 
     uint8_t tlvBuffer[512];
@@ -1207,7 +1334,10 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
 
     // Create CMAFContainerOptionsStruct object
-    cmafContainerOptions.chunkDuration = 1000;
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    std::string trackName                = "video";
+    cmafContainerOptions.trackName       = Span(trackName.data(), trackName.size());
     cmafContainerOptions.metadataEnabled.ClearValue();
 
     cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
@@ -1272,7 +1402,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(1);
     transportOptions.audioStreamID.SetValue(2);
-    transportOptions.endpointID       = 1;
+    transportOptions.TLSEndpointID    = 1;
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
     transportOptions.containerOptions = containerOptions;
@@ -1280,6 +1410,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
 
     PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
     TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTlsClientManagementDelegate tlsClientManagementDelegate;
 
     MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
@@ -1287,7 +1418,8 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     Commands::AllocatePushTransport::DecodableType commandData;
     commandData.transportOptions = transportOptions;
 
-    server.GetLogic().SetDelegate(1, &mockDelegate);
+    server.GetLogic().SetDelegate(&mockDelegate);
+    server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
     EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
     EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
 

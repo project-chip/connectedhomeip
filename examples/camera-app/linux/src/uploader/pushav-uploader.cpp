@@ -17,15 +17,167 @@
  */
 
 #include "pushav-uploader.h"
+#include <algorithm>
+#include <cstring>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
+#include <openssl/bio.h>
+#include <openssl/pem.h>
+#include <openssl/x509.h>
+#include <sys/stat.h>
+#include <vector>
 
-PushAVUploader::PushAVUploader(PushAVCertPath certPath) : mCertPath(certPath), mIsRunning(false) {}
+PushAVUploader::PushAVUploader() : mIsRunning(false) {}
 
 PushAVUploader::~PushAVUploader()
 {
+    // Ensure final MPD upload during uploader thread termination to persist media data before shutdown.
+    if (!mMPDPath.first.empty() && !mMPDPath.second.empty())
+    {
+        ChipLogProgress(Camera, "Uploading final MPD to server before shutdown");
+        UploadData(mMPDPath);
+    }
+
     Stop();
+}
+
+// Helper function to convert certificate from DER format to PEM format
+std::string DerCertToPem(const std::vector<uint8_t> & derData)
+{
+    const unsigned char * p = derData.data();
+    X509 * cert             = d2i_X509(nullptr, &p, derData.size());
+    if (!cert)
+    {
+        ChipLogError(Camera, "Failed to parse DER certificate of size: %ld", derData.size());
+        return "";
+    }
+
+    BIO * bio = BIO_new(BIO_s_mem());
+    if (!bio)
+    {
+        X509_free(cert);
+        ChipLogError(Camera, "Failed to allocate BIO");
+        return "";
+    }
+
+    if (!PEM_write_bio_X509(bio, cert))
+    {
+        BIO_free(bio);
+        X509_free(cert);
+        ChipLogError(Camera, "Failed to write PEM certificate");
+        return "";
+    }
+
+    BUF_MEM * bptr;
+    BIO_get_mem_ptr(bio, &bptr);
+    std::string pem(bptr->data, bptr->length);
+
+    BIO_free(bio);
+    X509_free(cert);
+
+    return pem;
+}
+
+// Helper function to convert vector of bytes to hex string representation
+std::string vectorToHexString(const std::vector<uint8_t> & vec)
+{
+    std::ostringstream oss;
+    for (size_t i = 0; i < vec.size(); ++i)
+    {
+        oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(vec[i]);
+        if ((i + 1) % 16 == 0)
+        {
+            oss << "\n";
+        }
+        else if (i != vec.size() - 1)
+        {
+            oss << " ";
+        }
+    }
+    return oss.str();
+}
+
+// Helper function to convert ECDSA private key from DER format to PEM format
+std::string ConvertECDSAPrivateKey_DER_to_PEM(const std::vector<uint8_t> & derData)
+{
+    const unsigned char * p = derData.data();
+
+    EVP_PKEY * pkey = d2i_AutoPrivateKey(nullptr, &p, derData.size());
+    if (!pkey)
+    {
+        ChipLogError(Camera, "Failed to parse DER ECDSA private key of size: %ld", derData.size());
+        return "";
+    }
+
+    // Write PEM to memory BIO
+    BIO * bio = BIO_new(BIO_s_mem());
+    if (!bio)
+    {
+        EVP_PKEY_free(pkey);
+        ChipLogError(Camera, "Failed to allocate BIO");
+        return "";
+    }
+
+    // Use PEM_write_bio_PrivateKey to write the EVP_PKEY in PEM format.
+    // This function handles the key type automatically.
+    if (!PEM_write_bio_PrivateKey(bio, pkey, nullptr, nullptr, 0, nullptr, nullptr))
+    {
+        BIO_free(bio);
+        EVP_PKEY_free(pkey);
+        ChipLogError(Camera, "Failed to convert ECDSA key to PEM format");
+        return "";
+    }
+
+    // Extract PEM string
+    char * pemData = nullptr;
+    long pemLen    = BIO_get_mem_data(bio, &pemData);
+    std::string pemStr(pemData, pemLen);
+
+    BIO_free(bio);
+    EVP_PKEY_free(pkey);
+
+    return pemStr;
+}
+
+// Helper function to read and print file content to log
+std::string readAndPrintFile(const std::string & filePath)
+{
+    std::ifstream file(filePath, std::ios::binary);
+    if (!file.is_open())
+    {
+        ChipLogDetail(Camera, "Failed to open file: %s", filePath.c_str());
+        return "";
+    }
+
+    // Read the entire file content
+    std::string fileContent((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+    // Print the file content
+    ChipLogDetail(Camera, "File:%s", filePath.c_str());
+    ChipLogDetail(Camera, "Content:%s", fileContent.c_str());
+
+    file.close();
+    return fileContent;
+}
+
+void SaveCertToFile(const std::string & certData, const std::string & filePath)
+{
+    std::ofstream out(filePath, std::ios::binary);
+    if (!out)
+    {
+        ChipLogDetail(Camera, "Failed to open file: %s", filePath.c_str());
+        return;
+    }
+    out.write(certData.data(), certData.size());
+    out.close();
+
+    // Set file permissions to read/write for owner only (0600)
+    if (chmod(filePath.c_str(), S_IRUSR | S_IWUSR) != 0)
+    {
+        ChipLogError(Camera, "Failed to set permissions for file: %s", filePath.c_str());
+    }
 }
 
 void PushAVUploader::ProcessQueue()
@@ -75,7 +227,7 @@ void PushAVUploader::Stop()
 
 void PushAVUploader::AddUploadData(std::string & filename, std::string & url)
 {
-    ChipLogError(Camera, "Added file name %s to queue", filename.c_str());
+    ChipLogProgress(Camera, "Added file name %s to queue", filename.c_str());
     std::lock_guard<std::mutex> lock(mQueueMutex);
     auto data = make_pair(filename, url);
     mAvData.push(data);
@@ -137,8 +289,52 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     upload.mSize                = static_cast<long>(size);
     upload.mBytesRead           = 0;
     struct curl_slist * headers = nullptr;
-    headers                     = curl_slist_append(headers, "Content-Type: application/*");
-    std::string fullUrl         = data.second + data.first;
+
+    // Determine content type based on file extension
+    std::string contentType = "application/*"; // Default fallback
+
+    // Extract file extension from full path
+    size_t dotPos = data.first.find_last_of('.');
+    if (dotPos != std::string::npos)
+    {
+        std::string extension = data.first.substr(dotPos);
+        if (extension == ".mpd")
+        {
+            contentType = "application/dash+xml"; // Manifest file
+        }
+        else if (extension == ".m4s")
+        {
+            contentType = "video/iso.segment"; // Media segment
+        }
+        else if (extension == ".init")
+        {
+            contentType = "video/mp4"; // Initialization segment
+        }
+    }
+
+    std::string contentTypeHeader = "Content-Type: " + contentType;
+    headers                       = curl_slist_append(headers, contentTypeHeader.c_str());
+
+    // Extract the filename from the full path
+    std::string fullPath = data.first;
+    std::string filename;
+    if (fullPath.substr(0, 5) == "/tmp/")
+    {
+        filename = fullPath.substr(5);
+    }
+    else
+    {
+        filename = fullPath;
+    }
+    std::string baseUrl = data.second;
+    if (baseUrl.back() != '/')
+    {
+        baseUrl += "/";
+    }
+    std::string fullUrl = baseUrl + filename;
+
+    ChipLogProgress(Camera, "Uploading file: %s to URL: %s", filename.c_str(), fullUrl.c_str());
+
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_URL, fullUrl.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
@@ -146,9 +342,46 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, true);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
     curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, static_cast<curl_off_t>(size));
+#ifndef TLS_CLUSTER_NOT_ENABLED
+
+    // TODO: The logic to provide DER-formatted certificates and keys in memory (blob) format to curl is currently unstable. As a
+    // temporary workaround, PEM-format files are being provided as input to curl.
+
+    auto rootCertPEM   = DerCertToPem(mCertBuffer.mRootCertBuffer);
+    auto clientCertPEM = DerCertToPem(mCertBuffer.mClientCertBuffer);
+    if (!mCertBuffer.mIntermediateCertBuffer.empty())
+    {
+        clientCertPEM.append("\n"); // Add newline separator between certs in PEM format
+    }
+    for (size_t i = 0; i < mCertBuffer.mIntermediateCertBuffer.size(); ++i)
+    {
+        clientCertPEM.append(DerCertToPem(mCertBuffer.mIntermediateCertBuffer[i]) + "\n");
+    }
+    std::string derKeyToPemstr = ConvertECDSAPrivateKey_DER_to_PEM(mCertBuffer.mClientKeyBuffer);
+
+    SaveCertToFile(rootCertPEM, "/tmp/root.pem");
+    SaveCertToFile(clientCertPEM, "/tmp/dev.pem");
+
+    // Logic to save PEM format to file
+    SaveCertToFile(derKeyToPemstr, "/tmp/dev.key");
+
+    curl_easy_setopt(curl, CURLOPT_CAINFO, "/tmp/root.pem");
+    curl_easy_setopt(curl, CURLOPT_SSLCERT, "/tmp/dev.pem");
+    curl_easy_setopt(curl, CURLOPT_SSLKEY, "/tmp/dev.key");
+
+    //  curl_blob rootBlob   = { mCertBuffer.mRootCertBuffer.data(), mCertBuffer.mRootCertBuffer.size(), CURL_BLOB_COPY };
+    //  curl_blob clientBlob = { mCertBuffer.mClientCertBuffer.data(), mCertBuffer.mClientCertBuffer.size(), CURL_BLOB_COPY };
+    //  curl_blob keyBlob    = { mCertBuffer.mClientKeyBuffer.data(), mCertBuffer.mClientKeyBuffer.size(), CURL_BLOB_COPY };
+
+    // curl_easy_setopt(curl, CURLOPT_CAINFO_BLOB, &rootBlob);
+    // curl_easy_setopt(curl, CURLOPT_SSLCERT_BLOB, &clientBlob);
+    // curl_easy_setopt(curl, CURLOPT_SSLKEY_BLOB, &keyBlob);
+#else
+    // TODO: The else block is for testing purpose. It should be removed once the TLS cluster integration is stable.
     curl_easy_setopt(curl, CURLOPT_CAINFO, mCertPath.mRootCert.c_str());
     curl_easy_setopt(curl, CURLOPT_SSLCERT, mCertPath.mDevCert.c_str());
     curl_easy_setopt(curl, CURLOPT_SSLKEY, mCertPath.mDevKey.c_str());
+#endif
     curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
     curl_easy_setopt(curl, CURLOPT_READFUNCTION, PushAvUploadCb);
     curl_easy_setopt(curl, CURLOPT_READDATA, &upload);
@@ -161,7 +394,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     }
     else
     {
-        ChipLogError(Camera, "CURL uploaded file  %s size: %ld", data.first.c_str(), size);
+        ChipLogDetail(Camera, "CURL uploaded file  %s size: %ld", data.first.c_str(), size);
     }
     if (upload.mData)
     {

@@ -106,14 +106,6 @@ if (wifi_soc) {
       include_dirs += [ "${examples_plat_dir}/wf200" ]
     }
 
-    if (chip_enable_ble_rs911x) {
-      # TODO efr32_sdk should not need a header from this location
-      include_dirs += [
-        "${examples_plat_dir}/rs911x",
-        "${examples_plat_dir}/rs911x/hal",
-      ]
-    }
-
     defines = []
     if (chip_enable_pw_rpc) {
       defines += [
@@ -135,8 +127,8 @@ silabs_executable("pump_app") {
   sources = [
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
+    "src/DataModelCallbacks.cpp",
     "src/PumpManager.cpp",
-    "src/ZclCallbacks.cpp",
   ]
 
   deps = [

@@ -512,7 +512,8 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
 
     ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02x)", hciResult);
 
-    mNeedToResetFailSafeTimer = (hciResult == BT_HCI_ERR_REMOTE_USER_TERM_CONN || hciResult == BT_HCI_ERR_CONN_TIMEOUT);
+    mNeedToResetFailSafeTimer = !ConfigurationMgr().IsFullyProvisioned() &&
+        (hciResult == BT_HCI_ERR_REMOTE_USER_TERM_CONN || hciResult == BT_HCI_ERR_CONN_TIMEOUT);
     mGAPConns--;
 
     // If indications were enabled for this connection, record that they are now disabled and
@@ -682,13 +683,13 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         err = HandleTXCharComplete(event);
         break;
 
+    case DeviceEventType::kCHIPoBLEConnectionClosed:
+        err = HandleBleConnectionClosed(event);
+        break;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     case DeviceEventType::kThreadStateChange:
         err = HandleThreadStateChange(event);
-        break;
-
-    case DeviceEventType::kCHIPoBLEConnectionClosed:
-        err = HandleBleConnectionClosed(event);
         break;
 
     case DeviceEventType::kOperationalNetworkEnabled:
@@ -919,6 +920,26 @@ ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gat
 }
 #endif
 
+CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * event)
+{
+    // Deinit BLE
+    bt_disable();
+    mBLERadioInitialized = false;
+
+#if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
+    pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (ThreadStackMgrImpl().IsReadyToAttach())
+    {
+        SwitchToIeee802154();
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+    return CHIP_NO_ERROR;
+}
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 CHIP_ERROR BLEManagerImpl::HandleOperationalNetworkEnabled(const ChipDeviceEvent * event)
 {
@@ -975,27 +996,9 @@ exit:
     return error;
 }
 
-CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * event)
-{
-    if (ThreadStackMgrImpl().IsReadyToAttach())
-    {
-        SwitchToIeee802154();
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 void BLEManagerImpl::SwitchToIeee802154(void)
 {
     ChipLogProgress(DeviceLayer, "Switch context from BLE to Thread");
-
-    // Deinit BLE
-    bt_disable();
-    mBLERadioInitialized = false;
-
-#if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
-    pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
-#endif
 
     // Init Thread
     ThreadStackMgrImpl().SetRadioBlocked(false);
@@ -1006,5 +1009,13 @@ void BLEManagerImpl::SwitchToIeee802154(void)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
+
+#if !defined(CONFIG_ZEPHYR_VERSION_3_3)
+// Implementation for Zephyr Bluetooth host.
+int bt_rand(void * buf, size_t len)
+{
+    return sys_csrand_get(buf, len);
+}
+#endif
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

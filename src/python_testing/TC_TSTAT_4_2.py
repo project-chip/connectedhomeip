@@ -432,7 +432,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 test_presets.remove(builtInPreset)
 
                 # Send the AtomicRequest begin command
-                await self.send_atomic_request_begin_command(timeout=5000, expected_timeout=3000)
+                await self.send_atomic_request_begin_command()
 
                 # Write to the presets attribute after calling AtomicRequest command
                 await self.write_presets(endpoint=endpoint, presets=test_presets)
@@ -463,7 +463,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 await self.send_atomic_request_begin_command()
 
                 # Write to the presets attribute after removing the preset that was set as the active preset handle.
-                test_presets = list(preset for preset in current_presets if preset.presetHandle is not activePresetHandle)
+                test_presets = list(preset for preset in current_presets if preset.presetHandle != activePresetHandle)
                 logger.info(f"Sending Presets: {test_presets}")
                 await self.write_presets(endpoint=endpoint, presets=test_presets)
 

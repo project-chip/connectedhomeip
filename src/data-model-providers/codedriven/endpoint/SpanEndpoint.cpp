@@ -45,13 +45,25 @@ SpanEndpoint::Builder & SpanEndpoint::Builder::SetDeviceTypes(Span<const DataMod
     return *this;
 }
 
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+SpanEndpoint::Builder & SpanEndpoint::Builder::SetEndpointUniqueId(CharSpan endpointUniqueId)
+{
+    mEndpointUniqueId = endpointUniqueId;
+    return *this;
+}
+#endif
+
 SpanEndpoint SpanEndpoint::Builder::Build()
 {
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    return SpanEndpoint(mClientClusters, mSemanticTags, mDeviceTypes, mEndpointUniqueId);
+#else
     return SpanEndpoint(mClientClusters, mSemanticTags, mDeviceTypes);
+#endif
 }
 
 CHIP_ERROR
-SpanEndpoint::SemanticTags(ReadOnlyBufferBuilder<Clusters::Descriptor::Structs::SemanticTagStruct::Type> & out) const
+SpanEndpoint::SemanticTags(ReadOnlyBufferBuilder<SemanticTag> & out) const
 {
     return out.ReferenceExisting(mSemanticTags);
 }
@@ -66,12 +78,27 @@ CHIP_ERROR SpanEndpoint::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) 
     return out.ReferenceExisting(mClientClusters);
 }
 
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+CharSpan SpanEndpoint::EndpointUniqueId() const
+{
+    return mEndpointUniqueId;
+}
+#endif
+
 // Private constructor for Builder
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+SpanEndpoint::SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const SemanticTag> & semanticTags,
+                           const Span<const DataModel::DeviceTypeEntry> & deviceTypes, const CharSpan & uniqueEndpointId) :
+    mDeviceTypes(deviceTypes),
+    mSemanticTags(semanticTags), mClientClusters(clientClusters), mEndpointUniqueId(uniqueEndpointId)
+{}
+#else
 SpanEndpoint::SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const SemanticTag> & semanticTags,
                            const Span<const DataModel::DeviceTypeEntry> & deviceTypes) :
     mDeviceTypes(deviceTypes),
     mSemanticTags(semanticTags), mClientClusters(clientClusters)
 {}
+#endif
 
 } // namespace app
 } // namespace chip

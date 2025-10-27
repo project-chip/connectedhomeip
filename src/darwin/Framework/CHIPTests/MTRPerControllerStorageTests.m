@@ -2624,7 +2624,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
                                 @{
                                     MTRAttributePathKey : globalAttributePath(clusterId2, MTRAttributeIDTypeGlobalAttributeAttributeListID),
                                     MTRDataKey : arrayOfUnsignedIntegersValue(@[
-                                        attributeId2, @(0xFFFC), @(0xFFFD), @0xFFF8, @(0xFFF9), @(0xFFFB)
+                                        attributeId2, @(0xFFFC), @(0xFFFD), @(0xFFF8), @(0xFFF9), @(0xFFFB)
                                     ]),
                                 },
 
@@ -2635,7 +2635,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
                                 },
                                 @{
                                     MTRAttributePathKey : descriptorAttributePath(MTRAttributeIDTypeClusterDescriptorAttributeServerListID),
-                                    MTRDataKey : arrayOfUnsignedIntegersValue(@[ clusterId1, clusterId2, @(MTRClusterIDTypeDescriptorID) ]),
+                                    MTRDataKey : arrayOfUnsignedIntegersValue(@[ @(MTRClusterIDTypeDescriptorID), clusterId1, clusterId2 ]),
                                 },
                                 @{
                                     MTRAttributePathKey : descriptorAttributePath(MTRAttributeIDTypeClusterDescriptorAttributeClientListID),
@@ -2955,9 +2955,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         os_unfair_lock_unlock(&counterLock);
     }];
 
-    // Make the wait time depend on pool size and device count (can expand number of devices in the future)
+    // Make the wait time depend on device count
     NSArray * expectationsToWait = [subscriptionExpectations.allValues arrayByAddingObject:baseDeviceReadExpectation];
-    [self waitForExpectations:expectationsToWait timeout:(kSubscriptionPoolBaseTimeoutInSeconds * orderedDeviceIDs.count / subscriptionPoolSize)];
+    [self waitForExpectations:expectationsToWait timeout:(kSubscriptionPoolBaseTimeoutInSeconds * orderedDeviceIDs.count)];
 
     XCTAssertEqual(subscriptionDequeueCount, orderedDeviceIDs.count);
 

@@ -48,7 +48,7 @@ public:
 
     Protocols::InteractionModel::Status AudioStreamDeallocate(const uint16_t streamID) override;
 
-    Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
+    Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
                                                                uint16_t & outStreamID) override;
 
     Protocols::InteractionModel::Status SnapshotStreamModify(const uint16_t streamID, const chip::Optional<bool> waterMarkEnabled,
@@ -67,17 +67,8 @@ public:
                                                         ImageSnapshot & outImageSnapshot) override;
 
     CHIP_ERROR
-    LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams) override;
-
-    CHIP_ERROR
-    LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams) override;
-
-    CHIP_ERROR
-    LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams) override;
-
-    CHIP_ERROR
-    ValidateStreamUsage(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                        const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;
+    ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                        Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;
 
     CHIP_ERROR
     ValidateVideoStreamID(uint16_t videoStreamId) override;
@@ -85,12 +76,17 @@ public:
     CHIP_ERROR
     ValidateAudioStreamID(uint16_t audioStreamId) override;
 
-    CHIP_ERROR
-    IsPrivacyModeActive(bool & isActive) override;
+    CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override;
 
     bool HasAllocatedVideoStreams() override;
 
     bool HasAllocatedAudioStreams() override;
+
+    CHIP_ERROR SetHardPrivacyModeOn(bool hardPrivacyMode) override;
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
@@ -98,12 +94,25 @@ public:
 
     CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
 
+    const std::vector<chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct> & GetAllocatedVideoStreams() const override;
+
+    const std::vector<chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct> & GetAllocatedAudioStreams() const override;
+
+    void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, uint32_t & outBandwidthbps) override;
+
     CameraAVStreamManager()  = default;
     ~CameraAVStreamManager() = default;
 
     void SetCameraDeviceHAL(CameraDeviceInterface * aCameraDevice);
 
 private:
+    CHIP_ERROR AllocatedVideoStreamsLoaded();
+
+    CHIP_ERROR AllocatedAudioStreamsLoaded();
+
+    CHIP_ERROR AllocatedSnapshotStreamsLoaded();
+
     CameraDeviceInterface * mCameraDeviceHAL = nullptr;
 };
 

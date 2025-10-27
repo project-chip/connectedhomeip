@@ -178,7 +178,7 @@ def _IssueNOCChainCallbackPythonCallback(devCtrl, status: PyChipError, noc: c_vo
             ipkBytes = string_at(ipk, ipkLen)[:]
         nocChain = NOCChain(nocBytes, icacBytes, rcacBytes, ipkBytes, adminSubject)
     else:
-        logging.error(f"Failure to generate NOC Chain: {status}. All NOCChain field will be None and commissioning will fail!")
+        LOGGER.error(f"Failure to generate NOC Chain: {status}. All NOCChain field will be None and commissioning will fail!")
     devCtrl.NOCChainCallback(nocChain)
 
 
@@ -350,8 +350,8 @@ class DeviceProxyWrapper():
         if that happens.
     '''
     class DeviceProxyType(enum.Enum):
-        OPERATIONAL = enum.auto(),
-        COMMISSIONEE = enum.auto(),
+        OPERATIONAL = enum.auto()
+        COMMISSIONEE = enum.auto()
 
     def __init__(self, deviceProxy: ctypes.c_void_p, proxyType, dmLib=None):
         self._deviceProxy = deviceProxy
@@ -518,7 +518,7 @@ class ChipDeviceControllerBase():
         def HandleOpenWindowComplete(nodeid: int, setupPinCode: int, setupManualCode: bytes,
                                      setupQRCode: bytes, err: PyChipError) -> None:
             if err.is_success:
-                LOGGER.info("Open Commissioning Window complete setting nodeid {} pincode to {}".format(nodeid, setupPinCode))
+                LOGGER.info("Open Commissioning Window complete setting node ID 0x%016X pincode to %d", nodeid, setupPinCode)
                 commissioningParameters = CommissioningParameters(
                     setupPinCode=setupPinCode, setupManualCode=setupManualCode.decode(), setupQRCode=setupQRCode.decode())
             else:
@@ -535,7 +535,7 @@ class ChipDeviceControllerBase():
 
         def HandleUnpairDeviceComplete(nodeid: int, err: PyChipError):
             if err.is_success:
-                LOGGER.info("Succesfully unpaired device with nodeid {}".format(nodeid))
+                LOGGER.info("Successfully unpaired device with node ID 0x%016X", nodeid)
             else:
                 LOGGER.warning("Failed to unpair device: {}".format(err))
 
@@ -719,7 +719,6 @@ class ChipDeviceControllerBase():
             nodeid (int): Node id of the device.
             isShortDiscriminator (Optional[bool]): Optional short discriminator.
 
-
         Returns:
             int: Effective Node ID of the device (as defined by the assigned NOC).
         '''
@@ -730,6 +729,29 @@ class ChipDeviceControllerBase():
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectBLE(
                     self.devCtrl, discriminator, isShortDiscriminator, setupPinCode, nodeid)
+            )
+
+            return await asyncio.futures.wrap_future(ctx.future)
+
+    async def ConnectNFC(self, discriminator: int, setupPinCode: int, nodeid: int) -> int:
+        '''
+        Connect to a NFC device via PASE using the given discriminator and setup pin code.
+
+        Args:
+            discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
+            setupPinCode (int): The setup pin code of the device.
+            nodeid (int): Node id of the device.
+
+        Returns:
+            int: Effective Node ID of the device (as defined by the assigned NOC).
+        '''
+        self.CheckIsActive()
+
+        async with self._commissioning_context as ctx:
+            self._enablePairingCompleteCallback(True)
+            await self._ChipStack.CallAsync(
+                lambda: self._dmLib.pychip_DeviceController_ConnectNFC(
+                    self.devCtrl, discriminator, setupPinCode, nodeid)
             )
 
             return await asyncio.futures.wrap_future(ctx.future)
@@ -1602,6 +1624,7 @@ class ChipDeviceControllerBase():
         Raises:
             InteractionModelError on error
         '''
+        LOGGER.debug("Sending command %s to node ID 0x%016X", payload, nodeid)
         self.CheckIsActive()
 
         eventLoop = asyncio.get_running_loop()
@@ -1804,13 +1827,15 @@ class ChipDeviceControllerBase():
         # An empty list is the expected return for sending group write attribute.
         return []
 
-    def TestOnlyPrepareToReceiveBdxData(self) -> asyncio.Future:
+    def TestOnlyPrepareToReceiveBdxData(self, max_block_size: int | None = None) -> asyncio.Future:
         '''
         Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data here.
 
         If no BDX transfer is initiated, the caller must cancel the returned future to avoid interfering with other BDX transfers.
         For example, the Diagnostic Logs clusters won't start a BDX transfer when the log is small so the future must be cancelled to allow later
         attempts to retrieve logs to succeed.
+
+        If max_block_size is provided (1..65535), it overrides the controller's default cap.
 
         Returns:
             a future that will yield a BdxTransfer with the init message from the transfer.
@@ -1823,7 +1848,7 @@ class ChipDeviceControllerBase():
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        Bdx.PrepareToReceiveBdxData(future).raise_on_error()
+        Bdx.PrepareToReceiveBdxData(future, max_block_size).raise_on_error()
         return future
 
     def TestOnlyPrepareToSendBdxData(self, data: bytes) -> asyncio.Future:
@@ -2073,6 +2098,8 @@ class ChipDeviceControllerBase():
         eventPaths = [self._parseEventPathTuple(
             v) for v in events] if events else None
 
+        allowLargePayload = payloadCapability in (TransportPayloadCapability.LARGE_PAYLOAD,
+                                                  TransportPayloadCapability.MRP_OR_TCP_PAYLOAD)
         transaction = ClusterAttribute.AsyncReadTransaction(future, eventLoop, self, returnClusterObject)
         ClusterAttribute.Read(transaction, device=device.deviceProxy,
                               attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths,
@@ -2080,7 +2107,7 @@ class ChipDeviceControllerBase():
                               subscriptionParameters=ClusterAttribute.SubscriptionParameters(
                                   reportInterval[0], reportInterval[1]) if reportInterval else None,
                               fabricFiltered=fabricFiltered,
-                              keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe).raise_on_error()
+                              keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe, allowLargePayload=allowLargePayload).raise_on_error()
         await future
 
         if result := transaction.GetSubscriptionHandler():
@@ -2313,6 +2340,10 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_ConnectBLE.argtypes = [
                 c_void_p, c_uint16, c_bool, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectBLE.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_ConnectNFC.argtypes = [
+                c_void_p, c_uint16, c_uint32, c_uint64]
+            self._dmLib.pychip_DeviceController_ConnectNFC.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.argtypes = [
                 c_char_p, c_uint32]
@@ -2571,7 +2602,6 @@ class ChipDeviceController(ChipDeviceControllerBase):
     '''
     The ChipDeviceCommissioner binding, named as ChipDeviceController
     '''
-    # TODO: This class contains DEPRECATED functions, we should update the test scripts to avoid the usage of those functions.
 
     def __init__(self,
                  opCredsContext: ctypes.c_void_p,
@@ -2630,8 +2660,8 @@ class ChipDeviceController(ChipDeviceControllerBase):
     async def Commission(self, nodeid) -> int:
         '''
         Start the auto-commissioning process on a node after establishing a PASE connection.
-        This function is intended to be used in conjunction with `EstablishPASESessionBLE` or
-        `EstablishPASESessionIP`. It can be called either before or after the DevicePairingDelegate
+        This function is intended to be used in conjunction with one of the EstablishPASESession
+        functions. It can be called either before or after the DevicePairingDelegate
         receives the OnPairingComplete call. Commissioners that want to perform simple
         auto-commissioning should use the supplied "CommissionWithCode" function, which will
         establish the PASE connection and commission automatically.
@@ -2656,7 +2686,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
             return await asyncio.futures.wrap_future(ctx.future)
 
-    async def CommissionThread(self, discriminator, setupPinCode, nodeId, threadOperationalDataset: bytes, isShortDiscriminator: bool = False) -> int:
+    async def CommissionBleThread(self, discriminator, setupPinCode, nodeId, threadOperationalDataset: bytes, isShortDiscriminator: bool = False) -> int:
         '''
         Commissions a Thread device over BLE.
 
@@ -2673,7 +2703,23 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self.SetThreadOperationalDataset(threadOperationalDataset)
         return await self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
 
-    async def CommissionWiFi(self, discriminator, setupPinCode, nodeId, ssid: str, credentials: str, isShortDiscriminator: bool = False) -> int:
+    async def CommissionNfcThread(self, discriminator, setupPinCode, nodeId, threadOperationalDataset: bytes) -> int:
+        '''
+        Commissions a Thread device over NFC.
+
+        Args:
+            discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
+            setupPinCode (int): The setup pin code of the device.
+            nodeId (int): Node id of the device.
+            threadOperationalDataset (bytes): The Thread operational dataset for commissioning.
+
+        Returns:
+            int: Effective Node ID of the device (as defined by the assigned NOC).
+        '''
+        self.SetThreadOperationalDataset(threadOperationalDataset)
+        return await self.ConnectNFC(discriminator, setupPinCode, nodeId)
+
+    async def CommissionBleWiFi(self, discriminator, setupPinCode, nodeId, ssid: str, credentials: str, isShortDiscriminator: bool = False) -> int:
         '''
         Commissions a Wi-Fi device over BLE.
 
@@ -3001,27 +3047,6 @@ class ChipDeviceController(ChipDeviceControllerBase):
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
                     self.devCtrl, setupPayload.encode("utf-8"), nodeid, discoveryType.value)
-            )
-
-            return await asyncio.futures.wrap_future(ctx.future)
-
-    async def CommissionIP(self, ipaddr: str, setupPinCode: int, nodeid: int) -> int:
-        '''
-        DEPRECATED, DO NOT USE! Use `CommissionOnNetwork` or `CommissionWithCode`
-
-        Raises:
-            ChipStackError: On failure.
-
-        Returns:
-            Effective Node ID of the device (as defined by the assigned NOC)
-        '''
-        self.CheckIsActive()
-
-        async with self._commissioning_context as ctx:
-            self._enablePairingCompleteCallback(True)
-            await self._ChipStack.CallAsync(
-                lambda: self._dmLib.pychip_DeviceController_ConnectIP(
-                    self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid)
             )
 
             return await asyncio.futures.wrap_future(ctx.future)

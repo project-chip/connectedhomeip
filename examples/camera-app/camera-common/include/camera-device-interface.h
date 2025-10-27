@@ -19,6 +19,7 @@
 #pragma once
 #include "camera-avstream-controller.h"
 #include "media-controller.h"
+#include "webrtc-provider-controller.h"
 #include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
@@ -83,10 +84,11 @@ struct SnapshotStream
     void * snapshotContext; // Platform-specific context object associated with
                             // snapshot stream;
 
-    bool IsCompatible(const SnapshotStreamStruct & inputParams) const
+    bool IsCompatible(const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs &
+                          inputParams) const
     {
-        return (snapshotStreamParams.imageCodec == inputParams.imageCodec && snapshotStreamParams.quality == inputParams.quality &&
-                snapshotStreamParams.frameRate == inputParams.frameRate &&
+        return (snapshotStreamParams.imageCodec == inputParams.imageCodec &&
+                snapshotStreamParams.frameRate <= inputParams.maxFrameRate &&
                 snapshotStreamParams.minResolution.width <= inputParams.minResolution.width &&
                 snapshotStreamParams.minResolution.height <= inputParams.minResolution.height &&
                 snapshotStreamParams.maxResolution.width >= inputParams.maxResolution.width &&
@@ -123,6 +125,9 @@ public:
     // Getter for WebRTCProvider Delegate
     virtual chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() = 0;
 
+    // Getter for WebRTCProvider Controller
+    virtual chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderController & GetWebRTCProviderController() = 0;
+
     // Getter for CameraAVStreamManagement Delegate
     virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() = 0;
 
@@ -140,6 +145,8 @@ public:
 
     // Getter for PushAVStreamTransport Delegate
     virtual chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() = 0;
+
+    virtual void HandlePushAvZoneTrigger(uint16_t zoneId) = 0;
 
     // Class defining the Camera HAL interface
     class CameraHALInterface
@@ -176,6 +183,11 @@ public:
 
         // Stop audio stream
         virtual CameraError StopAudioStream(uint16_t streamID) = 0;
+
+        // Allocate snapshot stream
+        virtual CameraError AllocateSnapshotStream(
+            const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & args,
+            uint16_t & outStreamID) = 0;
 
         // Start snapshot stream
         virtual CameraError StartSnapshotStream(uint16_t streamID) = 0;
@@ -235,7 +247,7 @@ public:
         // Get snapshot capabilities
         virtual std::vector<SnapshotCapabilitiesStruct> & GetSnapshotCapabilities() = 0;
 
-        // Get the maximum network bandwidth(mbps) that the camera would consume
+        // Get the maximum network bandwidth(bps) that the camera would consume
         // for transmission of its media streams.
         virtual uint32_t GetMaxNetworkBandwidth() = 0;
 
@@ -252,9 +264,9 @@ public:
         // This also sets the default priority of the stream usages.
         virtual std::vector<StreamUsageEnum> & GetSupportedStreamUsages() = 0;
 
-        // Get stream usage priorities as an ordered list. This is expected to
-        // be a subset of the SupportedStreamUsages.
-        virtual std::vector<StreamUsageEnum> & GetStreamUsagePriorities() = 0;
+        // Get/Set stream usage priorities as an ordered list. This is a subset of the SupportedStreamUsages.
+        virtual std::vector<StreamUsageEnum> & GetStreamUsagePriorities()                                = 0;
+        virtual CameraError SetStreamUsagePriorities(std::vector<StreamUsageEnum> streamUsagePriorities) = 0;
 
         // Get/Set soft recording privacy mode
         virtual CameraError SetSoftRecordingPrivacyModeEnabled(bool softRecordingPrivacyMode) = 0;
@@ -267,8 +279,9 @@ public:
         // Does camera have a hard privacy switch
         virtual bool HasHardPrivacySwitch() = 0;
 
-        // Get whether hard privacy mode is on
-        virtual bool GetHardPrivacyMode() = 0;
+        // Get/Set hard privacy mode
+        virtual CameraError SetHardPrivacyMode(bool hardPrivacyMode) = 0;
+        virtual bool GetHardPrivacyMode()                            = 0;
 
         // Get/Set night vision
         virtual CameraError SetNightVision(TriStateAutoEnum nightVision) = 0;
@@ -340,9 +353,11 @@ public:
         virtual bool GetStatusLightEnabled()                               = 0;
 
         // Set Pan, Tilt, and Zoom
-        virtual CameraError SetPan(int16_t aPan)   = 0;
-        virtual CameraError SetTilt(int16_t aTilt) = 0;
-        virtual CameraError SetZoom(uint8_t aZoom) = 0;
+        virtual CameraError SetPan(int16_t aPan)                          = 0;
+        virtual CameraError SetTilt(int16_t aTilt)                        = 0;
+        virtual CameraError SetZoom(uint8_t aZoom)                        = 0;
+        virtual CameraError SetPhysicalPTZ(chip::Optional<int16_t> aPan, chip::Optional<int16_t> aTilt,
+                                           chip::Optional<uint8_t> aZoom) = 0;
 
         // Get device defined limits for Pan, Tilt, and Zoom
         virtual int16_t GetPanMin()  = 0;

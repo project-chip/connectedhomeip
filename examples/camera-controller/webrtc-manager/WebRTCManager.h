@@ -26,6 +26,13 @@
 #include <webrtc-manager/WebRTCProviderClient.h>
 #include <webrtc-manager/WebRTCRequestorDelegate.h>
 
+struct ICECandidateInfo
+{
+    std::string candidate;
+    std::string mid;
+    int mlineIndex;
+};
+
 class WebRTCManager
 {
 public:
@@ -87,10 +94,11 @@ private:
     uint16_t mPendingSessionId = 0;
     std::string mLocalDescription;
 
-    // Local vector to store the ICE Candidate strings coming from the WebRTC stack
-    std::vector<std::string> mLocalCandidates;
+    // Local vector to store the ICE Candidate info coming from the WebRTC stack
+    std::vector<ICECandidateInfo> mLocalCandidates;
 
     std::shared_ptr<rtc::Track> mTrack;
+    std::shared_ptr<rtc::Track> mAudioTrack;
 
     // Callback to notify when session is established
     SessionEstablishedCallback mSessionEstablishedCallback;
@@ -99,7 +107,8 @@ private:
     uint16_t mCurrentVideoStreamId = 0;
 
     // UDP socket for RTP forwarding
-    int mRTPSocket = -1;
+    int mRTPSocket      = -1;
+    int mAudioRTPSocket = -1;
 
     // Close and reset the RTP socket
     void CloseRTPSocket();

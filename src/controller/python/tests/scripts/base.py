@@ -45,6 +45,7 @@ from matter import ChipDeviceCtrl
 from matter.ChipStack import ChipStack
 from matter.crypto import p256keypair
 from matter.exceptions import ChipStackException
+from matter.setup_payload import SetupPayload
 from matter.storage import PersistentStorageJSON
 from matter.utils import CommissioningBuildingBlocks
 
@@ -317,17 +318,6 @@ class BaseTestHelper:
         await self.devCtrl.Commission(nodeid)
         return self.devCtrl.CheckTestCommissionerCallbacks() and self.devCtrl.CheckTestCommissionerPaseConnection(nodeid)
 
-    async def TestCommissioning(self, ip: str, setuppin: int, nodeid: int):
-        self.logger.info("Commissioning device {}".format(ip))
-        try:
-            await self.devCtrl.CommissionIP(ip, setuppin, nodeid)
-        except ChipStackException:
-            self.logger.exception(
-                "Failed to finish commissioning device {}".format(ip))
-            return False
-        self.logger.info("Commissioning finished.")
-        return True
-
     async def TestCommissioningWithSetupPayload(self, setupPayload: str, nodeid: int, discoveryType: int = 2):
         self.logger.info("Commissioning device with setup payload {}".format(setupPayload))
         try:
@@ -339,17 +329,17 @@ class BaseTestHelper:
         self.logger.info("Commissioning finished.")
         return True
 
-    async def TestOnNetworkCommissioning(self, discriminator: int, setuppin: int, nodeid: int, ip_override: str = None):
+    async def TestOnNetworkCommissioning(self, discriminator: int, setuppin: int, nodeid: int):
         self.logger.info("Testing discovery")
         device = await self.TestDiscovery(discriminator=discriminator)
+
+        qr = SetupPayload().GenerateQrCode(passcode=setuppin, discriminator=discriminator)
+
         if not device:
             self.logger.info("Failed to discover any devices.")
             return False
-        address = device.addresses[0]
-        if ip_override:
-            address = ip_override
         self.logger.info("Testing commissioning")
-        if not await self.TestCommissioning(address, setuppin, nodeid):
+        if not await self.TestCommissioningWithSetupPayload(qr, nodeid):
             self.logger.info("Failed to finish commissioning")
             return False
         return True
@@ -778,7 +768,7 @@ class BaseTestHelper:
 
         return True
 
-    async def TestMultiFabric(self, ip: str, setuppin: int, nodeid: int):
+    async def TestMultiFabric(self, setup_code: str, nodeid: int):
         self.logger.info("Opening Commissioning Window")
 
         await self.devCtrl.SendCommand(
@@ -796,10 +786,9 @@ class BaseTestHelper:
             self.controllerNodeId, self.paaTrustStorePath)
 
         try:
-            await self.devCtrl2.CommissionIP(ip, setuppin, nodeid)
+            await self.devCtrl2.CommissionWithCode(setupPayload=setup_code, nodeid=nodeid)
         except ChipStackException:
-            self.logger.exception(
-                "Failed to finish key exchange with device {}".format(ip))
+            self.logger.exception("Failed to finish key exchange with device")
             return False
 
         #
@@ -1074,7 +1063,7 @@ class BaseTestHelper:
         return True
 
     def TestCloseSession(self, nodeid: int):
-        self.logger.info(f"Closing sessions with device {nodeid}")
+        self.logger.info("Closing sessions with device 0x%016X", nodeid)
         try:
             self.devCtrl.MarkSessionDefunct(nodeid)
             return True
@@ -1163,7 +1152,7 @@ class BaseTestHelper:
             return False
 
     async def TestTriggerTestEventHandler(self, nodeid, enable_key, event_trigger):
-        self.logger.info("Test trigger test event handler for device = %08x trigger = %016x", nodeid, event_trigger)
+        self.logger.info("Test trigger test event handler for device 0x%016X trigger 0x%016x", nodeid, event_trigger)
         try:
             await self.devCtrl.SendCommand(nodeid, 0, Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=enable_key, eventTrigger=event_trigger))
             return True
@@ -1172,7 +1161,7 @@ class BaseTestHelper:
             return False
 
     async def TestWaitForActive(self, nodeid, stayActiveDurationMs=30000):
-        self.logger.info("Test wait for device = %08x", nodeid)
+        self.logger.info("Test wait for device 0x%016X", nodeid)
         try:
             await self.devCtrl.WaitForActive(nodeid, stayActiveDurationMs=stayActiveDurationMs)
             return True

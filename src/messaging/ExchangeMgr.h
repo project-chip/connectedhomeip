@@ -251,7 +251,9 @@ private:
     void SendStandaloneAckIfNeeded(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                    const SessionHandle & session, MessageFlags msgFlags, System::PacketBufferHandle && msgBuf);
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    void OnTCPConnectionClosed(const SessionHandle & session, CHIP_ERROR conErr) override;
+    void OnTCPConnectionClosed(const Transport::ActiveTCPConnectionState & conn, const SessionHandle & session,
+                               CHIP_ERROR conErr) override;
+    bool OnTCPConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 
