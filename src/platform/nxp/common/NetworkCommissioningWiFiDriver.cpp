@@ -107,8 +107,7 @@ CHIP_ERROR NXPWiFiDriver::ConnectWiFiStagedNetwork()
     VerifyOrReturnError(mSavedNetwork.ssidLen != 0, CHIP_ERROR_KEY_NOT_FOUND);
 
     // Connect to saved network
-    return ConnectWiFiNetwork(mSavedNetwork.ssid, mSavedNetwork.ssidLen, mSavedNetwork.credentials,
-                              mSavedNetwork.credentialsLen);
+    return ConnectWiFiNetwork(mSavedNetwork.ssid, mSavedNetwork.ssidLen, mSavedNetwork.credentials, mSavedNetwork.credentialsLen);
 }
 
 void NXPWiFiDriver::Shutdown()
