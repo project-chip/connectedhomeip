@@ -75,14 +75,16 @@ CharSpan SpanEndpoint::EndpointUniqueId() const
 
 // Private constructor for Builder
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-SpanEndpoint::SpanEndpoint(const Span<const ClusterId> & clientClusters,
-                           const Span<const DataModel::DeviceTypeEntry> & deviceTypes, const CharSpan & uniqueEndpointId) :
-    mDeviceTypes(deviceTypes), mClientClusters(clientClusters), mEndpointUniqueId(uniqueEndpointId)
+SpanEndpoint::SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const DataModel::DeviceTypeEntry> & deviceTypes,
+                           const CharSpan & uniqueEndpointId) :
+    mDeviceTypes(deviceTypes),
+    mClientClusters(clientClusters), mEndpointUniqueId(uniqueEndpointId)
 {}
 #else
 SpanEndpoint::SpanEndpoint(const Span<const ClusterId> & clientClusters,
                            const Span<const DataModel::DeviceTypeEntry> & deviceTypes) :
-    mDeviceTypes(deviceTypes), mClientClusters(clientClusters)
+    mDeviceTypes(deviceTypes),
+    mClientClusters(clientClusters)
 {}
 #endif
 

@@ -95,11 +95,10 @@ public:
 private:
     // Private constructor for Builder
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-    SpanEndpoint(const Span<const ClusterId> & clientClusters,
-                 const Span<const DataModel::DeviceTypeEntry> & deviceTypes, const CharSpan & uniqueEndpointId);
+    SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const DataModel::DeviceTypeEntry> & deviceTypes,
+                 const CharSpan & uniqueEndpointId);
 #else
-    SpanEndpoint(const Span<const ClusterId> & clientClusters,
-                 const Span<const DataModel::DeviceTypeEntry> & deviceTypes);
+    SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const DataModel::DeviceTypeEntry> & deviceTypes);
 #endif
 
     // Iteration methods
