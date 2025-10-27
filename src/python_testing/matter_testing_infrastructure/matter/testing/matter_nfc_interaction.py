@@ -1,5 +1,4 @@
 import logging
-import re
 
 import ndef
 from mobly import asserts
@@ -178,7 +177,7 @@ def _read_ndef_length(reader_connection_object):
     return length
 
 
-def _read_ndef_data(reader_connection_object, length):
+def _read_ndef_data(reader_connection_object, length: int) -> bytes:
     """
     Read the NDEF message data from the NFC tag.
 
@@ -211,7 +210,7 @@ def _read_ndef_data(reader_connection_object, length):
     return bytes(data)
 
 
-def _read_nfc_tag_data(reader_objects:list, nfc_reader_index):
+def _read_nfc_tag_data(reader_objects: list, nfc_reader_index: int):
     """
     Read and decode NDEF data from an NFC tag.
 
@@ -268,7 +267,7 @@ def _read_nfc_tag_data(reader_objects:list, nfc_reader_index):
     raise ValueError("No NDEF records with decodable data found")
 
 
-def connect_read_nfc_tag_data(nfc_reader_index):
+def connect_read_nfc_tag_data(nfc_reader_index: int):
     """
     Connect to an NFC reader and read NDEF data from a tag.
 
