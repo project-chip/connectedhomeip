@@ -157,7 +157,7 @@ public class ChipDeviceController {
     setICDCheckInDelegate(deviceControllerPtr, new ICDCheckInDelegateWrapper(delegate));
   }
 
-  /* This method was deprecated. Please use {@link ChipDeviceController.pairDevice(BluetoothGatt, int, long, long, CommissionParameters)}. */
+  /* This method was deprecated. Please use {@link ChipDeviceController.pairDeviceThroughBLE(BluetoothGatt, int, long, long, CommissionParameters)}. */
   @Deprecated
   public void pairDevice(
       BluetoothGatt bleServer,
@@ -165,10 +165,10 @@ public class ChipDeviceController {
       long deviceId,
       long setupPincode,
       NetworkCredentials networkCredentials) {
-    pairDevice(bleServer, connId, deviceId, setupPincode, null, networkCredentials, null);
+    pairDeviceThroughBLE(bleServer, connId, deviceId, setupPincode, null, networkCredentials, null);
   }
 
-  /* This method was deprecated. Please use {@link ChipDeviceController.pairDevice(BluetoothGatt, int, long, long, CommissionParameters)}. */
+  /* This method was deprecated. Please use {@link ChipDeviceController.pairDeviceThroughBLE(BluetoothGatt, int, long, long, CommissionParameters)}. */
   @Deprecated
   public void pairDevice(
       BluetoothGatt bleServer,
@@ -177,11 +177,11 @@ public class ChipDeviceController {
       long setupPincode,
       NetworkCredentials networkCredentials,
       ICDRegistrationInfo registrationInfo) {
-    pairDevice(
+    pairDeviceThroughBLE(
         bleServer, connId, deviceId, setupPincode, null, networkCredentials, registrationInfo);
   }
 
-  /* This method was deprecated. Please use {@link ChipDeviceController.pairDevice(BluetoothGatt, int, long, long, CommissionParameters)}. */
+  /* This method was deprecated. Please use {@link ChipDeviceController.pairDeviceThroughBLE(BluetoothGatt, int, long, long, CommissionParameters)}. */
   @Deprecated
   public void pairDevice(
       BluetoothGatt bleServer,
@@ -190,7 +190,7 @@ public class ChipDeviceController {
       long setupPincode,
       @Nullable byte[] csrNonce,
       NetworkCredentials networkCredentials) {
-    pairDevice(bleServer, connId, deviceId, setupPincode, csrNonce, networkCredentials, null);
+    pairDeviceThroughBLE(bleServer, connId, deviceId, setupPincode, csrNonce, networkCredentials, null);
   }
 
   /**
@@ -207,7 +207,7 @@ public class ChipDeviceController {
    *     {@link ICDRegistrationInfo}. If this value is null when commissioning an ICD device, {@link
    *     CompletionListener.onICDRegistrationInfoRequired} is called to request the
    *     ICDRegistrationInfo value. This method was deprecated. Please use {@link
-   *     ChipDeviceController.pairDevice(BluetoothGatt, int, long, long, CommissionParameters)}.
+   *     ChipDeviceController.pairDeviceThroughBLE(BluetoothGatt, int, long, long, CommissionParameters)}.
    */
   @Deprecated
   public void pairDevice(
@@ -224,7 +224,18 @@ public class ChipDeviceController {
             .setNetworkCredentials(networkCredentials)
             .setICDRegistrationInfo(icdRegistrationInfo)
             .build();
-    pairDevice(bleServer, connId, deviceId, setupPincode, params);
+    pairDeviceThroughBLE(bleServer, connId, deviceId, setupPincode, params);
+  }
+
+  /* This method was deprecated. Please use {@link ChipDeviceController.pairDeviceThroughBLE(BluetoothGatt, int, long, long, CommissionParameters)}. */
+  @Deprecated
+  public void pairDevice(
+      BluetoothGatt bleServer,
+      int connId,
+      long deviceId,
+      long setupPincode,
+      @Nonnull CommissionParameters params) {
+    pairDeviceThroughBLE(bleServer, connId, deviceId, setupPincode, params);
   }
 
   /**
@@ -237,7 +248,7 @@ public class ChipDeviceController {
    * @param params Parameters representing commissioning arguments. see detailed in {@link
    *     CommissionParameters}
    */
-  public void pairDevice(
+  public void pairDeviceThroughBLE(
       BluetoothGatt bleServer,
       int connId,
       long deviceId,
@@ -254,7 +265,7 @@ public class ChipDeviceController {
 
       Log.d(TAG, "Bluetooth connection added with ID: " + connectionId);
       Log.d(TAG, "Pairing device with ID: " + deviceId);
-      pairDevice(
+      pairDeviceThroughBLE(
           deviceControllerPtr,
           deviceId,
           connectionId,
@@ -1639,7 +1650,7 @@ public class ChipDeviceController {
   private native void setICDCheckInDelegate(
       long deviceControllerPtr, ICDCheckInDelegateWrapper delegate);
 
-  private native void pairDevice(
+  private native void pairDeviceThroughBLE(
       long deviceControllerPtr,
       long deviceId,
       int connectionId,

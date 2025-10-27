@@ -85,7 +85,7 @@ using namespace chip::Crypto;
 
 #define CDC_JNI_CALLBACK_LOCAL_REF_COUNT 256
 
-static void PairDeviceCommon(JNIEnv * env, AndroidDeviceControllerWrapper * wrapper, chip::NodeId deviceId,
+static void PairDevice(JNIEnv * env, AndroidDeviceControllerWrapper * wrapper, chip::NodeId deviceId,
                              RendezvousParameters & rendezvousParams, jbyteArray csrNonce, jobject networkCredentials,
                              jobject icdRegistrationInfo);
 static void * IOThreadMain(void * arg);
@@ -656,7 +656,7 @@ exit:
     }
 }
 
-JNI_METHOD(void, pairDevice)
+JNI_METHOD(void, pairDeviceThroughBLE)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint connObj, jlong pinCode, jbyteArray csrNonce,
  jobject networkCredentials, jobject icdRegistrationInfo)
 {
@@ -678,11 +678,11 @@ JNI_METHOD(void, pairDevice)
 #endif
                                                 .SetPeerAddress(Transport::PeerAddress::BLE());
 
-    PairDeviceCommon(env, wrapper, static_cast<chip::NodeId>(deviceId), rendezvousParams, csrNonce, networkCredentials,
+    PairDevice(env, wrapper, static_cast<chip::NodeId>(deviceId), rendezvousParams, csrNonce, networkCredentials,
                      icdRegistrationInfo);
 }
 
-static void PairDeviceCommon(JNIEnv * env, AndroidDeviceControllerWrapper * wrapper, chip::NodeId deviceId,
+static void PairDevice(JNIEnv * env, AndroidDeviceControllerWrapper * wrapper, chip::NodeId deviceId,
                              RendezvousParameters & rendezvousParams, jbyteArray csrNonce, jobject networkCredentials,
                              jobject icdRegistrationInfo)
 {
@@ -732,7 +732,7 @@ JNI_METHOD(void, pairDeviceThroughNfc)
     RendezvousParameters rendezvousParams =
         RendezvousParameters().SetSetupPINCode(static_cast<uint32_t>(pinCode)).SetPeerAddress(Transport::PeerAddress::NFC());
 
-    PairDeviceCommon(env, wrapper, static_cast<chip::NodeId>(deviceId), rendezvousParams, csrNonce, networkCredentials,
+    PairDevice(env, wrapper, static_cast<chip::NodeId>(deviceId), rendezvousParams, csrNonce, networkCredentials,
                      icdRegistrationInfo);
 }
 
