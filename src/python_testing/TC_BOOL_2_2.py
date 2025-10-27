@@ -48,10 +48,10 @@ class TC_BOOL_2_2(MatterBaseTest):
     async def set_dut_state_value(self, endpoint: int, state: bool):
         """Set the DUT's BooleanState value via named pipe command."""
         logger.info(f" --- Setting DUT StateValue to {'TRUE' if state else 'FALSE'}")
-        if self.is_pics_sdk_ci_only:
+        if self.is_pics_sdk_ci_only:    # for running in CI
             command_dict = {"Name": "SetBooleanState", "EndpointId": endpoint, "NewState": state}
             self.write_to_app_pipe(command_dict)
-        else:
+        else:                           # for manual testing
             self.wait_for_user_input(
                 prompt_msg=f"Bring the DUT into a state so StateValue is {'TRUE' if state else 'FALSE'}.")
 
@@ -144,7 +144,7 @@ class TC_BOOL_2_2(MatterBaseTest):
         await self.set_dut_state_value(endpoint, state=False)
 
         # Receive StateChange event with StateValue set to FALSE.
-        post_prompt_settle_delay_seconds = 1.0 if self.is_pics_sdk_ci_only else 10.0
+        post_prompt_settle_delay_seconds = 1.0 if self.is_pics_sdk_ci_only else 10.0  # longer delay for manual testing
         event = event_listener.wait_for_event_report(
             cbool.Events.StateChange, timeout_sec=post_prompt_settle_delay_seconds)
         asserts.assert_false(event.stateValue, "Unexpected stateValue on StateChange")
