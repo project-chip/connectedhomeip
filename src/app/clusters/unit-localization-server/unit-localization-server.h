@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <app/persistence/AttributePersistenceMigration.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/UnitLocalization/ClusterId.h>
 #include <clusters/UnitLocalization/Enums.h>
@@ -35,8 +37,7 @@ inline constexpr uint8_t kMaxSupportedLocalizationUnits = 3;
 class UnitLocalizationCluster : public DefaultServerCluster
 {
 public:
-    using MigrationCallback = void(const ConcreteClusterPath &, ServerClusterContext &);
-    UnitLocalizationCluster(EndpointId endpointId, BitFlags<UnitLocalization::Feature> feature, MigrationCallback * mclb);
+    UnitLocalizationCluster(EndpointId endpointId, BitFlags<UnitLocalization::Feature> feature);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
@@ -57,10 +58,14 @@ private:
         UnitLocalization::TempUnitEnum::kKelvin
     };
     DataModel::List<UnitLocalization::TempUnitEnum> mSupportedTemperatureUnits{ mUnitsBuffer };
-
-    MigrationCallback * mCallback = nullptr;
-
     DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
+};
+
+class UnitLocalizationClusterWithMigration : public UnitLocalizationCluster
+{
+    UnitLocalizationClusterWithMigration(EndpointId endpointId, BitFlags<UnitLocalization::Feature> feature);
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
 };
 
 } // namespace Clusters

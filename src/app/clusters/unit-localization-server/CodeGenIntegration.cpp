@@ -34,13 +34,7 @@ using namespace Protocols::InteractionModel;
 
 namespace {
 
-LazyRegisteredServerCluster<UnitLocalizationCluster> gServer;
-
-void Migration(const ConcreteClusterPath & clusterPath, ServerClusterContext & context)
-{
-    AttributeId attributesToUpdate[] = { UnitLocalization::Attributes::TemperatureUnit::Id };
-    MigrateFromSafeAttributePersistenceProvider(clusterPath, Span(attributesToUpdate), context.storage);
-}
+LazyRegisteredServerCluster<UnitLocalizationClusterWithMigration> gServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -51,7 +45,7 @@ public:
 
         const BitFlags<UnitLocalization::Feature> featureMap(rawFeatureMap);
 
-        gServer.Create(endpointId, featureMap, Migration);
+        gServer.Create(endpointId, featureMap);
 
         return gServer.Registration();
     }
