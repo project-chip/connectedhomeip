@@ -40,8 +40,9 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import run_if_endpoint_matches, has_attribute
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep,
                                            default_matter_test_main)
 from matter.tlv import uint
 
@@ -87,10 +88,6 @@ class TC_CLCTRL_4_4(MatterBaseTest):
     def steps_TC_CLCTRL_4_4(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep("2a", "Read the AttributeList attribute to determine supported attributes",
-                     "AttributeList of the ClosureControl cluster is returned by the DUT"),
-            TestStep("2b", "Check if CountdownTime attribute is supported",
-                     "CountdownTime attribute should be present in the AttributeList"),
             TestStep("2c", "Establish a wildcard subscription to all attributes on the ClosureControl cluster",
                      "Subscription successfully established"),
             TestStep("2d", "Read the FeatureMap attribute to determine supported features",
@@ -132,11 +129,11 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
     def pics_TC_CLCTRL_4_4(self) -> list[str]:
         pics = [
-            "CLCTRL.S",
+            "CLCTRL.S.A0000",
         ]
         return pics
 
-    @async_test_body
+    @run_if_endpoint_matches(has_attribute(Clusters.ClosureControl, Clusters.ClosureControl.Attributes.CountdownTime))
     async def test_TC_CLCTRL_4_4(self):
         countdown_time_max: uint = 259200
 
@@ -145,18 +142,6 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
         self.step(1)
         attributes: typing.List[uint] = Clusters.ClosureControl.Attributes
-
-        self.step("2a")
-        attribute_list: typing.List[uint] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
-        logging.info(f"AttributeList: {attribute_list}")
-
-        self.step("2b")
-        is_countdown_time_supported: bool = attributes.CountdownTime.attribute_id in attribute_list
-
-        if not is_countdown_time_supported:
-            logging.info("CountdownTime attribute not supported, skipping test")
-            self.mark_all_remaining_steps_skipped("2c")
-            return
 
         self.step("2c")
         sub_handler = AttributeSubscriptionHandler(expected_cluster=Clusters.ClosureControl)

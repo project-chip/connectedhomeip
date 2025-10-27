@@ -40,8 +40,9 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import run_if_endpoint_matches, has_feature
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep,
                                            default_matter_test_main)
 
 
@@ -81,7 +82,6 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         steps = [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
             TestStep("2a", "TH reads from the DUT the (0xFFFC) FeatureMap attribute"),
-            TestStep("2b", "If the CL feature is not supported on the cluster, skip remaining steps and end test case."),
             TestStep("2c", "TH establishes a wildcard subscription to all attributes on the Closure Control Cluster, with MinIntervalFloor = 0, MaxIntervalCeiling = 30 and KeepSubscriptions = false."),
             TestStep("2d", "TH reads from the DUT the (0xFFFB) AttributeList attribute"),
             TestStep("3a", "TH reads from the DUT the MainState attribute"),
@@ -115,11 +115,11 @@ class TC_CLCTRL_3_1(MatterBaseTest):
 
     def pics_TC_CLCTRL_3_1(self) -> list[str]:
         pics = [
-            "CLCTRL.S"
+            "CLCTRL.S.F06"
         ]
         return pics
 
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(Clusters.ClosureControl, Clusters.ClosureControl.Bitmaps.Feature.kCalibration))
     async def test_TC_CLCTRL_3_1(self):
         endpoint = self.get_endpoint(default=1)
         dev_controller = self.default_controller
@@ -135,16 +135,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         logging.info("Reading FeatureMap attribute from the DUT")
         feature_map = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         logging.info(f"FeatureMap: {feature_map}")
-        is_cl_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kCalibration
         is_lt_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
-
-        # STEP 2b: If the CL feature is not supported on the cluster, skip remaining steps and end test case.
-        self.step("2b")
-
-        if not is_cl_feature_supported:
-            logging.info("The feature Calibration is not supported by the DUT")
-            self.mark_all_remaining_steps_skipped("2c")
-            return
 
         # STEP 2c: TH establishes a wildcard subscription to all attributes on the Closure Control Cluster, with MinIntervalFloor = 0, MaxIntervalCeiling = 30 and KeepSubscriptions = false.
         self.step("2c")

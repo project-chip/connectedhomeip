@@ -43,8 +43,9 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import run_if_endpoint_matches, has_feature
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep,
                                            default_matter_test_main)
 from matter.tlv import uint
 
@@ -90,9 +91,6 @@ class TC_CLCTRL_4_2(MatterBaseTest):
     def steps_TC_CLCTRL_4_2(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep("2a", "Read the FeatureMap attribute to determine supported features",
-                     "FeatureMap of the ClosureControl cluster is returned by the DUT"),
-            TestStep("2b", "If the LT feature is not supported, skip remaining steps and end test case"),
             TestStep("2c", "Read the LatchControlModes attribute",
                      "LatchControlModes of the ClosureControl cluster is returned by the DUT; Value saved as LatchControlModes"),
             TestStep("2d", "Read the OverallCurrentState attribute",
@@ -156,11 +154,11 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
     def pics_TC_CLCTRL_4_2(self) -> list[str]:
         pics = [
-            "CLCTRL.S",
+            "CLCTRL.S.F01",
         ]
         return pics
 
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(Clusters.ClosureControl, Clusters.ClosureControl.Bitmaps.Feature.kLatching))
     async def test_TC_CLCTRL_4_2(self):
 
         endpoint = self.get_endpoint(default=1)
@@ -168,20 +166,6 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
         self.step(1)
         attributes: typing.List[uint] = Clusters.ClosureControl.Attributes
-
-        self.step("2a")
-        feature_map: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
-        is_latching_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
-
-        logging.info(f"FeatureMap: {feature_map}")
-
-        self.step("2b")
-        if not is_latching_supported:
-            logging.info("Latching feature is not supported, skipping remaining steps.")
-            self.mark_all_remaining_steps_skipped("2c")
-            return
-        else:
-            logging.info("Latching feature is supported, proceeding with the test.")
 
         self.step("2c")
         latch_control_modes: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)

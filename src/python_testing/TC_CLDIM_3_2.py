@@ -41,8 +41,9 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import run_if_endpoint_matches, has_feature
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep,
                                            default_matter_test_main)
 
 
@@ -69,10 +70,9 @@ class TC_CLDIM_3_2(MatterBaseTest):
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
-            TestStep("2b", "If MotionLatching feature is not supported, skip remaining steps"),
             TestStep("2c", "Read LimitRange attribute"),
             TestStep("2d", "Read LatchControlModes attribute"),
-            TestStep("2e", "Establish wilcard subscription to all attributes"),
+            TestStep("2e", "Establish wildcard subscription to all attributes"),
             TestStep("2f", "Read CurrentState attribute"),
             TestStep("2g", "If state is unlatched, skip steps 2h to 2l"),
             TestStep("2h", "If LatchControlModes is manual unlatching, skip step 2i"),
@@ -99,11 +99,11 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
     def pics_TC_CLDIM_3_2(self) -> list[str]:
         pics = [
-            "CLDIM.S",
+            "CLDIM.S.F01",
         ]
         return pics
 
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(Clusters.ClosureDimension, Clusters.ClosureDimension.Bitmaps.Feature.kLatching))
     async def test_TC_CLDIM_3_2(self):
         endpoint = self.get_endpoint(default=1)
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
@@ -120,15 +120,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         feature_map = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
         is_positioning_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
-        is_latching_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
         is_limitation_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
-
-        # STEP 2b: If MotionLatching Feature is not supported, skip remaining steps
-        self.step("2b")
-        if not is_latching_supported:
-            logging.info("MotionLatching Feature is not supported. Skipping remaining steps.")
-            self.mark_all_remaining_steps_skipped("2c")
-            return
 
         # STEP 2c: Read LimitRange attribute if supported
         self.step("2c")
