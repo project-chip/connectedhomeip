@@ -107,104 +107,107 @@ public:
         TLV::TLVReader reader;
         ReturnErrorOnFailure(GetResponseReader(reader));
         return response.Decode(reader);
-    }
 
-    // Decode specific response into a specific DecodableType
-    template <typename ResponseType>
-    CHIP_ERROR DecodeResponse(ResponseType & response, size_t index) const
+        // Decode specific response into a specific DecodableType
+        template <typename ResponseType>
+        CHIP_ERROR DecodeResponse(ResponseType & response, size_t index) const
+        {
+            TLV::TLVReader reader;
+            ReturnErrorOnFailure(GetResponseReader(reader, index));
+            return response.Decode(reader);
+        }
+
+        // Configuration methods
+        void SetFabricIndex(FabricIndex index)
+        {
+            mFabricIndex = index;
+        }
+
+    private:
+        std::vector<ResponseRecord> mResponses;
+        std::vector<StatusRecord> mStatuses;
+        FabricIndex mFabricIndex = 1; // Default to 1 to maintain backward compatibility
+    };
+
+    // Helper class for invoking commands in tests.
+    // Manages TLV encoding/decoding and command handler setup.
+    class InvokeOperation
     {
-        TLV::TLVReader reader;
-        ReturnErrorOnFailure(GetResponseReader(reader, index));
-        return response.Decode(reader);
-    }
+    public:
+        InvokeOperation(EndpointId endpoint, ClusterId cluster, CommandId command) :
+            mCommandPath(endpoint, cluster, command), mHandler(std::make_unique<MockCommandHandler>())
+        {
+            mRequest.path = mCommandPath;
+        }
 
-    // Configuration methods
-    void SetFabricIndex(FabricIndex index) { mFabricIndex = index; }
+        InvokeOperation(const ConcreteCommandPath & path) : mCommandPath(path), mHandler(std::make_unique<MockCommandHandler>())
+        {
+            mRequest.path = mCommandPath;
+        }
 
-private:
-    std::vector<ResponseRecord> mResponses;
-    std::vector<StatusRecord> mStatuses;
-    FabricIndex mFabricIndex = 1; // Default to 1 to maintain backward compatibility
-};
+        // New constructor: allows injection of a custom MockCommandHandler
+        InvokeOperation(const ConcreteCommandPath & path, std::unique_ptr<MockCommandHandler> handler) :
+            mCommandPath(path), mHandler(std::move(handler))
+        {
+            mRequest.path = mCommandPath;
+        }
 
-// Helper class for invoking commands in tests.
-// Manages TLV encoding/decoding and command handler setup.
-class InvokeOperation
-{
-public:
-    InvokeOperation(EndpointId endpoint, ClusterId cluster, CommandId command) :
-        mCommandPath(endpoint, cluster, command), mHandler(std::make_unique<MockCommandHandler>())
-    {
-        mRequest.path = mCommandPath;
-    }
+        InvokeOperation(EndpointId endpoint, ClusterId cluster, CommandId command, std::unique_ptr<MockCommandHandler> handler) :
+            mCommandPath(endpoint, cluster, command), mHandler(std::move(handler))
+        {
+            mRequest.path = mCommandPath;
+        }
+        // Invoke a command using a pre-defined request structure
+        template <typename ClusterType, typename RequestType>
+        std::optional<DataModel::ActionReturnStatus> Invoke(ClusterType & cluster, const RequestType & request)
+        {
+            CHIP_ERROR err = CHIP_NO_ERROR;
+            TLV::TLVWriter writer;
+            writer.Init(mTlvBuffer);
 
-    InvokeOperation(const ConcreteCommandPath & path) : mCommandPath(path), mHandler(std::make_unique<MockCommandHandler>())
-    {
-        mRequest.path = mCommandPath;
-    }
+            // Setup reader (declare before any SuccessOrExit calls)
+            TLV::TLVReader reader;
 
-    // New constructor: allows injection of a custom MockCommandHandler
-    InvokeOperation(const ConcreteCommandPath & path, std::unique_ptr<MockCommandHandler> handler) :
-        mCommandPath(path), mHandler(std::move(handler))
-    {
-        mRequest.path = mCommandPath;
-    }
+            // Use the request's built-in Encode method
+            SuccessOrExit(err = request.Encode(writer, TLV::AnonymousTag()));
+            SuccessOrExit(err = writer.Finalize());
 
-    InvokeOperation(EndpointId endpoint, ClusterId cluster, CommandId command, std::unique_ptr<MockCommandHandler> handler) :
-        mCommandPath(endpoint, cluster, command), mHandler(std::move(handler))
-    {
-        mRequest.path = mCommandPath;
-    }
-    // Invoke a command using a pre-defined request structure
-    template <typename ClusterType, typename RequestType>
-    std::optional<DataModel::ActionReturnStatus> Invoke(ClusterType & cluster, const RequestType & request)
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        TLV::TLVWriter writer;
-        writer.Init(mTlvBuffer);
+            reader.Init(mTlvBuffer, writer.GetLengthWritten());
+            SuccessOrExit(err = reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
 
-        // Use the request's built-in Encode method
-        SuccessOrExit(err = request.Encode(writer, TLV::AnonymousTag()));
-        SuccessOrExit(err = writer.Finalize());
+            // Invoke the command
+            return cluster.InvokeCommand(mRequest, reader, mHandler.get());
 
-        // Setup reader (declare before any SuccessOrExit calls)
-        TLV::TLVReader reader;
-        reader.Init(mTlvBuffer, writer.GetLengthWritten());
-        SuccessOrExit(err = reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+        exit:
+            return std::make_optional(DataModel::ActionReturnStatus(err));
+        }
 
-        // Invoke the command
-        return cluster.InvokeCommand(mRequest, reader, mHandler.get());
+        // Get the command handler to inspect responses
+        MockCommandHandler & GetHandler() { return *mHandler; }
+        const MockCommandHandler & GetHandler() const { return *mHandler; }
 
-    exit:
-        return std::make_optional(DataModel::ActionReturnStatus(err));
-    }
+        // Convenience method to decode the response
+        template <typename ResponseType>
+        CHIP_ERROR DecodeResponse(ResponseType & response)
+        {
+            return mHandler->DecodeResponse(response);
+        }
 
-    // Get the command handler to inspect responses
-    MockCommandHandler & GetHandler() { return *mHandler; }
-    const MockCommandHandler & GetHandler() const { return *mHandler; }
+        // Get the invoke request (path and metadata)
+        const DataModel::InvokeRequest & GetRequest() const { return mRequest; }
 
-    // Convenience method to decode the response
-    template <typename ResponseType>
-    CHIP_ERROR DecodeResponse(ResponseType & response)
-    {
-        return mHandler->DecodeResponse(response);
-    }
+    private:
+        // Buffer size for TLV encoding/decoding of command payloads.
+        // 256 bytes was chosen as a conservative upper bound for typical command payloads in tests.
+        // All command payloads used in tests must fit within this buffer; tests with larger payloads will fail.
+        // If protocol or test requirements change, this value may need to be increased.
+        static constexpr size_t kTlvBufferSize = 256;
 
-    // Get the invoke request (path and metadata)
-    const DataModel::InvokeRequest & GetRequest() const { return mRequest; }
-
-private:
-    // Buffer size for TLV encoding/decoding of command payloads.
-    // 256 bytes was chosen as a conservative upper bound for typical command payloads in tests.
-    // All command payloads used in tests must fit within this buffer; tests with larger payloads will fail.
-    // If protocol or test requirements change, this value may need to be increased.
-    static constexpr size_t kTlvBufferSize = 256;
-
-    ConcreteCommandPath mCommandPath;
-    DataModel::InvokeRequest mRequest;
-    std::unique_ptr<MockCommandHandler> mHandler;
-    uint8_t mTlvBuffer[kTlvBufferSize];
-};
+        ConcreteCommandPath mCommandPath;
+        DataModel::InvokeRequest mRequest;
+        std::unique_ptr<MockCommandHandler> mHandler;
+        uint8_t mTlvBuffer[kTlvBufferSize];
+    };
 
 } // namespace Testing
 } // namespace app
