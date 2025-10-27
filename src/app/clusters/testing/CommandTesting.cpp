@@ -69,7 +69,8 @@ CHIP_ERROR MockCommandHandler::AddResponseData(const ConcreteCommandPath & aRequ
 void MockCommandHandler::AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                      const DataModel::EncodableToTLV & aEncodable)
 {
-    (void) AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable);
+    CHIP_ERROR err = AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable);
+    VerifyOrDie(err == CHIP_NO_ERROR);
 }
 
 CHIP_ERROR MockCommandHandler::GetResponseReader(TLV::TLVReader & reader) const
