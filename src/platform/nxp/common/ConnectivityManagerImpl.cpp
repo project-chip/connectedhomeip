@@ -500,6 +500,10 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
                 NetworkCommissioning::NXPWiFiDriver::GetInstance().OnConnectWiFiNetwork(
                     NetworkCommissioning::Status::kNetworkIDNotFound, CharSpan(), wlanEvent);
             }
+            else if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Failed to reconnect to staged network after WiFi FW recovery: %" CHIP_ERROR_FORMAT, err.Format());
+            }
         }
         break;
 
