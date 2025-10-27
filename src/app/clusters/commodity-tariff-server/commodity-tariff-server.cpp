@@ -405,7 +405,13 @@ struct ThresholdsPerFeatureValidationContext
 
         bool operator==(const FeatureEntry & other) const
         {
-            return (this->thresholdVal == other.thresholdVal) && ((this->featureVal.Raw() & other.featureVal.Raw()) == 0);
+            return (this->thresholdVal == other.thresholdVal) && (this->featureVal == other.featureVal);
+        }
+
+        bool haveJointFeatures(const FeatureEntry & other) const
+        {
+            return (this->thresholdVal == other.thresholdVal) && 
+                   ((this->featureVal.Raw() & other.featureVal.Raw()) != 0);
         }
     };
 
@@ -416,6 +422,15 @@ struct ThresholdsPerFeatureValidationContext
     {
         CHIP_ERROR ret     = CHIP_NO_ERROR;
         FeatureEntry entry = { .thresholdVal = threshold, .featureVal = feature };
+
+        for (const auto& existingEntry : featuresPerThreshold)
+        {
+            if (entry.haveJointFeatures(existingEntry))
+            {
+                ret = CHIP_ERROR_DUPLICATE_KEY_ID;
+                break;
+            }
+        }
 
         if (!featuresPerThreshold.insert(entry))
         {
