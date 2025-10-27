@@ -28,24 +28,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ReadOnlyBuffer.h>
-
-#include <app/data-model-provider/tests/WriteTesting.h>
-
-#include <lib/core/TLVReader.h>
-
 #include <credentials/GroupDataProvider.h>
-
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/clusters/testing/TestReadWriteAttribute.h>
-// #include <app/data-model-provider/tests/ReadTesting.h>
-// #include <lib/core/TLVWriter.h>
-// #include <app/clusters/testing/AttributeTesting.h>
-// #include <app/data-model/List.h>
-// #include <lib/support/Span.h>
-// #include <lib/support/logging/CHIPLogging.h>
-//  #include <app/AttributeValueDecoder.h>
-// #include <app/AttributeValueEncoder.h>
-// #include <platform/DiagnosticDataProvider.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -119,111 +104,10 @@ TEST_F(TestGroupKeyManagementCluster, AttributesTest)
     ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 }
 
-class FakeGroupDataProvider : public chip::Credentials::GroupDataProvider
-{
-public:
-    std::map<chip::FabricIndex, std::vector<GroupKey>> mFabricKeys;
-    FakeGroupDataProvider() : GroupDataProvider(5, 10) {}
-
-    class VectorIterator : public GroupKeyIterator
-    {
-    public:
-        VectorIterator(const std::vector<GroupKey> & vec) : mVector(vec) {}
-        size_t Count() override { return mVector.size(); }
-        bool Next(GroupKey & item) override
-        {
-            if (mIndex >= mVector.size())
-            {
-                return false;
-            }
-            item = mVector[mIndex++];
-            return true;
-        }
-        void Release() override { delete this; }
-
-    private:
-        const std::vector<GroupKey> & mVector;
-        size_t mIndex = 0;
-    };
-
-    CHIP_ERROR SetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, const GroupKey & groupKey) override
-    {
-        auto & keyList = mFabricKeys[fabric_index];
-        if (index > keyList.size())
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-
-        if (index == keyList.size())
-        {
-            keyList.push_back(groupKey); // Append
-        }
-        else
-        {
-            keyList[index] = groupKey; // Replace existing
-        }
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR GetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, GroupKey & groupKey) override
-    {
-        if (mFabricKeys.count(fabric_index) == 0 || index >= mFabricKeys[fabric_index].size())
-        {
-            return CHIP_ERROR_NOT_FOUND;
-        }
-        groupKey = mFabricKeys[fabric_index][index];
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR RemoveGroupKeys(chip::FabricIndex fabric_index) override
-    {
-        if (mFabricKeys.count(fabric_index) > 0)
-        {
-            mFabricKeys.at(fabric_index).clear();
-        }
-        return CHIP_NO_ERROR;
-    }
-
-    GroupKeyIterator * IterateGroupKeys(chip::FabricIndex fabric_index) override
-    {
-        if (mFabricKeys.count(fabric_index) == 0)
-        {
-            // Return an iterator for an empty vector to avoid creating an entry in the map
-            static const std::vector<GroupKey> kEmpty;
-            return new VectorIterator(kEmpty);
-        }
-        return new VectorIterator(mFabricKeys.at(fabric_index));
-    }
-
-    CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
-    void Finish() override {}
-    CHIP_ERROR SetGroupInfo(chip::FabricIndex, const GroupInfo &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR GetGroupInfo(chip::FabricIndex, chip::GroupId, GroupInfo &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR RemoveGroupInfo(chip::FabricIndex, chip::GroupId) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR SetGroupInfoAt(chip::FabricIndex, size_t, const GroupInfo &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR GetGroupInfoAt(chip::FabricIndex, size_t, GroupInfo &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR RemoveGroupInfoAt(chip::FabricIndex, size_t) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    bool HasEndpoint(chip::FabricIndex, chip::GroupId, chip::EndpointId) override { return false; }
-    CHIP_ERROR AddEndpoint(chip::FabricIndex, chip::GroupId, chip::EndpointId) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR RemoveEndpoint(chip::FabricIndex, chip::GroupId, chip::EndpointId) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR RemoveEndpoint(chip::FabricIndex, chip::EndpointId) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    GroupInfoIterator * IterateGroupInfo(chip::FabricIndex) override { return nullptr; }
-    EndpointIterator * IterateEndpoints(chip::FabricIndex, std::optional<chip::GroupId> = std::nullopt) override { return nullptr; }
-    CHIP_ERROR RemoveGroupKeyAt(chip::FabricIndex, size_t) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR SetKeySet(chip::FabricIndex, const chip::ByteSpan &, const KeySet &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR GetKeySet(chip::FabricIndex, chip::KeysetId, KeySet &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR RemoveKeySet(chip::FabricIndex, chip::KeysetId) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR GetIpkKeySet(chip::FabricIndex, KeySet &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    KeySetIterator * IterateKeySets(chip::FabricIndex) override { return nullptr; }
-    CHIP_ERROR RemoveFabric(chip::FabricIndex) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    GroupSessionIterator * IterateGroupSessions(uint16_t) override { return nullptr; }
-    chip::Crypto::SymmetricKeyContext * GetKeyContext(chip::FabricIndex, chip::GroupId) override { return nullptr; }
-};
-
 struct ClusterTestContext
 {
     ::chip::app::Clusters::GroupKeyManagementCluster & mCluster;
-    ClusterTestContext(::chip::app::Clusters::GroupKeyManagementCluster & cluster, FakeGroupDataProvider & provider) :
+    ClusterTestContext(::chip::app::Clusters::GroupKeyManagementCluster & cluster, chip::Credentials::GroupDataProvider & provider) :
         mCluster(cluster)
     {
         ::chip::Credentials::SetGroupDataProvider(&provider);
@@ -235,53 +119,49 @@ struct ClusterTestContext
     }
 };
 
-namespace TestHelpers {
-
-template <typename ClusterT, typename T>
-CHIP_ERROR WriteClusterAttribute(ClusterT & cluster, const chip::app::ConcreteAttributePath & path, const T & listToWrite)
+class MockSessionKeystore : public chip::Crypto::SessionKeystore
 {
-    chip::app::Testing::WriteOperation writeOperation(path);
-    writeOperation.SetSubjectDescriptor(chip::app::Testing::kAdminSubjectDescriptor);
+public:
+    using P256ECDHDerivedSecret = chip::Crypto::P256ECDHDerivedSecret;
+    using Symmetric128BitsKeyByteArray = chip::Crypto::Symmetric128BitsKeyByteArray;
+    using Aes128KeyHandle = chip::Crypto::Aes128KeyHandle;
+    using Hmac128KeyHandle = chip::Crypto::Hmac128KeyHandle;
+    using HkdfKeyHandle = chip::Crypto::HkdfKeyHandle;
+    using Symmetric128BitsKeyHandle = chip::Crypto::Symmetric128BitsKeyHandle;
+    using AttestationChallenge = chip::Crypto::AttestationChallenge;
 
-    // The ZAP-generated `GroupKeyMapStruct::Type` does not provide a generic `Encode()`
-    // method. Instead, it has context-specific `EncodeForWrite()` and `EncodeForRead()`
-    // methods. High-level helpers like `DecoderFor()` cannot resolve this and fail
-    // to compile. Hence we manually encode the list of structs into a TLV buffer.
-
-    uint8_t tlvBuffer[1024];
-    chip::TLV::TLVWriter writer;
-    writer.Init(tlvBuffer);
-
-    chip::TLV::TLVType outerContainer;
-    CHIP_ERROR err = writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Array, outerContainer);
-    if (err != CHIP_NO_ERROR)
+    // --- SymmetricKeyStore APIs ---
+    CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key) override
     {
-        return err;
+        return CHIP_NO_ERROR;
     }
-
-    for (const auto & item : listToWrite)
+    CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128KeyHandle & key) override
     {
-        err = item.EncodeForWrite(writer, chip::TLV::AnonymousTag());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        return CHIP_NO_ERROR;
     }
+    CHIP_ERROR CreateKey(const ByteSpan & keyMaterial, HkdfKeyHandle & key) override { return CHIP_NO_ERROR; }
+    void DestroyKey(Symmetric128BitsKeyHandle & key) override {}
+    void DestroyKey(HkdfKeyHandle & key) override {}
 
-    err = writer.EndContainer(outerContainer);
-    if (err != CHIP_NO_ERROR)
+    CHIP_ERROR DeriveKey(const P256ECDHDerivedSecret & secret, const ByteSpan & salt, const ByteSpan & info,
+                         Aes128KeyHandle & key) override
     {
-        return err;
+        return CHIP_NO_ERROR;
     }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(tlvBuffer, writer.GetLengthWritten());
-    ReturnErrorOnFailure(reader.Next()); // Position reader on the array
-
-    chip::app::AttributeValueDecoder decoder(reader, *writeOperation.GetRequest().subjectDescriptor);
-
-    return cluster.WriteAttribute(writeOperation.GetRequest(), decoder).GetUnderlyingError();
-}
+    CHIP_ERROR DeriveSessionKeys(const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info,
+                                 Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
+                                 AttestationChallenge & attestationChallenge) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR DeriveSessionKeys(const HkdfKeyHandle & secretKey, const ByteSpan & salt, const ByteSpan & info,
+                                 Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
+                                 AttestationChallenge & attestationChallenge) override
+    {
+        return CHIP_NO_ERROR;
+    }
+};
+namespace TestHelpers {
 
 GroupKeyManagement::Structs::GroupKeyMapStruct::Type CreateKey(chip::GroupId groupId, uint16_t keySetId,
                                                                chip::FabricIndex fabricIndex)
@@ -321,40 +201,63 @@ void PrepopulateGroupKeyMap(GroupKeyManagementCluster & cluster,
     ASSERT_EQ(err, CHIP_NO_ERROR);
 }
 
-void VerifyGroupKeysMatch(FakeGroupDataProvider & provider, const chip::FabricIndex fabricIndex,
+void VerifyGroupKeysMatch(chip::Credentials::GroupDataProvider & provider, const chip::FabricIndex fabricIndex,
                           const std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> & expectedKeys)
 {
-    ASSERT_EQ(provider.mFabricKeys.count(fabricIndex), 1u);
+    using chip::Credentials::GroupDataProvider;
 
-    const auto & storedKeys = provider.mFabricKeys.at(fabricIndex);
+    GroupDataProvider::GroupKeyIterator * iterator = provider.IterateGroupKeys(fabricIndex);
+    ASSERT_NE(iterator, nullptr);
+    ASSERT_EQ(iterator->Count(), expectedKeys.size());
 
-    ASSERT_EQ(storedKeys.size(), expectedKeys.size());
-
-    for (size_t i = 0; i < expectedKeys.size(); ++i)
+    size_t i = 0;
+    GroupDataProvider::GroupKey storedKey;
+    while (iterator->Next(storedKey))
     {
-        EXPECT_EQ(storedKeys[i].group_id, expectedKeys[i].groupId);
-        EXPECT_EQ(storedKeys[i].keyset_id, expectedKeys[i].groupKeySetID);
+        ASSERT_LT(i, expectedKeys.size());
+        if (i < expectedKeys.size())
+        {
+            EXPECT_EQ(storedKey.group_id, expectedKeys[i].groupId);
+            EXPECT_EQ(storedKey.keyset_id, expectedKeys[i].groupKeySetID);
+        }
+        i++;
     }
+
+    ASSERT_EQ(i, expectedKeys.size());
+
+    iterator->Release();
 }
+
 } // namespace TestHelpers
+
 
 TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttribute)
 {
     chip::Test::TestServerClusterContext testStack;
-    FakeGroupDataProvider fakeProvider;
-    GroupKeyManagementCluster cluster;
-    ClusterTestContext clusterContext(cluster, fakeProvider);
+    
+    chip::Credentials::GroupDataProviderImpl realProvider;
+
+    MockSessionKeystore mockKeystore;
+
+    auto * storage = &testStack.StorageDelegate();
+    ASSERT_NE(storage, nullptr);
+
+    realProvider.SetStorageDelegate(storage);
+    realProvider.SetSessionKeystore(&mockKeystore);  
+    ASSERT_EQ(realProvider.Init(), CHIP_NO_ERROR); 
 
     auto context = testStack.Create();
+
+    GroupKeyManagementCluster cluster;
+    ClusterTestContext clusterContext(cluster, realProvider);
     ASSERT_EQ(cluster.Startup(context), CHIP_NO_ERROR);
 
     const chip::FabricIndex fabricIndex = chip::app::Testing::kTestFabrixIndex;
-
     auto keys = TestHelpers::CreateGroupKeyMapList(2, fabricIndex);
 
     TestHelpers::PrepopulateGroupKeyMap(cluster, keys);
+    TestHelpers::VerifyGroupKeysMatch(realProvider, fabricIndex, keys);
 
-    TestHelpers::VerifyGroupKeysMatch(fakeProvider, fabricIndex, keys);
+    realProvider.Finish();
 }
-
 } // namespace
