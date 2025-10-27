@@ -34,7 +34,7 @@ public:
     {
         EventNumber eventNumber;
         app::EventOptions eventOptions;
-        bool wasDeliveredUrgently{false};
+        bool wasDeliveredUrgently{ false };
         ByteSpan GetEncodeByteSpan() const { return ByteSpan(mEventEncodeBuffer, mEncodedLength); }
 
         // This relies on the default encoding of events which uses
