@@ -25,8 +25,8 @@
 #include <PowerTopologyDelegate.h>
 #include <WhmMain.h>
 #include <WhmManufacturer.h>
-#include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
+#include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <device-energy-management-modes.h>
 #include <energy-evse-modes.h>
 #include <water-heater-mode.h>
