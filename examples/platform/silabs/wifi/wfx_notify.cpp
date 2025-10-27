@@ -219,7 +219,7 @@ void wfx_retry_connection(uint16_t retryAttempt)
             return;
         }
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
-        wfx_rsi_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);
+        wfx_rsi_power_save(RSI_SLEEP_MODE_8, ASSOCIATED_POWER_SAVE);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
         ChipLogProgress(DeviceLayer, "wfx_retry_connection : Next attempt after %d Seconds", retryInterval);
         retryInterval += retryInterval;
