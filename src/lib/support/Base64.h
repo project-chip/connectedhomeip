@@ -94,6 +94,6 @@ extern uint32_t Base64Decode32(const char * in, uint32_t inLen, MutableByteSpan 
  *
  * NOTE: The actual decoded length may be smaller than this due to padding.
  */
-#define BASE64_MAX_DECODED_LEN(LEN) ((LEN) * 3 / 4)
+#define BASE64_MAX_DECODED_LEN(LEN) ((LEN) *3 / 4)
 
 } // namespace chip
