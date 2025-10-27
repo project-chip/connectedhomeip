@@ -226,7 +226,7 @@ class DeviceProvisioningFragment : Fragment() {
 
       setAttestationDelegate()
 
-      deviceController.pairDevice(gatt, connId, deviceId, deviceInfo.setupPinCode, network)
+      deviceController.pairDeviceThroughBLE(gatt, connId, deviceId, deviceInfo.setupPinCode, network)
       DeviceIdUtil.setNextAvailableId(requireContext(), deviceId + 1)
     }
   }

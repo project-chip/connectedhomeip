@@ -165,7 +165,7 @@ public class ChipDeviceController {
       long deviceId,
       long setupPincode,
       NetworkCredentials networkCredentials) {
-    pairDeviceThroughBLE(bleServer, connId, deviceId, setupPincode, null, networkCredentials, null);
+    pairDevice(bleServer, connId, deviceId, setupPincode, null, networkCredentials, null);
   }
 
   /* This method was deprecated. Please use {@link ChipDeviceController.pairDeviceThroughBLE(BluetoothGatt, int, long, long, CommissionParameters)}. */
@@ -177,7 +177,7 @@ public class ChipDeviceController {
       long setupPincode,
       NetworkCredentials networkCredentials,
       ICDRegistrationInfo registrationInfo) {
-    pairDeviceThroughBLE(
+    pairDevice(
         bleServer, connId, deviceId, setupPincode, null, networkCredentials, registrationInfo);
   }
 
@@ -190,7 +190,7 @@ public class ChipDeviceController {
       long setupPincode,
       @Nullable byte[] csrNonce,
       NetworkCredentials networkCredentials) {
-    pairDeviceThroughBLE(
+    pairDevice(
         bleServer, connId, deviceId, setupPincode, csrNonce, networkCredentials, null);
   }
 
