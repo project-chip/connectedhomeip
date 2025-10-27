@@ -15,11 +15,15 @@
  *    limitations under the License.
  */
 
-#include "app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-logic.h"
+#include <app/EventLogging.h>
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/WiFiNetworkDiagnostics/Ids.h>
 #include <clusters/WiFiNetworkDiagnostics/Metadata.h>
+#include <lib/support/CodeUtils.h>
+#include <platform/DiagnosticDataProvider.h>
+#include <tracing/macros.h>
+#include <tracing/metric_event.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -33,64 +37,138 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+namespace {
+template <typename T, typename Type>
+CHIP_ERROR ReadIfSupported(DiagnosticDataProvider & provider, CHIP_ERROR (DeviceLayer::DiagnosticDataProvider::*getter)(T &),
+                           Type & data, AttributeValueEncoder & aEncoder)
+{
+    T value;
+    CHIP_ERROR err = (provider.*getter)(value);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        data.SetNonNull(value);
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "The WiFi interface is not currently configured or operational.");
+    }
+
+    return aEncoder.Encode(data);
+}
+
+// WiFiBssId uses custom implementations instead of ReadIfSupported because it
+// is attribute of type octet string.
+CHIP_ERROR ReadWiFiBssId(DiagnosticDataProvider & provider, AttributeValueEncoder & aEncoder)
+{
+    Attributes::Bssid::TypeInfo::Type bssid;
+
+    uint8_t bssidBytes[chip::DeviceLayer::kMaxHardwareAddrSize];
+    MutableByteSpan bssidSpan(bssidBytes);
+    if (provider.GetWiFiBssId(bssidSpan) == CHIP_NO_ERROR)
+    {
+        if (!bssidSpan.empty())
+        {
+            bssid.SetNonNull(bssidSpan);
+        }
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "The WiFi interface is not currently connected.");
+    }
+
+    return aEncoder.Encode(bssid);
+}
+} // namespace
+
+void WiFiDiagnosticsServerCluster::OnDisconnectionDetected(uint16_t reasonCode)
+{
+    MATTER_TRACE_SCOPE("OnDisconnectionDetected", "WiFiDiagnosticsDelegate");
+
+    VerifyOrReturn(mContext != nullptr);
+
+    Events::Disconnection::Type event{ reasonCode };
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mEndpointId);
+}
+
+void WiFiDiagnosticsServerCluster::OnAssociationFailureDetected(uint8_t associationFailureCause, uint16_t status)
+{
+    MATTER_TRACE_SCOPE("OnAssociationFailureDetected", "WiFiDiagnosticsDelegate");
+
+    VerifyOrReturn(mContext != nullptr);
+
+    Events::AssociationFailure::Type event{ static_cast<AssociationFailureCauseEnum>(associationFailureCause), status };
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mEndpointId);
+}
+
+void WiFiDiagnosticsServerCluster::OnConnectionStatusChanged(uint8_t connectionStatus)
+{
+    MATTER_TRACE_SCOPE("OnConnectionStatusChanged", "WiFiDiagnosticsDelegate");
+
+    VerifyOrReturn(mContext != nullptr);
+
+    Events::ConnectionStatus::Type event{ static_cast<ConnectionStatusEnum>(connectionStatus) };
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mEndpointId);
+}
+
 DataModel::ActionReturnStatus WiFiDiagnosticsServerCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                           AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id:
-        return encoder.Encode(mLogic.GetFeatureFlags());
+        return encoder.Encode(mFeatureFlags);
     case ClusterRevision::Id:
         return encoder.Encode(WiFiNetworkDiagnostics::kRevision);
     case Bssid::Id:
-        return mLogic.ReadWiFiBssId(encoder);
+        return ReadWiFiBssId(mDiagnosticProvider, encoder);
     case Attributes::SecurityType::Id: {
         Attributes::SecurityType::TypeInfo::Type securityType;
-        return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiSecurityType, securityType, encoder);
+        return ReadIfSupported(mDiagnosticProvider, &DiagnosticDataProvider::GetWiFiSecurityType, securityType, encoder);
     }
     case WiFiVersion::Id: {
         Attributes::WiFiVersion::TypeInfo::Type version;
-        return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiVersion, version, encoder);
+        return ReadIfSupported(mDiagnosticProvider, &DiagnosticDataProvider::GetWiFiVersion, version, encoder);
     }
     case ChannelNumber::Id: {
         Attributes::ChannelNumber::TypeInfo::Type channelNumber;
-        return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiChannelNumber, channelNumber, encoder);
+        return ReadIfSupported(mDiagnosticProvider, &DiagnosticDataProvider::GetWiFiChannelNumber, channelNumber, encoder);
     }
     case Rssi::Id: {
         Attributes::Rssi::TypeInfo::Type rssi;
-        return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiRssi, rssi, encoder);
+        return ReadIfSupported(mDiagnosticProvider, &DiagnosticDataProvider::GetWiFiRssi, rssi, encoder);
     }
     case BeaconLostCount::Id: {
         Attributes::BeaconLostCount::TypeInfo::Type count;
-        return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiBeaconLostCount, count, encoder);
+        return ReadIfSupported(mDiagnosticProvider, &DiagnosticDataProvider::GetWiFiBeaconLostCount, count, encoder);
     }
     case BeaconRxCount::Id: {
         Attributes::BeaconRxCount::TypeInfo::Type count;
-        return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiBeaconRxCount, count, encoder);
+        return ReadIfSupported(mDiagnosticProvider, &DiagnosticDataProvider::GetWiFiBeaconRxCount, count, encoder);
     }
     case PacketMulticastRxCount::Id: {
         Attributes::PacketMulticastRxCount::TypeInfo::Type count;
-        return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketMulticastRxCount, count, encoder);
+        return ReadIfSupported(mDiagnosticProvider, &DiagnosticDataProvider::GetWiFiPacketMulticastRxCount, count, encoder);
     }
     case PacketMulticastTxCount::Id: {
         Attributes::PacketMulticastTxCount::TypeInfo::Type count;
-        return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketMulticastTxCount, count, encoder);
+        return ReadIfSupported(mDiagnosticProvider, &DiagnosticDataProvider::GetWiFiPacketMulticastTxCount, count, encoder);
     }
     case PacketUnicastRxCount::Id: {
         Attributes::PacketUnicastRxCount::TypeInfo::Type count;
-        return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketUnicastRxCount, count, encoder);
+        return ReadIfSupported(mDiagnosticProvider, &DiagnosticDataProvider::GetWiFiPacketUnicastRxCount, count, encoder);
     }
     case PacketUnicastTxCount::Id: {
         Attributes::PacketUnicastTxCount::TypeInfo::Type count;
-        return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketUnicastTxCount, count, encoder);
+        return ReadIfSupported(mDiagnosticProvider, &DiagnosticDataProvider::GetWiFiPacketUnicastTxCount, count, encoder);
     }
     case CurrentMaxRate::Id: {
         Attributes::CurrentMaxRate::TypeInfo::Type rate;
-        return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiCurrentMaxRate, rate, encoder);
+        return ReadIfSupported(mDiagnosticProvider, &DiagnosticDataProvider::GetWiFiCurrentMaxRate, rate, encoder);
     }
     case OverrunCount::Id: {
         Attributes::OverrunCount::TypeInfo::Type count;
-        return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiOverrunCount, count, encoder);
+        return ReadIfSupported(mDiagnosticProvider, &DiagnosticDataProvider::GetWiFiOverrunCount, count, encoder);
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
@@ -101,8 +179,6 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
                                                     ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder attributeListBuilder(builder);
-
-    const BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags = mLogic.GetFeatureFlags();
 
     const DataModel::AttributeEntry optionalAttributes[] = {
         BeaconLostCount::kMetadataEntry,        //
@@ -126,15 +202,15 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
                                     WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id, //
                                     WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id    //
                                     >
-        optionalAttributeSet(mLogic.GetOptionalAttributeSet());
+        optionalAttributeSet(mOptionalAttributeSet);
 
-    if (featureFlags.Has(Feature::kErrorCounts))
+    if (mFeatureFlags.Has(Feature::kErrorCounts))
     {
         optionalAttributeSet.Set<BeaconLostCount::Id>();
         optionalAttributeSet.Set<OverrunCount::Id>();
     }
 
-    if (featureFlags.Has(Feature::kPacketCounts))
+    if (mFeatureFlags.Has(Feature::kPacketCounts))
     {
         optionalAttributeSet.Set<BeaconRxCount::Id>();
         optionalAttributeSet.Set<PacketMulticastRxCount::Id>();
@@ -148,7 +224,7 @@ CHIP_ERROR WiFiDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & 
 CHIP_ERROR WiFiDiagnosticsServerCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                           ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (mLogic.GetFeatureFlags().Has(Feature::kErrorCounts))
+    if (mFeatureFlags.Has(Feature::kErrorCounts))
     {
         static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = { Commands::ResetCounts::kMetadataEntry };
         return builder.ReferenceExisting(kAcceptedCommands);
@@ -164,7 +240,10 @@ std::optional<DataModel::ActionReturnStatus> WiFiDiagnosticsServerCluster::Invok
     switch (request.path.mCommandId)
     {
     case Commands::ResetCounts::Id: {
-        mLogic.HandleResetCounts();
+        // Note that ResetWiFiNetworkDiagnosticsCounts() does return a CHIP_ERROR; however, for backwards compatibility,
+        // we completely ignore that return value. It would probably be more correct to return the result
+        // of the reset, but that seems to potentially cause backwards compatibility issues.
+        mDiagnosticProvider.ResetWiFiNetworkDiagnosticsCounts();
         return Protocols::InteractionModel::Status::Success;
     }
     default:
