@@ -190,6 +190,8 @@ CHIP_ERROR RTKDACVendorProvider::GetProductAttestationIntermediateCert(MutableBy
 #if FEATURE_TRUSTZONE_ENABLE && CONFIG_DAC_KEY_ENC
 CHIP_ERROR RTKDACVendorProvider::ImportDACKey()
 {
+    VerifyOrReturnError(pFactoryData->dac.dac_cert.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    VerifyOrReturnError(pFactoryData->dac.dac_key.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     ByteSpan dacCertSpan{ pFactoryData->dac.dac_cert.value, pFactoryData->dac.dac_cert.len };
     chip::Crypto::P256PublicKey dacPublicKey;
     ReturnErrorOnFailure(chip::Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey));
@@ -242,7 +244,7 @@ CHIP_ERROR RTKDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpan & m
         ChipLogError(DeviceLayer, "secure_app_function_call DAC key sign %d", param.ret);
         return CHIP_ERROR_INTERNAL;
     }
-    if (param.sig_len > sizeof(sig_tmp_buf))
+    if (param.sig_len == 0|| param.sig_len > sizeof(sig_tmp_buf))
     {
         ChipLogError(DeviceLayer, "Signature length out of bounds: %d", param.sig_len);
         return CHIP_ERROR_INTERNAL;
