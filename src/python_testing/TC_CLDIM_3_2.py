@@ -41,10 +41,9 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.decorators import run_if_endpoint_matches, has_feature
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep,
-                                           default_matter_test_main)
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, default_matter_test_main
 
 
 def current_latch_matcher(latch: bool) -> AttributeMatcher:
