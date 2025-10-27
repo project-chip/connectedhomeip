@@ -40,17 +40,24 @@ from matter.testing.matter_testing import MatterBaseTest
 
 def get_all_cmds_for_cluster_id(cid: int) -> list[Clusters.ClusterObjects.ClusterCommand]:
     """Get all commands for a given cluster ID.
-
+    
     Args:
         cid: Cluster ID to get commands for
-
+        
     Returns:
-        List of command classes for the cluster
+        List of command classes for the cluster, or empty list if cluster has no commands
+        
+    Note:
+        Some clusters don't have a Commands attribute (they have no commands defined).
+        The AttributeError catch handles this case gracefully by returning an empty list,
+        allowing callers to safely iterate through all clusters without special-casing
+        clusters that don't support commands.
     """
     cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cid]
     try:
         return inspect.getmembers(cluster.Commands, inspect.isclass)
     except AttributeError:
+        # Cluster has no Commands attribute - return empty list
         return []
 
 
