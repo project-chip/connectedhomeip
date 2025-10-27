@@ -12,6 +12,7 @@ NFC_SUCCESS_SW2 = 0x00
 
 MAX_NDEF_DATA_LENGTH = 256
 
+
 def _clean_nfc_data(ndef_data_string: str) -> str:
     """
        Return a string containing only printable characters from `ndef_data_string`.
@@ -44,7 +45,8 @@ def _clean_nfc_data(ndef_data_string: str) -> str:
        """
     return ''.join([ndef_data_char for ndef_data_char in ndef_data_string if ndef_data_char.isprintable()])
 
-def _check_transmission_status(sw1:int, sw2:int, operation_name:str):
+
+def _check_transmission_status(sw1: int, sw2: int, operation_name: str):
     """
     Check status words from NFC message transmission.
 
