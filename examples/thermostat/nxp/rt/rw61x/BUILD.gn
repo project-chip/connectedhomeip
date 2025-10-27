@@ -101,10 +101,8 @@ rt_sdk("sdk") {
     ]
   }
 
-  if(chip_enable_wifi) {
-    defines += [
-      "WIFI_USER_CONFIG_FILE=<WiFiUserConfig.h>",
-    ]
+  if (chip_enable_wifi) {
+    defines += [ "WIFI_USER_CONFIG_FILE=<WiFiUserConfig.h>" ]
   }
 
   defines += [
