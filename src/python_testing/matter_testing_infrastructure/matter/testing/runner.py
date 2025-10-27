@@ -656,10 +656,18 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     if not commissioning_method:
         return True
 
-    # Skip discriminator/setup-pincode/QR-code/manual-code validation only for NFC in-test commissioning
+    # For NFC transport (when using the --commissioning-method argument), the NFC tag data is
+    # read beforehand and commissioning data ( QR code ) is already populated from the tag.
+    # Therefore, it does not need to be passed explicitly.
+    #
+    # However, during in-test commissioning, the user must manually read the NFC tag
+    # (containing the commissioning credentials) within the main test body
+    # and supply it later for commissioning with the DUT.
+    #
+    # For this reason, commissioning data validation is intentionally skipped in this scenario.
+
     skip_nfc_intest_commission_data_validation = (args.in_test_commissioning_method is not None and
                                                   'nfc' in args.in_test_commissioning_method)
-
     if not skip_nfc_intest_commission_data_validation:
         if len(config.dut_node_ids) > len(device_descriptors):
             print("error: More node IDs provided than discriminators")

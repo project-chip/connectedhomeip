@@ -13,26 +13,7 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-#
-# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
-# for details about the block below.
-#
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     factory-reset: true
-#     quiet: true
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --in-test-commissioning-method nfc-thread
-#       --thread-dataset-hex 0e080000000000010000000300001935060004001fffe002085b35dead5b35beef0708fd1dc324dec8779d051000112233445566778899aabbccddeeff03043562333501025b3504108b930382a737b00cdd648e3ab3ee2e190c0402a0f7f8
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --int-arg NFC_Reader_index:0
-#       --storage-path admin_storage.json
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-# === END CI TEST ARGUMENTS ===
+
 
 import logging
 
@@ -57,10 +38,6 @@ class TC_DD_3_23(MatterBaseTest):
 
     @async_test_body
     async def test_TC_DD_3_23(self):
-
-        if self.is_pics_sdk_ci_only:
-            self.mark_all_remaining_steps_skipped(1)
-            return
 
         # Step 1: Here we check if the Tag is connected to the Host machine and read the NFC Tag data
         self.step(1)

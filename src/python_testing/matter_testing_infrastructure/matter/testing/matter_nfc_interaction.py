@@ -7,16 +7,45 @@ from smartcard.System import readers
 
 logger = logging.getLogger(__name__)
 
-NFC_DATA_CLEANUP_PATTERN = r'[^\x20-\x7E]'  # Pattern to remove non-printable characters from NFC data
-
 # NFC transmission success status words
 NFC_SUCCESS_SW1 = 0x90
 NFC_SUCCESS_SW2 = 0x00
 
 MAX_NDEF_DATA_LENGTH = 256
 
+def _clean_nfc_data(ndef_data_string: str) -> str:
+    """
+       Return a string containing only printable characters from `ndef_data_string`.
 
-def _check_transmission_status(sw1, sw2, operation_name):
+       Purpose
+       - Remove non-printable/control characters (for example NUL: '\x00', DEL, etc.)
+         commonly encountered when reading raw NDEF text-record payload bytes that
+         include a status byte or other metadata.
+       - Produce a visible, printable string safe to pass to text-based consumers
+         such as SetupPayload loaders that expect a human-readable setup string.
+
+       Parameters
+       - ndef_data_string: str
+           The input text to sanitize. Typically this will already be decoded (e.g. via
+           payload_bytes.decode('utf-8')) or extracted from an NDEF Text record.
+
+       Returns
+       - str: sanitized string containing only printable characters. If the input is
+         empty, returns an empty string.
+
+       Example
+       >>> _clean_nfc_data("\\x00MT:4CT91EVQ20KA0648G00")
+       'MT:4CT91EVQ20KA0648G00'
+
+       Rationale (short)
+       - NDEF Text record payloads include a status byte and (optionally) a language
+         code before the visible text. Those metadata bytes are non-printable and should
+         be removed before using the visible text. This function provides a simple,
+         defensive cleanup step for that common case.
+       """
+    return ''.join([ndef_data_char for ndef_data_char in ndef_data_string if ndef_data_char.isprintable()])
+
+def _check_transmission_status(sw1:int, sw2:int, operation_name:str):
     """
     Check status words from NFC message transmission.
 
@@ -113,7 +142,7 @@ def _select_ndef_file(reader_connection_object):
     _check_transmission_status(sw1, sw2, "select NDEF file")
 
 
-def _read_ndef_length(connection):
+def _read_ndef_length(reader_connection_object):
     """
     Read the NDEF message length from the NFC tag.
 
@@ -123,7 +152,7 @@ def _read_ndef_length(connection):
     of NDEF data follow.
 
     Args:
-        connection: The NFC reader connection object used to communicate with the
+        reader_connection_object: The NFC reader connection object used to communicate with the
                    NFC tag.
 
     Returns:
@@ -139,7 +168,7 @@ def _read_ndef_length(connection):
     """
     # Transmit READ BINARY message for first 2 bytes (message length)
     READ_LENGTH_MESSAGE = [0x00, 0xB0, 0x00, 0x00, 0x02]
-    data, sw1, sw2 = connection.transmit(READ_LENGTH_MESSAGE)
+    data, sw1, sw2 = reader_connection_object.transmit(READ_LENGTH_MESSAGE)
     _check_transmission_status(sw1, sw2, "read NDEF length")
 
     # Convert 2-byte big-endian length to integer
@@ -149,7 +178,7 @@ def _read_ndef_length(connection):
     return length
 
 
-def _read_ndef_data(connection, length):
+def _read_ndef_data(reader_connection_object, length):
     """
     Read the NDEF message data from the NFC tag.
 
@@ -177,12 +206,12 @@ def _read_ndef_data(connection, length):
     """
     # Transmit READ BINARY message for NDEF data starting from offset 0x0002
     READ_DATA_MESSAGE = [0x00, 0xB0, 0x00, 0x02, length]
-    data, sw1, sw2 = connection.transmit(READ_DATA_MESSAGE)
+    data, sw1, sw2 = reader_connection_object.transmit(READ_DATA_MESSAGE)
     _check_transmission_status(sw1, sw2, "read NDEF data")
     return bytes(data)
 
 
-def _read_nfc_tag_data(reader_objects, nfc_reader_index):
+def _read_nfc_tag_data(reader_objects:list, nfc_reader_index):
     """
     Read and decode NDEF data from an NFC tag.
 
@@ -221,17 +250,19 @@ def _read_nfc_tag_data(reader_objects, nfc_reader_index):
     if not ndef_records:
         raise ValueError("No NDEF records found in message - tag may be corrupted or empty")
 
-    # Loop through records to find one with data attribute
+    # Loop through records to find one with data attribute,
+    # when the data is decodable we will exit from the loop
+    # if the data could not de-coded we will catch exception and move on to the next record
     for record in ndef_records:
         if hasattr(record, 'data') and record.data:
             try:
-                record_data = record.data.decode("utf-8")
-                # Clean up non-printable characters and return readable text
-                cleaned_data = re.sub(NFC_DATA_CLEANUP_PATTERN, '', record_data)
+                ndef_record_data = record.data.decode("utf-8")
+                # Clean up non-printable characters and return readable text which can be used as SetupPayload later on
+                cleaned_data = _clean_nfc_data(ndef_record_data)
                 return cleaned_data
             except UnicodeDecodeError:
                 # Continue to next record if this one can't be decoded
-                continue
+                logger.warning(f"NDEF record data {record.data} could not be decoded moving on to next record")
 
     # If we get here, no record had data attribute or all failed to decode
     raise ValueError("No NDEF records with decodable data found")
