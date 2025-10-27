@@ -146,6 +146,7 @@ source_set("thread-border-router-management-test-srcs") {
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/clusters/general-commissioning-server:general-commissioning-server",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
@@ -314,6 +315,7 @@ chip_test_suite("tests") {
 
   if (chip_device_platform != "android") {
     test_sources += [
+      "TestCertificateTableImpl.cpp",
       "TestExtensionFieldSets.cpp",
       "TestSceneTable.cpp",
     ]
@@ -321,6 +323,7 @@ chip_test_suite("tests") {
       ":actions-cluster-test-srcs",
       ":power-cluster-test-srcs",
       ":scenes-table-test-srcs",
+      "${chip_root}/src/app/clusters/tls-certificate-management-server:certificate-table",
     ]
   }
 
@@ -333,10 +336,7 @@ chip_test_suite("tests") {
     ]
   } else if (!chip_fake_platform) {
     test_sources += [ "TestThreadBorderRouterManagementCluster.cpp" ]
-    public_deps += [
-      ":thread-border-router-management-test-srcs",
-      "${chip_root}/src/app/clusters/general-commissioning-server:test-only-temporary-coupling",
-    ]
+    public_deps += [ ":thread-border-router-management-test-srcs" ]
   }
 
   if (!chip_fake_platform) {

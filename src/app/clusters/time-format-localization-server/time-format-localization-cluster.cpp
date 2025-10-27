@@ -27,9 +27,6 @@ namespace app {
 namespace Clusters {
 
 namespace {
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
-    TimeFormatLocalization::Attributes::HourFormat::kMetadataEntry,
-};
 class AutoReleaseIterator
 {
 public:
@@ -225,7 +222,8 @@ CHIP_ERROR TimeFormatLocalizationCluster::Attributes(const ConcreteClusterPath &
         optionalAttributeSet.Set<TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id>();
     }
 
-    return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributes), optionalAttributeSet);
+    return listBuilder.Append(Span(TimeFormatLocalization::Attributes::kMandatoryMetadata), Span(optionalAttributes),
+                              optionalAttributeSet);
 }
 
 } // namespace Clusters

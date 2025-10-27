@@ -67,25 +67,25 @@ WebrtcTransport::RequestArgs & WebrtcTransport::GetRequestArgs()
     return mRequestArgs;
 }
 
-void WebrtcTransport::SendVideo(const char * data, size_t size, int64_t timestamp, uint16_t videoStreamID)
+void WebrtcTransport::SendVideo(const chip::ByteSpan & data, int64_t timestamp, uint16_t videoStreamID)
 {
     if (mLocalVideoTrack)
     {
-        mLocalVideoTrack->SendFrame(data, size, timestamp);
+        mLocalVideoTrack->SendFrame(data, timestamp);
     }
 }
 
 // Implementation of SendAudio method
-void WebrtcTransport::SendAudio(const char * data, size_t size, int64_t timestamp, uint16_t audioStreamID)
+void WebrtcTransport::SendAudio(const chip::ByteSpan & data, int64_t timestamp, uint16_t audioStreamID)
 {
     if (mLocalAudioTrack)
     {
-        mLocalAudioTrack->SendFrame(data, size, timestamp);
+        mLocalAudioTrack->SendFrame(data, timestamp);
     }
 }
 
 // Implementation of SendAudioVideo method
-void WebrtcTransport::SendAudioVideo(const char * data, size_t size, uint16_t videoStreamID, uint16_t audioStreamID)
+void WebrtcTransport::SendAudioVideo(const chip::ByteSpan & data, uint16_t videoStreamID, uint16_t audioStreamID)
 {
     // Placeholder for actual WebRTC implementation to send synchronized audio/video data
 }
@@ -146,7 +146,7 @@ void WebrtcTransport::Start()
     mPeerConnection = CreateWebRTCPeerConnection();
 
     mPeerConnection->SetCallbacks([this](const std::string & sdp, SDPType type) { this->OnLocalDescription(sdp, type); },
-                                  [this](const std::string & candidate) { this->OnICECandidate(candidate); },
+                                  [this](const ICECandidateInfo & candidateInfo) { this->OnICECandidate(candidateInfo); },
                                   [this](bool connected) { this->OnConnectionStateChanged(connected); },
                                   [this](std::shared_ptr<WebRTCTrack> track) { this->OnTrack(track); });
 }
@@ -208,12 +208,13 @@ bool WebrtcTransport::ClosePeerConnection()
     return true;
 }
 
-void WebrtcTransport::OnICECandidate(const std::string & candidate)
+void WebrtcTransport::OnICECandidate(const ICECandidateInfo & candidateInfo)
 {
     ChipLogProgress(Camera, "ICE Candidate received for sessionID: %u", mRequestArgs.sessionId);
-    mLocalCandidates.push_back(candidate);
+    mLocalCandidates.push_back(candidateInfo);
     ChipLogProgress(Camera, "Local Candidate:");
-    ChipLogProgress(Camera, "%s", candidate.c_str());
+    ChipLogProgress(Camera, "%s", candidateInfo.candidate.c_str());
+    ChipLogProgress(Camera, "  mid: %s, mlineIndex: %d", candidateInfo.mid.c_str(), candidateInfo.mlineIndex);
 }
 
 void WebrtcTransport::OnConnectionStateChanged(bool connected)

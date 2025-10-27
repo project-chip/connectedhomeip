@@ -3,16 +3,16 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <data-model-providers/codedriven/endpoint/SpanEndpoint.h>
 
-#include <initializer_list>
 #include <vector>
 
 #include <clusters/Descriptor/ClusterId.h>
 #include <clusters/OnOff/ClusterId.h>
+#include <devices/Types.h>
 
 using namespace chip;
 using namespace chip::app;
 using chip::app::DataModel::DeviceTypeEntry;
-using SemanticTag = chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type;
+using SemanticTag = chip::app::Clusters::Globals::Structs::SemanticTagStruct::Type;
 
 using namespace chip::app;
 
@@ -21,8 +21,7 @@ TEST(TestSpanEndpoint, InstantiateWithAllParameters)
     const chip::ClusterId clientClusters[] = { 10, 20 };
     const SemanticTag semanticTags[]       = { { .mfgCode = chip::VendorId::TestVendor1, .namespaceID = 1, .tag = 1 },
                                                { .mfgCode = chip::VendorId::TestVendor2, .namespaceID = 2, .tag = 2 } };
-    const DeviceTypeEntry deviceTypes[]    = { { .deviceTypeId = 100, .deviceTypeRevision = 1 },
-                                               { .deviceTypeId = 200, .deviceTypeRevision = 2 } };
+    const DeviceTypeEntry deviceTypes[]    = { Device::Type::kDoorLock, Device::Type::kSpeaker };
 
     auto endpoint = SpanEndpoint::Builder()
                         .SetClientClusters(Span<const chip::ClusterId>(clientClusters))
@@ -41,6 +40,16 @@ TEST(TestSpanEndpoint, InstantiateWithAllParameters)
     ReadOnlyBufferBuilder<DeviceTypeEntry> deviceTypeBuilder;
     ASSERT_EQ(endpoint.DeviceTypes(deviceTypeBuilder), CHIP_NO_ERROR);
     ASSERT_EQ(deviceTypeBuilder.Size(), std::size(deviceTypes));
+
+    // A basic test that device types content looks reasonable
+    auto buffer = deviceTypeBuilder.TakeBuffer();
+
+    EXPECT_EQ(buffer[0].deviceTypeId, Device::kDoorLockDeviceTypeId);
+    EXPECT_EQ(buffer[0].deviceTypeRevision, Device::kDoorLockDeviceTypeRevision);
+
+    // compare content as well
+    EXPECT_EQ(buffer[1].deviceTypeId, deviceTypes[1].deviceTypeId);
+    EXPECT_EQ(buffer[1].deviceTypeRevision, deviceTypes[1].deviceTypeRevision);
 }
 
 TEST(TestSpanEndpoint, SetAndGetClientClusters)
@@ -71,9 +80,9 @@ TEST(TestSpanEndpoint, SetAndGetSemanticTags)
 
 TEST(TestSpanEndpoint, SetAndGetDeviceTypes)
 {
-    const DeviceTypeEntry deviceTypes[] = { { .deviceTypeId = 100, .deviceTypeRevision = 1 },
-                                            { .deviceTypeId = 200, .deviceTypeRevision = 2 } };
-    auto endpoint                       = SpanEndpoint::Builder().SetDeviceTypes(Span<const DeviceTypeEntry>(deviceTypes)).Build();
+    const DeviceTypeEntry deviceTypes[] = { Device::Type::kAirPurifier, Device::Type::kClosure };
+
+    auto endpoint = SpanEndpoint::Builder().SetDeviceTypes(Span<const DeviceTypeEntry>(deviceTypes)).Build();
     ReadOnlyBufferBuilder<DeviceTypeEntry> builder;
     ASSERT_EQ(endpoint.DeviceTypes(builder), CHIP_NO_ERROR);
     auto retrievedDeviceTypes = builder.TakeBuffer();
