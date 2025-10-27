@@ -34,7 +34,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import inspect
 import logging
 import random
 from dataclasses import dataclass
@@ -46,24 +45,8 @@ import matter.discovery as Discovery
 from matter import ChipUtility
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
-
-
-def get_all_cmds_for_cluster_id(cid: int) -> list[Clusters.ClusterObjects.ClusterCommand]:
-    cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cid]
-    try:
-        return inspect.getmembers(cluster.Commands, inspect.isclass)
-    except AttributeError:
-        return []
-
-
-def client_cmd(cmd_class):
-    # Inspect returns all the classes, not just the ones we want, so use a try
-    # here incase we're inspecting a builtin class
-    try:
-        return cmd_class if cmd_class.is_client else None
-    except AttributeError:
-        return None
+from matter.testing.matter_testing import async_test_body, default_matter_test_main, matchers
+from support_modules.idm_support import IDMBaseTest, get_all_cmds_for_cluster_id, client_cmd
 
 # one of the steps in this test requires sending a command that requires a timed interaction
 # without first sending the TimedRequest action
@@ -78,7 +61,7 @@ class FakeRevokeCommissioning(Clusters.AdministratorCommissioning.Commands.Revok
         return False
 
 
-class TC_IDM_1_2(MatterBaseTest):
+class TC_IDM_1_2(IDMBaseTest):
 
     @async_test_body
     async def test_TC_IDM_1_2(self):
