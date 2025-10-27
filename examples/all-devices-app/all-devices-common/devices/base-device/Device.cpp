@@ -27,8 +27,8 @@ CHIP_ERROR BaseDevice::BaseRegistration(EndpointId endpoint, CodeDrivenDataModel
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     mEndpointId = endpoint;
 
-    //TODO: This needs to be updated to be more customizable and allow the cluster to be created with 
-    // optional attributes or semantic tags being set. 
+    //TODO: This needs to be updated to be more customizable and allow the cluster to be created with
+    // optional attributes or semantic tags being set.
     mDescriptorCluster.Create(endpoint, DescriptorCluster::OptionalAttributesSet(0), Span<const SemanticTag>());
     ReturnErrorOnFailure(provider.AddCluster(mDescriptorCluster.Registration()));
 

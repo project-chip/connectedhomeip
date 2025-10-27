@@ -82,7 +82,7 @@ bool AllDevicesAppOptionHandler(const char * program, OptionSet * options, int i
     return true;
 }
 
-//TODO: This message on supported device types needs to be updated to scale 
+//TODO: This message on supported device types needs to be updated to scale
 // better once new devices are added.
 chip::ArgParser::OptionSet sCmdLineOptions = { AllDevicesAppOptionHandler, // handler function
                                                sAllDevicesAppOptionDefs,   // array of option definitions
