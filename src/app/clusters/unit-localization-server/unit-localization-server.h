@@ -63,6 +63,7 @@ private:
 
 class UnitLocalizationClusterWithMigration : public UnitLocalizationCluster
 {
+public:
     UnitLocalizationClusterWithMigration(EndpointId endpointId, BitFlags<UnitLocalization::Feature> feature);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
