@@ -373,6 +373,30 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
 
 # Commissioning-related decorators
 
+def _check_commissioning_status(test_instance, timeout: int = 30) -> bool:
+    """
+    Internal helper to check if device is commissioned.
+
+    Args:
+        test_instance: MatterBaseTest instance
+        timeout: Timeout in seconds for the check
+
+    Returns:
+        True if device is commissioned, False if factory fresh
+    """
+    # Import locally to avoid circular dependency
+    from matter.testing.commissioning import is_commissioned
+
+    check_commissioned = asyncio.wait_for(
+        is_commissioned(
+            test_instance.default_controller,
+            test_instance.dut_node_id
+        ),
+        timeout=timeout
+    )
+    return test_instance.event_loop.run_until_complete(check_commissioned)
+
+
 def require_factory_reset(body):
     """Decorator to ensure test runs only on factory-fresh (not commissioned) device.
 
@@ -381,7 +405,7 @@ def require_factory_reset(body):
     factory reset is required.
 
     The check is performed by reading the TrustedRootCertificates attribute from the
-    OperationalCredentials cluster. This works over PASE (before CASE session is established).
+    OperationalCredentials cluster.
 
     Useful for tests that require factory-default state, such as:
     - Discriminator uniqueness tests (TC_SC_7_1)
@@ -410,21 +434,13 @@ def require_factory_reset(body):
     """
     def factory_reset_checker(test_instance, *args, **kwargs):
         # Import locally to avoid circular dependency
-        from matter.testing.commissioning import is_commissioned
         from matter.testing.matter_testing import MatterBaseTest
         assert isinstance(test_instance, MatterBaseTest)
 
         LOGGER.info("Checking if device is factory fresh (required for this test)...")
 
         # Check if device is commissioned
-        check_commissioned = asyncio.wait_for(
-            is_commissioned(
-                test_instance.default_controller,
-                test_instance.dut_node_id
-            ),
-            timeout=30
-        )
-        device_is_commissioned = test_instance.event_loop.run_until_complete(check_commissioned)
+        device_is_commissioned = _check_commissioning_status(test_instance, timeout=30)
 
         if device_is_commissioned:
             asserts.fail(
@@ -478,21 +494,13 @@ def skip_if_commissioned(body):
     """
     def commissioned_skipper(test_instance, *args, **kwargs):
         # Import locally to avoid circular dependency
-        from matter.testing.commissioning import is_commissioned
         from matter.testing.matter_testing import MatterBaseTest
         assert isinstance(test_instance, MatterBaseTest)
 
         LOGGER.info("Checking device commissioning status...")
 
         # Check if device is commissioned
-        check_commissioned = asyncio.wait_for(
-            is_commissioned(
-                test_instance.default_controller,
-                test_instance.dut_node_id
-            ),
-            timeout=30
-        )
-        device_is_commissioned = test_instance.event_loop.run_until_complete(check_commissioned)
+        device_is_commissioned = _check_commissioning_status(test_instance, timeout=30)
 
         if device_is_commissioned:
             LOGGER.info("Device is already commissioned - skipping test")
