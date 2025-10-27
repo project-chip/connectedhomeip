@@ -190,8 +190,7 @@ public class ChipDeviceController {
       long setupPincode,
       @Nullable byte[] csrNonce,
       NetworkCredentials networkCredentials) {
-    pairDevice(
-        bleServer, connId, deviceId, setupPincode, csrNonce, networkCredentials, null);
+    pairDevice(bleServer, connId, deviceId, setupPincode, csrNonce, networkCredentials, null);
   }
 
   /**
