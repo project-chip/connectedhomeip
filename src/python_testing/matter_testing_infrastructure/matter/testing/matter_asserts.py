@@ -6,8 +6,6 @@ from typing import Any, Callable, List, Optional, Type, TypeVar
 
 from mobly import asserts
 
-from matter.testing.commissioning import get_commissioned_fabric_count, is_commissioned
-
 T = TypeVar('T')
 
 
@@ -403,6 +401,8 @@ async def assert_is_commissioned(
         # Check that device has been successfully commissioned in previous step
         await assert_is_commissioned(controller, node_id=1234, "Newly commissioned device")
     """
+    from matter.testing.commissioning import is_commissioned
+
     commissioned = await is_commissioned(dev_ctrl, node_id)
     asserts.assert_true(
         commissioned,
@@ -447,6 +447,8 @@ async def assert_factory_fresh(
         pase_params = {'method': 'on-network', 'discriminator': 1234, 'passcode': 20202021}
         await assert_factory_fresh(controller, node_id=1234, "DUT", pase_params=pase_params)
     """
+    from matter.testing.commissioning import is_commissioned
+
     commissioned = await is_commissioned(dev_ctrl, node_id, pase_params=pase_params)
     asserts.assert_false(
         commissioned,
@@ -495,6 +497,8 @@ async def assert_fabric_count(
         pase_params = {'method': 'on-network', 'discriminator': 1234, 'passcode': 20202021}
         await assert_fabric_count(controller, node_id=1234, expected_count=0, "DUT", pase_params=pase_params)
     """
+    from matter.testing.commissioning import get_commissioned_fabric_count
+
     actual_count = await get_commissioned_fabric_count(dev_ctrl, node_id, pase_params=pase_params)
     asserts.assert_equal(
         actual_count,
