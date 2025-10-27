@@ -86,8 +86,8 @@ using namespace chip::Crypto;
 #define CDC_JNI_CALLBACK_LOCAL_REF_COUNT 256
 
 static void PairDevice(JNIEnv * env, AndroidDeviceControllerWrapper * wrapper, chip::NodeId deviceId,
-                             RendezvousParameters & rendezvousParams, jbyteArray csrNonce, jobject networkCredentials,
-                             jobject icdRegistrationInfo);
+                       RendezvousParameters & rendezvousParams, jbyteArray csrNonce, jobject networkCredentials,
+                       jobject icdRegistrationInfo);
 static void * IOThreadMain(void * arg);
 static CHIP_ERROR StopIOThread();
 static CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jbyteArray pakeVerifier, jobject & outParams);
@@ -679,12 +679,12 @@ JNI_METHOD(void, pairDeviceThroughBLE)
                                                 .SetPeerAddress(Transport::PeerAddress::BLE());
 
     PairDevice(env, wrapper, static_cast<chip::NodeId>(deviceId), rendezvousParams, csrNonce, networkCredentials,
-                     icdRegistrationInfo);
+               icdRegistrationInfo);
 }
 
 static void PairDevice(JNIEnv * env, AndroidDeviceControllerWrapper * wrapper, chip::NodeId deviceId,
-                             RendezvousParameters & rendezvousParams, jbyteArray csrNonce, jobject networkCredentials,
-                             jobject icdRegistrationInfo)
+                       RendezvousParameters & rendezvousParams, jbyteArray csrNonce, jobject networkCredentials,
+                       jobject icdRegistrationInfo)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -733,7 +733,7 @@ JNI_METHOD(void, pairDeviceThroughNfc)
         RendezvousParameters().SetSetupPINCode(static_cast<uint32_t>(pinCode)).SetPeerAddress(Transport::PeerAddress::NFC());
 
     PairDevice(env, wrapper, static_cast<chip::NodeId>(deviceId), rendezvousParams, csrNonce, networkCredentials,
-                     icdRegistrationInfo);
+               icdRegistrationInfo);
 }
 
 JNI_METHOD(void, pairDeviceWithAddress)
