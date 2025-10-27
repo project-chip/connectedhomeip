@@ -161,8 +161,8 @@ abstract class PairingCommand(
   override fun onCommissioningStatusUpdate(nodeId: Long, stage: String?, errorCode: UInt) {
     val stageName = stage ?: "unknown"
     logger.log(
-        Level.INFO,
-        "Commissioning status update: stage $stageName, nodeId=$nodeId, errorCode=$errorCode"
+      Level.INFO,
+      "Commissioning status update: stage $stageName, nodeId=$nodeId, errorCode=$errorCode"
     )
   }
 
