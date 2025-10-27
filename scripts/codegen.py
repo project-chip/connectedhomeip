@@ -30,9 +30,9 @@ import sys
 import tempfile
 import traceback
 import urllib.request
+from pathlib import Path
 
 import click
-from pathlib import Path
 from tools.zap.clang_format import getClangFormatBinary
 
 try:
