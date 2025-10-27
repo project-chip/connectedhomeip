@@ -280,34 +280,38 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
     const Structs::TariffPeriodStruct::Type * period = FindTariffPeriodByDayEntryId(aCtx, dayEntryID);
 
     // Use a fixed-size array with maximum expected components
-    constexpr size_t MAX_COMPONENTS = CommodityTariffConsts::kTariffPeriodItemMaxIDs;
-    std::array<Structs::TariffComponentStruct::Type, MAX_COMPONENTS> tempArray;
-    size_t componentCount = 0;
+    Platform::ScopedMemoryBufferWithSize<Structs::TariffComponentStruct::Type> tempBuffer;
+    Platform::ScopedMemoryBufferWithSize<char> tempLabelBuffers[kTariffPeriodItemMaxIDs];
 
     if (period == nullptr)
     {
         return CHIP_ERROR_NOT_FOUND;
     }
     const DataModel::List<const uint32_t> & componentIDs = period->tariffComponentIDs;
+    const size_t componentCount                          = componentIDs.size();
 
-    for (const auto & entryID : componentIDs)
+    // Validate component count
+    if (componentCount == 0 || componentCount > kTariffPeriodItemMaxIDs)
+    {
+        return CHIP_ERROR_INVALID_LIST_LENGTH;
+    }
+
+    // Allocate memory for the component array
+    if (!tempBuffer.Calloc(componentCount))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    for (size_t i = 0; i < componentIDs.size(); i++)
     {
         Structs::TariffComponentStruct::Type entry;
-        auto current =
-            GetListEntryById<Structs::TariffComponentStruct::Type>(aCtx.mTariffProvider->GetTariffComponents().Value(), entryID);
+        auto current = GetListEntryById<Structs::TariffComponentStruct::Type>(aCtx.mTariffProvider->GetTariffComponents().Value(),
+                                                                              componentIDs[i]);
         if (current == nullptr)
         {
             err = CHIP_ERROR_NOT_FOUND;
-            goto exit;
+            break;
         }
-
-        if (componentCount >= MAX_COMPONENTS)
-        {
-            ChipLogError(AppServer, "Component array is full, cannot add more components.");
-            err = CHIP_ERROR_BUFFER_TOO_SMALL;
-            goto exit;
-        }
-
         entry = *current;
         if (current->label.HasValue())
         {
@@ -316,20 +320,17 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
             if (!current->label.Value().IsNull())
             {
                 chip::CharSpan srcLabelSpan = current->label.Value().Value();
-                if (CHIP_NO_ERROR !=
-                    (err = CommodityTariffAttrsDataMgmt::SpanCopier<char>::Copy(current->label.Value().Value(), tmpNullLabel,
-                                                                                srcLabelSpan.size())))
-                {
-                    goto exit;
-                }
+                tempLabelBuffers[i].CopyFromSpan(srcLabelSpan);
+                tmpNullLabel.SetNonNull(chip::CharSpan(tempLabelBuffers[i].Get(), srcLabelSpan.size()));
             }
             entry.label = MakeOptional(tmpNullLabel);
         }
-        tempArray[componentCount++] = entry;
+        tempBuffer[i] = entry;
     }
+    SuccessOrExit(err);
 
     err =
-        mgmtObj.SetNewValue(MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempArray.data(), componentCount)));
+        mgmtObj.SetNewValue(MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempBuffer.Get(), componentCount)));
     SuccessOrExit(err);
 
     err = mgmtObj.UpdateBegin(nullptr);
@@ -341,11 +342,6 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
     }
 
 exit:
-    for (size_t i = 0; i < componentCount; i++)
-    {
-        mgmtObj.CleanupExtListEntry(tempArray[i]);
-    }
-
     return err;
 }
 } // namespace Utils
