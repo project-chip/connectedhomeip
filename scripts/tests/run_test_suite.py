@@ -353,7 +353,8 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     energy_gateway_app = build_app(energy_gateway_app, 'app', 'chip-energy-gateway-app')
     energy_management_app = build_app(energy_management_app, 'app', 'chip-energy-management-app')
     closure_app = build_app(closure_app, 'app', 'closure-app')
-    matter_repl_yaml_tester = build_app(matter_repl_yaml_tester, 'tool', 'yamltest_with_matter_repl_tester.py').wrap_with(('python3',))
+    matter_repl_yaml_tester = build_app(matter_repl_yaml_tester, 'tool',
+                                        'yamltest_with_matter_repl_tester.py').wrap_with(('python3',))
 
     if chip_tool_with_python is None:
         if context.obj.runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
