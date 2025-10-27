@@ -719,9 +719,9 @@ PyChipError pychip_DeviceController_ResetCommissioningParameters()
 PyChipError pychip_DeviceController_SetLocalMRPConfig(uint32_t idleRetransIntervalMillis, uint32_t activeRetransIntervalMillis,
                                                       uint16_t activeThresholdMillis)
 {
-    chip::ReliableMessageProtocolConfig config{chip::System::Clock::Milliseconds32(idleRetransIntervalMillis),
-                                               chip::System::Clock::Milliseconds32(activeRetransIntervalMillis),
-                                               chip::System::Clock::Milliseconds16(activeThresholdMillis)};
+    chip::ReliableMessageProtocolConfig config{ chip::System::Clock::Milliseconds32(idleRetransIntervalMillis),
+                                                chip::System::Clock::Milliseconds32(activeRetransIntervalMillis),
+                                                chip::System::Clock::Milliseconds16(activeThresholdMillis) };
     chip::ReliableMessageProtocolConfig::SetLocalMRPConfig(chip::MakeOptional(config));
     return ToPyChipError(CHIP_NO_ERROR);
 }
