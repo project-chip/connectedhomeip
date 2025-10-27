@@ -5,6 +5,7 @@ Matter-specific assertions building on top of Mobly asserts.
 from typing import Any, Callable, List, Optional, Type, TypeVar
 
 from mobly import asserts
+
 from matter.testing.commissioning import get_commissioned_fabric_count, is_commissioned
 
 T = TypeVar('T')
