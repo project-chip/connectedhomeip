@@ -547,7 +547,7 @@ void HandleTCPConnectionComplete(const TCPEndPointHandle & aEndPoint, CHIP_ERROR
     }
 }
 
-static void HandleTCPConnectionClosed(TCPEndPoint & aEndPoint, CHIP_ERROR aError)
+static void HandleTCPConnectionClosed(const TCPEndPointHandle & aEndPoint, CHIP_ERROR aError)
 {
     if (aError == CHIP_NO_ERROR)
     {
