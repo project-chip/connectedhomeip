@@ -427,7 +427,10 @@ public:
     // state
     //
     // Returns the old data model provider value.
-    DataModel::Provider * SetDataModelProvider(DataModel::Provider * model, DataModel::ProviderChangeListener * listener = nullptr);
+    DataModel::Provider * Startup(DataModel::Provider * model, DataModel::ProviderChangeListener * listener = nullptr);
+
+    // TODO: remove after replacing all `SetDataModelProvider` with `Startup` in unit tests.
+    DataModel::Provider * SetDataModelProvider(DataModel::Provider * model) { return Startup(model); }
 
 private:
     /* DataModel::ActionContext implementation */

@@ -1593,7 +1593,13 @@ DataVersion * emberAfDataVersionStorage(const ConcreteClusterPath & aConcreteClu
 
 DataModel::ProviderChangeListener * emberAfGlobalInteractionModelAttributesChangedListener()
 {
-    return CodegenDataModelProvider::Instance().GetProviderChangeListener();
+    // return reporting engine if Provider has not started and ProviderChangeListener saved in InteractionModelContext is nullptr .
+    DataModel::ProviderChangeListener * listener = CodegenDataModelProvider::Instance().GetProviderChangeListener();
+    if (listener == nullptr)
+    {
+        return &InteractionModelEngine::GetInstance()->GetReportingEngine();
+    }
+    return listener;
 }
 
 void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
