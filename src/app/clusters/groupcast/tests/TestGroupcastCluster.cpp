@@ -27,6 +27,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <platform/NetworkCommissioning.h>
 
@@ -171,11 +172,13 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Form a valid JoinGroup command
+    const uint8_t keyData[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    const EndpointId kEndpoints[] = { 1 };
+
     Commands::JoinGroup::Type cmdData;
     cmdData.groupID         = 1;
-    cmdData.endpoints       = { 1 };
+    cmdData.endpoints       = chip::app::DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
     cmdData.keyID           = 0xAABBCCDD;
-    const uint8_t keyData[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
     cmdData.key             = MakeOptional(ByteSpan(keyData));
     cmdData.gracePeriod     = MakeOptional(0U);
     cmdData.useAuxiliaryACL = MakeOptional(true);
