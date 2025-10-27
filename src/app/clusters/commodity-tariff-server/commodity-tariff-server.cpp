@@ -405,7 +405,7 @@ struct ThresholdsPerFeatureValidationContext
 
         bool operator==(const FeatureEntry & other) const
         {
-            return (this->thresholdVal == other.thresholdVal) && ( (this->featureVal.Raw() & other.featureVal.Raw()) == 0 );
+            return (this->thresholdVal == other.thresholdVal) && ((this->featureVal.Raw() & other.featureVal.Raw()) == 0);
         }
     };
 
