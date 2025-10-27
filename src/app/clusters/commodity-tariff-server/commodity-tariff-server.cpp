@@ -405,7 +405,7 @@ struct ThresholdsPerFeatureValidationContext
 
         bool operator==(const FeatureEntry & other) const
         {
-            return (this->featureVal == other.featureVal) && (this->thresholdVal == other.thresholdVal);
+            return (this->thresholdVal == other.thresholdVal) && ( (this->featureVal.Raw() & other.featureVal.Raw()) == 0 );
         }
     };
 
@@ -568,12 +568,6 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
         {
             return startTime == other.startTime && duration == other.duration;
         }
-    };
-
-    // Hash function for StartDurationPair
-    struct DeStartDurationPairHash
-    {
-        size_t operator()(const DeStartDurationPair & p) const { return (static_cast<size_t>(p.startTime) << 16) | p.duration; }
     };
 
     for (const auto & period : tariffPeriods)
