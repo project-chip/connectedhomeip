@@ -292,6 +292,154 @@ uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out)
     return Base64Decode32(in, inLen, out, Base64CharToVal);
 }
 
+// In Base64.cpp, add these implementations:
+
+uint16_t Base64Encode(const uint8_t * in, uint16_t inLen, MutableCharSpan & out)
+{
+    size_t needed = BASE64_ENCODED_LEN(inLen);
+    if (out.size() < needed)
+    {
+        out.reduce_size(0);
+        return 0;
+    }
+
+    uint16_t len = Base64Encode(in, inLen, out.data());
+    out.reduce_size(len);
+    return len;
+}
+
+uint16_t Base64URLEncode(const uint8_t * in, uint16_t inLen, MutableCharSpan & out)
+{
+    return Base64Encode(in, inLen, out, Base64URLValToChar);
+}
+
+uint16_t Base64Encode(const uint8_t * in, uint16_t inLen, MutableCharSpan & out, Base64ValToCharFunct valToCharFunct)
+{
+    size_t needed = BASE64_ENCODED_LEN(inLen);
+    if (out.size() < needed)
+    {
+        out.reduce_size(0);
+        return 0;
+    }
+
+    uint16_t len = Base64Encode(in, inLen, out.data(), valToCharFunct);
+    out.reduce_size(len);
+    return len;
+}
+
+uint16_t Base64Decode(const char * in, uint16_t inLen, MutableByteSpan & out)
+{
+    size_t maxNeeded = BASE64_MAX_DECODED_LEN(inLen);
+    if (out.size() < maxNeeded)
+    {
+        out.reduce_size(0);
+        return UINT16_MAX;
+    }
+
+    uint16_t len = Base64Decode(in, inLen, out.data());
+    if (len == UINT16_MAX)
+    {
+        out.reduce_size(0);
+        return UINT16_MAX;
+    }
+
+    out.reduce_size(len);
+    return len;
+}
+
+uint16_t Base64URLDecode(const char * in, uint16_t inLen, MutableByteSpan & out)
+{
+    return Base64Decode(in, inLen, out, Base64URLCharToVal);
+}
+
+uint16_t Base64Decode(const char * in, uint16_t inLen, MutableByteSpan & out, Base64CharToValFunct charToValFunct)
+{
+    size_t maxNeeded = BASE64_MAX_DECODED_LEN(inLen);
+    if (out.size() < maxNeeded)
+    {
+        out.reduce_size(0);
+        return UINT16_MAX;
+    }
+
+    uint16_t len = Base64Decode(in, inLen, out.data(), charToValFunct);
+    if (len == UINT16_MAX)
+    {
+        out.reduce_size(0);
+        return UINT16_MAX;
+    }
+
+    out.reduce_size(len);
+    return len;
+}
+
+uint32_t Base64Encode32(const uint8_t * in, uint32_t inLen, MutableCharSpan & out)
+{
+    uint64_t needed = ((static_cast<uint64_t>(inLen) + 2) / 3) * 4;
+    if (needed > out.size())
+    {
+        out.reduce_size(0);
+        return 0;
+    }
+
+    uint32_t len = Base64Encode32(in, inLen, out.data());
+    out.reduce_size(len);
+    return len;
+}
+
+uint32_t Base64Encode32(const uint8_t * in, uint32_t inLen, MutableCharSpan & out, Base64ValToCharFunct valToCharFunct)
+{
+    uint64_t needed = ((static_cast<uint64_t>(inLen) + 2) / 3) * 4;
+    if (needed > out.size())
+    {
+        out.reduce_size(0);
+        return 0;
+    }
+
+    uint32_t len = Base64Encode32(in, inLen, out.data(), valToCharFunct);
+    out.reduce_size(len);
+    return len;
+}
+
+uint32_t Base64Decode32(const char * in, uint32_t inLen, MutableByteSpan & out)
+{
+    uint64_t maxNeeded = (static_cast<uint64_t>(inLen) * 3) / 4;
+    if (maxNeeded > out.size())
+    {
+        out.reduce_size(0);
+        return UINT32_MAX;
+    }
+
+    uint32_t len = Base64Decode32(in, inLen, out.data());
+    if (len == UINT32_MAX)
+    {
+        out.reduce_size(0);
+        return UINT32_MAX;
+    }
+
+    out.reduce_size(len);
+    return len;
+}
+
+uint32_t Base64Decode32(const char * in, uint32_t inLen, MutableByteSpan & out, Base64CharToValFunct charToValFunct)
+{
+    uint64_t maxNeeded = (static_cast<uint64_t>(inLen) * 3) / 4;
+    if (maxNeeded > out.size())
+    {
+        out.reduce_size(0);
+        return UINT32_MAX;
+    }
+
+    uint32_t len = Base64Decode32(in, inLen, out.data(), charToValFunct);
+    if (len == UINT32_MAX)
+    {
+        out.reduce_size(0);
+        return UINT32_MAX;
+    }
+
+    out.reduce_size(len);
+    return len;
+}
+
 } // namespace chip
 
 #ifdef TEST

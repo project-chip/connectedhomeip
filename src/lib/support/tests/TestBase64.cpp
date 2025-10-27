@@ -34,34 +34,37 @@ using namespace chip;
 TEST(TestBase64, EncodeDecodeBasic)
 {
     const uint8_t in1[] = { 'f' };
-    char out[8]         = {};
-    uint8_t outb[8]     = {};
+    char outbuf[8]      = {};
+    uint8_t outbbuf[8]  = {};
+    MutableCharSpan out(outbuf);
+    MutableByteSpan outb(outbbuf);
 
     // f -> Zg==
     uint16_t olen = Base64Encode(in1, 1, out);
-    EXPECT_EQ(std::string(out, olen), std::string("Zg=="));
+    EXPECT_TRUE(out.data_equal(CharSpan("Zg==", olen)));
 
-    uint16_t dlen = Base64Decode(out, olen, outb);
-    EXPECT_EQ(dlen, 1u);
-    EXPECT_EQ(outb[0], 'f');
+    Base64Decode(out.data(), olen, outb);
+    EXPECT_TRUE(outb.data_equal(ByteSpan(in1, 1)));
 
     // fo -> Zm8=
     const uint8_t in2[] = { 'f', 'o' };
+    out                 = MutableCharSpan(outbuf);
     olen                = Base64Encode(in2, 2, out);
-    EXPECT_EQ(std::string(out, olen), std::string("Zm8="));
+    EXPECT_TRUE(out.data_equal(CharSpan("Zm8=", olen)));
 
-    dlen = Base64Decode(out, olen, outb);
-    EXPECT_EQ(dlen, 2u);
-    EXPECT_EQ(std::memcmp(outb, in2, 2), 0);
+    outb = MutableByteSpan(outbbuf);
+    Base64Decode(out.data(), olen, outb);
+    EXPECT_TRUE(outb.data_equal(ByteSpan(in2, 2)));
 
     // foo -> Zm9v
     const uint8_t in3[] = { 'f', 'o', 'o' };
+    out                 = MutableCharSpan(outbuf);
     olen                = Base64Encode(in3, 3, out);
-    EXPECT_EQ(std::string(out, olen), std::string("Zm9v"));
+    EXPECT_TRUE(out.data_equal(CharSpan("Zm9v", olen)));
 
-    dlen = Base64Decode(out, olen, outb);
-    EXPECT_EQ(dlen, 3u);
-    EXPECT_EQ(std::memcmp(outb, in3, 3), 0);
+    outb = MutableByteSpan(outbbuf);
+    Base64Decode(out.data(), olen, outb);
+    EXPECT_TRUE(outb.data_equal(ByteSpan(in3, 3)));
 }
 
 TEST(TestBase64, EncodeDecodeURL)

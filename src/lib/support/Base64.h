@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include <lib/support/Span.h>
+
 #include <stdint.h>
 
 namespace chip {
@@ -64,6 +66,22 @@ extern uint32_t Base64Encode32(const uint8_t * in, uint32_t inLen, char * out, B
 extern uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out);
 extern uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out, Base64CharToValFunct charToValFunct);
 
+// Base64 encode/decode functions with MutableCharSpan output
+extern uint16_t Base64Encode(const uint8_t * in, uint16_t inLen, MutableCharSpan & out);
+extern uint16_t Base64URLEncode(const uint8_t * in, uint16_t inLen, MutableCharSpan & out);
+extern uint16_t Base64Encode(const uint8_t * in, uint16_t inLen, MutableCharSpan & out, Base64ValToCharFunct valToCharFunct);
+
+// Base64 decode functions with MutableByteSpan output
+extern uint16_t Base64Decode(const char * in, uint16_t inLen, MutableByteSpan & out);
+extern uint16_t Base64URLDecode(const char * in, uint16_t inLen, MutableByteSpan & out);
+extern uint16_t Base64Decode(const char * in, uint16_t inLen, MutableByteSpan & out, Base64CharToValFunct charToValFunct);
+
+// 32-bit length variants with span output
+extern uint32_t Base64Encode32(const uint8_t * in, uint32_t inLen, MutableCharSpan & out);
+extern uint32_t Base64Encode32(const uint8_t * in, uint32_t inLen, MutableCharSpan & out, Base64ValToCharFunct valToCharFunct);
+extern uint32_t Base64Decode32(const char * in, uint32_t inLen, MutableByteSpan & out);
+extern uint32_t Base64Decode32(const char * in, uint32_t inLen, MutableByteSpan & out, Base64CharToValFunct charToValFunct);
+
 /** Computes the base-64 encoded length for a given input length.
  *
  * The computed length includes room for padding characters.
@@ -76,6 +94,6 @@ extern uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out, B
  *
  * NOTE: The actual decoded length may be smaller than this due to padding.
  */
-#define BASE64_MAX_DECODED_LEN(LEN) ((LEN) *3 / 4)
+#define BASE64_MAX_DECODED_LEN(LEN) ((LEN) * 3 / 4)
 
 } // namespace chip
