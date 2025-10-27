@@ -602,7 +602,7 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
                 return CHIP_ERROR_KEY_NOT_FOUND; // Item not found in original list
             }
 
-            if (dayEntriesMap.find(deID) == nullptr)
+            if (dayEntriesMap.find(deID) == dayEntriesMap.end())
             {
                 ChipLogError(AppServer, "Unable to find DayEntry with ID%" PRIu32 "in the parsed data map", deID);
                 return CHIP_ERROR_KEY_NOT_FOUND; // Day entry not found in map
@@ -631,13 +631,13 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
         for (const uint32_t tcID : tcIDs)
         {
             // Check if TC exists in original context
-            if (UpdCtx.TariffComponentKeyIDsFeatureMap.find(tcID) == nullptr)
+            if (UpdCtx.TariffComponentKeyIDsFeatureMap.find(tcID) == UpdCtx.TariffComponentKeyIDsFeatureMap.end())
             {
                 ChipLogError(AppServer, "TariffComponent ID%" PRIu32 "not found in validation context feature map", tcID);
                 return CHIP_ERROR_KEY_NOT_FOUND; // Item not found in original list
             }
 
-            if (tariffComponentsMap.find(tcID) == nullptr)
+            if (tariffComponentsMap.find(tcID) == tariffComponentsMap.end())
             {
                 ChipLogError(AppServer, "Unable to find TariffComponent with ID%" PRIu32 "in the parsed data map", tcID);
                 return CHIP_ERROR_KEY_NOT_FOUND; // Tariff component not found in map

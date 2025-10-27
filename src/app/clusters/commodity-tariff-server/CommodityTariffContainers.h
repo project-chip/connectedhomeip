@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <cassert>
 #include <pw_containers/algorithm.h>
 #include <pw_containers/flat_map.h>
 #include <pw_containers/vector.h>
@@ -231,22 +232,20 @@ public:
     Value & operator[](const Key & key)
     {
         auto it = find(key);
-
         if (it != data_.end())
         {
             return it->second;
         }
 
-        if (!full())
-        {
-            // Key not found, insert it.
-            data_.push_back({ key, Value{} });
-        }
-        else
+        // Key not found, must insert.
+        if (full())
         {
             ChipLogError(AppServer, "Can't place new entry - the buffer is full");
+            // This is a programming error. Using operator[] on a full map for a new key.
+            assert(!full());
         }
 
+        data_.push_back({ key, Value{} });
         return data_.back().second;
     }
 
