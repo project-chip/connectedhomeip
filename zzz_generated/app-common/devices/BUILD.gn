@@ -11,24 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build_overrides/chip.gni")
-import("${chip_root}/build/chip/chip_test_suite.gni")
 
-chip_test_suite("tests") {
-  output_name = "libEndpointTests"
+source_set("ids") {
+  sources = [ "Ids.h" ]
 
-  test_sources = [
-    "TestEndpointInterfaceRegistry.cpp",
-    "TestSpanEndpoint.cpp",
-  ]
+  public_deps = [ "${chip_root}/src/lib/core:types" ]
+}
 
-  cflags = [ "-Wconversion" ]
+source_set("devices") {
+  sources = [ "Types.h" ]
 
   public_deps = [
-    "${chip_root}/src/app/clusters/descriptor",
-    "${chip_root}/src/app/data-model-provider:string-builder-adapters",
-    "${chip_root}/src/app/server-cluster/testing",
-    "${chip_root}/src/data-model-providers/codedriven/endpoint",
-    "${chip_root}/zzz_generated/app-common/devices/",
+    ":ids",
+    "${chip_root}/src/app/data-model-provider:metadata",
   ]
 }
