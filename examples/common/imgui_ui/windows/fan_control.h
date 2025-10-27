@@ -34,7 +34,7 @@ namespace Windows {
 class FanControl : public Window
 {
 public:
-    FanControl(chip::EndpointId endpointId, const char * title) : mEndpointId(endpointId), mTitle(title) {}
+    FanControl(chip::EndpointId endpointId) : mEndpointId(endpointId), mTitle("Fan control") {}
 
     void UpdateState() override;
     void Render() override;

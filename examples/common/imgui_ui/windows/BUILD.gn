@@ -20,6 +20,10 @@ source_set("windows") {
   sources = [ "window.h" ]
 }
 
+source_set("helpers") {
+  sources = [ "helpers.h" ]
+}
+
 static_library("connectivity") {
   sources = [
     "connectivity.cpp",
@@ -80,12 +84,11 @@ static_library("humidity_measurement") {
   ]
 
   deps = [
+    ":helpers",
     ":windows",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/third_party/imgui",
   ]
-
-  check_includes = false
 
   public_configs = [ "${chip_root}/src:includes" ]
 }
@@ -97,12 +100,11 @@ static_library("temperature_measurement") {
   ]
 
   deps = [
+    ":helpers",
     ":windows",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/third_party/imgui",
   ]
-
-  check_includes = false
 
   public_configs = [ "${chip_root}/src:includes" ]
 }
@@ -114,12 +116,11 @@ static_library("fan_control") {
   ]
 
   deps = [
+    ":helpers",
     ":windows",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/third_party/imgui",
   ]
-
-  check_includes = false
 
   public_configs = [ "${chip_root}/src:includes" ]
 }

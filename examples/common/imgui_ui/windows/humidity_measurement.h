@@ -34,7 +34,7 @@ namespace Windows {
 class HumidityMeasurement : public Window
 {
 public:
-    HumidityMeasurement(chip::EndpointId endpointId, const char * title) : mEndpointId(endpointId), mTitle(title) {}
+    HumidityMeasurement(chip::EndpointId endpointId) : mEndpointId(endpointId), mTitle("Humidity measurement") {}
 
     void UpdateState() override;
     void Render() override;

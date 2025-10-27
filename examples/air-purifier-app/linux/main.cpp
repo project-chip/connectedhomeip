@@ -83,11 +83,9 @@ int main(int argc, char * argv[])
 
     ui.AddWindow(std::make_unique<example::Ui::Windows::QRCode>());
     ui.AddWindow(std::make_unique<example::Ui::Windows::Connectivity>());
-    ui.AddWindow(std::make_unique<example::Ui::Windows::FanControl>(chip::EndpointId(FAN_CONTROL_ENDPOINT), "Fan control"));
-    ui.AddWindow(std::make_unique<example::Ui::Windows::HumidityMeasurement>(chip::EndpointId(RELATIVE_HUMIDITY_SENSOR_ENDPOINT),
-                                                                             "Humidity measurement"));
-    ui.AddWindow(std::make_unique<example::Ui::Windows::TemperatureMeasurement>(chip::EndpointId(TEMPERATURE_SENSOR_ENDPOINT),
-                                                                                "Temperature measurement"));
+    ui.AddWindow(std::make_unique<example::Ui::Windows::FanControl>(chip::EndpointId(FAN_CONTROL_ENDPOINT)));
+    ui.AddWindow(std::make_unique<example::Ui::Windows::HumidityMeasurement>(chip::EndpointId(RELATIVE_HUMIDITY_SENSOR_ENDPOINT)));
+    ui.AddWindow(std::make_unique<example::Ui::Windows::TemperatureMeasurement>(chip::EndpointId(TEMPERATURE_SENSOR_ENDPOINT)));
     ChipLinuxAppMainLoop(&ui);
 #else
     ChipLinuxAppMainLoop();
