@@ -49,33 +49,31 @@ def get_all_cmds_for_cluster_id(cid: int) -> list[Clusters.ClusterObjects.Cluste
         
     Note:
         Some clusters don't have a Commands attribute (they have no commands defined).
-        The AttributeError catch handles this case gracefully by returning an empty list,
-        allowing callers to safely iterate through all clusters without special-casing
-        clusters that don't support commands.
+        Returning an empty list allows callers to safely iterate through all clusters
+        without special-casing clusters that don't support commands.
     """
     cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cid]
-    try:
+    if hasattr(cluster, 'Commands'):
         return inspect.getmembers(cluster.Commands, inspect.isclass)
-    except AttributeError:
-        # Cluster has no Commands attribute - return empty list
-        return []
+    return []
 
 
 def client_cmd(cmd_class):
     """Filter to check if a command class is a client command.
-
+    
     Args:
         cmd_class: Command class to check
-
+        
     Returns:
         The command class if it's a client command, None otherwise
+        
+    Note:
+        Inspect returns all classes, not just command classes. Some builtin classes
+        won't have the is_client attribute, so we check for it explicitly.
     """
-    # Inspect returns all the classes, not just the ones we want, so use a try
-    # here incase we're inspecting a builtin class
-    try:
+    if hasattr(cmd_class, 'is_client'):
         return cmd_class if cmd_class.is_client else None
-    except AttributeError:
-        return None
+    return None
 
 
 # ============================================================================
