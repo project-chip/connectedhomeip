@@ -17,4 +17,26 @@
  */
 #pragma once
 
-#include <app/clusters/electrical-energy-measurement-server/CodegenIntegration.h>
+#include <lib/core/Optional.h>
+
+#include <app-common/zap-generated/cluster-objects.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ElectricalEnergyMeasurement {
+
+bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<Structs::EnergyMeasurementStruct::Type> & energyImported,
+                                    const Optional<Structs::EnergyMeasurementStruct::Type> & energyExported);
+
+bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const Optional<Structs::EnergyMeasurementStruct::Type> & energyImported,
+                                  const Optional<Structs::EnergyMeasurementStruct::Type> & energyExported);
+
+CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const Structs::MeasurementAccuracyStruct::Type & accuracy);
+
+CHIP_ERROR SetCumulativeReset(EndpointId endpointId, const Optional<Structs::CumulativeEnergyResetStruct::Type> & cumulativeReset);
+
+} // namespace ElectricalEnergyMeasurement
+} // namespace Clusters
+} // namespace app
+} // namespace chip
