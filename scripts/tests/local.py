@@ -38,7 +38,19 @@ import coloredlogs
 import tabulate
 import yaml
 
-from matter.testing.metadata import extract_runs_args
+# Attempt to import extract_runs_args. If it fails, attempt to add the
+# controller python path to the sys.path as a fallback.
+try:
+    from matter.testing.metadata import extract_runs_args  # May fail if python environment not built yet
+except ImportError:
+    _CONTROLLER_PYTHON_PATH = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'controller', 'python')
+    if _CONTROLLER_PYTHON_PATH not in sys.path:
+        sys.path.insert(0, _CONTROLLER_PYTHON_PATH)
+    try:
+        from matter.testing.metadata import extract_runs_args
+    except ImportError:
+        # filtering by app (--app-filter) will not work.
+        extract_runs_args = None
 
 
 def _get_apps_from_script(path: str) -> List[str]:
@@ -866,6 +878,8 @@ def python_tests(
 
     app_filter_list = None
     if app_filter:
+        if not extract_runs_args:
+            raise Exception("`--app-filter` requires the python testing environment: ./scripts/tests/local.py build-python")
         app_filter_list = _parse_filters(app_filter)
 
     if skip:
