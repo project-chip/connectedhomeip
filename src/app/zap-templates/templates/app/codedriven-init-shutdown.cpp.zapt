@@ -16,7 +16,7 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId  clusterId) 
         break;
     {{else if (isInConfigList name "CodeDrivenClustersWithoutCodegenIntegration")}}
     case app::Clusters::{{asUpperCamelCase name}}::Id:
-        #error "The {{asUpperCamelCase name}} cluster is part of the CodeDrivenClustersWithoutCodegenIntegration, but an Init() call with this cluster was made."
+        #error "The {{asUpperCamelCase name}} cluster is part of the CodeDrivenClustersWithoutCodegenIntegration, but is enabled in ZAP and should be initialized directly."
     {{/if}}
     {{/all_user_clusters}}
     }
@@ -32,7 +32,7 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     {{else if (isInConfigList name "CodeDrivenClustersWithoutCodegenIntegration")}}
     case app::Clusters::{{asUpperCamelCase name}}::Id:
-        #error "The {{asUpperCamelCase name}} cluster is part of the CodeDrivenClustersWithoutCodegenIntegration, but a Shutdown() call with this cluster was made."
+        #error "The {{asUpperCamelCase name}} cluster is part of the CodeDrivenClustersWithoutCodegenIntegration, but is enabled in ZAP and should be shutdown directly."
     {{/if}}
     {{/all_user_clusters}}
     }
