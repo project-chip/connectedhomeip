@@ -139,7 +139,7 @@ struct BlobMsgFieldBase : public std::conditional_t<Required, NonOptional<T>, st
 // The field type captures the field name as a compile-time string,
 // so a matching blobmsg_policy can be generated automatically.
 //
-// By default fields are optional, i.e. derive from use std::optional.
+// By default fields are optional, i.e. derive from std::optional.
 // Passing Required=true (or using BlobMsgRequiredField) creates makes
 // the field non-optional. BlobMsgParse() will fail is any required
 // fields are missing.
