@@ -29,30 +29,31 @@ namespace Test {
 
 // Detection traits for Encode() and EncodeForWrite()
 template <typename T, typename = void>
-struct HasEncodeForWrite : std::false_type {};
+struct HasEncodeForWrite : std::false_type
+{
+};
 
 template <typename T>
 struct HasEncodeForWrite<
-    T,
-    std::void_t<decltype(std::declval<T>().EncodeForWrite(std::declval<chip::TLV::TLVWriter &>(),
-                                                          chip::TLV::AnonymousTag()))>
-> : std::true_type {};
+    T, std::void_t<decltype(std::declval<T>().EncodeForWrite(std::declval<chip::TLV::TLVWriter &>(), chip::TLV::AnonymousTag()))>>
+    : std::true_type
+{
+};
 
 template <typename T, typename = void>
-struct HasGenericEncode : std::false_type {};
+struct HasGenericEncode : std::false_type
+{
+};
 
 template <typename T>
 struct HasGenericEncode<
-    T,
-    std::void_t<decltype(std::declval<T>().Encode(std::declval<chip::TLV::TLVWriter &>(),
-                                                 chip::TLV::AnonymousTag()))>
-> : std::true_type {};
-
+    T, std::void_t<decltype(std::declval<T>().Encode(std::declval<chip::TLV::TLVWriter &>(), chip::TLV::AnonymousTag()))>>
+    : std::true_type
+{
+};
 
 template <typename T>
-CHIP_ERROR WriteClusterAttribute(app::ServerClusterInterface & cluster,
-                                 const app::ConcreteAttributePath & path,
-                                 const T & value)
+CHIP_ERROR WriteClusterAttribute(app::ServerClusterInterface & cluster, const app::ConcreteAttributePath & path, const T & value)
 {
     // Simple scalar / enum path
     if constexpr (std::is_integral_v<T> || std::is_enum_v<T>)
@@ -94,8 +95,7 @@ CHIP_ERROR WriteClusterAttribute(app::ServerClusterInterface & cluster,
     }
 }
 template <typename ElementT>
-CHIP_ERROR WriteClusterAttribute(app::ServerClusterInterface & cluster,
-                                 const app::ConcreteAttributePath & path,
+CHIP_ERROR WriteClusterAttribute(app::ServerClusterInterface & cluster, const app::ConcreteAttributePath & path,
                                  const chip::app::DataModel::List<ElementT> & list)
 {
     app::Testing::WriteOperation writeOperation(path);
