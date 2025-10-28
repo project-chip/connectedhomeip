@@ -237,7 +237,7 @@ Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateInPlaceIndi
             NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::Id);
         }
     }
-    return Protocols::InteractionModel::Status::Success
+    return Protocols::InteractionModel::Status::Success;
 }
 
 chip::Protocols::InteractionModel::Status
