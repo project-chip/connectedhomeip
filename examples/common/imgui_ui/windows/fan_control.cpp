@@ -265,7 +265,7 @@ void FanControl::Render()
     }
 
     const auto flags = ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_SizingStretchProp;
-    if (ImGui::BeginTable("Rock setting", 2, flags)) // 3 columns
+    if (ImGui::BeginTable("Rock setting", 2, flags))
     {
         ImGui::TableSetupColumn("Setting", ImGuiTableColumnFlags_None, 1.0f);
         ImGui::TableSetupColumn("Flags", ImGuiTableColumnFlags_None, 3.0f);
