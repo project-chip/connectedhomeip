@@ -386,28 +386,18 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
             test_name = f'Subscribe access checker - {privilege}'
 
-            try:
-                logging.info(f"Subscribing to attribute {attribute} cluster {xml_cluster.name} privilege {privilege}")
+            logging.info(f"Subscribing to attribute {attribute} cluster {xml_cluster.name} privilege {privilege}")
 
-                if operation_allowed(spec_requires, privilege):
-                    result = await self._subscribe_single_attribute_check_success(
-                        endpoint_id, cluster_id, attribute_id, attribute, cluster_class, privilege, test_name)
-                    if result is None:  # Skip this attribute (INVALID_ACTION)
-                        continue
-                else:
-                    result = await self._subscribe_single_attribute_expect_error(
-                        endpoint_id, cluster_id, attribute_id, attribute, cluster_class, privilege, test_name)
-                    if result is None:  # Skip this attribute (INVALID_ACTION)
-                        continue
-
-            except Exception as e:
-                # Catch any other unexpected exceptions not handled by helper methods
-                logging.error(f"Unexpected exception subscribing to cluster {xml_cluster.name}: {e}")
-                self.record_error(test_name=test_name,
-                                  location=AttributePathLocation(endpoint_id=endpoint_id,
-                                                                 cluster_id=cluster_id, attribute_id=attribute_id),
-                                  problem=f"Unexpected error during subscription: {e}")
-                self.success = False
+            if operation_allowed(spec_requires, privilege):
+                result = await self._subscribe_single_attribute_check_success(
+                    endpoint_id, cluster_id, attribute_id, attribute, cluster_class, privilege, test_name)
+                if result is None:  # Skip this attribute (INVALID_ACTION)
+                    continue
+            else:
+                result = await self._subscribe_single_attribute_expect_error(
+                    endpoint_id, cluster_id, attribute_id, attribute, cluster_class, privilege, test_name)
+                if result is None:  # Skip this attribute (INVALID_ACTION)
+                    continue
 
     async def _run_write_access_test_for_cluster_privilege(self, endpoint_id, cluster_id, cluster, xml_cluster: XmlCluster, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, wildcard_read):
         for attribute_id in checkable_attributes(cluster_id, cluster, xml_cluster):
