@@ -1,5 +1,10 @@
 #include "AttributePersistenceMigration.h"
 
+#if CHIP_ERROR_LOGGING
+static constexpr const char * kMigrationLogFormat =
+    "Migration Error - Failed %s path " ChipLogFormatMEI "/" ChipLogFormatMEI "/" ChipLogFormatMEI " - %" CHIP_ERROR_FORMAT;
+#endif
+
 namespace chip::app {
 
 CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceProvider & safeProvider,
@@ -42,11 +47,8 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(NotSpecified,
-                         "Migration Error - Failed %s path " ChipLogFormatMEI "/" ChipLogFormatMEI "/" ChipLogFormatMEI
-                         " - %" CHIP_ERROR_FORMAT,
-                         "Reading", ChipLogValueMEI(cluster.mEndpointId), ChipLogValueMEI(cluster.mClusterId),
-                         ChipLogValueMEI(attr), err.Format());
+            ChipLogError(NotSpecified, kMigrationLogFormat, "Reading", ChipLogValueMEI(cluster.mEndpointId),
+                         ChipLogValueMEI(cluster.mClusterId), ChipLogValueMEI(attr), err.Format());
             finalError = err; // make sure we report an error if any element fails
             continue;
         }
@@ -54,22 +56,16 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
         err = normProvider.WriteValue(attrPath, copyOfBuffer);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(NotSpecified,
-                         "Migration Error - Failed %s path " ChipLogFormatMEI "/" ChipLogFormatMEI "/" ChipLogFormatMEI
-                         " - %" CHIP_ERROR_FORMAT,
-                         "Writing", ChipLogValueMEI(cluster.mEndpointId), ChipLogValueMEI(cluster.mClusterId),
-                         ChipLogValueMEI(attr), err.Format());
+            ChipLogError(NotSpecified, kMigrationLogFormat, "Writing", ChipLogValueMEI(cluster.mEndpointId),
+                         ChipLogValueMEI(cluster.mClusterId), ChipLogValueMEI(attr), err.Format());
             finalError = err; // make sure we report an error if any element fails
         }
 
         err = safeProvider.SafeDeleteValue(attrPath);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(NotSpecified,
-                         "Migration Error - Failed %s path " ChipLogFormatMEI "/" ChipLogFormatMEI "/" ChipLogFormatMEI
-                         " - %" CHIP_ERROR_FORMAT,
-                         "Deleting", ChipLogValueMEI(cluster.mEndpointId), ChipLogValueMEI(cluster.mClusterId),
-                         ChipLogValueMEI(attr), err.Format());
+            ChipLogError(NotSpecified, kMigrationLogFormat, "Deleting", ChipLogValueMEI(cluster.mEndpointId),
+                         ChipLogValueMEI(cluster.mClusterId), ChipLogValueMEI(attr), err.Format());
             finalError = err; // make sure we report an error if any element fails
         }
     }
