@@ -244,7 +244,7 @@ CHIP_ERROR RTKDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpan & m
         ChipLogError(DeviceLayer, "secure_app_function_call DAC key sign %d", param.ret);
         return CHIP_ERROR_INTERNAL;
     }
-    if (param.sig_len == 0|| param.sig_len > sizeof(sig_tmp_buf))
+    if (param.sig_len == 0 || param.sig_len > sizeof(sig_tmp_buf))
     {
         ChipLogError(DeviceLayer, "Signature length out of bounds: %d", param.sig_len);
         return CHIP_ERROR_INTERNAL;
