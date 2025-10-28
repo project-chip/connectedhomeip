@@ -130,7 +130,7 @@ jobs:
                    
 
             - name: Uploading Binaries
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ always() && !env.ACT }}
               with:
                   name: cirque_log-${{steps.outsuffix.outputs.value}}-logs
