@@ -59,12 +59,9 @@ class TC_CNET_4_12(MatterBaseTest):
         instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
         return instance_name
 
-    async def wait_for_srp_update(self, timeout_seconds: int = 600):
+    async def wait_for_srp_update(self, timeout_seconds: int = 180):
         instance_qname = f"{self.get_dut_instance_name}.{MdnsServiceType.OPERATIONAL.value}"
 
-        # *** STEP 6 ***
-        # TH performs a query for the SRV record against the qname instance_qname.
-        self.step(6)
         mdns = MdnsDiscovery()
         srv_record = await mdns.get_srv_record(
             service_name=instance_qname,
