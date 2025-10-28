@@ -306,7 +306,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         sGroupDataProvider.SetSessionKeystore(this->sessionKeystore);
         ReturnErrorOnFailure(sGroupDataProvider.Init());
         this->groupDataProvider = &sGroupDataProvider;
-        chip::Groupcast::DataProvider::Instance().Initialize(this->persistentStorageDelegate, this->sessionKeystore);
+        Groupcast::DataProvider::Instance().Initialize(this->persistentStorageDelegate, this->sessionKeystore);
 
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
         ReturnErrorOnFailure(sSessionResumptionStorage.Init(this->persistentStorageDelegate));

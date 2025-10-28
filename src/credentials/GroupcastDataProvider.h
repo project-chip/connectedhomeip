@@ -42,6 +42,7 @@ struct Group
     Group & operator=(const Group & t)
     {
         this->group_id       = t.group_id;
+        this->key_id         = t.key_id;
         this->endpoint_count = t.endpoint_count;
         memcpy(this->endpoints, t.endpoints, this->endpoint_count * sizeof(EndpointId));
         return *this;

@@ -23,6 +23,7 @@
 #include <lib/support/PersistentArray.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemClock.h>
+#include <lib/core/TLVCommon.h>
 
 using namespace chip;
 
@@ -42,15 +43,14 @@ struct Tags
 // GroupList
 //
 
-static constexpr size_t kMaxMembershipCount = CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT;
-constexpr size_t kEndpointEntrySize         = 4; // TLV::AnonymousTag(1) + Endpoint(2) + EndContainer(1)
-constexpr size_t kPersistentBufferMax =
-    4 + kEndpointsMax * kEndpointEntrySize; // GroupId(2) + KeyId(2) + kEndpointsMax(8) * kEndpointEntrySize(4);
 
-struct GroupList : public PersistentArray<kMaxMembershipCount, kPersistentBufferMax, Group>
+static constexpr size_t kMaxMembershipCount = CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT;
+static constexpr size_t MaxPersistentBuffer() { return TLV::EstimateStructOverhead(sizeof(GroupId) + sizeof(KeysetId) + sizeof(uint16_t), kEndpointsMax * (3 + sizeof(EndpointId))); }
+
+struct GroupList : public PersistentArray<kMaxMembershipCount, MaxPersistentBuffer(), Group>
 {
     GroupList(FabricIndex fabric, PersistentStorageDelegate * storage) :
-        PersistentArray<kMaxMembershipCount, kPersistentBufferMax, Group>(storage), mFabric(fabric)
+        PersistentArray<kMaxMembershipCount, MaxPersistentBuffer(), Group>(storage), mFabric(fabric)
     {}
 
     CHIP_ERROR UpdateKey(StorageKeyName & key) const override
@@ -129,7 +129,7 @@ struct GroupList : public PersistentArray<kMaxMembershipCount, kPersistentBuffer
 
 DataProvider::GroupIterator::GroupIterator(DataProvider & group_data, FabricIndex fabric) : mProvider(group_data), mFabric(fabric)
 {
-    chip::Groupcast::GroupList list(fabric, group_data.mStorage);
+    GroupList list(fabric, group_data.mStorage);
     list.Load();
     mCount = list.Count();
 }
@@ -143,7 +143,7 @@ bool DataProvider::GroupIterator::Next(Group & out)
 {
     VerifyOrReturnValue(mIndex < mCount, false);
     Group entry;
-    chip::Groupcast::GroupList list(mFabric, mProvider.mStorage);
+    GroupList list(mFabric, mProvider.mStorage);
     list.Load();
     VerifyOrReturnValue(CHIP_NO_ERROR == list.Get(mIndex++, entry), false);
     out = entry;
@@ -189,7 +189,7 @@ CHIP_ERROR DataProvider::AddGroup(chip::FabricIndex fabric_idx, Group & grp)
 
     // Insert entry
     {
-        chip::Groupcast::GroupList list(fabric_idx, mStorage);
+        GroupList list(fabric_idx, mStorage);
         Group entry(grp.group_id, grp.key_id);
         size_t index = 0;
 
@@ -200,13 +200,14 @@ CHIP_ERROR DataProvider::AddGroup(chip::FabricIndex fabric_idx, Group & grp)
         entry.endpoint_count = grp.endpoint_count;
         memcpy(entry.endpoints, grp.endpoints, entry.endpoint_count * sizeof(EndpointId));
 
-        return list.Add(entry, true);
+        ReturnErrorOnFailure(list.Add(entry, true));
+        return list.Save();
     }
 }
 
 CHIP_ERROR DataProvider::GetGroup(FabricIndex fabric_idx, Group & grp)
 {
-    chip::Groupcast::GroupList list(fabric_idx, mStorage);
+    GroupList list(fabric_idx, mStorage);
     Group entry(grp.group_id);
     size_t index = 0;
     // Find grp in NVM
@@ -218,7 +219,7 @@ CHIP_ERROR DataProvider::GetGroup(FabricIndex fabric_idx, Group & grp)
 
 CHIP_ERROR DataProvider::SetEndpoints(FabricIndex fabric_idx, Group & grp)
 {
-    chip::Groupcast::GroupList list(fabric_idx, mStorage);
+    GroupList list(fabric_idx, mStorage);
     Group entry(grp.group_id);
     size_t index = 0;
     // Find group in NVM
@@ -228,12 +229,13 @@ CHIP_ERROR DataProvider::SetEndpoints(FabricIndex fabric_idx, Group & grp)
     {
         entry.endpoints[i] = grp.endpoints[i];
     }
+    ReturnErrorOnFailure(list.Set(index, entry));
     return list.Save();
 }
 
 CHIP_ERROR DataProvider::RemoveGroup(FabricIndex fabric_idx, GroupId group_id)
 {
-    chip::Groupcast::GroupList list(fabric_idx, mStorage);
+    GroupList list(fabric_idx, mStorage);
     ReturnErrorOnFailure(list.Remove(Group(group_id)));
     return list.Save();
 }
