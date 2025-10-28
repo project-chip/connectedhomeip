@@ -80,7 +80,11 @@ public:
 
     CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) override;
 
-    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override;
+    CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override;
 
     bool HasAllocatedVideoStreams() override;
 
@@ -100,6 +104,8 @@ private:
     void ScheduleEndSend(uint16_t sessionId);
 
     void RegisterWebrtcTransport(uint16_t sessionId);
+
+    void UnregisterWebrtcTransport(uint16_t sessionId);
 
     CHIP_ERROR SendOfferCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
                                 uint16_t sessionId);

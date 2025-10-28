@@ -94,7 +94,6 @@ void MatterTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
     // This cluster should only exist in Root endpoint.
     VerifyOrReturn(endpoint == kRootEndpointId);
 
-    // register a singleton server (root endpoint only)
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::RegisterServer(
         {
@@ -113,7 +112,6 @@ void MatterTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint)
     // This cluster should only exist in Root endpoint.
     VerifyOrReturn(endpoint == kRootEndpointId);
 
-    // register a singleton server (root endpoint only)
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::UnregisterServer(
         {

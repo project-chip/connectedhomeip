@@ -25,7 +25,7 @@ namespace bdx {
 
 namespace {
 // Max block size for the BDX transfer.
-constexpr uint32_t kMaxBdxBlockSize = 1024;
+constexpr uint16_t kMaxBdxBlockSize = CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE;
 
 // How often we poll our transfer session.  Sadly, we get allocated on
 // unsolicited message, which makes it hard for our clients to configure this.

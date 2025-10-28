@@ -33,17 +33,20 @@ ThermostatDelegate ThermostatDelegate::sInstance;
 
 ThermostatDelegate::ThermostatDelegate()
 {
-    mNumberOfPresets                          = kMaxNumberOfPresetsSupported;
-    mNextFreeIndexInPresetsList               = 0;
-    mNextFreeIndexInPendingPresetsList        = 0;
-    mMaxThermostatSuggestions                 = kMaxNumberOfThermostatSuggestions;
-    mIndexOfCurrentSuggestion                 = mMaxThermostatSuggestions;
-    mNextFreeIndexInThermostatSuggestionsList = 0;
+    mNumberOfPresets                            = kMaxNumberOfPresetsSupported;
+    mNextFreeIndexInPresetsList                 = 0;
+    mNextFreeIndexInPendingPresetsList          = 0;
+    mMaxThermostatSuggestions                   = kMaxNumberOfThermostatSuggestions;
+    mIndexOfCurrentSuggestion                   = mMaxThermostatSuggestions;
+    mNextFreeIndexInThermostatSuggestionsList   = 0;
+    mMaxNumberOfSchedulesAllowedPerScheduleType = kMaxNumberOfSchedulesSupported;
 
     // Start the unique ID from 0 and it increases montonically.
     mUniqueID = 0;
 
     InitializePresets();
+
+    InitializeScheduleTypes();
 
     memset(mActivePresetHandleData, 0, sizeof(mActivePresetHandleData));
     mActivePresetHandleDataSize = 0;
@@ -482,4 +485,27 @@ size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime
         }
     }
     return minEffectiveTimeSuggestionIndex;
+}
+
+void ThermostatDelegate::InitializeScheduleTypes()
+{
+    static_assert(MATTER_ARRAY_SIZE(mScheduleTypes) == 2);
+
+    mScheduleTypes[0] = { .systemMode           = SystemModeEnum::kHeat,
+                          .numberOfSchedules    = mMaxNumberOfSchedulesAllowedPerScheduleType,
+                          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) };
+
+    mScheduleTypes[1] = { .systemMode           = SystemModeEnum::kCool,
+                          .numberOfSchedules    = mMaxNumberOfSchedulesAllowedPerScheduleType,
+                          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) };
+}
+
+CHIP_ERROR ThermostatDelegate::GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType)
+{
+    if (index < MATTER_ARRAY_SIZE(mScheduleTypes))
+    {
+        scheduleType = mScheduleTypes[index];
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
