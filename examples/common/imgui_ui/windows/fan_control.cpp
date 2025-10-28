@@ -20,9 +20,9 @@
 #include <imgui.h>
 
 #include <math.h>
-#include <vector>
-#include <utility>
 #include <string_view>
+#include <utility>
+#include <vector>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
@@ -32,10 +32,12 @@ namespace Ui {
 namespace Windows {
 
 template <typename T>
-static const std::string GetBitmapValueString(chip::BitMask<T> bitmask, const std::vector<std::pair<T, std::string_view>>&  valuesToNames)
+static const std::string GetBitmapValueString(chip::BitMask<T> bitmask,
+                                              const std::vector<std::pair<T, std::string_view>> & valuesToNames)
 {
     std::string result;
-    for (const auto& entry : valuesToNames ) {
+    for (const auto & entry : valuesToNames)
+    {
         if (bitmask.Has(entry.first))
         {
             if (!result.empty())
@@ -50,19 +52,17 @@ static const std::string GetBitmapValueString(chip::BitMask<T> bitmask, const st
 
 static const std::string GetRockBitmapValueString(chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> bitmask)
 {
-    return GetBitmapValueString(bitmask, {
-        {chip::app::Clusters::FanControl::RockBitmap::kRockLeftRight, "Left-right"},
-        {chip::app::Clusters::FanControl::RockBitmap::kRockUpDown, "Up-down"},
-        {chip::app::Clusters::FanControl::RockBitmap::kRockRound, "Round"}
-    });
+    return GetBitmapValueString(bitmask,
+                                { { chip::app::Clusters::FanControl::RockBitmap::kRockLeftRight, "Left-right" },
+                                  { chip::app::Clusters::FanControl::RockBitmap::kRockUpDown, "Up-down" },
+                                  { chip::app::Clusters::FanControl::RockBitmap::kRockRound, "Round" } });
 }
 
 static const std::string GetWindBitmapValueString(chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> bitmask)
 {
-    return GetBitmapValueString(bitmask, {
-        {chip::app::Clusters::FanControl::WindBitmap::kSleepWind, "Sleep"},
-        {chip::app::Clusters::FanControl::WindBitmap::kNaturalWind, "Natural"}
-    });
+    return GetBitmapValueString(bitmask,
+                                { { chip::app::Clusters::FanControl::WindBitmap::kSleepWind, "Sleep" },
+                                  { chip::app::Clusters::FanControl::WindBitmap::kNaturalWind, "Natural" } });
 }
 
 template <typename T>
