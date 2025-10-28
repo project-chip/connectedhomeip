@@ -2658,7 +2658,7 @@ provisional cluster DeviceEnergyManagementMode = 159 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 3;
+  device type ma_rootdevice = 22, version 4;
   device type ma_otarequestor = 18, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
@@ -2867,7 +2867,7 @@ endpoint 1 {
   device type ma_powersource = 17, version 1;
   device type ma_electricalsensor = 1296, version 1;
   device type energy_evse = 1292, version 2;
-  device type device_energy_management = 1293, version 2;
+  device type device_energy_management = 1293, version 3;
 
 
   server cluster Identify {
@@ -2934,7 +2934,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster ElectricalEnergyMeasurement {
@@ -2950,7 +2950,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster DeviceEnergyManagement {
@@ -3016,7 +3016,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
 
     handle command GetTargetsResponse;
     handle command Disable;
