@@ -328,7 +328,7 @@ CHIP_ERROR AppTask::Init()
 
     initParams.dataModelProvider        = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
-    // provide a customzied ProviderChangeListener
+    // provide a customized ProviderChangeListener, which injects a delay before marking attribute path dirty
     initParams.dataModelProviderChangeListner = &mCustomizedProviderChangeListener;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();
