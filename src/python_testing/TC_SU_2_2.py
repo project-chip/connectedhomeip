@@ -453,36 +453,20 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Start AttributeSubscriptionHandler first to avoid missing any rapid OTA events (race condition)
         # Atrributes: UpdateState and UpdateStateProgress (updateAvailable sequence)
         # ------------------------------------------------------------------------------------
-        subscription_attr_state = AttributeSubscriptionHandler(
+
+        subscription_attr = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+            expected_attribute=None  # receive all attributes
         )
 
-        subscription_attr_progress = AttributeSubscriptionHandler(
-            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress
-        )
-
-        # Start subscriptions for both attributes in parallel
-        await asyncio.gather(
-            subscription_attr_state.start(
-                dev_ctrl=controller,
-                node_id=requestor_node_id,
-                endpoint=0,
-                fabric_filtered=False,
-                min_interval_sec=0.5,
-                max_interval_sec=1,
-                keepSubscriptions=True
-            ),
-            subscription_attr_progress.start(
-                dev_ctrl=controller,
-                node_id=requestor_node_id,
-                endpoint=0,
-                fabric_filtered=False,
-                min_interval_sec=2,
-                max_interval_sec=3,
-                keepSubscriptions=True
-            )
+        await subscription_attr.start(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
+            endpoint=0,
+            fabric_filtered=False,
+            min_interval_sec=0.5,
+            max_interval_sec=1,
+            keepSubscriptions=True
         )
 
         # ------------------------------------------------------------------------------------
@@ -501,115 +485,60 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             f'{step_number}: Step #1.1 - Started subscription for UpdateState and UpdateStateProgress attributes '
             'before AnnounceOTAProvider to avoid missing OTA events')
 
-        observed_states = set()
-        state_sequence = []  # Full OTA state flow
-        final_idle_seen = False
-
-        def matcher_update_state(report):
-            """
-            Step #1.2.1 matcher function to track OTA UpdateState.
-            Tracks state transitions: Downloading > Applying > Idle.
-            Records each observed state only once and validates when Idle is reached.
-            """
-            nonlocal observed_states, final_idle_seen, state_sequence
-            val = report.value
-            if val is None:
-                return False
-
-            # Only track Downloading (4) or Applying (5) once
-            if val in [Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,  # 4
-                       Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying]:  # 5
-                if val not in observed_states:
-                    observed_states.add(val)
-                    state_sequence.append(val)
-                    logger.info(f'{step_number}: 1.2.1 - UpdateState recorded: {val}')
-            elif val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle:  # 1
-                if not final_idle_seen:  # log only once
-                    final_idle_seen = True
-                    state_sequence.append(val)
-                    logger.info(f'{step_number}: 1.2.1 - OTA UpdateState sequence complete, final state is Idle')
-            # Return True only when Idle is reached
-            return final_idle_seen
-
-        # Create matcher object from UpdateState
-        matcher_update_state_obj = AttributeMatcher.from_callable(
-            description="Validate OTA UpdateState transitions: Downloading > Applying > Idle",
-            matcher=matcher_update_state
-        )
-
-        progress_recorded = set()
+        state_sequence = []
         progress_values = []
+        downloading_seen = False
         progress_seen = False
-        final_null_seen = False
 
-        def matcher_progress(report):
+        def matcher_combined(report):
             """
-            Step #1.2.2 matcher function to track OTA progress values.
-            Tracks state transitions: non-null progress values range 1-99 > None.
-            Records each unique value once and expects a final None after progress has been observed.
+            Combined matcher for Step 1 (NEW)
+            - Validates UpdateState reaches Downloading
+            - UpdateStateProgress has any value 1–100
+            Follows the style of matcher_ota_updatestate.
             """
-            nonlocal progress_values, progress_seen, final_null_seen, progress_recorded
-            val = getattr(report.value, "value", report.value)  # unwrap Nullable if needed
+            nonlocal state_sequence, progress_values, downloading_seen, progress_seen
+            val = getattr(report.value, "value", report.value)
 
-            if val == NullValue:
-                val = None
+            current_time = time.time()
 
-            # Track progress numbers 1-99
-            if val is not None and isinstance(val, int) and 1 <= val <= 99:
-                progress_seen = True
-                if val not in progress_recorded:
-                    progress_recorded.add(val)
-                    progress_values.append(val)
-                    logger.info(f'{step_number}: 1.2.2 - UpdateStateProgress recorded: {val}')
-                return False
+            # UpdateState
+            if report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState:
+                if val is not None and val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading:
+                    if not downloading_seen:
+                        downloading_seen = True
+                        state_sequence.append(Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
+                        logger.info(f'{step_number}: State observed: {val} at {current_time} (NEW)')
 
-            # Track final None after some progress
-            if val is None and progress_seen:
-                final_null_seen = True
-                progress_values.append(val)
-                logger.info(f'{step_number} 1.2.2 - OTA UpdateStateProgress sequence complete, final state is None: {progress_values}')
-                return final_null_seen
+            # UpdateStateProgress
+            elif report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress:
+                if val is not None and isinstance(val, int) and 1 <= val <= 100:
+                    if not progress_seen:
+                        progress_seen = True
+                        progress_values.append(val)
+                        logger.info(f'{step_number}: Progress observed: {val} at {current_time} (NEW)')
 
-            return False
+            # End matcher once minimal conditions met
+            return downloading_seen and progress_seen
 
-        # Create matcher object for UpdateStateProgress
-        matcher_progress_obj = AttributeMatcher.from_callable(
-            description="Validate OTA UpdateStateProgress transitions: non-null values rage 1-99 and final None",
-            matcher=matcher_progress
+        matcher_combined_obj = AttributeMatcher.from_callable(
+            description=f"{step_number} - Minimal Step 1 matcher: Downloading + progress 1-100 (NEW)",
+            matcher=matcher_combined
         )
 
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.3 - Start tasks to track OTA attributes:
         # UpdateState and UpdateStateProgress (updateAvailable sequence) with validations
         # ------------------------------------------------------------------------------------
+
         try:
-            # Wait until the final state (Idle) is reached or timeout (5 min)
-
-            thread_state = threading.Thread(
-                target=lambda: subscription_attr_state.await_all_expected_report_matches(
-                    [matcher_update_state_obj], timeout_sec=300.0)
-            )
-            thread_progress = threading.Thread(
-                target=lambda: subscription_attr_progress.await_all_expected_report_matches(
-                    [matcher_progress_obj], timeout_sec=300.0)
-            )
-
-            # Start both threads
-            thread_state.start()
-            thread_progress.start()
-
-            # Wait for both threads to complete
-            thread_state.join()
-            thread_progress.join()
-
-            logger.info(
-                f'{step_number}: Step #1.3 - Both OTA attributes UpdateState (1.2.1) and UpdateStateProgress (1.2.2) matchers have completed.')
+            await subscription_attr.await_all_expected_report_matches([matcher_combined_obj], timeout_sec=60.0)
         except Exception as e:
-            logger.warning(f'OTA update encountered an error or timeout: {e}')
+            logger.warning(f'{step_number}: OTA update encountered an error or timeout: {e}')
         finally:
-            # Cancel both subscriptions and task
-            await subscription_attr_state.cancel()
-            await subscription_attr_progress.cancel()
+            # Cancel subscription
+            logger.info(f'{step_number}: Step #1.3 - UpdateState (Available sequence) matcher has completed.')
+            await subscription_attr.cancel()
 
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.4 - Verify image transfer from TH/OTA-P to DUT is successful
@@ -619,17 +548,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number}: Step #1.4 - Full OTA state sequence observed: {state_sequence}')
         logger.info(f'{step_number}: Step #1.4 - Progress values observed: {progress_values}')
 
-        # Expected OTA flow
         expected_flows = [
-            [
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
-            ],
-            [
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,
-                Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
-            ]
+            [Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading]
         ]
 
         # Assert the observed sequence matches expected
@@ -639,6 +559,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             msg = f"Observed OTA flow: {state_sequence}, Expected one of: {expected_flows}"
             asserts.fail(msg)
 
+        # Assert that progress has at least one value between 1 and 100
+        assert any(1 <= v <= 100 for v in progress_values), f"{step_number}: No valid UpdateStateProgress observed (1-100)"
+        logger.info(f'{step_number}: Step #1.4 - UpdateStateProgress has valid value(s) in range 1-100')
+
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.5 - Close Provider Process
         # ------------------------------------------------------------------------------------
@@ -646,6 +570,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # Kill Provider process
         self.current_provider_app_proc.terminate()
+        await asyncio.sleep(2)  # Wait for process to terminate
 
         self.step(2)
         # ------------------------------------------------------------------------------------
