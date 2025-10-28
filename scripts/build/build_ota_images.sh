@@ -24,27 +24,7 @@ PRODUCT_ID="0xBEEF"
 MAX_RANGE=6
 OUT_PREFIX="out/su_ota_images_min"
 BUILT_IMAGES_STACK=()
-TARGET_FILE="$CHIP_ROOT/examples/ota-requestor-app/linux/include/CHIPProjectAppConfig.h"
-BACKUP_CONFIG_FILE="cp $TARGET_FILE $CHIP_ROOT/examples/ota-requestor-app/linux/include/CHIPProjectAppConfig.h.backup"
 STATUS_CODE=0
-
-replace_version_config_str() {
-    local version="$1"
-    local dest_file="$2"
-
-    cat >>"$dest_file" <<EOL
-
-#ifdef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
-#undef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION $i
-#endif
-#ifdef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
-#undef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "$i.0"
-#endif
-EOL
-
-}
 
 # Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
@@ -81,54 +61,52 @@ echo "Output Prefix: $OUT_PREFIX"
 BASE_OUT_PREFIX="$CHIP_ROOT/$OUT_PREFIX"
 echo "PREFIX $BASE_OUT_PREFIX"
 
-# Create the backup file
 echo "Starting building the ota images with different version number."
-echo "Creating the backup file"
-
-cp "$TARGET_FILE" "$CHIP_ROOT"/examples/ota-requestor-app/linux/include/CHIPProjectAppConfig.h.backup
-STATUS_CODE=$?
-if [ "$STATUS_CODE" -ne 0 ]; then
-    echo "Command failed with status code: $STATUS_CODE"
-    exit 1
-fi
 
 for ((i = 2; i <= "$MAX_RANGE"; i++)); do
     echo "Building for version $i"
 
-    replace_version_config_str "$i" "$TARGET_FILE"
+    # Use a per-version GN output dir to avoid clobbering / to enable reuse
+    OUT_DIR="${BASE_OUT_PREFIX}-v${i}"
+    mkdir -p "$OUT_DIR"
 
-    # Build the image
-    echo "Building the requestor app"
-    ./"$CHIP_ROOT"/scripts/examples/gn_build_example.sh "$CHIP_ROOT"/examples/ota-requestor-app/linux "$BASE_OUT_PREFIX" chip_config_network_layer_ble=false is_debug=false >/dev/null
+    # Pass version via GN args (target_cflags). Quotes must be escaped so the GN arg
+    # arrives intact. gn_build_example.sh forwards key=value args to gn gen.
+    GN_VERSION_ARGS="target_cflags=[\"-DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${i}\",\"-DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\\\"${i}.0\\\"\"]"
+
+    # Build the image without editing source files
+    echo "Building the requestor app (out: $OUT_DIR)"
+    ./"$CHIP_ROOT"/scripts/examples/gn_build_example.sh \
+        "$CHIP_ROOT"/examples/ota-requestor-app/linux "$OUT_DIR" \
+        chip_config_network_layer_ble=false is_debug=false "$GN_VERSION_ARGS" >/dev/null
     STATUS_CODE=$?
     if [ "$STATUS_CODE" -ne 0 ]; then
-        echo "Failed to build the app $TARGET_FILE"
+        echo "Failed to build the app for version $i"
         break
     fi
 
-    # Strip command
+    # Strip command (create .min binary in the same OUT_DIR)
     if [ "$(uname -s)" = "Darwin" ]; then
-        strip "$BASE_OUT_PREFIX"/chip-ota-requestor-app -o "$BASE_OUT_PREFIX"/chip-ota-requestor-app.min >/dev/null 2>&1
+        strip "$OUT_DIR"/chip-ota-requestor-app -o "$OUT_DIR"/chip-ota-requestor-app.min >/dev/null 2>&1
     else
-        strip --strip-all "$BASE_OUT_PREFIX"/chip-ota-requestor-app -o "$BASE_OUT_PREFIX"/chip-ota-requestor-app.min >/dev/null 2>&1
+        strip --strip-all "$OUT_DIR"/chip-ota-requestor-app -o "$OUT_DIR"/chip-ota-requestor-app.min >/dev/null 2>&1
     fi
     STATUS_CODE=$?
     if [ "$STATUS_CODE" -ne 0 ]; then
-        echo "Failed to strip the code from min app"
+        echo "Failed to strip the code for version $i"
         break
     fi
 
-    # Create ota image
-    OTA_IMAGE_PATH=$CHIP_ROOT/$OUT_PREFIX/chip-ota-requestor-app_v$i.min.ota
-    python3 "$CHIP_ROOT"/src/app/ota_image_tool.py create -v "$VENDOR_ID" -p "$PRODUCT_ID" -vn "$i" -vs "$i.0" -da sha256 "$BASE_OUT_PREFIX"/chip-ota-requestor-app.min "$OTA_IMAGE_PATH"
+    # Create ota image (store images under the shared OUT_PREFIX directory)
+    OTA_IMAGE_PATH="$OUT_DIR/chip-ota-requestor-app_v${i}.min.ota"
+    python3 "$CHIP_ROOT"/src/app/ota_image_tool.py create -v "$VENDOR_ID" -p "$PRODUCT_ID" -vn "$i" -vs "$i.0" -da sha256 "$OUT_DIR"/chip-ota-requestor-app.min "$OTA_IMAGE_PATH"
     STATUS_CODE=$?
     if [ "$STATUS_CODE" -ne 0 ]; then
-        echo "Failed to create the OTA Image $TARGET_FILE"
+        echo "Failed to create the OTA Image for version $i"
         break
     fi
+
     BUILT_IMAGES_STACK+=("$OTA_IMAGE_PATH")
-    echo "Restoring the config file"
-    cp "$CHIP_ROOT"/examples/ota-requestor-app/linux/include/CHIPProjectAppConfig.h.backup "$TARGET_FILE"
 done
 
 if [ "$STATUS_CODE" -eq 0 ]; then
@@ -137,11 +115,6 @@ if [ "$STATUS_CODE" -eq 0 ]; then
         echo "$item"
     done
 fi
-
-echo "Restoring backup file"
-cp "$CHIP_ROOT"/examples/ota-requestor-app/linux/include/CHIPProjectAppConfig.h.backup "$TARGET_FILE"
-echo "Removing old backup file"
-rm "$CHIP_ROOT"/examples/ota-requestor-app/linux/include/CHIPProjectAppConfig.h.backup
 
 if [ "$STATUS_CODE" -ne 0 ]; then
     exit 1

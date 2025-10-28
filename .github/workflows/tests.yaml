@@ -855,8 +855,8 @@ jobs:
                   CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >- 
                   ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 2
-                  && mv out/su_ota_images_min/*.ota objdir-clone
-                  && rm -rf out/su_ota_images_min"
+                  && mv out/su_ota_images_min-v*/*.ota objdir-clone
+                  && rm -rf out/su_ota_images_min-v*"
 
             - name: ccache stats
               run: ccache -s
