@@ -20,6 +20,9 @@
 #     app: ${ALL_CLUSTERS_APP}
 #     factory-reset: true
 #     quiet: true
+#     # The --app-pipe is required for the out-of-band named pipe command to force uptime changes:
+#     # {"Name": "SetTotalOperationalHours", "Hours": 3}
+#     # This allows the test to set TotalOperationalHours > 2 hours for CI testing
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/dggen_2_1_fifo
 #     app-ready-pattern: "Server initialization complete"
 #     script-args: >
@@ -168,7 +171,7 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
             logging.info("Uptime manipulation completed for CI")
 
             # Wait a moment for the command to be processed
-            await asyncio.sleep(1.0)
+            await asyncio.sleep(5.0)
 
             # Verify the setting worked - this is critical for the test
             total_hrs_check = await self._read_total_hrs(ctrl)
