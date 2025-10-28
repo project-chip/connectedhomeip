@@ -371,7 +371,6 @@ bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled()
 
 void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
 {
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
     WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
     uint8_t associationFailureCause =
         chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);
@@ -493,7 +492,7 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
             network
             */
             mIsWifiRecovering = false;
-            err               = NetworkCommissioning::NXPWiFiDriver::GetInstance().ConnectWiFiStagedNetwork();
+            CHIP_ERROR err    = NetworkCommissioning::NXPWiFiDriver::GetInstance().ConnectWiFiStagedNetwork();
             if (err == CHIP_ERROR_KEY_NOT_FOUND)
             {
                 /* if no SSID is staged, notify the network commissioning module to clean environnement for next commissioning  */
