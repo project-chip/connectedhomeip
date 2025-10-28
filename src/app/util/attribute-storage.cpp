@@ -1593,7 +1593,8 @@ DataVersion * emberAfDataVersionStorage(const ConcreteClusterPath & aConcreteClu
 
 DataModel::ProviderChangeListener * emberAfGlobalInteractionModelAttributesChangedListener()
 {
-    // return reporting engine if Provider has not started and ProviderChangeListener saved in InteractionModelContext is nullptr .
+    // Return reporting engine (default ProviderChangeListener) if Provider has not started. This guarantees that this function
+    // never returns a nullptr.
     DataModel::ProviderChangeListener * listener = CodegenDataModelProvider::Instance().GetProviderChangeListener();
     if (listener == nullptr)
     {

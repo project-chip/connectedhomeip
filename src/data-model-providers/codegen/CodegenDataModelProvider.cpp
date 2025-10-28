@@ -168,7 +168,6 @@ DataModel::ProviderChangeListener * CodegenDataModelProvider::GetProviderChangeL
 {
     if (!mContext)
     {
-        ChipLogError(DataManagement, "GetProviderChangeListener called before provider has been started.");
         return nullptr;
     }
     return &(mContext->dataModelChangeListener);
