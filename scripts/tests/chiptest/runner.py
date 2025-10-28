@@ -131,7 +131,7 @@ class Application:
         self.path = pathlib.Path(self.path)
 
     def add_args(self, args: tuple[str, ...]):
-        return Application(kind=self.kind, path=self.path, args=self.args + args)
+        return Application(kind=self.kind, path=self.path, wrapper=self.wrapper, args=self.args + args)
 
     def wrap_with(self, wrapper: tuple[str, ...]):
         return Application(kind=self.kind, path=self.path, wrapper=wrapper + self.wrapper, args=self.args)

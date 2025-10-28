@@ -151,7 +151,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         runtime = TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON
 
     if chip_tool is not None:
-        chip_tool = Application(kind='tool', path=Path(chip_tool)).wrap_with(('python3',))
+        chip_tool = Application(kind='tool', path=Path(chip_tool))
     else:
         if not runtime == TestRunTime.MATTER_REPL_PYTHON:
             paths_finder = PathsFinder()
@@ -358,9 +358,12 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
     if chip_tool_with_python is None:
         if context.obj.runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
-            chip_tool_with_python = build_app(None, 'tool', 'darwinframeworktool.py').wrap_with(('python3',))
+            chip_tool_with_python = build_app(None, 'tool', 'darwinframeworktool.py')
         else:
-            chip_tool_with_python = build_app(None, 'tool', 'chiptool.py').wrap_with(('python3',))
+            chip_tool_with_python = build_app(None, 'tool', 'chiptool.py')
+
+        if chip_tool_with_python is not None:
+            chip_tool_with_python = chip_tool_with_python.wrap_with(('python3',))
 
     if ble_wifi and sys.platform != "linux":
         raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
