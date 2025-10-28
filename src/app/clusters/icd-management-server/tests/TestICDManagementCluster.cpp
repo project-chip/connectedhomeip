@@ -54,7 +54,6 @@ struct TestIcdManagementCluster : public ::testing::Test
 TEST_F(TestIcdManagementCluster, TestAttributes)
 {
     // Create test instances
-    TestPersistentStorageDelegate storage;
     chip::Crypto::DefaultSessionKeystore keystore;
     FabricTable fabricTable;
     ICDConfigurationData & icdConfig = ICDConfigurationData::GetInstance();
@@ -63,12 +62,13 @@ TEST_F(TestIcdManagementCluster, TestAttributes)
         BitMask<IcdManagement::OptionalCommands>(IcdManagement::OptionalCommands::kStayActive);
     BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint(0);
 
+    // Since ICDManagementClusterWithCIP is under the #if CHIP_CONFIG_ENABLE_ICD_CIP, we need to test both cases.
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-    ICDManagementClusterWithCIP cluster(kRootEndpointId, storage, keystore, fabricTable, icdConfig,
+    ICDManagementClusterWithCIP cluster(kRootEndpointId, keystore, fabricTable, icdConfig,
                                         OptionalAttributeSet(IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id),
                                         optionalCommands, userActiveModeTriggerHint, CharSpan());
 #else
-    ICDManagementCluster cluster(kRootEndpointId, storage, keystore, fabricTable, icdConfig,
+    ICDManagementCluster cluster(kRootEndpointId, keystore, fabricTable, icdConfig,
                                  OptionalAttributeSet(IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id),
                                  optionalCommands, userActiveModeTriggerHint, CharSpan());
 #endif

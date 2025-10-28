@@ -76,9 +76,9 @@ public:
             instructionSpan = MutableCharSpan();
         }
 
-        gServer.Create(endpointId, Server::GetInstance().GetPersistentStorage(), *Server::GetInstance().GetSessionKeystore(),
-                       Server::GetInstance().GetFabricTable(), ICDConfigurationData::GetInstance().GetInstance(),
-                       optionalAttributeSet, enabledCommands, userActiveModeTriggerHint, instructionSpan);
+        gServer.Create(endpointId, *Server::GetInstance().GetSessionKeystore(), Server::GetInstance().GetFabricTable(),
+                       ICDConfigurationData::GetInstance().GetInstance(), optionalAttributeSet, enabledCommands,
+                       userActiveModeTriggerHint, instructionSpan);
         return gServer.Registration();
     }
 
