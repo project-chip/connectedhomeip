@@ -50,7 +50,7 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::NetworkCommissioning::Id:
 #error                                                                                                                             \
-    "The NetworkCommissioning cluster is part of the CodeDrivenClustersWithoutCodegenIntegration, but an Init() call with this cluster was made."
+    "The NetworkCommissioning cluster is part of the CodeDrivenClustersWithoutCodegenIntegration, but is enabled in ZAP and should be initialized directly."
     case app::Clusters::DiagnosticLogs::Id:
         MatterDiagnosticLogsClusterInitCallback(endpoint);
         break;
@@ -114,7 +114,7 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::NetworkCommissioning::Id:
 #error                                                                                                                             \
-    "The NetworkCommissioning cluster is part of the CodeDrivenClustersWithoutCodegenIntegration, but a Shutdown() call with this cluster was made."
+    "The NetworkCommissioning cluster is part of the CodeDrivenClustersWithoutCodegenIntegration, but is enabled in ZAP and should be shutdown directly."
     case app::Clusters::DiagnosticLogs::Id:
         MatterDiagnosticLogsClusterShutdownCallback(endpoint);
         break;
