@@ -6843,6 +6843,34 @@ public static class ContentControlClusterRemainingScreenTimeExpiredEvent {
     return output.toString();
   }
 }
+public static class ContentControlClusterEnteringBlockContentTimeWindowEvent {
+
+  public ContentControlClusterEnteringBlockContentTimeWindowEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static ContentControlClusterEnteringBlockContentTimeWindowEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new ContentControlClusterEnteringBlockContentTimeWindowEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ContentControlClusterEnteringBlockContentTimeWindowEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ZoneManagementClusterZoneTriggeredEvent {
   public Integer zone;
   public Integer reason;
