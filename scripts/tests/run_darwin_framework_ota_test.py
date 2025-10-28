@@ -60,8 +60,8 @@ class DarwinToolRunner:
 
 
 class InteractiveDarwinTool(DarwinToolRunner):
-    def __init__(self, runner, application):
-        self.prompt = "WAITING FOR COMMANDS NOW"
+    def __init__(self, runner, prompt, application):
+        self.prompt = prompt
         super().__init__(runner, application)
 
     def waitForPrompt(self):
@@ -163,8 +163,9 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
         commissionerNodeId = nodeIdLine.group(1)
         darwin_tool.stop()
 
-        darwin_tool = InteractiveDarwinTool(runner, darwin_framework_tool.add_args(
-            ("interactive", "start", "--additional-prompt", self.prompt)))
+        prompt = "WAITING FOR COMMANDS NOW"
+        darwin_tool = InteractiveDarwinTool(runner, prompt, darwin_framework_tool.add_args(
+            ("interactive", "start", "--additional-prompt", prompt)))
         darwin_tool.start()
 
         darwin_tool.waitForPrompt()
