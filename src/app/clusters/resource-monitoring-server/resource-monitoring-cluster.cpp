@@ -240,7 +240,8 @@ Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateInPlaceIndi
     return Protocols::InteractionModel::Status::Success
 }
 
-chip::Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateLastChangedTime(DataModel::Nullable<uint32_t> aNewLastChangedTime)
+chip::Protocols::InteractionModel::Status
+ResourceMonitoringCluster::UpdateLastChangedTime(DataModel::Nullable<uint32_t> aNewLastChangedTime)
 {
     auto oldLastchangedTime = mLastChangedTime;
     mLastChangedTime        = aNewLastChangedTime;
