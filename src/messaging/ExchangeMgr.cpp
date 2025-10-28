@@ -178,7 +178,7 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
     {
         if (umh.IsInUse() && umh.Matches(protocolId, msgType))
         {
-            // Capture the handler before unregistering.
+            // Store the handler before unregistering.
             if (outHandler != nullptr)
             {
                 *outHandler = umh.Handler;
