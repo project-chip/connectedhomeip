@@ -291,16 +291,51 @@ public:
     void SetCallbacks(OnLocalDescriptionCallback onLocalDescription, OnICECandidateCallback onICECandidate,
                       OnConnectionStateCallback onConnectionState, OnTrackCallback onTrack) override
     {
-        mPeerConnection->onLocalDescription(
-            [onLocalDescription](rtc::Description desc) { onLocalDescription(std::string(desc), RtcTypeToSDPType(desc.type())); });
+        mPeerConnection->onLocalDescription([onLocalDescription, onICECandidate](rtc::Description desc) {
+            // First, notify about the local description
+            onLocalDescription(std::string(desc), RtcTypeToSDPType(desc.type()));
 
-        mPeerConnection->onLocalCandidate([onICECandidate](rtc::Candidate candidate) { onICECandidate(std::string(candidate)); });
+            // Extract any candidates embedded in the SDP description
+            std::vector<rtc::Candidate> candidates = desc.candidates();
+            ChipLogProgress(Camera, "Extracted %lu candidates from SDP description", candidates.size());
+
+            for (const auto & candidate : candidates)
+            {
+                ICECandidateInfo candidateInfo;
+                candidateInfo.candidate  = std::string(candidate);
+                candidateInfo.mid        = candidate.mid();
+                candidateInfo.mlineIndex = -1; // libdatachannel doesn't provide mlineIndex
+
+                ChipLogProgress(Camera, "[From SDP] Candidate: %s, mid: %s", candidateInfo.candidate.c_str(),
+                                candidateInfo.mid.c_str());
+
+                onICECandidate(candidateInfo);
+            }
+        });
+
+        mPeerConnection->onLocalCandidate([onICECandidate](rtc::Candidate candidate) {
+            ICECandidateInfo candidateInfo;
+            candidateInfo.candidate = std::string(candidate);
+            candidateInfo.mid       = candidate.mid();
+
+            // Note: libdatachannel doesn't directly provide mlineIndex, so we use -1 to indicate it is not present.
+            candidateInfo.mlineIndex = -1;
+
+            onICECandidate(candidateInfo);
+        });
 
         mPeerConnection->onStateChange([onConnectionState](rtc::PeerConnection::State state) {
             ChipLogProgress(Camera, "[PeerConnection State: %s]", GetPeerConnectionStateStr(state));
             if (state == rtc::PeerConnection::State::Connected)
             {
                 onConnectionState(true);
+            }
+            else if (state == rtc::PeerConnection::State::Failed || state == rtc::PeerConnection::State::Closed)
+            {
+                // rtc::PeerConnection::State::Disconnected as a terminal state will trigger teardown on transient ICE disconnects;
+                // per WebRTC semantics, Disconnected can recover to Connected. Limit the false signal to Failed and Closed only to
+                // avoid prematurely ending sessions.
+                onConnectionState(false);
             }
         });
 
