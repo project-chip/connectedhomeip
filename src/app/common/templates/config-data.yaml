@@ -165,7 +165,6 @@ CodeDrivenClustersWithCodegenIntegration:
     - Time Format Localization
     - User Label
     - Wi-Fi Network Diagnostics
-    - Diagnostic Logs
     # keep-sorted end
 
 CodeDrivenClustersWithoutCodegenIntegration:
