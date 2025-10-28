@@ -67,12 +67,12 @@ for ((i = 2; i <= "$MAX_RANGE"; i++)); do
     echo "Building for version $i"
 
     # Use a per-version GN output dir to avoid clobbering / to enable reuse
-    OUT_DIR="${BASE_OUT_PREFIX}-v${i}"
+    OUT_DIR="$BASE_OUT_PREFIX-v$i"
     mkdir -p "$OUT_DIR"
 
     # Pass version via GN args (target_cflags). Quotes must be escaped so the GN arg
     # arrives intact. gn_build_example.sh forwards key=value args to gn gen.
-    GN_VERSION_ARGS="target_cflags=[\"-DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${i}\",\"-DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\\\"${i}.0\\\"\"]"
+    GN_VERSION_ARGS="target_cflags=[\"-DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=$i\",\"-DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\\\"$i.0\\\"\"]"
 
     # Build the image without editing source files
     echo "Building the requestor app (out: $OUT_DIR)"
@@ -98,7 +98,7 @@ for ((i = 2; i <= "$MAX_RANGE"; i++)); do
     fi
 
     # Create ota image (store images under the shared OUT_PREFIX directory)
-    OTA_IMAGE_PATH="$OUT_DIR/chip-ota-requestor-app_v${i}.min.ota"
+    OTA_IMAGE_PATH="$OUT_DIR/chip-ota-requestor-app_v$i.min.ota"
     python3 "$CHIP_ROOT"/src/app/ota_image_tool.py create -v "$VENDOR_ID" -p "$PRODUCT_ID" -vn "$i" -vs "$i.0" -da sha256 "$OUT_DIR"/chip-ota-requestor-app.min "$OTA_IMAGE_PATH"
     STATUS_CODE=$?
     if [ "$STATUS_CODE" -ne 0 ]; then
