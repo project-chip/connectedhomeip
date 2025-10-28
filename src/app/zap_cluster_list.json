@@ -66,10 +66,8 @@
         "ICD_MANAGEMENT_CLUSTER": [],
         "IDENTIFY_CLUSTER": [],
         "ILLUMINANCE_MEASUREMENT_CLUSTER": [],
-        "JOINT_FABRIC_DATASTORE_CLUSTER": ["joint-fabric-datastore-server"],
-        "JOINT_FABRIC_ADMINISTRATOR_CLUSTER": [
-            "joint-fabric-administrator-server"
-        ],
+        "JOINT_FABRIC_DATASTORE_CLUSTER": [],
+        "JOINT_FABRIC_ADMINISTRATOR_CLUSTER": [],
         "KEYPAD_INPUT_CLUSTER": [],
         "LAUNDRY_WASHER_MODE_CLUSTER": [],
         "LEVEL_CONTROL_CLUSTER": [],

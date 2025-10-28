@@ -20,6 +20,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
+#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/persistence/PascalString.h>
@@ -1589,28 +1590,13 @@ DataVersion * emberAfDataVersionStorage(const ConcreteClusterPath & aConcreteClu
     return ep.dataVersions + clusterIndex;
 }
 
-namespace {
-class GlobalInteractionModelEngineChangedpathListener : public AttributesChangedListener
+DataModel::ProviderChangeListener * emberAfGlobalInteractionModelAttributesChangedListener()
 {
-public:
-    ~GlobalInteractionModelEngineChangedpathListener() = default;
-
-    void MarkDirty(const AttributePathParams & path) override
-    {
-        InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
-    }
-};
-
-} // namespace
-
-AttributesChangedListener * emberAfGlobalInteractionModelAttributesChangedListener()
-{
-    static GlobalInteractionModelEngineChangedpathListener listener;
-    return &listener;
+    return &InteractionModelEngine::GetInstance()->GetReportingEngine();
 }
 
 void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                             AttributesChangedListener * listener)
+                             DataModel::ProviderChangeListener * listener)
 {
     // Increase cluster data path
     DataVersion * version = emberAfDataVersionStorage(ConcreteClusterPath(endpoint, clusterId));
@@ -1629,7 +1615,7 @@ void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, Attribute
     listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
 }
 
-void emberAfEndpointChanged(EndpointId endpoint, AttributesChangedListener * listener)
+void emberAfEndpointChanged(EndpointId endpoint, DataModel::ProviderChangeListener * listener)
 {
     listener->MarkDirty(AttributePathParams(endpoint));
 }
