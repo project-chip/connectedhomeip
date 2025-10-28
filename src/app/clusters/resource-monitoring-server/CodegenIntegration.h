@@ -37,7 +37,7 @@ public:
      * and then calls SetDelegate() with the supplied delegate. The caller is responsible for ensuring that the delegate remains
      * valid for the lifetime of the cluster instance.
      *
-     * @param delegate                         Pointer to a ResourceMonitoringDelegate that will be associated with this instance.
+     * @param delegate                         Pointer to a ResourceMonitoring::Delegate that will be associated with this instance.
      *                                        The caller must ensure the delegate outlives the cluster instance.
      * @param aEndpointId                      The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aClusterId                       The ID of the ResourceMonitoring aliased cluster to be instantiated.
