@@ -50,7 +50,7 @@ auto dispatch_to_optional_fn(OPT const & opt, ARGS &&... args) -> decltype(std::
     return ReturnType{};
 }
 
-struct MockDelegate : public ResourceMonitoring::ResourceMonitoringDelegate
+struct MockDelegate : public ResourceMonitoring::Delegate
 {
     CHIP_ERROR Init() { return dispatch_to_optional_fn(mInit); };
 
