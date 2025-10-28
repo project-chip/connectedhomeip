@@ -183,7 +183,7 @@ void ResourceMonitoringCluster::SetReplacementProductListManagerInstance(
     mReplacementProductListManager = replacementProductListManager;
 }
 
-void ResourceMonitoringCluster::UpdateCondition(uint8_t newCondition)
+chip::Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateCondition(uint8_t newCondition)
 {
     auto oldConditionattr = mCondition;
     mCondition            = newCondition;
@@ -199,16 +199,17 @@ void ResourceMonitoringCluster::UpdateCondition(uint8_t newCondition)
             NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::Condition::Id);
         }
     }
+    return Protocols::InteractionModel::Status::Success;
 }
 
-void ResourceMonitoringCluster::UpdateChangeIndication(
+Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateChangeIndication(
     chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum aNewChangeIndication)
 {
     if (aNewChangeIndication == chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum::kWarning)
     {
         if (!mEnabledFeatures.Has(ResourceMonitoring::Feature::kWarning))
         {
-            return;
+            return Protocols::InteractionModel::Status::InvalidValue;
         }
     }
     auto oldChangeIndication = mChangeIndication;
@@ -217,9 +218,10 @@ void ResourceMonitoringCluster::UpdateChangeIndication(
     {
         NotifyAttributeChanged(ResourceMonitoring::Attributes::ChangeIndication::Id);
     }
+    return Protocols::InteractionModel::Status::Success;
 }
 
-void ResourceMonitoringCluster::UpdateInPlaceIndicator(bool newInPlaceIndicator)
+Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateInPlaceIndicator(bool newInPlaceIndicator)
 {
     auto oldInPlaceIndicator = mInPlaceIndicator;
     mInPlaceIndicator        = newInPlaceIndicator;
@@ -235,9 +237,10 @@ void ResourceMonitoringCluster::UpdateInPlaceIndicator(bool newInPlaceIndicator)
             NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::Id);
         }
     }
+    return Protocols::InteractionModel::Status::Success
 }
 
-void ResourceMonitoringCluster::UpdateLastChangedTime(DataModel::Nullable<uint32_t> aNewLastChangedTime)
+chip::Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateLastChangedTime(DataModel::Nullable<uint32_t> aNewLastChangedTime)
 {
     auto oldLastchangedTime = mLastChangedTime;
     mLastChangedTime        = aNewLastChangedTime;
@@ -260,6 +263,7 @@ void ResourceMonitoringCluster::UpdateLastChangedTime(DataModel::Nullable<uint32
             NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id);
         }
     }
+    return Protocols::InteractionModel::Status::Success;
 }
 
 void ResourceMonitoringCluster::LoadPersistentAttributes()
