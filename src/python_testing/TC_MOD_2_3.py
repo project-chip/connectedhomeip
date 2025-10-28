@@ -169,7 +169,6 @@ class TC_MOD_2_3(MatterBaseTest):
             if supported_mode.mode != mode_select_current_mode:
                 mode_select_m1_mode = supported_mode.mode
                 break
-        mode_select_m1_mode = 7
 
         self.step("4a")
         result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.StoreScene(self.kGroup1, 0x01))
