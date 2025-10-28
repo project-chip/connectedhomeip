@@ -25,7 +25,7 @@
 namespace chip {
 namespace Test {
 
-/// Keeps a queue of generated events that can be aqueried later for testing purposes
+/// Keeps a queue of generated events that can be acquired later for testing purposes
 class LogOnlyEvents : public app::DataModel::EventsGenerator
 {
 public:
