@@ -60,7 +60,7 @@ class DarwinToolRunner:
 
 
 class InteractiveDarwinTool(DarwinToolRunner):
-    def __init__(self, runner, appliocation):
+    def __init__(self, runner, application):
         self.prompt = "WAITING FOR COMMANDS NOW"
         super().__init__(runner, application)
 
