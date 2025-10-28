@@ -71,10 +71,6 @@ void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::Disco
             SameExceptOrder(discoveredNodeIPAddressSpan, nodeDataIPAddressSpan))
         {
             discoveredNode = nodeData;
-            if (mDeviceDiscoveryDelegate != nullptr)
-            {
-                mDeviceDiscoveryDelegate->OnDiscoveredDevice(nodeData);
-            }
             return;
         }
     }
