@@ -43,8 +43,6 @@ _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
 _EXCLUDE_DEVICE_FROM_LINUX_CI = [
     "noip_rootnode_dimmablelight_bCwGYSDpoe",  # Broken.
     "rootnode_genericswitch_2dfff6e516",  # not actively developed,
-    # heatingcoolingunit is not the spec/matter_devices.xml. This leads to failure in the bundle step.
-    "rootnode_heatingcoolingunit_ncdGai1E5a",
     "rootnode_mounteddimmableloadcontrol_a9a1a87f2d",  # not actively developed,
     "rootnode_mountedonoffcontrol_ec30c757a6",  # not actively developed,
     "rootnode_onofflight_samplemei",  # not actively developed,
@@ -479,7 +477,7 @@ def main() -> int:
                     if options.dry_run:
                         flush_print(archive_name)
                         continue
-                    command = f"./chef.py -cbr -d {device_name} -t {platform} "
+                    command = f"./chef.py -br -d {device_name} -t {platform} "
                     command += " ".join(args)
                     flush_print(f"Building {command}", with_border=True)
                     shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")

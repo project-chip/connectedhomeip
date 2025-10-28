@@ -82,6 +82,9 @@ Davis, CA 95616, USA
       <item value="0x05" name="EndpointInUse" summary="The endpoint is in use and cannot be removed.">
         <mandatoryConform/>
       </item>
+      <item value="0x06" name="InvalidTime" summary="Time sync has not yet occurred.">
+        <mandatoryConform/>
+      </item>
     </enum>
     <struct name="TLSEndpointStruct">
       <field id="0" name="EndpointID" type="TLSEndpointID">
@@ -131,7 +134,7 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="MaxProvisioned" type="uint8" default="5">
+    <attribute id="0x0000" name="MaxProvisioned" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
@@ -148,9 +151,7 @@ Davis, CA 95616, USA
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
       <constraint>
-        <maxCount>
-          <attribute name="MaxProvisioned"/>
-        </maxCount>
+        <desc/>
       </constraint>
     </attribute>
   </attributes>

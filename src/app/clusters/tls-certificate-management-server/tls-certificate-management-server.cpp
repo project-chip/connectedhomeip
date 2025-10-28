@@ -80,12 +80,17 @@ CHIP_ERROR TlsCertificateManagementServer::Init()
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
 
-    return CHIP_NO_ERROR;
+    return Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
 }
 
 CHIP_ERROR TlsCertificateManagementServer::Finish()
 {
     mCertificateTable.Finish();
+
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+
     return CHIP_NO_ERROR;
 }
 
@@ -388,6 +393,7 @@ void TlsCertificateManagementServer::HandleProvisionClientCertificate(HandlerCon
         ReturnOnFailure(Crypto::IsCertificateValidAtCurrentTime(cert),
                         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
     }
+    ReturnOnFailure(srcIter.GetStatus(), ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidAction));
 
     auto fabric = ctx.mCommandHandler.GetAccessingFabricIndex();
     DataModel::Nullable<Tls::TLSCCDID> foundId;
@@ -493,6 +499,12 @@ void TlsCertificateManagementServer::HandleRemoveClientCertificate(HandlerContex
     auto result =
         mDelegate.RemoveClientCert(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), req.ccdid);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, result);
+}
+
+void TlsCertificateManagementServer::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    ReturnAndLogOnFailure(mCertificateTable.RemoveFabric(fabricIndex), Zcl, "Failed to remove TLS certificate data for fabric 0x%x",
+                          fabricIndex);
 }
 
 /** @brief TlsCertificateManagement Cluster Server Init

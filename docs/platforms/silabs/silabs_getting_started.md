@@ -12,7 +12,7 @@ sample app.
 > frequent releases thoroughly tested and validated. Developers looking to
 > develop matter products with silabs hardware are encouraged to use our latest
 > release with added tools and documentation.
-> [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases)
+> [Silabs matter_sdk Github](https://github.com/SiliconLabsSoftware/matter_sdk/tags)
 >
 > Developers can find more resources on the
 > [Silicon Labs Matter Community Page](https://community.silabs.com/s/article/connected-home-over-ip-chip-faq?language=en_US).
@@ -28,26 +28,27 @@ sample app.
 -   [Flashing](#flashing)
     -   [Flasher Arguments](#flasher-arguments)
 -   [Standard Application Behavior](#standard-application-behavior)
+-   [Silabs CLI](#silabs-cli)
 
 ## Requirements
 
 ### Hardware Requirements
 
 For the list of hardware requirements, see the official
-[Silicon Labs Matter HW requirements](https://siliconlabs.github.io/matter/latest/general/HARDWARE_REQUIREMENTS.html)
+[Silicon Labs Matter HW requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
 documentation.
 
 ### Software Requirements
 
 For the list of software requirements, see the official
-[Silicon Labs Matter Software requirements](https://siliconlabs.github.io/matter/latest/general/SOFTWARE_REQUIREMENTS.html)
+[Silicon Labs Matter Software requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/software-requirements)
 documentation.
 
 #### Software Artifacts
 
 For pre-built binaries for the latest Silicon Labs Matter release, see the
 official
-[Silicon Labs Matter Software Artifacts](https://siliconlabs.github.io/matter/latest/general/ARTIFACTS.html#matter-software-artifacts).
+[Silicon Labs Matter Software Artifacts](https://docs.silabs.com/matter/latest/matter-prerequisites/matter-artifacts).
 This includes all necessary binaries to run a Silicon Labs sample app.
 
 ## Building
@@ -56,32 +57,40 @@ Silicon Labs currently supports the following list of sample apps in the main
 Matter SDK. Every sample has its own documentation explaining its unique
 features and functionalities. The examples in the `CSA Matter Repository` column
 are supported in the main Matter SDK. Additionally, the
-[Silabs Matter Repository](https://github.com/SiliconLabs/matter) offers extra
-sample applications for different device-types
+[Silabs Matter Repository](https://github.com/SiliconLabsSoftware/matter_sdk)
+offers extra sample applications for different device-types
 
 <table>
     <tbody>
         <tr>
             <th>CSA Matter Repository</th>
-            <th> <a href="https://github.com/SiliconLabs/matter">Silabs Matter Repository</a></th>
+            <th> <a href="https://github.com/SiliconLabsSoftware/matter_sdk">Silabs matter_sdk Repository</a></th>
         </tr>
         <tr>
           <td>
             <ul>
-                <li> <a href="../../lighting-app/silabs/README.md">Lighting App</a></li>
-                <li> <a href="../../light-switch-app/silabs/README.md)">Light-Switch App</a></li>
-                <li> <a href="../../chef/README.md">Chef App</a></li>
-                <li> <a href="../../lock-app/silabs/README.md">Lock App</a></li>
-                <li> <a href="../../pump-app/silabs/README.md">Pump App</a></li>
-                <li> <a href="../../smoke-co-alarm-app/silabs/README.md">Smoke & CO Alarm App</a></li>
-                <li> <a href="../../thermostat/silabs/README.md">Thermostat App</a></li>
+                <li> <a href="../../../examples/lighting-app/silabs/README.md">Lighting App</a></li>
+                <li> <a href="../../../examples/light-switch-app/silabs/README.md">Light-Switch App</a></li>
+                <li> <a href="../../../examples/chef/README.md">Chef App</a></li>
+                <li> <a href="../../../examples/lock-app/silabs/README.md">Lock App</a></li>
+                <li> <a href="../../../examples/pump-app/silabs/README.md">Pump App</a></li>
+                <li> <a href="../../../examples/smoke-co-alarm-app/silabs/README.md">Smoke & CO Alarm App</a></li>
+                <li> <a href="../../../examples/thermostat/silabs/README.md">Thermostat App</a></li>
+                <li> <a href="../../../examples/air-quality-sensor-app/silabs/README.md">Air Quality Sensor App</a></li>
+                <li> <a href="../../../examples/closure-app/silabs/README.md">Closure App</a></li>
+                <li> <a href="../../../examples/dishwasher-app/silabs/README.md">Dishwasher App</a></li>
+                <li> <a href="../../../examples/energy-management-app/silabs/README.md">Energy Management App</a></li>
+                <li> <a href="../../../examples/lit-icd-app/silabs/README.md">LIT ICD App</a></li>
+                <li> <a href="../../../examples/refrigerator-app/silabs/README.md">Refrigerator App</a></li>
+                <li> <a href="../../../examples/window-app/silabs/README.md">Window App</a></li>
             </ul>
           </td>
           <td>
             <ul>
-                <li><a href="https://github.com/SiliconLabs/matter/blob/release_2.2.0-1.2/silabs_examples/dishwasher-app/silabs/README.md">Dishwasher App</a></li>
-                <li><a href="https://github.com/SiliconLabs/matter/blob/release_2.2.0-1.2/silabs_examples/onoff-plug-app/README.md">On-Off Plug App</a></li>
-                <li><a href="https://github.com/SiliconLabs/matter/blob/release_2.2.0-1.2/silabs_examples/silabs-sensors/README.md">Multi Sensor App</a></li>
+                <li><a href="https://github.com/SiliconLabsSoftware/matter_sdk/blob/main/examples/base-platform-app/silabs/README.md">Platform App</a></li>
+                <li><a href="https://github.com/SiliconLabsSoftware/matter_sdk/blob/main/examples/onoff-plug-app/silabs/README.md">On-Off Plug App</a></li>
+                <li><a href="https://github.com/SiliconLabsSoftware/matter_sdk/blob/main/examples/multi-sensor-app/silabs">Multi Sensor App</a></li>
+                <li><a href="https://github.com/SiliconLabsSoftware/matter_sdk/blob/main/examples/template/silabs/README.md">Template App</a></li>
             </ul>
           </td>
         </tr>
@@ -106,18 +115,6 @@ the BRD4187C DK is
 ./scripts/examples/gn_silabs_example.sh ./examples/lighting-app/silabs/ ./out/lighting-app BRD4187C
 ```
 
-To build the lighting app as an Wi-Fi MG24 + RS9116 NCP, the default build
-command for the BRD4187C is
-
-```shell
-./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/lighting-app_rs9116 BRD4187C use_external_flash=false chip_enable_ble_rs911x=true --wifi rs9116
-```
-
-> **Note**: The build argument `--wifi rs9116` is necessary to build the
-> BRD4187C image with the necessary code for the NCP combo.
-> `chip_enable_ble_rs911x=true` enables the RS9116 NCP bluetooth. The MG24 +
-> RS9116 NCP combo does not yet support external flash.
-
 To build the lighting app as an Wi-Fi MG24 + SiWx917 NCP, the default build
 command for the BRD4187C is
 
@@ -127,7 +124,7 @@ command for the BRD4187C is
 
 > **Note**: The build argument `--wifi SiWx917` is necessary to build BRD4187C
 > image with the necessary code for the NCP combo. `chip_enable_ble_rs911x=true`
-> enables the RS9116 NCP bluetooth. The MG24 + SiWx917 NCP combo does not yet
+> enables the SiWx917 NCP bluetooth. The MG24 + SiWx917 NCP combo does not yet
 > support external flash.
 
 To build the lighting app as an Wi-Fi MG24 + wf200 NCP, the default build
@@ -159,7 +156,7 @@ Here is a list of some the supported macros and their GN argument equivalent.
 
 |          Macro Name           | Description                                                                                            | GN equivalent                                                                                                                                              |
 | :---------------------------: | :----------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|            --wifi             | Configures an sample app as a Wi-Fi devices.<br /> This macro requires rs9116 or SiWx917 or wf200.     | --wifi rs9116 : use_rs9116=true<br /> --wifi SiWx917 : use_SiWx917=true<br /> --wifi wf200 : use_wf200=true<br />                                          |
+|            --wifi             | Configures an sample app as a Wi-Fi devices.<br /> This macro requires SiWx917 or wf200.               | --wifi SiWx917 : use_SiWx917=true<br /> --wifi wf200 : use_wf200=true<br />                                                                                |
 |             --icd             | Configures the device as an ICD                                                                        | chip_enable_icd_server=true chip_openthread_ftd=false                                                                                                      |
 |          --low-power          | Configures the most power efficient build.<br /> This is used in tandem with the `--icd` macro         | chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true                                                                  |
 |    --chip_enable_wifi_ipv4    | Enables IPv4 support on Wi-fi configured builds                                                        | chip_enable_wifi_ipv4=true chip_inet_config_enable_ipv4=true                                                                                               |

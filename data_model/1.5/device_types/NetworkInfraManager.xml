@@ -63,6 +63,13 @@ Davis, CA 95616, USA
     <revision revision="2" summary="Add Thread Network Diagnostics requirement; extend &quot;Other Requirements&quot; section"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
+  <conditionRequirements>
+    <deviceType id="0x0016" name="Root Node">
+      <conditionRequirement name="ManagedAclAllowed">
+        <optionalConform/>
+      </conditionRequirement>
+    </deviceType>
+  </conditionRequirements>
   <clusters>
     <cluster id="0x0035" name="Thread Network Diagnostics" side="server">
       <mandatoryConform/>

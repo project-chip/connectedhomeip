@@ -52,6 +52,9 @@ struct CertificateId
 
     bool IsValid() { return (mCertificateId != kUndefinedCertificateId); }
 
+    uint16_t & Value() { return mCertificateId; }
+    const uint16_t & Value() const { return mCertificateId; }
+
     bool operator==(const CertificateId & other) const { return (mCertificateId == other.mCertificateId); }
 };
 
@@ -105,6 +108,8 @@ public:
                                          IterateClientCertFnType iterateFn) override;
     CHIP_ERROR RemoveClientCertificate(FabricIndex fabric, TLSCCDID id) override;
     CHIP_ERROR GetClientCertificateCount(FabricIndex fabric, uint8_t & outCount) override;
+
+    CHIP_ERROR RemoveFabric(FabricIndex fabric) override;
 
 private:
     CHIP_ERROR FindRootCertificateEntry(TLSCAID id, FabricIndex out_fabric);
