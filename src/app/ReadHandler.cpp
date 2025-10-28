@@ -42,6 +42,7 @@ using Status = Protocols::InteractionModel::Status;
 uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // We don't need to check for precision loss since the max value of the IdleModeDuration can fit inside a uint16_t
     const auto idleModeDuration =
         std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
     return std::max(idleModeDuration, kSubscriptionMaxIntervalPublisherLimit);
@@ -52,8 +53,7 @@ uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
                          InteractionType aInteractionType, Observer * observer) :
-    mExchangeCtx(*this),
-    mManagementCallback(apCallback)
+    mExchangeCtx(*this), mManagementCallback(apCallback)
 {
     VerifyOrDie(apExchangeContext != nullptr);
 
@@ -780,8 +780,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     // If the next interval is greater than the MaxIntervalCeiling, use the MaxIntervalCeiling.
     // Otherwise, use IdleModeDuration as MaxInterval
 
-    // GetPublisherSelectedIntervalLimit() returns the IdleModeDuration if the device is an ICD
-    uint32_t decidedMaxInterval = GetPublisherSelectedIntervalLimit();
+    uint32_t decidedMaxInterval = ICDConfigurationData::GetInstance().GetIdleModeDuration().count();
 
     // Check if the PublisherSelectedIntervalLimit is 0. If so, set decidedMaxInterval to MaxIntervalCeiling
     if (decidedMaxInterval == 0)
