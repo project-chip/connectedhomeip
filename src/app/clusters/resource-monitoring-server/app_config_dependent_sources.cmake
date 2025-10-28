@@ -16,8 +16,8 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/CodegenIntegration.cpp",
-    "${CLUSTER_DIR}/CodegenIntegration.h",
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
 )
 
 # These are the things that BUILD.gn dependencies would pull
