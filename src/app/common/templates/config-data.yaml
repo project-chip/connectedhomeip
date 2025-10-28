@@ -139,7 +139,7 @@ ClustersWithPreAttributeChangeFunctions:
     # keep-sorted end
 
 # Code Driven clusters are all clusters that implement the ServerClusterInterface.
-# There are 2 lists defining these clusters. Those that have a CodegenIntregtation.cpp 
+# There are 2 lists defining these clusters. Those that have a CodegenIntregtation.cpp
 # file where they have Init() and/or Shutdown() callbacks, and those that don't.
 CodeDrivenClustersWithCodegenIntegration:
     # keep-sorted start
