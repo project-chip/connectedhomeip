@@ -42,8 +42,8 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(NotSpecified, "Migration Error - Failed %s path %x/%x/%x - %" CHIP_ERROR_FORMAT, "Reading",
-                         cluster.mEndpointId, cluster.mClusterId, attr, err.Format());
+            ChipLogError(NotSpecified, "Migration Error - Failed %s path %" PRIx16 "/%" PRIx32 "/%" PRIx32 " - %" CHIP_ERROR_FORMAT,
+                         "Reading", cluster.mEndpointId, cluster.mClusterId, attr, err.Format());
             finalError = err; // make sure we report an error if any element fails
             continue;
         }
@@ -51,16 +51,16 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
         err = normProvider.WriteValue(attrPath, copyOfBuffer);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(NotSpecified, "Migration Error - Failed %s path %x/%x/%x - %" CHIP_ERROR_FORMAT, "Writing",
-                         cluster.mEndpointId, cluster.mClusterId, attr, err.Format());
+            ChipLogError(NotSpecified, "Migration Error - Failed %s path %" PRIx16 "/%" PRIx32 "/%" PRIx32 " - %" CHIP_ERROR_FORMAT,
+                         "Writing", cluster.mEndpointId, cluster.mClusterId, attr, err.Format());
             finalError = err; // make sure we report an error if any element fails
         }
 
         err = safeProvider.SafeDeleteValue(attrPath);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(NotSpecified, "Migration Error - Failed %s path %x/%x/%x - %" CHIP_ERROR_FORMAT, "Deleting",
-                         cluster.mEndpointId, cluster.mClusterId, attr, err.Format());
+            ChipLogError(NotSpecified, "Migration Error - Failed %s path %" PRIx16 "/%" PRIx32 "/%" PRIx32 " - %" CHIP_ERROR_FORMAT,
+                         "Deleting", cluster.mEndpointId, cluster.mClusterId, attr, err.Format());
             finalError = err; // make sure we report an error if any element fails
         }
     }
