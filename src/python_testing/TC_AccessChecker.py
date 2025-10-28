@@ -391,8 +391,6 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             if operation_allowed(spec_requires, privilege):
                 result = await self._subscribe_single_attribute_check_success(
                     endpoint_id, cluster_id, attribute_id, attribute, cluster_class, privilege, test_name)
-                if result is None:  # Skip this attribute (INVALID_ACTION)
-                    continue
             else:
                 result = await self._subscribe_single_attribute_expect_error(
                     endpoint_id, cluster_id, attribute_id, attribute, cluster_class, privilege, test_name)
