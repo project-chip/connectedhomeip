@@ -25,7 +25,7 @@ from matter.testing.decorators import run_if_endpoint_matches, has_attribute
 class ProductAppearanceBase(MatterBaseTest):
     def steps(self) -> list[TestStep]:
         return [
-            TestStep(0,  "DUT commissioned and preconditions", is_commissioning=True),
+            TestStep(0, "DUT commissioned if not already done", is_commissioning=True),
             TestStep(1, "TH reads ProductAppearance attribute from the DUT.",
                      "Verify the finish is a valid ProductFinishEnum and the PrimaryColor is a valid ColorEnum")
         ]
