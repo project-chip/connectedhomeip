@@ -116,7 +116,8 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
         darwin_framework_tool = Application(kind='tool', path=Path(darwin_framework_tool))
 
     if ota_requestor_app is not None:
-        ota_requestor_app = Application(kind='app', path=Path(ota_requestor_app)).add_args(('--otaDownloadPath', ota_destination_file))
+        ota_requestor_app = Application(kind='app', path=Path(ota_requestor_app)
+                                        ).add_args(('--otaDownloadPath', ota_destination_file))
 
     runner = Runner()
     runner.capture_delegate = ExecutionCapture()
@@ -162,7 +163,8 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
         commissionerNodeId = nodeIdLine.group(1)
         darwin_tool.stop()
 
-        darwin_tool = InteractiveDarwinTool(runner, darwin_framework_tool.add_args(("interactive", "start", "--additional-prompt", self.prompt)))
+        darwin_tool = InteractiveDarwinTool(runner, darwin_framework_tool.add_args(
+            ("interactive", "start", "--additional-prompt", self.prompt)))
         darwin_tool.start()
 
         darwin_tool.waitForPrompt()
