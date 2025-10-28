@@ -384,7 +384,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
     err = Internal::PSOC6Utils::p6_start_ap();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "p6_start_ap failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "p6_start_ap failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
 exit:
@@ -453,7 +453,8 @@ void ConnectivityManagerImpl::DriveAPState()
                 SystemLayer().ScheduleLambda([apTimeout, this] {
                     CHIP_ERROR ret = CHIP_NO_ERROR;
                     ret            = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, this);
-                    VerifyOrReturn(ret == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "StartTimer failed %s: ", chip::ErrorStr(ret)));
+                    VerifyOrReturn(ret == CHIP_NO_ERROR,
+                                   ChipLogError(DeviceLayer, "StartTimer failed: %" CHIP_ERROR_FORMAT, ret.Format()));
                 });
             }
             else
@@ -555,7 +556,7 @@ void ConnectivityManagerImpl::DriveStationState()
             err = Internal::PSOC6Utils::p6_wifi_disconnect();
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "p6_wifi_disconnect() failed: %s", chip::ErrorStr(err));
+                ChipLogError(DeviceLayer, "p6_wifi_disconnect() failed: %" CHIP_ERROR_FORMAT, err.Format());
             }
             SuccessOrExit(err);
 
@@ -599,7 +600,7 @@ void ConnectivityManagerImpl::DriveStationState()
                 err = Internal::PSOC6Utils::p6_wifi_connect();
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(DeviceLayer, "p6_wifi_connect() failed: %s", chip::ErrorStr(err));
+                    ChipLogError(DeviceLayer, "p6_wifi_connect() failed: %" CHIP_ERROR_FORMAT, err.Format());
                 }
                 SuccessOrExit(err);
             }
@@ -613,7 +614,8 @@ void ConnectivityManagerImpl::DriveStationState()
                 SystemLayer().ScheduleLambda([timeToNextConnect, this] {
                     CHIP_ERROR ret = CHIP_NO_ERROR;
                     ret            = DeviceLayer::SystemLayer().StartTimer(timeToNextConnect, DriveStationState, this);
-                    VerifyOrReturn(ret == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "StartTimer failed %s: ", chip::ErrorStr(ret)));
+                    VerifyOrReturn(ret == CHIP_NO_ERROR,
+                                   ChipLogError(DeviceLayer, "StartTimer failed: %" CHIP_ERROR_FORMAT, ret.Format()));
                 });
             }
         }

@@ -59,10 +59,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace AllocatePushTransport.
 namespace AllocatePushTransportResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kTransportConfiguration), transportConfiguration);
+    encoder.EncodeResponseCommandFabricScopedStructField(to_underlying(Fields::kTransportConfiguration),
+                                                         aWriter.mAccessingFabricIndex, transportConfiguration);
     return encoder.Finalize();
 }
 
@@ -187,6 +188,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kConnectionID), connectionID);
     encoder.Encode(to_underlying(Fields::kActivationReason), activationReason);
     encoder.Encode(to_underlying(Fields::kTimeControl), timeControl);
+    encoder.Encode(to_underlying(Fields::kUserDefined), userDefined);
     return encoder.Finalize();
 }
 
@@ -211,6 +213,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         else if (__context_tag == to_underlying(Fields::kTimeControl))
         {
             err = DataModel::Decode(reader, timeControl);
+        }
+        else if (__context_tag == to_underlying(Fields::kUserDefined))
+        {
+            err = DataModel::Decode(reader, userDefined);
         }
 
         ReturnErrorOnFailure(err);
@@ -247,10 +253,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace FindTransport.
 namespace FindTransportResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kTransportConfigurations), transportConfigurations);
+    encoder.EncodeResponseCommandFabricScopedStructField(to_underlying(Fields::kTransportConfigurations),
+                                                         aWriter.mAccessingFabricIndex, transportConfigurations);
     return encoder.Finalize();
 }
 

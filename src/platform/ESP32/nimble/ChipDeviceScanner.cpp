@@ -28,40 +28,44 @@ namespace Internal {
 namespace {
 
 /// Retrieve CHIP device identification info from the device advertising data
-bool NimbleGetChipDeviceInfo(const ble_hs_adv_fields & fields, chip::Ble::ChipBLEDeviceIdentificationInfo & deviceInfo)
+bool NimbleGetChipDeviceInfo(const ble_hs_adv_field * field, chip::Ble::ChipBLEDeviceIdentificationInfo & deviceInfo)
 {
     // Check for CHIP Service UUID
-
-    if (fields.svc_data_uuid16 != NULL)
+    if (field && field->type == BLE_HS_ADV_TYPE_SVC_DATA_UUID16 && field->length > 10 && field->value[0] == 0xf6 &&
+        field->value[1] == 0xff)
     {
-        if (fields.svc_data_uuid16_len > 8 && fields.svc_data_uuid16[0] == 0xf6 && fields.svc_data_uuid16[1] == 0xff)
-        {
-            deviceInfo.OpCode                              = fields.svc_data_uuid16[2];
-            deviceInfo.DeviceDiscriminatorAndAdvVersion[0] = fields.svc_data_uuid16[3];
-            deviceInfo.DeviceDiscriminatorAndAdvVersion[1] = fields.svc_data_uuid16[4];
-            // vendor and product Id from adv
-            deviceInfo.DeviceVendorId[0]  = fields.svc_data_uuid16[5];
-            deviceInfo.DeviceVendorId[1]  = fields.svc_data_uuid16[6];
-            deviceInfo.DeviceProductId[0] = fields.svc_data_uuid16[7];
-            deviceInfo.DeviceProductId[1] = fields.svc_data_uuid16[8];
-            deviceInfo.AdditionalDataFlag = fields.svc_data_uuid16[9];
-            return true;
-        }
+        deviceInfo.OpCode                              = field->value[2];
+        deviceInfo.DeviceDiscriminatorAndAdvVersion[0] = field->value[3];
+        deviceInfo.DeviceDiscriminatorAndAdvVersion[1] = field->value[4];
+        // vendor and product Id from adv
+        deviceInfo.DeviceVendorId[0]  = field->value[5];
+        deviceInfo.DeviceVendorId[1]  = field->value[6];
+        deviceInfo.DeviceProductId[0] = field->value[7];
+        deviceInfo.DeviceProductId[1] = field->value[8];
+        deviceInfo.AdditionalDataFlag = field->value[9];
+        return true;
     }
     return false;
 }
 
 } // namespace
 
-void ChipDeviceScanner::ReportDevice(const struct ble_hs_adv_fields & fields, const ble_addr_t & addr)
+void ChipDeviceScanner::ReportDevice(const uint8_t * adv_data, size_t adv_data_len, const ble_addr_t & addr)
 {
-    chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo;
-    if (NimbleGetChipDeviceInfo(fields, deviceInfo) == false)
+    const struct ble_hs_adv_field * field = reinterpret_cast<const struct ble_hs_adv_field *>(adv_data);
+    while (field && field->length > 0 && field->length + 1 <= adv_data_len)
     {
-        ChipLogDetail(Ble, "Device %s does not look like a CHIP device", addr_str(addr.val));
-        return;
+        chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo;
+        if (NimbleGetChipDeviceInfo(field, deviceInfo))
+        {
+            mDelegate->OnDeviceScanned(addr, deviceInfo);
+            return;
+        }
+        adv_data     = adv_data + 1 + field->length;
+        adv_data_len = adv_data_len - 1 - field->length;
+        field        = adv_data_len >= 2 ? reinterpret_cast<const struct ble_hs_adv_field *>(adv_data) : nullptr;
     }
-    mDelegate->OnDeviceScanned(fields, addr, deviceInfo);
+    ChipLogDetail(Ble, "Device %s does not look like a CHIP device", addr_str(addr.val));
 }
 
 void ChipDeviceScanner::RemoveDevice()
@@ -81,11 +85,9 @@ int ChipDeviceScanner::OnBleCentralEvent(struct ble_gap_event * event, void * ar
     }
 
     case BLE_GAP_EVENT_DISC: {
-
         /* Try to connect to the advertiser if it looks interesting. */
-        struct ble_hs_adv_fields fields;
-        ble_hs_adv_parse_fields(&fields, event->disc.data, event->disc.length_data);
-        scanner->ReportDevice(fields, event->disc.addr);
+        ESP_LOG_BUFFER_HEX("BLE Scanner", event->disc.data, event->disc.length_data);
+        scanner->ReportDevice(event->disc.data, event->disc.length_data, event->disc.addr);
         return 0;
     }
     }

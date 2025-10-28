@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -160,7 +161,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MoveToHue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t hue                                  = static_cast<uint8_t>(0);
     DirectionEnum direction                      = static_cast<DirectionEnum>(0);
@@ -206,7 +206,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MoveHue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     MoveModeEnum moveMode                        = static_cast<MoveModeEnum>(0);
     uint8_t rate                                 = static_cast<uint8_t>(0);
@@ -251,7 +250,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StepHue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     StepModeEnum stepMode                        = static_cast<StepModeEnum>(0);
     uint8_t stepSize                             = static_cast<uint8_t>(0);
@@ -297,7 +295,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MoveToSaturation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t saturation                           = static_cast<uint8_t>(0);
     uint16_t transitionTime                      = static_cast<uint16_t>(0);
@@ -341,7 +338,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MoveSaturation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     MoveModeEnum moveMode                        = static_cast<MoveModeEnum>(0);
     uint8_t rate                                 = static_cast<uint8_t>(0);
@@ -386,7 +382,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StepSaturation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     StepModeEnum stepMode                        = static_cast<StepModeEnum>(0);
     uint8_t stepSize                             = static_cast<uint8_t>(0);
@@ -433,7 +428,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MoveToHueAndSaturation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t hue                                  = static_cast<uint8_t>(0);
     uint8_t saturation                           = static_cast<uint8_t>(0);
@@ -480,7 +474,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MoveToColor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t colorX                              = static_cast<uint16_t>(0);
     uint16_t colorY                              = static_cast<uint16_t>(0);
@@ -526,7 +519,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MoveColor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     int16_t rateX                                = static_cast<int16_t>(0);
     int16_t rateY                                = static_cast<int16_t>(0);
@@ -571,7 +563,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StepColor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     int16_t stepX                                = static_cast<int16_t>(0);
     int16_t stepY                                = static_cast<int16_t>(0);
@@ -617,7 +608,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MoveToColorTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t colorTemperatureMireds              = static_cast<uint16_t>(0);
     uint16_t transitionTime                      = static_cast<uint16_t>(0);
@@ -662,7 +652,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::EnhancedMoveToHue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t enhancedHue                         = static_cast<uint16_t>(0);
     DirectionEnum direction                      = static_cast<DirectionEnum>(0);
@@ -708,7 +697,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::EnhancedMoveHue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     MoveModeEnum moveMode                        = static_cast<MoveModeEnum>(0);
     uint16_t rate                                = static_cast<uint16_t>(0);
@@ -753,7 +741,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::EnhancedStepHue::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     StepModeEnum stepMode                        = static_cast<StepModeEnum>(0);
     uint16_t stepSize                            = static_cast<uint16_t>(0);
@@ -800,7 +787,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::EnhancedMoveToHueAndSaturation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t enhancedHue                         = static_cast<uint16_t>(0);
     uint8_t saturation                           = static_cast<uint8_t>(0);
@@ -849,7 +835,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ColorLoopSet::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<UpdateFlagsBitmap> updateFlags = static_cast<chip::BitMask<UpdateFlagsBitmap>>(0);
     ColorLoopActionEnum action                   = static_cast<ColorLoopActionEnum>(0);
@@ -897,7 +882,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StopMoveStep::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
     chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
@@ -939,7 +923,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MoveColorTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     MoveModeEnum moveMode                        = static_cast<MoveModeEnum>(0);
     uint16_t rate                                = static_cast<uint16_t>(0);
@@ -990,7 +973,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StepColorTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     StepModeEnum stepMode                        = static_cast<StepModeEnum>(0);
     uint16_t stepSize                            = static_cast<uint16_t>(0);

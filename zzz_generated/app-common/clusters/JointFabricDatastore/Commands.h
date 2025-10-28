@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -161,7 +162,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddKeySet::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Structs::DatastoreGroupKeySetStruct::Type groupKeySet;
 
@@ -196,7 +196,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UpdateKeySet::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Structs::DatastoreGroupKeySetStruct::Type groupKeySet;
 
@@ -231,7 +230,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveKeySet::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t groupKeySetID = static_cast<uint16_t>(0);
 
@@ -271,7 +269,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddGroup::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     chip::CharSpan friendlyName;
@@ -321,7 +318,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UpdateGroup::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     DataModel::Nullable<chip::CharSpan> friendlyName;
@@ -366,7 +362,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveGroup::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
@@ -404,7 +399,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddAdmin::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::NodeId nodeID = static_cast<chip::NodeId>(0);
     chip::CharSpan friendlyName;
@@ -447,7 +441,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UpdateAdmin::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<chip::NodeId> nodeID;
     DataModel::Nullable<chip::CharSpan> friendlyName;
@@ -486,7 +479,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveAdmin::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::NodeId nodeID = static_cast<chip::NodeId>(0);
 
@@ -522,7 +514,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddPendingNode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::NodeId nodeID = static_cast<chip::NodeId>(0);
     chip::CharSpan friendlyName;
@@ -559,7 +550,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RefreshNode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::NodeId nodeID = static_cast<chip::NodeId>(0);
 
@@ -595,7 +585,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UpdateNode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::NodeId nodeID = static_cast<chip::NodeId>(0);
     chip::CharSpan friendlyName;
@@ -632,7 +621,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveNode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::NodeId nodeID = static_cast<chip::NodeId>(0);
 
@@ -669,7 +657,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UpdateEndpointForNode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
     chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
@@ -710,7 +697,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddGroupIDToEndpointForNode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
     chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
@@ -751,7 +737,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveGroupIDFromEndpointForNode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
     chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
@@ -792,7 +777,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddBindingToEndpointForNode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
     chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
@@ -833,7 +817,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveBindingFromEndpointForNode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t listID             = static_cast<uint16_t>(0);
     chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
@@ -873,7 +856,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddACLToNode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::NodeId nodeID = static_cast<chip::NodeId>(0);
     Structs::DatastoreAccessControlEntryStruct::Type ACLEntry;
@@ -911,7 +893,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveACLFromNode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t listID     = static_cast<uint16_t>(0);
     chip::NodeId nodeID = static_cast<chip::NodeId>(0);

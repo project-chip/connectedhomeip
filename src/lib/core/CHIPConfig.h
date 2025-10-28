@@ -516,14 +516,27 @@
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
 /**
+ *  @def CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+ *
+ *  If asserted (1) along with CHIP_CONFIG_ERROR_SOURCE, then CHIP_ERROR will store the error location
+ *  using the std::source_location (requires at least C++20) instead of keeping raw __FILE__ and __LINE__.
+ *  This feature comes with FLASH and RAM overhead, so it is disabled by default.
+ */
+#ifndef CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+#define CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION 0
+#endif // CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+
+/**
  *  @def CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
  *
  *  If asserted (1) along with CHIP_CONFIG_ERROR_SOURCE, then instances of CHIP_NO_ERROR will also include
  *  the source location of their expansion. Otherwise, CHIP_NO_ERROR is excluded from source tracking.
+ *  Since CHIP_NO_ERROR is used in many places and tracking it adds marginal debugging value, it is
+ *  disabled by default.
  */
 #ifndef CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
-#define CHIP_CONFIG_ERROR_SOURCE_NO_ERROR 1
-#endif // CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_CONFIG_ERROR_SOURCE_NO_ERROR 0
+#endif // CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
 
 /**
  *  @def CHIP_CONFIG_ERROR_FORMAT_AS_STRING
@@ -532,7 +545,6 @@
  *  If 1, then ChipError::Format() returns a const char *, from chip::ErrorStr().
  *  In either case, the macro CHIP_ERROR_FORMAT expands to a suitable printf format.
  */
-
 #ifndef CHIP_CONFIG_ERROR_FORMAT_AS_STRING
 #define CHIP_CONFIG_ERROR_FORMAT_AS_STRING 0
 #endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
@@ -1108,6 +1120,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
 #define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC
+ *
+ * @brief Defines the number of binding entries per fabric.
+ */
+#ifndef CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC
+#define CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC 4
 #endif
 
 /**
@@ -1902,6 +1923,21 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
 
 /**
+ *  @def CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE
+ *
+ *  @brief
+ *    Maximum block size recommended by device for BDX transfers of diagnostic logs.
+ *    If increased, also increase CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX.
+ *    Note that SecureSession::AllowsLargePayload limits the payload size for all transport
+ *    types besides TCP, so, if using UDP, BDX blocks larger than a certain size (e.g. 1174)
+ *    will be unable to send.
+ *
+ */
+#ifndef CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE
+#define CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE 1024
+#endif // CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE
+
+/**
  *  @def CHIP_CONFIG_TEST_GOOGLETEST
  *
  *  @brief
@@ -1940,6 +1976,86 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID 0
 #endif // CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
 
+/**
+ * @def CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES
+ *
+ * @brief The maximum number of bytes taken by the TLS root certificate in persistent storage. This needs
+ * to be increased if the size of TLSCertStruct changes.
+ *
+ * @note The default is based on real-world testing of serialization for the worst case allowed by the spec.
+ */
+#ifndef CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES
+#define CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES 3200
+#endif // CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES
+
+/**
+ * @def CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES
+ *
+ * @brief The maximum number of bytes taken by the TLS client certificate in persistent storage. This needs
+ * to be increased if the size of TLSClientCertificateDetailStruct changes.
+ *
+ * @note The default is based on real-world testing of serialization for the worst case allowed by the spec.
+ */
+#ifndef CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES
+#define CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES 31000
+#endif // CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES
+
+/**
+ * @def CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
+ *
+ * @brief The maximum number of client certificates per fabric for the TLS table
+ */
+#ifndef CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
+#define CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE 5
+#endif // CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
+
+/**
+ *  @def CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL
+ *
+ *  @brief
+ *    A duration, in milliseconds, to be added to the backoff interval for sigma1 message retransmission in controller side if the
+ * remote device is LIT. This additional interval is to mitigate the issue that the sigma2 message may not be able to reach the
+ * controller in congested network in time.
+ */
+#ifndef CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL
+#define CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL 0
+#endif // CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL
+
+/**
+ * @def CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
+ *
+ * @brief The maximum number of root certificates per fabric for the TLS table
+ */
+#ifndef CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
+#define CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE 5
+#endif // CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
+ *
+ * @brief The maximum number of video streams per device
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS
+ *
+ * @brief The maximum number of audio streams per device
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
+ *
+ * @brief The maximum number of snapshot streams per device
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
 /**
  * @}
  */

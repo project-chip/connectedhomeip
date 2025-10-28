@@ -125,8 +125,8 @@ if [[ -d "${ANDROID_NDK_HOME}/toolchains" && -d "${ANDROID_HOME}/platforms" ]]; 
 else
     echo
     echo "Hint: Set \$ANDROID_HOME and \$ANDROID_NDK_HOME to enable building for Android"
-    echo "      The required android sdk platform version is 21. It can be obtained from"
-    echo "      https://dl.google.com/android/repository/platform-26_r02.zip"
+    echo "      The required android sdk platform version is 30. It can be obtained from"
+    echo "      https://dl.google.com/android/repository/platform-30_r03.zip"
 fi
 
 echo
@@ -150,23 +150,6 @@ else
         psoc6_sdk_args="psoc6_board=\"CY8CKIT-062S2-43012\""
     fi
 fi
-
-# K32W SDK setup
-k32w_sdk_args=""
-
-if [[ -d "$NXP_K32W0_SDK_ROOT" ]]; then
-    k32w_sdk_args+="k32w0_sdk_root=\"$NXP_K32W0_SDK_ROOT\""
-    extra_args+=" $k32w0_sdk_args enable_k32w_builds=true"
-fi
-
-echo
-if [[ ! -d "$NXP_K32W0_SDK_ROOT" ]]; then
-    echo "Hint: Set \$NXP_K32W0_SDK_ROOT to enable building for K32W061"
-else
-    echo 'To build the K32W lock sample as a standalone project':
-    echo "(cd $CHIP_ROOT/examples/lock-app/nxp/k32w0; gn gen out/debug --args='$k32w_sdk_args'; ninja -C out/debug)"
-fi
-echo
 
 if [[ -z "$qpg_enabled" ]]; then
     echo "Hint: Pass enable_qpg_builds=true to this script to enable building for QPG"

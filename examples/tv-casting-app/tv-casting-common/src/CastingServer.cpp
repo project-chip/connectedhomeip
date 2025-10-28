@@ -111,7 +111,7 @@ CHIP_ERROR CastingServer::SetRotatingDeviceIdUniqueId(chip::Optional<chip::ByteS
 CHIP_ERROR CastingServer::InitBindingHandlers()
 {
     auto & server = chip::Server::GetInstance();
-    chip::BindingManager::GetInstance().Init(
+    app::Clusters::Binding::Manager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
     return CHIP_NO_ERROR;
 }
@@ -304,14 +304,14 @@ void CastingServer::ReadServerClustersForNode(NodeId nodeId)
         ChipLogError(AppServer, "Init error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    for (const auto & binding : BindingTable::GetInstance())
+    for (const auto & binding : app::Clusters::Binding::Table::GetInstance())
     {
         ChipLogProgress(NotSpecified,
                         "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
-        if (binding.type == MATTER_UNICAST_BINDING && nodeId == binding.nodeId)
+        if (binding.type == app::Clusters::Binding::MATTER_UNICAST_BINDING && nodeId == binding.nodeId)
         {
             if (!mActiveTargetVideoPlayerInfo.HasEndpoint(binding.remote))
             {
@@ -374,8 +374,8 @@ CHIP_ERROR CastingServer::ReadMACAddress(TargetEndpointInfo * endpoint)
                 if (response.data() != nullptr && response.size() > 0)
                 {
                     videoPlayerInfo->SetMACAddress(response);
-                    ChipLogProgress(AppServer, "Updating cache of VideoPlayers with MACAddress: %.*s",
-                                    static_cast<int>(response.size()), response.data());
+                    ChipLogProgress(AppServer, "Updating cache of VideoPlayers with MACAddress: %s",
+                                    NullTerminated(response).c_str());
                     CHIP_ERROR error = CastingServer::GetInstance()->mPersistenceManager.AddVideoPlayer(videoPlayerInfo);
                     if (error != CHIP_NO_ERROR)
                     {
@@ -575,7 +575,7 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
 
             // find targetPeerNodeId from binding table by matching the binding's fabricIndex with the accessing fabricIndex
             // received in BindingsChanged event
-            for (const auto & binding : BindingTable::GetInstance())
+            for (const auto & binding : app::Clusters::Binding::Table::GetInstance())
             {
                 ChipLogProgress(
                     AppServer,
@@ -583,7 +583,8 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
                     " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                     binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                     binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
-                if (binding.type == MATTER_UNICAST_BINDING && event->BindingsChanged.fabricIndex == binding.fabricIndex)
+                if (binding.type == app::Clusters::Binding::MATTER_UNICAST_BINDING &&
+                    event->BindingsChanged.fabricIndex == binding.fabricIndex)
                 {
                     ChipLogProgress(
                         NotSpecified,
@@ -667,14 +668,14 @@ NodeId CastingServer::GetVideoPlayerNodeForFabricIndex(FabricIndex fabricIndex)
     {
         ChipLogError(AppServer, "GetVideoPlayerNodeForFabricIndex Init error: %" CHIP_ERROR_FORMAT, err.Format());
     }
-    for (const auto & binding : BindingTable::GetInstance())
+    for (const auto & binding : app::Clusters::Binding::Table::GetInstance())
     {
         ChipLogProgress(NotSpecified,
                         "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
-        if (binding.type == MATTER_UNICAST_BINDING && fabricIndex == binding.fabricIndex)
+        if (binding.type == app::Clusters::Binding::MATTER_UNICAST_BINDING && fabricIndex == binding.fabricIndex)
         {
             ChipLogProgress(NotSpecified, "GetVideoPlayerNodeForFabricIndex nodeId=0x" ChipLogFormatX64,
                             ChipLogValueX64(binding.nodeId));
@@ -693,14 +694,14 @@ FabricIndex CastingServer::GetVideoPlayerFabricIndexForNode(NodeId nodeId)
     {
         ChipLogError(AppServer, "GetVideoPlayerFabricIndexForNode Init error: %" CHIP_ERROR_FORMAT, err.Format());
     }
-    for (const auto & binding : BindingTable::GetInstance())
+    for (const auto & binding : app::Clusters::Binding::Table::GetInstance())
     {
         ChipLogProgress(NotSpecified,
                         "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
-        if (binding.type == MATTER_UNICAST_BINDING && nodeId == binding.nodeId)
+        if (binding.type == app::Clusters::Binding::MATTER_UNICAST_BINDING && nodeId == binding.nodeId)
         {
             ChipLogProgress(NotSpecified, "GetVideoPlayerFabricIndexForNode fabricIndex=%d nodeId=0x" ChipLogFormatX64,
                             binding.fabricIndex, ChipLogValueX64(binding.nodeId));

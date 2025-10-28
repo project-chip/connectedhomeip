@@ -28,6 +28,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 0
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -44,16 +45,19 @@ import sys
 from binascii import hexlify, unhexlify
 from typing import Optional
 
-import chip.clusters as Clusters
 import nest_asyncio
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest,
-                                         TestStep, async_test_body, default_matter_test_main)
-from chip.tlv import TLVReader
-from chip.utils import CommissioningBuildingBlocks
 from ecdsa import NIST256p, VerifyingKey
 from ecdsa.keys import BadSignatureError
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, default_matter_test_main,
+                                           has_command, run_if_endpoint_matches)
+from matter.testing.pics import accepted_cmd_pics_str
+from matter.tlv import TLVReader
+from matter.utils import CommissioningBuildingBlocks
 
 nest_asyncio.apply()
 
@@ -356,7 +360,10 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
         self.current_step_id = 0
         return self.aggregated_steps
 
-    @async_test_body
+    def pics_TC_OPCREDS_3_8(self) -> list[str]:
+        return [accepted_cmd_pics_str('OPCREDS', Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement.command_id)]
+
+    @run_if_endpoint_matches(has_command(Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement))
     async def test_TC_OPCREDS_3_8(self):
         # TODO(test_plans#5046): actually make the test follow final test plan. For now
         # it functionally validates the VID Verification parts of Operational Credentials Cluster
@@ -588,7 +595,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                                  "Expected CONSTRAINT_ERROR for SetVIDVerificationStatement with VIDVerificationStatement too large")
 
         with test_step(9, description="Establish a subscription to Operational Credentials cluster on endpoint 0 from TH1 fabric client, with MinIntervalFloor=0, MaxIntervalCeiling=30"):
-            attrib_listener = ClusterAttributeChangeAccumulator(opcreds)
+            attrib_listener = AttributeSubscriptionHandler(expected_cluster=opcreds)
             await attrib_listener.start(th1_dev_ctrl, th1_dut_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=30)
 
         with test_step(10, description="Invoke SetVIDVerificationStatement with maximum-sized VVSC and VIDVerificationStatement present and setting VID to 0x6a01 on TH2's fabric, outside fail-safe. Verify VIDVerificationStatement, VVSC and VID updates are correct. Verify subscription received the updated values."):

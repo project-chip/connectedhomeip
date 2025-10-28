@@ -43,12 +43,12 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:132
+            image: ghcr.io/project-chip/chip-build-nxp:174
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -69,70 +69,45 @@ jobs:
               with:
                   gh-context: ${{ toJson(github) }}
 
-            - name: Build K32W0 examples
-              run: |
-                  scripts/run_in_build_env.sh "\
-                      ./scripts/build/build_examples.py \
-                      --target nxp-k32w0-freertos-lighting-factory-log-progress \
-                      --target nxp-k32w0-freertos-contact-sensor-low-power-factory \
-                      build \
-                      --copy-artifacts-to out/artifacts \
-                  "
-            - name: Get K32W0 lighting app size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    nxp k32w0+release light \
-                    out/artifacts/nxp-k32w0-freertos-lighting-factory-log-progress/chip-k32w0x-light-example.elf \
-                    /tmp/bloat_reports/
-            - name: Get K32W0 contact sensor size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    nxp k32w0+release contact \
-                    out/artifacts/nxp-k32w0-freertos-contact-sensor-low-power-factory/chip-k32w0x-contact-example.elf \
-                    /tmp/bloat_reports/
-
-            - name: clean build
-              run: rm -rf ./out
-
-            - name: Build K32W1 examples
-              run: |
-                  scripts/run_in_build_env.sh "\
-                      ./scripts/build/build_examples.py \
-                      --target nxp-k32w1-freertos-lighting \
-                      build \
-                      --copy-artifacts-to out/artifacts \
-                  "
-            - name: Get K32W1 lighting app size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    nxp k32w1+release light \
-                    out/artifacts/nxp-k32w1-freertos-lighting/chip-k32w1-light-example.elf \
-                    /tmp/bloat_reports/
-
-            - name: clean build
-              run: rm -rf ./out
-
             - name: Build MCXW71 examples
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
+                      --target nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-cmake-frdm \
+                      --target nxp-mcxw71-freertos-lighting-thread-cmake-frdm \
+                      --target nxp-mcxw71-freertos-lock-app-thread-mtd-low-power-cmake-frdm \
                       --target nxp-mcxw71-freertos-contact-sensor-low-power \
-                      --target nxp-mcxw71-freertos-lock-app \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
             - name: Get MCXW71 contact sensor size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nxp mcxw71+release contact \
-                    out/artifacts/nxp-mcxw71-freertos-contact-sensor-low-power/chip-mcxw71-contact-example.elf \
+                    out/nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-cmake-frdm/app.elf \
+                    /tmp/bloat_reports/
+            - name: Get MCXW71 lighting app size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    nxp mcxw71+release lighting \
+                    out/nxp-mcxw71-freertos-lighting-thread-cmake-frdm/app.elf \
                     /tmp/bloat_reports/
             - name: Get MCXW71 lock app size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nxp mcxw71+release lock \
-                    out/artifacts/nxp-mcxw71-freertos-lock-app/chip-mcxw71-lock-example.elf \
+                    out/nxp-mcxw71-freertos-lock-app-thread-mtd-low-power-cmake-frdm/app.elf \
                     /tmp/bloat_reports/
+
+            - name: Build MCXW72 examples
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-mcxw72-freertos-contact-sensor-thread-mtd-low-power-cmake-frdm \
+                      --target nxp-mcxw72-freertos-lighting-thread-cmake-frdm \
+                      --target nxp-mcxw72-freertos-lock-app-thread-mtd-low-power-cmake-frdm \
+                      --target nxp-mcxw72-freertos-contact-sensor-ota-low-power \
+                      build \
+                  "
 
             - name: clean build
               run: rm -rf ./out
@@ -149,10 +124,11 @@ jobs:
             - name: Build RT1060 thermostat example app
               if:
                   github.event_name == 'push' || steps.changed_paths.outputs.nxp
-                  == 'true'
+                  == 'true' || steps.changed_paths.outputs.pigweed == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
+                      --target nxp-rt1060-freertos-thermostat-wifi-evkc-iw610-cmake \
                       --target nxp-rt1060-freertos-thermostat-thread-wifi-ota-evkc-iwx12-cmake \
                       build \
                   "
@@ -163,7 +139,7 @@ jobs:
             - name: Build RT1170 all clusters example app
               if:
                   github.event_name == 'push' || steps.changed_paths.outputs.nxp
-                  == 'true'
+                  == 'true' || steps.changed_paths.outputs.pigweed == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
@@ -186,7 +162,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-freertos-all-clusters-wifi-ota-cmake \
+                      --target nxp-rw61x-freertos-all-clusters-wifi-ota-se05x-cmake \
                       build \
                   "
             - name: Build RW61X thermostat OTBR example app
@@ -201,6 +177,13 @@ jobs:
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target nxp-rw61x-freertos-thermostat-ethernet-cmake-frdm \
+                      build \
+                  "
+            - name: Build RW61X unit test example app
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-rw61x-freertos-unit-test-cmake-frdm \
                       build \
                   "
 
@@ -219,11 +202,11 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:132
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:174
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -235,10 +218,13 @@ jobs:
                   filters: |
                       nxp:
                         - '**/nxp/**'
+                      pigweed:
+                        - 'src/pw_backends/**'
+                        - 'third_party/pigweed/**'
             - name: Build NXP Zephyr examples
               if:
                   github.event_name == 'push' || steps.changed_paths.outputs.nxp
-                  == 'true'
+                  == 'true' || steps.changed_paths.outputs.pigweed == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \

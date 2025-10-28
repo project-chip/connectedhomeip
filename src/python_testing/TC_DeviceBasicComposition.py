@@ -87,6 +87,10 @@
 #     factory-reset: false
 #     quiet: true
 #   run9:
+#     script-args: --storage-path admin_storage.json --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json --tests test_TC_IDM_11_1
+#     factory-reset: false
+#     quiet: true
+#   run10:
 #     app: ${ENERGY_MANAGEMENT_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -97,7 +101,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run10:
+#   run11:
 #     app: ${LIT_ICD_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -108,7 +112,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run11:
+#   run12:
 #     app: ${CHIP_MICROWAVE_OVEN_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -119,7 +123,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run12:
+#   run13:
 #     app: ${CHIP_RVC_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -130,7 +134,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run13:
+#   run14:
 #     app: ${NETWORK_MANAGEMENT_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -141,7 +145,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run14:
+#   run15:
 #     app: ${LIGHTING_APP_NO_UNIQUE_ID}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -162,36 +166,38 @@
 # Run 6: Tests CASE connection using QR code (12.1 only)
 # Run 7: Tests CASE connection using manual discriminator and passcode (12.1 only)
 # Run 8: Tests reusing storage from run7 (i.e. factory-reset=false)
-# Run 9: Tests against energy-management-app
-# Run 10: Tests against lit-icd app
-# Run 11: Tests against microwave-oven app
-# Run 12: Tests against chip-rvc app
-# Run 13: Tests against network-management-app
-# Run 14: Tests against lighting-app-data-mode-no-unique-id
+# Run 9: Test using the generated attribute wildcard file from previous run
+# Run 10: Tests against energy-management-app
+# Run 11: Tests against lit-icd app
+# Run 12: Tests against microwave-oven app
+# Run 13: Tests against chip-rvc app
+# Run 14: Tests against network-management-app
+# Run 15: Tests against lighting-app-data-mode-no-unique-id
 
 import logging
 from dataclasses import dataclass
 from typing import Any, Callable
 
-import chip.clusters as Clusters
-import chip.clusters.ClusterObjects
-import chip.tlv
-from chip import ChipUtility
-from chip.clusters.Attribute import ValueDecodeFailure
-from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObjectFieldDescriptor
-from chip.clusters.Types import Nullable
-from chip.exceptions import ChipStackError
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds, attribute_id_type,
-                                               cluster_id_type, command_id_type)
-from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
-                                         UnknownProblemLocation, async_test_body, default_matter_test_main)
-from chip.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
-                                                    find_tag_list_problems, find_tree_roots, flat_list_ok,
-                                                    get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
-from chip.tlv import uint
-from TC_DeviceConformance import get_supersets
+from test_testing.DeviceConformanceTests import get_supersets
+
+import matter.clusters as Clusters
+import matter.clusters.ClusterObjects
+import matter.tlv
+from matter import ChipUtility
+from matter.clusters.Attribute import ValueDecodeFailure
+from matter.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObjectFieldDescriptor
+from matter.clusters.Types import Nullable
+from matter.exceptions import ChipStackError
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds,
+                                                 attribute_id_type, cluster_id_type, command_id_type)
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation, UnknownProblemLocation
+from matter.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
+                                                      find_tag_list_problems, find_tree_roots, flat_list_ok,
+                                                      get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
+from matter.tlv import uint
 
 
 def get_vendor_id(mei: int) -> int:
@@ -211,7 +217,7 @@ def check_int_in_range(min_value: int, max_value: int, allow_null: bool = False)
         if obj is None and allow_null:
             return
 
-        if not isinstance(obj, int) and not isinstance(obj, chip.tlv.uint):
+        if not isinstance(obj, int) and not isinstance(obj, matter.tlv.uint):
             raise ValueError(f"Value {str(obj)} is not an integer or uint (decoded type: {type(obj)})")
         int_val = int(obj)
         if (int_val < min_value) or (int_val > max_value):
@@ -242,7 +248,7 @@ def check_list_of_ints_in_range(min_value: int, max_value: int, min_size: int = 
                 f"Value {str(obj)} is a list of size {len(obj)}, but expected a list with size in range [{min_size}, {max_size}]")
 
         for val_idx, val in enumerate(obj):
-            if not isinstance(val, int) and not isinstance(val, chip.tlv.uint):
+            if not isinstance(val, int) and not isinstance(val, matter.tlv.uint):
                 raise ValueError(
                     f"At index {val_idx} in {str(obj)}, value {val} is not an int/uint, but an int/uint was expected (decoded type: {type(val)})")
 
@@ -333,6 +339,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             self.fail_current_test("At least one endpoint was missing the descriptor cluster.")
 
     async def _read_non_standard_attribute_check_unsupported_read(self, endpoint_id, cluster_id, attribute_id) -> bool:
+        # If we're doing this from file, we don't have a way to assess this. Assume this is OK for now.
+        if self.test_from_file:
+            return True
+
         @dataclass
         class TempAttribute(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -457,11 +467,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                             continue
 
                         attribute_value = cluster[attribute_id]
-                        if isinstance(attribute_value, ValueDecodeFailure):
-                            self.record_warning(self.get_test_name(), location=location,
-                                                problem=f"Found a failure to read/decode {attribute_string} on {location.as_cluster_string(self.cluster_mapper)} when it was claimed as supported in AttributeList ({attribute_list}): {str(attribute_value)}", spec_location="AttributeList Attribute")
-                            # Warn only for now
-                            # TODO: Fail in the future
+                        if isinstance(attribute_value, ValueDecodeFailure) and cluster_id != Clusters.Objects.UnitTesting.id:
+                            self.record_error(self.get_test_name(), location=location,
+                                              problem=f"Found a failure to read/decode {attribute_string} on {location.as_cluster_string(self.cluster_mapper)} when it was claimed as supported in AttributeList ({attribute_list}): {str(attribute_value)}", spec_location="AttributeList Attribute")
+                            success = False
                             continue
                     for attribute_id in cluster:
                         if attribute_id not in attribute_list:
@@ -494,12 +503,12 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         # validate that all the returned attributes in the standard clusters contain only known attribute ids
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                if cluster_id not in chip.clusters.ClusterObjects.ALL_ATTRIBUTES:
+                if cluster_id not in matter.clusters.ClusterObjects.ALL_ATTRIBUTES:
                     # Skip clusters that are not part of the standard generated corpus (e.g. MS clusters)
                     continue
                 standard_attributes = [a for a in cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
                                        if a <= attribute_standard_range_max]
-                allowed_standard_attributes = chip.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
+                allowed_standard_attributes = matter.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
                 unexpected_standard_attributes = sorted(list(set(standard_attributes) - set(allowed_standard_attributes)))
                 for unexpected in unexpected_standard_attributes:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=unexpected)
@@ -523,18 +532,18 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         # Command lists only have a scoped range, so we only need to check for known command ids, no global range check
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                if cluster_id not in chip.clusters.ClusterObjects.ALL_CLUSTERS:
+                if cluster_id not in matter.clusters.ClusterObjects.ALL_CLUSTERS:
                     continue
                 standard_accepted_commands = [
                     a for a in cluster[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] if a <= command_standard_range_max]
                 standard_generated_commands = [
                     a for a in cluster[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID] if a <= command_standard_range_max]
-                if cluster_id in chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS:
-                    allowed_accepted_commands = [a for a in chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id]]
+                if cluster_id in matter.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS:
+                    allowed_accepted_commands = [a for a in matter.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id]]
                 else:
                     allowed_accepted_commands = []
-                if cluster_id in chip.clusters.ClusterObjects.ALL_GENERATED_COMMANDS:
-                    allowed_generated_commands = [a for a in chip.clusters.ClusterObjects.ALL_GENERATED_COMMANDS[cluster_id]]
+                if cluster_id in matter.clusters.ClusterObjects.ALL_GENERATED_COMMANDS:
+                    allowed_generated_commands = [a for a in matter.clusters.ClusterObjects.ALL_GENERATED_COMMANDS[cluster_id]]
                 else:
                     allowed_generated_commands = []
 
@@ -633,7 +642,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         self.print_step(9, "Validate that all clusters in the standard range have a known cluster ID")
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             standard_clusters = [a for a in endpoint.keys() if a < mei_range_min]
-            unknown_clusters = sorted(list(set(standard_clusters) - set(chip.clusters.ClusterObjects.ALL_CLUSTERS)))
+            unknown_clusters = sorted(list(set(standard_clusters) - set(matter.clusters.ClusterObjects.ALL_CLUSTERS)))
             for bad in unknown_clusters:
                 location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=bad)
                 self.record_error(self.get_test_name(
@@ -653,12 +662,12 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         self.print_step(11, "Validate that standard cluster FeatureMap attributes contains only known feature flags")
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                if cluster_id not in chip.clusters.ClusterObjects.ALL_CLUSTERS:
+                if cluster_id not in matter.clusters.ClusterObjects.ALL_CLUSTERS:
                     continue
                 feature_map = cluster[GlobalAttributeIds.FEATURE_MAP_ID]
                 feature_mask = 0
                 try:
-                    feature_map_enum = chip.clusters.ClusterObjects.ALL_CLUSTERS[cluster_id].Bitmaps.Feature
+                    feature_map_enum = matter.clusters.ClusterObjects.ALL_CLUSTERS[cluster_id].Bitmaps.Feature
                     for f in feature_map_enum:
                         feature_mask = feature_mask | f
                 except AttributeError:
@@ -686,7 +695,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                                                                    reportInterval=(100, 1000))
             if len(subscription.GetEvents()) == 0:
                 test_failure = 'Wildcard event subscription returned no events'
-        except ChipStackError as e:
+        except ChipStackError as e:  # chipstack-ok: assert_raises not suitable here since error must be inspected before determining test outcome
             # Connection over PASE will fail subscriptions with "Unsupported access"
             # TODO: ideally we should SKIP this test for PASE connections
             _IM_UNSUPPORTED_ACCESS_CODE = 0x500 + Status.UnsupportedAccess

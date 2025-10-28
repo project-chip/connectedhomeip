@@ -35,11 +35,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 
 class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
@@ -109,14 +110,13 @@ class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
                 if mptzpreset.presetID == presetID:
                     notFound = False
                     break
-
             asserts.assert_true(notFound, "Preset not removed despite invocation of MPTZRemovePreset")
 
             # Repeat removal of already removed value, verify Not Found
             self.step(7)
             await self.send_remove_preset_command(endpoint, presetID, expected_status=Status.NotFound)
 
-            self.skip_all_remaining_steps(8)
+            self.mark_all_remaining_steps_skipped(8)
             return
 
         self.skip_step(5)

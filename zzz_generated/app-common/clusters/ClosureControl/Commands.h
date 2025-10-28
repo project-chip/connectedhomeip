@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -75,7 +76,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -108,7 +108,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MoveTo::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Optional<TargetPositionEnum> position;
     Optional<bool> latch;
@@ -118,7 +117,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -146,13 +145,12 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Calibrate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType

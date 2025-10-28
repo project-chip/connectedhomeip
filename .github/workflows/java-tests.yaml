@@ -44,13 +44,13 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-java:132
+            image: ghcr.io/project-chip/chip-build-java:174
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -351,7 +351,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Uploading core files
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux-java-controller
@@ -359,7 +359,7 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-linux-java-controller

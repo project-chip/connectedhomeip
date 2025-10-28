@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -101,11 +102,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetTargetsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedules;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -117,7 +117,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetTargetsResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> chargingTargetSchedules;
 
@@ -135,7 +134,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Disable::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -168,7 +166,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::EnableCharging::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<uint32_t> chargingEnabledUntil;
     int64_t minimumChargeCurrent = static_cast<int64_t>(0);
@@ -208,7 +205,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::EnableDischarging::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<uint32_t> dischargingEnabledUntil;
     int64_t maximumDischargeCurrent = static_cast<int64_t>(0);
@@ -244,7 +240,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StartDiagnostics::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -275,7 +270,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetTargets::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedules;
 
@@ -309,7 +303,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetTargets::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -339,7 +332,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ClearTargets::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 

@@ -630,13 +630,13 @@ private:
      * Validates that the command exists and on success returns the data for the command in `entry`.
      */
     Status CheckCommandExistence(const ConcreteCommandPath & aCommandPath, DataModel::AcceptedCommandEntry & entry);
-    Status CheckCommandAccess(const DataModel::InvokeRequest & aRequest, const DataModel::AcceptedCommandEntry & entry);
+    Status CheckCommandAccess(const DataModel::InvokeRequest & aRequest, const Access::Privilege aRequiredPrivilege);
     Status CheckCommandFlags(const DataModel::InvokeRequest & aRequest, const DataModel::AcceptedCommandEntry & entry);
 
     /**
-     * Check if the given attribute path is a valid path in the data model provider.
+     * Find the AttributeEntry that corresponds to the given attribute, if there is one.
      */
-    bool IsExistentAttributePath(const ConcreteAttributePath & path);
+    std::optional<DataModel::AttributeEntry> FindAttributeEntry(const ConcreteAttributePath & path);
 
     static void ResumeSubscriptionsTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 

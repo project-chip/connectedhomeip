@@ -36,6 +36,7 @@ config("includes") {
 
 executable("chip-lighting-app") {
   sources = [
+    "Identify.cpp",
     "LightingAppCommandDelegate.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
@@ -53,6 +54,7 @@ executable("chip-lighting-app") {
   if (chip_examples_enable_imgui_ui) {
     deps += [
       "${chip_root}/examples/common/imgui_ui",
+      "${chip_root}/examples/common/imgui_ui/windows:connectivity",
       "${chip_root}/examples/common/imgui_ui/windows:light",
       "${chip_root}/examples/common/imgui_ui/windows:occupancy_sensing",
       "${chip_root}/examples/common/imgui_ui/windows:qrcode",

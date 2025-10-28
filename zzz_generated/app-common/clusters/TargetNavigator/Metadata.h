@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace TargetNavigator {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace TargetList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(TargetList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -28,16 +30,28 @@ namespace CurrentTarget {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentTarget::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CurrentTarget
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    TargetList::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace NavigateTarget {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(NavigateTarget::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace NavigateTarget
 
 } // namespace Commands
+
+namespace Events {
+namespace TargetUpdated {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TargetUpdated
+
+} // namespace Events
 } // namespace TargetNavigator
 } // namespace Clusters
 } // namespace app

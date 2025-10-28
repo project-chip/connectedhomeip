@@ -16,8 +16,11 @@
  */
 #pragma once
 
+#include <access/Privilege.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/server-cluster/ServerClusterInterface.h>
+#include <lib/core/CHIPError.h>
+
 #include <optional>
 
 namespace chip {
@@ -36,7 +39,13 @@ namespace app {
 class DefaultServerCluster : public ServerClusterInterface
 {
 public:
-    DefaultServerCluster(const ConcreteClusterPath & path);
+    DefaultServerCluster(const ConcreteClusterPath & path) : mPath(path) {}
+
+    constexpr DefaultServerCluster(ConcreteClusterPath && path) :
+        mPath(std::move(path)),
+        mDataVersion(0) // data version will be initialized in startup, however constexpr requires initialization
+    {}
+
     ~DefaultServerCluster() override = default;
 
     //////////////////////////// ServerClusterInterface implementation ////////////////////////////////////////
@@ -63,6 +72,13 @@ public:
     ///
     /// Default implementation just returns the global attributes required by the API contract.
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    /// Must only be implemented if event readability is relevant
+    CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override
+    {
+        eventInfo.readPrivilege = Access::Privilege::kView;
+        return CHIP_NO_ERROR;
+    }
 
     ///////////////////////////////////// Command Support /////////////////////////////////////////////////////////
 
@@ -98,6 +114,11 @@ protected:
     /// This increases cluster data version and if a cluster context is available it will
     /// notify that the attribute has changed.
     void NotifyAttributeChanged(AttributeId attributeId);
+
+    /// Marks that a specific attribute has changed value, if `status` is success.
+    ///
+    /// Will return `status`
+    DataModel::ActionReturnStatus NotifyAttributeChangedIfSuccess(AttributeId attributeId, DataModel::ActionReturnStatus status);
 
 private:
     DataVersion mDataVersion; // will be random-initialized as per spec

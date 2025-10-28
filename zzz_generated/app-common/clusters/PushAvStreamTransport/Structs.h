@@ -23,7 +23,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BitMask.h>
@@ -129,19 +129,27 @@ public:
 namespace CMAFContainerOptionsStruct {
 enum class Fields : uint8_t
 {
-    kChunkDuration   = 0,
-    kCENCKey         = 1,
-    kMetadataEnabled = 2,
-    kCENCKeyID       = 3,
+    kCMAFInterface   = 0,
+    kSegmentDuration = 1,
+    kChunkDuration   = 2,
+    kSessionGroup    = 3,
+    kTrackName       = 4,
+    kCENCKey         = 5,
+    kCENCKeyID       = 6,
+    kMetadataEnabled = 7,
 };
 
 struct Type
 {
 public:
-    uint16_t chunkDuration = static_cast<uint16_t>(0);
+    CMAFInterfaceEnum CMAFInterface = static_cast<CMAFInterfaceEnum>(0);
+    uint16_t segmentDuration        = static_cast<uint16_t>(0);
+    uint16_t chunkDuration          = static_cast<uint16_t>(0);
+    uint8_t sessionGroup            = static_cast<uint8_t>(0);
+    chip::CharSpan trackName;
     Optional<chip::ByteSpan> CENCKey;
-    Optional<bool> metadataEnabled;
     Optional<chip::ByteSpan> CENCKeyID;
+    Optional<bool> metadataEnabled;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -182,7 +190,7 @@ enum class Fields : uint8_t
     kStreamUsage      = 0,
     kVideoStreamID    = 1,
     kAudioStreamID    = 2,
-    kEndpointID       = 3,
+    kTLSEndpointID    = 3,
     kUrl              = 4,
     kTriggerOptions   = 5,
     kIngestMethod     = 6,
@@ -196,7 +204,7 @@ public:
     Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
-    uint16_t endpointID = static_cast<uint16_t>(0);
+    uint16_t TLSEndpointID = static_cast<uint16_t>(0);
     chip::CharSpan url;
     Structs::TransportTriggerOptionsStruct::Type triggerOptions;
     IngestMethodsEnum ingestMethod = static_cast<IngestMethodsEnum>(0);
@@ -214,7 +222,7 @@ public:
     Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
-    uint16_t endpointID = static_cast<uint16_t>(0);
+    uint16_t TLSEndpointID = static_cast<uint16_t>(0);
     chip::CharSpan url;
     Structs::TransportTriggerOptionsStruct::DecodableType triggerOptions;
     IngestMethodsEnum ingestMethod = static_cast<IngestMethodsEnum>(0);
@@ -233,6 +241,7 @@ enum class Fields : uint8_t
     kConnectionID     = 0,
     kTransportStatus  = 1,
     kTransportOptions = 2,
+    kFabricIndex      = 254,
 };
 
 struct Type
@@ -241,10 +250,19 @@ public:
     uint16_t connectionID               = static_cast<uint16_t>(0);
     TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
     Optional<Structs::TransportOptionsStruct::Type> transportOptions;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
 };
 
 struct DecodableType
@@ -253,10 +271,15 @@ public:
     uint16_t connectionID               = static_cast<uint16_t>(0);
     TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
     Optional<Structs::TransportOptionsStruct::DecodableType> transportOptions;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 } // namespace TransportConfigurationStruct

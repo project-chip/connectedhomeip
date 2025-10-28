@@ -68,7 +68,6 @@ std::vector<Action *> gActions;
 
 namespace {
 
-constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_bridge_fifo_";
 NamedPipeCommands sChipNamedPipeCommands;
 BridgeCommandDelegate sBridgeCommandDelegate;
 
@@ -136,8 +135,9 @@ DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::DeviceTypeList::Id, ARRAY, kDe
 
 // Declare Bridged Device Basic Information cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(bridgedDeviceBasicAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::NodeLabel::Id, CHAR_STRING, kNodeLabelSize, 0), /* NodeLabel */
-    DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::Reachable::Id, BOOLEAN, 1, 0),              /* Reachable */
+DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::NodeLabel::Id, CHAR_STRING, kNodeLabelSize,
+                          ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)),         /* NodeLabel */
+    DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::Reachable::Id, BOOLEAN, 1, 0), /* Reachable */
     DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::UniqueID::Id, CHAR_STRING, kUniqueIdSize, 0),
     DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::ConfigurationVersion::Id, INT32U, 4,
                               0), /* Configuration Version */
@@ -565,6 +565,30 @@ Protocols::InteractionModel::Status HandleWriteOnOffAttribute(DeviceOnOff * dev,
     return Protocols::InteractionModel::Status::Success;
 }
 
+Protocols::InteractionModel::Status HandleWriteBridgedDeviceBasicAttribute(Device * dev, AttributeId attributeId, uint8_t * buffer)
+{
+    ChipLogProgress(DeviceLayer, "HandleWriteBridgedDeviceBasicAttribute: attrId=" ChipLogFormatMEI, ChipLogValueMEI(attributeId));
+
+    if (attributeId != BridgedDeviceBasicInformation::Attributes::NodeLabel::Id)
+    {
+        return Protocols::InteractionModel::Status::UnsupportedWrite;
+    }
+
+    CharSpan nameSpan = CharSpan::fromZclString(buffer);
+
+    if (nameSpan.size() > kNodeLabelSize)
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+
+    std::string name(nameSpan.data(), nameSpan.size());
+    dev->SetName(name.c_str());
+
+    HandleDeviceStatusChanged(dev, Device::kChanged_Name);
+
+    return Protocols::InteractionModel::Status::Success;
+}
+
 Protocols::InteractionModel::Status HandleReadTempMeasurementAttribute(DeviceTempSensor * dev, chip::AttributeId attributeId,
                                                                        uint8_t * buffer, uint16_t maxReadLength)
 {
@@ -711,6 +735,10 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
         if ((dev->IsReachable()) && (clusterId == OnOff::Id))
         {
             ret = HandleWriteOnOffAttribute(static_cast<DeviceOnOff *>(dev), attributeMetadata->attributeId, buffer);
+        }
+        else if ((dev->IsReachable()) && (clusterId == BridgedDeviceBasicInformation::Id))
+        {
+            ret = HandleWriteBridgedDeviceBasicAttribute(dev, attributeMetadata->attributeId, buffer);
         }
     }
 
@@ -1052,9 +1080,9 @@ void ApplicationInit()
         }
     }
 
-    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
+    std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
 
-    if (sChipNamedPipeCommands.Start(path, &sBridgeCommandDelegate) != CHIP_NO_ERROR)
+    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sBridgeCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();

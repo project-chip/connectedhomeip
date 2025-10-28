@@ -536,6 +536,15 @@ static BOOL CommandNeedsTimedInvokeInScenesManagementCluster(AttributeId aAttrib
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInGroupcastCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Groupcast;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInHEPAFilterMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::HepaFilterMonitoring;
@@ -762,6 +771,12 @@ static BOOL CommandNeedsTimedInvokeInClosureControlCluster(AttributeId aAttribut
 {
     using namespace Clusters::ClosureControl;
     switch (aAttributeId) {
+    case Commands::MoveTo::Id: {
+        return YES;
+    }
+    case Commands::Calibrate::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
@@ -771,6 +786,12 @@ static BOOL CommandNeedsTimedInvokeInClosureDimensionCluster(AttributeId aAttrib
 {
     using namespace Clusters::ClosureDimension;
     switch (aAttributeId) {
+    case Commands::SetTarget::Id: {
+        return YES;
+    }
+    case Commands::Step::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
@@ -1005,6 +1026,12 @@ static BOOL CommandNeedsTimedInvokeInThreadBorderRouterManagementCluster(Attribu
 {
     using namespace Clusters::ThreadBorderRouterManagement;
     switch (aAttributeId) {
+    case Commands::SetActiveDatasetRequest::Id: {
+        return YES;
+    }
+    case Commands::SetPendingDatasetRequest::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
@@ -1146,6 +1173,18 @@ static BOOL CommandNeedsTimedInvokeInContentControlCluster(AttributeId aAttribut
 {
     using namespace Clusters::ContentControl;
     switch (aAttributeId) {
+    case Commands::UpdatePIN::Id: {
+        return YES;
+    }
+    case Commands::ResetPIN::Id: {
+        return YES;
+    }
+    case Commands::Enable::Id: {
+        return YES;
+    }
+    case Commands::Disable::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
@@ -1309,6 +1348,9 @@ static BOOL CommandNeedsTimedInvokeInUnitTestingCluster(AttributeId aAttributeId
     using namespace Clusters::UnitTesting;
     switch (aAttributeId) {
     case Commands::TimedInvokeRequest::Id: {
+        return YES;
+    }
+    case Commands::TestCheckCommandFlags::Id: {
         return YES;
     }
     default: {
@@ -1499,6 +1541,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ScenesManagement::Id: {
         return CommandNeedsTimedInvokeInScenesManagementCluster(commandID);
+    }
+    case Clusters::Groupcast::Id: {
+        return CommandNeedsTimedInvokeInGroupcastCluster(commandID);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return CommandNeedsTimedInvokeInHEPAFilterMonitoringCluster(commandID);

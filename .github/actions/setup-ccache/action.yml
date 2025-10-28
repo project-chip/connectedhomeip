@@ -1,0 +1,71 @@
+name: 'Setup ccache'
+description: 'Configures and restores the ccache cache'
+inputs:
+  build-variant:
+    required: true
+    description: 'The build variant for cache key uniqueness'
+  disable:
+    required: false
+    default: 'false'
+    description: 'If true, skip cache restore and set CCACHE_DISABLE=1 to bypass ccache.'
+  cache-suffix:
+    required: false
+    default: ''
+    description: 'Optional suffix appended to the cache key to force rotation (e.g., a short hash).'
+outputs:
+  cache-primary-key:
+    description: "The primary key used for the cache"
+    value: ${{ steps.cache-vars.outputs.cache_key }}
+  cache-hit:
+    description: "A boolean value to indicate an exact match was found for the primary key"
+    value: ${{ steps.ccache-restore.outputs.cache-hit }}
+runs:
+  using: "composite"
+  steps:
+    - name: Configure ccache
+      uses: pyTooling/Actions/with-post-step@v0.4.5
+      with:
+        main: |
+          mkdir -p .ccache
+          echo "CCACHE_NOHASHDIR=1" >> $GITHUB_ENV
+          echo "CCACHE_BASEDIR=${{ github.workspace }}" >> $GITHUB_ENV
+          echo "CCACHE_NODIRECT=1" >> $GITHUB_ENV
+          echo "CCACHE_PREFIX_CPP=${{ github.workspace }}/scripts/helpers/ccache-prefix-cpp.sh" >> $GITHUB_ENV
+          echo "CCACHE_SLOPPINESS=time_macros" >> $GITHUB_ENV
+          echo "CCACHE_DIR=${{ github.workspace }}/.ccache" >> $GITHUB_ENV
+          echo "CCACHE_COMPILERCHECK=content" >> $GITHUB_ENV
+          echo "CCACHE_MAXSIZE=5G" >> $GITHUB_ENV
+          echo "CCACHE_COMPRESS=1" >> $GITHUB_ENV
+          echo "CCACHE_COMPRESSLEVEL=6" >> $GITHUB_ENV
+          echo "CHIP_PW_COMMAND_LAUNCHER=ccache" >> $GITHUB_ENV
+        post: |
+          ccache --show-stats
+    - name: Optionally disable ccache
+      if: ${{ inputs.disable == 'true' }}
+      shell: bash
+      run: |
+        echo "CCACHE_DISABLE=1" >> $GITHUB_ENV
+    - name: Prepare cache variables
+      id: cache-vars
+      shell: bash
+      run: |
+        CACHE_SUFFIX="${{ inputs.cache-suffix }}"
+        if [ -n "$CACHE_SUFFIX" ]; then
+          CCACHE_KEY="ccache-${{ runner.os }}-${{ inputs.build-variant }}-${CACHE_SUFFIX}"
+        else
+          CCACHE_KEY="ccache-${{ runner.os }}-${{ inputs.build-variant }}"
+        fi
+        echo "CCACHE_KEY=${CCACHE_KEY}" >> "$GITHUB_ENV"
+        echo "cache_key=${CCACHE_KEY}" >> "$GITHUB_OUTPUT"
+
+        CCACHE_RESTORE_KEY="ccache-${{ runner.os }}-${{ inputs.build-variant }}-"
+        echo "CCACHE_RESTORE_KEY=${CCACHE_RESTORE_KEY}" >> "$GITHUB_ENV"
+    - name: Restore ccache
+      if: ${{ inputs.disable != 'true' }}
+      id: ccache-restore
+      uses: actions/cache/restore@v4
+      with:
+        path: .ccache
+        key: ${{ env.CCACHE_KEY }}
+        restore-keys: |
+          ${{ env.CCACHE_RESTORE_KEY }}

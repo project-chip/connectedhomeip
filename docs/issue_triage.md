@@ -106,6 +106,7 @@ types or functionality) as well as individual examples.
 | `examples/build_overrides`                     |                              | UNMAINTAINED |
 | `examples/chef`                                | Andrei Litvin                |              |
 | `examples/chip-tool`                           |                              | UNMAINTAINED |
+| `examples/closure-app`                         | Satyanaag Bollimpalli        |              |
 | `examples/contact-sensor-app`                  |                              | UNMAINTAINED |
 | `examples/darwin-framework-tool`               | Boris Zbarsky                |              |
 | `examples/dishwasher-app`                      |                              | UNMAINTAINED |

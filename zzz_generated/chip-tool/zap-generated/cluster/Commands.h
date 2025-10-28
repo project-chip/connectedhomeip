@@ -94,6 +94,7 @@
 | OperationalState                                                    | 0x0060 |
 | RvcOperationalState                                                 | 0x0061 |
 | ScenesManagement                                                    | 0x0062 |
+| Groupcast                                                           | 0x0065 |
 | HepaFilterMonitoring                                                | 0x0071 |
 | ActivatedCarbonFilterMonitoring                                     | 0x0072 |
 | BooleanStateConfiguration                                           | 0x0080 |
@@ -1228,6 +1229,7 @@ private:
 | * AccessControlEntriesPerFabric                                     | 0x0004 |
 | * CommissioningARL                                                  | 0x0005 |
 | * Arl                                                               | 0x0006 |
+| * AuxiliaryACL                                                      | 0x0007 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -1238,6 +1240,7 @@ private:
 | * AccessControlEntryChanged                                         | 0x0000 |
 | * AccessControlExtensionChanged                                     | 0x0001 |
 | * FabricRestrictionReviewUpdate                                     | 0x0002 |
+| * AuxiliaryAccessUpdated                                            | 0x0003 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -2206,6 +2209,9 @@ private:
 | * TCAcknowledgements                                                | 0x0007 |
 | * TCAcknowledgementsRequired                                        | 0x0008 |
 | * TCUpdateDeadline                                                  | 0x0009 |
+| * RecoveryIdentifier                                                | 0x000A |
+| * NetworkRecoveryReason                                             | 0x000B |
+| * IsCommissioningWithoutPower                                       | 0x000C |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -6241,6 +6247,229 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster Groupcast                                                   | 0x0065 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * JoinGroup                                                         |   0x00 |
+| * LeaveGroup                                                        |   0x01 |
+| * UpdateGroupKey                                                    |   0x03 |
+| * ExpireGracePeriod                                                 |   0x04 |
+| * ConfigureAuxiliaryACL                                             |   0x05 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Membership                                                        | 0x0000 |
+| * MaxMembershipCount                                                | 0x0001 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command JoinGroup
+ */
+class GroupcastJoinGroup : public ClusterCommand
+{
+public:
+    GroupcastJoinGroup(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("join-group", credsIssuerConfig), mComplex_Endpoints(&mRequest.endpoints)
+    {
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        AddArgument("Endpoints", &mComplex_Endpoints);
+        AddArgument("KeyID", 0, UINT32_MAX, &mRequest.keyID);
+        AddArgument("Key", &mRequest.key);
+        AddArgument("GracePeriod", 0, UINT32_MAX, &mRequest.gracePeriod);
+        AddArgument("UseAuxiliaryACL", 0, 1, &mRequest.useAuxiliaryACL);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Groupcast::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Groupcast::Commands::JoinGroup::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Groupcast::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Groupcast::Commands::JoinGroup::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::Groupcast::Commands::JoinGroup::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::EndpointId>> mComplex_Endpoints;
+};
+
+/*
+ * Command LeaveGroup
+ */
+class GroupcastLeaveGroup : public ClusterCommand
+{
+public:
+    GroupcastLeaveGroup(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("leave-group", credsIssuerConfig), mComplex_Endpoints(&mRequest.endpoints)
+    {
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        AddArgument("Endpoints", &mComplex_Endpoints, "", Argument::kOptional);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Groupcast::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Groupcast::Commands::LeaveGroup::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Groupcast::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Groupcast::Commands::LeaveGroup::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::Groupcast::Commands::LeaveGroup::Type mRequest;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const chip::EndpointId>>> mComplex_Endpoints;
+};
+
+/*
+ * Command UpdateGroupKey
+ */
+class GroupcastUpdateGroupKey : public ClusterCommand
+{
+public:
+    GroupcastUpdateGroupKey(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("update-group-key", credsIssuerConfig)
+    {
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        AddArgument("KeyID", 0, UINT32_MAX, &mRequest.keyID);
+        AddArgument("Key", &mRequest.key);
+        AddArgument("GracePeriod", 0, UINT32_MAX, &mRequest.gracePeriod);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Groupcast::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Groupcast::Commands::UpdateGroupKey::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Groupcast::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Groupcast::Commands::UpdateGroupKey::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::Groupcast::Commands::UpdateGroupKey::Type mRequest;
+};
+
+/*
+ * Command ExpireGracePeriod
+ */
+class GroupcastExpireGracePeriod : public ClusterCommand
+{
+public:
+    GroupcastExpireGracePeriod(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("expire-grace-period", credsIssuerConfig)
+    {
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Groupcast::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Groupcast::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::Type mRequest;
+};
+
+/*
+ * Command ConfigureAuxiliaryACL
+ */
+class GroupcastConfigureAuxiliaryACL : public ClusterCommand
+{
+public:
+    GroupcastConfigureAuxiliaryACL(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("configure-auxiliary-acl", credsIssuerConfig)
+    {
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
+        AddArgument("UseAuxiliaryACL", 0, 1, &mRequest.useAuxiliaryACL);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Groupcast::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Groupcast::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster HepaFilterMonitoring                                        | 0x0071 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -7624,6 +7853,7 @@ private:
 | Attributes:                                                         |        |
 | * AvailableEndpoints                                                | 0x0000 |
 | * ActiveEndpoints                                                   | 0x0001 |
+| * ElectricalCircuitNodes                                            | 0x0002 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -9046,8 +9276,9 @@ private:
 | * CountdownTime                                                     | 0x0000 |
 | * MainState                                                         | 0x0001 |
 | * CurrentErrorList                                                  | 0x0002 |
-| * OverallState                                                      | 0x0003 |
-| * OverallTarget                                                     | 0x0004 |
+| * OverallCurrentState                                               | 0x0003 |
+| * OverallTargetState                                                | 0x0004 |
+| * LatchControlModes                                                 | 0x0005 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -9181,7 +9412,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * CurrentState                                                      | 0x0000 |
-| * Target                                                            | 0x0001 |
+| * TargetState                                                       | 0x0001 |
 | * Resolution                                                        | 0x0002 |
 | * StepValue                                                         | 0x0003 |
 | * Unit                                                              | 0x0004 |
@@ -9191,6 +9422,7 @@ private:
 | * RotationAxis                                                      | 0x0008 |
 | * Overflow                                                          | 0x0009 |
 | * ModulationType                                                    | 0x000A |
+| * LatchControlModes                                                 | 0x000B |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -9442,6 +9674,8 @@ private:
 | * ClearWeeklySchedule                                               |   0x03 |
 | * SetActiveScheduleRequest                                          |   0x05 |
 | * SetActivePresetRequest                                            |   0x06 |
+| * AddThermostatSuggestion                                           |   0x07 |
+| * RemoveThermostatSuggestion                                        |   0x08 |
 | * AtomicRequest                                                     |   0xFE |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -9505,6 +9739,10 @@ private:
 | * Presets                                                           | 0x0050 |
 | * Schedules                                                         | 0x0051 |
 | * SetpointHoldExpiryTimestamp                                       | 0x0052 |
+| * MaxThermostatSuggestions                                          | 0x0053 |
+| * ThermostatSuggestions                                             | 0x0054 |
+| * CurrentThermostatSuggestion                                       | 0x0055 |
+| * ThermostatSuggestionNotFollowingReason                            | 0x0056 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -9512,6 +9750,14 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+| * SystemModeChange                                                  | 0x0000 |
+| * LocalTemperatureChange                                            | 0x0001 |
+| * OccupancyChange                                                   | 0x0002 |
+| * SetpointChange                                                    | 0x0003 |
+| * RunningStateChange                                                | 0x0004 |
+| * RunningModeChange                                                 | 0x0005 |
+| * ActiveScheduleChange                                              | 0x0006 |
+| * ActivePresetChange                                                | 0x0007 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -9747,6 +9993,84 @@ public:
 
 private:
     chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::Type mRequest;
+};
+
+/*
+ * Command AddThermostatSuggestion
+ */
+class ThermostatAddThermostatSuggestion : public ClusterCommand
+{
+public:
+    ThermostatAddThermostatSuggestion(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("add-thermostat-suggestion", credsIssuerConfig)
+    {
+        AddArgument("PresetHandle", &mRequest.presetHandle);
+        AddArgument("EffectiveTime", 0, UINT32_MAX, &mRequest.effectiveTime);
+        AddArgument("ExpirationInMinutes", 0, UINT16_MAX, &mRequest.expirationInMinutes);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::AddThermostatSuggestion::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::AddThermostatSuggestion::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::Thermostat::Commands::AddThermostatSuggestion::Type mRequest;
+};
+
+/*
+ * Command RemoveThermostatSuggestion
+ */
+class ThermostatRemoveThermostatSuggestion : public ClusterCommand
+{
+public:
+    ThermostatRemoveThermostatSuggestion(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("remove-thermostat-suggestion", credsIssuerConfig)
+    {
+        AddArgument("UniqueID", 0, UINT8_MAX, &mRequest.uniqueID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::RemoveThermostatSuggestion::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::Thermostat::Commands::RemoveThermostatSuggestion::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::Thermostat::Commands::RemoveThermostatSuggestion::Type mRequest;
 };
 
 /*
@@ -13246,6 +13570,12 @@ private:
 | * UnblockUnratedContent                                             |   0x08 |
 | * SetOnDemandRatingThreshold                                        |   0x09 |
 | * SetScheduledContentRatingThreshold                                |   0x0A |
+| * AddBlockChannels                                                  |   0x0B |
+| * RemoveBlockChannels                                               |   0x0C |
+| * AddBlockApplications                                              |   0x0D |
+| * RemoveBlockApplications                                           |   0x0E |
+| * SetBlockContentTimeWindow                                         |   0x0F |
+| * RemoveBlockContentTimeWindow                                      |   0x10 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Enabled                                                           | 0x0000 |
@@ -13256,6 +13586,9 @@ private:
 | * ScreenDailyTime                                                   | 0x0005 |
 | * RemainingScreenTime                                               | 0x0006 |
 | * BlockUnrated                                                      | 0x0007 |
+| * BlockChannelList                                                  | 0x0008 |
+| * BlockApplicationList                                              | 0x0009 |
+| * BlockContentTimeWindow                                            | 0x000A |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -13264,6 +13597,7 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 | * RemainingScreenTimeExpired                                        | 0x0000 |
+| * EnteringBlockContentTimeWindow                                    | 0x0001 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -13638,6 +13972,244 @@ private:
     chip::app::Clusters::ContentControl::Commands::SetScheduledContentRatingThreshold::Type mRequest;
 };
 
+/*
+ * Command AddBlockChannels
+ */
+class ContentControlAddBlockChannels : public ClusterCommand
+{
+public:
+    ContentControlAddBlockChannels(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("add-block-channels", credsIssuerConfig), mComplex_Channels(&mRequest.channels)
+    {
+        AddArgument("Channels", &mComplex_Channels);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ContentControl::Commands::AddBlockChannels::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ContentControl::Commands::AddBlockChannels::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ContentControl::Commands::AddBlockChannels::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::ContentControl::Structs::BlockChannelStruct::Type>>
+        mComplex_Channels;
+};
+
+/*
+ * Command RemoveBlockChannels
+ */
+class ContentControlRemoveBlockChannels : public ClusterCommand
+{
+public:
+    ContentControlRemoveBlockChannels(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("remove-block-channels", credsIssuerConfig), mComplex_ChannelIndexes(&mRequest.channelIndexes)
+    {
+        AddArgument("ChannelIndexes", &mComplex_ChannelIndexes);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ContentControl::Commands::RemoveBlockChannels::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ContentControl::Commands::RemoveBlockChannels::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ContentControl::Commands::RemoveBlockChannels::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const uint16_t>> mComplex_ChannelIndexes;
+};
+
+/*
+ * Command AddBlockApplications
+ */
+class ContentControlAddBlockApplications : public ClusterCommand
+{
+public:
+    ContentControlAddBlockApplications(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("add-block-applications", credsIssuerConfig), mComplex_Applications(&mRequest.applications)
+    {
+        AddArgument("Applications", &mComplex_Applications);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ContentControl::Commands::AddBlockApplications::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ContentControl::Commands::AddBlockApplications::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ContentControl::Commands::AddBlockApplications::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::ContentControl::Structs::AppInfoStruct::Type>>
+        mComplex_Applications;
+};
+
+/*
+ * Command RemoveBlockApplications
+ */
+class ContentControlRemoveBlockApplications : public ClusterCommand
+{
+public:
+    ContentControlRemoveBlockApplications(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("remove-block-applications", credsIssuerConfig), mComplex_Applications(&mRequest.applications)
+    {
+        AddArgument("Applications", &mComplex_Applications);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ContentControl::Commands::RemoveBlockApplications::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ContentControl::Commands::RemoveBlockApplications::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ContentControl::Commands::RemoveBlockApplications::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::ContentControl::Structs::AppInfoStruct::Type>>
+        mComplex_Applications;
+};
+
+/*
+ * Command SetBlockContentTimeWindow
+ */
+class ContentControlSetBlockContentTimeWindow : public ClusterCommand
+{
+public:
+    ContentControlSetBlockContentTimeWindow(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-block-content-time-window", credsIssuerConfig), mComplex_TimeWindow(&mRequest.timeWindow)
+    {
+        AddArgument("TimeWindow", &mComplex_TimeWindow);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ContentControl::Commands::SetBlockContentTimeWindow::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ContentControl::Commands::SetBlockContentTimeWindow::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ContentControl::Commands::SetBlockContentTimeWindow::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::ContentControl::Structs::TimeWindowStruct::Type> mComplex_TimeWindow;
+};
+
+/*
+ * Command RemoveBlockContentTimeWindow
+ */
+class ContentControlRemoveBlockContentTimeWindow : public ClusterCommand
+{
+public:
+    ContentControlRemoveBlockContentTimeWindow(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("remove-block-content-time-window", credsIssuerConfig),
+        mComplex_TimeWindowIndexes(&mRequest.timeWindowIndexes)
+    {
+        AddArgument("TimeWindowIndexes", &mComplex_TimeWindowIndexes);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ContentControl::Commands::RemoveBlockContentTimeWindow::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ContentControl::Commands::RemoveBlockContentTimeWindow::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ContentControl::Commands::RemoveBlockContentTimeWindow::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const uint16_t>> mComplex_TimeWindowIndexes;
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster ContentAppObserver                                          | 0x0510 |
 |------------------------------------------------------------------------------|
@@ -13699,14 +14271,18 @@ private:
 | Commands:                                                           |        |
 | * CreateTwoDCartesianZone                                           |   0x00 |
 | * UpdateTwoDCartesianZone                                           |   0x02 |
-| * GetTwoDCartesianZone                                              |   0x03 |
-| * RemoveZone                                                        |   0x05 |
+| * RemoveZone                                                        |   0x03 |
+| * CreateOrUpdateTrigger                                             |   0x04 |
+| * RemoveTrigger                                                     |   0x05 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * SupportedZoneSources                                              | 0x0000 |
-| * Zones                                                             | 0x0001 |
-| * Triggers                                                          | 0x0002 |
-| * Sensitivity                                                       | 0x0003 |
+| * MaxUserDefinedZones                                               | 0x0000 |
+| * MaxZones                                                          | 0x0001 |
+| * Zones                                                             | 0x0002 |
+| * Triggers                                                          | 0x0003 |
+| * SensitivityMax                                                    | 0x0004 |
+| * Sensitivity                                                       | 0x0005 |
+| * TwoDCartesianMax                                                  | 0x0006 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -13798,44 +14374,6 @@ private:
 };
 
 /*
- * Command GetTwoDCartesianZone
- */
-class ZoneManagementGetTwoDCartesianZone : public ClusterCommand
-{
-public:
-    ZoneManagementGetTwoDCartesianZone(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("get-two-dcartesian-zone", credsIssuerConfig)
-    {
-        AddArgument("ZoneID", 0, UINT16_MAX, &mRequest.zoneID);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::ZoneManagement::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZone::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::ZoneManagement::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZone::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZone::Type mRequest;
-};
-
-/*
  * Command RemoveZone
  */
 class ZoneManagementRemoveZone : public ClusterCommand
@@ -13872,6 +14410,82 @@ private:
     chip::app::Clusters::ZoneManagement::Commands::RemoveZone::Type mRequest;
 };
 
+/*
+ * Command CreateOrUpdateTrigger
+ */
+class ZoneManagementCreateOrUpdateTrigger : public ClusterCommand
+{
+public:
+    ZoneManagementCreateOrUpdateTrigger(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("create-or-update-trigger", credsIssuerConfig), mComplex_Trigger(&mRequest.trigger)
+    {
+        AddArgument("Trigger", &mComplex_Trigger);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ZoneManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ZoneManagement::Commands::CreateOrUpdateTrigger::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ZoneManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ZoneManagement::Commands::CreateOrUpdateTrigger::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ZoneManagement::Commands::CreateOrUpdateTrigger::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::ZoneManagement::Structs::ZoneTriggerControlStruct::Type> mComplex_Trigger;
+};
+
+/*
+ * Command RemoveTrigger
+ */
+class ZoneManagementRemoveTrigger : public ClusterCommand
+{
+public:
+    ZoneManagementRemoveTrigger(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("remove-trigger", credsIssuerConfig)
+    {
+        AddArgument("ZoneID", 0, UINT16_MAX, &mRequest.zoneID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ZoneManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ZoneManagement::Commands::RemoveTrigger::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ZoneManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ZoneManagement::Commands::RemoveTrigger::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ZoneManagement::Commands::RemoveTrigger::Type mRequest;
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster CameraAvStreamManagement                                    | 0x0551 |
 |------------------------------------------------------------------------------|
@@ -13892,7 +14506,7 @@ private:
 | * MaxEncodedPixelRate                                               | 0x0001 |
 | * VideoSensorParams                                                 | 0x0002 |
 | * NightVisionUsesInfrared                                           | 0x0003 |
-| * MinViewport                                                       | 0x0004 |
+| * MinViewportResolution                                             | 0x0004 |
 | * RateDistortionTradeOffPoints                                      | 0x0005 |
 | * MaxContentBufferSize                                              | 0x0006 |
 | * MicrophoneCapabilities                                            | 0x0007 |
@@ -13906,7 +14520,7 @@ private:
 | * AllocatedVideoStreams                                             | 0x000F |
 | * AllocatedAudioStreams                                             | 0x0010 |
 | * AllocatedSnapshotStreams                                          | 0x0011 |
-| * RankedVideoStreamPrioritiesList                                   | 0x0012 |
+| * StreamUsagePriorities                                             | 0x0012 |
 | * SoftRecordingPrivacyModeEnabled                                   | 0x0013 |
 | * SoftLivestreamPrivacyModeEnabled                                  | 0x0014 |
 | * HardPrivacyModeOn                                                 | 0x0015 |
@@ -14037,8 +14651,7 @@ public:
         AddArgument("MaxResolution", &mComplex_MaxResolution);
         AddArgument("MinBitRate", 0, UINT32_MAX, &mRequest.minBitRate);
         AddArgument("MaxBitRate", 0, UINT32_MAX, &mRequest.maxBitRate);
-        AddArgument("MinFragmentLen", 0, UINT16_MAX, &mRequest.minFragmentLen);
-        AddArgument("MaxFragmentLen", 0, UINT16_MAX, &mRequest.maxFragmentLen);
+        AddArgument("KeyFrameInterval", 0, UINT16_MAX, &mRequest.keyFrameInterval);
         AddArgument("WatermarkEnabled", 0, 1, &mRequest.watermarkEnabled);
         AddArgument("OSDEnabled", 0, 1, &mRequest.OSDEnabled);
         ClusterCommand::AddArguments();
@@ -14380,6 +14993,7 @@ private:
 | * TiltMax                                                           | 0x0006 |
 | * PanMin                                                            | 0x0007 |
 | * PanMax                                                            | 0x0008 |
+| * MovementState                                                     | 0x0009 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -14633,7 +15247,7 @@ public:
 
 private:
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::ViewportStruct::Type> mComplex_Viewport;
+    TypedComplexArgument<chip::app::Clusters::Globals::Structs::ViewportStruct::Type> mComplex_Viewport;
 };
 
 /*
@@ -14707,7 +15321,8 @@ class WebRTCTransportProviderSolicitOffer : public ClusterCommand
 {
 public:
     WebRTCTransportProviderSolicitOffer(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("solicit-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers)
+        ClusterCommand("solicit-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers),
+        mComplex_SFrameConfig(&mRequest.SFrameConfig)
     {
         AddArgument("StreamUsage", 0, UINT8_MAX, &mRequest.streamUsage);
         AddArgument("OriginatingEndpointID", 0, UINT16_MAX, &mRequest.originatingEndpointID);
@@ -14716,6 +15331,7 @@ public:
         AddArgument("ICEServers", &mComplex_ICEServers, "", Argument::kOptional);
         AddArgument("ICETransportPolicy", &mRequest.ICETransportPolicy);
         AddArgument("MetadataEnabled", 0, 1, &mRequest.metadataEnabled);
+        AddArgument("SFrameConfig", &mComplex_SFrameConfig, "", Argument::kOptional);
         ClusterCommand::AddArguments();
     }
 
@@ -14745,6 +15361,8 @@ private:
     TypedComplexArgument<
         chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::Globals::Structs::ICEServerStruct::Type>>>
         mComplex_ICEServers;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type>>
+        mComplex_SFrameConfig;
 };
 
 /*
@@ -14754,7 +15372,8 @@ class WebRTCTransportProviderProvideOffer : public ClusterCommand
 {
 public:
     WebRTCTransportProviderProvideOffer(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("provide-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers)
+        ClusterCommand("provide-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers),
+        mComplex_SFrameConfig(&mRequest.SFrameConfig)
     {
         AddArgument("WebRTCSessionID", 0, UINT16_MAX, &mRequest.webRTCSessionID);
         AddArgument("Sdp", &mRequest.sdp);
@@ -14765,6 +15384,7 @@ public:
         AddArgument("ICEServers", &mComplex_ICEServers, "", Argument::kOptional);
         AddArgument("ICETransportPolicy", &mRequest.ICETransportPolicy);
         AddArgument("MetadataEnabled", 0, 1, &mRequest.metadataEnabled);
+        AddArgument("SFrameConfig", &mComplex_SFrameConfig, "", Argument::kOptional);
         ClusterCommand::AddArguments();
     }
 
@@ -14794,6 +15414,8 @@ private:
     TypedComplexArgument<
         chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::Globals::Structs::ICEServerStruct::Type>>>
         mComplex_ICEServers;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type>>
+        mComplex_SFrameConfig;
 };
 
 /*
@@ -15291,6 +15913,7 @@ public:
         AddArgument("ConnectionID", 0, UINT16_MAX, &mRequest.connectionID);
         AddArgument("ActivationReason", 0, UINT8_MAX, &mRequest.activationReason);
         AddArgument("TimeControl", &mComplex_TimeControl, "", Argument::kOptional);
+        AddArgument("UserDefined", &mRequest.userDefined);
         ClusterCommand::AddArguments();
     }
 
@@ -16747,7 +17370,7 @@ private:
 | * FindRootCertificate                                               |   0x02 |
 | * LookupRootCertificate                                             |   0x04 |
 | * RemoveRootCertificate                                             |   0x06 |
-| * TLSClientCSR                                                      |   0x07 |
+| * ClientCSR                                                         |   0x07 |
 | * ProvisionClientCertificate                                        |   0x09 |
 | * FindClientCertificate                                             |   0x0A |
 | * LookupClientCertificate                                           |   0x0C |
@@ -16921,22 +17544,23 @@ private:
 };
 
 /*
- * Command TLSClientCSR
+ * Command ClientCSR
  */
-class TlsCertificateManagementTLSClientCSR : public ClusterCommand
+class TlsCertificateManagementClientCSR : public ClusterCommand
 {
 public:
-    TlsCertificateManagementTLSClientCSR(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("tlsclient-csr", credsIssuerConfig)
+    TlsCertificateManagementClientCSR(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("client-csr", credsIssuerConfig)
     {
         AddArgument("Nonce", &mRequest.nonce);
+        AddArgument("Ccdid", 0, UINT16_MAX, &mRequest.ccdid);
         ClusterCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::ClientCSR::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -16946,7 +17570,7 @@ public:
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsCertificateManagement::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsCertificateManagement::Commands::ClientCSR::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -16955,7 +17579,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Type mRequest;
+    chip::app::Clusters::TlsCertificateManagement::Commands::ClientCSR::Type mRequest;
 };
 
 /*
@@ -16966,10 +17590,11 @@ class TlsCertificateManagementProvisionClientCertificate : public ClusterCommand
 public:
     TlsCertificateManagementProvisionClientCertificate(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("provision-client-certificate", credsIssuerConfig),
-        mComplex_ClientCertificateDetails(&mRequest.clientCertificateDetails)
+        mComplex_IntermediateCertificates(&mRequest.intermediateCertificates)
     {
         AddArgument("Ccdid", 0, UINT16_MAX, &mRequest.ccdid);
-        AddArgument("ClientCertificateDetails", &mComplex_ClientCertificateDetails);
+        AddArgument("ClientCertificate", &mRequest.clientCertificate);
+        AddArgument("IntermediateCertificates", &mComplex_IntermediateCertificates);
         ClusterCommand::AddArguments();
     }
 
@@ -16998,8 +17623,7 @@ public:
 
 private:
     chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::Type>
-        mComplex_ClientCertificateDetails;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex_IntermediateCertificates;
 };
 
 /*
@@ -17282,7 +17906,8 @@ private:
 | Attributes:                                                         |        |
 | * MeteredQuantity                                                   | 0x0000 |
 | * MeteredQuantityTimestamp                                          | 0x0001 |
-| * MeasurementType                                                   | 0x0002 |
+| * TariffUnit                                                        | 0x0002 |
+| * MaximumMeteredQuantities                                          | 0x0003 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -17322,6 +17947,7 @@ private:
 | * TestSecondBatchHelperRequest                                      |   0x17 |
 | * StringEchoRequest                                                 |   0x18 |
 | * GlobalEchoRequest                                                 |   0x19 |
+| * TestCheckCommandFlags                                             |   0x1A |
 | * TestDifferentVendorMeiRequest                                     |   0xFFF200AA|
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -17374,6 +18000,7 @@ private:
 | * ClusterErrorBoolean                                               | 0x0032 |
 | * GlobalEnum                                                        | 0x0033 |
 | * GlobalStruct                                                      | 0x0034 |
+| * UnsupportedAttributeRequiringAdminPrivilege                       | 0x00FE |
 | * Unsupported                                                       | 0x00FF |
 | * ReadFailureCode                                                   | 0x3000 |
 | * FailureInt32U                                                     | 0x3001 |
@@ -18469,6 +19096,43 @@ private:
 };
 
 /*
+ * Command TestCheckCommandFlags
+ */
+class UnitTestingTestCheckCommandFlags : public ClusterCommand
+{
+public:
+    UnitTestingTestCheckCommandFlags(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-check-command-flags", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestCheckCommandFlags::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestCheckCommandFlags::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::UnitTesting::Commands::TestCheckCommandFlags::Type mRequest;
+};
+
+/*
  * Command TestDifferentVendorMeiRequest
  */
 class UnitTestingTestDifferentVendorMeiRequest : public ClusterCommand
@@ -19086,7 +19750,7 @@ void registerClusterDescriptor(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EndpointId>>>(
             Id, "parts-list", Attributes::PartsList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>>>(
+            chip::app::DataModel::List<const chip::app::Clusters::Globals::Structs::SemanticTagStruct::Type>>>(
             Id, "tag-list", Attributes::TagList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "endpoint-unique-id", Attributes::EndpointUniqueID::Id,
                                                     WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -19200,6 +19864,7 @@ void registerClusterAccessControl(Commands & commands, CredentialIssuerCommands 
                                    credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "commissioning-arl", Attributes::CommissioningARL::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "arl", Attributes::Arl::Id, credsIssuerConfig),                                     //
+        make_unique<ReadAttribute>(Id, "auxiliary-acl", Attributes::AuxiliaryACL::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -19227,6 +19892,9 @@ void registerClusterAccessControl(Commands & commands, CredentialIssuerCommands 
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessRestrictionEntryStruct::Type>>>(
             Id, "arl", Attributes::Arl::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::Type>>>(
+            Id, "auxiliary-acl", Attributes::AuxiliaryACL::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -19249,6 +19917,7 @@ void registerClusterAccessControl(Commands & commands, CredentialIssuerCommands 
                                         credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "commissioning-arl", Attributes::CommissioningARL::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "arl", Attributes::Arl::Id, credsIssuerConfig),                                     //
+        make_unique<SubscribeAttribute>(Id, "auxiliary-acl", Attributes::AuxiliaryACL::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -19262,14 +19931,16 @@ void registerClusterAccessControl(Commands & commands, CredentialIssuerCommands 
         make_unique<ReadEvent>(Id, "access-control-extension-changed", Events::AccessControlExtensionChanged::Id,
                                credsIssuerConfig), //
         make_unique<ReadEvent>(Id, "fabric-restriction-review-update", Events::FabricRestrictionReviewUpdate::Id,
-                               credsIssuerConfig),          //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+                               credsIssuerConfig),                                                                     //
+        make_unique<ReadEvent>(Id, "auxiliary-access-updated", Events::AuxiliaryAccessUpdated::Id, credsIssuerConfig), //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                            //
         make_unique<SubscribeEvent>(Id, "access-control-entry-changed", Events::AccessControlEntryChanged::Id,
                                     credsIssuerConfig), //
         make_unique<SubscribeEvent>(Id, "access-control-extension-changed", Events::AccessControlExtensionChanged::Id,
                                     credsIssuerConfig), //
         make_unique<SubscribeEvent>(Id, "fabric-restriction-review-update", Events::FabricRestrictionReviewUpdate::Id,
-                                    credsIssuerConfig), //
+                                    credsIssuerConfig),                                                                     //
+        make_unique<SubscribeEvent>(Id, "auxiliary-access-updated", Events::AuxiliaryAccessUpdated::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
@@ -20086,8 +20757,12 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
         make_unique<ReadAttribute>(Id, "tcmin-required-version", Attributes::TCMinRequiredVersion::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "tcacknowledgements", Attributes::TCAcknowledgements::Id, credsIssuerConfig),       //
         make_unique<ReadAttribute>(Id, "tcacknowledgements-required", Attributes::TCAcknowledgementsRequired::Id,
+                                   credsIssuerConfig),                                                                       //
+        make_unique<ReadAttribute>(Id, "tcupdate-deadline", Attributes::TCUpdateDeadline::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "recovery-identifier", Attributes::RecoveryIdentifier::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "network-recovery-reason", Attributes::NetworkRecoveryReason::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "is-commissioning-without-power", Attributes::IsCommissioningWithoutPower::Id,
                                    credsIssuerConfig),                                                                     //
-        make_unique<ReadAttribute>(Id, "tcupdate-deadline", Attributes::TCUpdateDeadline::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -20118,6 +20793,14 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "tcupdate-deadline", 0, UINT32_MAX,
                                                                               Attributes::TCUpdateDeadline::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::ByteSpan>>(Id, "recovery-identifier", Attributes::RecoveryIdentifier::Id,
+                                                    WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<
+            WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::NetworkRecoveryReasonEnum>>>(
+            Id, "network-recovery-reason", 0, UINT8_MAX, Attributes::NetworkRecoveryReason::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "is-commissioning-without-power", 0, 1, Attributes::IsCommissioningWithoutPower::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -20141,8 +20824,12 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
         make_unique<SubscribeAttribute>(Id, "tcmin-required-version", Attributes::TCMinRequiredVersion::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "tcacknowledgements", Attributes::TCAcknowledgements::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "tcacknowledgements-required", Attributes::TCAcknowledgementsRequired::Id,
+                                        credsIssuerConfig),                                                                       //
+        make_unique<SubscribeAttribute>(Id, "tcupdate-deadline", Attributes::TCUpdateDeadline::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "recovery-identifier", Attributes::RecoveryIdentifier::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "network-recovery-reason", Attributes::NetworkRecoveryReason::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "is-commissioning-without-power", Attributes::IsCommissioningWithoutPower::Id,
                                         credsIssuerConfig),                                                                     //
-        make_unique<SubscribeAttribute>(Id, "tcupdate-deadline", Attributes::TCUpdateDeadline::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -23414,6 +24101,67 @@ void registerClusterScenesManagement(Commands & commands, CredentialIssuerComman
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterGroupcast(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::Groupcast;
+
+    const char * clusterName = "Groupcast";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),             //
+        make_unique<GroupcastJoinGroup>(credsIssuerConfig),             //
+        make_unique<GroupcastLeaveGroup>(credsIssuerConfig),            //
+        make_unique<GroupcastUpdateGroupKey>(credsIssuerConfig),        //
+        make_unique<GroupcastExpireGracePeriod>(credsIssuerConfig),     //
+        make_unique<GroupcastConfigureAuxiliaryACL>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "membership", Attributes::Membership::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "max-membership-count", Attributes::MaxMembershipCount::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::Groupcast::Structs::MembershipStruct::Type>>>(
+            Id, "membership", Attributes::Membership::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "max-membership-count", 0, UINT16_MAX, Attributes::MaxMembershipCount::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "membership", Attributes::Membership::Id, credsIssuerConfig),                       //
+        make_unique<SubscribeAttribute>(Id, "max-membership-count", Attributes::MaxMembershipCount::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterHepaFilterMonitoring(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::HepaFilterMonitoring;
@@ -24585,19 +25333,23 @@ void registerClusterPowerTopology(Commands & commands, CredentialIssuerCommands 
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "available-endpoints", Attributes::AvailableEndpoints::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "active-endpoints", Attributes::ActiveEndpoints::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "available-endpoints", Attributes::AvailableEndpoints::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "active-endpoints", Attributes::ActiveEndpoints::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "electrical-circuit-nodes", Attributes::ElectricalCircuitNodes::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EndpointId>>>(
             Id, "available-endpoints", Attributes::AvailableEndpoints::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EndpointId>>>(
             Id, "active-endpoints", Attributes::ActiveEndpoints::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::PowerTopology::Structs::CircuitNodeStruct::Type>>>(
+            Id, "electrical-circuit-nodes", Attributes::ElectricalCircuitNodes::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -24608,10 +25360,12 @@ void registerClusterPowerTopology(Commands & commands, CredentialIssuerCommands 
         make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "available-endpoints", Attributes::AvailableEndpoints::Id, credsIssuerConfig),      //
-        make_unique<SubscribeAttribute>(Id, "active-endpoints", Attributes::ActiveEndpoints::Id, credsIssuerConfig),            //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                           //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                            //
+        make_unique<SubscribeAttribute>(Id, "available-endpoints", Attributes::AvailableEndpoints::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "active-endpoints", Attributes::ActiveEndpoints::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "electrical-circuit-nodes", Attributes::ElectricalCircuitNodes::Id,
+                                        credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25391,8 +26145,9 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
         make_unique<ReadAttribute>(Id, "countdown-time", Attributes::CountdownTime::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "main-state", Attributes::MainState::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "current-error-list", Attributes::CurrentErrorList::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "overall-state", Attributes::OverallState::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "overall-target", Attributes::OverallTarget::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "overall-current-state", Attributes::OverallCurrentState::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "overall-target-state", Attributes::OverallTargetState::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "latch-control-modes", Attributes::LatchControlModes::Id, credsIssuerConfig),       //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25408,11 +26163,14 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
             WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::ClosureControl::ClosureErrorEnum>>>(
             Id, "current-error-list", Attributes::CurrentErrorList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallStateStruct::Type>>>(
-            Id, "overall-state", Attributes::OverallState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallCurrentStateStruct::Type>>>(
+            Id, "overall-current-state", Attributes::OverallCurrentState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::Type>>>(
-            Id, "overall-target", Attributes::OverallTarget::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallTargetStateStruct::Type>>>(
+            Id, "overall-target-state", Attributes::OverallTargetState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ClosureControl::LatchControlModesBitmap>>>(
+            Id, "latch-control-modes", 0, UINT8_MAX, Attributes::LatchControlModes::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -25428,8 +26186,9 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeAttribute>(Id, "countdown-time", Attributes::CountdownTime::Id, credsIssuerConfig),                //
         make_unique<SubscribeAttribute>(Id, "main-state", Attributes::MainState::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "current-error-list", Attributes::CurrentErrorList::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "overall-state", Attributes::OverallState::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "overall-target", Attributes::OverallTarget::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "overall-current-state", Attributes::OverallCurrentState::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "overall-target-state", Attributes::OverallTargetState::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "latch-control-modes", Attributes::LatchControlModes::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25470,7 +26229,7 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "current-state", Attributes::CurrentState::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "target", Attributes::Target::Id, credsIssuerConfig),                               //
+        make_unique<ReadAttribute>(Id, "target-state", Attributes::TargetState::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "resolution", Attributes::Resolution::Id, credsIssuerConfig),                       //
         make_unique<ReadAttribute>(Id, "step-value", Attributes::StepValue::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "unit", Attributes::Unit::Id, credsIssuerConfig),                                   //
@@ -25480,6 +26239,7 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "rotation-axis", Attributes::RotationAxis::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "overflow", Attributes::Overflow::Id, credsIssuerConfig),                           //
         make_unique<ReadAttribute>(Id, "modulation-type", Attributes::ModulationType::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "latch-control-modes", Attributes::LatchControlModes::Id, credsIssuerConfig),       //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25487,11 +26247,11 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::Type>>>(
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::DimensionStateStruct::Type>>>(
             Id, "current-state", Attributes::CurrentState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::TargetStruct::Type>>>(
-            Id, "target", Attributes::Target::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::DimensionStateStruct::Type>>>(
+            Id, "target-state", Attributes::TargetState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::Percent100ths>>(Id, "resolution", 0, UINT16_MAX, Attributes::Resolution::Id,
                                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::Percent100ths>>(Id, "step-value", 0, UINT16_MAX, Attributes::StepValue::Id,
@@ -25513,6 +26273,9 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         make_unique<WriteAttribute<chip::app::Clusters::ClosureDimension::ModulationTypeEnum>>(
             Id, "modulation-type", 0, UINT8_MAX, Attributes::ModulationType::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ClosureDimension::LatchControlModesBitmap>>>(
+            Id, "latch-control-modes", 0, UINT8_MAX, Attributes::LatchControlModes::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -25526,7 +26289,7 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "current-state", Attributes::CurrentState::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "target", Attributes::Target::Id, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, "target-state", Attributes::TargetState::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "resolution", Attributes::Resolution::Id, credsIssuerConfig),                       //
         make_unique<SubscribeAttribute>(Id, "step-value", Attributes::StepValue::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "unit", Attributes::Unit::Id, credsIssuerConfig),                                   //
@@ -25536,6 +26299,7 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeAttribute>(Id, "rotation-axis", Attributes::RotationAxis::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "overflow", Attributes::Overflow::Id, credsIssuerConfig),                           //
         make_unique<SubscribeAttribute>(Id, "modulation-type", Attributes::ModulationType::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "latch-control-modes", Attributes::LatchControlModes::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25826,14 +26590,16 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                 //
-        make_unique<ThermostatSetpointRaiseLower>(credsIssuerConfig),       //
-        make_unique<ThermostatSetWeeklySchedule>(credsIssuerConfig),        //
-        make_unique<ThermostatGetWeeklySchedule>(credsIssuerConfig),        //
-        make_unique<ThermostatClearWeeklySchedule>(credsIssuerConfig),      //
-        make_unique<ThermostatSetActiveScheduleRequest>(credsIssuerConfig), //
-        make_unique<ThermostatSetActivePresetRequest>(credsIssuerConfig),   //
-        make_unique<ThermostatAtomicRequest>(credsIssuerConfig),            //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                   //
+        make_unique<ThermostatSetpointRaiseLower>(credsIssuerConfig),         //
+        make_unique<ThermostatSetWeeklySchedule>(credsIssuerConfig),          //
+        make_unique<ThermostatGetWeeklySchedule>(credsIssuerConfig),          //
+        make_unique<ThermostatClearWeeklySchedule>(credsIssuerConfig),        //
+        make_unique<ThermostatSetActiveScheduleRequest>(credsIssuerConfig),   //
+        make_unique<ThermostatSetActivePresetRequest>(credsIssuerConfig),     //
+        make_unique<ThermostatAddThermostatSuggestion>(credsIssuerConfig),    //
+        make_unique<ThermostatRemoveThermostatSuggestion>(credsIssuerConfig), //
+        make_unique<ThermostatAtomicRequest>(credsIssuerConfig),              //
         //
         // Attributes
         //
@@ -25914,7 +26680,14 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "presets", Attributes::Presets::Id, credsIssuerConfig),                             //
         make_unique<ReadAttribute>(Id, "schedules", Attributes::Schedules::Id, credsIssuerConfig),                         //
         make_unique<ReadAttribute>(Id, "setpoint-hold-expiry-timestamp", Attributes::SetpointHoldExpiryTimestamp::Id,
-                                   credsIssuerConfig),                                                                     //
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "max-thermostat-suggestions", Attributes::MaxThermostatSuggestions::Id,
+                                   credsIssuerConfig),                                                                      //
+        make_unique<ReadAttribute>(Id, "thermostat-suggestions", Attributes::ThermostatSuggestions::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "current-thermostat-suggestion", Attributes::CurrentThermostatSuggestion::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "thermostat-suggestion-not-following-reason",
+                                   Attributes::ThermostatSuggestionNotFollowingReason::Id, credsIssuerConfig),             //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -26081,6 +26854,21 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "setpoint-hold-expiry-timestamp", 0, UINT32_MAX,
                                                                               Attributes::SetpointHoldExpiryTimestamp::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "max-thermostat-suggestions", 0, UINT8_MAX,
+                                             Attributes::MaxThermostatSuggestions::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::Thermostat::Structs::ThermostatSuggestionStruct::Type>>>(
+            Id, "thermostat-suggestions", Attributes::ThermostatSuggestions::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::Structs::ThermostatSuggestionStruct::Type>>>(
+            Id, "current-thermostat-suggestion", Attributes::CurrentThermostatSuggestion::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<
+            chip::BitMask<chip::app::Clusters::Thermostat::ThermostatSuggestionNotFollowingReasonBitmap>>>>(
+            Id, "thermostat-suggestion-not-following-reason", 0, UINT16_MAX, Attributes::ThermostatSuggestionNotFollowingReason::Id,
+            WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -26173,7 +26961,14 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "presets", Attributes::Presets::Id, credsIssuerConfig),                             //
         make_unique<SubscribeAttribute>(Id, "schedules", Attributes::Schedules::Id, credsIssuerConfig),                         //
         make_unique<SubscribeAttribute>(Id, "setpoint-hold-expiry-timestamp", Attributes::SetpointHoldExpiryTimestamp::Id,
-                                        credsIssuerConfig),                                                                     //
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "max-thermostat-suggestions", Attributes::MaxThermostatSuggestions::Id,
+                                        credsIssuerConfig),                                                                      //
+        make_unique<SubscribeAttribute>(Id, "thermostat-suggestions", Attributes::ThermostatSuggestions::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "current-thermostat-suggestion", Attributes::CurrentThermostatSuggestion::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "thermostat-suggestion-not-following-reason",
+                                        Attributes::ThermostatSuggestionNotFollowingReason::Id, credsIssuerConfig),             //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -26182,8 +26977,24 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                      //
+        make_unique<ReadEvent>(Id, "system-mode-change", Events::SystemModeChange::Id, credsIssuerConfig),                  //
+        make_unique<ReadEvent>(Id, "local-temperature-change", Events::LocalTemperatureChange::Id, credsIssuerConfig),      //
+        make_unique<ReadEvent>(Id, "occupancy-change", Events::OccupancyChange::Id, credsIssuerConfig),                     //
+        make_unique<ReadEvent>(Id, "setpoint-change", Events::SetpointChange::Id, credsIssuerConfig),                       //
+        make_unique<ReadEvent>(Id, "running-state-change", Events::RunningStateChange::Id, credsIssuerConfig),              //
+        make_unique<ReadEvent>(Id, "running-mode-change", Events::RunningModeChange::Id, credsIssuerConfig),                //
+        make_unique<ReadEvent>(Id, "active-schedule-change", Events::ActiveScheduleChange::Id, credsIssuerConfig),          //
+        make_unique<ReadEvent>(Id, "active-preset-change", Events::ActivePresetChange::Id, credsIssuerConfig),              //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeEvent>(Id, "system-mode-change", Events::SystemModeChange::Id, credsIssuerConfig),             //
+        make_unique<SubscribeEvent>(Id, "local-temperature-change", Events::LocalTemperatureChange::Id, credsIssuerConfig), //
+        make_unique<SubscribeEvent>(Id, "occupancy-change", Events::OccupancyChange::Id, credsIssuerConfig),                //
+        make_unique<SubscribeEvent>(Id, "setpoint-change", Events::SetpointChange::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeEvent>(Id, "running-state-change", Events::RunningStateChange::Id, credsIssuerConfig),         //
+        make_unique<SubscribeEvent>(Id, "running-mode-change", Events::RunningModeChange::Id, credsIssuerConfig),           //
+        make_unique<SubscribeEvent>(Id, "active-schedule-change", Events::ActiveScheduleChange::Id, credsIssuerConfig),     //
+        make_unique<SubscribeEvent>(Id, "active-preset-change", Events::ActivePresetChange::Id, credsIssuerConfig),         //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
@@ -26515,30 +27326,30 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
                                                                              Attributes::Primary6Intensity::Id,
                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "white-point-x", 0, UINT16_MAX, Attributes::WhitePointX::Id,
-                                              WriteCommandType::kWrite, credsIssuerConfig), //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "white-point-y", 0, UINT16_MAX, Attributes::WhitePointY::Id,
-                                              WriteCommandType::kWrite, credsIssuerConfig), //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "color-point-rx", 0, UINT16_MAX, Attributes::ColorPointRX::Id,
-                                              WriteCommandType::kWrite, credsIssuerConfig), //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "color-point-ry", 0, UINT16_MAX, Attributes::ColorPointRY::Id,
-                                              WriteCommandType::kWrite, credsIssuerConfig), //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(Id, "color-point-rintensity", 0, UINT8_MAX,
                                                                              Attributes::ColorPointRIntensity::Id,
-                                                                             WriteCommandType::kWrite, credsIssuerConfig), //
+                                                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "color-point-gx", 0, UINT16_MAX, Attributes::ColorPointGX::Id,
-                                              WriteCommandType::kWrite, credsIssuerConfig), //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "color-point-gy", 0, UINT16_MAX, Attributes::ColorPointGY::Id,
-                                              WriteCommandType::kWrite, credsIssuerConfig), //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(Id, "color-point-gintensity", 0, UINT8_MAX,
                                                                              Attributes::ColorPointGIntensity::Id,
-                                                                             WriteCommandType::kWrite, credsIssuerConfig), //
+                                                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "color-point-bx", 0, UINT16_MAX, Attributes::ColorPointBX::Id,
-                                              WriteCommandType::kWrite, credsIssuerConfig), //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "color-point-by", 0, UINT16_MAX, Attributes::ColorPointBY::Id,
-                                              WriteCommandType::kWrite, credsIssuerConfig), //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(Id, "color-point-bintensity", 0, UINT8_MAX,
                                                                              Attributes::ColorPointBIntensity::Id,
-                                                                             WriteCommandType::kWrite, credsIssuerConfig), //
+                                                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "enhanced-current-hue", 0, UINT16_MAX, Attributes::EnhancedCurrentHue::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::Clusters::ColorControl::EnhancedColorModeEnum>>(
@@ -29348,6 +30159,12 @@ void registerClusterContentControl(Commands & commands, CredentialIssuerCommands
         make_unique<ContentControlUnblockUnratedContent>(credsIssuerConfig),              //
         make_unique<ContentControlSetOnDemandRatingThreshold>(credsIssuerConfig),         //
         make_unique<ContentControlSetScheduledContentRatingThreshold>(credsIssuerConfig), //
+        make_unique<ContentControlAddBlockChannels>(credsIssuerConfig),                   //
+        make_unique<ContentControlRemoveBlockChannels>(credsIssuerConfig),                //
+        make_unique<ContentControlAddBlockApplications>(credsIssuerConfig),               //
+        make_unique<ContentControlRemoveBlockApplications>(credsIssuerConfig),            //
+        make_unique<ContentControlSetBlockContentTimeWindow>(credsIssuerConfig),          //
+        make_unique<ContentControlRemoveBlockContentTimeWindow>(credsIssuerConfig),       //
         //
         // Attributes
         //
@@ -29357,16 +30174,19 @@ void registerClusterContentControl(Commands & commands, CredentialIssuerCommands
         make_unique<ReadAttribute>(Id, "on-demand-rating-threshold", Attributes::OnDemandRatingThreshold::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "scheduled-content-ratings", Attributes::ScheduledContentRatings::Id, credsIssuerConfig),  //
         make_unique<ReadAttribute>(Id, "scheduled-content-rating-threshold", Attributes::ScheduledContentRatingThreshold::Id,
-                                   credsIssuerConfig),                                                                     //
-        make_unique<ReadAttribute>(Id, "screen-daily-time", Attributes::ScreenDailyTime::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "remaining-screen-time", Attributes::RemainingScreenTime::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "block-unrated", Attributes::BlockUnrated::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+                                   credsIssuerConfig),                                                                          //
+        make_unique<ReadAttribute>(Id, "screen-daily-time", Attributes::ScreenDailyTime::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "remaining-screen-time", Attributes::RemainingScreenTime::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "block-unrated", Attributes::BlockUnrated::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "block-channel-list", Attributes::BlockChannelList::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "block-application-list", Attributes::BlockApplicationList::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "block-content-time-window", Attributes::BlockContentTimeWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                 //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                   //
         make_unique<WriteAttribute<bool>>(Id, "enabled", 0, 1, Attributes::Enabled::Id, WriteCommandType::kForceWrite,
                                           credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
@@ -29387,6 +30207,17 @@ void registerClusterContentControl(Commands & commands, CredentialIssuerCommands
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "block-unrated", 0, 1, Attributes::BlockUnrated::Id, WriteCommandType::kForceWrite,
                                           credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::ContentControl::Structs::BlockChannelStruct::Type>>>(
+            Id, "block-channel-list", Attributes::BlockChannelList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::ContentControl::Structs::AppInfoStruct::Type>>>(
+            Id, "block-application-list", Attributes::BlockApplicationList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::ContentControl::Structs::TimeWindowStruct::Type>>>(
+            Id, "block-content-time-window", Attributes::BlockContentTimeWindow::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -29410,6 +30241,10 @@ void registerClusterContentControl(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeAttribute>(Id, "screen-daily-time", Attributes::ScreenDailyTime::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "remaining-screen-time", Attributes::RemainingScreenTime::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "block-unrated", Attributes::BlockUnrated::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "block-channel-list", Attributes::BlockChannelList::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "block-application-list", Attributes::BlockApplicationList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "block-content-time-window", Attributes::BlockContentTimeWindow::Id,
+                                        credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -29420,8 +30255,12 @@ void registerClusterContentControl(Commands & commands, CredentialIssuerCommands
         //
         make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                          //
         make_unique<ReadEvent>(Id, "remaining-screen-time-expired", Events::RemainingScreenTimeExpired::Id, credsIssuerConfig), //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadEvent>(Id, "entering-block-content-time-window", Events::EnteringBlockContentTimeWindow::Id,
+                               credsIssuerConfig),          //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
         make_unique<SubscribeEvent>(Id, "remaining-screen-time-expired", Events::RemainingScreenTimeExpired::Id,
+                                    credsIssuerConfig), //
+        make_unique<SubscribeEvent>(Id, "entering-block-content-time-window", Events::EnteringBlockContentTimeWindow::Id,
                                     credsIssuerConfig), //
     };
 
@@ -29488,33 +30327,42 @@ void registerClusterZoneManagement(Commands & commands, CredentialIssuerCommands
         make_unique<ClusterCommand>(Id, credsIssuerConfig),                    //
         make_unique<ZoneManagementCreateTwoDCartesianZone>(credsIssuerConfig), //
         make_unique<ZoneManagementUpdateTwoDCartesianZone>(credsIssuerConfig), //
-        make_unique<ZoneManagementGetTwoDCartesianZone>(credsIssuerConfig),    //
         make_unique<ZoneManagementRemoveZone>(credsIssuerConfig),              //
+        make_unique<ZoneManagementCreateOrUpdateTrigger>(credsIssuerConfig),   //
+        make_unique<ZoneManagementRemoveTrigger>(credsIssuerConfig),           //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "supported-zone-sources", Attributes::SupportedZoneSources::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "max-user-defined-zones", Attributes::MaxUserDefinedZones::Id, credsIssuerConfig),  //
+        make_unique<ReadAttribute>(Id, "max-zones", Attributes::MaxZones::Id, credsIssuerConfig),                          //
         make_unique<ReadAttribute>(Id, "zones", Attributes::Zones::Id, credsIssuerConfig),                                 //
         make_unique<ReadAttribute>(Id, "triggers", Attributes::Triggers::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "sensitivity-max", Attributes::SensitivityMax::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "sensitivity", Attributes::Sensitivity::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "two-dcartesian-max", Attributes::TwoDCartesianMax::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::ZoneManagement::ZoneSourceEnum>>>(
-            Id, "supported-zone-sources", Attributes::SupportedZoneSources::Id, WriteCommandType::kForceWrite,
-            credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "max-user-defined-zones", 0, UINT8_MAX, Attributes::MaxUserDefinedZones::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "max-zones", 0, UINT8_MAX, Attributes::MaxZones::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::ZoneManagement::Structs::ZoneInformationStruct::Type>>>(
             Id, "zones", Attributes::Zones::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::ZoneManagement::Structs::ZoneTriggerControlStruct::Type>>>(
-            Id, "triggers", Attributes::Triggers::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+            Id, "triggers", Attributes::Triggers::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "sensitivity-max", 0, UINT8_MAX, Attributes::SensitivityMax::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "sensitivity", 0, UINT8_MAX, Attributes::Sensitivity::Id, WriteCommandType::kWrite,
                                              credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::ZoneManagement::Structs::TwoDCartesianVertexStruct::Type>>(
+            Id, "two-dcartesian-max", Attributes::TwoDCartesianMax::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -29527,10 +30375,13 @@ void registerClusterZoneManagement(Commands & commands, CredentialIssuerCommands
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "supported-zone-sources", Attributes::SupportedZoneSources::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "max-user-defined-zones", Attributes::MaxUserDefinedZones::Id, credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(Id, "max-zones", Attributes::MaxZones::Id, credsIssuerConfig),                          //
         make_unique<SubscribeAttribute>(Id, "zones", Attributes::Zones::Id, credsIssuerConfig),                                 //
         make_unique<SubscribeAttribute>(Id, "triggers", Attributes::Triggers::Id, credsIssuerConfig),                           //
+        make_unique<SubscribeAttribute>(Id, "sensitivity-max", Attributes::SensitivityMax::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "sensitivity", Attributes::Sensitivity::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "two-dcartesian-max", Attributes::TwoDCartesianMax::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -29578,7 +30429,7 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<ReadAttribute>(Id, "max-encoded-pixel-rate", Attributes::MaxEncodedPixelRate::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "video-sensor-params", Attributes::VideoSensorParams::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "night-vision-uses-infrared", Attributes::NightVisionUsesInfrared::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "min-viewport", Attributes::MinViewport::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "min-viewport-resolution", Attributes::MinViewportResolution::Id, credsIssuerConfig),      //
         make_unique<ReadAttribute>(Id, "rate-distortion-trade-off-points", Attributes::RateDistortionTradeOffPoints::Id,
                                    credsIssuerConfig),                                                                        //
         make_unique<ReadAttribute>(Id, "max-content-buffer-size", Attributes::MaxContentBufferSize::Id, credsIssuerConfig),   //
@@ -29593,9 +30444,8 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<ReadAttribute>(Id, "allocated-video-streams", Attributes::AllocatedVideoStreams::Id, credsIssuerConfig),  //
         make_unique<ReadAttribute>(Id, "allocated-audio-streams", Attributes::AllocatedAudioStreams::Id, credsIssuerConfig),  //
         make_unique<ReadAttribute>(Id, "allocated-snapshot-streams", Attributes::AllocatedSnapshotStreams::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "ranked-video-stream-priorities-list", Attributes::RankedVideoStreamPrioritiesList::Id,
-                                   credsIssuerConfig), //
+                                   credsIssuerConfig),                                                                       //
+        make_unique<ReadAttribute>(Id, "stream-usage-priorities", Attributes::StreamUsagePriorities::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "soft-recording-privacy-mode-enabled", Attributes::SoftRecordingPrivacyModeEnabled::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "soft-livestream-privacy-mode-enabled", Attributes::SoftLivestreamPrivacyModeEnabled::Id,
@@ -29637,7 +30487,8 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<bool>>(Id, "night-vision-uses-infrared", 0, 1, Attributes::NightVisionUsesInfrared::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type>>(
-            Id, "min-viewport", Attributes::MinViewport::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            Id, "min-viewport-resolution", Attributes::MinViewportResolution::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
             const chip::app::Clusters::CameraAvStreamManagement::Structs::RateDistortionTradeOffPointsStruct::Type>>>(
             Id, "rate-distortion-trade-off-points", Attributes::RateDistortionTradeOffPoints::Id, WriteCommandType::kForceWrite,
@@ -29677,8 +30528,8 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
             Id, "allocated-snapshot-streams", Attributes::AllocatedSnapshotStreams::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::Globals::StreamUsageEnum>>>(
-            Id, "ranked-video-stream-priorities-list", Attributes::RankedVideoStreamPrioritiesList::Id,
-            WriteCommandType::kForceWrite, credsIssuerConfig), //
+            Id, "stream-usage-priorities", Attributes::StreamUsagePriorities::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "soft-recording-privacy-mode-enabled", 0, 1,
                                           Attributes::SoftRecordingPrivacyModeEnabled::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
@@ -29692,7 +30543,7 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum>>(
             Id, "night-vision-illum", 0, UINT8_MAX, Attributes::NightVisionIllum::Id, WriteCommandType::kWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::Clusters::CameraAvStreamManagement::Structs::ViewportStruct::Type>>(
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::Globals::Structs::ViewportStruct::Type>>(
             Id, "viewport", Attributes::Viewport::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "speaker-muted", 0, 1, Attributes::SpeakerMuted::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
@@ -29744,8 +30595,8 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<SubscribeAttribute>(Id, "max-encoded-pixel-rate", Attributes::MaxEncodedPixelRate::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "video-sensor-params", Attributes::VideoSensorParams::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "night-vision-uses-infrared", Attributes::NightVisionUsesInfrared::Id,
-                                        credsIssuerConfig),                                                  //
-        make_unique<SubscribeAttribute>(Id, "min-viewport", Attributes::MinViewport::Id, credsIssuerConfig), //
+                                        credsIssuerConfig),                                                                       //
+        make_unique<SubscribeAttribute>(Id, "min-viewport-resolution", Attributes::MinViewportResolution::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "rate-distortion-trade-off-points", Attributes::RateDistortionTradeOffPoints::Id,
                                         credsIssuerConfig),                                                                      //
         make_unique<SubscribeAttribute>(Id, "max-content-buffer-size", Attributes::MaxContentBufferSize::Id, credsIssuerConfig), //
@@ -29761,9 +30612,8 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<SubscribeAttribute>(Id, "allocated-video-streams", Attributes::AllocatedVideoStreams::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "allocated-audio-streams", Attributes::AllocatedAudioStreams::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "allocated-snapshot-streams", Attributes::AllocatedSnapshotStreams::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "ranked-video-stream-priorities-list", Attributes::RankedVideoStreamPrioritiesList::Id,
-                                        credsIssuerConfig), //
+                                        credsIssuerConfig),                                                                       //
+        make_unique<SubscribeAttribute>(Id, "stream-usage-priorities", Attributes::StreamUsagePriorities::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "soft-recording-privacy-mode-enabled", Attributes::SoftRecordingPrivacyModeEnabled::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "soft-livestream-privacy-mode-enabled",
@@ -29835,6 +30685,7 @@ void registerClusterCameraAvSettingsUserLevelManagement(Commands & commands, Cre
         make_unique<ReadAttribute>(Id, "tilt-max", Attributes::TiltMax::Id, credsIssuerConfig),                            //
         make_unique<ReadAttribute>(Id, "pan-min", Attributes::PanMin::Id, credsIssuerConfig),                              //
         make_unique<ReadAttribute>(Id, "pan-max", Attributes::PanMax::Id, credsIssuerConfig),                              //
+        make_unique<ReadAttribute>(Id, "movement-state", Attributes::MovementState::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -29861,6 +30712,8 @@ void registerClusterCameraAvSettingsUserLevelManagement(Commands & commands, Cre
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<int16_t>>(Id, "pan-max", INT16_MIN, INT16_MAX, Attributes::PanMax::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum>>(
+            Id, "movement-state", 0, UINT8_MAX, Attributes::MovementState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -29882,6 +30735,7 @@ void registerClusterCameraAvSettingsUserLevelManagement(Commands & commands, Cre
         make_unique<SubscribeAttribute>(Id, "tilt-max", Attributes::TiltMax::Id, credsIssuerConfig),                            //
         make_unique<SubscribeAttribute>(Id, "pan-min", Attributes::PanMin::Id, credsIssuerConfig),                              //
         make_unique<SubscribeAttribute>(Id, "pan-max", Attributes::PanMax::Id, credsIssuerConfig),                              //
+        make_unique<SubscribeAttribute>(Id, "movement-state", Attributes::MovementState::Id, credsIssuerConfig),                //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -30611,7 +31465,7 @@ void registerClusterTlsCertificateManagement(Commands & commands, CredentialIssu
         make_unique<TlsCertificateManagementFindRootCertificate>(credsIssuerConfig),        //
         make_unique<TlsCertificateManagementLookupRootCertificate>(credsIssuerConfig),      //
         make_unique<TlsCertificateManagementRemoveRootCertificate>(credsIssuerConfig),      //
-        make_unique<TlsCertificateManagementTLSClientCSR>(credsIssuerConfig),               //
+        make_unique<TlsCertificateManagementClientCSR>(credsIssuerConfig),                  //
         make_unique<TlsCertificateManagementProvisionClientCertificate>(credsIssuerConfig), //
         make_unique<TlsCertificateManagementFindClientCertificate>(credsIssuerConfig),      //
         make_unique<TlsCertificateManagementLookupClientCertificate>(credsIssuerConfig),    //
@@ -30820,8 +31674,10 @@ void registerClusterCommodityMetering(Commands & commands, CredentialIssuerComma
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                      //
         make_unique<ReadAttribute>(Id, "metered-quantity", Attributes::MeteredQuantity::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "metered-quantity-timestamp", Attributes::MeteredQuantityTimestamp::Id,
+                                   credsIssuerConfig),                                                //
+        make_unique<ReadAttribute>(Id, "tariff-unit", Attributes::TariffUnit::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "maximum-metered-quantities", Attributes::MaximumMeteredQuantities::Id,
                                    credsIssuerConfig),                                                                     //
-        make_unique<ReadAttribute>(Id, "measurement-type", Attributes::MeasurementType::Id, credsIssuerConfig),            //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -30834,9 +31690,11 @@ void registerClusterCommodityMetering(Commands & commands, CredentialIssuerComma
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "metered-quantity-timestamp", 0, UINT32_MAX,
                                                                               Attributes::MeteredQuantityTimestamp::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>>>(
-            Id, "measurement-type", 0, UINT16_MAX, Attributes::MeasurementType::Id, WriteCommandType::kForceWrite,
-            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum>>>(
+            Id, "tariff-unit", 0, UINT8_MAX, Attributes::TariffUnit::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(Id, "maximum-metered-quantities", 0, UINT16_MAX,
+                                                                              Attributes::MaximumMeteredQuantities::Id,
+                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -30851,8 +31709,10 @@ void registerClusterCommodityMetering(Commands & commands, CredentialIssuerComma
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
         make_unique<SubscribeAttribute>(Id, "metered-quantity", Attributes::MeteredQuantity::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "metered-quantity-timestamp", Attributes::MeteredQuantityTimestamp::Id,
+                                        credsIssuerConfig),                                                //
+        make_unique<SubscribeAttribute>(Id, "tariff-unit", Attributes::TariffUnit::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "maximum-metered-quantities", Attributes::MaximumMeteredQuantities::Id,
                                         credsIssuerConfig),                                                                     //
-        make_unique<SubscribeAttribute>(Id, "measurement-type", Attributes::MeasurementType::Id, credsIssuerConfig),            //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -30904,6 +31764,7 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<UnitTestingTestSecondBatchHelperRequest>(credsIssuerConfig),            //
         make_unique<UnitTestingStringEchoRequest>(credsIssuerConfig),                       //
         make_unique<UnitTestingGlobalEchoRequest>(credsIssuerConfig),                       //
+        make_unique<UnitTestingTestCheckCommandFlags>(credsIssuerConfig),                   //
         make_unique<UnitTestingTestDifferentVendorMeiRequest>(credsIssuerConfig),           //
         //
         // Attributes
@@ -30959,38 +31820,40 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<ReadAttribute>(Id, "cluster-error-boolean", Attributes::ClusterErrorBoolean::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "global-enum", Attributes::GlobalEnum::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "global-struct", Attributes::GlobalStruct::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "unsupported", Attributes::Unsupported::Id, credsIssuerConfig),                       //
-        make_unique<ReadAttribute>(Id, "read-failure-code", Attributes::ReadFailureCode::Id, credsIssuerConfig),             //
-        make_unique<ReadAttribute>(Id, "failure-int32u", Attributes::FailureInt32U::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "nullable-boolean", Attributes::NullableBoolean::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "nullable-bitmap8", Attributes::NullableBitmap8::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "nullable-bitmap16", Attributes::NullableBitmap16::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "nullable-bitmap32", Attributes::NullableBitmap32::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "nullable-bitmap64", Attributes::NullableBitmap64::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "nullable-int8u", Attributes::NullableInt8u::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "nullable-int16u", Attributes::NullableInt16u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int24u", Attributes::NullableInt24u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int32u", Attributes::NullableInt32u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int40u", Attributes::NullableInt40u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int48u", Attributes::NullableInt48u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int56u", Attributes::NullableInt56u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int64u", Attributes::NullableInt64u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int8s", Attributes::NullableInt8s::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "nullable-int16s", Attributes::NullableInt16s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int24s", Attributes::NullableInt24s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int32s", Attributes::NullableInt32s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int40s", Attributes::NullableInt40s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int48s", Attributes::NullableInt48s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int56s", Attributes::NullableInt56s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int64s", Attributes::NullableInt64s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-enum8", Attributes::NullableEnum8::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "nullable-enum16", Attributes::NullableEnum16::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-float-single", Attributes::NullableFloatSingle::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "nullable-float-double", Attributes::NullableFloatDouble::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "nullable-octet-string", Attributes::NullableOctetString::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "nullable-char-string", Attributes::NullableCharString::Id, credsIssuerConfig),       //
-        make_unique<ReadAttribute>(Id, "nullable-enum-attr", Attributes::NullableEnumAttr::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "nullable-struct", Attributes::NullableStruct::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "unsupported-attribute-requiring-admin-privilege",
+                                   Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "unsupported", Attributes::Unsupported::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "read-failure-code", Attributes::ReadFailureCode::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "failure-int32u", Attributes::FailureInt32U::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "nullable-boolean", Attributes::NullableBoolean::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "nullable-bitmap8", Attributes::NullableBitmap8::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "nullable-bitmap16", Attributes::NullableBitmap16::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "nullable-bitmap32", Attributes::NullableBitmap32::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "nullable-bitmap64", Attributes::NullableBitmap64::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "nullable-int8u", Attributes::NullableInt8u::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "nullable-int16u", Attributes::NullableInt16u::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int24u", Attributes::NullableInt24u::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int32u", Attributes::NullableInt32u::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int40u", Attributes::NullableInt40u::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int48u", Attributes::NullableInt48u::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int56u", Attributes::NullableInt56u::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int64u", Attributes::NullableInt64u::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int8s", Attributes::NullableInt8s::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "nullable-int16s", Attributes::NullableInt16s::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int24s", Attributes::NullableInt24s::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int32s", Attributes::NullableInt32s::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int40s", Attributes::NullableInt40s::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int48s", Attributes::NullableInt48s::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int56s", Attributes::NullableInt56s::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int64s", Attributes::NullableInt64s::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-enum8", Attributes::NullableEnum8::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "nullable-enum16", Attributes::NullableEnum16::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-float-single", Attributes::NullableFloatSingle::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "nullable-float-double", Attributes::NullableFloatDouble::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "nullable-octet-string", Attributes::NullableOctetString::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "nullable-char-string", Attributes::NullableCharString::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "nullable-enum-attr", Attributes::NullableEnumAttr::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "nullable-struct", Attributes::NullableStruct::Id, credsIssuerConfig),            //
         make_unique<ReadAttribute>(Id, "nullable-range-restricted-int8u", Attributes::NullableRangeRestrictedInt8u::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "nullable-range-restricted-int8s", Attributes::NullableRangeRestrictedInt8s::Id,
@@ -31113,6 +31976,9 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
             Id, "global-enum", 0, UINT8_MAX, Attributes::GlobalEnum::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::Clusters::Globals::Structs::TestGlobalStruct::Type>>(
             Id, "global-struct", Attributes::GlobalStruct::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "unsupported-attribute-requiring-admin-privilege", 0, 1,
+                                          Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id, WriteCommandType::kWrite,
+                                          credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "unsupported", 0, 1, Attributes::Unsupported::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "read-failure-code", 0, UINT8_MAX, Attributes::ReadFailureCode::Id,
@@ -31281,38 +32147,40 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<SubscribeAttribute>(Id, "cluster-error-boolean", Attributes::ClusterErrorBoolean::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "global-enum", Attributes::GlobalEnum::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "global-struct", Attributes::GlobalStruct::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "unsupported", Attributes::Unsupported::Id, credsIssuerConfig),                       //
-        make_unique<SubscribeAttribute>(Id, "read-failure-code", Attributes::ReadFailureCode::Id, credsIssuerConfig),             //
-        make_unique<SubscribeAttribute>(Id, "failure-int32u", Attributes::FailureInt32U::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "nullable-boolean", Attributes::NullableBoolean::Id, credsIssuerConfig),              //
-        make_unique<SubscribeAttribute>(Id, "nullable-bitmap8", Attributes::NullableBitmap8::Id, credsIssuerConfig),              //
-        make_unique<SubscribeAttribute>(Id, "nullable-bitmap16", Attributes::NullableBitmap16::Id, credsIssuerConfig),            //
-        make_unique<SubscribeAttribute>(Id, "nullable-bitmap32", Attributes::NullableBitmap32::Id, credsIssuerConfig),            //
-        make_unique<SubscribeAttribute>(Id, "nullable-bitmap64", Attributes::NullableBitmap64::Id, credsIssuerConfig),            //
-        make_unique<SubscribeAttribute>(Id, "nullable-int8u", Attributes::NullableInt8u::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "nullable-int16u", Attributes::NullableInt16u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int24u", Attributes::NullableInt24u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int32u", Attributes::NullableInt32u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int40u", Attributes::NullableInt40u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int48u", Attributes::NullableInt48u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int56u", Attributes::NullableInt56u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int64u", Attributes::NullableInt64u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int8s", Attributes::NullableInt8s::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "nullable-int16s", Attributes::NullableInt16s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int24s", Attributes::NullableInt24s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int32s", Attributes::NullableInt32s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int40s", Attributes::NullableInt40s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int48s", Attributes::NullableInt48s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int56s", Attributes::NullableInt56s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int64s", Attributes::NullableInt64s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-enum8", Attributes::NullableEnum8::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "nullable-enum16", Attributes::NullableEnum16::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-float-single", Attributes::NullableFloatSingle::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "nullable-float-double", Attributes::NullableFloatDouble::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "nullable-octet-string", Attributes::NullableOctetString::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "nullable-char-string", Attributes::NullableCharString::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "nullable-enum-attr", Attributes::NullableEnumAttr::Id, credsIssuerConfig),           //
-        make_unique<SubscribeAttribute>(Id, "nullable-struct", Attributes::NullableStruct::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "unsupported-attribute-requiring-admin-privilege",
+                                        Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "unsupported", Attributes::Unsupported::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "read-failure-code", Attributes::ReadFailureCode::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "failure-int32u", Attributes::FailureInt32U::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "nullable-boolean", Attributes::NullableBoolean::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "nullable-bitmap8", Attributes::NullableBitmap8::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "nullable-bitmap16", Attributes::NullableBitmap16::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "nullable-bitmap32", Attributes::NullableBitmap32::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "nullable-bitmap64", Attributes::NullableBitmap64::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "nullable-int8u", Attributes::NullableInt8u::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "nullable-int16u", Attributes::NullableInt16u::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int24u", Attributes::NullableInt24u::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int32u", Attributes::NullableInt32u::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int40u", Attributes::NullableInt40u::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int48u", Attributes::NullableInt48u::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int56u", Attributes::NullableInt56u::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int64u", Attributes::NullableInt64u::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int8s", Attributes::NullableInt8s::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "nullable-int16s", Attributes::NullableInt16s::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int24s", Attributes::NullableInt24s::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int32s", Attributes::NullableInt32s::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int40s", Attributes::NullableInt40s::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int48s", Attributes::NullableInt48s::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int56s", Attributes::NullableInt56s::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int64s", Attributes::NullableInt64s::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-enum8", Attributes::NullableEnum8::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "nullable-enum16", Attributes::NullableEnum16::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-float-single", Attributes::NullableFloatSingle::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "nullable-float-double", Attributes::NullableFloatDouble::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "nullable-octet-string", Attributes::NullableOctetString::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "nullable-char-string", Attributes::NullableCharString::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "nullable-enum-attr", Attributes::NullableEnumAttr::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "nullable-struct", Attributes::NullableStruct::Id, credsIssuerConfig),            //
         make_unique<SubscribeAttribute>(Id, "nullable-range-restricted-int8u", Attributes::NullableRangeRestrictedInt8u::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "nullable-range-restricted-int8s", Attributes::NullableRangeRestrictedInt8s::Id,
@@ -31535,6 +32403,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterOperationalState(commands, credsIssuerConfig);
     registerClusterRvcOperationalState(commands, credsIssuerConfig);
     registerClusterScenesManagement(commands, credsIssuerConfig);
+    registerClusterGroupcast(commands, credsIssuerConfig);
     registerClusterHepaFilterMonitoring(commands, credsIssuerConfig);
     registerClusterActivatedCarbonFilterMonitoring(commands, credsIssuerConfig);
     registerClusterBooleanStateConfiguration(commands, credsIssuerConfig);

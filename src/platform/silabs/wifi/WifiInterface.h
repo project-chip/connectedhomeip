@@ -353,6 +353,11 @@ public:
         return static_cast<uint32_t>(1UL << chip::to_underlying(chip::app::Clusters::NetworkCommissioning::WiFiBandEnum::k2g4));
     }
 
+    /**
+     * @brief Function resets reconnection attempt interval back to the minimum value
+     */
+    void ResetConnectionRetryInterval();
+
 protected:
     /**
      * @brief Function notifies the PlatformManager that an IPv6 event occured on the WiFi interface.
@@ -363,6 +368,12 @@ protected:
     void NotifyIPv6Change(bool gotIPv6Addr);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
+    /**
+     * @brief Updates the IPv4 address in the Wi-Fi interface and notifies the application layer about the new IP address.
+     *
+     * @param[in] ip New IPv4 address
+     */
+    void GotIPv4Address(uint32_t ip);
     /**
      * @brief Function notifies the PlatformManager that an IPv4 event occured on the WiFi interface.
      *

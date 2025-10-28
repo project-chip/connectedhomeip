@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -84,7 +85,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Offer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     chip::CharSpan sdp;
@@ -126,7 +126,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Answer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     chip::CharSpan sdp;
@@ -164,7 +163,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ICECandidates::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     DataModel::List<const Globals::Structs::ICECandidateStruct::Type> ICECandidates;
@@ -202,7 +200,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::End::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t webRTCSessionID            = static_cast<uint16_t>(0);
     Globals::WebRTCEndReasonEnum reason = static_cast<Globals::WebRTCEndReasonEnum>(0);

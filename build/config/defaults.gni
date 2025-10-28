@@ -98,6 +98,9 @@ declare_args() {
   default_configs_prefix_mappings =
       [ "${build_root}/config/compiler:prefix_mappings_default" ]
 
+  # Defaults ARC configs.
+  default_configs_arc = [ "${build_root}/config/compiler:arc_default" ]
+
   # Extra default configs.
   default_configs_extra = []
 }
@@ -124,6 +127,7 @@ default_configs += default_configs_coverage
 default_configs += default_configs_target
 default_configs += default_configs_dead_code
 default_configs += default_configs_prefix_mappings
+default_configs += default_configs_arc
 default_configs += default_configs_extra
 
 executable_default_configs = []

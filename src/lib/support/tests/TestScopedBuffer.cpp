@@ -102,10 +102,12 @@ TEST_F(TestScopedBuffer, TestRelease)
         EXPECT_EQ(TestCounterMemoryManagement::Counter(), 0);
         EXPECT_TRUE(buffer.Alloc(128));
         EXPECT_NE(buffer.Get(), nullptr);
+        EXPECT_FALSE(buffer.IsNull());
 
         ptr = buffer.Release();
         EXPECT_NE(ptr, nullptr);
         EXPECT_EQ(buffer.Get(), nullptr);
+        EXPECT_TRUE(buffer.IsNull());
     }
 
     EXPECT_EQ(TestCounterMemoryManagement::Counter(), 1);

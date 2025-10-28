@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -90,7 +91,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RegisterClient::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     chip::NodeId checkInNodeID = static_cast<chip::NodeId>(0);
     uint64_t monitoredSubject  = static_cast<uint64_t>(0);
@@ -133,11 +133,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RegisterClientResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint32_t ICDCounter = static_cast<uint32_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -149,7 +148,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RegisterClientResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint32_t ICDCounter = static_cast<uint32_t>(0);
 
@@ -169,7 +167,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UnregisterClient::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     chip::NodeId checkInNodeID = static_cast<chip::NodeId>(0);
     Optional<chip::ByteSpan> verificationKey;
@@ -206,7 +203,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StayActiveRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint32_t stayActiveDuration = static_cast<uint32_t>(0);
 
@@ -241,11 +237,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StayActiveResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint32_t promisedActiveDuration = static_cast<uint32_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -257,7 +252,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::StayActiveResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint32_t promisedActiveDuration = static_cast<uint32_t>(0);
 

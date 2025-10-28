@@ -46,21 +46,6 @@ static_library("helpers") {
   ]
 }
 
-source_set("binding-test-srcs") {
-  sources = [
-    "${chip_root}/src/app/clusters/bindings/PendingNotificationMap.cpp",
-    "${chip_root}/src/app/clusters/bindings/PendingNotificationMap.h",
-    "${chip_root}/src/app/util/binding-table.cpp",
-    "${chip_root}/src/app/util/binding-table.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
-    "${chip_root}/src/app/util/mock:mock_ember",
-    "${chip_root}/src/lib/core",
-  ]
-}
-
 source_set("ota-requestor-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp",
@@ -161,6 +146,7 @@ source_set("thread-border-router-management-test-srcs") {
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/clusters/general-commissioning-server:general-commissioning-server",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
@@ -192,10 +178,12 @@ source_set("closure-dimension-test-srcs") {
   ]
   public_deps = [
     "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/cluster-building-blocks:cluster-building-blocks",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+    "${chip_root}/zzz_generated/app-common/clusters/ClosureDimension:metadata",
   ]
 }
 
@@ -228,7 +216,6 @@ source_set("closure-control-test-srcs") {
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-logic.cpp",
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-logic.h",
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-matter-context.h",
-    "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-matter-context.h",
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-objects.h",
   ]
 
@@ -239,6 +226,7 @@ source_set("closure-control-test-srcs") {
     "${chip_root}/src/app/common:enums",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/zzz_generated/app-common/clusters/ClosureControl:metadata",
   ]
 }
 
@@ -247,6 +235,7 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestAclAttribute.cpp",
+    "TestAclCommand.cpp",
     "TestAclEvent.cpp",
     "TestActionsCluster.cpp",
     "TestAttributeAccessInterfaceCache.cpp",
@@ -255,7 +244,6 @@ chip_test_suite("tests") {
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
     "TestBasicCommandPathRegistry.cpp",
-    "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
     "TestCheckInHandler.cpp",
     "TestClosureControlClusterLogic.cpp",
@@ -281,7 +269,6 @@ chip_test_suite("tests") {
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
     "TestOperationalStateClusterObjects.cpp",
-    "TestPendingNotificationMap.cpp",
     "TestPendingResponseTrackerImpl.cpp",
     "TestPowerSourceCluster.cpp",
     "TestReadInteraction.cpp",
@@ -300,7 +287,6 @@ chip_test_suite("tests") {
 
   public_deps = [
     ":app-test-stubs",
-    ":binding-test-srcs",
     ":closure-control-test-srcs",
     ":closure-dimension-test-srcs",
     ":ecosystem-information-test-srcs",
@@ -329,6 +315,7 @@ chip_test_suite("tests") {
 
   if (chip_device_platform != "android") {
     test_sources += [
+      "TestCertificateTableImpl.cpp",
       "TestExtensionFieldSets.cpp",
       "TestSceneTable.cpp",
     ]
@@ -336,6 +323,7 @@ chip_test_suite("tests") {
       ":actions-cluster-test-srcs",
       ":power-cluster-test-srcs",
       ":scenes-table-test-srcs",
+      "${chip_root}/src/app/clusters/tls-certificate-management-server:certificate-table",
     ]
   }
 
@@ -375,8 +363,7 @@ chip_test_suite("tests") {
   # On NRF, Open IoT SDK and fake platforms we do not have a realtime clock available,
   # so TestEventLogging.cpp would be testing the same thing as TestEventLoggingNoUTCTime,
   # but it's not set up to deal with the timestamps being that low.
-  if (chip_device_platform != "nrfconnect" &&
-      chip_device_platform != "openiotsdk" && chip_device_platform != "fake") {
+  if (chip_device_platform != "nrfconnect" && chip_device_platform != "fake") {
     test_sources += [ "TestEventLogging.cpp" ]
   }
 }

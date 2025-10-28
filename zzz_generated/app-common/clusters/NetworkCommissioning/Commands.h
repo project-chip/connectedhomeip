@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -117,7 +118,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ScanNetworks::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Optional<DataModel::Nullable<chip::ByteSpan>> ssid;
     Optional<uint64_t> breadcrumb;
@@ -157,14 +157,13 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ScanNetworksResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
     Optional<DataModel::List<const Structs::WiFiInterfaceScanResultStruct::Type>> wiFiScanResults;
     Optional<DataModel::List<const Structs::ThreadInterfaceScanResultStruct::Type>> threadScanResults;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -176,7 +175,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ScanNetworksResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
@@ -203,7 +201,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddOrUpdateWiFiNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan ssid;
     chip::ByteSpan credentials;
@@ -249,7 +246,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddOrUpdateThreadNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan operationalDataset;
     Optional<uint64_t> breadcrumb;
@@ -287,7 +283,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan networkID;
     Optional<uint64_t> breadcrumb;
@@ -328,7 +323,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::NetworkConfigResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
@@ -336,7 +330,7 @@ public:
     Optional<chip::ByteSpan> clientIdentity;
     Optional<chip::ByteSpan> possessionSignature;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -348,7 +342,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::NetworkConfigResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
@@ -372,7 +365,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ConnectNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan networkID;
     Optional<uint64_t> breadcrumb;
@@ -411,13 +403,12 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ConnectNetworkResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
     DataModel::Nullable<int32_t> errorValue;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -429,7 +420,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ConnectNetworkResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
@@ -452,7 +442,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ReorderNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan networkID;
     uint8_t networkIndex = static_cast<uint8_t>(0);
@@ -492,7 +481,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::QueryIdentity::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan keyIdentifier;
     Optional<chip::ByteSpan> possessionNonce;
@@ -530,12 +518,11 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::QueryIdentityResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan identity;
     Optional<chip::ByteSpan> possessionSignature;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -547,7 +534,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::QueryIdentityResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan identity;
     Optional<chip::ByteSpan> possessionSignature;

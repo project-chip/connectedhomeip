@@ -18,6 +18,7 @@
 
 #include "InteractiveCommands.h"
 
+#include <device-manager/DeviceManager.h>
 #include <platform/logging/LogV.h>
 #include <system/SystemClock.h>
 
@@ -211,6 +212,7 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
         }
     }
 
+    camera::DeviceManager::Instance().Shutdown();
     SetCommandExitStatus(CHIP_NO_ERROR);
     CloseLogFile();
 
@@ -500,4 +502,19 @@ CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
         gInteractiveServerResult.Reset();
     }
     return CHIP_NO_ERROR;
+}
+
+void StopInteractiveEventLoop()
+{
+    ChipLogProgress(NotSpecified, "Stop Interactive EventLoop, exiting...");
+
+    sShutdownRequested.store(true);
+    sQueueCondition.notify_one();
+
+    InteractiveServerCommand * command =
+        static_cast<InteractiveServerCommand *>(CommandMgr().GetCommandByName("interactive", "server"));
+    if (command)
+    {
+        command->StopCommand();
+    }
 }

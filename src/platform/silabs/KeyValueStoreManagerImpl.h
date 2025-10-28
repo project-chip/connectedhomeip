@@ -46,7 +46,18 @@ public:
     static void KvsMapMigration();
 
 private:
+    static KeyValueStoreManagerImpl sInstance;
+
     static void OnScheduledKeyMapSave(System::Layer * systemLayer, void * appState);
+
+    /**
+     * @brief Cleans up unused keys in the key-value store.
+     *
+     * This function iterates over the key map and removes shadow keys (keys that
+     * no longer have corresponding entries in NVM). It ensures that the key map
+     * remains consistent and frees up space for new entries.
+     */
+    static void KvsKeyMapCleanup(void * argument);
 
     void ScheduleKeyMapSave(void);
     bool IsValidKvsNvm3Key(const uint32_t nvm3Key) const;
@@ -56,8 +67,6 @@ private:
     //  ===== Members for internal use by the following friends.
     friend KeyValueStoreManager & KeyValueStoreMgr();
     friend KeyValueStoreManagerImpl & KeyValueStoreMgrImpl();
-
-    static KeyValueStoreManagerImpl sInstance;
 };
 
 /**
@@ -75,7 +84,7 @@ inline KeyValueStoreManager & KeyValueStoreMgr(void)
  * Returns the platform-specific implementation of the KeyValueStoreManager singleton object.
  *
  * Chip applications can use this to gain access to features of the KeyValueStoreManager
- * that are specific to the ESP32 platform.
+ * that are specific to the Silabs platform.
  */
 inline KeyValueStoreManagerImpl & KeyValueStoreMgrImpl(void)
 {

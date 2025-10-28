@@ -23,6 +23,11 @@
  *
  */
 
+#include <memory>
+#include <optional>
+#include <utility>
+#include <vector>
+
 #include "chip-cert.h"
 
 #include <credentials/CertificationDeclaration.h>
@@ -159,26 +164,25 @@ CDFormat DetectCDFormat(const uint8_t * cd, uint32_t cdLen)
     return kCDFormat_Unknown;
 }
 
-bool ReadCD(const char * fileNameOrStr, MutableByteSpan cd)
+std::optional<std::vector<uint8_t>> ReadCD(const char * fileNameOrStr)
 {
     CDFormat cdFmt = kCDFormat_Unknown;
     uint32_t cdLen = 0;
-    std::unique_ptr<uint8_t[]> cdBuf;
+    std::vector<uint8_t> cdBuf;
 
     // If fileNameOrStr is a file name
     if (access(fileNameOrStr, R_OK) == 0)
     {
-        VerifyOrReturnError(ReadFileIntoMem(fileNameOrStr, nullptr, cdLen), false);
+        VerifyOrReturnError(ReadFileIntoMem(fileNameOrStr, nullptr, cdLen), std::nullopt);
+        cdBuf.resize(cdLen);
 
-        cdBuf = std::unique_ptr<uint8_t[]>(new uint8_t[cdLen]);
+        VerifyOrReturnError(ReadFileIntoMem(fileNameOrStr, cdBuf.data(), cdLen), std::nullopt);
 
-        VerifyOrReturnError(ReadFileIntoMem(fileNameOrStr, cdBuf.get(), cdLen), false);
-
-        cdFmt = DetectCDFormat(cdBuf.get(), cdLen);
+        cdFmt = DetectCDFormat(cdBuf.data(), cdLen);
         if (cdFmt == kCDFormat_Unknown)
         {
             fprintf(stderr, "Unrecognized CD Format in File: %s\n", fileNameOrStr);
-            return false;
+            return std::nullopt;
         }
     }
     // Otherwise, treat fileNameOrStr as a pointer to the CD string (in hex or base64 encoded format)
@@ -190,31 +194,28 @@ bool ReadCD(const char * fileNameOrStr, MutableByteSpan cd)
         if (cdFmt == kCDFormat_Unknown)
         {
             fprintf(stderr, "Unrecognized CD Format in the Input Argument: %s\n", fileNameOrStr);
-            return false;
+            return std::nullopt;
         }
 
-        cdBuf = std::unique_ptr<uint8_t[]>(new uint8_t[cdLen]);
-        memcpy(cdBuf.get(), fileNameOrStr, cdLen);
+        cdBuf.resize(cdLen);
+        memcpy(cdBuf.data(), fileNameOrStr, cdLen);
     }
 
     if (cdFmt == kCDFormat_Hex)
     {
-        size_t len = chip::Encoding::HexToBytes(Uint8::to_char(cdBuf.get()), cdLen, cdBuf.get(), cdLen);
-        VerifyOrReturnError(CanCastTo<uint32_t>(2 * len), false);
-        VerifyOrReturnError(2 * len == cdLen, false);
+        size_t len = chip::Encoding::HexToBytes(Uint8::to_char(cdBuf.data()), cdLen, cdBuf.data(), cdLen);
+        VerifyOrReturnError(CanCastTo<uint32_t>(2 * len), std::nullopt);
+        VerifyOrReturnError(2 * len == cdLen, std::nullopt);
         cdLen = static_cast<uint32_t>(len);
     }
     else if (cdFmt == kCDFormat_Base64)
     {
-        VerifyOrReturnError(Base64Decode(cdBuf.get(), cdLen, cdBuf.get(), cdLen, cdLen), false);
+        VerifyOrReturnError(Base64Decode(cdBuf.data(), cdLen, cdBuf.data(), cdLen, cdLen), std::nullopt);
     }
 
-    VerifyOrReturnError(cdLen <= cd.size(), false);
-    memcpy(cd.data(), cdBuf.get(), cdLen);
+    cdBuf.resize(cdLen);
 
-    cd.reduce_size(cdLen);
-
-    return true;
+    return cdBuf;
 }
 
 void ENFORCE_FORMAT(1, 2) SimpleDumpWriter(const char * aFormat, ...)
@@ -237,12 +238,11 @@ bool PrintCD(ByteSpan cd)
     uint32_t signerKeyIdHexLen = 0;
 
     VerifyOrReturnError(!cd.empty(), false);
-    VerifyOrReturnError(OpenFile(gOutFileName, gOutFile, true), false);
     VerifyOrReturnError(CMS_ExtractKeyId(cd, signerKeyId) == CHIP_NO_ERROR, false);
     VerifyOrReturnError(CMS_ExtractCDContent(cd, cdContent) == CHIP_NO_ERROR, false);
 
     signerKeyIdHexLen = 2 * static_cast<uint32_t>(signerKeyId.size()) + 1;
-    signerKeyIdHex    = std::unique_ptr<char[]>(new char[signerKeyIdHexLen]);
+    signerKeyIdHex    = std::make_unique<char[]>(signerKeyIdHexLen);
     VerifyOrReturnError(Encoding::BytesToUppercaseHexString(signerKeyId.data(), signerKeyId.size(), signerKeyIdHex.get(),
                                                             signerKeyIdHexLen) == CHIP_NO_ERROR,
                         false);
@@ -260,9 +260,6 @@ bool PrintCD(ByteSpan cd)
 
 bool Cmd_PrintCD(int argc, char * argv[])
 {
-    uint8_t cdBuf[kCertificationElements_TLVEncodedMaxLength] = { 0 };
-    MutableByteSpan cd(cdBuf);
-
     if (argc == 1)
     {
         gHelpOptions.PrintBriefUsage(stderr);
@@ -271,7 +268,13 @@ bool Cmd_PrintCD(int argc, char * argv[])
 
     VerifyOrReturnError(ParseArgs(CMD_NAME, argc, argv, gCmdOptionSets, HandleNonOptionArgs), false);
 
-    VerifyOrReturnError(ReadCD(gInFileNameOrStr, cd), false);
+    std::optional<std::vector<uint8_t>> cd = ReadCD(gInFileNameOrStr);
+    VerifyOrReturnError(cd.has_value(), false);
 
-    return PrintCD(cd);
+    bool isSuccess = false;
+    VerifyOrReturnError(OpenFile(gOutFileName, gOutFile, true), false);
+    isSuccess = PrintCD(ByteSpan{ cd->data(), cd->size() });
+    CloseFile(gOutFile);
+
+    return isSuccess;
 }

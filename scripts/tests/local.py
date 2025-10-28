@@ -38,6 +38,37 @@ import coloredlogs
 import tabulate
 import yaml
 
+try:
+    from matter.testing.metadata import extract_runs_args  # May fail if python environment not built yet
+except ImportError:
+    # Fallback to manual import from source tree
+    _MATTER_TESTING_PATH = os.path.join(os.path.dirname(
+        __file__), '..', '..', 'src', 'python_testing', 'matter_testing_infrastructure')
+    if _MATTER_TESTING_PATH not in sys.path:
+        sys.path.insert(0, _MATTER_TESTING_PATH)
+    try:
+        from matter.testing.metadata import extract_runs_args
+    except ImportError:
+        extract_runs_args = None  # filtering by app (--app-filter) will not work.
+
+
+def _get_apps_from_script(path: str) -> List[str]:
+    """
+    Parses a python script and returns the apps it is for.
+    """
+    try:
+        runs_args = extract_runs_args(path)
+        apps = set()
+        for run_config in runs_args.values():
+            if run_config and 'app' in run_config:
+                # app is like "${ALL_CLUSTERS_APP}"
+                app_name = run_config['app'].strip('${}')
+                apps.add(app_name)
+        return list(apps)
+    except Exception as e:
+        logging.warning(f"Failed to parse metadata from {path}: {e}")
+        return []
+
 
 def _get_native_machine_target():
     """
@@ -155,6 +186,13 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
     )
     targets.append(
         ApplicationTarget(
+            key="CLOSURE_APP",
+            target=f"{target_prefix}-closure-{suffix}",
+            binary="closure-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
             key="LIT_ICD_APP",
             target=f"{target_prefix}-lit-icd-{suffix}",
             binary="lit-icd-app",
@@ -258,6 +296,20 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
             key="CAMERA_APP",
             target=f"{target_prefix}-camera-{suffix}",
             binary="chip-camera-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="JF_CONTROL_APP",
+            target=f"{target_prefix}-jf-control-app",
+            binary="jfc-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="JF_ADMIN_APP",
+            target=f"{target_prefix}-jf-admin-app",
+            binary="jfa-app",
         )
     )
 
@@ -757,6 +809,19 @@ def gen_coverage(flat):
     type=click.Choice(list(__RUNNERS__.keys()), case_sensitive=False),
     help="Determines the verbosity of script output",
 )
+@click.option(
+    "--override-binary-path",
+    default=None,
+    nargs=2,
+    multiple=True,
+    help="Defines an override binary path for a given app. Can be used multiple times. E.g. --override-binary-path ALL_CLUSTERS_APP out/some/path/chip-all-clusters-app"
+)
+@click.option(
+    "--app-filter",
+    default=None,
+    type=str,
+    help="Run only tests that are for the given app. Comma separated list of apps. E.g. --app-filter ALL_CLUSTERS_APP,CHIP_TOOL",
+)
 def python_tests(
     test_filter,
     skip,
@@ -768,6 +833,8 @@ def python_tests(
     keep_going,
     coverage,
     fail_log_dir,
+    override_binary_path,
+    app_filter,
 ):
     """
     Run python tests via `run_python_test.py`
@@ -791,9 +858,14 @@ def python_tests(
         return _maybe_with_runner(os.path.basename(path), path, runner)
 
     # create an env file
+    override_binaries = dict(override_binary_path or [])
+
     with open("./out/test_env.yaml", "wt") as f:
         for target in _get_targets(coverage):
-            run_path = as_runner(f"out/{target.target}/{target.binary}")
+            if target.key in override_binaries:
+                run_path = as_runner(override_binaries[target.key])
+            else:
+                run_path = as_runner(f"out/{target.target}/{target.binary}")
             f.write(f"{target.key}: {run_path}\n")
         f.write("TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}\n")
         f.write("TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}\n")
@@ -802,6 +874,12 @@ def python_tests(
     if not test_filter:
         test_filter = "*"
     test_filter = _parse_filters(test_filter)
+
+    app_filter_list = None
+    if app_filter:
+        if not extract_runs_args:
+            raise Exception("`--app-filter` requires the python testing environment: ./scripts/tests/local.py build-python")
+        app_filter_list = _parse_filters(app_filter)
 
     if skip:
         print("SKIP IS %r" % skip)
@@ -844,7 +922,7 @@ def python_tests(
         if os.path.basename(file) in excluded_patterns:
             continue
         test_scripts.append(file)
-    test_scripts.append("src/controller/python/test/test_scripts/mobile-device-test.py")
+    test_scripts.append("src/controller/python/tests/scripts/mobile-device-test.py")
     test_scripts.sort()  # order consistent
 
     execution_times = []
@@ -852,6 +930,12 @@ def python_tests(
     try:
         to_run = []
         for script in [t for t in test_scripts if test_filter.any_matches(t)]:
+            if app_filter_list:
+                required_apps = _get_apps_from_script(script)
+                if not any(app_filter_list.any_matches(app) for app in required_apps):
+                    logging.info("Skipping %s due to app filter (requires %r)", script, required_apps)
+                    continue
+
             if from_filter:
                 if not fnmatch.fnmatch(script, from_filter):
                     logging.info("From-filter SKIP %s", script)
@@ -879,6 +963,9 @@ def python_tests(
                     f"./scripts/tests/run_python_test.py --load-from-env out/test_env.yaml --script {script}",
                 ]
 
+                if app_filter_list:
+                    cmd.extend(('--app-filter', app_filter))
+
                 if dry_run:
                     print(shlex.join(cmd))
                     continue
@@ -896,7 +983,7 @@ def python_tests(
                 tend = time.time()
 
                 if result.returncode != 0:
-                    logging.error("Test failed: %s", script)
+                    logging.error("Test failed: %s (error code %d when running %r)", script, result.returncode, cmd)
                     if fail_log_dir:
                         out_name = os.path.join(fail_log_dir, f"{base_name}.out.log")
                         err_name = os.path.join(fail_log_dir, f"{base_name}.err.log")
@@ -1121,7 +1208,7 @@ def chip_tool_tests(
     # This likely should be run in docker to not allow breaking things
     # run as:
     #
-    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:132
+    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:174
     runner = __RUNNERS__[runner]
 
     # make sure we are fully aware if running with or without coverage
@@ -1189,6 +1276,9 @@ def chip_tool_tests(
         ("--lit-icd-app", "LIT_ICD_APP"),
         ("--microwave-oven-app", "CHIP_MICROWAVE_OVEN_APP"),
         ("--rvc-app", "CHIP_RVC_APP"),
+        ("--energy-gateway-app", "ENERGY_GATEWAY_APP"),
+        ("--energy-management-app", "ENERGY_MANAGEMENT_APP"),
+        ("--closure-app", "CLOSURE_APP"),
     ]
 
     for flag, path_key in target_flags:

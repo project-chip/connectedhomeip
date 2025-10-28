@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -93,7 +94,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetUTCTime::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint64_t UTCTime            = static_cast<uint64_t>(0);
     GranularityEnum granularity = static_cast<GranularityEnum>(0);
@@ -132,7 +132,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetTrustedTimeSource::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     DataModel::Nullable<Structs::FabricScopedTrustedTimeSourceStruct::Type> trustedTimeSource;
 
@@ -167,7 +166,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetTimeZone::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const Structs::TimeZoneStruct::Type> timeZone;
 
@@ -202,11 +200,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetTimeZoneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     bool DSTOffsetRequired = static_cast<bool>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -218,7 +215,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetTimeZoneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     bool DSTOffsetRequired = static_cast<bool>(0);
 
@@ -237,7 +233,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetDSTOffset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const Structs::DSTOffsetStruct::Type> DSTOffset;
 
@@ -272,7 +267,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetDefaultNTP::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<chip::CharSpan> defaultNTP;
 

@@ -23,6 +23,11 @@
 #include "LEDManager.h"
 #include "PWMManager.h"
 
+#ifdef CONFIG_TFLM_FEATURE
+#include "tflm/audio/app_audio.h"
+#include "tflm/audio/app_codec.h"
+#endif
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -35,6 +40,14 @@ XyColor_t sXY;
 HsvColor_t sHSV;
 CtColor_t sCT;
 RgbColor_t sLedRgb;
+
+#ifdef CONFIG_TFLM_FEATURE
+k_timer sAudioProcessUpdateTimer;
+// Ensure the timer starts only after the commissioning
+// or reconnection process is finished.
+constexpr uint16_t kInitialAudioProcessUpdateTimerPeriodMs = 15000;
+constexpr uint16_t kAudioProcessUpdateTimerPeriodMs        = 500; // 500ms timer period
+#endif
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -80,9 +93,70 @@ CHIP_ERROR AppTask::Init(void)
         // Set actual state to stored before reboot
         SetInitiateAction(storedValue ? ON_ACTION : OFF_ACTION, static_cast<int32_t>(AppEvent::kEventType_DeviceAction), nullptr);
     }
+#ifdef CONFIG_TFLM_FEATURE
+    app_codec_init();
+#endif
 
     return CHIP_NO_ERROR;
 }
+
+#ifdef CONFIG_TFLM_FEATURE
+void AppTask::AudioProcessUpdateTimerTimeoutCallback(k_timer * timer)
+{
+    if (!timer)
+    {
+        return;
+    }
+
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_Timer;
+    event.Handler = AudioProcessUpdateTimerEventHandler;
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::AudioProcessUpdateTimerEventHandler(AppEvent * aEvent)
+{
+    int32_t result = 0;
+    bool onoff_value;
+
+    if (aEvent->Type != AppEvent::kEventType_Timer)
+    {
+        return;
+    }
+
+    tflite_micro_micro_speech_process_action(&result);
+
+    LOG_INF("result is %d", result);
+
+    if (result == 2)
+    {
+        onoff_value = 1;
+        PlatformMgr().LockChipStack();
+        Clusters::OnOff::Attributes::OnOff::Set(1, onoff_value);
+        PlatformMgr().UnlockChipStack();
+    }
+    else if (result == 3)
+    {
+        onoff_value = 0;
+        PlatformMgr().LockChipStack();
+        Clusters::OnOff::Attributes::OnOff::Set(1, onoff_value);
+        PlatformMgr().UnlockChipStack();
+    }
+}
+
+void AppTask::MicroSpeechProcessStart()
+{
+    k_timer_init(&sAudioProcessUpdateTimer, &AppTask::AudioProcessUpdateTimerTimeoutCallback, nullptr);
+    k_timer_user_data_set(&sAudioProcessUpdateTimer, &sAppTask);
+    k_timer_start(&sAudioProcessUpdateTimer, K_MSEC(kInitialAudioProcessUpdateTimerPeriodMs),
+                  K_MSEC(kAudioProcessUpdateTimerPeriodMs));
+}
+
+void AppTask::MicroSpeechProcessStop()
+{
+    k_timer_stop(&sAudioProcessUpdateTimer);
+}
+#endif
 
 void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {

@@ -395,6 +395,7 @@ public:
     /* EventsGenerator implementation */
     CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventPayloadWriter, const EventOptions & options,
                              EventNumber & generatedEventNumber) override;
+    void ScheduleUrgentEventDeliverySync(std::optional<FabricIndex> fabricIndex = std::nullopt) override;
 
 private:
     static EventManagement sInstance;
@@ -510,9 +511,11 @@ private:
      *
      * The function is used to scan through the event log to find events matching the spec in the supplied context.
      * Particularly, it would check against mStartingEventNumber, and skip fetched event.
+     *
+     * On success, if the event represented by the EventEnvelopeContext should be encoded, encodeEvent will be set to true.
      */
     static CHIP_ERROR EventIterator(const TLV::TLVReader & aReader, size_t aDepth, EventLoadOutContext * apEventLoadOutContext,
-                                    EventEnvelopeContext * event);
+                                    EventEnvelopeContext * event, bool & encodeEvent);
 
     /**
      * @brief Internal iterator function used to fetch event into EventEnvelopeContext, then EventIterator would filter event
@@ -541,15 +544,10 @@ private:
     /**
      * @brief Check whether the event instance represented by the EventEnvelopeContext should be included in the report.
      *
-     * @retval CHIP_ERROR_UNEXPECTED_EVENT This path should be excluded in the generated event report.
-     * @retval CHIP_EVENT_ID_FOUND This path should be included in the generated event report.
-     * @retval CHIP_ERROR_ACCESS_DENIED This path should be included in the generated event report, but the client does not have
-     * .       enough privilege to access it.
-     *
-     * TODO: Consider using CHIP_NO_ERROR, CHIP_ERROR_SKIP_EVENT, CHIP_ERROR_ACCESS_DENINED or some enum to represent the checking
-     * result.
+     * @retval false This event instance should be excluded in the generated event report.
+     * @retval true This event instance should be included in the generated event report.
      */
-    static CHIP_ERROR CheckEventContext(EventLoadOutContext * eventLoadOutContext, const EventEnvelopeContext & event);
+    static bool IncludeEventInReport(EventLoadOutContext * eventLoadOutContext, const EventEnvelopeContext & event);
 
     /**
      * @brief copy event from circular buffer to target buffer for report

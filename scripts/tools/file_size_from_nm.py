@@ -14,12 +14,22 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "click",
+#     "cxxfilt",
+#     "coloredlogs",
+#     "pandas",
+#     "plotly",
+# ]
+# ///
+#
 # Displays a treemap code size as read by `nm` over a binary
 #
 # Example call:
 #
-# scripts/tools/file_size_from_nm.py \
+# uv run --script ./scripts/tools/file_size_from_nm.py \
 #     --max-depth 5                  \
 #     out/nrf-nrf52840dk-light-data-model-enabled/nrfconnect/zephyr/zephyr.elf
 #
@@ -33,13 +43,6 @@
 #   in the entire "src". We have duplicated file names for which we do not have a
 #   good way to disambiguate
 #
-
-# Requires:
-#    click
-#    cxxfilt
-#    coloredlogs
-#    pandas
-#    plotly
 
 import fnmatch
 import logging
@@ -487,12 +490,12 @@ def build_treemap(
                 data["name_with_size"][idx] = f"{label}: {total_size}"
             else:
                 # The "full name" is generally quite long, so shorten it...
-                data["name_with_size"][idx] = f"{data["short_name"][idx]}: {total_size}"
+                data["name_with_size"][idx] = f"{data['short_name'][idx]}: {total_size}"
         else:
             # When using object files, the paths hare are the full "foo::bar::....::method"
             # so clean them up a bit
             short_name = shorten_name(data["short_name"][idx])
-            data["name_with_size"][idx] = f"{short_name}: {data["size"][idx]}"
+            data["name_with_size"][idx] = f"{short_name}: {data['size'][idx]}"
 
     extra_args = {}
     if color is not None:
@@ -560,7 +563,7 @@ def symbols_from_objdump(elf_file: str) -> list[Symbol]:
 
     # The format looks like:
     #
-    #     out/qpg-qpg6105-light/chip-qpg6105-lighting-example.out:     file format elf32-little                                                                                          │
+    #     out/qpg-qpg6200-light/chip-qpg6200-lighting-example.out:     file format elf32-little                                                                                          │
     #                                                                                                                                                                                │
     #     SYMBOL TABLE:                                                                                                                                                                  │
     #     04000010 l    d  .bl_user_license   00000000 .bl_user_license                                                                                                                  │

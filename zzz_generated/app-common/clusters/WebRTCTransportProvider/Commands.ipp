@@ -41,6 +41,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kICEServers), ICEServers);
     encoder.Encode(to_underlying(Fields::kICETransportPolicy), ICETransportPolicy);
     encoder.Encode(to_underlying(Fields::kMetadataEnabled), metadataEnabled);
+    encoder.Encode(to_underlying(Fields::kSFrameConfig), SFrameConfig);
     return encoder.Finalize();
 }
 
@@ -82,6 +83,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         {
             err = DataModel::Decode(reader, metadataEnabled);
         }
+        else if (__context_tag == to_underlying(Fields::kSFrameConfig))
+        {
+            err = DataModel::Decode(reader, SFrameConfig);
+        }
 
         ReturnErrorOnFailure(err);
     }
@@ -89,7 +94,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace SolicitOffer.
 namespace SolicitOfferResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kWebRTCSessionID), webRTCSessionID);
@@ -144,6 +149,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kICEServers), ICEServers);
     encoder.Encode(to_underlying(Fields::kICETransportPolicy), ICETransportPolicy);
     encoder.Encode(to_underlying(Fields::kMetadataEnabled), metadataEnabled);
+    encoder.Encode(to_underlying(Fields::kSFrameConfig), SFrameConfig);
     return encoder.Finalize();
 }
 
@@ -193,6 +199,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         {
             err = DataModel::Decode(reader, metadataEnabled);
         }
+        else if (__context_tag == to_underlying(Fields::kSFrameConfig))
+        {
+            err = DataModel::Decode(reader, SFrameConfig);
+        }
 
         ReturnErrorOnFailure(err);
     }
@@ -200,7 +210,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace ProvideOffer.
 namespace ProvideOfferResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kWebRTCSessionID), webRTCSessionID);

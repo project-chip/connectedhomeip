@@ -25,6 +25,19 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::CMAFInterfaceEnum val)
+{
+    using EnumType = PushAvStreamTransport::CMAFInterfaceEnum;
+    switch (val)
+    {
+    case EnumType::kInterface1:
+    case EnumType::kInterface2DASH:
+    case EnumType::kInterface2HLS:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::ContainerFormatEnum val)
 {
     using EnumType = PushAvStreamTransport::ContainerFormatEnum;
@@ -59,6 +72,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::
     case EnumType::kInvalidCombination:
     case EnumType::kInvalidTriggerType:
     case EnumType::kInvalidTransportStatus:
+    case EnumType::kInvalidOptions:
+    case EnumType::kInvalidStreamUsage:
+    case EnumType::kInvalidTime:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

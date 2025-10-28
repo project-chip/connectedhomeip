@@ -93,3 +93,5 @@ private:
     WebSocketServer mWebSocketServer;
     chip::Optional<uint16_t> mPort;
 };
+
+void StopInteractiveEventLoop();

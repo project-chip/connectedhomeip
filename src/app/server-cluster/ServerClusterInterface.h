@@ -32,10 +32,9 @@
 namespace chip {
 namespace app {
 
-/// Handles cluster interactions for a specific cluster id.
+/// Handles cluster interactions for a specific set of cluster instances
 ///
-/// A `ServerClusterInterface` instance is associated with a single endpointId and represents
-/// a cluster that exists at a given `endpointId/clusterId` path.
+/// A `ServerClusterInterface` instance may be associated with multiple `endpointId/clusterId` paths.
 ///
 /// Provides metadata as well as interaction processing (attribute read/write and command handling).
 class ServerClusterInterface
@@ -98,7 +97,9 @@ public:
     ///
     /// Precondition:
     ///   - `path` endpoint+cluster part MUST match one of the paths returned by GetPaths.
-    virtual void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType) {}
+    virtual void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType,
+                                                FabricIndex accessingFabric)
+    {}
 
     /// Reads the value of an existing attribute.
     ///
@@ -154,6 +155,11 @@ public:
     /// Precondition:
     ///   - `path` MUST match one of the paths returned by GetPaths.
     virtual CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) = 0;
+
+    /// Retrieve information about a specific generated event.
+    ///
+    /// In particular information regarding access, so that event reads can be validated.
+    virtual CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) = 0;
 
     ///////////////////////////////////// Command Support /////////////////////////////////////////////////////////
 

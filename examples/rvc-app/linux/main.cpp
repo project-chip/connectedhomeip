@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "Identify.h"
 #include "RvcAppCommandDelegate.h"
 #include "rvc-device.h"
 #include <AppMain.h>
@@ -28,7 +29,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
-constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_rvc_fifo_";
 NamedPipeCommands sChipNamedPipeCommands;
 RvcAppCommandDelegate sRvcAppCommandDelegate;
 } // namespace
@@ -37,9 +37,9 @@ RvcDevice * gRvcDevice = nullptr;
 
 void ApplicationInit()
 {
-    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
+    std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
 
-    if (sChipNamedPipeCommands.Start(path, &sRvcAppCommandDelegate) != CHIP_NO_ERROR)
+    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sRvcAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();
@@ -49,6 +49,7 @@ void ApplicationInit()
     gRvcDevice->Init();
 
     sRvcAppCommandDelegate.SetRvcDevice(gRvcDevice);
+    IdentifyInit();
 }
 
 void ApplicationShutdown()

@@ -119,29 +119,29 @@ public:
      * @brief
      *   Encrypt the input data using keys established in the secure channel
      *
-     * @param input Unencrypted input data
+     * @param[in] input Unencrypted input data
      * @param input_length Length of the input data
-     * @param output Output buffer for encrypted data
-     * @param nonce Nonce buffer for encrypt
-     * @param header message header structure. Encryption type will be set on the header.
-     * @param mac - output the resulting mac
+     * @param[out] output Output buffer for encrypted data
+     * @param[in] nonce Nonce buffer for encrypt
+     * @param[in] header message header structure. Encryption type will be set on the header.
+     * @param[out] mac - output the resulting mac
      *
      * @return CHIP_ERROR The result of encryption
      */
-    CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, ConstNonceView nonce, PacketHeader & header,
-                       MessageAuthenticationCode & mac) const;
+    CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, ConstNonceView nonce,
+                       const PacketHeader & header, MessageAuthenticationCode & mac) const;
 
     /**
      * @brief
      *   Decrypt the input data using keys established in the secure channel
      *
-     * @param input Encrypted input data
+     * @param[in] input Encrypted input data
      * @param input_length Length of the input data
-     * @param output Output buffer for decrypted data
-     * @param nonce Nonce buffer for decrypt
-     * @param header message header structure
+     * @param[out] output Output buffer for decrypted data
+     * @param[in] nonce Nonce buffer for decrypt
+     * @param[in] header message header structure
+     * @param[in] mac Input mac
      * @return CHIP_ERROR The result of decryption
-     * @param mac Input mac
      */
     CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, ConstNonceView nonce,
                        const PacketHeader & header, const MessageAuthenticationCode & mac) const;
@@ -153,15 +153,6 @@ public:
                               const MessageAuthenticationCode & mac) const;
 
     ByteSpan GetAttestationChallenge() const { return mAttestationChallenge.Span(); }
-
-    /**
-     * @brief
-     *   Memory overhead of encrypting data. The overhead is independent of size of
-     *   the data being encrypted. The extra space is used for storing the common header.
-     *
-     * @return number of bytes.
-     */
-    size_t EncryptionOverhead();
 
     bool IsInitiator() const { return mKeyAvailable && mSessionRole == SessionRole::kInitiator; }
 

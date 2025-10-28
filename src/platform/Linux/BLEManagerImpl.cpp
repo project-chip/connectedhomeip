@@ -180,8 +180,7 @@ exit:
 
 uint16_t BLEManagerImpl::_NumConnections()
 {
-    uint16_t numCons = 0;
-    return numCons;
+    return mEndpoint.GetNumConnections();
 }
 
 CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
@@ -197,32 +196,25 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     {
     case DeviceEventType::kCHIPoBLESubscribe:
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
-        {
-            ChipDeviceEvent connectionEvent{ .Type = DeviceEventType::kCHIPoBLEConnectionEstablished };
-            PlatformMgr().PostEventOrDie(&connectionEvent);
-        }
+        NotifyCHIPoBLEConnectionEstablished();
         break;
-
     case DeviceEventType::kCHIPoBLEUnsubscribe:
         HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
+        NotifyCHIPoBLEConnectionClosed();
         break;
-
     case DeviceEventType::kCHIPoBLEWriteReceived:
         HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
                             PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
         break;
-
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
         HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
-
     case DeviceEventType::kCHIPoBLEConnectionError:
         HandleConnectionError(event->CHIPoBLEConnectionError.ConId, event->CHIPoBLEConnectionError.Reason);
         break;
     case DeviceEventType::kServiceProvisioningChange:
         // Force the advertising configuration to be refreshed to reflect new provisioning state.
         mFlags.Clear(Flags::kAdvertisingConfigured);
-
         DriveBLEState();
         break;
     default:
@@ -234,7 +226,6 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEvent)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipLogDetail(DeviceLayer, "HandlePlatformSpecificBLEEvent %d", apEvent->Type);
     switch (apEvent->Type)
     {
     case DeviceEventType::kPlatformLinuxBLEAdapterAdded:
@@ -262,7 +253,7 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
             mFlags.Clear(Flags::kBluezBLELayerInitialized);
             mFlags.Clear(Flags::kAdvertisingConfigured);
             mFlags.Clear(Flags::kAppRegistered);
-            mFlags.Clear(Flags::kAdvertising);
+            ClearAdvertisingFlag();
             CleanScanConfig();
             // Indicate that the adapter is no longer available
             err = BLE_ERROR_ADAPTER_UNAVAILABLE;
@@ -309,21 +300,18 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
             SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleAdvertisingTimer, this));
         }
         mFlags.Set(Flags::kAdvertising);
+        NotifyCHIPoBLEAdvertisingChange(kActivity_Started);
         break;
     case DeviceEventType::kPlatformLinuxBLEPeripheralAdvStopComplete:
         SuccessOrExit(err = apEvent->Platform.BLEPeripheralAdvStopComplete.mError);
         mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
         DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
         // Transition to the not Advertising state...
-        if (mFlags.Has(Flags::kAdvertising))
-        {
-            mFlags.Clear(Flags::kAdvertising);
-            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
-        }
+        ClearAdvertisingFlag();
         break;
     case DeviceEventType::kPlatformLinuxBLEPeripheralAdvReleased:
         // If the advertising was stopped due to a premature release, check if it needs to be restarted.
-        mFlags.Clear(Flags::kAdvertising);
+        ClearAdvertisingFlag();
         DriveBLEState();
         break;
     case DeviceEventType::kPlatformLinuxBLEPeripheralRegisterAppComplete:
@@ -470,7 +458,7 @@ void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint
     System::PacketBufferHandle buf(System::PacketBufferHandle::NewWithData(value, len));
     VerifyOrReturn(!buf.IsNull(), ChipLogError(DeviceLayer, "Failed to allocate packet buffer in %s", __func__));
 
-    ChipLogDetail(DeviceLayer, "Indication received, conn = %p", conId);
+    ChipLogDetail(DeviceLayer, "Indication received: conn=%p", conId);
 
     ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformLinuxBLEIndicationReceived,
                            .Platform = {
@@ -484,7 +472,7 @@ void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_
     System::PacketBufferHandle buf(System::PacketBufferHandle::NewWithData(value, len));
     VerifyOrReturn(!buf.IsNull(), ChipLogError(DeviceLayer, "Failed to allocate packet buffer in %s", __func__));
 
-    ChipLogProgress(Ble, "Write request received, conn = %p", conId);
+    ChipLogProgress(Ble, "Write request received: conn=%p", conId);
 
     // Post an event to the Chip queue to deliver the data into the Chip stack.
     ChipDeviceEvent event{ .Type                  = DeviceEventType::kCHIPoBLEWriteReceived,
@@ -749,6 +737,14 @@ void BLEManagerImpl::CleanScanConfig()
     mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
 }
 
+void BLEManagerImpl::ClearAdvertisingFlag()
+{
+    VerifyOrReturn(mFlags.Has(Flags::kAdvertising));
+    mFlags.Clear(Flags::kAdvertising);
+    NotifyCHIPoBLEAdvertisingChange(kActivity_Stopped);
+    ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
+}
+
 void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator)
 {
     mBLEScanConfig.mDiscriminator = connDiscriminator;
@@ -811,6 +807,24 @@ void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(CHIP_ERROR error)
 void BLEManagerImpl::NotifyBLEPeripheralAdvReleased()
 {
     ChipDeviceEvent event{ .Type = DeviceEventType::kPlatformLinuxBLEPeripheralAdvReleased };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::NotifyCHIPoBLEConnectionEstablished()
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoBLEConnectionEstablished };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::NotifyCHIPoBLEConnectionClosed()
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoBLEConnectionClosed };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::NotifyCHIPoBLEAdvertisingChange(enum ActivityChange change)
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoBLEAdvertisingChange, .CHIPoBLEAdvertisingChange = { .Result = change } };
     PlatformMgr().PostEventOrDie(&event);
 }
 

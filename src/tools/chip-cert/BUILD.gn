@@ -28,6 +28,7 @@ executable("chip-cert") {
     "Cmd_GenCert.cpp",
     "Cmd_PrintCD.cpp",
     "Cmd_PrintCert.cpp",
+    "Cmd_PrintTLV.cpp",
     "Cmd_ResignCert.cpp",
     "Cmd_ValidateAttCert.cpp",
     "Cmd_ValidateCert.cpp",
@@ -49,6 +50,7 @@ executable("chip-cert") {
     "${chip_root}/src/lib/asn1",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform/logging:stdio",
   ]
 
   output_dir = root_out_dir

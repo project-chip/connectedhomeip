@@ -20,7 +20,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
+#include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
 #include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
 #include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
@@ -29,9 +29,9 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
+#include <soil-measurement-stub.h>
 
 #include "ButtonEventsSimulator.h"
-#include "meter-identification-instance.h"
 #include <air-quality-instance.h>
 #include <dishwasher-mode.h>
 #include <laundry-washer-mode.h>
@@ -567,6 +567,33 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
             ChipLogError(NotSpecified, "Failed to store configuration version:%d", configurationVersion);
         }
     }
+    else if (name == "SetSimulatedSoilMoisture")
+    {
+        EndpointId endpoint          = static_cast<EndpointId>(self->mJsonValue["EndpointId"].asUInt());
+        Json::Value jsonSoilMoisture = self->mJsonValue["SoilMoistureValue"];
+        DataModel::Nullable<Percent> soilMoistureMeasuredValue;
+
+        if (endpoint != 1)
+        {
+            ChipLogError(NotSpecified, "Invalid EndpointId to set Soil Moisture value.");
+            return;
+        }
+
+        if (jsonSoilMoisture.isNull())
+        {
+            soilMoistureMeasuredValue.SetNull();
+        }
+        else
+        {
+            soilMoistureMeasuredValue.SetNonNull(static_cast<uint8_t>(self->mJsonValue["SoilMoistureValue"].asUInt()));
+        }
+
+        self->OnSoilMoistureChange(endpoint, soilMoistureMeasuredValue);
+    }
+    else if (name == "UserIntentCommissioningStart")
+    {
+        Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+    }
     else
     {
         ChipLogError(NotSpecified, "Unhandled command '%s': this should never happen", name.c_str());
@@ -617,7 +644,7 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kSensor)));
         ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kPowerSource)));
         ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kUserInterfaceFault)));
-        Clusters::GeneralDiagnosticsServer::Instance().OnHardwareFaultsDetect(previous, current);
+        Clusters::GeneralDiagnostics::GlobalNotifyHardwareFaultsDetect(previous, current);
     }
     else if (eventId == Clusters::GeneralDiagnostics::Events::RadioFaultChange::Id)
     {
@@ -632,7 +659,7 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         ReturnOnFailure(current.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kCellularFault)));
         ReturnOnFailure(current.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kThreadFault)));
         ReturnOnFailure(current.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kNFCFault)));
-        Clusters::GeneralDiagnosticsServer::Instance().OnRadioFaultsDetect(previous, current);
+        Clusters::GeneralDiagnostics::GlobalNotifyRadioFaultsDetect(previous, current);
     }
     else if (eventId == Clusters::GeneralDiagnostics::Events::NetworkFaultChange::Id)
     {
@@ -646,7 +673,7 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kHardwareFailure)));
         ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kNetworkJammed)));
         ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kConnectionFailed)));
-        Clusters::GeneralDiagnosticsServer::Instance().OnNetworkFaultsDetect(previous, current);
+        Clusters::GeneralDiagnostics::GlobalNotifyNetworkFaultsDetect(previous, current);
     }
     else
     {
@@ -927,6 +954,20 @@ void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)
     {
         ChipLogDetail(NotSpecified, "Invalid value: %u", aNewValue);
     }
+}
+
+void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, DataModel::Nullable<Percent> soilMoisture)
+{
+    if (soilMoisture.IsNull())
+    {
+        ChipLogDetail(NotSpecified, "Set SoilMoisture value to null");
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Set SoilMoisture value to %u", soilMoisture.Value());
+    }
+
+    SoilMeasurement::SetSoilMoistureMeasuredValue(soilMoisture);
 }
 
 void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointId, uint8_t newOccupancyValue)

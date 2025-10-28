@@ -23,7 +23,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BitMask.h>
@@ -37,7 +37,7 @@ namespace app {
 namespace Clusters {
 namespace ClosureDimension {
 namespace Structs {
-namespace CurrentStateStruct {
+namespace DimensionStateStruct {
 enum class Fields : uint8_t
 {
     kPosition = 0,
@@ -48,8 +48,8 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    Optional<chip::Percent100ths> position;
-    Optional<bool> latch;
+    Optional<DataModel::Nullable<chip::Percent100ths>> position;
+    Optional<DataModel::Nullable<bool>> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -61,7 +61,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace CurrentStateStruct
+} // namespace DimensionStateStruct
 namespace RangePercent100thsStruct {
 enum class Fields : uint8_t
 {
@@ -85,31 +85,6 @@ public:
 using DecodableType = Type;
 
 } // namespace RangePercent100thsStruct
-namespace TargetStruct {
-enum class Fields : uint8_t
-{
-    kPosition = 0,
-    kLatch    = 1,
-    kSpeed    = 2,
-};
-
-struct Type
-{
-public:
-    Optional<chip::Percent100ths> position;
-    Optional<bool> latch;
-    Optional<Globals::ThreeLevelAutoEnum> speed;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace TargetStruct
 namespace UnitRangeStruct {
 enum class Fields : uint8_t
 {

@@ -56,6 +56,10 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
 
 Instance::~Instance()
 {
+    if (mDelegate)
+    {
+        mDelegate->SetInstance(nullptr);
+    }
     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
@@ -137,7 +141,7 @@ void Instance::SetCookTimeSec(uint32_t cookTimeSec)
 
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    ChipLogError(Zcl, "Microwave Oven Control: Reading");
+    ChipLogDetail(Zcl, "Microwave Oven Control: Reading");
     switch (aPath.mAttributeId)
     {
     case MicrowaveOvenControl::Attributes::CookTime::Id:

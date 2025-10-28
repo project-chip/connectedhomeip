@@ -27,6 +27,7 @@
 
 #import "CHIPCommandStorageDelegate.h"
 #import "CertificateIssuer.h"
+#import "CommissionerInfos.h"
 #import "ControllerStorage.h"
 #import "DeviceDelegate.h"
 #include "MTRError_Utils.h"
@@ -50,7 +51,7 @@ constexpr char kTrustStorePathVariable[] = "PAA_TRUST_STORE_PATH";
 namespace {
 NSString * ToNSString(const chip::Optional<chip::app::DataModel::Nullable<char *>> & string)
 {
-    if (!string.HasValue() && string.Value().IsNull()) {
+    if (!string.HasValue() || string.Value().IsNull()) {
         return nil;
     }
 
@@ -305,23 +306,6 @@ MTRDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurrent
 NSNumber * CHIPCommandBridge::CurrentCommissionerFabricId()
 {
     return GetCommissionerFabricId(mCurrentIdentity.c_str());
-}
-
-NSNumber * CHIPCommandBridge::GetCommissionerFabricId(const char * identity)
-{
-    if (strcmp(identity, kIdentityAlpha) == 0) {
-        return @(1);
-    } else if (strcmp(identity, kIdentityBeta) == 0) {
-        return @(2);
-    } else if (strcmp(identity, kIdentityGamma) == 0) {
-        return @(3);
-    } else {
-        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", identity, kIdentityAlpha,
-            kIdentityBeta, kIdentityGamma);
-        chipDie();
-    }
-
-    return @(0); // This should never happens.
 }
 
 MTRDeviceController * CHIPCommandBridge::GetCommissioner(const char * identity) { return mControllers[identity]; }

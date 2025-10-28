@@ -36,10 +36,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -99,7 +100,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         return steps
 
-    @ async_test_body
+    @async_test_body
     async def test_TC_TSTAT_2_2(self):
         endpoint = self.get_endpoint()
 
@@ -592,7 +593,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
         # Test Harness Reads MinSetpointDeadBand attribute from Server DUT and verifies that the value is within range
         if self.pics_guard(hasAutoModeFeature):
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
-            asserts.assert_less_equal(val, 25)
+            asserts.assert_less_equal(val, 127)
 
             if self.pics_guard(self.check_pics("TSTAT.S.M.MinSetpointDeadBandWritable")):
                 # Test Harness Writes a value back that is different but valid for MinSetpointDeadBand attribute
@@ -610,7 +611,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             asserts.assert_equal(status, Status.ConstraintError)
 
             # Test Harness Writes the value above MinSetpointDeadBand
-            status = await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(30), endpoint_id=endpoint, expect_success=False)
+            status = await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(128), endpoint_id=endpoint, expect_success=False)
             asserts.assert_equal(status, Status.ConstraintError)
 
         self.step("11c")
@@ -620,7 +621,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(0), endpoint_id=endpoint)
 
             # Test Harness Writes the max limit of MinSetpointDeadBand
-            await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(25), endpoint_id=endpoint)
+            await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(127), endpoint_id=endpoint)
 
         self.step("12")
 

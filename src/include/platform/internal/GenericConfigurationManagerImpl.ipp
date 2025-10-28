@@ -532,9 +532,11 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetUniqueId(char * buf,
     err                = ReadConfigValueStr(ConfigClass::kConfigKey_UniqueId, buf, bufSize, uniqueIdLen);
 
     ReturnErrorOnFailure(err);
-
     VerifyOrReturnError(uniqueIdLen < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(buf[uniqueIdLen] == 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+
+    // ensure null termination if the string read is not null terminting (e.g. posix config on darwin
+    // returns data without null terminators as it reads data as binary.)
+    buf[uniqueIdLen] = 0;
 
     return err;
 }
@@ -671,7 +673,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetCommissionableDevice
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetInitialPairingInstruction(char * buf, size_t bufSize)
 {
-    VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION), CHIP_ERROR_BUFFER_TOO_SMALL);
+    constexpr size_t kLiteralSize  = sizeof(CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION);
+    constexpr bool kIsLiteralEmpty = (kLiteralSize == 1); // Only the null terminator is present, the literal is "" (empty-string)
+
+    if (kIsLiteralEmpty)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    VerifyOrReturnError((bufSize >= kLiteralSize), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION);
     return CHIP_NO_ERROR;
 }
@@ -679,7 +689,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetInitialPairingInstru
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSecondaryPairingInstruction(char * buf, size_t bufSize)
 {
-    VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION), CHIP_ERROR_BUFFER_TOO_SMALL);
+    constexpr size_t kLiteralSize  = sizeof(CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION);
+    constexpr bool kIsLiteralEmpty = (kLiteralSize == 1); // Only the null terminator is present, the literal is "" (empty-string)
+
+    if (kIsLiteralEmpty)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    VerifyOrReturnError((bufSize >= kLiteralSize), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION);
     return CHIP_NO_ERROR;
 }

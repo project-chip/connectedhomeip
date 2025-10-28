@@ -20,6 +20,7 @@
  *      openSSL based implementation of CHIP crypto primitives
  */
 
+#include "CHIPCryptoPALOpenSSL.h"
 #include "CHIPCryptoPAL.h"
 
 #include <type_traits>
@@ -66,13 +67,11 @@ namespace Crypto {
 #define RAND_priv_bytes RAND_bytes
 #define BN_CTX_secure_new BN_CTX_new
 #define EC_GROUP_clear_free EC_GROUP_free
-using boringssl_size_t_openssl_int = size_t;
-using boringssl_uint_openssl_int   = unsigned int;
-using libssl_err_type              = uint32_t;
+using boringssl_uint_openssl_int = unsigned int;
+using libssl_err_type            = uint32_t;
 #else
-using boringssl_size_t_openssl_int = int;
-using boringssl_uint_openssl_int   = int;
-using libssl_err_type              = unsigned long;
+using boringssl_uint_openssl_int = int;
+using libssl_err_type            = unsigned long;
 #endif // CHIP_CRYPTO_BORINGSSL
 
 #define kKeyLengthInBits 256
@@ -84,13 +83,7 @@ enum class DigestType
     SHA256
 };
 
-enum class ECName
-{
-    None   = 0,
-    P256v1 = 1,
-};
-
-static int _nidForCurve(ECName name)
+int GetNidForCurve(ECName name)
 {
     switch (name)
     {
@@ -104,7 +97,7 @@ static int _nidForCurve(ECName name)
     }
 }
 
-static void _logSSLError()
+void SSLErrorLog()
 {
     unsigned long ssl_err_code = ERR_get_error();
     while (ssl_err_code != 0)
@@ -198,7 +191,7 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     VerifyOrExit(tag_length == CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, error = CHIP_ERROR_INVALID_ARGUMENT);
 #else
     VerifyOrExit(tag_length == 8 || tag_length == 12 || tag_length == CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
-                              error = CHIP_ERROR_INVALID_ARGUMENT);
+                            error = CHIP_ERROR_INVALID_ARGUMENT);
 #endif // CHIP_CRYPTO_BORINGSSL
 
 #if CHIP_CRYPTO_BORINGSSL
@@ -251,7 +244,7 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     // Encrypt
     VerifyOrExit(CanCastTo<int>(plaintext_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     result = EVP_EncryptUpdate(context, Uint8::to_uchar(ciphertext), &bytesWritten, Uint8::to_const_uchar(plaintext),
-                                            static_cast<int>(plaintext_length));
+                                          static_cast<int>(plaintext_length));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit((ciphertext_was_null && bytesWritten == 0) || (bytesWritten >= 0), error = CHIP_ERROR_INTERNAL);
     ciphertext_length = static_cast<unsigned int>(bytesWritten);
@@ -328,7 +321,7 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     VerifyOrExit(tag_length == CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, error = CHIP_ERROR_INVALID_ARGUMENT);
 #else
     VerifyOrExit(tag_length == 8 || tag_length == 12 || tag_length == CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
-                              error = CHIP_ERROR_INVALID_ARGUMENT);
+                            error = CHIP_ERROR_INVALID_ARGUMENT);
 #endif // CHIP_CRYPTO_BORINGSSL
     VerifyOrExit(nonce != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(nonce_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -362,7 +355,7 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     // we're writing the tag, not reading.
     VerifyOrExit(CanCastTo<int>(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     result = EVP_CIPHER_CTX_ctrl(context, EVP_CTRL_CCM_SET_TAG, static_cast<int>(tag_length),
-                                              const_cast<void *>(static_cast<const void *>(tag)));
+                                            const_cast<void *>(static_cast<const void *>(tag)));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in key + nonce
@@ -388,7 +381,7 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     // Pass in ciphertext. We wont get anything if validation fails.
     VerifyOrExit(CanCastTo<int>(ciphertext_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     result = EVP_DecryptUpdate(context, Uint8::to_uchar(plaintext), &bytesOutput, Uint8::to_const_uchar(ciphertext),
-                                            static_cast<int>(ciphertext_length));
+                                          static_cast<int>(ciphertext_length));
     if (plaintext_was_null)
     {
         VerifyOrExit(bytesOutput <= static_cast<int>(sizeof(placeholder_plaintext)), error = CHIP_ERROR_INTERNAL);
@@ -695,7 +688,7 @@ CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, c
 exit:
     if (error != CHIP_NO_ERROR)
     {
-        _logSSLError();
+        SSLErrorLog();
     }
 
     return error;
@@ -729,77 +722,6 @@ ECName MapECName(SupportedECPKeyTypes keyType)
     }
 }
 
-static inline void from_EC_KEY(EC_KEY * key, P256KeypairContext * context)
-{
-    *SafePointerCast<EC_KEY **>(context) = key;
-}
-
-static inline EC_KEY * to_EC_KEY(P256KeypairContext * context)
-{
-    return *SafePointerCast<EC_KEY **>(context);
-}
-
-static inline const EC_KEY * to_const_EC_KEY(const P256KeypairContext * context)
-{
-    return *SafePointerCast<const EC_KEY * const *>(context);
-}
-
-CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
-{
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int nid          = NID_undef;
-    EC_KEY * ec_key  = nullptr;
-    ECDSA_SIG * sig  = nullptr;
-    const BIGNUM * r = nullptr;
-    const BIGNUM * s = nullptr;
-
-    VerifyOrReturnError((msg != nullptr) && (msg_length > 0), CHIP_ERROR_INVALID_ARGUMENT);
-
-    uint8_t digest[kSHA256_Hash_Length];
-    memset(&digest[0], 0, sizeof(digest));
-
-    ReturnErrorOnFailure(Hash_SHA256(msg, msg_length, &digest[0]));
-
-    ERR_clear_error();
-
-    static_assert(P256ECDSASignature::Capacity() >= kP256_ECDSA_Signature_Length_Raw, "P256ECDSASignature must be large enough");
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_UNINITIALIZED);
-    nid = _nidForCurve(MapECName(mPublicKey.Type()));
-    VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    ec_key = to_EC_KEY(&mKeypair);
-    VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    sig = ECDSA_do_sign(Uint8::to_const_uchar(&digest[0]), static_cast<boringssl_size_t_openssl_int>(sizeof(digest)), ec_key);
-    VerifyOrExit(sig != nullptr, error = CHIP_ERROR_INTERNAL);
-    ECDSA_SIG_get0(sig, &r, &s);
-    VerifyOrExit((r != nullptr) && (s != nullptr), error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(CanCastTo<size_t>(BN_num_bytes(r)) && CanCastTo<size_t>(BN_num_bytes(s)), error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit((static_cast<size_t>(BN_num_bytes(r)) <= kP256_FE_Length) &&
-                     (static_cast<size_t>(BN_num_bytes(s)) <= kP256_FE_Length),
-                 error = CHIP_ERROR_INTERNAL);
-
-    // Concatenate r and s to output. Sizes were checked above.
-    VerifyOrExit(out_signature.SetLength(kP256_ECDSA_Signature_Length_Raw) == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(BN_bn2binpad(r, out_signature.Bytes() + 0u, kP256_FE_Length) == kP256_FE_Length, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(BN_bn2binpad(s, out_signature.Bytes() + kP256_FE_Length, kP256_FE_Length) == kP256_FE_Length,
-                 error = CHIP_ERROR_INTERNAL);
-
-exit:
-    if (sig != nullptr)
-    {
-        // SIG owns the memory of r, s
-        ECDSA_SIG_free(sig);
-    }
-
-    if (error != CHIP_NO_ERROR)
-    {
-        _logSSLError();
-    }
-
-    return error;
-}
-
 CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length,
                                                        const P256ECDSASignature & signature) const
 {
@@ -830,7 +752,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
     VerifyOrExit(hash_length == kSHA256_Hash_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(signature.Length() == kP256_ECDSA_Signature_Length_Raw, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    nid = _nidForCurve(MapECName(Type()));
+    nid = GetNidForCurve(MapECName(Type()));
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     ec_group = EC_GROUP_new_by_curve_name(nid);
@@ -869,7 +791,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
     error = CHIP_NO_ERROR;
 
 exit:
-    _logSSLError();
+    SSLErrorLog();
     if (ec_sig != nullptr)
     {
         ECDSA_SIG_free(ec_sig);
@@ -902,140 +824,6 @@ exit:
     return error;
 }
 
-// helper function to populate octet key into EVP_PKEY out_evp_pkey. Caller must free out_evp_pkey
-static CHIP_ERROR _create_evp_key_from_binary_p256_key(const P256PublicKey & key, EVP_PKEY ** out_evp_pkey)
-{
-
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    EC_KEY * ec_key  = nullptr;
-    int result       = -1;
-    EC_POINT * point = nullptr;
-    EC_GROUP * group = nullptr;
-    int nid          = NID_undef;
-
-    VerifyOrExit(*out_evp_pkey == nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    nid = _nidForCurve(MapECName(key.Type()));
-    VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INTERNAL);
-
-    ec_key = EC_KEY_new_by_curve_name(nid);
-    VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    group = EC_GROUP_new_by_curve_name(nid);
-    VerifyOrExit(group != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    point = EC_POINT_new(group);
-    VerifyOrExit(point != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    result = EC_POINT_oct2point(group, point, Uint8::to_const_uchar(key), key.Length(), nullptr);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    result = EC_KEY_set_public_key(ec_key, point);
-
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    *out_evp_pkey = EVP_PKEY_new();
-    VerifyOrExit(*out_evp_pkey != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    result = EVP_PKEY_set1_EC_KEY(*out_evp_pkey, ec_key);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-exit:
-    if (ec_key != nullptr)
-    {
-        EC_KEY_free(ec_key);
-        ec_key = nullptr;
-    }
-
-    if (error != CHIP_NO_ERROR && *out_evp_pkey)
-    {
-        EVP_PKEY_free(*out_evp_pkey);
-        out_evp_pkey = nullptr;
-    }
-
-    if (point != nullptr)
-    {
-        EC_POINT_free(point);
-        point = nullptr;
-    }
-
-    if (group != nullptr)
-    {
-        EC_GROUP_free(group);
-        group = nullptr;
-    }
-
-    return error;
-}
-
-CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
-{
-    ERR_clear_error();
-    CHIP_ERROR error      = CHIP_NO_ERROR;
-    int result            = -1;
-    EVP_PKEY * local_key  = nullptr;
-    EVP_PKEY * remote_key = nullptr;
-
-    EVP_PKEY_CTX * context = nullptr;
-    size_t out_buf_length  = 0;
-
-    EC_KEY * ec_key = EC_KEY_dup(to_const_EC_KEY(&mKeypair));
-    VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_UNINITIALIZED);
-
-    local_key = EVP_PKEY_new();
-    VerifyOrExit(local_key != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    result = EVP_PKEY_set1_EC_KEY(local_key, ec_key);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    error = _create_evp_key_from_binary_p256_key(remote_public_key, &remote_key);
-    SuccessOrExit(error);
-
-    context = EVP_PKEY_CTX_new(local_key, nullptr);
-    VerifyOrExit(context != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    result = EVP_PKEY_derive_init(context);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    result = EVP_PKEY_derive_set_peer(context, remote_key);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    out_buf_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
-    result         = EVP_PKEY_derive(context, out_secret.Bytes(), &out_buf_length);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-    SuccessOrExit(error = out_secret.SetLength(out_buf_length));
-
-exit:
-    if (ec_key != nullptr)
-    {
-        EC_KEY_free(ec_key);
-        ec_key = nullptr;
-    }
-
-    if (local_key != nullptr)
-    {
-        EVP_PKEY_free(local_key);
-        local_key = nullptr;
-    }
-
-    if (remote_key != nullptr)
-    {
-        EVP_PKEY_free(remote_key);
-        remote_key = nullptr;
-    }
-
-    if (context != nullptr)
-    {
-        EVP_PKEY_CTX_free(context);
-        context = nullptr;
-    }
-
-    _logSSLError();
-    return error;
-}
-
 void ClearSecretData(uint8_t * buf, size_t len)
 {
     OPENSSL_cleanse(buf, len);
@@ -1046,7 +834,7 @@ bool IsBufferContentEqualConstantTime(const void * a, const void * b, size_t n)
     return CRYPTO_memcmp(a, b, n) == 0;
 }
 
-static CHIP_ERROR P256PublicKeyFromECKey(EC_KEY * ec_key, P256PublicKey & pubkey)
+CHIP_ERROR P256PublicKeyFromECKey(EC_KEY * ec_key, P256PublicKey & pubkey)
 {
     ERR_clear_error();
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -1059,7 +847,7 @@ static CHIP_ERROR P256PublicKeyFromECKey(EC_KEY * ec_key, P256PublicKey & pubkey
     const EC_POINT * pubkey_ecp = EC_KEY_get0_public_key(ec_key);
     VerifyOrExit(pubkey_ecp != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    nid = _nidForCurve(curve);
+    nid = GetNidForCurve(curve);
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     group = EC_GROUP_new_by_curve_name(nid);
@@ -1078,240 +866,7 @@ exit:
         group = nullptr;
     }
 
-    _logSSLError();
-    return error;
-}
-
-CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
-{
-    ERR_clear_error();
-
-    Clear();
-
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
-    EC_KEY * ec_key  = nullptr;
-    ECName curve     = MapECName(mPublicKey.Type());
-
-    int nid = _nidForCurve(curve);
-    VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    ec_key = EC_KEY_new_by_curve_name(nid);
-    VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    result = EC_KEY_generate_key(ec_key);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    error = P256PublicKeyFromECKey(ec_key, mPublicKey);
-    SuccessOrExit(error);
-
-    from_EC_KEY(ec_key, &mKeypair);
-    mInitialized = true;
-    ec_key       = nullptr;
-
-exit:
-    if (ec_key != nullptr)
-    {
-        EC_KEY_free(ec_key);
-        ec_key = nullptr;
-    }
-
-    _logSSLError();
-    return error;
-}
-
-CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
-{
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
-    const EC_KEY * ec_key = to_const_EC_KEY(&mKeypair);
-    uint8_t privkey[kP256_PrivateKey_Length];
-
-    int privkey_size          = 0;
-    const BIGNUM * privkey_bn = EC_KEY_get0_private_key(ec_key);
-    VerifyOrExit(privkey_bn != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    privkey_size = BN_bn2binpad(privkey_bn, privkey, sizeof(privkey));
-    privkey_bn   = nullptr;
-
-    VerifyOrExit(privkey_size > 0, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit((size_t) privkey_size == sizeof(privkey), error = CHIP_ERROR_INTERNAL);
-
-    {
-        size_t len = output.Length() == 0 ? output.Capacity() : output.Length();
-        Encoding::BufferWriter bbuf(output.Bytes(), len);
-        bbuf.Put(mPublicKey, mPublicKey.Length());
-        bbuf.Put(privkey, sizeof(privkey));
-        VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
-        output.SetLength(bbuf.Needed());
-    }
-
-exit:
-    ClearSecretData(privkey, sizeof(privkey));
-    _logSSLError();
-    return error;
-}
-
-CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
-{
-    Encoding::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
-
-    Clear();
-
-    BIGNUM * pvt_key     = nullptr;
-    EC_GROUP * group     = nullptr;
-    EC_POINT * key_point = nullptr;
-
-    EC_KEY * ec_key = nullptr;
-    ECName curve    = MapECName(mPublicKey.Type());
-
-    ERR_clear_error();
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
-    int nid          = NID_undef;
-
-    const uint8_t * privkey = input.ConstBytes() + mPublicKey.Length();
-
-    VerifyOrExit(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
-    bbuf.Put(input.ConstBytes(), mPublicKey.Length());
-    VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
-
-    nid = _nidForCurve(curve);
-    VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    group = EC_GROUP_new_by_curve_name(nid);
-    VerifyOrExit(group != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    key_point = EC_POINT_new(group);
-    VerifyOrExit(key_point != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    result = EC_POINT_oct2point(group, key_point, Uint8::to_const_uchar(mPublicKey), mPublicKey.Length(), nullptr);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    ec_key = EC_KEY_new_by_curve_name(nid);
-    VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    result = EC_KEY_set_public_key(ec_key, key_point);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    pvt_key = BN_bin2bn(privkey, kP256_PrivateKey_Length, nullptr);
-    VerifyOrExit(pvt_key != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    result = EC_KEY_set_private_key(ec_key, pvt_key);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    from_EC_KEY(ec_key, &mKeypair);
-    mInitialized = true;
-    ec_key       = nullptr;
-
-exit:
-    if (ec_key != nullptr)
-    {
-        EC_KEY_free(ec_key);
-        ec_key = nullptr;
-    }
-
-    if (group != nullptr)
-    {
-        EC_GROUP_free(group);
-        group = nullptr;
-    }
-
-    if (pvt_key != nullptr)
-    {
-        BN_free(pvt_key);
-        pvt_key = nullptr;
-    }
-
-    if (key_point != nullptr)
-    {
-        EC_POINT_free(key_point);
-        key_point = nullptr;
-    }
-    _logSSLError();
-    return error;
-}
-
-void P256Keypair::Clear()
-{
-    if (mInitialized)
-    {
-        EC_KEY * ec_key = to_EC_KEY(&mKeypair);
-        EC_KEY_free(ec_key);
-        mInitialized = false;
-    }
-}
-
-P256Keypair::~P256Keypair()
-{
-    Clear();
-}
-
-CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
-{
-    ERR_clear_error();
-    CHIP_ERROR error     = CHIP_NO_ERROR;
-    int result           = 0;
-    int csr_length_local = 0;
-
-    X509_REQ * x509_req = X509_REQ_new();
-    EVP_PKEY * evp_pkey = nullptr;
-
-    EC_KEY * ec_key = to_EC_KEY(&mKeypair);
-
-    X509_NAME * subject = X509_NAME_new();
-    VerifyOrExit(subject != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_UNINITIALIZED);
-
-    result = X509_REQ_set_version(x509_req, 0);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    result = EC_KEY_check_key(ec_key);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    evp_pkey = EVP_PKEY_new();
-    VerifyOrExit(evp_pkey != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    result = EVP_PKEY_set1_EC_KEY(evp_pkey, ec_key);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    result = X509_REQ_set_pubkey(x509_req, evp_pkey);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    // TODO: mbedTLS CSR parser fails if the subject name is not set (or if empty).
-    //       CHIP Spec doesn't specify the subject name that can be used.
-    //       Figure out the correct value and update this code.
-    result = X509_NAME_add_entry_by_txt(subject, "O", MBSTRING_ASC, Uint8::from_const_char("CSR"), -1, -1, 0);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    result = X509_REQ_set_subject_name(x509_req, subject);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    result = X509_REQ_sign(x509_req, evp_pkey, EVP_sha256());
-    VerifyOrExit(result > 0, error = CHIP_ERROR_INTERNAL);
-
-    csr_length_local = i2d_X509_REQ(x509_req, nullptr);
-    VerifyOrExit(csr_length_local >= 0, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(CanCastTo<size_t>(csr_length_local), error = CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrExit(static_cast<size_t>(csr_length_local) <= csr_length, error = CHIP_ERROR_BUFFER_TOO_SMALL);
-    csr_length = static_cast<size_t>(i2d_X509_REQ(x509_req, &out_csr));
-
-exit:
-    ec_key = nullptr;
-
-    if (evp_pkey != nullptr)
-    {
-        EVP_PKEY_free(evp_pkey);
-        evp_pkey = nullptr;
-    }
-
-    X509_NAME_free(subject);
-    subject = nullptr;
-
-    X509_REQ_free(x509_req);
-
-    _logSSLError();
+    SSLErrorLog();
     return error;
 }
 
@@ -1360,7 +915,7 @@ exit:
     {
         EVP_PKEY_free(evp_pkey);
     }
-    _logSSLError();
+    SSLErrorLog();
     return error;
 }
 
@@ -1686,8 +1241,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
     VerifyOrExit(X509_get_serialNumber(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_get_signature_nid(x509Cert) == NID_ecdsa_with_SHA256, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_get_issuer_name(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(X509_get_notBefore(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(X509_get_notAfter(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(X509_getm_notBefore(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(X509_getm_notAfter(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(X509_get_subject_name(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
 
     // Verify public key presence and format.
@@ -1745,16 +1300,20 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
                 }
             }
             break;
-        case NID_subject_key_identifier:
+        case NID_subject_key_identifier: {
             VerifyOrExit(!isCritical && !extSKIDPresent, err = CHIP_ERROR_INTERNAL);
-            VerifyOrExit(X509_get0_subject_key_id(x509Cert)->length == kSubjectKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
+            const ASN1_OCTET_STRING * pSKID = X509_get0_subject_key_id(x509Cert);
+            VerifyOrExit(pSKID != nullptr && pSKID->length == kSubjectKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
             extSKIDPresent = true;
             break;
-        case NID_authority_key_identifier:
+        }
+        case NID_authority_key_identifier: {
             VerifyOrExit(!isCritical && !extAKIDPresent, err = CHIP_ERROR_INTERNAL);
-            VerifyOrExit(X509_get0_authority_key_id(x509Cert)->length == kAuthorityKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
+            const ASN1_OCTET_STRING * pAKID = X509_get0_authority_key_id(x509Cert);
+            VerifyOrExit(pAKID != nullptr && pAKID->length == kAuthorityKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
             extAKIDPresent = true;
             break;
+        }
         default:
             break;
         }
@@ -1839,12 +1398,16 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     {
         X509_VERIFY_PARAM * param = X509_STORE_CTX_get0_param(verifyCtx);
         chip::ASN1::ASN1UniversalTime asn1Time;
-        char * asn1TimeStr = reinterpret_cast<char *>(X509_get_notBefore(x509LeafCertificate)->data);
         uint32_t unixEpoch;
 
         VerifyOrExit(param != nullptr, (result = CertificateChainValidationResult::kNoMemory, err = CHIP_ERROR_NO_MEMORY));
 
-        VerifyOrExit(CHIP_NO_ERROR == asn1Time.ImportFrom_ASN1_TIME_string(CharSpan(asn1TimeStr, strlen(asn1TimeStr))),
+        ASN1_TIME * pNotBefore = X509_getm_notBefore(x509LeafCertificate);
+        VerifyOrExit(pNotBefore != nullptr,
+                     (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
+        CharSpan asn1TimeSpan(reinterpret_cast<char *>(pNotBefore->data), static_cast<size_t>(pNotBefore->length));
+
+        VerifyOrExit(CHIP_NO_ERROR == asn1Time.ImportFrom_ASN1_TIME_string(asn1TimeSpan),
                      (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
 
         VerifyOrExit(asn1Time.ExportTo_UnixTime(unixEpoch),
@@ -1897,9 +1460,9 @@ CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & candidateCertificate, c
     x509issuerCertificate = d2i_X509(nullptr, &pIssuerCertificate, static_cast<long>(issuerCertificate.size()));
     VerifyOrExit(x509issuerCertificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
-    candidateNotBeforeTime = X509_get_notBefore(x509CandidateCertificate);
-    issuerNotBeforeTime    = X509_get_notBefore(x509issuerCertificate);
-    issuerNotAfterTime     = X509_get_notAfter(x509issuerCertificate);
+    candidateNotBeforeTime = X509_getm_notBefore(x509CandidateCertificate);
+    issuerNotBeforeTime    = X509_getm_notBefore(x509issuerCertificate);
+    issuerNotAfterTime     = X509_getm_notAfter(x509issuerCertificate);
     VerifyOrExit(candidateNotBeforeTime && issuerNotBeforeTime && issuerNotAfterTime, error = CHIP_ERROR_INTERNAL);
 
     result = ASN1_TIME_diff(&days, &seconds, issuerNotBeforeTime, candidateNotBeforeTime);
@@ -1936,14 +1499,14 @@ CHIP_ERROR IsCertificateValidAtCurrentTime(const ByteSpan & certificate)
     x509Certificate = d2i_X509(nullptr, &pCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509Certificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
-    time = X509_get_notBefore(x509Certificate);
+    time = X509_getm_notBefore(x509Certificate);
     VerifyOrExit(time, error = CHIP_ERROR_INTERNAL);
 
     result = X509_cmp_current_time(time);
     // check if certificate's notBefore timestamp is earlier than or equal to current time.
     VerifyOrExit(result == -1, error = CHIP_ERROR_CERT_EXPIRED);
 
-    time = X509_get_notAfter(x509Certificate);
+    time = X509_getm_notAfter(x509Certificate);
     VerifyOrExit(time, error = CHIP_ERROR_INTERNAL);
 
     result = X509_cmp_current_time(time);
@@ -2271,11 +1834,32 @@ CHIP_ERROR ExtractIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSp
     return ExtractRawDNFromX509Cert(false, certificate, issuer);
 }
 
+class ScopedASN1Object
+{
+public:
+    ScopedASN1Object(const char * string, int no_name) : obj(OBJ_txt2obj(string, no_name)) {}
+    ~ScopedASN1Object() { ASN1_OBJECT_free(obj); }
+
+    explicit operator bool() const { return obj != nullptr; }
+    ASN1_OBJECT * Get() const { return obj; }
+
+    ScopedASN1Object(const ScopedASN1Object &)             = delete;
+    ScopedASN1Object & operator=(const ScopedASN1Object &) = delete;
+
+private:
+    ASN1_OBJECT * obj = nullptr;
+};
+
 CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCertVidPid & vidpid)
 {
-    ASN1_OBJECT * commonNameObj = OBJ_txt2obj("2.5.4.3", 1);
-    ASN1_OBJECT * matterVidObj  = OBJ_txt2obj("1.3.6.1.4.1.37244.2.1", 1); // Matter VID OID - taken from Spec
-    ASN1_OBJECT * matterPidObj  = OBJ_txt2obj("1.3.6.1.4.1.37244.2.2", 1); // Matter PID OID - taken from Spec
+    ScopedASN1Object commonNameObj("2.5.4.3", 1);
+    VerifyOrReturnError(commonNameObj, CHIP_ERROR_NO_MEMORY);
+
+    ScopedASN1Object matterVidObj("1.3.6.1.4.1.37244.2.1", 1); // Matter VID OID - taken from Spec
+    VerifyOrReturnError(matterVidObj, CHIP_ERROR_NO_MEMORY);
+
+    ScopedASN1Object matterPidObj("1.3.6.1.4.1.37244.2.2", 1); // Matter PID OID - taken from Spec
+    VerifyOrReturnError(matterPidObj, CHIP_ERROR_NO_MEMORY);
 
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     X509 * x509certificate             = nullptr;
@@ -2284,7 +1868,7 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
     int x509EntryCountIdx              = 0;
     AttestationCertVidPid vidpidFromCN;
 
-    VerifyOrReturnError(!certificate.empty() && CanCastTo<long>(certificate.size()), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(!certificate.empty() && CanCastTo<long>(certificate.size()), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     x509certificate = d2i_X509(nullptr, &pCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -2300,15 +1884,15 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
         VerifyOrExit(object != nullptr, err = CHIP_ERROR_INTERNAL);
 
         DNAttrType attrType = DNAttrType::kUnspecified;
-        if (OBJ_cmp(object, commonNameObj) == 0)
+        if (OBJ_cmp(object, commonNameObj.Get()) == 0)
         {
             attrType = DNAttrType::kCommonName;
         }
-        else if (OBJ_cmp(object, matterVidObj) == 0)
+        else if (OBJ_cmp(object, matterVidObj.Get()) == 0)
         {
             attrType = DNAttrType::kMatterVID;
         }
-        else if (OBJ_cmp(object, matterPidObj) == 0)
+        else if (OBJ_cmp(object, matterPidObj.Get()) == 0)
         {
             attrType = DNAttrType::kMatterPID;
         }
@@ -2335,9 +1919,6 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
     }
 
 exit:
-    ASN1_OBJECT_free(commonNameObj);
-    ASN1_OBJECT_free(matterVidObj);
-    ASN1_OBJECT_free(matterPidObj);
     X509_free(x509certificate);
 
     return err;

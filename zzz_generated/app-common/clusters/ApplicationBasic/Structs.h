@@ -23,7 +23,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BitMask.h>
@@ -37,7 +37,29 @@ namespace app {
 namespace Clusters {
 namespace ApplicationBasic {
 namespace Structs {
-namespace ApplicationStruct = Clusters::detail::Structs::ApplicationStruct;
+namespace ApplicationStruct {
+enum class Fields : uint8_t
+{
+    kCatalogVendorID = 0,
+    kApplicationID   = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t catalogVendorID = static_cast<uint16_t>(0);
+    chip::CharSpan applicationID;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ApplicationStruct
 } // namespace Structs
 } // namespace ApplicationBasic
 } // namespace Clusters

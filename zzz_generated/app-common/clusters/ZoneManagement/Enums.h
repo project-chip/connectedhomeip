@@ -104,6 +104,8 @@ enum class Feature : uint32_t
 {
     kTwoDimensionalCartesianZone = 0x1,
     kPerZoneSensitivity          = 0x2,
+    kUserDefined                 = 0x4,
+    kFocusZones                  = 0x8,
 };
 } // namespace ZoneManagement
 } // namespace Clusters

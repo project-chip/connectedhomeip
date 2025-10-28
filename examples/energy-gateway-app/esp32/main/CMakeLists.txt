@@ -23,8 +23,11 @@ get_filename_component(APP_COMMON_GEN_DIR ${CHIP_ROOT}/zzz_generated/app-common/
 set(PRIV_INCLUDE_DIRS_LIST
   "${CHIP_ROOT}/examples/providers"
   "${ENERGY_GATEWAY_DIR}/commodity-price/include"
+  "${ENERGY_GATEWAY_DIR}/commodity-metering/include"
+  "${ENERGY_GATEWAY_DIR}/commodity-tariff/include"
   "${ENERGY_GATEWAY_DIR}/common/include"
   "${ENERGY_GATEWAY_DIR}/electrical-grid-conditions/include"
+  "${ENERGY_GATEWAY_DIR}/meter-identification/include"
   "${CMAKE_CURRENT_LIST_DIR}/include"
   "${CHIP_ROOT}/examples/platform/esp32"
 )
@@ -34,8 +37,11 @@ set(SRC_DIRS_LIST
   "${APP_COMMON_GEN_DIR}"
   "${CHIP_ROOT}/examples/providers"
   "${ENERGY_GATEWAY_DIR}/commodity-price/src"
+  "${ENERGY_GATEWAY_DIR}/commodity-metering/src"
+  "${ENERGY_GATEWAY_DIR}/commodity-tariff/src"
   "${ENERGY_GATEWAY_DIR}/common/src"
   "${ENERGY_GATEWAY_DIR}/electrical-grid-conditions/src"
+  "${ENERGY_GATEWAY_DIR}/meter-identification/src"
   "${CHIP_ROOT}/examples/platform/esp32/ota"
   "${CHIP_ROOT}/examples/platform/esp32/common"
   "${CHIP_ROOT}/examples/platform/esp32/time"
@@ -77,7 +83,6 @@ if(CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
   target_add_binary_data(${COMPONENT_TARGET} "insights_auth_key.txt" TEXT)
 endif()
 
-set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
   "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"

@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -75,7 +76,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetCookingParameters::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Optional<uint8_t> cookMode;
     Optional<uint32_t> cookTime;
@@ -118,7 +118,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddMoreTime::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint32_t timeToAdd = static_cast<uint32_t>(0);
 

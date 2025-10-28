@@ -22,7 +22,7 @@ import("crypto.gni")
 
 if (chip_crypto == "") {
   if (current_os == "android" || current_os == "freertos" ||
-      current_os == "zephyr" || current_os == "mbed" || current_os == "webos" ||
+      current_os == "zephyr" || current_os == "webos" ||
       current_os == "cmsis-rtos") {
     chip_crypto = "mbedtls"
   } else if (current_os == "mac" || current_os == "ios") {
@@ -67,12 +67,14 @@ buildconfig_header("crypto_buildconfig") {
     "CHIP_CRYPTO_MBEDTLS=${chip_crypto_mbedtls}",
     "CHIP_CRYPTO_PSA=${chip_crypto_psa}",
     "CHIP_CRYPTO_PSA_SPAKE2P=${chip_crypto_psa_spake2p}",
+    "CHIP_CRYPTO_PSA_AEAD_SINGLE_PART=${chip_crypto_psa_aead_single_part}",
     "CHIP_CRYPTO_KEYSTORE_PSA=${chip_crypto_keystore_psa}",
     "CHIP_CRYPTO_KEYSTORE_RAW=${chip_crypto_keystore_raw}",
     "CHIP_CRYPTO_KEYSTORE_APP=${chip_crypto_keystore_app}",
     "CHIP_CRYPTO_OPENSSL=${chip_crypto_openssl}",
     "CHIP_CRYPTO_BORINGSSL=${chip_crypto_boringssl}",
     "CHIP_CRYPTO_PLATFORM=${chip_crypto_platform}",
+    "CHIP_CRYPTO_TRUSTY_OS=${chip_with_trusty_os}",
   ]
 }
 
@@ -92,6 +94,10 @@ source_set("public_headers") {
     "${chip_root}/src/lib/support",
     "${nlassert_root}:nlassert",
   ]
+
+  if (chip_with_trusty_os) {
+    public_deps += [ "${chip_root}/third_party/libtrustymatter" ]
+  }
 }
 
 if (chip_crypto == "openssl") {
@@ -102,7 +108,17 @@ if (chip_crypto == "openssl") {
   }
 
   source_set("cryptopal_openssl") {
-    sources = [ "CHIPCryptoPALOpenSSL.cpp" ]
+    sources = [
+      "CHIPCryptoPALOpenSSL.cpp",
+      "CHIPCryptoPALOpenSSL.h",
+    ]
+
+    if (chip_with_trusty_os) {
+      sources += [ "P256KeyPairTrustyImpl.cpp" ]
+    } else {
+      sources += [ "P256KeyPairOpenSSL.cpp" ]
+    }
+
     public_configs = [ ":openssl_config" ]
     public_deps = [ ":public_headers" ]
   }
@@ -111,7 +127,17 @@ if (chip_crypto == "openssl") {
 
   source_set("cryptopal_boringssl") {
     # BoringSSL is close enough to OpenSSL that it uses same PAL, with minor #ifdef differences
-    sources = [ "CHIPCryptoPALOpenSSL.cpp" ]
+    sources = [
+      "CHIPCryptoPALOpenSSL.cpp",
+      "CHIPCryptoPALOpenSSL.h",
+    ]
+
+    if (chip_with_trusty_os) {
+      sources += [ "P256KeyPairTrustyImpl.cpp" ]
+    } else {
+      sources += [ "P256KeyPairOpenSSL.cpp" ]
+    }
+
     public_deps = [
       ":public_headers",
       "${boringssl_root}:boringssl",

@@ -16,6 +16,7 @@ name: 19.9.2. [TC-AUDIOOUTPUT-7.2] Rename Output Verification
 
 PICS:
     - AUDIOOUTPUT.S
+    - AUDIOOUTPUT.S.C01.Rsp
 
 config:
     nodeId: 0x12344321
@@ -35,7 +36,6 @@ tests:
                 value: nodeId
 
     - label: "Step 1: TH reads the OutputList attribute from the DUT"
-      PICS: AUDIOOUTPUT.S.A0000
       command: "readAttribute"
       attribute: "OutputList"
       response:
@@ -46,7 +46,6 @@ tests:
     - label:
           "Step 2: TH sends a RenameOutput command to the DUT with an index from
           the list in step 1 and the name 'CertTest'"
-      PICS: AUDIOOUTPUT.S.C01.Rsp
       command: "RenameOutput"
       arguments:
           values:
