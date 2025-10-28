@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "time-synchronization-server.h"
+#include "time-synchronization-cluster.h"
 #include "DefaultTimeSyncDelegate.h"
 #include "time-synchronization-delegate.h"
 
