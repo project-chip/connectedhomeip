@@ -24,6 +24,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --app-pipe /tmp/boolean_state_2_2_fifo
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
