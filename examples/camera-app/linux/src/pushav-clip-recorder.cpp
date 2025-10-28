@@ -891,6 +891,8 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     // Helper function for safe path formatting
     char path_buffer[512];
     auto make_path = [&](const char * format, int number = -1) -> std::string {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
         if (number >= 0)
         {
             snprintf(path_buffer, sizeof(path_buffer), format, basePath.c_str(), number);
@@ -899,6 +901,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         {
             snprintf(path_buffer, sizeof(path_buffer), format, basePath.c_str());
         }
+#pragma GCC diagnostic pop
         return std::string(path_buffer);
     };
 

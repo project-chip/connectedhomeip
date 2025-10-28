@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is the equivalent to app_config_dependent_sources.gni
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/DefaultTimeSyncDelegate.cpp"
-    "${CLUSTER_DIR}/DefaultTimeSyncDelegate.h"
-    "${CLUSTER_DIR}/TimeSyncDataProvider.cpp"
-    "${CLUSTER_DIR}/time-synchronization-delegate.h"
-    "${CLUSTER_DIR}/time-synchronization-cluster.cpp"
-    "${CLUSTER_DIR}/time-synchronization-cluster.h"
-)
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/chip_data_model.gni")
+import("${chip_root}/src/platform/device.gni")
+
+chip_data_model("silabs-closure") {
+  if (chip_enable_wifi) {
+    zap_file = "closure-wifi-app.zap"
+  } else {
+    zap_file = "closure-thread-app.zap"
+  }
+  is_server = true
+}
