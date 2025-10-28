@@ -99,7 +99,7 @@ public:
     app::DataModel::ActionReturnStatus ReadAttribute(AttributeId attr_id, T & out)
     {
         VerifyOrReturnError(verifyClusterPathsValid(), CHIP_ERROR_INCORRECT_STATE);
-        const auto & path = mCluster->GetPaths()[0];
+        auto path = mCluster->GetPaths()[0];
 
         // Store the read operation in a vector<std::unique_ptr<...>> to ensure its lifetime
         // using std::unique_ptr because ReadOperation is non-copyable and non-movable
@@ -132,7 +132,7 @@ public:
     app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr_id, const T & value)
     {
         VerifyOrReturnError(verifyClusterPathsValid(), CHIP_ERROR_INCORRECT_STATE);
-        const auto & path = mCluster->GetPaths()[0];
+        auto path = mCluster->GetPaths()[0];
 
         app::Testing::WriteOperation writeOperation(path.mEndpointId, path.mClusterId, attr_id);
 
@@ -151,7 +151,7 @@ public:
                                                                                                    const T & arguments)
     {
         VerifyOrReturnError(verifyClusterPathsValid(), CHIP_ERROR_INCORRECT_STATE);
-        const auto & path = mCluster->GetPaths()[0];
+        auto path = mCluster->GetPaths()[0];
 
         // TODO: Not Implemented
         return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -162,9 +162,8 @@ public:
     // @returns `false` if `GetPaths()` returned an empty list.
     bool TestAttributesList(Span<app::DataModel::AttributeEntry> expected)
     {
-        if (!verifyClusterPathsValid())
-            return false;
-        const auto & path = mCluster->GetPaths()[0];
+        VerifyOrReturnValue(verifyClusterPathsValid(), false);
+        auto path = mCluster->GetPaths()[0];
         ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> attributesBuilder;
         if (mCluster->Attributes(path, attributesBuilder) != CHIP_NO_ERROR)
             return false;
@@ -176,9 +175,8 @@ public:
     // @returns `false` if `GetPaths()` returned an empty list.
     bool TestAcceptedCommandsList(Span<app::DataModel::AcceptedCommandEntry> expected)
     {
-        if (!verifyClusterPathsValid())
-            return false;
-        const auto & path = mCluster->GetPaths()[0];
+        VerifyOrReturnValue(verifyClusterPathsValid(), false);
+        auto path = mCluster->GetPaths()[0];
         ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> commandsBuilder;
         if (mCluster->AcceptedCommands(path, commandsBuilder) != CHIP_NO_ERROR)
             return false;
@@ -190,9 +188,8 @@ public:
     // @returns `false` if `GetPaths()` returned an empty list.
     bool TestGeneratedCommandsList(Span<CommandId> expected)
     {
-        if (!verifyClusterPathsValid())
-            return false;
-        const auto & path = mCluster->GetPaths()[0];
+        VerifyOrReturnValue(verifyClusterPathsValid(), false);
+        auto path = mCluster->GetPaths()[0];
         ReadOnlyBufferBuilder<CommandId> commandsBuilder;
         if (mCluster->GeneratedCommands(path, commandsBuilder) != CHIP_NO_ERROR)
             return false;
@@ -202,7 +199,7 @@ public:
 private:
     bool verifyClusterPathsValid()
     {
-        const auto & paths = mCluster->GetPaths();
+        auto paths = mCluster->GetPaths();
         if (paths.size() == 0)
         {
             ChipLogError(Test, "Cluster has no paths registered (GetPaths returned empty list)");

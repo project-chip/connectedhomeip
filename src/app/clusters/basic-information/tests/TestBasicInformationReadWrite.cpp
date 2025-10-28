@@ -371,7 +371,7 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
         CharSpan invalidLocation        = CharSpan::fromCharString(invalidLocationStr);
 
         // Attempt to write the invalid location and confirm it fails
-        app::DataModel::ActionReturnStatus writeErr = tester.WriteAttribute(Attributes::Location::Id, invalidLocation);
+        DataModel::ActionReturnStatus writeErr = tester.WriteAttribute(Attributes::Location::Id, invalidLocation);
         EXPECT_NE(writeErr, CHIP_NO_ERROR); // Expect a failure (ConstraintError)
     }
 }
