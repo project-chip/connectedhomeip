@@ -142,6 +142,8 @@ ClustersWithPreAttributeChangeFunctions:
 # There are 2 lists defining these clusters. Those that have a CodegenIntregtation.cpp 
 # file where they have Init() and/or Shutdown() callbacks, and those that don't.
 CodeDrivenClustersWithCodegenIntegration:
+    # keep-sorted start
+    - Access Control
     - Administrator Commissioning
     - Basic Information
     - Binding
@@ -164,8 +166,11 @@ CodeDrivenClustersWithCodegenIntegration:
     - User Label
     - Wi-Fi Network Diagnostics
     - Diagnostic Logs
+    # keep-sorted end
 
 CodeDrivenClustersWithoutCodegenIntegration:
+    # keep-sorted start
     - Network Commissioning
     - Soil Measurement
     - WebRTC Transport Requestor
+    # keep-sorted end
