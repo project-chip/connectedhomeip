@@ -65,16 +65,25 @@ class ICDManagementCluster : public DefaultServerCluster, public chip::app::ICDS
 public:
     using OptionalAttributeSet = app::OptionalAttributeSet<IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id>;
 
-    // TODO: The interaction between aEnabledCommands and feature flags (particularly LITS) needs clarification.
+    // TODO: The interaction between enabledCommands and feature flags (particularly LITS) needs clarification.
     // According to spec, LITS implies StayActiveRequest support. Options:
-    // 1. Document that kStayActive bit in aEnabledCommands is ignored when LITS feature is set
-    // 2. Add Startup() validation to fail if aEnabledCommands and feature flags are inconsistent,
+    // 1. Document that kStayActive bit in enabledCommands is ignored when LITS feature is set
+    // 2. Add Startup() validation to fail if enabledCommands and feature flags are inconsistent,
     //    and simplify AcceptedCommands/GeneratedCommands to only check mEnabledCommands
-    ICDManagementCluster(EndpointId endpointId, PersistentStorageDelegate & storage, Crypto::SymmetricKeystore & symmetricKeystore,
-                         FabricTable & fabricTable, ICDConfigurationData & icdConfigurationData,
-                         OptionalAttributeSet optionalAttributeSet, BitMask<IcdManagement::OptionalCommands> aEnabledCommands,
-                         BitMask<IcdManagement::UserActiveModeTriggerBitmap> aUserActiveModeTriggerBitmap,
-                         CharSpan aUserActiveModeTriggerInstruction);
+
+    /**
+     * @brief Constructor for ICDManagementCluster
+     *
+     * @param userActiveModeTriggerInstruction The instruction string is copied into an internal buffer
+     *        during construction. The caller does not need to maintain the lifetime of the CharSpan
+     *        or its underlying data after the constructor returns. If the instruction exceeds
+     *        kUserActiveModeTriggerInstructionMaxLength (128 bytes), it will be truncated.
+     */
+    ICDManagementCluster(EndpointId endpointId, Crypto::SymmetricKeystore & symmetricKeystore, FabricTable & fabricTable,
+                         ICDConfigurationData & icdConfigurationData, OptionalAttributeSet optionalAttributeSet,
+                         BitMask<IcdManagement::OptionalCommands> enabledCommands,
+                         BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerBitmap,
+                         CharSpan userActiveModeTriggerInstruction);
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & aEncoder) override;
@@ -99,15 +108,14 @@ protected:
     CHIP_ERROR ReadOperatingMode(AttributeValueEncoder & encoder);
 #endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
-    PersistentStorageDelegate & mStorage;
     Crypto::SymmetricKeystore & mSymmetricKeystore;
     FabricTable & mFabricTable;
     ICDConfigurationData & mICDConfigurationData;
     const OptionalAttributeSet mOptionalAttributeSet;
-    BitMask<IcdManagement::OptionalCommands> mEnabledCommands;
-    BitMask<IcdManagement::UserActiveModeTriggerBitmap> mUserActiveModeTriggerBitmap;
+    const BitMask<IcdManagement::OptionalCommands> mEnabledCommands;
+    const BitMask<IcdManagement::UserActiveModeTriggerBitmap> mUserActiveModeTriggerBitmap;
     char mUserActiveModeTriggerInstruction[IcdManagement::kUserActiveModeTriggerInstructionMaxLength];
-    uint8_t mUserActiveModeTriggerInstructionLength;
+    const uint8_t mUserActiveModeTriggerInstructionLength;
 };
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
@@ -135,16 +143,19 @@ private:
  * This subclass extends ICDManagementCluster with CIP functionality,
  * including client registration/unregistration and fabric delegate management.
  * The fabric delegate is automatically registered/unregistered in Startup/Shutdown.
+ *
+ * @param userActiveModeTriggerInstruction The instruction string is copied into an internal buffer
+ *        during construction (by the base class). The caller does not need to maintain the lifetime
+ *        of the CharSpan or its underlying data after the constructor returns.
  */
 class ICDManagementClusterWithCIP : public ICDManagementCluster
 {
 public:
-    ICDManagementClusterWithCIP(EndpointId endpointId, PersistentStorageDelegate & storage,
-                                Crypto::SymmetricKeystore & symmetricKeystore, FabricTable & fabricTable,
+    ICDManagementClusterWithCIP(EndpointId endpointId, Crypto::SymmetricKeystore & symmetricKeystore, FabricTable & fabricTable,
                                 ICDConfigurationData & icdConfigurationData, OptionalAttributeSet optionalAttributeSet,
-                                BitMask<IcdManagement::OptionalCommands> aEnabledCommands,
-                                BitMask<IcdManagement::UserActiveModeTriggerBitmap> aUserActiveModeTriggerBitmap,
-                                CharSpan aUserActiveModeTriggerInstruction);
+                                BitMask<IcdManagement::OptionalCommands> enabledCommands,
+                                BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerBitmap,
+                                CharSpan userActiveModeTriggerInstruction);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown() override;
@@ -156,6 +167,11 @@ public:
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
 private:
     CHIP_ERROR ReadRegisteredClients(AttributeValueEncoder & encoder);
