@@ -97,7 +97,8 @@ public:
     CHIP_ERROR Init() { return CHIP_NO_ERROR; };
 
     Protocols::InteractionModel::Status UpdateCondition(uint8_t newCondition);
-    Protocols::InteractionModel::Status UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum newChangeIndication);
+    Protocols::InteractionModel::Status
+    UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum newChangeIndication);
     Protocols::InteractionModel::Status UpdateInPlaceIndicator(bool newInPlaceIndicator);
     Protocols::InteractionModel::Status UpdateLastChangedTime(DataModel::Nullable<uint32_t> newLastChangedTime);
 
