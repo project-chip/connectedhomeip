@@ -55,7 +55,7 @@ static constexpr size_t kScenesMaxTransitionTime = 60'000'000u;
 class SceneHandler : public IntrusiveListNodeBase<>
 {
 public:
-    SceneHandler() {};
+    SceneHandler(){};
     virtual ~SceneHandler() = default;
 
     /// @brief Copies the list of supported clusters for an endpoint in a Span and resizes the span to fit the actual number of
@@ -182,7 +182,7 @@ public:
 
             mExtensionFieldSets = other.mExtensionFieldSets;
         }
-        ~SceneData() {};
+        ~SceneData(){};
 
         bool operator==(const SceneData & other) const
         {
@@ -222,9 +222,9 @@ public:
 
     using SceneTableEntry = app::Storage::Data::TableEntry<SceneStorageId, SceneData>;
 
-    SceneTable() {};
+    SceneTable(){};
 
-    virtual ~SceneTable() {};
+    virtual ~SceneTable(){};
 
     // Not copyable
     SceneTable(const SceneTable &) = delete;
