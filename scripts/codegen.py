@@ -129,7 +129,6 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
                 subprocess.check_call(['java', '-jar', path, '--google-style'] + paths)
         except Exception:
             traceback.print_exc()
-            raise
     """
     Parses MATTER IDL files (.matter) and performs SDK code generation
     as set up by the program arguments.
