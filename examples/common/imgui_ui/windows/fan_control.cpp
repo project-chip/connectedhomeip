@@ -233,10 +233,6 @@ void FanControl::Render()
     auto rockSettingMin = static_cast<int>(chip::app::Clusters::FanControl::RockBitmap::kRockLeftRight);
     auto rockSettingMax = static_cast<int>(chip::app::Clusters::FanControl::RockBitmap::kRockRound);
     auto rockSettingVal = GetBitIdx(uiRockSetting, rockSettingMin, rockSettingMax);
-    ImGui::SliderInt(
-        "Rock setting", &rockSettingVal, 0,
-        GetBitIdx(chip::BitMask(chip::app::Clusters::FanControl::RockBitmap::kRockRound), rockSettingMin, rockSettingMax),
-        GetRockBitmapValueString(rockSetting).c_str());
     if (!uiRockSetting.Has(rockSetting))
     {
         mTargetRockSetting.SetValue(uiRockSetting);
@@ -251,10 +247,6 @@ void FanControl::Render()
     auto windSettingMin = static_cast<int>(chip::app::Clusters::FanControl::WindBitmap::kSleepWind);
     auto windSettingMax = static_cast<int>(chip::app::Clusters::FanControl::WindBitmap::kNaturalWind);
     auto windSettingVal = GetBitIdx(uiWindSetting, windSettingMin, windSettingMax);
-    ImGui::SliderInt(
-        "Wind setting", &windSettingVal, 0,
-        GetBitIdx(chip::BitMask(chip::app::Clusters::FanControl::WindBitmap::kNaturalWind), windSettingMin, windSettingMax),
-        GetWindBitmapValueString(windSetting).c_str());
     if (!uiWindSetting.Has(windSetting))
     {
         mTargetWindSetting.SetValue(uiWindSetting);
@@ -270,6 +262,28 @@ void FanControl::Render()
     if (static_cast<int>(featureMap) != uiFeatureMap)
     {
         mTargetFeatureMap = uiFeatureMap;
+    }
+
+    const auto flags = ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_SizingStretchProp;
+    if (ImGui::BeginTable("Rock setting", 2, flags)) // 3 columns
+    {
+        ImGui::TableSetupColumn("Setting", ImGuiTableColumnFlags_None, 1.0f);
+        ImGui::TableSetupColumn("Flags", ImGuiTableColumnFlags_None, 3.0f);
+        ImGui::TableHeadersRow();
+
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Rocking");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("%s", GetRockBitmapValueString(rockSettingVal).c_str());
+
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Wind");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("%s", GetWindBitmapValueString(windSettingVal).c_str());
+
+        ImGui::EndTable();
     }
 
     ImGui::End();
