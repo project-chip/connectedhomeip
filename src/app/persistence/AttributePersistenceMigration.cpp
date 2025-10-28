@@ -42,7 +42,7 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(NotSpecified, "Migration Error - Failed %s path %d/%d/%d - %" CHIP_ERROR_FORMAT, "Reading",
+            ChipLogError(NotSpecified, "Migration Error - Failed %s path %d/%lx/%lx - %" CHIP_ERROR_FORMAT, "Reading",
                          cluster.mEndpointId, cluster.mClusterId, attr, err.Format());
             finalError = err; // make sure we report an error if any element fails
             continue;
@@ -51,7 +51,7 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
         err = normProvider.WriteValue(attrPath, copyOfBuffer);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(NotSpecified, "Migration Error - Failed %s path %d/%d/%d - %" CHIP_ERROR_FORMAT, "Writing",
+            ChipLogError(NotSpecified, "Migration Error - Failed %s path %d/%lx/%lx - %" CHIP_ERROR_FORMAT, "Writing",
                          cluster.mEndpointId, cluster.mClusterId, attr, err.Format());
             finalError = err; // make sure we report an error if any element fails
         }
@@ -59,7 +59,7 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
         err = safeProvider.SafeDeleteValue(attrPath);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(NotSpecified, "Migration Error - Failed %s path %d/%d/%d - %" CHIP_ERROR_FORMAT, "Deleting",
+            ChipLogError(NotSpecified, "Migration Error - Failed %s path %d/%lx/%lx - %" CHIP_ERROR_FORMAT, "Deleting",
                          cluster.mEndpointId, cluster.mClusterId, attr, err.Format());
             finalError = err; // make sure we report an error if any element fails
         }
