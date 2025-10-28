@@ -45,10 +45,22 @@
 struct k_timer;
 struct Identify;
 
-class CustomizedProviderChangeListener : public chip::app::DataModel::ProviderChangeListener
+class LightAttributesJitteProviderChangeListener : public chip::app::DataModel::ProviderChangeListener
 {
 public:
+    static constexpr size_t kMaxAttributePathsBufferSize = 10;
+
+    LightAttributesJitteProviderChangeListener() { k_mutex_init(&mMutex); }
     void MarkDirty(const chip::app::AttributePathParams & path) override;
+
+private:
+    void ProcessPaths();
+    void TimerCallback();
+
+    std::array<chip::app::AttributePathParams, kMaxAttributePathsBufferSize> mAttributePaths;
+    size_t current_index = 0;
+    bool mTimerActive    = false;
+    k_mutex mMutex;
 };
 
 class AppTask
@@ -59,11 +71,6 @@ public:
         static AppTask sAppTask;
         return sAppTask;
     };
-    static chip::app::DataModel::ProviderChangeListener & GetCustomizedProviderChangeListener()
-    {
-        static CustomizedProviderChangeListener sCustomizedProviderChangeListener;
-        return sCustomizedProviderChangeListener;
-    }
 
     CHIP_ERROR StartApp();
 
@@ -72,7 +79,6 @@ public:
 
     static void IdentifyStartHandler(Identify *);
     static void IdentifyStopHandler(Identify *);
-    static void MarkDirty(const chip::app::AttributePathParams & path);
 
 private:
 #ifdef CONFIG_CHIP_PW_RPC
@@ -105,8 +111,7 @@ private:
     FunctionEvent mFunction   = FunctionEvent::NoneSelected;
     bool mFunctionTimerActive = false;
     PWMDevice mPWMDevice;
-    std::vector<chip::app::AttributePathParams> mAttributePaths;
-    struct k_mutex mMutex;
+    LightAttributesJitteProviderChangeListener mCustomizedProviderChangeListener;
 
 #if CONFIG_CHIP_FACTORY_DATA
     chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;

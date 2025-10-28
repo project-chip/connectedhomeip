@@ -159,24 +159,48 @@ constexpr uint32_t kOff_ms{ 950 };
 app::Clusters::NetworkCommissioning::Instance sWiFiCommissioningInstance(0, &(NetworkCommissioning::NrfWiFiDriver::Instance()));
 #endif
 
-void CustomizedProviderChangeListener::MarkDirty(const chip::app::AttributePathParams & path)
+void LightAttributesJitteProviderChangeListener::MarkDirty(const chip::app::AttributePathParams & path)
 {
-    AppTask::MarkDirty(path);
-}
-
-void AppTask::MarkDirty(const chip::app::AttributePathParams & path)
-{
-    k_mutex_lock(&Instance().mMutex, K_FOREVER);
-    Instance().mAttributePaths.push_back(path);
-    // Batch all changes that happen within the timer window.
-    if (!Instance().mFunctionTimerActive)
+    k_mutex_lock(&mMutex, K_FOREVER);
+    if (current_index >= kMaxAttributePathsBufferSize)
+    {
+        LOG_WRN("Attribute path buffer is full, processing existing paths to make room.");
+        ProcessPaths();
+    }
+    mAttributePaths[current_index++] = path;
+    if (!mTimerActive)
     {
         uint32_t jitter = chip::Crypto::GetRandU16() % kUpdateClusterStateJitterTimeoutMs;
-        Instance().StartTimer(kUpdateClusterStateBaseTimeoutMs + jitter);
+        LOG_INF("start timer with %d ms ", kUpdateClusterStateBaseTimeoutMs + jitter);
+        // mTimerDelegate.StartTimer(TimerCallback, System::Clock::Milliseconds32(kUpdateClusterStateBaseTimeoutMs + jitter), this);
+        chip::DeviceLayer::SystemLayer().StartTimer(
+            System::Clock::Milliseconds32(kUpdateClusterStateBaseTimeoutMs + jitter),
+            [](chip::System::Layer *, void * me) {
+                static_cast<LightAttributesJitteProviderChangeListener *>(me)->TimerCallback();
+            },
+            this);
+        mTimerActive = true;
     }
-    Instance().mFunction = FunctionEvent::UpdateClusterState;
-    k_mutex_unlock(&Instance().mMutex);
-};
+    k_mutex_unlock(&mMutex);
+}
+
+void LightAttributesJitteProviderChangeListener::ProcessPaths()
+{
+    for (size_t i = 0; i < current_index; i++)
+    {
+        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(mAttributePaths[i]);
+    }
+    LOG_INF("set %d attributes path dirty", current_index);
+    current_index = 0;
+}
+
+void LightAttributesJitteProviderChangeListener::TimerCallback()
+{
+    k_mutex_lock(&mMutex, K_FOREVER);
+    ProcessPaths();
+    mTimerActive = false;
+    k_mutex_unlock(&mMutex);
+}
 
 CHIP_ERROR AppTask::Init()
 {
@@ -196,7 +220,6 @@ CHIP_ERROR AppTask::Init()
         LOG_ERR("PlatformMgr().InitChipStack() failed");
         return err;
     }
-    k_mutex_init(&mMutex);
 
 #if defined(CONFIG_NET_L2_OPENTHREAD)
     err = ThreadStackMgr().InitThreadStack();
@@ -310,7 +333,7 @@ CHIP_ERROR AppTask::Init()
     initParams.dataModelProvider        = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     // provide a customzied ProviderChangeListener
-    initParams.dataModelProviderChangeListner = &GetCustomizedProviderChangeListener();
+    initParams.dataModelProviderChangeListner = &mCustomizedProviderChangeListener;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();
 
@@ -527,22 +550,6 @@ void AppTask::FunctionTimerEventHandler(const AppEvent & event)
         StartBLEAdvertisementHandler(event);
         Instance().mFunction = FunctionEvent::NoneSelected;
 #endif
-    }
-    else if (Instance().mFunction == FunctionEvent::UpdateClusterState)
-    {
-        k_mutex_lock(&Instance().mMutex, K_FOREVER);
-        for (const auto & path : Instance().mAttributePaths)
-        {
-            CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
-            if (err != CHIP_NO_ERROR)
-            {
-                LOG_ERR("Failed to set path dirty with error %" CHIP_ERROR_FORMAT, err.Format());
-            }
-        }
-        Instance().mAttributePaths.clear();
-        Instance().mFunction = FunctionEvent::NoneSelected;
-        Instance().CancelTimer();
-        k_mutex_unlock(&Instance().mMutex);
     }
 }
 
