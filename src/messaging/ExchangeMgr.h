@@ -168,10 +168,9 @@ public:
      *
      *  @param[in]    msgType       The message type of the corresponding protocol.
      *
-     *  @param[out]   outHandler   If non-null, receives the handler that was removed from the
-     *                             unsolicited message handler pool. If no handler matched, *outHandler
-     *                             will be set to nullptr. Callers may pass nullptr if they do not
-     *                             need this information.
+     *  @param[out]   outHandler   If non-null, receives the handler that was unregistered. If no
+     *                             handler matched, *outHandler is set to nullptr. Callers may pass
+     *                             nullptr if they do not need this information.
      *
      *  @retval #CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER  If the matching unsolicited message handler
      *                                                       is not found.

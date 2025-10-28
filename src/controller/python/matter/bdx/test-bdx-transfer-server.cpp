@@ -49,7 +49,9 @@ void TestBdxTransferServer::Shutdown()
     // Re-register the BdxTransferServer that was registered as part of CHIPDeviceControllerFactory.
     // Otherwise when BdxTransferServer::Shutdown() attempts to unregister this, it causes an error.
     if (mPrevSendInitHandler != nullptr)
+    {
         LogErrorOnFailure(mExchangeManager->RegisterUnsolicitedMessageHandlerForType(MessageType::SendInit, mPrevSendInitHandler));
+    }
 
     mExchangeManager = nullptr;
 }

@@ -178,9 +178,11 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
     {
         if (umh.IsInUse() && umh.Matches(protocolId, msgType))
         {
-            // Capture the handler before resetting the slot.
+            // Capture the handler before unregistering.
             if (outHandler != nullptr)
+            {
                 *outHandler = umh.Handler;
+            }
             umh.Reset();
             SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumUMHandlers);
             return CHIP_NO_ERROR;
@@ -188,7 +190,9 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
     }
 
     if (outHandler != nullptr)
+    {
         *outHandler = nullptr;
+    }
 
     return CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER;
 }
