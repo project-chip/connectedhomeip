@@ -171,8 +171,6 @@ void LightAttributesJitteProviderChangeListener::MarkDirty(const chip::app::Attr
     if (!mTimerActive)
     {
         uint32_t jitter = chip::Crypto::GetRandU16() % kUpdateClusterStateJitterTimeoutMs;
-        LOG_INF("start timer with %d ms ", kUpdateClusterStateBaseTimeoutMs + jitter);
-        // mTimerDelegate.StartTimer(TimerCallback, System::Clock::Milliseconds32(kUpdateClusterStateBaseTimeoutMs + jitter), this);
         chip::DeviceLayer::SystemLayer().StartTimer(
             System::Clock::Milliseconds32(kUpdateClusterStateBaseTimeoutMs + jitter),
             [](chip::System::Layer *, void * me) {
@@ -190,7 +188,6 @@ void LightAttributesJitteProviderChangeListener::ProcessPaths()
     {
         chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(mAttributePaths[i]);
     }
-    LOG_INF("set %d attributes path dirty", current_index);
     current_index = 0;
 }
 

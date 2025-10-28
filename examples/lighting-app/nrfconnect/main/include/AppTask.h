@@ -45,6 +45,14 @@
 struct k_timer;
 struct Identify;
 
+/**
+ * @brief A customized ProviderChangeListener that introduces a delay before marking attributes dirty.
+ *
+ * This implementation adds a randomized delay (a constant base time plus jitter) before notifying the reporting engine that an
+ * attribute path is dirty. The primary goal is to delay DataReports sending, thereby reducing overall network traffic. This
+ * approach has proven effective in mitigating network congestion and reducing packet retransmissions, particularly on constrained
+ * networks like Thread.
+ */
 class LightAttributesJitteProviderChangeListener : public chip::app::DataModel::ProviderChangeListener
 {
 public:
