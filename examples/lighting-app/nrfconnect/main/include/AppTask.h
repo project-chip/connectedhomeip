@@ -53,20 +53,22 @@ struct Identify;
  * approach has proven effective in mitigating network congestion and reducing packet retransmissions, particularly on constrained
  * networks like Thread.
  */
-class LightAttributesJitteProviderChangeListener : public chip::app::DataModel::ProviderChangeListener
+class LightAttributesJitterProviderChangeListener : public chip::app::DataModel::ProviderChangeListener
 {
 public:
-    static constexpr size_t kMaxAttributePathsBufferSize = 10;
+    static constexpr size_t kMaxAttributePathsBufferSize    = 10;
+    static constexpr int kUpdateClusterStateBaseTimeoutMs   = 1000;
+    static constexpr int kUpdateClusterStateJitterTimeoutMs = 1000;
 
-    LightAttributesJitteProviderChangeListener() { k_mutex_init(&mMutex); }
+    LightAttributesJitterProviderChangeListener() { k_mutex_init(&mMutex); }
     void MarkDirty(const chip::app::AttributePathParams & path) override;
 
 private:
-    void ProcessPaths();
+    void FlushDirtyPaths();
     void TimerCallback();
 
     std::array<chip::app::AttributePathParams, kMaxAttributePathsBufferSize> mAttributePaths;
-    size_t current_index = 0;
+    size_t mCurrentIndex = 0;
     bool mTimerActive    = false;
     k_mutex mMutex;
 };
@@ -119,7 +121,7 @@ private:
     FunctionEvent mFunction   = FunctionEvent::NoneSelected;
     bool mFunctionTimerActive = false;
     PWMDevice mPWMDevice;
-    LightAttributesJitteProviderChangeListener mCustomizedProviderChangeListener;
+    LightAttributesJitterProviderChangeListener mCustomizedProviderChangeListener;
 
 #if CONFIG_CHIP_FACTORY_DATA
     chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;

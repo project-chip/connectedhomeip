@@ -78,14 +78,12 @@ using namespace ::chip::DeviceLayer;
 
 namespace {
 
-constexpr int kFactoryResetTriggerTimeout        = 3000;
-constexpr int kFactoryResetCancelWindowTimeout   = 3000;
-constexpr int kUpdateClusterStateBaseTimeoutMs   = 1000;
-constexpr int kUpdateClusterStateJitterTimeoutMs = 1000;
-constexpr int kAppEventQueueSize                 = 10;
-constexpr EndpointId kLightEndpointId            = 1;
-constexpr uint8_t kDefaultMinLevel               = 0;
-constexpr uint8_t kDefaultMaxLevel               = 254;
+constexpr int kFactoryResetTriggerTimeout      = 3000;
+constexpr int kFactoryResetCancelWindowTimeout = 3000;
+constexpr int kAppEventQueueSize               = 10;
+constexpr EndpointId kLightEndpointId          = 1;
+constexpr uint8_t kDefaultMinLevel             = 0;
+constexpr uint8_t kDefaultMaxLevel             = 254;
 #if NUMBER_OF_BUTTONS == 2
 constexpr uint32_t kAdvertisingTriggerTimeout = 3000;
 #endif
@@ -159,23 +157,23 @@ constexpr uint32_t kOff_ms{ 950 };
 app::Clusters::NetworkCommissioning::Instance sWiFiCommissioningInstance(0, &(NetworkCommissioning::NrfWiFiDriver::Instance()));
 #endif
 
-void LightAttributesJitteProviderChangeListener::MarkDirty(const chip::app::AttributePathParams & path)
+void LightAttributesJitterProviderChangeListener::MarkDirty(const chip::app::AttributePathParams & path)
 {
     k_mutex_lock(&mMutex, K_FOREVER);
-    if (current_index >= kMaxAttributePathsBufferSize)
+    if (mCurrentIndex >= kMaxAttributePathsBufferSize)
     {
-        LOG_WRN("Attribute path buffer is full, processing existing paths to make room.");
-        ProcessPaths();
+        // When attribute path buffer is full, process existing paths to make room
+        FlushDirtyPaths();
     }
-    mAttributePaths[current_index++] = path;
+    mAttributePaths[mCurrentIndex++] = path;
     if (!mTimerActive)
     {
-        uint32_t jitter = chip::Crypto::GetRandU16() % kUpdateClusterStateJitterTimeoutMs;
+        uint32_t jitterMs = chip::Crypto::GetRandU16() % kUpdateClusterStateJitterTimeoutMs;
         chip::DeviceLayer::SystemLayer().StartTimer(
-            chip::System::Clock::Milliseconds32(kUpdateClusterStateBaseTimeoutMs + jitter),
+            chip::System::Clock::Milliseconds32(kUpdateClusterStateBaseTimeoutMs + jitterMs),
             [](chip::System::Layer *, void * me) {
                 chip::DeviceLayer::SystemLayer().ScheduleLambda(
-                    [me] { static_cast<LightAttributesJitteProviderChangeListener *>(me)->TimerCallback(); });
+                    [me] { static_cast<LightAttributesJitterProviderChangeListener *>(me)->TimerCallback(); });
             },
             this);
         mTimerActive = true;
@@ -183,19 +181,19 @@ void LightAttributesJitteProviderChangeListener::MarkDirty(const chip::app::Attr
     k_mutex_unlock(&mMutex);
 }
 
-void LightAttributesJitteProviderChangeListener::ProcessPaths()
+void LightAttributesJitterProviderChangeListener::FlushDirtyPaths()
 {
-    for (size_t i = 0; i < current_index; i++)
+    for (size_t i = 0; i < mCurrentIndex; i++)
     {
         chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(mAttributePaths[i]);
     }
-    current_index = 0;
+    mCurrentIndex = 0;
 }
 
-void LightAttributesJitteProviderChangeListener::TimerCallback()
+void LightAttributesJitterProviderChangeListener::TimerCallback()
 {
     k_mutex_lock(&mMutex, K_FOREVER);
-    ProcessPaths();
+    FlushDirtyPaths();
     mTimerActive = false;
     k_mutex_unlock(&mMutex);
 }
