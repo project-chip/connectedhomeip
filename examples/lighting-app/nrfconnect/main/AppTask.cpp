@@ -172,9 +172,10 @@ void LightAttributesJitteProviderChangeListener::MarkDirty(const chip::app::Attr
     {
         uint32_t jitter = chip::Crypto::GetRandU16() % kUpdateClusterStateJitterTimeoutMs;
         chip::DeviceLayer::SystemLayer().StartTimer(
-            System::Clock::Milliseconds32(kUpdateClusterStateBaseTimeoutMs + jitter),
+            chip::System::Clock::Milliseconds32(kUpdateClusterStateBaseTimeoutMs + jitter),
             [](chip::System::Layer *, void * me) {
-                static_cast<LightAttributesJitteProviderChangeListener *>(me)->TimerCallback();
+                chip::DeviceLayer::SystemLayer().ScheduleLambda(
+                    [me] { static_cast<LightAttributesJitteProviderChangeListener *>(me)->TimerCallback(); });
             },
             this);
         mTimerActive = true;
