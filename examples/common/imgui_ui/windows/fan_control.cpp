@@ -20,6 +20,9 @@
 #include <imgui.h>
 
 #include <math.h>
+#include <vector>
+#include <utility>
+#include <string_view>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
@@ -29,52 +32,37 @@ namespace Ui {
 namespace Windows {
 
 template <typename T>
-void collect(T value, chip::BitMask<T> mask, std::string & result, const std::string & tag)
+static const std::string GetBitmapValueString(chip::BitMask<T> bitmask, const std::vector<std::pair<T, std::string_view>>&  valuesToNames)
 {
-    if (mask.Has(value))
-    {
-        if (!result.empty())
+    std::string result;
+    for (const auto& entry : valuesToNames ) {
+        if (bitmask.Has(entry.first))
         {
-            result += "|";
+            if (!result.empty())
+            {
+                result += "|";
+            }
+            result += entry.second;
         }
-        result += tag;
     }
+    return result.empty() ? "Unknown" : result;
 }
 
 static const std::string GetRockBitmapValueString(chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> bitmask)
 {
-    std::string result;
-    collect(chip::app::Clusters::FanControl::RockBitmap::kRockLeftRight, bitmask, result, "Left-right");
-    collect(chip::app::Clusters::FanControl::RockBitmap::kRockUpDown, bitmask, result, "Up-down");
-    collect(chip::app::Clusters::FanControl::RockBitmap::kRockRound, bitmask, result, "Round");
-    return result.empty() ? "Unknown" : result;
+    return GetBitmapValueString(bitmask, {
+        {chip::app::Clusters::FanControl::RockBitmap::kRockLeftRight, "Left-right"},
+        {chip::app::Clusters::FanControl::RockBitmap::kRockUpDown, "Up-down"},
+        {chip::app::Clusters::FanControl::RockBitmap::kRockRound, "Round"}
+    });
 }
 
 static const std::string GetWindBitmapValueString(chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> bitmask)
 {
-    std::string result;
-    collect(chip::app::Clusters::FanControl::WindBitmap::kSleepWind, bitmask, result, "Sleep");
-    collect(chip::app::Clusters::FanControl::WindBitmap::kNaturalWind, bitmask, result, "Natural");
-    return result.empty() ? "Unknown" : result;
-}
-
-template <typename T>
-static constexpr int GetBitIdx(const chip::BitMask<T> & bitmap, int tMin, int tMax)
-{
-    if (tMin > tMax)
-    {
-        return -1;
-    }
-
-    int arg = tMin;
-    int r   = 0;
-
-    while (!bitmap.HasOnly(static_cast<T>(arg)))
-    {
-        arg = arg << 1;
-        r++;
-    }
-    return r;
+    return GetBitmapValueString(bitmask, {
+        {chip::app::Clusters::FanControl::WindBitmap::kSleepWind, "Sleep"},
+        {chip::app::Clusters::FanControl::WindBitmap::kNaturalWind, "Natural"}
+    });
 }
 
 template <typename T>
@@ -230,29 +218,21 @@ void FanControl::Render()
         mTargetAirflowDirection = static_cast<chip::app::Clusters::FanControl::AirflowDirectionEnum>(uiAirflowDirection);
     }
 
-    auto rockSettingMin = static_cast<int>(chip::app::Clusters::FanControl::RockBitmap::kRockLeftRight);
-    auto rockSettingMax = static_cast<int>(chip::app::Clusters::FanControl::RockBitmap::kRockRound);
-    auto rockSettingVal = GetBitIdx(uiRockSetting, rockSettingMin, rockSettingMax);
     if (!uiRockSetting.Has(rockSetting))
     {
         mTargetRockSetting.SetValue(uiRockSetting);
     }
 
-    ImGui::LabelText("Rock support", "%d", GetBits(uiRockSupport, rockSettingMin, rockSettingMax));
     if (rockSupport != uiRockSupport)
     {
         mTargetRockSupport.SetValue(uiRockSupport);
     }
 
-    auto windSettingMin = static_cast<int>(chip::app::Clusters::FanControl::WindBitmap::kSleepWind);
-    auto windSettingMax = static_cast<int>(chip::app::Clusters::FanControl::WindBitmap::kNaturalWind);
-    auto windSettingVal = GetBitIdx(uiWindSetting, windSettingMin, windSettingMax);
     if (!uiWindSetting.Has(windSetting))
     {
         mTargetWindSetting.SetValue(uiWindSetting);
     }
 
-    ImGui::LabelText("Wind support", "%d", GetBits(uiWindSupport, windSettingMin, windSettingMax));
     if (windSupport != uiWindSupport)
     {
         mTargetWindSupport.SetValue(uiWindSupport);
@@ -265,23 +245,33 @@ void FanControl::Render()
     }
 
     const auto flags = ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_SizingStretchProp;
-    if (ImGui::BeginTable("Rock setting", 2, flags))
+    if (ImGui::BeginTable("Wind and Rock", 2, flags))
     {
-        ImGui::TableSetupColumn("Setting", ImGuiTableColumnFlags_None, 1.0f);
+        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_None, 1.0f);
         ImGui::TableSetupColumn("Flags", ImGuiTableColumnFlags_None, 3.0f);
         ImGui::TableHeadersRow();
 
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(0);
-        ImGui::Text("Rocking");
+        ImGui::Text("Rock support");
         ImGui::TableSetColumnIndex(1);
-        ImGui::Text("%s", GetRockBitmapValueString(rockSettingVal).c_str());
+        ImGui::Text("%s", GetRockBitmapValueString(uiRockSupport).c_str());
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Rock setting");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("%s", GetRockBitmapValueString(uiRockSetting).c_str());
 
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(0);
-        ImGui::Text("Wind");
+        ImGui::Text("Wind support");
         ImGui::TableSetColumnIndex(1);
-        ImGui::Text("%s", GetWindBitmapValueString(windSettingVal).c_str());
+        ImGui::Text("%s", GetWindBitmapValueString(uiWindSupport).c_str());
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Wind setting");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("%s", GetWindBitmapValueString(uiWindSetting).c_str());
 
         ImGui::EndTable();
     }
