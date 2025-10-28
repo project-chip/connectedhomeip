@@ -67,6 +67,10 @@ not_automated:
       reason: Shared code for TC_SEPR, not a standalone test
     - name: TC_SETRF_TestBase.py
       reason: Shared code for TC_SETRF, not a standalone test
+    - name: TC_SUTestBase.py
+      reason: Shared code for TC_SU, not a standalone test
+    - name: TC_SU_2_4.py
+      reason: CI script not implemented yet.
     - name: TC_COMMTR_TestBase.py
       reason: Shared code for TC_COMMTR, not a standalone test
     - name: TC_MTRIDTestBase.py
