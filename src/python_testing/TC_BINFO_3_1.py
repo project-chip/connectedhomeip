@@ -32,10 +32,11 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from support_modules.product_appearance import ProductAppearanceBase
-from matter.testing.decorators import run_if_endpoint_matches, has_attribute
+
+import matter.clusters as Clusters
+from matter.testing.decorators import has_attribute, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 
 
 class TC_BINFO_3_1(ProductAppearanceBase):
