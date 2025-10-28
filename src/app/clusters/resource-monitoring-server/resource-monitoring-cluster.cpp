@@ -55,7 +55,7 @@ ResourceMonitoringCluster::ResourceMonitoringCluster(
     mEnabledFeatures(enabledFeatures), mOptionalAttributeSet(optionalAttributeSet)
 {}
 
-CHIP_ERROR ResourceMonitoringCluster::SetDelegate(ResourceMonitoringDelegate * aDelegate)
+CHIP_ERROR ResourceMonitoringCluster::SetDelegate(Delegate * aDelegate)
 {
     VerifyOrReturnError(aDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -385,7 +385,7 @@ bool ResourceMonitoringCluster::HasOptionalAttribute(AttributeId aAttribute) con
     return mOptionalAttributeSet.IsSet(aAttribute);
 }
 
-Protocols::InteractionModel::Status ResourceMonitoringDelegate::OnResetCondition()
+Protocols::InteractionModel::Status Delegate::OnResetCondition()
 {
     // call application specific pre reset logic,
     // anything other than Success will cause the command to fail, and not do any of the resets
@@ -427,12 +427,12 @@ Protocols::InteractionModel::Status ResourceMonitoringDelegate::OnResetCondition
     return status;
 }
 
-Protocols::InteractionModel::Status ResourceMonitoringDelegate::PreResetCondition()
+Protocols::InteractionModel::Status Delegate::PreResetCondition()
 {
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status ResourceMonitoringDelegate::PostResetCondition()
+Protocols::InteractionModel::Status Delegate::PostResetCondition()
 {
     return Protocols::InteractionModel::Status::Success;
 }

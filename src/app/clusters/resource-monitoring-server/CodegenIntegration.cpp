@@ -49,7 +49,7 @@ ListEntry * gActiveClusters{ nullptr };
 // Removes the first node with a matching pair (endpointId, clusterId) from the list and returns the new head of the list.
 ListEntry * removeListEntryFromList(ListEntry * head, EndpointId endpointId, ClusterId clusterId)
 {
-    ListEntry * current = head;
+    ListEntry * current  = head;
     ListEntry * previous = nullptr;
 
     while (current)
@@ -72,7 +72,7 @@ ListEntry * removeListEntryFromList(ListEntry * head, EndpointId endpointId, Clu
         else
         {
             previous = current;
-            current = current->next;
+            current  = current->next;
         }
     }
     return head;
@@ -80,31 +80,23 @@ ListEntry * removeListEntryFromList(ListEntry * head, EndpointId endpointId, Clu
 
 } // namespace
 
-
-
 // Common helper for cluster initialization
 void InitResourceMonitoringCluster(EndpointId endpointId, ClusterId clusterId, BitFlags<ResourceMonitoring::Feature> featureFlags,
-                                  const ResourceMonitoring::ResourceMonitoringCluster::OptionalAttributeSet & optionalAttributeSet,
-                                  chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum degradationDirection,
-                                  bool resetConditionSupported)
+                                   const ResourceMonitoring::ResourceMonitoringCluster::OptionalAttributeSet & optionalAttributeSet,
+                                   chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum degradationDirection,
+                                   bool resetConditionSupported)
 {
     ListEntry * previous = nullptr;
-    ListEntry * current = gActiveClusters;
+    ListEntry * current  = gActiveClusters;
 
     while (current != nullptr)
     {
         previous = current;
-        current = current->next;
+        current  = current->next;
     }
 
-    ListEntry * newNode = new ListEntry{
-        endpointId,
-        clusterId,
-        featureFlags,
-        optionalAttributeSet,
-        degradationDirection,
-        resetConditionSupported
-    };
+    ListEntry * newNode =
+        new ListEntry{ endpointId, clusterId, featureFlags, optionalAttributeSet, degradationDirection, resetConditionSupported };
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(newNode->registration);
 
@@ -134,13 +126,9 @@ void MatterHepaFilterMonitoringClusterInitCallback(EndpointId endpointId)
     ResourceMonitoring::ResourceMonitoringCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
     uint32_t featureMap = CodegenClusterIntegration::LoadFeatureMap(endpointId, HepaFilterMonitoring::Id);
 
-    InitResourceMonitoringCluster(
-        endpointId,
-        HepaFilterMonitoring::Id,
-        BitFlags<ResourceMonitoring::Feature>{ featureMap },
-        optionalAttributeSet,
-        chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown,
-        true // reset condition command supported
+    InitResourceMonitoringCluster(endpointId, HepaFilterMonitoring::Id, BitFlags<ResourceMonitoring::Feature>{ featureMap },
+                                  optionalAttributeSet, chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown,
+                                  true // reset condition command supported
     );
 }
 
@@ -159,13 +147,10 @@ void MatterActivatedCarbonFilterMonitoringClusterInitCallback(EndpointId endpoin
     ResourceMonitoring::ResourceMonitoringCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
     uint32_t featureMap = CodegenClusterIntegration::LoadFeatureMap(endpointId, ActivatedCarbonFilterMonitoring::Id);
 
-    InitResourceMonitoringCluster(
-        endpointId,
-        ActivatedCarbonFilterMonitoring::Id,
-        BitFlags<ResourceMonitoring::Feature>{ featureMap },
-        optionalAttributeSet,
-        chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown,
-        true // reset condition command supported
+    InitResourceMonitoringCluster(endpointId, ActivatedCarbonFilterMonitoring::Id,
+                                  BitFlags<ResourceMonitoring::Feature>{ featureMap }, optionalAttributeSet,
+                                  chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown,
+                                  true // reset condition command supported
     );
 }
 
@@ -179,7 +164,7 @@ namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
 
-ResourceMonitoringCluster* GetClusterInstance(EndpointId endpointId, ClusterId clusterId)
+ResourceMonitoringCluster * GetClusterInstance(EndpointId endpointId, ClusterId clusterId)
 {
     ListEntry * current = gActiveClusters;
 

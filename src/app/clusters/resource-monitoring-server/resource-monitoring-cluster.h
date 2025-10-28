@@ -38,7 +38,7 @@ namespace Clusters {
 namespace ResourceMonitoring {
 
 // forward declarations
-class ResourceMonitoringDelegate;
+class Delegate;
 
 class ResourceMonitoringCluster : public DefaultServerCluster
 {
@@ -63,39 +63,6 @@ public:
                               OptionalAttributeSet optionalAttributeSet,
                               ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
                               bool aResetConditionCommandSupported);
-
-
-    /**
-     * Creates a resource monitoring cluster object and attaches the provided delegate.
-     *
-     * This overloaded constructor facilitates keeping existing code in (for instance) `examples/placeholder/linux/resource-monitoring-delegates.cpp`.
-     * This constructor forwards to the primary constructor overload and then calls SetDelegate() with the
-     * supplied delegate. The caller is responsible for ensuring that the delegate remains valid for the lifetime of the cluster
-     * instance.
-     *
-     * @param delegate                         Pointer to a ResourceMonitoringDelegate that will be associated with this instance.
-     *                                        The caller must ensure the delegate outlives the cluster instance.
-     * @param aEndpointId                      The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aClusterId                       The ID of the ResourceMonitoring aliased cluster to be instantiated.
-     * @param aFeatureMap                      The feature map of the cluster (packed as a uint32_t).
-     * @param aDegradationDirection            The degradation direction of the cluster.
-     * @param resetConditionCommandSupported   Whether the ResetCondition command is supported by the cluster.
-     */
-    ResourceMonitoringCluster(ResourceMonitoringDelegate * delegate, EndpointId endpointId, ClusterId clusterId,
-                              uint32_t featureMap, DegradationDirectionEnum degradationDirection,
-                              bool resetConditionCommandSupported)
-        : ResourceMonitoringCluster(endpointId, clusterId,
-                                    BitFlags<ResourceMonitoring::Feature>{ featureMap },
-                                    OptionalAttributeSet{
-                                        ResourceMonitoring::Attributes::Condition::Id |
-                                        ResourceMonitoring::Attributes::DegradationDirection::Id |
-                                        ResourceMonitoring::Attributes::InPlaceIndicator::Id |
-                                        ResourceMonitoring::Attributes::LastChangedTime::Id
-                                    },
-                                    degradationDirection, resetConditionCommandSupported)
-    {
-        SetDelegate(delegate);
-    }
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
@@ -135,13 +102,13 @@ public:
     void UpdateLastChangedTime(DataModel::Nullable<uint32_t> newLastChangedTime);
 
     /**
-     * Sets delegate to passed ResourceMonitoringDelegate pointer. If this is not nullptr, subsequent action is to set instance
+     * Sets delegate to passed Delegate pointer. If this is not nullptr, subsequent action is to set instance
      * pointer in the delegate to this (ResourceMonitoringCluster) instance.
      *
      * @param aDelegate A pointer to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CHIP_ERROR SetDelegate(ResourceMonitoringDelegate * aDelegate);
+    CHIP_ERROR SetDelegate(Delegate * aDelegate);
 
     // Attribute getters
     uint8_t GetCondition() const;
@@ -161,7 +128,7 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
 private:
-    ResourceMonitoringDelegate * mDelegate;
+    Delegate * mDelegate;
 
     void LoadPersistentAttributes();
 
@@ -188,7 +155,7 @@ private:
     const OptionalAttributeSet mOptionalAttributeSet;
 };
 
-class ResourceMonitoringDelegate
+class Delegate
 {
     friend class ResourceMonitoringCluster;
 
@@ -206,8 +173,8 @@ protected:
     ResourceMonitoringCluster * GetInstance() { return mInstance; }
 
 public:
-    ResourceMonitoringDelegate()          = default;
-    virtual ~ResourceMonitoringDelegate() = default;
+    Delegate()          = default;
+    virtual ~Delegate() = default;
 
     // The following methods should be overridden by the SDK user to implement the business logic of their application
 
@@ -258,9 +225,6 @@ public:
      */
     virtual Protocols::InteractionModel::Status PostResetCondition();
 };
-
-
-using Instance = ResourceMonitoringCluster;
 
 } // namespace ResourceMonitoring
 } // namespace Clusters
