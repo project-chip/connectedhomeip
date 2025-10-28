@@ -29,6 +29,53 @@
 #include <cinttypes>
 
 using namespace chip::TLV;
+using namespace chip::app;
+
+namespace {
+
+struct InvalidEventsRemoveContext
+{
+    chip::Platform::ScopedMemoryBuffer<uint8_t> scopedBuffer;
+    TLVWriter writer;
+    size_t removedEventCount;
+};
+
+CHIP_ERROR FetchBufferExcludeInvalidEvents(const TLVReader & aReader, size_t aDepth, void * apContext)
+{
+    InvalidEventsRemoveContext * ctx = static_cast<InvalidEventsRemoveContext *>(apContext);
+    TLVReader event;
+    TLVType tlvType;
+    TLVType tlvType1;
+    event.Init(aReader);
+    VerifyOrReturnError(event.EnterContainer(tlvType) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    VerifyOrReturnError(event.Next(ContextTag(EventReportIB::Tag::kEventData)) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    VerifyOrReturnError(event.EnterContainer(tlvType1) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+
+    while (CHIP_NO_ERROR == event.Next())
+    {
+        if (event.GetTag() == ContextTag(EventDataIB::Tag::kPath))
+        {
+            EventPathIB::Parser path;
+            ConcreteEventPath eventPath;
+            DataModel::EventEntry eventInfo;
+            ReturnErrorOnFailure(path.Init(event));
+            ReturnErrorOnFailure(path.GetEventPath(&eventPath));
+            if (InteractionModelEngine::GetInstance()->GetDataModelProvider()->EventInfo(eventPath, eventInfo) == CHIP_NO_ERROR)
+            {
+                TLVReader encodedEvent;
+                encodedEvent.Init(aReader);
+                ctx->writer.CopyElement(encodedEvent);
+            }
+            else
+            {
+                ctx->removedEventCount++;
+            }
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+} // namespace
 
 namespace chip {
 namespace app {
@@ -415,6 +462,9 @@ CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, const Ev
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mState != EventManagementStates::Shutdown, CHIP_ERROR_INCORRECT_STATE);
+    // If the event path is invalid, we should not record it in the event log buffer.
+    DataModel::EventEntry eventInfo;
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->EventInfo(aEventOptions.mPath, eventInfo));
     return LogEventPrivate(apDelegate, aEventOptions, aEventNumber);
 }
 
@@ -561,13 +611,12 @@ bool EventManagement::IncludeEventInReport(EventLoadOutContext * eventLoadOutCon
     {
         // If we cannot get event info here, that means the data model doesn't support the
         // event (eg. the endpoint is removed).  Return false, because we can't even perform ACL checks here,
-        // since we don't know what permissions to check for.  This is not an error condition
+        // since we don't know what permissions to check for. This is not an error condition
         // (other than omitting the event), because the only way we can end up in this situation
         // is with a wildcard event path.
         //
-        // TODO: We should not record the event in the log buffer when the event is not supported by the data model, see #41448.
-        // TODO: We should remove the event from the log buffer when the event path is no longer valid (eg. when the endpoint of the
-        // event path is removed), see #41448
+        // We already have API to remove events with invalid path, but we cannot ensure whether it is called
+        // before this function gets called. Keep this check anyway.
         return false;
     }
 
@@ -747,6 +796,58 @@ CHIP_ERROR EventManagement::FabricRemoved(FabricIndex aFabricIndex)
         err = CHIP_NO_ERROR;
     }
     return err;
+}
+
+CHIP_ERROR EventManagement::RemoveEventsWithInvalidPath()
+{
+    assertChipStackLockedByCurrentThread();
+    for (auto * currentBuffer = mpEventBuffer; currentBuffer; currentBuffer = currentBuffer->GetNextCircularEventBuffer())
+    {
+        if (currentBuffer->DataLength() == 0)
+        {
+            // Current buffer doesn't include any events, skip it.
+            continue;
+        }
+        TLVReader reader;
+        CircularTLVReader circularReader;
+        InvalidEventsRemoveContext ctx;
+        circularReader.Init(*currentBuffer);
+        reader.Init(circularReader);
+        ctx.scopedBuffer.Calloc(currentBuffer->DataLength());
+        VerifyOrReturnError(ctx.scopedBuffer.Get(), CHIP_ERROR_NO_MEMORY);
+        ctx.writer.Init(ctx.scopedBuffer.Get(), currentBuffer->DataLength());
+        ctx.removedEventCount = 0;
+        // Get a buffer which excludes the events with the invalid path from current buffer.
+        CHIP_ERROR err = TLV::Utilities::Iterate(reader, FetchBufferExcludeInvalidEvents, &ctx, false);
+        if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
+        if (ctx.removedEventCount == 0)
+        {
+            // No event gets removed, switch to the next buffer
+            continue;
+        }
+        ReturnErrorOnFailure(ctx.writer.Finalize());
+        currentBuffer->mProcessEvictedElement = nullptr;
+        // Evict all the events in current buffer
+        while (err == CHIP_NO_ERROR)
+        {
+            err = currentBuffer->EvictHead();
+        }
+        // Copy the obtained buffer to current buffer
+        CircularTLVWriter circularWriter;
+        TLVReader copyReader;
+        circularWriter.Init(*currentBuffer);
+        copyReader.Init(ctx.scopedBuffer.Get(), ctx.writer.GetLengthWritten());
+        while (copyReader.Next() == CHIP_NO_ERROR)
+        {
+            ReturnErrorOnFailure(circularWriter.CopyElement(copyReader));
+        }
+        ReturnErrorOnFailure(circularWriter.Finalize());
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EventManagement::GetEventReader(TLVReader & aReader, PriorityLevel aPriority, CircularEventBufferWrapper * apBufWrapper)

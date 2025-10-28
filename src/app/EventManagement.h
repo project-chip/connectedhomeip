@@ -374,6 +374,11 @@ public:
     CHIP_ERROR FabricRemoved(FabricIndex aFabricIndex);
 
     /**
+     * @brief Iterate all events and remove the events whose associated EventPath is invalid.
+     */
+    CHIP_ERROR RemoveEventsWithInvalidPath();
+
+    /**
      * @brief
      *   Fetch the most recently vended Number for a particular priority level
      *
