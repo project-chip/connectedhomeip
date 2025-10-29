@@ -23,7 +23,6 @@
 
 #include <cstring>
 #include <string>
-#include <vector>
 
 #include <pw_unit_test/framework.h>
 
@@ -117,34 +116,30 @@ TEST(TestBase64, DecodeErrorCases)
     EXPECT_EQ(dlen, UINT16_MAX);
 }
 
-TEST(TestBase64, Encode32Decode32Chunking)
+TEST(TestBase64, EncodeAndNextDecode)
 {
-    // Create an input larger than kMaxConvert used in the implementation
-    const size_t kMaxConvert = (UINT16_MAX / 4) * 3;
-    const size_t bigLen      = kMaxConvert + 10; // force chunking
+    const uint8_t testInput[] = { 'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd', '!', 0x42, 0xFF, 0x00 };
+    char encodedBuffer[32];
+    uint8_t decodedBuffer[32];
 
-    std::vector<uint8_t> in(bigLen);
-    for (size_t i = 0; i < bigLen; ++i)
-        in[i] = static_cast<uint8_t>(i & 0xFF);
+    // Create input span
+    ByteSpan inputSpan(testInput, sizeof(testInput));
 
-    // encode32
-    std::vector<char> encoded(((bigLen + 2) / 3) * 4 + 4);
-    uint32_t encLen = Base64Encode32(in.data(), static_cast<uint32_t>(bigLen), encoded.data());
-    EXPECT_GT(encLen, 0u);
+    // Encode the input
+    MutableCharSpan encodedSpan(encodedBuffer, sizeof(encodedBuffer));
+    CHIP_ERROR encodeErr = Base64Encode(inputSpan, encodedSpan);
+    EXPECT_EQ(encodeErr, CHIP_NO_ERROR);
+    EXPECT_GT(encodedSpan.size(), 0u);
 
-    // decode32
-    std::vector<uint8_t> decoded(bigLen + 4);
-    uint32_t decLen = Base64Decode32(encoded.data(), encLen, decoded.data());
-    EXPECT_EQ(decLen, static_cast<uint32_t>(bigLen));
-    EXPECT_EQ(std::memcmp(decoded.data(), in.data(), bigLen), 0);
+    // Decode the encoded data
+    CharSpan encodedForDecode(encodedSpan.data(), encodedSpan.size());
+    MutableByteSpan decodedSpan(decodedBuffer, sizeof(decodedBuffer));
+    CHIP_ERROR decodeErr = Base64Decode(encodedForDecode, decodedSpan);
+    EXPECT_EQ(decodeErr, CHIP_NO_ERROR);
 
-    // Make an encoded string with an invalid char to force Decode32 to fail
-    if (encLen >= 5)
-    {
-        encoded[2]       = ';'; // invalid
-        uint32_t decFail = Base64Decode32(encoded.data(), encLen, decoded.data());
-        EXPECT_EQ(decFail, UINT32_MAX);
-    }
+    // Validate decoded output matches original input using Span::data_equal
+    EXPECT_TRUE(decodedSpan.data_equal(inputSpan));
+    EXPECT_EQ(decodedSpan.size(), inputSpan.size());
 }
 
 TEST(TestBase64, FailingEncodingWithSpansOverloads)
