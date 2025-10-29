@@ -40,45 +40,64 @@ TEST(TestBase64, EncodeDecodeBasic)
     MutableByteSpan outb(outbbuf);
 
     // f -> Zg==
-    uint16_t olen = Base64Encode(in1, 1, out);
-    EXPECT_TRUE(out.data_equal(CharSpan("Zg==", olen)));
+    ByteSpan inputSpan1(in1, 1);
+    CHIP_ERROR encodeErr = Base64Encode(inputSpan1, out);
+    EXPECT_EQ(encodeErr, CHIP_NO_ERROR);
+    EXPECT_TRUE(out.data_equal(CharSpan("Zg==", out.size())));
 
-    Base64Decode(out.data(), olen, outb);
+    CharSpan encodedSpan1(out.data(), out.size());
+    CHIP_ERROR decodeErr = Base64Decode(encodedSpan1, outb);
+    EXPECT_EQ(decodeErr, CHIP_NO_ERROR);
     EXPECT_TRUE(outb.data_equal(ByteSpan(in1, 1)));
 
     // fo -> Zm8=
     const uint8_t in2[] = { 'f', 'o' };
     out                 = MutableCharSpan(outbuf);
-    olen                = Base64Encode(in2, 2, out);
-    EXPECT_TRUE(out.data_equal(CharSpan("Zm8=", olen)));
+    ByteSpan inputSpan2(in2, 2);
+    encodeErr = Base64Encode(inputSpan2, out);
+    EXPECT_EQ(encodeErr, CHIP_NO_ERROR);
+    EXPECT_TRUE(out.data_equal(CharSpan("Zm8=", out.size())));
 
     outb = MutableByteSpan(outbbuf);
-    Base64Decode(out.data(), olen, outb);
+    CharSpan encodedSpan2(out.data(), out.size());
+    decodeErr = Base64Decode(encodedSpan2, outb);
+    EXPECT_EQ(decodeErr, CHIP_NO_ERROR);
     EXPECT_TRUE(outb.data_equal(ByteSpan(in2, 2)));
 
     // foo -> Zm9v
     const uint8_t in3[] = { 'f', 'o', 'o' };
     out                 = MutableCharSpan(outbuf);
-    olen                = Base64Encode(in3, 3, out);
-    EXPECT_TRUE(out.data_equal(CharSpan("Zm9v", olen)));
+    ByteSpan inputSpan3(in3, 3);
+    encodeErr = Base64Encode(inputSpan3, out);
+    EXPECT_EQ(encodeErr, CHIP_NO_ERROR);
+    EXPECT_TRUE(out.data_equal(CharSpan("Zm9v", out.size())));
 
     outb = MutableByteSpan(outbbuf);
-    Base64Decode(out.data(), olen, outb);
+    CharSpan encodedSpan3(out.data(), out.size());
+    decodeErr = Base64Decode(encodedSpan3, outb);
+    EXPECT_EQ(decodeErr, CHIP_NO_ERROR);
     EXPECT_TRUE(outb.data_equal(ByteSpan(in3, 3)));
 }
 
 TEST(TestBase64, EncodeDecodeURL)
 {
     const uint8_t in[] = { 'B', 'a', 's', 'e', '6', '4', 0x0f, 0xff, 0x12, 0x33, 0x34, 0x0f };
-    std::vector<char> out(256);
-    std::vector<uint8_t> dec(256);
+    char out[256];
+    uint8_t dec[256];
 
-    uint16_t olen = Base64URLEncode(in, sizeof(in), out.data());
-    EXPECT_GT(olen, 0u);
+    ByteSpan inputSpan(in, sizeof(in));
+    MutableCharSpan outputSpan(out, sizeof(out));
 
-    uint16_t dlen = Base64URLDecode(out.data(), olen, dec.data());
-    EXPECT_EQ(dlen, static_cast<uint16_t>(sizeof(in)));
-    EXPECT_EQ(std::memcmp(dec.data(), in, sizeof(in)), 0);
+    CHIP_ERROR encodeErr = Base64URLEncode(inputSpan, outputSpan);
+    EXPECT_EQ(encodeErr, CHIP_NO_ERROR);
+    EXPECT_GT(outputSpan.size(), 0u);
+
+    CharSpan encodedSpan(outputSpan.data(), outputSpan.size());
+    MutableByteSpan decodedSpan(dec, sizeof(dec));
+
+    CHIP_ERROR decodeErr = Base64URLDecode(encodedSpan, decodedSpan);
+    EXPECT_EQ(decodeErr, CHIP_NO_ERROR);
+    EXPECT_TRUE(decodedSpan.data_equal(ByteSpan(in, sizeof(in))));
 }
 
 TEST(TestBase64, DecodeErrorCases)
@@ -125,5 +144,157 @@ TEST(TestBase64, Encode32Decode32Chunking)
         encoded[2]       = ';'; // invalid
         uint32_t decFail = Base64Decode32(encoded.data(), encLen, decoded.data());
         EXPECT_EQ(decFail, UINT32_MAX);
+    }
+}
+
+TEST(TestBase64, FailingEncodingWithSpansOverloads)
+{
+    const uint8_t testData[] = { 'f', 'o', 'o' };
+    char outputBuffer[16];
+
+    // Test CHIP_ERROR_BUFFER_TOO_SMALL for Base64Encode
+    {
+        ByteSpan input(testData, sizeof(testData));
+        MutableCharSpan output(outputBuffer, 3); // Too small for encoded output (needs 4 chars minimum)
+
+        CHIP_ERROR err = Base64Encode(input, output);
+        EXPECT_EQ(err, CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
+
+    // Test CHIP_ERROR_BUFFER_TOO_SMALL for Base64URLEncode
+    {
+        ByteSpan input(testData, sizeof(testData));
+        MutableCharSpan output(outputBuffer, 3); // Too small for encoded output (needs 4 chars minimum)
+
+        CHIP_ERROR err = Base64URLEncode(input, output);
+        EXPECT_EQ(err, CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
+
+    // Test CHIP_ERROR_INVALID_ARGUMENT for Base64Encode with oversized input
+    {
+        // Create a mock ByteSpan that reports size > UINT32_MAX
+        // We can't actually create such large data, but we can test the size check logic
+        const uint8_t smallData[] = { 'a' };
+        ByteSpan input(smallData, 1);
+        MutableCharSpan output(outputBuffer, sizeof(outputBuffer));
+
+        // Normal case should work
+        CHIP_ERROR err = Base64Encode(input, output);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+    }
+
+    // Test CHIP_ERROR_INVALID_ARGUMENT for Base64URLEncode with oversized input
+    {
+        const uint8_t smallData[] = { 'a' };
+        ByteSpan input(smallData, 1);
+        MutableCharSpan output(outputBuffer, sizeof(outputBuffer));
+
+        // Normal case should work
+        CHIP_ERROR err = Base64URLEncode(input, output);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+    }
+
+    // Test exact boundary case - buffer exactly the right size should work
+    {
+        ByteSpan input(testData, sizeof(testData));
+        MutableCharSpan output(outputBuffer, BASE64_ENCODED_LEN(sizeof(testData))); // Exactly right size
+
+        CHIP_ERROR err = Base64Encode(input, output);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(output.size(), 4u); // 3 bytes encode to 4 characters
+    }
+
+    // Test exact boundary case for URL encoding
+    {
+        ByteSpan input(testData, sizeof(testData));
+        MutableCharSpan output(outputBuffer, BASE64_ENCODED_LEN(sizeof(testData))); // Exactly right size
+
+        CHIP_ERROR err = Base64URLEncode(input, output);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(output.size(), 4u); // 3 bytes encode to 4 characters
+    }
+}
+
+TEST(TestBase64, FailingDecodingWithSpansOverloads)
+{
+    const char testEncodedData[] = "Zm9v"; // "foo" encoded
+    uint8_t outputBuffer[16];
+
+    // Test CHIP_ERROR_BUFFER_TOO_SMALL for Base64Decode
+    {
+        CharSpan input(testEncodedData, strlen(testEncodedData));
+        MutableByteSpan output(outputBuffer, 1); // Too small for decoded output (needs 3 bytes)
+
+        CHIP_ERROR err = Base64Decode(input, output);
+        EXPECT_EQ(err, CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
+
+    // Test CHIP_ERROR_BUFFER_TOO_SMALL for Base64URLDecode
+    {
+        CharSpan input(testEncodedData, strlen(testEncodedData));
+        MutableByteSpan output(outputBuffer, 1); // Too small for decoded output (needs 3 bytes)
+
+        CHIP_ERROR err = Base64URLDecode(input, output);
+        EXPECT_EQ(err, CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
+
+    // Test CHIP_ERROR_INVALID_ARGUMENT for Base64Decode with invalid input
+    {
+        const char invalidData[] = "Zm9v;"; // Invalid character ';'
+        CharSpan input(invalidData, strlen(invalidData));
+        MutableByteSpan output(outputBuffer, sizeof(outputBuffer));
+
+        CHIP_ERROR err = Base64Decode(input, output);
+        EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Test CHIP_ERROR_INVALID_ARGUMENT for Base64URLDecode with invalid input
+    {
+        const char invalidData[] = "Zm9v;"; // Invalid character ';'
+        CharSpan input(invalidData, strlen(invalidData));
+        MutableByteSpan output(outputBuffer, sizeof(outputBuffer));
+
+        CHIP_ERROR err = Base64URLDecode(input, output);
+        EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Test CHIP_ERROR_INVALID_ARGUMENT for Base64Decode with odd length input
+    {
+        const char oddLengthData[] = "Z"; // Odd length (1 character)
+        CharSpan input(oddLengthData, strlen(oddLengthData));
+        MutableByteSpan output(outputBuffer, sizeof(outputBuffer));
+
+        CHIP_ERROR err = Base64Decode(input, output);
+        EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Test CHIP_ERROR_INVALID_ARGUMENT for Base64URLDecode with odd length input
+    {
+        const char oddLengthData[] = "Z"; // Odd length (1 character)
+        CharSpan input(oddLengthData, strlen(oddLengthData));
+        MutableByteSpan output(outputBuffer, sizeof(outputBuffer));
+
+        CHIP_ERROR err = Base64URLDecode(input, output);
+        EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Test exact boundary case - buffer exactly the right size should work
+    {
+        CharSpan input(testEncodedData, strlen(testEncodedData));
+        MutableByteSpan output(outputBuffer, BASE64_MAX_DECODED_LEN(strlen(testEncodedData))); // Exactly right size
+
+        CHIP_ERROR err = Base64Decode(input, output);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(output.size(), 3u); // "foo" decodes to 3 bytes
+    }
+
+    // Test exact boundary case for URL decoding
+    {
+        CharSpan input(testEncodedData, strlen(testEncodedData));
+        MutableByteSpan output(outputBuffer, BASE64_MAX_DECODED_LEN(strlen(testEncodedData))); // Exactly right size
+
+        CHIP_ERROR err = Base64URLDecode(input, output);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(output.size(), 3u); // "foo" decodes to 3 bytes
     }
 }

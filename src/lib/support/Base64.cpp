@@ -292,152 +292,90 @@ uint32_t Base64Decode32(const char * in, uint32_t inLen, uint8_t * out)
     return Base64Decode32(in, inLen, out, Base64CharToVal);
 }
 
-// In Base64.cpp, add these implementations:
-
-uint16_t Base64Encode(const uint8_t * in, uint16_t inLen, MutableCharSpan & out)
+CHIP_ERROR Base64Encode(const ByteSpan & input, MutableCharSpan & output)
 {
-    size_t needed = BASE64_ENCODED_LEN(inLen);
-    if (out.size() < needed)
+    if (input.size() > UINT16_MAX)
     {
-        out.reduce_size(0);
-        return 0;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    uint16_t len = Base64Encode(in, inLen, out.data());
-    out.reduce_size(len);
-    return len;
+    size_t encodedLen = BASE64_ENCODED_LEN(input.size());
+    if (output.size() < encodedLen)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    uint16_t actualLen = Base64Encode(input.data(), static_cast<uint16_t>(input.size()), output.data());
+    output.reduce_size(actualLen);
+
+    return CHIP_NO_ERROR;
 }
 
-uint16_t Base64URLEncode(const uint8_t * in, uint16_t inLen, MutableCharSpan & out)
+CHIP_ERROR Base64URLEncode(const ByteSpan & input, MutableCharSpan & output)
 {
-    return Base64Encode(in, inLen, out, Base64URLValToChar);
+    if (input.size() > UINT16_MAX)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    size_t encodedLen = BASE64_ENCODED_LEN(input.size());
+    if (output.size() < encodedLen)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    uint16_t actualLen = Base64URLEncode(input.data(), static_cast<uint16_t>(input.size()), output.data());
+    output.reduce_size(actualLen);
+
+    return CHIP_NO_ERROR;
 }
 
-uint16_t Base64Encode(const uint8_t * in, uint16_t inLen, MutableCharSpan & out, Base64ValToCharFunct valToCharFunct)
+CHIP_ERROR Base64Decode(const CharSpan & input, MutableByteSpan & output)
 {
-    size_t needed = BASE64_ENCODED_LEN(inLen);
-    if (out.size() < needed)
+    if (input.size() > UINT16_MAX)
     {
-        out.reduce_size(0);
-        return 0;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    uint16_t len = Base64Encode(in, inLen, out.data(), valToCharFunct);
-    out.reduce_size(len);
-    return len;
+    size_t maxDecodedLen = BASE64_MAX_DECODED_LEN(input.size());
+    if (output.size() < maxDecodedLen)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    uint16_t actualLen = Base64Decode(input.data(), static_cast<uint16_t>(input.size()), output.data());
+    if (actualLen == UINT16_MAX)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    output.reduce_size(actualLen);
+
+    return CHIP_NO_ERROR;
 }
 
-uint16_t Base64Decode(const char * in, uint16_t inLen, MutableByteSpan & out)
+CHIP_ERROR Base64URLDecode(const CharSpan & input, MutableByteSpan & output)
 {
-    size_t maxNeeded = BASE64_MAX_DECODED_LEN(inLen);
-    if (out.size() < maxNeeded)
+    if (input.size() > UINT16_MAX)
     {
-        out.reduce_size(0);
-        return UINT16_MAX;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    uint16_t len = Base64Decode(in, inLen, out.data());
-    if (len == UINT16_MAX)
+    size_t maxDecodedLen = BASE64_MAX_DECODED_LEN(input.size());
+    if (output.size() < maxDecodedLen)
     {
-        out.reduce_size(0);
-        return UINT16_MAX;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
-    out.reduce_size(len);
-    return len;
-}
-
-uint16_t Base64URLDecode(const char * in, uint16_t inLen, MutableByteSpan & out)
-{
-    return Base64Decode(in, inLen, out, Base64URLCharToVal);
-}
-
-uint16_t Base64Decode(const char * in, uint16_t inLen, MutableByteSpan & out, Base64CharToValFunct charToValFunct)
-{
-    size_t maxNeeded = BASE64_MAX_DECODED_LEN(inLen);
-    if (out.size() < maxNeeded)
+    uint16_t actualLen = Base64URLDecode(input.data(), static_cast<uint16_t>(input.size()), output.data());
+    if (actualLen == UINT16_MAX)
     {
-        out.reduce_size(0);
-        return UINT16_MAX;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    uint16_t len = Base64Decode(in, inLen, out.data(), charToValFunct);
-    if (len == UINT16_MAX)
-    {
-        out.reduce_size(0);
-        return UINT16_MAX;
-    }
+    output.reduce_size(actualLen);
 
-    out.reduce_size(len);
-    return len;
-}
-
-uint32_t Base64Encode32(const uint8_t * in, uint32_t inLen, MutableCharSpan & out)
-{
-    uint64_t needed = ((static_cast<uint64_t>(inLen) + 2) / 3) * 4;
-    if (needed > out.size())
-    {
-        out.reduce_size(0);
-        return 0;
-    }
-
-    uint32_t len = Base64Encode32(in, inLen, out.data());
-    out.reduce_size(len);
-    return len;
-}
-
-uint32_t Base64Encode32(const uint8_t * in, uint32_t inLen, MutableCharSpan & out, Base64ValToCharFunct valToCharFunct)
-{
-    uint64_t needed = ((static_cast<uint64_t>(inLen) + 2) / 3) * 4;
-    if (needed > out.size())
-    {
-        out.reduce_size(0);
-        return 0;
-    }
-
-    uint32_t len = Base64Encode32(in, inLen, out.data(), valToCharFunct);
-    out.reduce_size(len);
-    return len;
-}
-
-uint32_t Base64Decode32(const char * in, uint32_t inLen, MutableByteSpan & out)
-{
-    uint64_t maxNeeded = (static_cast<uint64_t>(inLen) * 3) / 4;
-    if (maxNeeded > out.size())
-    {
-        out.reduce_size(0);
-        return UINT32_MAX;
-    }
-
-    uint32_t len = Base64Decode32(in, inLen, out.data());
-    if (len == UINT32_MAX)
-    {
-        out.reduce_size(0);
-        return UINT32_MAX;
-    }
-
-    out.reduce_size(len);
-    return len;
-}
-
-uint32_t Base64Decode32(const char * in, uint32_t inLen, MutableByteSpan & out, Base64CharToValFunct charToValFunct)
-{
-    uint64_t maxNeeded = (static_cast<uint64_t>(inLen) * 3) / 4;
-    if (maxNeeded > out.size())
-    {
-        out.reduce_size(0);
-        return UINT32_MAX;
-    }
-
-    uint32_t len = Base64Decode32(in, inLen, out.data(), charToValFunct);
-    if (len == UINT32_MAX)
-    {
-        out.reduce_size(0);
-        return UINT32_MAX;
-    }
-
-    out.reduce_size(len);
-    return len;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip
