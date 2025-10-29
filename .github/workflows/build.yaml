@@ -458,7 +458,7 @@ jobs:
                   # We want to build various standalone example apps (similar to what examples-linux-standalone.yaml
                   # does), so use target_os="all" to get those picked up as part of the "unified" build.  But then
                   # to save CI resources we want to exclude the "host clang" build, which uses the pigweed clang.
-                  scripts/build/gn_gen.sh --args='target_os="all" is_asan=true enable_host_clang_build=false' --add-export-compile-commands=*
+                  scripts/build/gn_gen.sh --args='target_os="all" is_asan=true enable_host_clang_build=false chip_enable_dnssd_tests=false' --add-export-compile-commands=*
                   scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
                   scripts/tests/gn_tests.sh
             - name: Ensure codegen is done for default
