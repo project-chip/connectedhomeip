@@ -15,14 +15,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "platform/ConfigurationManager.h"
-#include "platform/DeviceControlServer.h"
-#include "platform/PlatformManager.h"
+#include "CodegenIntegration.h"
+
 #include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Server.h>
 #include <app/static-cluster-config/GeneralCommissioning.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/CodeUtils.h>
+#include <platform/ConfigurationManager.h>
+#include <platform/DeviceControlServer.h>
+#include <platform/PlatformManager.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -86,9 +90,17 @@ public:
 
 } // namespace
 
-void MatterGeneralCommissioningClusterInitCallback(EndpointId endpointId)
+namespace chip::app::Clusters::GeneralCommissioning {
+
+GeneralCommissioningCluster * Instance()
 {
-    VerifyOrReturn(endpointId == kRootEndpointId);
+    VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+    return &gServer.Cluster();
+}
+
+void EnsureCreated()
+{
+    VerifyOrReturn(!gServer.IsConstructed());
 
     IntegrationDelegate integrationDelegate;
 
@@ -96,7 +108,7 @@ void MatterGeneralCommissioningClusterInitCallback(EndpointId endpointId)
     // Startup() will be called automatically by the registry when context is set
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                = endpointId,
+            .endpointId                = kRootEndpointId,
             .clusterId                 = GeneralCommissioning::Id,
             .fixedClusterInstanceCount = GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
@@ -104,6 +116,14 @@ void MatterGeneralCommissioningClusterInitCallback(EndpointId endpointId)
             .fetchOptionalAttributes   = true,
         },
         integrationDelegate);
+}
+
+} // namespace chip::app::Clusters::GeneralCommissioning
+
+void MatterGeneralCommissioningClusterInitCallback(EndpointId endpointId)
+{
+    VerifyOrReturn(endpointId == kRootEndpointId);
+    chip::app::Clusters::GeneralCommissioning::EnsureCreated();
 }
 
 void MatterGeneralCommissioningClusterShutdownCallback(EndpointId endpointId)
