@@ -60,7 +60,7 @@ class TC_CNET_4_12(MatterBaseTest):
         return instance_name
 
     async def wait_for_srp_update(self, timeout_seconds: int = 180):
-        instance_qname = f"{self.get_dut_instance_name()}.{MdnsServiceType.OPERATIONAL.value}"
+        instance_qname = f"{self.get_dut_instance_name}.{MdnsServiceType.OPERATIONAL.value}"
 
         mdns = MdnsDiscovery()
         srv_record = await mdns.get_srv_record(
