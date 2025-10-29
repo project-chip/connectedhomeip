@@ -24,6 +24,7 @@
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server/Server.h>
 #include <clusters/GeneralCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Enums.h>
@@ -33,6 +34,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <platform/DeviceControlServer.h>
 #include <platform/NetworkCommissioning.h>
 
 #include "FakeWifiDriver.h"
@@ -57,9 +59,20 @@ struct TestNetworkCommissioningCluster : public ::testing::Test
 
 TEST_F(TestNetworkCommissioningCluster, TestAttributes)
 {
+    GeneralCommissioningCluster generalCommissioningCluster(GeneralCommissioningCluster::Context {
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+        .configurationManager       = DeviceLayer::ConfigurationMgr(),
+        .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+        .fabricTable = Server::GetInstance().GetFabricTable(), .failsafeContext = Server::GetInstance().GetFailSafeContext(),
+        .platformManager = DeviceLayer::PlatformMgr(),
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    });
     {
         Testing::FakeWiFiDriver fakeWifiDriver;
-        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver);
+
+        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, generalCommissioningCluster);
 
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(cluster.Attributes({ kRootEndpointId, NetworkCommissioning::Id }, builder), CHIP_NO_ERROR);
@@ -97,7 +110,17 @@ TEST_F(TestNetworkCommissioningCluster, TestAttributes)
 TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
 {
     Testing::FakeWiFiDriver fakeWifiDriver;
-    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver);
+    GeneralCommissioningCluster generalCommissioningCluster(GeneralCommissioningCluster::Context {
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+        .configurationManager       = DeviceLayer::ConfigurationMgr(),
+        .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+        .fabricTable = Server::GetInstance().GetFabricTable(), .failsafeContext = Server::GetInstance().GetFailSafeContext(),
+        .platformManager = DeviceLayer::PlatformMgr(),
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    });
+    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, generalCommissioningCluster);
 
     chip::Test::TestServerClusterContext context;
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);

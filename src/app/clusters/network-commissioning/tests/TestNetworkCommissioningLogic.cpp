@@ -17,6 +17,7 @@
 
 #include <app/clusters/network-commissioning/NetworkCommissioningLogic.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/server/Server.h>
 #include <clusters/GeneralCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Enums.h>
@@ -25,6 +26,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <platform/DeviceControlServer.h>
 #include <platform/NetworkCommissioning.h>
 
 #include "FakeWifiDriver.h"
@@ -44,7 +46,17 @@ struct TestNetworkCommissioningLogic : public ::testing::Test
 TEST_F(TestNetworkCommissioningLogic, TestFeatures)
 {
     Testing::FakeWiFiDriver fakeWifiDriver;
-    NetworkCommissioningLogic logic(kRootEndpointId, &fakeWifiDriver);
+    GeneralCommissioningCluster generalCommissioningCluster(GeneralCommissioningCluster::Context {
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+        .configurationManager       = DeviceLayer::ConfigurationMgr(),
+        .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+        .fabricTable = Server::GetInstance().GetFabricTable(), .failsafeContext = Server::GetInstance().GetFailSafeContext(),
+        .platformManager = DeviceLayer::PlatformMgr(),
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    });
+    NetworkCommissioningLogic logic(kRootEndpointId, &fakeWifiDriver, generalCommissioningCluster);
     ASSERT_EQ(logic.Features(), BitFlags<NetworkCommissioning::Feature>(NetworkCommissioning::Feature::kWiFiNetworkInterface));
 }
 

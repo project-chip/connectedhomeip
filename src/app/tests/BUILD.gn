@@ -142,12 +142,19 @@ source_set("thread-border-router-management-test-srcs") {
     "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.cpp",
     "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.h",
     "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
+
+    # thread border router management currently integrates with general commissioning and NEEDS the ember instance
+    # of that cluster. This should be removed once this cluster is moved to ServerClusterInterface.
+    "${chip_root}/src/app/clusters/general-commissioning-server/CodegenIntegration.cpp",
+    "${chip_root}/src/app/clusters/general-commissioning-server/CodegenIntegration.h",
   ]
 
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/app/clusters/general-commissioning-server:general-commissioning-server",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/server-cluster:registry",
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
   ]
