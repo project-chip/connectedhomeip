@@ -39,7 +39,7 @@ void Instance::Shutdown()
 
 GeneralCommissioningCluster & Instance::CodegenGeneralCommissioningCluster()
 {
-    // ensures that we have a codengen general commissioning cluster
+    // ensures that we have a codegen general commissioning cluster
     GeneralCommissioning::EnsureCreated();
     GeneralCommissioningCluster * cluster = GeneralCommissioning::Instance();
     VerifyOrDie(cluster != nullptr); // should be ok because we `EnsureCreated`
