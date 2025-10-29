@@ -177,7 +177,7 @@ public:
         const chip::app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
 
         // constexpr size_t kTlvBufferSize = 128; // Typically CommanderSender will use a TLV of size kMaxSecureSduLengthBytes. For
-                                               // now, just use 128 for the unit test.
+        // now, just use 128 for the unit test.
         uint8_t buffer[kTlvBufferSize];
         chip::TLV::TLVWriter tlvWriter;
         tlvWriter.Init(buffer);
