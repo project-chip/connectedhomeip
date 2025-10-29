@@ -23,10 +23,7 @@
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Dnssd.h>
-#include <app/server/Server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <data-model-providers/codedriven/endpoint/SpanEndpoint.h>
 #include <devices/device-factory/DeviceFactory.h>
 #include <devices/root-node/RootNodeDevice.h>
 #include <platform/CommissionableDataProvider.h>

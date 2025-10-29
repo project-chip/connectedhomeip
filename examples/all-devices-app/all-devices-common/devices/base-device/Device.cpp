@@ -16,7 +16,6 @@
  */
 
 #include <devices/base-device/Device.h>
-#include <memory>
 
 using namespace chip::app::Clusters;
 

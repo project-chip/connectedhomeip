@@ -19,7 +19,3 @@ buildconfig = "${build_root}/config/BUILDCONFIG.gn"
 
 # CHIP uses angle bracket includes.
 check_system_includes = true
-
-default_args = {
-  import("//args.gni")
-}

@@ -20,6 +20,7 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/reporting/ReportScheduler.h>
 #include <devices/base-device/Device.h>
+#include <memory>
 
 namespace chip {
 namespace app {
