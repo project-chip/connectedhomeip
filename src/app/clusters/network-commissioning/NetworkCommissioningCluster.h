@@ -36,15 +36,18 @@ class NetworkCommissioningCluster : public DefaultServerCluster
 public:
     NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::WiFiDriver * driver,
                                 GeneralCommissioningCluster & generalCommissioningCluster) :
-        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver, generalCommissioningCluster)
+        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
+        mLogic(endpointId, driver, generalCommissioningCluster)
     {}
     NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::ThreadDriver * driver,
                                 GeneralCommissioningCluster & generalCommissioningCluster) :
-        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver, generalCommissioningCluster)
+        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
+        mLogic(endpointId, driver, generalCommissioningCluster)
     {}
     NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::EthernetDriver * driver,
                                 GeneralCommissioningCluster & generalCommissioningCluster) :
-        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver, generalCommissioningCluster)
+        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
+        mLogic(endpointId, driver, generalCommissioningCluster)
     {}
 
     CHIP_ERROR Init() { return mLogic.Init(); }

@@ -22,7 +22,7 @@ namespace chip::app::Clusters::GeneralCommissioning {
 
 // Get the instance of the cluster if one was created (generally devices have on on the root endpoint)
 // will return nullptr if the cluster has not yet been created;
-GeneralCommissioningCluster *Instance();
+GeneralCommissioningCluster * Instance();
 
 // This will ensure that the cluster has been created for the root endpoint. This method exists because
 // dependencies: some clusters require an `Instance` to be available inside their startul, like the network
