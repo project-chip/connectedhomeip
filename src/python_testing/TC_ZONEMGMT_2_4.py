@@ -338,7 +338,8 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
                 time.sleep(1)
         else:
             self.wait_for_user_input(
-                prompt_msg=f"Press enter and immediately start, and keep generating motion activity from zone {zoneID1} for a period exceeding {maxDuration} seconds. \n After {maxDuration}, keep generating some motion activity during the {blindDuration} seconds blind duration phase. DUT should not send any ZoneTriggered event during this phase.")
+                prompt_msg=f"""Press enter and immediately start, and keep generating motion activity from zone {zoneID1} for a period exceeding {maxDuration} seconds.
+After {maxDuration}, keep generating some motion activity during the {blindDuration} seconds blind duration phase. DUT should not send any ZoneTriggered event during this phase.""")
 
         event_delay_seconds = maxDuration
         event = event_listener.wait_for_event_report(
