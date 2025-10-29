@@ -103,23 +103,15 @@ class HostApp(Enum):
         TARGETS = {
             # keep-sorted start
             HostApp.AIR_PURIFIER: ":linux_air_purifier_app",
-            HostApp.ALL_CLUSTERS: ":linux_all_clusters_app",
             HostApp.BRIDGE: ":linux_bridge_app",
             HostApp.CLOSURE: ":linux_closure_app",
-            HostApp.ENERGY_GATEWAY: ":linux_energy_gateway_app",
-            HostApp.ENERGY_MANAGEMENT: ":linux_energy_management_app",
             HostApp.LIGHT: ":linux_lighting_app",
-            HostApp.LIT_ICD: ":linux_lit_icd_app",
             HostApp.LOCK: ":linux_lock_app",
             HostApp.MICROWAVE_OVEN: ":linux_microwave_oven_app",
-            HostApp.NETWORK_MANAGER: ":linux_network_manager_app",
             HostApp.OTA_PROVIDER: ":linux_ota_provider_app",
-            HostApp.OTA_REQUESTOR: ":linux_ota_requestor_app",
             HostApp.RVC: ":linux_rvc_app",
-            HostApp.TERMS_AND_CONDITIONS: ":linux_terms_and_conditions_app",
             HostApp.THERMOSTAT: ":linux_thermostat_app",
             HostApp.TV_APP: ":linux_tv_app",
-            HostApp.TV_CASTING_APP: ":linux_tv_casting_app",
             HostApp.WATER_LEAK_DETECTOR: ":linux_water_leak_detector_app",
             # keep-sorted end
         }
