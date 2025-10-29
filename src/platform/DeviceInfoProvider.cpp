@@ -65,7 +65,7 @@ CHIP_ERROR DeviceInfoProvider::SetUserLabelList(EndpointId endpoint, Span<const 
 
 CHIP_ERROR DeviceInfoProvider::ClearUserLabelList(EndpointId endpoint)
 {
-    return SetUserLabelList(endpoint, Span<UserLabelType>());
+    return SetUserLabelList(endpoint, Span<const UserLabelType>());
 }
 
 CHIP_ERROR DeviceInfoProvider::AppendUserLabel(EndpointId endpoint, const UserLabelType & label)
