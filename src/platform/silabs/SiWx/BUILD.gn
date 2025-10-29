@@ -69,10 +69,10 @@ static_library("SiWx917") {
     "${silabs_platform_dir}/platformAbstraction/WiseMcuSpam.cpp",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    "../siwx917_ble/BLEManagerImpl.cpp",
-    "../siwx917_ble/ble_config.h",
-    "../siwx917_ble/wfx_sl_ble_init.cpp",
-    "../siwx917_ble/wfx_sl_ble_init.h",
+    # "${silabs_platform_dir}/SiWx/ble/BLEManagerImpl.cpp",
+    # "${silabs_platform_dir}/SiWx/ble/ble_config.h",
+    # "${silabs_platform_dir}/SiWx/ble/sl_si91x_ble_init.cpp",
+    # "${silabs_platform_dir}/SiWx/ble/sl_si91x_ble_init.h",
     "SiWxPlatformInterface.h",
   ]
 
@@ -80,6 +80,7 @@ static_library("SiWx917") {
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/platform:platform_base",
     "${silabs_platform_dir}/platformAbstraction:wisemcu",
+    "${silabs_platform_dir}/SiWx/ble:siwx-ble",
   ]
   deps = [
     "${chip_root}/src/app/common:ids",

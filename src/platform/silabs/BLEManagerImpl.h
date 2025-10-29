@@ -27,7 +27,7 @@
 #include "FreeRTOS.h"
 #include "timers.h"
 #if SLI_SI91X_ENABLE_BLE
-#include "wfx_sl_ble_init.h"
+#include "sl_si91x_ble_init.h"
 #else
 #include "gatt_db.h"
 #include "sl_bgapi.h"

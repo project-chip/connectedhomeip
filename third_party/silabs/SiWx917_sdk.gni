@@ -63,7 +63,7 @@ template("siwx917_sdk") {
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/config",
 
-      "${chip_root}/src/platform/silabs/siwx917_ble",
+      "${chip_root}/src/platform/silabs/SiWx/ble",
       "${chip_root}/src/platform/silabs/wifi",
 
       # ble component
@@ -191,7 +191,7 @@ template("siwx917_sdk") {
       "SL_WIFI=1",
       "CCP_SI917_BRINGUP=1",
       "SL_COMPONENT_CATALOG_PRESENT=1",
-      "SIWX917_WIFI=1",
+      "SL_MATTER_SIWX_WIFI_ENABLE=1",
       "SLI_SI91X_ENABLE_OS=1",
       "SLI_SI91X_MCU_INTERFACE=1",  #Enable CCP bus Interface, Differentiation:
                                     # 1->SOC and 0->NCP
@@ -419,8 +419,8 @@ template("siwx917_sdk") {
         sources = [
           "${_mbedtls_root}/include/mbedtls/platform.h",
           "${_mbedtls_root}/include/mbedtls/version.h",
-          "${chip_root}/src/platform/silabs/SiWx917/siwx917-chip-mbedtls-config.h",
-          "${chip_root}/src/platform/silabs/SiWx917/siwx917-chip-psa-config.h",
+          "${chip_root}/src/platform/silabs/SiWx/siwx917-chip-mbedtls-config.h",
+          "${chip_root}/src/platform/silabs/SiWx/siwx917-chip-psa-config.h",
 
           # mbedtls
           "${_mbedtls_root}/library/aes.c",
@@ -559,7 +559,7 @@ template("siwx917_sdk") {
           # config file
           "${_mbedtls_root}/include/mbedtls/platform.h",
           "${_mbedtls_root}/include/mbedtls/version.h",
-          "${chip_root}/src/platform/silabs/SiWx917/siwx917-chip-mbedtls-config.h",
+          "${chip_root}/src/platform/silabs/SiWx/siwx917-chip-mbedtls-config.h",
 
           # mbedtls
           "${_mbedtls_root}/library/aes.c",

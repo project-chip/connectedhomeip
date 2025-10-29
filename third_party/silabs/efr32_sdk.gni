@@ -267,7 +267,7 @@ template("efr32_sdk") {
 
       libs += [ "${matter_support_root}/sdk-copies/protocol/openthread/libs/libsl_openthread_cm33_gcc.a" ]
 
-      if (!chip_enable_ble_siwx917) {
+      if (!chip_enable_ble_siwx) {
         libs += [
           "${matter_support_root}/sdk-copies/protocol/bluetooth/bgcommon/lib/build/gcc/cortex-m33/bgcommon/release/libbgcommon.a",
           "${matter_support_root}/sdk-copies/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a",
@@ -299,7 +299,7 @@ template("efr32_sdk") {
 
       libs += [ "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg24_gcc_release.a" ]
 
-      if (!chip_enable_ble_siwx917) {
+      if (!chip_enable_ble_siwx) {
         libs += [ "${matter_support_root}/sdk-copies/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a" ]
       }
 
@@ -387,7 +387,7 @@ template("efr32_sdk") {
     }
 
     if (use_SiWx917) {
-      _include_dirs += [ "${chip_root}/src/platform/silabs/siwx917_ble" ]
+      _include_dirs += [ "${chip_root}/src/platform/silabs/SiWx/ble" ]
     }
 
     if (use_wf200 || use_SiWx917) {
@@ -401,7 +401,7 @@ template("efr32_sdk") {
       ]
     }
 
-    if (chip_enable_ble_siwx917) {
+    if (chip_enable_ble_siwx) {
       _include_dirs +=
           [ "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc" ]
     }
@@ -522,7 +522,7 @@ template("efr32_sdk") {
       defines += [ "SL_MATTER_PROVISION_FLASH=0" ]
     }
 
-    if (chip_enable_ble_siwx917) {
+    if (chip_enable_ble_siwx) {
       defines += [
         "SLI_SI91X_ENABLE_BLE=1",
         "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
@@ -563,7 +563,7 @@ template("efr32_sdk") {
         defines += [
           "SL_HEAP_SIZE=32768",
           "SL_WIFI=1",
-          "SIWX917_WIFI",
+          "SL_MATTER_SIWX_WIFI_ENABLE",
           "EXP_BOARD=1",
           "SLI_SI917=1",
           "CHIP_9117",
@@ -891,7 +891,7 @@ template("efr32_sdk") {
       ]
     }
 
-    if (chip_enable_ble_siwx917) {
+    if (chip_enable_ble_siwx) {
       sources += [
         "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gap_apis.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gatt_apis.c",

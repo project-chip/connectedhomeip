@@ -42,7 +42,7 @@ if (chip_enable_wifi && !wifi_soc && !sl_build_unit_tests) {
   import("${chip_root}/src/platform/silabs/wifi/args.gni")
 
   if (use_SiWx917) {
-    import("${silabs_platform_dir}/wifi/SiWx/ncp/siwx917_ncp.gni")
+    import("${silabs_platform_dir}/wifi/SiWx/ncp/args.gni")
   } else if (use_wf200) {
     import("${silabs_platform_dir}/wifi/wf200/wf200.gni")
   }

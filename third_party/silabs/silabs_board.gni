@@ -70,7 +70,7 @@ declare_args() {
   show_qr_code = !disable_lcd
 
   # Enabling BLE on 917 NCP by default
-  chip_enable_ble_siwx917 = use_SiWx917
+  chip_enable_ble_siwx = use_SiWx917
 }
 
 # TODO - This needs to be removed once multiplexing issues resolved

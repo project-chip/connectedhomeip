@@ -70,12 +70,13 @@ static_library("efr32") {
     "../../SingletonConfigurationManager.cpp",
   ]
 
-  if (chip_enable_ble_siwx917) {
+
+  if (chip_enable_ble_siwx) {
     sources += [
-      "../siwx917_ble/BLEManagerImpl.cpp",
-      "../siwx917_ble/ble_config.h",
-      "../siwx917_ble/wfx_sl_ble_init.cpp",
-      "../siwx917_ble/wfx_sl_ble_init.h",
+      "${silabs_platform_dir}/SiWx/ble/BLEManagerImpl.cpp",
+      "${silabs_platform_dir}/SiWx/ble/ble_config.h",
+      "${silabs_platform_dir}/SiWx/ble/sl_si91x_ble.cpp",
+      "${silabs_platform_dir}/SiWx/ble/sl_si91x_ble.h"
     ]
   } else {
     sources += [ "BLEManagerImpl.cpp" ]
