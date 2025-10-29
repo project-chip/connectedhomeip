@@ -64,6 +64,7 @@ public:
     {}
 
     OptionalAttributes & GetOptionalAttributes() { return mOptionalAttributes; }
+    Context & ClusterContext() { return mClusterContext; }
 
     void SetBreadCrumb(uint64_t value);
 
