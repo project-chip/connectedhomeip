@@ -122,7 +122,7 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
                 ChipLogError(Camera, "Failed to create directory: %s", p.c_str());
                 return false;
             }
-            // Set permissions to 0755 (owner rwx, group rx, others rx)
+            // Set permissions to file: (owner rwx, group rx)
             std::filesystem::permissions(
                 p, std::filesystem::perms::owner_all | std::filesystem::perms::group_read | std::filesystem::perms::group_exec,
                 std::filesystem::perm_options::replace, ec);
