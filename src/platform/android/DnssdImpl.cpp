@@ -504,21 +504,22 @@ void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callback
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     JniUtfString jniServiceType(env, serviceType);
 
-    auto size              = env->GetArrayLength(instanceName);
-    DnssdService * service = new DnssdService[size];
+    auto size = env->GetArrayLength(instanceName);
+    auto services = std::make_unique<DnssdService[]>(size);
+    
     for (decltype(size) i = 0; i < size; i++)
     {
         JniUtfString jniInstanceName(env, (jstring) env->GetObjectArrayElement(instanceName, i));
         VerifyOrReturn(strlen(jniInstanceName.c_str()) <= Operational::kInstanceNameMaxLength,
                        dispatch(CHIP_ERROR_INVALID_ARGUMENT));
 
-        CopyString(service[i].mName, jniInstanceName.c_str());
-        VerifyOrReturn(extractProtocol(jniServiceType.c_str(), service[i].mType, service[i].mProtocol) == CHIP_NO_ERROR,
+        CopyString(services[i].mName, jniInstanceName.c_str());
+        VerifyOrReturn(extractProtocol(jniServiceType.c_str(), services[i].mType, services[i].mProtocol) == CHIP_NO_ERROR,
                        dispatch(CHIP_ERROR_INVALID_ARGUMENT));
     }
 
-    dispatch(CHIP_NO_ERROR, service, size);
-    delete[] service;
+    dispatch(CHIP_NO_ERROR, services.get(), size);
+    // Memory automatically freed when unique_ptr goes out of scope
 }
 
 } // namespace Dnssd
