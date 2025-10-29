@@ -65,28 +65,6 @@ static const std::string GetWindBitmapValueString(chip::BitMask<chip::app::Clust
                                   { chip::app::Clusters::FanControl::WindBitmap::kNaturalWind, "Natural" } });
 }
 
-template <typename T>
-static constexpr int GetBits(const chip::BitMask<T> & bitmap, int tMin, int tMax)
-{
-    if (tMin > tMax)
-    {
-        return -1;
-    }
-
-    int arg = tMin;
-    int r   = 0;
-
-    while (arg <= tMax)
-    {
-        if (bitmap.Has(static_cast<T>(arg)))
-        {
-            r |= arg;
-        }
-        arg = arg << 1;
-    }
-    return r;
-}
-
 void FanControl::UpdateState()
 {
     UpdateStateEnum(mEndpointId, mTargetFanMode, mFanMode, &chip::app::Clusters::FanControl::Attributes::FanMode::Set,
