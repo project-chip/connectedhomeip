@@ -361,20 +361,12 @@ class TC_CNET_4_12(MatterBaseTest):
         )
 
         self.step(7)
-        try:
-            cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=thread_network_id_bytes_th2, breadcrumb=2)
-            resp = await self.send_single_cmd(
-                dev_ctrl=self.default_controller,
-                node_id=self.dut_node_id,
-                cmd=cmd
-            )
-        except ChipStackError:
-            # This is OK - if the device does not send the response before swapping networks
-            # then we will not receive a response and that is fine.
-            # Will will be able to tell if this succeeded by whether we can reach the
-            # device on the second network and by the networks attribute.
-            pass
-
+        cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=thread_network_id_bytes_th2, breadcrumb=2)
+        resp = await self.send_single_cmd(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            cmd=cmd
+        )
         logger.info(f'Step #7: ConnectNetwork resp for THREAD_2ND: ({vars(resp)})')
         logger.info(f'Step #7: ConnectNetwork Status for THREAD_2ND is success: ({resp.networkingStatus})')
         # Verify that the DUT responds with AddThreadNConnectNetworketwork with NetworkingStatus as 'Success'(0)
@@ -424,9 +416,6 @@ class TC_CNET_4_12(MatterBaseTest):
         # This means the THREAD_2ND network will be removed,
         # and the device will reconnect to Thread 1 without further intervention.
         logger.info('Step #11: DUT automatically return to THREAD_1ST')
-
-        # Wait for reconnection.
-        await asyncio.sleep(connect_max_time_seconds + fudge_factor_seconds)
 
         self.step(12)
         networks = await self.read_single_attribute_check_success(
