@@ -227,19 +227,14 @@ class DeviceProvisioningFragment : Fragment() {
 
       setAttestationDelegate()
 
-      val params = CommissionParameters.Builder()
-        .setCsrNonce(null)
-        .setNetworkCredentials(network)
-        .setICDRegistrationInfo(null)
-        .build()
+      val params =
+        CommissionParameters.Builder()
+          .setCsrNonce(null)
+          .setNetworkCredentials(network)
+          .setICDRegistrationInfo(null)
+          .build()
 
-      deviceController.pairDeviceThroughBLE(
-        gatt,
-        connId,
-        deviceId,
-        deviceInfo.setupPinCode,
-        params
-      )
+      deviceController.pairDeviceThroughBLE(gatt, connId, deviceId, deviceInfo.setupPinCode, params)
       DeviceIdUtil.setNextAvailableId(requireContext(), deviceId + 1)
     }
   }
