@@ -95,6 +95,7 @@ static_library("BEE") {
       "CG/CGSecureDACVendorProvider.cpp",
       "CG/CGSecureDACVendorProvider.h",
     ]
+    defines = [ "CONFIG_USE_CG_SECURE_DAC_VENDOR=1" ]
   }
 }
 
