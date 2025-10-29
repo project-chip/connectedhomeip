@@ -492,7 +492,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         def matcher_combined(report):
             """
-            Combined matcher for Step 1 (NEW)
+            Combined matcher for Step 1
             - Validates UpdateState reaches Downloading
             - UpdateStateProgress has any value 1–100
             Follows the style of matcher_ota_updatestate.
@@ -508,7 +508,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                     if not downloading_seen:
                         downloading_seen = True
                         state_sequence.append(Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
-                        logger.info(f'{step_number}: State observed: {val} at {current_time} (NEW)')
+                        logger.info(f'{step_number}: State observed: {val} at {current_time}')
 
             # UpdateStateProgress
             elif report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress:
@@ -516,13 +516,13 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                     if not progress_seen:
                         progress_seen = True
                         progress_values.append(val)
-                        logger.info(f'{step_number}: Progress observed: {val} at {current_time} (NEW)')
+                        logger.info(f'{step_number}: Progress observed: {val} at {current_time}')
 
             # End matcher once minimal conditions met
             return downloading_seen and progress_seen
 
         matcher_combined_obj = AttributeMatcher.from_callable(
-            description=f"{step_number} - Minimal Step 1 matcher: Downloading + progress 1-100 (NEW)",
+            description=f"{step_number} - Minimal Step 1 matcher: Downloading + progress 1-100",
             matcher=matcher_combined
         )
 
