@@ -185,7 +185,7 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
 
     MockCommandHandler cmdHandler;
     chip::Test::ClusterTester tester(cluster);
-    auto result = tester.InvokeCommand(Commands::JoinGroup::Id, cmdData, &cmdHandler);
+    auto result = tester.Invoke(Commands::JoinGroup::Id, cmdData, &cmdHandler);
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(result.value().GetStatusCode().GetStatus(),    // NOLINT(bugprone-unchecked-optional-access)
               Protocols::InteractionModel::Status::Failure); // Currently expect Failure as JoinGroup command returns
