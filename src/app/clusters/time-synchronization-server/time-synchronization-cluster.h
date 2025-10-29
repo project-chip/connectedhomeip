@@ -102,42 +102,20 @@ public:
     CHIP_ERROR LoadDSTOffset();
     CHIP_ERROR ClearDSTOffset();
 
-    const DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & GetTrustedTimeSource() const
-    {
-        return mTrustedTimeSource;
-    }
-
-    Span<TimeSyncDataProvider::TimeZoneStore> & GetTimeZone()
-    {
-        // We can't return a reference to a local temporary object, so we need this assignment
-        mTimeZoneObj.timeZoneList = mTimeZoneObj.timeZoneList.SubSpan(0, mTimeZoneObj.validSize);
-        return mTimeZoneObj.timeZoneList;
-    }
-
-    DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> & GetDSTOffset()
-    {
-        // We can't return a reference to a local temporary object, so we need this assignment
-        mDstOffsetObj.dstOffsetList = mDstOffsetObj.dstOffsetList.SubSpan(0, mDstOffsetObj.validSize);
-        return mDstOffsetObj.dstOffsetList;
-    }
-
-    CHIP_ERROR GetDefaultNtp(MutableCharSpan & dntp) { return mTimeSyncDataProvider.LoadDefaultNtp(dntp); }
-
+    const DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & GetTrustedTimeSource() const;
+    Span<TimeSyncDataProvider::TimeZoneStore> & GetTimeZone();
+    DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> & GetDSTOffset();
+    CHIP_ERROR GetDefaultNtp(MutableCharSpan & dntp);
     CHIP_ERROR SetUTCTime(EndpointId ep, uint64_t utcTime, TimeSynchronization::GranularityEnum granularity,
                           TimeSynchronization::TimeSourceEnum source);
-
     CHIP_ERROR GetLocalTime(EndpointId ep, DataModel::Nullable<uint64_t> & localTime);
 
     const TimeSynchronization::GranularityEnum & GetGranularity() const { return mGranularity; }
 
     TimeSynchronization::TimeState UpdateTimeZoneState();
     TimeSynchronization::TimeState UpdateDSTOffsetState();
-    TimeSynchronization::TimeSyncEventFlag GetEventFlag() const { return mEventFlag; }
-    void ClearEventFlag(TimeSynchronization::TimeSyncEventFlag flag)
-    {
-        uint8_t eventFlag = to_underlying(mEventFlag) ^ to_underlying(flag);
-        mEventFlag        = static_cast<TimeSynchronization::TimeSyncEventFlag>(eventFlag);
-    }
+    TimeSynchronization::TimeSyncEventFlag GetEventFlag() const;
+    void ClearEventFlag(TimeSynchronization::TimeSyncEventFlag flag);
 
     // Fabric Table delegate functions
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
