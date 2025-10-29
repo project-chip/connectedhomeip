@@ -333,7 +333,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         # Generate some activity triggers to facilitate advancing of triggerdetectedDuration
         # beyond maxduration
         if self.is_pics_sdk_ci_only:
-            for i in range(maxDuration+2):
+            for i in range(maxDuration + 2):
                 self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
                 time.sleep(1)
         else:
