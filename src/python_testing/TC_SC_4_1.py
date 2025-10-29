@@ -63,8 +63,6 @@ from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter import discovery
-from matter.setup_payload import SetupPayload
 from matter.testing.commissioning import get_setup_payload_info_config
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
