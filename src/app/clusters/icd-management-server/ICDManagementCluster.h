@@ -112,10 +112,10 @@ protected:
     FabricTable & mFabricTable;
     ICDConfigurationData & mICDConfigurationData;
     const OptionalAttributeSet mOptionalAttributeSet;
-    const BitMask<IcdManagement::OptionalCommands> mEnabledCommands;
     const BitMask<IcdManagement::UserActiveModeTriggerBitmap> mUserActiveModeTriggerBitmap;
+    const BitMask<IcdManagement::OptionalCommands> mEnabledCommands;
+    uint8_t mUserActiveModeTriggerInstructionLength;
     char mUserActiveModeTriggerInstruction[IcdManagement::kUserActiveModeTriggerInstructionMaxLength];
-    const uint8_t mUserActiveModeTriggerInstructionLength;
 };
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP

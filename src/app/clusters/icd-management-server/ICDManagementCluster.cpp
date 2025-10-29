@@ -97,13 +97,15 @@ ICDManagementCluster::ICDManagementCluster(EndpointId endpointId, Crypto::Symmet
                                            CharSpan userActiveModeTriggerInstruction) :
     DefaultServerCluster({ endpointId, IcdManagement::Id }),
     mSymmetricKeystore(symmetricKeystore), mFabricTable(fabricTable), mICDConfigurationData(icdConfigurationData),
-    mOptionalAttributeSet(optionalAttributeSet), mEnabledCommands(enabledCommands),
-    mUserActiveModeTriggerBitmap(userActiveModeTriggerBitmap),
-    mUserActiveModeTriggerInstructionLength(static_cast<uint8_t>(
-        std::min(userActiveModeTriggerInstruction.size(), IcdManagement::kUserActiveModeTriggerInstructionMaxLength)))
+    mOptionalAttributeSet(optionalAttributeSet), mUserActiveModeTriggerBitmap(userActiveModeTriggerBitmap),
+    mEnabledCommands(enabledCommands), mUserActiveModeTriggerInstructionLength(0)
 {
+    static_assert(sizeof(mUserActiveModeTriggerInstruction) <= UINT8_MAX,
+                  "mUserActiveModeTriggerInstruction size must fit in uint8_t");
+
     MutableCharSpan buffer(mUserActiveModeTriggerInstruction);
     CopyCharSpanToMutableCharSpanWithTruncation(userActiveModeTriggerInstruction, buffer);
+    mUserActiveModeTriggerInstructionLength = static_cast<uint8_t>(buffer.size());
 }
 
 DataModel::ActionReturnStatus ICDManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

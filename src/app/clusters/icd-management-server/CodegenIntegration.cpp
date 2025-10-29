@@ -62,7 +62,7 @@ public:
             Protocols::InteractionModel::Status::Success)
         {
             ChipLogError(Zcl, "Failed to get UserActiveModeTriggerHint, using default (0)");
-            userActiveModeTriggerHint = BitMask<IcdManagement::UserActiveModeTriggerBitmap>(0);
+            userActiveModeTriggerHint.ClearAll();
         }
 
         // Get UserActiveModeTriggerInstruction
