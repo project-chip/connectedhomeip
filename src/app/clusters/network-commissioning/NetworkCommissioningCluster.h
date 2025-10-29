@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "app/clusters/general-commissioning-server/general-commissioning-cluster.h"
 #include <app/clusters/network-commissioning/NetworkCommissioningLogic.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 
@@ -33,14 +34,17 @@ namespace Clusters {
 class NetworkCommissioningCluster : public DefaultServerCluster
 {
 public:
-    NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::WiFiDriver * driver) :
-        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver)
+    NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::WiFiDriver * driver,
+                                GeneralCommissioningCluster & generalCommissioningCluster) :
+        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver, generalCommissioningCluster)
     {}
-    NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::ThreadDriver * driver) :
-        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver)
+    NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::ThreadDriver * driver,
+                                GeneralCommissioningCluster & generalCommissioningCluster) :
+        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver, generalCommissioningCluster)
     {}
-    NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::EthernetDriver * driver) :
-        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver)
+    NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::EthernetDriver * driver,
+                                GeneralCommissioningCluster & generalCommissioningCluster) :
+        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver, generalCommissioningCluster)
     {}
 
     CHIP_ERROR Init() { return mLogic.Init(); }

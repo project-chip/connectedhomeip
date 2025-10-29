@@ -59,7 +59,8 @@ public:
     };
 
     GeneralCommissioningCluster(Context && context) :
-        DefaultServerCluster({ kRootEndpointId, GeneralCommissioning::Id }), mContext(std::move(context)), mOptionalAttributes(0)
+        DefaultServerCluster({ kRootEndpointId, GeneralCommissioning::Id }), mClusterContext(std::move(context)),
+        mOptionalAttributes(0)
     {}
 
     OptionalAttributes & GetOptionalAttributes() { return mOptionalAttributes; }
@@ -94,7 +95,7 @@ public:
 #endif
 
 private:
-    Context mContext;
+    Context mClusterContext;
     OptionalAttributes mOptionalAttributes;
     uint64_t mBreadCrumb = 0;
 

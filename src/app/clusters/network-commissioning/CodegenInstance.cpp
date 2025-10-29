@@ -16,6 +16,8 @@
  */
 #include "CodegenInstance.h"
 
+#include <app/clusters/general-commissioning-server/CodegenIntegration.h>
+#include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 namespace chip {
@@ -33,6 +35,16 @@ void Instance::Shutdown()
 {
     CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
     mCluster.Cluster().Shutdown();
+}
+
+GeneralCommissioningCluster & Instance::CodegenGeneralCommissioningCluster()
+{
+    // ensures that we have a codengen general commissioning cluster
+    GeneralCommissioning::EnsureCreated();
+    GeneralCommissioningCluster * cluster = GeneralCommissioning::Instance();
+    VerifyOrDie(cluster != nullptr); // should be ok because we `EnsureCreated`
+
+    return *cluster;
 }
 
 } // namespace NetworkCommissioning

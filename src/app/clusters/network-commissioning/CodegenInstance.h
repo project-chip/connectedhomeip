@@ -17,6 +17,7 @@
 #pragma once
 
 #include "NetworkCommissioningCluster.h"
+#include "app/clusters/general-commissioning-server/general-commissioning-cluster.h"
 
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -44,12 +45,15 @@ public:
     /// Calls Shutdown on the cluster and unregisters the cluster from the CodegenDataModelProvider Registry
     void Shutdown();
 
-    Instance(EndpointId aEndpointId, WiFiDriver * apDelegate) : mCluster(aEndpointId, apDelegate) {}
-    Instance(EndpointId aEndpointId, ThreadDriver * apDelegate) : mCluster(aEndpointId, apDelegate) {}
-    Instance(EndpointId aEndpointId, EthernetDriver * apDelegate) : mCluster(aEndpointId, apDelegate) {}
+    Instance(EndpointId aEndpointId, WiFiDriver * apDelegate) : mCluster(aEndpointId, apDelegate, CodegenGeneralCommissioningCluster()) {}
+    Instance(EndpointId aEndpointId, ThreadDriver * apDelegate) : mCluster(aEndpointId, apDelegate, CodegenGeneralCommissioningCluster()) {}
+    Instance(EndpointId aEndpointId, EthernetDriver * apDelegate) : mCluster(aEndpointId, apDelegate, CodegenGeneralCommissioningCluster()) {}
 
 private:
     RegisteredServerCluster<NetworkCommissioningCluster> mCluster;
+
+    // Fetches the CodegenIntegration-specific instance of the general commissioning cluster.
+    GeneralCommissioningCluster &CodegenGeneralCommissioningCluster();
 };
 
 // The InstanceAndDriver class encapsulates the creation and management of a transport driver instance (Wi-Fi, Thread, or Ethernet)
