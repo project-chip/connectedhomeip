@@ -55,24 +55,31 @@ LinuxCommissionableDataProvider gCommissionableDataProvider;
 
 // App custom argument handling
 constexpr uint16_t kOptionDeviceType = 0xffd0;
+constexpr uint16_t kOptionEndpoint   = 0xffd1;
 const char * deviceTypeName          = "contact-sensor"; // defaulting to contact sensor if not specified
+EndpointId deviceEndpoint            = 1; // defaulting to endpoint 1 if not specified
 
 chip::ArgParser::OptionDef sAllDevicesAppOptionDefs[] = {
     { "device", chip::ArgParser::kArgumentRequired, kOptionDeviceType },
+    { "endpoint", chip::ArgParser::kArgumentRequired, kOptionEndpoint },
 };
 
 bool AllDevicesAppOptionHandler(const char * program, OptionSet * options, int identifier, const char * name, const char * value)
 {
     switch (identifier)
     {
-    case kOptionDeviceType:
+    case kOptionDeviceType: 
         if (value == nullptr || !DeviceFactory::GetInstance().IsValidDevice(value))
         {
-            ChipLogError(Support, "INTERNAL ERROR: Invalid device type: %s\n", value);
+            ChipLogError(Support, "INTERNAL ERROR: Invalid device type: %s. Run with the --help argument to view the list of valid device types.\n", value);
             return false;
         }
         ChipLogProgress(AppServer, "Using the device type of %s", value);
         deviceTypeName = value;
+        return true;
+    case kOptionEndpoint: 
+        deviceEndpoint = static_cast<EndpointId>(atoi(value));
+        ChipLogProgress(AppServer, "Using endpoint %d for the device.", deviceEndpoint);
         return true;
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
@@ -87,7 +94,8 @@ bool AllDevicesAppOptionHandler(const char * program, OptionSet * options, int i
 chip::ArgParser::OptionSet sCmdLineOptions = { AllDevicesAppOptionHandler, // handler function
                                                sAllDevicesAppOptionDefs,   // array of option definitions
                                                "PROGRAM OPTIONS",          // help group
-                                               "-d, --device <contact-sensor|water-leak-detector>\n" };
+                                               "-d, --device <contact-sensor|water-leak-detector>\n" 
+                                               "-e, --endpoint <endpoint-number>\n"};
 
 void StopSignalHandler(int /* signal */)
 {
@@ -113,7 +121,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
     rootNodeDevice.Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
     constructedDevice = DeviceFactory::GetInstance().Create(deviceTypeName);
-    constructedDevice->Register(1, dataModelProvider, kInvalidEndpointId);
+    constructedDevice->Register(deviceEndpoint, dataModelProvider, kInvalidEndpointId);
 
     return &dataModelProvider;
 }
