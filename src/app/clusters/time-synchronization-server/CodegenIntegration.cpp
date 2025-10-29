@@ -97,7 +97,6 @@ void MatterTimeSynchronizationClusterInitCallback(EndpointId endpointId)
 
     IntegrationDelegate integrationDelegate;
 
-    // register a singleton server (root endpoint only)
     CodegenClusterIntegration::RegisterServer(
         {
             .endpointId                = endpointId,
@@ -116,7 +115,6 @@ void MatterTimeSynchronizationClusterShutdownCallback(EndpointId endpointId)
 
     IntegrationDelegate integrationDelegate;
 
-    // unregister a singleton server (root endpoint only)
     CodegenClusterIntegration::UnregisterServer(
         {
             .endpointId                = endpointId,
