@@ -70,7 +70,7 @@ jobs:
                      "clang") GN_ARGS='is_clang=true chip_build_all_platform_tests=true';;
                      "mbedtls") GN_ARGS='chip_crypto="mbedtls" chip_build_all_platform_tests=true';;
                      "rotating_device_id") GN_ARGS='chip_crypto="boringssl" chip_enable_rotating_device_id=true chip_build_all_platform_tests=true';;
-                     "icd") GN_ARGS='chip_enable_icd_server=true chip_enable_icd_lit=true chip_build_all_platform_tests=true chip_icd_report_on_active_mode=true';;
+                     "icd") GN_ARGS='chip_enable_icd_server=true chip_enable_icd_lit=true chip_build_all_platform_tests=true';;
                      *) ;;
                   esac
 
