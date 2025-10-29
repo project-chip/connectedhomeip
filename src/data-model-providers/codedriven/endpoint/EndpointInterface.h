@@ -41,8 +41,6 @@ public:
 
     using SemanticTag = Clusters::Globals::Structs::SemanticTagStruct::Type;
 
-    virtual CHIP_ERROR SemanticTags(ReadOnlyBufferBuilder<SemanticTag> & out) const = 0;
-
     virtual CHIP_ERROR DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const = 0;
 
     virtual CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const = 0;
