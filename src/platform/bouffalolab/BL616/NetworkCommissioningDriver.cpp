@@ -226,14 +226,17 @@ void BLWiFiDriver::OnScanWiFiNetworkDone()
     uint32_t nums = wifi_mgmr_sta_scanlist_nums_get();
     if (nums)
     {
-        wifi_mgmr_scan_item_t * pScanList = (wifi_mgmr_scan_item_t *) MemoryAlloc(nums * sizeof(wifi_mgmr_scan_item_t));
-
-        if (NULL == pScanList || 0 == wifi_mgmr_sta_scanlist_dump(pScanList, nums))
+        Platform::ScopedMemoryBuffer<wifi_mgmr_scan_item_t> pscanList;
+        if (!pscanList.Calloc(nums))
         {
-            if (pScanList)
-            {
-                MemoryFree(pScanList);
-            }
+            ChipLogError(DeviceLayer, "Failed to allocate memory for scan list");
+            mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+            mpScanCallback = nullptr;
+            return;
+        }
+
+        if (0 == wifi_mgmr_sta_scanlist_dump(pscanList.Get(), nums))
+        {
             mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
             mpScanCallback = nullptr;
         }
@@ -246,9 +249,9 @@ void BLWiFiDriver::OnScanWiFiNetworkDone()
             {
                 for (uint32_t i = 0; i < nums; i++)
                 {
-                    if (mScanSSIDlength == pScanList[i].ssid_len && memcmp(pScanList[i].ssid, mScanSSID, mScanSSIDlength) == 0)
+                    if (mScanSSIDlength == pscanList[i].ssid_len && memcmp(pscanList[i].ssid, mScanSSID, mScanSSIDlength) == 0)
                     {
-                        pScanResult   = &pScanList[i];
+                        pScanResult   = &pscanList[i];
                         scanResultNum = 1;
                         break;
                     }
@@ -256,11 +259,13 @@ void BLWiFiDriver::OnScanWiFiNetworkDone()
             }
             else
             {
-                pScanResult   = pScanList;
+                pScanResult   = pscanList.Get();
                 scanResultNum = nums;
             }
 
-            if (CHIP_NO_ERROR != DeviceLayer::SystemLayer().ScheduleLambda([scanResultNum, pScanResult, pScanList]() {
+            // Transfer ownership to lambda by moving the ScopedMemoryBuffer
+            if (CHIP_NO_ERROR != DeviceLayer::SystemLayer().ScheduleLambda([scanResultNum, pScanResult, 
+                                                                            pscanList = std::move(pscanList)]() mutable {
                     BLScanResponseIterator iter(scanResultNum, pScanResult);
 
                     if (GetInstance().mpScanCallback)
@@ -272,11 +277,11 @@ void BLWiFiDriver::OnScanWiFiNetworkDone()
                     {
                         ChipLogError(DeviceLayer, "can't find the ScanCallback function");
                     }
-
-                    MemoryFree(pScanList);
+                    // pscanList will be automatically freed when lambda goes out of scope
                 }))
             {
-                MemoryFree(pScanList);
+                // If ScheduleLambda fails, pscanList will be automatically freed here
+                ChipLogError(DeviceLayer, "Failed to schedule scan result processing");
             }
         }
     }
