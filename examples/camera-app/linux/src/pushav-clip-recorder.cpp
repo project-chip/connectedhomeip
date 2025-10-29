@@ -125,8 +125,7 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
             // Set permissions to 0755 (owner rwx, group rx, others rx)
             std::filesystem::permissions(p,
                                          std::filesystem::perms::owner_all | std::filesystem::perms::group_read |
-                                             std::filesystem::perms::group_exec | std::filesystem::perms::others_read |
-                                             std::filesystem::perms::others_exec,
+                                             std::filesystem::perms::group_exec,
                                          std::filesystem::perm_options::replace, ec);
             ChipLogProgress(Camera, "Created directory: %s", p.c_str());
         }
@@ -152,7 +151,7 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
     }
 
     // Clean up previous session directory if it exists
-    fs::remove_all(sessionDir);
+    std::filesystem::remove_all(sessionDir);
 
     // Create session and track directories
     if (!ensure(sessionDir) || !ensure(trackDir))

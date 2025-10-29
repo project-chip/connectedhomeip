@@ -23,7 +23,6 @@
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
-#include <filesystem>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -31,8 +30,6 @@
 #include <string>
 #include <thread>
 #include <vector>
-
-namespace fs = std::filesystem;
 
 // FFmpeg headers
 extern "C" {
