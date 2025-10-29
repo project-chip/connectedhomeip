@@ -193,6 +193,14 @@ tests:
     - label: "Factory Reset the default accessory"
       command: "FactoryReset"
 
+    - label: "Wait for default accessory to setup SIGTERM handler"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
     - label: "Factory Reset the default accessory by key"
       command: "FactoryReset"
       arguments:
