@@ -52,13 +52,13 @@ class TC_BINFO_3_1(MatterBaseTest):
     def steps_TC_BINFO_3_1(self) -> list[TestStep]:
         steps = [
             TestStep(1, "TH reads ProductAppearance from the DUT.",
-                     "Verify that TH reads ProductAppearance attribute from the DUT successfully and the value is in ProductAppearanceStruct. Finish value is in range 0-5"),
+                     "Verify that TH reads ProductAppearance attribute from the DUT successfully and the value is in ProductAppearanceStruct. Finish value is in range 0-5."),
             TestStep(2, "TH reads ProductAppearance from the DUT.",
-                     "Verify that TH reads ProductAppearance attribute from the DUT successfully and the value is in ProductAppearanceStruct. PrimaryColor is in range 0-20"),
+                     "Verify that TH reads ProductAppearance attribute from the DUT successfully and the value is in ProductAppearanceStruct. PrimaryColor is in range 0-20."),
             TestStep(3, "TH reads ProductAppearance from the DUT.",
-                     "Vendor specific test-step. Verify that TH reads ProductAppearance attribute from the DUT successfully"),
+                     "Vendor specific test-step. Verify that TH reads ProductAppearance attribute from the DUT successfully."),
             TestStep(4, "TH reads ProductAppearance from the DUT.",
-                     "Vendor specific test-step. Verify that TH reads ProductAppearance attribute from the DUT successfully"),
+                     "Vendor specific test-step. Verify that TH reads ProductAppearance attribute from the DUT successfully."),
         ]
         return steps
 
@@ -75,34 +75,27 @@ class TC_BINFO_3_1(MatterBaseTest):
         endpoint = self.get_endpoint(default=0)
         attributes = Clusters.BasicInformation.Attributes
 
-        self.step(1)
+        # Read ProductAppearance once and reuse for all steps since the attribute value doesn't change
         productAppearance = await self.read_binfo_attribute_expect_success(
             endpoint=endpoint, attribute=attributes.ProductAppearance)
         asserts.assert_is_not_none(productAppearance, "ProductAppearance attribute read failed")
+
+        self.step(1)
         asserts.assert_greater_equal(productAppearance.finish, 0, "Finish value is below minimum range")
         asserts.assert_less_equal(productAppearance.finish, 5, "Finish value is above maximum range")
 
         self.step(2)
-        productAppearance = await self.read_binfo_attribute_expect_success(
-            endpoint=endpoint, attribute=attributes.ProductAppearance)
-        asserts.assert_is_not_none(productAppearance, "ProductAppearance attribute read failed")
         if productAppearance.primaryColor is not None:
             asserts.assert_greater_equal(productAppearance.primaryColor, 0, "PrimaryColor value is below minimum range")
             asserts.assert_less_equal(productAppearance.primaryColor, 20, "PrimaryColor value is above maximum range")
 
         self.step(3)
-        productAppearance = await self.read_binfo_attribute_expect_success(
-            endpoint=endpoint, attribute=attributes.ProductAppearance)
-        asserts.assert_is_not_none(productAppearance, "ProductAppearance attribute read failed")
         # Vendor specific test: This step should verify the actual Finish value matches PIXIT.BINFO.Finish
         # For example, if PIXIT.BINFO.Finish is satin(2), the test should verify finish == 2
         self.wait_for_user_input(
             prompt_msg="Verify that the ProductAppearance.Finish value matches your PIXIT.BINFO.Finish setting, then continue")
 
         self.step(4)
-        productAppearance = await self.read_binfo_attribute_expect_success(
-            endpoint=endpoint, attribute=attributes.ProductAppearance)
-        asserts.assert_is_not_none(productAppearance, "ProductAppearance attribute read failed")
         # Vendor specific test: This step should verify the actual PrimaryColor value matches PIXIT.BINFO.PrimaryColor
         # For example, if PIXIT.BINFO.PrimaryColor is purple(5), the test should verify primaryColor == 5
         self.wait_for_user_input(
