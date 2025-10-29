@@ -667,22 +667,21 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-void CASESession::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR err)
+void CASESession::HandleConnectionAttemptComplete(const Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR err)
 {
     VerifyOrReturn(conn == mPeerConnState);
 
     char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
     conn->mPeerAddr.ToString(peerAddrBuf);
 
-    auto ConnectionCleanup = [](CASESession * s) {
-        s->mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->ReleaseTCPConnection();
-        s->mSecureSessionHolder.Get().Value()->AsSecureSession()->ReleaseTCPConnection();
-        s->Clear();
-    };
-    std::unique_ptr<CASESession, decltype(ConnectionCleanup)> connectionHolder(this, ConnectionCleanup);
+    auto connectionCleanup = ScopeExit([&, this]() {
+        mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->ReleaseTCPConnection();
+        mSecureSessionHolder.Get().Value()->AsSecureSession()->ReleaseTCPConnection();
+        AbortPendingEstablish(err);
+    });
 
     // Bail if connection setup encountered an error.
-    LogAndReturnOnFailure(err, SecureChannel, "Connection establishment failed with peer at %s", peerAddrBuf);
+    ReturnAndLogOnFailure(err, SecureChannel, "Connection establishment failed with peer at %s", peerAddrBuf);
 
     ChipLogDetail(SecureChannel, "TCP Connection established with %s before session establishment", peerAddrBuf);
 
@@ -695,9 +694,10 @@ void CASESession::HandleConnectionAttemptComplete(Transport::ActiveTCPConnection
     mSecureSessionHolder.Get().Value()->AsSecureSession()->SetTCPConnection(conn);
 
     // Send Sigma1 after connection is established for sessions over TCP
-    LogAndReturnOnFailure(SendSigma1(), SecureChannel, "Sigma1 failed to peer %s", peerAddrBuf);
+    err = SendSigma1();
+    ReturnAndLogOnFailure(err, SecureChannel, "Sigma1 failed to peer %s", peerAddrBuf);
 
-    connectionHolder.release();
+    connectionCleanup.release();
 }
 
 void CASESession::HandleConnectionClosed(const Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr)

@@ -204,6 +204,22 @@ def BuildHostTarget():
     target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
     target.AppendModifier('terms-and-conditions', terms_and_conditions_required=True)
     target.AppendModifier('webrtc', enable_webrtc=True)
+    target.AppendModifier('unified', unified=True).OnlyIfRe(
+        "-(" + "|".join([
+            # keep-sorted start
+            'air-purifier',
+            'bridge',
+            'closure',
+            'light',
+            'lock',
+            'microwave-oven',
+            'ota-provider',
+            'rvc',
+            'thermostat',
+            'tv-app',
+            'water-leak-detector',
+            # keep-sorted end
+        ]) + ")-")
 
     return target
 
@@ -294,7 +310,6 @@ def BuildEfr32Target():
     target.AppendModifier(
         'show-qr-code', show_qr_code=True).ExceptIfRe('-low-power')
     target.AppendModifier('wifi', enable_wifi=True)
-    target.AppendModifier('rs9116', enable_rs9116=True).OnlyIfRe('-wifi')
     target.AppendModifier('wf200', enable_wf200=True).OnlyIfRe('-wifi')
     target.AppendModifier('siwx917', enable_917_ncp=True).OnlyIfRe('-wifi')
     target.AppendModifier('ipv4', enable_wifi_ipv4=True).OnlyIfRe('-wifi')

@@ -25,9 +25,19 @@
 
 #pragma once
 
+#include <app/clusters/identify-server/IdentifyCluster.h>
 #include <binding-handler.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/CommonDeviceCallbacks.h>
+
+class IdentifyDelegateImpl : public chip::app::Clusters::IdentifyDelegate
+{
+public:
+    void OnIdentifyStart(chip::app::Clusters::IdentifyCluster & cluster) override;
+    void OnIdentifyStop(chip::app::Clusters::IdentifyCluster & cluster) override;
+    void OnTriggerEffect(chip::app::Clusters::IdentifyCluster & cluster) override;
+    bool IsTriggerEffectEnabled() const override;
+};
 
 class AppDeviceCallbacks : public CommonDeviceCallbacks
 {
