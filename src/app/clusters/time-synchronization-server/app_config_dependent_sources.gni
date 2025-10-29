@@ -15,7 +15,7 @@ app_config_dependent_sources = [
   "DefaultTimeSyncDelegate.cpp",
   "DefaultTimeSyncDelegate.h",
   "TimeSyncDataProvider.cpp",
+  "time-synchronization-cluster.cpp",
+  "time-synchronization-cluster.h",
   "time-synchronization-delegate.h",
-  "time-synchronization-server.cpp",
-  "time-synchronization-server.h",
 ]
