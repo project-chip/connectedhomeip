@@ -17,14 +17,24 @@
 #pragma once
 
 #include <app/AppConfig.h>
+#include <app/FailSafeContext.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
+#include <app/server/CommissioningWindowManager.h>
 #include <clusters/GeneralCommissioning/AttributeIds.h>
 #include <clusters/GeneralCommissioning/ClusterId.h>
 #include <clusters/GeneralCommissioning/Commands.h>
 #include <clusters/GeneralCommissioning/Enums.h>
-#include <cstdint>
+#include <credentials/FabricTable.h>
 #include <lib/support/BitFlags.h>
+#include <platform/ConfigurationManager.h>
+#include <platform/PlatformManager.h>
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+#include <app/server/TermsAndConditionsProvider.h> //nogncheck
+#endif                                             // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+
+#include <cstdint>
 
 namespace chip::app::Clusters {
 
@@ -33,7 +43,24 @@ class GeneralCommissioningCluster : public DefaultServerCluster, chip::FabricTab
 public:
     using OptionalAttributes = OptionalAttributeSet<GeneralCommissioning::Attributes::IsCommissioningWithoutPower::Id>;
 
-    GeneralCommissioningCluster() : DefaultServerCluster({ kRootEndpointId, GeneralCommissioning::Id }), mOptionalAttributes(0) {}
+    /// Injected dependencies of this cluster
+    struct Context
+    {
+        CommissioningWindowManager & commissioningWindowManager;
+        DeviceLayer::ConfigurationManager & configurationManager;
+        DeviceLayer::DeviceControlServer & deviceControlServer;
+        FabricTable & fabricTable;
+        FailSafeContext & failsafeContext;
+        DeviceLayer::PlatformManager & platformManager;
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        TermsAndConditionsProvider & termsAndConditionsProvider;
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    };
+
+    GeneralCommissioningCluster(Context && context) :
+        DefaultServerCluster({ kRootEndpointId, GeneralCommissioning::Id }), mContext(std::move(context)), mOptionalAttributes(0)
+    {}
 
     OptionalAttributes & GetOptionalAttributes() { return mOptionalAttributes; }
 
@@ -57,9 +84,6 @@ public:
     // Fabric delegate
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
-    // GeneralCommissioning is a singleton cluster that exists only on the root endpoint.
-    static GeneralCommissioningCluster & Instance();
-
     // Feature map constant based on compile-time defines. This ensures feature map
     // is in sync with the actual supported features determined at build time.
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -70,6 +94,7 @@ public:
 #endif
 
 private:
+    Context mContext;
     OptionalAttributes mOptionalAttributes;
     uint64_t mBreadCrumb = 0;
 

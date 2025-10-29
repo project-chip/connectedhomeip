@@ -15,7 +15,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "platform/ConfigurationManager.h"
+#include "platform/DeviceControlServer.h"
+#include "platform/PlatformManager.h"
 #include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/GeneralCommissioning.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 
@@ -42,7 +47,7 @@ static_assert((kGeneralCommissioningFixedClusterCount == 0) ||
                    GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId),
               "General Commissioning cluster MUST be on endpoint 0");
 
-ServerClusterRegistration gRegistration(GeneralCommissioningCluster::Instance());
+LazyRegisteredServerCluster<GeneralCommissioningCluster> gServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -50,16 +55,29 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        // Configure optional attributes based on fetched bits
-        GeneralCommissioningCluster::Instance().GetOptionalAttributes() =
-            GeneralCommissioningCluster::OptionalAttributes(optionalAttributeBits);
 
-        return gRegistration;
+        gServer.Create(GeneralCommissioningCluster::Context{
+            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+            .configurationManager       = DeviceLayer::ConfigurationMgr(),
+            .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+            .fabricTable                = Server::GetInstance().GetFabricTable(),
+            .failsafeContext            = Server::GetInstance().GetFailSafeContext(),
+            .platformManager            = DeviceLayer::PlatformMgr(),
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        });
+
+        // Configure optional attributes based on fetched bits
+        gServer.Cluster().GetOptionalAttributes() = GeneralCommissioningCluster::OptionalAttributes(optionalAttributeBits);
+
+        return gServer.Registration();
     }
 
     ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
-        return &GeneralCommissioningCluster::Instance();
+        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+        return &gServer.Cluster();
     }
 
     // Nothing to destroy: separate singleton class without constructor/destructor is used
