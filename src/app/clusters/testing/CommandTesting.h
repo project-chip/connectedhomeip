@@ -76,7 +76,6 @@ public:
 
     // Helper methods to extract response data
     bool HasResponse() const { return !mResponses.empty(); }
-    bool HasResponses() const { return !mResponses.empty(); }
     size_t GetResponseCount() const { return mResponses.size(); }
 
     // Methods for working with single response (first in array)
