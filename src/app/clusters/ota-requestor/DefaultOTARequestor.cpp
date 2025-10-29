@@ -552,6 +552,8 @@ CHIP_ERROR DefaultOTARequestor::TriggerImmediateQuery(FabricIndex fabricIndex)
 void DefaultOTARequestor::DownloadUpdate()
 {
     RecordNewUpdateState(OTAUpdateStateEnum::kDownloading, OTAChangeReasonEnum::kSuccess);
+    // If image successfully downloads and is applied, the device will reboot so persist all relevant data
+    StoreCurrentUpdateInfo();
     ConnectToProvider(kDownload);
 }
 
@@ -563,10 +565,6 @@ void DefaultOTARequestor::DownloadUpdateDelayedOnUserConsent()
 void DefaultOTARequestor::ApplyUpdate()
 {
     RecordNewUpdateState(OTAUpdateStateEnum::kApplying, OTAChangeReasonEnum::kSuccess);
-
-    // If image is successfully applied, the device will reboot so persist all relevant data
-    StoreCurrentUpdateInfo();
-
     ConnectToProvider(kApplyUpdate);
 }
 
