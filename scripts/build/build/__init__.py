@@ -17,25 +17,25 @@ class BuildSteps(Enum):
 
 class BuildTimer:
     def __init__(self):
-        self._start_time = None
+        self._total_start_time = None
+        self._total_end_time = None
         self._build_times = {}
 
-    def __enter__(self):
-        self._start_time = time.time()
-        return self
+    def time_builds(self, builders):
+        self._total_start_time = time.time()
+        for builder in builders:
+            start_time = time.time()
+            builder.build()
+            end_time = time.time()
+            self._build_times[builder.identifier] = end_time - start_time
+        self._total_end_time = time.time()
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        total_time = time.time() - self._start_time
+    def print_timing_report(self):
+        total_time = self._total_end_time - self._total_start_time
         logging.info("Build Time Summary:")
         for target, duration in self._build_times.items():
             logging.info(f"  - {target}: {self._format_duration(duration)}")
         logging.info(f"Total build time: {self._format_duration(total_time)}")
-
-    def time_it(self, name, func):
-        start_time = time.time()
-        func()
-        end_time = time.time()
-        self._build_times[name] = end_time - start_time
 
     def _format_duration(self, seconds):
         minutes = int(seconds // 60)
@@ -115,10 +115,9 @@ class Context:
     def Build(self):
         self.Generate()
 
-        with BuildTimer() as timer:
-            # Run everything sequentially
-            for builder in self.builders:
-                timer.time_it(builder.identifier, builder.build)
+        timer = BuildTimer()
+        timer.time_builds(self.builders)
+        timer.print_timing_report()
 
     def CleanOutputDirectories(self):
         for builder in self.builders:

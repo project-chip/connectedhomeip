@@ -205,7 +205,7 @@ def BuildHostTarget():
     target.AppendModifier('terms-and-conditions', terms_and_conditions_required=True)
     target.AppendModifier('webrtc', enable_webrtc=True)
     target.AppendModifier('unified', unified=True).OnlyIfRe(
-        "(-" + '-|-'.join([
+        "-(" + "|".join([
             # keep-sorted start
             'air-purifier',
             'all-clusters',
@@ -227,7 +227,7 @@ def BuildHostTarget():
             'tv-casting-app',
             'water-leak-detector',
             # keep-sorted end
-        ]) + "-)")
+        ]) + ")-")
 
     return target
 
