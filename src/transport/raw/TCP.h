@@ -305,7 +305,6 @@ private:
     static void HandleAcceptError(const Inet::TCPEndPointHandle & endPoint, CHIP_ERROR err);
 
     void InitEndpoint(const Inet::TCPEndPointHandle & endpoint);
-    CHIP_ERROR TryResetConnection(ActiveTCPConnectionState & connection);
     CHIP_ERROR PrepareBuffer(System::PacketBufferHandle & msgBuf);
 
     Inet::TCPEndPointHandle mListenSocket;                             ///< TCP socket used by the transport
