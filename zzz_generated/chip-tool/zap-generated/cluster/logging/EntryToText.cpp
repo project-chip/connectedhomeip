@@ -510,6 +510,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "CommissioningARL";
         case chip::app::Clusters::AccessControl::Attributes::Arl::Id:
             return "Arl";
+        case chip::app::Clusters::AccessControl::Attributes::AuxiliaryACL::Id:
+            return "AuxiliaryACL";
         case chip::app::Clusters::AccessControl::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::AccessControl::Attributes::AcceptedCommandList::Id:
@@ -2511,6 +2513,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "AvailableEndpoints";
         case chip::app::Clusters::PowerTopology::Attributes::ActiveEndpoints::Id:
             return "ActiveEndpoints";
+        case chip::app::Clusters::PowerTopology::Attributes::ElectricalCircuitNodes::Id:
+            return "ElectricalCircuitNodes";
         case chip::app::Clusters::PowerTopology::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::PowerTopology::Attributes::AcceptedCommandList::Id:
@@ -4273,6 +4277,12 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "RemainingScreenTime";
         case chip::app::Clusters::ContentControl::Attributes::BlockUnrated::Id:
             return "BlockUnrated";
+        case chip::app::Clusters::ContentControl::Attributes::BlockChannelList::Id:
+            return "BlockChannelList";
+        case chip::app::Clusters::ContentControl::Attributes::BlockApplicationList::Id:
+            return "BlockApplicationList";
+        case chip::app::Clusters::ContentControl::Attributes::BlockContentTimeWindow::Id:
+            return "BlockContentTimeWindow";
         case chip::app::Clusters::ContentControl::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ContentControl::Attributes::AcceptedCommandList::Id:
@@ -6114,6 +6124,18 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "SetOnDemandRatingThreshold";
         case chip::app::Clusters::ContentControl::Commands::SetScheduledContentRatingThreshold::Id:
             return "SetScheduledContentRatingThreshold";
+        case chip::app::Clusters::ContentControl::Commands::AddBlockChannels::Id:
+            return "AddBlockChannels";
+        case chip::app::Clusters::ContentControl::Commands::RemoveBlockChannels::Id:
+            return "RemoveBlockChannels";
+        case chip::app::Clusters::ContentControl::Commands::AddBlockApplications::Id:
+            return "AddBlockApplications";
+        case chip::app::Clusters::ContentControl::Commands::RemoveBlockApplications::Id:
+            return "RemoveBlockApplications";
+        case chip::app::Clusters::ContentControl::Commands::SetBlockContentTimeWindow::Id:
+            return "SetBlockContentTimeWindow";
+        case chip::app::Clusters::ContentControl::Commands::RemoveBlockContentTimeWindow::Id:
+            return "RemoveBlockContentTimeWindow";
         default:
             return "Unknown";
         }

@@ -22,7 +22,7 @@ An example showing the use of CHIP on the Silicon Labs SiWx917
 > frequent releases thoroughly tested and validated. Developers looking to
 > develop matter products with silabs hardware are encouraged to use our latest
 > release with added tools and documentation.
-> [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases)
+> [Silabs matter_sdk Github](https://github.com/SiliconLabsSoftware/matter_sdk/tags)
 
 ## Introduction
 
@@ -58,8 +58,8 @@ based on the Silicon Labs platform.
 -   Supported hardware:
 
     -   > For the latest supported hardware please refer to the
-        > [Hardware Requirements](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/general/HARDWARE_REQUIREMENTS.md)
-        > in the Silicon Labs Matter Github Repo
+        > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
+        > in the Silicon Labs Matter Documentation
 
     917SoC boards :
 
@@ -67,30 +67,30 @@ based on the Silicon Labs platform.
 
 *   Build the example application:
 
-          cd ~/connectedhomeip
-          ./scripts/examples/gn_silabs_example.sh ./examples/closure-app/silabs/ ./out/closure-app BRD4338A
+            cd ~/connectedhomeip
+            ./scripts/examples/gn_silabs_example.sh ./examples/closure-app/silabs/ ./out/closure-app BRD4338A
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip
-          $ rm -rf ./out/
+            $ cd ~/connectedhomeip
+            $ rm -rf ./out/
 
     OR use GN/Ninja directly
 
-          $ cd ~/connectedhomeip/examples/closure-app/silabs
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export SILABS_BOARD=BRD4338A
+            $ cd ~/connectedhomeip/examples/closure-app/silabs
+            $ git submodule update --init
+            $ source third_party/connectedhomeip/scripts/activate.sh
+            $ export SILABS_BOARD=BRD4338A
 
     To build the Closure example
 
-          $ gn gen out/debug
-          $ ninja -C out/debug
+            $ gn gen out/debug
+            $ ninja -C out/debug
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/closure-app/silabs
-          $ rm -rf out/
+            $ cd ~/connectedhomeip/examples/closure-app/silabs
+            $ rm -rf out/
 
 For more build options, help is provided when running the build script without
 arguments
@@ -105,9 +105,8 @@ arguments
 -   Or with the Ozone debugger, just load the .out file.
 
 All SiWx917 boards require a connectivity firmware, see Silicon Labs
-documentation for more info. Pre-built bootloader binaries are available in the
-Assets section of the Releases page on
-[Silabs Matter Github](https://github.com/SiliconLabs/matter/releases) .
+documentation for more info. Pre-built firmware binaries are available on the
+[Matter Software Artifacts page](https://docs.silabs.com/matter/latest/matter-prerequisites/matter-artifacts#siwx917-firmware-for-siwn917-ncp-and-siwg917-soc).
 
 ## Running the Complete Example
 
@@ -131,21 +130,21 @@ Assets section of the Releases page on
 
     Here is an example with the chip-tool:
 
-          $ chip-tool pairing ble-wifi 1 <SSID> <Password> 20202021 3840
+            $ chip-tool pairing ble-wifi 1 <SSID> <Password> 20202021 3840
 
 *   User interface :
 
     **Push Button 0**
 
-        -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
-            for 30 seconds. The device will then switch to a slower interval advertisement.
-            After 15 minutes, the advertisement stops.
-            Additionally, it will cycle through the QR code, application status screen and device status screen, respectively.
+          -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
+              for 30 seconds. The device will then switch to a slower interval advertisement.
+              After 15 minutes, the advertisement stops.
+              Additionally, it will cycle through the QR code, application status screen and device status screen, respectively.
 
-        -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
-            Releasing the button within the 6-second window cancels the factory reset
-            procedure. **LEDs** blink in unison when the factory reset procedure is
-            initiated.
+          -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
+              Releasing the button within the 6-second window cancels the factory reset
+              procedure. **LEDs** blink in unison when the factory reset procedure is
+              initiated.
 
 ## Group Communication (Multicast)
 
