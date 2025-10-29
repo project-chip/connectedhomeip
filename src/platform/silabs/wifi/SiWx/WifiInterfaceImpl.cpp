@@ -611,69 +611,6 @@ void WifiInterfaceImpl::ProcessEvent(WifiPlatformEvent event)
         // TODO: Currently unimplemented
         break;
 
-    case WifiPlatformEvent::kScan:
-        ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kScan");
-        if (!(wfx_rsi.dev_state.Has(WifiInterface::WifiState::kScanStarted)))
-        {
-            ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kScan");
-            sl_status_t status = SL_STATUS_OK;
-
-            sl_wifi_scan_configuration_t wifi_scan_configuration = default_wifi_scan_configuration;
-            if (wfx_rsi.dev_state.Has(WifiInterface::WifiState::kStationConnected))
-            {
-                /* Terminate with end of scan which is no ap sent back */
-                wifi_scan_configuration.type                   = SL_WIFI_SCAN_TYPE_ADV_SCAN;
-                wifi_scan_configuration.periodic_scan_interval = kAdvScanPeriodicity;
-            }
-
-            sl_wifi_advanced_scan_configuration_t advanced_scan_configuration = {
-                .trigger_level        = kAdvScanThreshold,
-                .trigger_level_change = kAdvRssiToleranceThreshold,
-                .active_channel_time  = kAdvActiveScanDuration,
-                .passive_channel_time = kAdvPassiveScanDuration,
-                .enable_instant_scan  = kAdvEnableInstantbgScan,
-                .enable_multi_probe   = kAdvMultiProbe,
-            };
-
-            status = sl_wifi_set_advanced_scan_configuration(&advanced_scan_configuration);
-
-            // TODO: Seems like Chipdie should be called here, the device should be initialized here
-            VerifyOrReturn(
-                status == SL_STATUS_OK,
-                ChipLogError(DeviceLayer, "sl_wifi_set_advanced_scan_configuration failed: 0x%lx", static_cast<uint32_t>(status)));
-
-            sl_wifi_set_scan_callback(BackgroundScanCallback, nullptr);
-            wfx_rsi.dev_state.Set(WifiInterface::WifiState::kScanStarted);
-
-            // If an ssid was not provided, we need to call the scan API with nullptr to scan all Wi-Fi networks
-            sl_wifi_ssid_t ssid      = { 0 };
-            sl_wifi_ssid_t * ssidPtr = nullptr;
-
-            if (wfx_rsi.scan_ssid != nullptr)
-            {
-                chip::ByteSpan requestedSsid(wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length);
-                chip::MutableByteSpan ouputSsid(ssid.value, sizeof(ssid.value));
-                chip::CopySpanToMutableSpan(requestedSsid, ouputSsid);
-
-                ssid.length = ouputSsid.size();
-                ssidPtr     = &ssid;
-            }
-
-            osSemaphoreAcquire(sScanInProgressSemaphore, osWaitForever);
-            status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, ssidPtr, &wifi_scan_configuration);
-            if (SL_STATUS_IN_PROGRESS == status)
-            {
-                osSemaphoreAcquire(sScanCompleteSemaphore, kWifiScanTimeoutTicks);
-            }
-
-            osSemaphoreRelease(sScanInProgressSemaphore);
-            if (status != SL_STATUS_OK)
-            {
-                ChipLogError(DeviceLayer, "sl_wifi_start_scan failed: 0x%lx", status);
-            }
-        }
-        break;
-
     case WifiPlatformEvent::kStationStartJoin:
         ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationStartJoin");
 
@@ -938,10 +875,61 @@ CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ::ScanCallba
     }
     wfx_rsi.scan_cb = callback;
 
-    // TODO: We should be calling the start function directly instead of doing it asynchronously
-    WifiPlatformEvent event = WifiPlatformEvent::kScan;
-    PostWifiPlatformEvent(event);
+    sl_status_t status = SL_STATUS_OK;
 
+    sl_wifi_scan_configuration_t wifi_scan_configuration = default_wifi_scan_configuration;
+    if (wfx_rsi.dev_state.Has(WifiInterface::WifiState::kStationConnected))
+    {
+        /* Terminate with end of scan which is no ap sent back */
+        wifi_scan_configuration.type                   = SL_WIFI_SCAN_TYPE_ADV_SCAN;
+        wifi_scan_configuration.periodic_scan_interval = kAdvScanPeriodicity;
+    }
+
+    sl_wifi_advanced_scan_configuration_t advanced_scan_configuration = {
+        .trigger_level        = kAdvScanThreshold,
+        .trigger_level_change = kAdvRssiToleranceThreshold,
+        .active_channel_time  = kAdvActiveScanDuration,
+        .passive_channel_time = kAdvPassiveScanDuration,
+        .enable_instant_scan  = kAdvEnableInstantbgScan,
+        .enable_multi_probe   = kAdvMultiProbe,
+    };
+
+    status = sl_wifi_set_advanced_scan_configuration(&advanced_scan_configuration);
+
+    // TODO: Seems like Chipdie should be called here, the device should be initialized here
+    VerifyOrReturnError(
+        status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+        ChipLogError(DeviceLayer, "sl_wifi_set_advanced_scan_configuration failed: 0x%lx", static_cast<uint32_t>(status)));
+
+    sl_wifi_set_scan_callback(BackgroundScanCallback, nullptr);
+    wfx_rsi.dev_state.Set(WifiInterface::WifiState::kScanStarted);
+
+    // If an ssid was not provided, we need to call the scan API with nullptr to scan all Wi-Fi networks
+    sl_wifi_ssid_t _ssid     = { 0 };
+    sl_wifi_ssid_t * ssidPtr = nullptr;
+
+    if (wfx_rsi.scan_ssid != nullptr)
+    {
+        chip::ByteSpan requestedSsid(wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length);
+        chip::MutableByteSpan ouputSsid(_ssid.value, sizeof(_ssid.value));
+        chip::CopySpanToMutableSpan(requestedSsid, ouputSsid);
+
+        _ssid.length = ouputSsid.size();
+        ssidPtr      = &_ssid;
+    }
+
+    osSemaphoreAcquire(sScanInProgressSemaphore, osWaitForever);
+    status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, ssidPtr, &wifi_scan_configuration);
+    if (SL_STATUS_IN_PROGRESS == status)
+    {
+        osSemaphoreAcquire(sScanCompleteSemaphore, kWifiScanTimeoutTicks);
+    }
+
+    osSemaphoreRelease(sScanInProgressSemaphore);
+    if (status != SL_STATUS_OK)
+    {
+        ChipLogError(DeviceLayer, "sl_wifi_start_scan failed: 0x%lx", status);
+    }
     return CHIP_NO_ERROR;
 }
 
