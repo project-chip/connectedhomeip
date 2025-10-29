@@ -21,6 +21,7 @@
 #include <app/clusters/closure-dimension-server/closure-dimension-delegate.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-matter-context.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/UnitTestUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <pw_unit_test/framework.h>
 #include <system/SystemClock.h>
@@ -1943,6 +1944,414 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommandWithLimitation)
                               Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
     currentState.SetNonNull(setCurrentStateStruct);
     EXPECT_EQ(logic->SetCurrentState(currentState), CHIP_NO_ERROR);
+}
+
+//=========================================================================================
+// Tests for CurrentState Attribute Quiet Reporting
+//=========================================================================================
+
+TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingPositionNonNulltoNull)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
+    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
+
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    mockContext.ClearDirtyList();
+
+    GenericDimensionStateStruct testCurrentStateStruct;
+    testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(1000);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(false);
+    testCurrentStateStruct.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+
+    DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, DataModel::NullNullable);
+
+    mockContext.ClearDirtyList();
+
+    // set position to 1000
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+
+    mockContext.ClearDirtyList();
+
+    // set position to null
+    testCurrentState.Value().position.Value().SetNull();
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+    EXPECT_TRUE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
+
+    mockContext.ClearDirtyList();
+}
+
+TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingPositionNulltoNonNull)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
+    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
+
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    mockContext.ClearDirtyList();
+
+    GenericDimensionStateStruct testCurrentStateStruct;
+    testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(DataModel::NullNullable);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(false);
+    testCurrentStateStruct.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+
+    DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, DataModel::NullNullable);
+
+    mockContext.ClearDirtyList();
+
+    // set position as null
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+
+    mockContext.ClearDirtyList();
+
+    // set position to NonNull(1000)
+    testCurrentState.Value().position.SetValue(DataModel::MakeNullable<chip::Percent100ths>(chip::Percent100ths(1000)));
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+    EXPECT_TRUE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
+
+    mockContext.ClearDirtyList();
+}
+
+TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingPositionChangeValueWithoutDelay)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
+    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
+
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    mockContext.ClearDirtyList();
+
+    GenericDimensionStateStruct testCurrentStateStruct;
+    testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(1000);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(false);
+    testCurrentStateStruct.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+
+    DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, DataModel::NullNullable);
+
+    mockContext.ClearDirtyList();
+
+    // set position as 1000
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+
+    mockContext.ClearDirtyList();
+
+    // set position to 2000
+    testCurrentState.Value().position.SetValue(DataModel::MakeNullable<chip::Percent100ths>(chip::Percent100ths(2000)));
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+    EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
+
+    mockContext.ClearDirtyList();
+}
+
+TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingPositionChangeValueWithDelay)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
+    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
+
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    mockContext.ClearDirtyList();
+
+    GenericDimensionStateStruct testCurrentStateStruct;
+    testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(1000);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(false);
+    testCurrentStateStruct.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+
+    DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, DataModel::NullNullable);
+
+    mockContext.ClearDirtyList();
+
+    // set position as 1000
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+
+    mockContext.ClearDirtyList();
+
+    chip::test_utils::SleepMillis(2000); // Sleep for 2 seconds
+
+    // set position to 2000
+    testCurrentState.Value().position.SetValue(DataModel::MakeNullable<chip::Percent100ths>(chip::Percent100ths(2000)));
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+    EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
+
+    mockContext.ClearDirtyList();
+
+    chip::test_utils::SleepMillis(2000); // Sleep for 2 seconds
+
+    // set position to 3000
+    testCurrentState.Value().position.SetValue(DataModel::MakeNullable<chip::Percent100ths>(chip::Percent100ths(3000)));
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+    EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
+
+    mockContext.ClearDirtyList();
+
+    chip::test_utils::SleepMillis(2000); // Sleep for 2 seconds
+
+    // set position to 4000
+    testCurrentState.Value().position.SetValue(DataModel::MakeNullable<chip::Percent100ths>(chip::Percent100ths(4000)));
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+    EXPECT_TRUE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
+
+    mockContext.ClearDirtyList();
+}
+
+TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingLatchNulltoValue)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
+    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
+
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    mockContext.ClearDirtyList();
+
+    GenericDimensionStateStruct testCurrentStateStruct;
+    testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(1000);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(DataModel::NullNullable);
+    testCurrentStateStruct.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+
+    DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, DataModel::NullNullable);
+
+    mockContext.ClearDirtyList();
+
+    // set latch as null
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+
+    mockContext.ClearDirtyList();
+
+    // set latch to false
+    testCurrentState.Value().latch.SetValue(DataModel::MakeNullable<bool>(false));
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+    EXPECT_TRUE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
+
+    mockContext.ClearDirtyList();
+}
+
+TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingLatchValuetoNull)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
+    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
+
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    mockContext.ClearDirtyList();
+
+    GenericDimensionStateStruct testCurrentStateStruct;
+    testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(1000);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(false);
+    testCurrentStateStruct.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+
+    DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, DataModel::NullNullable);
+
+    mockContext.ClearDirtyList();
+
+    // set latch as false
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+
+    mockContext.ClearDirtyList();
+
+    // set latch to null
+    testCurrentState.Value().latch.Value().SetNull();
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+    EXPECT_TRUE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
+
+    mockContext.ClearDirtyList();
+}
+
+TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingLatchValueChange)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
+    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
+
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    mockContext.ClearDirtyList();
+
+    GenericDimensionStateStruct testCurrentStateStruct;
+    testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(1000);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(false);
+    testCurrentStateStruct.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+
+    DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, DataModel::NullNullable);
+
+    mockContext.ClearDirtyList();
+
+    // set latch as false
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+
+    mockContext.ClearDirtyList();
+
+    // set latch to true
+    testCurrentState.Value().latch.Value().SetNonNull(true);
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+    EXPECT_TRUE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
+
+    mockContext.ClearDirtyList();
+}
+
+TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingSpeedNullOptionaltoValue)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
+    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
+
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    mockContext.ClearDirtyList();
+
+    GenericDimensionStateStruct testCurrentStateStruct;
+    testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(1000);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(false);
+    testCurrentStateStruct.speed    = NullOptional;
+
+    DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, DataModel::NullNullable);
+
+    mockContext.ClearDirtyList();
+
+    // set speed as nulloptional
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+
+    mockContext.ClearDirtyList();
+
+    // set speed to low
+    testCurrentState.Value().speed.SetValue(Globals::ThreeLevelAutoEnum::kLow);
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+    EXPECT_TRUE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
+
+    mockContext.ClearDirtyList();
+}
+
+TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingSpeedValuetoNullOptional)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
+    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
+
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    mockContext.ClearDirtyList();
+
+    GenericDimensionStateStruct testCurrentStateStruct;
+    testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(1000);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(false);
+    testCurrentStateStruct.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+
+    DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, DataModel::NullNullable);
+
+    mockContext.ClearDirtyList();
+
+    // set speed as low
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+
+    mockContext.ClearDirtyList();
+
+    // set latch to NullOptional
+    testCurrentState.Value().speed.ClearValue();
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+    EXPECT_TRUE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
+
+    mockContext.ClearDirtyList();
+}
+
+TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingSpeedValueChange)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
+    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
+
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    mockContext.ClearDirtyList();
+
+    GenericDimensionStateStruct testCurrentStateStruct;
+    testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(1000);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(false);
+    testCurrentStateStruct.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+
+    DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, DataModel::NullNullable);
+
+    mockContext.ClearDirtyList();
+
+    // set speed as low
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+
+    mockContext.ClearDirtyList();
+
+    // set speed to medium
+    testCurrentState.Value().speed.SetValue(Globals::ThreeLevelAutoEnum::kMedium);
+    EXPECT_EQ(logic->SetCurrentState(testCurrentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(currentState, testCurrentState);
+    EXPECT_TRUE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
+
+    mockContext.ClearDirtyList();
 }
 
 } // namespace ClosureDimension
