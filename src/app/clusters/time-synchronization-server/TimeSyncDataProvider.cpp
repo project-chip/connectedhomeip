@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "TimeSyncDataProvider.h"
+#include <app/clusters/time-synchronization-server/TimeSyncDataProvider.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
 #include <lib/core/TLV.h>
