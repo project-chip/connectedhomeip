@@ -47,13 +47,14 @@ TEST_F(TestNetworkCommissioningLogic, TestFeatures)
 {
     Testing::FakeWiFiDriver fakeWifiDriver;
     GeneralCommissioningCluster generalCommissioningCluster(GeneralCommissioningCluster::Context {
-        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-        .configurationManager       = DeviceLayer::ConfigurationMgr(),
-        .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
-        .fabricTable = Server::GetInstance().GetFabricTable(), .failsafeContext = Server::GetInstance().GetFailSafeContext(),
-        .platformManager = DeviceLayer::PlatformMgr(),
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
+            .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
+            .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+            .fabricTable            = Server::GetInstance().GetFabricTable(),                //
+            .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
+            .platformManager        = DeviceLayer::PlatformMgr(),                            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-        .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     });
     NetworkCommissioningLogic logic(kRootEndpointId, &fakeWifiDriver, generalCommissioningCluster);

@@ -60,13 +60,14 @@ struct TestNetworkCommissioningCluster : public ::testing::Test
 TEST_F(TestNetworkCommissioningCluster, TestAttributes)
 {
     GeneralCommissioningCluster generalCommissioningCluster(GeneralCommissioningCluster::Context {
-        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-        .configurationManager       = DeviceLayer::ConfigurationMgr(),
-        .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
-        .fabricTable = Server::GetInstance().GetFabricTable(), .failsafeContext = Server::GetInstance().GetFailSafeContext(),
-        .platformManager = DeviceLayer::PlatformMgr(),
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
+            .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
+            .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+            .fabricTable            = Server::GetInstance().GetFabricTable(),                //
+            .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
+            .platformManager        = DeviceLayer::PlatformMgr(),                            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-        .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     });
     {
@@ -111,13 +112,14 @@ TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
 {
     Testing::FakeWiFiDriver fakeWifiDriver;
     GeneralCommissioningCluster generalCommissioningCluster(GeneralCommissioningCluster::Context {
-        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-        .configurationManager       = DeviceLayer::ConfigurationMgr(),
-        .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
-        .fabricTable = Server::GetInstance().GetFabricTable(), .failsafeContext = Server::GetInstance().GetFailSafeContext(),
-        .platformManager = DeviceLayer::PlatformMgr(),
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
+            .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
+            .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+            .fabricTable            = Server::GetInstance().GetFabricTable(),                //
+            .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
+            .platformManager        = DeviceLayer::PlatformMgr(),                            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-        .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     });
     NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, generalCommissioningCluster);
