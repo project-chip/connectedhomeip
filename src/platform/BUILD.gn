@@ -88,7 +88,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     # different radios.
     #
     # Defaults to enabled on Linux since it's useful for tests and for
-    # performance evaluation in general. Default values are retaiened.
+    # performance evaluation in general. Default values are retained.
     chip_device_config_enable_dynamic_mrp_config =
         chip_device_platform == "linux"
 
