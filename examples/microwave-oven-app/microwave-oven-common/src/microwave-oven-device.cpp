@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include "microwave-oven-device.h"
+#include "Identify.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -251,6 +252,7 @@ void MatterMicrowaveOvenServerInit()
 {
     gMicrowaveOvenDevice = Platform::MakeUnique<ExampleMicrowaveOvenDevice>(kDemoEndpointId);
     gMicrowaveOvenDevice.get()->MicrowaveOvenInit();
+    IdentifyInit();
 }
 
 void MatterMicrowaveOvenServerShutdown()

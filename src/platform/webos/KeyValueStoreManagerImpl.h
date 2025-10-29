@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *          Platform-specific implementation of KVS for linux.
+ *          Platform-specific implementation of KVS for webOS.
  */
 
 #pragma once
@@ -43,7 +43,7 @@ public:
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);
 
 private:
-    DeviceLayer::Internal::ChipLinuxStorage mStorage;
+    DeviceLayer::Internal::ChipWebOSStorage mStorage;
 
     // ===== Members for internal use by the following friends.
     friend KeyValueStoreManager & KeyValueStoreMgr();

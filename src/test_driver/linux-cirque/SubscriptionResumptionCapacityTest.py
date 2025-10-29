@@ -133,10 +133,10 @@ class TestSubscriptionResumptionCapacity(CHIPVirtualHome):
                 CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_repl-1.0.0-py3-none-any.whl")))
 
         command1 = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
-                    "--args python3 {} -t 300 -a {} --paa-trust-store-path {} --subscription-capacity {}").format(
+                    "--args python3 {} -t 300 --paa-trust-store-path {} --subscription-capacity {}").format(
                         os.path.join(CHIP_REPO, "src/controller/python/tests/scripts",
                                      "subscription_resumption_capacity_test_ctrl1.py"),
-                        ethernet_ip, os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
+                        os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
                         TEST_SUBSCRIPTION_CAPACITY)
         ret1 = self.execute_device_cmd(req_ids[0], command1)
 

@@ -17,6 +17,7 @@ source_set("certificate-table") {
   public = [
     "CertificateTable.h",
     "CertificateTableImpl.h",
+    "IncrementingIdHelper.h",
   ]
 
   deps = [ "${chip_root}/src/app" ]

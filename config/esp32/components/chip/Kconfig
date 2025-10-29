@@ -856,13 +856,6 @@ menu "CHIP Device Layer"
                 NVS namespace. If this option is enabled, the application can use an API to set a CD,
                 the configured CD will be used for subsequent CD reads.
 
-        config ENABLE_ESP_DIAGNOSTICS_TRACE
-            bool "Enable ESP Platform Diagnostics for Matter"
-            default n
-            help
-                Enables the ESP Diagnostics platform to collect, store, and retrieve diagnostic data for the Matter protocol.
-                This feature helps monitor system health and performance by providing insights through diagnostics logs.
-
        config ENABLE_ESP_INSIGHTS_TRACE
            bool "Enable Matter ESP Insights"
            depends on ESP_INSIGHTS_ENABLED
@@ -882,14 +875,35 @@ menu "CHIP Device Layer"
         config MAX_PERMIT_LIST_SIZE
             int "Set permit list size for Insights traces"
             range 5 30
-            depends on ESP_INSIGHTS_ENABLED || ENABLE_ESP_DIAGNOSTICS_TRACE
+            depends on ESP_INSIGHTS_ENABLED
             default 20
             help
                 Set the maximum number of group entries that can be included in the permit list for reporting
-                traces to Insights or diagnostics. This ensures proper management of trace reporting capacity.
+                traces to Insights. This ensures proper management of trace reporting capacity.
     endmenu
 
+    menu "Diagnostics Options"
+        config ENABLE_ESP_DIAGNOSTICS
+            bool "Enable ESP Platform Diagnostics for Matter"
+            default n
+            help
+                Enables the ESP Diagnostics platform to collect, store, and retrieve diagnostic data for the Matter protocol.
+                This feature helps monitor system health and performance by providing insights through diagnostics logs.
 
+        config ENABLE_ESP_DIAGNOSTIC_TRACES
+            bool "Enable Traces"
+            default y
+            depends on ENABLE_ESP_DIAGNOSTICS
+            help
+                Enable Traces for the ESP Platform Diagnostics for Matter.
+
+        config ENABLE_ESP_DIAGNOSTIC_METRICS
+            bool "Enable Metrics"
+            default y
+            depends on ENABLE_ESP_DIAGNOSTICS
+            help
+                Enable Metrics for the ESP Platform Diagnostics for Matter.
+    endmenu
 
     menu "Testing Options"
 
@@ -1147,7 +1161,7 @@ menu "CHIP Device Layer"
             int "MRP local active retry interval for Thread network in milliseconds"
             depends on ENABLE_MATTER_OVER_THREAD
             range 0 3600000
-            default 800
+            default 2000
             help
                 Base retry interval of the present Thread node when it is in the active state.
 
@@ -1163,7 +1177,7 @@ menu "CHIP Device Layer"
             int "MRP local idle retry interval for Thread network in milliseconds"
             depends on ENABLE_MATTER_OVER_THREAD
             range 0 3600000
-            default 800
+            default 2000
             help
                 Base retry interval of the present Thread node when it is in the idle state.
 
@@ -1179,7 +1193,7 @@ menu "CHIP Device Layer"
             int "MRP retransmission delta timeout for Thread network in milliseconds"
             depends on ENABLE_MATTER_OVER_THREAD
             range 0 3600000
-            default 500
+            default 1500
             help
                 A constant value added to the calculated retransmission timeout.
 
