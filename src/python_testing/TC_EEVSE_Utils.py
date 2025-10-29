@@ -300,7 +300,7 @@ class EEVSEBaseTestHelper:
 
         logger.info(
             f"minutesPastMidnight = {minutes_past_midnight} => "
-            f"{int(minutes_past_midnight/60)}:{int(minutes_past_midnight%60)}"
+            f"{int(minutes_past_midnight/60)}:{int(minutes_past_midnight % 60)}"
             f" Expected target_time = {target_time}")
 
         # Matter Epoch is 1st Jan 2000
