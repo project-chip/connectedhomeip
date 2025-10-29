@@ -219,7 +219,7 @@ DataModel::ActionReturnStatus GeneralCommissioningCluster::ReadAttribute(const D
     }
     case TCUpdateDeadline::Id: {
         Optional<uint32_t> outUpdateAcceptanceDeadline;
-        ReturnErrorOnFailure(mClusterContext.termsAndConditionsProvider->GetUpdateAcceptanceDeadline(outUpdateAcceptanceDeadline));
+        ReturnErrorOnFailure(mClusterContext.termsAndConditionsProvider.GetUpdateAcceptanceDeadline(outUpdateAcceptanceDeadline));
         return encoder.Encode(outUpdateAcceptanceDeadline);
     }
 #endif

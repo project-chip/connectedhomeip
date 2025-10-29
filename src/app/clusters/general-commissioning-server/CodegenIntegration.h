@@ -25,7 +25,7 @@ namespace chip::app::Clusters::GeneralCommissioning {
 GeneralCommissioningCluster * Instance();
 
 // This will ensure that the cluster has been created for the root endpoint. This method exists because
-// dependencies: some clusters require an `Instance` to be available inside their startul, like the network
+// dependencies: some clusters require an `Instance` to be available inside their startup, like the network
 // commissioning cluster requiring a general commissioning cluster.
 void EnsureCreated();
 
