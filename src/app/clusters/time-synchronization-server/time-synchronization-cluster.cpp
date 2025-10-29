@@ -213,9 +213,9 @@ TimeSynchronizationCluster::TimeSynchronizationCluster(
     EndpointId endpoint, const TimeSynchronizationCluster::OptionalAttributeSet & optionalAttributeSet,
     const BitFlags<Feature> features, SupportsDNSResolve::TypeInfo::Type supportsDNSResolve, TimeZoneDatabaseEnum timeZoneDatabase,
     TimeSourceEnum timeSource, NTPServerAvailable::TypeInfo::Type ntpServerAvailable) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mOptionalAttributeSet(optionalAttributeSet), mFeatures(features), mSupportsDNSResolve(supportsDNSResolve),
-    mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource), mNTPServerAvailable(ntpServerAvailable),
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mOptionalAttributeSet(optionalAttributeSet), mFeatures(features),
+    mSupportsDNSResolve(supportsDNSResolve), mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
+    mNTPServerAvailable(ntpServerAvailable),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -772,7 +772,7 @@ CHIP_ERROR TimeSynchronizationCluster::ClearTimeZone()
 void TimeSynchronizationCluster::InitDSTOffset()
 {
     mDstOffsetObj.validSize     = 0;
-    mDstOffsetObj.dstOffsetList = DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type>(mDst);
+    mDstOffsetObj.dstOffsetList = DataModel::List<Structs::DSTOffsetStruct::Type>(mDst);
 }
 
 CHIP_ERROR TimeSynchronizationCluster::SetDSTOffset(const DataModel::DecodableList<Structs::DSTOffsetStruct::Type> & dstL)
@@ -851,6 +851,30 @@ CHIP_ERROR TimeSynchronizationCluster::ClearDSTOffset()
     ReturnErrorOnFailure(mTimeSyncDataProvider.ClearDSTOffset());
     emitDSTTableEmptyEvent(GetDelegate()->GetEndpoint(), GetEventsGenerator());
     return CHIP_NO_ERROR;
+}
+
+const DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> & TimeSynchronizationCluster::GetTrustedTimeSource() const
+{
+    return mTrustedTimeSource;
+}
+
+CHIP_ERROR TimeSynchronizationCluster::GetDefaultNtp(MutableCharSpan & dntp)
+{
+    return mTimeSyncDataProvider.LoadDefaultNtp(dntp);
+}
+
+Span<TimeSyncDataProvider::TimeZoneStore> & TimeSynchronizationCluster::GetTimeZone()
+{
+    // We can't return a reference to a local temporary object, so we need this assignment
+    mTimeZoneObj.timeZoneList = mTimeZoneObj.timeZoneList.SubSpan(0, mTimeZoneObj.validSize);
+    return mTimeZoneObj.timeZoneList;
+}
+
+DataModel::List<Structs::DSTOffsetStruct::Type> & TimeSynchronizationCluster::GetDSTOffset()
+{
+    // We can't return a reference to a local temporary object, so we need this assignment
+    mDstOffsetObj.dstOffsetList = mDstOffsetObj.dstOffsetList.SubSpan(0, mDstOffsetObj.validSize);
+    return mDstOffsetObj.dstOffsetList;
 }
 
 CHIP_ERROR TimeSynchronizationCluster::SetUTCTime(EndpointId ep, uint64_t utcTime, GranularityEnum granularity,
@@ -1001,6 +1025,17 @@ TimeState TimeSynchronizationCluster::UpdateDSTOffsetState()
         return TimeState::kChanged;
     }
     return TimeState::kActive;
+}
+
+TimeSynchronization::TimeSyncEventFlag TimeSynchronizationCluster::GetEventFlag() const
+{
+    return mEventFlag;
+}
+
+void TimeSynchronizationCluster::ClearEventFlag(TimeSynchronization::TimeSyncEventFlag flag)
+{
+    uint8_t eventFlag = to_underlying(mEventFlag) ^ to_underlying(flag);
+    mEventFlag        = static_cast<TimeSynchronization::TimeSyncEventFlag>(eventFlag);
 }
 
 void TimeSynchronizationCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
