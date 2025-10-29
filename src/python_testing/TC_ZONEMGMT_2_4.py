@@ -353,7 +353,8 @@ After {maxDuration}, keep generating some motion activity during the {blindDurat
 
         self.step("5c")
         event_delay_seconds = blindDuration + 1
-
+        if self.is_pics_sdk_ci_only:
+            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
         event = event_listener.wait_for_event_expect_no_report(timeout_sec=event_delay_seconds)
         logger.info(f"Successfully timed out without receiving any ZoneTriggered event during blind duration for zone: {zoneID1}")
 
