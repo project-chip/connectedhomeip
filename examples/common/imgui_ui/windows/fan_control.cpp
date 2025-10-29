@@ -117,107 +117,92 @@ void FanControl::Render()
     ImGui::Begin(mTitle.c_str());
     ImGui::Text("On Endpoint %d", mEndpointId);
 
-    auto fanMode          = mFanMode;
-    auto percentSetting   = mPercentSetting;
-    auto percent          = mPercent;
-    auto airflowDirection = mAirflowDirection;
-    auto fanModeSequence  = mFanModeSequence;
-    auto rockSetting      = mRockSetting;
-    auto windSetting      = mWindSetting;
-    auto rockSupport      = mRockSupport;
-    auto windSupport      = mWindSupport;
-    uint8_t speedSetting  = mSpeedSetting;
-    uint16_t speedCurrent = mSpeedCurrent;
-    uint16_t speedMax     = mSpeedMax;
-    uint32_t featureMap   = mFeatureMap;
-
-    int uiFanMode          = static_cast<int>(fanMode);
-    int uiPercentSetting   = static_cast<int>(percentSetting);
-    int uiSpeedSetting     = static_cast<int>(speedSetting);
-    int uiAirflowDirection = static_cast<int>(airflowDirection);
-
-    int uiFanModeSequence                                                    = static_cast<int>(fanModeSequence);
-    int uiPercent                                                            = percent;
-    int uiSpeedCurrent                                                       = speedCurrent;
-    int uiSpeedMax                                                           = speedMax;
-    int uiFeatureMap                                                         = featureMap;
-    chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> uiRockSetting = rockSetting;
-    chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> uiRockSupport = rockSupport;
-    chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> uiWindSetting = windSetting;
-    chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> uiWindSupport = windSupport;
+    int uiFanMode          = static_cast<int>(mFanMode);
+    int uiPercentSetting   = static_cast<int>(mPercentSetting);
+    int uiSpeedSetting     = static_cast<int>(mSpeedSetting);
+    int uiAirflowDirection = static_cast<int>(mAirflowDirection);
+    int uiFanModeSequence                                                    = static_cast<int>(mFanModeSequence);
+    int uiPercent                                                            = mPercent;
+    int uiSpeedCurrent                                                       = mSpeedCurrent;
+    int uiSpeedMax                                                           = mSpeedMax;
+    int uiFeatureMap                                                         = mFeatureMap;
+    chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> uiRockSetting = mRockSetting;
+    chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> uiRockSupport = mRockSupport;
+    chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> uiWindSetting = mWindSetting;
+    chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> uiWindSupport = mWindSupport;
 
     ImGui::SliderInt("Mode value", &uiFanMode, static_cast<int>(chip::app::Clusters::FanControl::FanModeEnum::kOff),
                      static_cast<int>(chip::app::Clusters::FanControl::FanModeEnum::kSmart));
-    if (static_cast<int>(fanMode) != uiFanMode)
+    if (static_cast<int>(mFanMode) != uiFanMode)
     {
         mTargetFanMode = static_cast<chip::app::Clusters::FanControl::FanModeEnum>(uiFanMode);
     }
 
     ImGui::LabelText("Mode sequence", "%d", uiFanModeSequence);
-    if (static_cast<int>(fanModeSequence) != uiFanModeSequence)
+    if (static_cast<int>(mFanModeSequence) != uiFanModeSequence)
     {
         mTargetFanModeSequence = static_cast<chip::app::Clusters::FanControl::FanModeSequenceEnum>(uiFanModeSequence);
     }
 
     ImGui::SliderInt("Percent setting", &uiPercentSetting, 0, 100);
-    if (static_cast<int>(percentSetting) != uiPercentSetting)
+    if (static_cast<int>(mPercentSetting) != uiPercentSetting)
     {
         mTargetPercentSetting.Update(uiPercentSetting);
     }
 
     ImGui::LabelText("Percent", "%d", uiPercent);
-    if (static_cast<int>(percent) != uiPercent)
+    if (static_cast<int>(mPercent) != uiPercent)
     {
         mTargetPercent = uiPercent;
     }
 
     ImGui::SliderInt("Speed setting", &uiSpeedSetting, 0, 10);
-    if (speedSetting != static_cast<uint8_t>(uiSpeedSetting))
+    if (mSpeedSetting != static_cast<uint8_t>(uiSpeedSetting))
     {
         mTargetSpeedSetting.Update(uiSpeedSetting);
     }
 
     ImGui::LabelText("Speed current", "%d", uiSpeedCurrent);
-    if (static_cast<int>(speedCurrent) != uiSpeedCurrent)
+    if (static_cast<int>(mSpeedCurrent) != uiSpeedCurrent)
     {
         mTargetSpeedCurrent = uiSpeedCurrent;
     }
 
     ImGui::LabelText("Speed Max", "%d", uiSpeedMax);
-    if (static_cast<int>(speedMax) != uiSpeedMax)
+    if (static_cast<int>(mSpeedMax) != uiSpeedMax)
     {
         mTargetSpeedMax = uiSpeedMax;
     }
 
     ImGui::SliderInt("Airflow direction", &uiAirflowDirection, 1, 0,
-                     airflowDirection == chip::app::Clusters::FanControl::AirflowDirectionEnum::kForward ? "Forward" : "Reverse");
-    if (static_cast<int>(airflowDirection) != uiAirflowDirection)
+                     mAirflowDirection == chip::app::Clusters::FanControl::AirflowDirectionEnum::kForward ? "Forward" : "Reverse");
+    if (static_cast<int>(mAirflowDirection) != uiAirflowDirection)
     {
         mTargetAirflowDirection = static_cast<chip::app::Clusters::FanControl::AirflowDirectionEnum>(uiAirflowDirection);
     }
 
-    if (!uiRockSetting.Has(rockSetting))
+    if (!uiRockSetting.Has(mRockSetting))
     {
         mTargetRockSetting.SetValue(uiRockSetting);
     }
 
-    if (rockSupport != uiRockSupport)
+    if (mRockSupport != uiRockSupport)
     {
         mTargetRockSupport.SetValue(uiRockSupport);
     }
 
-    if (!uiWindSetting.Has(windSetting))
+    if (!uiWindSetting.Has(mWindSetting))
     {
         mTargetWindSetting.SetValue(uiWindSetting);
     }
 
-    if (windSupport != uiWindSupport)
+    if (mWindSupport != uiWindSupport)
     {
         mTargetWindSupport.SetValue(uiWindSupport);
     }
 
     ImGui::LabelText("Feature map", "%d", uiFeatureMap);
-    if (static_cast<int>(featureMap) != uiFeatureMap)
+    if (static_cast<int>(mFeatureMap) != uiFeatureMap)
     {
         mTargetFeatureMap = uiFeatureMap;
     }
