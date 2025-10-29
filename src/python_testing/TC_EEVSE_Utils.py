@@ -164,6 +164,8 @@ class EEVSEBaseTestHelper:
             await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.SetTargets(chargingTargetSchedules),
                                        endpoint=endpoint,
                                        timedRequestTimeoutMs=timedRequestTimeoutMs)
+            asserts.assert_equal(expected_status, Status.Success,
+                                 "Unexpected error returned")
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status,
