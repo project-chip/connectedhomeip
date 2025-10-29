@@ -333,12 +333,12 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         # Generate some activity triggers to facilitate advancing of triggerdetectedDuration
         # beyond maxduration
         if self.is_pics_sdk_ci_only:
-            for i in range(maxDuration):
+            for i in range(maxDuration+2):
                 self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
                 time.sleep(1)
         else:
             self.wait_for_user_input(
-                prompt_msg=f"Press enter and immediately start and keep generating motion activity from zone {zoneID1} for a period exceeding {maxDuration} seconds")
+                prompt_msg=f"Press enter and immediately start, and keep generating motion activity from zone {zoneID1} for a period exceeding {maxDuration} seconds. \n After {maxDuration}, keep generating some motion activity during the {blindDuration} seconds blind duration phase. DUT should not send any ZoneTriggered event during this phase.")
 
         event_delay_seconds = maxDuration
         event = event_listener.wait_for_event_report(
@@ -352,10 +352,9 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
 
         self.step("5c")
         event_delay_seconds = blindDuration + 1
-        await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1}. Stop after 2-3 seconds.")
 
         event = event_listener.wait_for_event_expect_no_report(timeout_sec=event_delay_seconds)
-        logger.info(f"Successfully timed out without receiving any ZoneTriggered event for zone: {zoneID1}")
+        logger.info(f"Successfully timed out without receiving any ZoneTriggered event during blind duration for zone: {zoneID1}")
 
         self.step("6")
 
