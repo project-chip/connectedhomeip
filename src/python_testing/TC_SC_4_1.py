@@ -80,10 +80,12 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securecha
 TCP_PICS_STR = "MCORE.SC.TCP"
 ROOT_NODE_ENDPOINT_ID = 0
 
+
 class SetupCodeType(enum.IntEnum):
     MANUAL_CODE = 0
     QR_CODE = 1
     NONE_SUPLIED = 2
+
 
 class TC_SC_4_1(MatterBaseTest):
 
@@ -806,7 +808,7 @@ class TC_SC_4_1(MatterBaseTest):
         #     length decimal number in ASCII text, omitting any leading zeros.
         #     Save as 'long_discriminator_subtype'.
         #   - Save Long discriminator value as 'long_discriminator'.
-        long_discriminator_subtype, long_discriminator = self.get_discriminator_subtype(is_obcw=False)        
+        long_discriminator_subtype, long_discriminator = self.get_discriminator_subtype(is_obcw=False)
 
         await self.default_controller.OpenCommissioningWindow(
             nodeid=self.dut_node_id,
