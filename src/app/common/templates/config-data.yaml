@@ -162,6 +162,7 @@ CodeDrivenClustersWithCodegenIntegration:
     - Operational Credentials
     - Push AV Stream Transport
     - Software Diagnostics
+    - Soil Measurement
     - Time Format Localization
     - User Label
     - Wi-Fi Network Diagnostics
@@ -170,6 +171,5 @@ CodeDrivenClustersWithCodegenIntegration:
 CodeDrivenClustersWithoutCodegenIntegration:
     # keep-sorted start
     - Network Commissioning
-    - Soil Measurement
     - WebRTC Transport Requestor
     # keep-sorted end
