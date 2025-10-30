@@ -213,7 +213,7 @@ class TestRunner(TestRunnerBase):
                         var_name = build_revision_var_name(
                             request.endpoint, request.cluster)
                         current_val = request.get_runtime_variable(var_name)
-                    except (ValueError, IndexError, KeyError) as e:
+                    except (ValueError, IndexError, KeyError):
                         current_val = "unknown"
 
                     reason = (f"Step skipped due to ClusterRevision range not matching (val={current_val}, "
