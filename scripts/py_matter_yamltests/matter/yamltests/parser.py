@@ -1449,7 +1449,7 @@ class YamlTests:
 
     def get_runtime_variable(self, name: str) -> Any:
         """Gets a runtime variable from the test context, or None if missing."""
-        self._runtime_config_variable_storage.get(name)
+        return self._runtime_config_variable_storage.get(name)
 
     def __iter__(self):
         return self
