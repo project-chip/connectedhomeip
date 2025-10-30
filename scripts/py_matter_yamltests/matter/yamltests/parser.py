@@ -50,6 +50,7 @@ def build_revision_var_name(endpoint, cluster) -> str:
     """Helper to create a unique variable name for the cluster revision read-out."""
     return f'__cluster_revision_read_EP_{endpoint}_CL_{cluster}'
 
+
 class UnknownPathQualifierError(TestStepError):
     """Raise when an attribute/command/event name is not found in the definitions."""
 
@@ -1233,7 +1234,8 @@ class TestStep:
 
             for constraint in constraints:
                 try:
-                    constraint.validate(received_value, response_type_name, self._runtime_config_variable_storage)
+                    constraint.validate(
+                        received_value, response_type_name, self._runtime_config_variable_storage)
                     result.success(check_type, error_success)
                 except TestStepError as e:
                     e.update_context(expected_response, self.step_index)
@@ -1344,7 +1346,8 @@ class YamlTests:
         self._definitions = definitions
         self._pics_checker = pics_checker
 
-        tests_with_cluster_revision_injections = self._tests_with_cluster_revision_checks(tests)
+        tests_with_cluster_revision_injections = self._tests_with_cluster_revision_checks(
+            tests)
 
         # Build list of enabled tests from the starting point where pseudo steps are added/injected for
         # things like min/maxRevision tests.
@@ -1365,7 +1368,6 @@ class YamlTests:
         self._tests = enabled_tests
         self._index = 0
         self.count = len(self._tests)
-
 
     def _tests_with_cluster_revision_checks(self, tests: dict) -> list[TestStep]:
         """Injection Logic for synthetic steps needed to process cluster revision checks."""

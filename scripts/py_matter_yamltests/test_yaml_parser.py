@@ -364,7 +364,8 @@ class TestYamlParser(unittest.TestCase):
             self.assertEqual(len(values), 1)
             value = values[0]
             self.assertEqual(value['name'], 'arg')
-            self.assertEqual(value['value'], _BASIC_ARITHMETIC_ARG_RESULTS[idx])
+            self.assertEqual(
+                value['value'], _BASIC_ARITHMETIC_ARG_RESULTS[idx])
 
     def test_config_override(self):
         config_override = {'nodeId': 12345,
@@ -424,10 +425,10 @@ class TestYamlParser(unittest.TestCase):
         self.assertEqual(steps[1].label, "Step 2 - No revision check")
         self.assertEqual(steps[2].label, "Step 3 - No revision check")
 
-
     def test_revision_step_injection(self):
         parser_config = TestParserConfig(None, self._definitions)
-        yaml_parser = TestParser(min_max_revision_injection_yaml, parser_config)
+        yaml_parser = TestParser(
+            min_max_revision_injection_yaml, parser_config)
 
         # The parser's YAML had 3 steps. The injection logic should add one
         # `readAttribute` step before step 2 (which is index 1).
@@ -505,8 +506,10 @@ class TestYamlParser(unittest.TestCase):
         # The injected step (list(yaml_parser.tests)[0]) set this variable
         # during a read that the runner would do for real.
         # We are checking the step that *uses* it (list(yaml_parser.tests)[1]).
-        cluster_rev_var_name = build_revision_var_name(endpoint=1, cluster="Test")
-        yaml_parser.tests.set_runtime_variable(name=cluster_rev_var_name, value=revision_value)
+        cluster_rev_var_name = build_revision_var_name(
+            endpoint=1, cluster="Test")
+        yaml_parser.tests.set_runtime_variable(
+            name=cluster_rev_var_name, value=revision_value)
 
         # Get the step that has the min/max check.
         # This is the 2nd step (index 1) after the injected step (index 0).
@@ -520,32 +523,38 @@ class TestYamlParser(unittest.TestCase):
 
     def test_revision_check_in_range(self):
         # 7 is between 5 and 10
-        test_step = self._get_revision_check_between_5_and_10_test_step(revision_value=7)
+        test_step = self._get_revision_check_between_5_and_10_test_step(
+            revision_value=7)
         self.assertTrue(test_step.is_revision_condition_passed)
 
     def test_revision_check_in_range_min_boundary(self):
         # 5 is between 5 and 10 (inclusive)
-        test_step = self._get_revision_check_between_5_and_10_test_step(revision_value=5)
+        test_step = self._get_revision_check_between_5_and_10_test_step(
+            revision_value=5)
         self.assertTrue(test_step.is_revision_condition_passed)
 
     def test_revision_check_in_range_max_boundary(self):
         # 10 is between 5 and 10 (inclusive)
-        test_step = self._get_revision_check_between_5_and_10_test_step(revision_value=10)
+        test_step = self._get_revision_check_between_5_and_10_test_step(
+            revision_value=10)
         self.assertTrue(test_step.is_revision_condition_passed)
 
     def test_revision_check_out_of_range_min(self):
         # 4 is less than 5
-        test_step = self._get_revision_check_between_5_and_10_test_step(revision_value=4)
+        test_step = self._get_revision_check_between_5_and_10_test_step(
+            revision_value=4)
         self.assertFalse(test_step.is_revision_condition_passed)
 
     def test_revision_check_out_of_range_max(self):
         # 11 is greater than 10
-        test_step = self._get_revision_check_between_5_and_10_test_step(revision_value=11)
+        test_step = self._get_revision_check_between_5_and_10_test_step(
+            revision_value=11)
         self.assertFalse(test_step.is_revision_condition_passed)
 
     def test_revision_check_variable_not_set(self):
         # Variable is not set (simulated by passing None)
-        test_step = self._get_revision_check_between_5_and_10_test_step(revision_value=None)
+        test_step = self._get_revision_check_between_5_and_10_test_step(
+            revision_value=None)
         self.assertFalse(test_step.is_revision_condition_passed)
 
     def test_revision_check_only_min(self):
@@ -560,19 +569,23 @@ tests:
 '''
         parser_config = TestParserConfig(None, self._definitions)
         yaml_parser = TestParser(yaml_content, parser_config)
-        cluster_rev_var_name = build_revision_var_name(endpoint=1, cluster="Test")
+        cluster_rev_var_name = build_revision_var_name(
+            endpoint=1, cluster="Test")
 
-        yaml_parser.tests.set_runtime_variable(name=cluster_rev_var_name, value=4)
+        yaml_parser.tests.set_runtime_variable(
+            name=cluster_rev_var_name, value=4)
         test_step_fail = list(yaml_parser.tests)[1]
         self.assertFalse(test_step_fail.is_revision_condition_passed)
 
         yaml_parser = TestParser(yaml_content, parser_config)
-        yaml_parser.tests.set_runtime_variable(name=cluster_rev_var_name, value=5)
+        yaml_parser.tests.set_runtime_variable(
+            name=cluster_rev_var_name, value=5)
         test_step_pass = list(yaml_parser.tests)[1]
         self.assertTrue(test_step_pass.is_revision_condition_passed)
 
         yaml_parser = TestParser(yaml_content, parser_config)
-        yaml_parser.tests.set_runtime_variable(name=cluster_rev_var_name, value=100)
+        yaml_parser.tests.set_runtime_variable(
+            name=cluster_rev_var_name, value=100)
         test_step_pass_high = list(yaml_parser.tests)[1]
         self.assertTrue(test_step_pass_high.is_revision_condition_passed)
 
@@ -588,19 +601,23 @@ tests:
 '''
         parser_config = TestParserConfig(None, self._definitions)
         yaml_parser = TestParser(yaml_content, parser_config)
-        cluster_rev_var_name = build_revision_var_name(endpoint=1, cluster="Test")
+        cluster_rev_var_name = build_revision_var_name(
+            endpoint=1, cluster="Test")
 
-        yaml_parser.tests.set_runtime_variable(name=cluster_rev_var_name, value=11)
+        yaml_parser.tests.set_runtime_variable(
+            name=cluster_rev_var_name, value=11)
         test_step_fail = list(yaml_parser.tests)[1]
         self.assertFalse(test_step_fail.is_revision_condition_passed)
 
         yaml_parser = TestParser(yaml_content, parser_config)
-        yaml_parser.tests.set_runtime_variable(name=cluster_rev_var_name, value=10)
+        yaml_parser.tests.set_runtime_variable(
+            name=cluster_rev_var_name, value=10)
         test_step_pass = list(yaml_parser.tests)[1]
         self.assertTrue(test_step_pass.is_revision_condition_passed)
 
         yaml_parser = TestParser(yaml_content, parser_config)
-        yaml_parser.tests.set_runtime_variable(name=cluster_rev_var_name, value=2)
+        yaml_parser.tests.set_runtime_variable(
+            name=cluster_rev_var_name, value=2)
         test_step_pass_low = list(yaml_parser.tests)[1]
         self.assertTrue(test_step_pass_low.is_revision_condition_passed)
 

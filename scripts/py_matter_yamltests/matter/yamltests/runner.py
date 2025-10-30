@@ -210,7 +210,8 @@ class TestRunner(TestRunnerBase):
                 if not is_revision_condition_passed:
                     # Try to get the var name and value for a more informative message
                     try:
-                        var_name = build_revision_var_name(request.endpoint, request.cluster)
+                        var_name = build_revision_var_name(
+                            request.endpoint, request.cluster)
                         current_val = request.get_runtime_variable(var_name)
                     except (ValueError, IndexError, KeyError) as e:
                         current_val = "unknown"
