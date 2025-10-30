@@ -52,13 +52,21 @@ class TC_BINFO_3_1(MatterBaseTest):
     def steps_TC_BINFO_3_1(self) -> list[TestStep]:
         steps = [
             TestStep(1, "TH reads ProductAppearance from the DUT.",
-                     "Verify that TH reads ProductAppearance attribute from the DUT successfully and the value is in ProductAppearanceStruct. Finish value is in range 0-5."),
+                     ("Verify that TH reads ProductAppearance attribute from the DUT successfully "
+                      "and the value is in ProductAppearanceStruct. "
+                      "Finish value is in range 0-5.")),
             TestStep(2, "TH reads ProductAppearance from the DUT.",
-                     "Verify that TH reads ProductAppearance attribute from the DUT successfully and the value is in ProductAppearanceStruct. PrimaryColor is in range 0-20."),
+                     ("Verify that TH reads ProductAppearance attribute from the DUT successfully "
+                      "and the value is in ProductAppearanceStruct. "
+                      "PrimaryColor is in range 0-20.")),
             TestStep(3, "TH reads ProductAppearance from the DUT.",
-                     "Vendor specific test-step. Verify that TH reads ProductAppearance attribute from the DUT successfully."),
+                     ("Vendor specific test-step. "
+                      "Verify that TH reads ProductAppearance attribute "
+                      "from the DUT successfully.")),
             TestStep(4, "TH reads ProductAppearance from the DUT.",
-                     "Vendor specific test-step. Verify that TH reads ProductAppearance attribute from the DUT successfully."),
+                     ("Vendor specific test-step. "
+                      "Verify that TH reads ProductAppearance attribute "
+                      "from the DUT successfully.")),
         ]
         return steps
 
@@ -93,13 +101,21 @@ class TC_BINFO_3_1(MatterBaseTest):
         # Vendor specific test: This step should verify the actual Finish value matches PIXIT.BINFO.Finish
         # For example, if PIXIT.BINFO.Finish is satin(2), the test should verify finish == 2
         self.wait_for_user_input(
-            prompt_msg="Verify that the ProductAppearance.Finish value matches your PIXIT.BINFO.Finish setting, then continue")
+            prompt_msg=(
+                "Verify that the ProductAppearance.Finish value matches your PIXIT.BINFO.Finish setting,\n"
+                "then continue.\n"
+                f"PIXIT.BINFO.Finish: {productAppearance.finish}"
+            ))
 
         self.step(4)
         # Vendor specific test: This step should verify the actual PrimaryColor value matches PIXIT.BINFO.PrimaryColor
         # For example, if PIXIT.BINFO.PrimaryColor is purple(5), the test should verify primaryColor == 5
         self.wait_for_user_input(
-            prompt_msg="Verify that the ProductAppearance.PrimaryColor value matches your PIXIT.BINFO.PrimaryColor setting, then continue")
+            prompt_msg=(
+                "Verify that the ProductAppearance.PrimaryColor value matches your PIXIT.BINFO.PrimaryColor setting,\n"
+                "then continue.\n"
+                f"PIXIT.BINFO.PrimaryColor: {productAppearance.primaryColor}"
+            ))
 
 
 if __name__ == "__main__":
