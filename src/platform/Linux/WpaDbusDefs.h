@@ -17,13 +17,17 @@
 
 #pragma once
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
 #include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/wpa/DBusWpa.h>
 #include <platform/Linux/dbus/wpa/DBusWpaBss.h>
 #include <platform/Linux/dbus/wpa/DBusWpaInterface.h>
 #include <platform/Linux/dbus/wpa/DBusWpaNetwork.h>
+#endif
 
 namespace chip {
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 template <>
 struct GAutoPtrDeleter<WpaSupplicant1>
@@ -49,8 +53,11 @@ struct GAutoPtrDeleter<WpaSupplicant1Network>
     using deleter = GObjectDeleter;
 };
 
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+
 namespace DeviceLayer {
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
 struct GDBusWpaSupplicant
 {
     GAutoPtr<WpaSupplicant1> proxy;
@@ -58,6 +65,7 @@ struct GDBusWpaSupplicant
     GAutoPtr<char> interfacePath;
     GAutoPtr<char> networkPath;
 };
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

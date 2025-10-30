@@ -186,20 +186,19 @@ static_library("Linux") {
       "WiFiPAFDriver.cpp",
       "WiFiPAFDriver.h",
     ]
-  }
-
-  if (chip_device_config_enable_wifipaf_ctrl_iface) {
-    include_dirs = [ "${chip_root}/third_party/hostap/repo/src/common" ]
-    sources += [
-      "WiFiPAFDriverCtrlIface.cpp",
-      "WiFiPAFDriverCtrlIface.h",
-    ]
-    deps += [ ":wpa_ctrl" ]
-  } else {
-    sources += [
-      "WiFiPAFDriverDbus.cpp",
-      "WiFiPAFDriverDbus.h",
-    ]
+    if (chip_device_config_enable_wifipaf_ctrl_iface) {
+      include_dirs = [ "${chip_root}/third_party/hostap/repo/src/common" ]
+      sources += [
+        "WiFiPAFDriverCtrlIface.cpp",
+        "WiFiPAFDriverCtrlIface.h",
+      ]
+      deps += [ ":wpa_ctrl" ]
+    } else {
+      sources += [
+        "WiFiPAFDriverDbus.cpp",
+        "WiFiPAFDriverDbus.h",
+      ]
+    }
   }
 }
 
