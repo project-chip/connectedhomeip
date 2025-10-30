@@ -160,6 +160,8 @@ WebRTCSessionStruct * WebRTCTransportProviderServer::FindSession(uint16_t sessio
 
 WebRTCTransportProviderServer::UpsertResultEnum WebRTCTransportProviderServer::UpsertSession(const WebRTCSessionStruct & session)
 {
+    assertChipStackLockedByCurrentThread();
+
     UpsertResultEnum result;
     auto it = std::find_if(mCurrentSessions.begin(), mCurrentSessions.end(),
                            [id = session.id](const auto & existing) { return existing.id == id; });
@@ -183,6 +185,8 @@ WebRTCTransportProviderServer::UpsertResultEnum WebRTCTransportProviderServer::U
 
 void WebRTCTransportProviderServer::RemoveSession(uint16_t sessionId)
 {
+    assertChipStackLockedByCurrentThread();
+
     size_t originalSize = mCurrentSessions.size();
 
     // Erase-Remove idiom

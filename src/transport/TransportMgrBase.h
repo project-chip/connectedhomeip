@@ -44,11 +44,11 @@ public:
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR TCPConnect(const Transport::PeerAddress & address, Transport::AppTCPConnectionCallbackCtxt * appState,
-                          Transport::ActiveTCPConnectionHolder & peerConnState);
+                          Transport::ActiveTCPConnectionHandle & peerConnState);
 
     void HandleConnectionReceived(Transport::ActiveTCPConnectionState & conn) override;
 
-    void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr) override;
+    void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override;
 
     void HandleConnectionClosed(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr) override;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT

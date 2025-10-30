@@ -310,6 +310,9 @@ static BOOL AttributeIsSpecifiedInAccessControlCluster(AttributeId aAttributeId)
     case Attributes::Arl::Id: {
         return YES;
     }
+    case Attributes::AuxiliaryACL::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -3204,6 +3207,9 @@ static BOOL AttributeIsSpecifiedInPowerTopologyCluster(AttributeId aAttributeId)
     case Attributes::ActiveEndpoints::Id: {
         return YES;
     }
+    case Attributes::ElectricalCircuitNodes::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -5821,6 +5827,15 @@ static BOOL AttributeIsSpecifiedInContentControlCluster(AttributeId aAttributeId
         return YES;
     }
     case Attributes::BlockUnrated::Id: {
+        return YES;
+    }
+    case Attributes::BlockChannelList::Id: {
+        return YES;
+    }
+    case Attributes::BlockApplicationList::Id: {
+        return YES;
+    }
+    case Attributes::BlockContentTimeWindow::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

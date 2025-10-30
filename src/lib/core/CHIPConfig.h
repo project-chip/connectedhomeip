@@ -1923,6 +1923,21 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
 
 /**
+ *  @def CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE
+ *
+ *  @brief
+ *    Maximum block size recommended by device for BDX transfers of diagnostic logs.
+ *    If increased, also increase CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX.
+ *    Note that SecureSession::AllowsLargePayload limits the payload size for all transport
+ *    types besides TCP, so, if using UDP, BDX blocks larger than a certain size (e.g. 1174)
+ *    will be unable to send.
+ *
+ */
+#ifndef CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE
+#define CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE 1024
+#endif // CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE
+
+/**
  *  @def CHIP_CONFIG_TEST_GOOGLETEST
  *
  *  @brief
@@ -1993,6 +2008,18 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
 #define CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE 5
 #endif // CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
+
+/**
+ *  @def CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL
+ *
+ *  @brief
+ *    A duration, in milliseconds, to be added to the backoff interval for sigma1 message retransmission in controller side if the
+ * remote device is LIT. This additional interval is to mitigate the issue that the sigma2 message may not be able to reach the
+ * controller in congested network in time.
+ */
+#ifndef CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL
+#define CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL 0
+#endif // CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL
 
 /**
  * @def CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
