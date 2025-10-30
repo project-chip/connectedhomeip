@@ -407,8 +407,10 @@ void ApplicationInit()
 
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &gOtaProvider);
 
-    std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
-    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sOtaProviderAppCommandDelegate) != CHIP_NO_ERROR))
+    std::string path     = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
+    std::string path_out = std::string(LinuxDeviceOptions::GetInstance().app_pipe_out);
+
+    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, path_out, &sOtaProviderAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommand");
         sChipNamedPipeCommands.Stop();

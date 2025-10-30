@@ -24,7 +24,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 
-OtaProviderAppCommandHandler * OtaProviderAppCommandHandler::FromJSON(const char *)
+OtaProviderAppCommandHandler * OtaProviderAppCommandHandler::FromJSON(const char * json)
 {
     Json::Reader reader;
     Json::Value value;
@@ -81,7 +81,7 @@ void OtaProviderAppCommandDelegate::OnEventCommandReceived(const char * json)
     auto handler = OtaProviderAppCommandHandler::FromJSON(json);
     if (nullptr == handler)
     {
-        ChipLogError(NotSpecified, "Camera App: Unable to instantiate a command handler");
+        ChipLogError(NotSpecified, "OTA Provider App: Unable to instantiate a command handler");
         return;
     }
 
