@@ -40,6 +40,19 @@ tests:
     - label: "Start the default accessory with no command line options"
       command: "Start"
 
+    # Guard between start/stop, factory-reset/stop or reboot/reboot cycles to 
+    # prevent the app from crashing when SIGTERM is delivered before signal
+    # handlers have been set up
+    - label: "Wait for default accessory to start"
+      cluster: "DelayCommands"
+      command: "WaitForMessage"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+              - name: "message"
+                value: "[DL] Starting event loop"
+
     - label: "Stop the default accessory by key"
       command: "Stop"
       arguments:
@@ -55,6 +68,16 @@ tests:
               - name: "discriminator"
                 value: 1111
 
+    - label: "Wait for default accessory to start"
+      cluster: "DelayCommands"
+      command: "WaitForMessage"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+              - name: "message"
+                value: "[DL] Starting event loop"
+
     - label: "Stop the default accessory"
       command: "Stop"
 
@@ -69,6 +92,16 @@ tests:
               - name: "port"
                 value: 5560
 
+    - label: "Wait for default accessory to start"
+      cluster: "DelayCommands"
+      command: "WaitForMessage"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+              - name: "message"
+                value: "[DL] Starting event loop"
+
     - label: "Stop the default accessory"
       command: "Stop"
 
@@ -78,6 +111,16 @@ tests:
           values:
               - name: "minCommissioningTimeout"
                 value: 10
+
+    - label: "Wait for default accessory to start"
+      cluster: "DelayCommands"
+      command: "WaitForMessage"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+              - name: "message"
+                value: "[DL] Starting event loop"
 
     - label: "Stop the default accessory"
       command: "Stop"
@@ -176,6 +219,16 @@ tests:
     - label: "Reboot the default accessory"
       command: "Reboot"
 
+    - label: "Wait for the default accessory to start"
+      cluster: "DelayCommands"
+      command: "WaitForMessage"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+              - name: "message"
+                value: "[DL] Starting event loop"
+
     - label: "Reboot the default accessory by key"
       command: "Reboot"
       arguments:
@@ -193,13 +246,15 @@ tests:
     - label: "Factory Reset the default accessory"
       command: "FactoryReset"
 
-    - label: "Wait for default accessory to setup SIGTERM handler"
+    - label: "Wait for the default accessory to start"
       cluster: "DelayCommands"
-      command: "WaitForMs"
+      command: "WaitForMessage"
       arguments:
           values:
-              - name: "ms"
-                value: 1000
+              - name: "registerKey"
+                value: "default"
+              - name: "message"
+                value: "[DL] Starting event loop"
 
     - label: "Factory Reset the default accessory by key"
       command: "FactoryReset"

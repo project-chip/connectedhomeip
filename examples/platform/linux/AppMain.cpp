@@ -1010,13 +1010,14 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     // NOLINTEND(bugprone-signal-handler)
 #endif
 #else
-    struct sigaction sa                        = {};
-    sa.sa_handler                              = StopSignalHandler;
-    sa.sa_flags                                = SA_RESETHAND;
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
 #endif
 
+    ChipLogProgress(DeviceLayer, "Starting event loop");
     if (impl != nullptr)
     {
         impl->RunMainLoop();
