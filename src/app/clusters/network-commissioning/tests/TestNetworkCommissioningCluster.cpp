@@ -13,10 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <cstdint>
 #include <pw_unit_test/framework.h>
 
 #include <app/AttributePathParams.h>
 #include <app/AttributeValueDecoder.h>
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
@@ -50,6 +52,12 @@ using chip::app::DataModel::AttributeEntry;
 using chip::app::Testing::kAdminSubjectDescriptor;
 using chip::app::Testing::WriteOperation;
 
+class NoopBreadcrumbTracker : public BreadCrumbTracker
+{
+public:
+    void SetBreadCrumb(uint64_t v) override {}
+};
+
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestNetworkCommissioningCluster : public ::testing::Test
 {
@@ -59,21 +67,11 @@ struct TestNetworkCommissioningCluster : public ::testing::Test
 
 TEST_F(TestNetworkCommissioningCluster, TestAttributes)
 {
-    GeneralCommissioningCluster generalCommissioningCluster(GeneralCommissioningCluster::Context {
-        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-            .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-            .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-            .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-            .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-            .platformManager        = DeviceLayer::PlatformMgr(),                            //
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
-#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-    });
+    NoopBreadcrumbTracker tracker;
     {
         Testing::FakeWiFiDriver fakeWifiDriver;
 
-        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, generalCommissioningCluster);
+        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, &tracker);
 
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(cluster.Attributes({ kRootEndpointId, NetworkCommissioning::Id }, builder), CHIP_NO_ERROR);
@@ -111,18 +109,8 @@ TEST_F(TestNetworkCommissioningCluster, TestAttributes)
 TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
 {
     Testing::FakeWiFiDriver fakeWifiDriver;
-    GeneralCommissioningCluster generalCommissioningCluster(GeneralCommissioningCluster::Context {
-        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-            .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-            .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-            .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-            .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-            .platformManager        = DeviceLayer::PlatformMgr(),                            //
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
-#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-    });
-    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, generalCommissioningCluster);
+    NoopBreadcrumbTracker tracker;
+    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, &tracker);
 
     chip::Test::TestServerClusterContext context;
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
