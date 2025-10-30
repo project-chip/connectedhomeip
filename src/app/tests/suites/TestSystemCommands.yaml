@@ -52,6 +52,8 @@ tests:
                 value: "default"
               - name: "message"
                 value: "[DL] Starting event loop"
+              - name: "timeout"
+                value: 30
 
     - label: "Stop the default accessory by key"
       command: "Stop"
@@ -77,6 +79,8 @@ tests:
                 value: "default"
               - name: "message"
                 value: "[DL] Starting event loop"
+              - name: "timeout"
+                value: 30
 
     - label: "Stop the default accessory"
       command: "Stop"
@@ -101,6 +105,8 @@ tests:
                 value: "default"
               - name: "message"
                 value: "[DL] Starting event loop"
+              - name: "timeout"
+                value: 30
 
     - label: "Stop the default accessory"
       command: "Stop"
@@ -121,6 +127,8 @@ tests:
                 value: "default"
               - name: "message"
                 value: "[DL] Starting event loop"
+              - name: "timeout"
+                value: 30
 
     - label: "Stop the default accessory"
       command: "Stop"
@@ -228,6 +236,8 @@ tests:
                 value: "default"
               - name: "message"
                 value: "[DL] Starting event loop"
+              - name: "timeout"
+                value: 30
 
     - label: "Reboot the default accessory by key"
       command: "Reboot"
@@ -255,6 +265,8 @@ tests:
                 value: "default"
               - name: "message"
                 value: "[DL] Starting event loop"
+              - name: "timeout"
+                value: 30
 
     - label: "Factory Reset the default accessory by key"
       command: "FactoryReset"
