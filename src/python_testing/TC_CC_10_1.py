@@ -64,19 +64,6 @@ class TC_CC_10_1(MatterBaseTest):
                     found = True
                     break
 
-            if not found:
-                if attribute_id == 0x0001 or attribute_id == 0x4001 or attribute_id == 0x4002 or attribute_id == 0x4003:
-                    empty_attribute_value = Clusters.ScenesManagement.Structs.AttributeValuePairStruct(
-                        attributeID=attribute_id,
-                        valueUnsigned8=0x00,
-                    )
-                elif attribute_id == 0x0003 or attribute_id == 0x0004 or attribute_id == 0x0007 or attribute_id == 0x4004:
-                    empty_attribute_value = Clusters.ScenesManagement.Structs.AttributeValuePairStruct(
-                        attributeID=attribute_id,
-                        valueUnsigned16=0x0000,
-                    )
-                efs_attribute_value_list.append(empty_attribute_value)
-
         extension_field_set = Clusters.ScenesManagement.Structs.ExtensionFieldSetStruct(
             clusterID=Clusters.Objects.ColorControl.id,
             attributeValueList=efs_attribute_value_list
