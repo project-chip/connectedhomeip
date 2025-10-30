@@ -89,8 +89,43 @@ public:
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown() override;
 
-    TimeSyncDataProvider & GetDataProvider() { return mTimeSyncDataProvider; }
+    // Fabric Table delegate functions
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+    // CASE connection functions
+    void OnDeviceConnectedFn(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
+    void OnDeviceConnectionFailureFn();
+
+    // ReadClient::Callback functions
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
+    void OnDone(ReadClient * apReadClient) override;
+#endif
+
+    // Platform event handler functions
+    void OnPlatformEventFn(const DeviceLayer::ChipDeviceEvent & event);
+    void OnTimeSyncCompletionFn(TimeSynchronization::TimeSourceEnum timeSource, TimeSynchronization::GranularityEnum granularity);
+    void OnFallbackNTPCompletionFn(bool timeSyncSuccessful);
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
+
+    const TimeSynchronization::GranularityEnum & GetGranularity() const { return mGranularity; }
+
+    TimeSynchronization::Delegate * GetDelegate();
+    void SetDefaultDelegate(TimeSynchronization::Delegate * delegate) { mDelegate = delegate; }
+    TimeSynchronization::Delegate * GetDefaultDelegate() { return GetDelegate(); }
+
+private:
     CHIP_ERROR SetTrustedTimeSource(const DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & tts);
     CHIP_ERROR SetDefaultNTP(const DataModel::Nullable<CharSpan> & dntp);
     void InitTimeZone();
@@ -110,58 +145,13 @@ public:
                           TimeSynchronization::TimeSourceEnum source);
     CHIP_ERROR GetLocalTime(EndpointId ep, DataModel::Nullable<uint64_t> & localTime);
 
-    const TimeSynchronization::GranularityEnum & GetGranularity() const { return mGranularity; }
+    TimeSyncDataProvider & GetDataProvider() { return mTimeSyncDataProvider; }
 
     TimeSynchronization::TimeState UpdateTimeZoneState();
     TimeSynchronization::TimeState UpdateDSTOffsetState();
     TimeSynchronization::TimeSyncEventFlag GetEventFlag() const;
     void ClearEventFlag(TimeSynchronization::TimeSyncEventFlag flag);
 
-    // Fabric Table delegate functions
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
-
-#if TIME_SYNC_ENABLE_TSC_FEATURE
-    // CASE connection functions
-    void OnDeviceConnectedFn(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
-    void OnDeviceConnectionFailureFn();
-
-    // ReadClient::Callback functions
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
-    void OnDone(ReadClient * apReadClient) override;
-#endif
-
-    CHIP_ERROR AttemptToGetTimeFromTrustedNode();
-
-    // Platform event handler functions
-    void OnPlatformEventFn(const DeviceLayer::ChipDeviceEvent & event);
-    void OnTimeSyncCompletionFn(TimeSynchronization::TimeSourceEnum timeSource, TimeSynchronization::GranularityEnum granularity);
-    void OnFallbackNTPCompletionFn(bool timeSyncSuccessful);
-
-    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder) override;
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
-
-    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
-
-    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
-
-    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
-
-    static TimeSynchronization::Delegate * GetDelegate()
-    {
-        if (mDelegate == nullptr)
-        {
-            static TimeSynchronization::DefaultTimeSyncDelegate dg;
-            mDelegate = &dg;
-        }
-        return mDelegate;
-    }
-    static void SetDefaultDelegate(TimeSynchronization::Delegate * delegate) { mDelegate = delegate; }
-    static TimeSynchronization::Delegate * GetDefaultDelegate() { return GetDelegate(); }
-
-private:
     static constexpr size_t kMaxDefaultNTPSize = 128;
     DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> mTrustedTimeSource;
     TimeSyncDataProvider::TimeZoneObj mTimeZoneObj{ Span<TimeSyncDataProvider::TimeZoneStore>(mTz), 0 };
@@ -179,10 +169,12 @@ private:
     TimeSynchronization::TimeZoneDatabaseEnum mTimeZoneDatabase;
     TimeSynchronization::TimeSourceEnum mTimeSource;
     TimeSynchronization::Attributes::NTPServerAvailable::TypeInfo::Type mNTPServerAvailable;
-    static TimeSynchronization::Delegate * mDelegate;
+    TimeSynchronization::Delegate * mDelegate = nullptr;
 
     TimeSyncDataProvider mTimeSyncDataProvider;
     TimeSynchronization::TimeSyncEventFlag mEventFlag = TimeSynchronization::TimeSyncEventFlag::kNone;
+
+    CHIP_ERROR AttemptToGetTimeFromTrustedNode();
 
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;

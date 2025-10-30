@@ -26,8 +26,6 @@ source_set("time-sync-data-provider") {
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib/core",
   ]
-
-  include_dirs = [ "." ]
 }
 
 source_set("time-synchronization-server") {

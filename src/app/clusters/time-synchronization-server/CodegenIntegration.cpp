@@ -131,17 +131,24 @@ namespace chip::app::Clusters::TimeSynchronization {
 
 TimeSynchronizationCluster * GetClusterInstance()
 {
-    return static_cast<TimeSynchronizationCluster *>(&gServer.Cluster());
+    VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+    return &gServer.Cluster();
 }
 
 void SetDefaultDelegate(TimeSynchronization::Delegate * delegate)
 {
-    return TimeSynchronizationCluster::SetDefaultDelegate(delegate);
+    auto timeSynchronization = GetClusterInstance();
+    VerifyOrReturn(timeSynchronization != nullptr);
+
+    return timeSynchronization->SetDefaultDelegate(delegate);
 }
 
 TimeSynchronization::Delegate * GetDefaultDelegate()
 {
-    return TimeSynchronizationCluster::GetDefaultDelegate();
+    auto timeSynchronization = GetClusterInstance();
+    VerifyOrReturnValue(timeSynchronization != nullptr, nullptr);
+
+    return timeSynchronization->GetDefaultDelegate();
 }
 
 } // namespace chip::app::Clusters::TimeSynchronization
