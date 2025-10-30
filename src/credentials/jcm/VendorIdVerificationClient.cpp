@@ -149,12 +149,12 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
         ByteSpan attestationChallenge = getSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
         CHIP_ERROR err                = Verify(info, clientChallenge, attestationChallenge, responseData);
         ChipLogProgress(Controller, "Vendor ID verification completed with result: %s", ErrorStr(err));
-        OnVendorIdVerficationComplete(err);
+        OnVendorIdVerificationComplete(err);
     };
 
     auto onFailureCb = [&](CHIP_ERROR err) {
         ChipLogError(Controller, "Failed to receive SignVIDVerificationResponse: %s", ErrorStr(err));
-        OnVendorIdVerficationComplete(err);
+        OnVendorIdVerificationComplete(err);
     };
 
     CHIP_ERROR err =
@@ -162,7 +162,7 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to send SignVIDVerificationRequest: %s", ErrorStr(err));
-        this->OnVendorIdVerficationComplete(err);
+        this->OnVendorIdVerificationComplete(err);
     }
 
     return CHIP_NO_ERROR;

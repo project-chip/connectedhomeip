@@ -397,7 +397,7 @@ TrustVerificationError DeviceCommissioner::VerifyAdministratorInformation()
     return TrustVerificationError::kSuccess;
 }
 
-void DeviceCommissioner::OnVendorIdVerficationComplete(const CHIP_ERROR & err)
+void DeviceCommissioner::OnVendorIdVerificationComplete(const CHIP_ERROR & err)
 {
     ContinueAfterVendorIDVerification(err);
 }

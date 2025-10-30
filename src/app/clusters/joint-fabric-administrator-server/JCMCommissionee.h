@@ -68,7 +68,7 @@ protected:
     // VendorIdVerificationClient overrides
     CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, Credentials::CertificateKeyId & subjectKeyId,
                                               ByteSpan & globallyTrustedRootSpan) override;
-    void OnVendorIdVerficationComplete(const CHIP_ERROR & err) override;
+    void OnVendorIdVerificationComplete(const CHIP_ERROR & err) override;
 
     // TrustVerificationStateMachine overrides
     Credentials::JCM::TrustVerificationStage

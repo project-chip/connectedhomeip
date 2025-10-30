@@ -80,7 +80,7 @@ CHIP_ERROR JCMCommissionee::OnLookupOperationalTrustAnchor(VendorId vendorID, Cr
     return err;
 }
 
-void JCMCommissionee::OnVendorIdVerficationComplete(const CHIP_ERROR & err)
+void JCMCommissionee::OnVendorIdVerificationComplete(const CHIP_ERROR & err)
 {
     TrustVerificationError result =
         (err == CHIP_NO_ERROR) ? TrustVerificationError::kSuccess : TrustVerificationError::kVendorIdVerificationFailed;
@@ -297,7 +297,7 @@ TrustVerificationError JCMCommissionee::PerformVendorIdVerification()
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(JointFabric, "Failed to read commissioner info. Error: %" CHIP_ERROR_FORMAT, err.Format());
-            OnVendorIdVerficationComplete(err);
+            OnVendorIdVerificationComplete(err);
         }
 
         chip::Messaging::ExchangeManager * exchangeMgr = &chip::Server::GetInstance().GetExchangeManager();
@@ -315,7 +315,7 @@ TrustVerificationError JCMCommissionee::PerformVendorIdVerification()
         if (verifyErr != CHIP_NO_ERROR)
         {
             ChipLogError(JointFabric, "JCM: Failed to start VendorId verification: %s", ErrorStr(err));
-            OnVendorIdVerficationComplete(verifyErr);
+            OnVendorIdVerificationComplete(verifyErr);
         }
     });
 

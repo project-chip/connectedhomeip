@@ -176,7 +176,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void OnVendorIdVerficationComplete(const CHIP_ERROR & err)
+    void OnVendorIdVerificationComplete(const CHIP_ERROR & err)
     {
         mVerificationCompleteCalled = true;
         mVerificationResult         = err;

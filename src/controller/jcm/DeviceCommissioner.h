@@ -94,7 +94,7 @@ protected:
     void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus) override;
     CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, Credentials::CertificateKeyId & subjectKeyId,
                                               ByteSpan & globallyTrustedRootSpan) override;
-    void OnVendorIdVerficationComplete(const CHIP_ERROR & err) override;
+    void OnVendorIdVerificationComplete(const CHIP_ERROR & err) override;
 
 private:
     // Parses the JCM extra commissioning information from the device
