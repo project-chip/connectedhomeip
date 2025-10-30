@@ -77,11 +77,12 @@ The following markers are used in this document (matches the ID master list):
 |325           |0x0145    |Snapshot Camera               |   |   |   |     |           |P  |
 |326           |0x0146    |Chime                         |   |   |   |     |           |P  |
 |327           |0x0147    |Camera Controller             |   |   |   |     |           |P  |
+|328           |0x0148    |Doorbell                      |   |   |   |     |           |P  |
 |514           |0x0202    |Window Covering               |C  |C  |C  |C    |C          |C  |
 |515           |0x0203    |Window Covering Controller    |C  |C  |C  |C    |C          |C  |
 |560           |0x0230    |Closure                       |   |   |   |     |           |P  |
 |561           |0x0231    |Closure Panel                 |   |   |   |     |           |P  |
-|574           |0x023E    |Closure Controller            |   |   |   |     |           |C  |
+|574           |0x023E    |Closure Controller            |   |   |   |     |           |P  |
 |768           |0x0300    |Heating/Cooling Unit          |C  |   |   |     |           |   |
 |769           |0x0301    |Thermostat                    |C  |C  |C  |C    |C          |C  |
 |770           |0x0302    |Temperature Sensor            |C  |C  |C  |C    |C          |C  |

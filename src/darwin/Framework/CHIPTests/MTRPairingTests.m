@@ -300,6 +300,8 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
         XCTAssertEqualObjects(decoded.productIdentity, info.productIdentity);
         XCTAssertEqualObjects(decoded.endpointsById, info.endpointsById);
         XCTAssertEqualObjects(decoded.rootEndpoint.children, info.rootEndpoint.children);
+        XCTAssertEqualObjects(decoded.attributes, info.attributes);
+        XCTAssertEqualObjects(decoded.networkInterfaces, info.networkInterfaces);
     } else {
         XCTAssertNil(info.endpointsById);
         XCTAssertNil(info.rootEndpoint);
@@ -311,13 +313,25 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
         return [path.cluster isEqual:@(MTRClusterIDTypeNetworkCommissioningID)] &&
             [path.attribute isEqual:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)];
     };
+    __auto_type endpointInList = ^(NSNumber * endpoint, NSArray<MTRNetworkInterfaceInfo *> * list) {
+        for (MTRNetworkInterfaceInfo * info in list) {
+            if ([info.endpointID isEqual:endpoint]) {
+                return YES;
+            }
+        }
+
+        return NO;
+    };
     NSUInteger networkCommissioningFeatureMapCount = 0;
     for (MTRAttributePath * path in info.attributes) {
         if (isNetworkCommissioningFeatureMap(path)) {
             ++networkCommissioningFeatureMapCount;
+            XCTAssertTrue(endpointInList(path.endpoint, info.networkInterfaces));
         }
     }
     XCTAssertGreaterThan(networkCommissioningFeatureMapCount, 0);
+
+    XCTAssertEqual(networkCommissioningFeatureMapCount, info.networkInterfaces.count);
 
     if (self.extraAttributesToRead) {
         // The attributes we tried to read should really have worked.
@@ -800,6 +814,9 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     [commissioning startWithController:sController];
 
     [self waitForExpectations:@[ expectation1 ] timeout:kPairingTimeoutInSeconds];
+    XCTAssertNotNil(commissioning.matchedPayload);
+    XCTAssertEqualObjects(commissioning.matchedPayload,
+        [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload1 error:nil]);
 
     XCTestExpectation * expectation2 = [self expectationWithDescription:@"Commissioning 2 complete"];
     commissioningDelegate = [[MTRPairingTestsCommissioningDelegate alloc] initWithExpectation:expectation2];
@@ -814,6 +831,9 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     [commissioning startWithController:sController];
 
     [self waitForExpectations:@[ expectation2 ] timeout:kPairingTimeoutInSeconds];
+    XCTAssertNotNil(commissioning.matchedPayload);
+    XCTAssertEqualObjects(commissioning.matchedPayload,
+        [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload2 error:nil]);
 }
 
 - (void)test014_CommissioningOperationStopDuringAttestation

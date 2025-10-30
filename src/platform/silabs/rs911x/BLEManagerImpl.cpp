@@ -40,9 +40,6 @@
 #endif
 
 extern "C" {
-#if !(SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-#include <rsi_driver.h>
-#endif
 #include <rsi_utils.h>
 }
 

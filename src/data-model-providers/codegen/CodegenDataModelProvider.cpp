@@ -533,26 +533,6 @@ CHIP_ERROR CodegenDataModelProvider::DeviceTypes(EndpointId endpointId, ReadOnly
     return builder.ReferenceExisting(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
 }
 
-CHIP_ERROR CodegenDataModelProvider::SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder)
-{
-    DataModel::Provider::SemanticTag semanticTag;
-    size_t count = 0;
-
-    while (GetSemanticTagForEndpointAtIndex(endpointId, count, semanticTag) == CHIP_NO_ERROR)
-    {
-        count++;
-    }
-
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(count));
-
-    for (size_t idx = 0; idx < count; idx++)
-    {
-        ReturnErrorOnFailure(GetSemanticTagForEndpointAtIndex(endpointId, idx, semanticTag));
-        ReturnErrorOnFailure(builder.Append(semanticTag));
-    }
-
-    return CHIP_NO_ERROR;
-}
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
 CHIP_ERROR CodegenDataModelProvider::EndpointUniqueID(EndpointId endpointId, MutableCharSpan & epUniqueId)
 {

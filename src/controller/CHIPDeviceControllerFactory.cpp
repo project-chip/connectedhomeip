@@ -62,6 +62,7 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     // Save our initialization state that we can't recover later from a
     // created-but-shut-down system state.
     mListenPort                = params.listenPort;
+    mInterfaceId               = params.interfaceId;
     mFabricIndependentStorage  = params.fabricIndependentStorage;
     mOperationalKeystore       = params.operationalKeystore;
     mOpCertStore               = params.opCertStore;
@@ -91,6 +92,7 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.bleLayer = mSystemState->BleLayer();
 #endif
     params.listenPort                = mListenPort;
+    params.interfaceId               = mInterfaceId;
     params.fabricIndependentStorage  = mFabricIndependentStorage;
     params.enableServerInteractions  = mEnableServerInteractions;
     params.groupDataProvider         = mSystemState->GetGroupDataProvider();
@@ -192,9 +194,16 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                                             ,
                                                         tcpListenParams
+#if INET_CONFIG_ENABLE_IPV4
+                                                        ,
+                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
+                                                            .SetAddressType(Inet::IPAddressType::kIPv4)
+                                                            .SetListenPort(params.listenPort)
+                                                            .SetServerListenEnabled(false)
+#endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-                                                        ,
+                                                            ,
                                                         Transport::WiFiPAFListenParameters()
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
@@ -290,6 +299,11 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         app::DnssdServer::Instance().SetSecuredIPv4Port(
             stateParams.transportMgr->GetTransport().GetImplAtIndex<1>().GetBoundPort());
 #endif // INET_CONFIG_ENABLE_IPV4
+
+        if (params.interfaceId)
+        {
+            app::DnssdServer::Instance().SetInterfaceId(*params.interfaceId);
+        }
 
         //
         // TODO: This is a hack to workaround the fact that we have a bi-polar stack that has controller and server modalities that

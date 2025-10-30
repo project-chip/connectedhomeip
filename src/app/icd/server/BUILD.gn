@@ -43,6 +43,7 @@ buildconfig_header("icd-server-buildconfig") {
     "CHIP_CONFIG_ENABLE_ICD_DSLS=${chip_enable_icd_dsls}",
     "ICD_REPORT_ON_ENTER_ACTIVE_MODE=${chip_icd_report_on_active_mode}",
     "ICD_MAX_NOTIFICATION_SUBSCRIBERS=${icd_max_notification_subscribers}",
+    "CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT=${chip_enable_icd_checkin_on_report_timeout}",
   ]
 
   visibility = [ ":icd-server-config" ]
@@ -66,6 +67,7 @@ source_set("notifier") {
 
   deps = [
     ":icd-server-config",
+    "${chip_root}/src/access:types",
     "${chip_root}/src/lib/core",
   ]
 }

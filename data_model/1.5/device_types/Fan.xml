@@ -57,11 +57,12 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x002B" name="Fan" revision="3">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x002B" name="Fan" revision="4">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Added ability to be composed with a Thermostat for fan heaters"/>
     <revision revision="3" summary="Added On/Off cluster"/>
+    <revision revision="4" summary="Remove FanModeSequence element override"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>
@@ -76,15 +77,6 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0202" name="Fan Control" side="server">
       <mandatoryConform/>
-      <attributes>
-        <attribute code="0x0001" name="FanModeSequence">
-          <access read="true" readPrivilege="view"/>
-          <quality persistence="fixed"/>
-          <mandatoryConform>
-            <condition name="Matter"/>
-          </mandatoryConform>
-        </attribute>
-      </attributes>
     </cluster>
   </clusters>
 </deviceType>

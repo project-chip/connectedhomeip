@@ -38,8 +38,14 @@ public:
     // https://stackoverflow.com/questions/50638053/constexpr-static-data-member-without-initializer
     // The number of bytes used by an entry (StorageData) + its metadata when persisting to storage
     static constexpr size_t kEntryMaxBytes();
+    // The number of bytes used by an ID (StorageId)
+    static constexpr size_t kIdMaxBytes() { return TLV::EstimateStructOverhead(sizeof(StorageId)); }
     // The number of bytes used by FabricEntryData, which is dependent on the size of StorageId
-    static constexpr size_t kFabricMaxBytes();
+    static constexpr size_t kFabricMaxBytes()
+    {
+        return TLV::EstimateStructOverhead(sizeof(uint8_t), // entry_count
+                                           kMaxPerFabric() * kIdMaxBytes());
+    }
     // The max number of entries per fabric; this value directly affects memory usage
     static constexpr uint16_t kMaxPerFabric();
     // The max number of entries for the endpoint (programmatic limit)

@@ -25,6 +25,8 @@ from lark.visitors import Discard, Transformer, v_args
 from .type_definitions import (AttributeRequirement, ClusterAttributeDeny, ClusterCommandRequirement, ClusterRequirement,
                                ClusterValidationRule, RequiredAttributesRule, RequiredCommandsRule)
 
+LOGGER = logging.getLogger(__name__)
+
 
 class ElementNotFoundError(Exception):
     def __init__(self, name):
@@ -95,7 +97,7 @@ def _isRequired(attr: xml.etree.ElementTree.Element) -> bool:
 
 def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
     if element.tag != 'cluster':
-        logging.error("Not a cluster element: %r" % element)
+        LOGGER.error("Not a cluster element: %r" % element)
         return None
 
     # cluster elements contain among other children
@@ -158,12 +160,12 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
             required_commands=required_commands
         )
     except Exception:
-        logging.exception("Failed to decode cluster %r" % element)
+        LOGGER.exception("Failed to decode cluster %r" % element)
         return None
 
 
 def ClustersInXmlFile(path: str):
-    logging.info("Loading XML from %s" % path)
+    LOGGER.info("Loading XML from %s" % path)
 
     # root is expected to be just a "configurator" object
     configurator = xml.etree.ElementTree.parse(path).getroot()
@@ -208,9 +210,9 @@ class LintRulesContext:
             try:
                 return "ID_%s" % name, parseNumberString(name)
             except ValueError:
-                logging.error("UNKNOWN cluster name %s" % name)
-                logging.error("Known names: %s" %
-                              (",".join(self._cluster_codes.keys()), ))
+                LOGGER.error("UNKNOWN cluster name %s" % name)
+                LOGGER.error("Known names: %s" %
+                             (",".join(self._cluster_codes.keys()), ))
                 return None
         else:
             return name, self._cluster_codes[name]

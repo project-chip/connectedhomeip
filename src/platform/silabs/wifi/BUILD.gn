@@ -38,15 +38,12 @@ declare_args() {
 
 # Workaround to prevent the assert when we are building the unit tests
 if (chip_enable_wifi && !wifi_soc && !sl_build_unit_tests) {
-  assert(use_rs9116 || use_wf200 || use_SiWx917)
+  assert(use_wf200 || use_SiWx917)
   import("${chip_root}/src/platform/silabs/wifi/args.gni")
 
-  if (use_rs9116) {
-    import("${silabs_platform_dir}/wifi/rs911x/rs911x.gni")
-  } else if (use_SiWx917) {
+  if (use_SiWx917) {
     import("${silabs_platform_dir}/wifi/SiWx/ncp/rs9117.gni")
-  }
-  if (use_wf200) {
+  } else if (use_wf200) {
     import("${silabs_platform_dir}/wifi/wf200/wf200.gni")
   }
 }
@@ -61,10 +58,7 @@ config("wifi-platform-config") {
     defines += [ "WIFI_DEBUG_ENABLED=0" ]
   }
 
-  if (use_rs9116) {
-    # All the stuff from wiseconnect
-    include_dirs += rs911x_inc_plat
-  } else if (use_SiWx917) {
+  if (use_SiWx917) {
     # All the stuff from wiseconnect
     include_dirs += rs9117_inc_plat
   }
@@ -126,12 +120,7 @@ source_set("wifi-platform") {
     "${silabs_platform_dir}/wifi/icd:power-save-interface",
   ]
 
-  if (use_rs9116) {
-    sources += rs911x_src_plat
-
-    # All the stuff from wiseconnect
-    sources += rs911x_src_sapi
-  } else if (use_SiWx917) {
+  if (use_SiWx917) {
     sources += rs911x_src_plat
 
     # All the stuff from wiseconnect
@@ -144,8 +133,6 @@ source_set("wifi-platform") {
     sources += [
       "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp",
       "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.h",
-      "${silabs_platform_dir}/wifi/wiseconnect-interface/WiseconnectWifiInterface.cpp",
-      "${silabs_platform_dir}/wifi/wiseconnect-interface/WiseconnectWifiInterface.h",
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net_for_lwip.c",
       "${wifi_sdk_root}/components/service/network_manager/src/sli_net_common_utility.c",
     ]
@@ -153,7 +140,7 @@ source_set("wifi-platform") {
     public_deps += [ "${lwip_root}:lwip" ]
   }
 
-  if (use_wf200 || use_rs9116) {
+  if (use_wf200) {
     sources += [
       "${silabs_platform_dir}/wifi/lwip-support/dhcp_client.cpp",
       "${silabs_platform_dir}/wifi/lwip-support/dhcp_client.h",

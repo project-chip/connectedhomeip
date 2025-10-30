@@ -34,7 +34,10 @@
 #include <credentials/GroupDataProvider.h>
 #include <credentials/OperationalCertificateStore.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <inet/InetInterface.h>
 #include <protocols/secure_channel/SessionResumptionStorage.h>
+
+#include <optional>
 
 namespace chip {
 
@@ -165,6 +168,8 @@ struct FactoryInitParams
     // data model it wants to use. Backwards-compatibility can use `CodegenDataModelProviderInstance`
     // for ember/zap-generated models.
     chip::app::DataModel::Provider * dataModelProvider = nullptr;
+
+    std::optional<Inet::InterfaceId> interfaceId;
 };
 
 class DeviceControllerFactory
@@ -291,6 +296,8 @@ private:
     void ControllerInitialized(const DeviceController & controller);
 
     uint16_t mListenPort;
+    std::optional<Inet::InterfaceId> mInterfaceId;
+
     DeviceControllerSystemState * mSystemState                          = nullptr;
     PersistentStorageDelegate * mFabricIndependentStorage               = nullptr;
     Crypto::OperationalKeystore * mOperationalKeystore                  = nullptr;

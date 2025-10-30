@@ -15,12 +15,21 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/lwip.gni")
 import("${silabs_sdk_build_root}/efr32_sdk.gni")
 
+declare_args() {
+  # Use LwIP from SiSDK if true, otherwise use the modified version from Matter Support.
+  sl_use_sisdk_lwip = true
+}
+
 # Defines a lwIP build target.
 #
 # lwIP depends on external header files to compile. This template defines
 # a combined build of the lwIP sources plus target configuration.
 template("lwip_target") {
-  _lwip_root = "${efr32_sdk_root}/util/third_party/lwip/lwip"
+  if (sl_use_sisdk_lwip) {
+    _lwip_root = "${efr32_sdk_root}/util/third_party/lwip/lwip"
+  } else {
+    _lwip_root = "${matter_support_root}/sdk-copies/lwip"
+  }
 
   lwip_target_name = target_name
 

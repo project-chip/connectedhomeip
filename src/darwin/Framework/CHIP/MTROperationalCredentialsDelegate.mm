@@ -144,14 +144,12 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
     chip::ByteSpan firmwareInfoSpan;
     chip::Credentials::DeviceAttestationVendorReservedDeconstructor vendorReserved;
 
-    chip::Optional<chip::Controller::CommissioningParameters> commissioningParameters
-        = mCppCommissioner->GetCommissioningParameters();
-    VerifyOrReturnError(commissioningParameters.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    auto & commissioningParameters = mCppCommissioner->GetCommissioningParameters();
 
     // Attestation Elements, nonce and signature will have a value in Commissioning Params as the CSR needs a signature or else we
     // cannot trust it
     ReturnErrorOnFailure(
-        chip::Credentials::DeconstructAttestationElements(commissioningParameters.Value().GetAttestationElements().Value(),
+        chip::Credentials::DeconstructAttestationElements(commissioningParameters.GetAttestationElements().Value(),
             certificationDeclarationSpan, attestationNonceSpan, timestampDeconstructed, firmwareInfoSpan, vendorReserved));
 
     NSData * firmwareInfo = nil;
@@ -160,9 +158,9 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
     }
     MTRDeviceAttestationInfo * attestationInfo = [[MTRDeviceAttestationInfo alloc]
                initWithDeviceAttestationChallenge:AsData(attestationChallenge)
-                                            nonce:AsData(commissioningParameters.Value().GetAttestationNonce().Value())
-                                      elementsTLV:AsData(commissioningParameters.Value().GetAttestationElements().Value())
-                                elementsSignature:AsData(commissioningParameters.Value().GetAttestationSignature().Value())
+                                            nonce:AsData(commissioningParameters.GetAttestationNonce().Value())
+                                      elementsTLV:AsData(commissioningParameters.GetAttestationElements().Value())
+                                elementsSignature:AsData(commissioningParameters.GetAttestationSignature().Value())
                      deviceAttestationCertificate:AsData(DAC)
         productAttestationIntermediateCertificate:AsData(PAI)
                          certificationDeclaration:AsData(certificationDeclarationSpan)
@@ -214,18 +212,15 @@ void MTROperationalCredentialsDelegate::ExternalNOCChainGenerated(
                 return;
             }
 
-            auto commissioningParameters = commissioner->GetCommissioningParameters();
-            if (!commissioningParameters.HasValue()) {
-                return;
-            }
+            auto & commissioningParameters = commissioner->GetCommissioningParameters();
 
-            IdentityProtectionKeySpan ipk = commissioningParameters.Value().GetIpk().ValueOr(GetIPK());
+            IdentityProtectionKeySpan ipk = commissioningParameters.GetIpk().ValueOr(GetIPK());
 
             Optional<NodeId> adminSubject;
             if (chain.adminSubject != nil) {
                 adminSubject.SetValue(chain.adminSubject.unsignedLongLongValue);
             } else {
-                adminSubject = commissioningParameters.Value().GetAdminSubject();
+                adminSubject = commissioningParameters.GetAdminSubject();
             }
 
             ByteSpan intermediateCertificate;

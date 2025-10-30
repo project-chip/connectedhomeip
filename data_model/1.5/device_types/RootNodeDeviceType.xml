@@ -57,16 +57,25 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0016" name="Root Node" revision="3">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0016" name="Root Node" revision="4">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Added Power Source to device type; Deprecated Power Source Configuration"/>
     <revision revision="3" summary="Added restriction on Managed Device feature of Access Control cluster"/>
+    <revision revision="4" summary="Added conditions and cluster requirements for Time Sync, TLS, and Power Source clusters"/>
   </revisionHistory>
   <classification class="node" scope="node"/>
   <conditions>
     <condition name="CustomNetworkConfig" summary="The node only supports out-of-band-configured networking (e.g. rich user interface, manufacturer-specific means, custom commissioning flows, or future IP-compliant network technology not yet directly supported by `NetworkCommissioning` cluster)."/>
     <condition name="ManagedAclAllowed" summary="The node has at least one endpoint where some Device Type present on the endpoint has a Device Library element requirement table entry that sets this condition to true."/>
+    <condition name="TimeSyncCond" summary="The node has at least one endpoint where some Device Type present on the endpoint needs to use Time Synchronization support."/>
+    <condition name="TimeSyncWithClientCond" summary="The node has at least one endpoint where some Device Type present on the endpoint needs to use Time Synchronization support with Client cluster support, and the TimeSyncClient feature."/>
+    <condition name="TimeSyncWithNTPCCond" summary="The node has at least one endpoint where some Device Type present on the endpoint needs to use Time Synchronization support with the NTPClient feature."/>
+    <condition name="TimeSyncWithTZCond" summary="The node has at least one endpoint where some Device Type present on the endpoint needs to use Time Synchronization support with the TimeZone feature."/>
+    <condition name="TLSCertificatesCond" summary="The node has at least one endpoint where some Device Type present on the endpoint needs to use TLS Certificate Management. Since TLS requires basic Time Sync support, this will include that dependency."/>
+    <condition name="TLSClientCond" summary="The node has at least one endpoint where some Device Type present on the endpoint needs to use TLS Client Management. Since TLS requires basic Time Sync support, this will include that dependency."/>
+    <condition name="PowerSourceCond" summary="The node has at least one endpoint where some Device Type present on the endpoint needs to have Power Source be on the Root Node."/>
+    <condition name="ACLExtensionCond" summary="The node has at least one endpoint where some Device Type present on the endpoint needs the Access Control instance to have the Extension attribute."/>
   </conditions>
   <clusters>
     <cluster id="0x001F" name="Access Control" side="server">
@@ -79,6 +88,13 @@ Davis, CA 95616, USA
           </optionalConform>
         </feature>
       </features>
+      <attributes>
+        <attribute code="0x0001" name="Extension">
+          <mandatoryConform>
+            <condition name="ACLExtensionCond"/>
+          </mandatoryConform>
+        </attribute>
+      </attributes>
     </cluster>
     <cluster id="0x0028" name="Basic Information" side="server">
       <quality singleton="true"/>
@@ -107,6 +123,14 @@ Davis, CA 95616, USA
       <otherwiseConform>
         <optionalConform/>
         <deprecateConform/>
+      </otherwiseConform>
+    </cluster>
+    <cluster id="0x002F" name="Power Source" side="server">
+      <otherwiseConform>
+        <mandatoryConform>
+          <condition name="PowerSourceCond"/>
+        </mandatoryConform>
+        <optionalConform/>
       </otherwiseConform>
     </cluster>
     <cluster id="0x0030" name="General Commissioning" side="server">
@@ -149,7 +173,112 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0038" name="Time Synchronization" side="server">
       <quality singleton="true"/>
-      <optionalConform/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <condition name="TimeSyncCond"/>
+        </mandatoryConform>
+        <mandatoryConform>
+          <condition name="TimeSyncWithClientCond"/>
+        </mandatoryConform>
+        <mandatoryConform>
+          <condition name="TimeSyncWithNTPCCond"/>
+        </mandatoryConform>
+        <mandatoryConform>
+          <condition name="TimeSyncWithTZCond"/>
+        </mandatoryConform>
+        <mandatoryConform>
+          <condition name="TLSClientCond"/>
+        </mandatoryConform>
+        <mandatoryConform>
+          <condition name="TLSCertificatesCond"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+      <features>
+        <feature code="TSC">
+          <otherwiseConform>
+            <mandatoryConform>
+              <condition name="TimeSyncWithClientCond"/>
+            </mandatoryConform>
+            <optionalConform choice="a" more="true" min="1">
+              <orTerm>
+                <condition name="TLSCertificatesCond"/>
+                <condition name="TLSClientCond"/>
+              </orTerm>
+            </optionalConform>
+            <optionalConform/>
+          </otherwiseConform>
+        </feature>
+        <feature code="NTPC">
+          <otherwiseConform>
+            <mandatoryConform>
+              <condition name="TimeSyncWithNTPCCond"/>
+            </mandatoryConform>
+            <optionalConform choice="a" more="true" min="1">
+              <orTerm>
+                <condition name="TLSCertificatesCond"/>
+                <condition name="TLSClientCond"/>
+              </orTerm>
+            </optionalConform>
+            <optionalConform/>
+          </otherwiseConform>
+        </feature>
+        <feature code="TZ">
+          <otherwiseConform>
+            <mandatoryConform>
+              <condition name="TimeSyncWithTZCond"/>
+            </mandatoryConform>
+            <optionalConform/>
+          </otherwiseConform>
+        </feature>
+      </features>
+    </cluster>
+    <cluster id="0x0038" name="Time Synchronization" side="client">
+      <quality singleton="true"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <condition name="TimeSyncWithClientCond"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+      <features>
+        <feature code="TSC">
+          <otherwiseConform>
+            <mandatoryConform>
+              <condition name="TimeSyncWithClientCond"/>
+            </mandatoryConform>
+            <optionalConform choice="a" more="true" min="1">
+              <orTerm>
+                <condition name="TLSCertificatesCond"/>
+                <condition name="TLSClientCond"/>
+              </orTerm>
+            </optionalConform>
+            <optionalConform/>
+          </otherwiseConform>
+        </feature>
+        <feature code="NTPC">
+          <otherwiseConform>
+            <mandatoryConform>
+              <condition name="TimeSyncWithNTPCCond"/>
+            </mandatoryConform>
+            <optionalConform choice="a" more="true" min="1">
+              <orTerm>
+                <condition name="TLSCertificatesCond"/>
+                <condition name="TLSClientCond"/>
+              </orTerm>
+            </optionalConform>
+            <optionalConform/>
+          </otherwiseConform>
+        </feature>
+        <feature code="TZ">
+          <otherwiseConform>
+            <mandatoryConform>
+              <condition name="TimeSyncWithTZCond"/>
+            </mandatoryConform>
+            <optionalConform/>
+          </otherwiseConform>
+        </feature>
+      </features>
     </cluster>
     <cluster id="0x003C" name="Administrator Commissioning" side="server">
       <quality singleton="true"/>
@@ -178,6 +307,24 @@ Davis, CA 95616, USA
           </mandatoryConform>
         </feature>
       </features>
+    </cluster>
+    <cluster id="0x0801" name="TLS Certificate Management" side="server">
+      <quality singleton="true"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <condition name="TLSCertificatesCond"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </cluster>
+    <cluster id="0x0802" name="TLS Client Management" side="server">
+      <quality singleton="true"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <condition name="TLSClientCond"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
     </cluster>
   </clusters>
 </deviceType>

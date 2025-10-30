@@ -23,6 +23,7 @@
 #include <app/data-model/Encode.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/OccupancySensing/Metadata.h>
 #include <lib/core/CHIPError.h>
 
 using chip::Protocols::InteractionModel::Status;
@@ -85,6 +86,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
         return aEncoder.Encode(*holdTimeLimitsStruct);
     }
+    case Attributes::ClusterRevision::Id:
+        return aEncoder.Encode(OccupancySensing::kRevision);
     default:
         return CHIP_NO_ERROR;
     }

@@ -25,6 +25,8 @@ from ..native import PyChipError
 from .library_handle import _GetDiscoveryLibraryHandle
 from .types import DiscoverFailureCallback_t, DiscoverSuccessCallback_t
 
+LOGGER = logging.getLogger(__name__)
+
 
 class DiscoveryType(enum.IntEnum):
     DISCOVERY_NETWORK_ONLY = 0
@@ -152,7 +154,7 @@ class _PendingDiscoveries:
                         try:
                             item.callback(item.result)
                         except Exception:
-                            logging.exception("Node discovery callback failed")
+                            LOGGER.exception("Node discovery callback failed")
                     else:
                         updatedDiscoveries.append(item)
 
@@ -202,7 +204,7 @@ _gPendingDiscoveries = _PendingDiscoveries()
 
 
 @DiscoverSuccessCallback_t
-def _DiscoverSuccess(fabric: int, node: int, interface: int, ip: str,  port: int):
+def _DiscoverSuccess(fabric: int, node: int, interface: int, ip: str, port: int):
     peerId = PeerId(fabric, node)
     address = NodeAddress(interface, ip, port)
 
@@ -214,7 +216,7 @@ def _DiscoverSuccess(fabric: int, node: int, interface: int, ip: str,  port: int
 def _DiscoverFailure(fabric: int, node: int, errorCode: PyChipError):
     # Many discovery errors currently do not include a useful node/fabric id
     # hence we just log and rely on discovery timeouts to return 'no data'
-    logging.error("Discovery failure, error %d", errorCode.code)
+    LOGGER.error("Discovery failure, error %d", errorCode.code)
 
 
 def FindAddressAsync(fabricid: int, nodeid: int, callback, timeout_ms=1000):

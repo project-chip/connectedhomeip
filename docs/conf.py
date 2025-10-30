@@ -21,6 +21,7 @@ version = "1.0.0"
 extensions = [
     "myst_parser",
     "external_content",
+    "sphinxcontrib.mermaid",
 ]
 exclude_patterns = [
     "_build",
@@ -61,7 +62,7 @@ suppress_warnings = [
     "myst.xref_missing",
 ]
 myst_enable_extensions = ["html_image"]
-
+myst_fence_as_directive = ["mermaid"]
 
 # -- Options for external_content --------------------------------------------
 

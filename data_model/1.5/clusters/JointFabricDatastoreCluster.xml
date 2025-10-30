@@ -635,6 +635,7 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="5" name="GroupPermission" type="DatastoreAccessControlEntryPrivilegeEnum">
+        <quality nullable="true"/>
         <mandatoryConform/>
       </field>
     </command>

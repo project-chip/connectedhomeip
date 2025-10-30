@@ -673,7 +673,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetCommissionableDevice
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetInitialPairingInstruction(char * buf, size_t bufSize)
 {
-    VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION), CHIP_ERROR_BUFFER_TOO_SMALL);
+    constexpr size_t kLiteralSize  = sizeof(CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION);
+    constexpr bool kIsLiteralEmpty = (kLiteralSize == 1); // Only the null terminator is present, the literal is "" (empty-string)
+
+    if (kIsLiteralEmpty)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    VerifyOrReturnError((bufSize >= kLiteralSize), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION);
     return CHIP_NO_ERROR;
 }
@@ -681,7 +689,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetInitialPairingInstru
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSecondaryPairingInstruction(char * buf, size_t bufSize)
 {
-    VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION), CHIP_ERROR_BUFFER_TOO_SMALL);
+    constexpr size_t kLiteralSize  = sizeof(CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION);
+    constexpr bool kIsLiteralEmpty = (kLiteralSize == 1); // Only the null terminator is present, the literal is "" (empty-string)
+
+    if (kIsLiteralEmpty)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    VerifyOrReturnError((bufSize >= kLiteralSize), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION);
     return CHIP_NO_ERROR;
 }

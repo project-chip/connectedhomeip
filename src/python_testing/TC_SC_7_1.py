@@ -22,11 +22,11 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 2222 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 2222 --passcode 20202024 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --bool-arg post_cert_test:true
-#       --qr-code MT:-24J0KCZ16750648G00
+#       --qr-code MT:-24J0KCZ16N71648G00
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -40,6 +40,7 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter import discovery
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
@@ -71,11 +72,15 @@ class TC_SC_7_1(MatterBaseTest):
     def steps_TC_SC_7_1(self):
         if self.post_cert_test:
             return [_trusted_root_test_step(1),
-                    TestStep(2, "TH extracts the discriminator from the provided setup code", "Ensure the code is not the default")]
+                    TestStep(2, "TH extracts the discriminator from the provided setup code", "Ensure the code is not the default"),
+                    TestStep(3, "TH extracts the passcode from the provided setup code", "Ensure the passcode is not the default")
+                    ]
 
         return [_trusted_root_test_step(1),
                 _trusted_root_test_step(2),
-                TestStep(3, "TH compares the discriminators from the provided setup codes", "Discriminators do not match")]
+                TestStep(3, "TH compares the discriminators from the provided setup codes", "Discriminators do not match"),
+                TestStep(4, "TH compares the passcodes from the provided setup codes", "Passcodes do not match")
+                ]
 
     def pics_TC_SC_7_1(self):
         # Testers can use either the QR or manual code, but this test is gated on manual because the manual pairing code is required
@@ -109,12 +114,22 @@ class TC_SC_7_1(MatterBaseTest):
         if self.post_cert_test:
             # For post-cert, we're testing against the defaults
             # TODO: Does it even make sense to test against a manual code in post-cert? It's such a small space, collisions are likely. Should we restrict post-cert to QR? What if one isn't provided?
-            asserts.assert_not_equal(setup_payload_info[0].filter_value, 3840, "Device is using the default discriminator")
+            if setup_payload_info[0].filter_type == discovery.FilterType.LONG_DISCRIMINATOR:
+                asserts.assert_not_equal(setup_payload_info[0].filter_value, 3840, "Device is using the default discriminator")
+            else:
+                self.mark_current_step_skipped()
         else:
             if setup_payload_info[0].filter_value == setup_payload_info[1].filter_value and self.matter_test_config.manual_code is not None:
-                logging.warn("The two provided discriminators are the same. Note that this CAN occur by chance, especially when using manual codes with the short discriminator. Consider using a QR code, or a different device if you believe the DUTs have individually provisioned")
+                logging.warning("The two provided discriminators are the same. Note that this CAN occur by chance, especially when using manual codes with the short discriminator. Consider using a QR code, or a different device if you believe the DUTs have individually provisioned")
             asserts.assert_not_equal(
                 setup_payload_info[0].filter_value, setup_payload_info[1].filter_value, "Devices are using the same discriminator values")
+
+        self.step(i+3)
+        if self.post_cert_test:
+            asserts.assert_not_equal(setup_payload_info[0].passcode, 20202021, "Device is using the default passcode")
+        else:
+            asserts.assert_not_equal(
+                setup_payload_info[0].passcode, setup_payload_info[1].passcode, "Devices are using the same discriminator values")
 
         # TODO: add test for PAKE salt. This needs to be plumbed through starting from HandlePBKDFParamResponse.
         # Will handle in a separate follow up as the plumbing here is aggressive and through some of the crypto layers.

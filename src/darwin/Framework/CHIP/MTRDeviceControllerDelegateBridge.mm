@@ -27,6 +27,7 @@
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
 #import "MTRProductIdentity.h"
+#import "MTRSetupPayload_Internal.h"
 #import "MTRUtilities.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 
@@ -101,7 +102,7 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
     }
 }
 
-void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error)
+void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error, const std::optional<chip::RendezvousParameters> & rendezvousParameters, const std::optional<chip::SetupPayload> & setupPayload)
 {
     MTRDeviceController * strongController = mController;
 
@@ -112,9 +113,21 @@ void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error)
     }
     MATTER_LOG_METRIC_END(kMetricSetupPASESession, error);
 
-    id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
+    auto * strongDelegate = static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
     if (strongDelegate && mQueue && strongController) {
-        if ([strongDelegate respondsToSelector:@selector(controller:commissioningSessionEstablishmentDone:)]) {
+        // The methods on MTRDeviceControllerDelegate_Internal are required, but
+        // we don't know whether our delegate actually implements the protocol,
+        // so still need to do the respondsToSelector checks.
+        if ([strongDelegate respondsToSelector:@selector(controller:commissioningSessionEstablishmentDone:forPayload:)]) {
+            MTRSetupPayload * payload;
+            if (setupPayload) {
+                payload = [[MTRSetupPayload alloc] initWithSetupPayload:*setupPayload];
+            }
+            dispatch_async(mQueue, ^{
+                NSError * nsError = [MTRError errorForCHIPErrorCode:error];
+                [strongDelegate controller:strongController commissioningSessionEstablishmentDone:nsError forPayload:payload];
+            });
+        } else if ([strongDelegate respondsToSelector:@selector(controller:commissioningSessionEstablishmentDone:)]) {
             dispatch_async(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
                 [strongDelegate controller:strongController commissioningSessionEstablishmentDone:nsError];
@@ -229,10 +242,35 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningStatusUpdate(chip::PeerId
     }
 }
 
+void MTRDeviceControllerDelegateBridge::OnCommissioningStageStart(chip::PeerId peerId, chip::Controller::CommissioningStage stageStarting)
+{
+    MTRDeviceController * strongController = mController;
+    auto * strongDelegate = static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
+    // The methods on MTRDeviceControllerDelegate_Internal are required, but
+    // we don't know whether our delegate actually implements the protocol,
+    // so still need to do the respondsToSelector checks.
+
+    if (stageStarting != chip::Controller::CommissioningStage::kScanNetworks) {
+        // This is the only stage we handle right now.
+        return;
+    }
+
+    if (!strongController || !mQueue || !strongDelegate) {
+        MTR_LOG_ERROR("Unable to handle commissioning stage start: missing required data: %@ %@ %@", strongController, mQueue, strongDelegate);
+        return;
+    }
+
+    if ([strongDelegate respondsToSelector:@selector(controllerStartingNetworkScan:)]) {
+        dispatch_async(mQueue, ^{
+            [strongDelegate controllerStartingNetworkScan:strongController];
+        });
+    }
+}
+
 void MTRDeviceControllerDelegateBridge::OnScanNetworksSuccess(const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse)
 {
     MTRDeviceController * strongController = mController;
-    id<MTRDeviceControllerDelegate_Internal> strongDelegate = GetInternalDelegate();
+    auto * strongDelegate = static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
     // The methods on MTRDeviceControllerDelegate_Internal are required, but
     // we don't know whether our delegate actually implements the protocol,
     // so still need to do the respondsToSelector checks.
@@ -251,15 +289,15 @@ void MTRDeviceControllerDelegateBridge::OnScanNetworksSuccess(const chip::app::C
     }
 
     if (response.wiFiScanResults) {
-        if ([strongDelegate respondsToSelector:@selector(controller:scannedWiFiNetworks:error:)]) {
+        if ([strongDelegate respondsToSelector:@selector(controller:needsWiFiCredentialsWithScanResults:error:)]) {
             dispatch_async(mQueue, ^{
-                [strongDelegate controller:strongController scannedWiFiNetworks:response.wiFiScanResults error:nil];
+                [strongDelegate controller:strongController needsWiFiCredentialsWithScanResults:response.wiFiScanResults error:nil];
             });
         }
     } else if (response.threadScanResults) {
-        if ([strongDelegate respondsToSelector:@selector(controller:scannedThreadNetworks:error:)]) {
+        if ([strongDelegate respondsToSelector:@selector(controller:needsThreadCredentialsWithScanResults:error:)]) {
             dispatch_async(mQueue, ^{
-                [strongDelegate controller:strongController scannedThreadNetworks:response.threadScanResults error:nil];
+                [strongDelegate controller:strongController needsThreadCredentialsWithScanResults:response.threadScanResults error:nil];
             });
         }
     } else {
@@ -270,7 +308,7 @@ void MTRDeviceControllerDelegateBridge::OnScanNetworksSuccess(const chip::app::C
 void MTRDeviceControllerDelegateBridge::OnScanNetworksFailure(CHIP_ERROR error)
 {
     MTRDeviceController * strongController = mController;
-    id<MTRDeviceControllerDelegate_Internal> strongDelegate = GetInternalDelegate();
+    auto * strongDelegate = static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
     // The methods on MTRDeviceControllerDelegate_Internal are required, but
     // we don't know whether our delegate actually implements the protocol,
     // so still need to do the respondsToSelector checks.
@@ -288,20 +326,74 @@ void MTRDeviceControllerDelegateBridge::OnScanNetworksFailure(CHIP_ERROR error)
     // based on mRootEndpointNetworkCommissioningFeatureMap.
     using Feature = chip::app::Clusters::NetworkCommissioning::Feature;
     if (mRootEndpointNetworkCommissioningFeatureMap.Has(Feature::kWiFiNetworkInterface)) {
-        if ([strongDelegate respondsToSelector:@selector(controller:scannedWiFiNetworks:error:)]) {
+        if ([strongDelegate respondsToSelector:@selector(controller:needsWiFiCredentialsWithScanResults:error:)]) {
             dispatch_async(mQueue, ^{
-                [strongDelegate controller:strongController scannedWiFiNetworks:nil error:[MTRError errorForCHIPErrorCode:error]];
+                [strongDelegate controller:strongController needsWiFiCredentialsWithScanResults:nil error:[MTRError errorForCHIPErrorCode:error]];
             });
         }
     } else if (mRootEndpointNetworkCommissioningFeatureMap.Has(Feature::kThreadNetworkInterface)) {
-        if ([strongDelegate respondsToSelector:@selector(controller:scannedThreadNetworks:error:)]) {
+        if ([strongDelegate respondsToSelector:@selector(controller:needsThreadCredentialsWithScanResults:error:)]) {
             dispatch_async(mQueue, ^{
-                [strongDelegate controller:strongController scannedThreadNetworks:nil error:[MTRError errorForCHIPErrorCode:error]];
+                [strongDelegate controller:strongController needsThreadCredentialsWithScanResults:nil error:[MTRError errorForCHIPErrorCode:error]];
             });
         }
     } else {
         MTR_LOG_ERROR("Scan failed for unknown network type: %lu", static_cast<unsigned long>(mRootEndpointNetworkCommissioningFeatureMap.Raw()));
     }
+}
+
+CHIP_ERROR MTRDeviceControllerDelegateBridge::WiFiCredentialsNeeded(chip::EndpointId endpoint)
+{
+    MTRDeviceController * strongController = mController;
+    auto * strongDelegate = static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
+    // The methods on MTRDeviceControllerDelegate_Internal are required, but
+    // we don't know whether our delegate actually implements the protocol,
+    // so still need to do the respondsToSelector checks.
+
+    if (!strongController || !mQueue || !strongDelegate) {
+        MTR_LOG_ERROR("Unable to handle WiFiCredentialsNeeded: missing required data: %@ %@ %@", strongController, mQueue, strongDelegate);
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    if (![strongDelegate respondsToSelector:@selector(controller:needsWiFiCredentialsWithScanResults:error:)]) {
+        // Fail out: we have no way to provide credentials and don't want to
+        // block commissioning until timeout.
+        MTR_LOG_ERROR("%@ Wi-Fi credentials needed, but no way to request them", strongController);
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    dispatch_async(mQueue, ^{
+        [strongDelegate controller:strongController needsWiFiCredentialsWithScanResults:nil error:nil];
+    });
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MTRDeviceControllerDelegateBridge::ThreadCredentialsNeeded(chip::EndpointId endpoint)
+{
+    MTRDeviceController * strongController = mController;
+    auto * strongDelegate = static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
+    // The methods on MTRDeviceControllerDelegate_Internal are required, but
+    // we don't know whether our delegate actually implements the protocol,
+    // so still need to do the respondsToSelector checks.
+
+    if (!strongController || !mQueue || !strongDelegate) {
+        MTR_LOG_ERROR("Unable to handle ThreadCredentialsNeeded: missing required data: %@ %@ %@", strongController, mQueue, strongDelegate);
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    if (![strongDelegate respondsToSelector:@selector(controller:needsThreadCredentialsWithScanResults:error:)]) {
+        // Fail out: we have no way to provide credentials and don't want to
+        // block commissioning until timeout.
+        MTR_LOG_ERROR("%@ Thread credentials needed, but no way to request them", strongController);
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    dispatch_async(mQueue, ^{
+        [strongDelegate controller:strongController needsThreadCredentialsWithScanResults:nil error:nil];
+    });
+
+    return CHIP_NO_ERROR;
 }
 
 void MTRDeviceControllerDelegateBridge::SetDeviceNodeID(chip::NodeId deviceNodeId)

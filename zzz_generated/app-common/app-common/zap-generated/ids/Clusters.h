@@ -74,6 +74,7 @@
 #include <clusters/GeneralCommissioning/ClusterId.h>
 #include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <clusters/GroupKeyManagement/ClusterId.h>
+#include <clusters/Groupcast/ClusterId.h>
 #include <clusters/Groups/ClusterId.h>
 #include <clusters/HepaFilterMonitoring/ClusterId.h>
 #include <clusters/IcdManagement/ClusterId.h>

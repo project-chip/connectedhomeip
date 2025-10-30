@@ -51,15 +51,13 @@ namespace ThreadNetworkDiagnostics {
  *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE = Is not a Runtime readable attribute. Use standard read
  *         All other errors should be treated as a read error and reported as such.
  *
- * @note This function implementation can compile in 3 different outcomes
+ * @note This function currently builds in two different variants:
  *       (1) CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK:
- *           - Generic implementation fetching the valid thread network data from the thread stack and encoding it respectively to
- *             the attributeID received.
- *       (2) CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK:
+ *           - Generic implementation fetching the valid thread network data from the thread stack
+ *             (via ThreadStackMgrImpl().OTInstance()) and encoding it respectively to the attributeID
+ *             received. This relies on an in-process OpenThread stack.
+ *       (2) Otherwise
  *           - Encode a NULL value for nullable attributes or 0 for the others.
- *           - Devices using the ot-br-posix dbus stack have not yet provided the API to fetch the needed thread informations.
- *       (3) None of the conditions above
- *           - returns CHIP_ERROR_NOT_IMPLEMENTED.
  */
 CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder)
 {
@@ -698,7 +696,7 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
     break;
     }
 
-#elif (CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+#else
     switch (attributeId)
     {
     case Attributes::NeighborTable::Id:
@@ -860,8 +858,6 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
         err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
         break;
     }
-#else
-    err = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
     return err;
 }

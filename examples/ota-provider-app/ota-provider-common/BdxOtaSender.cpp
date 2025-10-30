@@ -236,3 +236,12 @@ void BdxOtaSender::Reset()
     mNumBytesSent = 0;
     memset(mFileDesignator, 0, chip::bdx::kMaxFileDesignatorLen);
 }
+
+void BdxOtaSender::AbortTransfer()
+{
+    if (mInitialized)
+    {
+        mTransfer.AbortTransfer(StatusCode::kUnknown);
+        PollForOutput();
+    }
+}

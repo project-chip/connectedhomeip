@@ -543,7 +543,7 @@ void SetupPretendDevices()
     AddEndpoint("External");
     AddCluster("Contact Sensor");
     AddAttribute("Contact", "true");
-    auto booleanState = app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
+    auto booleanState = app::Clusters::BooleanState::FindClusterOnEndpoint(1);
     if (booleanState != nullptr)
     {
         booleanState->SetStateValue(true);

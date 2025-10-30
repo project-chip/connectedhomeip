@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -58,46 +58,25 @@ public:
     class EndpointInfo
     {
     public:
-        struct EndPointDeletor
-        {
-            void operator()(chip::Inet::UDPEndPoint * e) { e->Free(); }
-        };
-
 #if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
         EndpointInfo(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType,
-                     std::unique_ptr<chip::Inet::UDPEndPoint, EndPointDeletor> && listenUdp,
-                     std::unique_ptr<chip::Inet::UDPEndPoint, EndPointDeletor> && unicastQueryUdp) :
+                     chip::Inet::UDPEndPointHandle && listenUdp, chip::Inet::UDPEndPointHandle && unicastQueryUdp) :
             mInterfaceId(interfaceId),
-            mAddressType(addressType), mListenUdp(listenUdp.release()), mUnicastQueryUdp(unicastQueryUdp.release())
+            mAddressType(addressType), mListenUdp(listenUdp), mUnicastQueryUdp(unicastQueryUdp)
         {}
 #else
         EndpointInfo(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType,
-                     std::unique_ptr<chip::Inet::UDPEndPoint, EndPointDeletor> && listenUdp) :
+                     chip::Inet::UDPEndPointHandle && listenUdp) :
             mInterfaceId(interfaceId),
-            mAddressType(addressType), mListenUdp(listenUdp.release())
+            mAddressType(addressType), mListenUdp(listenUdp)
         {}
 #endif
 
-        ~EndpointInfo()
-        {
-            if (mListenUdp != nullptr)
-            {
-                mListenUdp->Free();
-            }
-
-#if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
-            if (mUnicastQueryUdp != nullptr)
-            {
-                mUnicastQueryUdp->Free();
-            }
-#endif
-        }
-
         const chip::Inet::InterfaceId mInterfaceId;
         const chip::Inet::IPAddressType mAddressType;
-        chip::Inet::UDPEndPoint * const mListenUdp;
+        chip::Inet::UDPEndPointHandle mListenUdp;
 #if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
-        chip::Inet::UDPEndPoint * const mUnicastQueryUdp;
+        chip::Inet::UDPEndPointHandle mUnicastQueryUdp;
 #endif
     };
 
@@ -114,16 +93,15 @@ public:
         /**
          * Returns non-null UDPEndpoint IFF a broadcast should be performed for the given EndpointInfo
          */
-        virtual chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) = 0;
+        virtual chip::Inet::UDPEndPointHandle Accept(ServerBase::EndpointInfo * info) = 0;
     };
 
 #if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
     using EndpointInfoPoolType = chip::PoolInterface<EndpointInfo, chip::Inet::InterfaceId, chip::Inet::IPAddressType,
-                                                     std::unique_ptr<chip::Inet::UDPEndPoint, EndpointInfo::EndPointDeletor> &&,
-                                                     std::unique_ptr<chip::Inet::UDPEndPoint, EndpointInfo::EndPointDeletor> &&>;
+                                                     chip::Inet::UDPEndPointHandle, chip::Inet::UDPEndPointHandle>;
 #else
-    using EndpointInfoPoolType = chip::PoolInterface<EndpointInfo, chip::Inet::InterfaceId, chip::Inet::IPAddressType,
-                                                     std::unique_ptr<chip::Inet::UDPEndPoint, EndpointInfo::EndPointDeletor> &&>;
+    using EndpointInfoPoolType =
+        chip::PoolInterface<EndpointInfo, chip::Inet::InterfaceId, chip::Inet::IPAddressType, chip::Inet::UDPEndPointHandle>;
 #endif
 
     ServerBase(EndpointInfoPoolType & pool) : mEndpoints(pool)

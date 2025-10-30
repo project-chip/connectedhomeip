@@ -63,6 +63,7 @@ template("declare_all_items_target") {
       "${chip_root}/zzz_generated/app-common/clusters/FormaldehydeConcentrationMeasurement" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/GeneralCommissioning" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/GeneralDiagnostics" + invoker.target,
+      "${chip_root}/zzz_generated/app-common/clusters/Groupcast" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/GroupKeyManagement" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/Groups" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/HepaFilterMonitoring" + invoker.target,

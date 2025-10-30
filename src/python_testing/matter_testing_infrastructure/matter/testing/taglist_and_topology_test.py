@@ -146,7 +146,7 @@ def create_device_type_list_for_root(direct_children: Set[int], endpoint_dict: D
     return device_types
 
 
-def cmp_tag_list(a: Clusters.Descriptor.Structs.SemanticTagStruct, b: Clusters.Descriptor.Structs.SemanticTagStruct):
+def cmp_tag_list(a: Clusters.Globals.Structs.SemanticTagStruct, b: Clusters.Globals.Structs.SemanticTagStruct):
     if type(a.mfgCode) != type(b.mfgCode):
         return -1 if type(a.mfgCode) is Nullable else 1
     if a.mfgCode != b.mfgCode:

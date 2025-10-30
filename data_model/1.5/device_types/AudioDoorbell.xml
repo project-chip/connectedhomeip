@@ -61,15 +61,28 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
-  <classification class="simple" scope="endpoint"/>
+  <classification superset="Doorbell" class="simple" scope="endpoint"/>
+  <conditionRequirements>
+    <deviceType id="0x0016" name="Root Node">
+      <conditionRequirement name="TLSCertificatesCond">
+        <mandatoryConform/>
+      </conditionRequirement>
+      <conditionRequirement name="PowerSourceCond">
+        <mandatoryConform/>
+      </conditionRequirement>
+      <conditionRequirement name="TimeSyncWithNTPCCond">
+        <optionalConform/>
+      </conditionRequirement>
+      <conditionRequirement name="TLSClientCond">
+        <optionalConform/>
+      </conditionRequirement>
+    </deviceType>
+  </conditionRequirements>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x002F" name="Power Source" side="server">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x0038" name="Time Synchronization" side="server">
+    <cluster id="0x003B" name="Switch" side="server">
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0551" name="Camera AV Stream Management" side="server">
@@ -101,11 +114,8 @@ Davis, CA 95616, USA
     <cluster id="0x0555" name="Push AV Stream Transport" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x0801" name="TLS Certificate Management" side="server">
+    <cluster id="0x0556" name="Chime" side="client">
       <mandatoryConform/>
-    </cluster>
-    <cluster id="0x0802" name="TLS Client Management" side="server">
-      <optionalConform/>
     </cluster>
   </clusters>
 </deviceType>

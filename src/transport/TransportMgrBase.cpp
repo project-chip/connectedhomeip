@@ -30,7 +30,7 @@ CHIP_ERROR TransportMgrBase::SendMessage(const Transport::PeerAddress & address,
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 CHIP_ERROR TransportMgrBase::TCPConnect(const Transport::PeerAddress & address, Transport::AppTCPConnectionCallbackCtxt * appState,
-                                        Transport::ActiveTCPConnectionHolder & peerConnState)
+                                        Transport::ActiveTCPConnectionHandle & peerConnState)
 {
     return mTransport->TCPConnect(address, appState, peerConnState);
 }
@@ -95,14 +95,9 @@ void TransportMgrBase::HandleConnectionReceived(Transport::ActiveTCPConnectionSt
     {
         mSessionManager->HandleConnectionReceived(conn);
     }
-    else
-    {
-        // Close connection here since no upper layer is interested in the connection.
-        Transport::ActiveTCPConnectionHolder releaseConnection(&conn);
-    }
 }
 
-void TransportMgrBase::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr)
+void TransportMgrBase::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr)
 {
     if (mSessionManager != nullptr)
     {

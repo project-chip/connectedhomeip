@@ -64,11 +64,15 @@ Davis, CA 95616, USA
     <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
+  <conditionRequirements>
+    <deviceType id="0x0016" name="Root Node">
+      <conditionRequirement name="TimeSyncCond">
+        <optionalConform/>
+      </conditionRequirement>
+    </deviceType>
+  </conditionRequirements>
   <clusters>
     <cluster id="0x0004" name="Groups" side="client">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0038" name="Time Synchronization" side="server">
       <optionalConform/>
     </cluster>
     <cluster id="0x0062" name="Scenes Management" side="client">

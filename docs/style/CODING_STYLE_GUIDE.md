@@ -20,7 +20,7 @@ happen relatively infrequently. Changes to the Python version are more frequent.
 | Language | Version |
 | -------- | ------- |
 | C++      | C++17   |
-| Python   | 3.10    |
+| Python   | 3.11    |
 
 Product-specific software may elect to use later standards in their own work.
 

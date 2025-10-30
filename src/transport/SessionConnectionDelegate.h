@@ -22,7 +22,7 @@
 namespace chip {
 
 namespace Transport {
-class ActiveTCPConnectionHolder;
+class ActiveTCPConnectionHandle;
 struct ActiveTCPConnectionState;
 } // namespace Transport
 
@@ -51,12 +51,13 @@ public:
 
     /**
      * @brief
-     *   Called when the underlying TCP connection attempt for the session is complete. Returns true if handled.
+     *   Called when the underlying TCP connection attempt for the session is complete.
+     *   Returns true if the handle was stored (i.e. ref-count incremented beyond lifetime of this method)
      *
      * @param conn          The TCP connection state
      * @param conErr        The connection error code if the connection was unsuccessful
      */
-    virtual bool OnTCPConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr) = 0;
+    virtual bool OnTCPConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) = 0;
 };
 
 } // namespace chip

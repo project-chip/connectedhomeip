@@ -18,6 +18,8 @@ from typing import List, Optional
 
 from matter.idl.matter_idl_types import Cluster, Idl, ParseMetaData
 
+LOGGER = logging.getLogger(__name__)
+
 
 class IdlPostProcessor:
     """Defines a callback that will apply after an entire parsing
@@ -119,7 +121,7 @@ class Context:
             if where:
                 msg = msg + " at " + where
 
-            logging.warning(msg)
+            LOGGER.warning(msg)
             self._not_handled.add(path)
 
     def AddIdlPostProcessor(self, processor: IdlPostProcessor, has_priority: bool = False):

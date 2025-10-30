@@ -205,7 +205,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 stateValueAttrValue = 1;
 
-                auto booleanState = app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
+                auto booleanState = app::Clusters::BooleanState::FindClusterOnEndpoint(1);
                 if (booleanState != nullptr)
                 {
                     booleanState->SetStateValue(stateValueAttrValue);
@@ -216,7 +216,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 stateValueAttrValue = 0;
 
-                auto booleanState = app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
+                auto booleanState = app::Clusters::BooleanState::FindClusterOnEndpoint(1);
                 if (booleanState != nullptr)
                 {
                     booleanState->SetStateValue(stateValueAttrValue);

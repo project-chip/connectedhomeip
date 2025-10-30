@@ -17,6 +17,7 @@
  */
 
 #include "AppMain.h"
+#include "lit-icd-common/Identify.h"
 #include <app-common/zap-generated/ids/Clusters.h>
 
 #include "system/SystemClock.h"
@@ -39,6 +40,7 @@ int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
     DeviceLayer::SystemLayer().StartTimer(10000_ms32, notifyIcdActive, nullptr);
+    IdentifyInit();
     ChipLinuxAppMainLoop();
     return 0;
 }

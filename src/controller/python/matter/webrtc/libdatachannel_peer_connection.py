@@ -24,6 +24,8 @@ from .libdatachannel_webrtc_client import LibdatachannelWebRTCClient
 from .types import Events, IceCandidate, IceCandidateList, PeerConnectionState
 from .utils import AsyncEventQueue
 
+LOGGER = logging.getLogger(__name__)
+
 
 class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
     """Manages a libdatachannel WebRTC peer connection, handling events such as offers, answers, ICE candidates,
@@ -195,7 +197,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         Raises:
             asyncio.TimeoutError: If no remote offer is received within the specified timeout period.
         """
-        logging.debug("Waiting for remote offer")
+        LOGGER.debug("Waiting for remote offer")
         return await self._remote_events[Events.OFFER].get(timeout_s)
 
     async def get_remote_answer(self, timeout_s: Optional[int] = None) -> tuple[int, str]:
@@ -211,7 +213,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         Raises:
             asyncio.TimeoutError: If no remote offer is received within the specified timeout period.
         """
-        logging.debug("Waiting for remote answer")
+        LOGGER.debug("Waiting for remote answer")
         return await self._remote_events[Events.ANSWER].get(timeout_s)
 
     async def get_remote_ice_candidates(self, timeout_s: Optional[int] = None) -> tuple[int, list[str]]:
@@ -227,7 +229,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         Raises:
             asyncio.TimeoutError: If no remote offer is received within the specified timeout period.
         """
-        logging.debug("waiting for remote iceCandidates")
+        LOGGER.debug("waiting for remote iceCandidates")
         return await self._remote_events[Events.ICE_CANDIDATE].get(timeout_s)
 
     async def get_remote_end(self, timeout: int | None = None) -> tuple[int, int]:
@@ -243,7 +245,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         Raises:
             asyncio.TimeoutError: If no remote offer is received within the specified timeout period.
         """
-        logging.debug("waiting for remote End session")
+        LOGGER.debug("waiting for remote End session")
         return await self._remote_events[Events.END].get(timeout)
 
     async def check_for_session_establishment(self) -> bool:

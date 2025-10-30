@@ -33,6 +33,7 @@
 #import "MTRDeviceConnectionBridge.h"
 #import "MTRDeviceControllerDataStore.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+#import "MTRSessionParameters.h"
 
 #include <credentials/FabricTable.h>
 #include <lib/core/DataModelTypes.h>
@@ -143,11 +144,21 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
 
 /**
+ * Like getSessionForNode:completion: but allows configuring what sort of session we want.
+ */
+- (void)getSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters)parameters completion:(MTRInternalDeviceConnectionCallback)completion;
+
+/**
  * Since getSessionForNode now enqueues by the subscription pool for Thread
  * devices, MTRDevice_Concrete needs a direct non-queued access because it already
  * makes use of the subscription pool.
  */
 - (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
+
+/**
+ * Like directlyGetSessionForNode:completion: but allows configuring what sort of session we want.
+ */
+- (void)directlyGetSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters)parameters completion:(MTRInternalDeviceConnectionCallback)completion;
 
 /**
  * Get a session for the commissionee device with the given device id.  This may

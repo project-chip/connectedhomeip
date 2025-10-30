@@ -69,7 +69,7 @@ def postprocess_report_by(config: Config, key: str, info: Mapping) -> None:
     """For --report-by=region, select all sections."""
     assert key == 'report.by'
     if config.get(key) == 'region':
-        config.put('section.select-all', True),
+        config.put('section.select-all', True)
 
 
 REPORT_BY_CONFIG: ConfigDescription = {

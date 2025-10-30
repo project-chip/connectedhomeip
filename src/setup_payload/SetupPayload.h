@@ -92,7 +92,8 @@ const int kTotalPayloadDataSizeInBits =
 
 const int kTotalPayloadDataSizeInBytes = kTotalPayloadDataSizeInBits / 8;
 
-const char * const kQRCodePrefix = "MT:";
+inline constexpr const char * kQRCodePrefix = "MT:";
+inline constexpr char kPayloadDelimiter     = '*';
 
 /// The rendezvous type this device supports.
 enum class RendezvousInformationFlag : uint8_t

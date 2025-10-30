@@ -96,9 +96,14 @@ void PlatformManagerImpl::HardwareInit(void)
 
 CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
 {
+    CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     SecLib_Init();
 
-    return CHIP_NO_ERROR;
+    err = chip::Crypto::add_entropy_source(plat_entropy_source, NULL, 16);
+    SuccessOrExit(err);
+
+exit:
+    return err;
 }
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
@@ -117,9 +122,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = ServiceInit();
     SuccessOrExit(err);
 #endif
-
-    err = chip::Crypto::add_entropy_source(plat_entropy_source, NULL, 16);
-    SuccessOrExit(err);
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.

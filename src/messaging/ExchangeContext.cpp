@@ -679,7 +679,7 @@ void ExchangeContext::OnSessionConnectionClosed(const Transport::ActiveTCPConnec
     }
 }
 
-void ExchangeContext::OnConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR connErr)
+void ExchangeContext::OnConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR connErr)
 {
     if (mDelegate != nullptr)
     {

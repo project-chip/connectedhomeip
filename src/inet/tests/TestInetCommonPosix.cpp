@@ -429,15 +429,15 @@ void ShutdownNetwork()
 {
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    gTCP.ForEachEndPoint([](TCPEndPoint * lEndPoint) -> Loop {
-        gTCP.ReleaseEndPoint(lEndPoint);
+    gTCP.ForEachEndPoint([](const TCPEndPointHandle & lEndPoint) -> Loop {
+        assert(false && "Expected no TCP connections");
         return Loop::Continue;
     });
     gTCP.Shutdown();
 #endif
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    gUDP.ForEachEndPoint([](UDPEndPoint * lEndPoint) -> Loop {
-        gUDP.ReleaseEndPoint(lEndPoint);
+    gUDP.ForEachEndPoint([](const UDPEndPointHandle & lEndPoint) -> Loop {
+        assert(false && "Expected no UDP connections");
         return Loop::Continue;
     });
     gUDP.Shutdown();

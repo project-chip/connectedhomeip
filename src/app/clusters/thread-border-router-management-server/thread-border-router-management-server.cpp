@@ -28,7 +28,7 @@
 #include "app/CommandHandlerInterfaceRegistry.h"
 #include "app/InteractionModelEngine.h"
 #include "app/MessageDef/StatusIB.h"
-#include "app/clusters/general-commissioning-server/general-commissioning-server.h"
+#include "app/clusters/general-commissioning-server/general-commissioning-cluster.h"
 #include "app/data-model/Nullable.h"
 #include "lib/core/CHIPError.h"
 #include "lib/core/Optional.h"
@@ -300,7 +300,7 @@ void ServerInstance::CommitSavedBreadcrumb()
 {
     if (mBreadcrumb.HasValue())
     {
-        GeneralCommissioning::SetBreadcrumb(mBreadcrumb.Value());
+        GeneralCommissioningCluster::Instance().SetBreadCrumb(mBreadcrumb.Value());
     }
     mBreadcrumb.ClearValue();
 }

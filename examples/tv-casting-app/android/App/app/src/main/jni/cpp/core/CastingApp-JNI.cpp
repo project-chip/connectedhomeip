@@ -102,7 +102,7 @@ JNI_METHOD(jobject, finishStartup)(JNIEnv *, jobject)
     // &server.GetCommissioningWindowManager().SetAppDelegate(??);
 
     // Initialize binding handlers
-    err = chip::BindingManager::GetInstance().Init(
+    err = chip::app::Clusters::Binding::Manager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
     VerifyOrReturnValue(err == CHIP_NO_ERROR, support::convertMatterErrorFromCppToJava(err),
                         ChipLogError(AppServer, "Failed to init BindingManager %" CHIP_ERROR_FORMAT, err.Format()));

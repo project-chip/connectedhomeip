@@ -195,6 +195,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeScenesManagementID:
         result = @"ScenesManagement";
         break;
+    case MTRClusterIDTypeGroupcastID:
+        result = @"Groupcast";
+        break;
     case MTRClusterIDTypeHEPAFilterMonitoringID:
         result = @"HEPAFilterMonitoring";
         break;
@@ -823,6 +826,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterAccessControlAttributeARLID:
             result = @"ARL";
+            break;
+
+        case MTRAttributeIDTypeClusterAccessControlAttributeAuxiliaryACLID:
+            result = @"AuxiliaryACL";
             break;
 
         case MTRAttributeIDTypeClusterAccessControlAttributeGeneratedCommandListID:
@@ -3748,6 +3755,46 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeGroupcastID:
+
+        switch (attributeID) {
+
+            // Cluster Groupcast attributes
+        case MTRAttributeIDTypeClusterGroupcastAttributeMembershipID:
+            result = @"Membership";
+            break;
+
+        case MTRAttributeIDTypeClusterGroupcastAttributeMaxMembershipCountID:
+            result = @"MaxMembershipCount";
+            break;
+
+        case MTRAttributeIDTypeClusterGroupcastAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterGroupcastAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterGroupcastAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterGroupcastAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterGroupcastAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known Groupcast attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeHEPAFilterMonitoringID:
 
         switch (attributeID) {
@@ -4559,6 +4606,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterPowerTopologyAttributeActiveEndpointsID:
             result = @"ActiveEndpoints";
+            break;
+
+        case MTRAttributeIDTypeClusterPowerTopologyAttributeElectricalCircuitNodesID:
+            result = @"ElectricalCircuitNodes";
             break;
 
         case MTRAttributeIDTypeClusterPowerTopologyAttributeGeneratedCommandListID:
@@ -7989,6 +8040,18 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"BlockUnrated";
             break;
 
+        case MTRAttributeIDTypeClusterContentControlAttributeBlockChannelListID:
+            result = @"BlockChannelList";
+            break;
+
+        case MTRAttributeIDTypeClusterContentControlAttributeBlockApplicationListID:
+            result = @"BlockApplicationList";
+            break;
+
+        case MTRAttributeIDTypeClusterContentControlAttributeBlockContentTimeWindowID:
+            result = @"BlockContentTimeWindow";
+            break;
+
         case MTRAttributeIDTypeClusterContentControlAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -10508,6 +10571,36 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeGroupcastID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterGroupcastCommandJoinGroupID:
+            result = @"JoinGroup";
+            break;
+
+        case MTRCommandIDTypeClusterGroupcastCommandLeaveGroupID:
+            result = @"LeaveGroup";
+            break;
+
+        case MTRCommandIDTypeClusterGroupcastCommandUpdateGroupKeyID:
+            result = @"UpdateGroupKey";
+            break;
+
+        case MTRCommandIDTypeClusterGroupcastCommandExpireGracePeriodID:
+            result = @"ExpireGracePeriod";
+            break;
+
+        case MTRCommandIDTypeClusterGroupcastCommandConfigureAuxiliaryACLID:
+            result = @"ConfigureAuxiliaryACL";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeHEPAFilterMonitoringID:
 
         switch (commandID) {
@@ -11706,6 +11799,30 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterContentControlCommandSetScheduledContentRatingThresholdID:
             result = @"SetScheduledContentRatingThreshold";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandAddBlockChannelsID:
+            result = @"AddBlockChannels";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandRemoveBlockChannelsID:
+            result = @"RemoveBlockChannels";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandAddBlockApplicationsID:
+            result = @"AddBlockApplications";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandRemoveBlockApplicationsID:
+            result = @"RemoveBlockApplications";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandSetBlockContentTimeWindowID:
+            result = @"SetBlockContentTimeWindow";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandRemoveBlockContentTimeWindowID:
+            result = @"RemoveBlockContentTimeWindow";
             break;
 
         default:
@@ -13098,6 +13215,20 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeGroupcastID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterGroupcastCommandLeaveGroupResponseID:
+            result = @"LeaveGroupResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeHEPAFilterMonitoringID:
 
         switch (commandID) {
@@ -14281,6 +14412,10 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
             result = @"FabricRestrictionReviewUpdate";
             break;
 
+        case MTREventIDTypeClusterAccessControlEventAuxiliaryAccessUpdatedID:
+            result = @"AuxiliaryAccessUpdated";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
             break;
@@ -15012,6 +15147,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeScenesManagementID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeGroupcastID:
 
         switch (eventID) {
 
@@ -15894,6 +16039,10 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
             // Cluster ContentControl events
         case MTREventIDTypeClusterContentControlEventRemainingScreenTimeExpiredID:
             result = @"RemainingScreenTimeExpired";
+            break;
+
+        case MTREventIDTypeClusterContentControlEventEnteringBlockContentTimeWindowID:
+            result = @"EnteringBlockContentTimeWindow";
             break;
 
         default:

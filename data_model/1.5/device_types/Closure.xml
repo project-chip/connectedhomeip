@@ -87,6 +87,9 @@ Davis, CA 95616, USA
         </optionalConform>
       </otherwiseConform>
     </cluster>
+    <cluster id="0x0102" name="Window Covering" side="server">
+      <disallowConform/>
+    </cluster>
     <cluster id="0x0104" name="Closure Control" side="server">
       <mandatoryConform/>
       <features>
@@ -96,6 +99,9 @@ Davis, CA 95616, USA
           </mandatoryConform>
         </feature>
       </features>
+    </cluster>
+    <cluster id="0x0105" name="Closure Dimension" side="server">
+      <disallowConform/>
     </cluster>
   </clusters>
 </deviceType>

@@ -72,6 +72,7 @@
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
 
+    // Non-concatenated properties reflect first payload
     XCTAssertFalse(payload.hasShortDiscriminator);
     XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 128);
     XCTAssertEqual(payload.setupPasscode.unsignedIntegerValue, 2048);
@@ -80,7 +81,16 @@
     XCTAssertEqual(payload.commissioningFlow, MTRCommissioningFlowStandard);
     XCTAssertEqual(payload.version.unsignedIntegerValue, 0);
     XCTAssertEqual(payload.discoveryCapabilities, MTRDiscoveryCapabilitiesSoftAP);
+
+    // qrCodeString preserves the full concatenated payload
     XCTAssertEqualObjects(payload.qrCodeString, concatenatedQRCode);
+
+    XCTAssertTrue(payload.concatenated);
+    XCTAssertEqual(payload.subPayloads.count, 2);
+
+    NSArray<NSString *> * parts = [concatenatedQRCode componentsSeparatedByString:@"*"];
+    XCTAssertEqualObjects(payload.subPayloads[0], [[MTRSetupPayload alloc] initWithPayload:parts[0]]);
+    XCTAssertEqualObjects(payload.subPayloads[1], [[MTRSetupPayload alloc] initWithPayload:[@"MT:" stringByAppendingString:parts[1]]]);
 }
 
 - (void)testOnboardingPayloadParser_QRCode_WrongVersion
@@ -147,6 +157,8 @@
     XCTAssertEqual(payload.commissioningFlow, MTRCommissioningFlowStandard);
     XCTAssertEqual(payload.version.unsignedIntegerValue, 0);
     XCTAssertEqual(payload.discoveryCapabilities, MTRDiscoveryCapabilitiesSoftAP);
+    XCTAssertFalse(payload.concatenated);
+    XCTAssertEqualObjects(payload.subPayloads, @[]);
 }
 
 - (void)testQRCodeParserWithOptionalData
@@ -405,6 +417,9 @@
         MTRSetupPayload * decoded = [NSKeyedUnarchiver unarchivedObjectOfClass:MTRSetupPayload.class fromData:data error:&error];
         XCTAssertNotNil(decoded, @"Error: %@", error);
 
+        XCTAssertEqual(decoded.concatenated, payload.concatenated);
+        XCTAssertEqualObjects(decoded.subPayloads, payload.subPayloads);
+
         XCTAssertEqualObjects(decoded.version, payload.version);
         XCTAssertEqualObjects(decoded.vendorID, payload.vendorID);
         XCTAssertEqualObjects(decoded.productID, payload.productID);
@@ -484,6 +499,17 @@
     XCTAssertTrue([payload isEqual:copy]);
     XCTAssertTrue([copy isEqual:payload]);
     XCTAssertEqual(payload.hash, copy.hash);
+
+    // The copy is concatenated and all sub-payloads were also copied
+    XCTAssertEqual(copy.concatenated, payload.concatenated);
+    XCTAssertEqual(copy.subPayloads.count, payload.subPayloads.count);
+    [payload.subPayloads enumerateObjectsUsingBlock:^(MTRSetupPayload * subPayload, NSUInteger idx, BOOL * stop) {
+        MTRSetupPayload * subCopy = copy.subPayloads[idx];
+        XCTAssertNotIdentical(subPayload, subCopy);
+        XCTAssertTrue([subPayload isEqual:subCopy]);
+        XCTAssertTrue([subCopy isEqual:subPayload]);
+        XCTAssertEqual(subPayload.hash, subCopy.hash);
+    }];
 }
 
 - (void)testCanParseFutureDiscoveryMethod

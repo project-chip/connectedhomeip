@@ -17,6 +17,7 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRCommissioningOperation.h>
 #import <Matter/MTRDeviceControllerDelegate.h>
+#import <Matter/MTRSetupPayload.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

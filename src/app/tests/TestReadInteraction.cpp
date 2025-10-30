@@ -24,6 +24,7 @@
 #include <app/InteractionModelHelper.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/EventDataIB.h>
+#include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
@@ -843,7 +844,8 @@ void TestReadInteraction::TestReadHandlerSetMaxReportingInterval()
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         // When an ICD build, the default behavior is to select the IdleModeDuration as MaxInterval
-        kMaxIntervalCeiling = readHandler.GetPublisherSelectedIntervalLimit();
+        kMaxIntervalCeiling =
+            std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
 #endif
         // Try to change the MaxInterval while ReadHandler is active
         EXPECT_EQ(readHandler.SetMaxReportingInterval(340), CHIP_ERROR_INCORRECT_STATE);
@@ -1880,7 +1882,8 @@ void TestReadInteraction::TestICDProcessSubscribeRequestSupMaxIntervalCeiling()
 
         EXPECT_EQ(readHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf)), CHIP_NO_ERROR);
 
-        uint16_t idleModeDuration = readHandler.GetPublisherSelectedIntervalLimit();
+        uint16_t idleModeDuration =
+            std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
 
         uint16_t minInterval;
         uint16_t maxInterval;
@@ -1949,7 +1952,8 @@ void TestReadInteraction::TestICDProcessSubscribeRequestInfMaxIntervalCeiling()
 
         EXPECT_EQ(readHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf)), CHIP_NO_ERROR);
 
-        uint16_t idleModeDuration = readHandler.GetPublisherSelectedIntervalLimit();
+        uint16_t idleModeDuration =
+            std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
 
         uint16_t minInterval;
         uint16_t maxInterval;
@@ -2018,7 +2022,8 @@ void TestReadInteraction::TestICDProcessSubscribeRequestSupMinInterval()
 
         EXPECT_EQ(readHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf)), CHIP_NO_ERROR);
 
-        uint16_t idleModeDuration = readHandler.GetPublisherSelectedIntervalLimit();
+        uint16_t idleModeDuration =
+            std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
 
         uint16_t minInterval;
         uint16_t maxInterval;
@@ -2102,7 +2107,7 @@ void TestReadInteraction::TestICDProcessSubscribeRequestMaxMinInterval()
 
 /**
  * @brief Test validates that an ICD will choose the MaxIntervalCeiling as MaxInterval if the next multiple after the MinInterval
- *        is greater than the IdleModeDuration and MaxIntervalCeiling
+ *        is greater than the publisher selected max interval limit and the MaxIntervalCeiling
  */
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestICDProcessSubscribeRequestInvalidIdleModeDuration)
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestICDProcessSubscribeRequestInvalidIdleModeDuration)
@@ -2114,8 +2119,10 @@ void TestReadInteraction::TestICDProcessSubscribeRequestInvalidIdleModeDuration(
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
 
-    uint16_t kMinInterval        = 400;
-    uint16_t kMaxIntervalCeiling = 400;
+    // Since the default IdleModeDuration is 300s for unit test,
+    // we need to set both values higher than 3600s which is the publisher selected max interval limit in this situation.
+    uint16_t kMinInterval        = 3610;
+    uint16_t kMaxIntervalCeiling = 3610;
 
     Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
 

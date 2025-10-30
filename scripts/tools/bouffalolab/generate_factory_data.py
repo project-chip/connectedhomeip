@@ -227,7 +227,7 @@ def gen_test_certs(chip_cert: str,
 
         der = Path(pem).with_suffix(".der")
         if not os.path.isfile(der):
-            cmd = [chip_cert, action, pem, der, "--x509-der", ]
+            cmd = [chip_cert, action, pem, der, "--x509-der"]
             subprocess.run(cmd)
 
         return der

@@ -125,10 +125,10 @@ Davis, CA 95616, USA
     <feature bit="12" code="UBOLT" name="Unbolting" summary="Lock supports unbolting">
       <optionalConform/>
     </feature>
-    <feature bit="13" code="ALIRO" name="AliroProvisioning" summary="Lock supports Aliro credential provisioning as defined in [Aliro&amp;#93;">
+    <feature bit="13" code="ALIRO" name="AliroProvisioning" summary="Lock supports Aliro credential provisioning as defined in Aliro">
       <optionalConform/>
     </feature>
-    <feature bit="14" code="ALBU" name="AliroBLEUWB" summary="Lock supports the Bluetooth LE + UWB Access Control Flow as defined in [Aliro&amp;#93;">
+    <feature bit="14" code="ALBU" name="AliroBLEUWB" summary="Lock supports the Bluetooth LE + UWB Access Control Flow as defined in Aliro">
       <optionalConform>
         <feature name="ALIRO"/>
       </optionalConform>
@@ -215,17 +215,17 @@ Davis, CA 95616, USA
           <feature name="FACE"/>
         </mandatoryConform>
       </item>
-      <item value="6" name="AliroCredentialIssuerKey" summary="A Credential Issuer public key as defined in [Aliro&amp;#93;">
+      <item value="6" name="AliroCredentialIssuerKey" summary="A Credential Issuer public key as defined in Aliro">
         <mandatoryConform>
           <feature name="ALIRO"/>
         </mandatoryConform>
       </item>
-      <item value="7" name="AliroEvictableEndpointKey" summary="An Endpoint public key as defined in [Aliro&amp;#93; which can be evicted if space is needed for another endpoint key">
+      <item value="7" name="AliroEvictableEndpointKey" summary="An Endpoint public key as defined in Aliro which can be evicted if space is needed for another endpoint key">
         <mandatoryConform>
           <feature name="ALIRO"/>
         </mandatoryConform>
       </item>
-      <item value="8" name="AliroNonEvictableEndpointKey" summary="An Endpoint public key as defined in [Aliro&amp;#93; which cannot be evicted if space is needed for another endpoint key">
+      <item value="8" name="AliroNonEvictableEndpointKey" summary="An Endpoint public key as defined in Aliro which cannot be evicted if space is needed for another endpoint key">
         <mandatoryConform>
           <feature name="ALIRO"/>
         </mandatoryConform>
@@ -509,7 +509,7 @@ Davis, CA 95616, USA
           <feature name="USR"/>
         </optionalConform>
       </item>
-      <item value="10" name="Aliro" summary="Lock/unlock operation came from an interaction defined in [Aliro&amp;#93;, or user change operation was a step-up credential provisioning as defined in [Aliro&amp;#93;">
+      <item value="10" name="Aliro" summary="Lock/unlock operation came from an interaction defined in Aliro, or user change operation was a step-up credential provisioning as defined in Aliro">
         <mandatoryConform>
           <feature name="ALIRO"/>
         </mandatoryConform>

@@ -28,6 +28,8 @@ from .errors import (TestStepEnumError, TestStepEnumSpecifierNotUnknownError, Te
 from .pics_checker import PICSChecker
 from .yaml_loader import YamlLoader
 
+LOGGER = logging.getLogger(__name__)
+
 ANY_COMMANDS_CLUSTER_NAME = 'AnyCommands'
 ANY_COMMANDS_LIST = [
     'CommandById',
@@ -85,8 +87,8 @@ class TestStepEventKeyError(UnknownPathQualifierError):
 
 class PostProcessCheckStatus(Enum):
     '''Indicates the post processing check step status.'''
-    SUCCESS = 'success',
-    WARNING = 'warning',
+    SUCCESS = 'success'
+    WARNING = 'warning'
     ERROR = 'error'
 
 
@@ -892,7 +894,7 @@ class TestStep:
             if last_event_number:
                 if 'LastReceivedEventNumber' in self._runtime_config_variable_storage:
                     if self._runtime_config_variable_storage['LastReceivedEventNumber'] > last_event_number:
-                        logging.warning(
+                        LOGGER.warning(
                             "Received an older event than expected: received %r < %r",
                             last_event_number,
                             self._runtime_config_variable_storage['LastReceivedEventNumber']

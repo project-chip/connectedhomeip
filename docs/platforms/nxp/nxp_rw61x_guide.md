@@ -25,6 +25,10 @@ The examples support:
 -   Matter over Openthread
 -   Matter over Wi-Fi with OpenThread Border Router support.
 
+> **Note:** For CMake builds, Matter over Wi-Fi is the default configuration
+> when no `prj_<flavour>.conf` file is specified in the
+> [build](#cmake-build-system).
+
 ### Supported build systems
 
 RW61x platform supports two different build systems to generate the application

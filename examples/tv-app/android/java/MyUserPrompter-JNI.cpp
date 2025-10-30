@@ -44,7 +44,7 @@ JNIMyUserPrompter::JNIMyUserPrompter(jobject provider)
     }
 
     mPromptForCommissionPincodeMethod =
-        env->GetMethodID(JNIMyUserPrompterClass, "promptForCommissionPinCode", "(IILjava/lang/String;)V");
+        env->GetMethodID(JNIMyUserPrompterClass, "promptForCommissionPinCode", "(IIILjava/lang/String;ILjava/lang/String;)V");
     if (mPromptForCommissionPincodeMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access JNIMyUserPrompter 'promptForCommissionPinCode' method");
@@ -59,7 +59,7 @@ JNIMyUserPrompter::JNIMyUserPrompter(jobject provider)
     }
 
     mPromptWithCommissionerPasscodeMethod =
-        env->GetMethodID(JNIMyUserPrompterClass, "promptWithCommissionerPasscode", "(IILjava/lang/String;JILjava/lang/String;)V");
+        env->GetMethodID(JNIMyUserPrompterClass, "promptWithCommissionerPasscode", "(IILjava/lang/String;JIILjava/lang/String;)V");
     if (mPromptWithCommissionerPasscodeMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access JNIMyUserPrompter 'promptWithCommissionerPasscode' method");
@@ -142,7 +142,7 @@ exit:
  *
  */
 void JNIMyUserPrompter::PromptForCommissionPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
-                                                    uint16_t pairingHint, const char * pairingInstruction)
+                                                    uint16_t pairingHint, const char * pairingInstruction, uint8_t passcodeLength)
 {
     DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -156,9 +156,12 @@ void JNIMyUserPrompter::PromptForCommissionPasscode(uint16_t vendorId, uint16_t 
         jstring jcommissioneeName = env->NewStringUTF(commissioneeName);
         VerifyOrExit(jcommissioneeName != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
 
+        ChipLogError(Zcl, "JNIMyUserPrompter::PromptForCommissionPasscode length=%d", static_cast<uint16_t>(passcodeLength));
+
         env->ExceptionClear();
         env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptForCommissionPincodeMethod, static_cast<jint>(vendorId),
-                            static_cast<jint>(productId), jcommissioneeName);
+                            static_cast<jint>(productId), static_cast<jint>(passcodeLength), jcommissioneeName,
+                            static_cast<jint>(pairingHint), pairingInstruction);
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in PromptForCommissionPincode");
@@ -234,7 +237,8 @@ bool JNIMyUserPrompter::DisplaysPasscodeAndQRCode()
  * For example "Casting Passcode: [passcode]. For more instructions, click here."
  */
 void JNIMyUserPrompter::PromptWithCommissionerPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
-                                                       uint32_t passcode, uint16_t pairingHint, const char * pairingInstruction)
+                                                       uint32_t passcode, uint8_t passcodeLength, uint16_t pairingHint,
+                                                       const char * pairingInstruction)
 {
     ChipLogError(Zcl, "JNIMyUserPrompter::PromptWithCommissionerPasscode");
 
@@ -256,7 +260,8 @@ void JNIMyUserPrompter::PromptWithCommissionerPasscode(uint16_t vendorId, uint16
         env->ExceptionClear();
         env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptWithCommissionerPasscodeMethod,
                             static_cast<jint>(vendorId), static_cast<jint>(productId), jcommissioneeName,
-                            static_cast<jlong>(passcode), static_cast<jint>(pairingHint), jpairingInstruction);
+                            static_cast<jlong>(passcode), static_cast<jint>(passcodeLength), static_cast<jint>(pairingHint),
+                            jpairingInstruction);
         if (env->ExceptionCheck())
         {
             ChipLogError(DeviceLayer, "Java exception in PromptWithCommissionerPasscode");

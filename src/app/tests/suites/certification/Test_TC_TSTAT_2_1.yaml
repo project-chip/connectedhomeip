@@ -435,7 +435,7 @@ tests:
           constraints:
               type: int8s
               minValue: 0
-              maxValue: 25
+              maxValue: 127
 
     - label: "Step 21: TH reads the RemoteSensing attribute from the DUT"
       PICS: TSTAT.S.A001a

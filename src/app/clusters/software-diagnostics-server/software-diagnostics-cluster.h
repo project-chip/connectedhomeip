@@ -130,9 +130,9 @@ public:
     }
 
 private:
-    // Encodes the `value` in `encoder`, while handling a potential `readError` that occured
+    // Encodes the `value` in `encoder`, while handling a potential `readError` that occurred
     // when the input `value` was read:
-    //   - CHIP_ERROR_NOT_IMPLEMENTED results in a 0 being encoded
+    //   - CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE results in a 0 being encoded
     //   - any other read error is just forwarded
     CHIP_ERROR EncodeValue(uint64_t value, CHIP_ERROR readError, AttributeValueEncoder & encoder)
     {

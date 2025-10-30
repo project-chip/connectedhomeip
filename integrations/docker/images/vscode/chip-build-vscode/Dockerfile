@@ -63,7 +63,6 @@ COPY --from=bouffalolab /opt/bouffalolab_sdk /opt/bouffalolab_sdk
 COPY --from=asr /opt/asr /opt/asr
 
 COPY --from=efr32 /opt/silabs/simplicity_sdk /opt/silabs/simplicity_sdk
-COPY --from=efr32 /opt/silabs/wiseconnect-wifi-bt-sdk /opt/silabs/wiseconnect-wifi-bt-sdk
 COPY --from=efr32 /opt/silabs/wifi_sdk /opt/silabs/wifi_sdk
 
 COPY --from=nuttx /opt/nuttx /opt/nuttx
@@ -74,15 +73,6 @@ COPY --from=nuttx /opt/nuttx /opt/nuttx
 RUN set -x \
   && mkdir -p /opt/android/sdk/licenses \
   && chmod -R a+w /opt/android/sdk/licenses \
-  && : # last line
-
-# mbedos requirements are generally just PIP packages
-RUN set -x \
-  && pip3 install --break-system-packages --no-cache-dir -U mbed-cli==1.10.5 mbed-tools==7.44.0 \
-  && : # last line
-RUN set -x \
-  && mbed config -G GCC_ARM_PATH /opt/mbed-os-toolchain/gcc-arm-none-eabi-9-2019-q4-major/bin/ \
-  && mbed toolchain -G -s GCC_ARM \
   && : # last line
 
 # Required for the Tizen SDK:
@@ -115,7 +105,6 @@ ENV SILABS_BOARD=BRD4186C
 ENV GSDK_ROOT=/opt/silabs/simplicity_sdk/
 ENV SISDK_ROOT=/opt/silabs/simplicity_sdk/
 ENV PATH=$PATH:/opt/silabs/slc_cli/
-ENV WISECONNECT_SDK_ROOT=/opt/silabs/wiseconnect-wifi-bt-sdk/
 ENV WIFI_SDK_ROOT=/opt/silabs/wifi_sdk
 ENV IDF_PATH=/opt/espressif/esp-idf/
 ENV IDF_TOOLS_PATH=/opt/espressif/tools

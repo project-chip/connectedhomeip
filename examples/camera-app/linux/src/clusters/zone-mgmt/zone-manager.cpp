@@ -17,6 +17,7 @@
  */
 
 #include "camera-device-interface.h"
+#include "camera-device.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -268,6 +269,11 @@ void ZoneManager::OnZoneTriggeredEvent(uint16_t zoneId,
             ChipLogProgress(Camera, "Trigger detected for ZoneId = %u, but ignored. Count = %u", zoneId,
                             foundTrigCtxt->triggerCount);
         }
+    }
+
+    if (mCameraDevice)
+    {
+        mCameraDevice->HandlePushAvZoneTrigger(zoneId);
     }
 }
 

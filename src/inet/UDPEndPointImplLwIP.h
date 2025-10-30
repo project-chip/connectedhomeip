@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
@@ -39,7 +39,6 @@ public:
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
     InterfaceId GetBoundInterface() const override;
     uint16_t GetBoundPort() const override;
-    void Free() override;
 
     /**
      * @brief Set the queue filter for all UDP endpoints

@@ -27,3 +27,4 @@ chip_error_logging = true
 chip_enable_icd_server = true
 chip_enable_icd_lit = true
 chip_enable_icd_dsls = true
+chip_app_data_model_target = "//:bouffalolab_contact_sensor"

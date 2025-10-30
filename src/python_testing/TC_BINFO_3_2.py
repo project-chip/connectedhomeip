@@ -51,6 +51,7 @@ class TC_BINFO_3_2(MatterBaseTest):
 
     def steps_TC_BINFO_3_2(self) -> list[TestStep]:
         steps = [
+            TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads ConfigurationVersion from the DUT and stores the value as initialConfigurationVersion",
                      "Verify that the value is in the inclusive range of 1 to 4294967295"),
             TestStep(2, "Change the configuration version in a way which results in functionality to be added or removed (e.g. rewire thermostat to support a new mode)"),
@@ -68,6 +69,7 @@ class TC_BINFO_3_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_BINFO_3_2(self):
+        self.step(0)
 
         endpoint = self.get_endpoint(default=0)
         attributes = Clusters.BasicInformation.Attributes

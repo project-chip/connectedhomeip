@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0102" name="Window Covering Cluster" revision="6">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0102" name="Window Covering Cluster" revision="7">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added; CCB 1994 1995 1996 1997 2086 2094 2095 2096 2097"/>
     <revision revision="2" summary="CCB 2328"/>
@@ -65,6 +65,7 @@ Davis, CA 95616, USA
     <revision revision="4" summary="All Hubs changes with FeatureMap &amp; OperationalStatus attribute"/>
     <revision revision="5" summary="New data model format and notation. Created plus clarified PositionAware and AbsolutePosition features. General cleanup of functionality."/>
     <revision revision="6" summary="Marked AbsolutePosition feature and associated elements provisional."/>
+    <revision revision="7" summary="Removed ABS feature and all associated elements from the cluster since it is disallowed by the Window Covering Device Type."/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0102" name="Window Covering"/>
@@ -81,12 +82,6 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="LF"/>
       </optionalConform>
-    </feature>
-    <feature bit="3" code="ABS" name="AbsolutePosition" summary="Absolute positioning is supported.">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
     </feature>
     <feature bit="4" code="PA_TL" name="PositionAwareTilt" summary="Position aware tilt control is supported.">
       <optionalConform>
@@ -317,82 +312,6 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0001" name="PhysicalClosedLimitLift" type="uint16" default="0">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform>
-          <andTerm>
-            <feature name="LF"/>
-            <feature name="PA_LF"/>
-            <feature name="ABS"/>
-          </andTerm>
-        </optionalConform>
-      </otherwiseConform>
-    </attribute>
-    <attribute id="0x0002" name="PhysicalClosedLimitTilt" type="uint16" default="0">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform>
-          <andTerm>
-            <feature name="TL"/>
-            <feature name="PA_TL"/>
-            <feature name="ABS"/>
-          </andTerm>
-        </optionalConform>
-      </otherwiseConform>
-    </attribute>
-    <attribute id="0x0003" name="CurrentPositionLift" type="uint16" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true" persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform>
-          <andTerm>
-            <feature name="LF"/>
-            <feature name="PA_LF"/>
-            <feature name="ABS"/>
-          </andTerm>
-        </optionalConform>
-      </otherwiseConform>
-      <constraint>
-        <between>
-          <from>
-            <attribute name="InstalledOpenLimitLift"/>
-          </from>
-          <to>
-            <attribute name="InstalledClosedLimitLift"/>
-          </to>
-        </between>
-      </constraint>
-    </attribute>
-    <attribute id="0x0004" name="CurrentPositionTilt" type="uint16" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true" persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform>
-          <andTerm>
-            <feature name="TL"/>
-            <feature name="PA_TL"/>
-            <feature name="ABS"/>
-          </andTerm>
-        </optionalConform>
-      </otherwiseConform>
-      <constraint>
-        <between>
-          <from>
-            <attribute name="InstalledOpenLimitTilt"/>
-          </from>
-          <to>
-            <attribute name="InstalledClosedLimitTilt"/>
-          </to>
-        </between>
-      </constraint>
-    </attribute>
     <attribute id="0x0005" name="NumberOfActuationsLift" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
@@ -439,6 +358,9 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality reportable="true"/>
       <mandatoryConform/>
+      <constraint>
+        <max value="63"/>
+      </constraint>
     </attribute>
     <attribute id="0x000B" name="TargetPositionLiftPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
@@ -494,93 +416,13 @@ Davis, CA 95616, USA
         <max value="10000"/>
       </constraint>
     </attribute>
-    <attribute id="0x0010" name="InstalledOpenLimitLift" type="uint16" default="0">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <andTerm>
-            <feature name="LF"/>
-            <feature name="PA_LF"/>
-            <feature name="ABS"/>
-          </andTerm>
-        </mandatoryConform>
-      </otherwiseConform>
-      <constraint>
-        <max value="65534"/>
-      </constraint>
-    </attribute>
-    <attribute id="0x0011" name="InstalledClosedLimitLift" type="uint16" default="65534">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <andTerm>
-            <feature name="LF"/>
-            <feature name="PA_LF"/>
-            <feature name="ABS"/>
-          </andTerm>
-        </mandatoryConform>
-      </otherwiseConform>
-      <constraint>
-        <max value="65534"/>
-      </constraint>
-    </attribute>
-    <attribute id="0x0012" name="InstalledOpenLimitTilt" type="uint16" default="0">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <andTerm>
-            <feature name="TL"/>
-            <feature name="PA_TL"/>
-            <feature name="ABS"/>
-          </andTerm>
-        </mandatoryConform>
-      </otherwiseConform>
-      <constraint>
-        <max value="65534"/>
-      </constraint>
-    </attribute>
-    <attribute id="0x0013" name="InstalledClosedLimitTilt" type="uint16" default="65534">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <andTerm>
-            <feature name="TL"/>
-            <feature name="PA_TL"/>
-            <feature name="ABS"/>
-          </andTerm>
-        </mandatoryConform>
-      </otherwiseConform>
-      <constraint>
-        <max value="65534"/>
-      </constraint>
-    </attribute>
-    <attribute id="0x0014" name="VelocityLift">
-      <deprecateConform/>
-    </attribute>
-    <attribute id="0x0015" name="AccelerationTimeLift">
-      <deprecateConform/>
-    </attribute>
-    <attribute id="0x0016" name="DecelerationTimeLift">
-      <deprecateConform/>
-    </attribute>
     <attribute id="0x0017" name="Mode" type="ModeBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0018" name="IntermediateSetpointsLift">
-      <deprecateConform/>
-    </attribute>
-    <attribute id="0x0019" name="IntermediateSetpointsTilt">
-      <deprecateConform/>
+      <constraint>
+        <max value="15"/>
+      </constraint>
     </attribute>
     <attribute id="0x001A" name="SafetyStatus" type="SafetyStatusBitmap" default="0">
       <access read="true" readPrivilege="view"/>
@@ -604,24 +446,6 @@ Davis, CA 95616, USA
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x04" name="GoToLiftValue" direction="commandToServer" response="Y">
-      <access invokePrivilege="operate"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform>
-          <andTerm>
-            <feature name="LF"/>
-            <feature name="ABS"/>
-          </andTerm>
-        </optionalConform>
-      </otherwiseConform>
-      <field id="0" name="LiftValue" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-    </command>
     <command id="0x05" name="GoToLiftPercentage" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <otherwiseConform>
@@ -636,24 +460,6 @@ Davis, CA 95616, USA
         </optionalConform>
       </otherwiseConform>
       <field id="0" name="LiftPercent100thsValue" type="percent100ths">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-    </command>
-    <command id="0x07" name="GoToTiltValue" direction="commandToServer" response="Y">
-      <access invokePrivilege="operate"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform>
-          <andTerm>
-            <feature name="TL"/>
-            <feature name="ABS"/>
-          </andTerm>
-        </optionalConform>
-      </otherwiseConform>
-      <field id="0" name="TiltValue" type="uint16">
         <mandatoryConform/>
         <constraint>
           <desc/>

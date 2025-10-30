@@ -77,8 +77,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kConnectionID), connectionID));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kTriggerType), triggerType));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kActivationReason), activationReason));
     return aWriter.EndContainer(outer);
 }
 
@@ -95,14 +93,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kConnectionID))
         {
             err = DataModel::Decode(reader, connectionID);
-        }
-        else if (__context_tag == to_underlying(Fields::kTriggerType))
-        {
-            err = DataModel::Decode(reader, triggerType);
-        }
-        else if (__context_tag == to_underlying(Fields::kActivationReason))
-        {
-            err = DataModel::Decode(reader, activationReason);
         }
         else
         {

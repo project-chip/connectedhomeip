@@ -117,6 +117,11 @@ matter_common_gn_args(
     DEVICE_INFO_EXAMPLE_PROVIDER CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 )
 
+if(NOT "${CONFIG_NXP_CUSTOM_UNIT_TESTS_DIR}" STREQUAL "")
+    # Only for NXP internal usage
+    matter_add_gn_arg_string("nxp_custom_unit_tests_dir" "${CONFIG_NXP_CUSTOM_UNIT_TESTS_DIR}")
+endif()
+
 matter_generate_args_tmp_file()
 
 # ==============================================================================

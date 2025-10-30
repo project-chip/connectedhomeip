@@ -64,8 +64,11 @@ class AppsRegister:
             accessory.kill()
 
     def killAll(self):
+        ok = True
         for accessory in self.__accessories.values():
-            accessory.kill()
+            # make sure to do kill() on all of our apps, even if some of them returned False
+            ok = accessory.kill() and ok
+        return ok
 
     def start(self, name, args):
         accessory = self.__accessories[name]

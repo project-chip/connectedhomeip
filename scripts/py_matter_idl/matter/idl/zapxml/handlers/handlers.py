@@ -22,7 +22,7 @@ from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
 from .parsing import AttrsToAccessPrivilege, AttrsToAttribute, ParseInt
 
-LOGGER = logging.getLogger('matter-xml-parser')
+LOGGER = logging.getLogger(__name__)
 
 
 def _IsConformanceTagName(name: str) -> bool:
@@ -415,7 +415,7 @@ class CommandHandler(BaseHandler):
             if name.endswith('Request'):
                 request_name = name
             else:
-                request_name = name+'Request'
+                request_name = name + 'Request'
 
             self._struct.name = request_name
 

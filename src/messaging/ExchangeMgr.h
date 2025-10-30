@@ -253,7 +253,7 @@ private:
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     void OnTCPConnectionClosed(const Transport::ActiveTCPConnectionState & conn, const SessionHandle & session,
                                CHIP_ERROR conErr) override;
-    bool OnTCPConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr) override;
+    bool OnTCPConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 

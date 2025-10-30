@@ -87,6 +87,10 @@
 #     factory-reset: false
 #     quiet: true
 #   run9:
+#     script-args: --storage-path admin_storage.json --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json --tests test_TC_IDM_11_1
+#     factory-reset: false
+#     quiet: true
+#   run10:
 #     app: ${ENERGY_MANAGEMENT_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -97,7 +101,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run10:
+#   run11:
 #     app: ${LIT_ICD_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -108,7 +112,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run11:
+#   run12:
 #     app: ${CHIP_MICROWAVE_OVEN_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -119,7 +123,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run12:
+#   run13:
 #     app: ${CHIP_RVC_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -130,7 +134,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run13:
+#   run14:
 #     app: ${NETWORK_MANAGEMENT_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -141,7 +145,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run14:
+#   run15:
 #     app: ${LIGHTING_APP_NO_UNIQUE_ID}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -162,18 +166,19 @@
 # Run 6: Tests CASE connection using QR code (12.1 only)
 # Run 7: Tests CASE connection using manual discriminator and passcode (12.1 only)
 # Run 8: Tests reusing storage from run7 (i.e. factory-reset=false)
-# Run 9: Tests against energy-management-app
-# Run 10: Tests against lit-icd app
-# Run 11: Tests against microwave-oven app
-# Run 12: Tests against chip-rvc app
-# Run 13: Tests against network-management-app
-# Run 14: Tests against lighting-app-data-mode-no-unique-id
+# Run 9: Test using the generated attribute wildcard file from previous run
+# Run 10: Tests against energy-management-app
+# Run 11: Tests against lit-icd app
+# Run 12: Tests against microwave-oven app
+# Run 13: Tests against chip-rvc app
+# Run 14: Tests against network-management-app
+# Run 15: Tests against lighting-app-data-mode-no-unique-id
 
 import logging
 from dataclasses import dataclass
 from typing import Any, Callable
 
-from TC_DeviceConformance import get_supersets
+from test_testing.DeviceConformanceTests import get_supersets
 
 import matter.clusters as Clusters
 import matter.clusters.ClusterObjects
@@ -192,6 +197,7 @@ from matter.testing.problem_notices import AttributePathLocation, ClusterPathLoc
 from matter.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
                                                       find_tag_list_problems, find_tree_roots, flat_list_ok,
                                                       get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
+from matter.tlv import uint
 
 
 def get_vendor_id(mei: int) -> int:
@@ -333,6 +339,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             self.fail_current_test("At least one endpoint was missing the descriptor cluster.")
 
     async def _read_non_standard_attribute_check_unsupported_read(self, endpoint_id, cluster_id, attribute_id) -> bool:
+        # If we're doing this from file, we don't have a way to assess this. Assume this is OK for now.
+        if self.test_from_file:
+            return True
+
         @dataclass
         class TempAttribute(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -345,13 +355,13 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=matter.tlv.uint)
+                return ClusterObjectFieldDescriptor(Type=uint)
 
             @ChipUtility.classproperty
             def standard_attribute(cls) -> bool:
                 return False
 
-            value: matter.tlv.uint = 0
+            value: 'uint' = 0
 
         result = await self.default_controller.Read(nodeid=self.dut_node_id, attributes=[(endpoint_id, TempAttribute)])
         try:

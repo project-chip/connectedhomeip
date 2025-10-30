@@ -63,6 +63,12 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
     }
 
     OTATlvProcessor::vOtaProcessInternalEncryption(byteBlock);
+    if (IsLastBlock())
+    {
+        // Remove padding from the last block since if the file was padded, last block will contain padding bytes.
+        VerifyOrReturnError(OTATlvProcessor::RemovePadding(byteBlock) == CHIP_NO_ERROR, CHIP_ERROR_WRONG_ENCRYPTION_TYPE,
+                            ChipLogError(SoftwareUpdate, "Failed to remove padding"));
+    }
     block = byteBlock;
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 

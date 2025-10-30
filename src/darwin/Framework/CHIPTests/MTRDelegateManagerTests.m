@@ -23,9 +23,33 @@
 @end
 
 @interface MTRDelegateManagerTestsDelegateImpl : NSObject <MTRDelegateManagerTestsDelegate>
+- (instancetype)initWithDeallocExpectation:(XCTestExpectation *)deallocExpectation;
+@property (nonatomic, readonly, nullable) XCTestExpectation * deallocExpectation;
 @end
 
 @implementation MTRDelegateManagerTestsDelegateImpl
+- (instancetype)init
+{
+    self = [super init];
+    NSLog(@"Initializing delegate %p", self);
+    return self;
+}
+
+- (instancetype)initWithDeallocExpectation:(XCTestExpectation *)deallocExpectation
+{
+    self = [super init];
+    NSLog(@"Initializing delegate %p", self);
+    _deallocExpectation = deallocExpectation;
+    return self;
+}
+
+- (void)dealloc
+{
+    NSLog(@"Deallocating delegate %p", self);
+    if (_deallocExpectation) {
+        [_deallocExpectation fulfill];
+    }
+}
 @end
 
 @interface MTRDelegateManagerTestsDelegateInfo : MTRDelegateInfo <id <MTRDelegateManagerTestsDelegate>>
@@ -151,8 +175,9 @@
     __auto_type * info3 = [[MTRDelegateManagerTestsDelegateInfo alloc] initWithDelegate:delegate3 queue:queue3];
 
     MTRDelegateManagerTestsDelegateInfo * info1;
+    __auto_type * delegate1DeallocExpectation = [self expectationWithDescription:@"Delegate 1 deallocated"];
     @autoreleasepool {
-        __auto_type * delegate1 = [[MTRDelegateManagerTestsDelegateImpl alloc] init];
+        __auto_type * delegate1 = [[MTRDelegateManagerTestsDelegateImpl alloc] initWithDeallocExpectation:delegate1DeallocExpectation];
         info1 = [[MTRDelegateManagerTestsDelegateInfo alloc] initWithDelegate:delegate1 queue:dispatch_get_main_queue()];
 
         [manager addDelegateInfo:info1];
@@ -173,19 +198,18 @@
                 dispatch_assert_queue(queue3);
                 [expectation3 fulfill];
             } else {
-                XCTFail("Unexpected delegate %@:", delegate);
+                XCTFail("Unexpected delegate: %@", delegate);
             }
         }];
 
-        [self waitForExpectations:@[ expectation1, expectation3, expectation2 ]]; // NOTE: No particular ordering required
+        [self waitForExpectations:@[ expectation1, expectation3, expectation2 ] timeout:3]; // NOTE: No particular ordering required
     }
 
     // Now delegate1 should go away.
+    [self waitForExpectations:@[ delegate1DeallocExpectation ] timeout:3];
 
-    __auto_type * expectation1 = [self expectationWithDescription:@"Delegate 1 again"];
     __auto_type * expectation2 = [self expectationWithDescription:@"Delegate 2 again"];
     __auto_type * expectation3 = [self expectationWithDescription:@"Delegate 3 again"];
-    expectation1.inverted = YES;
     [manager callDelegatesWithBlock:^(MTRDelegateManagerTestsDelegateImpl * delegate) {
         if (delegate == delegate2) {
             dispatch_assert_queue(dispatch_get_main_queue());
@@ -194,12 +218,11 @@
             dispatch_assert_queue(queue3);
             [expectation3 fulfill];
         } else {
-            dispatch_assert_queue(dispatch_get_main_queue());
-            [expectation1 fulfill];
+            XCTFail("Unexpected delegate: %@", delegate);
         }
     }];
 
-    [self waitForExpectations:@[ expectation3, expectation2, expectation1 ] timeout:3]; // NOTE: No particular ordering required
+    [self waitForExpectations:@[ expectation3, expectation2 ] timeout:3]; // NOTE: No particular ordering required
 }
 
 @end

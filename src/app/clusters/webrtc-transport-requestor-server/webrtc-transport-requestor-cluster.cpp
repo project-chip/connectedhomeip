@@ -39,10 +39,6 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Commands::End::kMetadataEntry,
 };
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
-    CurrentSessions::kMetadataEntry,
-};
-
 NodeId GetNodeIdFromCtx(const CommandHandler & commandHandler)
 {
     auto descriptor = commandHandler.GetSubjectDescriptor();
@@ -143,7 +139,7 @@ CHIP_ERROR WebRTCTransportRequestorServer::Attributes(const ConcreteClusterPath 
                                                       ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(kMandatoryAttributes), {}, {});
+    return listBuilder.Append(Span(kMandatoryMetadata), {}, {});
 }
 
 uint16_t WebRTCTransportRequestorServer::GenerateSessionId()
@@ -264,6 +260,14 @@ WebRTCTransportRequestorServer::HandleICECandidates(const CommandHandler & comma
     {
         // Get current candidate.
         const ICECandidateStruct & candidate = iter.GetValue();
+
+        // Validate SDPMid constraint: if present, must have min length 1
+        if (!candidate.SDPMid.IsNull() && candidate.SDPMid.Value().empty())
+        {
+            ChipLogError(Zcl, "HandleICECandidates: SDPMid must have minimum length of 1 when present");
+            return Status::ConstraintError;
+        }
+
         candidates.push_back(candidate);
     }
 

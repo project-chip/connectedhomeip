@@ -26,7 +26,6 @@
 #include <stdbool.h> // For bool
 #include <stdint.h>  // For various uint*_t types
 
-#include <app/util/AttributesChangedListener.h>
 #include <app/util/MarkAttributeDirty.h>
 #include <app/util/basic-types.h>
 #include <app/util/types_stub.h> // For various types.

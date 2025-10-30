@@ -724,7 +724,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
 
         self.step("44")
         # TH removes the subscription to Commodity Tariff cluster attributes
-        subscription_handler.cancel()
+        await subscription_handler.cancel()
 
 
 if __name__ == "__main__":

@@ -129,11 +129,9 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="1" name="GroupKeySecurityPolicy" type="GroupKeySecurityPolicyEnum">
-        <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="EpochKey0" type="octstr">
-        <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
@@ -141,12 +139,10 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="3" name="EpochStartTime0" type="epoch-us">
-        <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="4" name="EpochKey1" type="octstr">
-        <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
@@ -154,12 +150,10 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="5" name="EpochStartTime1" type="epoch-us">
-        <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="6" name="EpochKey2" type="octstr">
-        <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
@@ -167,12 +161,10 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="7" name="EpochStartTime2" type="epoch-us">
-        <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="8" name="GroupKeyMulticastPolicy" type="GroupKeyMulticastPolicyEnum">
-        <access fabricSensitive="true"/>
         <otherwiseConform>
           <provisionalConform/>
           <mandatoryConform/>

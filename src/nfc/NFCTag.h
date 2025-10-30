@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <lib/core/CHIPError.h>
 #include <lib/support/DLLUtil.h>
 #include <system/SystemPacketBuffer.h>

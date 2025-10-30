@@ -190,7 +190,7 @@ enum class Fields : uint8_t
     kStreamUsage      = 0,
     kVideoStreamID    = 1,
     kAudioStreamID    = 2,
-    kEndpointID       = 3,
+    kTLSEndpointID    = 3,
     kUrl              = 4,
     kTriggerOptions   = 5,
     kIngestMethod     = 6,
@@ -204,7 +204,7 @@ public:
     Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
-    uint16_t endpointID = static_cast<uint16_t>(0);
+    uint16_t TLSEndpointID = static_cast<uint16_t>(0);
     chip::CharSpan url;
     Structs::TransportTriggerOptionsStruct::Type triggerOptions;
     IngestMethodsEnum ingestMethod = static_cast<IngestMethodsEnum>(0);
@@ -222,7 +222,7 @@ public:
     Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
-    uint16_t endpointID = static_cast<uint16_t>(0);
+    uint16_t TLSEndpointID = static_cast<uint16_t>(0);
     chip::CharSpan url;
     Structs::TransportTriggerOptionsStruct::DecodableType triggerOptions;
     IngestMethodsEnum ingestMethod = static_cast<IngestMethodsEnum>(0);

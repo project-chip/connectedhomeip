@@ -74,6 +74,7 @@
 #include <clusters/GeneralCommissioning/EventIds.h>
 #include <clusters/GeneralDiagnostics/EventIds.h>
 #include <clusters/GroupKeyManagement/EventIds.h>
+#include <clusters/Groupcast/EventIds.h>
 #include <clusters/Groups/EventIds.h>
 #include <clusters/HepaFilterMonitoring/EventIds.h>
 #include <clusters/IcdManagement/EventIds.h>

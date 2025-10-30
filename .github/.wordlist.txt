@@ -1612,6 +1612,7 @@ VSC
 VSCode
 WaitNewInputEvent
 WakeOnLan
+Walkthrough
 WantedBy
 watchdogTimeout
 watchOS

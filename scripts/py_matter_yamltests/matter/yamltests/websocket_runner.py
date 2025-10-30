@@ -25,6 +25,8 @@ import websockets
 from .hooks import WebSocketRunnerHooks
 from .runner import TestRunner
 
+LOGGER = logging.getLogger(__name__)
+
 _KEEP_ALIVE_TIMEOUT_IN_SECONDS = 120
 _MAX_MESSAGE_SIZE_IN_BYTES = 10485760  # 10 MB
 _CONNECT_MAX_RETRIES_DEFAULT = 4
@@ -36,7 +38,7 @@ _WEBSOCKET_SERVER_TERMINATE_TIMEOUT = 10  # seconds
 @dataclass
 class WebSocketRunnerConfig:
     server_address: str = 'localhost'
-    server_port: int = '9002'
+    server_port: int = 9002
     server_path: str = None
     server_arguments: str = None
     hooks: WebSocketRunnerHooks = WebSocketRunnerHooks()
@@ -105,16 +107,20 @@ class WebSocketRunner(TestRunner):
         if command:
             start_time = time.time()
 
-            command = ['stdbuf', '-o0', '-e0'] + command  # disable buffering
             instance = subprocess.Popen(
-                command, text=False, bufsize=0, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                command,
+                bufsize=0,                  # unbuffered
+                text=False,                 # keep output as bytes
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+            )
 
             # Loop to read the subprocess output with a timeout
             lines = []
             while True:
                 if time.time() - start_time > _WEBSOCKET_SERVER_MESSAGE_TIMEOUT:
                     for line in lines:
-                        print(line.decode('utf-8'), end='')
+                        print(line.decode('utf-8', errors='replace'), end='')
                     self._hooks.abort(url)
                     await self._stop_server(instance)
                     raise Exception(
@@ -123,9 +129,9 @@ class WebSocketRunner(TestRunner):
                 ready, _, _ = select.select([instance.stdout], [], [], 1)
                 if ready:
                     line = instance.stdout.readline()
-                    if len(line):
+                    if line:
                         lines.append(line)
-                        if re.search(_WEBSOCKET_SERVER_MESSAGE, line.decode('utf-8')):
+                        if re.search(_WEBSOCKET_SERVER_MESSAGE, line.decode('utf-8', errors='replace')):
                             break  # Exit the loop if the pattern is found
                 else:
                     continue
@@ -139,7 +145,7 @@ class WebSocketRunner(TestRunner):
             try:
                 instance.wait(_WEBSOCKET_SERVER_TERMINATE_TIMEOUT)
             except subprocess.TimeoutExpired:
-                logging.debug(
+                LOGGER.debug(
                     'Subprocess did not terminate on SIGTERM, killing it now')
                 instance.kill()
 

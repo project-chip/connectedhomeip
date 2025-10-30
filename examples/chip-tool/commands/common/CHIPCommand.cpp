@@ -158,6 +158,11 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
         port = static_cast<uint16_t>(port + CurrentCommissionerId());
     }
     factoryInitParams.listenPort = port;
+    if (mInterfaceId.HasValue())
+    {
+        factoryInitParams.interfaceId =
+            chip::Inet::InterfaceId(static_cast<chip::Inet::InterfaceId::PlatformType>(mInterfaceId.Value()));
+    }
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
     auto systemState = chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState();
