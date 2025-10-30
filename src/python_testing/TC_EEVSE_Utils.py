@@ -176,7 +176,7 @@ class EEVSEBaseTestHelper:
 
             # If the command was expected to fail but it succeeded, check it wasn't meant to fail
             asserts.assert_equal(expected_status, Status.Success,
-                                f"Unexpected Success returned when expected {expected_status}")
+                                 f"Unexpected Success returned when expected {expected_status}")
 
         except InteractionModelError as e:
             # The command failed, which might be what we expected, check if it is the expected error
@@ -195,7 +195,7 @@ class EEVSEBaseTestHelper:
                                        endpoint=endpoint,
                                        timedRequestTimeoutMs=timedRequestTimeoutMs)
 
-            # If the command was expected to fail but it succeeded, check it wasn't meant to fail            
+            # If the command was expected to fail but it succeeded, check it wasn't meant to fail
             asserts.assert_equal(expected_status, Status.Success,
                                  f"Unexpected Success returned when expected {expected_status}")
 
