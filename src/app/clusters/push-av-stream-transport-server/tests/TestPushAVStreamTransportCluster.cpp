@@ -62,7 +62,6 @@ public:
     bool IsTimedInvoke() const override { return mIsTimedInvoke; }
     void FlushAcksRightAwayOnSlowCommand() override { mAcksFlushed = true; }
     Messaging::ExchangeContext * GetExchangeContext() const override { return mExchangeContext; }
-    Access::SubjectDescriptor GetSubjectDescriptor() const override { return mSubjectDescriptor; }
 
     // Configuration methods for testing
     void SetTimedInvoke(bool isTimed) { mIsTimedInvoke = isTimed; }
@@ -72,7 +71,6 @@ private:
     bool mIsTimedInvoke                           = false;
     bool mAcksFlushed                             = false;
     Messaging::ExchangeContext * mExchangeContext = nullptr;
-    Access::SubjectDescriptor mSubjectDescriptor;
 };
 
 static uint8_t gDebugEventBuffer[120];

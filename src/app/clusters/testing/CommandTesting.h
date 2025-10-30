@@ -126,7 +126,7 @@ public:
 private:
     std::vector<ResponseRecord> mResponses;
     std::vector<StatusRecord> mStatuses;
-    FabricIndex mFabricIndex = 1; // Default to 1 to maintain backward compatibility
+    FabricIndex mFabricIndex = 1; // Default to a valid fabric index for general test usage.
 };
 
 } // namespace Testing
