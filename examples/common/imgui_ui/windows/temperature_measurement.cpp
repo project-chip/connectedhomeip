@@ -17,12 +17,11 @@
 #include "temperature_measurement.h"
 #include "helpers.h"
 
-#include <imgui.h>
-
-#include <math.h>
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
+
+#include <imgui.h>
+#include <math.h>
 
 namespace example {
 namespace Ui {

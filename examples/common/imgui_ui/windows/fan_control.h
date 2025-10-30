@@ -18,13 +18,14 @@
 
 #include "window.h"
 
+#include <app/data-model/Nullable.h>
+#include <app-common/zap-generated/cluster-enums.h>
+
+#include <lib/core/DataModelTypes.h>
+
 #include <stdint.h>
 #include <string>
 
-#include <app/data-model/Nullable.h>
-#include <lib/core/DataModelTypes.h>
-
-#include <app-common/zap-generated/cluster-enums.h>
 
 namespace example {
 namespace Ui {
