@@ -204,12 +204,25 @@ void UDPEndPointImplLwIP::CloseImpl()
 {
     assertChipStackLockedByCurrentThread();
 
+#if CHIP_DETAIL_LOGGING
+    ChipLogProgress(Inet, "CloseImpl: ENTRY ep=%p pcb=%p delay=%d state=%d", this, mUDP, 
+                    static_cast<int>(mDelayReleaseCount.load()), static_cast<int>(mState));
+#endif
+
     // Since UDP PCB is released synchronously here, but UDP endpoint itself might have to wait
     // for destruction asynchronously, there could be more allocated UDP endpoints than UDP PCBs.
     if (mUDP == nullptr)
     {
+#if CHIP_DETAIL_LOGGING
+        ChipLogProgress(Inet, "CloseImpl: EXIT early (already closed) ep=%p delay=%d state=%d", this, 
+                        static_cast<int>(mDelayReleaseCount.load()), static_cast<int>(mState));
+#endif
         return;
     }
+#if CHIP_DETAIL_LOGGING
+    ChipLogProgress(Inet, "CloseImpl: removing PCB ep=%p pcb=%p delay=%d state=%d", this, mUDP, 
+                    static_cast<int>(mDelayReleaseCount.load()), static_cast<int>(mState));
+#endif
     RunOnTCPIP([this]() { udp_remove(mUDP); });
     mUDP              = nullptr;
     mLwIPEndPointType = LwIPEndPointType::Unknown;
@@ -218,10 +231,40 @@ void UDPEndPointImplLwIP::CloseImpl()
     // event pending in the event queue (SystemLayer::ScheduleLambda), we
     // schedule a unref call to the end of the queue, to ensure that the
     // queued pointer to UDPEndPointImplLwIP is not dangling.
-    if (mDelayReleaseCount != 0)
+    int32_t currentDelayCount = mDelayReleaseCount.load();
+    if (currentDelayCount != 0)
     {
+#if CHIP_DETAIL_LOGGING
+        ChipLogProgress(Inet, "CloseImpl: delayReleaseCount=%d scheduling deferred Unref ep=%p", static_cast<int>(currentDelayCount),
+                        this);
+#endif
         Ref();
-        CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this] { Unref(); });
+        // Capture the instance ID to validate this is still the same endpoint instance
+        uint32_t expectedInstanceId = mInstanceId.load();
+        CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this, expectedInstanceId] {
+#if CHIP_DETAIL_LOGGING
+            ChipLogProgress(Inet, "DeferredUnref: ENTRY ep=%p expected_id=%u current_id=%u pcb=%p ref=%lu", 
+                            this, static_cast<unsigned>(expectedInstanceId), static_cast<unsigned>(mInstanceId.load()),
+                            mUDP, (unsigned long) GetReferenceCount());
+#endif
+            // Verify this is still the same endpoint instance by checking the instance ID
+            if (mInstanceId.load() != expectedInstanceId)
+            {
+#if CHIP_DETAIL_LOGGING
+                ChipLogProgress(Inet, "DeferredUnref: SKIPPING - endpoint was reused ep=%p expected_id=%u current_id=%u", 
+                                this, static_cast<unsigned>(expectedInstanceId), static_cast<unsigned>(mInstanceId.load()));
+#endif
+                // This endpoint memory was reused for a new endpoint with different instance ID.
+                // The original endpoint this Unref was intended for is already gone.
+                return;
+            }
+            
+#if CHIP_DETAIL_LOGGING
+            ChipLogProgress(Inet, "DeferredUnref: EXECUTING Unref ep=%p id=%u ref=%lu", 
+                            this, static_cast<unsigned>(expectedInstanceId), (unsigned long) GetReferenceCount());
+#endif
+            Unref();
+        });
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Inet, "Unable to schedule lambda: %" CHIP_ERROR_FORMAT, err.Format());
@@ -229,6 +272,10 @@ void UDPEndPointImplLwIP::CloseImpl()
             Unref();
         }
     }
+#if CHIP_DETAIL_LOGGING
+    ChipLogProgress(Inet, "CloseImpl: EXIT ep=%p PCB freed delay=%d state=%d", this, 
+                    static_cast<int>(mDelayReleaseCount.load()), static_cast<int>(mState));
+#endif
 }
 
 void UDPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && msg, IPPacketInfo * pktInfo)
@@ -376,14 +423,65 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
 
     // Increase mDelayReleaseCount to delay release of this UDP EndPoint while the HandleDataReceived call is
     // pending on it.
+#if CHIP_DETAIL_LOGGING
+    int32_t preIncDelay = ep->mDelayReleaseCount.load();
+#endif
     ep->mDelayReleaseCount++;
+#if CHIP_DETAIL_LOGGING
+    ChipLogProgress(Inet, "LwIPReceiveUDPMessage: INCREMENT delay ep=%p pcb=%p delay=%d->%d size=%u state=%d ref=%lu", ep, pcb,
+                    static_cast<int>(preIncDelay), static_cast<int>(ep->mDelayReleaseCount.load()), 
+                    buf->TotalLength(), static_cast<int>(ep->mState), (unsigned long) ep->GetReferenceCount());
+#endif
 
+    // Capture the instance ID to validate this is still the same endpoint instance
+    uint32_t expectedInstanceId = ep->mInstanceId.load();
     CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda(
-        [ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf), pktInfo = pktInfo.get()] {
+        [ep, pcb, expectedInstanceId, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf), pktInfo = pktInfo.get()] {
+#if CHIP_DETAIL_LOGGING
+            int32_t preDecDelay = ep->mDelayReleaseCount.load();
+            ChipLogProgress(Inet, "LwIPReceiveUDPMessage lambda: ENTRY ep=%p pcb=%p preDelay=%d state=%d ref=%lu id=%u->%u", ep, pcb,
+                            static_cast<int>(preDecDelay), static_cast<int>(ep->mState), (unsigned long) ep->GetReferenceCount(),
+                            static_cast<unsigned>(expectedInstanceId), static_cast<unsigned>(ep->mInstanceId.load()));
+#endif
+            
+            // Critical check: Verify this lambda is for the correct endpoint instance
+            // by comparing the instance ID. If they don't match, this endpoint was 
+            // deleted and recreated at the same memory address.
+            if (ep->mInstanceId.load() != expectedInstanceId)
+            {
+#if CHIP_DETAIL_LOGGING
+                ChipLogProgress(Inet, "LwIPReceiveUDPMessage lambda: STALE LAMBDA detected ep=%p pcb=%p expected_id=%u current_id=%u - dropping packet", 
+                                ep, pcb, static_cast<unsigned>(expectedInstanceId), static_cast<unsigned>(ep->mInstanceId.load()));
+#endif
+                // This is a stale lambda for a previously deleted endpoint.
+                // The memory was reused for a new endpoint with different instance ID.
+                pbuf_free(p);
+                return;
+            }
+            
+            int32_t oldDelay = ep->mDelayReleaseCount.load();
             ep->mDelayReleaseCount--;
+            
+#if CHIP_DETAIL_LOGGING
+            int32_t postDecDelay = ep->mDelayReleaseCount.load();
+            ChipLogProgress(Inet, "LwIPReceiveUDPMessage lambda: DECREMENT delay ep=%p pcb=%p delay=%d->%d state=%d", ep, pcb,
+                            static_cast<int>(oldDelay), static_cast<int>(postDecDelay), static_cast<int>(ep->mState));
+            
+            // Log warning if we went negative
+            if (postDecDelay < 0) {
+                ChipLogError(Inet, "LwIPReceiveUDPMessage lambda: WARNING negative delay! ep=%p pcb=%p delay=%d", ep, pcb, static_cast<int>(postDecDelay));
+            }
+#endif
 
             auto handle = System::PacketBufferHandle::Adopt(p);
+#if CHIP_DETAIL_LOGGING
+            ChipLogProgress(Inet, "LwIPReceiveUDPMessage lambda: calling HandleDataReceived ep=%p pcb=%p", ep, pcb);
+#endif
             ep->HandleDataReceived(std::move(handle), pktInfo);
+#if CHIP_DETAIL_LOGGING
+            ChipLogProgress(Inet, "LwIPReceiveUDPMessage lambda: COMPLETED ep=%p pcb=%p delay=%d", ep, pcb,
+                            static_cast<int>(ep->mDelayReleaseCount.load()));
+#endif
         });
 
     if (err == CHIP_NO_ERROR)
@@ -395,6 +493,10 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
     }
     else
     {
+#if CHIP_DETAIL_LOGGING
+        ChipLogError(Inet, "LwIPReceiveUDPMessage: ScheduleLambda FAILED ep=%p pcb=%p err=%" CHIP_ERROR_FORMAT " delay=%d state=%d", 
+                     ep, pcb, err.Format(), static_cast<int>(ep->mDelayReleaseCount.load()), static_cast<int>(ep->mState));
+#endif
         // On failure to enqueue the processing, we have to tell the filter that
         // the packet is basically dequeued, if it tries to keep track of the lifecycle.
         if (sQueueFilter != nullptr)
@@ -403,7 +505,24 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
             ChipLogError(Inet, "Dequeue ERROR err = %" CHIP_ERROR_FORMAT, err.Format());
         }
 
+        int32_t oldDelay = ep->mDelayReleaseCount.load();
+#if CHIP_DETAIL_LOGGING
+        ChipLogError(Inet, "LwIPReceiveUDPMessage: FAILURE PATH DECREMENT ep=%p pcb=%p preDelay=%d state=%d ref=%lu", ep, pcb,
+                     static_cast<int>(oldDelay), static_cast<int>(ep->mState), (unsigned long) ep->GetReferenceCount());
+#endif
+        
         ep->mDelayReleaseCount--;
+        
+#if CHIP_DETAIL_LOGGING
+        int32_t postDecDelay = ep->mDelayReleaseCount.load();
+        ChipLogError(Inet, "LwIPReceiveUDPMessage: FAILURE PATH DECREMENTED delay ep=%p pcb=%p %d->%d", ep, pcb,
+                     static_cast<int>(oldDelay), static_cast<int>(postDecDelay));
+        
+        // Log warning if we went negative
+        if (postDecDelay < 0) {
+            ChipLogError(Inet, "LwIPReceiveUDPMessage: FAILURE PATH WARNING negative delay! ep=%p pcb=%p delay=%d", ep, pcb, static_cast<int>(postDecDelay));
+        }
+#endif
     }
 }
 
