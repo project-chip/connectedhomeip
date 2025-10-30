@@ -184,7 +184,9 @@ tests:
           constraints:
               minValue: 1
 
-    - label: "Force-fail if minRevision is not handled properly (should be skipped by minRevision). Used to test YAML minRevision support."
+    - label:
+          "Force-fail if minRevision is not handled properly (should be skipped
+          by minRevision). Used to test YAML minRevision support."
       command: "readAttribute"
       attribute: "MaxPathsPerInvoke"
       minRevision: 100
@@ -192,7 +194,9 @@ tests:
           constraints:
               maxValue: 0
 
-    - label: "Force-fail if maxRevision is not handled properly (should be skipped by maxRevision). Used to test YAML maxRevision support."
+    - label:
+          "Force-fail if maxRevision is not handled properly (should be skipped
+          by maxRevision). Used to test YAML maxRevision support."
       command: "readAttribute"
       attribute: "MaxPathsPerInvoke"
       maxRevision: 1
