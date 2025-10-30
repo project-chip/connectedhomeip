@@ -19,9 +19,9 @@
 #include "pushav-uploader.h"
 #include <algorithm>
 #include <cstring>
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
-#include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
 #include <openssl/bio.h>
 #include <openssl/pem.h>
@@ -41,6 +41,22 @@ PushAVUploader::~PushAVUploader()
     }
 
     Stop();
+
+    while (!mAvData.empty())
+    {
+        std::pair<std::string, std::string> uploadJob = std::move(mAvData.front());
+        mAvData.pop();
+
+        std::error_code ec;
+        if (!std::filesystem::remove(uploadJob.first, ec))
+        {
+            ChipLogError(Camera, "Failed to delete file: %s, error: %s", uploadJob.first.c_str(), ec.message().c_str());
+        }
+        else
+        {
+            ChipLogDetail(Camera, "Successfully deleted file: %s", uploadJob.first.c_str());
+        }
+    }
 }
 
 // Helper function to convert certificate from DER format to PEM format
@@ -318,9 +334,10 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     // Extract the filename from the full path
     std::string fullPath = data.first;
     std::string filename;
-    if (fullPath.substr(0, 5) == "/tmp/")
+    size_t sessionPos = fullPath.find("/session_");
+    if (sessionPos != std::string::npos)
     {
-        filename = fullPath.substr(5);
+        filename = fullPath.substr(sessionPos + 1);
     }
     else
     {
@@ -396,6 +413,22 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     {
         ChipLogDetail(Camera, "CURL uploaded file  %s size: %ld", data.first.c_str(), size);
     }
+
+    bool isMPDFile = (dotPos != std::string::npos && data.first.substr(dotPos) == ".mpd");
+
+    if (!isMPDFile)
+    {
+        std::error_code ec;
+        if (!std::filesystem::remove(data.first, ec))
+        {
+            ChipLogError(Camera, "Failed to delete file: %s, error: %s", data.first.c_str(), ec.message().c_str());
+        }
+        else
+        {
+            ChipLogDetail(Camera, "Successfully deleted file: %s", data.first.c_str());
+        }
+    }
+
     if (upload.mData)
     {
         std::free(upload.mData);
