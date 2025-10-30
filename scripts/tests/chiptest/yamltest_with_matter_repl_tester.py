@@ -39,7 +39,7 @@ from matter.ChipStack import ChipStack
 from matter.storage import PersistentStorageJSON
 from matter.yaml.runner import ReplTestRunner
 from matter.yamltests.definitions import SpecDefinitionsFromPaths
-from matter.yamltests.parser import build_revision_var_name, PostProcessCheckStatus, TestParser, TestParserConfig
+from matter.yamltests.parser import PostProcessCheckStatus, TestParser, TestParserConfig, build_revision_var_name
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
