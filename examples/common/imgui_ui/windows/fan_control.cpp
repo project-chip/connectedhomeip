@@ -95,19 +95,19 @@ void FanControl::UpdateState()
                         &chip::app::Clusters::FanControl::Attributes::SpeedSetting::Set,
                         &chip::app::Clusters::FanControl::Attributes::SpeedSetting::Get);
 
-    UpdateStateOptional(mEndpointId, mTargetRockSupport, mRockSupport,
+    UpdateStateEnum(mEndpointId, mTargetRockSupport, mRockSupport,
                         &chip::app::Clusters::FanControl::Attributes::RockSupport::Set,
                         &chip::app::Clusters::FanControl::Attributes::RockSupport::Get);
 
-    UpdateStateOptional(mEndpointId, mTargetRockSetting, mRockSetting,
+    UpdateStateEnum(mEndpointId, mTargetRockSetting, mRockSetting,
                         &chip::app::Clusters::FanControl::Attributes::RockSetting::Set,
                         &chip::app::Clusters::FanControl::Attributes::RockSetting::Get);
 
-    UpdateStateOptional(mEndpointId, mTargetWindSupport, mWindSupport,
+    UpdateStateEnum(mEndpointId, mTargetWindSupport, mWindSupport,
                         &chip::app::Clusters::FanControl::Attributes::WindSupport::Set,
                         &chip::app::Clusters::FanControl::Attributes::WindSupport::Get);
 
-    UpdateStateOptional(mEndpointId, mTargetWindSetting, mWindSetting,
+    UpdateStateEnum(mEndpointId, mTargetWindSetting, mWindSetting,
                         &chip::app::Clusters::FanControl::Attributes::WindSetting::Set,
                         &chip::app::Clusters::FanControl::Attributes::WindSetting::Get);
 }
@@ -183,22 +183,22 @@ void FanControl::Render()
 
     if (!uiRockSetting.Has(mRockSetting))
     {
-        mTargetRockSetting.SetValue(uiRockSetting);
+        mTargetRockSetting = uiRockSetting;
     }
 
     if (mRockSupport != uiRockSupport)
     {
-        mTargetRockSupport.SetValue(uiRockSupport);
+        mTargetRockSupport = uiRockSupport;
     }
 
     if (!uiWindSetting.Has(mWindSetting))
     {
-        mTargetWindSetting.SetValue(uiWindSetting);
+        mTargetWindSetting = uiWindSetting;
     }
 
     if (mWindSupport != uiWindSupport)
     {
-        mTargetWindSupport.SetValue(uiWindSupport);
+        mTargetWindSupport = uiWindSupport;
     }
 
     ImGui::LabelText("Feature map", "%d", uiFeatureMap);

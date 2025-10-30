@@ -71,16 +71,16 @@ private:
     chip::app::DataModel::Nullable<chip::Percent> mTargetPercentSetting;
 
     chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> mRockSupport;
-    chip::Optional<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>> mTargetRockSupport;
+    chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> mTargetRockSupport;
 
     chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> mRockSetting;
-    chip::Optional<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>> mTargetRockSetting;
+    chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> mTargetRockSetting;
 
     chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> mWindSupport;
-    chip::Optional<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>> mTargetWindSupport;
+    chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> mTargetWindSupport;
 
     chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> mWindSetting;
-    chip::Optional<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>> mTargetWindSetting;
+    chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> mTargetWindSetting;
 };
 
 } // namespace Windows

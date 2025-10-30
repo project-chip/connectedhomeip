@@ -25,28 +25,6 @@ namespace example {
 namespace Ui {
 namespace Windows {
 
-template <typename T, typename V>
-void UpdateStateOptional(chip::EndpointId endpointId, chip::Optional<T> & targetValue, T & value,
-                         chip::Protocols::InteractionModel::Status (*setter)(chip::EndpointId endpoint, V value),
-                         chip::Protocols::InteractionModel::Status (*getter)(chip::EndpointId endpoint, V * value))
-{
-    if (targetValue.HasValue())
-    {
-        setter(endpointId, static_cast<V>(targetValue.Value()));
-        targetValue.ClearValue();
-    }
-
-    V val;
-    auto status = getter(endpointId, &val);
-    if (status != chip::Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "ImGuiHelper::UpdateStateOptional: failed to get optional value: %d",
-                     chip::to_underlying(status));
-    }
-
-    value = static_cast<T>(val);
-}
-
 template <typename T>
 void UpdateStateEnum(chip::EndpointId endpointId, T & targetValue, T & value,
                      chip::Protocols::InteractionModel::Status (*setter)(chip::EndpointId endpoint, T value),
