@@ -195,7 +195,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
 
     def pics_TC_CLCTRL_4_1(self) -> list[str]:
         pics = [
-            "CLCTRL.S"
+            "CLCTRL.S", "CLCTRL.S.F00"
         ]
         return pics
 
