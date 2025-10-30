@@ -137,17 +137,14 @@ public:
         TLV::TLVWriter writer;
         writer.Init(mTlvBuffer);
 
-        // Setup reader (declare before any SuccessOrExit calls)
         TLV::TLVReader reader;
 
-        // Use the request's built-in Encode method
         SuccessOrExit(err = request.Encode(writer, TLV::AnonymousTag()));
         SuccessOrExit(err = writer.Finalize());
 
         reader.Init(mTlvBuffer, writer.GetLengthWritten());
         SuccessOrExit(err = reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
 
-        // Invoke the command
         return mCluster.InvokeCommand(mRequest, reader, mHandler.get());
 
     exit:
@@ -179,18 +176,15 @@ public:
         return mCluster.InvokeCommand(request, tlvReader, effectiveHandler);
     }
 
-    // Get the command handler to inspect responses
     chip::app::Testing::MockCommandHandler & GetHandler() { return *mHandler; }
     const chip::app::Testing::MockCommandHandler & GetHandler() const { return *mHandler; }
 
-    // Convenience method to decode the response
     template <typename ResponseType>
     CHIP_ERROR DecodeResponse(ResponseType & response)
     {
         return mHandler->DecodeResponse(response);
     }
 
-    // Get the invoke request (path and metadata)
     const app::DataModel::InvokeRequest & GetRequest() const { return mRequest; }
 
 private:
