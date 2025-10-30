@@ -54,7 +54,6 @@ public:
     void Reset()
     {
         mPreviouslyFoundCluster = std::nullopt;
-        mLastResolvedCommand    = std::nullopt;
     }
 
     void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate) { mPersistentStorageDelegate = delegate; }
@@ -117,50 +116,6 @@ private:
         ClusterReference(const ConcreteClusterPath p, const EmberAfCluster * c) : path(p), cluster(c) {}
     };
 
-    struct ResolvedCommandTarget
-    {
-        enum class HandlerType : uint8_t
-        {
-            kServerCluster,
-            kCommandHandlerInterface,
-            kGenerated,
-        };
-
-        ResolvedCommandTarget(const ConcreteClusterPath & clusterPath, ServerClusterInterface * serverCluster) :
-            cluster(clusterPath), type(HandlerType::kServerCluster)
-        {
-            handler.serverCluster = serverCluster;
-        }
-
-        ResolvedCommandTarget(const ConcreteClusterPath & clusterPath, CommandHandlerInterface * interface) :
-            cluster(clusterPath), type(HandlerType::kCommandHandlerInterface)
-        {
-            handler.commandHandler = interface;
-        }
-
-        static ResolvedCommandTarget Generated(const ConcreteClusterPath & clusterPath)
-        {
-            ResolvedCommandTarget target(clusterPath, HandlerType::kGenerated);
-            return target;
-        }
-
-        ConcreteClusterPath cluster;
-        HandlerType type;
-        union Handler
-        {
-            Handler() : serverCluster(nullptr) {}
-            ServerClusterInterface * serverCluster;
-            CommandHandlerInterface * commandHandler;
-        } handler;
-
-    private:
-        ResolvedCommandTarget(const ConcreteClusterPath & clusterPath, HandlerType handlerType) :
-            cluster(clusterPath), type(handlerType)
-        {
-            handler.serverCluster = nullptr;
-        }
-    };
-
     enum class ClusterSide : uint8_t
     {
         kServer,
@@ -174,13 +129,6 @@ private:
     PersistentStorageDelegate * mPersistentStorageDelegate = nullptr;
 
     SingleEndpointServerClusterRegistry mRegistry;
-
-    std::optional<ResolvedCommandTarget> mLastResolvedCommand;
-
-    void RememberResolvedCommand(ServerClusterInterface * cluster, const ConcreteClusterPath & path);
-    void RememberResolvedCommand(CommandHandlerInterface * interface, const ConcreteClusterPath & path);
-    void RememberGeneratedCommand(const ConcreteClusterPath & path);
-    std::optional<ResolvedCommandTarget> GetResolvedCommandFor(const ConcreteCommandPath & path) const;
 
     /// Finds the specified ember cluster
     ///

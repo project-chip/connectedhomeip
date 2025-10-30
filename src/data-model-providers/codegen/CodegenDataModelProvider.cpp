@@ -45,7 +45,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/ScopedBuffer.h>
-#include <lib/support/SpanSearchValue.h>
 
 #include <cstdint>
 #include <optional>
@@ -165,10 +164,9 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 }
 
 // Validation happens before we decode or dispatch command payloads. The flow intentionally mirrors the logic used by the
-// generated data-model provider so that we only ever resolve command metadata once:
-//   1. `CheckCommandExistence` asks the active data-model provider for an `AcceptedCommandEntry`.  `CodegenDataModelProvider`
-//   caches the most recent lookup and returns the same entry that `InvokeCommand` will later reuse for dispatch.  This avoids
-//   duplicate registry/metadata traversals and keeps privilege data consistent.
+// generated data-model provider so that dispatch observes the same metadata that validation relied on:
+//   1. `CheckCommandExistence` asks the active data-model provider for an `AcceptedCommandEntry`, guaranteeing dispatch sees the
+//   same command metadata.
 //   2. `CheckCommandAccess` enforces ACL/privilege requirements derived from that entry.  By relying on the provider’s metadata
 //   we ensure the privilege used here matches what the generated handler expects.
 //   3. `CheckCommandFlags` validates timed / fabric-scoped / payload-size constraints that were also computed by the provider
@@ -180,44 +178,16 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
                                                                                      TLV::TLVReader & input_arguments,
                                                                                      CommandHandler * handler)
 {
-    const ConcreteClusterPath clusterPath(request.path.mEndpointId, request.path.mClusterId);
-
-    if (auto cached = GetResolvedCommandFor(request.path); cached.has_value())
-    {
-        switch (cached->type)
-        {
-        case ResolvedCommandTarget::HandlerType::kServerCluster:
-            return cached->handler.serverCluster->InvokeCommand(request, input_arguments, handler);
-
-        case ResolvedCommandTarget::HandlerType::kCommandHandlerInterface: {
-            CommandHandlerInterface::HandlerContext context(*handler, request.path, input_arguments);
-            cached->handler.commandHandler->InvokeCommand(context);
-
-            if (context.mCommandHandled)
-            {
-                return std::nullopt;
-            }
-            break;
-        }
-
-        case ResolvedCommandTarget::HandlerType::kGenerated:
-            DispatchSingleClusterCommand(request.path, input_arguments, handler);
-            return std::nullopt;
-        }
-    }
-
     if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
     {
-        RememberResolvedCommand(cluster, clusterPath);
         return cluster->InvokeCommand(request, input_arguments, handler);
     }
 
     CommandHandlerInterface * handler_interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
 
-    if (handler_interface)
+    if (handler_interface != nullptr)
     {
-        RememberResolvedCommand(handler_interface, clusterPath);
         CommandHandlerInterface::HandlerContext context(*handler, request.path, input_arguments);
         handler_interface->InvokeCommand(context);
 
@@ -228,7 +198,6 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
         }
     }
 
-    RememberGeneratedCommand(clusterPath);
     // Ember always sets the return in the handler
     DispatchSingleClusterCommand(request.path, input_arguments, handler);
     return std::nullopt;
@@ -478,12 +447,8 @@ const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const Concret
 CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path,
                                                       ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    bool hasResolvedHandler = false;
-
     if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
     {
-        RememberResolvedCommand(cluster, path);
-        hasResolvedHandler = true;
         return cluster->AcceptedCommands(path, builder);
     }
 
@@ -502,16 +467,8 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
         // Otherwise we finished.
         if (err != CHIP_ERROR_NOT_IMPLEMENTED)
         {
-            RememberResolvedCommand(interface, path);
             return err;
         }
-        RememberResolvedCommand(interface, path);
-        hasResolvedHandler = true;
-    }
-
-    if (!hasResolvedHandler)
-    {
-        RememberGeneratedCommand(path);
     }
     VerifyOrReturnError(serverCluster->acceptedCommandList != nullptr, CHIP_NO_ERROR);
 
@@ -567,48 +524,6 @@ CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath
     }
     const auto commandCount = static_cast<size_t>(endOfList - serverCluster->generatedCommandList);
     return builder.ReferenceExisting({ serverCluster->generatedCommandList, commandCount });
-}
-
-void CodegenDataModelProvider::RememberResolvedCommand(ServerClusterInterface * cluster, const ConcreteClusterPath & path)
-{
-    if (cluster == nullptr)
-    {
-        return;
-    }
-
-    mLastResolvedCommand = ResolvedCommandTarget(path, cluster);
-}
-
-void CodegenDataModelProvider::RememberResolvedCommand(CommandHandlerInterface * interface, const ConcreteClusterPath & path)
-{
-    if (interface == nullptr)
-    {
-        return;
-    }
-
-    mLastResolvedCommand = ResolvedCommandTarget(path, interface);
-}
-
-void CodegenDataModelProvider::RememberGeneratedCommand(const ConcreteClusterPath & path)
-{
-    mLastResolvedCommand = ResolvedCommandTarget::Generated(path);
-}
-
-std::optional<CodegenDataModelProvider::ResolvedCommandTarget>
-CodegenDataModelProvider::GetResolvedCommandFor(const ConcreteCommandPath & path) const
-{
-    if (!mLastResolvedCommand.has_value())
-    {
-        return std::nullopt;
-    }
-
-    if ((mLastResolvedCommand->cluster.mEndpointId != path.mEndpointId) ||
-        (mLastResolvedCommand->cluster.mClusterId != path.mClusterId))
-    {
-        return std::nullopt;
-    }
-
-    return mLastResolvedCommand;
 }
 
 void CodegenDataModelProvider::InitDataModelForTesting()
