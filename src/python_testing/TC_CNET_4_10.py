@@ -348,9 +348,9 @@ class TC_CNET_4_10(MatterBaseTest):
 
         # Step 17: Complete commissioning
         self.step(17)
-        await self.send_single_cmd(
-            cmd=gen_comm.Commands.CommissioningComplete()
-        )
+        await self.send_single_cmd(endpoint=0,
+                                   cmd=gen_comm.Commands.CommissioningComplete()
+                                   )
         # Successful command execution is implied if no exception is raised.
 
         # Step 18: Verify failsafe disabled
@@ -395,9 +395,9 @@ class TC_CNET_4_10(MatterBaseTest):
                              "Failed to add/update Thread network during cleanup")
 
         # Commit the change by completing commissioning
-        await self.send_single_cmd(
-            cmd=gen_comm.Commands.CommissioningComplete()
-        )
+        await self.send_single_cmd(endpoint=0,
+                                   cmd=gen_comm.Commands.CommissioningComplete()
+                                   )
 
         # Verify network added and is the one we intended to add
         networks_after_add = await self.read_single_attribute_check_success(
