@@ -33,7 +33,7 @@ CHIP_ERROR Instance::Init()
     GeneralCommissioningCluster * cluster = GeneralCommissioning::Instance();
     VerifyOrDie(cluster != nullptr); // should be ok because we `EnsureCreated`
 
-    std::visit([this, &cluster](auto delegate) {  mCluster.Create(mEndpointId, delegate, *cluster); }, mDelegate);
+    std::visit([this, &cluster](auto delegate) { mCluster.Create(mEndpointId, delegate, *cluster); }, mDelegate);
     ReturnErrorOnFailure(mCluster.Cluster().Init());
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 }
