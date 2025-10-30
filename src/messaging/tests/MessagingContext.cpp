@@ -265,7 +265,7 @@ CHIP_ERROR MessagingContext::CreateJFCASESessionAToB()
 CHIP_ERROR MessagingContext::CreateJFCASESessionAToB(const CATValues & cats)
 {
     return mpData->mSessionManager.InjectCaseSessionWithTestKey(
-        mpData->mSessionAliceToBob, kJFAKeyId, kBobKeyId, GetJFAFabric()->GetNodeId(), GetJFBFabric()->GetNodeId(),
+        mpData->mJFSessionAToB, kJFAKeyId, kBobKeyId, GetJFAFabric()->GetNodeId(), GetJFBFabric()->GetNodeId(),
         mpData->mJFAFabricIndex, mpData->mJFBAddress, CryptoContext::SessionRole::kInitiator, cats);
 }
 
