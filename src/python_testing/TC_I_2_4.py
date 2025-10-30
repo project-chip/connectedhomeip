@@ -116,7 +116,7 @@ class TC_I_2_4(MatterBaseTest):
 
     @run_if_endpoint_matches(has_cluster(Clusters.Identify))
     async def test_TC_I_2_4(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         # Commissioning - already done
         self.step(1)

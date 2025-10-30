@@ -63,7 +63,7 @@ class TC_PAVST_2_1(MatterBaseTest):
 
     @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
     async def test_TC_PAVST_2_1(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.PushAvStreamTransport
         attr = Clusters.PushAvStreamTransport.Attributes
 

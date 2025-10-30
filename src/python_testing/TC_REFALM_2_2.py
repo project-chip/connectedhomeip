@@ -182,10 +182,14 @@ class TC_REFALM_2_2(MatterBaseTest):
         command_dict = {"Name": "SetRefrigeratorDoorStatus", "EndpointId": self.endpoint, "DoorOpen": 0}
         self.write_to_app_pipe(command_dict)
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_REFALM_2_2(self):
         """Run the test steps."""
-        self.endpoint = self.get_endpoint(default=1)
+        self.endpoint = self.get_endpoint()
         cluster = Clusters.RefrigeratorAlarm
         logger.info(f"Default endpoint {self.endpoint}")
         # Commision the device.

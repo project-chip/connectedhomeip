@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 class AVSMTestBase:
     async def precondition_one_allocated_snapshot_stream(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -79,7 +79,7 @@ class AVSMTestBase:
             pass
 
     async def precondition_one_allocated_audio_stream(self, streamUsage: Globals.Enums.StreamUsageEnum = None):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -133,7 +133,7 @@ class AVSMTestBase:
             pass
 
     async def precondition_one_allocated_video_stream(self, streamUsage: Globals.Enums.StreamUsageEnum = None):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands

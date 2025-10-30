@@ -76,7 +76,7 @@ class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
     async def test_TC_AVSUM_2_6(self):
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)  # Already done, immediately go to step 2
         attribute_list = await self.read_avsum_attribute_expect_success(endpoint, attributes.AttributeList)

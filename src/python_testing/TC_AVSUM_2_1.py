@@ -78,7 +78,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
     async def test_TC_AVSUM_2_1(self):
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         tilt_min_dut = tilt_max_dut = pan_min_dut = pan_max_dut = zoom_max_dut = None
 

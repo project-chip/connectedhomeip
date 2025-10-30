@@ -72,7 +72,7 @@ class TC_TCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
     async def test_TC_TCCM_1_2(self):
 
         # Setup common mode check
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
 

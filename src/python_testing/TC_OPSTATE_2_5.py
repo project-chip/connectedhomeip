@@ -62,9 +62,13 @@ class TC_OPSTATE_2_5(MatterBaseTest, TC_OPSTATE_BASE):
     def pics_TC_OPSTATE_2_5(self) -> list[str]:
         return ["OPSTATE.S"]
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_OPSTATE_2_5(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         await self.TEST_TC_OPSTATE_BASE_2_5(endpoint=endpoint)
 

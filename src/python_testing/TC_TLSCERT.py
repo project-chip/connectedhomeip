@@ -76,7 +76,7 @@ class TC_TLSCERT(MatterBaseTest):
     async def common_setup(self, step_prefix: string = "1") -> TLSUtils:
         self.step(f'{step_prefix}.1')
         attributes = Clusters.TlsCertificateManagement.Attributes
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         # Establishing CR1 controller
         cr1_cmd = TLSUtils(self, endpoint=endpoint)
@@ -107,7 +107,7 @@ class TC_TLSCERT(MatterBaseTest):
     async def common_two_fabric_setup(self, step_prefix: string = "1") -> TwoFabricData:
         cr1_cmd = await self.common_setup(f'{step_prefix}.1')
         cr1 = self.default_controller
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(f'{step_prefix}.2')
         # Establishing CR2 controller

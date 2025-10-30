@@ -75,10 +75,14 @@ class TC_VALCC_3_2(MatterBaseTest):
         ]
         return pics
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_VALCC_3_2(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         asserts.assert_is_not_none(
             endpoint, "Endpoint is required for this tests. The test endpoint is set using the --endpoint flag")
 

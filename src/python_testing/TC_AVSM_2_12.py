@@ -160,7 +160,7 @@ class TC_AVSM_2_12(MatterBaseTest):
 
     @run_if_endpoint_matches(has_cluster(Clusters.CameraAvStreamManagement))
     async def test_TC_AVSM_2_12(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
 

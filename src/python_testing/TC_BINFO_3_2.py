@@ -71,7 +71,7 @@ class TC_BINFO_3_2(MatterBaseTest):
     async def test_TC_BINFO_3_2(self):
         self.step(0)
 
-        endpoint = self.get_endpoint(default=0)
+        endpoint = self.get_endpoint()
         attributes = Clusters.BasicInformation.Attributes
 
         self.step(1)

@@ -147,9 +147,13 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                      "DUT responds with InvalidStreamUsage."),
         ]
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_PAVST_2_3(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         self.endpoint = endpoint
         self.node_id = self.dut_node_id
         pvcluster = Clusters.PushAvStreamTransport

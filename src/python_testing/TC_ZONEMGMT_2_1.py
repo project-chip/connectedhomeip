@@ -76,7 +76,7 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
     @run_if_endpoint_matches(has_cluster(Clusters.ZoneManagement) and
                              has_cluster(Clusters.CameraAvStreamManagement))
     async def test_TC_ZONEMGMT_2_1(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.ZoneManagement
         attr = Clusters.ZoneManagement.Attributes
 

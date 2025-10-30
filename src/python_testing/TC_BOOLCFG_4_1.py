@@ -65,10 +65,14 @@ class TC_BOOLCFG_4_1(MatterBaseTest):
         ]
         return pics
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_BOOLCFG_4_1(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         attributes = Clusters.BooleanStateConfiguration.Attributes

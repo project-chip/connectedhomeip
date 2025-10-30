@@ -68,11 +68,15 @@ class TC_DISHM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         ]
         return pics
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_DISHM_1_2(self):
 
         # Setup common mode check
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
 

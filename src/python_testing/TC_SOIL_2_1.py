@@ -72,7 +72,7 @@ class TC_SOIL_2_1(MatterBaseTest):
     @run_if_endpoint_matches(has_cluster(Clusters.SoilMeasurement))
     async def test_TC_SOIL_2_1(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         attributes = Clusters.SoilMeasurement.Attributes

@@ -129,9 +129,13 @@ class TC_CLDIM_3_3(MatterBaseTest):
         ]
         return pics
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_CLDIM_3_3(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
