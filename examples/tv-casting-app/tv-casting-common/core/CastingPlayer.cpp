@@ -143,6 +143,10 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                 mAttributes.interfaceId = discoveredInterfaceId;
                 ChipLogProgress(AppServer, "Restored discovered CastingPlayer numIPs: %u", mAttributes.numIPs);
 
+                // make sure to copy fields passed in which are needed for UDC
+                mIdOptions                                     = idOptions;
+                mClientProvidedCommissionerDeclarationCallback = connectionCallbacks.mCommissionerDeclarationCallback != nullptr;
+
                 // don't attempt to connect with the cached CastingPlayer if the nodeId is not set
                 // instead, fall through to trigger UDC
                 if (mAttributes.nodeId != 0)
