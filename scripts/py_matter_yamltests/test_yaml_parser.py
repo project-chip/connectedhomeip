@@ -552,10 +552,11 @@ class TestYamlParser(unittest.TestCase):
         self.assertFalse(test_step.is_revision_condition_passed)
 
     def test_revision_check_variable_not_set(self):
-        # Variable is not set (simulated by passing None)
+        # Variable is not set (simulated by passing None): this is illegal and raises
         test_step = self._get_revision_check_between_5_and_10_test_step(
             revision_value=None)
-        self.assertFalse(test_step.is_revision_condition_passed)
+        with self.assertRaises(KeyError):
+            test_step.is_revision_condition_passed
 
     def test_revision_check_only_min(self):
         # This test needs a slightly different YAML

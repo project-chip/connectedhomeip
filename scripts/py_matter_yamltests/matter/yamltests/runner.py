@@ -194,20 +194,7 @@ class TestRunner(TestRunnerBase):
                     continue
 
                 # Handle skipping steps where ClusterRevision does not apply.
-                fail_msg = ""
-                try:
-                    is_revision_condition_passed = request.is_revision_condition_passed
-                    if is_revision_condition_passed is None:
-                        fail_msg = f"Failed to compute ClusterRevision constraints for step '{request.label}'!"
-                except Exception as e:
-                    fail_msg = f"Error during ClusterRevision check for step '{request.label}': {e}"
-                    is_revision_condition_passed = None
-
-                if is_revision_condition_passed is None:
-                    # This should never happen.
-                    raise ValueError(fail_msg)
-
-                if not is_revision_condition_passed:
+                if not request.is_revision_condition_passed:
                     # Try to get the var name and value for a more informative message
                     try:
                         var_name = build_revision_var_name(

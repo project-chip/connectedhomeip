@@ -189,7 +189,7 @@ tests:
           by minRevision). Used to test YAML minRevision support."
       command: "readAttribute"
       attribute: "MaxPathsPerInvoke"
-      minRevision: 100
+      minRevision: 1000
       response:
           constraints:
               maxValue: 0
@@ -199,7 +199,7 @@ tests:
           by maxRevision). Used to test YAML maxRevision support."
       command: "readAttribute"
       attribute: "MaxPathsPerInvoke"
-      maxRevision: 1
+      maxRevision: 0
       response:
           constraints:
               maxValue: 0

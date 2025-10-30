@@ -875,13 +875,13 @@ class TestStep:
         return self._test.max_revision
 
     @property
-    def is_revision_condition_passed(self) -> Optional[bool]:
+    def is_revision_condition_passed(self) -> bool:
         """Checks if the revision conditions passed properly based on min/maxRevision.
 
         This is evaluated at runtime by the runner.
 
-        Returns True if step can be run, False if it cannot be run, or None if there
-        was an error processing revision (i.e. internal error).
+        Returns True if step can be run, False if it cannot be run, or raises an exception
+        if there was an error processing revision (i.e. internal error).
         """
         # If no revision checks are defined, the step is OK to run.
         if self.min_revision is None and self.max_revision is None:
@@ -898,37 +898,27 @@ class TestStep:
         cluster_revision = self.get_runtime_variable(var_name)
 
         if cluster_revision is None:
-            LOGGER.warning(
+            raise KeyError(
                 f"Step '{self.label}': Cannot check min/maxRevision. "
                 f"ClusterRevision variable '{var_name}' is not set (read step may have been skipped or failed)."
             )
-            return None
 
         # Perform the checks
         try:
             # Ensure values are integers for comparison
             cluster_revision = int(cluster_revision)
 
-            min_ok = True
-            if self.min_revision is not None:
-                min_revision_val = int(self.min_revision)
-                min_ok = (cluster_revision >= min_revision_val)
-
-            max_ok = True
-            if self.max_revision is not None:
-                max_revision_val = int(self.max_revision)
-                max_ok = (cluster_revision <= max_revision_val)
-
-            return min_ok and max_ok
-
+            return all([
+              (self.min_revision is None) or (cluster_revision >= int(self.min_revision)),
+              (self.max_revision is None) or (cluster_revision <= int(self.max_revision)),
+            ])
         except (ValueError, TypeError) as e:
-            # Failed to convert revision to int, or comparison failed.
-            LOGGER.error(
+            # Failed to convert revision to int. This can happen with malformed YAML.
+            raise ValueError(
                 f"Step '{self.label}': Error checking min/maxRevision. "
                 f"cluster_revision='{cluster_revision}', min='{self.min_revision}', max='{self.max_revision}'. "
                 f"Error: {e}."
             )
-            return None
 
     def _get_last_event_number(self, responses) -> Optional[int]:
         if not self.is_event:
