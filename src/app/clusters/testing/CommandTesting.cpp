@@ -21,6 +21,7 @@
 #include <lib/core/TLVTags.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace app {
@@ -45,7 +46,7 @@ void MockCommandHandler::AddStatus(const ConcreteCommandPath & aRequestCommandPa
 CHIP_ERROR MockCommandHandler::AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                                const DataModel::EncodableToTLV & aEncodable)
 {
-    chip::System::PacketBufferHandle handle = chip::MessagePacketBuffer::New(1024);
+    chip::System::PacketBufferHandle handle = chip::MessagePacketBuffer::New(chip::System::PacketBuffer::kMaxSize);
     VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     TLV::TLVWriter baseWriter;
