@@ -895,7 +895,7 @@ class TestStep:
         # `YamlTests` class).
         var_name = build_revision_var_name(endpoint, cluster)
 
-        cluster_revision = self._runtime_config_variable_storage.get(var_name)
+        cluster_revision = self.get_runtime_variable(var_name)
 
         if cluster_revision is None:
             LOGGER.warning(
@@ -951,6 +951,10 @@ class TestStep:
                 event_number = received_event_number
 
         return event_number
+
+    def get_runtime_variable(self, name: str) -> Any:
+        """Gets a runtime variable from the test context, or None if missing."""
+        return self._runtime_config_variable_storage.get(name)
 
     def post_process_response(self, received_responses):
         result = PostProcessResponseResult()
