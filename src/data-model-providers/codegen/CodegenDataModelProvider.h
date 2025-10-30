@@ -51,10 +51,7 @@ public:
 
     /// clears out internal caching. Especially useful in unit tests,
     /// where path caching does not really apply (the same path may result in different outcomes)
-    void Reset()
-    {
-        mPreviouslyFoundCluster = std::nullopt;
-    }
+    void Reset() { mPreviouslyFoundCluster = std::nullopt; }
 
     void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate) { mPersistentStorageDelegate = delegate; }
     PersistentStorageDelegate * GetPersistentStorageDelegate() { return mPersistentStorageDelegate; }
