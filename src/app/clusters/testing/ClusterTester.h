@@ -122,22 +122,18 @@ namespace Test {
         template <typename RequestType>
         [[nodiscard]] std::optional<chip::app::DataModel::ActionReturnStatus> Invoke(const RequestType & request)
         {
-            CHIP_ERROR err = CHIP_NO_ERROR;
             TLV::TLVWriter writer;
             writer.Init(mTlvBuffer);
 
             TLV::TLVReader reader;
 
-            SuccessOrExit(err = request.Encode(writer, TLV::AnonymousTag()));
-            SuccessOrExit(err = writer.Finalize());
+            ReturnErrorOnFailure(request.Encode(writer, TLV::AnonymousTag()));
+            ReturnErrorOnFailure(writer.Finalize());
 
             reader.Init(mTlvBuffer, writer.GetLengthWritten());
-            SuccessOrExit(err = reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+            ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
 
             return mCluster.InvokeCommand(mRequest, reader, &mHandler);
-
-        exit:
-            return std::make_optional(chip::app::DataModel::ActionReturnStatus(err));
         }
 
         // Simplified overload to invoke a command with just the command ID and data.
