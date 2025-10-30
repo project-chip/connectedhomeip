@@ -909,8 +909,8 @@ class TestStep:
             cluster_revision = int(cluster_revision)
 
             return all([
-              (self.min_revision is None) or (cluster_revision >= int(self.min_revision)),
-              (self.max_revision is None) or (cluster_revision <= int(self.max_revision)),
+                (self.min_revision is None) or (cluster_revision >= int(self.min_revision)),
+                (self.max_revision is None) or (cluster_revision <= int(self.max_revision)),
             ])
         except (ValueError, TypeError) as e:
             # Failed to convert revision to int. This can happen with malformed YAML.

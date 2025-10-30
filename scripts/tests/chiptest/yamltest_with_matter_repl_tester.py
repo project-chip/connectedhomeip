@@ -65,8 +65,8 @@ async def execute_test(yaml, runner):
                 current_val = "unknown"
 
             logging.warning(f"Step {test_step.label} skipped due to ClusterRevision range not matching (val={current_val}, "
-                      f"min={test_step.min_revision}, "
-                      f"max={test_step.max_revision})")
+                            f"min={test_step.min_revision}, "
+                            f"max={test_step.max_revision})")
             continue
 
         test_action = runner.encode(test_step)
