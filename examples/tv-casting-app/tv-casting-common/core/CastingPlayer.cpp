@@ -120,27 +120,7 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                     AppServer,
                     "CastingPlayer::VerifyOrEstablishConnection() Attempting to Re-establish CASE with cached CastingPlayer");
 
-                // forcebypass flag
-                // Preserve the IP addresses from the discovered CastingPlayer before overwriting with cached data
-                unsigned int discoveredNumIPs = mAttributes.numIPs;
-                chip::Inet::IPAddress discoveredIpAddresses[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];
-                for (unsigned int i = 0; i < discoveredNumIPs; i++)
-                {
-                    discoveredIpAddresses[i] = mAttributes.ipAddresses[i];
-                }
-                chip::Inet::InterfaceId discoveredInterfaceId = mAttributes.interfaceId;
-
                 *this                          = cachedCastingPlayers[index];
-
-                // Restore the IP addresses from the discovered CastingPlayer
-                mAttributes.numIPs = discoveredNumIPs;
-                for (unsigned int i = 0; i < discoveredNumIPs; i++)
-                {
-                    mAttributes.ipAddresses[i] = discoveredIpAddresses[i];
-                }
-                mAttributes.interfaceId = discoveredInterfaceId;
-                ChipLogProgress(AppServer, "Restored discovered CastingPlayer numIPs: %u", mAttributes.numIPs);
-
                 mConnectionState               = CASTING_PLAYER_CONNECTING;
                 mOnCompleted                   = connectionCallbacks.mOnConnectionComplete;
                 mCommissioningWindowTimeoutSec = commissioningWindowTimeoutSec;
