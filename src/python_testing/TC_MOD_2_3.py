@@ -96,7 +96,6 @@ class TC_MOD_2_3(MatterBaseTest):
         self.groupKey = Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
             groupKeySetID=self.kGroupKeyset1,
             groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0="0123456789abcdef".encode(),
             epochKey0="a0a1a2a3a4a5a6a7a8a9aaabacadaeaf".encode(),
             epochStartTime0=1110000,
             epochKey1="b0b1b2b3b4b5b6b7b8b9babbbcbdbebf".encode(),
