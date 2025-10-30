@@ -52,7 +52,10 @@ public:
 private:
     LazyRegisteredServerCluster<NetworkCommissioningCluster> mCluster;
 
-    // caches the creation valures until `Init` is called
+    // caches the creation values until `Init()` is called
+    // This is done because Instances are generally `static` however the instances
+    // require data that is available only once the server initialization starts (in particular
+    // ember metadata is required so that the coupling with GeneralCommissioning can be established).
     EndpointId mEndpointId;
     std::variant<WiFiDriver *, ThreadDriver *, EthernetDriver *> mDelegate;
 };
