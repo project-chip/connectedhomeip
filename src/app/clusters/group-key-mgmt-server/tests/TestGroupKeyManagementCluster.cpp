@@ -240,7 +240,8 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
         iterator->Release();
     }
 };
-TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeSameKeySetIds)
+// Cluster should accept writing multiple group keys with the same KeySetID but different Group IDs
+TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeSameKeySetDifferentGroup)
 {
     const chip::FabricIndex fabricIndex = chip::app::Testing::kTestFabrixIndex;
     chip::GroupId startGroupId          = 0x1001;
@@ -252,6 +253,7 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeSa
     VerifyGroupKeysMatch(fabricIndex, keys);
 }
 
+// Cluster should replace duplicate keys for the same group/keyset combination
 TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeDuplicateKey)
 {
     const chip::FabricIndex fabricIndex = chip::app::Testing::kTestFabrixIndex;
