@@ -165,12 +165,11 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 
 // Validation happens before we decode or dispatch command payloads. The flow intentionally mirrors the logic used by the
 // generated data-model provider so that dispatch observes the same metadata that validation relied on:
-//   1. `CheckCommandExistence` asks the active data-model provider for an `AcceptedCommandEntry`, guaranteeing dispatch sees the
-//   same command metadata.
-//   2. `CheckCommandAccess` enforces ACL/privilege requirements derived from that entry.  By relying on the provider’s metadata
-//   we ensure the privilege used here matches what the generated handler expects.
-//   3. `CheckCommandFlags` validates timed / fabric-scoped / payload-size constraints that were also computed by the provider
-//   so any change to generated metadata automatically applies to both validation and dispatch.
+//   1. `CheckCommandAccess` enforces ACL/privilege requirements for the command path before any further checks.
+//   2. `CheckCommandExistence` asks the active data-model provider for an `AcceptedCommandEntry`, guaranteeing dispatch sees the
+//      same command metadata.
+//   3. `CheckCommandFlags` validates timed / fabric-scoped / payload-size constraints that were also computed by the provider,
+//      so any change to generated metadata automatically applies to both validation and dispatch.
 //
 // Should any other code want to modify the command validation policy, it must do so via the provider or these helper functions
 // so that pre-dispatch validation and the eventual dispatch path remain in lock-step.
