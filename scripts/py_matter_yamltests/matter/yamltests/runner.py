@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 
 from .adapter import TestAdapter
 from .hooks import TestRunnerHooks
-from .parser import TestParser
+from .parser import build_revision_var_name, TestParser
 from .parser_builder import TestParserBuilder, TestParserBuilderConfig
 from .pseudo_clusters.pseudo_clusters import PseudoClusters
 
@@ -188,10 +188,41 @@ class TestRunner(TestRunnerBase):
 
             test_duration = 0
             for idx, request in enumerate(parser.tests):
+                # Handle skipping tests where PICS do not apply.
                 if not request.is_pics_enabled:
                     hooks.step_skipped(request.label, request.pics)
                     continue
-                elif not config.adapter:
+
+                # Handle skipping steps where ClusterRevision does not apply.
+                fail_msg = ""
+                try:
+                    is_revision_condition_passed = request.is_revision_condition_passed
+                    if is_revision_condition_passed is None:
+                        fail_msg = f"Failed to compute ClusterRevision constraints for step '{request.label}'!"
+                except Exception as e:
+                    fail_msg = f"Error during ClusterRevision check for step '{request.label}': {e}"
+                    is_revision_condition_passed = None
+
+                if is_revision_condition_passed is None:
+                    # This should never happen.
+                    raise ValueError(fail_msg)
+
+                if not is_revision_condition_passed:
+                    # Try to get the var name and value for a more informative message
+                    try:
+                        var_name = build_revision_var_name(request.endpoint, request.cluster)
+                        current_val = request.get_runtime_variable(var_name)
+                    except (ValueError, IndexError, KeyError) as e:
+                        current_val = "unknown"
+
+                    reason = (f"Step skipped due to ClusterRevision range not matching (val={current_val}, "
+                              f"min={request.min_revision}, "
+                              f"max={request.max_revision})")
+                    hooks.step_skipped(request.label, reason)
+                    continue
+
+                # Handle normal flows of execution after condition skipping above.
+                if not config.adapter:
                     hooks.step_start(request)
                     hooks.step_unknown()
                     continue
