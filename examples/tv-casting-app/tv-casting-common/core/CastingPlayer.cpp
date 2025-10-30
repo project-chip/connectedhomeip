@@ -327,6 +327,12 @@ void CastingPlayer::RemoveFabric()
     chip::Server::GetInstance().GetFabricTable().Delete(mAttributes.fabricIndex);
     mAttributes.fabricIndex = 0;
     mAttributes.nodeId      = 0;
+
+    CHIP_ERROR err = support::CastingStore::GetInstance()->AddOrUpdate(*this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "CastingStore::AddOrUpdate() failed. Err: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 void CastingPlayer::RegisterEndpoint(const memory::Strong<Endpoint> endpoint)
