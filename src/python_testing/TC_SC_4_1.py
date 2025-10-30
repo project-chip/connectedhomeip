@@ -28,11 +28,21 @@
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
+#       --manual-code 10054912339
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #   run2:
+#     app: ${ALL_CLUSTERS_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --qr-code MT:-24J0KQS02-10648G00
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#   run3:
 #     app: ${LIT_ICD_APP}
 #     factory-reset: true
 #     quiet: true
@@ -40,8 +50,7 @@
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
+#       --qr-code MT:-24J0KQS02-10648G00
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
@@ -232,8 +241,6 @@ class TC_SC_4_1(MatterBaseTest):
         discriminator: str | None = None
         discriminator_subtype: str | None = None
         setup_payload_info = get_setup_payload_info_config(self.matter_test_config)
-
-        logging.info(f"\n\n\n\n\n\n\n\n\t\t\t\t\t\t** setup_payload_info: {setup_payload_info}\n\n\n\n\n\n\n")
 
         if setup_payload_info:
             discriminator = setup_payload_info[0].filter_value
