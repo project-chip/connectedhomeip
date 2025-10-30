@@ -79,7 +79,7 @@ ListEntry * removeListEntryFromList(ListEntry * head, EndpointId endpointId, Clu
 } // namespace
 
 // Common helper for cluster initialization
-void InitResourceMonitoringCluster(EndpointId endpointId, ClusterId clusterId, BitFlags<ResourceMonitoring::Feature> featureFlags,
+void InitResourceMonitoringCluster(EndpointId endpointId, ClusterId clusterId,
                                    const ResourceMonitoring::ResourceMonitoringCluster::OptionalAttributeSet & optionalAttributeSet,
                                    chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum degradationDirection,
                                    bool resetConditionSupported)
@@ -92,6 +92,12 @@ void InitResourceMonitoringCluster(EndpointId endpointId, ClusterId clusterId, B
         previous = current;
         current  = current->next;
     }
+
+    BitFlags<ResourceMonitoring::Feature> featureFlags{ 
+        to_underlying(ResourceMonitoring::Feature::kCondition) | 
+        to_underlying(ResourceMonitoring::Feature::kWarning) |
+        to_underlying(ResourceMonitoring::Feature::kReplacementProductList)
+    };
 
     ListEntry * newNode =
         new ListEntry{ endpointId, clusterId, featureFlags, optionalAttributeSet, degradationDirection, resetConditionSupported };
@@ -122,9 +128,8 @@ void MatterHepaFilterMonitoringClusterInitCallback(EndpointId endpointId)
 {
     uint32_t optionalAttributeBits = 0;
     ResourceMonitoring::ResourceMonitoringCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
-    uint32_t featureMap = CodegenClusterIntegration::LoadFeatureMap(endpointId, HepaFilterMonitoring::Id);
 
-    InitResourceMonitoringCluster(endpointId, HepaFilterMonitoring::Id, BitFlags<ResourceMonitoring::Feature>{ featureMap },
+    InitResourceMonitoringCluster(endpointId, HepaFilterMonitoring::Id,
                                   optionalAttributeSet, chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown,
                                   true // reset condition command supported
     );
@@ -143,10 +148,8 @@ void MatterActivatedCarbonFilterMonitoringClusterInitCallback(EndpointId endpoin
 {
     uint32_t optionalAttributeBits = 0;
     ResourceMonitoring::ResourceMonitoringCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
-    uint32_t featureMap = CodegenClusterIntegration::LoadFeatureMap(endpointId, ActivatedCarbonFilterMonitoring::Id);
 
-    InitResourceMonitoringCluster(endpointId, ActivatedCarbonFilterMonitoring::Id,
-                                  BitFlags<ResourceMonitoring::Feature>{ featureMap }, optionalAttributeSet,
+    InitResourceMonitoringCluster(endpointId, ActivatedCarbonFilterMonitoring::Id, optionalAttributeSet,
                                   chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum::kDown,
                                   true // reset condition command supported
     );
