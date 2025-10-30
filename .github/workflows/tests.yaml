@@ -94,6 +94,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
+                     --log-level DEBUG \
                      --target TestSystemCommands \
                      --runner chip_tool_python \
                      --chip-tool ./out/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \

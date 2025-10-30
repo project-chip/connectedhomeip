@@ -52,7 +52,7 @@ tests:
                 value: "default"
               - name: "message"
                 value: "[DL] Starting event loop"
-              - name: "timeout"
+              - name: "timeoutInSeconds"
                 value: 30
 
     - label: "Stop the default accessory by key"
@@ -79,7 +79,7 @@ tests:
                 value: "default"
               - name: "message"
                 value: "[DL] Starting event loop"
-              - name: "timeout"
+              - name: "timeoutInSeconds"
                 value: 30
 
     - label: "Stop the default accessory"
@@ -105,17 +105,17 @@ tests:
                 value: "default"
               - name: "message"
                 value: "[DL] Starting event loop"
-              - name: "timeout"
+              - name: "timeoutInSeconds"
                 value: 30
 
     - label: "Stop the default accessory"
       command: "Stop"
 
-    - label: "Start the default accessory with minCommissioningTimeout only"
+    - label: "Start the default accessory with minCommissioningtimeoutInSeconds only"
       command: "Start"
       arguments:
           values:
-              - name: "minCommissioningTimeout"
+              - name: "minCommissioningtimeoutInSeconds"
                 value: 10
 
     - label: "Wait for default accessory to start"
@@ -127,7 +127,7 @@ tests:
                 value: "default"
               - name: "message"
                 value: "[DL] Starting event loop"
-              - name: "timeout"
+              - name: "timeoutInSeconds"
                 value: 30
 
     - label: "Stop the default accessory"
@@ -145,7 +145,7 @@ tests:
                 value: "/tmp/chip_kvs_default"
               - name: "registerKey"
                 value: "default"
-              - name: "minCommissioningTimeout"
+              - name: "minCommissioningtimeoutInSeconds"
                 value: 10
 
     - label: "Start a second accessory with all command line options"
@@ -236,7 +236,7 @@ tests:
                 value: "default"
               - name: "message"
                 value: "[DL] Starting event loop"
-              - name: "timeout"
+              - name: "timeoutInSeconds"
                 value: 30
 
     - label: "Reboot the default accessory by key"
@@ -265,7 +265,7 @@ tests:
                 value: "default"
               - name: "message"
                 value: "[DL] Starting event loop"
-              - name: "timeout"
+              - name: "timeoutInSeconds"
                 value: 30
 
     - label: "Factory Reset the default accessory by key"
