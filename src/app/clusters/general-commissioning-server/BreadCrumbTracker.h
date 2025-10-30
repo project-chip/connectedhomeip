@@ -23,8 +23,8 @@ namespace chip::app::Clusters {
 class BreadCrumbTracker
 {
 public:
-    virtual ~BreadCrumbTracker() = default;
-    virtual  void SetBreadCrumb(uint64_t value) = 0;
+    virtual ~BreadCrumbTracker()               = default;
+    virtual void SetBreadCrumb(uint64_t value) = 0;
 };
 
 } // namespace chip::app::Clusters

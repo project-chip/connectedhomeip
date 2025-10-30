@@ -135,8 +135,7 @@ NetworkCommissioningLogic::NetworkInstanceList NetworkCommissioningLogic::sInsta
 NetworkCommissioningLogic::NetworkCommissioningLogic(EndpointId aEndpointId, WiFiDriver * apDelegate,
                                                      BreadCrumbTracker * aTracker) :
     mEndpointId(aEndpointId),
-    mFeatureFlags(WiFiFeatures(apDelegate)), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate),
-    mBreadcrumbTracker(aTracker)
+    mFeatureFlags(WiFiFeatures(apDelegate)), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate), mBreadcrumbTracker(aTracker)
 {
     mpDriver.Set<WiFiDriver *>(apDelegate);
 }
