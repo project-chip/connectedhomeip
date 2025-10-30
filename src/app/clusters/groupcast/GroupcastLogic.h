@@ -26,6 +26,7 @@
 #include <clusters/Groupcast/Enums.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <credentials/GroupcastDataProvider.h>
 
 namespace chip {
 namespace app {
@@ -44,7 +45,8 @@ public:
     CHIP_ERROR ReadMaxMembershipCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 
     CHIP_ERROR JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data);
-    CHIP_ERROR LeaveGroup(FabricIndex fabric_index, const Groupcast::Commands::LeaveGroup::DecodableType & data,
+    CHIP_ERROR LeaveGroup(FabricIndex fabric_index, chip::Groupcast::Group &group,
+                          const Groupcast::Commands::LeaveGroup::DecodableType & data,
                           Groupcast::Commands::LeaveGroupResponse::Type & response);
     CHIP_ERROR UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data);
     CHIP_ERROR ExpireGracePeriod(FabricIndex fabric_index, const Groupcast::Commands::ExpireGracePeriod::DecodableType & data);
