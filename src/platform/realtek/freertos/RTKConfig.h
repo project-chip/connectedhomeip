@@ -28,7 +28,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-class BeeConfig
+class RTKConfig
 {
 public:
     struct Key;
@@ -99,7 +99,7 @@ public:
     static void RunConfigUnitTest(void);
 };
 
-struct BeeConfig::Key
+struct RTKConfig::Key
 {
     const char * Namespace;
     const char * Name;
@@ -107,7 +107,7 @@ struct BeeConfig::Key
     bool operator==(const Key & other) const;
 };
 
-inline bool BeeConfig::Key::operator==(const Key & other) const
+inline bool RTKConfig::Key::operator==(const Key & other) const
 {
     return strcmp(Namespace, other.Namespace) == 0 && strcmp(Name, other.Name) == 0;
 }
