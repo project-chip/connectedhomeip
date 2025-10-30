@@ -114,7 +114,7 @@ int soc_pll_config(void)
     status                                  = RSI_CLK_SetIntfPllFreq(M4CLK, INTF_PLL_CLK, SOC_PLL_REF_FREQUENCY);
     if (status != RSI_OK)
     {
-        ChipLogError(DeviceLayer, "Failed to Config Interface PLL Clock, status:%d", status);
+        ChipLogError(DeviceLayer, "Failed to Config Interface PLL Clock, status: %ld", status);
     }
     else
     {
