@@ -103,21 +103,6 @@ TEST_F(TestGroupKeyManagementCluster, AttributesTest)
     ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 }
 
-struct ClusterTestContext
-{
-    chip::app::Clusters::GroupKeyManagementCluster & mCluster;
-    ClusterTestContext(chip::app::Clusters::GroupKeyManagementCluster & cluster, chip::Credentials::GroupDataProvider & provider) :
-        mCluster(cluster)
-    {
-        chip::Credentials::SetGroupDataProvider(&provider);
-    }
-    ~ClusterTestContext()
-    {
-        mCluster.Shutdown();
-        chip::Credentials::SetGroupDataProvider(nullptr);
-    }
-};
-
 class MockSessionKeystore : public chip::Crypto::SessionKeystore
 {
 public:
@@ -180,96 +165,95 @@ CreateGroupKeyMapList(size_t count, chip::FabricIndex fabricIndex, chip::GroupId
     return list;
 }
 
-void PrepopulateGroupKeyMap(GroupKeyManagementCluster & cluster,
-                            const std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> & keys)
-{
-    auto listToWrite =
-        chip::app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
-
-    auto path = chip::app::ConcreteAttributePath(chip::kRootEndpointId, GroupKeyManagement::Id,
-                                                 GroupKeyManagement::Attributes::GroupKeyMap::Id);
-
-    CHIP_ERROR err = Test::WriteClusterAttribute(cluster, path, listToWrite);
-
-    ASSERT_EQ(err, CHIP_NO_ERROR);
-}
-
-void VerifyGroupKeysMatch(chip::Credentials::GroupDataProvider & provider, const chip::FabricIndex fabricIndex,
-                          const std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> & expectedKeys)
-{
-    using chip::Credentials::GroupDataProvider;
-
-    GroupDataProvider::GroupKeyIterator * iterator = provider.IterateGroupKeys(fabricIndex);
-    ASSERT_NE(iterator, nullptr);
-    ASSERT_EQ(iterator->Count(), expectedKeys.size());
-
-    size_t i = 0;
-    GroupDataProvider::GroupKey storedKey;
-    while (iterator->Next(storedKey))
-    {
-        ASSERT_LT(i, expectedKeys.size());
-        if (i < expectedKeys.size())
-        {
-            EXPECT_EQ(storedKey.group_id, expectedKeys[i].groupId);
-            EXPECT_EQ(storedKey.keyset_id, expectedKeys[i].groupKeySetID);
-        }
-        i++;
-    }
-
-    ASSERT_EQ(i, expectedKeys.size());
-
-    iterator->Release();
-}
-
 } // namespace TestHelpers
 
-TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeSameKeySetIds)
+struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementCluster
 {
-    chip::Test::TestServerClusterContext testStack;
-    chip::Credentials::GroupDataProviderImpl realProvider;
-    MockSessionKeystore mockKeystore;
-    auto * storage = &testStack.StorageDelegate();
-    ASSERT_NE(storage, nullptr);
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    realProvider.SetStorageDelegate(storage);
-    realProvider.SetSessionKeystore(&mockKeystore);
-    ASSERT_EQ(realProvider.Init(), CHIP_NO_ERROR);
+    chip::Test::TestServerClusterContext mTestStack;
+    chip::Credentials::GroupDataProviderImpl mRealProvider;
+    MockSessionKeystore mMockKeystore;
+    GroupKeyManagementCluster mCluster;
 
-    auto context = testStack.Create();
-    GroupKeyManagementCluster cluster;
-    ClusterTestContext clusterContext(cluster, realProvider);
-    ASSERT_EQ(cluster.Startup(context), CHIP_NO_ERROR);
+    // This context object is non-assignable
+    decltype(mTestStack.Create()) mContext;
 
+    // We initialize mContext here
+    TestGroupKeyManagementClusterWithStorage() : mContext(mTestStack.Create()) {}
+
+    void SetUp() override
+    {
+        auto * storage = &mTestStack.StorageDelegate();
+        ASSERT_NE(storage, nullptr);
+
+        mRealProvider.SetStorageDelegate(storage);
+        mRealProvider.SetSessionKeystore(&mMockKeystore);
+        ASSERT_EQ(mRealProvider.Init(), CHIP_NO_ERROR);
+
+        chip::Credentials::SetGroupDataProvider(&mRealProvider);
+
+        ASSERT_EQ(mCluster.Startup(mContext), CHIP_NO_ERROR);
+    }
+
+    void TearDown() override
+    {
+        mCluster.Shutdown();
+        chip::Credentials::SetGroupDataProvider(nullptr);
+        mRealProvider.Finish();
+    }
+
+    void PrepopulateGroupKeyMap(const std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> & keys)
+    {
+        auto listToWrite =
+            chip::app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
+
+        auto path = chip::app::ConcreteAttributePath(chip::kRootEndpointId, GroupKeyManagement::Id,
+                                                     GroupKeyManagement::Attributes::GroupKeyMap::Id);
+
+        CHIP_ERROR err = chip::Test::WriteClusterAttribute(mCluster, path, listToWrite);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+    }
+
+    void VerifyGroupKeysMatch(const chip::FabricIndex fabricIndex,
+                              const std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> & expectedKeys)
+    {
+        chip::Credentials::GroupDataProvider::GroupKeyIterator * iterator = mRealProvider.IterateGroupKeys(fabricIndex);
+        ASSERT_NE(iterator, nullptr);
+        ASSERT_EQ(iterator->Count(), expectedKeys.size());
+
+        size_t i = 0;
+        chip::Credentials::GroupDataProvider::GroupKey storedKey;
+        while (iterator->Next(storedKey))
+        {
+            ASSERT_LT(i, expectedKeys.size());
+            if (i < expectedKeys.size())
+            {
+                EXPECT_EQ(storedKey.group_id, expectedKeys[i].groupId);
+                EXPECT_EQ(storedKey.keyset_id, expectedKeys[i].groupKeySetID);
+            }
+            i++;
+        }
+
+        ASSERT_EQ(i, expectedKeys.size());
+        iterator->Release();
+    }
+};
+TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeSameKeySetIds)
+{
     const chip::FabricIndex fabricIndex = chip::app::Testing::kTestFabrixIndex;
     chip::GroupId startGroupId          = 0x1001;
     uint16_t sharedKeySetId             = 5;
 
     auto keys = TestHelpers::CreateGroupKeyMapList(2, fabricIndex, startGroupId, sharedKeySetId, 0 /* keySetIdIncrement */);
 
-    TestHelpers::PrepopulateGroupKeyMap(cluster, keys);
-
-    TestHelpers::VerifyGroupKeysMatch(realProvider, fabricIndex, keys);
-
-    realProvider.Finish();
+    PrepopulateGroupKeyMap(keys);
+    VerifyGroupKeysMatch(fabricIndex, keys);
 }
 
-TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeDuplicateKey)
+TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeDuplicateKey)
 {
-    chip::Test::TestServerClusterContext testStack;
-    chip::Credentials::GroupDataProviderImpl realProvider;
-    MockSessionKeystore mockKeystore;
-    auto * storage = &testStack.StorageDelegate();
-    ASSERT_NE(storage, nullptr);
-
-    realProvider.SetStorageDelegate(storage);
-    realProvider.SetSessionKeystore(&mockKeystore);
-    ASSERT_EQ(realProvider.Init(), CHIP_NO_ERROR);
-
-    auto context = testStack.Create();
-    GroupKeyManagementCluster cluster;
-    ClusterTestContext clusterContext(cluster, realProvider);
-    ASSERT_EQ(cluster.Startup(context), CHIP_NO_ERROR);
-
     const chip::FabricIndex fabricIndex = chip::app::Testing::kTestFabrixIndex;
     chip::GroupId groupId               = 100;
     uint16_t keysetId                   = 5;
@@ -281,45 +265,22 @@ TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeDuplicateKey)
     auto path = chip::app::ConcreteAttributePath(chip::kRootEndpointId, GroupKeyManagement::Id,
                                                  GroupKeyManagement::Attributes::GroupKeyMap::Id);
 
-    CHIP_ERROR err = chip::Test::WriteClusterAttribute(cluster, path, listToWrite);
+    CHIP_ERROR err = chip::Test::WriteClusterAttribute(mCluster, path, listToWrite);
 
     ASSERT_EQ(err, CHIP_ERROR_DUPLICATE_KEY_ID);
 
     std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> expectedKeys;
     expectedKeys.push_back(keys[0]);
 
-    TestHelpers::VerifyGroupKeysMatch(realProvider, fabricIndex, expectedKeys);
-
-    realProvider.Finish();
+    VerifyGroupKeysMatch(fabricIndex, expectedKeys);
 }
 
-TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttribute)
+TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttribute)
 {
-    chip::Test::TestServerClusterContext testStack;
-
-    chip::Credentials::GroupDataProviderImpl realProvider;
-
-    MockSessionKeystore mockKeystore;
-
-    auto * storage = &testStack.StorageDelegate();
-    ASSERT_NE(storage, nullptr);
-
-    realProvider.SetStorageDelegate(storage);
-    realProvider.SetSessionKeystore(&mockKeystore);
-    ASSERT_EQ(realProvider.Init(), CHIP_NO_ERROR);
-
-    auto context = testStack.Create();
-
-    GroupKeyManagementCluster cluster;
-    ClusterTestContext clusterContext(cluster, realProvider);
-    ASSERT_EQ(cluster.Startup(context), CHIP_NO_ERROR);
-
     const chip::FabricIndex fabricIndex = chip::app::Testing::kTestFabrixIndex;
     auto keys                           = TestHelpers::CreateGroupKeyMapList(2, fabricIndex);
 
-    TestHelpers::PrepopulateGroupKeyMap(cluster, keys);
-    TestHelpers::VerifyGroupKeysMatch(realProvider, fabricIndex, keys);
-
-    realProvider.Finish();
+    PrepopulateGroupKeyMap(keys);
+    VerifyGroupKeysMatch(fabricIndex, keys);
 }
 } // namespace
