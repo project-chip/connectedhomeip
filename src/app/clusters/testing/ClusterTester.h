@@ -135,7 +135,7 @@ public:
 
     // Invoke a command using a predefined request structure
     template <typename RequestType>
-    std::optional<app::DataModel::ActionReturnStatus> Invoke(const RequestType & request)
+    [[nodiscard]] std::optional<app::DataModel::ActionReturnStatus> Invoke(const RequestType & request)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         TLV::TLVWriter writer;
@@ -159,7 +159,7 @@ public:
     // Builds the request automatically using the internal cluster's paths.
     // Ideal for quick tests without manual request construction.
     template <typename T>
-    std::optional<chip::app::DataModel::ActionReturnStatus> Invoke(chip::CommandId commandId, const T & data,
+    [[nodiscard]] std::optional<chip::app::DataModel::ActionReturnStatus> Invoke(chip::CommandId commandId, const T & data,
                                                                    app::CommandHandler * handler = nullptr)
     {
         const auto & paths = mCluster.GetPaths();
