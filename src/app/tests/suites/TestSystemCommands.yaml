@@ -40,7 +40,7 @@ tests:
     - label: "Start the default accessory with no command line options"
       command: "Start"
 
-    # Guard between start/stop, factory-reset/stop or reboot/reboot cycles to 
+    # Guard between start/stop, factory-reset/stop or reboot/reboot cycles to
     # prevent the app from crashing when SIGTERM is delivered before signal
     # handlers have been set up
     - label: "Wait for default accessory to start"
