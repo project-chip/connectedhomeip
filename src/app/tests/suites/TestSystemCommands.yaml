@@ -115,7 +115,7 @@ tests:
       command: "Start"
       arguments:
           values:
-              - name: "minCommissioningtimeoutInSeconds"
+              - name: "minCommissioningTimeout"
                 value: 10
 
     - label: "Wait for default accessory to start"
@@ -145,7 +145,7 @@ tests:
                 value: "/tmp/chip_kvs_default"
               - name: "registerKey"
                 value: "default"
-              - name: "minCommissioningtimeoutInSeconds"
+              - name: "minCommissioningTimeout"
                 value: 10
 
     - label: "Start a second accessory with all command line options"
