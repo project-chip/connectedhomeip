@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 
 from .adapter import TestAdapter
 from .hooks import TestRunnerHooks
-from .parser import build_revision_var_name, TestParser
+from .parser import TestParser, build_revision_var_name
 from .parser_builder import TestParserBuilder, TestParserBuilderConfig
 from .pseudo_clusters.pseudo_clusters import PseudoClusters
 

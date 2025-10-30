@@ -25,7 +25,7 @@ from unittest.mock import mock_open, patch
 
 from matter.yamltests.definitions import ParseSource, SpecDefinitions
 from matter.yamltests.errors import TestStepEnumError, TestStepEnumSpecifierNotUnknownError, TestStepEnumSpecifierWrongError
-from matter.yamltests.parser import build_revision_var_name, TestParser, TestParserConfig
+from matter.yamltests.parser import TestParser, TestParserConfig, build_revision_var_name
 
 simple_test_description = '''<?xml version="1.0"?>
   <configurator>
