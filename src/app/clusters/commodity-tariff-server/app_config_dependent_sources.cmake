@@ -13,7 +13,6 @@
 # limitations under the License.
 
 # This is the equivalent to app_config_dependent_sources.gni
-
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE

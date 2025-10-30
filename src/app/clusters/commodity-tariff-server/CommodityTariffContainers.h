@@ -20,7 +20,6 @@
 
 #include <cassert>
 #include <pw_containers/algorithm.h>
-#include <pw_containers/flat_map.h>
 #include <pw_containers/vector.h>
 
 #include "lib/core/CHIPError.h"
