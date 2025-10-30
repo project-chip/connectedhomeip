@@ -24,33 +24,41 @@ using namespace FixedLabel::Attributes;
 
 namespace {
 
-CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder)
+class AutoReleaseIterator
 {
-    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
-
-    if (provider)
+public:
+    AutoReleaseIterator(DeviceLayer::DeviceInfoProvider * provider, EndpointId endpointId) :
+        mIterator(provider != nullptr ? provider->IterateFixedLabel(endpointId) : nullptr)
+    {}
+    ~AutoReleaseIterator()
     {
-        DeviceLayer::DeviceInfoProvider::FixedLabelIterator * it = provider->IterateFixedLabel(endpoint);
-
-        if (it)
+        if (mIterator != nullptr)
         {
-            CHIP_ERROR err = encoder.EncodeList([&it](const auto & encod) -> CHIP_ERROR {
-                FixedLabel::Structs::LabelStruct::Type fixedlabel;
-
-                while (it->Next(fixedlabel))
-                {
-                    ReturnErrorOnFailure(encod.Encode(fixedlabel));
-                }
-
-                return CHIP_NO_ERROR;
-            });
-
-            it->Release();
-            return err;
+            mIterator->Release();
         }
     }
 
-    return encoder.EncodeEmptyList();
+    bool IsValid() const { return mIterator != nullptr; }
+
+    DeviceLayer::DeviceInfoProvider::FixedLabelIterator * operator->() { return mIterator; }
+
+private:
+    DeviceLayer::DeviceInfoProvider::FixedLabelIterator * mIterator;
+};
+
+CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder)
+{
+    AutoReleaseIterator it(DeviceLayer::GetDeviceInfoProvider(), endpoint);
+    VerifyOrReturnValue(it.IsValid(), encoder.EncodeEmptyList());
+
+    return encoder.EncodeList([&it](const auto & encod) -> CHIP_ERROR {
+        FixedLabel::Structs::LabelStruct::Type fixedlabel;
+        while (it->Next(fixedlabel))
+        {
+            ReturnErrorOnFailure(encod.Encode(fixedlabel));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 } // namespace

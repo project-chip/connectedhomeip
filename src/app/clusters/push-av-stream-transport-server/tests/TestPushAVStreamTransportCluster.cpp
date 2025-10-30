@@ -410,8 +410,9 @@ class TestTlsClientManagementDelegate : public TlsClientManagementDelegate
 {
 
 public:
-    CHIP_ERROR GetProvisionedEndpointByIndex(EndpointId matterEndpoint, FabricIndex fabric, size_t index,
-                                             EndpointStructType & endpoint) const override
+    CHIP_ERROR Init(PersistentStorageDelegate & storage) override { return CHIP_NO_ERROR; }
+
+    CHIP_ERROR ForEachEndpoint(EndpointId matterEndpoint, FabricIndex fabric, LoadedEndpointCallback callback) override
     {
         return CHIP_NO_ERROR;
     }
@@ -424,11 +425,10 @@ public:
         return ClusterStatusCode(Status::Success);
     }
 
-    Protocols::InteractionModel::Status FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                    uint16_t endpointID,
-                                                                    EndpointStructType & endpoint) const override
+    CHIP_ERROR FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
+                                           LoadedEndpointCallback callback) override
     {
-        return Status::Success;
+        return CHIP_NO_ERROR;
     }
 
     Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
@@ -448,6 +448,12 @@ public:
     }
 
     void RemoveFabric(FabricIndex fabric) override {}
+
+    CHIP_ERROR MutateEndpointReferenceCount(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
+                                            int8_t delta) override
+    {
+        return CHIP_NO_ERROR;
+    }
 };
 
 class TestPushAVStreamTransportServerLogic : public ::testing::Test
