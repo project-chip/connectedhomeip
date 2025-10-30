@@ -42,6 +42,7 @@ executable("all-devices-app") {
     "${chip_root}/src/app/persistence:default",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib",
+    "${chip_root}/examples/all-devices-app/linux/app_options:app-options",
   ]
   deps += pw_build_LINK_DEPS
 

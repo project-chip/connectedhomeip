@@ -32,6 +32,7 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <string>
 #include <system/SystemLayer.h>
+#include <app_options/AppOptions.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -50,49 +51,7 @@ DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 // To hold SPAKE2+ verifier, discriminator, passcode
 LinuxCommissionableDataProvider gCommissionableDataProvider;
 
-// App custom argument handling
-constexpr uint16_t kOptionDeviceType = 0xffd0;
-constexpr uint16_t kOptionEndpoint   = 0xffd1;
-const char * deviceTypeName          = "contact-sensor"; // defaulting to contact sensor if not specified
-EndpointId deviceEndpoint            = 1; // defaulting to endpoint 1 if not specified
 
-chip::ArgParser::OptionDef sAllDevicesAppOptionDefs[] = {
-    { "device", chip::ArgParser::kArgumentRequired, kOptionDeviceType },
-    { "endpoint", chip::ArgParser::kArgumentRequired, kOptionEndpoint },
-};
-
-bool AllDevicesAppOptionHandler(const char * program, OptionSet * options, int identifier, const char * name, const char * value)
-{
-    switch (identifier)
-    {
-    case kOptionDeviceType: 
-        if (value == nullptr || !DeviceFactory::GetInstance().IsValidDevice(value))
-        {
-            ChipLogError(Support, "INTERNAL ERROR: Invalid device type: %s. Run with the --help argument to view the list of valid device types.\n", value);
-            return false;
-        }
-        ChipLogProgress(AppServer, "Using the device type of %s", value);
-        deviceTypeName = value;
-        return true;
-    case kOptionEndpoint: 
-        deviceEndpoint = static_cast<EndpointId>(atoi(value));
-        ChipLogProgress(AppServer, "Using endpoint %d for the device.", deviceEndpoint);
-        return true;
-    default:
-        ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
-        return false;
-    }
-
-    return true;
-}
-
-// TODO: This message on supported device types needs to be updated to scale
-//  better once new devices are added.
-chip::ArgParser::OptionSet sCmdLineOptions = { AllDevicesAppOptionHandler, // handler function
-                                               sAllDevicesAppOptionDefs,   // array of option definitions
-                                               "PROGRAM OPTIONS",          // help group
-                                               "-d, --device <contact-sensor|water-leak-detector>\n" 
-                                               "-e, --endpoint <endpoint-number>\n"};
 
 void StopSignalHandler(int /* signal */)
 {
@@ -117,8 +76,8 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     static std::unique_ptr<BaseDevice> constructedDevice;
 
     rootNodeDevice.Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
-    constructedDevice = DeviceFactory::GetInstance().Create(deviceTypeName);
-    constructedDevice->Register(deviceEndpoint, dataModelProvider, kInvalidEndpointId);
+    constructedDevice = DeviceFactory::GetInstance().Create(AppOptions::GetDeviceType());
+    constructedDevice->Register(AppOptions::GetDeviceEndpoint(), dataModelProvider, kInvalidEndpointId);
 
     return &dataModelProvider;
 }
@@ -236,7 +195,7 @@ CHIP_ERROR Initialize(int argc, char * argv[])
 {
     ChipLogProgress(AppServer, "Initializing...");
     ReturnErrorOnFailure(Platform::MemoryInit());
-    ReturnErrorOnFailure(ParseArguments(argc, argv, &sCmdLineOptions));
+    ReturnErrorOnFailure(ParseArguments(argc, argv, AppOptions::GetOptions()));
     ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH));
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
