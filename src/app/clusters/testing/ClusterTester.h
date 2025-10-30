@@ -60,8 +60,9 @@ namespace Test {
 class ClusterTester
 {
 public:
-    ClusterTester(chip::app::ServerClusterInterface & cluster)
-    : mCluster(cluster), mHandler(std::make_unique<chip::app::Testing::MockCommandHandler>()) {}
+    ClusterTester(chip::app::ServerClusterInterface & cluster) :
+        mCluster(cluster), mHandler(std::make_unique<chip::app::Testing::MockCommandHandler>())
+    {}
 
     template <typename T>
     CHIP_ERROR ReadAttribute(AttributeId attr, T & value)
@@ -103,7 +104,7 @@ public:
 
     void InvokeOperation(EndpointId endpoint, ClusterId cluster, CommandId command)
     {
-        mCommandPath  = chip::app::ConcreteCommandPath(endpoint, cluster, command);
+        mCommandPath = chip::app::ConcreteCommandPath(endpoint, cluster, command);
         mHandler->ClearResponses();
         mHandler->ClearStatuses();
         mRequest.path = mCommandPath;
@@ -111,7 +112,7 @@ public:
 
     void InvokeOperation(const app::ConcreteCommandPath & path)
     {
-        mCommandPath  = path;
+        mCommandPath = path;
         mHandler->ClearResponses();
         mHandler->ClearStatuses();
         mRequest.path = mCommandPath;
