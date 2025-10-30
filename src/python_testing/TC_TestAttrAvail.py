@@ -64,8 +64,8 @@ import asyncio
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_TestAttrAvail(MatterBaseTest, BasicCompositionTests):
