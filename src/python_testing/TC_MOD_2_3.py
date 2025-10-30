@@ -62,7 +62,7 @@ class TC_MOD_2_3(MatterBaseTest):
     def steps_TC_MOD_2_3(self) -> list[TestStep]:
         steps = [
             TestStep("0", "Commissioning, already done", is_commissioning=True),
-            TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT using a key that is pre-installed on the TH. GroupKeySet fields are as follows: * GroupKeySetID: 0x01a1 * GroupKeySecurityPolicy: TrustFirst (0) * EpochKey0: a0a1a2a3a4a5a6a7a8a9aaabacadaeaf * EpochStartTime0: 1110000 * EpochKey1: b0b1b2b3b4b5b6b7b8b9babbbcbdbebf * EpochStartTime1: 1110001 * EpochKey2: c0c1c2c3c4c5c6c7c8c9cacbcccdcecf * EpochStartTime2: 1110002"),
+            TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT using a key that is pre-installed on the TH"),
             TestStep("0b", "TH binds GroupIds 0x0001 with GroupKeySetID 0x01a1 in the GroupKeyMap attribute list on GroupKeyManagement cluster by writing the GroupKeyMap attribute with two entries as follows: * List item 1: - FabricIndex: 1 - GroupId: 0x0001 - GroupKeySetId: 0x01a1"),
             TestStep("0c", "TH sends a _RemoveAllGroups_ command to DUT. If a status response is expected, DUT sends a response to TH with the _Status_ field equal to 0x00 (SUCCESS)."),
             TestStep("1a", "TH sends a _AddGroup_ command to DUT with the _GroupID_ field set to _G~1~_. DUT sends a _AddGroupResponse_ command to TH with the _Status_ field set to 0x00 (SUCCESS) and the _GroupID_ field set to _G~1~_."),
@@ -96,11 +96,11 @@ class TC_MOD_2_3(MatterBaseTest):
         self.groupKey = Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
             groupKeySetID=self.kGroupKeyset1,
             groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0="a0a1a2a3a4a5a6a7a8a9aaabacadaeaf".encode(),
+            epochKey0="0123456789abcdef".encode(),
             epochStartTime0=1110000,
-            epochKey1="b0b1b2b3b4b5b6b7b8b9babbbcbdbebf".encode(),
+            epochKey1="0123456789abcdef".encode(),
             epochStartTime1=1110001,
-            epochKey2="c0c1c2c3c4c5c6c7c8c9cacbcccdcecf".encode(),
+            epochKey2="0123456789abcdef".encode(),
             epochStartTime2=1110002)
 
         await self.TH1.SendCommand(self.dut_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(self.groupKey))
