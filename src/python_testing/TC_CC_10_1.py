@@ -56,12 +56,9 @@ class TC_CC_10_1(MatterBaseTest):
     def _prepare_cc_extension_field_set(self, attribute_value_list: List[Clusters.ScenesManagement.Structs.AttributeValuePairStruct]) -> Clusters.ScenesManagement.Structs.ExtensionFieldSetStruct:
         efs_attribute_value_list: List[Clusters.ScenesManagement.Structs.AttributeValuePairStruct] = []
         for attribute_id in kCCAttributeValueIDs:
-            # Attempt to find the attribute in the input list
-            found = False
             for pair in attribute_value_list:
                 if pair.attributeID == attribute_id:
                     efs_attribute_value_list.append(pair)
-                    found = True
                     break
 
         extension_field_set = Clusters.ScenesManagement.Structs.ExtensionFieldSetStruct(
