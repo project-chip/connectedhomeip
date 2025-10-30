@@ -1,7 +1,8 @@
 #include "AttributePersistenceMigration.h"
 
 #define K_MIGRATION_LOG_FORMAT                                                                                                     \
-    "Migration Error - Failed %s path in %s provider" ChipLogFormatMEI "/" ChipLogFormatMEI "/" ChipLogFormatMEI " - %"
+    "Migration Error - Failed %s path in %s provider" ChipLogFormatMEI "/" ChipLogFormatMEI "/" ChipLogFormatMEI                   \
+    " - %" CHIP_ERROR_FORMAT
 
 namespace chip::app {
 
