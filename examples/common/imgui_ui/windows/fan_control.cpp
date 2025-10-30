@@ -20,6 +20,7 @@
 #include <imgui.h>
 
 #include <math.h>
+#include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -47,6 +48,7 @@ static const std::string GetBitmapValueString(chip::BitMask<T> bitmask,
             result += entry.second;
         }
     }
+
     return result.empty() ? "Unknown" : result;
 }
 

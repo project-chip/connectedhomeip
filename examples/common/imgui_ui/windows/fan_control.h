@@ -23,7 +23,6 @@
 
 #include <app/data-model/Nullable.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/core/Optional.h>
 
 #include <app-common/zap-generated/cluster-enums.h>
 

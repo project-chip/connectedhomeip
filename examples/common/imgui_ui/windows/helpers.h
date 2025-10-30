@@ -100,6 +100,7 @@ void UpdateStateNullable(chip::EndpointId endpointId, chip::app::DataModel::Null
     value = result.Value();
 }
 
+
 } // namespace Windows
 } // namespace Ui
 } // namespace example
