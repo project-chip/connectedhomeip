@@ -167,13 +167,12 @@ namespace Test {
             VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
             const chip::app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
 
-            uint8_t buffer[kTlvBufferSize];
             chip::TLV::TLVWriter tlvWriter;
-            tlvWriter.Init(buffer);
+            tlvWriter.Init(mTlvBuffer);
             ReturnErrorOnFailure(data.Encode(tlvWriter, chip::TLV::AnonymousTag()));
 
             chip::TLV::TLVReader tlvReader;
-            tlvReader.Init(buffer, tlvWriter.GetLengthWritten());
+            tlvReader.Init(mTlvBuffer, tlvWriter.GetLengthWritten());
             ReturnErrorOnFailure(tlvReader.Next());
 
             // Use provided handler or internal one
