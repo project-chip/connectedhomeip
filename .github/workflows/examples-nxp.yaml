@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:168
+            image: ghcr.io/project-chip/chip-build-nxp:172
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -202,7 +202,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:168
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:172
 
         steps:
             - name: Checkout
