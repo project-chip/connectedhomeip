@@ -98,10 +98,11 @@ GeneralCommissioningCluster * Instance()
     return &gServer.Cluster();
 }
 
-void EnsureCreated()
-{
-    VerifyOrReturn(!gServer.IsConstructed());
+} // namespace chip::app::Clusters::GeneralCommissioning
 
+void MatterGeneralCommissioningClusterInitCallback(EndpointId endpointId)
+{
+    VerifyOrReturn(endpointId == kRootEndpointId);
     IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
@@ -116,14 +117,6 @@ void EnsureCreated()
             .fetchOptionalAttributes   = true,
         },
         integrationDelegate);
-}
-
-} // namespace chip::app::Clusters::GeneralCommissioning
-
-void MatterGeneralCommissioningClusterInitCallback(EndpointId endpointId)
-{
-    VerifyOrReturn(endpointId == kRootEndpointId);
-    chip::app::Clusters::GeneralCommissioning::EnsureCreated();
 }
 
 void MatterGeneralCommissioningClusterShutdownCallback(EndpointId endpointId)

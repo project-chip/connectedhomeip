@@ -18,6 +18,7 @@
 
 #include <app/clusters/general-commissioning-server/CodegenIntegration.h>
 #include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
+#include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 namespace chip {
@@ -25,15 +26,17 @@ namespace app {
 namespace Clusters {
 namespace NetworkCommissioning {
 
+void Instance::CodegenGeneralCommissioningBreadcrumbTracker::SetBreadCrumb(uint64_t value)
+{
+    GeneralCommissioningCluster * cluster = GeneralCommissioning::Instance();
+    if (cluster != nullptr)
+    {
+        cluster->SetBreadCrumb(value);
+    }
+}
+
 CHIP_ERROR Instance::Init()
 {
-    VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
-    // ensures that we have a codegen general commissioning cluster
-    GeneralCommissioning::EnsureCreated();
-    GeneralCommissioningCluster * cluster = GeneralCommissioning::Instance();
-    VerifyOrDie(cluster != nullptr); // should be ok because we `EnsureCreated`
-
-    std::visit([this, &cluster](auto delegate) { mCluster.Create(mEndpointId, delegate, *cluster); }, mDelegate);
     ReturnErrorOnFailure(mCluster.Cluster().Init());
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 }
@@ -42,7 +45,6 @@ void Instance::Shutdown()
 {
     CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
     mCluster.Cluster().Shutdown();
-    mCluster.Destroy();
 }
 
 } // namespace NetworkCommissioning

@@ -22,7 +22,6 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
 #include <app/clusters/network-commissioning/ThreadScanResponse.h>
 #include <app/clusters/network-commissioning/WifiScanResponse.h>
 #include <app/data-model/Nullable.h>
@@ -134,28 +133,28 @@ NetworkCommissioningLogic::NetworkInstanceList NetworkCommissioningLogic::sInsta
 #endif
 
 NetworkCommissioningLogic::NetworkCommissioningLogic(EndpointId aEndpointId, WiFiDriver * apDelegate,
-                                                     GeneralCommissioningCluster & generalCommissioningCluster) :
+                                                     BreadCrumbTracker * aTracker) :
     mEndpointId(aEndpointId),
     mFeatureFlags(WiFiFeatures(apDelegate)), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate),
-    mGeneralCommissioningCluster(generalCommissioningCluster)
+    mBreadcrumbTracker(aTracker)
 {
     mpDriver.Set<WiFiDriver *>(apDelegate);
 }
 
 NetworkCommissioningLogic::NetworkCommissioningLogic(EndpointId aEndpointId, ThreadDriver * apDelegate,
-                                                     GeneralCommissioningCluster & generalCommissioningCluster) :
+                                                     BreadCrumbTracker * aTracker) :
     mEndpointId(aEndpointId),
     mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate),
-    mGeneralCommissioningCluster(generalCommissioningCluster)
+    mBreadcrumbTracker(aTracker)
 {
     mpDriver.Set<ThreadDriver *>(apDelegate);
 }
 
 NetworkCommissioningLogic::NetworkCommissioningLogic(EndpointId aEndpointId, EthernetDriver * apDelegate,
-                                                     GeneralCommissioningCluster & generalCommissioningCluster) :
+                                                     BreadCrumbTracker * aTracker) :
     mEndpointId(aEndpointId),
     mFeatureFlags(Feature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(apDelegate),
-    mGeneralCommissioningCluster(generalCommissioningCluster)
+    mBreadcrumbTracker(aTracker)
 {}
 
 CHIP_ERROR NetworkCommissioningLogic::Init()
@@ -589,7 +588,7 @@ NetworkCommissioningLogic::HandleAddOrUpdateThreadNetwork(CommandHandler & handl
 void NetworkCommissioningLogic::UpdateBreadcrumb(const Optional<uint64_t> & breadcrumb)
 {
     VerifyOrReturn(breadcrumb.HasValue());
-    mGeneralCommissioningCluster.SetBreadCrumb(breadcrumb.Value());
+    mBreadcrumbTracker->SetBreadCrumb(breadcrumb.Value());
 }
 
 void NetworkCommissioningLogic::CommitSavedBreadcrumb()

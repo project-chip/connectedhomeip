@@ -18,9 +18,9 @@
 
 #include "NetworkCommissioningCluster.h"
 
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
@@ -45,19 +45,20 @@ public:
     /// Calls Shutdown on the cluster and unregisters the cluster from the CodegenDataModelProvider Registry
     void Shutdown();
 
-    template <typename Driver>
-    Instance(EndpointId aEndpointId, Driver * apDelegate) : mEndpointId(aEndpointId), mDelegate(apDelegate)
-    {}
+    Instance(EndpointId aEndpointId, WiFiDriver * apDelegate) : mCluster(aEndpointId, apDelegate, &mTracker) {}
+    Instance(EndpointId aEndpointId, ThreadDriver * apDelegate) : mCluster(aEndpointId, apDelegate, &mTracker) {}
+    Instance(EndpointId aEndpointId, EthernetDriver * apDelegate) : mCluster(aEndpointId, apDelegate, &mTracker) {}
 
 private:
-    LazyRegisteredServerCluster<NetworkCommissioningCluster> mCluster;
+    // does the tracking via the public general commissioning cluster (if available)
+    class CodegenGeneralCommissioningBreadcrumbTracker : public BreadCrumbTracker
+    {
+    public:
+        void SetBreadCrumb(uint64_t value) override;
+    };
 
-    // caches the creation values until `Init()` is called
-    // This is done because Instances are generally `static` however the instances
-    // require data that is available only once the server initialization starts (in particular
-    // ember metadata is required so that the coupling with GeneralCommissioning can be established).
-    EndpointId mEndpointId;
-    std::variant<WiFiDriver *, ThreadDriver *, EthernetDriver *> mDelegate;
+    CodegenGeneralCommissioningBreadcrumbTracker mTracker;
+    RegisteredServerCluster<NetworkCommissioningCluster> mCluster;
 };
 
 // The InstanceAndDriver class encapsulates the creation and management of a transport driver instance (Wi-Fi, Thread, or Ethernet)

@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include "app/clusters/general-commissioning-server/general-commissioning-cluster.h"
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningLogic.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 
@@ -35,19 +35,16 @@ class NetworkCommissioningCluster : public DefaultServerCluster
 {
 public:
     NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::WiFiDriver * driver,
-                                GeneralCommissioningCluster & generalCommissioningCluster) :
-        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
-        mLogic(endpointId, driver, generalCommissioningCluster)
+                                BreadCrumbTracker * tracker) :
+        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver, tracker)
     {}
     NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::ThreadDriver * driver,
-                                GeneralCommissioningCluster & generalCommissioningCluster) :
-        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
-        mLogic(endpointId, driver, generalCommissioningCluster)
+                                BreadCrumbTracker * tracker) :
+        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver, tracker)
     {}
     NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::EthernetDriver * driver,
-                                GeneralCommissioningCluster & generalCommissioningCluster) :
-        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
-        mLogic(endpointId, driver, generalCommissioningCluster)
+                                BreadCrumbTracker * tracker) :
+        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver, tracker)
     {}
 
     CHIP_ERROR Init() { return mLogic.Init(); }

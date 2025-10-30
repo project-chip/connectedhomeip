@@ -18,6 +18,7 @@
 
 #include <app/AppConfig.h>
 #include <app/FailSafeContext.h>
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/server/CommissioningWindowManager.h>
@@ -39,7 +40,7 @@
 
 namespace chip::app::Clusters {
 
-class GeneralCommissioningCluster : public DefaultServerCluster, chip::FabricTable::Delegate
+class GeneralCommissioningCluster : public DefaultServerCluster, chip::FabricTable::Delegate, public BreadCrumbTracker
 {
 public:
     using OptionalAttributes = OptionalAttributeSet<GeneralCommissioning::Attributes::IsCommissioningWithoutPower::Id>;
@@ -67,7 +68,7 @@ public:
     OptionalAttributes & GetOptionalAttributes() { return mOptionalAttributes; }
     Context & ClusterContext() { return mClusterContext; }
 
-    void SetBreadCrumb(uint64_t value);
+    void SetBreadCrumb(uint64_t value) override;
 
     // Server cluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;

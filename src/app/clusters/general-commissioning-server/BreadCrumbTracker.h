@@ -14,14 +14,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <cstdint>
+
 #pragma once
 
-#include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
+namespace chip::app::Clusters {
 
-namespace chip::app::Clusters::GeneralCommissioning {
+class BreadCrumbTracker
+{
+public:
+    virtual ~BreadCrumbTracker() = default;
+    virtual  void SetBreadCrumb(uint64_t value) = 0;
+};
 
-// Get the instance of the cluster if one was created (generally devices have one on the root endpoint)
-// will return nullptr if the cluster has not yet been created;
-GeneralCommissioningCluster * Instance();
-
-} // namespace chip::app::Clusters::GeneralCommissioning
+} // namespace chip::app::Clusters
