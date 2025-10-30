@@ -287,15 +287,15 @@ Here is an example of only checking for the value of a given attribute if
 `ClusterRevision` >= 3 using `minRevision`.
 
 ```yaml
-    - label: "Verify the minimum-to-support Max Paths Per Invoke value"
-      command: "readAttribute"
-      attribute: "MaxPathsPerInvoke"
-      minRevision: 3  # Attribute was added in revision 3, so this step applies
-                      # to revision >= 3.
-      response:
-          constraints:
-              minValue: 1
-
+- label: "Verify the minimum-to-support Max Paths Per Invoke value"
+  command: "readAttribute"
+  attribute: "MaxPathsPerInvoke"
+  minRevision:
+      3 # Attribute was added in revision 3, so this step applies
+      # to revision >= 3.
+  response:
+      constraints:
+          minValue: 1
 ```
 
 #### Setting step timeouts
