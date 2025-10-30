@@ -70,7 +70,7 @@ class TC_IDM_4_2(MatterBaseTest):
     def steps_TC_IDM_4_2(self):
         return [TestStep("precondition", "Commissioning already done.", is_commissioning=True),
                 TestStep(1, "CR1 reads the ServerList attribute from the Descriptor cluster on EP0.",
-                         "If the ICD Management cluster ID (70,0x46) is present, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = IdleModeDuration and min_interval_floor_s to 0, otherwise, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = 60 mins and min_interval_floor_s to 3."),
+                         "If the ICD Management cluster ID (70,0x46) is present, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = max(IdleModeDuration, 60min) and min_interval_floor_s to 0, otherwise, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = 60 mins and min_interval_floor_s to 3."),
                 TestStep(2, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value greater than subscription_max_interval_publisher_limit_sec. DUT sends a report data action to the TH. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.",
                          "Verify on the CR1, a report data message is received. Verify it contains the following data Report data - data of the attribute/event requested earlier. Verify on the CR1 the Subscribe Response has the following fields, SubscriptionId - Verify it is of type uint32. MaxInterval - Verify it is of type uint32. Verify that the MaxInterval is less than or equal to MaxIntervalCeiling."),
                 TestStep(3, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value less than subscription_max_interval_publisher_limit_sec. DUT sends a report data action to the CR1. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.",
@@ -206,7 +206,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # *** Step 1 ***
         # CR1 reads the ServerList attribute from the Descriptor cluster on EP0. If the ICDManagement cluster ID
-        # (70,0x46) is present, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = IdleModeDuration and
+        # (70,0x46) is present, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = max(IdleModeDuration, 60min) and
         # min_interval_floor_s to 0, otherwise, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = 60 mins and
         # min_interval_floor_s to 3.
         self.step(1)
@@ -218,10 +218,10 @@ class TC_IDM_4_2(MatterBaseTest):
         if Clusters.IcdManagement.id in ep0_servers:
             # Read the IdleModeDuration attribute value from the DUT
             logging.info(
-                "CR1 reads from the DUT the IdleModeDuration attribute and sets SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = IdleModeDuration")
+                "CR1 reads from the DUT the IdleModeDuration attribute and sets SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = max(IdleModeDuration, 60min)")
 
             idleModeDuration = await self.get_idle_mode_duration_sec(CR1)
-            subscription_max_interval_publisher_limit_sec = idleModeDuration
+            subscription_max_interval_publisher_limit_sec = max(idleModeDuration, 60 * 60)
             min_interval_floor_sec = 0
         else:
             # Defaulting SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC to 60 minutes
