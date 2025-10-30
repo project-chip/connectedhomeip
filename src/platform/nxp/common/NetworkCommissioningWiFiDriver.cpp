@@ -127,20 +127,31 @@ CHIP_ERROR NXPWiFiDriver::CommitConfiguration()
 
 CHIP_ERROR NXPWiFiDriver::RevertConfiguration()
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     struct wlan_network searchedNetwork = { 0 };
 
-    /* If network was added we have to remove it (as the connection failed) from wifi driver to be able
-    to connect to another network next commissioning */
-    if (wlan_get_network_byname(mStagingNetwork.ssid, &searchedNetwork) == WM_SUCCESS)
+    /* If network was added we have to remove it (only if device is not connected to a wifi network) from wifi driver to be able
+    to connect to another network next commissioning.
+    Do not remove the network if the device is already connected to a WiFi network,
+    example scenario: TC-CNET-4.9
+    */
+    if (!is_sta_connected() && wlan_get_network_byname(mStagingNetwork.ssid, &searchedNetwork) == WM_SUCCESS)
     {
         if (wlan_remove_network(mStagingNetwork.ssid) != WM_SUCCESS)
         {
             return CHIP_ERROR_INTERNAL;
         }
     }
-    mStagingNetwork = mSavedNetwork;
 
-    return CHIP_NO_ERROR;
+    mStagingNetwork = mSavedNetwork;
+    if(mStagingNetwork.ssidLen > 0)
+    {
+        // Connect to saved network
+        err = ConnectWiFiNetwork(mSavedNetwork.ssid, mSavedNetwork.ssidLen, mSavedNetwork.credentials, mSavedNetwork.credentialsLen);
+
+    }
+
+    return err;
 }
 
 bool NXPWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
