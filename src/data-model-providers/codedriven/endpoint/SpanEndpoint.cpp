@@ -33,12 +33,6 @@ SpanEndpoint::Builder & SpanEndpoint::Builder::SetClientClusters(Span<const Clus
     return *this;
 }
 
-SpanEndpoint::Builder & SpanEndpoint::Builder::SetSemanticTags(Span<const SemanticTag> semanticTags)
-{
-    mSemanticTags = semanticTags;
-    return *this;
-}
-
 SpanEndpoint::Builder & SpanEndpoint::Builder::SetDeviceTypes(Span<const DataModel::DeviceTypeEntry> deviceTypes)
 {
     mDeviceTypes = deviceTypes;
@@ -56,16 +50,10 @@ SpanEndpoint::Builder & SpanEndpoint::Builder::SetEndpointUniqueId(CharSpan endp
 SpanEndpoint SpanEndpoint::Builder::Build()
 {
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-    return SpanEndpoint(mClientClusters, mSemanticTags, mDeviceTypes, mEndpointUniqueId);
+    return SpanEndpoint(mClientClusters, mDeviceTypes, mEndpointUniqueId);
 #else
-    return SpanEndpoint(mClientClusters, mSemanticTags, mDeviceTypes);
+    return SpanEndpoint(mClientClusters, mDeviceTypes);
 #endif
-}
-
-CHIP_ERROR
-SpanEndpoint::SemanticTags(ReadOnlyBufferBuilder<SemanticTag> & out) const
-{
-    return out.ReferenceExisting(mSemanticTags);
 }
 
 CHIP_ERROR SpanEndpoint::DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const
@@ -87,16 +75,16 @@ CharSpan SpanEndpoint::EndpointUniqueId() const
 
 // Private constructor for Builder
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-SpanEndpoint::SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const SemanticTag> & semanticTags,
-                           const Span<const DataModel::DeviceTypeEntry> & deviceTypes, const CharSpan & uniqueEndpointId) :
+SpanEndpoint::SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const DataModel::DeviceTypeEntry> & deviceTypes,
+                           const CharSpan & uniqueEndpointId) :
     mDeviceTypes(deviceTypes),
-    mSemanticTags(semanticTags), mClientClusters(clientClusters), mEndpointUniqueId(uniqueEndpointId)
+    mClientClusters(clientClusters), mEndpointUniqueId(uniqueEndpointId)
 {}
 #else
-SpanEndpoint::SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const SemanticTag> & semanticTags,
+SpanEndpoint::SpanEndpoint(const Span<const ClusterId> & clientClusters,
                            const Span<const DataModel::DeviceTypeEntry> & deviceTypes) :
     mDeviceTypes(deviceTypes),
-    mSemanticTags(semanticTags), mClientClusters(clientClusters)
+    mClientClusters(clientClusters)
 {}
 #endif
 
