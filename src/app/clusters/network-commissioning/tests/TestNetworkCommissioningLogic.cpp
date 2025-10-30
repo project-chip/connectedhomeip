@@ -36,6 +36,12 @@ namespace {
 using namespace chip;
 using namespace chip::app::Clusters;
 
+class NoopBreadcrumbTracker : public BreadCrumbTracker
+{
+public:
+    void SetBreadCrumb(uint64_t v) override {}
+};
+
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestNetworkCommissioningLogic : public ::testing::Test
 {
@@ -46,18 +52,8 @@ struct TestNetworkCommissioningLogic : public ::testing::Test
 TEST_F(TestNetworkCommissioningLogic, TestFeatures)
 {
     Testing::FakeWiFiDriver fakeWifiDriver;
-    GeneralCommissioningCluster generalCommissioningCluster(GeneralCommissioningCluster::Context {
-        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-            .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-            .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-            .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-            .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-            .platformManager        = DeviceLayer::PlatformMgr(),                            //
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
-#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-    });
-    NetworkCommissioningLogic logic(kRootEndpointId, &fakeWifiDriver, generalCommissioningCluster);
+    NoopBreadcrumbTracker tracker;
+    NetworkCommissioningLogic logic(kRootEndpointId, &fakeWifiDriver, &tracker);
     ASSERT_EQ(logic.Features(), BitFlags<NetworkCommissioning::Feature>(NetworkCommissioning::Feature::kWiFiNetworkInterface));
 }
 
