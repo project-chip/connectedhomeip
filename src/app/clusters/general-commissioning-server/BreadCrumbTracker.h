@@ -14,9 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <cstdint>
-
 #pragma once
+#include <cstdint>
 
 namespace chip::app::Clusters {
 
