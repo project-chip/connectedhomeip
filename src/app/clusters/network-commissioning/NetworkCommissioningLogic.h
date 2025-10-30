@@ -31,6 +31,7 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
+#include <functional>
 #include <optional>
 
 namespace chip {
@@ -59,11 +60,12 @@ class NetworkCommissioningLogic : private NetworkCommissioningLogicListNode,
                                   public DeviceLayer::NetworkCommissioning::ThreadDriver::ScanCallback
 {
 public:
-    using ThreadDriver   = DeviceLayer::NetworkCommissioning::ThreadDriver;
-    using WiFiDriver     = DeviceLayer::NetworkCommissioning::WiFiDriver;
-    using EthernetDriver = DeviceLayer::NetworkCommissioning::EthernetDriver;
+    using ThreadDriver              = DeviceLayer::NetworkCommissioning::ThreadDriver;
+    using WiFiDriver                = DeviceLayer::NetworkCommissioning::WiFiDriver;
+    using EthernetDriver            = DeviceLayer::NetworkCommissioning::EthernetDriver;
+    using AttributeChangeCallbackFn = std::function<void(AttributeId)>;
 
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(AttributeChangeCallbackFn callback);
     void Shutdown();
 
     // BaseDriver::NetworkStatusChangeCallback
@@ -208,6 +210,8 @@ private:
     uint8_t mLastNetworkIDLen = 0;
     Optional<uint64_t> mCurrentOperationBreadcrumb;
     bool mScanningWasDirected = false;
+
+    AttributeChangeCallbackFn mAttributeChangedCallback = nullptr;
 
     void SetLastNetworkingStatusValue(NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo::Type networkingStatusValue);
     void SetLastConnectErrorValue(NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo::Type connectErrorValue);
