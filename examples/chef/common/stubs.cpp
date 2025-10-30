@@ -75,8 +75,10 @@ void InitIdentifyCluster()
         if (epIndex >= kIdentifyTableSize)
             continue;
 
-        gIdentifyInstanceTable[epIndex] =
-            std::make_unique<struct Identify>(endpointId, nullptr, nullptr, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone);
+        gIdentifyInstanceTable[epIndex] = std::make_unique<struct Identify>(
+            endpointId, [](struct Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
+            [](struct Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
+            chip::app::Clusters::Identify::IdentifyTypeEnum::kNone);
     }
 }
 } // namespace
