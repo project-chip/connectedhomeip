@@ -55,7 +55,7 @@ public:
 protected:
     virtual CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
                                                       ByteSpan & globallyTrustedRootSpan) = 0;
-    virtual void OnVendorIdVerificationComplete(const CHIP_ERROR & err)                    = 0;
+    virtual void OnVendorIdVerificationComplete(const CHIP_ERROR & err)                   = 0;
 
 private:
     CHIP_ERROR VerifyNOCCertificateChain(const ByteSpan & nocSpan, const ByteSpan & icacSpan, const ByteSpan & rcacSpan);
