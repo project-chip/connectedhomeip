@@ -62,24 +62,23 @@ class TC_MOD_2_3(MatterBaseTest):
     def steps_TC_MOD_2_3(self) -> list[TestStep]:
         steps = [
             TestStep("0", "Commissioning, already done", is_commissioning=True),
-            TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT using a key that is pre-installed on the TH. GroupKeySet fields are as follows: GroupKeySetID: 0x01a1, GroupKeySecurityPolicy: TrustFirst (0), EpochKey0: a0a1a2a3a4a5a6a7a8a9aaabacadaeaf, EpochStartTime0: 1110000, EpochKey1: b0b1b2b3b4b5b6b7b8b9babbbcbdbebf, EpochStartTime1: 1110001, EpochKey2: c0c1c2c3c4c5c6c7c8c9cacbcccdcecf, EpochStartTime2: 1110002"),
+            TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT using a key that is pre-installed on the TH. GroupKeySet fields are as follows: * GroupKeySetID: 0x01a1 * GroupKeySecurityPolicy: TrustFirst (0) * EpochKey0: a0a1a2a3a4a5a6a7a8a9aaabacadaeaf * EpochStartTime0: 1110000 * EpochKey1: b0b1b2b3b4b5b6b7b8b9babbbcbdbebf * EpochStartTime1: 1110001 * EpochKey2: c0c1c2c3c4c5c6c7c8c9cacbcccdcecf * EpochStartTime2: 1110002"),
             TestStep("0b", "TH binds GroupIds 0x0001 with GroupKeySetID 0x01a1 in the GroupKeyMap attribute list on GroupKeyManagement cluster by writing the GroupKeyMap attribute with two entries as follows: * List item 1: - FabricIndex: 1 - GroupId: 0x0001 - GroupKeySetId: 0x01a1"),
-            TestStep("0c", "TH sends a _RemoveAllGroups_ command to DUT."),
-            TestStep("1a", "TH sends a _AddGroup_ command to DUT with the _GroupID_ field set to _G~1~_."),
-            TestStep("1b", "TH sends a _RemoveAllScenes_ command to DUT with the _GroupID_ field set to _G~1~_."),
-            TestStep("1c", "TH sends a _GetSceneMembership_ command to DUT with the _GroupID_ field set to _G~1~_."),
-            TestStep("2", "TH reads the _SupportedModes attribute_ from the DUT. Verify that the DUT response provides a list of supported modes.  Record the mode numbers for usage in step 5a. Skip tests 3 to 7 if less than 1 mode is supported."),
-            TestStep("3", "TH reads the _CurrentMode attribute_ from the DUT. Record the mode numbers for usage in steps 5a."),
-            TestStep("4a", "TH sends a _StoreScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
-            TestStep("4b", "TH sends a _ViewScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
+            TestStep("0c", "TH sends a _RemoveAllGroups_ command to DUT. If a status response is expected, DUT sends a response to TH with the _Status_ field equal to 0x00 (SUCCESS)."),
+            TestStep("1a", "TH sends a _AddGroup_ command to DUT with the _GroupID_ field set to _G~1~_. DUT sends a _AddGroupResponse_ command to TH with the _Status_ field set to 0x00 (SUCCESS) and the _GroupID_ field set to _G~1~_."),
+            TestStep("1b", "TH sends a _RemoveAllScenes_ command to DUT with the _GroupID_ field set to _G~1~_. DUT sends a _RemoveAllScenes_ command to TH with the _Status_ field set to 0x00 (SUCCESS) and _GroupID_ field set to _G~1~_."),
+            TestStep("1c", "TH sends a _GetSceneMembership_ command to DUT with the _GroupID_ field set to _G~1~_. DUT sends a _GetSceneMembershipResponse_ command to TH with the _Status_ field set to 0x00 (SUCCESS), the _Capacity_ field recorded into _SC~0~_ for later use, the _GroupID_ field set to _G~1~_ and the _SceneList_ field containing 0 entry"),
+            TestStep("2", "TH reads the _SupportedModes attribute_ from the DUT. Verify that the DUT response provides a list of supported modes. Record the list of supported modes under _L~1~_ for usage in step 5a. Skip tests 3 to 7 if less than 1 mode is supported."),
+            TestStep("3", "TH reads the _CurrentMode attribute_ from the DUT. Record the mode value as _M~Initial~_ for usage in steps 5a."),
+            TestStep("4a", "TH sends a _StoreScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01. DUT sends a _StoreSceneResponse_ command to TH with the _Status_ field set to 0x00 (SUCCESS), the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
+            TestStep("4b", "TH sends a _ViewScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01. DUT sends a _ViewSceneResponse_ command to TH with the _Status_ field set to 0x00 (SUCCESS), the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x01, the _TransitionTime_ field set to 0 and a set of extension fields appropriate to the values set in step 4a."),
             TestStep(
-                "5a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02 and the ExtensionFieldSets set to: '[{ ClusterID: 0x0050, AttributeValueList: [{ AttributeID: 0x0003, ValueUnsigned8: _M~1~_ }] }]' where _M~1~_ is a value selected from the list of supported modes obtained in step 2 but different from the value obtained in step 3 if there is more than 1 item returned in step 2."),
-            TestStep("5b", "TH sends a _ViewScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x02."),
+                "5a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02 and the ExtensionFieldSets set to: '[{ ClusterID: 0x0050, AttributeValueList: [{ AttributeID: 0x0003, ValueUnsigned8: _M~1~_ }] }]' where _M~1~_ is a value selected from the _L~1~_ but different from _M~Initial~_ obtained in step 3 unless _L~1~_ contains only one item. DUT sends a _AddSceneResponse_ command to TH with the _Status_ field set to 0x00 (SUCCESS), the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x02."),
+            TestStep("5b", "TH sends a _ViewScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x02. DUT sends a _ViewSceneResponse_ command to TH with the _Status_ field set to 0x00 (SUCCESS), the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02, the _TransitionTime_ field set to 0 and a set of extension fields where CurrentMode attribute value is equal to _M~1~_ from step 5a."),
             TestStep("6a", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02 and the _TransitionTime_ omitted."),
-            TestStep("6b", "After a few seconds, TH reads the _CurrentMode attribute_ from DUT "),
-            TestStep(
-                "7a", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x01 and the _TransitionTime_ omitted.| {resDutSuccess}"),
-            TestStep("7b", "After a few seconds, TH reads the _CurrentMode attribute_ from DUT "),
+            TestStep("6b", "After a few seconds, TH reads the _CurrentMode attribute_ from DUT. Value has to be the same as _M~1~_ from step 5a."),
+            TestStep("7a", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x01 and the _TransitionTime_ omitted."),
+            TestStep("7b", "After a few seconds, TH reads the _CurrentMode attribute_ from DUT. Value has to be the same as _M~Initial~_ from step 3."),
 
         ]
         return steps
@@ -98,10 +97,11 @@ class TC_MOD_2_3(MatterBaseTest):
             groupKeySetID=self.kGroupKeyset1,
             groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
             epochKey0="0123456789abcdef".encode(),
+            epochKey0="a0a1a2a3a4a5a6a7a8a9aaabacadaeaf".encode(),
             epochStartTime0=1110000,
-            epochKey1="0123456789abcdef".encode(),
+            epochKey1="b0b1b2b3b4b5b6b7b8b9babbbcbdbebf".encode(),
             epochStartTime1=1110001,
-            epochKey2="0123456789abcdef".encode(),
+            epochKey2="c0c1c2c3c4c5c6c7c8c9cacbcccdcecf".encode(),
             epochStartTime2=1110002)
 
         await self.TH1.SendCommand(self.dut_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(self.groupKey))
@@ -151,9 +151,9 @@ class TC_MOD_2_3(MatterBaseTest):
     async def test_TC_MOD_2_3(self):
         cluster = Clusters.ModeSelect
         attributes = cluster.Attributes
-        mode_select_supported_modes = []
-        mode_select_current_mode = None
-        mode_select_m1_mode = None  # Mode to be used in step 5a
+        mode_select_supported_modes = []  # L~1~
+        mode_select_initial_mode = None  # M~Initial~
+        mode_select_m1_mode = None  # M~1~, Mode to be used in step 5a
 
         self.step("2")
         mode_select_supported_modes = await self.read_single_attribute_check_success(cluster, attributes.SupportedModes)
@@ -162,11 +162,11 @@ class TC_MOD_2_3(MatterBaseTest):
             return
 
         self.step("3")
-        mode_select_current_mode = await self.read_single_attribute_check_success(cluster, attributes.CurrentMode)
+        mode_select_initial_mode = await self.read_single_attribute_check_success(cluster, attributes.CurrentMode)
 
-        mode_select_m1_mode = mode_select_current_mode
+        mode_select_m1_mode = mode_select_initial_mode
         for supported_mode in mode_select_supported_modes:
-            if supported_mode.mode != mode_select_current_mode:
+            if supported_mode.mode != mode_select_initial_mode:
                 mode_select_m1_mode = supported_mode.mode
                 break
 
@@ -190,7 +190,7 @@ class TC_MOD_2_3(MatterBaseTest):
 
             for AV in EFS.attributeValueList:
                 if AV.attributeID == current_mode_attribute_id:
-                    asserts.assert_equal(AV.valueUnsigned8, mode_select_current_mode, "View Scene failed on CurrentMode")
+                    asserts.assert_equal(AV.valueUnsigned8, mode_select_initial_mode, "View Scene failed on CurrentMode")
                     found_var = True
         asserts.assert_true(found_var, "View Scene failed to find CurrentMode attribute in ExtensionFieldSets")
 
@@ -253,7 +253,7 @@ class TC_MOD_2_3(MatterBaseTest):
         self.step("7b")
         await asyncio.sleep(2)  # Wait a few seconds as per test spec
         current_mode_after_recall = await self.read_single_attribute_check_success(cluster, attributes.CurrentMode)
-        asserts.assert_equal(current_mode_after_recall, mode_select_current_mode,
+        asserts.assert_equal(current_mode_after_recall, mode_select_initial_mode,
                              "CurrentMode is not equal to expected value after Recall Scene")
 
 
