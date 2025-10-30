@@ -77,7 +77,7 @@ class TC_CNET_4_16(MatterBaseTest):
         self.step(1)
 
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900)
-        res = await self.send_single_cmd(cmd=cmd)
+        res = await self.send_single_cmd(endpoint=0, cmd=cmd)
         # Verify that DUT sends ArmFailSafeResponse command to the TH
         asserts.assert_equal(
             res.errorCode,
