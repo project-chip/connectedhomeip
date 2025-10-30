@@ -269,6 +269,9 @@ public class MatterCastingPlayer implements CastingPlayer {
   @Override
   public native void disconnect();
 
+  @Override
+  public native void removeFabric();
+
   /**
    * @brief Get CastingPlayer's current ConnectionState.
    * @throws IllegalArgumentException or NullPointerException when native layer returns invalid
