@@ -86,6 +86,9 @@ class EEVSEBaseTestHelper:
                     endpoint=endpoint,
                     timedRequestTimeoutMs=timedRequestTimeoutMs)
 
+            asserts.assert_equal(expected_status, Status.Success,
+                                 "Unexpected error returned")
+
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
@@ -106,6 +109,9 @@ class EEVSEBaseTestHelper:
                     endpoint=endpoint,
                     timedRequestTimeoutMs=timedRequestTimeoutMs)
 
+            asserts.assert_equal(expected_status, Status.Success,
+                                 "Unexpected error returned")
+
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
@@ -115,6 +121,9 @@ class EEVSEBaseTestHelper:
             await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.Disable(),
                                        endpoint=endpoint,
                                        timedRequestTimeoutMs=timedRequestTimeoutMs)
+
+            asserts.assert_equal(expected_status, Status.Success,
+                                 "Unexpected error returned")
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status,
@@ -127,6 +136,9 @@ class EEVSEBaseTestHelper:
                                        endpoint=endpoint,
                                        timedRequestTimeoutMs=timedRequestTimeoutMs)
 
+            asserts.assert_equal(expected_status, Status.Success,
+                                 "Unexpected error returned")
+
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
@@ -138,6 +150,9 @@ class EEVSEBaseTestHelper:
                                        endpoint=endpoint,
                                        timedRequestTimeoutMs=timedRequestTimeoutMs)
 
+            asserts.assert_equal(expected_status, Status.Success,
+                                 "Unexpected error returned")
+
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
@@ -148,6 +163,8 @@ class EEVSEBaseTestHelper:
             get_targets_resp = await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.GetTargets(),
                                                           endpoint=endpoint,
                                                           timedRequestTimeoutMs=timedRequestTimeoutMs)
+            asserts.assert_equal(expected_status, Status.Success,
+                                 "Unexpected error returned")
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status,
