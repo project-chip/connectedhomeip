@@ -55,6 +55,10 @@ static const std::string GetBitmapValueString(chip::BitMask<T> bitmask,
 
 static const std::string GetRockBitmapValueString(chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> bitmask)
 {
+    if (bitmask > chip::app::Clusters::FanControl::RockBitmap::kRockRound) {
+        return "Unsupported rocking bitmask";
+    }
+
     return GetBitmapValueString(bitmask,
                                 { { chip::app::Clusters::FanControl::RockBitmap::kRockLeftRight, "Left-right" },
                                   { chip::app::Clusters::FanControl::RockBitmap::kRockUpDown, "Up-down" },
@@ -63,6 +67,10 @@ static const std::string GetRockBitmapValueString(chip::BitMask<chip::app::Clust
 
 static const std::string GetWindBitmapValueString(chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> bitmask)
 {
+    if (bitmask > chip::app::Clusters::FanControl::WindBitmap::kNaturalWind) {
+        return "Unsupported wind for bitmask";
+    }
+
     return GetBitmapValueString(bitmask,
                                 { { chip::app::Clusters::FanControl::WindBitmap::kSleepWind, "Sleep" },
                                   { chip::app::Clusters::FanControl::WindBitmap::kNaturalWind, "Natural" } });
