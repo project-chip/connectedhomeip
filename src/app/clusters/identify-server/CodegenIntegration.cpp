@@ -175,7 +175,8 @@ void MatterIdentifyClusterInitCallback(EndpointId endpointId)
     if (GetLegacyIdentifyInstance(endpointId) != nullptr &&
         CodegenDataModelProvider::Instance().Registry().Get({ endpointId, Clusters::Identify::Id }) == nullptr)
     {
-        ChipLogError(AppServer, "Init error: failed to find Identify cluster registration for endpoint %u", endpointId);
+        ChipLogError(AppServer, "Warning: unexpected state. Failed to find Identify cluster registration for endpoint %u",
+                     endpointId);
     }
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
 }
