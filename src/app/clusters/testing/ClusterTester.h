@@ -60,7 +60,7 @@ namespace Test {
 class ClusterTester
 {
 public:
-    ClusterTester(chip::app::ServerClusterInterface & cluster) : mCluster(cluster) {}
+    ClusterTester(app::ServerClusterInterface & cluster) : mCluster(cluster) {}
 
     template <typename T>
     CHIP_ERROR ReadAttribute(AttributeId attr, T & value)
@@ -71,18 +71,18 @@ public:
         // supported to not be ambigous. This is most often the case (e.g. DefaultServerCluster
         // does this).
         VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
-        chip::app::ConcreteAttributePath attributePath(paths[0].mEndpointId, paths[0].mClusterId, attr);
-        mReadOperation = std::make_unique<chip::app::Testing::ReadOperation>(attributePath);
+        app::ConcreteAttributePath attributePath(paths[0].mEndpointId, paths[0].mClusterId, attr);
+        mReadOperation = std::make_unique<app::Testing::ReadOperation>(attributePath);
 
-        std::unique_ptr<chip::app::AttributeValueEncoder> encoder = mReadOperation->StartEncoding();
+        std::unique_ptr<app::AttributeValueEncoder> encoder = mReadOperation->StartEncoding();
         ReturnErrorOnFailure(mCluster.ReadAttribute(mReadOperation->GetRequest(), *encoder).GetUnderlyingError());
         ReturnErrorOnFailure(mReadOperation->FinishEncoding());
 
-        std::vector<chip::app::Testing::DecodedAttributeData> attributeData;
+        std::vector<app::Testing::DecodedAttributeData> attributeData;
         ReturnErrorOnFailure(mReadOperation->GetEncodedIBs().Decode(attributeData));
         VerifyOrReturnError(attributeData.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
 
-        return chip::app::DataModel::Decode(attributeData[0].dataReader, value);
+        return app::DataModel::Decode(attributeData[0].dataReader, value);
     }
 
     template <typename T>
@@ -94,14 +94,14 @@ public:
         // supported to not be ambigous. This is most often the case (e.g. DefaultServerCluster
         // does this).
         VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
-        chip::app::ConcreteAttributePath attributePath(paths[0].mEndpointId, paths[0].mClusterId, attr);
-        chip::app::Testing::WriteOperation writeOperation(attributePath);
-        chip::app::AttributeValueDecoder decoder = writeOperation.DecoderFor(value);
+        app::ConcreteAttributePath attributePath(paths[0].mEndpointId, paths[0].mClusterId, attr);
+        app::Testing::WriteOperation writeOperation(attributePath);
+        app::AttributeValueDecoder decoder = writeOperation.DecoderFor(value);
         return mCluster.WriteAttribute(writeOperation.GetRequest(), decoder).GetUnderlyingError();
     };
 
     // Prepares an invoke request: sets the command path and clears handler state.
-    void InvokeOperation(const chip::app::ConcreteCommandPath & path)
+    void InvokeOperation(const app::ConcreteCommandPath & path)
     {
         mCommandPath = path;
         mHandler.ClearResponses();
@@ -111,7 +111,7 @@ public:
 
     // Invoke a command using a predefined request structure
     template <typename RequestType>
-    [[nodiscard]] std::optional<chip::app::DataModel::ActionReturnStatus> Invoke(const RequestType & request)
+    [[nodiscard]] std::optional<app::DataModel::ActionReturnStatus> Invoke(const RequestType & request)
     {
         TLV::TLVWriter writer;
         writer.Init(mTlvBuffer);
@@ -131,12 +131,12 @@ public:
     // Builds the request automatically using the internal cluster's paths.
     // Ideal for quick tests without manual request construction.
     template <typename T>
-    [[nodiscard]] std::optional<chip::app::DataModel::ActionReturnStatus> Invoke(chip::CommandId commandId, const T & data,
-                                                                                 chip::app::CommandHandler * handler)
+    [[nodiscard]] std::optional<app::DataModel::ActionReturnStatus> Invoke(chip::CommandId commandId, const T & data,
+                                                                                 app::CommandHandler * handler)
     {
         const auto & paths = mCluster.GetPaths();
         VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
-        const chip::app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
+        const app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
 
         chip::TLV::TLVWriter tlvWriter;
         tlvWriter.Init(mTlvBuffer);
@@ -157,11 +157,11 @@ public:
 
     // Invoke a command using a predefined request structure
     template <typename T>
-    chip::app::DataModel::ActionReturnStatus Invoke(chip::CommandId commandId, const T & data)
+    app::DataModel::ActionReturnStatus Invoke(chip::CommandId commandId, const T & data)
     {
         const auto & paths = mCluster.GetPaths();
         VerifyOrDie(paths.size() == 1u);
-        const chip::app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
+        const app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
 
         // Clear any previous handler state to avoid stale responses
         mHandler.ClearResponses();
@@ -194,7 +194,7 @@ public:
     {
         const auto & paths = mCluster.GetPaths();
         VerifyOrDie(paths.size() == 1u);
-        const chip::app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
+        const app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
 
         // Clear any previous handler state to avoid stale responses
         mHandler.ClearResponses();
@@ -219,11 +219,11 @@ public:
         return response;
     }
 
-    const chip::app::DataModel::InvokeRequest & GetRequest() const { return mRequest; }
+    const app::DataModel::InvokeRequest & GetRequest() const { return mRequest; }
 
 private:
-    chip::app::ServerClusterInterface & mCluster;
-    std::unique_ptr<chip::app::Testing::ReadOperation> mReadOperation;
+    app::ServerClusterInterface & mCluster;
+    std::unique_ptr<app::Testing::ReadOperation> mReadOperation;
 
     // Buffer size for TLV encoding/decoding of command payloads.
     // 256 bytes was chosen as a conservative upper bound for typical command payloads in tests.
@@ -231,9 +231,9 @@ private:
     // If protocol or test requirements change, this value may need to be increased.
     static constexpr size_t kTlvBufferSize = 256;
 
-    chip::app::ConcreteCommandPath mCommandPath;
-    chip::app::DataModel::InvokeRequest mRequest;
-    chip::app::Testing::MockCommandHandler mHandler;
+    app::ConcreteCommandPath mCommandPath;
+    app::DataModel::InvokeRequest mRequest;
+    app::Testing::MockCommandHandler mHandler;
     uint8_t mTlvBuffer[kTlvBufferSize];
 };
 
