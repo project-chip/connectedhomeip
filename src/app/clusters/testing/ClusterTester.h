@@ -132,7 +132,7 @@ public:
     // Ideal for quick tests without manual request construction.
     template <typename T>
     [[nodiscard]] std::optional<app::DataModel::ActionReturnStatus> Invoke(chip::CommandId commandId, const T & data,
-                                                                                 app::CommandHandler * handler)
+                                                                           app::CommandHandler * handler)
     {
         const auto & paths = mCluster.GetPaths();
         VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
