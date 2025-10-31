@@ -124,14 +124,7 @@ protected:
     void DeleteEndPoint(EndPoint * endPoint)
     {
         SYSTEM_STATS_DECREMENT(EndPointProperties<EndPointType>::kSystemStatsKey);
-    // Instrumentation: capture address before release.
-#if CHIP_DETAIL_LOGGING
-    if (endPoint != nullptr)
-    {
-        ChipLogProgress(Inet, "DeleteEndPoint: %s ep=%p", EndPointProperties<EndPointType>::kName, endPoint);
-    }
-#endif
-    ReleaseEndPoint(endPoint);
+        ReleaseEndPoint(endPoint);
     }
 
 private:
@@ -150,15 +143,8 @@ public:
     EndPointManagerImplPool()           = default;
     ~EndPointManagerImplPool() override = default;
 
-    TypedEndPointHandle CreateEndPoint() override
-    {
-        auto handle = sEndPointPool.CreateObject(*this);
-#if CHIP_DETAIL_LOGGING
-        ChipLogProgress(Inet, "CreateEndPoint: %s ep=%p", EndPointProperties<typename EndPointImpl::EndPoint>::kName,
-                        static_cast<const void*>(handle));
-#endif
-        return handle;
-    }
+    TypedEndPointHandle CreateEndPoint() override { return sEndPointPool.CreateObject(*this); }
+
     Loop ForEachEndPoint(const typename Manager::EndPointVisitor visitor) override
     {
         return sEndPointPool.ForEachActiveObject([&](EndPoint * endPoint) -> Loop {
@@ -168,13 +154,7 @@ public:
     }
 
 private:
-    void ReleaseEndPoint(EndPoint * endPoint) override
-    {
-#if CHIP_DETAIL_LOGGING
-        ChipLogProgress(Inet, "ReleaseEndPoint: %s ep=%p", EndPointProperties<EndPoint>::kName, endPoint);
-#endif
-        sEndPointPool.ReleaseObject(static_cast<EndPointImpl *>(endPoint));
-    }
+    void ReleaseEndPoint(EndPoint * endPoint) override { sEndPointPool.ReleaseObject(static_cast<EndPointImpl *>(endPoint)); }
 
     ObjectPool<EndPointImpl, EndPointProperties<EndPoint>::kNumEndPoints> sEndPointPool;
 };

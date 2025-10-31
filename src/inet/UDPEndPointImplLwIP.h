@@ -38,19 +38,10 @@ public:
         // Generate a unique instance ID to detect endpoint reuse
         static std::atomic<uint32_t> sNextInstanceId{ 1 };
         mInstanceId.store(sNextInstanceId.fetch_add(1));
-#if CHIP_DETAIL_LOGGING
-        ChipLogProgress(Inet, "UDPEndPointImplLwIP: CONSTRUCTOR ep=%p pcb=nullptr id=%u", this, 
-                        static_cast<unsigned>(mInstanceId.load()));
-#endif
     }
 
     ~UDPEndPointImplLwIP()
-    {
-#if CHIP_DETAIL_LOGGING
-        ChipLogProgress(Inet, "UDPEndPointImplLwIP: DESTRUCTOR ep=%p pcb=%p id=%u", this, mUDP, 
-                        static_cast<unsigned>(mInstanceId.load()));
-#endif
-    }
+    {}
 
     // UDPEndPoint overrides.
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;

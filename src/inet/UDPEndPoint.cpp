@@ -123,15 +123,7 @@ CHIP_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
 
 void UDPEndPoint::Free()
 {
-#if CHIP_DETAIL_LOGGING
-    ChipLogProgress(Inet, "UDPEndPoint::Free ep=%p state=%u ref=%lu", this, static_cast<unsigned>(mState),
-                    (unsigned long) GetReferenceCount());
-#endif
     Close();
-#if CHIP_DETAIL_LOGGING
-    ChipLogProgress(Inet, "UDPEndPoint::Free after Close ep=%p state=%u ref=%lu", this, static_cast<unsigned>(mState),
-                    (unsigned long) GetReferenceCount());
-#endif
     Delete();
 }
 
@@ -139,16 +131,8 @@ void UDPEndPoint::Close()
 {
     if (mState != State::kClosed)
     {
-#if CHIP_DETAIL_LOGGING
-        ChipLogProgress(Inet, "UDPEndPoint::Close transitioning ep=%p oldState=%u ref=%lu", this,
-                static_cast<unsigned>(mState), (unsigned long) GetReferenceCount());
-#endif
         mState = State::kClosed;
         CloseImpl();
-#if CHIP_DETAIL_LOGGING
-        ChipLogProgress(Inet, "UDPEndPoint::Close done ep=%p state=%u ref=%lu", this, static_cast<unsigned>(mState),
-                (unsigned long) GetReferenceCount());
-#endif
     }
 }
 
