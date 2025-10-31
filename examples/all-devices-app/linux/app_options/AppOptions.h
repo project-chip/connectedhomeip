@@ -19,24 +19,21 @@
 #pragma once
 
 #include <AppMain.h>
-#include <string>
 #include <lib/core/DataModelTypes.h>
+#include <string>
 
 class AppOptions
 {
 public:
     static chip::ArgParser::OptionSet * GetOptions();
 
-    static const char* GetDeviceType(){
-        return mDeviceTypeName;
-    }
+    static const char * GetDeviceType() { return mDeviceTypeName; }
 
-    static chip::EndpointId GetDeviceEndpoint(){
-        return mDeviceEndpoint;
-    }
+    static chip::EndpointId GetDeviceEndpoint() { return mDeviceEndpoint; }
 
 private:
-    static bool AllDevicesAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier, const char * name, const char * value);
+    static bool AllDevicesAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier,
+                                           const char * name, const char * value);
 
     static const char * mDeviceTypeName;
     static chip::EndpointId mDeviceEndpoint;

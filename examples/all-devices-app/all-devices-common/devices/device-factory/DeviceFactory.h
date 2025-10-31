@@ -52,8 +52,13 @@ public:
         if (IsValidDevice(deviceTypeArg))
         {
             return mRegistry.find(deviceTypeArg)->second();
-        }else {
-            ChipLogError(Support, "INTERNAL ERROR: Invalid device type: %s. Run with the --help argument to view the list of valid device types.\n", deviceTypeArg.c_str());
+        }
+        else
+        {
+            ChipLogError(
+                Support,
+                "INTERNAL ERROR: Invalid device type: %s. Run with the --help argument to view the list of valid device types.\n",
+                deviceTypeArg.c_str());
         }
         return nullptr;
     }

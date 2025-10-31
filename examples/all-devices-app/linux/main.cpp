@@ -23,6 +23,7 @@
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Dnssd.h>
+#include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <devices/device-factory/DeviceFactory.h>
 #include <devices/root-node/RootNodeDevice.h>
@@ -32,7 +33,6 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <string>
 #include <system/SystemLayer.h>
-#include <app_options/AppOptions.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -50,8 +50,6 @@ DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
 LinuxCommissionableDataProvider gCommissionableDataProvider;
-
-
 
 void StopSignalHandler(int /* signal */)
 {

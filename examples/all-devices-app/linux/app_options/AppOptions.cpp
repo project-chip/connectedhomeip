@@ -25,10 +25,11 @@ using namespace chip::ArgParser;
 constexpr uint16_t kOptionDeviceType = 0xffd0;
 constexpr uint16_t kOptionEndpoint   = 0xffd1;
 
-const char * AppOptions::mDeviceTypeName   = "contact-sensor"; // defaulting to contact sensor if not specified
-chip::EndpointId AppOptions::mDeviceEndpoint     = 1; // defaulting to endpoint 1 if not specified
+const char * AppOptions::mDeviceTypeName     = "contact-sensor"; // defaulting to contact sensor if not specified
+chip::EndpointId AppOptions::mDeviceEndpoint = 1;                // defaulting to endpoint 1 if not specified
 
-bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * options, int identifier, const char * name, const char * value)
+bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * options, int identifier, const char * name,
+                                            const char * value)
 {
     switch (identifier)
     {
@@ -68,10 +69,10 @@ OptionSet * AppOptions::GetOptions()
     // TODO: This message on supported device types needs to be updated to scale
     //  better once new devices are added.
     static OptionSet sCmdLineOptions = { AllDevicesAppOptionHandler, // handler function
-                                                sAllDevicesAppOptionDefs,   // array of option definitions
-                                                "PROGRAM OPTIONS",          // help group
-                                                "-d, --device <contact-sensor|water-leak-detector>\n"
-                                                "-e, --endpoint <endpoint-number>\n"};
+                                         sAllDevicesAppOptionDefs,   // array of option definitions
+                                         "PROGRAM OPTIONS",          // help group
+                                         "-d, --device <contact-sensor|water-leak-detector>\n"
+                                         "-e, --endpoint <endpoint-number>\n" };
 
     return &sCmdLineOptions;
 }
