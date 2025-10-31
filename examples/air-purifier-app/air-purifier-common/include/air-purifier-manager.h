@@ -19,6 +19,7 @@
 #include <DeviceManager.h>
 #include <air-quality-sensor-manager.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>
+#include <app/clusters/resource-monitoring-server/CodegenIntegration.h>
 #include <filter-delegates.h>
 #include <relative-humidity-sensor-manager.h>
 #include <temperature-sensor-manager.h>
