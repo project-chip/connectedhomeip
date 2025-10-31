@@ -32,7 +32,7 @@ namespace app {
 
 CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
-    ReturnErrorOnFailure(BaseRegistration(endpointId, provider, parentId));
+    ReturnErrorOnFailure(SingleEndpointRegistration(endpointId, provider, parentId));
 
     mBasicInformationCluster.Create();
 

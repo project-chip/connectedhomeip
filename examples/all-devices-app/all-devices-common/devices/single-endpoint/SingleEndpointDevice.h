@@ -22,6 +22,7 @@
 #include <clusters/Descriptor/Structs.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
+#include <devices/base-device/Device.h>
 
 #include <string>
 
@@ -31,10 +32,12 @@ namespace chip::app {
 ///
 /// Current implementation assumes that a device is registered on a single
 /// endpoint.
-class BaseDevice : public EndpointInterface
+class SingleEndpointDevice : public BaseDevice
 {
 public:
-    virtual ~BaseDevice() = default;
+    virtual ~SingleEndpointDevice() = default;
+
+    EndpointId GetEndpointId() const { return mEndpointId; }
 
     /// Register relevant clusters on the given endpoint
     virtual CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -45,15 +48,14 @@ public:
     /// Will only be called if register has succeeded before
     virtual void UnRegister(CodeDrivenDataModelProvider & provider) = 0;
 
-    // Endpoint interface implementation
-    CHIP_ERROR DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const override;
-    CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
-
 protected:
-    BaseDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes) : mDeviceTypes(deviceTypes), mEndpointRegistration(*this, {}) {}
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes) : BaseDevice(deviceTypes) {}
 
-    Span<const DataModel::DeviceTypeEntry> mDeviceTypes;
-    EndpointInterfaceRegistration mEndpointRegistration;
+    /// Internal registration function for common device clusters and endpoint registration.
+    /// Subclasses are expected to call this
+    CHIP_ERROR SingleEndpointRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId);
+
+    EndpointId mEndpointId = kInvalidEndpointId;
 
     // Common clusters..
     LazyRegisteredServerCluster<Clusters::DescriptorCluster> mDescriptorCluster;

@@ -23,7 +23,7 @@ namespace chip::app {
 CHIP_ERROR BooleanStateSensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                               EndpointId parentId)
 {
-    ReturnErrorOnFailure(BaseRegistration(endpoint, provider, parentId));
+    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, *mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));

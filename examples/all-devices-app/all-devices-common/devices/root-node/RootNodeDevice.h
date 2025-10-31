@@ -28,13 +28,13 @@
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <devices/Types.h>
-#include <devices/base-device/Device.h>
+#include <devices/single-endpoint/SingleEndpointDevice.h>
 #include <platform/NetworkCommissioning.h>
 
 namespace chip {
 namespace app {
 
-class RootNodeDevice : public BaseDevice
+class RootNodeDevice : public SingleEndpointDevice
 {
 public:
     ~RootNodeDevice() override = default;
@@ -45,7 +45,7 @@ public:
 
 protected:
     // Most implementations require network commissioning, so only subclasses have access to this.
-    RootNodeDevice() : BaseDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1)) {}
+    RootNodeDevice() : SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1)) {}
 
 private:
     LazyRegisteredServerCluster<Clusters::BasicInformationCluster> mBasicInformationCluster;

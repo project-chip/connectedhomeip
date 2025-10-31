@@ -19,13 +19,13 @@
 #include <app/clusters/boolean-state-server/boolean-state-cluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/reporting/ReportScheduler.h>
-#include <devices/base-device/Device.h>
+#include <devices/single-endpoint/SingleEndpointDevice.h>
 #include <memory>
 
 namespace chip {
 namespace app {
 
-class BooleanStateSensorDevice : public BaseDevice
+class BooleanStateSensorDevice : public SingleEndpointDevice
 {
 public:
     /*
@@ -36,7 +36,7 @@ public:
      */
     BooleanStateSensorDevice(std::unique_ptr<reporting::ReportScheduler::TimerDelegate> timerDelegate,
                              Span<const DataModel::DeviceTypeEntry> deviceType) :
-        BaseDevice(deviceType),
+        SingleEndpointDevice(deviceType),
         mTimerDelegate(std::move(timerDelegate))
     {}
     ~BooleanStateSensorDevice() override = default;

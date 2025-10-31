@@ -21,24 +21,6 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-CHIP_ERROR BaseDevice::BaseRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
-{
-    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
-    mEndpointId = endpoint;
-
-    // TODO: This needs to be updated to be more customizable and allow the cluster to be created with
-    //  optional attributes or semantic tags being set.
-    mDescriptorCluster.Create(endpoint, DescriptorCluster::OptionalAttributesSet(0), Span<const SemanticTag>());
-    ReturnErrorOnFailure(provider.AddCluster(mDescriptorCluster.Registration()));
-
-    mEndpointRegistration.endpointEntry = DataModel::EndpointEntry{
-        .id                 = endpoint,
-        .parentId           = parentId,
-        .compositionPattern = DataModel::EndpointCompositionPattern::kFullFamily,
-    };
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR BaseDevice::DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const
 {
     VerifyOrReturnValue(mDescriptorCluster.IsConstructed(), CHIP_NO_ERROR);
