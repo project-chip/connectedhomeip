@@ -33,12 +33,12 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path,
                           ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
 // Needed for correct functionality.
 //WriteAttribute
-//Attributes
 //InvokeCommand
-//AcceptedCommands?
-//GeneratedCommands?
 };
 
 }  // namespace chip::app::Clusters

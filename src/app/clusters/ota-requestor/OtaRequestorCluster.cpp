@@ -23,6 +23,13 @@
 #include <clusters/OtaSoftwareUpdateRequestor/Metadata.h>
 
 namespace chip::app::Clusters {
+namespace {
+
+constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
+    OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::kMetadataEntry,
+};
+
+}  // namespace
 
 OtaRequestorCluster::OtaRequestorCluster(EndpointId endpointId)
     : DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id))
@@ -41,6 +48,12 @@ CHIP_ERROR OtaRequestorCluster::Attributes(const ConcreteClusterPath & path,
 {
     AttributeListBuilder listBuilder(builder);
     return listBuilder.Append(Span(OtaSoftwareUpdateRequestor::Attributes::kMandatoryMetadata), {});
+}
+
+CHIP_ERROR OtaRequestorCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+{
+    return builder.ReferenceExisting(kAcceptedCommands);
 }
 
 }  // namespace chip::app::Clusters
