@@ -280,6 +280,7 @@ class TC_CNET_4_10(MatterBaseTest):
         # Step 10: Verify breadcrumb
         self.step(10)
         breadcrumb = await self.read_single_attribute_check_success(
+            endpoint=0,
             cluster=gen_comm,
             attribute=gen_comm.Attributes.Breadcrumb
         )
@@ -299,6 +300,7 @@ class TC_CNET_4_10(MatterBaseTest):
         # Step 12: Verify breadcrumb unchanged
         self.step(12)
         breadcrumb = await self.read_single_attribute_check_success(
+            endpoint=0,
             cluster=gen_comm,
             attribute=gen_comm.Attributes.Breadcrumb
         )
