@@ -219,15 +219,6 @@ public:
         return response;
     }
 
-    chip::app::Testing::MockCommandHandler & GetHandler() { return mHandler; }
-    const chip::app::Testing::MockCommandHandler & GetHandler() const { return mHandler; }
-
-    template <typename ResponseType>
-    CHIP_ERROR DecodeResponse(ResponseType & response)
-    {
-        return mHandler.DecodeResponse(response);
-    }
-
     const chip::app::DataModel::InvokeRequest & GetRequest() const { return mRequest; }
 
 private:
