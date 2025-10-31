@@ -96,11 +96,11 @@ class TC_MOD_2_3(MatterBaseTest):
         self.groupKey = Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
             groupKeySetID=self.kGroupKeyset1,
             groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0="0123456789abcdef".encode(),
+            epochKey0=bytes.fromhex("a0a1a2a3a4a5a6a7a8a9aaabacadaeaf"),
             epochStartTime0=1110000,
-            epochKey1="0123456789abcdef".encode(),
+            epochKey1=bytes.fromhex("b0b1b2b3b4b5b6b7b8b9babbbcbdbebf"),
             epochStartTime1=1110001,
-            epochKey2="0123456789abcdef".encode(),
+            epochKey2=bytes.fromhex("c0c1c2c3c4c5c6c7c8c9cacbcccdcecf"),
             epochStartTime2=1110002)
 
         await self.TH1.SendCommand(self.dut_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(self.groupKey))
