@@ -107,6 +107,11 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
     return sInstance;
 }
 
+bool DiagnosticDataProviderImpl::SupportsWatermarks()
+{
+    return true;
+}
+
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
     currentHeapFree = esp_get_free_heap_size();
@@ -123,6 +128,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
 {
     currentHeapHighWatermark = heap_caps_get_total_size(MALLOC_CAP_DEFAULT) - esp_get_minimum_free_heap_size();
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
+{
+    // esp-idf does not provide a way to reset the watermarks
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
