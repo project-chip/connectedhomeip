@@ -116,11 +116,10 @@ class TC_BINFO_3_1(MatterBaseTest):
                             "PIXIT.BINFO.PrimaryColor must be included on the command line in "
                             "the --int-arg flag as PIXIT.BINFO.PrimaryColor:<primary_color_value>")
         pixit_primary_color = self.matter_test_config.global_test_params["PIXIT.BINFO.PrimaryColor"]
-        if productAppearance.primaryColor is not None:
-            asserts.assert_equal(productAppearance.primaryColor, pixit_primary_color,
-                                 (f"ProductAppearance.PrimaryColor ({productAppearance.primaryColor})\n"
-                                  f"does not match PIXIT.BINFO.PrimaryColor ({pixit_primary_color})\n"
-                                  "Please verify the PIXIT.BINFO.PrimaryColor setting and try again."))
+        asserts.assert_equal(productAppearance.primaryColor, pixit_primary_color,
+                             (f"ProductAppearance.PrimaryColor ({productAppearance.primaryColor})\n"
+                              f"does not match PIXIT.BINFO.PrimaryColor ({pixit_primary_color})\n"
+                              "Please verify the PIXIT.BINFO.PrimaryColor setting and try again."))
 
 
 if __name__ == "__main__":
