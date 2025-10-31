@@ -28,12 +28,11 @@ namespace app {
 class BooleanStateSensorDevice : public SingleEndpointDevice
 {
 public:
-    /*
-     * This is a general class for boolean state sensor devices. The device type passed here will
-     * determine the type of sensor it is (contact, water leak, etc.) This is meant to be a reusable
-     * class for the sensor types that share the same core functionality through the identify and
-     * boolean state clusters.
-     */
+    /// This is a general class for boolean state sensor devices. The device type passed here will
+    /// determine the type of sensor it is (contact, water leak, etc.) This is meant to be a reusable
+    /// class for the sensor types that share the same core functionality through the identify and
+    /// boolean state clusters. The caller creating a BooleanStateSensorDevice MUST ensure that the underlying 
+    /// data for the Span of deviceTypes remains valid for the entire liefetime of the BooleanStateSensorDevice object instance.
     BooleanStateSensorDevice(std::unique_ptr<reporting::ReportScheduler::TimerDelegate> timerDelegate,
                              Span<const DataModel::DeviceTypeEntry> deviceType) :
         SingleEndpointDevice(deviceType),

@@ -36,7 +36,7 @@ CHIP_ERROR BooleanStateSensorDevice::Register(chip::EndpointId endpoint, CodeDri
 
 void BooleanStateSensorDevice::UnRegister(CodeDrivenDataModelProvider & provider)
 {
-    provider.RemoveEndpoint(mEndpointId);
+    SingleEndpointUnregistration(provider);
     if (mBooleanStateCluster.IsConstructed())
     {
         provider.RemoveCluster(&mBooleanStateCluster.Cluster());

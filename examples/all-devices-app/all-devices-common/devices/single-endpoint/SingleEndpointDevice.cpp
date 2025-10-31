@@ -39,4 +39,13 @@ CHIP_ERROR SingleEndpointDevice::SingleEndpointRegistration(EndpointId endpoint,
     return CHIP_NO_ERROR;
 }
 
+void SingleEndpointDevice::SingleEndpointUnregistration(CodeDrivenDataModelProvider & provider) {
+    provider.RemoveEndpoint(mEndpointId);
+    if (mDescriptorCluster.IsConstructed())
+    {
+        provider.RemoveCluster(&mDescriptorCluster.Cluster());
+        mDescriptorCluster.Destroy();
+    }
+}
+
 } // namespace chip::app

@@ -36,13 +36,15 @@ class BaseDevice : public EndpointInterface
 public:
     virtual ~BaseDevice() = default;
 
-    /// Register relevant clusters on the given endpoint
+    /// Register relevant clusters on the given endpoint. This must only
+    /// be called after starting up a device for the first time. This function 
+    /// will create/instantiate all clusters on the device and complete endpoint registration.
     virtual CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                 EndpointId parentId = kInvalidEndpointId) = 0;
 
-    /// Remove clusters from the given provider.
-    ///
-    /// Will only be called if register has succeeded before
+    /// Removes a device's clusters from the given provider. This 
+    /// must only be called when any functionality from the device 
+    /// is no longer needed (for example, on shutown).
     virtual void UnRegister(CodeDrivenDataModelProvider & provider) = 0;
 
     // Endpoint interface implementation
@@ -50,6 +52,8 @@ public:
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 
 protected:
+    /// The caller creating a BaseDevice MUST ensure that the underlying data for the Span of 
+    /// deviceTypes remains valid for the entire liefetime of the BaseDevice object instance. 
     BaseDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes) : mDeviceTypes(deviceTypes), mEndpointRegistration(*this, {}) {}
 
     Span<const DataModel::DeviceTypeEntry> mDeviceTypes;

@@ -30,7 +30,7 @@ namespace chip::app {
 
 /// A device is a entity that maintains some cluster functionality.
 ///
-/// Current implementation assumes that a device is registered on a single
+/// This implementation assumes that a device is registered on a single
 /// endpoint.
 class SingleEndpointDevice : public BaseDevice
 {
@@ -39,26 +39,27 @@ public:
 
     EndpointId GetEndpointId() const { return mEndpointId; }
 
-    /// Register relevant clusters on the given endpoint
-    virtual CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                EndpointId parentId = kInvalidEndpointId) = 0;
-
-    /// Remove clusters from the given provider.
-    ///
-    /// Will only be called if register has succeeded before
-    virtual void UnRegister(CodeDrivenDataModelProvider & provider) = 0;
-
 protected:
+    /// The caller creating a SingleEndpointDevice MUST ensure that the underlying data for the Span of 
+    /// deviceTypes remains valid for the entire liefetime of the SingleEndpointDevice object instance.
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes) : BaseDevice(deviceTypes) {}
 
     /// Internal registration function for common device clusters and endpoint registration.
-    /// Subclasses are expected to call this
+    /// Device subclasses are expected to, and must only call this as part of their own device specific Register() 
+    /// functions. This allows creation of common and device-specific clusters to be done together and 
+    /// also to complete endpoint registration.
     CHIP_ERROR SingleEndpointRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId);
 
-    EndpointId mEndpointId = kInvalidEndpointId;
+    /// Internal function to unregister a single endpoint device. This will destroy the clusters part of 
+    /// this class, and must be called in a subclass' device-specific UnRegister() function. This allows 
+    /// for the destruction of the general SingleEndpointDevice clusters and device-specifc clusters from  
+    /// the subclass, as well as removal of the device endpoint from the provider to happen together.
+    void SingleEndpointUnregistration(CodeDrivenDataModelProvider & provider);
 
-    // Common clusters..
-    LazyRegisteredServerCluster<Clusters::DescriptorCluster> mDescriptorCluster;
+    /// A default value of kInvalidEndpointId is used for the endpoint ID. When this is the value of the endpoint ID,
+    /// it signifies that endpoint registration (and cluster creation) has not yet been completed. The endpoint
+    /// ID will be set after a call to SingleEndpointRegistration() has been made. 
+    EndpointId mEndpointId = kInvalidEndpointId;
 };
 
 } // namespace chip::app
