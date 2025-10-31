@@ -42,7 +42,8 @@ public:
 
     JitterDeferredProviderChangeListener(ProviderChangeListener * aUnderlyingListener, uint32_t aDeferAttributePathBaseTimeoutMs,
                                          uint32_t aDeferAttributePathJitterTimeoutMs) :
-        mUnderlyingListener(aUnderlyingListener), mDeferAttributePathBaseTimeoutMs(aDeferAttributePathBaseTimeoutMs),
+        mUnderlyingListener(aUnderlyingListener),
+        mDeferAttributePathBaseTimeoutMs(aDeferAttributePathBaseTimeoutMs),
         mDeferAttributePathJitterTimeoutMs(aDeferAttributePathJitterTimeoutMs)
     {}
 

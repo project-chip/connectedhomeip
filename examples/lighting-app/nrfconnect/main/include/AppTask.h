@@ -22,7 +22,6 @@
 #include "LEDWidget.h"
 #include "PWMDevice.h"
 
-#include <app/AttributePathParams.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #if CONFIG_CHIP_FACTORY_DATA
@@ -43,6 +42,7 @@
 
 struct k_timer;
 struct Identify;
+
 class AppTask
 {
 public:
