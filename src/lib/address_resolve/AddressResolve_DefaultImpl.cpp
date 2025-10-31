@@ -35,6 +35,9 @@ void NodeLookupHandle::ResetForLookup(System::Clock::Timestamp now, const NodeLo
     mRequestStartTime = now;
     mRequest          = request;
     mResults          = NodeLookupResults();
+#if CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
+    mCacheUsed        = false;
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
 }
 
 void NodeLookupHandle::LookupResult(const ResolveResult & result)
@@ -88,6 +91,16 @@ System::Clock::Timeout NodeLookupHandle::NextEventTimeout(System::Clock::Timesta
         return System::Clock::Timeout::zero();
     }
 
+#if CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
+    // Check if we need to trigger cache usage after delay
+    if (!mCacheUsed && elapsed < kCacheDelayTimeout)
+    {
+        auto cacheTimeout = kCacheDelayTimeout - elapsed;
+        auto maxTimeout = mRequest.GetMaxLookupTime() - elapsed;
+        return (cacheTimeout < maxTimeout) ? cacheTimeout : maxTimeout;
+    }
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
+
     if (elapsed < mRequest.GetMaxLookupTime())
     {
         return mRequest.GetMaxLookupTime() - elapsed;
@@ -96,6 +109,34 @@ System::Clock::Timeout NodeLookupHandle::NextEventTimeout(System::Clock::Timesta
     ChipLogError(Discovery, "Unexpected timeout: lookup should have been cleaned already.");
     return System::Clock::Timeout::zero();
 }
+
+#if CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
+bool NodeLookupHandle::TryUseCache(System::Clock::Timestamp now, const NodeAddressCache & cache)
+{
+    if (mCacheUsed)
+    {
+        return false;
+    }
+
+    const System::Clock::Timestamp elapsed = now - mRequestStartTime;
+    if (elapsed < kCacheDelayTimeout)
+    {
+        return false;
+    }
+
+    ResolveResult result;
+    if (cache.Lookup(mRequest.GetPeerId(), result))
+    {
+        ChipLogProgress(Discovery, "Using cached address after %lu ms delay", static_cast<unsigned long>(elapsed.count()));
+        LookupResult(result);
+        mCacheUsed = true;
+        return true;
+    }
+
+    mCacheUsed = true; // Mark as tried even if no cache entry found
+    return false;
+}
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
 
 NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
 {
@@ -211,6 +252,13 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
     ReArmTimer();
     ChipLogProgress(Discovery, "Lookup started for " ChipLogFormatPeerId, ChipLogValuePeerId(peerId));
     return CHIP_NO_ERROR;
+}
+
+void Resolver::AddFallbackEntry(const PeerId & peerId, const ResolveResult & result)
+{
+#if CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
+    mNodeAddressCache.CacheNode(peerId, result);
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
 }
 
 CHIP_ERROR Resolver::TryNextResult(Impl::NodeLookupHandle & handle)
@@ -371,6 +419,9 @@ void Resolver::HandleAction(IntrusiveList<NodeLookupHandle>::Iterator & current)
         ChipLogError(Discovery, "Unexpected lookup state (not success or fail).");
         break;
     }
+#if CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
+    mNodeAddressCache.RemoveCachedNodeAddress(peerId);
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
 }
 
 void Resolver::HandleTimer()
@@ -380,6 +431,14 @@ void Resolver::HandleTimer()
     {
         auto current = it;
         it++;
+
+#if CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
+        // Try to use cache after delay if no results yet
+        if (!current->HasLookupResult())
+        {
+            current->TryUseCache(mTimeSource.GetMonotonicTimestamp(), mNodeAddressCache);
+        }
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK_ENTRY
 
         HandleAction(current);
     }

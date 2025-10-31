@@ -39,6 +39,8 @@ static_library("address_resolve") {
     sources += [
       "AddressResolve_DefaultImpl.cpp",
       "AddressResolve_DefaultImpl.h",
+      "NodeAddressCache.cpp",
+      "NodeAddressCache.h",
     ]
   } else if (chip_address_resolve_strategy == "custom") {
     # nothing to do here, custom implementation
