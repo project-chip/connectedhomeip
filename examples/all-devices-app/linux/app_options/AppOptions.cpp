@@ -32,7 +32,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
 {
     switch (identifier)
     {
-    case kOptionDeviceType: 
+    case kOptionDeviceType:
         if (value == nullptr)
         {
             ChipLogError(Support, "INTERNAL ERROR: No device type value passed in.\n");
@@ -41,7 +41,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         ChipLogProgress(AppServer, "Using the device type of %s", value);
         mDeviceTypeName = value;
         return true;
-    case kOptionEndpoint: 
+    case kOptionEndpoint:
         if (value == nullptr)
         {
             ChipLogError(Support, "INTERNAL ERROR: No endpoint ID value passed in.\n");
@@ -58,7 +58,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
     return true;
 }
 
-OptionSet * AppOptions::GetOptions() 
+OptionSet * AppOptions::GetOptions()
 {
     static OptionDef sAllDevicesAppOptionDefs[] = {
         { "device", kArgumentRequired, kOptionDeviceType },
@@ -70,7 +70,7 @@ OptionSet * AppOptions::GetOptions()
     static OptionSet sCmdLineOptions = { AllDevicesAppOptionHandler, // handler function
                                                 sAllDevicesAppOptionDefs,   // array of option definitions
                                                 "PROGRAM OPTIONS",          // help group
-                                                "-d, --device <contact-sensor|water-leak-detector>\n" 
+                                                "-d, --device <contact-sensor|water-leak-detector>\n"
                                                 "-e, --endpoint <endpoint-number>\n"};
 
     return &sCmdLineOptions;
