@@ -303,6 +303,12 @@ void OperationalSessionSetup::SetAdditionalLitBackoffInterval(const Optional<Sys
         additionalTime.ValueOr(System::Clock::Milliseconds32(CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL));
 }
 
+System::Clock::Milliseconds32 OperationalSessionSetup::GetAdditionalLitBackoffInterval()
+{
+    assertChipStackLockedByCurrentThread();
+    return sAdditionalLitBackoffInterval;
+}
+
 CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & result)
 {
     auto config = result.mrpRemoteConfig;
