@@ -91,6 +91,11 @@ if(CONFIG_BOOTLOADER_MCUBOOT)
   target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
 endif()
 
+if(CONFIG_MCUMGR_TRANSPORT_BT)
+    zephyr_library_link_libraries(MCUBOOT_BOOTUTIL)
+    target_sources(app PRIVATE ${TELINK_COMMON}/util/src/DFUOverSMP.cpp)
+endif()
+
 if (CONFIG_CHIP_PW_RPC)
   include(${TELINK_COMMON}/Rpc.cmake)
 endif(CONFIG_CHIP_PW_RPC)

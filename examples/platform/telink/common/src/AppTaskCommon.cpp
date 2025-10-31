@@ -44,6 +44,10 @@
 #include <OTAUtil.h>
 #endif
 
+#ifdef CONFIG_MCUMGR_TRANSPORT_BT
+#include <DFUOverSMP.h>
+#endif
+
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #endif
@@ -326,6 +330,9 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Set up a valid Network Commissioning cluster on endpoint 0 is done in
     // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
+#endif
+#ifdef CONFIG_MCUMGR_TRANSPORT_BT
+    GetDFUOverSMP().Init();
 #endif
 
     // We need to disable OpenThread to prevent writing to the NVS storage when factory reset occurs

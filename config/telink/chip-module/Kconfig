@@ -95,6 +95,24 @@ config TELINK_OTA_BUTTON_TEST
 	  Merge the signed binary with the same version as the main into slot-1 of merged.hex.
 	  Pressing the button initiates a forced image update.
 
+config CHIP_DFU_OVER_BT_SMP
+	bool "Enable DFU over Bluetooth LE SMP feature set"
+	select MCUMGR
+	select MCUMGR_TRANSPORT_BT
+	select IMG_MANAGER
+	select STREAM_FLASH
+	select ZCBOR
+	select MCUMGR_GRP_IMG
+	select MCUMGR_GRP_OS
+	select MCUMGR_GRP_ZBASIC
+	select MCUMGR_GRP_ZBASIC_STORAGE_ERASE
+	select MCUMGR_TRANSPORT_BT_REASSEMBLY
+	select MCUMGR_MGMT_NOTIFICATION_HOOKS
+	select MCUMGR_GRP_IMG_UPLOAD_CHECK_HOOK
+	help
+	  Enables Device Firmware Upgrade over Bluetooth LE with SMP and configures
+	  the set of options related to that feature.
+
 config TELINK_OTA_PARTITION_ADDR
 	hex "image-1 partition address"
 	default $(dt_node_reg_addr_hex,$(dt_nodelabel_path,slot1_partition),0)

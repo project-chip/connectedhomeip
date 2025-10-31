@@ -55,8 +55,13 @@ chip_configure_data_model(app
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../light-switch-common/light-switch-app.zap
 )
 
-if(CONFIG_BOOTLOADER_MCUBOOT)
+if(CONFIG_BOOTLOADER_MCUBOOT OR CONFIG_MCUMGR_TRANSPORT_BT)
   target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
+endif()
+
+if(CONFIG_MCUMGR_TRANSPORT_BT)
+  zephyr_library_link_libraries(MCUBOOT_BOOTUTIL)
+    target_sources(app PRIVATE ${TELINK_COMMON}/util/src/DFUOverSMP.cpp)
 endif()
 
 if (CONFIG_CHIP_PW_RPC)
