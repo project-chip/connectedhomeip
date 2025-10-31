@@ -65,16 +65,17 @@ public:
 
 private:
     std::map<std::string, DeviceCreator> mRegistry;
+    DefaultTimerDelegate timer;
 
     DeviceFactory()
     {
-        mRegistry["contact-sensor"] = []() {
+        mRegistry["contact-sensor"] = [this]() {
             return std::make_unique<BooleanStateSensorDevice>(
-                std::make_unique<DefaultTimerDelegate>(), Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
+                &timer, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
         };
-        mRegistry["water-leak-detector"] = []() {
+        mRegistry["water-leak-detector"] = [this]() {
             return std::make_unique<BooleanStateSensorDevice>(
-                std::make_unique<DefaultTimerDelegate>(),
+                &timer,
                 Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
         };
     }

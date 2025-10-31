@@ -33,10 +33,10 @@ public:
     /// class for the sensor types that share the same core functionality through the identify and
     /// boolean state clusters. The caller creating a BooleanStateSensorDevice MUST ensure that the underlying 
     /// data for the Span of deviceTypes remains valid for the entire liefetime of the BooleanStateSensorDevice object instance.
-    BooleanStateSensorDevice(std::unique_ptr<reporting::ReportScheduler::TimerDelegate> timerDelegate,
+    BooleanStateSensorDevice(reporting::ReportScheduler::TimerDelegate * timerDelegate,
                              Span<const DataModel::DeviceTypeEntry> deviceType) :
         SingleEndpointDevice(deviceType),
-        mTimerDelegate(std::move(timerDelegate))
+        mTimerDelegate(timerDelegate)
     {}
     ~BooleanStateSensorDevice() override = default;
 
@@ -47,7 +47,7 @@ public:
     Clusters::BooleanStateCluster & BooleanState() { return mBooleanStateCluster.Cluster(); }
 
 private:
-    std::unique_ptr<reporting::ReportScheduler::TimerDelegate> mTimerDelegate;
+    reporting::ReportScheduler::TimerDelegate * mTimerDelegate;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::BooleanStateCluster> mBooleanStateCluster;
 };
