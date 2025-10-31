@@ -1011,7 +1011,7 @@ def _OnWriteDoneCallback(closure):
 
 
 def WriteAttributes(future: Future, eventLoop, device,
-                    attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: Union[None, int] = None,
+                    attributes: List[AttributeWriteRequest], suppressResponse: bool = False, timedRequestTimeoutMs: Union[None, int] = None,
                     interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None, forceLegacyListEncoding: bool = False) -> PyChipError:
     handle = GetLibraryHandle()
 
