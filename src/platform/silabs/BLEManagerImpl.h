@@ -146,12 +146,9 @@ private:
         kExtAdvertisingEnabled    = 0x0040,
     };
 
-    enum
-    {
-        kMaxConnections      = BLE_LAYER_NUM_BLE_ENDPOINTS,
-        kMaxDeviceNameLength = 21,
-        kUnusedIndex         = 0xFF,
-    };
+    static constexpr uint8_t kMaxConnections      = BLE_LAYER_NUM_BLE_ENDPOINTS;
+    static constexpr uint8_t kMaxDeviceNameLength = 21;
+    static constexpr uint8_t kUnusedIndex         = 0xFF;
 
     static constexpr uint8_t kFlagTlvSize       = 3; // 1 byte for length, 1b for type and 1b for the Flag value
     static constexpr uint8_t kUUIDTlvSize       = 4; // 1 byte for length, 1b for type and 2b for the UUID value
