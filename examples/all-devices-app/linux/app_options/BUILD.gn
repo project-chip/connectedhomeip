@@ -19,22 +19,20 @@ config("option-includes") {
   include_dirs = [ ".." ]
 }
 
-
 source_set("app-options") {
-    sources = [
-        "AppOptions.h",
-        "AppOptions.cpp",
-    ]
+  sources = [
+    "AppOptions.cpp",
+    "AppOptions.h",
+  ]
 
-    public_deps = [
-        "${chip_root}/examples/common/tracing:commandline",
-        "${chip_root}/examples/platform/linux:app-main",
-        "${chip_root}/src/lib",
-    ]
+  public_deps = [
+    "${chip_root}/examples/common/tracing:commandline",
+    "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/lib",
+  ]
 
-    public_configs = [ 
-        "${chip_root}/src:includes",
-        ":option-includes",
-    ]
-
+  public_configs = [
+    "${chip_root}/src:includes",
+    ":option-includes",
+  ]
 }

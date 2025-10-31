@@ -34,6 +34,7 @@ executable("all-devices-app") {
   deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node",
+    "${chip_root}/examples/all-devices-app/linux/app_options:app-options",
     "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/examples/platform/linux:linux-commissionable-data-provider",
@@ -42,7 +43,6 @@ executable("all-devices-app") {
     "${chip_root}/src/app/persistence:default",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib",
-    "${chip_root}/examples/all-devices-app/linux/app_options:app-options",
   ]
   deps += pw_build_LINK_DEPS
 
