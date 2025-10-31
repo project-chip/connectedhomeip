@@ -134,7 +134,7 @@ NetworkCommissioningLogic::NetworkInstanceList NetworkCommissioningLogic::sInsta
 #endif
 
 NetworkCommissioningLogic::NetworkCommissioningLogic(EndpointId aEndpointId, WiFiDriver * apDelegate,
-                                                     BreadCrumbTracker * aTracker) :
+                                                     BreadCrumbTracker & aTracker) :
     mEndpointId(aEndpointId),
     mFeatureFlags(WiFiFeatures(apDelegate)), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate), mBreadcrumbTracker(aTracker)
 {
@@ -142,7 +142,7 @@ NetworkCommissioningLogic::NetworkCommissioningLogic(EndpointId aEndpointId, WiF
 }
 
 NetworkCommissioningLogic::NetworkCommissioningLogic(EndpointId aEndpointId, ThreadDriver * apDelegate,
-                                                     BreadCrumbTracker * aTracker) :
+                                                     BreadCrumbTracker & aTracker) :
     mEndpointId(aEndpointId),
     mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate),
     mBreadcrumbTracker(aTracker)
@@ -151,7 +151,7 @@ NetworkCommissioningLogic::NetworkCommissioningLogic(EndpointId aEndpointId, Thr
 }
 
 NetworkCommissioningLogic::NetworkCommissioningLogic(EndpointId aEndpointId, EthernetDriver * apDelegate,
-                                                     BreadCrumbTracker * aTracker) :
+                                                     BreadCrumbTracker & aTracker) :
     mEndpointId(aEndpointId),
     mFeatureFlags(Feature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(apDelegate),
     mBreadcrumbTracker(aTracker)
@@ -588,7 +588,7 @@ NetworkCommissioningLogic::HandleAddOrUpdateThreadNetwork(CommandHandler & handl
 void NetworkCommissioningLogic::UpdateBreadcrumb(const Optional<uint64_t> & breadcrumb)
 {
     VerifyOrReturn(breadcrumb.HasValue());
-    mBreadcrumbTracker->SetBreadCrumb(breadcrumb.Value());
+    mBreadcrumbTracker.SetBreadCrumb(breadcrumb.Value());
 }
 
 void NetworkCommissioningLogic::CommitSavedBreadcrumb()

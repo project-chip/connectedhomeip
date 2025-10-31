@@ -51,7 +51,7 @@ TEST_F(TestNetworkCommissioningLogic, TestFeatures)
 {
     Testing::FakeWiFiDriver fakeWifiDriver;
     NoopBreadcrumbTracker tracker;
-    NetworkCommissioningLogic logic(kRootEndpointId, &fakeWifiDriver, &tracker);
+    NetworkCommissioningLogic logic(kRootEndpointId, &fakeWifiDriver, tracker);
     ASSERT_EQ(logic.Features(), BitFlags<NetworkCommissioning::Feature>(NetworkCommissioning::Feature::kWiFiNetworkInterface));
 }
 

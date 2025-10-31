@@ -67,7 +67,7 @@ TEST_F(TestNetworkCommissioningCluster, TestAttributes)
     {
         Testing::FakeWiFiDriver fakeWifiDriver;
 
-        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, &tracker);
+        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker);
 
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(cluster.Attributes({ kRootEndpointId, NetworkCommissioning::Id }, builder), CHIP_NO_ERROR);
@@ -106,7 +106,7 @@ TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
 {
     Testing::FakeWiFiDriver fakeWifiDriver;
     NoopBreadcrumbTracker tracker;
-    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, &tracker);
+    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker);
 
     chip::Test::TestServerClusterContext context;
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);

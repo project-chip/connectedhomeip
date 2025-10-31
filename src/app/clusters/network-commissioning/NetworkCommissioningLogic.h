@@ -209,7 +209,7 @@ private:
     uint8_t mLastNetworkIDLen = 0;
     Optional<uint64_t> mCurrentOperationBreadcrumb;
     bool mScanningWasDirected = false;
-    BreadCrumbTracker * mBreadcrumbTracker;
+    BreadCrumbTracker & mBreadcrumbTracker;
 
     void SetLastNetworkingStatusValue(NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo::Type networkingStatusValue);
     void SetLastConnectErrorValue(NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo::Type connectErrorValue);
@@ -229,9 +229,9 @@ private:
     void UpdateBreadcrumb(const Optional<uint64_t> & breadcrumbValue);
 
 public:
-    NetworkCommissioningLogic(EndpointId aEndpointId, WiFiDriver * apDelegate, BreadCrumbTracker * tracker);
-    NetworkCommissioningLogic(EndpointId aEndpointId, ThreadDriver * apDelegate, BreadCrumbTracker * tracker);
-    NetworkCommissioningLogic(EndpointId aEndpointId, EthernetDriver * apDelegate, BreadCrumbTracker * tracker);
+    NetworkCommissioningLogic(EndpointId aEndpointId, WiFiDriver * apDelegate, BreadCrumbTracker & tracker);
+    NetworkCommissioningLogic(EndpointId aEndpointId, ThreadDriver * apDelegate, BreadCrumbTracker & tracker);
+    NetworkCommissioningLogic(EndpointId aEndpointId, EthernetDriver * apDelegate, BreadCrumbTracker & tracker);
     virtual ~NetworkCommissioningLogic()
     {
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
