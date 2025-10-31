@@ -1,9 +1,9 @@
 |                                |   Pass Rate |
 |:-------------------------------|------------:|
 | codeql                         |           0 |
-| tests                          |          78 |
-| darwin                         |          89 |
-| builds                         |          89 |
+| darwin                         |          71 |
+| builds                         |          86 |
+| build-example-efr32            |          86 |
 | tv-casting-example-darwin      |         100 |
 | build-example-nxp              |         100 |
 | build-example-infineon         |         100 |
@@ -34,12 +34,12 @@
 | full-builds-android            |         100 |
 | run-misspell                   |         100 |
 | recent-fail-summary            |         100 |
+| tests                          |         100 |
 | build-example-realtek          |         100 |
-| build-example-ti-cc13xx-26xx   |         100 |
 | darwin-tests                   |         100 |
 | build-example-tizen            |         100 |
 | bloat-check                    |         100 |
+| build-example-ti-cc13xx-26xx   |         100 |
 | cirque                         |         100 |
 | validate-gradle-wrapper        |         100 |
-| build-example-efr32            |         100 |
 | build-example-ti-cc32xx        |         100 |
