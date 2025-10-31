@@ -9,7 +9,7 @@ from subprocess import PIPE
 
 import click
 from chiptest.accessories import AppsRegister
-from chiptest.runner import Subprocess, Runner
+from chiptest.runner import Runner, Subprocess
 from chiptest.test_definition import App, ExecutionCapture
 from chipyaml.paths_finder import PathsFinder
 
