@@ -88,21 +88,6 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
     async def _read_net_ifaces(self, dev_ctrl):
         return await self.read_single_attribute_check_success(dev_ctrl, Clusters.GeneralDiagnostics.Attributes.NetworkInterfaces)
 
-    async def _wait_for_commissionee(self, node_id=None, timeout_s=120):
-        # If your harness has a specific helper, replace this.
-        # Here we do a small poll to State (read + sleep).
-        node_id = node_id if node_id is not None else self.req_node_id
-        end = self.event_loop.time() + timeout_s
-        while self.event_loop.time() < end:
-            try:
-                # Try to read something cheap to confirm it's back
-                # (UpTime, for example)
-                _ = await self._read_uptime(self.default_controller)
-                return
-            except Exception:
-                await asyncio.sleep(1.0)
-        raise TimeoutError(f"DUT {node_id} did not become accessible again in {timeout_s}s")
-
     def _validate_network_interfaces(self, interfaces) -> None:
         """
         Basic verifications:
