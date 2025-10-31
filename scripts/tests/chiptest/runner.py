@@ -121,7 +121,7 @@ class RunnerWaitQueue:
 
 
 @dataclass
-class Application:
+class Subprocess:
     kind: str
     path: pathlib.Path | str
     wrapper: tuple[str, ...] = ()
@@ -131,10 +131,10 @@ class Application:
         self.path = pathlib.Path(self.path)
 
     def add_args(self, args: tuple[str, ...]):
-        return Application(kind=self.kind, path=self.path, wrapper=self.wrapper, args=self.args + args)
+        return Subprocess(kind=self.kind, path=self.path, wrapper=self.wrapper, args=self.args + args)
 
     def wrap_with(self, wrapper: tuple[str, ...]):
-        return Application(kind=self.kind, path=self.path, wrapper=wrapper + self.wrapper, args=self.args)
+        return Subprocess(kind=self.kind, path=self.path, wrapper=wrapper + self.wrapper, args=self.args)
 
     def to_cmd(self) -> typing.List[str]:
         return list(self.wrapper) + [str(self.path)] + list(self.args)
@@ -144,13 +144,13 @@ class Runner:
     def __init__(self, capture_delegate=None):
         self.capture_delegate = capture_delegate
 
-    def RunSubprocess(self, application, name, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
+    def RunSubprocess(self, subprocess, name, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
         if sys.platform == 'darwin':
             # Try harder to avoid any stdout buffering in our tests
-            application = application.wrap_with(('stdbuf', '-o0', '-i0'))
+            subprocess = subprocess.wrap_with(('stdbuf', '-o0', '-i0'))
 
-        logging.info('RunSubprocess starting application %s' % application)
-        cmd = application.to_cmd()
+        logging.info('RunSubprocess starting application %s' % subprocess)
+        cmd = subprocess.to_cmd()
 
         outpipe = LogPipe(
             logging.DEBUG, capture_delegate=self.capture_delegate,
@@ -198,6 +198,6 @@ class NamespacedRunner(Runner):
         super().__init__(capture_delegate)
         self.ns = ns
 
-    def RunSubprocess(self, application, name, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
-        wrapped_app = self.ns.wrap_in_namespace(application)
-        return super().RunSubprocess(wrapped_app, name, wait, dependencies, timeout_seconds, stdin)
+    def RunSubprocess(self, subprocess, name, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
+        wrapped_subprocess = self.ns.wrap_in_namespace(subprocess)
+        return super().RunSubprocess(wrapped_subprocess, name, wait, dependencies, timeout_seconds, stdin)

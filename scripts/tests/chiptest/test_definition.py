@@ -25,7 +25,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, auto
 
-from .runner import Application
+from .runner import Subprocess
 
 TEST_NODE_ID = '0x12344321'
 TEST_DISCRIMINATOR = '3840'
@@ -216,23 +216,23 @@ class TestTarget(Enum):
 
 @dataclass
 class ApplicationPaths:
-    chip_tool: Application
-    all_clusters_app: Application
-    lock_app: Application
-    fabric_bridge_app: Application
-    ota_provider_app: Application
-    ota_requestor_app: Application
-    tv_app: Application
-    bridge_app: Application
-    lit_icd_app: Application
-    microwave_oven_app: Application
-    matter_repl_yaml_tester_cmd: Application
-    chip_tool_with_python_cmd: Application
-    rvc_app: Application
-    network_manager_app: Application
-    energy_gateway_app: Application
-    energy_management_app: Application
-    closure_app: Application
+    chip_tool: Subprocess
+    all_clusters_app: Subprocess
+    lock_app: Subprocess
+    fabric_bridge_app: Subprocess
+    ota_provider_app: Subprocess
+    ota_requestor_app: Subprocess
+    tv_app: Subprocess
+    bridge_app: Subprocess
+    lit_icd_app: Subprocess
+    microwave_oven_app: Subprocess
+    matter_repl_yaml_tester_cmd: Subprocess
+    chip_tool_with_python_cmd: Subprocess
+    rvc_app: Subprocess
+    network_manager_app: Subprocess
+    energy_gateway_app: Subprocess
+    energy_management_app: Subprocess
+    closure_app: Subprocess
 
     def items(self):
         return [self.chip_tool, self.all_clusters_app, self.lock_app,
