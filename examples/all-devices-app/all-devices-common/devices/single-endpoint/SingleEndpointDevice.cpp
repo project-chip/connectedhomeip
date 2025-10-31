@@ -21,7 +21,8 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-CHIP_ERROR SingleEndpointDevice::SingleEndpointRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR SingleEndpointDevice::SingleEndpointRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                                            EndpointId parentId)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     mEndpointId = endpoint;
@@ -39,7 +40,8 @@ CHIP_ERROR SingleEndpointDevice::SingleEndpointRegistration(EndpointId endpoint,
     return CHIP_NO_ERROR;
 }
 
-void SingleEndpointDevice::SingleEndpointUnregistration(CodeDrivenDataModelProvider & provider) {
+void SingleEndpointDevice::SingleEndpointUnregistration(CodeDrivenDataModelProvider & provider)
+{
     provider.RemoveEndpoint(mEndpointId);
     if (mDescriptorCluster.IsConstructed())
     {

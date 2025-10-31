@@ -75,8 +75,7 @@ private:
         };
         mRegistry["water-leak-detector"] = [this]() {
             return std::make_unique<BooleanStateSensorDevice>(
-                &timer,
-                Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
+                &timer, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
         };
     }
 };
