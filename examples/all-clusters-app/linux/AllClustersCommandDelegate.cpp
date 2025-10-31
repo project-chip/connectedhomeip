@@ -611,7 +611,7 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
             ChipLogError(NotSpecified, "TotalOperationalHours value %u is out of valid range (0 to 0xFFFFFFFE)", hours);
             return;
         }
-        
+
         CHIP_ERROR err = DeviceLayer::ConfigurationMgr().StoreTotalOperationalHours(hours);
         if (err != CHIP_NO_ERROR)
         {
