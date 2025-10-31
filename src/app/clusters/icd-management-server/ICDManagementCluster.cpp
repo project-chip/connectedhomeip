@@ -316,11 +316,9 @@ Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const Co
     {
         // Notify subscribers that the first entry for the fabric was successfully added
         TriggerICDMTableUpdatedEvent();
-        emberAfAttributeChanged(/* endpoint = */ 0, IcdManagement::Id, IcdManagement::Attributes::OperatingMode::Id,
-                                emberAfGlobalInteractionModelAttributesChangedListener());
+        MatterReportingAttributeChangeCallback(ConcreteAttributePath(mEndpointId,  IcdManagement::Id, IcdManagement::Attributes::OperatingMode::Id));
     }
-    emberAfAttributeChanged(/* endpoint = */ 0, IcdManagement::Id, IcdManagement::Attributes::RegisteredClients::Id,
-                            emberAfGlobalInteractionModelAttributesChangedListener());
+    MatterReportingAttributeChangeCallback(ConcreteAttributePath(mEndpointId,  IcdManagement::Id, IcdManagement::Attributes::RegisteredClients::Id));
     icdCounter = mICDConfigurationData->GetICDCounter().GetValue();
     return Status::Success;
 }
@@ -357,13 +355,10 @@ Status ICDManagementServer::UnregisterClient(CommandHandler * commandObj, const 
     if (table.IsEmpty())
     {
         TriggerICDMTableUpdatedEvent();
-        emberAfAttributeChanged(/* endpoint = */ 0, IcdManagement::Id, IcdManagement::Attributes::OperatingMode::Id,
-                                emberAfGlobalInteractionModelAttributesChangedListener());
+        MatterReportingAttributeChangeCallback(ConcreteAttributePath(mEndpointId,  IcdManagement::Id, IcdManagement::Attributes::OperatingMode::Id));
     }
 
-    emberAfAttributeChanged(/* endpoint = */ 0, IcdManagement::Id, IcdManagement::Attributes::RegisteredClients::Id,
-                            emberAfGlobalInteractionModelAttributesChangedListener());
-
+    MatterReportingAttributeChangeCallback(ConcreteAttributePath(mEndpointId,  IcdManagement::Id, IcdManagement::Attributes::RegisteredClients::Id));
     return Status::Success;
 }
 
