@@ -98,15 +98,13 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
                          "Manual pairing code PICS is set if QR or NFC is set"),
                 TestStep(10, "If any of the checks failed, fail the test")]
 
-    @property
-    def default_endpoint(self) -> int:
-        return None
-
     def test_TC_IDM_10_4(self):
         # wildcard read is done in setup_class
         self.step(1)
+        asserts.assert_not_equal(self.matter_test_config.endpoint, None,
+                                 "An explicit endpoint is required for this test, please use --endpoint")
         self.endpoint_id = self.get_endpoint()
-        asserts.assert_not_equal(self.endpoint_id, None, "An explicit endpoint is required for this test, please use --endpoint")
+
         self.endpoint = self.endpoints_tlv[self.endpoint_id]
         self.success = True
 

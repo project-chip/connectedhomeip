@@ -445,7 +445,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return self.check_pics('PICS_SDK_CI_ONLY')
 
     @property
-    def default_endpoint(self) -> bool:
+    def default_endpoint(self) -> int:
         return 0
 
     #
