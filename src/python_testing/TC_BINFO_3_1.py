@@ -19,7 +19,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/bin_info_3_1_fifo
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -29,7 +29,9 @@
 #       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --app-pipe /tmp/bin_info_3_1_fifo
+#       --int-arg PIXIT.BINFO.Finish:2
+#       --int-arg PIXIT.BINFO.PrimaryColor:5
+#
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -93,29 +95,33 @@ class TC_BINFO_3_1(MatterBaseTest):
         asserts.assert_less_equal(productAppearance.finish, 5, "Finish value is above maximum range")
 
         self.step(2)
-        if productAppearance.primaryColor is not None:
-            asserts.assert_greater_equal(productAppearance.primaryColor, 0, "PrimaryColor value is below minimum range")
-            asserts.assert_less_equal(productAppearance.primaryColor, 20, "PrimaryColor value is above maximum range")
+        asserts.assert_greater_equal(productAppearance.primaryColor, 0, "PrimaryColor value is below minimum range")
+        asserts.assert_less_equal(productAppearance.primaryColor, 20, "PrimaryColor value is above maximum range")
 
         self.step(3)
         # Vendor specific test: This step should verify the actual Finish value matches PIXIT.BINFO.Finish
         # For example, if PIXIT.BINFO.Finish is satin(2), the test should verify finish == 2
-        self.wait_for_user_input(
-            prompt_msg=(
-                "Verify that the ProductAppearance.Finish value matches your PIXIT.BINFO.Finish setting,\n"
-                "then continue.\n"
-                f"PIXIT.BINFO.Finish: {productAppearance.finish}"
-            ))
+        asserts.assert_true("PIXIT.BINFO.Finish" in self.matter_test_config.global_test_params,
+                            "PIXIT.BINFO.Finish must be included on the command line in "
+                            "the --int-arg flag as PIXIT.BINFO.Finish:<finish_value>")
+        pixit_finish = self.matter_test_config.global_test_params["PIXIT.BINFO.Finish"]
+        asserts.assert_equal(productAppearance.finish, pixit_finish,
+                             (f"ProductAppearance.Finish ({productAppearance.finish}) "
+                              f"does not match PIXIT.BINFO.Finish ({pixit_finish})\n"
+                              "Please verify the PIXIT.BINFO.Finish setting and try again."))
 
         self.step(4)
         # Vendor specific test: This step should verify the actual PrimaryColor value matches PIXIT.BINFO.PrimaryColor
         # For example, if PIXIT.BINFO.PrimaryColor is purple(5), the test should verify primaryColor == 5
-        self.wait_for_user_input(
-            prompt_msg=(
-                "Verify that the ProductAppearance.PrimaryColor value matches your PIXIT.BINFO.PrimaryColor setting,\n"
-                "then continue.\n"
-                f"PIXIT.BINFO.PrimaryColor: {productAppearance.primaryColor}"
-            ))
+        asserts.assert_true("PIXIT.BINFO.PrimaryColor" in self.matter_test_config.global_test_params,
+                            "PIXIT.BINFO.PrimaryColor must be included on the command line in "
+                            "the --int-arg flag as PIXIT.BINFO.PrimaryColor:<primary_color_value>")
+        pixit_primary_color = self.matter_test_config.global_test_params["PIXIT.BINFO.PrimaryColor"]
+        if productAppearance.primaryColor is not None:
+            asserts.assert_equal(productAppearance.primaryColor, pixit_primary_color,
+                                 (f"ProductAppearance.PrimaryColor ({productAppearance.primaryColor})\n"
+                                  f"does not match PIXIT.BINFO.PrimaryColor ({pixit_primary_color})\n"
+                                  "Please verify the PIXIT.BINFO.PrimaryColor setting and try again."))
 
 
 if __name__ == "__main__":
