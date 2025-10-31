@@ -23,7 +23,6 @@
 #include "PWMDevice.h"
 
 #include <app/AttributePathParams.h>
-#include <app/data-model-provider/ProviderChangeListener.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #if CONFIG_CHIP_FACTORY_DATA
@@ -44,35 +43,6 @@
 
 struct k_timer;
 struct Identify;
-
-/**
- * @brief A customized ProviderChangeListener that introduces a delay before marking attributes dirty.
- *
- * This implementation adds a randomized delay (a constant base time plus jitter) before notifying the reporting engine that an
- * attribute path is dirty. The primary goal is to delay DataReports sending, thereby reducing overall network traffic. This
- * approach has proven effective in mitigating network congestion and reducing packet retransmissions, particularly on constrained
- * networks like Thread.
- */
-class LightAttributesJitterProviderChangeListener : public chip::app::DataModel::ProviderChangeListener
-{
-public:
-    static constexpr size_t kMaxAttributePathsBufferSize    = 10;
-    static constexpr int kUpdateClusterStateBaseTimeoutMs   = 1000;
-    static constexpr int kUpdateClusterStateJitterTimeoutMs = 1000;
-
-    LightAttributesJitterProviderChangeListener() { k_mutex_init(&mMutex); }
-    void MarkDirty(const chip::app::AttributePathParams & path) override;
-
-private:
-    void FlushDirtyPaths();
-    void TimerCallback();
-
-    std::array<chip::app::AttributePathParams, kMaxAttributePathsBufferSize> mAttributePaths;
-    size_t mCurrentIndex = 0;
-    bool mTimerActive    = false;
-    k_mutex mMutex;
-};
-
 class AppTask
 {
 public:
@@ -121,7 +91,6 @@ private:
     FunctionEvent mFunction   = FunctionEvent::NoneSelected;
     bool mFunctionTimerActive = false;
     PWMDevice mPWMDevice;
-    LightAttributesJitterProviderChangeListener mCustomizedProviderChangeListener;
 
 #if CONFIG_CHIP_FACTORY_DATA
     chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;

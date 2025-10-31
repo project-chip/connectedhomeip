@@ -31,6 +31,7 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
+#include <app/data-model-provider/JitterDeferredProviderChangeListener.h>
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/persistence/DeferredAttributePersistenceProvider.h>
@@ -157,47 +158,6 @@ constexpr uint32_t kOff_ms{ 950 };
 app::Clusters::NetworkCommissioning::Instance sWiFiCommissioningInstance(0, &(NetworkCommissioning::NrfWiFiDriver::Instance()));
 #endif
 
-void LightAttributesJitterProviderChangeListener::MarkDirty(const chip::app::AttributePathParams & path)
-{
-    k_mutex_lock(&mMutex, K_FOREVER);
-    if (mCurrentIndex >= kMaxAttributePathsBufferSize)
-    {
-        // When attribute path buffer is full, process existing paths to make room
-        FlushDirtyPaths();
-    }
-    mAttributePaths[mCurrentIndex++] = path;
-    if (!mTimerActive)
-    {
-        uint32_t jitterMs = chip::Crypto::GetRandU16() % kUpdateClusterStateJitterTimeoutMs;
-        chip::DeviceLayer::SystemLayer().StartTimer(
-            chip::System::Clock::Milliseconds32(kUpdateClusterStateBaseTimeoutMs + jitterMs),
-            [](chip::System::Layer *, void * me) {
-                chip::DeviceLayer::SystemLayer().ScheduleLambda(
-                    [me] { static_cast<LightAttributesJitterProviderChangeListener *>(me)->TimerCallback(); });
-            },
-            this);
-        mTimerActive = true;
-    }
-    k_mutex_unlock(&mMutex);
-}
-
-void LightAttributesJitterProviderChangeListener::FlushDirtyPaths()
-{
-    for (size_t i = 0; i < mCurrentIndex; i++)
-    {
-        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(mAttributePaths[i]);
-    }
-    mCurrentIndex = 0;
-}
-
-void LightAttributesJitterProviderChangeListener::TimerCallback()
-{
-    k_mutex_lock(&mMutex, K_FOREVER);
-    FlushDirtyPaths();
-    mTimerActive = false;
-    k_mutex_unlock(&mMutex);
-}
-
 CHIP_ERROR AppTask::Init()
 {
     // Initialize CHIP stack
@@ -316,6 +276,9 @@ CHIP_ERROR AppTask::Init()
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
     static DeviceLayer::FactoryResetTestEventTriggerHandler sFactoryResetEventTriggerHandler{};
+    static chip::app::DataModel::JitterDeferredProviderChangeListener sJitterDeferredProviderChangeListener(
+        &chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine());
+
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sFactoryResetEventTriggerHandler) == CHIP_NO_ERROR);
@@ -326,10 +289,9 @@ CHIP_ERROR AppTask::Init()
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     VerifyOrDie(gSimpleAttributePersistence.Init(initParams.persistentStorageDelegate) == CHIP_NO_ERROR);
 
-    initParams.dataModelProvider        = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
-    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
-    // provide a customized ProviderChangeListener, which injects a delay before marking attribute path dirty
-    initParams.dataModelProviderChangeListner = &mCustomizedProviderChangeListener;
+    initParams.dataModelProvider              = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+    initParams.testEventTriggerDelegate       = &sTestEventTriggerDelegate;
+    initParams.dataModelProviderChangeListner = &sJitterDeferredProviderChangeListener;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();
 
