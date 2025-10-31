@@ -605,6 +605,13 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
         }
 
         uint32_t hours = static_cast<uint32_t>(self->mJsonValue["Hours"].asUInt());
+        // Validate the value is within valid range (max value is 0xFFFFFFFE per specification)
+        if (hours > 0xFFFFFFFE)
+        {
+            ChipLogError(NotSpecified, "TotalOperationalHours value %u is out of valid range (0 to 0xFFFFFFFE)", hours);
+            return;
+        }
+        
         CHIP_ERROR err = DeviceLayer::ConfigurationMgr().StoreTotalOperationalHours(hours);
         if (err != CHIP_NO_ERROR)
         {

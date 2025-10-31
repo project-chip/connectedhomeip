@@ -54,16 +54,16 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
       - NetworkInterfaces validated in code
       - TotalOperationalHours: verify >2 (manual precondition) and post-factory reset <=1
     """
+    DEFAULT_NODE_ID = 0x12344321
 
     def desc_TC_DGGEN_2_1_Py(self) -> str:
-        return "[TC-DGGEN-2.1] Attributes (Server) — Pythonized + tweaks - REQUIRES device running >2h without factory reset"
+        return "[TC-DGGEN-2.1] Attributes (Server) — Python version + tweaks - REQUIRES device running >2h without factory reset"
 
     def pics_TC_DGGEN_2_1_Py(self):
         return ["DGGEN.S"]
 
     def steps_TC_DGGEN_2_1_Py(self) -> List[TestStep]:
         return [
-            TestStep(0,  "Manual pre-check: Device in use >2h without factory reset (tester confirms)"),
             TestStep(1,  "Read TotalOperationalHours and verify >2"),
             TestStep(2,  "Step 2a mod: Read and save RebootCount (boot_count1)"),
             TestStep(3,  "Step 4a/4b: Read UpTime (uptime1), wait 10s, read UpTime (uptime2) and verify uptime2 >= uptime1"),
@@ -71,30 +71,22 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
             TestStep(5,  "Step 2b mod: Read RebootCount and verify boot_count == boot_count1 + 1"),
             TestStep(6,  "UpTime post-reboot (uptime3) < uptime2"),
             TestStep(7,  "Step 3 mod: Programmatically validate NetworkInterfaces"),
-            TestStep(8,  "Factory reset (manual), re-commission, verify TotalOperationalHours <= 1", is_commissioning=True),
+            TestStep(8,  "Factory reset (manual), re-commission, verify TotalOperationalHours <= 1"),
         ]
 
     # ------- helpers -------
 
-    async def _read_attr(self, dev_ctrl, cluster_attr, endpoint=None, node_id=None):
-        return await self.read_single_attribute(
-            dev_ctrl=dev_ctrl,
-            node_id=node_id if node_id is not None else self.req_node_id,
-            endpoint=endpoint if endpoint is not None else self.endpoint,
-            attribute=cluster_attr
-        )
-
     async def _read_reboot_count(self, dev_ctrl) -> int:
-        return int(await self._read_attr(dev_ctrl, Clusters.GeneralDiagnostics.Attributes.RebootCount))
+        return await self.read_single_attribute_check_success(dev_ctrl, Clusters.GeneralDiagnostics.Attributes.RebootCount)
 
     async def _read_uptime(self, dev_ctrl) -> int:
-        return int(await self._read_attr(dev_ctrl, Clusters.GeneralDiagnostics.Attributes.UpTime))
+        return await self.read_single_attribute_check_success(dev_ctrl, Clusters.GeneralDiagnostics.Attributes.UpTime)
 
     async def _read_total_hrs(self, dev_ctrl) -> int:
-        return int(await self._read_attr(dev_ctrl, Clusters.GeneralDiagnostics.Attributes.TotalOperationalHours))
+        return await self.read_single_attribute_check_success(dev_ctrl, Clusters.GeneralDiagnostics.Attributes.TotalOperationalHours)
 
     async def _read_net_ifaces(self, dev_ctrl):
-        return await self._read_attr(dev_ctrl, Clusters.GeneralDiagnostics.Attributes.NetworkInterfaces)
+        return await self.read_single_attribute_check_success(dev_ctrl, Clusters.GeneralDiagnostics.Attributes.NetworkInterfaces)
 
     async def _wait_for_commissionee(self, node_id=None, timeout_s=120):
         # If your harness has a specific helper, replace this.
@@ -151,17 +143,9 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
     @async_test_body
     async def test_TC_DGGEN_2_1_Py(self):
         self.endpoint = self.get_endpoint(0)
-        self.req_node_id = self.user_params.get('req_node_id', 0x12344321)
+        self.req_node_id = self.user_params.get('req_node_id', self.DEFAULT_NODE_ID)
 
         ctrl = self.default_controller
-
-        # IMPORTANT: This test requires the device to have been running for >2 hours without factory reset
-        logging.info("=" * 80)
-        logging.info("IMPORTANT PRECONDITION: This test requires the device to have been running")
-        logging.info("for MORE THAN 2 HOURS without factory reset. If this condition is not met,")
-        logging.info("the test will FAIL. You can run other tests in the meantime as long as")
-        logging.info("you don't factory reset the device.")
-        logging.info("=" * 80)
 
         # CI-specific setup: Set uptime > 2 hours for CI testing
         if self.is_pics_sdk_ci_only:
@@ -170,33 +154,16 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
             self.write_to_app_pipe({"Name": "SetTotalOperationalHours", "Hours": 3})
             logging.info("Uptime manipulation completed for CI")
 
-            # Wait a moment for the command to be processed
-            await asyncio.sleep(5.0)
-
-            # Verify the setting worked - this is critical for the test
-            total_hrs_check = await self._read_total_hrs(ctrl)
-            logging.info(f"TotalOperationalHours after setting: {total_hrs_check}")
-            if total_hrs_check < 2:
-                logging.error("CRITICAL: Failed to set TotalOperationalHours via named pipe!")
-                logging.error("The SetTotalOperationalHours command handler may not be implemented in the app.")
-                logging.error("This test requires the device to have been running for >2 hours.")
-                logging.error("Please ensure the all-clusters-app has the SetTotalOperationalHours command handler.")
-                asserts.fail("Failed to set TotalOperationalHours via named pipe - command handler not working")
-
-        # Step 0: Manual precondition
-        self.step(0)
-        logging.info(
-            "[Manual] Confirm: the DUT was in use >2h WITHOUT recent factory reset. "
-            "If not, retry later."
-        )
-
         # Step 1: TotalOperationalHours > 2
         self.step(1)
         total_hrs = await self._read_total_hrs(ctrl)
         logging.info(f"TotalOperationalHours (pre): {total_hrs}")
-
-        # This assertion MUST pass - the test is designed to verify devices that have been running >2 hours
-        assert total_hrs > 2, f"Precondition not met: TotalOperationalHours={total_hrs} <= 2. Device must have been in use for more than 2 hours without factory reset."
+        asserts.assert_greater(total_hrs, 2, (
+            f"Precondition not met: TotalOperationalHours={total_hrs} <= 2. "
+            "This test requires the device to have been running for MORE THAN 2 HOURS "
+            "without factory reset. If this condition is not met, the test will FAIL. "
+            "You can run other tests in the meantime as long as you don't factory reset the device."
+        ))
         logging.info("Precondition met: TotalOperationalHours > 2")
 
         # Step 2: 2a mod — save RebootCount (without requiring value)
@@ -223,8 +190,7 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
 
             # After manual reboot, expire previous sessions so that we can re-establish connections
             logging.info("Expiring sessions after manual device reboot")
-            self.th1.ExpireSessions(self.dut_node_id)
-            self.th2.ExpireSessions(self.dut_node_id)
+            self.default_controller.ExpireSessions(self.dut_node_id)
             logging.info("Manual device reboot completed")
 
         else:
@@ -239,8 +205,7 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
                 time.sleep(1)
 
                 # Expire sessions and re-establish connections
-                self.th1.ExpireSessions(self.dut_node_id)
-                self.th2.ExpireSessions(self.dut_node_id)
+                self.default_controller.ExpireSessions(self.dut_node_id)
 
                 logging.info("App restart completed successfully")
 
@@ -268,11 +233,12 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
 
         # Step 8: Factory reset (manual), re-commission, TotalOperationalHours <= 1
         self.step(8)
-        logging.info(
-            "[Required action] Perform Factory Reset of the DUT and re-commission it in this fabric. "
-            "Then continue; the test will wait for the DUT to be accessible."
-        )
-        await self._wait_for_commissionee(timeout_s=240)
+        self.wait_for_user_input(prompt_msg="Perform Factory Reset of the DUT, then press Enter to continue.")
+
+        # Re-commission the device after factory reset
+        logging.info("Re-commissioning DUT after factory reset")
+        commissioned = await self.commission_devices()
+        asserts.assert_true(commissioned, "Failed to re-commission DUT after factory reset")
 
         total_hrs_after_fr = await self._read_total_hrs(ctrl)
         logging.info(f"TotalOperationalHours post-factory-reset: {total_hrs_after_fr}")
