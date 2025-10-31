@@ -16,6 +16,12 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/app/common_flags.gni")
 
+source_set("bread-crumb-tracker") {
+  sources = [ "BreadCrumbTracker.h" ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
 source_set("general-commissioning-server") {
   sources = [
     "general-commissioning-cluster.cpp",
@@ -23,6 +29,7 @@ source_set("general-commissioning-server") {
   ]
 
   public_deps = [
+    ":bread-crumb-tracker",
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server",

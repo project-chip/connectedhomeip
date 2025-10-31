@@ -17,6 +17,7 @@
 
 #include <app/clusters/network-commissioning/NetworkCommissioningLogic.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/server/Server.h>
 #include <clusters/GeneralCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Enums.h>
@@ -25,6 +26,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <platform/DeviceControlServer.h>
 #include <platform/NetworkCommissioning.h>
 
 #include "FakeWifiDriver.h"
@@ -33,6 +35,12 @@ namespace {
 
 using namespace chip;
 using namespace chip::app::Clusters;
+
+class NoopBreadcrumbTracker : public BreadCrumbTracker
+{
+public:
+    void SetBreadCrumb(uint64_t v) override {}
+};
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestNetworkCommissioningLogic : public ::testing::Test
@@ -44,7 +52,8 @@ struct TestNetworkCommissioningLogic : public ::testing::Test
 TEST_F(TestNetworkCommissioningLogic, TestFeatures)
 {
     Testing::FakeWiFiDriver fakeWifiDriver;
-    NetworkCommissioningLogic logic(kRootEndpointId, &fakeWifiDriver);
+    NoopBreadcrumbTracker tracker;
+    NetworkCommissioningLogic logic(kRootEndpointId, &fakeWifiDriver, &tracker);
     ASSERT_EQ(logic.Features(), BitFlags<NetworkCommissioning::Feature>(NetworkCommissioning::Feature::kWiFiNetworkInterface));
 }
 
