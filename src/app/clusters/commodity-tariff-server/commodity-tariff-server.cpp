@@ -182,9 +182,9 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
     // Checks that all DayEntryIDs in Tariff Periods are in main DayEntries list:
     for (const auto & item : UpdCtx.RefsToDayEntryIDsFromTariffPeriods)
     {
-        if (!isIdInList(tariffComponents, &TariffComponentStruct::Type::tariffComponentID, item))
+        if (!isIdInList(dayEntries, &DayEntryStruct::Type::dayEntryID, item))
         {
-            ChipLogError(AppServer, "DayEntry ID%" PRIu32 "referenced from TariffPeriods doesn't exist in main DayEntries list",
+            ChipLogError(AppServer, "DayEntry ID%" PRIu32 " referenced from TariffPeriods doesn't exist in main DayEntries list",
                          item);
             return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
         }
@@ -196,7 +196,7 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
         if (!isIdInList(tariffComponents, &TariffComponentStruct::Type::tariffComponentID, item))
         {
             ChipLogError(AppServer,
-                         "TariffComponent ID%" PRIu32 "referenced from TariffPeriods doesn't exist in main TariffComponents list",
+                         "TariffComponent ID%" PRIu32 " referenced from TariffPeriods doesn't exist in main TariffComponents list",
                          item);
             return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
         }
@@ -209,7 +209,7 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
         {
             if (!isIdInList(dayEntries, &DayEntryStruct::Type::dayEntryID, item))
             {
-                ChipLogError(AppServer, "DayEntry ID%" PRIu32 "referenced from DayPatterns doesn't exist in main DayEntries list",
+                ChipLogError(AppServer, "DayEntry ID%" PRIu32 " referenced from DayPatterns doesn't exist in main DayEntries list",
                              item);
                 return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
             }
@@ -225,7 +225,7 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
             if (!isIdInList(dayEntries, &DayEntryStruct::Type::dayEntryID, item))
             {
                 ChipLogError(AppServer,
-                             "DayEntry ID%" PRIu32 "referenced from IndividualDays doesn't exist in main DayEntries list", item);
+                             "DayEntry ID%" PRIu32 " referenced from IndividualDays doesn't exist in main DayEntries list", item);
                 return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
             }
         }
@@ -242,7 +242,7 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
             if (!isIdInList(dayPatterns, &DayPatternStruct::Type::dayPatternID, item))
             {
                 ChipLogError(AppServer,
-                             "DayPattern ID%" PRIu32 "referenced from CalendarPeriods doesn't exist in main DayPatterns list",
+                             "DayPattern ID%" PRIu32 " referenced from CalendarPeriods doesn't exist in main DayPatterns list",
                              item);
                 return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
             }
