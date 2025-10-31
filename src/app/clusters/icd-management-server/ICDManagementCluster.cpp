@@ -28,9 +28,9 @@
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 #include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
+#include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-#include <app/reporting/reporting.h>
 
 using namespace chip;
 using namespace chip::app;
