@@ -314,7 +314,7 @@ TrustVerificationError JCMCommissionee::PerformVendorIdVerification()
         CHIP_ERROR verifyErr = VerifyVendorId(exchangeMgr, sessionHandleGetter, &mInfo);
         if (verifyErr != CHIP_NO_ERROR)
         {
-            ChipLogError(JointFabric, "JCM: Failed to start VendorId verification: %s", ErrorStr(err));
+            ChipLogError(JointFabric, "JCM: Failed to start VendorId verification: %s", ErrorStr(verifyErr));
             OnVendorIdVerificationComplete(verifyErr);
         }
     });
