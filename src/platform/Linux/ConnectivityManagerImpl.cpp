@@ -746,7 +746,11 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelPublish(uint32_t PublishId)
 {
-    return mWiFiPAFDriver->CancelPublish(PublishId);
+    if (mWiFiPAFDriver != nullptr)
+    {
+        return mWiFiPAFDriver->CancelPublish(PublishId);
+    }
+    return CHIP_NO_ERROR;
 }
 #endif
 
@@ -1173,7 +1177,11 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelSubscribe(uint32_t SubscribeId)
 {
-    return mWiFiPAFDriver->CancelSubscribe(SubscribeId);
+    if (mWiFiPAFDriver != nullptr)
+    {
+        return mWiFiPAFDriver->CancelSubscribe(SubscribeId);
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelIncompleteSubscribe()
@@ -1185,12 +1193,20 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelIncompleteSubscribe()
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo, System::PacketBufferHandle && msgBuf)
 {
-    return mWiFiPAFDriver->Send(TxInfo, std::move(msgBuf));
+    if (mWiFiPAFDriver != nullptr)
+    {
+        return mWiFiPAFDriver->Send(TxInfo, std::move(msgBuf));
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role)
 {
-    return mWiFiPAFDriver->Shutdown(id, role);
+    if (mWiFiPAFDriver != nullptr)
+    {
+        return mWiFiPAFDriver->Shutdown(id, role);
+    }
+    return CHIP_NO_ERROR;
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
