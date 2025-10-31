@@ -59,8 +59,8 @@ config("wifi-platform-config") {
   }
 
   if (use_SiWx917) {
-    # All the stuff from wiseconnect
-    include_dirs += siwx917_ncp_inc_plat
+    # All the stuff from wifisdk
+    include_dirs += siwx_ncp_inc_plat
   }
 
   if (chip_default_wifi_ssid != "") {
@@ -121,10 +121,10 @@ source_set("wifi-platform") {
   ]
 
   if (use_SiWx917) {
-    sources += siwx917_ncp_src_plat
+    sources += siwx_ncp_src_plat
 
-    # All the stuff from wiseconnect
-    sources += siwx917_ncp_src_sapi
+    # All the stuff from wifisdk
+    sources += siwx_ncp_src_si91x
   } else if (use_wf200) {
     sources += wf200_plat_src
   }

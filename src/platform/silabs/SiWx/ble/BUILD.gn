@@ -13,31 +13,27 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/third_party/silabs/silabs_board.gni")
 import("${chip_root}/third_party/silabs/efr32_sdk.gni")
 
 config("siwx-ble-config") {
   defines = []
   include_dirs = []
-  include_dirs = [ "${silabs_platform_dir}/SiWx/ble" ]
-
-  # if (chip_enable_ble_siwx) {
-  #   defines += [
-  #     "SLI_SI91X_ENABLE_BLE=1",
-  #     "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
-  #   ]
-  # }
+  include_dirs = [ "${silabs_platform_dir}/SiWx/ble", ]
 }
 
 source_set("siwx-ble") {
   sources = [
-    "BleManagerImpl.cpp",
+    "BLEManagerImpl.cpp",
     "sl_si91x_ble_init.cpp",
   ]
 
   public_configs = [ ":siwx-ble-config" ]
 
-  # public_deps = [
-  #   "${chip_root}/src/lib/support",
-  #   "${chip_root}/src/system",
-  # ]
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/system",
+    "${chip_root}/src/ble",
+  ]
 }

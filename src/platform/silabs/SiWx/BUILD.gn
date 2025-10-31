@@ -37,7 +37,7 @@ source_set("logging") {
   ]
 }
 
-static_library("SiWx917") {
+static_library("SiWx") {
   sources = [
     "${silabs_platform_dir}/BLEManagerImpl.h",
     "${silabs_platform_dir}/BlePlatformConfig.h",
@@ -69,10 +69,6 @@ static_library("SiWx917") {
     "${silabs_platform_dir}/platformAbstraction/WiseMcuSpam.cpp",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    # "${silabs_platform_dir}/SiWx/ble/BLEManagerImpl.cpp",
-    # "${silabs_platform_dir}/SiWx/ble/ble_config.h",
-    # "${silabs_platform_dir}/SiWx/ble/sl_si91x_ble_init.cpp",
-    # "${silabs_platform_dir}/SiWx/ble/sl_si91x_ble_init.h",
     "SiWxPlatformInterface.h",
   ]
 

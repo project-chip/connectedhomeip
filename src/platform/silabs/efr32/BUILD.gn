@@ -71,22 +71,18 @@ static_library("efr32") {
   ]
 
 
-  if (chip_enable_ble_siwx) {
-    sources += [
-      "${silabs_platform_dir}/SiWx/ble/BLEManagerImpl.cpp",
-      "${silabs_platform_dir}/SiWx/ble/ble_config.h",
-      "${silabs_platform_dir}/SiWx/ble/sl_si91x_ble.cpp",
-      "${silabs_platform_dir}/SiWx/ble/sl_si91x_ble.h"
-    ]
-  } else {
-    sources += [ "BLEManagerImpl.cpp" ]
-  }
-
   public_deps = [
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/src/platform/logging:headers",
     "${silabs_platform_dir}/platformAbstraction:gsdk",
   ]
+
+  # BLE implementation selection: use SiWx BLE wrapper or local EFR32 implementation
+  if (chip_enable_ble_siwx) {
+    public_deps += [ "${silabs_platform_dir}/SiWx/ble:siwx-ble" ]
+  } else {
+    sources += [ "BLEManagerImpl.cpp" ]
+  }
   deps = [
     "${chip_root}/src/app/common:ids",
     "${sl_provision_root}:headers",
