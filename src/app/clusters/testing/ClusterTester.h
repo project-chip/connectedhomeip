@@ -57,10 +57,12 @@ namespace Test {
 // {
 //     ASSERT_GT(it.GetValue().label.size(), 0u);
 // }
-class ClusterTester
-{
+class ClusterTester {
 public:
-    ClusterTester(chip::app::ServerClusterInterface & cluster) : mCluster(cluster) {}
+    ClusterTester(chip::app::ServerClusterInterface & cluster)
+        : mCluster(cluster)
+    {
+    }
 
     template <typename T>
     CHIP_ERROR ReadAttribute(AttributeId attr, T & value)
@@ -132,7 +134,7 @@ public:
     // Ideal for quick tests without manual request construction.
     template <typename T>
     [[nodiscard]] std::optional<chip::app::DataModel::ActionReturnStatus> Invoke(chip::CommandId commandId, const T & data,
-                                                                                 chip::app::CommandHandler * handler = nullptr)
+        chip::app::CommandHandler * handler)
     {
         const auto & paths = mCluster.GetPaths();
         VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
@@ -147,12 +149,74 @@ public:
         ReturnErrorOnFailure(tlvReader.Next());
 
         // Use provided handler or internal one
-        if (handler == nullptr)
-        {
+        if (handler == nullptr) {
             handler = &mHandler;
         }
 
         return mCluster.InvokeCommand(request, tlvReader, handler);
+    }
+
+    // Invoke a command using a predefined request structure
+    template <typename T>
+    chip::app::DataModel::ActionReturnStatus Invoke(chip::CommandId commandId, const T & data)
+    {
+        const auto & paths = mCluster.GetPaths();
+        VerifyOrDie(paths.size() == 1u);
+        const chip::app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
+
+        // Clear any previous handler state to avoid stale responses
+        mHandler.ClearResponses();
+        mHandler.ClearStatuses();
+
+        chip::TLV::TLVWriter tlvWriter;
+        tlvWriter.Init(mTlvBuffer);
+        CHIP_ERROR err = data.Encode(tlvWriter, chip::TLV::AnonymousTag());
+        VerifyOrDie(err == CHIP_NO_ERROR);
+
+        chip::TLV::TLVReader tlvReader;
+        tlvReader.Init(mTlvBuffer, tlvWriter.GetLengthWritten());
+        VerifyOrDie(tlvReader.Next() == CHIP_NO_ERROR);
+
+        auto statusOpt = mCluster.InvokeCommand(request, tlvReader, &mHandler);
+        if (statusOpt.has_value()) {
+            return statusOpt.value();
+        }
+
+        // A response was produced; consider this a success from a status perspective
+        return Protocols::InteractionModel::Status::Success;
+    }
+
+    // Simplified overload to invoke a command with just the command ID and data.
+    // Builds the request automatically using the internal cluster's paths.
+    // Ideal for quick tests without manual request construction.
+    template <typename ResponseType, typename T>
+    ResponseType Invoke(chip::CommandId commandId, const T & data)
+    {
+        const auto & paths = mCluster.GetPaths();
+        VerifyOrDie(paths.size() == 1u);
+        const chip::app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
+
+        // Clear any previous handler state to avoid stale responses
+        mHandler.ClearResponses();
+        mHandler.ClearStatuses();
+
+        chip::TLV::TLVWriter tlvWriter;
+        tlvWriter.Init(mTlvBuffer);
+        CHIP_ERROR err = data.Encode(tlvWriter, chip::TLV::AnonymousTag());
+        VerifyOrDie(err == CHIP_NO_ERROR);
+
+        chip::TLV::TLVReader tlvReader;
+        tlvReader.Init(mTlvBuffer, tlvWriter.GetLengthWritten());
+        VerifyOrDie(tlvReader.Next() == CHIP_NO_ERROR);
+
+        auto statusOpt = mCluster.InvokeCommand(request, tlvReader, &mHandler);
+        // Expect a response to be produced (statusOpt must be empty)
+        VerifyOrDie(!statusOpt.has_value());
+
+        ResponseType response;
+        err = mHandler.DecodeResponse(response);
+        VerifyOrDie(err == CHIP_NO_ERROR);
+        return response;
     }
 
     chip::app::Testing::MockCommandHandler & GetHandler() { return mHandler; }
