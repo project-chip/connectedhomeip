@@ -205,23 +205,23 @@ private:
     // If unsuccessful, it will emit a TimeFailure event.
     void AttemptToGetFallbackNTPTimeFromDelegate();
 
-    Protocols::InteractionModel::Status
+    std::optional<DataModel::ActionReturnStatus>
     HandleSetUTCTime(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                      const TimeSynchronization::Commands::SetUTCTime::DecodableType & commandData);
 
-    Protocols::InteractionModel::Status
+    std::optional<DataModel::ActionReturnStatus>
     HandleSetTrustedTimeSource(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                const TimeSynchronization::Commands::SetTrustedTimeSource::DecodableType & commandData);
 
-    Protocols::InteractionModel::Status
+    std::optional<DataModel::ActionReturnStatus>
     HandleSetTimeZone(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                       const TimeSynchronization::Commands::SetTimeZone::DecodableType & commandData);
 
-    Protocols::InteractionModel::Status
+    std::optional<DataModel::ActionReturnStatus>
     HandleSetDSTOffset(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                        const TimeSynchronization::Commands::SetDSTOffset::DecodableType & commandData);
 
-    Protocols::InteractionModel::Status
+    std::optional<DataModel::ActionReturnStatus>
     HandleSetDefaultNTP(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                         const TimeSynchronization::Commands::SetDefaultNTP::DecodableType & commandData);
 

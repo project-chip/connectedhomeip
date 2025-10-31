@@ -176,9 +176,9 @@ TimeSynchronizationCluster::TimeSynchronizationCluster(
     EndpointId endpoint, const TimeSynchronizationCluster::OptionalAttributeSet & optionalAttributeSet,
     const BitFlags<Feature> features, SupportsDNSResolve::TypeInfo::Type supportsDNSResolve, TimeZoneDatabaseEnum timeZoneDatabase,
     TimeSourceEnum timeSource, NTPServerAvailable::TypeInfo::Type ntpServerAvailable) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mOptionalAttributeSet(optionalAttributeSet), mFeatures(features), mSupportsDNSResolve(supportsDNSResolve),
-    mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource), mNTPServerAvailable(ntpServerAvailable),
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mOptionalAttributeSet(optionalAttributeSet), mFeatures(features),
+    mSupportsDNSResolve(supportsDNSResolve), mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
+    mNTPServerAvailable(ntpServerAvailable),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -1090,7 +1090,7 @@ CHIP_ERROR TimeSynchronizationCluster::GeneratedCommands(const ConcreteClusterPa
     return CHIP_NO_ERROR;
 }
 
-Protocols::InteractionModel::Status
+std::optional<DataModel::ActionReturnStatus>
 TimeSynchronizationCluster::HandleSetUTCTime(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                              const Commands::SetUTCTime::DecodableType & commandData)
 {
@@ -1116,11 +1116,10 @@ TimeSynchronizationCluster::HandleSetUTCTime(CommandHandler * commandObj, const 
         return Protocols::InteractionModel::Status::Success;
     }
 
-    commandObj->AddClusterSpecificFailure(commandPath, to_underlying(StatusCode::kTimeNotAccepted));
-    return Protocols::InteractionModel::Status::Failure;
+    return Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusCode::kTimeNotAccepted);
 }
 
-Protocols::InteractionModel::Status
+std::optional<DataModel::ActionReturnStatus>
 TimeSynchronizationCluster::HandleSetTrustedTimeSource(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                        const Commands::SetTrustedTimeSource::DecodableType & commandData)
 {
@@ -1146,7 +1145,7 @@ TimeSynchronizationCluster::HandleSetTrustedTimeSource(CommandHandler * commandO
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status
+std::optional<DataModel::ActionReturnStatus>
 TimeSynchronizationCluster::HandleSetTimeZone(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                               const Commands::SetTimeZone::DecodableType & commandData)
 {
@@ -1197,12 +1196,12 @@ TimeSynchronizationCluster::HandleSetTimeZone(CommandHandler * commandObj, const
         }
     }
 
-    commandObj->AddResponse(commandPath, response);
     NotifyAttributeChanged(TimeZone::Id);
-    return Protocols::InteractionModel::Status::Success;
+    commandObj->AddResponse(commandPath, response);
+    return std::nullopt;
 }
 
-Protocols::InteractionModel::Status
+std::optional<DataModel::ActionReturnStatus>
 TimeSynchronizationCluster::HandleSetDSTOffset(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                const Commands::SetDSTOffset::DecodableType & commandData)
 {
@@ -1233,7 +1232,7 @@ TimeSynchronizationCluster::HandleSetDSTOffset(CommandHandler * commandObj, cons
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status
+std::optional<DataModel::ActionReturnStatus>
 TimeSynchronizationCluster::HandleSetDefaultNTP(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                 const Commands::SetDefaultNTP::DecodableType & commandData)
 {

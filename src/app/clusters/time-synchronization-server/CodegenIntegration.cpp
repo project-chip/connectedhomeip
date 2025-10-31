@@ -138,16 +138,18 @@ TimeSynchronizationCluster * GetClusterInstance()
 void SetDefaultDelegate(TimeSynchronization::Delegate * delegate)
 {
     auto timeSynchronization = GetClusterInstance();
-    VerifyOrReturn(timeSynchronization != nullptr);
+    VerifyOrDie(timeSynchronization != nullptr);
 
+    // The delegate can only be set if GetClusterInstance() returns a valid instance
     return timeSynchronization->SetDefaultDelegate(delegate);
 }
 
 TimeSynchronization::Delegate * GetDefaultDelegate()
 {
     auto timeSynchronization = GetClusterInstance();
-    VerifyOrReturnValue(timeSynchronization != nullptr, nullptr);
+    VerifyOrDie(timeSynchronization != nullptr);
 
+    // The delegate can only be get if GetClusterInstance() returns a valid instance
     return timeSynchronization->GetDefaultDelegate();
 }
 

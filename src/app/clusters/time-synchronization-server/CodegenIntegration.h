@@ -24,6 +24,7 @@ namespace chip::app::Clusters::TimeSynchronization {
 
 TimeSynchronizationCluster * GetClusterInstance();
 
+// The delegate now can only be set/get after the server initialization
 void SetDefaultDelegate(Delegate * delegate);
 Delegate * GetDefaultDelegate();
 
