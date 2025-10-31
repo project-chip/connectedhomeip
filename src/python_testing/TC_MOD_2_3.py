@@ -238,7 +238,7 @@ class TC_MOD_2_3(MatterBaseTest):
         asserts.assert_true(found_var, "View Scene failed to find CurrentMode attribute in ExtensionFieldSets")
 
         self.step("6a")
-        await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x02, 0))
+        await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x02))
 
         self.step("6b")
         await asyncio.sleep(2)  # Wait a few seconds as per test spec
