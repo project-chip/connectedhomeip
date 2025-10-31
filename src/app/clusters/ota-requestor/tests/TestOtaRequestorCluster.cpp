@@ -92,4 +92,16 @@ TEST_F(TestOtaRequestorCluster, AcceptedCommandsTest)
     EXPECT_TRUE(chip::Testing::EqualAcceptedCommandSets(acceptedCommands.TakeBuffer(), expected.TakeBuffer()));
 }
 
+TEST_F(TestOtaRequestorCluster, GeneratedCommandsTest)
+{
+    chip::Test::TestServerClusterContext context;
+    OtaRequestorCluster cluster(kTestEndpointId);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ReadOnlyBufferBuilder<CommandId> generatedCommands;
+    EXPECT_EQ(cluster.GeneratedCommands(ConcreteClusterPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id), generatedCommands),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(generatedCommands.TakeBuffer().size(), 0u);
+}
+
 }  // namespace
