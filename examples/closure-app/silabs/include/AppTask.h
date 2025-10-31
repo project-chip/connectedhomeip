@@ -78,6 +78,14 @@ public:
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
+    /**
+     * @brief Closure button action event handler
+     * Handles button press events for closure control operations
+     *
+     * @param aEvent pointer to the button event being processed
+     */
+    static void ClosureButtonActionEventHandler(AppEvent * aEvent);
+
 private:
     static AppTask sAppTask;
 
