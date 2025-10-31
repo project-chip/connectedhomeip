@@ -11,21 +11,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-# transitional dependencies so that chip_data_model sets
-# the right dependencies
-source_set("ota-requestor") {
-  sources = [
-    "OtaRequestorCluster.cpp",
-    "OtaRequestorCluster.h",
-  ]
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "TestOtaRequestorCluster"
+
+  test_sources = [ "TestOtaRequestorCluster.cpp" ]
+
+  sources = []
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app/clusters/basic-information",
-    "${chip_root}/src/controller:interactions",
-    "${chip_root}/src/app/server-cluster",
-    "${chip_root}/zzz_generated/app-common/clusters/OtaSoftwareUpdateRequestor",
+    "${chip_root}/src/app/clusters/ota-requestor",
+    "${chip_root}/src/app/clusters/testing",
+    "${chip_root}/src/app/data-model-provider/tests:encode-decode",
+    "${chip_root}/src/app/server-cluster/testing:testing",
+    "${chip_root}/src/lib/support",
   ]
 }
