@@ -19,7 +19,6 @@ source_set("commodity-tariff-server") {
     "CommodityTariffAttrsDataMgmt.cpp",
     "CommodityTariffAttrsDataMgmt.h",
     "CommodityTariffConsts.h",
-    "CommodityTariffContainers.h",
   ]
 
   public_deps = [

@@ -22,5 +22,4 @@ TARGET_SOURCES(
   "${CLUSTER_DIR}/CommodityTariffAttrsDataMgmt.cpp"
   "${CLUSTER_DIR}/CommodityTariffAttrsDataMgmt.h"
   "${CLUSTER_DIR}/CommodityTariffConsts.h"
-  "${CLUSTER_DIR}/CommodityTariffContainers.h"
 )
