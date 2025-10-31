@@ -77,6 +77,7 @@
 #include <clusters/Groupcast/CommandIds.h>
 #include <clusters/Groups/CommandIds.h>
 #include <clusters/HepaFilterMonitoring/CommandIds.h>
+#include <clusters/Humidistat/CommandIds.h>
 #include <clusters/IcdManagement/CommandIds.h>
 #include <clusters/Identify/CommandIds.h>
 #include <clusters/IlluminanceMeasurement/CommandIds.h>
