@@ -145,12 +145,14 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
         asserts.assert_equal(await self._read_identify_time(), 0)
         await self.send_single_cmd(
             cmd=Clusters.Objects.Identify.Commands.Identify(
-                identify_time=5),
+                identifyTime=5),
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
             endpoint=self._DIMMABLELIGHT_ENDPOINT,
         )
-        asserts.assert_greater(await self._read_identify_time(), 0)
+        identify_time = await self._read_identify_time()
+        asserts.assert_greater(identify_time, 0)
+        asserts.assert_less_equal(identify_time, 5)
 
         self.step(5)
         device_connection = create_device_serial_or_socket_connection(
