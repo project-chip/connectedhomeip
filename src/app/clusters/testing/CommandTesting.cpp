@@ -46,7 +46,7 @@ void MockCommandHandler::AddStatus(const ConcreteCommandPath & aRequestCommandPa
 CHIP_ERROR MockCommandHandler::AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                                const DataModel::EncodableToTLV & aEncodable)
 {
-    chip::System::PacketBufferHandle handle = chip::MessagePacketBuffer::New(chip::System::PacketBuffer::kMaxSize);
+    chip::System::PacketBufferHandle handle = chip::MessagePacketBuffer::New(1024);
     VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     TLV::TLVWriter baseWriter;
