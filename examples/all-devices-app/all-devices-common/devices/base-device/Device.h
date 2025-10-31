@@ -44,7 +44,7 @@ public:
 
     /// Removes a device's clusters from the given provider. This
     /// must only be called when register has succeeded before. Expected
-    /// usage of this function is for when the device is no longer needed 
+    /// usage of this function is for when the device is no longer needed
     /// (for example, on shutown), to destory the device's clusters.
     virtual void UnRegister(CodeDrivenDataModelProvider & provider) = 0;
 
