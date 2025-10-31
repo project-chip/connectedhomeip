@@ -132,12 +132,12 @@ class TC_DGGEN_2_1_Py(MatterBaseTest):
 
         ctrl = self.default_controller
 
-        # CI-specific setup: Set uptime > 2 hours for CI testing
+        # CI-specific setup: Set TotalOperationalHours > 2 hours for CI testing
         if self.is_pics_sdk_ci_only:
-            logging.info("CI environment detected - setting uptime > 2 hours via named pipe")
+            logging.info("CI environment detected - setting TotalOperationalHours > 2 hours via named pipe")
             # Set TotalOperationalHours to 3 hours for CI testing
             self.write_to_app_pipe({"Name": "SetTotalOperationalHours", "Hours": 3})
-            logging.info("Uptime manipulation completed for CI")
+            logging.info("TotalOperationalHours manipulation completed for CI")
 
         # Step 1: TotalOperationalHours > 2
         self.step(1)
