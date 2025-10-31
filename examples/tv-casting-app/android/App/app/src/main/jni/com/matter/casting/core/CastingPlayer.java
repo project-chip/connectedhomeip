@@ -178,9 +178,9 @@ public interface CastingPlayer {
    */
   String getConnectionStateNative();
 
-  /** 
-   * @brief Removes any fabric associated with this player in order to cause the UDC flow when 
-   * verifyOrEstablishConnection is called 
+  /**
+   * @brief Removes any fabric associated with this player in order to cause the UDC flow when
+   *     verifyOrEstablishConnection is called
    */
   void removeFabric();
 }
