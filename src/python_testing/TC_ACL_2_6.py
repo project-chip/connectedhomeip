@@ -79,6 +79,9 @@ class TC_ACL_2_6(MatterBaseTest):
     def desc_TC_ACL_2_6(self) -> str:
         return "[TC-ACL-2.6] AccessControlEntryChanged event"
 
+    def pics_TC_ACL_2_6(self) -> list[str]:
+        return ['ACL.S']
+
     async def internal_test_TC_ACL_2_6(self, force_legacy_encoding: bool):
         self.step(1)
         # Initialize TH1 controller
