@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,10 +36,10 @@ using namespace chip::app::DataModel;
 constexpr size_t kTestPathsSize                                      = 10;
 constexpr std::array<AttributePathParams, kTestPathsSize> kTestPaths = {
     AttributePathParams(1, 1, 1), AttributePathParams(2, 2, 2),    AttributePathParams(3, 3, 3), AttributePathParams(4, 4, 4),
-    AttributePathParams(5, 5, 5), AttributePathParams(8, 6, 6),    AttributePathParams(7, 7, 7), AttributePathParams(8, 8, 8),
+    AttributePathParams(5, 5, 5), AttributePathParams(6, 6, 6),    AttributePathParams(7, 7, 7), AttributePathParams(8, 8, 8),
     AttributePathParams(9, 9, 9), AttributePathParams(10, 10, 10),
 };
-const AttributePathParams kOverflowPath(1, 2, 3);
+constexpr AttributePathParams kOverflowPath(1, 2, 3);
 
 constexpr uint32_t kBaseTimeoutMs   = 1000;
 constexpr uint32_t kJitterTimeoutMs = 1000;
@@ -121,8 +121,9 @@ TEST_F(TestJitterDeferredProviderChangeListener, TestBufferFullFlush)
         jitteryListener.MarkDirty(kTestPaths[i]);
     }
 
-    // At this point, a timer is armed, but nothing has been flushed yet.
+    // The underlying listener should not have been called yet.
     EXPECT_EQ(underlyingListener.mPaths.size(), 0u);
+    EXPECT_EQ(underlyingListener.mLastCallTimestampMs, System::Clock::kZero);
 
     // This call should overflow the buffer and trigger an immediate flush.
     jitteryListener.MarkDirty(kOverflowPath);
@@ -132,6 +133,7 @@ TEST_F(TestJitterDeferredProviderChangeListener, TestBufferFullFlush)
         EXPECT_EQ(underlyingListener.mPaths[i], kTestPaths[i]);
     }
     EXPECT_EQ(underlyingListener.mPaths.size(), JitterDeferredProviderChangeListener::kMaxAttributePathsBufferSize);
+    EXPECT_NE(underlyingListener.mLastCallTimestampMs, System::Clock::kZero);
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
