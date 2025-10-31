@@ -75,7 +75,6 @@ class TC_BINFO_3_1(MatterBaseTest):
     def pics_TC_BINFO_3_1(self) -> list[str]:
         pics = [
             "BINFO.S",
-            "BINFO.S.A0014",
         ]
         return pics
 
