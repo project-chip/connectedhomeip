@@ -176,16 +176,7 @@ void MatterIdentifyClusterInitCallback(EndpointId endpointId)
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
 }
 
-void MatterIdentifyClusterShutdownCallback(EndpointId endpointId)
-{
-#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-    if (GetLegacyIdentifyInstance(endpointId) != nullptr &&
-        CodegenDataModelProvider::Instance().Registry().Get({ endpointId, Clusters::Identify::Id }) == nullptr)
-    {
-        ChipLogError(AppServer, "Shutdown error: failed to find Identify cluster registration for endpoint %u", endpointId);
-    }
-#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-}
+void MatterIdentifyClusterShutdownCallback(EndpointId endpointId) {}
 
 // Legacy PluginServer callback stubs
 void MatterIdentifyPluginServerInitCallback() {}
