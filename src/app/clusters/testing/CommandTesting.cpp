@@ -22,6 +22,8 @@
 #include <lib/support/CodeUtils.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/SessionManager.h>
+#include <transport/raw/MessageHeader.h>
 
 namespace chip {
 namespace app {
@@ -46,7 +48,7 @@ void MockCommandHandler::AddStatus(const ConcreteCommandPath & aRequestCommandPa
 CHIP_ERROR MockCommandHandler::AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                                const DataModel::EncodableToTLV & aEncodable)
 {
-    chip::System::PacketBufferHandle handle = chip::MessagePacketBuffer::New(1024);
+    chip::System::PacketBufferHandle handle = chip::MessagePacketBuffer::New(chip::kMaxAppMessageLen);
     VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     TLV::TLVWriter baseWriter;
