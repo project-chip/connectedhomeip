@@ -19,6 +19,12 @@
 
 namespace chip::app::Clusters {
 
+/// Defines an interface for tracking a breadcrumb value.
+///
+/// The Breadcrumb attribute allows commissioners and administrators
+/// to save a small payload that can be subsequently read, to keep
+/// track of progress (see 11.10.6.1 of the Matter spec related
+/// to Breadcrumb Attribute in the General Commissioning Cluster).
 class BreadCrumbTracker
 {
 public:
