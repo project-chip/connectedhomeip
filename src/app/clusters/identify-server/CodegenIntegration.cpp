@@ -156,6 +156,10 @@ Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIde
                  .WithEffectVariant(effectVariant))
 {
     RegisterLegacyIdentify(this);
+
+    // CodegenDataModelProvider::Instance() is a Meyer’s singleton so it's safe to call this here without worrying about
+    // intialization order. It's also OK to Register() the cluster in the provider even if the endpoint is not yet started up. It
+    // will be started up when the endpoint is started and a context is set.
     RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 };
 
