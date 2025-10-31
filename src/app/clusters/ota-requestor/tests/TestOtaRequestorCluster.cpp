@@ -25,9 +25,8 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/OtaSoftwareUpdateRequestor/ClusterId.h>
+#include <clusters/OtaSoftwareUpdateRequestor/EventIds.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Metadata.h>
-
-#include <clusters/Identify/Metadata.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -102,6 +101,36 @@ TEST_F(TestOtaRequestorCluster, GeneratedCommandsTest)
     EXPECT_EQ(cluster.GeneratedCommands(ConcreteClusterPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id), generatedCommands),
               CHIP_NO_ERROR);
     EXPECT_EQ(generatedCommands.TakeBuffer().size(), 0u);
+}
+
+TEST_F(TestOtaRequestorCluster, EventInfoTest)
+{
+    chip::Test::TestServerClusterContext context;
+    OtaRequestorCluster cluster(kTestEndpointId);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    DataModel::EventEntry eventInfo;
+
+    EXPECT_EQ(cluster.EventInfo(ConcreteEventPath(kTestEndpointId,
+                                                  OtaSoftwareUpdateRequestor::Id,
+                                                  OtaSoftwareUpdateRequestor::Events::StateTransition::Id), eventInfo),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(eventInfo.readPrivilege,
+              OtaSoftwareUpdateRequestor::Events::StateTransition::kMetadataEntry.readPrivilege);
+
+    EXPECT_EQ(cluster.EventInfo(ConcreteEventPath(kTestEndpointId,
+                                                  OtaSoftwareUpdateRequestor::Id,
+                                                  OtaSoftwareUpdateRequestor::Events::VersionApplied::Id), eventInfo),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(eventInfo.readPrivilege,
+              OtaSoftwareUpdateRequestor::Events::VersionApplied::kMetadataEntry.readPrivilege);
+
+    EXPECT_EQ(cluster.EventInfo(ConcreteEventPath(kTestEndpointId,
+                                                  OtaSoftwareUpdateRequestor::Id,
+                                                  OtaSoftwareUpdateRequestor::Events::DownloadError::Id), eventInfo),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(eventInfo.readPrivilege,
+              OtaSoftwareUpdateRequestor::Events::DownloadError::kMetadataEntry.readPrivilege);
 }
 
 }  // namespace
