@@ -30,6 +30,7 @@
 #endif
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <app/reporting/reporting.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -316,11 +317,9 @@ Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const Co
     {
         // Notify subscribers that the first entry for the fabric was successfully added
         TriggerICDMTableUpdatedEvent();
-        MatterReportingAttributeChangeCallback(
-            ConcreteAttributePath(mEndpointId, IcdManagement::Id, IcdManagement::Attributes::OperatingMode::Id));
+        MatterReportingAttributeChangeCallback(0, IcdManagement::Id, IcdManagement::Attributes::OperatingMode::Id);
     }
-    MatterReportingAttributeChangeCallback(
-        ConcreteAttributePath(mEndpointId, IcdManagement::Id, IcdManagement::Attributes::RegisteredClients::Id));
+    MatterReportingAttributeChangeCallback(0, IcdManagement::Id, IcdManagement::Attributes::RegisteredClients::Id);
     icdCounter = mICDConfigurationData->GetICDCounter().GetValue();
     return Status::Success;
 }
@@ -357,12 +356,10 @@ Status ICDManagementServer::UnregisterClient(CommandHandler * commandObj, const 
     if (table.IsEmpty())
     {
         TriggerICDMTableUpdatedEvent();
-        MatterReportingAttributeChangeCallback(
-            ConcreteAttributePath(mEndpointId, IcdManagement::Id, IcdManagement::Attributes::OperatingMode::Id));
+        MatterReportingAttributeChangeCallback(0, IcdManagement::Id, IcdManagement::Attributes::OperatingMode::Id);
     }
 
-    MatterReportingAttributeChangeCallback(
-        ConcreteAttributePath(mEndpointId, IcdManagement::Id, IcdManagement::Attributes::RegisteredClients::Id));
+    MatterReportingAttributeChangeCallback(0, IcdManagement::Id, IcdManagement::Attributes::RegisteredClients::Id);
     return Status::Success;
 }
 
