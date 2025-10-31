@@ -49,7 +49,7 @@ import threading
 import time
 
 from mobly import asserts
-from TC_SUTestBase import SoftwareUpdateBaseTest, ACLHandler
+from TC_SUTestBase import SoftwareUpdateBaseTest
 
 
 import matter.clusters as Clusters
@@ -68,6 +68,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
     LOG_FILE_PATH = "provider.log"
     KVS_PATH = "/tmp/chip_kvs_provider"
+    provider_app_path = "./out/debug/chip-ota-provider-app"
+    ota_image_v2 = "firmware_requestor_v2min.ota"
 
     async def add_single_ota_provider(self, controller, requestor_node_id: int, provider_node_id: int):
         """
@@ -169,12 +171,13 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'AnnounceOTAProvider response: {resp}')
         return resp
 
-    async def setup_provider(self, version: int, extra_args: list[str]):
+    async def setup_provider(self, provider_app_path: str, ota_image_path: str, extra_args: list[str]):
         """
-        Launch an OTA Provider process with the specified version and extra arguments.
+        Launch an OTA Provider process with the specified image and extra arguments.
 
         Args:
-            version (int): Version number of the provider process.
+            provider_app_path: (str): Path to the OTA provider application executable.
+            ota_image_path (str): Path to the OTA image file.
             extra_args (list[str]): Additional command-line arguments to pass to the provider.
 
         Returns:
@@ -182,6 +185,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         """
 
         logger.info(f"""Prerequisite - Provider info:
+            provider_app_path: {provider_app_path},
+            ota_image_path: {ota_image_path},
             discriminator: {self.provider_data["discriminator"]},
             setupPinCode: {self.provider_data["setup_pincode"]},
             port: {self.provider_data["port"]},
@@ -190,59 +195,106 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             log_file: {self.LOG_FILE_PATH}""")
 
         self.start_provider(
-            version=version,
+            provider_app_path=provider_app_path,
+            ota_image_path=ota_image_path,
             setup_pincode=self.provider_data["setup_pincode"],
             discriminator=self.provider_data["discriminator"],
             port=self.provider_data["port"],
             extra_args=extra_args,
             kvs_path=self.KVS_PATH,
-            log_file=self.LOG_FILE_PATH
+            log_file=self.LOG_FILE_PATH,
+            expected_output="Server initialization complete",
+            timeout=10
         )
 
-    async def setup_acl(self, controller, requestor_node_id, provider_node_id, fabric_id, step_number):
+    async def extend_ota_acls(self, controller, provider_node_id, requestor_node_id):
         """
-        Set ACLs for OTA update (Only one time):
-        - On Requestor to allow specified Provider to interact with OTA Requestor cluster
-        - On Provider to allow Requestor to interact with OTA Provider cluster
+        Set ACLs for OTA interaction between a Requestor and Provider.
+        Preserves existing ACLs to avoid overwriting.
 
         Args:
-            controller: The controller object used to interact with nodes.
-            requestor_node_id (int): Node ID of the Requestor (DUT).
-            provider_node_id (int): Node ID of the Provider.
-            fabric_id (int): Fabric index under which ACLs should be applied.
-            step_number (str): Step identifier used for logging.
+            controller: The Matter device controller instance used to read/write ACLs.
+            requestor_node: Node ID of the OTA Requestor (DUT).
+            provider_node: Node ID of the OTA Provider.
 
         Returns:
-            None: Applies ACLs asynchronously; does not return a value.
+            None
+
+        Raises:
+            AssertionError: If reading or writing ACL attributes fails.
         """
-        logger.info(f'{step_number}: Prerequisite #4.0 - Setting ACLs under FabricIndex {fabric_id}')
-        logger.info(f'{step_number}: Prerequisite #4.0 - Requestor (DUT), NodeID: {requestor_node_id}')
-        logger.info(f'{step_number}: Prerequisite #4.0 - Provider, NodeID: {provider_node_id}')
 
-        # Read existing ACLs on Requestor
-        original_requestor_acls = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-
-        # Read existing ACLs on Provider
-        original_provider_acls = await self.read_single_attribute(
+        # Read existing ACLs on Requestor and Provider
+        provider_existing_acls = await self.read_single_attribute(
             dev_ctrl=controller,
             node_id=provider_node_id,
             endpoint=0,
             attribute=Clusters.AccessControl.Attributes.Acl,
         )
 
-        # Apply ACLs for OTA
-        await self.acl_handler.set_ota_acls(
-            requestor_node=requestor_node_id,
-            provider_node=provider_node_id,
-            fabric_index=fabric_id,
-            original_requestor_acls=original_requestor_acls,
-            original_provider_acls=original_provider_acls,
+        requestor_existing_acls = await self.read_single_attribute(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
+            endpoint=0,
+            attribute=Clusters.AccessControl.Attributes.Acl,
         )
+
+        # Generate new ACL entries for OTA interaction (via TC_SUTestBase)
+        await self.create_acl_entry(
+            dev_ctrl=controller,
+            provider_node_id=provider_node_id,
+            requestor_node_id=requestor_node_id
+        )
+
+        await self.create_acl_entry(
+            dev_ctrl=controller,
+            provider_node_id=requestor_node_id,
+            requestor_node_id=provider_node_id
+        )
+
+        # Read the current ACLs after adding new entries
+        provider_current_acls = await self.read_single_attribute(
+            dev_ctrl=controller,
+            node_id=provider_node_id,
+            endpoint=0,
+            attribute=Clusters.AccessControl.Attributes.Acl,
+        )
+
+        requestor_current_acls = await self.read_single_attribute(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
+            endpoint=0,
+            attribute=Clusters.AccessControl.Attributes.Acl,
+        )
+
+        # Combine original + new ACLs to preserve existing entries
+        combined_provider_acls = provider_existing_acls + provider_current_acls
+        combined_requestor_acls = requestor_existing_acls + requestor_current_acls
+
+        # Write back the combined ACLs
+        await self.write_acl(controller, provider_node_id, combined_provider_acls)
+        await self.write_acl(controller, requestor_node_id, combined_requestor_acls)
+
+        logger.info(f'OTA ACLs extended between provider: {provider_node_id} and requestor: {requestor_node_id}')
+
+    async def write_acl(self, controller, node_id, acl):
+        """
+        Writes the Access Control List (ACL) to the DUT device using the specified controller.
+
+        Args:
+            controller: The Matter controller (e.g., th1, th4) that will perform the write operation.
+            acl (list): List of AccessControlEntryStruct objects defining the ACL permissions to write.
+            node_id:
+
+        Raises:
+            AssertionError: If writing the ACL attribute fails (status is not Status.Success).
+        """
+        result = await controller.WriteAttribute(
+            node_id,
+            [(0, Clusters.AccessControl.Attributes.Acl(acl))]
+        )
+        asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
+        return True
 
     def matcher_ota_updatestate(self, step_name, start_states, allowed_states, min_interval_sec, final_state=None):
         """
@@ -400,7 +452,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         controller = self.default_controller
         fabric_id = controller.fabricId
         requestor_node_id = self.dut_node_id
-        self.acl_handler = ACLHandler(controller)
 
         # Prerequisite #1.0 - Provider info
         provider_node_id = 1
@@ -430,7 +481,12 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         provider_extra_args_updateAvailable = [
             "-q", "updateAvailable"
         ]
-        await self.setup_provider(version=2, extra_args=provider_extra_args_updateAvailable)
+
+        await self.setup_provider(
+            provider_app_path=self.provider_app_path,
+            ota_image_path=self.ota_image_v2,
+            extra_args=provider_extra_args_updateAvailable
+        )
 
         # Prerequisite #2.0 - Commission Provider (Only one time)
         resp = await controller.CommissionOnNetwork(
@@ -441,8 +497,11 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         )
         logger.info(f'{step_number}: Prerequisite #2 - Provider Commissioning response: {resp}')
 
-        # Prerequisite #3.0 - ACLs (Only one time)
-        await self.setup_acl(controller, requestor_node_id, provider_node_id, fabric_id, step_number)
+        await self.extend_ota_acls(
+            controller=controller,
+            provider_node_id=provider_node_id,
+            requestor_node_id=requestor_node_id
+        )
 
         # Prerequisite #3.0 - Add OTA Provider to the Requestor (Only if none exists, and only one time)
         logger.info(f'{step_number}: Prerequisite #4.0 - Add Provider to Requestor(DUT) DefaultOTAProviders')
@@ -584,7 +643,12 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             "-q", "busy",
             "-t", "60"
         ]
-        await self.setup_provider(version=3, extra_args=provider_extra_args_busy)
+
+        await self.setup_provider(
+            provider_app_path=self.provider_app_path,
+            ota_image_path=self.ota_image_v2,
+            extra_args=provider_extra_args_busy
+        )
 
         # ------------------------------------------------------------------------------------
         # [STEP_2]: Step #2.1 - Matcher for OTA records logs
@@ -695,7 +759,12 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             "-q", "updateNotAvailable",
             "-t", "60"
         ]
-        await self.setup_provider(version=4, extra_args=provider_extra_args_updateNotAvailable)
+
+        await self.setup_provider(
+            provider_app_path=self.provider_app_path,
+            ota_image_path=self.ota_image_v2,
+            extra_args=provider_extra_args_updateNotAvailable
+        )
 
         # ------------------------------------------------------------------------------------
         # [STEP_3]: Step #3.1 - Matcher for OTA records logs
@@ -805,7 +874,12 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             "-q", "busy",
             "-t", "180"
         ]
-        await self.setup_provider(version=5, extra_args=provider_extra_args_busy_180)
+
+        await self.setup_provider(
+            provider_app_path=self.provider_app_path,
+            ota_image_path=self.ota_image_v2,
+            extra_args=provider_extra_args_busy_180
+        )
 
         # ------------------------------------------------------------------------------------
         # [STEP_4]: Step #4.1 - Matcher for OTA records logs
@@ -935,7 +1009,11 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         step_number_s6 = "[STEP_6]"
         logger.info(f'{step_number_s6}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
 
-        await self.setup_provider(version=3, extra_args=provider_extra_args_updateAvailable)
+        await self.setup_provider(
+            provider_app_path=self.provider_app_path,
+            ota_image_path=self.ota_image_v2,
+            extra_args=provider_extra_args_updateAvailable
+        )
 
         # ------------------------------------------------------------------------------------
         # [STEP_6]: Step #6.1 - Matcher for OTA records logs
@@ -1058,7 +1136,12 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         provider_extra_args_invalid_bdx = [
             "-i", "bdx://000000000000000X"
         ]
-        await self.setup_provider(version=3, extra_args=provider_extra_args_invalid_bdx)
+
+        await self.setup_provider(
+            provider_app_path=self.provider_app_path,
+            ota_image_path=self.ota_image_v2,
+            extra_args=provider_extra_args_invalid_bdx
+        )
 
         # ------------------------------------------------------------------------------------
         # [STEP_7]: Step #7.1 - Matcher for OTA records logs
@@ -1092,7 +1175,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_7]: Step #7.2 -  Track OTA StateTransition event: should stay Idle due to invalid BDX ImageURI in UpdateAvailable.
         # StateTransition event matcher: Idle > Querying (first event) > Querying > Idle (second event)
         # ------------------------------------------------------------------------------------
-
         state_sequence_notavailable = []  # Full OTA state flow
 
         def matcher_idle_state_no_download_invalid_uri(report):
@@ -1157,7 +1239,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number_s7}: Step #7.4 - Full OTA StateTransition (invalid BDX ImageURI) observed: {state_sequence_notavailable}')
 
         # ------------------------------------------------------------------------------------
-        # [STEP_7]: Step #7.5 - Close Provider_S7 Process (CLEANUP!)
+        # [STEP_7]: Step #7.5 - Close Provider Process
         # ------------------------------------------------------------------------------------
         # Clear DefaultOTAProviders for a clean state
         await self.clear_ota_providers(
@@ -1166,7 +1248,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         )
 
         logger.info(
-            f'{step_number_s7}: Step #7.5 - Closed Provider_S7 process.')
+            f'{step_number_s7}: Step #7.5 - Closed Provider process.')
 
         # Kill Provider process
         self.current_provider_app_proc.terminate()
