@@ -156,51 +156,35 @@ Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIde
                  .WithEffectVariant(effectVariant))
 {
     RegisterLegacyIdentify(this);
+    (void) CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 };
 
 Identify::~Identify()
 {
+    (void) CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
     UnregisterLegacyIdentify(this);
 }
 
 void MatterIdentifyClusterInitCallback(EndpointId endpointId)
 {
-    Identify * identify = GetLegacyIdentifyInstance(endpointId);
-    if (identify != nullptr)
-    {
-        CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(identify->mCluster.Registration());
-
-        if (err != CHIP_NO_ERROR)
-        {
 #if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-            ChipLogError(AppServer, "Failed to register cluster %u/" ChipLogFormatMEI ":   %" CHIP_ERROR_FORMAT, endpointId,
-                         ChipLogValueMEI(Clusters::Identify::Id), err.Format());
-#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        }
-    }
-#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-    else
+    if (GetLegacyIdentifyInstance(endpointId) != nullptr &&
+        CodegenDataModelProvider::Instance().Registry().Get({ endpointId, Clusters::Identify::Id }) == nullptr)
     {
-        ChipLogError(AppServer, "Failed to find Instance of Identify cluster for endpoint %u", endpointId);
+        ChipLogError(AppServer, "Init error: failed to find Identify cluster registration for endpoint %u", endpointId);
     }
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
 }
 
 void MatterIdentifyClusterShutdownCallback(EndpointId endpointId)
 {
-    Identify * identify = GetLegacyIdentifyInstance(endpointId);
-    if (identify != nullptr)
-    {
-        CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&(identify->mCluster.Cluster()));
-
-        if (err != CHIP_NO_ERROR)
-        {
 #if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-            ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT, endpointId,
-                         ChipLogValueMEI(Clusters::Identify::Id), err.Format());
-#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        }
+    if (GetLegacyIdentifyInstance(endpointId) != nullptr &&
+        CodegenDataModelProvider::Instance().Registry().Get({ endpointId, Clusters::Identify::Id }) == nullptr)
+    {
+        ChipLogError(AppServer, "Shutdown error: failed to find Identify cluster registration for endpoint %u", endpointId);
     }
+#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
 }
 
 // Legacy PluginServer callback stubs
