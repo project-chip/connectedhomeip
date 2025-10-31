@@ -57,12 +57,10 @@ namespace Test {
 // {
 //     ASSERT_GT(it.GetValue().label.size(), 0u);
 // }
-class ClusterTester {
+class ClusterTester
+{
 public:
-    ClusterTester(chip::app::ServerClusterInterface & cluster)
-        : mCluster(cluster)
-    {
-    }
+    ClusterTester(chip::app::ServerClusterInterface & cluster) : mCluster(cluster) {}
 
     template <typename T>
     CHIP_ERROR ReadAttribute(AttributeId attr, T & value)
@@ -134,7 +132,7 @@ public:
     // Ideal for quick tests without manual request construction.
     template <typename T>
     [[nodiscard]] std::optional<chip::app::DataModel::ActionReturnStatus> Invoke(chip::CommandId commandId, const T & data,
-        chip::app::CommandHandler * handler)
+                                                                                 chip::app::CommandHandler * handler)
     {
         const auto & paths = mCluster.GetPaths();
         VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
@@ -149,7 +147,8 @@ public:
         ReturnErrorOnFailure(tlvReader.Next());
 
         // Use provided handler or internal one
-        if (handler == nullptr) {
+        if (handler == nullptr)
+        {
             handler = &mHandler;
         }
 
@@ -178,7 +177,8 @@ public:
         VerifyOrDie(tlvReader.Next() == CHIP_NO_ERROR);
 
         auto statusOpt = mCluster.InvokeCommand(request, tlvReader, &mHandler);
-        if (statusOpt.has_value()) {
+        if (statusOpt.has_value())
+        {
             return statusOpt.value();
         }
 
