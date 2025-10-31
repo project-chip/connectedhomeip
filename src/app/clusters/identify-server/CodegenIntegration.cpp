@@ -156,12 +156,12 @@ Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIde
                  .WithEffectVariant(effectVariant))
 {
     RegisterLegacyIdentify(this);
-    (void) CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
+    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 };
 
 Identify::~Identify()
 {
-    (void) CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
     UnregisterLegacyIdentify(this);
 }
 

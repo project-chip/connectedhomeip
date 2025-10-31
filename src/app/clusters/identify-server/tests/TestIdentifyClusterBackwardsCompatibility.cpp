@@ -174,8 +174,7 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestLateLegacyInstantiation)
     // Instantiate legacy Identify late (after the callback/ember init)
     struct Identify identify(endpointId, nullptr, nullptr, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone);
 
-    // Check that the cluster is NOT properly registered in the CodegenDMP Registry
-    // because there's a bug where we don't register properly if instantiated late
+    // Check the cluster is properly registered in the CodegenDMP Registry
     EXPECT_TRUE(CodegenDataModelProvider::Instance().Registry().Get(ConcreteClusterPath(endpointId, Clusters::Identify::Id)) !=
                 nullptr);
 }
