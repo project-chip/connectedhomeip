@@ -15,9 +15,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "CodegenIntegration.h"
+
 #include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/GeneralCommissioning.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/CodeUtils.h>
+#include <platform/ConfigurationManager.h>
+#include <platform/DeviceControlServer.h>
+#include <platform/PlatformManager.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -42,7 +51,7 @@ static_assert((kGeneralCommissioningFixedClusterCount == 0) ||
                    GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId),
               "General Commissioning cluster MUST be on endpoint 0");
 
-ServerClusterRegistration gRegistration(GeneralCommissioningCluster::Instance());
+LazyRegisteredServerCluster<GeneralCommissioningCluster> gServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -50,16 +59,19 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        // Configure optional attributes based on fetched bits
-        GeneralCommissioningCluster::Instance().GetOptionalAttributes() =
-            GeneralCommissioningCluster::OptionalAttributes(optionalAttributeBits);
 
-        return gRegistration;
+        gServer.Create();
+
+        // Configure optional attributes based on fetched bits
+        gServer.Cluster().GetOptionalAttributes() = GeneralCommissioningCluster::OptionalAttributes(optionalAttributeBits);
+
+        return gServer.Registration();
     }
 
     ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
-        return &GeneralCommissioningCluster::Instance();
+        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+        return &gServer.Cluster();
     }
 
     // Nothing to destroy: separate singleton class without constructor/destructor is used
@@ -68,17 +80,26 @@ public:
 
 } // namespace
 
+namespace chip::app::Clusters::GeneralCommissioning {
+
+GeneralCommissioningCluster * Instance()
+{
+    VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+    return &gServer.Cluster();
+}
+
+} // namespace chip::app::Clusters::GeneralCommissioning
+
 void MatterGeneralCommissioningClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
-
     IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
     // Startup() will be called automatically by the registry when context is set
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                = endpointId,
+            .endpointId                = kRootEndpointId,
             .clusterId                 = GeneralCommissioning::Id,
             .fixedClusterInstanceCount = GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
@@ -97,7 +118,7 @@ void MatterGeneralCommissioningClusterShutdownCallback(EndpointId endpointId)
     // Shutdown() will be called automatically by the registry when context is cleared
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                = endpointId,
+            .endpointId                = kRootEndpointId,
             .clusterId                 = GeneralCommissioning::Id,
             .fixedClusterInstanceCount = GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
