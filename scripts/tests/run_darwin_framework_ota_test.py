@@ -4,11 +4,12 @@ import io
 import json
 import logging
 import time
+from pathlib import Path
 from subprocess import PIPE
 
 import click
 from chiptest.accessories import AppsRegister
-from chiptest.runner import Runner
+from chiptest.runner import Runner, Subprocess
 from chiptest.test_definition import App, ExecutionCapture
 from chipyaml.paths_finder import PathsFinder
 
@@ -18,16 +19,16 @@ TEST_PID = '0x8001'
 
 
 class DarwinToolRunner:
-    def __init__(self, runner, command):
+    def __init__(self, runner, application):
         self.process = None
         self.outpipe = None
         self.runner = runner
         self.lastLogIndex = 0
-        self.command = command
+        self.application = application
         self.stdin = None
 
     def start(self):
-        self.process, self.outpipe, errpipe = self.runner.RunSubprocess(self.command,
+        self.process, self.outpipe, errpipe = self.runner.RunSubprocess(self.application,
                                                                         name='DARWIN-TOOL',
                                                                         wait=False,
                                                                         stdin=PIPE)
@@ -59,9 +60,9 @@ class DarwinToolRunner:
 
 
 class InteractiveDarwinTool(DarwinToolRunner):
-    def __init__(self, runner, binary_path):
-        self.prompt = "WAITING FOR COMMANDS NOW"
-        super().__init__(runner, [binary_path, "interactive", "start", "--additional-prompt", self.prompt])
+    def __init__(self, runner, prompt, application):
+        self.prompt = prompt
+        super().__init__(runner, application)
 
     def waitForPrompt(self):
         self.waitForMessage(self.prompt)
@@ -111,6 +112,13 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
     if ota_requestor_app is None:
         ota_requestor_app = paths_finder.get('chip-ota-requestor-app')
 
+    if darwin_framework_tool is not None:
+        darwin_framework_tool = Subprocess(kind='tool', path=Path(darwin_framework_tool))
+
+    if ota_requestor_app is not None:
+        ota_requestor_app = Subprocess(kind='app', path=Path(ota_requestor_app)
+                                       ).add_args(('--otaDownloadPath', ota_destination_file))
+
     runner = Runner()
     runner.capture_delegate = ExecutionCapture()
 
@@ -137,16 +145,16 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
         with open(ota_candidate_file, "w") as f:
             json.dump(json_data, f)
 
-        requestor_app = App(runner, [ota_requestor_app, '--otaDownloadPath', ota_destination_file])
+        requestor_app = App(runner, ota_requestor_app)
         apps_register.add('default', requestor_app)
 
         requestor_app.start()
 
-        pairing_cmd = [darwin_framework_tool, 'pairing', 'code', TEST_NODE_ID, requestor_app.setupCode]
+        pairing_cmd = darwin_framework_tool.add_args(('pairing', 'code', TEST_NODE_ID, requestor_app.setupCode))
         runner.RunSubprocess(pairing_cmd, name='PAIR', dependencies=[apps_register])
 
         # pairing get-commissioner-node-id does not seem to work right in interactive mode for some reason
-        darwin_tool = DarwinToolRunner(runner, [darwin_framework_tool, 'pairing', 'get-commissioner-node-id'])
+        darwin_tool = DarwinToolRunner(runner, darwin_framework_tool.add_args(('pairing', 'get-commissioner-node-id')))
         darwin_tool.start()
         darwin_tool.waitForMessage(": Commissioner Node Id")
         nodeIdLine = darwin_tool.outpipe.FindLastMatchingLine('.*: Commissioner Node Id (0x[0-9A-F]+)')
@@ -155,7 +163,9 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
         commissionerNodeId = nodeIdLine.group(1)
         darwin_tool.stop()
 
-        darwin_tool = InteractiveDarwinTool(runner, darwin_framework_tool)
+        prompt = "WAITING FOR COMMANDS NOW"
+        darwin_tool = InteractiveDarwinTool(runner, prompt, darwin_framework_tool.add_args(
+            ("interactive", "start", "--additional-prompt", prompt)))
         darwin_tool.start()
 
         darwin_tool.waitForPrompt()

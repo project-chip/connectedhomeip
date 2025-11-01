@@ -14,6 +14,7 @@
 
 import logging
 import os
+import pathlib
 import pty
 import queue
 import re
@@ -21,6 +22,7 @@ import subprocess
 import sys
 import threading
 import typing
+from dataclasses import dataclass
 
 
 class LogPipe(threading.Thread):
@@ -118,22 +120,44 @@ class RunnerWaitQueue:
         return self.queue.get()
 
 
-class Runner:
+@dataclass
+class Subprocess:
+    kind: str
+    path: pathlib.Path | str
+    wrapper: tuple[str, ...] = ()
+    args: tuple[str, ...] = ()
 
+    def __post_init__(self):
+        self.path = pathlib.Path(self.path)
+
+    def add_args(self, args: tuple[str, ...]):
+        return Subprocess(kind=self.kind, path=self.path, wrapper=self.wrapper, args=self.args + args)
+
+    def wrap_with(self, wrapper: tuple[str, ...]):
+        return Subprocess(kind=self.kind, path=self.path, wrapper=wrapper + self.wrapper, args=self.args)
+
+    def to_cmd(self) -> typing.List[str]:
+        return list(self.wrapper) + [str(self.path)] + list(self.args)
+
+
+class Runner:
     def __init__(self, capture_delegate=None):
         self.capture_delegate = capture_delegate
 
-    def RunSubprocess(self, cmd, name, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
+    def RunSubprocess(self, subprocess, name, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
+        if sys.platform == 'darwin':
+            # Try harder to avoid any stdout buffering in our tests
+            subprocess = subprocess.wrap_with(('stdbuf', '-o0', '-i0'))
+
+        logging.info('RunSubprocess starting application %s' % subprocess)
+        cmd = subprocess.to_cmd()
+
         outpipe = LogPipe(
             logging.DEBUG, capture_delegate=self.capture_delegate,
             name=name + ' OUT')
         errpipe = LogPipe(
             logging.INFO, capture_delegate=self.capture_delegate,
             name=name + ' ERR')
-
-        if sys.platform == 'darwin':
-            # Try harder to avoid any stdout buffering in our tests
-            cmd = ['stdbuf', '-o0', '-i0'] + cmd
 
         if self.capture_delegate:
             self.capture_delegate.Log(name, 'EXECUTING %r' % cmd)
@@ -167,3 +191,13 @@ class Runner:
                 raise Exception('Command %r failed: %d' % (cmd, s.returncode))
 
         logging.debug('Command %r completed with error code 0', cmd)
+
+
+class NamespacedRunner(Runner):
+    def __init__(self, ns, capture_delegate=None):
+        super().__init__(capture_delegate)
+        self.ns = ns
+
+    def RunSubprocess(self, subprocess, name, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
+        wrapped_subprocess = self.ns.wrap_in_namespace(subprocess)
+        return super().RunSubprocess(wrapped_subprocess, name, wait, dependencies, timeout_seconds, stdin)
