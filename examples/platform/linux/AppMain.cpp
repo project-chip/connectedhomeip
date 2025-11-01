@@ -1017,6 +1017,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     sigaction(SIGTERM, &sa, nullptr);
 #endif
 
+    ChipLogProgress(DeviceLayer, "Starting event loop");
     if (impl != nullptr)
     {
         impl->RunMainLoop();
