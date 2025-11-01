@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,30 +13,27 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/efr32_sdk.gni")
-import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
+import("${chip_root}/third_party/silabs/efr32_sdk.gni")
 
-# This is necessary since the BUILD.gn for both platforms are still split
-shell_dependency_path = "${chip_root}/examples/platform/silabs/efr32"
-if (wifi_soc) {
-  shell_dependency_path = "${chip_root}/examples/platform/silabs/SiWx"
+config("siwx-ble-config") {
+  defines = []
+  include_dirs = []
+  include_dirs = [ "${silabs_platform_dir}/SiWx/ble", ]
 }
 
-config("icd-shell-config") {
-  include_dirs = [ "./icd/" ]
-}
-
-source_set("icd") {
+source_set("siwx-ble") {
   sources = [
-    "./icd/ICDShellCommands.cpp",
-    "./icd/ICDShellCommands.h",
+    "BLEManagerImpl.cpp",
+    "sl_si91x_ble_init.cpp",
   ]
 
-  public_configs = [ ":icd-shell-config" ]
+  public_configs = [ ":siwx-ble-config" ]
 
   deps = [
-    "${chip_root}/src/app/icd/server:notifier",
-    "${shell_dependency_path}:matter-shell",
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/system",
+    "${chip_root}/src/ble",
   ]
 }
