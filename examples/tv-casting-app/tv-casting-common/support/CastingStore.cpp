@@ -511,7 +511,7 @@ CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayer
         chip::TLV::TLVType endpointsContainerType;
         ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::ContextTag(kCastingPlayerEndpointsContainerTag),
                                                       chip::TLV::kTLVType_Array, endpointsContainerType));
-        std::vector<memory::Strong<core::Endpoint>> endpoints = core::CastingPlayer::GetTargetCastingPlayer()->GetEndpoints();
+        std::vector<memory::Strong<core::Endpoint>> endpoints = castingPlayer.GetEndpoints();
         for (auto & endpoint : endpoints)
         {
             ChipLogProgress(
