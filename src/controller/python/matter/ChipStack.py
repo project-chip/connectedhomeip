@@ -193,6 +193,9 @@ class ChipStack(object):
         for subscription in tuple(self._subscriptions.values()):
             subscription.Shutdown()
 
+        # Shut down the BDX server.
+        Bdx.Shutdown()
+
         # Terminate Matter thread and shutdown the stack.
         self._ChipStackLib.pychip_DeviceController_StackShutdown()
 
