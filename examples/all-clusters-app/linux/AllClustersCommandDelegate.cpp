@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
 #include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
 #include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
@@ -594,6 +595,30 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     {
         Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     }
+    else if (name == "SetBooleanState")
+    {
+        bool hasEndpointId = HasNumericField(self->mJsonValue, "EndpointId");
+        bool hasNewState   = self->mJsonValue.isMember("NewState");
+
+        if (!hasEndpointId || !hasNewState)
+        {
+            std::string inputJson = self->mJsonValue.toStyledString();
+            ChipLogError(NotSpecified, "Missing or invalid value for one of EndpointId, NewState in %s", inputJson.c_str());
+            return;
+        }
+
+        if (!self->mJsonValue["EndpointId"].isUInt() || !self->mJsonValue["NewState"].isBool())
+        {
+            std::string inputJson = self->mJsonValue.toStyledString();
+            ChipLogError(NotSpecified, "Invalid type for one of EndpointId, NewState in %s", inputJson.c_str());
+            return;
+        }
+
+        auto endpointId = static_cast<chip::EndpointId>(self->mJsonValue["EndpointId"].asUInt());
+        auto newState   = self->mJsonValue["NewState"].asBool();
+
+        self->OnBooleanStateChangeHandler(endpointId, newState);
+    }
     else
     {
         ChipLogError(NotSpecified, "Unhandled command '%s': this should never happen", name.c_str());
@@ -1032,6 +1057,16 @@ void AllClustersAppCommandHandler::OccupancyPresentTimerHandler(System::Layer * 
     {
         ChipLogDetail(NotSpecified, "Set Occupancy attribute to clear");
         EmitOccupancyChangedEvent(endpointId, clearValue);
+    }
+}
+
+void AllClustersAppCommandHandler::OnBooleanStateChangeHandler(chip::EndpointId endpointId, bool newState)
+{
+    auto booleanState = BooleanState::FindClusterOnEndpoint(endpointId);
+    if (booleanState != nullptr)
+    {
+        booleanState->SetStateValue(newState);
+        ChipLogProgress(NotSpecified, "BooleanState changed to %s on endpoint %d", newState ? "true" : "false", endpointId);
     }
 }
 
