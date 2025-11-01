@@ -1,6 +1,10 @@
 # Tests that are NOT executed in CI, along with the reason on
 # why they are not.
 not_automated:
+    - name: TC_DD_3_23.py
+      reason:
+          NFC-Thread hardware setup needed for running this test-case and CI
+          does not support it
     - name: MinimalRepresentation.py
       reason: Code/Test not being used or not shared code for any other tests
     - name: TC_AVSMTestBase.py
