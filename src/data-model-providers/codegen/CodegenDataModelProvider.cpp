@@ -45,7 +45,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/ScopedBuffer.h>
-#include <lib/support/SpanSearchValue.h>
 
 #include <cstdint>
 #include <optional>
@@ -164,6 +163,16 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
     });
 }
 
+// Validation happens before we decode or dispatch command payloads. The flow intentionally mirrors the logic used by the
+// generated data-model provider so that dispatch observes the same metadata that validation relied on:
+//   1. `CheckCommandExistence` asks the active data-model provider for an `AcceptedCommandEntry`, guaranteeing dispatch sees the
+//      same command metadata.
+//   2. `CheckCommandAccess` enforces ACL/privilege requirements for the command path after existence is confirmed.
+//   3. `CheckCommandFlags` validates timed / fabric-scoped / payload-size constraints that were also computed by the provider,
+//      so any change to generated metadata automatically applies to both validation and dispatch.
+//
+// Should any other code want to modify the command validation policy, it must do so via the provider or these helper functions
+// so that pre-dispatch validation and the eventual dispatch path remain in lock-step.
 std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                      TLV::TLVReader & input_arguments,
                                                                                      CommandHandler * handler)
@@ -176,7 +185,7 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
     CommandHandlerInterface * handler_interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
 
-    if (handler_interface)
+    if (handler_interface != nullptr)
     {
         CommandHandlerInterface::HandlerContext context(*handler, request.path, input_arguments);
         handler_interface->InvokeCommand(context);
@@ -453,11 +462,13 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
     if (interface != nullptr)
     {
         CHIP_ERROR err = interface->RetrieveAcceptedCommands(path, builder);
-        // If retrieving the accepted commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal procesing.
+        // If retrieving the accepted commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal processing.
         // Otherwise we finished.
-        VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
+        if (err != CHIP_ERROR_NOT_IMPLEMENTED)
+        {
+            return err;
+        }
     }
-
     VerifyOrReturnError(serverCluster->acceptedCommandList != nullptr, CHIP_NO_ERROR);
 
     const chip::CommandId * endOfList = serverCluster->acceptedCommandList;
