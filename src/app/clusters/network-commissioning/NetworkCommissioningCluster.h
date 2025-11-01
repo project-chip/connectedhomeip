@@ -43,7 +43,10 @@ public:
         DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver)
     {}
 
-    CHIP_ERROR Init() { return mLogic.Init(); }
+    CHIP_ERROR Init()
+    {
+        return mLogic.Init([this](AttributeId attributeId) { NotifyAttributeChanged(attributeId); });
+    }
 
     // Undo of the init.
     //

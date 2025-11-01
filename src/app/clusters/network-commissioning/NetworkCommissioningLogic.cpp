@@ -150,13 +150,15 @@ NetworkCommissioningLogic::NetworkCommissioningLogic(EndpointId aEndpointId, Eth
     mEndpointId(aEndpointId), mFeatureFlags(Feature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(apDelegate)
 {}
 
-CHIP_ERROR NetworkCommissioningLogic::Init()
+CHIP_ERROR NetworkCommissioningLogic::Init(AttributeChangeCallbackFn callback)
 {
+    VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
     ReturnErrorOnFailure(mpBaseDriver->Init(this));
     mLastNetworkingStatusValue.SetNull();
     mLastConnectErrorValue.SetNull();
-    mLastNetworkIDLen = 0;
+    mLastNetworkIDLen         = 0;
+    mAttributeChangedCallback = std::move(callback);
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     if (!sInstances.Contains(this))
     {
@@ -199,38 +201,43 @@ void NetworkCommissioningLogic::SendNonConcurrentConnectNetworkResponse()
 
 void NetworkCommissioningLogic::SetLastNetworkingStatusValue(Attributes::LastNetworkingStatus::TypeInfo::Type networkingStatusValue)
 {
+    VerifyOrDie(mAttributeChangedCallback != nullptr);
+
     if (mLastNetworkingStatusValue.Update(networkingStatusValue))
     {
-        MatterReportingAttributeChangeCallback(mEndpointId, Clusters::NetworkCommissioning::Id,
-                                               Attributes::LastNetworkingStatus::TypeInfo::GetAttributeId());
+        mAttributeChangedCallback(Attributes::LastNetworkingStatus::TypeInfo::GetAttributeId());
     }
 }
 
 void NetworkCommissioningLogic::SetLastConnectErrorValue(Attributes::LastConnectErrorValue::TypeInfo::Type connectErrorValue)
 {
+    VerifyOrDie(mAttributeChangedCallback != nullptr);
+
     if (mLastConnectErrorValue.Update(connectErrorValue))
     {
-        MatterReportingAttributeChangeCallback(mEndpointId, Clusters::NetworkCommissioning::Id,
-                                               Attributes::LastConnectErrorValue::TypeInfo::GetAttributeId());
+        mAttributeChangedCallback(Attributes::LastConnectErrorValue::TypeInfo::GetAttributeId());
     }
 }
 
 void NetworkCommissioningLogic::SetLastNetworkId(ByteSpan lastNetworkId)
 {
+    VerifyOrDie(mAttributeChangedCallback != nullptr);
+
     ByteSpan prevLastNetworkId{ mLastNetworkID, mLastNetworkIDLen };
     VerifyOrReturn(lastNetworkId.size() <= kMaxNetworkIDLen);
     VerifyOrReturn(!prevLastNetworkId.data_equal(lastNetworkId));
 
     memcpy(mLastNetworkID, lastNetworkId.data(), lastNetworkId.size());
     mLastNetworkIDLen = static_cast<uint8_t>(lastNetworkId.size());
-    MatterReportingAttributeChangeCallback(mEndpointId, Clusters::NetworkCommissioning::Id,
-                                           Attributes::LastNetworkID::TypeInfo::GetAttributeId());
+
+    mAttributeChangedCallback(Attributes::LastNetworkID::TypeInfo::GetAttributeId());
 }
 
 void NetworkCommissioningLogic::ReportNetworksListChanged() const
 {
-    MatterReportingAttributeChangeCallback(mEndpointId, Clusters::NetworkCommissioning::Id,
-                                           Attributes::Networks::TypeInfo::GetAttributeId());
+    VerifyOrDie(mAttributeChangedCallback != nullptr);
+
+    mAttributeChangedCallback(Attributes::Networks::TypeInfo::GetAttributeId());
 }
 
 void NetworkCommissioningLogic::OnNetworkingStatusChange(Status aCommissioningError, Optional<ByteSpan> aNetworkId,
