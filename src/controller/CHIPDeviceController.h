@@ -862,7 +862,7 @@ protected:
 
     /* This function start the JCM verification steps
      */
-    virtual CHIP_ERROR StartJCMTrustVerification() { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR StartJCMTrustVerification(DeviceProxy * proxy) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     virtual CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params)

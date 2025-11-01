@@ -34,6 +34,7 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/TestOnlyLocalCertificateAuthority.h>
 #include <credentials/tests/CHIPCert_test_vectors.h>
+#include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/asn1/ASN1.h>
@@ -3296,6 +3297,73 @@ TEST_F(TestFabricTable, VidVerificationSigningWorksWithoutVvs)
 
         EXPECT_EQ(VerifySignatureWithNocPublicKey(fabricTable, kFabricIndex2, ByteSpan{ kExpectedUnderlyingTbs2 },
                                                   responseData2.signature.Span()),
+                  CHIP_NO_ERROR);
+    }
+}
+
+TEST_F(TestFabricTable, JFVidVerificationWorksWithoutVvsUsingTestCerts)
+{
+    chip::TestPersistentStorageDelegate storage;
+
+    // Initialize a fabric table.
+    ScopedFabricTable fabricTableHolder;
+    EXPECT_EQ(fabricTableHolder.Init(&storage), CHIP_NO_ERROR);
+    FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
+
+    EXPECT_EQ(fabricTable.FabricCount(), 0);
+
+    FabricIndex kFabricIndex = kUndefinedFabricIndex;
+    fabricTable.AddNewFabricForTestIgnoringCollisions(TestCerts::GetJFBRootCertAsset().mCert, TestCerts::GetJFBIACertAsset().mCert,
+                                                      TestCerts::GetJFBNodeCertAsset().mCert, TestCerts::GetJFBNodeCertAsset().mKey,
+                                                      &kFabricIndex);
+
+    EXPECT_EQ(fabricTable.FabricCount(), 1);
+
+    const FabricInfo * fabricInfo = fabricTable.FindFabricWithIndex(kFabricIndex);
+    VendorId kVendorId            = fabricInfo->GetVendorId();
+
+    FabricTable::SignVIDVerificationResponseData responseData;
+    {
+        const uint8_t kAttestationChallenge[16] = {
+            0x14, 0x5f, 0x2e, 0xf3, 0x9e, 0x3e, 0x4f, 0xfc, 0xf5, 0x64, 0x9c, 0x09, 0x09, 0xcb, 0xc8, 0xe4,
+        };
+        ByteSpan kAttestationChallengeSpan{ kAttestationChallenge };
+
+        const uint8_t kClientChallenge[32] = {
+            0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0,
+            0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf, 0xe0,
+        };
+        ByteSpan kClientChallengeSpan{ kClientChallenge };
+
+        uint8_t rcacBuf[Credentials::kMaxCHIPCertLength];
+        MutableByteSpan rcacSpan{ rcacBuf };
+        ASSERT_EQ(fabricTable.FetchRootCert(kFabricIndex, rcacSpan), CHIP_NO_ERROR);
+        Credentials::P256PublicKeySpan kTrustedCAPublicKeySpan;
+        ASSERT_EQ(Credentials::ExtractPublicKeyFromChipCert(rcacSpan, kTrustedCAPublicKeySpan), CHIP_NO_ERROR);
+
+        uint8_t kVendorFabricBindingMessageBuffer[Crypto::kVendorFabricBindingMessageV1Size];
+        MutableByteSpan kVendorFabricBindingMessageSpan{ kVendorFabricBindingMessageBuffer };
+        ASSERT_EQ(Crypto::GenerateVendorFabricBindingMessage(Crypto::FabricBindingVersion::kVersion1, kTrustedCAPublicKeySpan,
+                                                             kFabricIndex, kVendorId, kVendorFabricBindingMessageSpan),
+                  CHIP_NO_ERROR);
+
+        ByteSpan kVidVerificationStatementSpan;
+        uint8_t kExpectedUnderlyingTbsBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
+        MutableByteSpan kExpectedUnderlyingTbs{ kExpectedUnderlyingTbsBuffer };
+        ASSERT_EQ(Crypto::GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeSpan, kAttestationChallengeSpan,
+                                                                 kVendorFabricBindingMessageSpan, kVidVerificationStatementSpan,
+                                                                 kExpectedUnderlyingTbs),
+                  CHIP_NO_ERROR);
+
+        ASSERT_EQ(
+            fabricTable.SignVIDVerificationRequest(kFabricIndex, kClientChallengeSpan, kAttestationChallengeSpan, responseData),
+            CHIP_NO_ERROR);
+
+        EXPECT_EQ(responseData.fabricBindingVersion, to_underlying(Crypto::FabricBindingVersion::kVersion1));
+        EXPECT_EQ(responseData.fabricIndex, kFabricIndex);
+
+        EXPECT_EQ(VerifySignatureWithNocPublicKey(fabricTable, kFabricIndex, ByteSpan{ kExpectedUnderlyingTbs },
+                                                  responseData.signature.Span()),
                   CHIP_NO_ERROR);
     }
 }

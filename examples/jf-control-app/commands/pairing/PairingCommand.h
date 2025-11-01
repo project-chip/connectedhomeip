@@ -23,6 +23,7 @@
 #include <controller/CommissioningDelegate.h>
 #include <controller/CurrentFabricRemover.h>
 #include <controller/jcm/DeviceCommissioner.h>
+#include <credentials/jcm/TrustVerification.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
 #include <lib/support/Span.h>
@@ -30,11 +31,15 @@
 
 #include <optional>
 
-using JCMDeviceCommissioner        = chip::Controller::JCM::DeviceCommissioner;
-using JCMTrustVerificationDelegate = chip::Controller::JCM::TrustVerificationDelegate;
-using JCMTrustVerificationStage    = chip::Controller::JCM::TrustVerificationStage;
-using JCMTrustVerificationError    = chip::Controller::JCM::TrustVerificationError;
-using JCMTrustVerificationInfo     = chip::Controller::JCM::TrustVerificationInfo;
+using namespace ::chip;
+using namespace ::chip::Credentials;
+
+using JCMDeviceCommissioner            = chip::Controller::JCM::DeviceCommissioner;
+using JCMTrustVerificationStateMachine = chip::Credentials::JCM::TrustVerificationStateMachine;
+using JCMTrustVerificationDelegate     = chip::Credentials::JCM::TrustVerificationDelegate;
+using JCMTrustVerificationStage        = chip::Credentials::JCM::TrustVerificationStage;
+using JCMTrustVerificationError        = chip::Credentials::JCM::TrustVerificationError;
+using JCMTrustVerificationInfo         = chip::Credentials::JCM::TrustVerificationInfo;
 
 enum class PairingMode
 {
@@ -68,7 +73,6 @@ class PairingCommand : public CHIPCommand,
                        public chip::Controller::DeviceDiscoveryDelegate,
                        public JCMTrustVerificationDelegate,
                        public chip::Credentials::DeviceAttestationDelegate
-
 {
 public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
@@ -260,10 +264,10 @@ public:
                                       chip::Credentials::AttestationVerificationResult attestationResult) override;
 
     /////////// JCMTrustVerificationDelegate /////////
-    void OnProgressUpdate(JCMDeviceCommissioner & commissioner, JCMTrustVerificationStage stage, JCMTrustVerificationInfo & info,
-                          JCMTrustVerificationError error) override;
-    void OnAskUserForConsent(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info) override;
-    void OnVerifyVendorId(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info) override;
+    void OnProgressUpdate(JCMTrustVerificationStateMachine & stateMachine, JCMTrustVerificationStage stage,
+                          JCMTrustVerificationInfo & info, JCMTrustVerificationError error);
+    void OnAskUserForConsent(JCMTrustVerificationStateMachine & stateMachine, JCMTrustVerificationInfo & info);
+    CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId, ByteSpan & globallyTrustedRoot);
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
@@ -333,6 +337,7 @@ private:
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
     ::pw::rpc::NanopbClientReader<::RequestOptions> rpcGetStream;
+    chip::ByteSpan mRemoteAdminTrustedRoot;
 
     // For unpair
     chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;
