@@ -18,9 +18,13 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/ConcreteCommandPath.h>
+#include <app/clusters/testing/CommandTesting.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/ServerClusterInterface.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/TLVReader.h>
 #include <memory>
 
@@ -96,32 +100,141 @@ public:
         return mCluster.WriteAttribute(writeOperation.GetRequest(), decoder).GetUnderlyingError();
     };
 
-    // Helper function to invoke a command and return the result.
+    // Prepares an invoke request: sets the command path and clears handler state.
+    void InvokeOperation(const app::ConcreteCommandPath & path)
+    {
+        mCommandPath = path;
+        mHandler.ClearResponses();
+        mHandler.ClearStatuses();
+        mRequest.path = mCommandPath;
+    }
+
+    // Invoke a command using a predefined request structure
+    template <typename RequestType>
+    [[nodiscard]] std::optional<app::DataModel::ActionReturnStatus> Invoke(const RequestType & request)
+    {
+        TLV::TLVWriter writer;
+        writer.Init(mTlvBuffer);
+
+        TLV::TLVReader reader;
+
+        ReturnErrorOnFailure(request.Encode(writer, TLV::AnonymousTag()));
+        ReturnErrorOnFailure(writer.Finalize());
+
+        reader.Init(mTlvBuffer, writer.GetLengthWritten());
+        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+
+        return mCluster.InvokeCommand(mRequest, reader, &mHandler);
+    }
+
+    // Simplified overload to invoke a command with just the command ID and data.
+    // Builds the request automatically using the internal cluster's paths.
+    // Ideal for quick tests without manual request construction.
     template <typename T>
-    std::optional<chip::app::DataModel::ActionReturnStatus> InvokeCommand(chip::CommandId commandId, const T & data,
-                                                                          app::CommandHandler * handler)
+    [[nodiscard]] std::optional<app::DataModel::ActionReturnStatus> Invoke(chip::CommandId commandId, const T & data,
+                                                                           app::CommandHandler * handler)
     {
         const auto & paths = mCluster.GetPaths();
         VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
-        const chip::app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
+        const app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
 
-        constexpr size_t kTlvBufferSize = 128; // Typically CommanderSender will use a TLV of size kMaxSecureSduLengthBytes. For
-                                               // now, just use 128 for the unit test.
-        uint8_t buffer[kTlvBufferSize];
         chip::TLV::TLVWriter tlvWriter;
-        tlvWriter.Init(buffer);
+        tlvWriter.Init(mTlvBuffer);
         ReturnErrorOnFailure(data.Encode(tlvWriter, chip::TLV::AnonymousTag()));
 
         chip::TLV::TLVReader tlvReader;
-        tlvReader.Init(buffer, tlvWriter.GetLengthWritten());
+        tlvReader.Init(mTlvBuffer, tlvWriter.GetLengthWritten());
         ReturnErrorOnFailure(tlvReader.Next());
+
+        // Use provided handler or internal one
+        if (handler == nullptr)
+        {
+            handler = &mHandler;
+        }
 
         return mCluster.InvokeCommand(request, tlvReader, handler);
     }
 
+    // Invoke a command using a predefined request structure
+    template <typename T>
+    app::DataModel::ActionReturnStatus Invoke(chip::CommandId commandId, const T & data)
+    {
+        const auto & paths = mCluster.GetPaths();
+        VerifyOrDie(paths.size() == 1u);
+        const app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
+
+        // Clear any previous handler state to avoid stale responses
+        mHandler.ClearResponses();
+        mHandler.ClearStatuses();
+
+        chip::TLV::TLVWriter tlvWriter;
+        tlvWriter.Init(mTlvBuffer);
+        CHIP_ERROR err = data.Encode(tlvWriter, chip::TLV::AnonymousTag());
+        VerifyOrDie(err == CHIP_NO_ERROR);
+
+        chip::TLV::TLVReader tlvReader;
+        tlvReader.Init(mTlvBuffer, tlvWriter.GetLengthWritten());
+        VerifyOrDie(tlvReader.Next() == CHIP_NO_ERROR);
+
+        auto statusOpt = mCluster.InvokeCommand(request, tlvReader, &mHandler);
+        if (statusOpt.has_value())
+        {
+            return statusOpt.value();
+        }
+
+        // A response was produced; consider this a success from a status perspective
+        return Protocols::InteractionModel::Status::Success;
+    }
+
+    // Simplified overload to invoke a command with just the command ID and data.
+    // Builds the request automatically using the internal cluster's paths.
+    // Ideal for quick tests without manual request construction.
+    template <typename ResponseType, typename T>
+    ResponseType Invoke(chip::CommandId commandId, const T & data)
+    {
+        const auto & paths = mCluster.GetPaths();
+        VerifyOrDie(paths.size() == 1u);
+        const app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
+
+        // Clear any previous handler state to avoid stale responses
+        mHandler.ClearResponses();
+        mHandler.ClearStatuses();
+
+        chip::TLV::TLVWriter tlvWriter;
+        tlvWriter.Init(mTlvBuffer);
+        CHIP_ERROR err = data.Encode(tlvWriter, chip::TLV::AnonymousTag());
+        VerifyOrDie(err == CHIP_NO_ERROR);
+
+        chip::TLV::TLVReader tlvReader;
+        tlvReader.Init(mTlvBuffer, tlvWriter.GetLengthWritten());
+        VerifyOrDie(tlvReader.Next() == CHIP_NO_ERROR);
+
+        auto statusOpt = mCluster.InvokeCommand(request, tlvReader, &mHandler);
+        // Expect a response to be produced (statusOpt must be empty)
+        VerifyOrDie(!statusOpt.has_value());
+
+        ResponseType response;
+        err = mHandler.DecodeResponse(response);
+        VerifyOrDie(err == CHIP_NO_ERROR);
+        return response;
+    }
+
+    const app::DataModel::InvokeRequest & GetRequest() const { return mRequest; }
+
 private:
     app::ServerClusterInterface & mCluster;
     std::unique_ptr<app::Testing::ReadOperation> mReadOperation;
+
+    // Buffer size for TLV encoding/decoding of command payloads.
+    // 256 bytes was chosen as a conservative upper bound for typical command payloads in tests.
+    // All command payloads used in tests must fit within this buffer; tests with larger payloads will fail.
+    // If protocol or test requirements change, this value may need to be increased.
+    static constexpr size_t kTlvBufferSize = 256;
+
+    app::ConcreteCommandPath mCommandPath;
+    app::DataModel::InvokeRequest mRequest;
+    app::Testing::MockCommandHandler mHandler;
+    uint8_t mTlvBuffer[kTlvBufferSize];
 };
 
 } // namespace Test
