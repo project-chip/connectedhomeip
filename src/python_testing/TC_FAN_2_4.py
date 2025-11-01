@@ -105,7 +105,7 @@ class TC_FAN_2_4(MatterBaseTest):
     @run_if_endpoint_matches(has_feature(Clusters.FanControl, Clusters.FanControl.Bitmaps.Feature.kWind))
     async def test_TC_FAN_2_4(self):
         # Setup
-        self.endpoint = self.get_endpoint(default=1)
+        self.endpoint = self.get_endpoint()
         cluster = Clusters.FanControl
         attr = cluster.Attributes
         valid_wind_support_range = range(1, 4)

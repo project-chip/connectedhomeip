@@ -91,7 +91,7 @@ class TC_DGSW_2_2(MatterBaseTest):
     @run_if_endpoint_matches(has_cluster(Clusters.SoftwareDiagnostics))
     async def test_TC_DGSW_2_2(self):
 
-        endpoint = self.get_endpoint(default=0)
+        endpoint = self.get_endpoint()
 
         # STEP 1: Commission DUT (already done)
         self.step(1)

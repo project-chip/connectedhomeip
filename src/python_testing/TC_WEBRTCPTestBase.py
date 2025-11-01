@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 class WEBRTCPTestBase:
     async def allocate_one_audio_stream(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -82,7 +82,7 @@ class WEBRTCPTestBase:
             pass
 
     async def allocate_one_video_stream(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -162,7 +162,7 @@ class WEBRTCPTestBase:
             pass
 
     async def validate_allocated_video_stream(self, videoStreamID):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
 
@@ -175,7 +175,7 @@ class WEBRTCPTestBase:
             asserts.fail(f"Video Stream with ID {videoStreamID} not found as expected")
 
     async def validate_allocated_audio_stream(self, audioStreamID):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
 

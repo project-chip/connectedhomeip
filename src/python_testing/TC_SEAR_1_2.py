@@ -203,9 +203,13 @@ class TC_SEAR_1_2(MatterBaseTest):
     def TC_SEAR_1_2(self) -> list[str]:
         return ["SEAR.S"]
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_SEAR_1_2(self):
-        self.endpoint = self.get_endpoint(default=1)
+        self.endpoint = self.get_endpoint()
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         self.print_step(1, "Commissioning, already done")

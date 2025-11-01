@@ -444,16 +444,20 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Checks if the 'PICS_SDK_CI_ONLY' PICS flag is enabled."""
         return self.check_pics('PICS_SDK_CI_ONLY')
 
+    @property
+    def default_endpoint(self) -> int:
+        return 0
+
     #
     # Matter Test API - Parameter Getters
     #
 
-    def get_endpoint(self, default: Optional[int] = 0) -> int:
+    def get_endpoint(self) -> int:
         """Gets the target endpoint ID from config, with a fallback default."""
         endpoint = self.matter_test_config.endpoint
         if endpoint is not None:
             return endpoint
-        return 0 if default is None else default
+        return self.default_endpoint
 
     def get_wifi_ssid(self, default: str = "") -> str:
         ''' Get WiFi SSID

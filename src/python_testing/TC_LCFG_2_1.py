@@ -70,7 +70,7 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
     @run_if_endpoint_matches(has_cluster(Clusters.LocalizationConfiguration))
     async def test_TC_LCFG_2_1(self):
 
-        endpoint = self.get_endpoint(default=0)
+        endpoint = self.get_endpoint()
         value_not_present_in_supported_locales = "fw-GB"
         max_lenght_string = 35
         max_length_list = 32

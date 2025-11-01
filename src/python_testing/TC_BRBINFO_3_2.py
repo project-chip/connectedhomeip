@@ -68,10 +68,14 @@ class TC_BRBINFO_3_2(MatterBaseTest):
         ]
         return pics
 
+    @property
+    def default_endpoint(self) -> int:
+        return 3
+
     @async_test_body
     async def test_TC_BRBINFO_3_2(self):
         self.step(0)
-        endpoint = self.get_endpoint(default=3)
+        endpoint = self.get_endpoint()
 
         attributes = Clusters.BridgedDeviceBasicInformation.Attributes
 

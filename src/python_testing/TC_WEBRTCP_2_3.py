@@ -84,13 +84,17 @@ class TC_WebRTCP_2_3(MatterBaseTest, WEBRTCPTestBase):
         ]
         return pics
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_WebRTCP_2_3(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.WebRTCTransportProvider
 
         # Sample SDP for testing

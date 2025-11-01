@@ -100,7 +100,7 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
     async def test_TC_AVSUM_2_2(self):
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         # Allow some user input steps to be skipped if running under CI
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 

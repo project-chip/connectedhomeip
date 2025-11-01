@@ -95,7 +95,7 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
     async def test_TC_AVSUM_2_4(self):
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         # PIXIT check
         canbemadebusy = self.user_params.get("PIXIT.CANBEMADEBUSY", False)
 

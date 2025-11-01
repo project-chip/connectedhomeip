@@ -85,7 +85,7 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
                                          Clusters.LaundryWasherControls.Bitmaps.Feature.kSpin))
     async def test_TC_WASHERCTRL_2_1(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
 
