@@ -30,11 +30,9 @@ declare_args() {
   use_external_flash = false
 
   stm32_sdk_root = "${chip_root}/third_party/st"
-
-  stm32_ic_family = "STM32WB5MM-DK"
 }
 
-if (stm32_family == "stm32wb5") {
+if (stm32_family == "stm32wb5" || stm32_family == "stm32wba6") {
   use_stm32_wpan = true
 }
 
@@ -103,6 +101,8 @@ template("stm32_sdk") {
     # declared in stm32_mbedtls_config further down this file.
     if (stm32_family == "stm32wb5") {
       defines += [ "MBEDTLS_USER_CONFIG_FILE=<examples/platform/stm32/config_files/STM32WB5/matter_config.h>" ]
+    } else if (stm32_family == "stm32wba6") {
+      defines += [ "MBEDTLS_USER_CONFIG_FILE=<matter_config.h>" ]
     }
 
     if (defined(invoker.enable_sleepy_device)) {
@@ -151,11 +151,15 @@ template("stm32_sdk") {
         "${chip_root}/examples/platform/stm32/config_files/STM32WB5/FreeRTOSConfig.h",
         "${chip_root}/examples/platform/stm32/config_files/STM32WB5/matter_config.h",
       ]
+    } else if (stm32_family == "stm32wba6") {
+      sources = [
+        "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/FreeRTOSConfig.h",
+        "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/matter_config.h",
+      ]
     }
 
     public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
   }
-
   source_set(sdk_target_name) {
     if (defined(invoker.enable_sleepy_device)) {
     }
