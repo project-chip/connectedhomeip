@@ -46,12 +46,12 @@ from mobly import asserts, signals
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters import ClusterObjects as ClusterObjects
-from matter.clusters.Attribute import AttributePath, SubscriptionTransaction, ValueDecodeFailure
+from matter.clusters.Attribute import AttributePath, ValueDecodeFailure
 from matter.clusters.enum import MatterIntEnum
 from matter.interaction_model import Status
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id
+from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.tlv import uint
 
@@ -358,22 +358,19 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
                             # Restore list values if we wrote an empty list successfully (per TC_AccessChecker pattern)
                             if isinstance(current_val, list) and len(new_val) == 0:
-                                try:
-                                    await self.default_controller.WriteAttribute(
-                                        nodeid=self.dut_node_id,
-                                        attributes=[(endpoint_id, attribute(current_val))]
-                                    )
-                                    logging.debug(f"{test_step}: Restored original value for {attribute.__name__}")
-                                    # Track the restoration as another change
-                                    changed_attributes.append({
-                                        'endpoint': endpoint_id,
-                                        'cluster': cluster_class,
-                                        'attribute': attribute,
-                                        'old_value': new_val,
-                                        'new_value': current_val
-                                    })
-                                except:
-                                    pass  # Best effort restore
+                                await self.default_controller.WriteAttribute(
+                                    nodeid=self.dut_node_id,
+                                    attributes=[(endpoint_id, attribute(current_val))]
+                                )
+                                logging.debug(f"{test_step}: Restored original value for {attribute.__name__}")
+                                # Track the restoration as another change
+                                changed_attributes.append({
+                                    'endpoint': endpoint_id,
+                                    'cluster': cluster_class,
+                                    'attribute': attribute,
+                                    'old_value': new_val,
+                                    'new_value': current_val
+                                })
 
                         elif resp[0].Status == Status.UnsupportedWrite:
                             # Optional write attribute that's not supported - this is fine
@@ -488,7 +485,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         self.device_clusters = self.all_device_clusters()
         node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel
-        node_label_attr_path = [(self.root_node_endpoint, node_label_attr)]
         TH: ChipDeviceController = self.default_controller
 
         # Step 1: Empty report verification
@@ -763,7 +759,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             else:
                 logging.info("Using default MRP Idle Interval (500ms for non-Thread)")
         except Exception as e:
-            logging.info("Using default MRP Idle Interval (500ms for non-Thread)")
+            logging.info(f"Using default MRP Idle Interval (500ms for non-Thread) but experienced {e}")
 
         MRP_RETRANSMISSION_TIMEOUT = (negotiated_idle_interval_ms * 9.256 * 1.375 / 1000.0) + 1.0
 
@@ -791,8 +787,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         # Find a second writable attribute for testing
         breadcrumb_attr = Clusters.GeneralCommissioning.Attributes.Breadcrumb
-        breadcrumb_path = [(self.root_node_endpoint, breadcrumb_attr)]
-
+        
         # First subscription with KeepSubscriptions=False
         attr_handler_step10_first = AttributeSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation,
@@ -859,8 +854,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             keepSubscriptions=False
         )
         self._init_subscription_callback(sub_step11_first)
-
-        first_sub_id_step11 = sub_step11_first.subscriptionId
 
         # Second subscription with KeepSubscriptions=False (should cancel first)
         attr_handler_step11_second = AttributeSubscriptionHandler(
@@ -971,7 +964,9 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         changed_count = await self.change_writable_attributes_and_verify_reports(
             sub_step13, priming_data, "Step 13"
         )
+        logging.info(f"Changed and verified {changed_count} attribute(s)")
 
+        # Shutdown subscription 
         sub_step13.Shutdown()
 
         # Step 14: Attribute on cluster from all endpoints
@@ -1066,6 +1061,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         changed_count = await self.change_writable_attributes_and_verify_reports(
             sub_step15, priming_data, "Step 15", clusters_to_skip=CLUSTERS_WITH_SUBSCRIPTION_ISSUES
         )
+        logging.info(f"Changed and verified {changed_count} attribute(s)")
 
         sub_step15.Shutdown()
 
@@ -1110,6 +1106,8 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         changed_count = await self.change_writable_attributes_and_verify_reports(
             sub_step16, priming_data, "Step 16", clusters_to_skip=CLUSTERS_WITH_SUBSCRIPTION_ISSUES
         )
+        logging.info(f"Changed and verified {changed_count} attribute(s)")
+
 
         sub_step16.Shutdown()
 
