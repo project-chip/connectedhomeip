@@ -787,7 +787,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         # Find a second writable attribute for testing
         breadcrumb_attr = Clusters.GeneralCommissioning.Attributes.Breadcrumb
-        
+
         # First subscription with KeepSubscriptions=False
         attr_handler_step10_first = AttributeSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation,
@@ -966,7 +966,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         )
         logging.info(f"Changed and verified {changed_count} attribute(s)")
 
-        # Shutdown subscription 
+        # Shutdown subscription
         sub_step13.Shutdown()
 
         # Step 14: Attribute on cluster from all endpoints
@@ -1107,7 +1107,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             sub_step16, priming_data, "Step 16", clusters_to_skip=CLUSTERS_WITH_SUBSCRIPTION_ISSUES
         )
         logging.info(f"Changed and verified {changed_count} attribute(s)")
-
 
         sub_step16.Shutdown()
 
