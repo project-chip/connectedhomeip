@@ -2156,7 +2156,7 @@
           "mfgCode": null,
           "define": "NETWORK_COMMISSIONING_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "ScanNetworks",
@@ -18642,7 +18642,7 @@
           "mfgCode": null,
           "define": "SOIL_MEASUREMENT_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "apiMaturity": "provisional",
           "attributes": [
             {
@@ -24935,7 +24935,7 @@
           "mfgCode": null,
           "define": "NETWORK_COMMISSIONING_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "ScanNetworks",

@@ -26,4 +26,6 @@ source_set("soil-measurement-server") {
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/SoilMeasurement",
   ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
 }

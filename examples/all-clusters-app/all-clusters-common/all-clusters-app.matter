@@ -1809,185 +1809,6 @@ cluster GeneralCommissioning = 48 {
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 
-/** Functionality to configure, enable, disable network credentials and access on a Matter device. */
-cluster NetworkCommissioning = 49 {
-  revision 2;
-
-  enum NetworkCommissioningStatusEnum : enum8 {
-    kSuccess = 0;
-    kOutOfRange = 1;
-    kBoundsExceeded = 2;
-    kNetworkIDNotFound = 3;
-    kDuplicateNetworkID = 4;
-    kNetworkNotFound = 5;
-    kRegulatoryError = 6;
-    kAuthFailure = 7;
-    kUnsupportedSecurity = 8;
-    kOtherConnectionFailure = 9;
-    kIPV6Failed = 10;
-    kIPBindFailed = 11;
-    kUnknownError = 12;
-  }
-
-  enum WiFiBandEnum : enum8 {
-    k2G4 = 0 [spec_name = "2G4"];
-    k3G65 = 1 [spec_name = "3G65"];
-    k5G = 2 [spec_name = "5G"];
-    k6G = 3 [spec_name = "6G"];
-    k60G = 4 [spec_name = "60G"];
-    k1G = 5 [spec_name = "1G"];
-  }
-
-  bitmap Feature : bitmap32 {
-    kWiFiNetworkInterface = 0x1;
-    kThreadNetworkInterface = 0x2;
-    kEthernetNetworkInterface = 0x4;
-    kPerDeviceCredentials = 0x8;
-  }
-
-  bitmap ThreadCapabilitiesBitmap : bitmap16 {
-    kIsBorderRouterCapable = 0x1;
-    kIsRouterCapable = 0x2;
-    kIsSleepyEndDeviceCapable = 0x4;
-    kIsFullThreadDevice = 0x8;
-    kIsSynchronizedSleepyEndDeviceCapable = 0x10;
-  }
-
-  bitmap WiFiSecurityBitmap : bitmap8 {
-    kUnencrypted = 0x1;
-    kWEP = 0x2 [spec_name = "WEP"];
-    kWPAPersonal = 0x4 [spec_name = "WPA-PERSONAL"];
-    kWPA2Personal = 0x8 [spec_name = "WPA2-PERSONAL"];
-    kWPA3Personal = 0x10 [spec_name = "WPA3-PERSONAL"];
-    kWPA3MatterPDC = 0x20 [spec_name = "WPA3-Matter-PDC"];
-  }
-
-  struct NetworkInfoStruct {
-    octet_string<32> networkID = 0;
-    boolean connected = 1;
-    optional nullable octet_string<20> networkIdentifier = 2;
-    optional nullable octet_string<20> clientIdentifier = 3;
-  }
-
-  struct ThreadInterfaceScanResultStruct {
-    int16u panId = 0;
-    int64u extendedPanId = 1;
-    char_string<16> networkName = 2;
-    int16u channel = 3;
-    int8u version = 4;
-    octet_string<8> extendedAddress = 5;
-    int8s rssi = 6;
-    int8u lqi = 7;
-  }
-
-  struct WiFiInterfaceScanResultStruct {
-    WiFiSecurityBitmap security = 0;
-    octet_string<32> ssid = 1;
-    octet_string<6> bssid = 2;
-    int16u channel = 3;
-    WiFiBandEnum wiFiBand = 4;
-    int8s rssi = 5;
-  }
-
-  readonly attribute access(read: administer) int8u maxNetworks = 0;
-  readonly attribute access(read: administer) NetworkInfoStruct networks[] = 1;
-  readonly attribute optional int8u scanMaxTimeSeconds = 2;
-  readonly attribute optional int8u connectMaxTimeSeconds = 3;
-  attribute access(write: administer) boolean interfaceEnabled = 4;
-  readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
-  readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
-  readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
-  provisional readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
-  provisional readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
-  provisional readonly attribute optional int16u threadVersion = 10;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct ScanNetworksRequest {
-    optional nullable octet_string<32> ssid = 0;
-    optional int64u breadcrumb = 1;
-  }
-
-  response struct ScanNetworksResponse = 1 {
-    NetworkCommissioningStatusEnum networkingStatus = 0;
-    optional char_string debugText = 1;
-    optional WiFiInterfaceScanResultStruct wiFiScanResults[] = 2;
-    optional ThreadInterfaceScanResultStruct threadScanResults[] = 3;
-  }
-
-  request struct AddOrUpdateWiFiNetworkRequest {
-    octet_string<32> ssid = 0;
-    octet_string<64> credentials = 1;
-    optional int64u breadcrumb = 2;
-    optional octet_string<140> networkIdentity = 3;
-    optional octet_string<20> clientIdentifier = 4;
-    optional octet_string<32> possessionNonce = 5;
-  }
-
-  request struct AddOrUpdateThreadNetworkRequest {
-    octet_string<254> operationalDataset = 0;
-    optional int64u breadcrumb = 1;
-  }
-
-  request struct RemoveNetworkRequest {
-    octet_string<32> networkID = 0;
-    optional int64u breadcrumb = 1;
-  }
-
-  response struct NetworkConfigResponse = 5 {
-    NetworkCommissioningStatusEnum networkingStatus = 0;
-    optional char_string<512> debugText = 1;
-    optional int8u networkIndex = 2;
-    optional octet_string<140> clientIdentity = 3;
-    optional octet_string<64> possessionSignature = 4;
-  }
-
-  request struct ConnectNetworkRequest {
-    octet_string<32> networkID = 0;
-    optional int64u breadcrumb = 1;
-  }
-
-  response struct ConnectNetworkResponse = 7 {
-    NetworkCommissioningStatusEnum networkingStatus = 0;
-    optional char_string debugText = 1;
-    nullable int32s errorValue = 2;
-  }
-
-  request struct ReorderNetworkRequest {
-    octet_string<32> networkID = 0;
-    int8u networkIndex = 1;
-    optional int64u breadcrumb = 2;
-  }
-
-  request struct QueryIdentityRequest {
-    octet_string<20> keyIdentifier = 0;
-    optional octet_string<32> possessionNonce = 1;
-  }
-
-  response struct QueryIdentityResponse = 10 {
-    octet_string<140> identity = 0;
-    optional octet_string<64> possessionSignature = 1;
-  }
-
-  /** Detemine the set of networks the device sees as available. */
-  command access(invoke: administer) ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
-  /** Add or update the credentials for a given Wi-Fi network. */
-  command access(invoke: administer) AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
-  /** Add or update the credentials for a given Thread network. */
-  command access(invoke: administer) AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
-  /** Remove the definition of a given network (including its credentials). */
-  command access(invoke: administer) RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
-  /** Connect to the specified network, using previously-defined credentials. */
-  command access(invoke: administer) ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
-  /** Modify the order in which networks will be presented in the Networks attribute. */
-  command access(invoke: administer) ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
-  /** Retrieve details about and optionally proof of possession of a network client identity. */
-  command access(invoke: administer) QueryIdentity(QueryIdentityRequest): QueryIdentityResponse = 9;
-}
-
 /** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
 cluster DiagnosticLogs = 50 {
   revision 1;
@@ -6253,19 +6074,6 @@ cluster RadonConcentrationMeasurement = 1071 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** This cluster provides an interface to soil measurement functionality, including configuration and provision of notifications of soil measurements. */
-provisional cluster SoilMeasurement = 1072 {
-  revision 1;
-
-  readonly attribute MeasurementAccuracyStruct soilMoistureMeasurementLimits = 0;
-  readonly attribute nullable percent soilMoistureMeasuredValue = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 cluster WakeOnLan = 1283 {
   revision 1;
@@ -7784,35 +7592,6 @@ endpoint 0 {
     handle command CommissioningCompleteResponse;
   }
 
-  server cluster NetworkCommissioning {
-    callback attribute maxNetworks;
-    callback attribute networks;
-    callback attribute scanMaxTimeSeconds;
-    callback attribute connectMaxTimeSeconds;
-    callback attribute interfaceEnabled;
-    callback attribute lastNetworkingStatus;
-    callback attribute lastNetworkID;
-    callback attribute lastConnectErrorValue;
-    callback attribute supportedWiFiBands;
-    callback attribute supportedThreadFeatures;
-    callback attribute threadVersion;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    callback attribute featureMap;
-    callback attribute clusterRevision;
-
-    handle command ScanNetworks;
-    handle command ScanNetworksResponse;
-    handle command AddOrUpdateWiFiNetwork;
-    handle command AddOrUpdateThreadNetwork;
-    handle command RemoveNetwork;
-    handle command NetworkConfigResponse;
-    handle command ConnectNetwork;
-    handle command ConnectNetworkResponse;
-    handle command ReorderNetwork;
-  }
-
   server cluster DiagnosticLogs {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -9131,16 +8910,6 @@ endpoint 1 {
     ram      attribute clusterRevision default = 3;
   }
 
-  server cluster SoilMeasurement {
-    callback attribute soilMoistureMeasurementLimits;
-    callback attribute soilMoistureMeasuredValue;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    callback attribute featureMap;
-    callback attribute clusterRevision;
-  }
-
   server cluster WakeOnLan {
     ram      attribute MACAddress;
     ram      attribute featureMap default = 0;
@@ -9660,32 +9429,6 @@ endpoint 65534 {
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
-  }
-
-  server cluster NetworkCommissioning {
-    callback attribute maxNetworks;
-    callback attribute networks;
-    callback attribute scanMaxTimeSeconds;
-    callback attribute connectMaxTimeSeconds;
-    callback attribute interfaceEnabled;
-    callback attribute lastNetworkingStatus;
-    callback attribute lastNetworkID;
-    callback attribute lastConnectErrorValue;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    callback attribute featureMap;
-    callback attribute clusterRevision;
-
-    handle command ScanNetworks;
-    handle command ScanNetworksResponse;
-    handle command AddOrUpdateWiFiNetwork;
-    handle command AddOrUpdateThreadNetwork;
-    handle command RemoveNetwork;
-    handle command NetworkConfigResponse;
-    handle command ConnectNetwork;
-    handle command ConnectNetworkResponse;
-    handle command ReorderNetwork;
   }
 }
 

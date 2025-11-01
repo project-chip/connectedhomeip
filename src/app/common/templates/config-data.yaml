@@ -138,10 +138,10 @@ ClustersWithPreAttributeChangeFunctions:
     - Thermostat User Interface Configuration
     # keep-sorted end
 
-# Code Driven clusters are clusters that implement the ServerClusterInterface.
-# The clusters in this list require Init() and/or Shutdown() callbacks, defined
-# in the cluster's respective CodgenIntegration.cpp file.
-CodeDrivenClusters:
+# Code Driven clusters are all clusters that implement the ServerClusterInterface.
+# There are 2 lists defining these clusters. Those that have a CodegenIntregtation.cpp
+# file where they have Init() and/or Shutdown() callbacks, and those that don't.
+CodeDrivenClustersWithCodegenIntegration:
     # keep-sorted start
     - Access Control
     - Administrator Commissioning
@@ -162,7 +162,14 @@ CodeDrivenClusters:
     - Operational Credentials
     - Push AV Stream Transport
     - Software Diagnostics
+    - Soil Measurement
     - Time Format Localization
     - User Label
     - Wi-Fi Network Diagnostics
+    # keep-sorted end
+
+CodeDrivenClustersWithoutCodegenIntegration:
+    # keep-sorted start
+    - Network Commissioning
+    - WebRTC Transport Requestor
     # keep-sorted end
