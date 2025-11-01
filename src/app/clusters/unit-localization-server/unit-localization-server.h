@@ -16,49 +16,59 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/cluster-enums.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/data-model/List.h>
-#include <cstdint>
-#include <lib/core/CHIPError.h>
+#pragma once
+
+#include <app/persistence/AttributePersistenceMigration.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/UnitLocalization/ClusterId.h>
+#include <clusters/UnitLocalization/Enums.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace UnitLocalization {
 
+namespace UnitLocalization {
 inline constexpr uint16_t kClusterRevision              = 2;
 inline constexpr uint8_t kMinSupportedLocalizationUnits = 2;
 inline constexpr uint8_t kMaxSupportedLocalizationUnits = 3;
+} // namespace UnitLocalization
 
-class UnitLocalizationServer : public AttributeAccessInterface
+class UnitLocalizationCluster : public DefaultServerCluster
 {
 public:
-    // Register for the UnitLocalization cluster on all endpoints.
-    CHIP_ERROR Init();
-    static UnitLocalizationServer & Instance();
+    UnitLocalizationCluster(EndpointId endpointId, BitFlags<UnitLocalization::Feature> feature);
 
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
 
-    CHIP_ERROR SetSupportedTemperatureUnits(DataModel::List<TempUnitEnum> & units);
-    const DataModel::List<TempUnitEnum> & GetSupportedTemperatureUnits(void) { return mSupportedTemperatureUnits; }
-    TempUnitEnum GetTemperatureUnit(void) { return mTemperatureUnit; }
-    CHIP_ERROR SetTemperatureUnit(TempUnitEnum unit);
+    // Server cluster implementation
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    CHIP_ERROR SetSupportedTemperatureUnits(DataModel::List<UnitLocalization::TempUnitEnum> & units);
 
 private:
-    UnitLocalizationServer() : AttributeAccessInterface(Optional<EndpointId>::Missing(), UnitLocalization::Id) {}
-
-    static UnitLocalizationServer mInstance;
-    DataModel::List<TempUnitEnum> mSupportedTemperatureUnits{ DataModel::List<TempUnitEnum>(mUnitsBuffer) };
-    TempUnitEnum mUnitsBuffer[kMaxSupportedLocalizationUnits] = { TempUnitEnum::kFahrenheit, TempUnitEnum::kCelsius,
-                                                                  TempUnitEnum::kKelvin };
-    TempUnitEnum mTemperatureUnit                             = TempUnitEnum::kCelsius;
+    BitFlags<UnitLocalization::Feature> mFeatures   = {};
+    UnitLocalization::TempUnitEnum mTemperatureUnit = UnitLocalization::TempUnitEnum::kCelsius;
+    UnitLocalization::TempUnitEnum mUnitsBuffer[UnitLocalization::kMaxSupportedLocalizationUnits] = {
+        UnitLocalization::TempUnitEnum::kFahrenheit, UnitLocalization::TempUnitEnum::kCelsius,
+        UnitLocalization::TempUnitEnum::kKelvin
+    };
+    DataModel::List<UnitLocalization::TempUnitEnum> mSupportedTemperatureUnits{ mUnitsBuffer };
+    DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
 };
 
-} // namespace UnitLocalization
+class UnitLocalizationClusterWithMigration : public UnitLocalizationCluster
+{
+public:
+    UnitLocalizationClusterWithMigration(EndpointId endpointId, BitFlags<UnitLocalization::Feature> feature);
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+};
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip
