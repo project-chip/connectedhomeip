@@ -41,15 +41,12 @@
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-#include <platform/GLibTypeDeleter.h>
-#include <platform/Linux/dbus/wpa/DBusWpa.h>
-#include <platform/Linux/dbus/wpa/DBusWpaBss.h>
-#include <platform/Linux/dbus/wpa/DBusWpaInterface.h>
-#include <platform/Linux/dbus/wpa/DBusWpaNetwork.h>
+#include <platform/Linux/WpaDbusDefs.h>
 #include <system/SystemMutex.h>
 
 #include <mutex>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <platform/Linux/WiFiPAFDriver.h>
 #include <wifipaf/WiFiPAFEndPoint.h>
 #include <wifipaf/WiFiPAFLayer.h>
 #endif
@@ -60,46 +57,7 @@
 #include <vector>
 
 namespace chip {
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-
-template <>
-struct GAutoPtrDeleter<WpaSupplicant1>
-{
-    using deleter = GObjectDeleter;
-};
-
-template <>
-struct GAutoPtrDeleter<WpaSupplicant1BSS>
-{
-    using deleter = GObjectDeleter;
-};
-
-template <>
-struct GAutoPtrDeleter<WpaSupplicant1Interface>
-{
-    using deleter = GObjectDeleter;
-};
-
-template <>
-struct GAutoPtrDeleter<WpaSupplicant1Network>
-{
-    using deleter = GObjectDeleter;
-};
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-
 namespace DeviceLayer {
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-struct GDBusWpaSupplicant
-{
-    GAutoPtr<WpaSupplicant1> proxy;
-    GAutoPtr<WpaSupplicant1Interface> iface;
-    GAutoPtr<char> interfacePath;
-    GAutoPtr<char> networkPath;
-};
-#endif
 
 /**
  * Concrete implementation of the ConnectivityManager singleton object for Linux platforms.
@@ -144,11 +102,6 @@ public:
                                  OnConnectionErrorFunct onError);
     CHIP_ERROR _WiFiPAFCancelSubscribe(uint32_t SubscribeId);
     CHIP_ERROR _WiFiPAFCancelIncompleteSubscribe();
-    void OnDiscoveryResult(GVariant * obj);
-    void OnReplied(GVariant * obj);
-    void OnNanReceive(GVariant * obj);
-    void OnNanPublishTerminated(guint public_id, gchar * reason);
-    void OnNanSubscribeTerminated(guint subscribe_id, gchar * reason);
     CHIP_ERROR _WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msgBuf);
     void _WiFiPafSetApFreq(const uint16_t freq) { mApFreq = freq; }
     CHIP_ERROR _WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role);
@@ -249,6 +202,7 @@ private:
     bool _WiFiPAFResourceAvailable() { return mPafChannelAvailable; };
     // The resource checking is needed right before sending data packets that they are initialized and connected.
     bool mPafChannelAvailable = true;
+    std::unique_ptr<WiFiPAFDriver> mWiFiPAFDriver;
 #endif
 
     bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
