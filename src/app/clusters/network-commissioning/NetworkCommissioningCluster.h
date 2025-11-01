@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningLogic.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 
@@ -33,14 +34,20 @@ namespace Clusters {
 class NetworkCommissioningCluster : public DefaultServerCluster
 {
 public:
-    NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::WiFiDriver * driver) :
-        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver)
+    NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::WiFiDriver * driver,
+                                BreadCrumbTracker & tracker) :
+        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
+        mLogic(endpointId, driver, tracker)
     {}
-    NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::ThreadDriver * driver) :
-        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver)
+    NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::ThreadDriver * driver,
+                                BreadCrumbTracker & tracker) :
+        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
+        mLogic(endpointId, driver, tracker)
     {}
-    NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::EthernetDriver * driver) :
-        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mLogic(endpointId, driver)
+    NetworkCommissioningCluster(EndpointId endpointId, DeviceLayer::NetworkCommissioning::EthernetDriver * driver,
+                                BreadCrumbTracker & tracker) :
+        DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
+        mLogic(endpointId, driver, tracker)
     {}
 
     CHIP_ERROR Init() { return mLogic.Init(); }

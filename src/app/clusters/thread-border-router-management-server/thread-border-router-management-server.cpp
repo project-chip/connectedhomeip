@@ -17,27 +17,28 @@
 
 #include "thread-border-router-management-server.h"
 
-#include "app-common/zap-generated/cluster-objects.h"
-#include "app-common/zap-generated/ids/Attributes.h"
-#include "app-common/zap-generated/ids/Clusters.h"
-#include "app-common/zap-generated/ids/Commands.h"
-#include "app/AttributeAccessInterfaceRegistry.h"
-#include "app/AttributeValueEncoder.h"
-#include "app/CommandHandler.h"
-#include "app/CommandHandlerInterface.h"
-#include "app/CommandHandlerInterfaceRegistry.h"
-#include "app/InteractionModelEngine.h"
-#include "app/MessageDef/StatusIB.h"
-#include "app/clusters/general-commissioning-server/general-commissioning-cluster.h"
-#include "app/data-model/Nullable.h"
-#include "lib/core/CHIPError.h"
-#include "lib/core/Optional.h"
-#include "lib/support/CodeUtils.h"
-#include "lib/support/Span.h"
-#include "lib/support/ThreadOperationalDataset.h"
-#include "platform/CHIPDeviceEvent.h"
-#include "platform/PlatformManager.h"
-#include "protocols/interaction_model/StatusCode.h"
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/AttributeValueEncoder.h>
+#include <app/CommandHandler.h>
+#include <app/CommandHandlerInterface.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/InteractionModelEngine.h>
+#include <app/MessageDef/StatusIB.h>
+#include <app/clusters/general-commissioning-server/CodegenIntegration.h>
+#include <app/data-model/Nullable.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
+#include <lib/support/ThreadOperationalDataset.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <platform/PlatformManager.h>
+#include <protocols/interaction_model/StatusCode.h>
+
 #include <optional>
 
 namespace chip {
@@ -300,7 +301,11 @@ void ServerInstance::CommitSavedBreadcrumb()
 {
     if (mBreadcrumb.HasValue())
     {
-        GeneralCommissioningCluster::Instance().SetBreadCrumb(mBreadcrumb.Value());
+        GeneralCommissioningCluster * cluster = GeneralCommissioning::Instance();
+        if (cluster != nullptr)
+        {
+            cluster->SetBreadCrumb(mBreadcrumb.Value());
+        }
     }
     mBreadcrumb.ClearValue();
 }

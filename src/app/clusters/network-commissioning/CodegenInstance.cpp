@@ -16,12 +16,24 @@
  */
 #include "CodegenInstance.h"
 
+#include <app/clusters/general-commissioning-server/CodegenIntegration.h>
+#include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
+#include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace NetworkCommissioning {
+
+void Instance::CodegenGeneralCommissioningBreadcrumbTracker::SetBreadCrumb(uint64_t value)
+{
+    GeneralCommissioningCluster * cluster = GeneralCommissioning::Instance();
+    if (cluster != nullptr)
+    {
+        cluster->SetBreadCrumb(value);
+    }
+}
 
 CHIP_ERROR Instance::Init()
 {
