@@ -59,6 +59,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/general-commissioning-server/tests",
       "${chip_root}/src/app/clusters/general-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/group-key-mgmt-server/tests",
+      "${chip_root}/src/app/clusters/icd-management-server/tests",
       "${chip_root}/src/app/clusters/network-commissioning/tests",
       "${chip_root}/src/app/clusters/ota-provider/tests",
       "${chip_root}/src/app/clusters/software-diagnostics-server/tests",
