@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 
 namespace chip::app::Clusters {
@@ -25,7 +26,7 @@ namespace chip::app::Clusters {
 class OtaRequestorCluster : public DefaultServerCluster
 {
 public:
-    explicit OtaRequestorCluster(EndpointId endpointId);
+    OtaRequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor);
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -33,12 +34,15 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path,
                           ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override;
+
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
-// Needed for correct functionality.
-//WriteAttribute
-//InvokeCommand
+private:
+    OTARequestorInterface & mOtaRequestor;
 };
 
 }  // namespace chip::app::Clusters
