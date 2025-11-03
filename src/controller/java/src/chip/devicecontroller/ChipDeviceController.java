@@ -1722,7 +1722,8 @@ public class ChipDeviceController {
   private native void unpairDeviceCallback(
       long deviceControllerPtr, long deviceId, UnpairDeviceCallback callback);
 
-  private native void continueCommissioningAfterConnectNetworkRequest(long deviceControllerPtr, long remoteDeviceId);
+  private native void continueCommissioningAfterConnectNetworkRequest(
+      long deviceControllerPtr, long remoteDeviceId);
 
   private native void stopDevicePairing(long deviceControllerPtr, long deviceId);
 
