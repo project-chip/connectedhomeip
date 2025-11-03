@@ -116,11 +116,7 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
     cmdData.useAuxiliaryACL = MakeOptional(true);
 
     chip::Test::ClusterTester tester(cluster);
-    const auto & paths = cluster.GetPaths();
-    ASSERT_EQ(paths.size(), 1u);
-    tester.InvokeOperation(app::ConcreteCommandPath(paths[0].mEndpointId, paths[0].mClusterId, Commands::JoinGroup::Id));
-
-    auto status = tester.Invoke(cmdData);
+    auto status = tester.Invoke(Commands::JoinGroup::Id, cmdData);
     ASSERT_TRUE(status.has_value());
     EXPECT_EQ(status->GetStatusCode().GetStatus(),
               Protocols::InteractionModel::Status::Failure); // Currently expect Failure as JoinGroup command returns
