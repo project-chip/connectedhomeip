@@ -116,8 +116,13 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
     cmdData.useAuxiliaryACL = MakeOptional(true);
 
     chip::Test::ClusterTester tester(cluster);
-    auto status = tester.Invoke(Commands::JoinGroup::Id, cmdData);
-    EXPECT_EQ(status.GetStatusCode().GetStatus(),
+    const auto & paths = cluster.GetPaths();
+    ASSERT_EQ(paths.size(), 1u);
+    tester.InvokeOperation(app::ConcreteCommandPath(paths[0].mEndpointId, paths[0].mClusterId, Commands::JoinGroup::Id));
+
+    auto status = tester.Invoke(cmdData);
+    ASSERT_TRUE(status.has_value());
+    EXPECT_EQ(status->GetStatusCode().GetStatus(),
               Protocols::InteractionModel::Status::Failure); // Currently expect Failure as JoinGroup command returns
                                                              // CHIP_ERROR_NOT_IMPLEMENTED
 }
