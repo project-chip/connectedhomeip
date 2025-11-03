@@ -13,13 +13,13 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/third_party/silabs/silabs_board.gni")
 import("${chip_root}/third_party/silabs/efr32_sdk.gni")
+import("${chip_root}/third_party/silabs/silabs_board.gni")
 
 config("siwx-ble-config") {
   defines = []
   include_dirs = []
-  include_dirs = [ "${silabs_platform_dir}/SiWx/ble", ]
+  include_dirs = [ "${silabs_platform_dir}/SiWx/ble" ]
 }
 
 source_set("siwx-ble") {
@@ -31,9 +31,9 @@ source_set("siwx-ble") {
   public_configs = [ ":siwx-ble-config" ]
 
   deps = [
-    "${chip_root}/src/platform:platform_base",
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/system",
     "${chip_root}/src/ble",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/system",
   ]
 }
