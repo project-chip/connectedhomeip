@@ -14,11 +14,11 @@
 
 #include "pw_sync/interrupt_spin_lock.h"
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/portmacro.h"
+#include "freertos/task.h"
 #include "pw_assert/check.h"
 #include "sdkconfig.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/portmacro.h"
 
 namespace pw::sync {
 
@@ -30,44 +30,54 @@ namespace pw::sync {
 static portMUX_TYPE s_interrupt_spin_lock_mux = portMUX_INITIALIZER_UNLOCKED;
 
 // ESP-IDF specific interrupt context detection
-static bool InInterruptContext() {
-  return xPortInIsrContext() != pdFALSE;
+static bool InInterruptContext()
+{
+    return xPortInIsrContext() != pdFALSE;
 }
 
-void InterruptSpinLock::lock() {
-  if (InInterruptContext()) {
-    native_type_.saved_interrupt_mask = taskENTER_CRITICAL_FROM_ISR();
-  } else {  // Task context
-    // Suspending the scheduler ensures that kernel API calls that occur
-    // within the critical section will not preempt the current task
-    // (if called from a thread context).  Otherwise, kernel APIs called
-    // from within the critical section may preempt the running task if
-    // the port implements portYIELD synchronously.
-    // Note: calls to vTaskSuspendAll(), like vTaskEnterCritical() can
-    // be nested.
-    // Note: vTaskSuspendAll()/xTaskResumeAll() are not safe to call before the
-    // scheduler has been started.
-    if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) {
-      vTaskSuspendAll();
+void InterruptSpinLock::lock()
+{
+    if (InInterruptContext())
+    {
+        native_type_.saved_interrupt_mask = taskENTER_CRITICAL_FROM_ISR();
     }
-    vPortEnterCritical(&s_interrupt_spin_lock_mux);
-  }
-  // We can't deadlock here so crash instead.
-  PW_DCHECK(!native_type_.locked,
-            "Recursive InterruptSpinLock::lock() detected");
-  native_type_.locked = true;
-}
-
-void InterruptSpinLock::unlock() {
-  native_type_.locked = false;
-  if (InInterruptContext()) {
-    taskEXIT_CRITICAL_FROM_ISR(native_type_.saved_interrupt_mask);
-  } else {  // Task context
-    vPortExitCritical(&s_interrupt_spin_lock_mux);
-    if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) {
-      xTaskResumeAll();
+    else
+    { // Task context
+        // Suspending the scheduler ensures that kernel API calls that occur
+        // within the critical section will not preempt the current task
+        // (if called from a thread context).  Otherwise, kernel APIs called
+        // from within the critical section may preempt the running task if
+        // the port implements portYIELD synchronously.
+        // Note: calls to vTaskSuspendAll(), like vTaskEnterCritical() can
+        // be nested.
+        // Note: vTaskSuspendAll()/xTaskResumeAll() are not safe to call before the
+        // scheduler has been started.
+        if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+        {
+            vTaskSuspendAll();
+        }
+        vPortEnterCritical(&s_interrupt_spin_lock_mux);
     }
-  }
+    // We can't deadlock here so crash instead.
+    PW_DCHECK(!native_type_.locked, "Recursive InterruptSpinLock::lock() detected");
+    native_type_.locked = true;
 }
 
-}  // namespace pw::sync
+void InterruptSpinLock::unlock()
+{
+    native_type_.locked = false;
+    if (InInterruptContext())
+    {
+        taskEXIT_CRITICAL_FROM_ISR(native_type_.saved_interrupt_mask);
+    }
+    else
+    { // Task context
+        vPortExitCritical(&s_interrupt_spin_lock_mux);
+        if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+        {
+            xTaskResumeAll();
+        }
+    }
+}
+
+} // namespace pw::sync

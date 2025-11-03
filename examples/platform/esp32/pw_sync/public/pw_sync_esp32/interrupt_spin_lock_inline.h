@@ -17,19 +17,19 @@
 
 namespace pw::sync {
 
-constexpr InterruptSpinLock::InterruptSpinLock()
-    : native_type_{.locked = false, .saved_interrupt_mask = 0} {}
+constexpr InterruptSpinLock::InterruptSpinLock() : native_type_{ .locked = false, .saved_interrupt_mask = 0 } {}
 
-inline InterruptSpinLock::native_handle_type
-InterruptSpinLock::native_handle() {
-  return native_type_;
+inline InterruptSpinLock::native_handle_type InterruptSpinLock::native_handle()
+{
+    return native_type_;
 }
 
-inline bool InterruptSpinLock::try_lock() {
-  // This backend does not support SMP and on a uniprocessor we cannot actually
-  // fail to acquire the lock. Recursive locking is already detected by lock().
-  lock();
-  return true;
+inline bool InterruptSpinLock::try_lock()
+{
+    // This backend does not support SMP and on a uniprocessor we cannot actually
+    // fail to acquire the lock. Recursive locking is already detected by lock().
+    lock();
+    return true;
 }
 
-}  // namespace pw::sync
+} // namespace pw::sync

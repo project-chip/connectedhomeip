@@ -13,15 +13,16 @@
 // the License.
 #pragma once
 
-#include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
+#include "sdkconfig.h"
 
 namespace pw::sync::backend {
 
-struct NativeInterruptSpinLock {
-  bool locked;  // Used to detect recursion.
-  UBaseType_t saved_interrupt_mask;
+struct NativeInterruptSpinLock
+{
+    bool locked; // Used to detect recursion.
+    UBaseType_t saved_interrupt_mask;
 };
-using NativeInterruptSpinLockHandle = NativeInterruptSpinLock&;
+using NativeInterruptSpinLockHandle = NativeInterruptSpinLock &;
 
-}  // namespace pw::sync::backend
+} // namespace pw::sync::backend

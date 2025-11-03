@@ -13,13 +13,13 @@
 // the License.
 #pragma once
 
-#include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
+#include "sdkconfig.h"
 
 namespace pw::sync::backend {
 
-using NativeMutex = StaticSemaphore_t;
-using NativeMutexHandle = NativeMutex&;
+using NativeMutex       = StaticSemaphore_t;
+using NativeMutexHandle = NativeMutex &;
 
-}  // namespace pw::sync::backend
+} // namespace pw::sync::backend

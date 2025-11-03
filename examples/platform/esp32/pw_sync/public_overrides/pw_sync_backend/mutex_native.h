@@ -21,7 +21,7 @@
 
 namespace pw::sync::backend {
 
-using NativeMutex = StaticSemaphore_t;
-using NativeMutexHandle = NativeMutex&;
+using NativeMutex       = StaticSemaphore_t;
+using NativeMutexHandle = NativeMutex &;
 
-}  // namespace pw::sync::backend
+} // namespace pw::sync::backend
