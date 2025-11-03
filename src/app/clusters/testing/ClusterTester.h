@@ -19,16 +19,12 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/ConcreteEventPath.h>
-#include <app/clusters/testing/MockCommandHandler.h>
-#include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/clusters/testing/CommandTesting.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/data-model/NullObject.h>
 #include <app/server-cluster/ServerClusterInterface.h>
-#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/TLVReader.h>
@@ -115,6 +111,8 @@ public:
     // compliant (see the comment of the class for usage example).
     // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
+    // multi-fabric writes will not work
+    // does not handle structs or ZAP-generated types with Encode / EncodeForWrite(), or DataModel::List.
     template <typename T>
     app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr_id, const T & value)
     {
@@ -144,99 +142,268 @@ public:
         }
     };
 
-    // Invoke a command and return the decoded result.
-    // The `request` parameter must be of the correct type for the command being invoked.
-    // Use `app::Clusters::<ClusterName>::Commands::<CommandName>::Type` for the `request` parameter to be spec compliant
-    // Will construct the command path using the first path returned by `GetPaths()` on the cluster.
-    // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
-    template <typename RequestType, typename ResponseType = typename RequestType::ResponseType>
-    [[nodiscard]] InvokeResult<ResponseType> Invoke(chip::CommandId commandId, const RequestType & request)
+    /*
+     * CHIP Test Cluster Write Helpers
+     *
+     *  - Scalars/enums: written directly using DecoderFor().
+     *  - Structs/ZAP structs: encoded into a TLV buffer via Encode() or EncodeForWrite().
+     *  - Lists: encoded as TLV arrays. Each element is encoded individually:
+     *      * Struct elements must provide EncodeForWrite().
+     *      * Simple elements (integral, enum) are handled by generic templated encoding.
+     *  - Supports multiple fabrics through WriteOperation subject descriptors.
+     *  - Uses cluster.GetPaths() to automatically deduce the endpoint + cluster for convenience.
+     */
+
+    template <typename T, typename = void>
+    struct HasEncodeForWrite : std::false_type
     {
-        InvokeResult<ResponseType> result;
+    };
 
-        const auto & paths = mCluster.GetPaths();
-        VerifyOrReturnValue(paths.size() == 1u, result);
+    template <typename T>
+    struct HasEncodeForWrite<
+        T,
+        std::void_t<decltype(std::declval<T>().EncodeForWrite(std::declval<chip::TLV::TLVWriter &>(), chip::TLV::AnonymousTag()))>>
+        : std::true_type
+    {
+    };
 
+    template <typename T, typename = void>
+    struct HasGenericEncode : std::false_type
+    {
+    };
+
+    template <typename T>
+    struct HasGenericEncode<
+        T, std::void_t<decltype(std::declval<T>().Encode(std::declval<chip::TLV::TLVWriter &>(), chip::TLV::AnonymousTag()))>>
+        : std::true_type
+    {
+    };
+
+    // Main helper for a single value (scalar or struct)
+    template <typename T>
+    CHIP_ERROR WriteAttribute(app::ServerClusterInterface & cluster, AttributeId attr, const T & value,
+                              FabricIndex fabricIndex = kUndefinedFabricIndex)
+    {
+        const auto & paths = cluster.GetPaths();
+        VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
+
+        app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
+
+        app::Testing::WriteOperation writeOperation(path);
+        if (fabricIndex != kUndefinedFabricIndex)
+        {
+            writeOperation.SetSubjectDescriptor({ fabricIndex });
+        }
+
+        if constexpr (std::is_integral_v<T> || std::is_enum_v<T>)
+        {
+            app::AttributeValueDecoder decoder = writeOperation.DecoderFor(value);
+            return cluster.WriteAttribute(writeOperation.GetRequest(), decoder).GetUnderlyingError();
+        }
+        else
+        {
+            uint8_t buffer[1024];
+            chip::TLV::TLVWriter writer;
+            writer.Init(buffer);
+
+            if constexpr (HasGenericEncode<T>::value)
+            {
+                ReturnErrorOnFailure(value.Encode(writer, chip::TLV::AnonymousTag()));
+            }
+            else if constexpr (HasEncodeForWrite<T>::value)
+            {
+                ReturnErrorOnFailure(value.EncodeForWrite(writer, chip::TLV::AnonymousTag()));
+            }
+            else
+            {
+                static_assert(!sizeof(T), "Type not supported by WriteAttribute");
+                return CHIP_ERROR_NOT_IMPLEMENTED;
+            }
+
+            chip::TLV::TLVReader reader;
+            reader.Init(buffer, writer.GetLengthWritten());
+            ReturnErrorOnFailure(reader.Next());
+
+            app::AttributeValueDecoder decoder(reader, *writeOperation.GetRequest().subjectDescriptor);
+            return cluster.WriteAttribute(writeOperation.GetRequest(), decoder).GetUnderlyingError();
+        }
+    }
+
+    // Overload for DataModel::List
+    template <typename ElementT>
+    CHIP_ERROR WriteAttribute(app::ServerClusterInterface & cluster, AttributeId attr,
+                              const chip::app::DataModel::List<ElementT> & list, FabricIndex fabricIndex = kUndefinedFabricIndex)
+    {
+        const auto & paths = cluster.GetPaths();
+        VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
+
+        app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
+
+        app::Testing::WriteOperation writeOperation(path);
+        if (fabricIndex != kUndefinedFabricIndex)
+        {
+            writeOperation.SetSubjectDescriptor({ fabricIndex });
+        }
+
+        uint8_t buffer[1024];
+        chip::TLV::TLVWriter writer;
+        writer.Init(buffer);
+
+        chip::TLV::TLVType outer;
+        ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Array, outer));
+
+        for (const auto & item : list)
+        {
+            if constexpr (std::is_integral_v<ElementT> || std::is_enum_v<ElementT>)
+            {
+                ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), item));
+            }
+            else if constexpr (HasGenericEncode<ElementT>::value)
+            {
+                ReturnErrorOnFailure(item.Encode(writer, chip::TLV::AnonymousTag()));
+            }
+            else if constexpr (HasEncodeForWrite<ElementT>::value)
+            {
+                ReturnErrorOnFailure(item.EncodeForWrite(writer, chip::TLV::AnonymousTag()));
+            }
+            else
+            {
+                static_assert(!sizeof(ElementT), "Element type not supported in DataModel::List");
+            }
+        }
+
+        ReturnErrorOnFailure(writer.EndContainer(outer));
+
+        chip::TLV::TLVReader reader;
+        reader.Init(buffer, writer.GetLengthWritten());
+        ReturnErrorOnFailure(reader.Next());
+
+        app::AttributeValueDecoder decoder(reader, *writeOperation.GetRequest().subjectDescriptor);
+        return cluster.WriteAttribute(writeOperation.GetRequest(), decoder).GetUnderlyingError();
+    }
+
+    // Prepares an invoke request: sets the command path and clears handler state.
+    void InvokeOperation(const app::ConcreteCommandPath & path)
+    {
+        mCommandPath = path;
         mHandler.ClearResponses();
         mHandler.ClearStatuses();
+        mRequest.path = mCommandPath;
+    }
 
-        const app::DataModel::InvokeRequest invokeRequest = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
-
+    // Invoke a command using a predefined request structure
+    template <typename RequestType>
+    [[nodiscard]] std::optional<app::DataModel::ActionReturnStatus> Invoke(const RequestType & request)
+    {
         TLV::TLVWriter writer;
         writer.Init(mTlvBuffer);
 
         TLV::TLVReader reader;
 
-        VerifyOrReturnValue(request.Encode(writer, TLV::AnonymousTag()) == CHIP_NO_ERROR, result);
-        VerifyOrReturnValue(writer.Finalize() == CHIP_NO_ERROR, result);
+        ReturnErrorOnFailure(request.Encode(writer, TLV::AnonymousTag()));
+        ReturnErrorOnFailure(writer.Finalize());
 
         reader.Init(mTlvBuffer, writer.GetLengthWritten());
-        VerifyOrReturnValue(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()) == CHIP_NO_ERROR, result);
+        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
 
-        result.status = mCluster.InvokeCommand(invokeRequest, reader, &mHandler);
+        return mCluster.InvokeCommand(mRequest, reader, &mHandler);
+    }
 
-        // If InvokeCommand returned nullopt, it means the command implementation handled the response.
-        // We need to check the mock handler for a data response or a status response.
-        if (!result.status.has_value())
+    // Simplified overload to invoke a command with just the command ID and data.
+    // Builds the request automatically using the internal cluster's paths.
+    // Ideal for quick tests without manual request construction.
+    template <typename T>
+    [[nodiscard]] std::optional<app::DataModel::ActionReturnStatus> Invoke(chip::CommandId commandId, const T & data,
+                                                                           app::CommandHandler * handler)
+    {
+        InvokeResult<ResponseType> result;
+
+        const auto & paths = mCluster.GetPaths();
+        VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
+        const app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
+
+        chip::TLV::TLVWriter tlvWriter;
+        tlvWriter.Init(mTlvBuffer);
+        ReturnErrorOnFailure(data.Encode(tlvWriter, chip::TLV::AnonymousTag()));
+
+        chip::TLV::TLVReader tlvReader;
+        tlvReader.Init(mTlvBuffer, tlvWriter.GetLengthWritten());
+        ReturnErrorOnFailure(tlvReader.Next());
+
+        // Use provided handler or internal one
+        if (handler == nullptr)
         {
-            if (mHandler.HasResponse())
-            {
-                // A data response was added, so the command is successful.
-                result.status = app::DataModel::ActionReturnStatus(CHIP_NO_ERROR);
-            }
-            else if (mHandler.HasStatus())
-            {
-                // A status response was added. Use the last one.
-                result.status = app::DataModel::ActionReturnStatus(mHandler.GetLastStatus().status);
-            }
-            else
-            {
-                // Neither response nor status was provided; this is unexpected.
-                // This would happen either in error (as mentioned here) or if the command is supposed
-                // to be handled asynchronously. ClusterTester does not support such asynchronous processing.
-                result.status = app::DataModel::ActionReturnStatus(CHIP_ERROR_INCORRECT_STATE);
-                ChipLogError(
-                    Test, "InvokeCommand returned nullopt, but neither HasResponse nor HasStatus is true. Setting error status.");
-            }
+            handler = &mHandler;
         }
 
-        // If command was successful and there's a response, decode it (skip for NullObjectType)
-        if constexpr (!std::is_same_v<ResponseType, app::DataModel::NullObjectType>)
+        return mCluster.InvokeCommand(request, tlvReader, handler);
+    }
+
+    // Invoke a command using a predefined request structure
+    template <typename T>
+    app::DataModel::ActionReturnStatus Invoke(chip::CommandId commandId, const T & data)
+    {
+        const auto & paths = mCluster.GetPaths();
+        VerifyOrDie(paths.size() == 1u);
+        const app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
+
+        // Clear any previous handler state to avoid stale responses
+        mHandler.ClearResponses();
+        mHandler.ClearStatuses();
+
+        chip::TLV::TLVWriter tlvWriter;
+        tlvWriter.Init(mTlvBuffer);
+        CHIP_ERROR err = data.Encode(tlvWriter, chip::TLV::AnonymousTag());
+        VerifyOrDie(err == CHIP_NO_ERROR);
+
+        chip::TLV::TLVReader tlvReader;
+        tlvReader.Init(mTlvBuffer, tlvWriter.GetLengthWritten());
+        VerifyOrDie(tlvReader.Next() == CHIP_NO_ERROR);
+
+        auto statusOpt = mCluster.InvokeCommand(request, tlvReader, &mHandler);
+        if (statusOpt.has_value())
         {
-            if (result.status.has_value() && result.status->IsSuccess() && mHandler.HasResponse())
-            {
-                ResponseType decodedResponse;
-                CHIP_ERROR decodeError = mHandler.DecodeResponse(decodedResponse);
-                if (decodeError == CHIP_NO_ERROR)
-                {
-                    result.response = std::move(decodedResponse);
-                }
-                else
-                {
-                    // Decode failed; reflect error in status and log
-                    result.status = app::DataModel::ActionReturnStatus(decodeError);
-                    ChipLogError(Test, "DecodeResponse failed: %s", decodeError.AsString());
-                }
-            }
+            return statusOpt.value();
         }
 
-        return result;
+        // A response was produced; consider this a success from a status perspective
+        return Protocols::InteractionModel::Status::Success;
     }
 
-    // convenience method: most requests have a `GetCommandId` (and GetClusterId() as well).
-    template <typename RequestType, typename ResponseType = typename RequestType::ResponseType>
-    [[nodiscard]] InvokeResult<ResponseType> Invoke(const RequestType & request)
+    // Simplified overload to invoke a command with just the command ID and data.
+    // Builds the request automatically using the internal cluster's paths.
+    // Ideal for quick tests without manual request construction.
+    template <typename ResponseType, typename T>
+    ResponseType Invoke(chip::CommandId commandId, const T & data)
     {
-        return Invoke(RequestType::GetCommandId(), request);
+        const auto & paths = mCluster.GetPaths();
+        VerifyOrDie(paths.size() == 1u);
+        const app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
+
+        // Clear any previous handler state to avoid stale responses
+        mHandler.ClearResponses();
+        mHandler.ClearStatuses();
+
+        chip::TLV::TLVWriter tlvWriter;
+        tlvWriter.Init(mTlvBuffer);
+        CHIP_ERROR err = data.Encode(tlvWriter, chip::TLV::AnonymousTag());
+        VerifyOrDie(err == CHIP_NO_ERROR);
+
+        chip::TLV::TLVReader tlvReader;
+        tlvReader.Init(mTlvBuffer, tlvWriter.GetLengthWritten());
+        VerifyOrDie(tlvReader.Next() == CHIP_NO_ERROR);
+
+        auto statusOpt = mCluster.InvokeCommand(request, tlvReader, &mHandler);
+        // Expect a response to be produced (statusOpt must be empty)
+        VerifyOrDie(!statusOpt.has_value());
+
+        ResponseType response;
+        err = mHandler.DecodeResponse(response);
+        VerifyOrDie(err == CHIP_NO_ERROR);
+        return response;
     }
 
-    // Returns the next generated event from the event generator in the test server cluster context
-    std::optional<LogOnlyEvents::EventInformation> GetNextGeneratedEvent()
-    {
-        return mTestServerClusterContext.EventsGenerator().GetNextEvent();
-    }
-
-    std::vector<app::AttributePathParams> & GetDirtyList() { return mTestServerClusterContext.ChangeListener().DirtyList(); }
+    const app::DataModel::InvokeRequest & GetRequest() const { return mRequest; }
 
 private:
     bool VerifyClusterPathsValid()
@@ -252,6 +419,7 @@ private:
 
     TestServerClusterContext mTestServerClusterContext{};
     app::ServerClusterInterface & mCluster;
+    std::unique_ptr<app::Testing::ReadOperation> mReadOperation;
 
     // Buffer size for TLV encoding/decoding of command payloads.
     // 256 bytes was chosen as a conservative upper bound for typical command payloads in tests.
@@ -259,10 +427,10 @@ private:
     // If protocol or test requirements change, this value may need to be increased.
     static constexpr size_t kTlvBufferSize = 256;
 
+    app::ConcreteCommandPath mCommandPath;
+    app::DataModel::InvokeRequest mRequest;
     app::Testing::MockCommandHandler mHandler;
     uint8_t mTlvBuffer[kTlvBufferSize];
-    std::vector<std::unique_ptr<app::Testing::ReadOperation>> mReadOperations;
 };
-
 } // namespace Test
 } // namespace chip
