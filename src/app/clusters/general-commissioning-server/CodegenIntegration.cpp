@@ -15,7 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "CodegenIntegration.h"
+#include <app/clusters/general-commissioning-server/CodegenIntegration.h>
 
 #include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
