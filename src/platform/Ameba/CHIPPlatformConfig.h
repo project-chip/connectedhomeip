@@ -24,6 +24,10 @@
 
 #pragma once
 
+#ifdef CONFIG_AMEBA_MBEDTLS_USE_HW_CRYPTO_ENGINE
+#include <ameba.h>
+#endif
+
 // ==================== General Platform Adaptations ====================
 
 #define CHIP_CONFIG_ERROR_TYPE uint32_t
@@ -40,6 +44,18 @@
 #define CHIP_CONFIG_ABORT() abort()
 
 // ==================== Security Adaptations ====================
+
+#ifdef CONFIG_AMEBA_MBEDTLS_USE_HW_CRYPTO_ENGINE
+
+#ifndef CHIP_CONFIG_SHA256_CONTEXT_SIZE
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE sizeof(hw_sha_context)
+#endif // CHIP_CONFIG_SHA256_CONTEXT_SIZE
+
+#ifndef CHIP_CONFIG_SHA256_CONTEXT_ALIGN
+#define CHIP_CONFIG_SHA256_CONTEXT_ALIGN hw_sha_context
+#endif // CHIP_CONFIG_SHA256_CONTEXT_ALIGN
+
+#endif // CONFIG_AMEBA_MBEDTLS_USE_HW_CRYPTO_ENGINE
 
 // ==================== General Configuration Overrides ====================
 

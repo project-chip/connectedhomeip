@@ -19,8 +19,6 @@ source_set("wifi-network-diagnostics-server") {
     "WiFiDiagnosticsTestEventTriggerHandler.h",
     "wifi-network-diagnostics-cluster.cpp",
     "wifi-network-diagnostics-cluster.h",
-    "wifi-network-diagnostics-logic.cpp",
-    "wifi-network-diagnostics-logic.h",
   ]
 
   public_deps = [
