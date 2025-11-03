@@ -206,7 +206,7 @@ TEST_F(TestOtaRequestorCluster, EventInfoTest)
               OtaSoftwareUpdateRequestor::Events::DownloadError::kMetadataEntry.readPrivilege);
 }
 
-TEST_F(TestOtaRequestorCluster, AnnounceOtaProviderTest)
+TEST_F(TestOtaRequestorCluster, AnnounceOtaProviderCommandTest)
 {
     chip::Test::TestServerClusterContext context;
     MockOtaRequestor otaRequestor;
@@ -219,6 +219,7 @@ TEST_F(TestOtaRequestorCluster, AnnounceOtaProviderTest)
     payload.vendorID = static_cast<VendorId>(4321);
     payload.announcementReason = OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable;
     payload.endpoint = 5;
+
     std::optional<DataModel::ActionReturnStatus> result =
         tester.InvokeCommand(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload, nullptr);
     EXPECT_EQ(result, std::nullopt);
@@ -230,6 +231,28 @@ TEST_F(TestOtaRequestorCluster, AnnounceOtaProviderTest)
     EXPECT_EQ(forwarded_payload.announcementReason,
               OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable);
     EXPECT_EQ(forwarded_payload.endpoint, 5);
+}
+
+TEST_F(TestOtaRequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
+{
+    chip::Test::TestServerClusterContext context;
+    MockOtaRequestor otaRequestor;
+    OtaRequestorCluster cluster(kTestEndpointId, otaRequestor);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    chip::Test::ClusterTester tester(cluster);
+    OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type payload;
+    payload.providerNodeID = 1234;
+    payload.vendorID = static_cast<VendorId>(4321);
+    payload.announcementReason = OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable;
+    payload.endpoint = 5;
+    uint8_t bytes[513] = {'\0'};
+    payload.metadataForNode = MakeOptional(ByteSpan(bytes));
+
+    std::optional<DataModel::ActionReturnStatus> result =
+        tester.InvokeCommand(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload, nullptr);
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(result.value(), DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
 }
 
 }  // namespace

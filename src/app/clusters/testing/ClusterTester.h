@@ -134,8 +134,8 @@ public:
         auto path                                   = mCluster.GetPaths()[0];
         const app::DataModel::InvokeRequest request = { .path = { path.mEndpointId, path.mClusterId, commandId } };
 
-        constexpr size_t kTlvBufferSize = 128; // Typically CommanderSender will use a TLV of size kMaxSecureSduLengthBytes. For
-                                               // now, just use 128 for the unit test.
+        constexpr size_t kTlvBufferSize = 1024; // Typically CommanderSender will use a TLV of size kMaxSecureSduLengthBytes. For
+                                                // now, just use 1024 for the unit test.
         uint8_t buffer[kTlvBufferSize];
         TLV::TLVWriter tlvWriter;
         tlvWriter.Init(buffer);
