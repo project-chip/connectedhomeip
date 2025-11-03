@@ -17,9 +17,33 @@
  */
 
 #include "Globals.h"
+#include "DeviceCallbacks.h"
+#include <app/TimerDelegates.h>
 
 LEDWidget statusLED1;
 LEDWidget statusLED2;
 BluetoothWidget bluetoothLED;
 WiFiWidget wifiLED;
 WiFiWidget pairingWindowLED;
+
+using namespace chip::app;
+using namespace chip::app::Clusters;
+
+DefaultTimerDelegate sTimerDelegate;
+IdentifyDelegateImpl sIdentifyDelegate;
+
+RegisteredServerCluster<IdentifyCluster> gIdentifyCluster1(IdentifyCluster::Config(1, sTimerDelegate)
+                                                               .WithIdentifyType(Identify::IdentifyTypeEnum::kVisibleIndicator)
+                                                               .WithDelegate(&sIdentifyDelegate));
+
+RegisteredServerCluster<IdentifyCluster> gIdentifyCluster2(IdentifyCluster::Config(2, sTimerDelegate)
+                                                               .WithIdentifyType(Identify::IdentifyTypeEnum::kVisibleIndicator)
+                                                               .WithDelegate(&sIdentifyDelegate));
+
+RegisteredServerCluster<IdentifyCluster> gIdentifyCluster3(IdentifyCluster::Config(3, sTimerDelegate)
+                                                               .WithIdentifyType(Identify::IdentifyTypeEnum::kVisibleIndicator)
+                                                               .WithDelegate(&sIdentifyDelegate));
+
+RegisteredServerCluster<IdentifyCluster> gIdentifyCluster4(IdentifyCluster::Config(4, sTimerDelegate)
+                                                               .WithIdentifyType(Identify::IdentifyTypeEnum::kVisibleIndicator)
+                                                               .WithDelegate(&sIdentifyDelegate));

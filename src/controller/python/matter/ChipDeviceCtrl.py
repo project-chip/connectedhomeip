@@ -1827,13 +1827,15 @@ class ChipDeviceControllerBase():
         # An empty list is the expected return for sending group write attribute.
         return []
 
-    def TestOnlyPrepareToReceiveBdxData(self) -> asyncio.Future:
+    def TestOnlyPrepareToReceiveBdxData(self, max_block_size: int | None = None) -> asyncio.Future:
         '''
         Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data here.
 
         If no BDX transfer is initiated, the caller must cancel the returned future to avoid interfering with other BDX transfers.
         For example, the Diagnostic Logs clusters won't start a BDX transfer when the log is small so the future must be cancelled to allow later
         attempts to retrieve logs to succeed.
+
+        If max_block_size is provided (1..65535), it overrides the controller's default cap.
 
         Returns:
             a future that will yield a BdxTransfer with the init message from the transfer.
@@ -1846,7 +1848,7 @@ class ChipDeviceControllerBase():
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        Bdx.PrepareToReceiveBdxData(future).raise_on_error()
+        Bdx.PrepareToReceiveBdxData(future, max_block_size).raise_on_error()
         return future
 
     def TestOnlyPrepareToSendBdxData(self, data: bytes) -> asyncio.Future:

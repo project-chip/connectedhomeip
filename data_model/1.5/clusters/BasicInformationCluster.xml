@@ -83,7 +83,7 @@ Davis, CA 95616, USA
       <item value="3" name="Teal" summary="Approximately RGB #008080.">
         <mandatoryConform/>
       </item>
-      <item value="4" name="Maroon" summary="Approximately RGB #800080.">
+      <item value="4" name="Maroon" summary="Approximately RGB #800000.">
         <mandatoryConform/>
       </item>
       <item value="5" name="Purple" summary="Approximately RGB #800080.">

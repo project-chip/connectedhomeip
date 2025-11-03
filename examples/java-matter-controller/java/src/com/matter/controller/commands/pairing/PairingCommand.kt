@@ -161,7 +161,16 @@ abstract class PairingCommand(
   }
 
   override fun onCommissioningStatusUpdate(nodeId: Long, stage: String?, errorCode: Long) {
-    logger.log(Level.INFO, "onCommissioningStatusUpdate")
+    val stageName = stage ?: "unknown"
+    logger.log(
+      Level.INFO,
+      "Commissioning status update: stage $stageName, nodeId=$nodeId, errorCode=$errorCode"
+    )
+  }
+
+  override fun onCommissioningStageStart(nodeId: Long, stage: String?) {
+    val stageName = stage ?: "unknown"
+    logger.log(Level.INFO, "Commissioning stage $stageName started for nodeId=$nodeId")
   }
 
   override fun onNotifyChipConnectionClosed() {
