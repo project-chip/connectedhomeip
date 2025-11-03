@@ -251,11 +251,8 @@ class TC_SC_3_5(MatterBaseTest):
                                                                     attribute=Clusters.OperationalCredentials.Attributes.NOCs,
                                                                     fabric_filtered=False)
 
-        asserts.assert_equal(
-            len(nocStructs) == 2,
-            True,
-            f"Expected 2 NOCStructs (1 for TH Client, 1 for DUT Commissioner), got {len(nocStructs)}"
-        )
+        asserts.assert_equal(len(nocStructs), 2,
+                             f"Expected 2 NOCStructs (1 for TH Client, 1 for DUT Commissioner), got {len(nocStructs)}")
         DUT_Commissioner_icac = nocStructs[1].icac
         DUT_Commissioner_fabricIndex = nocStructs[1].fabricIndex
 
