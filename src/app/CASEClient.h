@@ -40,7 +40,9 @@ struct CASEClientInitParams
     // claiming different MRP parameters for the same node.
     Optional<ReliableMessageProtocolConfig> mrpLocalConfig = NullOptional;
 
-    Optional<uint32_t> minimumLitBackoffInterval = NullOptional;
+    // The minimum backoff interval for LIT devices. This is used to calculate
+    // the sigma1 retransmission timeout for LIT devices.
+    Optional<uint32_t> minimumLITBackoffInterval = NullOptional;
 
     CHIP_ERROR Validate() const
     {

@@ -300,17 +300,16 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
 
     if (result.isICDOperatingAsLIT)
     {
-        // When an ICD operates as a LIT, the SII is missing in DNS-SD advertisement, resulting in
-        // mIdleRetransTimeout being 0, which is not a usable value. Since CASE
-        // is set up for LIT ICDs only when they are active, it is known that
-        // the ICD is in active mode. Therefore, using mActiveRetransTimeout
-        // for the initial message in the exchange is appropriate. If
-        // mActiveRetransTimeout is insufficient, consider setting it further
-        // using minimumLitBackoffInterval so that it is guaranteed to be larger
-        // than minimum lit backoff set by client and don't need worry about how larger or smaller we need to compensate.
+        // When an ICD operates as a LIT, the DNS-SD advertisement lacks the Session Idle Interval
+        // (SII). This would cause mIdleRetransTimeout to be 0, which is not a usable value. Since
+        // CASE is established with LIT ICDs only when they are active, we can base
+        // mIdleRetransTimeout on active mode parameters. To ensure sufficient time for MRP
+        // retransmissions, particularly in Thread networks where mActiveRetransTimeout might be too
+        // small, we use the maximum of config.mActiveRetransTimeout and
+        // mInitParams.minimumLITBackoffInterval
 
         config.mIdleRetransTimeout =
-            std::max(config.mActiveRetransTimeout, System::Clock::Milliseconds32(mInitParams.minimumLitBackoffInterval.ValueOr(0)));
+            std::max(config.mActiveRetransTimeout, System::Clock::Milliseconds32(mInitParams.minimumLITBackoffInterval.ValueOr(0)));
     }
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload)

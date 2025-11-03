@@ -171,7 +171,9 @@ struct FactoryInitParams
 
     std::optional<Inet::InterfaceId> interfaceId;
 
-    Optional<uint32_t> minimumLitBackoffInterval;
+    // The minimum backoff interval for LIT devices. This is used to calculate
+    // the sigma1 retransmission timeout for LIT devices.
+    Optional<uint32_t> minimumLITBackoffInterval;
 };
 
 class DeviceControllerFactory

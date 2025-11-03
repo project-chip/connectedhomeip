@@ -334,7 +334,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         // Don't provide an MRP local config, so each CASE initiation will use
         // the then-current value.
         .mrpLocalConfig            = NullOptional,
-        .minimumLitBackoffInterval = params.minimumLitBackoffInterval,
+        .minimumLITBackoffInterval = params.minimumLITBackoffInterval,
     };
 
     CASESessionManagerConfig sessionManagerConfig = {
