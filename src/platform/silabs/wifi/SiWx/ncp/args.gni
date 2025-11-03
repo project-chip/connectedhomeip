@@ -16,7 +16,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("${silabs_sdk_build_root}/efr32_sdk.gni")
 
-siwx917_ncp_src_plat = [
+siwx_ncp_src_plat = [
   "${chip_root}/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.cpp",
   "${chip_root}/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.h",
   "${chip_root}/src/platform/silabs/wifi/SiWx/ncp/sl_si91x_ncp_utility.c",
@@ -27,9 +27,9 @@ siwx917_ncp_src_plat = [
   "${chip_root}/src/platform/silabs/wifi/SiWx/ncp/efx32_ncp_host.c",
 ]
 
-siwx917_ncp_inc_plat = [ "${wifi_sdk_root}/components/si91x/ble/inc" ]
+siwx_ncp_inc_plat = [ "${wifi_sdk_root}/components/si91x/ble/inc" ]
 
-siwx917_ncp_src_sapi = [
+siwx_ncp_src_si91x = [
   # sl_si91x_wireless component
   "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c",
   "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c",
