@@ -99,7 +99,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
     def pics_TC_CLDIM_3_2(self) -> list[str]:
         pics = [
-            "CLDIM.S",
+            "CLDIM.S", "CLDIM.S.F01"
         ]
         return pics
 

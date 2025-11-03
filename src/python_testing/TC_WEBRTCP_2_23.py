@@ -56,7 +56,7 @@ class TC_WEBRTCP_2_23(MatterBaseTest, WEBRTCPTestBase):
 
     def steps_TC_WEBRTCP_2_23(self) -> list[TestStep]:
         steps = [
-            TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via CameraAVStreamManagement",
                      "Valid stream IDs are obtained"),
             TestStep(2, "TH reads the AllocatedAudioStreams and AllocatedVideoStreams attributes to check reference counts",
