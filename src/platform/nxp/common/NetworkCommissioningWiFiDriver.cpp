@@ -148,7 +148,8 @@ CHIP_ERROR NXPWiFiDriver::RevertConfiguration()
     // succeed right away if no saved network
     VerifyOrReturnError(mStagingNetwork.ssidLen > 0, CHIPO_NO_ERROR);
     // Connect to saved network
-    return ConnectWiFiNetwork(mStagingNetwork.ssid, mStagingNetwork.ssidLen, mStagingNetwork.credentials, mStagingNetwork.credentialsLen);
+    return ConnectWiFiNetwork(mStagingNetwork.ssid, mStagingNetwork.ssidLen, mStagingNetwork.credentials,
+                              mStagingNetwork.credentialsLen);
 }
 
 bool NXPWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
