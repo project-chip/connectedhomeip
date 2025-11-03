@@ -19,9 +19,9 @@
 
 import asyncio
 
-import nfc
 from mobly import asserts
 
+import nfc
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body
 from matter.testing.runner import default_matter_test_main
 
