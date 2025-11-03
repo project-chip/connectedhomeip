@@ -26,7 +26,7 @@
 #include <support/CodeUtils.h>
 
 using namespace chip;
-using BeeConfig = chip::DeviceLayer::Internal::BeeConfig;
+using RTKConfig = chip::DeviceLayer::Internal::RTKConfig;
 
 BoltLockManager BoltLockManager::sLock;
 
@@ -71,16 +71,16 @@ bool BoltLockManager::IsUnlocked()
 bool BoltLockManager::ReadConfigValues()
 {
     size_t outLen;
-    BeeConfig::ReadConfigValueBin(BeeConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(mUsers),
+    RTKConfig::ReadConfigValueBin(RTKConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(mUsers),
                                   sizeof(EmberAfPluginDoorLockUserInfo) * MATTER_ARRAY_SIZE(mUsers), outLen);
 
-    BeeConfig::ReadConfigValueBin(BeeConfig::kConfigKey_LockUserData, reinterpret_cast<uint8_t *>(mUserData),
+    RTKConfig::ReadConfigValueBin(RTKConfig::kConfigKey_LockUserData, reinterpret_cast<uint8_t *>(mUserData),
                                   sizeof(UserData) * MATTER_ARRAY_SIZE(mUserData), outLen);
 
-    BeeConfig::ReadConfigValueBin(BeeConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(mCredentials),
+    RTKConfig::ReadConfigValueBin(RTKConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(mCredentials),
                                   sizeof(EmberAfPluginDoorLockCredentialInfo) * MATTER_ARRAY_SIZE(mCredentials), outLen);
 
-    BeeConfig::ReadConfigValueBin(BeeConfig::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
+    RTKConfig::ReadConfigValueBin(RTKConfig::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
                                   sizeof(mCredentialData), outLen);
 
     return true;
@@ -124,10 +124,10 @@ bool BoltLockManager::SetUser(uint16_t userIndex, FabricIndex creator, FabricInd
     user.lastModifiedBy     = modifier;
 
     // Save user information in NVM flash
-    BeeConfig::WriteConfigValueBin(BeeConfig::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(mUsers),
+    RTKConfig::WriteConfigValueBin(RTKConfig::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(mUsers),
                                    sizeof(EmberAfPluginDoorLockUserInfo) * CONFIG_LOCK_NUM_USERS);
 
-    BeeConfig::WriteConfigValueBin(BeeConfig::kConfigKey_LockUserData, reinterpret_cast<const uint8_t *>(mUserData),
+    RTKConfig::WriteConfigValueBin(RTKConfig::kConfigKey_LockUserData, reinterpret_cast<const uint8_t *>(mUserData),
                                    sizeof(UserData) * CONFIG_LOCK_NUM_USERS);
 
     ChipLogProgress(Zcl, "Successfully set the user [index=%d]", userIndex);
@@ -167,10 +167,10 @@ bool BoltLockManager::SetCredential(uint16_t credentialIndex, FabricIndex creato
     credential.modificationSource = DlAssetSource::kMatterIM;
     credential.lastModifiedBy     = modifier;
 
-    BeeConfig::WriteConfigValueBin(BeeConfig::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(mCredentials),
+    RTKConfig::WriteConfigValueBin(RTKConfig::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(mCredentials),
                                    sizeof(EmberAfPluginDoorLockCredentialInfo) * CONFIG_LOCK_NUM_CREDENTIALS);
 
-    BeeConfig::WriteConfigValueBin(BeeConfig::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(mCredentialData),
+    RTKConfig::WriteConfigValueBin(RTKConfig::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(mCredentialData),
                                    CONFIG_LOCK_NUM_CREDENTIALS * kMaxCredentialLength);
 
     ChipLogProgress(Zcl, "Setting lock credential %u: %s", static_cast<unsigned>(credentialIndex),

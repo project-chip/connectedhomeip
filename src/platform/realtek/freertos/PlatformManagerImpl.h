@@ -95,7 +95,11 @@ inline PlatformManagerImpl & PlatformMgrImpl(void)
 inline void PlatformManagerImpl::_RunEventLoop(void)
 {
 #if defined(FEATURE_TRUSTZONE_ENABLE) && (FEATURE_TRUSTZONE_ENABLE == 1)
+#if CONFIG_USE_CG_SECURE_DAC_VENDOR
     constexpr size_t kPlatformManagerSecureContextSize = 2 * 1024;
+#else // RTK Encrypt DAC
+    constexpr size_t kPlatformManagerSecureContextSize = 8 * 1024;
+#endif
     os_alloc_secure_ctx(kPlatformManagerSecureContextSize);
 #endif
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_RunEventLoop();

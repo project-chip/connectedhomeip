@@ -95,6 +95,28 @@ class HostApp(Enum):
     JF_ADMIN = auto()
     CLOSURE = auto()
 
+    def UnifiedTargetName(self):
+        """
+        returns the target name to compile an app as a unified build (i.e. with the GN
+        root set to '')
+        """
+        TARGETS = {
+            # keep-sorted start
+            HostApp.AIR_PURIFIER: ":linux_air_purifier_app",
+            HostApp.BRIDGE: ":linux_bridge_app",
+            HostApp.CLOSURE: ":linux_closure_app",
+            HostApp.LIGHT: ":linux_lighting_app",
+            HostApp.LOCK: ":linux_lock_app",
+            HostApp.MICROWAVE_OVEN: ":linux_microwave_oven_app",
+            HostApp.OTA_PROVIDER: ":linux_ota_provider_app",
+            HostApp.RVC: ":linux_rvc_app",
+            HostApp.THERMOSTAT: ":linux_thermostat_app",
+            HostApp.TV_APP: ":linux_tv_app",
+            HostApp.WATER_LEAK_DETECTOR: ":linux_water_leak_detector_app",
+            # keep-sorted end
+        }
+        return TARGETS[self]
+
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
             return 'all-clusters-app/linux'
@@ -379,16 +401,29 @@ class HostBuilder(GnBuilder):
                  use_googletest=False,
                  enable_webrtc=False,
                  terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
+                 unified=False
                  ):
-        super(HostBuilder, self).__init__(
-            root=os.path.join(root, 'examples', app.ExamplePath()),
-            runner=runner)
+        """
+        Construct a host builder.
+
+        Params (limited docs, documenting interesting ones):
+
+           - unified: build will happen in a SINGLE output directory instead of separated out
+                      into per-target directories. Directory name will be "unified"
+        """
+
+        # Unified builds use the top level root for compilation
+        if not unified:
+            root = os.path.join(root, 'examples', app.ExamplePath())
+
+        super(HostBuilder, self).__init__(root=root, runner=runner)
 
         self.app = app
         self.board = board
         self.extra_gn_options = []
         self.build_env = {}
         self.fuzzing_type = fuzzing_type
+        self.unified = unified
 
         if enable_rpcs:
             self.extra_gn_options.append('import("//with_pw_rpc.gni")')
@@ -400,8 +435,16 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
             self.extra_gn_options.append('chip_enable_ble=false')
 
+        if unified:
+            self.extra_gn_options.append('target_os="all"')
+            self.extra_gn_options.append('matter_enable_tracing_support=true')
+            self.extra_gn_options.append('matter_log_json_payload_hex=true')
+            self.extra_gn_options.append('matter_log_json_payload_decode_full=true')
+            self.build_command = app.UnifiedTargetName()
+
         if not enable_wifipaf:
-            self.extra_gn_options.append('chip_device_config_enable_wifipaf=false')
+            self.extra_gn_options.append(
+                'chip_device_config_enable_wifipaf=false')
 
         if not enable_wifi:
             self.extra_gn_options.append('chip_enable_wifi=false')
@@ -611,7 +654,7 @@ class HostBuilder(GnBuilder):
         return os.environ[name]
 
     def generate(self):
-        super(HostBuilder, self).generate()
+        super(HostBuilder, self).generate(dedup=self.unified)
         if 'JAVA_HOME' in os.environ:
             self._Execute(
                 ["third_party/java_deps/set_up_java_deps.sh"],
@@ -746,5 +789,15 @@ class HostBuilder(GnBuilder):
                 for root, dirs, files in os.walk(path):
                     for file in files:
                         yield BuilderOutput(os.path.join(root, file), file)
+            elif self.unified:
+                # unified builds are generally in 'standalone' however this is not
+                # a rule and lit-icd is a special case.
+                path = os.path.join(self.output_dir, "standalone", name)
+                if not os.path.exists(path):
+                    path = os.path.join(self.output_dir, 'lit_icd', name)
+                if not os.path.exists(path):
+                    path = os.path.join(self.output_dir, name)
+
+                yield BuilderOutput(path, name)
             else:
                 yield BuilderOutput(os.path.join(self.output_dir, name), name)

@@ -32,7 +32,7 @@ group("default") {
     } else if (chip_device_platform == "ameba") {
       deps += [ "${chip_root}/src/platform/Ameba:logging" ]
     } else if (chip_device_platform == "realtek_bee") {
-      deps += [ "${chip_root}/src/platform/realtek/BEE:logging" ]
+      deps += [ "${chip_root}/src/platform/realtek/freertos:logging" ]
     } else if (chip_device_platform == "realtek_zephyr") {
       deps += [ "${chip_root}/src/platform/realtek/zephyr:logging" ]
     } else if (chip_device_platform == "asr") {

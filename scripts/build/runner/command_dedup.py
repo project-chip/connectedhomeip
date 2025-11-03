@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,27 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
-import("//build_overrides/chip.gni")
+import shlex
 
-import("${build_root}/toolchain/gcc_toolchain.gni")
 
-declare_args() {
-  bee_ar = ""
-  bee_cc = ""
-  bee_cxx = ""
-  bee_cpu = ""
-}
+class CommandDedup:
+    def __init__(self):
+        self.commands = set()
 
-gcc_toolchain("bee") {
-  ar = bee_ar
-  cc = bee_cc
-  cxx = bee_cxx
-
-  toolchain_args = {
-    current_os = "freertos"
-    current_cpu = bee_cpu
-    is_clang = false
-    import("${chip_root}/src/platform/realtek/freertos/args.gni")
-  }
-}
+    def is_duplicate(self, cmd: list) -> bool:
+        s = " ".join([shlex.quote(part) for part in cmd])
+        if s in self.commands:
+            return True
+        self.commands.add(s)
+        return False
