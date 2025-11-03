@@ -171,8 +171,11 @@ struct FactoryInitParams
 
     std::optional<Inet::InterfaceId> interfaceId;
 
-    // The minimum backoff interval for LIT devices. This is used to calculate
-    // the sigma1 retransmission timeout for LIT devices.
+    // The minimum backoff interval for LIT devices. This is used to calculate the sigma1
+    // retransmission timeout for LIT devices, ensuring it's at least `minimumLITBackoffInterval`.
+    // Specifically, the timeout is `max(LIT activeRetransTimeout,
+    // minimumLITBackoffInterval)`. This prevents issues with MRP retransmission in Thread
+    // networks when activeRetransTimeout is too small.
     Optional<uint32_t> minimumLITBackoffInterval;
 };
 
