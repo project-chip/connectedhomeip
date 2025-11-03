@@ -45,6 +45,7 @@ struct CASEClientInitParams
     // Specifically, the timeout is `max(LIT activeRetransTimeout,
     // minimumLITBackoffInterval)`. This prevents issues with MRP retransmission in Thread
     // networks when activeRetransTimeout is too small.
+    // Note: This parameter is not spec-compliant.
     Optional<uint32_t> minimumLITBackoffInterval = NullOptional;
 
     CHIP_ERROR Validate() const
