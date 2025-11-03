@@ -144,7 +144,7 @@ public:
     std::optional<app::DataModel::ActionReturnStatus> InvokeCommand(CommandId commandId, const T & data,
                                                                     app::CommandHandler * handler)
     {
-        const auto & paths = mCluster.GetPaths();
+        const auto & paths = mCluster->GetPaths();
         VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
         const app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
 
@@ -159,7 +159,7 @@ public:
         tlvReader.Init(buffer, tlvWriter.GetLengthWritten());
         ReturnErrorOnFailure(tlvReader.Next());
 
-        return mCluster.InvokeCommand(request, tlvReader, handler);
+        return mCluster->InvokeCommand(request, tlvReader, handler);
     }
 
     // Compare the attributes of the cluster against the expected set.
