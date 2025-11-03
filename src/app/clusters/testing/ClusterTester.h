@@ -60,7 +60,36 @@ namespace Test {
 // {
 //     ASSERT_GT(it.GetValue().label.size(), 0u);
 // }
-//
+
+// Detection traits for Encode() and EncodeForWrite()
+template <typename...>
+using void_t = void;
+
+// Detection traits for Encode() and EncodeForWrite()
+template <typename T, typename = void>
+struct HasEncodeForWrite : std::false_type
+{
+};
+
+template <typename T>
+struct HasEncodeForWrite<
+    T, void_t<decltype(std::declval<T>().EncodeForWrite(std::declval<chip::TLV::TLVWriter &>(), chip::TLV::AnonymousTag()))>>
+    : std::true_type
+{
+};
+
+template <typename T, typename = void>
+struct HasGenericEncode : std::false_type
+{
+};
+
+template <typename T>
+struct HasGenericEncode<
+    T, void_t<decltype(std::declval<T>().Encode(std::declval<chip::TLV::TLVWriter &>(), chip::TLV::AnonymousTag()))>>
+    : std::true_type
+{
+};
+
 class ClusterTester
 {
 public:
@@ -172,96 +201,41 @@ public:
      *  - Uses cluster.GetPaths() to automatically deduce the endpoint + cluster for convenience.
      */
 
-    template <typename T, typename = void>
-    struct HasEncodeForWrite : std::false_type
-    {
-    };
-
+    // Write single value
     template <typename T>
-    struct HasEncodeForWrite<
-        T,
-        std::void_t<decltype(std::declval<T>().EncodeForWrite(std::declval<chip::TLV::TLVWriter &>(), chip::TLV::AnonymousTag()))>>
-        : std::true_type
+    CHIP_ERROR WriteAttribute(AttributeId attr, const T & value, chip::FabricIndex fabricIndex)
     {
-    };
-
-    template <typename T, typename = void>
-    struct HasGenericEncode : std::false_type
-    {
-    };
-
-    template <typename T>
-    struct HasGenericEncode<
-        T, std::void_t<decltype(std::declval<T>().Encode(std::declval<chip::TLV::TLVWriter &>(), chip::TLV::AnonymousTag()))>>
-        : std::true_type
-    {
-    };
-
-    // Main helper for a single value (scalar or struct)
-    template <typename T>
-    CHIP_ERROR WriteAttribute(app::ServerClusterInterface & cluster, AttributeId attr, const T & value,
-                              FabricIndex fabricIndex = kUndefinedFabricIndex)
-    {
-        const auto & paths = cluster.GetPaths();
+        const auto & paths = mCluster.GetPaths();
         VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
 
         app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
+        app::Testing::WriteOperation writeOp(path);
+        writeOp.SetSubjectDescriptor(chip::Access::SubjectDescriptor{ fabricIndex });
 
-        app::Testing::WriteOperation writeOperation(path);
-        if (fabricIndex != kUndefinedFabricIndex)
-        {
-            writeOperation.SetSubjectDescriptor({ fabricIndex });
-        }
+        uint8_t buffer[1024];
+        chip::TLV::TLVWriter writer;
+        writer.Init(buffer);
 
-        if constexpr (std::is_integral_v<T> || std::is_enum_v<T>)
-        {
-            app::AttributeValueDecoder decoder = writeOperation.DecoderFor(value);
-            return cluster.WriteAttribute(writeOperation.GetRequest(), decoder).GetUnderlyingError();
-        }
-        else
-        {
-            uint8_t buffer[1024];
-            chip::TLV::TLVWriter writer;
-            writer.Init(buffer);
+        ReturnErrorOnFailure(EncodeValueToTLV(writer, value));
 
-            if constexpr (HasGenericEncode<T>::value)
-            {
-                ReturnErrorOnFailure(value.Encode(writer, chip::TLV::AnonymousTag()));
-            }
-            else if constexpr (HasEncodeForWrite<T>::value)
-            {
-                ReturnErrorOnFailure(value.EncodeForWrite(writer, chip::TLV::AnonymousTag()));
-            }
-            else
-            {
-                static_assert(!sizeof(T), "Type not supported by WriteAttribute");
-                return CHIP_ERROR_NOT_IMPLEMENTED;
-            }
+        chip::TLV::TLVReader reader;
+        reader.Init(buffer, writer.GetLengthWritten());
+        ReturnErrorOnFailure(reader.Next());
 
-            chip::TLV::TLVReader reader;
-            reader.Init(buffer, writer.GetLengthWritten());
-            ReturnErrorOnFailure(reader.Next());
-
-            app::AttributeValueDecoder decoder(reader, *writeOperation.GetRequest().subjectDescriptor);
-            return cluster.WriteAttribute(writeOperation.GetRequest(), decoder).GetUnderlyingError();
-        }
+        app::AttributeValueDecoder decoder(reader, *writeOp.GetRequest().subjectDescriptor);
+        return mCluster.WriteAttribute(writeOp.GetRequest(), decoder).GetUnderlyingError();
     }
 
-    // Overload for DataModel::List
+    // Write list of values
     template <typename ElementT>
-    CHIP_ERROR WriteAttribute(app::ServerClusterInterface & cluster, AttributeId attr,
-                              const chip::app::DataModel::List<ElementT> & list, FabricIndex fabricIndex = kUndefinedFabricIndex)
+    CHIP_ERROR WriteAttribute(AttributeId attr, const chip::app::DataModel::List<ElementT> & list, chip::FabricIndex fabricIndex)
     {
-        const auto & paths = cluster.GetPaths();
+        const auto & paths = mCluster.GetPaths();
         VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
 
         app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
-
-        app::Testing::WriteOperation writeOperation(path);
-        if (fabricIndex != kUndefinedFabricIndex)
-        {
-            writeOperation.SetSubjectDescriptor({ fabricIndex });
-        }
+        app::Testing::WriteOperation writeOp(path);
+        writeOp.SetSubjectDescriptor(chip::Access::SubjectDescriptor{ fabricIndex });
 
         uint8_t buffer[1024];
         chip::TLV::TLVWriter writer;
@@ -272,22 +246,7 @@ public:
 
         for (const auto & item : list)
         {
-            if constexpr (std::is_integral_v<ElementT> || std::is_enum_v<ElementT>)
-            {
-                ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), item));
-            }
-            else if constexpr (HasGenericEncode<ElementT>::value)
-            {
-                ReturnErrorOnFailure(item.Encode(writer, chip::TLV::AnonymousTag()));
-            }
-            else if constexpr (HasEncodeForWrite<ElementT>::value)
-            {
-                ReturnErrorOnFailure(item.EncodeForWrite(writer, chip::TLV::AnonymousTag()));
-            }
-            else
-            {
-                static_assert(!sizeof(ElementT), "Element type not supported in DataModel::List");
-            }
+            ReturnErrorOnFailure(EncodeValueToTLV(writer, item));
         }
 
         ReturnErrorOnFailure(writer.EndContainer(outer));
@@ -296,8 +255,32 @@ public:
         reader.Init(buffer, writer.GetLengthWritten());
         ReturnErrorOnFailure(reader.Next());
 
-        app::AttributeValueDecoder decoder(reader, *writeOperation.GetRequest().subjectDescriptor);
-        return cluster.WriteAttribute(writeOperation.GetRequest(), decoder).GetUnderlyingError();
+        app::AttributeValueDecoder decoder(reader, *writeOp.GetRequest().subjectDescriptor);
+        return mCluster.WriteAttribute(writeOp.GetRequest(), decoder).GetUnderlyingError();
+    }
+
+private:
+    // Helper to encode any value to TLV
+    template <typename T>
+    static CHIP_ERROR EncodeValueToTLV(chip::TLV::TLVWriter & writer, const T & value)
+    {
+        if constexpr (std::is_integral_v<T> || std::is_enum_v<T>)
+        {
+            return chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), value);
+        }
+        else if constexpr (HasGenericEncode<T>::value)
+        {
+            return value.Encode(writer, chip::TLV::AnonymousTag());
+        }
+        else if constexpr (HasEncodeForWrite<T>::value)
+        {
+            return value.EncodeForWrite(writer, chip::TLV::AnonymousTag());
+        }
+        else
+        {
+            static_assert(!sizeof(T), "Type not supported for TLV encoding");
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
     }
 
     // Prepares an invoke request: sets the command path and clears handler state.

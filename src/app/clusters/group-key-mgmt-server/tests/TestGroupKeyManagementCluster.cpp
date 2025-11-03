@@ -209,7 +209,7 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
         auto listToWrite =
             chip::app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
 
-        CHIP_ERROR err = tester.WriteAttribute(mCluster, GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, fabricIndex);
+        CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, fabricIndex);
         ASSERT_EQ(err, CHIP_NO_ERROR);
     }
 
@@ -244,8 +244,7 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeSa
     chip::GroupId startGroupId          = 0x1001;
     uint16_t sharedKeySetId             = 5;
 
-    auto keys = TestHelpers::CreateGroupKeyMapList(2, fabricIndex, startGroupId, sharedKeySetId, 0 /* keySetIdIncrement */);
-
+    auto keys = TestHelpers::CreateGroupKeyMapList(2, fabricIndex, startGroupId, sharedKeySetId, 1, 0);
     PrepopulateGroupKeyMap(keys, fabricIndex);
     VerifyGroupKeysMatch(fabricIndex, keys);
 }
@@ -262,7 +261,7 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeDu
     auto listToWrite =
         chip::app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
 
-    CHIP_ERROR err = tester.WriteAttribute(mCluster, GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, fabricIndex);
+    CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, fabricIndex);
 
     ASSERT_EQ(err, CHIP_ERROR_DUPLICATE_KEY_ID);
 
