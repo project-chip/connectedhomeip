@@ -19,6 +19,7 @@ pw_add_library(pw_sync.esp32 INTERFACE
       pw_third_party.freertos
     PUBLIC_COMPILE_OPTIONS
       -Wno-undef
+      -Wno-sign-compare
 )
 
 # This target provides the backend for pw::sync::InterruptSpinLock.
