@@ -404,80 +404,53 @@ cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
-/** Attributes and commands for group configuration and manipulation. */
-cluster Groups = 4 {
-  revision 4;
+/** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
+cluster Identify = 3 {
+  revision 6;
 
-  bitmap Feature : bitmap32 {
-    kGroupNames = 0x1;
+  enum EffectIdentifierEnum : enum8 {
+    kBlink = 0;
+    kBreathe = 1;
+    kOkay = 2;
+    kChannelChange = 11;
+    kFinishEffect = 254;
+    kStopEffect = 255;
   }
 
-  bitmap NameSupportBitmap : bitmap8 {
-    kGroupNames = 0x80;
+  enum EffectVariantEnum : enum8 {
+    kDefault = 0;
   }
 
-  readonly attribute NameSupportBitmap nameSupport = 0;
+  enum IdentifyTypeEnum : enum8 {
+    kNone = 0;
+    kLightOutput = 1;
+    kVisibleIndicator = 2;
+    kAudibleBeep = 3;
+    kDisplay = 4;
+    kActuator = 5;
+  }
+
+  attribute int16u identifyTime = 0;
+  readonly attribute IdentifyTypeEnum identifyType = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  request struct AddGroupRequest {
-    group_id groupID = 0;
-    char_string<16> groupName = 1;
+  request struct IdentifyRequest {
+    int16u identifyTime = 0;
   }
 
-  response struct AddGroupResponse = 0 {
-    enum8 status = 0;
-    group_id groupID = 1;
+  request struct TriggerEffectRequest {
+    EffectIdentifierEnum effectIdentifier = 0;
+    EffectVariantEnum effectVariant = 1;
   }
 
-  request struct ViewGroupRequest {
-    group_id groupID = 0;
-  }
-
-  response struct ViewGroupResponse = 1 {
-    enum8 status = 0;
-    group_id groupID = 1;
-    char_string<16> groupName = 2;
-  }
-
-  request struct GetGroupMembershipRequest {
-    group_id groupList[] = 0;
-  }
-
-  response struct GetGroupMembershipResponse = 2 {
-    nullable int8u capacity = 0;
-    group_id groupList[] = 1;
-  }
-
-  request struct RemoveGroupRequest {
-    group_id groupID = 0;
-  }
-
-  response struct RemoveGroupResponse = 3 {
-    enum8 status = 0;
-    group_id groupID = 1;
-  }
-
-  request struct AddGroupIfIdentifyingRequest {
-    group_id groupID = 0;
-    char_string<16> groupName = 1;
-  }
-
-  /** The AddGroup command allows a client to add group membership in a particular group for the server endpoint. */
-  fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
-  /** The ViewGroup command allows a client to request that the server responds with a ViewGroupResponse command containing the name string for a particular group. */
-  fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
-  /** The GetGroupMembership command allows a client to inquire about the group membership of the server endpoint, in a number of ways. */
-  fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
-  /** The RemoveGroup command allows a client to request that the server removes the membership for the server endpoint, if any, in a particular group. */
-  fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
-  /** The RemoveAllGroups command allows a client to direct the server to remove all group associations for the server endpoint. */
-  fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
-  /** The AddGroupIfIdentifying command allows a client to add group membership in a particular group for the server endpoint, on condition that the endpoint is identifying itself. */
-  fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
+  /** This command starts or stops the receiving device identifying itself. */
+  command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
+  /** This command allows the support of feedback to the user, such as a certain light effect. */
+  command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
@@ -693,6 +666,26 @@ cluster Descriptor = 29 {
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
   readonly attribute optional char_string<32> endpointUniqueID = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
+cluster Binding = 30 {
+  revision 1;
+
+  fabric_scoped struct TargetStruct {
+    optional node_id node = 1;
+    optional group_id group = 2;
+    optional endpoint_no endpoint = 3;
+    optional cluster_id cluster = 4;
+    fabric_idx fabricIndex = 254;
+  }
+
+  attribute access(write: manage) TargetStruct binding[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1699,6 +1692,61 @@ cluster ThreadNetworkDiagnostics = 53 {
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
+/** This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
+Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
+Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
+cluster Switch = 59 {
+  revision 2;
+
+  bitmap Feature : bitmap32 {
+    kLatchingSwitch = 0x1;
+    kMomentarySwitch = 0x2;
+    kMomentarySwitchRelease = 0x4;
+    kMomentarySwitchLongPress = 0x8;
+    kMomentarySwitchMultiPress = 0x10;
+    kActionSwitch = 0x20;
+  }
+
+  info event SwitchLatched = 0 {
+    int8u newPosition = 0;
+  }
+
+  info event InitialPress = 1 {
+    int8u newPosition = 0;
+  }
+
+  info event LongPress = 2 {
+    int8u newPosition = 0;
+  }
+
+  info event ShortRelease = 3 {
+    int8u previousPosition = 0;
+  }
+
+  info event LongRelease = 4 {
+    int8u previousPosition = 0;
+  }
+
+  info event MultiPressOngoing = 5 {
+    int8u newPosition = 0;
+    int8u currentNumberOfPressesCounted = 1;
+  }
+
+  info event MultiPressComplete = 6 {
+    int8u previousPosition = 0;
+    int8u totalNumberOfPressesCounted = 1;
+  }
+
+  readonly attribute int8u numberOfPositions = 0;
+  readonly attribute int8u currentPosition = 1;
+  readonly attribute optional int8u multiPressMax = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1;
@@ -2008,158 +2056,101 @@ cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** Attributes and commands for scene configuration and manipulation. */
-provisional cluster ScenesManagement = 98 {
-  revision 1;
+/** Allows servers to ensure that listed clients are notified when a server is available for communication. */
+cluster IcdManagement = 70 {
+  revision 3;
 
-  bitmap CopyModeBitmap : bitmap8 {
-    kCopyAllScenes = 0x1;
+  enum ClientTypeEnum : enum8 {
+    kPermanent = 0;
+    kEphemeral = 1;
+  }
+
+  enum OperatingModeEnum : enum8 {
+    kSIT = 0 [spec_name = "SIT"];
+    kLIT = 1 [spec_name = "LIT"];
   }
 
   bitmap Feature : bitmap32 {
-    kSceneNames = 0x1;
+    kCheckInProtocolSupport = 0x1;
+    kUserActiveModeTrigger = 0x2;
+    kLongIdleTimeSupport = 0x4;
+    kDynamicSitLitSupport = 0x8;
   }
 
-  struct AttributeValuePairStruct {
-    attrib_id attributeID = 0;
-    optional int8u valueUnsigned8 = 1;
-    optional int8s valueSigned8 = 2;
-    optional int16u valueUnsigned16 = 3;
-    optional int16s valueSigned16 = 4;
-    optional int32u valueUnsigned32 = 5;
-    optional int32s valueSigned32 = 6;
-    optional int64u valueUnsigned64 = 7;
-    optional int64s valueSigned64 = 8;
+  bitmap UserActiveModeTriggerBitmap : bitmap32 {
+    kPowerCycle = 0x1;
+    kSettingsMenu = 0x2;
+    kCustomInstruction = 0x4;
+    kDeviceManual = 0x8;
+    kActuateSensor = 0x10;
+    kActuateSensorSeconds = 0x20;
+    kActuateSensorTimes = 0x40;
+    kActuateSensorLightsBlink = 0x80;
+    kResetButton = 0x100;
+    kResetButtonLightsBlink = 0x200;
+    kResetButtonSeconds = 0x400;
+    kResetButtonTimes = 0x800;
+    kSetupButton = 0x1000;
+    kSetupButtonSeconds = 0x2000;
+    kSetupButtonLightsBlink = 0x4000;
+    kSetupButtonTimes = 0x8000;
+    kAppDefinedButton = 0x10000;
   }
 
-  struct ExtensionFieldSetStruct {
-    cluster_id clusterID = 0;
-    AttributeValuePairStruct attributeValueList[] = 1;
-  }
-
-  fabric_scoped struct SceneInfoStruct {
-    int8u sceneCount = 0;
-    fabric_sensitive int8u currentScene = 1;
-    fabric_sensitive group_id currentGroup = 2;
-    fabric_sensitive boolean sceneValid = 3;
-    int8u remainingCapacity = 4;
+  fabric_scoped struct MonitoringRegistrationStruct {
+    fabric_sensitive node_id checkInNodeID = 1;
+    fabric_sensitive int64u monitoredSubject = 2;
+    fabric_sensitive ClientTypeEnum clientType = 4;
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute int16u sceneTableSize = 1;
-  readonly attribute SceneInfoStruct fabricSceneInfo[] = 2;
+  readonly attribute int32u idleModeDuration = 0;
+  readonly attribute int32u activeModeDuration = 1;
+  readonly attribute int16u activeModeThreshold = 2;
+  readonly attribute access(read: administer) optional MonitoringRegistrationStruct registeredClients[] = 3;
+  readonly attribute access(read: administer) optional int32u ICDCounter = 4;
+  readonly attribute optional int16u clientsSupportedPerFabric = 5;
+  readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
+  readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
+  readonly attribute optional OperatingModeEnum operatingMode = 8;
+  readonly attribute optional int32u maximumCheckInBackOff = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  request struct AddSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-    int32u transitionTime = 2;
-    char_string<16> sceneName = 3;
-    ExtensionFieldSetStruct extensionFieldSetStructs[] = 4;
+  request struct RegisterClientRequest {
+    node_id checkInNodeID = 0;
+    int64u monitoredSubject = 1;
+    octet_string<16> key = 2;
+    optional octet_string<16> verificationKey = 3;
+    ClientTypeEnum clientType = 4;
   }
 
-  response struct AddSceneResponse = 0 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
+  response struct RegisterClientResponse = 1 {
+    int32u ICDCounter = 0;
   }
 
-  request struct ViewSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
+  request struct UnregisterClientRequest {
+    node_id checkInNodeID = 0;
+    optional octet_string<16> verificationKey = 1;
   }
 
-  response struct ViewSceneResponse = 1 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-    optional int32u transitionTime = 3;
-    optional char_string<16> sceneName = 4;
-    optional ExtensionFieldSetStruct extensionFieldSetStructs[] = 5;
+  request struct StayActiveRequestRequest {
+    int32u stayActiveDuration = 0;
   }
 
-  request struct RemoveSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
+  response struct StayActiveResponse = 4 {
+    int32u promisedActiveDuration = 0;
   }
 
-  response struct RemoveSceneResponse = 2 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct RemoveAllScenesRequest {
-    group_id groupID = 0;
-  }
-
-  response struct RemoveAllScenesResponse = 3 {
-    status status = 0;
-    group_id groupID = 1;
-  }
-
-  request struct StoreSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct StoreSceneResponse = 4 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct RecallSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-    optional nullable int32u transitionTime = 2;
-  }
-
-  request struct GetSceneMembershipRequest {
-    group_id groupID = 0;
-  }
-
-  response struct GetSceneMembershipResponse = 6 {
-    status status = 0;
-    nullable int8u capacity = 1;
-    group_id groupID = 2;
-    optional int8u sceneList[] = 3;
-  }
-
-  request struct CopySceneRequest {
-    CopyModeBitmap mode = 0;
-    group_id groupIdentifierFrom = 1;
-    int8u sceneIdentifierFrom = 2;
-    group_id groupIdentifierTo = 3;
-    int8u sceneIdentifierTo = 4;
-  }
-
-  response struct CopySceneResponse = 64 {
-    status status = 0;
-    group_id groupIdentifierFrom = 1;
-    int8u sceneIdentifierFrom = 2;
-  }
-
-  /** Add a scene to the scene table. Extension field sets are input as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}'. */
-  fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
-  /** Retrieves the requested scene entry from its Scene table. */
-  fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
-  /** Removes the requested scene entry, corresponding to the value of the GroupID field, from its Scene Table */
-  fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
-  /** Remove all scenes, corresponding to the value of the GroupID field, from its Scene Table */
-  fabric command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
-  /** Adds the scene entry into its Scene Table along with all extension field sets corresponding to the current state of other clusters on the same endpoint */
-  fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
-  /** Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table */
-  fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
-  /** This command can be used to get the used scene identifiers within a certain group, for the endpoint that implements this cluster. */
-  fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
-  /** This command allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
-  fabric command access(invoke: manage) CopyScene(CopySceneRequest): CopySceneResponse = 64;
+  /** This command allows a client to register itself with the ICD to be notified when the device is available for communication. */
+  fabric command access(invoke: manage) RegisterClient(RegisterClientRequest): RegisterClientResponse = 0;
+  /** This command allows a client to unregister itself with the ICD. */
+  fabric command access(invoke: manage) UnregisterClient(UnregisterClientRequest): DefaultSuccess = 2;
+  /** This command allows a client to request that the server stays in active mode for at least a given time duration (in milliseconds) from when this command is received. */
+  command StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
 }
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
@@ -2507,8 +2498,15 @@ endpoint 0 {
     callback attribute clusterRevision;
   }
 
+  server cluster Binding {
+    callback attribute binding;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
   server cluster AccessControl {
     emits event AccessControlEntryChanged;
+    emits event AccessControlExtensionChanged;
     callback attribute acl;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
@@ -2597,8 +2595,6 @@ endpoint 0 {
     callback attribute lastNetworkingStatus;
     callback attribute lastNetworkID;
     callback attribute lastConnectErrorValue;
-    callback attribute supportedThreadFeatures;
-    callback attribute threadVersion;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2607,6 +2603,7 @@ endpoint 0 {
 
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
+    handle command AddOrUpdateWiFiNetwork;
     handle command AddOrUpdateThreadNetwork;
     handle command RemoveNetwork;
     handle command NetworkConfigResponse;
@@ -2616,9 +2613,6 @@ endpoint 0 {
   }
 
   server cluster GeneralDiagnostics {
-    emits event HardwareFaultChange;
-    emits event RadioFaultChange;
-    emits event NetworkFaultChange;
     emits event BootReason;
     callback attribute networkInterfaces;
     callback attribute rebootCount;
@@ -2782,6 +2776,9 @@ endpoint 0 {
 
   server cluster FixedLabel {
     callback attribute labelList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -2791,9 +2788,52 @@ endpoint 0 {
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
+
+  server cluster IcdManagement {
+    callback attribute idleModeDuration;
+    callback attribute activeModeDuration;
+    callback attribute activeModeThreshold;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+  }
 }
 endpoint 1 {
-  device type ma_colortemperaturelight = 268, version 4;
+  device type ma_dimmerswitch = 260, version 3;
+
+  binding cluster Identify;
+  binding cluster OnOff;
+  binding cluster LevelControl;
+  binding cluster ColorControl;
+
+  server cluster Identify {
+    callback attribute identifyTime;
+    callback attribute identifyType;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+
+    handle command Identify;
+    handle command TriggerEffect;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster Binding {
+    callback attribute binding;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+}
+endpoint 2 {
+  device type ma_genericswitch = 15, version 3;
 
 
   server cluster Identify {
@@ -2809,74 +2849,6 @@ endpoint 1 {
     handle command TriggerEffect;
   }
 
-  server cluster Groups {
-    ram      attribute nameSupport;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command AddGroup;
-    handle command AddGroupResponse;
-    handle command ViewGroup;
-    handle command ViewGroupResponse;
-    handle command GetGroupMembership;
-    handle command GetGroupMembershipResponse;
-    handle command RemoveGroup;
-    handle command RemoveGroupResponse;
-    handle command RemoveAllGroups;
-    handle command AddGroupIfIdentifying;
-  }
-
-  server cluster OnOff {
-    persist  attribute onOff default = 0x00;
-    ram      attribute globalSceneControl default = 0x01;
-    ram      attribute onTime default = 0x0000;
-    ram      attribute offWaitTime default = 0x0000;
-    persist  attribute startUpOnOff default = 0xFF;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 6;
-
-    handle command Off;
-    handle command On;
-    handle command Toggle;
-    handle command OffWithEffect;
-    handle command OnWithRecallGlobalScene;
-    handle command OnWithTimedOff;
-  }
-
-  server cluster LevelControl {
-    persist  attribute currentLevel default = 0xFE;
-    ram      attribute remainingTime default = 0x0000;
-    ram      attribute minLevel default = 0x01;
-    ram      attribute maxLevel default = 0xFE;
-    ram      attribute options default = 0x00;
-    ram      attribute onOffTransitionTime default = 0x0000;
-    ram      attribute onLevel default = 0xFF;
-    ram      attribute onTransitionTime;
-    ram      attribute offTransitionTime;
-    ram      attribute defaultMoveRate default = 50;
-    persist  attribute startUpCurrentLevel default = 255;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 6;
-
-    handle command MoveToLevel;
-    handle command Move;
-    handle command Step;
-    handle command Stop;
-    handle command MoveToLevelWithOnOff;
-    handle command MoveWithOnOff;
-    handle command StepWithOnOff;
-    handle command StopWithOnOff;
-  }
-
   server cluster Descriptor {
     callback attribute deviceTypeList;
     callback attribute serverList;
@@ -2889,79 +2861,15 @@ endpoint 1 {
     callback attribute clusterRevision;
   }
 
-  server cluster ScenesManagement {
-    ram      attribute sceneTableSize default = 16;
-    callback attribute fabricSceneInfo;
+  server cluster Switch {
+    emits event InitialPress;
+    ram      attribute numberOfPositions default = 2;
+    ram      attribute currentPosition default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 1;
-
-    handle command AddScene;
-    handle command AddSceneResponse;
-    handle command ViewScene;
-    handle command ViewSceneResponse;
-    handle command RemoveSceneResponse;
-    handle command RemoveScene;
-    handle command RemoveAllScenesResponse;
-    handle command RemoveAllScenes;
-    handle command StoreScene;
-    handle command StoreSceneResponse;
-    handle command RecallScene;
-    handle command GetSceneMembership;
-    handle command GetSceneMembershipResponse;
-    handle command CopyScene;
-    handle command CopySceneResponse;
-  }
-
-  server cluster ColorControl {
-    persist  attribute currentHue default = 0x00;
-    persist  attribute currentSaturation default = 0x00;
-    ram      attribute remainingTime default = 0x0000;
-    persist  attribute currentX default = 0x616B;
-    persist  attribute currentY default = 0x607D;
-    persist  attribute colorTemperatureMireds default = 0x00FA;
-    persist  attribute colorMode default = 0x01;
-    ram      attribute options default = 0x00;
-    ram      attribute numberOfPrimaries;
-    persist  attribute enhancedCurrentHue default = 0x0000;
-    persist  attribute enhancedColorMode default = 0x01;
-    persist  attribute colorLoopActive default = 0x00;
-    persist  attribute colorLoopDirection default = 0x00;
-    persist  attribute colorLoopTime default = 0x0019;
-    ram      attribute colorLoopStartEnhancedHue default = 0x2300;
-    ram      attribute colorLoopStoredEnhancedHue default = 0x0000;
-    ram      attribute colorCapabilities default = 0x1F;
-    ram      attribute colorTempPhysicalMinMireds default = 0x009A;
-    ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
-    ram      attribute coupleColorTempToLevelMinMireds;
-    persist  attribute startUpColorTemperatureMireds default = 0x00FA;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0x1F;
-    ram      attribute clusterRevision default = 8;
-
-    handle command MoveToHue;
-    handle command MoveHue;
-    handle command StepHue;
-    handle command MoveToSaturation;
-    handle command MoveSaturation;
-    handle command StepSaturation;
-    handle command MoveToHueAndSaturation;
-    handle command MoveToColor;
-    handle command MoveColor;
-    handle command StepColor;
-    handle command MoveToColorTemperature;
-    handle command EnhancedMoveToHue;
-    handle command EnhancedMoveHue;
-    handle command EnhancedStepHue;
-    handle command EnhancedMoveToHueAndSaturation;
-    handle command ColorLoopSet;
-    handle command StopMoveStep;
-    handle command MoveColorTemperature;
-    handle command StepColorTemperature;
+    ram      attribute featureMap default = 6;
+    ram      attribute clusterRevision default = 2;
   }
 }
 
