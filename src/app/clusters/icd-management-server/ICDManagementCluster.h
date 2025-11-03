@@ -54,7 +54,7 @@ public:
     ICDManagementServer() = default;
 
     void Init(chip::PersistentStorageDelegate & storage, chip::Crypto::SymmetricKeystore * symmetricKeystore,
-                     chip::ICDConfigurationData & ICDConfigurationData);
+              chip::ICDConfigurationData & ICDConfigurationData);
 
     static ICDManagementServer & GetInstance() { return instance; };
 #if CHIP_CONFIG_ENABLE_ICD_CIP
