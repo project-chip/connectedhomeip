@@ -114,11 +114,11 @@ int soc_pll_config(void)
     status                                  = RSI_CLK_SetIntfPllFreq(M4CLK, INTF_PLL_CLK, SOC_PLL_REF_FREQUENCY);
     if (status != RSI_OK)
     {
-        SILABS_LOG("Failed to Config Interface PLL Clock, status:%d", status);
+        ChipLogError(DeviceLayer, "Failed to Config Interface PLL Clock, status: %ld", status);
     }
     else
     {
-        SILABS_LOG("Configured Interface PLL Clock to %d", INTF_PLL_CLK);
+        ChipLogProgress(DeviceLayer, "Configured Interface PLL Clock to %d", INTF_PLL_CLK);
     }
 
     RSI_CLK_QspiClkConfig(M4CLK, QSPI_INTFPLLCLK, 0, 0, 1);

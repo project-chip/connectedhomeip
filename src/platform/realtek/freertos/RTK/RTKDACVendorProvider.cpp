@@ -26,7 +26,7 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
-#include <platform/realtek/BEE/CHIPDevicePlatformConfig.h>
+#include <platform/realtek/freertos/CHIPDevicePlatformConfig.h>
 
 using namespace ::chip::DeviceLayer::Internal;
 
