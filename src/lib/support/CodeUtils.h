@@ -294,7 +294,7 @@
         CHIP_ERROR __err = (expr);                                                                                                 \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
-            SuccessOrLog(__err, MOD, MSG, ##__VA_ARGS__);                                                                          \
+            ChipLogFailure(__err, MOD, MSG, ##__VA_ARGS__);                                                                        \
             return __err;                                                                                                          \
         }                                                                                                                          \
     } while (false)
@@ -324,7 +324,7 @@
         CHIP_ERROR __err = (expr);                                                                                                 \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
-            SuccessOrLog(__err, MOD, MSG, ##__VA_ARGS__);                                                                          \
+            ChipLogFailure(__err, MOD, MSG, ##__VA_ARGS__);                                                                        \
             return value;                                                                                                          \
         }                                                                                                                          \
     } while (false)
