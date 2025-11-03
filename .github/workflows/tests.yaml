@@ -670,9 +670,9 @@ jobs:
                   CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-all-devices-app-${BUILD_VARIANT}-tsan-clang-test
+                  --target linux-x64-all-devices-app-tsan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-all-devices-app-${BUILD_VARIANT}-tsan-clang-test"
+                  && rm -rf out/linux-x64-all-devices-app-tsan-clang-test"
 
             - name: Build linux-x64-lit-icd
               env:
