@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 Project CHIP Authors
+# Copyright (c) 2022-2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -161,7 +161,7 @@ class TelinkBuilder(Builder):
                  app: TelinkApp = TelinkApp,
                  board: TelinkBoard = TelinkBoard,
                  enable_ota: bool = False,
-                 enable_dfu: bool = False,
+                 enable_dfu_smp: bool = False,
                  enable_shell: bool = False,
                  enable_rpcs: bool = False,
                  enable_factory_data: bool = False,
@@ -177,7 +177,7 @@ class TelinkBuilder(Builder):
         self.app = app
         self.board = board
         self.enable_ota = enable_ota
-        self.enable_dfu = enable_dfu
+        self.enable_dfu_smp = enable_dfu_smp
         self.enable_shell = enable_shell
         self.enable_rpcs = enable_rpcs
         self.enable_factory_data = enable_factory_data
@@ -211,8 +211,8 @@ class TelinkBuilder(Builder):
         if self.enable_ota:
             flags.append("-DCONFIG_CHIP_OTA_REQUESTOR=y")
 
-        if self.enable_dfu:
-            flags.append("-DCONFIG_BOOTLOADER_MCUBOOT=y")
+        if self.enable_dfu_smp:
+            flags.append("-DCONFIG_CHIP_DFU_OVER_BT_SMP=y")
 
         if self.enable_shell:
             flags.append("-DCONFIG_CHIP_LIB_SHELL=y")
