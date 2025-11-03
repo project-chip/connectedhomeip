@@ -19,7 +19,7 @@
 #include <app/clusters/boolean-state-server/boolean-state-cluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/reporting/ReportScheduler.h>
-#include <devices/single-endpoint/SingleEndpointDevice.h>
+#include <devices/interface/SingleEndpointDevice.h>
 #include <memory>
 
 namespace chip {

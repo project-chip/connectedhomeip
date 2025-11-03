@@ -22,7 +22,7 @@
 #include <clusters/Descriptor/Structs.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
-#include <devices/base-device/Device.h>
+#include <devices/interface/DeviceInterface.h>
 
 #include <string>
 
@@ -32,7 +32,7 @@ namespace chip::app {
 ///
 /// This implementation assumes that a device is registered on a single
 /// endpoint.
-class SingleEndpointDevice : public BaseDevice
+class SingleEndpointDevice : public DeviceInterface
 {
 public:
     virtual ~SingleEndpointDevice() = default;
@@ -42,7 +42,7 @@ public:
 protected:
     /// The caller creating a SingleEndpointDevice MUST ensure that the underlying data for the Span of
     /// deviceTypes remains valid for the entire liefetime of the SingleEndpointDevice object instance.
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes) : BaseDevice(deviceTypes) {}
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes) : DeviceInterface(deviceTypes) {}
 
     /// Internal registration function for common device clusters and endpoint registration.
     /// Device subclasses are expected to, and must only call this as part of their own device specific Register()

@@ -22,7 +22,7 @@ source_set("root-node") {
   ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/single-endpoint:single-endpoint-device",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:single-endpoint-device",
     "${chip_root}/src/app/clusters/access-control-server",
     "${chip_root}/src/app/clusters/administrator-commissioning-server",
     "${chip_root}/src/app/clusters/basic-information",

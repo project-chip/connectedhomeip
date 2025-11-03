@@ -28,7 +28,7 @@
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <devices/Types.h>
-#include <devices/single-endpoint/SingleEndpointDevice.h>
+#include <devices/interface/SingleEndpointDevice.h>
 #include <platform/NetworkCommissioning.h>
 
 namespace chip {

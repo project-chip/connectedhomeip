@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
-#include <devices/base-device/Device.h>
+#include <devices/interface/DeviceInterface.h>
 
 using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-CHIP_ERROR BaseDevice::DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const
+CHIP_ERROR DeviceInterface::DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const
 {
     VerifyOrReturnValue(mDescriptorCluster.IsConstructed(), CHIP_NO_ERROR);
     ReturnErrorOnFailure(out.ReferenceExisting(mDeviceTypes));
@@ -29,7 +29,7 @@ CHIP_ERROR BaseDevice::DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEn
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BaseDevice::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const
+CHIP_ERROR DeviceInterface::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const
 {
     // no bindings
     return CHIP_NO_ERROR;

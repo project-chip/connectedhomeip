@@ -71,7 +71,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         chip::app::CodeDrivenDataModelProvider(*delegate, attributePersistenceProvider);
 
     static WifiRootNodeDevice rootNodeDevice(&sWiFiDriver);
-    static std::unique_ptr<BaseDevice> constructedDevice;
+    static std::unique_ptr<DeviceInterface> constructedDevice;
 
     rootNodeDevice.Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
     constructedDevice = DeviceFactory::GetInstance().Create(AppOptions::GetDeviceType());

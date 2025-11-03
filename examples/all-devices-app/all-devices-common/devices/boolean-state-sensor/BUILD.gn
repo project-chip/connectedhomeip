@@ -22,7 +22,7 @@ source_set("boolean-state-sensor") {
   ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/single-endpoint:single-endpoint-device",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:single-endpoint-device",
     "${chip_root}/src/app/clusters/boolean-state-server",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/data-model-providers/codedriven",

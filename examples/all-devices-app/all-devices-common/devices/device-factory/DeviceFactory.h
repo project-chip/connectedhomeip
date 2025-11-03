@@ -37,7 +37,7 @@ namespace chip::app {
 class DeviceFactory
 {
 public:
-    using DeviceCreator = std::function<std::unique_ptr<BaseDevice>()>;
+    using DeviceCreator = std::function<std::unique_ptr<DeviceInterface>()>;
 
     static DeviceFactory & GetInstance()
     {
@@ -47,7 +47,7 @@ public:
 
     bool IsValidDevice(const std::string & deviceTypeArg) { return mRegistry.find(deviceTypeArg) != mRegistry.end(); }
 
-    std::unique_ptr<BaseDevice> Create(const std::string & deviceTypeArg)
+    std::unique_ptr<DeviceInterface> Create(const std::string & deviceTypeArg)
     {
         if (IsValidDevice(deviceTypeArg))
         {

@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <devices/single-endpoint/SingleEndpointDevice.h>
+#include <devices/interface/SingleEndpointDevice.h>
 
 using namespace chip::app::Clusters;
 

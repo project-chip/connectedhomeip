@@ -27,14 +27,11 @@
 
 namespace chip::app {
 
-/// A device is a entity that maintains some cluster functionality.
-///
-/// Current implementation assumes that a device is registered on a single
-/// endpoint.
-class BaseDevice : public EndpointInterface
+/// A device is an entity that maintains some cluster functionality.
+class DeviceInterface : public EndpointInterface
 {
 public:
-    virtual ~BaseDevice() = default;
+    virtual ~DeviceInterface() = default;
 
     /// Register relevant clusters on the given endpoint. This must only
     /// be called after starting up a device for the first time. This function
@@ -53,9 +50,9 @@ public:
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 
 protected:
-    /// The caller creating a BaseDevice MUST ensure that the underlying data for the Span of
-    /// deviceTypes remains valid for the entire liefetime of the BaseDevice object instance.
-    BaseDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes) : mDeviceTypes(deviceTypes), mEndpointRegistration(*this, {}) {}
+    /// The caller creating a DeviceInterface MUST ensure that the underlying data for the Span of
+    /// deviceTypes remains valid for the entire liefetime of the DeviceInterface object instance.
+    DeviceInterface(Span<const DataModel::DeviceTypeEntry> deviceTypes) : mDeviceTypes(deviceTypes), mEndpointRegistration(*this, {}) {}
 
     Span<const DataModel::DeviceTypeEntry> mDeviceTypes;
     EndpointInterfaceRegistration mEndpointRegistration;
