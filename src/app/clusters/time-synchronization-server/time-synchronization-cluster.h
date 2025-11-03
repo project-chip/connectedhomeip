@@ -141,9 +141,9 @@ private:
     Span<TimeSyncDataProvider::TimeZoneStore> & GetTimeZone();
     DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> & GetDSTOffset();
     CHIP_ERROR GetDefaultNtp(MutableCharSpan & dntp);
-    CHIP_ERROR SetUTCTime(EndpointId ep, uint64_t utcTime, TimeSynchronization::GranularityEnum granularity,
+    CHIP_ERROR SetUTCTime(uint64_t utcTime, TimeSynchronization::GranularityEnum granularity,
                           TimeSynchronization::TimeSourceEnum source);
-    CHIP_ERROR GetLocalTime(EndpointId ep, DataModel::Nullable<uint64_t> & localTime);
+    CHIP_ERROR GetLocalTime(DataModel::Nullable<uint64_t> & localTime);
 
     TimeSyncDataProvider & GetDataProvider() { return mTimeSyncDataProvider; }
 
