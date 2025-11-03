@@ -589,6 +589,7 @@ void LayerImplSelect::HandleEvents()
 
     if (!IsSelectResultValid())
     {
+        VerifyOrReturn(errno != EINTR); // EINTR is not really an error (and we don't use it for signal handling)
         ChipLogError(DeviceLayer, "Select failed: %" CHIP_ERROR_FORMAT, CHIP_ERROR_POSIX(errno).Format());
         return;
     }
