@@ -163,9 +163,9 @@ class App:
                 # s[0] = found, s[1] = index
                 symptom_dict[s] = outpipe.CapturedLogContains(s, self.lastLogIndex)
 
-            ready = all([ s[0] for s in symptom_dict.values() ])
+            ready = all([s[0] for s in symptom_dict.values()])
             if ready:
-                self.lastLogIndex = max([ s[1] for s in symptom_dict.values() ]) + 1
+                self.lastLogIndex = max([s[1] for s in symptom_dict.values()]) + 1
             return ready
 
         ready = searchSymptoms()
