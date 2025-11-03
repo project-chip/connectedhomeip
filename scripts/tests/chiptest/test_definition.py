@@ -150,7 +150,7 @@ class App:
         outpipe = kwargs.get('outpipe', self.outpipe)
         timeoutInSeconds = kwargs.get('timeoutInSeconds', 10)
 
-        logging.info('Waiting for symptoms %r', symptoms)
+        logging.debug('Waiting for symptoms %r', symptoms)
 
         start_time = time.monotonic()
         symptom_dict = {}
@@ -163,18 +163,18 @@ class App:
             ready = all([ s[0] for s in symptom_dict.values() ])
             if ready:
                 self.lastLogIndex = max([ s[1] for s in symptom_dict.values() ]) + 1
-            logging.info('after searchSymptoms ready=%r: %r', ready, symptom_dict)
             return ready
 
         ready = searchSymptoms()
         while not ready:
             if server_process.poll() is not None:
-                died_str = ('Server died while waiting for %r, returncode %d',
-                            symptoms, server_process.returncode)
+                died_str = f'Server died while waiting for {symptoms!r}, '
+                'returncode {server_process.returncode}'
+
                 logging.error(died_str)
                 raise Exception(died_str)
             if time.monotonic() - start_time > timeoutInSeconds:
-                raise Exception('Timeout while waiting for %r', symptoms)
+                raise Exception(f'Timeout while waiting for {symptoms!r}')
             time.sleep(0.1)
 
             ready = searchSymptoms()

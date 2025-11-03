@@ -72,7 +72,7 @@ tests:
     - label: "Stop the default accessory"
       command: "Stop"
 
-    - label: "Start the default accessory with minCommissioningtimeoutInSeconds only"
+    - label: "Start the default accessory with minCommissioningTimeout only"
       command: "Start"
       arguments:
           values:
