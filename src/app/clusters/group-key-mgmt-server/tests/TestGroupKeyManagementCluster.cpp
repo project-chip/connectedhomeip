@@ -253,7 +253,7 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeSa
     VerifyGroupKeysMatch(fabricIndex, keys);
 }
 
-// Cluster should replace duplicate keys for the same group/keyset combination
+// Cluster should reject a write containing duplicate keys for the same group/keyset combination.
 TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeDuplicateKey)
 {
     const chip::FabricIndex fabricIndex = chip::app::Testing::kTestFabrixIndex;
