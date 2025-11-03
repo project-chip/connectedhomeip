@@ -50,9 +50,7 @@ class LogPipe(threading.Thread):
         self.start()
 
     def CapturedLogContains(self, txt: str, index=0):
-        logging.debug(f"Checking if CapturedLogContains {txt}")
         for i, line in enumerate(self.captured_logs[index:]):
-            logging.debug(f"Matching line {line} searching for {txt}, result {txt in line}")
             if txt in line:
                 return True, index + i
         return False, len(self.captured_logs)

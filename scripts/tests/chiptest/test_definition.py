@@ -98,10 +98,10 @@ class App:
         return True
 
     def waitForAnyAdvertisement(self):
-        self.__waitFor("mDNS service published:", self.process, self.outpipe)
+        self.__waitFor("mDNS service published:", "Starting event loop")
 
     def waitForMessage(self, message, timeoutInSeconds=10):
-        self.__waitFor(message, self.process, self.outpipe, timeoutInSeconds)
+        self.__waitFor(message, timeoutInSeconds=timeoutInSeconds)
         return True
 
     def kill(self):
@@ -142,30 +142,44 @@ class App:
                     self.kvsPathSet.add(value)
         return self.runner.RunSubprocess(app_cmd, name='APP ', wait=False)
 
-    def __waitFor(self, waitForString, server_process, outpipe, timeoutInSeconds=10):
-        logging.debug('Waiting for %s' % waitForString)
+    def __waitFor(self, *symptoms, **kwargs):
+        """
+        Wait for all provided symptom strings to appear in the capture log.
+        """
+        server_process = kwargs.get('server_process', self.process)
+        outpipe = kwargs.get('outpipe', self.outpipe)
+        timeoutInSeconds = kwargs.get('timeoutInSeconds', 10)
+
+        logging.info('Waiting for symptoms %r', symptoms)
 
         start_time = time.monotonic()
-        ready, self.lastLogIndex = outpipe.CapturedLogContains(
-            waitForString, self.lastLogIndex)
-        if ready:
-            self.lastLogIndex += 1
+        symptom_dict = {}
 
+        def searchSymptoms():
+            for s in symptoms:
+                # s[0] = found, s[1] = index
+                symptom_dict[s] = outpipe.CapturedLogContains(s, self.lastLogIndex)
+
+            ready = all([ s[0] for s in symptom_dict.values() ])
+            if ready:
+                self.lastLogIndex = max([ s[1] for s in symptom_dict.values() ]) + 1
+            logging.info('after searchSymptoms ready=%r: %r', ready, symptom_dict)
+            return ready
+
+        ready = searchSymptoms()
         while not ready:
             if server_process.poll() is not None:
-                died_str = ('Server died while waiting for %s, returncode %d' %
-                            (waitForString, server_process.returncode))
+                died_str = ('Server died while waiting for %r, returncode %d',
+                            symptoms, server_process.returncode)
                 logging.error(died_str)
                 raise Exception(died_str)
             if time.monotonic() - start_time > timeoutInSeconds:
-                raise Exception('Timeout while waiting for %s' % waitForString)
+                raise Exception('Timeout while waiting for %r', symptoms)
             time.sleep(0.1)
-            ready, self.lastLogIndex = outpipe.CapturedLogContains(
-                waitForString, self.lastLogIndex)
-            if ready:
-                self.lastLogIndex += 1
 
-        logging.debug('Success waiting for: %s' % waitForString)
+            ready = searchSymptoms()
+
+        logging.debug('Success waiting for: %r', symptoms)
 
     def __updateSetUpCode(self):
         qrLine = self.outpipe.FindLastMatchingLine('.*SetupQRCode: *\\[(.*)]')
@@ -193,6 +207,7 @@ class App:
                 self.process.wait(10)
             self.process = None
             self.outpipe = None
+            self.lastLogIndex = 0
         return True
 
 
