@@ -404,7 +404,7 @@ CHIP_ERROR GeneralCommissioningCluster::Startup(ServerClusterContext & context)
 
 void GeneralCommissioningCluster::Shutdown()
 {
-    PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>());
+    PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
     Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown();
 }
