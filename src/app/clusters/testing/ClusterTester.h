@@ -140,21 +140,26 @@ public:
         return mCluster->WriteAttribute(writeOperation.GetRequest(), decoder);
     }
 
-    // Invoke a command with `arguments`.
-    // The `arguments` parameter must be of the correct type for the command being invoked.
-    // Use `app::Clusters::<ClusterName>::Commands::<CommandName>::Type` for the `arguments` parameter to be spec compliant (see the
-    // comment of the class for usage example).
-    // Will construct the command path using the first path returned by `GetPaths()` on the cluster.
-    // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` returned an empty list.
     template <typename T>
-    std::optional<std::variant<app::DataModel::ActionReturnStatus, CommandResponse>> InvokeCommand(CommandId command_id,
-                                                                                                   const T & arguments)
+    std::optional<app::DataModel::ActionReturnStatus> InvokeCommand(CommandId commandId, const T & data,
+                                                                    app::CommandHandler * handler)
     {
-        VerifyOrReturnError(verifyClusterPathsValid(), CHIP_ERROR_INCORRECT_STATE);
-        auto path = mCluster->GetPaths()[0];
+        const auto & paths = mCluster.GetPaths();
+        VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
+        const app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
 
-        // TODO: Not Implemented
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        constexpr size_t kTlvBufferSize = 128; // Typically CommanderSender will use a TLV of size kMaxSecureSduLengthBytes. For
+                                               // now, just use 128 for the unit test.
+        uint8_t buffer[kTlvBufferSize];
+        TLV::TLVWriter tlvWriter;
+        tlvWriter.Init(buffer);
+        ReturnErrorOnFailure(data.Encode(tlvWriter, TLV::AnonymousTag()));
+
+        TLV::TLVReader tlvReader;
+        tlvReader.Init(buffer, tlvWriter.GetLengthWritten());
+        ReturnErrorOnFailure(tlvReader.Next());
+
+        return mCluster.InvokeCommand(request, tlvReader, handler);
     }
 
     // Compare the attributes of the cluster against the expected set.
