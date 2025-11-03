@@ -41,20 +41,6 @@ using namespace chip::Access;
 
 using chip::Protocols::InteractionModel::Status;
 
-namespace chip::app::Clusters {
-
-/*
- * ICD Management Implementation
- */
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-PersistentStorageDelegate * ICDManagementServer::mStorage           = nullptr;
-Crypto::SymmetricKeystore * ICDManagementServer::mSymmetricKeystore = nullptr;
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
-
-ICDConfigurationData * ICDManagementServer::mICDConfigurationData = nullptr;
-
-} // namespace chip::app::Clusters
-
 namespace {
 ICDManagementAttributeAccess gAttribute;
 #if CHIP_CONFIG_ENABLE_ICD_CIP
@@ -91,6 +77,8 @@ CHIP_ERROR CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & c
 } // anonymous namespace
 
 namespace chip::app::Clusters {
+
+ICDManagementServer ICDManagementServer::instance;
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 void ICDManagementFabricDelegate::Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore,
@@ -378,6 +366,11 @@ void ICDManagementServer::Init(PersistentStorageDelegate & storage, Crypto::Symm
     mICDConfigurationData = &icdConfigurationData;
 }
 
+void ICDManagementServer::OnICDModeChange()
+{
+    // Notify attribute change for OperatingMode attribute
+    MatterReportingAttributeChangeCallback(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::OperatingMode::Id);
+}
 } // namespace chip::app::Clusters
 
 /**********************************************************
@@ -394,8 +387,7 @@ bool emberAfIcdManagementClusterRegisterClientCallback(CommandHandler * commandO
 {
     uint32_t icdCounter = 0;
 
-    ICDManagementServer server;
-    Status status = server.RegisterClient(commandObj, commandPath, commandData, icdCounter);
+    Status status = ICDManagementServer::GetInstance().RegisterClient(commandObj, commandPath, commandData, icdCounter);
 
     if (Status::Success == status)
     {
@@ -417,8 +409,7 @@ bool emberAfIcdManagementClusterRegisterClientCallback(CommandHandler * commandO
 bool emberAfIcdManagementClusterUnregisterClientCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                          const Commands::UnregisterClient::DecodableType & commandData)
 {
-    ICDManagementServer server;
-    Status status = server.UnregisterClient(commandObj, commandPath, commandData);
+    Status status = ICDManagementServer::GetInstance().UnregisterClient(commandObj, commandPath, commandData);
 
     commandObj->AddStatus(commandPath, status);
     return true;
@@ -461,7 +452,8 @@ void MatterIcdManagementPluginServerInitCallback()
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttribute);
 
     // Configure ICD Management
-    ICDManagementServer::Init(storage, symmetricKeystore, icdConfigurationData);
+    ICDManagementServer::GetInstance().Init(storage, symmetricKeystore, icdConfigurationData);
+    chip::Server::GetInstance().GetICDManager().RegisterObserver(&ICDManagementServer::GetInstance());
 }
 
 void MatterIcdManagementPluginServerShutdownCallback()

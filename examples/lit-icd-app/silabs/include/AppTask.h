@@ -98,7 +98,7 @@ public:
     /**
      * @brief AppTask has no action to do on this ICD event. Do nothing.
      */
-    void OnICDModeChange();
+    void OnICDModeChange(){};
 
 private:
     static AppTask sAppTask;
