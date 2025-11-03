@@ -127,7 +127,6 @@ CHIP_ERROR NXPWiFiDriver::CommitConfiguration()
 
 CHIP_ERROR NXPWiFiDriver::RevertConfiguration()
 {
-    CHIP_ERROR err                      = CHIP_NO_ERROR;
     struct wlan_network searchedNetwork = { 0 };
 
     /* If network was added we have to remove it (only if device is not connected to a wifi network) from wifi driver to be able
@@ -143,15 +142,13 @@ CHIP_ERROR NXPWiFiDriver::RevertConfiguration()
         }
     }
 
+    /* Reset mStagingNetwork as it may have been updated during add/update network operation */
     mStagingNetwork = mSavedNetwork;
-    if (mStagingNetwork.ssidLen > 0)
-    {
-        // Connect to saved network
-        err =
-            ConnectWiFiNetwork(mSavedNetwork.ssid, mSavedNetwork.ssidLen, mSavedNetwork.credentials, mSavedNetwork.credentialsLen);
-    }
 
-    return err;
+    // succeed right away if no saved network
+    VerifyOrReturnError(mStagingNetwork.ssidLen > 0, CHIPO_NO_ERROR);
+    // Connect to saved network
+    return ConnectWiFiNetwork(mStagingNetwork.ssid, mStagingNetwork.ssidLen, mStagingNetwork.credentials, mStagingNetwork.credentialsLen);
 }
 
 bool NXPWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
