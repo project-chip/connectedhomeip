@@ -464,4 +464,5 @@ void MatterIcdManagementPluginServerShutdownCallback()
     FabricTable & fabricTable = Server::GetInstance().GetFabricTable();
     fabricTable.RemoveFabricDelegate(&gFabricDelegate);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
+    chip::Server::GetInstance().GetICDManager().ReleaseObserver(&ICDManagementServer::GetInstance());
 }
