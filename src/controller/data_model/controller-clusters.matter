@@ -3858,7 +3858,7 @@ cluster SmokeCoAlarm = 92 {
 
   bitmap Feature : bitmap32 {
     kSmokeAlarm = 0x1;
-    kCOAlarm = 0x2 [spec_name = "CO Alarm"];
+    kCoAlarm = 0x2;
   }
 
   critical event SmokeAlarm = 0 {

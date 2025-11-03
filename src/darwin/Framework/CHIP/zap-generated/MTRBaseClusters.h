@@ -19355,7 +19355,7 @@ typedef NS_ENUM(uint8_t, MTRSmokeCOAlarmSensitivity) {
 
 typedef NS_OPTIONS(uint32_t, MTRSmokeCOAlarmFeature) {
     MTRSmokeCOAlarmFeatureSmokeAlarm MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x1,
-    MTRSmokeCOAlarmFeatureCOAlarm MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x2,
+    MTRSmokeCOAlarmFeatureCoAlarm MTR_PROVISIONALLY_AVAILABLE = 0x2,
 } MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 typedef NS_OPTIONS(uint32_t, MTRDishwasherAlarmAlarmBitmap) {
