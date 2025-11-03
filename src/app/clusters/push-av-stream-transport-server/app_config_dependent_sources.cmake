@@ -24,3 +24,10 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
 )
+
+# Build and link uriparser library
+if(NOT TARGET uriparser::uriparser)
+    add_subdirectory("${CHIP_ROOT}/third_party/uriparser" "${CMAKE_BINARY_DIR}/uriparser")
+endif()
+
+target_link_libraries(${APP_TARGET} PRIVATE uriparser::uriparser)
