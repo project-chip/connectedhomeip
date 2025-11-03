@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "thermostat-server.h"
+#include "ThermostatCluster.h"
 #include "PresetStructWithOwnedMembers.h"
 
 #include <app/util/attribute-storage.h>
@@ -1222,13 +1222,13 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
             {
                 DesiredCoolingSetpoint = static_cast<int16_t>(CoolingSetpoint + amount * 10);
                 CoolLimit              = static_cast<int16_t>(DesiredCoolingSetpoint -
-                                                 EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
+                                                              EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
                 {
                     if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == Status::Success)
                     {
                         DesiredHeatingSetpoint = static_cast<int16_t>(HeatingSetpoint + amount * 10);
                         HeatLimit              = static_cast<int16_t>(DesiredHeatingSetpoint -
-                                                         EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
+                                                                      EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
                         {
                             if (CoolLimit != 0 || HeatLimit != 0)
                             {

@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <app/clusters/thermostat-server/thermostat-delegate.h>
+#include <app/clusters/thermostat-server/ThermostatDelegate.h>
 
 namespace chip {
 namespace app {

@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include "thermostat-server-presets.h"
-#include "thermostat-server.h"
+#include "ThermostatClusterPresets.h"
+#include "ThermostatCluster.h"
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 

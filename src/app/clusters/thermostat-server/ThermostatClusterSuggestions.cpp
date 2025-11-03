@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
+#include "ThermostatCluster.h"
+#include "ThermostatClusterPresets.h"
 #include "ThermostatSuggestionStructWithOwnedMembers.h"
-#include "thermostat-server-presets.h"
-#include "thermostat-server.h"
 
 #include <app/reporting/reporting.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
