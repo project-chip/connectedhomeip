@@ -35,22 +35,6 @@
 namespace chip {
 namespace Test {
 
-// This will be used for testing commands
-struct CommandResponse
-{
-    app::ConcreteCommandPath path;
-    CommandId responseId;
-    template <typename T>
-    CHIP_ERROR GetResponseData(T & dest)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-private:
-    uint8_t mResponseEncodeBuffer[128];
-    ByteSpan mEncodedSpan;
-};
-
 // Helper class for testing clusters.
 //
 // This class ensures that data read by attribute is referencing valid memory for all
