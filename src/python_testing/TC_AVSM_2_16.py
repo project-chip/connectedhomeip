@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CAMERA_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/avsm_2_16_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -31,6 +31,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
+#       --app-pipe /tmp/avsm_2_16_fifo
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -80,7 +81,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 4,
-                "TH establishes a WeRTC session via a ProvideOffer/Answer exchange using aVideoStreamID and aAudioStreamID.",
+                "TH ensures all Soft and Hard PrivacyModes are disabled/off and establishes a WeRTC session via a ProvideOffer/Answer exchange using aVideoStreamID and aAudioStreamID.",
                 "Verify the ProvideOfferResponse. Store the SessionID as aSessionID",
             ),
             TestStep(
@@ -178,6 +179,47 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         aAudioRefCount = aAllocatedAudioStreams[0].referenceCount
 
         self.step(4)
+        # Ensure privacy modes are not enabled before issuing WebRTC
+        # ProvideOffer command
+        self.privacySupport = (aFeatureMap & cluster.Bitmaps.Feature.kPrivacy) > 0
+        if self.privacySupport:
+            result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint)
+            asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
+            logger.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{False}")
+
+            softLivestreamPrivMode = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.SoftLivestreamPrivacyModeEnabled
+            )
+            asserts.assert_false(softLivestreamPrivMode, "SoftLivestreamPrivacyModeEnabled should be False")
+
+            result = await self.write_single_attribute(attr.SoftRecordingPrivacyModeEnabled(False), endpoint_id=endpoint)
+            asserts.assert_equal(result, Status.Success, "Error when trying to write SoftRecordingPrivacyModeEnabled")
+            logger.info(f"Tx'd : SoftRecordingPrivacyModeEnabled{False}")
+
+            softRecordingPrivMode = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.SoftRecordingPrivacyModeEnabled
+            )
+            asserts.assert_false(softRecordingPrivMode, "SoftRecordingPrivacyModeEnabled should be False")
+
+        if await self.attribute_guard(endpoint=endpoint, attribute=attr.HardPrivacyModeOn):
+            # For CI: Use app pipe to simulate physical privacy switch being turned on
+            # For manual testing: User should physically turn on the privacy switch
+            logger.info("HardPrivacy is supported")
+
+            if self.is_pics_sdk_ci_only:
+                self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": False})
+            else:
+                self.wait_for_user_input(
+                    "Please ensure that the physical privacy switch on the device is OFF, then press Enter to continue...")
+
+            # Verify the attribute reflects the privacy switch state
+            hard_privacy_mode = await self.read_single_attribute_check_success(
+                endpoint=endpoint,
+                cluster=Clusters.CameraAvStreamManagement,
+                attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOn
+            )
+            asserts.assert_false(hard_privacy_mode, "HardPrivacyModeOn should be False")
+
         # Establish WebRTC via Provide Offer/Answer
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
         webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(

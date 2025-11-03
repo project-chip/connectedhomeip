@@ -47,6 +47,10 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
         return await self.read_single_attribute_check_success(
             endpoint=self._DIMMABLELIGHT_ENDPOINT, cluster=Clusters.Objects.LevelControl, attribute=Clusters.Objects.LevelControl.Attributes.CurrentLevel)
 
+    async def _read_identify_time(self):
+        return await self.read_single_attribute_check_success(
+            endpoint=self._DIMMABLELIGHT_ENDPOINT, cluster=Clusters.Objects.Identify, attribute=Clusters.Objects.Identify.Attributes.IdentifyTime)
+
     def _read_on_off_pwrpc(self, device):
         result = device.rpcs.chip.rpc.Attributes.Read(
             endpoint=self._DIMMABLELIGHT_ENDPOINT,
@@ -98,8 +102,9 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
         return [TestStep(1, "[TC_DIMMABLELIGHT] Commissioning already done.", is_commissioning=True),
                 TestStep(2, "[TC_DIMMABLELIGHT] Test level control."),
                 TestStep(3, "[TC_DIMMABLELIGHT] Test toggle."),
-                TestStep(4, "[TC_DIMMABLELIGHT] Set up PwRPC connection."),
-                TestStep(5, "[TC_DIMMABLELIGHT] Test PwRPC on/off and level control.")]
+                TestStep(4, "[TC_DIMMABLELIGHT] Test identify."),
+                TestStep(5, "[TC_DIMMABLELIGHT] Set up PwRPC connection."),
+                TestStep(6, "[TC_DIMMABLELIGHT] Test PwRPC on/off and level control.")]
 
     @async_test_body
     async def test_TC_DIMMABLELIGHT(self):
@@ -137,6 +142,19 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
         asserts.assert_equal(await self._read_on_off(), not before)
 
         self.step(4)
+        asserts.assert_equal(await self._read_identify_time(), 0)
+        await self.send_single_cmd(
+            cmd=Clusters.Objects.Identify.Commands.Identify(
+                identifyTime=5),
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=self._DIMMABLELIGHT_ENDPOINT,
+        )
+        identify_time = await self._read_identify_time()
+        asserts.assert_greater(identify_time, 0)
+        asserts.assert_less_equal(identify_time, 5)
+
+        self.step(5)
         device_connection = create_device_serial_or_socket_connection(
             device="",
             baudrate=self._PW_RPC_BAUD_RATE,
@@ -149,7 +167,7 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
             device_tracing=False,
         )
 
-        self.step(5)
+        self.step(6)
         with device_connection as device:
             # Test onOff
             self._write_on_off_pwrpc(device, True)

@@ -89,13 +89,13 @@ void DefaultMediaController::UnregisterTransport(Transport * transport)
     }
 }
 
-void DefaultMediaController::DistributeVideo(const char * data, size_t size, uint16_t videoStreamID)
+void DefaultMediaController::DistributeVideo(const uint8_t * data, size_t size, uint16_t videoStreamID)
 {
     std::string streamKey = "v" + std::to_string(videoStreamID);
     mPreRollBuffer.PushFrameToBuffer(streamKey, data, size);
 }
 
-void DefaultMediaController::DistributeAudio(const char * data, size_t size, uint16_t audioStreamID)
+void DefaultMediaController::DistributeAudio(const uint8_t * data, size_t size, uint16_t audioStreamID)
 {
     std::string streamKey = "a" + std::to_string(audioStreamID);
     mPreRollBuffer.PushFrameToBuffer(streamKey, data, size);
@@ -114,4 +114,30 @@ void DefaultMediaController::SetPreRollLength(Transport * transport, uint16_t pr
     {
         ChipLogError(Camera, "SetDelay: Transport not registered");
     }
+}
+
+Transport * DefaultMediaController::GetTransportForVideoStream(uint16_t videoStreamID)
+{
+    std::lock_guard<std::mutex> lock(mConnectionsMutex);
+    for (const auto & conn : mConnections)
+    {
+        if (conn.videoStreamID == videoStreamID)
+        {
+            return conn.transport;
+        }
+    }
+    return nullptr;
+}
+
+Transport * DefaultMediaController::GetTransportForAudioStream(uint16_t audioStreamID)
+{
+    std::lock_guard<std::mutex> lock(mConnectionsMutex);
+    for (const auto & conn : mConnections)
+    {
+        if (conn.audioStreamID == audioStreamID)
+        {
+            return conn.transport;
+        }
+    }
+    return nullptr;
 }

@@ -58,6 +58,7 @@ class TC_WEBRTCP_2_14(MatterBaseTest, WEBRTCPTestBase):
         Define the step-by-step sequence for the test.
         """
         steps = [
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success"),
             TestStep(2, "TH writes `SoftRecordingPrivacyModeEnabled` to TRUE on CameraAVStreamManagement cluster",
@@ -67,23 +68,29 @@ class TC_WEBRTCP_2_14(MatterBaseTest, WEBRTCPTestBase):
             TestStep(4, "TH sends the ProvideOffer command with null WebRTCSessionID and StreamUsage = 2 (kAnalysis)",
                      "DUT responds with INVALID_IN_STATE status code"),
             TestStep(5, "TH sends the ProvideOffer command with null WebRTCSessionID and StreamUsage = 3 (kLiveView)",
-                     "DUT responds with INVALID_IN_STATE status code"),
+                     "DUT responds with a valid ProvideOfferResponse"),
         ]
         return steps
 
     def pics_TC_WEBRTCP_2_14(self) -> list[str]:
         pics = [
             "WEBRTCP.S",
+            "WEBRTCP.S.C02.Rsp",   # ProvideOffer command
             "AVSM.S",
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
+            "AVSM.S.A0013",        # SoftRecordingPrivacyModeEnabled attribute
         ]
         return pics
 
     @async_test_body
     async def test_TC_WEBRTCP_2_14(self):
         """
-        Executes the test steps for validating ProvideOffer behavior with SoftRecordingPrivacyModeEnabled.
+        Executes the test steps for validating ProvideOffer fails with SoftRecordingPrivacyModeEnabled.
         """
 
+        self.step("precondition")
+        # Commission DUT - already done
         endpoint = self.get_endpoint(default=1)
 
         self.step(1)
@@ -168,7 +175,7 @@ class TC_WEBRTCP_2_14(MatterBaseTest, WEBRTCPTestBase):
                                  "Expected INVALID_IN_STATE for kAnalysis when SoftRecordingPrivacyModeEnabled is True")
 
         self.step(5)
-        # Send ProvideOffer command with StreamUsage = 3 (kLiveView) - should fail with INVALID_IN_STATE
+        # Send ProvideOffer command with StreamUsage = 3 (kLiveView) - should pass
         cmd = Clusters.WebRTCTransportProvider.Commands.ProvideOffer(
             webRTCSessionID=NullValue,
             sdp=common_sdp,
@@ -178,12 +185,9 @@ class TC_WEBRTCP_2_14(MatterBaseTest, WEBRTCPTestBase):
             audioStreamID=audioStreamID
         )
 
-        try:
-            await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-            asserts.fail("Expected ProvideOffer with kLiveView to fail with INVALID_IN_STATE when SoftRecordingPrivacyModeEnabled is True")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.InvalidInState,
-                                 "Expected INVALID_IN_STATE for kLiveView when SoftRecordingPrivacyModeEnabled is True")
+        resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+        asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.ProvideOfferResponse,
+                             "Incorrect response type")
 
 
 if __name__ == "__main__":

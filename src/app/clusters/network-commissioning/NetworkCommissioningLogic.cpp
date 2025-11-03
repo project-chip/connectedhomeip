@@ -22,7 +22,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/general-commissioning-server/general-commissioning-server.h>
+#include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
 #include <app/clusters/network-commissioning/ThreadScanResponse.h>
 #include <app/clusters/network-commissioning/WifiScanResponse.h>
 #include <app/data-model/Nullable.h>
@@ -382,8 +382,7 @@ NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetwork(CommandHandler & handler
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
         if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
         {
-            HandleAddOrUpdateWiFiNetworkWithPDC(handler, commandPath, req);
-            return;
+            return HandleAddOrUpdateWiFiNetworkWithPDC(handler, commandPath, req);
         }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
         return Protocols::InteractionModel::Status::InvalidCommand;
@@ -581,7 +580,7 @@ NetworkCommissioningLogic::HandleAddOrUpdateThreadNetwork(CommandHandler & handl
 void NetworkCommissioningLogic::UpdateBreadcrumb(const Optional<uint64_t> & breadcrumb)
 {
     VerifyOrReturn(breadcrumb.HasValue());
-    GeneralCommissioning::SetBreadcrumb(breadcrumb.Value());
+    GeneralCommissioningCluster::Instance().SetBreadCrumb(breadcrumb.Value());
 }
 
 void NetworkCommissioningLogic::CommitSavedBreadcrumb()

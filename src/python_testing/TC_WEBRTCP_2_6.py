@@ -43,29 +43,40 @@ import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCProvider_2_6(MatterBaseTest, WEBRTCPTestBase):
+class TC_WebRTCP_2_6(MatterBaseTest, WEBRTCPTestBase):
 
-    def desc_TC_WebRTCProvider_2_6(self) -> str:
+    def desc_TC_WebRTCP_2_6(self) -> str:
         """Returns a description of this test"""
         return "[TC-{picsCode}-2.6] Validate CameraAVStreamManagement cluster presence on endpoint"
 
-    def steps_TC_WebRTCProvider_2_6(self) -> list[TestStep]:
+    def steps_TC_WebRTCP_2_6(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
         steps = [
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH reads the descriptor cluster on the endpoint containing the WebRTC Transport Provider cluster"),
             TestStep(2, "TH verifies CameraAVStreamManagement cluster (ID 0x0551) is present in the server cluster list"),
         ]
         return steps
 
+    def pics_TC_WebRTCP_2_6(self) -> list[str]:
+        """
+        Return the list of PICS applicable to this test case.
+        """
+        pics = [
+            "WEBRTCP.S",           # WebRTC Transport Provider Server
+        ]
+        return pics
+
     @async_test_body
-    async def test_TC_WebRTCProvider_2_6(self):
+    async def test_TC_WebRTCP_2_6(self):
         """
         Executes the test steps for validating CameraAVStreamManagement cluster presence.
         """
 
-        # Find the endpoint that has WebRTC Transport Provider cluster
+        self.step("precondition")
+        # Commission DUT - already done
         webrtc_endpoint = self.get_endpoint(default=1)
 
         self.step(1)

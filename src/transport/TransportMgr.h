@@ -66,7 +66,7 @@ public:
      * @param conn      the connection object
      * @param conErr    the connection error on the attempt, or CHIP_NO_ERROR.
      */
-    virtual void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr){};
+    virtual void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr){};
 
     virtual void HandleConnectionClosed(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr){};
 

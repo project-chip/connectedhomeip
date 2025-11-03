@@ -51,6 +51,7 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
 
     def steps_TC_WEBRTCP_2_9(self) -> list[TestStep]:
         steps = [
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success and provides stream IDs"),
             TestStep(2, "TH sends the SolicitOffer command with valid parameters and no ICEServers or ICETransportPolicy fields",
@@ -69,7 +70,11 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
     def pics_TC_WEBRTCP_2_9(self) -> list[str]:
         pics = [
             "WEBRTCP.S",
+            "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
+            "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
             "AVSM.S",
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
         ]
         return pics
 
@@ -88,7 +93,12 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
 
     @async_test_body
     async def test_TC_WEBRTCP_2_9(self):
+        """
+        Executes the test steps for validating SolicitOffer with ICEServers and ICETransportPolicy.
+        """
 
+        self.step("precondition")
+        # Commission DUT - already done
         endpoint = self.user_params.get("endpoint", 1)
 
         self.step(1)
