@@ -94,7 +94,6 @@ for ((i = 2; i <= "$MAX_RANGE"; i++)); do
     BUILT_IMAGES_STACK+=("$OTA_IMAGE_PATH")
 done
 
-
 echo "Generated files"
 for item in "${BUILT_IMAGES_STACK[@]}"; do
     echo "$item"
