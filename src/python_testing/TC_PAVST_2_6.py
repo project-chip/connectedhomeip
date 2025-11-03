@@ -249,7 +249,7 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         event_callback = EventSubscriptionHandler(expected_cluster=pvcluster)
         await event_callback.start(self.default_controller,
                                    self.dut_node_id,
-                                   self.get_endpoint(1))
+                                   self.get_endpoint())
         cmd = pvcluster.Commands.SetTransportStatus(
             connectionID=aConnectionID,
             transportStatus=not aTransportStatus

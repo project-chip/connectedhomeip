@@ -251,7 +251,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         event_callback = EventSubscriptionHandler(expected_cluster=Clusters.RefrigeratorAlarm)
         await event_callback.start(self.default_controller,
                                    self.dut_node_id,
-                                   self.get_endpoint(1))
+                                   self.get_endpoint())
 
         self.step(12)
         # repeat step 4 and 5
