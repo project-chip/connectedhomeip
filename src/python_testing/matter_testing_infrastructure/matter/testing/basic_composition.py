@@ -35,7 +35,7 @@ from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Attribute import AttributeCache, ValueDecodeFailure
 from matter.MatterTlvJson import TLVJsonConverter
 from matter.testing.conformance import ConformanceException
-from matter.testing.matter_testing import MatterTestConfig, ProblemNotice
+from matter.testing.matter_testing import MatterBaseTest, MatterTestConfig, ProblemNotice
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
 
 LOGGER = logging.getLogger(__name__)
@@ -136,7 +136,7 @@ def JsonToMatterTlv(json_filename: str) -> AttributeCache:
         return converter.convert_dump_to_cache(json_tlv)
 
 
-class BasicCompositionTests:
+class BasicCompositionTests(MatterBaseTest):
     # These attributes are initialized/provided by the inheriting test class (MatterBaseTest)
     # or its setup process. Providing type hints here for mypy.
     default_controller: ChipDeviceController
