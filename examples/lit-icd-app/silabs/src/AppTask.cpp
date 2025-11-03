@@ -166,5 +166,5 @@ void AppTask::OnEnterIdleMode()
 
 void AppTask::OnICDModeChange()
 {
-    MatterReportingAttributeChangeCallback(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::OperatingMode::Id);
+    MatterReportingAttributeChangeCallback(kRootEndpointId, chip::app::Clusters::IcdManagement::Id, chip::app::Clusters::IcdManagement::Attributes::OperatingMode::Id);
 }
