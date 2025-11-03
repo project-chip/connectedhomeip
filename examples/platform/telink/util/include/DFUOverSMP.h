@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 /**
  *    @file
  *      Provides an implementation of Device Firmware Upgrade using SMP protocol
- *      over Bluetooth LE functionality for nRF Connect SDK platform.
+ *      over Bluetooth LE functionality for Telink platform.
  */
 
 #pragma once

@@ -83,7 +83,7 @@ config SIGNED_OTA_IMAGE_FILE_NAME
 	string "Zephyr signed image file name"
 	default "zephyr.signed.lzma.signed.bin" if COMPRESS_LZMA
 	default "zephyr.signed.bin"
-	depends on CHIP_OTA_REQUESTOR
+	depends on BOOTLOADER_MCUBOOT
 	help
 	  Provides the file name of the generated Zephyr signed image.
 
@@ -97,10 +97,9 @@ config TELINK_OTA_BUTTON_TEST
 
 config CHIP_DFU_OVER_BT_SMP
 	bool "Enable DFU over Bluetooth LE SMP feature set"
+	select BOOTLOADER_MCUBOOT
 	select MCUMGR
 	select MCUMGR_TRANSPORT_BT
-	select IMG_MANAGER
-	select STREAM_FLASH
 	select ZCBOR
 	select MCUMGR_GRP_IMG
 	select MCUMGR_GRP_OS

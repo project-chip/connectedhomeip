@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022-2024 Project CHIP Authors
+#    Copyright (c) 2022-2025 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ chip_configure_data_model(app
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../light-switch-common/light-switch-app.zap
 )
 
-if(CONFIG_BOOTLOADER_MCUBOOT OR CONFIG_MCUMGR_TRANSPORT_BT)
+if(CONFIG_BOOTLOADER_MCUBOOT)
   target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
 endif()
 
