@@ -1382,12 +1382,13 @@ JNI_METHOD(void, continueCommissioningAfterConnectNetworkRequest)(JNIEnv * env, 
     wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
     VerifyOrExit(wrapper != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    wrapper->Controller()->ContinueCommissioningAfterConnectNetworkRequest(static_cast<NodeId>(remoteDeviceId));
+    err = wrapper->Controller()->ContinueCommissioningAfterConnectNetworkRequest(static_cast<NodeId>(remoteDeviceId));
+    SuccessOrExit(err);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to continue Commissioning after Connect Network Request. : %" CHIP_ERROR_FORMAT,
+        ChipLogError(Controller, "Failed to continue Commissioning after Connect Network Request: %" CHIP_ERROR_FORMAT,
                      err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
