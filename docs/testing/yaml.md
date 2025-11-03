@@ -271,11 +271,32 @@ the test harness. Note that full-test gating is not currently implemented in the
 local runner or in the CI.
 
 Some test steps need to be gated on values from earlier in the test. In these
-cases, PICS cannot be used. Instead, the runIf: tag can be used. This tag
+cases, PICS cannot be used. Instead, the `runIf` tag can be used. This tag
 requires a boolean value. To convert values to booleans, the TestEqualities
 function can be use. See
 [TestEqualities](https://github.com/project-chip/connectedhomeip/blob/master/src/app/tests/suites/TestEqualities.yaml)
 for an example of how to use this pseudo-cluster.
+
+In addition to the `PICS` and `runIf` tags, there are the `minRevision` and
+`maxRevision` tags which use the step's `cluster`'s `ClusterRevision` attribute
+to determine if a step should be skipped because it only applies to older or
+newer versions. A step will be skipped if the cluster's `ClusterRevision`
+attribute is < `minRevision` (if present), or > `maxRevision` (if present).
+
+Here is an example of only checking for the value of a given attribute if
+`ClusterRevision` >= 3 using `minRevision`.
+
+```yaml
+- label: "Verify the minimum-to-support Max Paths Per Invoke value"
+  command: "readAttribute"
+  attribute: "MaxPathsPerInvoke"
+  minRevision:
+      3 # Attribute was added in revision 3, so this step applies
+      # to revision >= 3.
+  response:
+      constraints:
+          minValue: 1
+```
 
 #### Setting step timeouts
 

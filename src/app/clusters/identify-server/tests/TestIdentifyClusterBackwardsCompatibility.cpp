@@ -17,8 +17,10 @@
 
 #include "ClusterActions.h"
 #include "TestTimerDelegate.h"
+#include <app/ConcreteClusterPath.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <gtest/gtest.h>
 
 using namespace chip;
@@ -26,6 +28,11 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Identify;
 using namespace chip::app::Clusters::Identify::Attributes;
+
+// Forward declaration of the callback to emulate ember initialization
+void MatterIdentifyClusterInitCallback(chip::EndpointId endpointId);
+// Stub for DataModelHandler init function
+void InitDataModelHandler() {}
 
 namespace {
 
@@ -155,6 +162,21 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestMActive)
     // Test that mActive is false after writing 0 to IdentifyTime.
     EXPECT_EQ(WriteAttribute(identify.mCluster.Cluster(), IdentifyTime::Id, 0u), CHIP_NO_ERROR);
     EXPECT_FALSE(identify.mActive);
+}
+
+TEST_F(TestIdentifyClusterBackwardsCompatibility, TestLateLegacyInstantiation)
+{
+    EndpointId endpointId = 1;
+
+    // Call MatterIdentifyClusterInitCallback(enpointId) to emulate ember initialization
+    MatterIdentifyClusterInitCallback(endpointId);
+
+    // Instantiate legacy Identify late (after the callback/ember init)
+    struct Identify identify(endpointId, nullptr, nullptr, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone);
+
+    // Check the cluster is properly registered in the CodegenDMP Registry
+    EXPECT_TRUE(CodegenDataModelProvider::Instance().Registry().Get(ConcreteClusterPath(endpointId, Clusters::Identify::Id)) !=
+                nullptr);
 }
 
 } // namespace
