@@ -751,6 +751,12 @@ public class ChipDeviceController {
     }
   }
 
+  public void onCommissioningStageStart(long nodeId, String stage) {
+    if (completionListener != null) {
+      completionListener.onCommissioningStageStart(nodeId, stage);
+    }
+  }
+
   public void onReadCommissioningInfo(
       int vendorId, int productId, int wifiEndpointId, int threadEndpointId) {
     if (completionListener != null) {
@@ -1897,6 +1903,9 @@ public class ChipDeviceController {
 
     /** Notifies the completion of each stage of commissioning. */
     void onCommissioningStatusUpdate(long nodeId, String stage, long errorCode);
+
+    /** Notifies when a commissioning stage starts. */
+    void onCommissioningStageStart(long nodeId, String stage);
 
     /** Notifies that the Chip connection has been closed. */
     void onNotifyChipConnectionClosed();
