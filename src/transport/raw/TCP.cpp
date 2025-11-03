@@ -632,7 +632,7 @@ CHIP_ERROR TCPBase::DoHandleIncomingConnection(const Inet::TCPEndPointHandle & l
     // continue to propagate to failure callbacks to avoid flaky tests
     if (getPeerError != CHIP_NO_ERROR)
     {
-        SuccessOrLog(getPeerError, Inet, "Failure getting peer info, using fallback");
+        ChipLogFailure(getPeerError, Inet, "Failure getting peer info, using fallback");
         addr = PeerAddress::TCP(peerAddress, peerPort, Inet::InterfaceId::Null());
     }
     ActiveTCPConnectionState * activeConnection = AllocateConnection(endPoint, addr);
