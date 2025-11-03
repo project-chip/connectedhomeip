@@ -5942,6 +5942,67 @@ public static class ActivatedCarbonFilterMonitoringClusterReplacementProductStru
     return output.toString();
   }
 }
+public static class WaterTankLevelMonitoringClusterReplacementProductStruct {
+  public Integer productIdentifierType;
+  public String productIdentifierValue;
+  private static final long PRODUCT_IDENTIFIER_TYPE_ID = 0L;
+  private static final long PRODUCT_IDENTIFIER_VALUE_ID = 1L;
+
+  public WaterTankLevelMonitoringClusterReplacementProductStruct(
+    Integer productIdentifierType,
+    String productIdentifierValue
+  ) {
+    this.productIdentifierType = productIdentifierType;
+    this.productIdentifierValue = productIdentifierValue;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(PRODUCT_IDENTIFIER_TYPE_ID, new UIntType(productIdentifierType)));
+    values.add(new StructElement(PRODUCT_IDENTIFIER_VALUE_ID, new StringType(productIdentifierValue)));
+
+    return new StructType(values);
+  }
+
+  public static WaterTankLevelMonitoringClusterReplacementProductStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer productIdentifierType = null;
+    String productIdentifierValue = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == PRODUCT_IDENTIFIER_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          productIdentifierType = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == PRODUCT_IDENTIFIER_VALUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          productIdentifierValue = castingValue.value(String.class);
+        }
+      }
+    }
+    return new WaterTankLevelMonitoringClusterReplacementProductStruct(
+      productIdentifierType,
+      productIdentifierValue
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WaterTankLevelMonitoringClusterReplacementProductStruct {\n");
+    output.append("\tproductIdentifierType: ");
+    output.append(productIdentifierType);
+    output.append("\n");
+    output.append("\tproductIdentifierValue: ");
+    output.append(productIdentifierValue);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct {
   public Long rangeMin;
   public Long rangeMax;

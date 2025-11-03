@@ -563,6 +563,15 @@ static BOOL CommandNeedsTimedInvokeInActivatedCarbonFilterMonitoringCluster(Attr
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInWaterTankLevelMonitoringCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WaterTankLevelMonitoring;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInBooleanStateConfigurationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::BooleanStateConfiguration;
@@ -1550,6 +1559,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return CommandNeedsTimedInvokeInActivatedCarbonFilterMonitoringCluster(commandID);
+    }
+    case Clusters::WaterTankLevelMonitoring::Id: {
+        return CommandNeedsTimedInvokeInWaterTankLevelMonitoringCluster(commandID);
     }
     case Clusters::BooleanStateConfiguration::Id: {
         return CommandNeedsTimedInvokeInBooleanStateConfigurationCluster(commandID);

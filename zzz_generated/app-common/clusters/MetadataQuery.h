@@ -280,6 +280,8 @@
 #include <clusters/WaterHeaterManagement/MetadataProvider.h>
 #include <clusters/WaterHeaterMode/Ids.h>
 #include <clusters/WaterHeaterMode/MetadataProvider.h>
+#include <clusters/WaterTankLevelMonitoring/Ids.h>
+#include <clusters/WaterTankLevelMonitoring/MetadataProvider.h>
 #include <clusters/WebRTCTransportProvider/Ids.h>
 #include <clusters/WebRTCTransportProvider/MetadataProvider.h>
 #include <clusters/WebRTCTransportRequestor/Ids.h>
@@ -990,6 +992,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == WaterHeaterMode::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, WaterHeaterMode::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == WaterTankLevelMonitoring::Id) || ...))
+    {
+        if (id == WaterTankLevelMonitoring::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, WaterTankLevelMonitoring::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == WebRTCTransportProvider::Id) || ...))
     {

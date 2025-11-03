@@ -155,6 +155,7 @@
 #include <clusters/WakeOnLan/EventIds.h>
 #include <clusters/WaterHeaterManagement/EventIds.h>
 #include <clusters/WaterHeaterMode/EventIds.h>
+#include <clusters/WaterTankLevelMonitoring/EventIds.h>
 #include <clusters/WebRTCTransportProvider/EventIds.h>
 #include <clusters/WebRTCTransportRequestor/EventIds.h>
 #include <clusters/WiFiNetworkDiagnostics/EventIds.h>

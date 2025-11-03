@@ -1205,6 +1205,12 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @property (nonatomic, copy) NSString * _Nonnull productIdentifierValue MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 @end
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRWaterTankLevelMonitoringClusterReplacementProductStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull productIdentifierType MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull productIdentifierValue MTR_PROVISIONALLY_AVAILABLE;
+@end
+
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRBooleanStateConfigurationClusterAlarmsStateChangedEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull alarmsActive MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
