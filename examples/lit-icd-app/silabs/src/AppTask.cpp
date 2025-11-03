@@ -163,3 +163,8 @@ void AppTask::OnEnterIdleMode()
     sAppTask.GetLCD().WriteDemoUI(false);
 #endif
 }
+
+void AppTask::OnICDModeChange()
+{
+    MatterReportingAttributeChangeCallback(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::OperatingMode::Id);
+}

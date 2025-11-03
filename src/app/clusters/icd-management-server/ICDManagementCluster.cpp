@@ -317,9 +317,8 @@ Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const Co
     {
         // Notify subscribers that the first entry for the fabric was successfully added
         TriggerICDMTableUpdatedEvent();
-        MatterReportingAttributeChangeCallback(0, IcdManagement::Id, IcdManagement::Attributes::OperatingMode::Id);
     }
-    MatterReportingAttributeChangeCallback(0, IcdManagement::Id, IcdManagement::Attributes::RegisteredClients::Id);
+    MatterReportingAttributeChangeCallback(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::RegisteredClients::Id);
     icdCounter = mICDConfigurationData->GetICDCounter().GetValue();
     return Status::Success;
 }
@@ -356,10 +355,9 @@ Status ICDManagementServer::UnregisterClient(CommandHandler * commandObj, const 
     if (table.IsEmpty())
     {
         TriggerICDMTableUpdatedEvent();
-        MatterReportingAttributeChangeCallback(0, IcdManagement::Id, IcdManagement::Attributes::OperatingMode::Id);
     }
 
-    MatterReportingAttributeChangeCallback(0, IcdManagement::Id, IcdManagement::Attributes::RegisteredClients::Id);
+    MatterReportingAttributeChangeCallback(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::RegisteredClients::Id);
     return Status::Success;
 }
 
