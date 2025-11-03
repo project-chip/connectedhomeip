@@ -46,8 +46,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
         .Set<BasicInformation::Attributes::ProductLabel::Id>()
         .Set<BasicInformation::Attributes::SerialNumber::Id>()
         .Set<BasicInformation::Attributes::LocalConfigDisabled::Id>()
-        .Set<BasicInformation::Attributes::Reachable::Id>()
-        .Set<BasicInformation::Attributes::ProductAppearance::Id>();
+        .Set<BasicInformation::Attributes::Reachable::Id>();
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
 
