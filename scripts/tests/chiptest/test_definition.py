@@ -65,7 +65,7 @@ class App:
             # Make sure to assign self.process before we do any operations that
             # might fail, so attempts to kill us on failure actually work.
             self.process, self.outpipe, _ = self.__startServer()
-            self.waitForAnyAdvertisement()
+            self.waitForApplicationUp()
             self.__updateSetUpCode()
             with self.cv_stopped:
                 self.stopped = False
@@ -97,7 +97,10 @@ class App:
 
         return True
 
-    def waitForAnyAdvertisement(self):
+    def waitForApplicationUp(self):
+        # Watch for both mDNS advertisement start as well as event loop start.
+        # These two messages can appear in any order depending on the implementation.
+        # Waiting for both makes the startup detection more robust.
         self.__waitFor("mDNS service published:", "Starting event loop")
 
     def waitForMessage(self, message, timeoutInSeconds=10):
