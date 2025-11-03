@@ -267,7 +267,7 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeDu
     auto path = chip::app::ConcreteAttributePath(chip::kRootEndpointId, GroupKeyManagement::Id,
                                                  GroupKeyManagement::Attributes::GroupKeyMap::Id);
 
-    CHIP_ERROR err = chip::Test::WriteClusterAttribute(mCluster, path, listToWrite);
+    CHIP_ERROR err = tester.WriteAttribute(mCluster, GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, fabricIndex);
 
     ASSERT_EQ(err, CHIP_ERROR_DUPLICATE_KEY_ID);
 

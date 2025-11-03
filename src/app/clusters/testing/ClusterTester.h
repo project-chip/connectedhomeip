@@ -138,6 +138,28 @@ public:
         }
     };
 
+    // Helper function to invoke a command and return the result.
+    template <typename T>
+    std::optional<chip::app::DataModel::ActionReturnStatus> InvokeCommand(chip::CommandId commandId, const T & data,
+                                                                          app::CommandHandler * handler)
+    {
+        const auto & paths = mCluster.GetPaths();
+        VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
+        const chip::app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
+
+        constexpr size_t kTlvBufferSize = 128; // Typically CommanderSender will use a TLV of size kMaxSecureSduLengthBytes. For
+                                               // now, just use 128 for the unit test.
+        uint8_t buffer[kTlvBufferSize];
+        chip::TLV::TLVWriter tlvWriter;
+        tlvWriter.Init(buffer);
+        ReturnErrorOnFailure(data.Encode(tlvWriter, chip::TLV::AnonymousTag()));
+
+        chip::TLV::TLVReader tlvReader;
+        tlvReader.Init(buffer, tlvWriter.GetLengthWritten());
+        ReturnErrorOnFailure(tlvReader.Next());
+
+        return mCluster.InvokeCommand(request, tlvReader, handler);
+    }
     /*
      * CHIP Test Cluster Write Helpers
      *
@@ -416,17 +438,7 @@ private:
     TestServerClusterContext mTestServerClusterContext{};
     app::ServerClusterInterface & mCluster;
     std::unique_ptr<app::Testing::ReadOperation> mReadOperation;
-
-    // Buffer size for TLV encoding/decoding of command payloads.
-    // 256 bytes was chosen as a conservative upper bound for typical command payloads in tests.
-    // All command payloads used in tests must fit within this buffer; tests with larger payloads will fail.
-    // If protocol or test requirements change, this value may need to be increased.
-    static constexpr size_t kTlvBufferSize = 256;
-
-    app::ConcreteCommandPath mCommandPath;
-    app::DataModel::InvokeRequest mRequest;
-    app::Testing::MockCommandHandler mHandler;
-    uint8_t mTlvBuffer[kTlvBufferSize];
 };
+
 } // namespace Test
 } // namespace chip
