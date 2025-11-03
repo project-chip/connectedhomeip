@@ -118,11 +118,11 @@ public:
 
         TLV::TLVReader reader;
 
-        ReturnErrorOnFailure(request.Encode(writer, TLV::AnonymousTag()));
-        ReturnErrorOnFailure(writer.Finalize());
+        VerifyOrReturnValue(request.Encode(writer, TLV::AnonymousTag()) == CHIP_NO_ERROR, std::nullopt);
+        VerifyOrReturnValue(writer.Finalize() == CHIP_NO_ERROR, std::nullopt);
 
         reader.Init(mTlvBuffer, writer.GetLengthWritten());
-        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+        VerifyOrReturnValue(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()) == CHIP_NO_ERROR, std::nullopt);
 
         return mCluster.InvokeCommand(mRequest, reader, &mHandler);
     }
