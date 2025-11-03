@@ -2230,11 +2230,13 @@ PICS:
       id: OPCREDS.S.C08.Tx
 
     - label:
-          "Does the Device(Server) invoking/generating the SetVIDVerificationStatement command?"
+          "Does the Device(Server) invoking/generating the
+          SetVIDVerificationStatement command?"
       id: OPCREDS.S.C0c.Tx
 
     - label:
-          "Does the Device(Server) invoking/generating the SignVIDVerificationRequest command?"
+          "Does the Device(Server) invoking/generating the
+          SignVIDVerificationRequest command?"
       id: OPCREDS.S.C0d.Tx
 
     - label:
