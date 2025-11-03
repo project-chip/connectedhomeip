@@ -307,7 +307,7 @@ class CADMINBaseTest(MatterBaseTest):
 
         try:
             comm_params = await th.OpenCommissioningWindow(
-                nodeid=node_id,
+                nodeId=node_id,
                 timeout=timeout,
                 iteration=iteration,
                 discriminator=discriminator if discriminator is not None else random.randint(0, 4095),

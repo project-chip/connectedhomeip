@@ -331,7 +331,7 @@ class TC_OPCREDS_3_4(MatterBaseTest):
 
         self.step(31)
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
 
 
 if __name__ == "__main__":
