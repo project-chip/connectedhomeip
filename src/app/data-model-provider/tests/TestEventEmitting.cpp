@@ -50,7 +50,7 @@ TEST(TestInteractionModelEventEmitting, TestBasicType)
 
     auto eventInfo = logOnlyEvents.GetNextEvent();
     ASSERT_TRUE(eventInfo.has_value());
-    ASSERT_EQ(n1, eventInfo->eventNumber); // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_EQ(n1, eventInfo->eventNumber);   // NOLINT(bugprone-unchecked-optional-access)
     ASSERT_EQ(eventInfo->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
               ConcreteEventPath(0 /* endpointId */, StartUpEventType::GetClusterId(), StartUpEventType::GetEventId()));
 
@@ -95,7 +95,7 @@ TEST(TestInteractionModelEventEmitting, TestFabricScoped)
     n1                = events->GenerateEvent(event, /* endpointId = */ 0);
 
     auto eventInfo = logOnlyEvents.GetNextEvent();
-    ASSERT_EQ(n1, eventInfo->eventNumber); // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_EQ(n1, eventInfo->eventNumber);   // NOLINT(bugprone-unchecked-optional-access)
     ASSERT_EQ(eventInfo->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
               ConcreteEventPath(0 /* endpointId */, AccessControlEntryChangedType::GetClusterId(),
                                 AccessControlEntryChangedType::GetEventId()));
