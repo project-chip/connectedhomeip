@@ -279,6 +279,7 @@ static_library("interaction-model") {
       "${chip_root}/src/app:required-privileges",
       "${chip_root}/src/app/clusters/ota-provider",
       "${chip_root}/src/app/common:attribute-type",
+      "${chip_root}/src/app/data-model-provider",
     ]
 
     public_configs += [ ":config-controller-dynamic-server" ]

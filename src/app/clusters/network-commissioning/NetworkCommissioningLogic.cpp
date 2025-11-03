@@ -382,8 +382,7 @@ NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetwork(CommandHandler & handler
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
         if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
         {
-            HandleAddOrUpdateWiFiNetworkWithPDC(handler, commandPath, req);
-            return;
+            return HandleAddOrUpdateWiFiNetworkWithPDC(handler, commandPath, req);
         }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
         return Protocols::InteractionModel::Status::InvalidCommand;

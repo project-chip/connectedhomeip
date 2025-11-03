@@ -16,6 +16,9 @@ declare_args() {
   # Matter SDK Configuration flag to enable ICD server functionality
   chip_enable_icd_server = false
 
+  # Enable the ICD server check-in on report timeout
+  chip_enable_icd_checkin_on_report_timeout = true
+
   chip_enable_icd_lit = false
 
   # Matter SDK Configuration flag to make the ICD manager emit a report on entering active mode
