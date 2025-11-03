@@ -44,7 +44,19 @@ DataModel::ActionReturnStatus OtaRequestorCluster::ReadAttribute(
     const DataModel::ReadAttributeRequest & request,
     AttributeValueEncoder & encoder)
 {
-    return Protocols::InteractionModel::Status::UnsupportedRead;
+    switch (request.path.mAttributeId)
+    {
+    case Attributes::DefaultOTAProviders::Id:
+        return Protocols::InteractionModel::Status::UnsupportedRead;
+    case Attributes::UpdatePossible::Id:
+        return Protocols::InteractionModel::Status::UnsupportedRead;
+    case Attributes::UpdateStatus::Id:
+        return Protocols::InteractionModel::Status::UnsupportedRead;
+    case Attributes::UpdateStatusProgress::Id:
+        return Protocols::InteractionModel::Status::UnsupportedRead;
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    }
 }
 
 CHIP_ERROR OtaRequestorCluster::Attributes(const ConcreteClusterPath & path,

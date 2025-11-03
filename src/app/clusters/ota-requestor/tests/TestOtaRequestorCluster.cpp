@@ -21,6 +21,7 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
+#include <app/data-model/Nullable.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -31,6 +32,7 @@
 #include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
 #include <clusters/OtaSoftwareUpdateRequestor/EventIds.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Metadata.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Structs.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -253,6 +255,57 @@ TEST_F(TestOtaRequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
         tester.InvokeCommand(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload, nullptr);
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(result.value(), DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
+}
+
+TEST_F(TestOtaRequestorCluster, ReadAttributesTest)
+{
+    chip::Test::TestServerClusterContext context;
+    MockOtaRequestor otaRequestor;
+    OtaRequestorCluster cluster(kTestEndpointId, otaRequestor);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    chip::Test::ClusterTester tester(cluster);
+
+    // Read and verify DefaultOTAProviders.
+    DataModel::DecodableList<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> defaultOtaProviders;
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id,
+                                   defaultOtaProviders),
+              CHIP_NO_ERROR);
+    size_t defaultOtaProvidersSize;
+    defaultOtaProviders.ComputeSize(&defaultOtaProvidersSize);
+    EXPECT_EQ(defaultOtaProvidersSize, 0u);
+
+    // Read and verify UpdatePossible.
+    bool updatePossible;
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, updatePossible),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(updatePossible);
+
+    // Read and verify UpdateState.
+    OtaSoftwareUpdateRequestor::UpdateStateEnum updateState;
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id, updateState),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(updateState, OtaSoftwareUpdateRequestor::UpdateStateEnum::kIdle);
+
+    // Read and verify UpdateStateProgress.
+    DataModel::Nullable<uint8_t> updateStateProgress;
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, updateStateProgress),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(updateStateProgress.IsNull());
+
+    // Read and verify FeatureMap.
+    uint32_t featureMap;
+    EXPECT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, 0u);
+
+    // Read and verify ClusterRevision.
+    uint16_t clusterRevision;
+    EXPECT_EQ(tester.ReadAttribute(Globals::Attributes::ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
+    EXPECT_EQ(clusterRevision, 1u);
+
+    // Read non-existent attribute.
+    uint32_t nonExistentAttribute;
+    EXPECT_NE(tester.ReadAttribute(0xFFFF, nonExistentAttribute), CHIP_NO_ERROR);
 }
 
 }  // namespace
