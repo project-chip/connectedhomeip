@@ -72,7 +72,7 @@ list(
     ${CHIP_ROOT}/src
     ${CHIP_ROOT}/src/system
     ${CHIP_ROOT}/src/app
-    ${CHIP_ROOT}/src/platform/realtek/BEE
+    ${CHIP_ROOT}/src/platform/realtek/freertos
     ${CHIP_ROOT}/src/platform/OpenThread
     ${CHIP_ROOT}/third_party/nlassert/repo/include
     ${CHIP_ROOT}/third_party/nlio/repo/include
