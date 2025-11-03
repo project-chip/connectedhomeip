@@ -41,8 +41,9 @@ constexpr std::array<AttributePathParams, kTestPathsSize> kTestPaths = {
 };
 constexpr AttributePathParams kOverflowPath(1, 2, 3);
 
-constexpr uint32_t kBaseTimeoutMs   = 1000;
-constexpr uint32_t kJitterTimeoutMs = 1000;
+constexpr uint32_t kBaseTimeoutMs       = 1000;
+constexpr uint32_t kJitterTimeoutMs     = 1000;
+constexpr uint32_t kSystemClockDelaytMs = 20;
 
 class MockProviderChangeListener : public ProviderChangeListener
 {
@@ -107,7 +108,13 @@ TEST_F(TestJitterDeferredProviderChangeListener, TestJitteryDelay)
     }
     uint64_t timeDiff = (underlyingListener.mLastCallTimestampMs - startTime).count();
     EXPECT_GE(timeDiff, kBaseTimeoutMs);
-    EXPECT_LE(timeDiff, kBaseTimeoutMs + kJitterTimeoutMs);
+
+    // We add a 20ms buffer to the maximum jitter delay to account for two issues:
+    // 1. A small timing gap between the test stamping 'StartTime' and the
+    //    JitterDeferredProviderChangeListener calling its internal 'StartTimer'.
+    // 2. The platform-dependent precision of 'StartTimer', which is tied
+    //    to the system's clock tick.
+    EXPECT_LE(timeDiff, kBaseTimeoutMs + kJitterTimeoutMs + kSystemClockDelaytMs);
 }
 
 TEST_F(TestJitterDeferredProviderChangeListener, TestBufferFullFlush)
@@ -139,7 +146,12 @@ TEST_F(TestJitterDeferredProviderChangeListener, TestBufferFullFlush)
 
     uint64_t timeDiff = (underlyingListener.mLastCallTimestampMs - startTime).count();
     EXPECT_GE(timeDiff, kBaseTimeoutMs);
-    EXPECT_LE(timeDiff, kBaseTimeoutMs + kJitterTimeoutMs);
+    // We add a 20ms buffer to the maximum jitter delay to account for two issues:
+    // 1. A small timing gap between the test stamping 'StartTime' and the
+    //    JitterDeferredProviderChangeListener calling its internal 'StartTimer'.
+    // 2. The platform-dependent precision of 'StartTimer', which is tied
+    //    to the system's clock tick.
+    EXPECT_LE(timeDiff, kBaseTimeoutMs + kJitterTimeoutMs + kSystemClockDelaytMs);
     EXPECT_EQ(underlyingListener.mPaths.size(), JitterDeferredProviderChangeListener::kMaxAttributePathsBufferSize + 1);
     EXPECT_EQ(underlyingListener.mPaths.back(), kOverflowPath);
 }
