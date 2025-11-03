@@ -1387,7 +1387,8 @@ JNI_METHOD(void, continueCommissioningAfterConnectNetworkRequest)(JNIEnv * env, 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to continue Commissioning after Connect Network Request. : %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Controller, "Failed to continue Commissioning after Connect Network Request. : %" CHIP_ERROR_FORMAT,
+                     err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
 }
