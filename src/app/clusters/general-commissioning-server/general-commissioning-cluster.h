@@ -58,9 +58,6 @@ public:
     // Fabric delegate
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
-    // GeneralCommissioning is a singleton cluster that exists only on the root endpoint.
-    static GeneralCommissioningCluster & Instance();
-
     // Feature map constant based on compile-time defines. This ensures feature map
     // is in sync with the actual supported features determined at build time.
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED

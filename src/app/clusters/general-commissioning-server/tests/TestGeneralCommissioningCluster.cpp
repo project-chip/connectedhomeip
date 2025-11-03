@@ -51,7 +51,7 @@ TEST_F(TestGeneralCommissioningCluster, TestAttributes)
 {
     // test without optional attributes
     {
-        auto & cluster            = GeneralCommissioningCluster::Instance();
+        GeneralCommissioningCluster cluster;
         auto & optionalAttributes = cluster.GetOptionalAttributes();
         optionalAttributes        = GeneralCommissioningCluster::OptionalAttributes(0);
 
@@ -87,7 +87,7 @@ TEST_F(TestGeneralCommissioningCluster, TestAttributes)
 
     // test with optional attributes
     {
-        auto & cluster            = GeneralCommissioningCluster::Instance();
+        GeneralCommissioningCluster cluster;
         auto & optionalAttributes = cluster.GetOptionalAttributes();
         optionalAttributes.Set<IsCommissioningWithoutPower::Id>();
 
@@ -132,8 +132,8 @@ TEST_F(TestGeneralCommissioningCluster, TestAcceptedCommands)
 {
     {
         ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
-        ASSERT_EQ(GeneralCommissioningCluster::Instance().AcceptedCommands({ kRootEndpointId, GeneralCommissioning::Id }, builder),
-                  CHIP_NO_ERROR);
+        GeneralCommissioningCluster cluster;
+        ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, GeneralCommissioning::Id }, builder), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
         ASSERT_EQ(expectedBuilder.AppendElements({
