@@ -209,9 +209,6 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
         auto listToWrite =
             chip::app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
 
-        auto path = chip::app::ConcreteAttributePath(chip::kRootEndpointId, GroupKeyManagement::Id,
-                                                     GroupKeyManagement::Attributes::GroupKeyMap::Id);
-
         CHIP_ERROR err = tester.WriteAttribute(mCluster, GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, fabricIndex);
         ASSERT_EQ(err, CHIP_NO_ERROR);
     }
@@ -264,8 +261,6 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeDu
 
     auto listToWrite =
         chip::app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
-    auto path = chip::app::ConcreteAttributePath(chip::kRootEndpointId, GroupKeyManagement::Id,
-                                                 GroupKeyManagement::Attributes::GroupKeyMap::Id);
 
     CHIP_ERROR err = tester.WriteAttribute(mCluster, GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, fabricIndex);
 
