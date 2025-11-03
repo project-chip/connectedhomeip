@@ -25,6 +25,9 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
+namespace app {
+namespace Clusters {
+namespace Binding {
 
 /**
  * Application callback function when a cluster associated with a binding changes.
@@ -39,8 +42,7 @@ namespace chip {
  *
  * The handler is not allowed to hold onto the pointer to the SessionHandler that is passed in.
  */
-using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device,
-                                           void * context);
+using BoundDeviceChangedHandler = void (*)(const TableEntry & binding, OperationalDeviceProxy * peer_device, void * context);
 
 /**
  * Application callback function when a context used in NotifyBoundClusterChanged will not be needed and should be
@@ -48,7 +50,7 @@ using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & bindin
  */
 using BoundDeviceContextReleaseHandler = PendingNotificationContextReleaseHandler;
 
-struct BindingManagerInitParams
+struct ManagerInitParams
 {
     FabricTable * mFabricTable               = nullptr;
     CASESessionManager * mCASESessionManager = nullptr;
@@ -71,10 +73,10 @@ struct BindingManagerInitParams
  * or watched cluster is changed).
  *
  */
-class BindingManager
+class Manager
 {
 public:
-    BindingManager() {}
+    Manager() {}
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
 
@@ -88,7 +90,7 @@ public:
         mPendingNotificationMap.RegisterPendingNotificationContextReleaseHandler(handler);
     }
 
-    CHIP_ERROR Init(const BindingManagerInitParams & params);
+    CHIP_ERROR Init(const ManagerInitParams & params);
 
     /*
      * Notifies the BindingManager that a new unicast binding is created.
@@ -120,7 +122,7 @@ public:
      */
     CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context);
 
-    static BindingManager & GetInstance() { return sBindingManager; }
+    static Manager & GetInstance() { return sBindingManager; }
 
 private:
     /*
@@ -136,7 +138,7 @@ private:
     class ConnectionCallback
     {
     public:
-        ConnectionCallback(BindingManager & bindingManager) :
+        ConnectionCallback(Manager & bindingManager) :
             mBindingManager(bindingManager), mOnConnectedCallback(HandleDeviceConnected, this),
             mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
         {}
@@ -159,18 +161,18 @@ private:
             Platform::Delete(_this);
         }
 
-        BindingManager & mBindingManager;
+        Manager & mBindingManager;
         Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
         Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
     };
 
-    static BindingManager sBindingManager;
+    static Manager sBindingManager;
 
     CHIP_ERROR EstablishConnection(const ScopedNodeId & nodeId);
 
     PendingNotificationMap mPendingNotificationMap;
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
-    BindingManagerInitParams mInitParams;
+    ManagerInitParams mInitParams;
 
     void HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     void HandleDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error);
@@ -179,7 +181,8 @@ private:
     CHIP_ERROR mLastSessionEstablishmentError;
 };
 
-namespace app {
+} // namespace Binding
+
 /**
  * @brief appends a binding to the list of bindings
  *        This function is to be used when a device wants to add a binding to its own table
@@ -189,7 +192,8 @@ namespace app {
  *
  * @param entry binding to add
  */
-CHIP_ERROR AddBindingEntry(const EmberBindingTableEntry & entry);
-} // namespace app
+CHIP_ERROR AddBindingEntry(const Binding::TableEntry & entry);
 
+} // namespace Clusters
+} // namespace app
 } // namespace chip
