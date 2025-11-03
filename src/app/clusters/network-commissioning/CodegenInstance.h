@@ -50,7 +50,7 @@ public:
     Instance(EndpointId aEndpointId, EthernetDriver * apDelegate) : mCluster(aEndpointId, apDelegate, mTracker) {}
 
 private:
-    // does the tracking via the public general commissioning cluster (if available)
+    // Does the tracking via the public general commissioning cluster (if available)
     class CodegenGeneralCommissioningBreadcrumbTracker : public BreadCrumbTracker
     {
     public:
