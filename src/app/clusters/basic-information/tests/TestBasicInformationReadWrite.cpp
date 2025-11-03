@@ -378,7 +378,7 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
 
 TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
 {
-    bool readValue;
+    bool readValue{};
 
     // --- Test Case 1: Write 'true' ---
     {

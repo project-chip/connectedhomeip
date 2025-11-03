@@ -50,12 +50,12 @@ TEST(TestInteractionModelEventEmitting, TestBasicType)
 
     auto eventInfo = logOnlyEvents.GetNextEvent();
     ASSERT_TRUE(eventInfo.has_value());
-    ASSERT_EQ(n1, eventInfo->eventNumber);
-    ASSERT_EQ(eventInfo->eventOptions.mPath,
+    ASSERT_EQ(n1, eventInfo->eventNumber); // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_EQ(eventInfo->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
               ConcreteEventPath(0 /* endpointId */, StartUpEventType::GetClusterId(), StartUpEventType::GetEventId()));
 
     chip::app::Clusters::BasicInformation::Events::StartUp::DecodableType decoded_event;
-    CHIP_ERROR err = eventInfo->GetEventData(decoded_event);
+    CHIP_ERROR err = eventInfo->GetEventData(decoded_event); // NOLINT(bugprone-unchecked-optional-access)
 
     if (err != CHIP_NO_ERROR)
     {
@@ -67,9 +67,9 @@ TEST(TestInteractionModelEventEmitting, TestBasicType)
     std::optional<EventNumber> n2 = events->GenerateEvent(event, /* endpointId = */ 1);
     eventInfo                     = logOnlyEvents.GetNextEvent();
     ASSERT_TRUE(eventInfo.has_value());
-    ASSERT_EQ(n2, eventInfo->eventNumber);
+    ASSERT_EQ(n2, eventInfo->eventNumber); // NOLINT(bugprone-unchecked-optional-access)
 
-    ASSERT_EQ(eventInfo->eventOptions.mPath,
+    ASSERT_EQ(eventInfo->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
               ConcreteEventPath(1 /* endpointId */, StartUpEventType::GetClusterId(), StartUpEventType::GetEventId()));
 }
 
@@ -95,13 +95,13 @@ TEST(TestInteractionModelEventEmitting, TestFabricScoped)
     n1                = events->GenerateEvent(event, /* endpointId = */ 0);
 
     auto eventInfo = logOnlyEvents.GetNextEvent();
-    ASSERT_EQ(n1, eventInfo->eventNumber);
-    ASSERT_EQ(eventInfo->eventOptions.mPath,
+    ASSERT_EQ(n1, eventInfo->eventNumber); // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_EQ(eventInfo->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
               ConcreteEventPath(0 /* endpointId */, AccessControlEntryChangedType::GetClusterId(),
                                 AccessControlEntryChangedType::GetEventId()));
 
     chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType decoded_event;
-    CHIP_ERROR err = eventInfo->GetEventData(decoded_event);
+    CHIP_ERROR err = eventInfo->GetEventData(decoded_event); // NOLINT(bugprone-unchecked-optional-access)
 
     if (err != CHIP_NO_ERROR)
     {

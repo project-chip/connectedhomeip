@@ -243,7 +243,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, SoftwareFaultListenerTest)
     chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::DecodableType decodedFault;
     auto event = context.EventsGenerator().GetNextEvent();
     ASSERT_TRUE(event.has_value());
-    ASSERT_EQ(event->GetEventData(decodedFault), CHIP_NO_ERROR);
+    ASSERT_EQ(event->GetEventData(decodedFault), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
 
     ASSERT_EQ(decodedFault.id, fault.id);
     ASSERT_TRUE(decodedFault.name.HasValue());
