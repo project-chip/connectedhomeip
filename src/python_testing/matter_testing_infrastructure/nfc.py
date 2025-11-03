@@ -33,8 +33,8 @@ class TagEventObserver(smartcard.CardMonitoring.CardObserver):
     Observer class to handle tag (NFC) events.
     """
 
-    def __init__(self, reader_helper):
-        self.reader_helper = reader_helper
+    def __init__(self, reader):
+        self.reader = reader
         self.last_ndef = None  # Store last NDEF bytes read
 
     # This method is called when a tag is inserted or removed
@@ -43,9 +43,9 @@ class TagEventObserver(smartcard.CardMonitoring.CardObserver):
         for tag in added_tags:
             logger.debug("NFC tag detected")
             try:
-                ndef_bytes = self.reader_helper.read_t4t_ndef()
+                ndef_bytes = self.reader.read_t4t_ndef()
                 self.last_ndef = ndef_bytes
-                logger.debug(self.reader_helper.ndef_content_to_string(ndef_bytes))
+                logger.debug(self.reader.ndef_content_to_string(ndef_bytes))
             except Exception as e:
                 logger.info(f"Error reading NFC tag: {e}")
         for tag in removed_tags:
@@ -57,8 +57,8 @@ class TagMonitorManager:
     Class to activate/deactivate NFC monitoring in background.
     """
 
-    def __init__(self, reader_helper):
-        self.reader_helper = reader_helper
+    def __init__(self, reader):
+        self.reader = reader
         self.tag_monitor = None
         self.observer = None
         self._stop_event = threading.Event()
@@ -66,7 +66,7 @@ class TagMonitorManager:
 
     def _monitoring_thread(self):
         self.tag_monitor = smartcard.CardMonitoring.CardMonitor()
-        self.observer = TagEventObserver(self.reader_helper)
+        self.observer = TagEventObserver(self.reader)
         self.tag_monitor.addObserver(self.observer)
         logger.info("Start monitoring NFC tags")
         try:
@@ -96,9 +96,14 @@ class TagMonitorManager:
         self._stop_event.set()
 
 
-class NFCReaderHelper:
+class NFCReader:
     """
-    Helper class for NFC reader operations and tag parsing.
+    Provides several NFC related functions:
+    - NFC reader operations: monitoring tags, reading and writing a tag.
+    - NFC tag conversion to string
+    - Recognition of of NFC-based Matter onboarding payload
+    Use the constructor without argument to connect with the first available reader.
+        reader = nfc.NFCReader()
     """
 
     def __init__(self, reader=None):
@@ -154,12 +159,6 @@ class NFCReaderHelper:
         try:
             for idx, record in enumerate(ndef.message_decoder(ndef_bytes), 1):
                 lines.append(f"NDEF Record {idx}: {record}")
-                # Following has limited added value but is kept commented for reference
-                # for attr in ['tnf', 'type', 'id', 'uri', 'text', 'data']:
-                #    if hasattr(record, attr):
-                #        value = getattr(record, attr)
-                #        lines.append(f"  {attr}: {value}")
-                # lines.append("")  # Blank line between records
         except Exception as e:
             lines.append(f"Error decoding NDEF: {e}")
 
@@ -172,7 +171,7 @@ class NFCReaderHelper:
         Returns:
             bytes: The raw NDEF message bytes, or None if an error occurs.
         """
-        with NFCConnectionManager(self) as connection:
+        with NFCConnection(self) as connection:
 
             # Select NDEF Tag Application
             SELECT_AID = [0x00, 0xA4, 0x04, 0x00, 0x07, 0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x01, 0x00]
@@ -252,7 +251,7 @@ class NFCReaderHelper:
         Returns:
             bool: True if write was successful, False otherwise.
         """
-        with NFCConnectionManager(self) as connection:
+        with NFCConnection(self) as connection:
 
             # Select NDEF file (E104)
             SELECT_NDEF = [0x00, 0xA4, 0x00, 0x0C, 0x02, 0xE1, 0x04]
@@ -290,13 +289,13 @@ class NFCReaderHelper:
         return True
 
 
-class NFCConnectionManager:
-    def __init__(self, reader_helper: NFCReaderHelper):
-        self.reader_helper = reader_helper
+class NFCConnection:
+    def __init__(self, reader: NFCReader):
+        self.reader = reader
         self.connection = None
 
     def __enter__(self):
-        self.connection = self.reader_helper.reader.createConnection()
+        self.connection = self.reader.reader.createConnection()
         self.connection.connect()
         return self.connection
 
@@ -307,12 +306,3 @@ class NFCConnectionManager:
         except Exception as e:
             logger.warning(f"Failed to disconnect NFC connection: {e}")
         return False
-
-# Main function to set up monitoring and handle tag events
-# it allows testing basic operation without a test.
-# def main():
-#    reader = NFCReaderHelper.get_connected_reader()
-#    if reader is None:
-#        sys.exit(1)
-#    NFCReaderHelper(reader)
-    # Example usage: helper.read_t4t_ndef(), etc.

@@ -15,22 +15,11 @@
 #    limitations under the License.
 #
 
-# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
-# for details about the block below.
-#
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#    run1:
-#      app: ${TYPE_OF_APP}
-#      app-args:
-#      script-args: >
-#      factory-reset: true
-#      quiet: true
-# === END CI TEST ARGUMENTS ===
+# Test excluded from CI
 
 import asyncio
 
-import nfc_helpers
+import nfc
 from mobly import asserts
 
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body
@@ -69,7 +58,7 @@ class TC_DD_1_5(MatterBaseTest):
     @async_test_body
     async def test_TC_DD_1_5(self):
 
-        reader = nfc_helpers.NFCReaderHelper()
+        reader = nfc.NFCReader()
         asserts.assert_is_not_none(reader, "No connected NFC reader found")
 
         ###########
