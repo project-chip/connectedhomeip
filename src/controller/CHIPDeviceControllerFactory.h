@@ -170,6 +170,8 @@ struct FactoryInitParams
     chip::app::DataModel::Provider * dataModelProvider = nullptr;
 
     std::optional<Inet::InterfaceId> interfaceId;
+
+    std::optional<uint32_t> minimumLitBackoffInterval;
 };
 
 class DeviceControllerFactory

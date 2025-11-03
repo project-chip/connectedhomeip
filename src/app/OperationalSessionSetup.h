@@ -276,9 +276,6 @@ public:
     void OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result) override;
     void OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason) override;
 
-    static void SetMinimumLitBackoffInterval(const Optional<System::Clock::Milliseconds32> & minimumTime);
-    static System::Clock::Milliseconds32 GetMinimumLitBackoffInterval();
-
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     // Update our remaining attempt count to be at least the given value.
     void UpdateAttemptCount(uint8_t attemptCount);

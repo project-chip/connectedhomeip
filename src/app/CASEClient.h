@@ -40,6 +40,8 @@ struct CASEClientInitParams
     // claiming different MRP parameters for the same node.
     Optional<ReliableMessageProtocolConfig> mrpLocalConfig = NullOptional;
 
+    Optional<uint32_t> minimumLitBackoffInterval = NullOptional;
+
     CHIP_ERROR Validate() const
     {
         // sessionResumptionStorage can be nullptr when resumption is disabled.

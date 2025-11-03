@@ -48,8 +48,6 @@ using namespace chip::Tracing;
 
 namespace chip {
 
-System::Clock::Timeout sMinimumLitBackoffInterval = System::Clock::Milliseconds32(CHIP_CONFIG_MINIMUM_LIT_BACKOFF_INTERVAL);
-
 void OperationalSessionSetup::MoveToState(State aTargetState)
 {
     if (mState != aTargetState)
@@ -296,19 +294,6 @@ void OperationalSessionSetup::UpdateDeviceData(const ResolveResult & result)
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
 
-void OperationalSessionSetup::SetMinimumLitBackoffInterval(const Optional<System::Clock::Milliseconds32> & minimumTime)
-{
-    assertChipStackLockedByCurrentThread();
-    sMinimumLitBackoffInterval =
-        minimumTime.ValueOr(System::Clock::Milliseconds32(CHIP_CONFIG_MINIMUM_LIT_BACKOFF_INTERVAL));
-}
-
-System::Clock::Milliseconds32 OperationalSessionSetup::GetMinimumLitBackoffInterval()
-{
-    assertChipStackLockedByCurrentThread();
-    return sMinimumLitBackoffInterval;
-}
-
 CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & result)
 {
     auto config = result.mrpRemoteConfig;
@@ -321,9 +306,11 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
         // the ICD is in active mode. Therefore, using mActiveRetransTimeout
         // for the initial message in the exchange is appropriate. If
         // mActiveRetransTimeout is insufficient, consider setting it further
-        // using sMinimumLitBackoffInterval so that it is guaranteed to be larger
+        // using minimumLitBackoffInterval so that it is guaranteed to be larger
         // than minimum lit backoff set by client and don't need worry about how larger or smaller we need to compensate.
-        config.mIdleRetransTimeout = std::max(config.mActiveRetransTimeout, sMinimumLitBackoffInterval);
+
+        config.mIdleRetransTimeout =
+            std::max(config.mActiveRetransTimeout, System::Clock::Milliseconds32(mInitParams.minimumLitBackoffInterval.ValueOr(0)));
     }
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload)
