@@ -14,10 +14,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
-# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
-# for details about the block below.
-#
 import logging
 
 from mobly import asserts
@@ -26,7 +22,7 @@ import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 
-class TestCheckSoftwareversion(MatterBaseTest):
+class TestCheckSoftwareVersion(MatterBaseTest):
 
     @async_test_body
     async def setup_class(self):

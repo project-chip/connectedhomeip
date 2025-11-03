@@ -16,6 +16,7 @@
 # limitations under the License.
 #
 
+set -x
 CHIP_ROOT="$(dirname "$0")/../.."
 
 # Default values for optional arguments
@@ -24,7 +25,6 @@ PRODUCT_ID="0xBEEF"
 MAX_RANGE=6
 OUT_PREFIX="out/su_ota_images_min"
 BUILT_IMAGES_STACK=()
-STATUS_CODE=0
 
 # Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
@@ -79,11 +79,6 @@ for ((i = 2; i <= "$MAX_RANGE"; i++)); do
     ./"$CHIP_ROOT"/scripts/examples/gn_build_example.sh \
         "$CHIP_ROOT"/examples/ota-requestor-app/linux "$OUT_DIR" \
         chip_config_network_layer_ble=false is_debug=false "$GN_VERSION_ARGS" >/dev/null
-    STATUS_CODE=$?
-    if [ "$STATUS_CODE" -ne 0 ]; then
-        echo "Failed to build the app for version $i"
-        break
-    fi
 
     # Strip command (create .min binary in the same OUT_DIR)
     if [ "$(uname -s)" = "Darwin" ]; then
@@ -91,31 +86,16 @@ for ((i = 2; i <= "$MAX_RANGE"; i++)); do
     else
         strip --strip-all "$OUT_DIR"/chip-ota-requestor-app -o "$OUT_DIR"/chip-ota-requestor-app.min >/dev/null 2>&1
     fi
-    STATUS_CODE=$?
-    if [ "$STATUS_CODE" -ne 0 ]; then
-        echo "Failed to strip the code for version $i"
-        break
-    fi
 
     # Create ota image (store images under the shared OUT_PREFIX directory)
     OTA_IMAGE_PATH="$OUT_DIR/chip-ota-requestor-app_v$i.min.ota"
     python3 "$CHIP_ROOT"/src/app/ota_image_tool.py create -v "$VENDOR_ID" -p "$PRODUCT_ID" -vn "$i" -vs "$i.0" -da sha256 "$OUT_DIR"/chip-ota-requestor-app.min "$OTA_IMAGE_PATH"
-    STATUS_CODE=$?
-    if [ "$STATUS_CODE" -ne 0 ]; then
-        echo "Failed to create the OTA Image for version $i"
-        break
-    fi
 
     BUILT_IMAGES_STACK+=("$OTA_IMAGE_PATH")
 done
 
-if [ "$STATUS_CODE" -eq 0 ]; then
-    echo "Generated files"
-    for item in "${BUILT_IMAGES_STACK[@]}"; do
-        echo "$item"
-    done
-fi
 
-if [ "$STATUS_CODE" -ne 0 ]; then
-    exit 1
-fi
+echo "Generated files"
+for item in "${BUILT_IMAGES_STACK[@]}"; do
+    echo "$item"
+done
