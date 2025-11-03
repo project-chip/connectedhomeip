@@ -127,7 +127,6 @@ public:
         return mCluster.InvokeCommand(mRequest, reader, &mHandler);
     }
 
-
 private:
     app::ServerClusterInterface & mCluster;
     std::unique_ptr<app::Testing::ReadOperation> mReadOperation;
