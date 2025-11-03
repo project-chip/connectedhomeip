@@ -171,7 +171,7 @@ struct FactoryInitParams
 
     std::optional<Inet::InterfaceId> interfaceId;
 
-    std::optional<uint32_t> minimumLitBackoffInterval;
+    Optional<uint32_t> minimumLitBackoffInterval;
 };
 
 class DeviceControllerFactory
