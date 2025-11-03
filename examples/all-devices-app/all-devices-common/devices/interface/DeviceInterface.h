@@ -52,7 +52,9 @@ public:
 protected:
     /// The caller creating a DeviceInterface MUST ensure that the underlying data for the Span of
     /// deviceTypes remains valid for the entire liefetime of the DeviceInterface object instance.
-    DeviceInterface(Span<const DataModel::DeviceTypeEntry> deviceTypes) : mDeviceTypes(deviceTypes), mEndpointRegistration(*this, {}) {}
+    DeviceInterface(Span<const DataModel::DeviceTypeEntry> deviceTypes) :
+        mDeviceTypes(deviceTypes), mEndpointRegistration(*this, {})
+    {}
 
     Span<const DataModel::DeviceTypeEntry> mDeviceTypes;
     EndpointInterfaceRegistration mEndpointRegistration;
