@@ -48,7 +48,7 @@ using namespace chip::Tracing;
 
 namespace chip {
 
-System::Clock::Timeout sAdditionalLitBackoffInterval = System::Clock::Milliseconds32(CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL);
+System::Clock::Timeout sMinimumLitBackoffInterval = System::Clock::Milliseconds32(CHIP_CONFIG_MINIMUM_LIT_BACKOFF_INTERVAL);
 
 void OperationalSessionSetup::MoveToState(State aTargetState)
 {
@@ -296,17 +296,17 @@ void OperationalSessionSetup::UpdateDeviceData(const ResolveResult & result)
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
 
-void OperationalSessionSetup::SetAdditionalLitBackoffInterval(const Optional<System::Clock::Milliseconds32> & additionalTime)
+void OperationalSessionSetup::SetMinimumLitBackoffInterval(const Optional<System::Clock::Milliseconds32> & minimumTime)
 {
     assertChipStackLockedByCurrentThread();
-    sAdditionalLitBackoffInterval =
-        additionalTime.ValueOr(System::Clock::Milliseconds32(CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL));
+    sMinimumLitBackoffInterval =
+        minimumTime.ValueOr(System::Clock::Milliseconds32(CHIP_CONFIG_MINIMUM_LIT_BACKOFF_INTERVAL));
 }
 
-System::Clock::Milliseconds32 OperationalSessionSetup::GetAdditionalLitBackoffInterval()
+System::Clock::Milliseconds32 OperationalSessionSetup::GetMinimumLitBackoffInterval()
 {
     assertChipStackLockedByCurrentThread();
-    return sAdditionalLitBackoffInterval;
+    return sMinimumLitBackoffInterval;
 }
 
 CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & result)
@@ -320,9 +320,10 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
         // is set up for LIT ICDs only when they are active, it is known that
         // the ICD is in active mode. Therefore, using mActiveRetransTimeout
         // for the initial message in the exchange is appropriate. If
-        // mActiveRetransTimeout is insufficient, consider increasing it further
-        // using sAdditionalLitBackoffInterval.
-        config.mIdleRetransTimeout = config.mActiveRetransTimeout + sAdditionalLitBackoffInterval;
+        // mActiveRetransTimeout is insufficient, consider setting it further
+        // using sMinimumLitBackoffInterval so that it is guaranteed to be larger
+        // than minimum lit backoff set by client and don't need worry about how larger or smaller we need to compensate.
+        config.mIdleRetransTimeout = std::max(config.mActiveRetransTimeout, sMinimumLitBackoffInterval);
     }
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload)

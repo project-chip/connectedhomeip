@@ -2000,16 +2000,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
 
 /**
- *  @def CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL
+ *  @def CHIP_CONFIG_MINIMUM_LIT_BACKOFF_INTERVAL
  *
  *  @brief
- *    A duration, in milliseconds, to be added to the backoff interval for sigma1 message retransmission in controller side if the
- * remote device is LIT. This additional interval is to mitigate the issue that the sigma2 message may not be able to reach the
+ *    A duration, in milliseconds, to be set as a minimum interval for sigma1 message retransmission in controller side if the
+ * remote device is LIT. This minimum interval is to mitigate the issue that the sigma2 message may not be able to reach the
  * controller in congested network in time.
  */
-#ifndef CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL
-#define CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL 0
-#endif // CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL
+#ifndef CHIP_CONFIG_MINIMUM_LIT_BACKOFF_INTERVAL
+#define CHIP_CONFIG_MINIMUM_LIT_BACKOFF_INTERVAL 0
+#endif // CHIP_CONFIG_MINIMUM_LIT_BACKOFF_INTERVAL
 
 /**
  * @def CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
