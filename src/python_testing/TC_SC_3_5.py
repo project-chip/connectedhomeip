@@ -186,7 +186,7 @@ class TC_SC_3_5(MatterBaseTest):
             await self.th_client.SendCommand(nodeid=self.th_server_local_nodeid, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=9000)
         except InteractionModelError as e:
             asserts.assert_not_equal(e.clusterStatus.name, Clusters.AdministratorCommissioning.Enums.StatusCode.kWindowNotOpen,
-                                     f'Failed to invoke Revoke Commissioning due to Commissioning Window not being open.')
+                                     'Failed to invoke Revoke Commissioning due to Commissioning Window not being open.')
 
         sleep(1)
 
