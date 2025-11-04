@@ -313,7 +313,7 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
         ASSERT_EQ(tester.ReadAttribute(Attributes::ClusterRevision::Id, clusterRev), CHIP_NO_ERROR);
         char buf[256];
         CharSpan val(buf);
-        app::DataModel::ActionReturnStatus err = tester.ReadAttribute(Attributes::UniqueID::Id, val);
+        DataModel::ActionReturnStatus err = tester.ReadAttribute(Attributes::UniqueID::Id, val);
 
         if (err != CHIP_NO_ERROR)
         {
