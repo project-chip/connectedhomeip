@@ -223,8 +223,7 @@ void UDPEndPointImplLwIP::CloseImpl()
         Ref();
         // Capture the instance ID to validate this is still the same endpoint instance
         uint32_t expectedInstanceId = mInstanceId.load();
-        CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this, expectedInstanceId] {
-
+        CHIP_ERROR err              = GetSystemLayer().ScheduleLambda([this, expectedInstanceId] {
             // Verify this is still the same endpoint instance by checking the instance ID
             if (mInstanceId.load() != expectedInstanceId)
             {
@@ -393,9 +392,8 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
 
     // Capture the instance ID to validate this is still the same endpoint instance
     uint32_t expectedInstanceId = ep->mInstanceId.load();
-    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda(
+    CHIP_ERROR err              = ep->GetSystemLayer().ScheduleLambda(
         [ep, pcb, expectedInstanceId, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf), pktInfo = pktInfo.get()] {
-
             // Critical check: Verify this lambda is for the correct endpoint instance
             // by comparing the instance ID. If they don't match, the endpoint was
             // deleted and recreated at the same memory address.
