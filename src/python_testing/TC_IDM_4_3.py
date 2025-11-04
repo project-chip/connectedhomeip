@@ -245,7 +245,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                         continue
 
                     try:
-                        # Get current value 
+                        # Get current value
                         current_val = attributes[attribute]
 
                         # Skip if value decode failed
@@ -253,7 +253,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                             logging.debug(f"{test_step}: Skipping {attribute.__name__} - decode failure")
                             continue
 
-                        # Determine new value based on type 
+                        # Determine new value based on type
                         if isinstance(current_val, str):
                             # String attribute - use unique value to trigger actual change
                             new_val = f"{test_step}_T{int(time.time())}_{changed_count}"
@@ -345,7 +345,8 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                     if received_val == expected_val:
                         verified_count += 1
                     else:
-                        asserts.assert_equal(received_val, expected_val, f"{test_step}: Report value mismatch for {attr.__name__}: expected '{expected_val}', got '{received_val}'")
+                        asserts.assert_equal(
+                            received_val, expected_val, f"{test_step}: Report value mismatch for {attr.__name__}: expected '{expected_val}', got '{received_val}'")
                 else:
                     # For non-string types, just verify we have the attribute data
                     verified_count += 1
@@ -355,7 +356,8 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         logging.info(f"{test_step}: Verified {verified_count}/{len(changed_attributes)} attribute change reports received")
 
-        asserts.assert_less_equal(len(missing_reports), 0, f"{test_step}: Missing reports for {len(missing_reports)} attribute(s): {', '.join(missing_reports)}")
+        asserts.assert_less_equal(
+            len(missing_reports), 0, f"{test_step}: Missing reports for {len(missing_reports)} attribute(s): {', '.join(missing_reports)}")
         asserts.assert_greater(verified_count, 0, f"No change reports verified, we should have received at least one report")
         return verified_count
 
@@ -965,12 +967,12 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             # Skip known problematic clusters
             if cluster_id in CLUSTERS_WITH_SUBSCRIPTION_ISSUES:
                 continue
-            
+
             # These may have non-standard subscription behavior
             if 0xFC00 <= cluster_id <= 0xFFFE:
                 logging.info(f"Step 10: Skipping manufacturer-specific cluster 0x{cluster_id:04X}")
                 continue
-            
+
             # Subscribe to all attributes in this cluster across all endpoints
             subscription_paths.append(AttributePath(ClusterId=cluster_id))
 
@@ -1020,12 +1022,12 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                 # Skip known problematic clusters
                 if cluster_id in CLUSTERS_WITH_SUBSCRIPTION_ISSUES:
                     continue
-                
+
                 # Skip manufacturer-specific clusters (0xFC00-0xFFFE range)
                 if 0xFC00 <= cluster_id <= 0xFFFE:
                     logging.info(f"Step 11: Skipping manufacturer-specific cluster 0x{cluster_id:04X}")
                     continue
-                
+
                 # Subscribe to all attributes in this cluster on this endpoint
                 subscription_paths_step11.append(AttributePath(
                     EndpointId=self.root_node_endpoint,
