@@ -52,7 +52,7 @@
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 #include <app/clusters/thermostat-server/thermostat-server.h>
-#include <app/clusters/time-synchronization-server/time-synchronization-server.h>
+#include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster.h>
 #include <app/server/Server.h>

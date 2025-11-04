@@ -192,11 +192,11 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
         self.step("13")
         # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER_KEY
         # and EventTrigger field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER for Test Event Clear.
-        self.send_test_event_trigger_clear()
+        await self.send_test_event_trigger_clear()
 
         self.step("14")
         # TH removes the subscription to MeteredQuantity attribute.
-        subscription_handler.cancel()
+        await subscription_handler.cancel()
 
 
 if __name__ == "__main__":

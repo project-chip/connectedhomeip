@@ -626,7 +626,15 @@ CHIP_ERROR TCPBase::DoHandleIncomingConnection(const Inet::TCPEndPointHandle & l
                                                uint16_t peerPort)
 {
     PeerAddress addr;
-    ReturnErrorOnFailure(GetPeerAddress(*endPoint, addr));
+    CHIP_ERROR getPeerError = GetPeerAddress(*endPoint, addr);
+    // See https://github.com/project-chip/connectedhomeip/issues/41746
+    // Failures here must be handled carefully so that broken connections
+    // continue to propagate to failure callbacks to avoid flaky tests
+    if (getPeerError != CHIP_NO_ERROR)
+    {
+        ChipLogFailure(getPeerError, Inet, "Failure getting peer info, using fallback");
+        addr = PeerAddress::TCP(peerAddress, peerPort, Inet::InterfaceId::Null());
+    }
     ActiveTCPConnectionState * activeConnection = AllocateConnection(endPoint, addr);
     if (activeConnection == nullptr)
     {

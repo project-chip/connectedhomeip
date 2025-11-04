@@ -107,15 +107,9 @@ protected:
     CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-    bool _HaveMeshConnectivity();
-    CHIP_ERROR _GetAndLogThreadStatsCounters();
-    CHIP_ERROR _GetAndLogThreadTopologyMinimal();
-    CHIP_ERROR _GetAndLogThreadTopologyFull();
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
-    CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
     CHIP_ERROR _GetThreadVersion(uint16_t & version);
     void _ResetThreadNetworkDiagnosticsCounts();
-    CHIP_ERROR _GetPollPeriod(uint32_t & buf);
     void _OnWoBLEAdvertisingStart();
     void _OnWoBLEAdvertisingStop();
 

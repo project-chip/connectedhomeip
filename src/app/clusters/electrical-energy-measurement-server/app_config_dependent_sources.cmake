@@ -19,4 +19,5 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/EnergyReportingTestEventTriggerHandler.h"
     "${CLUSTER_DIR}/ElectricalEnergyMeasurementCluster.cpp"
     "${CLUSTER_DIR}/electrical-energy-measurement-server.h"
+    "${CLUSTER_DIR}/ElectricalEnergyMeasurementCluster.h"
 )
