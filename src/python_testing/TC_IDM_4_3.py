@@ -555,7 +555,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         asserts.assert_greater(attr_handler_step3_second.attribute_queue.qsize(), 0,
                                "Should receive report on second subscription")
 
-        # First subscription should have been cancelled (no new reports after attribute change)
+        # First subscription should have been cancelled
         # Note: The first handler may still have the priming report but no update
 
         await attr_handler_step3_second.cancel()
@@ -592,7 +592,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         time.sleep(max_interval + 1)
         time_empty = time.time()
 
-        # Change attribute
         new_label_step4 = "TestLabel_Step4"
         await TH.WriteAttribute(
             self.dut_node_id,
@@ -602,7 +601,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # Wait for change report - give it enough time considering MinInterval
         wait_start = time.time()
         report_received = False
-        timeout = max_interval + 5  # Add buffer for retransmission
+        timeout = max_interval + 5
 
         while time.time() - wait_start < timeout:
             if attr_handler_step4.attribute_queue.qsize() > 0:
@@ -747,7 +746,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         )
 
         # Wait for reports
-        time.sleep(self.max_interval_ceiling_sec + 1)
+        time.sleep(self.max_interval_ceiling_sec)
 
         # Verify both subscriptions received reports
         asserts.assert_greater(attr_handler_step5_first.attribute_queue.qsize(), 0,
@@ -801,7 +800,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         )
 
         # Wait for reports
-        time.sleep(self.max_interval_ceiling_sec + 1)
+        time.sleep(self.max_interval_ceiling_sec)
 
         # Verify second subscription received reports
         asserts.assert_greater(attr_handler_step6_second.attribute_queue.qsize(), 0,
@@ -848,7 +847,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         )
 
         # Wait for attribute report
-        time.sleep(self.max_interval_ceiling_sec + 1)
+        time.sleep(self.max_interval_ceiling_sec)
 
         # Verify attribute report received
         asserts.assert_greater(attr_handler_step7.attribute_queue.qsize(), 0,
@@ -880,7 +879,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         cluster_data = priming_data[self.root_node_endpoint][Clusters.BasicInformation]
         num_attributes = len(cluster_data)
-        asserts.assert_greater(num_attributes, 1,
+        asserts.assert_greater(num_attributes, 5,
                                "Should receive multiple attributes in priming report for wildcard subscription")
 
         # Change writable attributes and verify change reports per test spec
