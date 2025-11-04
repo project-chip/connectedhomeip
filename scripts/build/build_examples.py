@@ -45,7 +45,7 @@ class Context:
             logging.info('Finding builder for %s' % target)
             builder = None
             for target_meta in build.targets.BUILD_TARGETS:
-                if target_meta.IsCompatible(target):
+                if target_meta.StringIntoTargetParts(target):
                     builder = target_meta.Create(
                         self.output_prefix, self.runner, options)
                     break
