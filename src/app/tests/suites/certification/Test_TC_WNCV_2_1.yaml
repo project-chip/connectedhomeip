@@ -152,62 +152,6 @@ tests:
               minValue: 0
               maxValue: 10000
 
-    ### Attribute[ 16]: InstalledOpenLimitLift  ====================
-    - label:
-          "Step 2e: TH reads from the DUT the (16) InstalledOpenLimitLift
-          attribute"
-      command: "readAttribute"
-      attribute: "InstalledOpenLimitLift"
-      PICS: WNCV.S.A0010
-      response:
-          saveAs: InstalledOpenLimitLiftValue
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65535
-
-    ### Attribute[ 17]: InstalledClosedLimitLift  ====================
-    - label:
-          "Step 2f: TH reads from the DUT the (17) InstalledClosedLimitLift
-          attribute"
-      command: "readAttribute"
-      attribute: "InstalledClosedLimitLift"
-      PICS: WNCV.S.A0011
-      response:
-          saveAs: InstalledClosedLimitLiftValue
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65535
-
-    ### Attribute[ 18]: InstalledOpenLimitTilt  ====================
-    - label:
-          "Step 2g: TH reads from the DUT the (18) InstalledOpenLimitTilt
-          attribute"
-      command: "readAttribute"
-      attribute: "InstalledOpenLimitTilt"
-      PICS: WNCV.S.A0012
-      response:
-          saveAs: InstalledOpenLimitTiltValue
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65535
-
-    ### Attribute[ 19]: InstalledClosedLimitTilt  ====================
-    - label:
-          "Step 2h: TH reads from the DUT the (19) InstalledClosedLimitTilt
-          attribute"
-      command: "readAttribute"
-      attribute: "InstalledClosedLimitTilt"
-      PICS: WNCV.S.A0013
-      response:
-          saveAs: InstalledClosedLimitTiltValue
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65535
-
     ### 3 CONDITIONALLY and PURELY OPTIONAL Attributes
     ### Attribute[ 26]: SafetyStatus  ==========================
     - label: "Step 3a: TH reads from the DUT the (26) SafetyStatus attribute"
@@ -220,85 +164,9 @@ tests:
               minValue: 0
               maxValue: 2047
 
-    ### Attribute[  1]: PhysicalClosedLimitLift  ====================
-    - label:
-          "Step 3b: TH reads from the DUT the ( 1) PhysicalClosedLimitLift
-          attribute"
-      command: "readAttribute"
-      attribute: "PhysicalClosedLimitLift"
-      PICS: WNCV.S.A0001
-      response:
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65535
-
-    ### Attribute[  2]: PhysicalClosedLimitTilt  ====================
-    - label:
-          "Step 3c: TH reads from the DUT the ( 2) PhysicalClosedLimitTilt
-          attribute"
-      command: "readAttribute"
-      attribute: "PhysicalClosedLimitTilt"
-      PICS: WNCV.S.A0002
-      response:
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65535
-
-    ### Attribute[  3]: CurrentPositionLift  ====================
-    - label:
-          "Step 3d: TH reads from the DUT the ( 3) CurrentPositionLift attribute"
-      command: "readAttribute"
-      attribute: "CurrentPositionLift"
-      PICS: WNCV.S.A0003 && !WNCV.S.A0010 && !WNCV.S.A0011
-      response:
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65535
-
-    ### Attribute[  3]: CurrentPositionLift  ====================
-    - label:
-          "Step 3d: TH reads the RO optional attribute default:
-          CurrentPositionLift"
-      command: "readAttribute"
-      attribute: "CurrentPositionLift"
-      PICS: WNCV.S.A0003 && WNCV.S.A0010 && WNCV.S.A0011
-      response:
-          constraints:
-              type: int16u
-              minValue: InstalledOpenLimitLiftValue
-              maxValue: InstalledClosedLimitLiftValue
-
-    ### Attribute[  4]: CurrentPositionTilt  ====================
-    - label:
-          "Step 3e: TH reads from the DUT the ( 4) CurrentPositionTilt attribute"
-      command: "readAttribute"
-      attribute: "CurrentPositionTilt"
-      PICS: WNCV.S.A0004 && !WNCV.S.A0012 && !WNCV.S.A0013
-      response:
-          constraints:
-              type: int16u
-              minValue: 0
-              maxValue: 65535
-
-    ### Attribute[  4]: CurrentPositionTilt  ====================
-    - label:
-          "Step 3e: TH reads the RO optional attribute default:
-          CurrentPositionTilt"
-      command: "readAttribute"
-      attribute: "CurrentPositionTilt"
-      PICS: WNCV.S.A0004 && WNCV.S.A0012 && WNCV.S.A0013
-      response:
-          constraints:
-              type: int16u
-              minValue: InstalledOpenLimitTiltValue
-              maxValue: InstalledClosedLimitTiltValue
-
     ### Attribute[  5]: NumberOfActuationsLift  ====================
     - label:
-          "Step 3f: TH reads from the DUT the ( 5) NumberOfActuationsLift
+          "Step 3b: TH reads from the DUT the ( 5) NumberOfActuationsLift
           attribute"
       command: "readAttribute"
       attribute: "NumberOfActuationsLift"
@@ -311,7 +179,7 @@ tests:
 
     ### Attribute[  6]: NumberOfActuationsTilt  ====================
     - label:
-          "Step 3g: TH reads from the DUT the ( 6) NumberOfActuationsTilt
+          "Step 3c: TH reads from the DUT the ( 6) NumberOfActuationsTilt
           attribute"
       command: "readAttribute"
       attribute: "NumberOfActuationsTilt"
@@ -324,7 +192,7 @@ tests:
 
     ### Attribute[  8]: CurrentPositionLiftPercentage  ====================
     - label:
-          "Step 3h: TH reads from the DUT the ( 8) CurrentPositionLiftPercentage
+          "Step 3d: TH reads from the DUT the ( 8) CurrentPositionLiftPercentage
           attribute"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
@@ -337,7 +205,7 @@ tests:
 
     ### Attribute[  9]: CurrentPositionTiltPercentage  ====================
     - label:
-          "Step 3i: TH reads from the DUT the ( 9) CurrentPositionTiltPercentage
+          "Step 3e: TH reads from the DUT the ( 9) CurrentPositionTiltPercentage
           attribute"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"

@@ -51,7 +51,7 @@ class TC_WEBRTCP_2_10(MatterBaseTest, WEBRTCPTestBase):
 
     def steps_TC_WEBRTCP_2_10(self) -> list[TestStep]:
         steps = [
-            TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success and provides stream IDs"),
             TestStep(2, "TH sends the SolicitOffer command with valid parameters from a specific endpoint ID",

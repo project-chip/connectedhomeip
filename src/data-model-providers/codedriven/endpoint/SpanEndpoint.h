@@ -28,8 +28,7 @@ namespace app {
  * @brief An implementation of EndpointInterface that uses `chip::Span` to refer to its data.
  *
  * This provider is constructed using its `Builder` class. It stores `chip::Span` members that
- * point to externally managed arrays for its configuration (device types, server/client clusters,
- * semantic tags, etc.).
+ * point to externally managed arrays for its configuration (device types, server/client clusters, etc.).
  *
  * @warning Lifetime of Span-Referenced Data:
  * `SpanEndpoint` does NOT take ownership of the data arrays referenced by its
@@ -58,7 +57,6 @@ public:
         explicit Builder() = default;
 
         Builder & SetClientClusters(Span<const ClusterId> clientClusters);
-        Builder & SetSemanticTags(Span<const SemanticTag> semanticTags);
         Builder & SetDeviceTypes(Span<const DataModel::DeviceTypeEntry> deviceTypes);
 
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
@@ -68,7 +66,6 @@ public:
 
     private:
         Span<const ClusterId> mClientClusters;
-        Span<const SemanticTag> mSemanticTags;
         Span<const DataModel::DeviceTypeEntry> mDeviceTypes;
 
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
@@ -88,7 +85,6 @@ public:
     SpanEndpoint & operator=(SpanEndpoint &&) = default;
 
     // Iteration methods
-    CHIP_ERROR SemanticTags(ReadOnlyBufferBuilder<SemanticTag> & out) const override;
     CHIP_ERROR DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const override;
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 
@@ -99,16 +95,14 @@ public:
 private:
     // Private constructor for Builder
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-    SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const SemanticTag> & semanticTags,
-                 const Span<const DataModel::DeviceTypeEntry> & deviceTypes, const CharSpan & uniqueEndpointId);
+    SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const DataModel::DeviceTypeEntry> & deviceTypes,
+                 const CharSpan & uniqueEndpointId);
 #else
-    SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const SemanticTag> & semanticTags,
-                 const Span<const DataModel::DeviceTypeEntry> & deviceTypes);
+    SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const DataModel::DeviceTypeEntry> & deviceTypes);
 #endif
 
     // Iteration methods
     Span<const DataModel::DeviceTypeEntry> mDeviceTypes;
-    Span<const SemanticTag> mSemanticTags;
     Span<const ClusterId> mClientClusters;
 
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID

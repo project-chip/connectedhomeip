@@ -44,6 +44,9 @@ public:
     // Sets the desired preroll buffer length in milliseconds for the given transport
     void SetPreRollLength(Transport * transport, uint16_t preRollBufferLength) override;
     void SetCameraDevice(Camera::CameraDevice * device);
+    // Get transport registered for a specific stream ID
+    Transport * GetTransportForVideoStream(uint16_t videoStreamID) override;
+    Transport * GetTransportForAudioStream(uint16_t audioStreamID) override;
 
 private:
     PreRollBuffer mPreRollBuffer;

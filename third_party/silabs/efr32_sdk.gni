@@ -91,6 +91,8 @@ declare_args() {
   sl_enable_test_event_trigger = false
 
   sl_verbose_mode = false
+
+  sl_em4_sleep = false
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
@@ -490,6 +492,7 @@ template("efr32_sdk") {
       "SL_CODE_COMPONENT_OPENTHREAD=openthread",
       "SL_CODE_COMPONENT_INTERRUPT_MANAGER=interrupt_manager",
       "SL_APP_PROPERTIES",
+      "SL_MATTER_EM4_SLEEP=${sl_em4_sleep}",
     ]
 
     if (silabs_log_enabled && chip_logging) {
@@ -723,6 +726,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_object.c",
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_page.c",
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_utils.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_burtc.c",
       "${efr32_sdk_root}/platform/emlib/src/em_cmu.c",
       "${efr32_sdk_root}/platform/emlib/src/em_crypto.c",
       "${efr32_sdk_root}/platform/emlib/src/em_emu.c",

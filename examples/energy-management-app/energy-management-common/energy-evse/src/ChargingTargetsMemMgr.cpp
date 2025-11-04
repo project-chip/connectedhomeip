@@ -93,6 +93,7 @@ CHIP_ERROR ChargingTargetsMemMgr::AllocAndCopy()
     // ChargingTargetsMemMgr.h before this method can be called.
 
     VerifyOrDie(mpListOfDays[mChargingTargetSchedulesIdx] == nullptr);
+    VerifyOrReturnError(mNumDailyChargingTargets <= kEvseTargetsMaxTargetsPerDay, CHIP_ERROR_NO_MEMORY);
 
     if (mNumDailyChargingTargets > 0)
     {
@@ -124,6 +125,7 @@ ChargingTargetsMemMgr::AllocAndCopy(const DataModel::List<const Structs::Chargin
     VerifyOrDie(mpListOfDays[mChargingTargetSchedulesIdx] == nullptr);
 
     mNumDailyChargingTargets = static_cast<uint16_t>(chargingTargets.size());
+    VerifyOrReturnError(mNumDailyChargingTargets <= kEvseTargetsMaxTargetsPerDay, CHIP_ERROR_NO_MEMORY);
 
     if (mNumDailyChargingTargets > 0)
     {
@@ -161,6 +163,7 @@ ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::Char
     ReturnErrorOnFailure(chargingTargets.ComputeSize(&numDailyChargingTargets));
 
     mNumDailyChargingTargets = static_cast<uint16_t>(numDailyChargingTargets);
+    VerifyOrReturnError(mNumDailyChargingTargets <= kEvseTargetsMaxTargetsPerDay, CHIP_ERROR_NO_MEMORY);
 
     if (mNumDailyChargingTargets > 0)
     {
