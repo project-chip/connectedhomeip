@@ -238,7 +238,7 @@ class AttributeSubscriptionHandler:
         if self._expected_attribute is not None:
             attributes = [(endpoint, self._expected_attribute)]
         self._subscription = await dev_ctrl.ReadAttribute(
-            nodeid=node_id,
+            nodeId=node_id,
             attributes=attributes,
             reportInterval=(int(min_interval_sec), int(max_interval_sec)),
             fabricFiltered=fabric_filtered,
