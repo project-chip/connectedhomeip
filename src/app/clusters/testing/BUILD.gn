@@ -21,8 +21,8 @@ source_set("testing") {
     "AttributeTesting.cpp",
     "AttributeTesting.h",
     "ClusterTester.h",
-    "CommandTesting.cpp",
-    "CommandTesting.h",
+    "MockCommandHandler.cpp",
+    "MockCommandHandler.h",
   ]
 
   public_deps = [
