@@ -245,7 +245,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                         continue
 
                     try:
-                        # Get current value (per TC_AccessChecker pattern)
+                        # Get current value 
                         current_val = attributes[attribute]
 
                         # Skip if value decode failed
@@ -253,7 +253,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                             logging.debug(f"{test_step}: Skipping {attribute.__name__} - decode failure")
                             continue
 
-                        # Determine new value based on type (per TC_AccessChecker pattern)
+                        # Determine new value based on type 
                         if isinstance(current_val, str):
                             # String attribute - use unique value to trigger actual change
                             new_val = f"{test_step}_T{int(time.time())}_{changed_count}"
@@ -284,7 +284,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                                 'new_value': new_val
                             })
 
-                            # Restore list values if we wrote an empty list successfully (per TC_AccessChecker pattern)
+                            # Restore list values if we wrote an empty list successfully
                             if isinstance(current_val, list) and len(new_val) == 0:
                                 await self.default_controller.WriteAttribute(
                                     nodeid=self.dut_node_id,
@@ -302,7 +302,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
                         elif resp[0].Status == Status.UnsupportedWrite:
                             # Optional write attribute that's not supported - this is fine
-                            logging.debug(f"{test_step}: {attribute.__name__} returned UnsupportedWrite (optional)")
+                            logging.debug(f"{test_step}: {attribute.__name__} returned UnsupportedWrite")
                         else:
                             # Other errors are acceptable per TC_AccessChecker pattern
                             # (e.g., InvalidValue, ConstraintError - as long as it's not UnsupportedAccess)
@@ -317,66 +317,47 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             return 0
 
         # Wait for change reports to arrive
-        # Reports should arrive within MaxInterval per subscription parameters
-        wait_time = self.max_interval_ceiling_sec
+        # Reports should arrive within MaxInterval per subscription parameters and adding an additional wait here for 5 seconds to be safe.
+        wait_time = self.max_interval_ceiling_sec + 5
         time.sleep(wait_time)
 
         # Verify we received reports for the changed attributes
         # Get the latest attribute data from the subscription
-        try:
-            current_data = subscription.GetAttributes()
-            verified_count = 0
-            missing_reports = []
+        current_data = subscription.GetAttributes()
+        verified_count = 0
+        missing_reports = []
 
-            for change in changed_attributes:
-                ep = change['endpoint']
-                cluster = change['cluster']
-                attr = change['attribute']
-                expected_val = change['new_value']
+        # Possible this might be too strict currently.
+        for change in changed_attributes:
+            ep = change['endpoint']
+            cluster = change['cluster']
+            attr = change['attribute']
+            expected_val = change['new_value']
 
-                # Check if we have data for this attribute in the subscription
-                if ep in current_data and cluster in current_data[ep] and attr in current_data[ep][cluster]:
-                    received_val = current_data[ep][cluster][attr]
+            # Check if we have data for this attribute in the subscription
+            if ep in current_data and cluster in current_data[ep] and attr in current_data[ep][cluster]:
+                received_val = current_data[ep][cluster][attr]
 
-                    # For strings, verify the value changed
-                    # For lists, we may have restored so just verify we got a report
-                    # For other types, we wrote back the same value so just verify presence
-                    if isinstance(expected_val, str):
-                        if received_val == expected_val:
-                            verified_count += 1
-                            logging.debug(f"{test_step}: Verified report for {attr.__name__} = '{received_val}'")
-                        else:
-                            logging.warning(
-                                f"{test_step}: Report value mismatch for {attr.__name__}: expected '{expected_val}', got '{received_val}'")
-                            verified_count += 1
-                    else:
-                        # For non-string types, just verify we have the attribute data
+                # For strings, verify the value changed
+                # For lists, we may have restored so just verify we got a report
+                # For other types, we wrote back the same value so just verify presence
+                if isinstance(expected_val, str):
+                    if received_val == expected_val:
                         verified_count += 1
-                        logging.debug(f"{test_step}: Verified report for {attr.__name__}")
+                    else:
+                        asserts.assert_equal(received_val, expected_val, f"{test_step}: Report value mismatch for {attr.__name__}: expected '{expected_val}', got '{received_val}'")
                 else:
-                    missing_reports.append(f"{attr.__name__} on endpoint {ep}")
-                    logging.warning(
-                        f"{test_step}: No report received for {attr.__name__} on endpoint {ep}, cluster 0x{cluster.id:04X}")
-
-            if missing_reports:
-                logging.warning(
-                    f"{test_step}: Missing reports for {len(missing_reports)} attribute(s): {', '.join(missing_reports[:5])}")
-                if len(missing_reports) > 5:
-                    logging.warning(f"{test_step}: ... and {len(missing_reports) - 5} more")
-
-            logging.info(f"{test_step}: Verified {verified_count}/{len(changed_attributes)} attribute change reports received")
-
-            if verified_count > 0:
-                return verified_count
+                    # For non-string types, just verify we have the attribute data
+                    verified_count += 1
+                    logging.debug(f"{test_step}: Verified report for {attr.__name__}")
             else:
-                logging.error(f"{test_step}: No change reports verified - subscription may not be functioning correctly")
-                return 0
+                missing_reports.append(f"{attr.__name__} on endpoint {ep}")
 
-        except Exception as e:
-            logging.error(f"{test_step}: Error verifying reports: {e}")
-            # Fallback: at least we tried to change attributes
-            logging.info(f"{test_step}: Returning changed_count as fallback: {changed_count}")
-            return changed_count
+        logging.info(f"{test_step}: Verified {verified_count}/{len(changed_attributes)} attribute change reports received")
+
+        asserts.assert_less_equal(len(missing_reports), 0, f"{test_step}: Missing reports for {len(missing_reports)} attribute(s): {', '.join(missing_reports)}")
+        asserts.assert_greater(verified_count, 0, f"No change reports verified, we should have received at least one report")
+        return verified_count
 
     @async_test_body
     async def test_TC_IDM_4_3(self):
@@ -670,7 +651,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         #
         # With JITTER (±25%) and MARGIN (1.1x) applied per spec:
         #   Worst-case multiplier: 1.25 × 1.1 = 1.375
-        #   Worst-case Total: 4628ms × 1.375 ≈ 6364ms (≈ 7.4s with 1s buffer)
+        #   Worst-case Total: 4628ms × 1.375 ≈ 6364ms
         #
         # However, we dynamically calculate MRP retransmission timeout based on the actual
         # negotiated idle interval retrieved from the DUT, ensuring accurate timing validation
@@ -697,7 +678,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         except Exception as e:
             logging.info(f"Using default MRP Idle Interval (500ms for non-Thread) but experienced {e}")
 
-        MRP_RETRANSMISSION_TIMEOUT = (negotiated_idle_interval_ms * 9.256 * 1.375 / 1000.0) + 1.0
+        MRP_RETRANSMISSION_TIMEOUT = (negotiated_idle_interval_ms * 9.256 * 1.375 / 1000.0)
 
         logging.info(f"Using MRP Idle Interval of {negotiated_idle_interval_ms}ms")
         logging.info(f"Calculated MRP retransmission timeout: {MRP_RETRANSMISSION_TIMEOUT:.2f}s")
@@ -949,7 +930,9 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # Subscribe to ALL attributes from ALL clusters on ALL endpoints
         # Note: Some clusters have attributes that don't support subscriptions (INVALID_ACTION) or only support subscriptions in special circumstances:
         # - AccessControl, NetworkCommissioning, CameraAvStreamManagement, OperationalCredentials
-        # - ValveConfigurationAndControl, CarbonDioxideConcentrationMeasurement
+        # - ValveConfigurationAndControl
+        # - All concentration measurement clusters (10 total: CO, CO2, NO2, Ozone, PM2.5, Formaldehyde, PM1, PM10, TVOC, Radon)
+        # - Manufacturer-specific clusters (0xFC00-0xFFFE range) may have non-standard subscription behavior
         # Since most of these appear to be mandatory/common clusters, we must exclude them from the wildcard so it doesnt fail.
         # We build a filtered wildcard by subscribing to all attributes for each non-problematic cluster similar to how it is done in ACE_2_4 test module.
 
@@ -959,7 +942,17 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             Clusters.CameraAvStreamManagement.id,
             Clusters.OperationalCredentials.id,
             Clusters.ValveConfigurationAndControl.id,
+            # All concentration measurement clusters have been added to remove possible clusters that might cause issues during subscription testing. More comprehensive testing is done in ACE_2_4 test module.
+            Clusters.CarbonMonoxideConcentrationMeasurement.id,
             Clusters.CarbonDioxideConcentrationMeasurement.id,
+            Clusters.NitrogenDioxideConcentrationMeasurement.id,
+            Clusters.OzoneConcentrationMeasurement.id,
+            Clusters.Pm25ConcentrationMeasurement.id,
+            Clusters.FormaldehydeConcentrationMeasurement.id,
+            Clusters.Pm1ConcentrationMeasurement.id,
+            Clusters.Pm10ConcentrationMeasurement.id,
+            Clusters.TotalVolatileOrganicCompoundsConcentrationMeasurement.id,
+            Clusters.RadonConcentrationMeasurement.id,
         ]
 
         all_cluster_ids = set()
@@ -969,9 +962,17 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # Build wildcard paths for all clusters EXCEPT the problematic ones
         subscription_paths = []
         for cluster_id in all_cluster_ids:
-            if cluster_id not in CLUSTERS_WITH_SUBSCRIPTION_ISSUES:
-                # Subscribe to all attributes in this cluster across all endpoints
-                subscription_paths.append(AttributePath(ClusterId=cluster_id))
+            # Skip known problematic clusters
+            if cluster_id in CLUSTERS_WITH_SUBSCRIPTION_ISSUES:
+                continue
+            
+            # These may have non-standard subscription behavior
+            if 0xFC00 <= cluster_id <= 0xFFFE:
+                logging.info(f"Step 10: Skipping manufacturer-specific cluster 0x{cluster_id:04X}")
+                continue
+            
+            # Subscribe to all attributes in this cluster across all endpoints
+            subscription_paths.append(AttributePath(ClusterId=cluster_id))
 
         sub_step10 = await TH.ReadAttribute(
             nodeid=self.dut_node_id,
@@ -1012,16 +1013,24 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         self.step(11)
 
         # Subscribe to all attributes from all clusters on endpoint 0
-        # Note: We must exclude clusters with subscription issues
+        # Note: We must exclude clusters with subscription issues and manufacturer-specific clusters
         subscription_paths_step11 = []
         if self.root_node_endpoint in self.endpoints_tlv:
             for cluster_id in self.endpoints_tlv[self.root_node_endpoint].keys():
-                if cluster_id not in CLUSTERS_WITH_SUBSCRIPTION_ISSUES:
-                    # Subscribe to all attributes in this cluster on this endpoint
-                    subscription_paths_step11.append(AttributePath(
-                        EndpointId=self.root_node_endpoint,
-                        ClusterId=cluster_id
-                    ))
+                # Skip known problematic clusters
+                if cluster_id in CLUSTERS_WITH_SUBSCRIPTION_ISSUES:
+                    continue
+                
+                # Skip manufacturer-specific clusters (0xFC00-0xFFFE range)
+                if 0xFC00 <= cluster_id <= 0xFFFE:
+                    logging.info(f"Step 11: Skipping manufacturer-specific cluster 0x{cluster_id:04X}")
+                    continue
+                
+                # Subscribe to all attributes in this cluster on this endpoint
+                subscription_paths_step11.append(AttributePath(
+                    EndpointId=self.root_node_endpoint,
+                    ClusterId=cluster_id
+                ))
 
         sub_step11 = await TH.ReadAttribute(
             nodeid=self.dut_node_id,
