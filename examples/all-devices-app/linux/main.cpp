@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <AppMain.h>
 #include <AllClustersExampleDeviceInfoProviderImpl.h>
+#include <AppMain.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
