@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/testing/CommandTesting.h>
+#include <app/clusters/testing/MockCommandHandler.h>
 
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPError.h>
