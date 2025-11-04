@@ -896,7 +896,7 @@ CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ::ScanCallba
 
     status = sl_wifi_set_advanced_scan_configuration(&advanced_scan_configuration);
 
-    // TODO: Seems like Chipdie should be called here, the device should be initialized here
+    // TODO: Seems like ChipDie should be called here, the device should be initialized here
     VerifyOrReturnError(
         status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
         ChipLogError(DeviceLayer, "sl_wifi_set_advanced_scan_configuration failed: 0x%lx", static_cast<uint32_t>(status)));
