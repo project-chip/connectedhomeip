@@ -24,7 +24,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-class AllDevicesExampleDeviceInfoProviderImpl : public AllClustersExampleDeviceInfoProviderImpl 
+class AllDevicesExampleDeviceInfoProviderImpl : public AllClustersExampleDeviceInfoProviderImpl
 {
 public:
     AllDevicesExampleDeviceInfoProviderImpl() = default;
