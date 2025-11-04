@@ -19,7 +19,7 @@
 #include <app/clusters/groupcast/GroupcastCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/testing/CommandTesting.h>
+#include <app/clusters/testing/MockCommandHandler.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
