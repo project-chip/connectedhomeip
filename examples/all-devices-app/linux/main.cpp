@@ -17,7 +17,7 @@
  */
 
 #include <AppMain.h>
-#include <DeviceInfoProviderImpl.h>
+#include <AllClustersExampleDeviceInfoProviderImpl.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
@@ -46,7 +46,7 @@ AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 
 DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sWiFiDriver;
 
-DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+AllClustersExampleDeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
 LinuxCommissionableDataProvider gCommissionableDataProvider;

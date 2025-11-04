@@ -38,7 +38,7 @@ executable("all-devices-app") {
     "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/examples/platform/linux:linux-commissionable-data-provider",
-    "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
+    "${chip_root}/examples/providers:all_clusters_device_info_provider",
     "${chip_root}/src/app/persistence",
     "${chip_root}/src/app/persistence:default",
     "${chip_root}/src/data-model-providers/codedriven",
