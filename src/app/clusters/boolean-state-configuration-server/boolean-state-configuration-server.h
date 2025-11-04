@@ -58,7 +58,8 @@ inline CHIP_ERROR SetAlarmsActive(EndpointId ep, chip::BitMask<AlarmModeBitmap> 
 {
     auto cluster = FindClusterOnEndpoint(ep);
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NO_ENDPOINT);
-    return cluster->SetAlarmsActive(alarms);
+    cluster->SetAlarmsActive(alarms);
+    return CHIP_NO_ERROR;
 }
 
 inline CHIP_ERROR SetAllEnabledAlarmsActive(EndpointId ep)
@@ -72,21 +73,24 @@ inline CHIP_ERROR ClearAllAlarms(EndpointId ep)
 {
     auto cluster = FindClusterOnEndpoint(ep);
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NO_ENDPOINT);
-    return cluster->ClearAllAlarms();
+    cluster->ClearAllAlarms();
+    return CHIP_NO_ERROR;
 }
 
 inline CHIP_ERROR SuppressAlarms(EndpointId ep, chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarms)
 {
     auto cluster = FindClusterOnEndpoint(ep);
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NO_ENDPOINT);
-    return cluster->SuppressAlarms(alarms);
+    cluster->SuppressAlarms(alarms);
+    return CHIP_NO_ERROR;
 }
 
 inline CHIP_ERROR SetCurrentSensitivityLevel(EndpointId ep, uint8_t level)
 {
     auto cluster = FindClusterOnEndpoint(ep);
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NO_ENDPOINT);
-    return cluster->SetCurrentSensitivityLevel(level);
+    cluster->SetCurrentSensitivityLevel(level);
+    return CHIP_NO_ERROR;
 }
 
 inline CHIP_ERROR EmitSensorFault(EndpointId ep, chip::BitMask<BooleanStateConfiguration::SensorFaultBitmap> fault)
@@ -94,7 +98,8 @@ inline CHIP_ERROR EmitSensorFault(EndpointId ep, chip::BitMask<BooleanStateConfi
 
     auto cluster = FindClusterOnEndpoint(ep);
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NO_ENDPOINT);
-    return cluster->EmitSensorFault(fault);
+    cluster->EmitSensorFault(fault);
+    return CHIP_NO_ERROR;
 }
 
 inline bool HasFeature(EndpointId ep, Feature feature)

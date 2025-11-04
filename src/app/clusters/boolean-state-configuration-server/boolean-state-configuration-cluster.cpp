@@ -16,9 +16,11 @@
  *
  */
 
-// TODO: start converting
-
 #include "boolean-state-configuration-cluster.h"
+
+#include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/BooleanStateConfiguration/Metadata.h>
+
 #if 0
 #include "boolean-state-configuration-server.h" // nogncheck
 
@@ -457,13 +459,108 @@ exit:
 
 #endif
 
+using namespace chip::app::DataModel;
+using namespace chip::app::Clusters::BooleanStateConfiguration;
+using namespace chip::app::Clusters::BooleanStateConfiguration::Attributes;
+
 namespace chip::app::Clusters {
 
-DataModel::ActionReturnStatus BooleanStateConfigurationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                              AttributeValueEncoder & encoder)
+ActionReturnStatus BooleanStateConfigurationCluster::ReadAttribute(const ReadAttributeRequest & request,
+                                                                   AttributeValueEncoder & encoder)
 {
-    // FIXME: implement
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    switch (request.path.mAttributeId)
+    {
+    case ClusterRevision::Id:
+        return encoder.Encode(BooleanStateConfiguration::kRevision);
+    case FeatureMap::Id:
+        return encoder.Encode(mFeatures);
+    case CurrentSensitivityLevel::Id:
+        return encoder.Encode(mCurrentSensitivityLevel);
+    case SupportedSensitivityLevels::Id:
+        return encoder.Encode(mSupportedSensitivityLevels);
+    case DefaultSensitivityLevel::Id:
+        return encoder.Encode(mDefaultSensitivityLevel);
+    case AlarmsActive::Id:
+        return encoder.Encode(mAlarmsActive);
+    case AlarmsSuppressed::Id:
+        return encoder.Encode(mAlarmsSuppressed);
+    case AlarmsEnabled::Id:
+        return encoder.Encode(mAlarmsEnabled);
+    case AlarmsSupported::Id:
+        return encoder.Encode(mAlarmsSupported);
+    case SensorFault::Id:
+        return encoder.Encode(mSensorFault);
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    }
+}
+
+ActionReturnStatus BooleanStateConfigurationCluster::WriteAttribute(const WriteAttributeRequest & request,
+                                                                    AttributeValueDecoder & decoder)
+{
+    switch (request.path.mAttributeId)
+    {
+    case CurrentSensitivityLevel::Id: {
+        uint8_t value;
+        ReturnErrorOnFailure(decoder.Decode(value));
+        SetCurrentSensitivityLevel(value); // set handles the notifications automatically
+        return CHIP_NO_ERROR;
+    }
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedWrite;
+    }
+}
+
+CHIP_ERROR BooleanStateConfigurationCluster::Attributes(const ConcreteClusterPath & path,
+                                                        ReadOnlyBufferBuilder<AttributeEntry> & builder)
+{
+    constexpr AttributeEntry optionalAttributesMeta[] = {
+        CurrentSensitivityLevel::kMetadataEntry,    //
+        SupportedSensitivityLevels::kMetadataEntry, //
+        DefaultSensitivityLevel::kMetadataEntry,    //
+        AlarmsActive::kMetadataEntry,               //
+        AlarmsSuppressed::kMetadataEntry,           //
+        AlarmsEnabled::kMetadataEntry,              //
+        AlarmsSupported::kMetadataEntry,            //
+        SensorFault::kMetadataEntry,                //
+    };
+
+    AttributeSet enabledOptionalAttributes;
+
+    if (mFeatures.Has(Feature::kSensitivityLevel))
+    {
+        enabledOptionalAttributes.ForceSet<CurrentSensitivityLevel::Id>();
+        enabledOptionalAttributes.ForceSet<SupportedSensitivityLevels::Id>();
+        if (mOptionalAttributes.IsSet(DefaultSensitivityLevel::Id))
+        {
+            enabledOptionalAttributes.ForceSet<DefaultSensitivityLevel::Id>();
+        }
+    }
+
+    if (mFeatures.Has(Feature::kVisual) || mFeatures.Has(Feature::kAudible))
+    {
+        enabledOptionalAttributes.ForceSet<AlarmsActive::Id>();
+        enabledOptionalAttributes.ForceSet<AlarmsSupported::Id>();
+
+        if (mOptionalAttributes.IsSet(AlarmsEnabled::Id))
+        {
+            enabledOptionalAttributes.ForceSet<AlarmsEnabled::Id>();
+        }
+    }
+
+    if (mFeatures.Has(Feature::kAlarmSuppress))
+    {
+        enabledOptionalAttributes.ForceSet<AlarmsSuppressed::Id>();
+    }
+
+    if (mOptionalAttributes.IsSet(SensorFault::Id))
+    {
+        enabledOptionalAttributes.ForceSet<SensorFault::Id>();
+    }
+
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span(kMandatoryMetadata), Span<const AttributeEntry>{ optionalAttributesMeta },
+                              enabledOptionalAttributes);
 }
 
 } // namespace chip::app::Clusters
