@@ -393,14 +393,17 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
     // Capture the instance ID to validate this is still the same endpoint instance
     uint32_t expectedInstanceId = ep->mInstanceId.load();
     CHIP_ERROR err              = ep->GetSystemLayer().ScheduleLambda(
-        [ep, pcb, expectedInstanceId, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf), pktInfo = pktInfo.get()] {
+        [ep, expectedInstanceId, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf), pktInfo = pktInfo.get()] {
             // Critical check: Verify this lambda is for the correct endpoint instance
             // by comparing the instance ID. If they don't match, the endpoint was
-            // deleted and recreated at the same memory address.
+            // deleted and new endpoint wascreated at the same memory address.
             if (ep->mInstanceId.load() != expectedInstanceId)
             {
                 // This is a stale lambda for a previously deleted endpoint.
                 // The memory was reused for a new endpoint with different instance ID.
+                // Note: We don't decrement mDelayReleaseCount here because:
+                // - The original endpoint's count is gone with the deleted endpoint
+                // - The new endpoint's count should not be decremented (it never had this packet)
                 pbuf_free(p);
                 return;
             }
