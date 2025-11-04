@@ -27,6 +27,11 @@ namespace DataModel {
 
 void JitterDeferredProviderChangeListener::MarkDirty(const AttributePathParams & path)
 {
+    if (path.mEndpointId == kRootEndpointId)
+    {
+        mUnderlyingListener->MarkDirty(path);
+        return;
+    }
     if (mCurrentIndex >= kMaxAttributePathsBufferSize)
     {
         // When attribute path buffer is full, flush and process existing paths to make room
