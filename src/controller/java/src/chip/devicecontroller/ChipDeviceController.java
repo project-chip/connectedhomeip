@@ -636,6 +636,10 @@ public class ChipDeviceController {
     unpairDeviceCallback(deviceControllerPtr, deviceId, callback);
   }
 
+  public void continueCommissioningAfterConnectNetworkRequest(long remoteDeviceId) {
+    continueCommissioningAfterConnectNetworkRequest(deviceControllerPtr, remoteDeviceId);
+  }
+
   /**
    * This function stops a pairing or commissioning process that is in progress.
    *
@@ -1717,6 +1721,9 @@ public class ChipDeviceController {
 
   private native void unpairDeviceCallback(
       long deviceControllerPtr, long deviceId, UnpairDeviceCallback callback);
+
+  private native void continueCommissioningAfterConnectNetworkRequest(
+      long deviceControllerPtr, long remoteDeviceId);
 
   private native void stopDevicePairing(long deviceControllerPtr, long deviceId);
 
