@@ -1804,7 +1804,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
     DataModel::AcceptedCommandEntry acceptedCommandEntry;
 
     const Status existenceStatus = CheckCommandExistence(request.path, acceptedCommandEntry);
-    const bool commandExists     = (existenceStatus == Status::Success);
+    const bool commandExists     = (existenceStatus == Status::Success)
 
     // Default to Operate when the command metadata is unknown so we can fail closed while still avoiding
     // leaking information about whether the path actually exists. When the metadata lookup succeeds we
