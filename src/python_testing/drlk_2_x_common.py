@@ -126,7 +126,7 @@ class DRLK_COMMON:
 
         # Allow for user overrides of these values
         self.user_index = self.user_params.get("user_index", 1)
-        self.endpoint = self.user_params.get("endpoint", 1)
+        self.endpoint = self.get_endpoint()
         credentialIndex = self.user_params.get("credential_index", 1)
         userCodeTemporaryDisableTime = self.user_params.get("user_code_temporary_disable_time", 15)
         wrongCodeEntryLimit = self.user_params.get("wrong_code_entry_limit", 3)
