@@ -982,13 +982,17 @@ class MatterBaseTest(base_test.BaseTestClass):
         if not isinstance(app_pipe_out, str):
             raise TypeError("The named pipe must be provided as a string value")
 
-        data = ""
+        line = ""
+        f = self.open_fifo_nonblocking(app_pipe_out)
+        LOGGER.info(f"Reading out-of-band command response to file: {app_pipe_out}")
+        line = f.readline()
+        f.close()
 
-        with open(app_pipe_out, "r") as app_pipe_out_fp:
-            LOGGER.info(f"Reading out-of-band command response to file: {app_pipe_out}")
-            data = json.load(app_pipe_out_fp)
+        return line
 
-        return data
+    def open_fifo_nonblocking(self, app_pipe_out):
+        fd = os.open(app_pipe_out, os.O_RDONLY | os.O_NONBLOCK)
+        return os.fdopen(fd, "r", buffering=1)
 
     def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None):
         """

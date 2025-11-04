@@ -199,8 +199,9 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         await asyncio.sleep(2)
 
         command = {"Name": "Snapshot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": 0}
+        fifo_in = "/tmp/su_2_8_fifo"
         fifo_out = "/tmp/su_2_8_fifo_out"
-        self.write_to_app_pipe(command)
+        self.write_to_app_pipe(command, fifo_in)
         response_data = self.read_from_app_pipe(fifo_out)
 
         logging.info(f"Response data: {response_data}")
