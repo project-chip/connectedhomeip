@@ -77,27 +77,28 @@ class Context:
                 self.builders[builder.identifier] = builder
 
     def CleanOutputDirectories(self):
-        for builder in self.builders.values():
+        for builder in set(self.builders.values()):
             logging.info('Cleaning %s' % builder.output_dir)
             shutil.rmtree(builder.output_dir, ignore_errors=True)
 
     def Generate(self):
-        for builder in self.builders.values():
+        for builder in set(self.builders.values()):
             builder.generate()
 
     def Build(self):
-        for builder in self.builders.values():
+        self.Generate()
+        for builder in set(self.builders.values()):
             builder.build()
 
     def CopyArtifactsTo(self, directory):
-        for builder in self.builders.values():
+        for target_name, builder in self.builders.items():
             builder.CopyArtifacts(directory)
 
     def CreateArtifactArchives(self, directory):
-        for builder in self.builders.values():
+        for target_name, builder in self.builders.items():
             archive_name = os.path.join(
-                directory, f'{builder.identifier}.tar.gz')
-            logging.info(f'Archiving {builder.identifier} to {archive_name}')
+                directory, f'{target_name}.tar.gz')
+            logging.info(f'Archiving {target_name} to {archive_name}')
             builder.CompressArtifacts(archive_name)
 
 
