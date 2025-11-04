@@ -358,7 +358,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         asserts.assert_less_equal(
             len(missing_reports), 0, f"{test_step}: Missing reports for {len(missing_reports)} attribute(s): {', '.join(missing_reports)}")
-        asserts.assert_greater(verified_count, 0, f"No change reports verified, we should have received at least one report")
+        asserts.assert_greater(verified_count, 0, "No change reports verified, we should have received at least one report")
         return verified_count
 
     @async_test_body
