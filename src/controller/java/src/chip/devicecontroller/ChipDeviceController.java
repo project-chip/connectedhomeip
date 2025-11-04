@@ -636,6 +636,10 @@ public class ChipDeviceController {
     unpairDeviceCallback(deviceControllerPtr, deviceId, callback);
   }
 
+  public void continueCommissioningAfterConnectNetworkRequest(long remoteDeviceId) {
+    continueCommissioningAfterConnectNetworkRequest(deviceControllerPtr, remoteDeviceId);
+  }
+
   /**
    * This function stops a pairing or commissioning process that is in progress.
    *
@@ -748,6 +752,12 @@ public class ChipDeviceController {
   public void onCommissioningStatusUpdate(long nodeId, String stage, long errorCode) {
     if (completionListener != null) {
       completionListener.onCommissioningStatusUpdate(nodeId, stage, errorCode);
+    }
+  }
+
+  public void onCommissioningStageStart(long nodeId, String stage) {
+    if (completionListener != null) {
+      completionListener.onCommissioningStageStart(nodeId, stage);
     }
   }
 
@@ -1712,6 +1722,9 @@ public class ChipDeviceController {
   private native void unpairDeviceCallback(
       long deviceControllerPtr, long deviceId, UnpairDeviceCallback callback);
 
+  private native void continueCommissioningAfterConnectNetworkRequest(
+      long deviceControllerPtr, long remoteDeviceId);
+
   private native void stopDevicePairing(long deviceControllerPtr, long deviceId);
 
   private native long getDeviceBeingCommissionedPointer(long deviceControllerPtr, long nodeId);
@@ -1897,6 +1910,9 @@ public class ChipDeviceController {
 
     /** Notifies the completion of each stage of commissioning. */
     void onCommissioningStatusUpdate(long nodeId, String stage, long errorCode);
+
+    /** Notifies when a commissioning stage starts. */
+    void onCommissioningStageStart(long nodeId, String stage);
 
     /** Notifies that the Chip connection has been closed. */
     void onNotifyChipConnectionClosed();
