@@ -18,6 +18,7 @@
 #include <app/data-model-provider/JitterDeferredProviderChangeListener.h>
 #include <crypto/RandUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <system/SystemLayer.h>
 #include <system/SystemTimer.h>
 
 namespace chip {
@@ -36,13 +37,8 @@ void JitterDeferredProviderChangeListener::MarkDirty(const AttributePathParams &
     {
         uint32_t jitterMs =
             (mDeferAttributePathJitterTimeoutMs == 0) ? 0 : Crypto::GetRandU32() % mDeferAttributePathJitterTimeoutMs;
-        DeviceLayer::SystemLayer().StartTimer(
-            System::Clock::Milliseconds32(mDeferAttributePathBaseTimeoutMs + jitterMs),
-            [](System::Layer *, void * me) {
-                DeviceLayer::SystemLayer().ScheduleLambda(
-                    [me] { static_cast<JitterDeferredProviderChangeListener *>(me)->TimerCallback(); });
-            },
-            this);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(mDeferAttributePathBaseTimeoutMs + jitterMs),
+                                              TimerCallback, this);
         mTimerActive = true;
     }
 }
@@ -59,10 +55,11 @@ void JitterDeferredProviderChangeListener::FlushDirtyPaths()
     mCurrentIndex = 0;
 }
 
-void JitterDeferredProviderChangeListener::TimerCallback()
+void JitterDeferredProviderChangeListener::TimerCallback(System::Layer * systemLayer, void * me)
 {
-    FlushDirtyPaths();
-    mTimerActive = false;
+    auto * self = static_cast<JitterDeferredProviderChangeListener *>(me);
+    self->FlushDirtyPaths();
+    self->mTimerActive = false;
 }
 
 } // namespace DataModel

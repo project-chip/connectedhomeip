@@ -18,6 +18,7 @@
 
 #include <app/AttributePathParams.h>
 #include <app/data-model-provider/ProviderChangeListener.h>
+#include <system/SystemLayer.h>
 
 #include <array>
 
@@ -42,8 +43,7 @@ public:
 
     JitterDeferredProviderChangeListener(ProviderChangeListener * aUnderlyingListener, uint32_t aDeferAttributePathBaseTimeoutMs,
                                          uint32_t aDeferAttributePathJitterTimeoutMs) :
-        mUnderlyingListener(aUnderlyingListener),
-        mDeferAttributePathBaseTimeoutMs(aDeferAttributePathBaseTimeoutMs),
+        mUnderlyingListener(aUnderlyingListener), mDeferAttributePathBaseTimeoutMs(aDeferAttributePathBaseTimeoutMs),
         mDeferAttributePathJitterTimeoutMs(aDeferAttributePathJitterTimeoutMs)
     {}
 
@@ -56,7 +56,7 @@ public:
 
 private:
     void FlushDirtyPaths();
-    void TimerCallback();
+    static void TimerCallback(System::Layer * systemLayer, void * me);
 
     ProviderChangeListener * mUnderlyingListener;
     uint32_t mDeferAttributePathBaseTimeoutMs;
