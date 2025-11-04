@@ -507,8 +507,13 @@ void MatterIcdManagementPluginServerInitCallback()
 
     // Configure ICD Management
     ICDManagementServer::GetInstance().Init(storage, symmetricKeystore, icdConfigurationData);
+
+// TODO(#32321): Remove #if after issue is resolved
+// Note: We only need this #if statement for platform examples that enable the ICD management server without building the sample
+// as an ICD. Since this is not spec compliant, we should remove this #if statement once we stop compiling the ICD management
+// server in those examples.
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    chip::Server::GetInstance().GetICDManager().RegisterObserver(&ICDManagementServer::GetInstance());
+    Server::GetInstance().GetICDManager().RegisterObserver(&ICDManagementServer::GetInstance());
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
@@ -520,8 +525,13 @@ void MatterIcdManagementPluginServerShutdownCallback()
     FabricTable & fabricTable = Server::GetInstance().GetFabricTable();
     fabricTable.RemoveFabricDelegate(&gFabricDelegate);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+// TODO(#32321): Remove #if after issue is resolved
+// Note: We only need this #if statement for platform examples that enable the ICD management server without building the sample
+// as an ICD. Since this is not spec compliant, we should remove this #if statement once we stop compiling the ICD management
+// server in those examples.
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    chip::Server::GetInstance().GetICDManager().ReleaseObserver(&ICDManagementServer::GetInstance());
+    Server::GetInstance().GetICDManager().ReleaseObserver(&ICDManagementServer::GetInstance());
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
