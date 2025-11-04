@@ -38,10 +38,8 @@ pw_add_library(pw_sync.esp32_interrupt_spin_lock STATIC
       pw_third_party.freertos
     PUBLIC_COMPILE_OPTIONS
       -Wno-undef
-      -Wno-sign-compare
     SOURCES
       interrupt_spin_lock.cc
     PRIVATE_COMPILE_OPTIONS
-      -Wno-sign-compare
       -Wno-undef
 )
