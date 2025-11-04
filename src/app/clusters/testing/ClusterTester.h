@@ -132,7 +132,7 @@ public:
                                                                     app::CommandHandler * handler)
     {
         VerifyOrReturnError(VerifyClusterPathsValid(), CHIP_ERROR_INCORRECT_STATE);
-        auto path = mCluster->GetPaths()[0];
+        auto path                                   = mCluster->GetPaths()[0];
         const app::DataModel::InvokeRequest request = { .path = { path.mEndpointId, path.mClusterId, commandId } };
 
         constexpr size_t kTlvBufferSize = 128; // Typically CommanderSender will use a TLV of size kMaxSecureSduLengthBytes. For
