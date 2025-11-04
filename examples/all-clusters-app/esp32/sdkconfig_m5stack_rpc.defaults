@@ -94,3 +94,7 @@ CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE=512
 
 # Optimize Flash
 CONFIG_NEWLIB_NANO_FORMAT=y
+
+
+# disable debug shell, this is per documentation
+CONFIG_ENABLE_CHIP_SHELL=n
