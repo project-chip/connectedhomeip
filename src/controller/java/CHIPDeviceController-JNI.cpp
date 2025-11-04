@@ -1367,6 +1367,35 @@ JNI_METHOD(void, unpairDeviceCallback)(JNIEnv * env, jobject self, jlong handle,
     }
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+// Method used in case of NFC-based Commissioning without power.
+// At end of 1st commissioning phase, the user is asked to install and power ON the device.
+// Present function is used to confirm that this action has been done.
+// The 2nd commissioning phase, on the Operational network, will then start.
+JNI_METHOD(void, continueCommissioningAfterConnectNetworkRequest)(JNIEnv * env, jobject self, jlong handle, jlong remoteDeviceId)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = nullptr;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+
+    VerifyOrExit(env != nullptr, err = CHIP_ERROR_BAD_REQUEST);
+
+    wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    VerifyOrExit(wrapper != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = wrapper->Controller()->ContinueCommissioningAfterConnectNetworkRequest(static_cast<NodeId>(remoteDeviceId));
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to continue Commissioning after Connect Network Request: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+
 JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     chip::DeviceLayer::StackLock lock;

@@ -277,6 +277,7 @@ public:
     void OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason) override;
 
     static void SetAdditionalLitBackoffInterval(const Optional<System::Clock::Milliseconds32> & additionalTime);
+    static System::Clock::Milliseconds32 GetAdditionalLitBackoffInterval();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     // Update our remaining attempt count to be at least the given value.

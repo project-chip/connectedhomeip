@@ -83,7 +83,7 @@ class TC_CGEN_2_11(MatterBaseTest):
         await self.commission_devices()
 
         response = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.ArmFailSafe(
                 expiryLengthSeconds=failsafe_expiry_length_seconds, breadcrumb=1),
@@ -97,7 +97,7 @@ class TC_CGEN_2_11(MatterBaseTest):
         # Step 2: Send initial SetTCAcknowledgements
         self.step(2)
         response = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(
                 TCVersion=tc_version_to_simulate, TCUserResponse=tc_user_response_to_simulate
@@ -114,7 +114,7 @@ class TC_CGEN_2_11(MatterBaseTest):
         # Step 3: Send CommissioningComplete
         self.step(3)
         response = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.CommissioningComplete(),
         )
@@ -130,7 +130,7 @@ class TC_CGEN_2_11(MatterBaseTest):
         self.step(4)
         updated_tc_version = tc_version_to_simulate + 1
         response = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(
                 TCVersion=updated_tc_version, TCUserResponse=tc_user_response_to_simulate
@@ -146,14 +146,14 @@ class TC_CGEN_2_11(MatterBaseTest):
 
         # Step 5: Verify TCAcceptedVersion is updated
         self.step(5)
-        response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion)])
+        response = await commissioner.ReadAttribute(nodeId=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion)])
         current_version = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion]
         asserts.assert_equal(current_version, updated_tc_version, "TCAcceptedVersion not updated correctly")
 
         # Step 6: Send SetTCAcknowledgements with maximum acknowledgements
         self.step(6)
         response = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(
                 TCVersion=updated_tc_version, TCUserResponse=65535
@@ -169,7 +169,7 @@ class TC_CGEN_2_11(MatterBaseTest):
 
         # Step 7: Verify TCAcknowledgements is updated
         self.step(7)
-        response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgements)])
+        response = await commissioner.ReadAttribute(nodeId=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgements)])
         current_acknowledgements = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgements]
         asserts.assert_equal(current_acknowledgements, 65535, "TCAcknowledgements not updated to maximum value")
 

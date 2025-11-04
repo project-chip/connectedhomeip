@@ -177,7 +177,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         self.step(4)
         event_path = [(self.matter_test_config.endpoint, Clusters.CommissionerControl.Events.CommissioningRequestResult, 1)]
-        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
 
         self.step(5)
         cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestID=1, responseTimeoutSeconds=30)
@@ -191,7 +191,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         params = await self.open_commissioning_window(dev_ctrl=self.default_controller, node_id=self.dut_node_id)
         self.step(7)
         pase_nodeid = self.dut_node_id + 1
-        await self.default_controller.FindOrEstablishPASESession(setupCode=params.commissioningParameters.setupQRCode, nodeid=pase_nodeid)
+        await self.default_controller.FindOrEstablishPASESession(setupCode=params.commissioningParameters.setupQRCode, nodeId=pase_nodeid)
         try:
             await self.send_single_cmd(cmd=cmd, node_id=pase_nodeid)
             asserts.fail("Unexpected success on CommissionNode")
@@ -215,10 +215,10 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         self.step(10)
         if not events:
-            new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+            new_event = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
         else:
             event_nums = [e.Header.EventNumber for e in events]
-            new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
+            new_event = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
         asserts.assert_equal(new_event, [], "Unexpected event")
 
         self.step(11)
@@ -236,10 +236,10 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         self.step(13)
         if not events:
-            new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+            new_event = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
         else:
             event_nums = [e.Header.EventNumber for e in events]
-            new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
+            new_event = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
         asserts.assert_equal(len(new_event), 1, "Unexpected event list len")
         asserts.assert_equal(new_event[0].Data.statusCode, 0, "Unexpected status code")
         asserts.assert_equal(new_event[0].Data.clientNodeID,
@@ -312,7 +312,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         self.step(24)
         events = new_event
         event_nums = [e.Header.EventNumber for e in events]
-        new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
+        new_event = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
         asserts.assert_equal(len(new_event), 1, "Unexpected event list len")
         asserts.assert_equal(new_event[0].Data.statusCode, 0, "Unexpected status code")
         asserts.assert_equal(new_event[0].Data.clientNodeID,

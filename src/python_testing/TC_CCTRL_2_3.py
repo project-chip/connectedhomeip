@@ -174,7 +174,7 @@ class TC_CCTRL_2_3(MatterBaseTest):
 
         self.step(6)
         event_path = [(self.matter_test_config.endpoint, Clusters.CommissionerControl.Events.CommissioningRequestResult, 1)]
-        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
         asserts.assert_equal(len(events), 1, "Unexpected event list len")
         asserts.assert_equal(events[0].Data.statusCode, 0, "Unexpected status code")
         asserts.assert_equal(events[0].Data.clientNodeID,
