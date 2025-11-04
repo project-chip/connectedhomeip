@@ -39,7 +39,6 @@ import logging
 import time
 import typing
 from enum import IntFlag
-from typing import Optional
 
 from mobly import asserts, signals
 
@@ -529,7 +528,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         while time.time() - wait_start < timeout:
             if attr_handler_step2.attribute_queue.qsize() > 0:
-                report = attr_handler_step2.attribute_queue.get()
+                attr_handler_step2.attribute_queue.get()
                 time_report = time.time()
                 report_received = True
                 break
