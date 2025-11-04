@@ -137,8 +137,6 @@ private:
     // If protocol or test requirements change, this value may need to be increased.
     static constexpr size_t kTlvBufferSize = 256;
 
-    app::ConcreteCommandPath mCommandPath;
-    app::DataModel::InvokeRequest mRequest;
     app::Testing::MockCommandHandler mHandler;
     uint8_t mTlvBuffer[kTlvBufferSize];
 };
