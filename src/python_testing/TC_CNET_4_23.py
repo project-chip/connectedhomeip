@@ -43,19 +43,18 @@ class TC_CNET_4_23(MatterBaseTest):
             TestStep(1, "TH begins commissioning the DUT over the initial commissioning radio (PASE):\n"
                         "* Establish PASE session\n"
                         "* Arm fail-safe timer (900 seconds)\n"
-                        "* Configure regulatory and time information\n"
-                        "* Skip automatic network commissioning (will be performed manually with incorrect then correct credentials)",
+                        "* Configure regulatory and time information\n",
                         is_commissioning=False),
-            TestStep(2, "TH sends AddOrUpdateWiFiNetwork with INCORRECT credentials",
+            TestStep(2, "TH sends AddOrUpdateWiFiNetwork with INCORRECT credentials and Breadcrumb field set to 1",
                         "Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:\n"
-                        "1. NetworkingStatus is kAuthFailure which is '0x07'\n"
-                        # No puede ser que devuelva kAuthFailure aca porque todavia no hizo ConnectNetwork
-                        "2. DebugText is of type string with max length 512 or empty"),
-            TestStep(3, "TH sends ConnectNetwork command",
-                        "Verify connection fails with appropriate error"),
+                        "1. NetworkingStatus is kSuccess (0x00)\n"
+                        "2. DebugText is of type string with max length 512 or empty\n"
+                        "Save network index for later verification"),
+            TestStep(3, "TH sends ConnectNetwork command and Breadcrumb field set to 2",
+                        "Verify connection is not successful"),
             TestStep(4, "TH reads LastNetworkingStatus and LastConnectErrorValue",
                         "Verify LastNetworkingStatus to be 'kAuthFailure'"),
-            TestStep(5, "TH sends RemoveNetwork to the DUT with NetworkID field set to the SSID of the failed network and Breadcrumb field set to 1",
+            TestStep(5, "TH sends RemoveNetwork to the DUT with NetworkID field set to the SSID of the failed network and Breadcrumb field set to 3",
                         "Verify that DUT sends NetworkConfigResponse to command with the following fields:\n"
                         "1. NetworkingStatus is Success\n"
                         # Esta bien que devuelva NetworkingStatus?
@@ -63,11 +62,11 @@ class TC_CNET_4_23(MatterBaseTest):
                         "2. NetworkIndex matches previously saved 'Userwifi_netidx'"),
             TestStep(6, "TH sends ScanNetworks command",
                         "Verify target network is visible"),
-            TestStep(7, "TH sends AddOrUpdateWiFiNetwork with CORRECT credentials",
+            TestStep(7, "TH sends AddOrUpdateWiFiNetwork with CORRECT credentials and Breadcrumb field set to 4",
                         "Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is success which is '0'\n"
                         "2. DebugText is of type string with max length 512 or empty"),
-            TestStep(8, "TH sends ConnectNetwork command",
+            TestStep(8, "TH sends ConnectNetwork command and Breadcrumb field set to 5",
                         "Verify connection succeeds"),
             TestStep(9, "TH reads LastNetworkingStatus and LastConnectErrorValue",
                         "Verify LastNetworkingStatus to be 'kSuccess'"),
@@ -104,18 +103,28 @@ class TC_CNET_4_23(MatterBaseTest):
 
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
 
+        # Network Commissioning cluster is always on root endpoint (0) during commissioning
+        endpoint = ROOT_ENDPOINT_ID
+
         TIMED_REQUEST_TIMEOUT_MS = 5000
 
+        # TH begins commissioning the DUT over the initial commissioning radio (PASE):
         self.step(1)
 
+        # Skip automatic network commissioning (will be performed manually with incorrect then correct credentials)
         commissioner.SetSkipCommissioningComplete(True)
         self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
+
+        # * Establish PASE session
+        # * Arm fail-safe timer (900 seconds)
+        # * Configure regulatory and time information
         await self.commission_devices()
 
+        # AddOrUpdateWiFiNetwork with INCORRECT credentials and Breadcrumb field set to 1
         self.step(2)
 
-        # AddOrUpdateWiFiNetwork with INCORRECT credentials
         response = await self.send_single_cmd(
+            endpoint=endpoint,
             cmd=cnet.Commands.AddOrUpdateWiFiNetwork(
                 ssid=ssid_correct,
                 credentials=password_incorrect,
@@ -126,25 +135,30 @@ class TC_CNET_4_23(MatterBaseTest):
         # Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:
         asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
                             "Unexpected value returned from AddOrUpdateWiFiNetwork")
-        # 1. NetworkingStatus is kAuthFailure which is '0x07'
-        asserts.assert_equal(response.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kAuthFailure,
-                             f"Expected 0x07 (kAuthFailure), but got: {response.networkingStatus}")
+        # 1. NetworkingStatus is kSuccess (0x00)
+        asserts.assert_equal(response.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                             f"Expected 0x00 (kSuccess), but got: {response.networkingStatus}")
         # 2. DebugText is of type string with max length 512 or empty
         if response.debugText:
             asserts.assert_less_equal(len(response.debugText), 512,
                                       f"Expected length of debugText to be less than or equal to 512, but got: {len(response.debugText)}")
 
-        # TH sends ConnectNetwork command
+        # Save network index for later verification
+        userwifi_netidx = response.networkIndex
+
+        # TH sends ConnectNetwork command and Breadcrumb field set to 2
         self.step(3)
 
         response = await self.send_single_cmd(
+            endpoint=endpoint,
             cmd=cnet.Commands.ConnectNetwork(
                 networkID=ssid_correct,
                 breadcrumb=2
-            )
+            ),
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
 
-        # Verify connection fails with appropriate error
+        # Verify connection is not successful
         success = await self.verify_networking_status(response)
         asserts.assert_false(success, "Expected ConnectNetwork to fail with incorrect credentials")
         logger.info(f"ConnectNetwork failed as expected for SSID: {ssid_correct.decode('utf-8')} with incorrect credentials")
@@ -153,6 +167,7 @@ class TC_CNET_4_23(MatterBaseTest):
         self.step(4)
 
         response = await self.read_single_attribute(
+            endpoint=endpoint,
             cluster=cnet,
             attr=cnet.Attributes.LastNetworkingStatus,
         )
@@ -161,10 +176,11 @@ class TC_CNET_4_23(MatterBaseTest):
         asserts.assert_equal(response, cnet.Enums.NetworkCommissioningStatusEnum.kAuthFailure,
                              "Expected LastNetworkingStatus to be 'kAuthFailure'")
 
-        # TH sends RemoveNetwork to the DUT with NetworkID field set to the SSID of the failed network and Breadcrumb field set to 1
+        # TH sends RemoveNetwork to the DUT with NetworkID field set to the SSID of the failed network and Breadcrumb field set to 3
         self.step(5)
 
         response = await self.send_single_cmd(
+            endpoint=endpoint,
             cmd=cnet.Commands.RemoveNetwork(
                 networkID=ssid_correct,
                 breadcrumb=3
@@ -186,6 +202,7 @@ class TC_CNET_4_23(MatterBaseTest):
         self.step(6)
 
         response = await self.send_single_cmd(
+            endpoint=endpoint,
             cmd=cnet.Commands.ScanNetworks()
         )
 
@@ -198,15 +215,16 @@ class TC_CNET_4_23(MatterBaseTest):
                             f"Expected to find SSID '{ssid_correct.decode('utf-8')}' in scan results")
         logger.info(f"ScanNetworks found SSID: {ssid_correct.decode('utf-8')}")
 
-        # TH sends AddOrUpdateWiFiNetwork with CORRECT credentials
+        # TH sends AddOrUpdateWiFiNetwork with CORRECT credentials and Breadcrumb field set to 4
         self.step(7)
         response = await self.send_single_cmd(
+            endpoint=endpoint,
             cmd=cnet.Commands.AddOrUpdateWiFiNetwork(
                 ssid=ssid_correct,
                 credentials=password_correct,
-                breadcrumb=3,
-                timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
-            )
+                breadcrumb=4
+            ),
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
 
         # Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:
@@ -220,14 +238,16 @@ class TC_CNET_4_23(MatterBaseTest):
             asserts.assert_less_equal(len(response.debugText), 512,
                                       f"Expected length of debugText to be less than or equal to 512, but got: {len(response.debugText)}")
 
-        # TH sends ConnectNetwork command
+        # TH sends ConnectNetwork command and Breadcrumb field set to 5
         self.step(8)
 
         response = await self.send_single_cmd(
+            endpoint=endpoint,
             cmd=cnet.Commands.ConnectNetwork(
                 networkID=ssid_correct,
-                breadcrumb=4
-            )
+                breadcrumb=5
+            ),
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
 
         # Verify connection succeeds
@@ -239,6 +259,7 @@ class TC_CNET_4_23(MatterBaseTest):
         self.step(9)
 
         response = await self.read_single_attribute(
+            endpoint=endpoint,
             cluster=cnet,
             attr=cnet.Attributes.LastNetworkingStatus,
         )
@@ -251,6 +272,7 @@ class TC_CNET_4_23(MatterBaseTest):
         self.step(10)
 
         response = await self.read_single_attribute(
+            endpoint=endpoint,
             cluster=cnet,
             attr=cnet.Attributes.Networks,
         )
@@ -265,7 +287,7 @@ class TC_CNET_4_23(MatterBaseTest):
 
         response = await commissioner.SendCommand(
             nodeid=self.dut_node_id,
-            endpoint=ROOT_ENDPOINT_ID,
+            endpoint=endpoint,
             payload=cgen.Commands.CommissioningComplete(),
         )
 
