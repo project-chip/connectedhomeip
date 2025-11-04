@@ -30,6 +30,7 @@ class GnBuilder(Builder):
         super(GnBuilder, self).__init__(root, runner)
 
         self.build_command = None
+        self._output_dir = None
 
     @property
     def output_dir(self):
@@ -37,9 +38,15 @@ class GnBuilder(Builder):
         In a unified build, the output directory is based on the unified_id, otherwise
         it is based on the builder identifier.
         """
+        if self._output_dir is not None:
+            return self._output_dir
         if self.unified_id:
             return os.path.join(self.root, 'out', self.unified_id)
         return os.path.join(self.root, 'out', self.identifier)
+
+    @output_dir.setter
+    def output_dir(self, value):
+        self._output_dir = value
 
     def GnBuildArgs(self):
         """Extra gn build `--args`
