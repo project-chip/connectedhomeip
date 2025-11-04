@@ -110,27 +110,24 @@ class GnBuilder(Builder):
         self._Execute(cmd, title=title, dedup=dedup)
 
     def _build(self):
-        self.PreBuildCommand()
-
         cmd = ['ninja', '-C', self.output_dir]
+
         if self.verbose:
             cmd.append('-v')
-        if self.ninja_jobs is not None:
-            cmd.append('-j' + str(self.ninja_jobs))
-        if self.build_command:
+
+        if self.ninja_jobs:
+            cmd.extend(['-j', str(self.ninja_jobs)])
+
+        if getattr(self, 'unified', False):
+            # For unified builds, we require building all targets, not just a
+            # specific app. As such the build command is not used.
+            pass
+        elif self.build_command:
             cmd.append(self.build_command)
 
-        extra_env = self.GnBuildEnv()
-        if extra_env:
-            # convert the command into a bash command that includes
-            # setting environment variables
-            cmd = [
-                'bash', '-c', '\n' + ' '.join(
-                    ['%s="%s" \\\n' % (key, value) for key, value in extra_env.items()] +
-                    [shlex.join(cmd)]
-                )
-            ]
-
-        self._Execute(cmd, title='Building ' + self.identifier)
+        title = 'Building ' + self.identifier
+        if self.build_command:
+            title += ' (target: %s)' % self.build_command
+        self._Execute(cmd, title=title)
 
         self.PostBuildCommand()
