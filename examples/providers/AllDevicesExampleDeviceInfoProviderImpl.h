@@ -16,10 +16,10 @@
  */
 #pragma once
 
+#include <AllClustersExampleDeviceInfoProviderImpl.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/DeviceInfoProvider.h>
-#include <AllClustersExampleDeviceInfoProviderImpl.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -30,7 +30,7 @@ public:
     AllDevicesExampleDeviceInfoProviderImpl() = default;
     ~AllDevicesExampleDeviceInfoProviderImpl() override {}
 
-    //Iterators
+    // Iterators
     SupportedLocalesIterator * IterateSupportedLocales() override;
 
     static AllDevicesExampleDeviceInfoProviderImpl & GetDefaultInstance();
@@ -48,8 +48,7 @@ protected:
         static constexpr size_t kNumSupportedLocales = 1;
         size_t mIndex                                = 0;
     };
-
 };
 
-}
-}
+} // namespace DeviceLayer
+} // namespace chip

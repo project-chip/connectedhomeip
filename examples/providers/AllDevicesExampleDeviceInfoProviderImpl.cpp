@@ -26,7 +26,6 @@
 
 #include <cstring>
 
-
 namespace chip {
 namespace DeviceLayer {
 
@@ -61,6 +60,5 @@ bool AllDevicesExampleDeviceInfoProviderImpl::AllDevicesSupportedLocalesIterator
     return true;
 }
 
-
-}
-}
+} // namespace DeviceLayer
+} // namespace chip
