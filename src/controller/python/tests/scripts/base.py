@@ -260,23 +260,23 @@ class BaseTestHelper:
     async def TestPaseOnly(self, ip: str, setuppin: int, nodeId: int, devCtrl=None):
         if devCtrl is None:
             devCtrl = self.devCtrl
-        self.logger.info("Attempting to establish PASE session with device id: %d addr: %s", nodeId, ip)
+        self.logger.info("Attempting to establish PASE session with device id: 0x%016X addr: %s", nodeId, ip)
         try:
             await devCtrl.EstablishPASESessionIP(ip, setuppin, nodeId)
         except ChipStackException:
-            self.logger.info("Failed to establish PASE session with device id: %d addr: %s", nodeId, ip)
+            self.logger.info("Failed to establish PASE session with device id: 0x%016X addr: %s", nodeId, ip)
             return False
-        self.logger.info("Successfully established PASE session with device id: %d addr: %s", nodeId, ip)
+        self.logger.info("Successfully established PASE session with device id: 0x%016X addr: %s", nodeId, ip)
         return True
 
     async def TestCommissionOnly(self, nodeId: int):
-        self.logger.info("Commissioning device with id %d", nodeId)
+        self.logger.info("Commissioning device with id 0x%016X", nodeId)
         try:
             await self.devCtrl.Commission(nodeId)
         except ChipStackException:
-            self.logger.info("Failed to commission device with id %d", nodeId)
+            self.logger.info("Failed to commission device with id 0x%016X", nodeId)
             return False
-        self.logger.info("Successfully commissioned device with id %d", nodeId)
+        self.logger.info("Successfully commissioned device with id 0x%016X", nodeId)
         return True
 
     async def TestKeyExchangeBLE(self, discriminator: int, setuppin: int, nodeId: int):

@@ -251,7 +251,7 @@ class _SyncAddressFinder:
         return self.result
 
 
-def FindAddress(fabricId, nodeId, timeoutMs=1000):
+def FindAddress(fabricId: int, nodeId: int, timeoutMs=1000):
     """Performs an address discovery for a node and returns the result."""
     finder = _SyncAddressFinder()
     FindAddressAsync(fabricId, nodeId, finder.Callback, timeoutMs)

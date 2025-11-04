@@ -34,12 +34,12 @@ LIGHTING_ENDPOINT_ID = 1
 GROUP_ID = 0
 
 
-async def waitForActiveAndTriggerCheckIn(test, nodeId):
+async def waitForActiveAndTriggerCheckIn(test, nodeId: int):
     coro = test.TestWaitForActive(nodeId=nodeId, stayActiveDurationMs=10)
     return await coro
 
 
-async def invalidateHalfCounterValuesAndWaitForCheckIn(test, nodeId, testEventKey):
+async def invalidateHalfCounterValuesAndWaitForCheckIn(test, nodeId: int, testEventKey):
     await test.TestTriggerTestEventHandler(nodeId, bytes.fromhex(testEventKey), 0x0046_0000_0000_0003)
     return await waitForActiveAndTriggerCheckIn(test, nodeId)
 

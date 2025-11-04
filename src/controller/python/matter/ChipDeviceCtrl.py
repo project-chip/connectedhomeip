@@ -241,7 +241,7 @@ async def WaitForCheckIn(scopedNodeId: ScopedNodeId, timeoutSeconds: float):
     eventLoop = asyncio.get_running_loop()
     future = eventLoop.create_future()
 
-    def OnCheckInCallback(nodeId):
+    def OnCheckInCallback(nodeId: int):
         eventLoop.call_soon_threadsafe(lambda: future.done() or future.set_result(None))
 
     RegisterOnActiveCallback(scopedNodeId, OnCheckInCallback)
