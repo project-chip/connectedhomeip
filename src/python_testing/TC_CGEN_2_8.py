@@ -87,7 +87,7 @@ class TC_CGEN_2_8(MatterBaseTest):
         await self.commission_devices()
 
         response = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.ArmFailSafe(
                 expiryLengthSeconds=failsafe_expiry_length_seconds, breadcrumb=1),
@@ -101,7 +101,7 @@ class TC_CGEN_2_8(MatterBaseTest):
         # Step 2: Send SetTCAcknowledgements
         self.step(2)
         response = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(
                 TCVersion=tc_version_to_simulate, TCUserResponse=tc_user_response_to_simulate
@@ -120,7 +120,7 @@ class TC_CGEN_2_8(MatterBaseTest):
         # Step 4: Send CommissioningComplete
         self.step(4)
         response = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.CommissioningComplete(),
         )
@@ -139,7 +139,7 @@ class TC_CGEN_2_8(MatterBaseTest):
         self.wait_for_user_input(prompt_msg="Manually trigger factory reset on the DUT, then continue")
 
         # Close the commissioner session with the device to clean up resources
-        commissioner.MarkSessionDefunct(nodeid=self.dut_node_id)
+        commissioner.MarkSessionDefunct(nodeId=self.dut_node_id)
 
         # Step 6: Put device in commissioning mode (requiring user input, so skip in CI)
         self.step(6)
@@ -154,26 +154,26 @@ class TC_CGEN_2_8(MatterBaseTest):
 
         # Step 8: Verify that TCAcceptedVersion equals 0
         self.step(8)
-        response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion)])
+        response = await commissioner.ReadAttribute(nodeId=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion)])
         accepted_version = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcceptedVersion]
         asserts.assert_equal(accepted_version, 0, "TCAcceptedVersion does not match expected value.")
 
         # Step 9: Verify that TCAcknowledgements equals 0
         self.step(9)
-        response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgements)])
+        response = await commissioner.ReadAttribute(nodeId=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgements)])
         acknowledgements = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgements]
         asserts.assert_equal(acknowledgements, 0, "TCAcknowledgements does not match expected value.")
 
         # Step 10: Verify that TCAcknowledgementsRequired equals True
         self.step(10)
-        response = await commissioner.ReadAttribute(nodeid=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired)])
+        response = await commissioner.ReadAttribute(nodeId=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired)])
         tc_acknowledgements_required = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCAcknowledgementsRequired]
         asserts.assert_equal(tc_acknowledgements_required, True, "TCAcknowledgementsRequired should be True.")
 
         # Step 11: Verify CommissioningComplete fails
         self.step(11)
         response = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.CommissioningComplete(),
         )

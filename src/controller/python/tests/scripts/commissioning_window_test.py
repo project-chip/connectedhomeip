@@ -83,15 +83,15 @@ async def main():
     timeoutTicker.start()
 
     test = BaseTestHelper(
-        nodeid=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=False)
+        nodeId=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=False)
 
     FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
               "Failed to finish network commissioning")
 
     logger.info("Commissioning DUT from first commissioner")
-    FailIfNot(await test.TestPaseOnly(ip=options.deviceAddress, setuppin=20202021, nodeid=1),
+    FailIfNot(await test.TestPaseOnly(ip=options.deviceAddress, setuppin=20202021, nodeId=1),
               "Unable to establish PASE connection to device")
-    FailIfNot(await test.TestCommissionOnly(nodeid=1), "Unable to commission device")
+    FailIfNot(await test.TestCommissionOnly(nodeId=1), "Unable to commission device")
 
     logger.info("Creating controller on a new fabric")
     FailIfNot(test.CreateNewFabricController(), "Unable to create new controller")
@@ -99,11 +99,11 @@ async def main():
     logger.info("Testing RevokeCommissioning")
     FailIfNot(await test.TestRevokeCommissioningWindow(ip=options.deviceAddress,
                                                        setuppin=20202021,
-                                                       nodeid=1),
+                                                       nodeId=1),
               "RevokeCommissioning test failed")
 
     logger.info("Test Enhanced Commissioning Window")
-    FailIfNot(await test.TestEnhancedCommissioningWindow(ip=options.deviceAddress, nodeid=1), "EnhancedCommissioningWindow open failed")
+    FailIfNot(await test.TestEnhancedCommissioningWindow(ip=options.deviceAddress, nodeId=1), "EnhancedCommissioningWindow open failed")
 
     timeoutTicker.stop()
 
