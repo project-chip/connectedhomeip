@@ -50,7 +50,8 @@ class TC_DD_3_23(MatterBaseTest):
         payload = SetupPayload().ParseQrCode(nfc_tag_data)
         asserts.assert_true(payload.supports_nfc_commissioning, "Device does not Support NFC Commissioning")
         self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
-        await self.commission_devices()
+        commissioning_success = await self.commission_devices()
+        asserts.assert_true(commissioning_success, "Device Commissioning using nfc transport has failed")
 
 
 if __name__ == "__main__":

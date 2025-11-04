@@ -10,41 +10,15 @@ logger = logging.getLogger(__name__)
 NFC_SUCCESS_SW1 = 0x90
 NFC_SUCCESS_SW2 = 0x00
 
-MAX_NDEF_DATA_LENGTH = 256
+MAX_SHORT_APDU_LENGTH = 255
 
+# APDU Class (CLA) bytes
+CLA_ISO = 0x00              # ISO/IEC 7816-4 standard class
 
-def _clean_nfc_data(ndef_data_string: str) -> str:
-    """
-       Return a string containing only printable characters from `ndef_data_string`.
-
-       Purpose
-       - Remove non-printable/control characters (for example NUL: '\x00', DEL, etc.)
-         commonly encountered when reading raw NDEF text-record payload bytes that
-         include a status byte or other metadata.
-       - Produce a visible, printable string safe to pass to text-based consumers
-         such as SetupPayload loaders that expect a human-readable setup string.
-
-       Parameters
-       - ndef_data_string: str
-           The input text to sanitize. Typically this will already be decoded (e.g. via
-           payload_bytes.decode('utf-8')) or extracted from an NDEF Text record.
-
-       Returns
-       - str: sanitized string containing only printable characters. If the input is
-         empty, returns an empty string.
-
-       Example
-       >>> _clean_nfc_data("\\x00MT:4CT91EVQ20KA0648G00")
-       'MT:4CT91EVQ20KA0648G00'
-
-       Rationale (short)
-       - NDEF Text record payloads include a status byte and (optionally) a language
-         code before the visible text. Those metadata bytes are non-printable and should
-         be removed before using the visible text. This function provides a simple,
-         defensive cleanup step for that common case.
-       """
-    return ''.join([ndef_data_char for ndef_data_char in ndef_data_string if ndef_data_char.isprintable()])
-
+# APDU Instruction (INS) bytes
+INS_SELECT = 0xA4           # Select file or application
+INS_READ_BINARY = 0xB0      # Read binary data from file
+INS_UPDATE_BINARY = 0xD6    # Update binary data in file
 
 def _check_transmission_status(sw1: int, sw2: int, operation_name: str):
     """
@@ -87,9 +61,15 @@ def _select_ndef_application(reader_connection_object):
         The NDEF Tag Application AID (D2760000850101) is defined in the NFC Forum
         specifications for NDEF-compatible tags.
     """
-    # Transmit SELECT message with NDEF Tag Application ID (D2760000850101)
-    SELECT_MESSAGE = [0x00, 0xA4, 0x04, 0x00, 0x07, 0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x01, 0x00]
-    data, sw1, sw2 = reader_connection_object.transmit(SELECT_MESSAGE)
+    # ISO/IEC 7816-4 APDU command to select NDEF's Application ID (= "D2760000850101")
+    # (P1, P2)=(0x04, 0x0C) corresponds to select first or only occurrence
+    # For more Information you can refer here https://en.wikipedia.org/wiki/Smart_card_application_protocol_data_unit
+    SELECT_NDEF_AID = [
+        CLA_ISO, INS_SELECT, 0x04, 0x00, 0x07,                # CLA INS P1 P2 Lc
+        0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x01,             # NDEF's Application ID
+        0x00                                                  # Le
+    ]
+    data, sw1, sw2 = reader_connection_object.transmit(SELECT_NDEF_AID)
     _check_transmission_status(sw1, sw2, "select NDEF application")
 
 
@@ -112,9 +92,11 @@ def _select_cc_file(reader_connection_object):
         This function must be called after _select_ndef_application() and before
         accessing NDEF data files.
     """
-    # Transmit SELECT message for Capability Container file (file ID: E103)
-    SELECT_CC_MESSAGE = [0x00, 0xA4, 0x00, 0x0C, 0x02, 0xE1, 0x03]
-    data, sw1, sw2 = reader_connection_object.transmit(SELECT_CC_MESSAGE)
+    # ISO/IEC 7816-4 APDU command to select the Capability Container file (file ID: 0xE103)
+    # (P1, P2)=(0x00, 0x0C) corresponds to select by file ID
+    SELECT_CC_FILE = [CLA_ISO, INS_SELECT, 0x00, 0x0C, 0x02,  # CLA INS P1 P2 Lc
+                      0xE1, 0x03]                             # File ID
+    data, sw1, sw2 = reader_connection_object.transmit(SELECT_CC_FILE)
     _check_transmission_status(sw1, sw2, "select CC file")
 
 
@@ -137,9 +119,11 @@ def _select_ndef_file(reader_connection_object):
         This function must be called after _select_ndef_application() and
         _select_cc_file() before reading or writing NDEF data.
     """
-    # Transmit SELECT message for NDEF data file (file ID: E104)
-    SELECT_NDEF_MESSAGE = [0x00, 0xA4, 0x00, 0x0C, 0x02, 0xE1, 0x04]
-    data, sw1, sw2 = reader_connection_object.transmit(SELECT_NDEF_MESSAGE)
+    # ISO/IEC 7816-4 APDU command to select the NDEF file (file ID: 0xE104)
+    # (P1, P2)=(0x00, 0x0C) corresponds to select by file ID
+    SELECT_NDEF_FILE = [CLA_ISO, INS_SELECT, 0x00, 0x0C, 0x02,  # CLA INS P1 P2 Lc
+                        0xE1, 0x04]                             # File ID
+    data, sw1, sw2 = reader_connection_object.transmit(SELECT_NDEF_FILE)
     _check_transmission_status(sw1, sw2, "select NDEF file")
 
 
@@ -167,15 +151,16 @@ def _read_ndef_length(reader_connection_object):
         reading the actual NDEF data. The returned length is used to determine
         how many bytes to read in subsequent operations.
     """
-    # Transmit READ BINARY message for first 2 bytes (message length)
-    READ_LENGTH_MESSAGE = [0x00, 0xB0, 0x00, 0x00, 0x02]
-    data, sw1, sw2 = reader_connection_object.transmit(READ_LENGTH_MESSAGE)
+    # ISO/IEC 7816-4 APDU command to read a binary message of 2 bytes starting from offset 0x00.
+    # Those 2 bytes contain the NDEF message length.
+    # (P1, P2) contain respectively the offset high byte and the offset low byte.
+    READ_NDEF_LENGTH = [CLA_ISO, INS_READ_BINARY, 0x00, 0x00, 0x02]           # CLA INS P1 P2 Lc
+    data, sw1, sw2 = reader_connection_object.transmit(READ_NDEF_LENGTH)
     _check_transmission_status(sw1, sw2, "read NDEF length")
 
     # Convert 2-byte big-endian length to integer
     length = (data[0] << 8) + data[1]
-    asserts.assert_less(length, MAX_NDEF_DATA_LENGTH, msg=f"NDEF of longer length than 256 are currently not managed,"
-                        f" current length: {length}")
+
     return length
 
 
@@ -205,71 +190,80 @@ def _read_ndef_data(reader_connection_object, length: int) -> bytes:
         correct number of bytes are read. The returned data can be processed
         with NDEF parsers to extract individual records and their payloads.
     """
-    # Transmit READ BINARY message for NDEF data starting from offset 0x0002
-    READ_DATA_MESSAGE = [0x00, 0xB0, 0x00, 0x02, length]
-    data, sw1, sw2 = reader_connection_object.transmit(READ_DATA_MESSAGE)
-    _check_transmission_status(sw1, sw2, "read NDEF data")
+    data = bytearray()
+    offset = 2  # Start after the 2-byte length field
+
+    while len(data) < length:
+        chunk_size = min(MAX_SHORT_APDU_LENGTH, length - len(data))
+        offset_high = (offset >> 8) & 0xFF
+        offset_low = offset & 0xFF
+        # ISO/IEC 7816-4 APDU command to read a binary message of 'chunk_size' bytes, starting from
+        # the offset indicated in (P1, P2)
+        apdu = [
+            CLA_ISO,
+            INS_READ_BINARY,
+            offset_high,        # P1
+            offset_low,         # P2
+            chunk_size
+        ]
+        chunk, sw1, sw2 = reader_connection_object.transmit(apdu)
+        _check_transmission_status(sw1, sw2, f"read NDEF data at offset {offset}")
+        data.extend(chunk)
+        offset += chunk_size
+
     return bytes(data)
 
 
 def _read_nfc_tag_data(reader_objects: list, nfc_reader_index: int):
     """
-    Read and decode NDEF data from an NFC tag.
-
-    This function performs the complete sequence of operations to read NDEF data
-    from an NFC tag: establishing connection, selecting applications and files,
-    reading the data, and decoding it into a readable format.
-
-    Args:
-        reader_objects: List of available NFC reader objects.
-        nfc_reader_index (int): Index of the NFC reader to use from the list.
-
-    Returns:
-        str: The decoded NDEF record data with non-printable characters removed.
-
-    Raises:
-        AssertionError: If any message transmission fails during the operation.
-
-    Note:
-        This function assumes the first NDEF record contains UTF-8 text data.
+    Read and decode NDEF URI data from an NFC tag.
+    This function expects the first NDEF record to be a URI record.
     """
     # Establish connection to the selected NFC reader
     reader_connection_object = reader_objects[nfc_reader_index].createConnection()
-    reader_connection_object.connect()
+    try:
+        reader_connection_object.connect()
 
-    # Perform NDEF file system navigation sequence
-    _select_ndef_application(reader_connection_object)  # Select NDEF app
-    _select_cc_file(reader_connection_object)  # Select capability container
-    _select_ndef_file(reader_connection_object)  # Select data file
+        # Perform NDEF file system navigation sequence
+        _select_ndef_application(reader_connection_object)  # Select NDEF app
+        _select_cc_file(reader_connection_object)  # Select capability container
+        _select_ndef_file(reader_connection_object)  # Select data file
 
-    # Read NDEF message length and data
-    ndef_length = _read_ndef_length(reader_connection_object)
-    ndef_data = _read_ndef_data(reader_connection_object, ndef_length)
+        # Read NDEF message length and data
+        ndef_length = _read_ndef_length(reader_connection_object)
+        ndef_data = _read_ndef_data(reader_connection_object, ndef_length)
 
-    # Parse NDEF message into records and find record with data
-    ndef_records = list(ndef.message_decoder(ndef_data))
-    if not ndef_records:
-        raise ValueError("No NDEF records found in message - tag may be corrupted or empty")
+        # Parse NDEF message into records and find record with data
+        ndef_records = list(ndef.message_decoder(ndef_data))
+        if not ndef_records:
+            raise ValueError("No NDEF records found in message - tag may be corrupted or empty")
 
-    # Loop through records to find one with data attribute,
-    # when the data is decodable we will exit from the loop
-    # if the data could not de-coded we will catch exception and move on to the next record
-    for record in ndef_records:
-        if hasattr(record, 'data') and record.data:
-            try:
-                ndef_record_data = record.data.decode("utf-8")
-                # Clean up non-printable characters and return readable text which can be used as SetupPayload later on
-                cleaned_data = _clean_nfc_data(ndef_record_data)
-                return cleaned_data
-            except UnicodeDecodeError:
-                # Continue to next record if this one can't be decoded
-                logger.warning(f"NDEF record data {record.data} could not be decoded moving on to next record")
+        # Loop through records to find a URI record
+        for record in ndef_records:
+            # Check for URI record type (well-known type 'U')
+            if record.type == 'urn:nfc:wkt:U':
+                # The payload is described in NFC Forum's "URI Record Type Definition Technical Specification"
+                # available here https://berlin.ccc.de/~starbug/felica/NFCForum-TS-RTD_URI_1.0.pdf
+                # As indicated in paragraph 3, the payload format is:
+                #     [identifier code (1 byte)] + [URI string]
+                # There is currently no prefix officially registered for Matter so the on-boarding data string
+                # is fully in the URI string.
+                #
+                # Ignore the identifier code and read the URI string
+                if hasattr(record, 'data') and record.data and len(record.data) > 1:
+                    uri_string = record.data[1:].decode("utf-8")
+                    return uri_string
+                else:
+                    raise ValueError("NDEF URI record payload is missing or too short")
+        # If we get here, no URI record was found
+        raise ValueError("No NDEF URI record found in message")
+    finally:
+        try:
+            reader_connection_object.disconnect()
+        except Exception:
+            pass  # Ignore disconnect errors
 
-    # If we get here, no record had data attribute or all failed to decode
-    raise ValueError("No NDEF records with decodable data found")
-
-
-def connect_read_nfc_tag_data(nfc_reader_index: int):
+def connect_read_nfc_tag_data(nfc_reader_index: int) -> str:
     """
     Connect to an NFC reader and read NDEF data from a tag.
 
