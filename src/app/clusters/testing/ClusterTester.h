@@ -68,9 +68,6 @@ public:
     // Sets the cluster to be used for Read/Write/Invoke operations.
     ClusterTester(app::ServerClusterInterface & cluster) : mCluster(&cluster) {}
 
-    // Sets the cluster to be used for Read/Write/Invoke operations.
-    void SetCluster(app::ServerClusterInterface & cluster) { mCluster = &cluster; }
-
     app::ServerClusterContext & GetServerClusterContext() { return mTestServerClusterContext.Get(); }
 
     // Read attribute into `out` parameter.
@@ -82,7 +79,7 @@ public:
     template <typename T>
     app::DataModel::ActionReturnStatus ReadAttribute(AttributeId attr_id, T & out)
     {
-        VerifyOrReturnError(verifyClusterPathsValid(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(VerifyClusterPathsValid(), CHIP_ERROR_INCORRECT_STATE);
         auto path = mCluster->GetPaths()[0];
 
         // Store the read operation in a vector<std::unique_ptr<...>> to ensure its lifetime
@@ -115,7 +112,7 @@ public:
     template <typename T>
     app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr_id, const T & value)
     {
-        VerifyOrReturnError(verifyClusterPathsValid(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(VerifyClusterPathsValid(), CHIP_ERROR_INCORRECT_STATE);
         auto path = mCluster->GetPaths()[0];
 
         app::Testing::WriteOperation writeOperation(path.mEndpointId, path.mClusterId, attr_id);
@@ -124,13 +121,19 @@ public:
         return mCluster->WriteAttribute(writeOperation.GetRequest(), decoder);
     }
 
+    // Invoke a command with `data` as arguments.
+    // The `data` parameter must be of the correct type for the command being invoked.
+    // Use `app::Clusters::<ClusterName>::Commands::<CommandName>::Type` for the `data` parameter to be spec compliant (see the
+    // comment of the class for usage example).
+    // Will construct the command path using the first path returned by `GetPaths()` on the cluster.
+    // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` returned an empty list.
     template <typename T>
     std::optional<app::DataModel::ActionReturnStatus> InvokeCommand(CommandId commandId, const T & data,
                                                                     app::CommandHandler * handler)
     {
-        const auto & paths = mCluster->GetPaths();
-        VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
-        const app::DataModel::InvokeRequest request = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
+        VerifyOrReturnError(VerifyClusterPathsValid(), CHIP_ERROR_INCORRECT_STATE);
+        auto path = mCluster->GetPaths()[0];
+        const app::DataModel::InvokeRequest request = { .path = { path.mEndpointId, path.mClusterId, commandId } };
 
         constexpr size_t kTlvBufferSize = 128; // Typically CommanderSender will use a TLV of size kMaxSecureSduLengthBytes. For
                                                // now, just use 128 for the unit test.
@@ -146,47 +149,8 @@ public:
         return mCluster->InvokeCommand(request, tlvReader, handler);
     }
 
-    // Compare the attributes of the cluster against the expected set.
-    // Will use the first path returned by `GetPaths()` on the cluster.
-    // @returns `false` if `GetPaths()` returned an empty list.
-    bool TestAttributesList(Span<app::DataModel::AttributeEntry> expected)
-    {
-        VerifyOrReturnValue(verifyClusterPathsValid(), false);
-        auto path = mCluster->GetPaths()[0];
-        ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> attributesBuilder;
-        if (mCluster->Attributes(path, attributesBuilder) != CHIP_NO_ERROR)
-            return false;
-        return Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expected);
-    }
-
-    // Compare the accepted commands of the cluster against the expected set.
-    // Will use the first path returned by `GetPaths()` on the cluster.
-    // @returns `false` if `GetPaths()` returned an empty list.
-    bool TestAcceptedCommandsList(Span<app::DataModel::AcceptedCommandEntry> expected)
-    {
-        VerifyOrReturnValue(verifyClusterPathsValid(), false);
-        auto path = mCluster->GetPaths()[0];
-        ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> commandsBuilder;
-        if (mCluster->AcceptedCommands(path, commandsBuilder) != CHIP_NO_ERROR)
-            return false;
-        return Testing::EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expected);
-    }
-
-    // Compare the generated commands of the cluster against the expected set.
-    // Will use the first path returned by `GetPaths()` on the cluster.
-    // @returns `false` if `GetPaths()` returned an empty list.
-    bool TestGeneratedCommandsList(Span<CommandId> expected)
-    {
-        VerifyOrReturnValue(verifyClusterPathsValid(), false);
-        auto path = mCluster->GetPaths()[0];
-        ReadOnlyBufferBuilder<CommandId> commandsBuilder;
-        if (mCluster->GeneratedCommands(path, commandsBuilder) != CHIP_NO_ERROR)
-            return false;
-        return Testing::EqualGeneratedCommandSets(commandsBuilder.TakeBuffer(), expected);
-    }
-
 private:
-    bool verifyClusterPathsValid()
+    bool VerifyClusterPathsValid()
     {
         auto paths = mCluster->GetPaths();
         if (paths.size() == 0)

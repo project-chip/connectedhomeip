@@ -108,7 +108,9 @@ public:
     [[nodiscard]] std::optional<EventInformation> GetNextEvent()
     {
         if (mEventQueue.empty())
+        {
             return std::nullopt;
+        }
         std::optional<EventInformation> info{ std::move(mEventQueue.front()) };
         mEventQueue.pop_front();
         return info;

@@ -21,6 +21,7 @@ source_set("testing") {
     "AttributeTesting.cpp",
     "AttributeTesting.h",
     "ClusterTester.h",
+    "ValidateGlobalAttributes.h"
   ]
 
   public_deps = [
