@@ -232,7 +232,7 @@ void UDPEndPointImplLwIP::CloseImpl()
                 // The original endpoint this Unref was intended for is already gone.
                 return;
             }
-            
+
             Unref();
         });
         if (err != CHIP_NO_ERROR)
@@ -395,9 +395,9 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
     uint32_t expectedInstanceId = ep->mInstanceId.load();
     CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda(
         [ep, pcb, expectedInstanceId, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf), pktInfo = pktInfo.get()] {
-            
+
             // Critical check: Verify this lambda is for the correct endpoint instance
-            // by comparing the instance ID. If they don't match, the endpoint was 
+            // by comparing the instance ID. If they don't match, the endpoint was
             // deleted and recreated at the same memory address.
             if (ep->mInstanceId.load() != expectedInstanceId)
             {
@@ -406,7 +406,7 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
                 pbuf_free(p);
                 return;
             }
-    
+
             ep->mDelayReleaseCount--;
 
             auto handle = System::PacketBufferHandle::Adopt(p);
