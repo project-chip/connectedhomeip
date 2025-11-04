@@ -17,8 +17,8 @@
 import json
 import logging
 import os
-import sys
 import shutil
+import sys
 
 import click
 import coloredlogs
