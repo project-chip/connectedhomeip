@@ -127,7 +127,7 @@ public:
 
 private:
     CHIP_ERROR SetTrustedTimeSource(const DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & tts);
-    CHIP_ERROR SetDefaultNTP(const DataModel::Nullable<CharSpan> & dntp);
+    inline CHIP_ERROR SetDefaultNTP(const DataModel::Nullable<CharSpan> & dntp);
     void InitTimeZone();
     CHIP_ERROR SetTimeZone(const DataModel::DecodableList<TimeSynchronization::Structs::TimeZoneStruct::Type> & tzL);
     CHIP_ERROR LoadTimeZone();
@@ -137,10 +137,10 @@ private:
     CHIP_ERROR LoadDSTOffset();
     CHIP_ERROR ClearDSTOffset();
 
-    const DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & GetTrustedTimeSource() const;
-    Span<TimeSyncDataProvider::TimeZoneStore> & GetTimeZone();
-    DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> & GetDSTOffset();
-    CHIP_ERROR GetDefaultNtp(MutableCharSpan & dntp);
+    inline const DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & GetTrustedTimeSource() const;
+    inline Span<TimeSyncDataProvider::TimeZoneStore> & GetTimeZone();
+    inline DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> & GetDSTOffset();
+    inline CHIP_ERROR GetDefaultNtp(MutableCharSpan & dntp);
     CHIP_ERROR SetUTCTime(uint64_t utcTime, TimeSynchronization::GranularityEnum granularity,
                           TimeSynchronization::TimeSourceEnum source);
     CHIP_ERROR GetLocalTime(DataModel::Nullable<uint64_t> & localTime);
@@ -149,8 +149,8 @@ private:
 
     TimeSynchronization::TimeState UpdateTimeZoneState();
     TimeSynchronization::TimeState UpdateDSTOffsetState();
-    TimeSynchronization::TimeSyncEventFlag GetEventFlag() const;
-    void ClearEventFlag(TimeSynchronization::TimeSyncEventFlag flag);
+    inline TimeSynchronization::TimeSyncEventFlag GetEventFlag() const;
+    inline void ClearEventFlag(TimeSynchronization::TimeSyncEventFlag flag);
 
     static constexpr size_t kMaxDefaultNTPSize = 128;
     DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> mTrustedTimeSource;
