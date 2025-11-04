@@ -581,6 +581,9 @@ class TC_TSTAT_2_2(MatterBaseTest):
                 finally:
                     await self.write_setpoint(cluster.Attributes.MinSetpointDeadBand, MinSetpointDeadBandValue // 10)
 
+                # Test Harness restores the original value of MinSetpointDeadBand
+                await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(MinSetpointDeadBandValue / 10), endpoint_id=endpoint)
+
         self.step("11b")
         if self.pics_guard(hasAutoModeFeature and self.check_pics("TSTAT.S.M.MinSetpointDeadBandWritable")):
             # These are invalid deadbands, so despite it not really being "writeable", these calls should fail anyway
@@ -594,6 +597,9 @@ class TC_TSTAT_2_2(MatterBaseTest):
                 await self.write_setpoint(cluster.Attributes.MinSetpointDeadBand, 127)
             finally:
                 await self.write_setpoint(cluster.Attributes.MinSetpointDeadBand, MinSetpointDeadBandValue // 10)
+
+            # Test Harness restores the original value of MinSetpointDeadBand
+            await self.write_single_attribute(attribute_value=cluster.Attributes.MinSetpointDeadBand(MinSetpointDeadBandValue / 10), endpoint_id=endpoint)
 
         self.step("12")
         if self.pics_guard(hasCoolingFeature and not hasHeatingFeature):

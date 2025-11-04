@@ -42,6 +42,7 @@ using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace Protocols::InteractionModel;
 
+
 // IMPORTANT NOTE:
 // No Side effects are permitted in emberAfThermostatClusterServerPreAttributeChangedCallback
 // If a setpoint changes is required as a result of setpoint limit change
