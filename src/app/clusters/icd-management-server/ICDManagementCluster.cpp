@@ -453,7 +453,9 @@ void MatterIcdManagementPluginServerInitCallback()
 
     // Configure ICD Management
     ICDManagementServer::GetInstance().Init(storage, symmetricKeystore, icdConfigurationData);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     chip::Server::GetInstance().GetICDManager().RegisterObserver(&ICDManagementServer::GetInstance());
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
 void MatterIcdManagementPluginServerShutdownCallback()
@@ -464,5 +466,7 @@ void MatterIcdManagementPluginServerShutdownCallback()
     FabricTable & fabricTable = Server::GetInstance().GetFabricTable();
     fabricTable.RemoveFabricDelegate(&gFabricDelegate);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     chip::Server::GetInstance().GetICDManager().ReleaseObserver(&ICDManagementServer::GetInstance());
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 }
