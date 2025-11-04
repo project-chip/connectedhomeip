@@ -41,9 +41,7 @@ if (chip_enable_wifi && !wifi_soc && !sl_build_unit_tests) {
   assert(use_wf200 || use_SiWx917)
   import("${chip_root}/src/platform/silabs/wifi/args.gni")
 
-  if (use_SiWx917) {
-    import("${silabs_platform_dir}/wifi/SiWx/ncp/args.gni")
-  } else if (use_wf200) {
+ if (use_wf200) {
     import("${silabs_platform_dir}/wifi/wf200/wf200.gni")
   }
 }
@@ -56,11 +54,6 @@ config("wifi-platform-config") {
     defines += [ "WIFI_DEBUG_ENABLED=1" ]
   } else {
     defines += [ "WIFI_DEBUG_ENABLED=0" ]
-  }
-
-  if (use_SiWx917) {
-    # All the stuff from wifisdk
-    include_dirs += siwx_ncp_inc_plat
   }
 
   if (chip_default_wifi_ssid != "") {
@@ -121,10 +114,11 @@ source_set("wifi-platform") {
   ]
 
   if (use_SiWx917) {
-    sources += siwx_ncp_src_plat
-
-    # All the stuff from wifisdk
-    sources += siwx_ncp_src_si91x
+    public_deps += [ "${silabs_platform_dir}/wifi/SiWx/ncp:siwx-ncp" ]
+    sources += [
+      "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp",
+      "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.h",
+    ]
   } else if (use_wf200) {
     sources += wf200_plat_src
   }
