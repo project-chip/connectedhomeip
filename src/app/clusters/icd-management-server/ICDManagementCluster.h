@@ -67,12 +67,12 @@ public:
      */
     Protocols::InteractionModel::Status
     RegisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                   const Clusters::IcdManagement::Commands::RegisterClient::DecodableType & commandData,
+                   const IcdManagement::Commands::RegisterClient::DecodableType & commandData,
                    uint32_t & icdCounter);
 
     Protocols::InteractionModel::Status
     UnregisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                     const Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
+                     const IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 private:
