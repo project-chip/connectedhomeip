@@ -82,6 +82,7 @@ class Context:
             shutil.rmtree(builder.output_dir, ignore_errors=True)
 
     def Generate(self):
+        self.runner.StartCommandExecution()
         for builder in set(self.builders.values()):
             builder.generate()
 
