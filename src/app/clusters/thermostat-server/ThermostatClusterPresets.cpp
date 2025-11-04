@@ -18,6 +18,7 @@
 #include "ThermostatClusterPresets.h"
 #include "Setpoints.h"
 #include "ThermostatCluster.h"
+#include "ThermostatClusterSetpoints.h"
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 

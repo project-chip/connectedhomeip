@@ -661,7 +661,6 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
     commandObj->AddStatus(commandPath, Thermostat::SetpointRaiseLower(commandPath.mEndpointId, commandData));
     return true;
 }
-
 void MatterThermostatPluginServerInitCallback()
 {
     TEMPORARY_RETURN_IGNORED Server::GetInstance().GetFabricTable().AddFabricDelegate(&gThermostatAttrAccess);
