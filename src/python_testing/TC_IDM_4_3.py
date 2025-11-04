@@ -82,39 +82,30 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         self.build_spec_xmls()
 
     def steps_TC_IDM_4_3(self):
-        return [TestStep(1, "DUT and TH activate the subscription for an attribute. Do not change the value of the attribute which has been subscribed.",
+        return [
+                TestStep(1, "DUT and TH activate the subscription for an attribute. Do not change the value of the attribute which has been subscribed.",
                          "Verify that there is an empty report data message sent from the DUT to the TH after the MinInterval time and no later than the MaxInterval time plus an additional duration equal to the total retransmission time according to negotiated MRP parameters."),
-                TestStep(2, "Activate the subscription between the DUT and the TH for an attribute of data type bool. If no such attribute exists, skip this step.",
-                         "Verify the subscription was successfully activated and a priming data report was sent"),
-                TestStep(3, "Activate the subscription between the DUT and the TH for an attribute of data type string. If no such attribute exists, skip this step.",
-                         "Verify the subscription was successfully activated and a priming data report was sent"),
-                TestStep(4, "Activate the subscription between the DUT and the TH for an attribute of data type unsigned integer. If no such attribute exists, skip this step.",
-                         "Verify the subscription was successfully activated and a priming data report was sent"),
-                TestStep(5, "Activate the subscription between the DUT and the TH for an attribute of data type signed integer. If no such attribute exists, skip this step.",
-                         "Verify the subscription was successfully activated and a priming data report was sent"),
-                TestStep(6, "Activate the subscription between the DUT and the TH for an attribute of data type floating point. If no such attribute exists, skip this step.",
-                         "Verify the subscription was successfully activated and a priming data report was sent"),
-                TestStep(7, "Activate the subscription between the DUT and the TH for an attribute of data type list. If no such attribute exists, skip this step.",
-                         "Verify the subscription was successfully activated and a priming data report was sent"),
-                TestStep(8, "Activate the subscription between the DUT and the TH for any attribute. KeepSubscriptions flag should be set to False Save the returned MaxInterval value as original_max_interval TH then sends another subscription request message for the same attribute with different parameters than before. KeepSubscriptions flag should be set to False Wait for original_max_interval. Change the value of the attribute requested on the DUT.",
+                TestStep(2, "Activate the subscription between the DUT and the TH for an attribute. Change the value of the attribute which has been subscribed on the DUT by sending a Write command from the TH.",
+                        "Verify that there is a report data message sent from the DUT for the changed value of the attribute. Verify that the Report Data is sent after the MinIntervalFloor time is reached and before the MaxInterval time."),
+                TestStep(3, "Activate the subscription between the DUT and the TH for any attribute. KeepSubscriptions flag should be set to False Save the returned MaxInterval value as original_max_interval TH then sends another subscription request message for the same attribute with different parameters than before. KeepSubscriptions flag should be set to False Wait for original_max_interval. Change the value of the attribute requested on the DUT.",
                          "Verify that the DUT sends the changed value of the attribute with the newest subscription id sent with the second request."),
-                TestStep(9, "Activate the subscription between the DUT and the TH for any attribute with MinIntervalFloor set to 5 seconds and MaxIntervalCeiling set to 10. Save the returned MaxInterval as max_interval. Wait to receive the empty report on the subscription and save the time the report was received as time_empty. TH then changes the attribute and waits for a data report. Save the time the report was received as time_data. TH then waits for a second empty report on the subscription and saves the time the report was received as time_empty_2",
+                TestStep(4, "Activate the subscription between the DUT and the TH for any attribute with MinIntervalFloor set to 5 seconds and MaxIntervalCeiling set to 10. Save the returned MaxInterval as max_interval. Wait to receive the empty report on the subscription and save the time the report was received as time_empty. TH then changes the attribute and waits for a data report. Save the time the report was received as time_data. TH then waits for a second empty report on the subscription and saves the time the report was received as time_empty_2",
                          "Verify that time_data - time_empty is larger than the MinIntervalFloor and smaller than max_interval plus an additional duration equal to the total retransmission time according to negotiated MRP parameters. Verify that time_empty_2 - time_data is larger than the MinIntervalFloor and smaller than max_interval plus an additional duration equal to the total retransmission time according to negotiated MRP parameters."),
-                TestStep(10, "TH sends a subscription request action for an attribute to the DUT with the KeepSubscriptions flag set to False. Activate the subscription between DUT and the TH. Initiate another subscription request action to the DUT for another attribute with the KeepSubscriptions flag set to True. Change both the attribute values on the DUT.",
+                TestStep(5, "TH sends a subscription request action for an attribute to the DUT with the KeepSubscriptions flag set to False. Activate the subscription between DUT and the TH. Initiate another subscription request action to the DUT for another attribute with the KeepSubscriptions flag set to True. Change both the attribute values on the DUT.",
                          "Verify that the TH receives reports for both these attributes on their respective subscriptions."),
-                TestStep(11, "TH sends a subscription request action for an attribute to the DUT with the KeepSubscriptions flag set to False. Activate the subscription between DUT and the TH. Initiate another subscription request action to the DUT for another attribute with the KeepSubscriptions flag set to False. Change both the attribute values on the DUT.",
+                TestStep(6, "TH sends a subscription request action for an attribute to the DUT with the KeepSubscriptions flag set to False. Activate the subscription between DUT and the TH. Initiate another subscription request action to the DUT for another attribute with the KeepSubscriptions flag set to False. Change both the attribute values on the DUT.",
                          "Verify that the TH receives a report for the second attribute on the second subscription. Verify that that the TH does not receive a report on the first subscription."),
-                TestStep(12, "TH sends a subscription request action for an attribute and all events. Change the value of the attribute and trigger an action on the DUT to trigger any event.",
+                TestStep(7, "TH sends a subscription request action for an attribute and all events. Change the value of the attribute and trigger an action on the DUT to trigger any event.",
                          "Verify on TH that DUT sends a report action data for both the attribute and the event."),
-                TestStep(13, "TH sends a subscription request action for attribute wildcard - AttributePath = [[Endpoint = EndpointID, Cluster = ClusterID]] for a cluster where more than 1 attribute can be changed by the TH. Change all or few of the attributes on the DUT",
+                TestStep(8, "TH sends a subscription request action for attribute wildcard - AttributePath = [[Endpoint = EndpointID, Cluster = ClusterID]] for a cluster where more than 1 attribute can be changed by the TH. Change all or few of the attributes on the DUT",
                          "Verify that the DUT sends reports for all the attributes that have changed."),
-                TestStep(14, "TH sends a subscription request to subscribe to an attribute on a specific cluster from all endpoints AttributePath = [[Attribute = Attribute, Cluster = ClusterID ]]. Change the attribute on the DUT",
+                TestStep(9, "TH sends a subscription request to subscribe to an attribute on a specific cluster from all endpoints AttributePath = [[Attribute = Attribute, Cluster = ClusterID ]]. Change the attribute on the DUT",
                          "Verify that the DUT sends a priming reports for all the attributes."),
-                TestStep(15, "TH sends a subscription request to subscribe to all attributes from all clusters from all endpoints. AttributePath = [[]]. Change all or few of the attributes on the DUT",
+                TestStep(10, "TH sends a subscription request to subscribe to all attributes from all clusters from all endpoints. AttributePath = [[]]. Change all or few of the attributes on the DUT",
                          "Verify that the DUT sends reports for all the attributes that have changed."),
-                TestStep(16, "TH sends a sub scription request to subscribe to all attributes from all clusters on an endpoint. AttributePath = [[Endpoint = EndpointID]]. Change all or few of the attributes on the DUT",
+                TestStep(11, "TH sends a sub scription request to subscribe to all attributes from all clusters on an endpoint. AttributePath = [[Endpoint = EndpointID]]. Change all or few of the attributes on the DUT",
                          "Verify that the DUT sends reports for all the attributes that have changed."),
-                TestStep(17, "TH sends a subscription request to subscribe to all attributes from a specific cluster on all endpoints. AttributePath = [[Cluster = ClusterID]].",
+                TestStep(12, "TH sends a subscription request to subscribe to all attributes from a specific cluster on all endpoints. AttributePath = [[Cluster = ClusterID]].",
                          "Verify that the DUT sends a priming reports for all the attributes."),
                 ]
 
@@ -157,30 +148,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             all_attributes_of_type = [attribute for attribute in all_attributes if attribute.attribute_type ==
                                       ClusterObjects.ClusterObjectFieldDescriptor(Type=desired_type)]
         return all_attributes_of_type
-
-    async def find_attribute_of_type(self, attribute_type: type) -> Optional[tuple]:
-        """Find an attribute of the specified type on the device.
-
-        Returns: tuple of (cluster, attribute, endpoint) if found, None otherwise.
-
-        This function was created by Raul to find an attribute of a specific type on the device.
-        """
-        for cluster in self.device_clusters:
-            all_types = await self.all_type_attributes_for_cluster(cluster, attribute_type)
-
-            if all_types:
-                chosen_attribute = all_types[0]
-                chosen_cluster = Clusters.ClusterObjects.ALL_CLUSTERS[chosen_attribute.cluster_id]
-
-                # Find endpoint where this cluster/attribute exists
-                for endpoint in self.endpoints:
-                    if (chosen_cluster in self.endpoints[endpoint]) and (chosen_attribute in self.endpoints[endpoint][chosen_cluster]):
-                        logging.info(
-                            f"Found attribute of type {attribute_type.__name__}: {chosen_attribute} on endpoint {endpoint}")
-                        return chosen_cluster, chosen_attribute, endpoint
-
-        logging.info(f"No attribute of type {attribute_type.__name__} found on device")
-        return None
 
     # Test configuration
     min_interval_floor_sec: int = 1
@@ -390,7 +357,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         # Wait for change reports to arrive
         # Reports should arrive within MaxInterval per subscription parameters
-        wait_time = self.max_interval_ceiling_sec + 2
+        wait_time = self.max_interval_ceiling_sec
         time.sleep(wait_time)
 
         # Verify we received reports for the changed attributes
@@ -450,46 +417,15 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             logging.info(f"{test_step}: Returning changed_count as fallback: {changed_count}")
             return changed_count
 
-    async def subscribe_to_attribute_type_and_verify(self, attribute_type: type, type_name: str):
-        """Helper method to subscribe to an attribute of specific type and verify success."""
-        result = await self.find_attribute_of_type(attribute_type)
-
-        if result is None:
-            logging.info(f"No attribute of type '{type_name}' found, skipping step")
-            return
-
-        cluster, attribute, endpoint = result
-
-        try:
-            subscription = await self.default_controller.ReadAttribute(
-                nodeid=self.dut_node_id,
-                attributes=[(endpoint, attribute)],
-                reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
-                keepSubscriptions=False,
-                fabricFiltered=False
-            )
-            self._init_subscription_callback(subscription)
-
-            asserts.assert_is_not_none(
-                subscription.subscriptionId,
-                f"Subscription activation to attribute of type '{type_name}' was unsuccessful"
-            )
-
-            subscription.Shutdown()
-        except Exception as e:
-            logging.warning(f"Failed to subscribe to attribute of type '{type_name}' ({attribute}): {e}. Skipping.")
-
     @async_test_body
     async def test_TC_IDM_4_3(self):
-        await self.setup_class_helper(allow_pase=False)
-
         self.device_clusters = self.all_device_clusters()
         node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel
         TH: ChipDeviceController = self.default_controller
 
         # Step 1: Empty report verification
+        # (This was originally test step 3 in the test plan it appears)
         self.step(1)
-
         # Track empty report arrival time
         # This callback mechanism was created by Raul to enable precise timing validation
         # of empty reports (SubscriptionStillActive messages) per Matter spec requirements
@@ -553,39 +489,16 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         await attr_handler_step1.cancel()
 
-        # Step 2: Bool attribute subscription
+        # New Step 2: Basic attribute change and report timing
+        # (This was originally test step 2 in the test plan)
         self.step(2)
-        await self.subscribe_to_attribute_type_and_verify(bool, "bool")
 
-        # Step 3: String attribute subscription
-        self.step(3)
-        await self.subscribe_to_attribute_type_and_verify(str, "string")
-
-        # Step 4: Unsigned integer attribute subscription
-        self.step(4)
-        await self.subscribe_to_attribute_type_and_verify(int, "unsigned integer")
-
-        # Step 5: Signed integer attribute subscription
-        self.step(5)
-        await self.subscribe_to_attribute_type_and_verify(int, "signed integer")
-
-        # Step 6: Floating point attribute subscription
-        self.step(6)
-        await self.subscribe_to_attribute_type_and_verify(float, "floating point")
-
-        # Step 7: List attribute subscription
-        self.step(7)
-        await self.subscribe_to_attribute_type_and_verify(list, "list")
-
-        # Step 8: Multiple subscriptions with KeepSubscriptions=False
-        self.step(8)
-
-        # First subscription with handler
-        attr_handler_step8_first = AttributeSubscriptionHandler(
+        attr_handler_step2 = AttributeSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation,
             expected_attribute=node_label_attr
         )
-        sub_step8_first = await attr_handler_step8_first.start(
+
+        sub_step2 = await attr_handler_step2.start(
             dev_ctrl=TH,
             node_id=self.dut_node_id,
             endpoint=self.root_node_endpoint,
@@ -594,17 +507,78 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             max_interval_sec=self.max_interval_ceiling_sec,
             keepSubscriptions=False
         )
-        self._init_subscription_callback(sub_step8_first)
+        self._init_subscription_callback(sub_step2)
 
-        first_sub_id = sub_step8_first.subscriptionId
-        _, original_max_interval_sec = sub_step8_first.GetReportingIntervalsSeconds()
+        # Flush priming report
+        attr_handler_step2.flush_reports()
 
-        # Second subscription with different parameters (this should replace the first)
-        attr_handler_step8_second = AttributeSubscriptionHandler(
+        # Record time before write
+        time_before_write = time.time()
+
+        # Change attribute via Write command
+        new_label = "TestLabel_Step2"
+        await TH.WriteAttribute(
+            self.dut_node_id,
+            [(self.root_node_endpoint, node_label_attr(value=new_label))]
+        )
+
+        # Wait for change report
+        timeout = self.max_interval_ceiling_sec + 2
+        wait_start = time.time()
+        report_received = False
+
+        while time.time() - wait_start < timeout:
+            if attr_handler_step2.attribute_queue.qsize() > 0:
+                report = attr_handler_step2.attribute_queue.get()
+                time_report = time.time()
+                report_received = True
+                break
+            time.sleep(0.1)
+
+        asserts.assert_true(report_received, "Failed to receive attribute change report")
+
+        # Verify timing: report should come after MinInterval
+        report_delay = time_report - time_before_write
+        asserts.assert_greater_equal(
+            report_delay, self.min_interval_floor_sec,
+            f"Report came too early ({report_delay}s < MinInterval {self.min_interval_floor_sec}s)"
+        )
+        asserts.assert_less(
+            report_delay, self.max_interval_ceiling_sec + 2,
+            f"Report came too late ({report_delay}s > MaxInterval {self.max_interval_ceiling_sec}s)"
+        )
+
+        await attr_handler_step2.cancel()
+
+        # Step 3: Multiple subscriptions with KeepSubscriptions=False
+        # (This was originally test step 11 in the test plan)
+        self.step(3)
+
+        # First subscription with handler
+        attr_handler_step3_first = AttributeSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation,
             expected_attribute=node_label_attr
         )
-        sub_step8_second = await attr_handler_step8_second.start(
+        sub_step3_first = await attr_handler_step3_first.start(
+            dev_ctrl=TH,
+            node_id=self.dut_node_id,
+            endpoint=self.root_node_endpoint,
+            fabric_filtered=False,
+            min_interval_sec=self.min_interval_floor_sec,
+            max_interval_sec=self.max_interval_ceiling_sec,
+            keepSubscriptions=False
+        )
+        self._init_subscription_callback(sub_step3_first)
+
+        first_sub_id = sub_step3_first.subscriptionId
+        _, original_max_interval_sec = sub_step3_first.GetReportingIntervalsSeconds()
+
+        # Second subscription with different parameters (this should replace the first)
+        attr_handler_step3_second = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.BasicInformation,
+            expected_attribute=node_label_attr
+            )
+        sub_step3_second = await attr_handler_step3_second.start(
             dev_ctrl=TH,
             node_id=self.dut_node_id,
             endpoint=self.root_node_endpoint,
@@ -612,19 +586,19 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             min_interval_sec=self.min_interval_floor_sec + 1,
             max_interval_sec=self.max_interval_ceiling_sec + 1,
             keepSubscriptions=False
-        )
-        self._init_subscription_callback(sub_step8_second)
+            )
+        self._init_subscription_callback(sub_step3_second)
 
-        second_sub_id = sub_step8_second.subscriptionId
+        second_sub_id = sub_step3_second.subscriptionId
 
         # Verify different subscription IDs
         asserts.assert_not_equal(first_sub_id, second_sub_id, "Subscription IDs should be different")
 
         # Flush priming reports
-        attr_handler_step8_second.flush_reports()
+        attr_handler_step3_second.flush_reports()
 
         # Change the attribute
-        new_label = "TestLabel_Step8"
+        new_label = "TestLabel_Step3"
         await TH.WriteAttribute(
             self.dut_node_id,
             [(self.root_node_endpoint, node_label_attr(value=new_label))]
@@ -634,50 +608,51 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         time.sleep(original_max_interval_sec + 1)
 
         # Verify we got a report on second subscription
-        asserts.assert_greater(attr_handler_step8_second.attribute_queue.qsize(), 0,
+        asserts.assert_greater(attr_handler_step3_second.attribute_queue.qsize(), 0,
                                "Should receive report on second subscription")
 
         # First subscription should have been cancelled (no new reports after attribute change)
         # Note: The first handler may still have the priming report but no update
 
-        await attr_handler_step8_second.cancel()
+        await attr_handler_step3_second.cancel()
 
-        # Step 9: MinInterval/MaxInterval timing validation
-        self.step(9)
+        # Step 4: MinInterval/MaxInterval timing validation
+        # (This was originally test steps 12 and 13 in the test plan, just appears to have been combined into one test step, which was a wise design decision)
+        self.step(4)
 
-        min_interval_step9 = 5
-        max_interval_step9 = 10
+        min_interval_step4 = 5
+        max_interval_step4 = 10
 
-        attr_handler_step9 = AttributeSubscriptionHandler(
+        attr_handler_step4 = AttributeSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation,
             expected_attribute=node_label_attr
         )
 
-        sub_step9 = await attr_handler_step9.start(
+        sub_step4 = await attr_handler_step4.start(
             dev_ctrl=TH,
             node_id=self.dut_node_id,
             endpoint=self.root_node_endpoint,
             fabric_filtered=False,
-            min_interval_sec=min_interval_step9,
-            max_interval_sec=max_interval_step9,
+            min_interval_sec=min_interval_step4,
+            max_interval_sec=max_interval_step4,
             keepSubscriptions=False
         )
-        self._init_subscription_callback(sub_step9)
+        self._init_subscription_callback(sub_step4)
 
-        _, max_interval = sub_step9.GetReportingIntervalsSeconds()
+        _, max_interval = sub_step4.GetReportingIntervalsSeconds()
 
         # Flush the priming report from the queue
-        attr_handler_step9.flush_reports()
+        attr_handler_step4.flush_reports()
 
         # Wait for first empty report and capture its time
         time.sleep(max_interval + 1)
         time_empty = time.time()
 
         # Change attribute
-        new_label_step9 = "TestLabel_Step9"
+        new_label_step4 = "TestLabel_Step4"
         await TH.WriteAttribute(
             self.dut_node_id,
-            [(self.root_node_endpoint, node_label_attr(value=new_label_step9))]
+            [(self.root_node_endpoint, node_label_attr(value=new_label_step4))]
         )
 
         # Wait for change report - give it enough time considering MinInterval
@@ -686,8 +661,8 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         timeout = max_interval + 5  # Add buffer for retransmission
 
         while time.time() - wait_start < timeout:
-            if attr_handler_step9.attribute_queue.qsize() > 0:
-                _ = attr_handler_step9.attribute_queue.get()
+            if attr_handler_step4.attribute_queue.qsize() > 0:
+                _ = attr_handler_step4.attribute_queue.get()
                 time_data = time.time()
                 report_received = True
                 break
@@ -696,7 +671,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         asserts.assert_true(report_received, "Failed to receive attribute change report")
 
         # Flush queue before waiting for next empty report
-        attr_handler_step9.flush_reports()
+        attr_handler_step4.flush_reports()
 
         # Wait for second empty report
         time.sleep(max_interval + 1)
@@ -770,56 +745,57 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         diff_1 = time_data - time_empty
         diff_2 = time_empty_2 - time_data
 
-        asserts.assert_greater(diff_1, min_interval_step9,
-                               f"First report interval ({diff_1}s) should be greater than MinInterval ({min_interval_step9}s)")
+        asserts.assert_greater(diff_1, min_interval_step4,
+                               f"First report interval ({diff_1}s) should be greater than MinInterval ({min_interval_step4}s)")
         asserts.assert_less(diff_1, max_interval + MRP_RETRANSMISSION_TIMEOUT,
                             f"First report interval ({diff_1}s) should be less than MaxInterval + MRP retransmission time ({max_interval + MRP_RETRANSMISSION_TIMEOUT}s)")
 
-        asserts.assert_greater(diff_2, min_interval_step9,
-                               f"Second report interval ({diff_2}s) should be greater than MinInterval ({min_interval_step9}s)")
+        asserts.assert_greater(diff_2, min_interval_step4,
+                               f"Second report interval ({diff_2}s) should be greater than MinInterval ({min_interval_step4}s)")
         asserts.assert_less(diff_2, max_interval + MRP_RETRANSMISSION_TIMEOUT,
                             f"Second report interval ({diff_2}s) should be less than MaxInterval + MRP retransmission time ({max_interval + MRP_RETRANSMISSION_TIMEOUT}s)")
 
-        await attr_handler_step9.cancel()
+        await attr_handler_step4.cancel()
 
-        # Step 10: KeepSubscriptions=True preserves first subscription
-        self.step(10)
+        # Step 5: KeepSubscriptions=True preserves first subscription
+        # (This was originally test step 14 in the test plan)
+        self.step(5)
 
         # Find a second writable attribute for testing
         breadcrumb_attr = Clusters.GeneralCommissioning.Attributes.Breadcrumb
 
         # First subscription with KeepSubscriptions=False
-        attr_handler_step10_first = AttributeSubscriptionHandler(
+        attr_handler_step5_first = AttributeSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation,
             expected_attribute=node_label_attr
         )
-        sub_step10_first = await attr_handler_step10_first.start(
+        sub_step5_first = await attr_handler_step5_first.start(
             dev_ctrl=TH,
             node_id=self.dut_node_id,
             endpoint=self.root_node_endpoint,
             fabric_filtered=False,
             keepSubscriptions=False
         )
-        self._init_subscription_callback(sub_step10_first)
+        self._init_subscription_callback(sub_step5_first)
 
         # Second subscription with KeepSubscriptions=True
-        attr_handler_step10_second = AttributeSubscriptionHandler(
+        attr_handler_step5_second = AttributeSubscriptionHandler(
             expected_cluster=Clusters.GeneralCommissioning,
             expected_attribute=breadcrumb_attr
         )
-        sub_step10_second = await attr_handler_step10_second.start(
+        sub_step5_second = await attr_handler_step5_second.start(
             dev_ctrl=TH,
             node_id=self.dut_node_id,
             endpoint=self.root_node_endpoint,
             fabric_filtered=False,
             keepSubscriptions=True
         )
-        self._init_subscription_callback(sub_step10_second)
+        self._init_subscription_callback(sub_step5_second)
 
         # Change both attributes
         await TH.WriteAttribute(
             self.dut_node_id,
-            [(self.root_node_endpoint, node_label_attr(value="TestLabel_Step10"))]
+            [(self.root_node_endpoint, node_label_attr(value="TestLabel_Step5"))]
         )
         await TH.WriteAttribute(
             self.dut_node_id,
@@ -830,49 +806,50 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         time.sleep(self.max_interval_ceiling_sec + 1)
 
         # Verify both subscriptions received reports
-        asserts.assert_greater(attr_handler_step10_first.attribute_queue.qsize(), 0,
+        asserts.assert_greater(attr_handler_step5_first.attribute_queue.qsize(), 0,
                                "First subscription should receive reports")
-        asserts.assert_greater(attr_handler_step10_second.attribute_queue.qsize(), 0,
+        asserts.assert_greater(attr_handler_step5_second.attribute_queue.qsize(), 0,
                                "Second subscription should receive reports")
 
-        await attr_handler_step10_first.cancel()
-        await attr_handler_step10_second.cancel()
+        await attr_handler_step5_first.cancel()
+        await attr_handler_step5_second.cancel()
 
-        # Step 11: KeepSubscriptions=False cancels first subscription
-        self.step(11)
+        # Step 6: KeepSubscriptions=False cancels first subscription
+        # (This was originally test step 15 in the test plan)
+        self.step(6)
 
         # First subscription with KeepSubscriptions=False
-        attr_handler_step11_first = AttributeSubscriptionHandler(
+        attr_handler_step6_first = AttributeSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation,
             expected_attribute=node_label_attr
         )
-        sub_step11_first = await attr_handler_step11_first.start(
+        sub_step6_first = await attr_handler_step6_first.start(
             dev_ctrl=TH,
             node_id=self.dut_node_id,
             endpoint=self.root_node_endpoint,
             fabric_filtered=False,
             keepSubscriptions=False
         )
-        self._init_subscription_callback(sub_step11_first)
+        self._init_subscription_callback(sub_step6_first)
 
         # Second subscription with KeepSubscriptions=False (should cancel first)
-        attr_handler_step11_second = AttributeSubscriptionHandler(
+        attr_handler_step6_second = AttributeSubscriptionHandler(
             expected_cluster=Clusters.GeneralCommissioning,
             expected_attribute=breadcrumb_attr
         )
-        sub_step11_second = await attr_handler_step11_second.start(
+        sub_step6_second = await attr_handler_step6_second.start(
             dev_ctrl=TH,
             node_id=self.dut_node_id,
             endpoint=self.root_node_endpoint,
             fabric_filtered=False,
             keepSubscriptions=False
         )
-        self._init_subscription_callback(sub_step11_second)
+        self._init_subscription_callback(sub_step6_second)
 
         # Change both attributes
         await TH.WriteAttribute(
             self.dut_node_id,
-            [(self.root_node_endpoint, node_label_attr(value="TestLabel_Step11"))]
+            [(self.root_node_endpoint, node_label_attr(value="TestLabel_Step6"))]
         )
         await TH.WriteAttribute(
             self.dut_node_id,
@@ -883,73 +860,75 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         time.sleep(self.max_interval_ceiling_sec + 1)
 
         # Verify second subscription received reports
-        asserts.assert_greater(attr_handler_step11_second.attribute_queue.qsize(), 0,
+        asserts.assert_greater(attr_handler_step6_second.attribute_queue.qsize(), 0,
                                "Second subscription should receive reports")
 
         # First subscription should not receive reports (it was cancelled)
 
-        await attr_handler_step11_second.cancel()
+        await attr_handler_step6_second.cancel()
 
-        # Step 12: Subscription to attribute and events
-        self.step(12)
+        # Step 7: Subscription to attribute and events
+        # (This was originally test step 16 in the test plan)
+        self.step(7)
 
         # Subscribe to attribute using handler
-        attr_handler_step12 = AttributeSubscriptionHandler(
+        attr_handler_step7 = AttributeSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation,
             expected_attribute=node_label_attr
         )
-        sub_step12_attr = await attr_handler_step12.start(
+        sub_step7_attr = await attr_handler_step7.start(
             dev_ctrl=TH,
             node_id=self.dut_node_id,
             endpoint=self.root_node_endpoint,
             fabric_filtered=False,
             keepSubscriptions=False
         )
-        self._init_subscription_callback(sub_step12_attr)
+        self._init_subscription_callback(sub_step7_attr)
 
         # Subscribe to events - using AccessControl cluster events as an example
-        event_handler_step12 = EventSubscriptionHandler(
+        event_handler_step7 = EventSubscriptionHandler(
             expected_cluster=Clusters.AccessControl
         )
-        sub_step12_event = await event_handler_step12.start(
+        sub_step7_event = await event_handler_step7.start(
             dev_ctrl=TH,
             node_id=self.dut_node_id,
             endpoint=self.root_node_endpoint,
             fabric_filtered=False
         )
-        self._init_subscription_callback(sub_step12_event)
+        self._init_subscription_callback(sub_step7_event)
 
         # Change attribute to trigger report
         await TH.WriteAttribute(
             self.dut_node_id,
-            [(self.root_node_endpoint, node_label_attr(value="TestLabel_Step12"))]
+            [(self.root_node_endpoint, node_label_attr(value="TestLabel_Step7"))]
         )
 
         # Wait for attribute report
         time.sleep(self.max_interval_ceiling_sec + 1)
 
         # Verify attribute report received
-        asserts.assert_greater(attr_handler_step12.attribute_queue.qsize(), 0,
+        asserts.assert_greater(attr_handler_step7.attribute_queue.qsize(), 0,
                                "Should receive attribute report")
 
-        await attr_handler_step12.cancel()
+        await attr_handler_step7.cancel()
 
-        # Step 13: Wildcard subscription (endpoint + cluster)
-        self.step(13)
+        # Step 8: Wildcard subscription (endpoint + cluster)
+        # (This was originally test step 17 in the test plan)
+        self.step(8)
 
         # Subscribe to all attributes in BasicInformation cluster on endpoint 0
         # This wildcard path subscribes to ALL attributes in the cluster
-        sub_step13 = await TH.ReadAttribute(
+        sub_step8 = await TH.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=[(self.root_node_endpoint, Clusters.BasicInformation)],
             reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
             keepSubscriptions=False,
             fabricFiltered=False
         )
-        self._init_subscription_callback(sub_step13)
+        self._init_subscription_callback(sub_step8)
 
         # Verify we got a priming report with multiple attributes
-        priming_data = sub_step13.GetAttributes()
+        priming_data = sub_step8.GetAttributes()
         asserts.assert_in(self.root_node_endpoint, priming_data,
                           "Should have data for endpoint 0")
         asserts.assert_in(Clusters.BasicInformation, priming_data[self.root_node_endpoint],
@@ -962,18 +941,19 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         # Change writable attributes and verify change reports per test spec
         changed_count = await self.change_writable_attributes_and_verify_reports(
-            sub_step13, priming_data, "Step 13"
+            sub_step8, priming_data, "Step 8"
         )
         logging.info(f"Changed and verified {changed_count} attribute(s)")
 
         # Shutdown subscription
-        sub_step13.Shutdown()
+        sub_step8.Shutdown()
 
-        # Step 14: Attribute on cluster from all endpoints
-        self.step(14)
+        # Step 9: Attribute on cluster from all endpoints
+        # (This was originally test step 18 in the test plan)
+        self.step(9)
 
         # Subscribe to NodeLabel attribute from BasicInformation cluster on ALL endpoints
-        sub_step14 = await TH.ReadAttribute(
+        sub_step9 = await TH.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=[AttributePath(
                 ClusterId=Clusters.BasicInformation.id,
@@ -983,10 +963,10 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             keepSubscriptions=False,
             fabricFiltered=False
         )
-        self._init_subscription_callback(sub_step14)
+        self._init_subscription_callback(sub_step9)
 
         # Verify we got priming reports from multiple endpoints (or at least endpoint 0)
-        priming_data = sub_step14.GetAttributes()
+        priming_data = sub_step9.GetAttributes()
         num_endpoints = len(priming_data)
         asserts.assert_greater_equal(num_endpoints, 1,
                                      "Should receive priming reports for at least one endpoint")
@@ -1000,10 +980,11 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         asserts.assert_true(found_attribute, "Should find NodeLabel attribute in priming report")
 
-        sub_step14.Shutdown()
+        sub_step9.Shutdown()
 
-        # Step 15: All attributes from all clusters from all endpoints
-        self.step(15)
+        # Step 10: All attributes from all clusters from all endpoints
+        # (This was originally test step 19 in the test plan)
+        self.step(10)
         # Subscribe to ALL attributes from ALL clusters on ALL endpoints
         # Note: Some clusters have attributes that don't support subscriptions (INVALID_ACTION) or only support subscriptions in special circumstances:
         # - AccessControl, NetworkCommissioning, CameraAvStreamManagement, OperationalCredentials
@@ -1031,17 +1012,17 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                 # Subscribe to all attributes in this cluster across all endpoints
                 subscription_paths.append(AttributePath(ClusterId=cluster_id))
 
-        sub_step15 = await TH.ReadAttribute(
+        sub_step10 = await TH.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=subscription_paths,
             reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
             keepSubscriptions=False,
             fabricFiltered=False
         )
-        self._init_subscription_callback(sub_step15)
+        self._init_subscription_callback(sub_step10)
 
         # Verify we got priming reports with multiple endpoints, clusters, and attributes
-        priming_data = sub_step15.GetAttributes()
+        priming_data = sub_step10.GetAttributes()
         num_endpoints = len(priming_data)
 
         total_clusters = 0
@@ -1059,38 +1040,39 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # Change writable attributes and verify change reports per test spec
         # Skip problematic clusters we identified earlier
         changed_count = await self.change_writable_attributes_and_verify_reports(
-            sub_step15, priming_data, "Step 15", clusters_to_skip=CLUSTERS_WITH_SUBSCRIPTION_ISSUES
+            sub_step10, priming_data, "Step 10", clusters_to_skip=CLUSTERS_WITH_SUBSCRIPTION_ISSUES
         )
         logging.info(f"Changed and verified {changed_count} attribute(s)")
 
-        sub_step15.Shutdown()
+        sub_step10.Shutdown()
 
-        # Step 16: All attributes from all clusters on an endpoint
-        self.step(16)
+        # Step 11: All attributes from all clusters on an endpoint
+        # (This was originally test step 20 in the test plan)
+        self.step(11)
 
         # Subscribe to all attributes from all clusters on endpoint 0
         # Note: We must exclude clusters with subscription issues
-        subscription_paths_step16 = []
+        subscription_paths_step11 = []
         if self.root_node_endpoint in self.endpoints_tlv:
             for cluster_id in self.endpoints_tlv[self.root_node_endpoint].keys():
                 if cluster_id not in CLUSTERS_WITH_SUBSCRIPTION_ISSUES:
                     # Subscribe to all attributes in this cluster on this endpoint
-                    subscription_paths_step16.append(AttributePath(
+                    subscription_paths_step11.append(AttributePath(
                         EndpointId=self.root_node_endpoint,
                         ClusterId=cluster_id
                     ))
 
-        sub_step16 = await TH.ReadAttribute(
+        sub_step11 = await TH.ReadAttribute(
             nodeid=self.dut_node_id,
-            attributes=subscription_paths_step16,
+            attributes=subscription_paths_step11,
             reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
             keepSubscriptions=False,
             fabricFiltered=False
         )
-        self._init_subscription_callback(sub_step16)
+        self._init_subscription_callback(sub_step11)
 
         # Verify we got priming reports with multiple clusters and attributes
-        priming_data = sub_step16.GetAttributes()
+        priming_data = sub_step11.GetAttributes()
         asserts.assert_in(self.root_node_endpoint, priming_data,
                           f"Should have data for endpoint {self.root_node_endpoint}")
 
@@ -1104,28 +1086,28 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # Change writable attributes and verify change reports per test spec
         # Skip problematic clusters we identified earlier
         changed_count = await self.change_writable_attributes_and_verify_reports(
-            sub_step16, priming_data, "Step 16", clusters_to_skip=CLUSTERS_WITH_SUBSCRIPTION_ISSUES
+            sub_step11, priming_data, "Step 11", clusters_to_skip=CLUSTERS_WITH_SUBSCRIPTION_ISSUES
         )
         logging.info(f"Changed and verified {changed_count} attribute(s)")
 
-        sub_step16.Shutdown()
+        sub_step11.Shutdown()
 
-        # Step 17: All attributes from specific cluster on all endpoints
-        self.step(17)
+        # Step 12: All attributes from specific cluster on all endpoints
+        # (This was originally test step 21 in the test plan)
+        self.step(12)
 
         # Subscribe to all attributes of BasicInformation cluster on ALL endpoints
-        # Use AttributePath with only ClusterId specified to wildcard endpoints and attributes
-        sub_step17 = await TH.ReadAttribute(
+        sub_step12 = await TH.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=[AttributePath(ClusterId=Clusters.BasicInformation.id)],
             reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
             keepSubscriptions=False,
             fabricFiltered=False
         )
-        self._init_subscription_callback(sub_step17)
+        self._init_subscription_callback(sub_step12)
 
         # Verify we got priming reports from multiple endpoints (or at least one)
-        priming_data = sub_step17.GetAttributes()
+        priming_data = sub_step12.GetAttributes()
         num_endpoints = len(priming_data)
 
         total_attributes = 0
@@ -1137,7 +1119,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         asserts.assert_greater_equal(num_endpoints, 1, "Should receive reports from at least one endpoint")
         asserts.assert_greater(total_attributes, 5, "Should receive multiple attributes from BasicInformation cluster")
 
-        sub_step17.Shutdown()
+        sub_step12.Shutdown()
 
 
 if __name__ == "__main__":
